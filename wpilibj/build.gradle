@@ -56,12 +56,13 @@ compileJava {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpimath')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
@@ -69,6 +70,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.27.0'
     devImplementation project(':hal')
     devImplementation project(':wpiutil')
+    devImplementation project(':wpimath')
     devImplementation project(':ntcore')
     devImplementation project(':cscore')
     devImplementation project(':cameraserver')
@@ -110,9 +112,11 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 project(':hal').addHalJniDependency(it)

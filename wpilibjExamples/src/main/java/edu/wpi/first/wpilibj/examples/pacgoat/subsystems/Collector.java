@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
@@ -14,11 +11,10 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
- * The Collector subsystem has one motor for the rollers, a limit switch for
- * ball detection, a piston for opening and closing the claw, and a reed switch
- * to check if the piston is open.
+ * The Collector subsystem has one motor for the rollers, a limit switch for ball detection, a
+ * piston for opening and closing the claw, and a reed switch to check if the piston is open.
  */
-public class Collector extends Subsystem implements AutoCloseable {
+public class Collector extends Subsystem {
   // Constants for some useful speeds
   public static final double kForward = 1;
   public static final double kStop = 0;
@@ -30,9 +26,7 @@ public class Collector extends Subsystem implements AutoCloseable {
   private final DigitalInput m_openDetector = new DigitalInput(6);
   private final Solenoid m_piston = new Solenoid(1, 1);
 
-  /**
-   * Create a new collector subsystem.
-   */
+  /** Create a new collector subsystem. */
   public Collector() {
     // Put everything to the LiveWindow for testing.
     addChild("Roller Motor", (Victor) m_rollerMotor);
@@ -44,9 +38,8 @@ public class Collector extends Subsystem implements AutoCloseable {
   /**
    * Whether or not the robot has the ball.
    *
-   * <p>NOTE: The current simulation model uses the the lower part of the claw
-   * since the limit switch wasn't exported. At some point, this will be
-   * updated.
+   * <p>NOTE: The current simulation model uses the the lower part of the claw since the limit
+   * switch wasn't exported. At some point, this will be updated.
    *
    * @return Whether or not the robot has the ball.
    */
@@ -63,9 +56,7 @@ public class Collector extends Subsystem implements AutoCloseable {
     m_rollerMotor.set(-speed);
   }
 
-  /**
-   * Stop the rollers from spinning.
-   */
+  /** Stop the rollers from spinning. */
   public void stop() {
     m_rollerMotor.set(0);
   }
@@ -79,25 +70,18 @@ public class Collector extends Subsystem implements AutoCloseable {
     return m_openDetector.get(); // TODO: prepend ! to reflect real robot
   }
 
-  /**
-   * Open the claw up (For shooting).
-   */
+  /** Open the claw up (For shooting). */
   public void open() {
     m_piston.set(true);
   }
 
-  /**
-   * Close the claw (For collecting and driving).
-   */
+  /** Close the claw (For collecting and driving). */
   @Override
   public void close() {
     m_piston.set(false);
   }
 
-  /**
-   * No default command.
-   */
+  /** No default command. */
   @Override
-  protected void initDefaultCommand() {
-  }
+  protected void initDefaultCommand() {}
 }

@@ -1,28 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
-import java.util.function.Consumer;
-
 import edu.wpi.first.hal.InterruptJNI;
 import edu.wpi.first.hal.util.AllocationException;
+import java.util.function.Consumer;
 
-
-/**
- * Base for sensors to be used with interrupts.
- */
-@SuppressWarnings("PMD.TooManyMethods")
+/** Base for sensors to be used with interrupts. */
 public abstract class InterruptableSensorBase implements AutoCloseable {
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings("MissingJavadocMethod")
   public enum WaitResult {
-    kTimeout(0x0), kRisingEdge(0x1), kFallingEdge(0x100), kBoth(0x101);
+    kTimeout(0x0),
+    kRisingEdge(0x1),
+    kFallingEdge(0x100),
+    kBoth(0x101);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     WaitResult(int value) {
@@ -42,19 +36,13 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
     }
   }
 
-  /**
-   * The interrupt resource.
-   */
+  /** The interrupt resource. */
   protected int m_interrupt = InterruptJNI.HalInvalidHandle;
 
-  /**
-   * Flags if the interrupt being allocated is synchronous.
-   */
+  /** Flags if the interrupt being allocated is synchronous. */
   protected boolean m_isSynchronousInterrupt;
 
-  /**
-   * Create a new InterrupatableSensorBase.
-   */
+  /** Create a new InterrupatableSensorBase. */
   public InterruptableSensorBase() {
     m_interrupt = 0;
   }
@@ -84,9 +72,8 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
    * @param handler The {@link Consumer} that will be called whenever there is an interrupt on this
-   *                device. Request interrupts in synchronous mode where the user program interrupt
-   *                handler will be called when an interrupt occurs. The default is interrupt on
-   *                rising edges only.
+   *     device. Request interrupts in synchronous mode where the user program interrupt handler
+   *     will be called when an interrupt occurs. The default is interrupt on rising edges only.
    */
   public void requestInterrupts(Consumer<WaitResult> handler) {
     if (m_interrupt != 0) {
@@ -97,26 +84,29 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
 
     assert m_interrupt != 0;
 
-    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-        getAnalogTriggerTypeForRouting());
+    InterruptJNI.requestInterrupts(
+        m_interrupt, getPortHandleForRouting(), getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
-    InterruptJNI.attachInterruptHandler(m_interrupt, (mask, obj) -> {
-      // Rising edge result is the interrupt bit set in the byte 0xFF
-      // Falling edge result is the interrupt bit set in the byte 0xFF00
-      boolean rising = (mask & 0xFF) != 0;
-      boolean falling = (mask & 0xFF00) != 0;
-      handler.accept(WaitResult.getValue(rising, falling));
-    }, null);
+    InterruptJNI.attachInterruptHandler(
+        m_interrupt,
+        (mask, obj) -> {
+          // Rising edge result is the interrupt bit set in the byte 0xFF
+          // Falling edge result is the interrupt bit set in the byte 0xFF00
+          boolean rising = (mask & 0xFF) != 0;
+          boolean falling = (mask & 0xFF00) != 0;
+          handler.accept(WaitResult.getValue(rising, falling));
+        },
+        null);
   }
 
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
    *
    * @param handler The {@link InterruptHandlerFunction} that contains the method {@link
-   *                InterruptHandlerFunction#interruptFired(int, Object)} that will be called
-   *                whenever there is an interrupt on this device. Request interrupts in synchronous
-   *                mode where the user program interrupt handler will be called when an interrupt
-   *                occurs. The default is interrupt on rising edges only.
+   *     InterruptHandlerFunction#interruptFired(int, Object)} that will be called whenever there is
+   *     an interrupt on this device. Request interrupts in synchronous mode where the user program
+   *     interrupt handler will be called when an interrupt occurs. The default is interrupt on
+   *     rising edges only.
    */
   public void requestInterrupts(InterruptHandlerFunction<?> handler) {
     if (m_interrupt != 0) {
@@ -127,11 +117,11 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
 
     assert m_interrupt != 0;
 
-    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-        getAnalogTriggerTypeForRouting());
+    InterruptJNI.requestInterrupts(
+        m_interrupt, getPortHandleForRouting(), getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
-    InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
-        handler.overridableParameter());
+    InterruptJNI.attachInterruptHandler(
+        m_interrupt, handler.m_function, handler.overridableParameter());
   }
 
   /**
@@ -148,17 +138,16 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
 
     assert m_interrupt != 0;
 
-    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-        getAnalogTriggerTypeForRouting());
+    InterruptJNI.requestInterrupts(
+        m_interrupt, getPortHandleForRouting(), getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
-
   }
 
   /**
    * Allocate the interrupt.
    *
    * @param watcher true if the interrupt should be in synchronous mode where the user program will
-   *                have to explicitly wait for the interrupt to occur.
+   *     have to explicitly wait for the interrupt to occur.
    */
   protected void allocateInterrupts(boolean watcher) {
     m_isSynchronousInterrupt = watcher;
@@ -181,9 +170,9 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
   /**
    * In synchronous mode, wait for the defined interrupt to occur.
    *
-   * @param timeout        Timeout in seconds
+   * @param timeout Timeout in seconds
    * @param ignorePrevious If true, ignore interrupts that happened before waitForInterrupt was
-   *                       called.
+   *     called.
    * @return Result of the wait.
    */
   public WaitResult waitForInterrupt(double timeout, boolean ignorePrevious) {
@@ -226,9 +215,7 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
     InterruptJNI.enableInterrupts(m_interrupt);
   }
 
-  /**
-   * Disable Interrupts without without deallocating structures.
-   */
+  /** Disable Interrupts without without deallocating structures. */
   public void disableInterrupts() {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
@@ -270,13 +257,12 @@ public abstract class InterruptableSensorBase implements AutoCloseable {
   /**
    * Set which edge to trigger interrupts on.
    *
-   * @param risingEdge  true to interrupt on rising edge
+   * @param risingEdge true to interrupt on rising edge
    * @param fallingEdge true to interrupt on falling edge
    */
   public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
     if (m_interrupt != 0) {
-      InterruptJNI.setInterruptUpSourceEdge(m_interrupt, risingEdge,
-          fallingEdge);
+      InterruptJNI.setInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge);
     } else {
       throw new IllegalArgumentException("You must call RequestInterrupts before setUpSourceEdge");
     }

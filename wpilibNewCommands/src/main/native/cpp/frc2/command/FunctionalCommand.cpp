@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/FunctionalCommand.h"
 
@@ -32,10 +29,18 @@ FunctionalCommand::FunctionalCommand(std::function<void()> onInit,
   AddRequirements(requirements);
 }
 
-void FunctionalCommand::Initialize() { m_onInit(); }
+void FunctionalCommand::Initialize() {
+  m_onInit();
+}
 
-void FunctionalCommand::Execute() { m_onExecute(); }
+void FunctionalCommand::Execute() {
+  m_onExecute();
+}
 
-void FunctionalCommand::End(bool interrupted) { m_onEnd(interrupted); }
+void FunctionalCommand::End(bool interrupted) {
+  m_onEnd(interrupted);
+}
 
-bool FunctionalCommand::IsFinished() { return m_isFinished(); }
+bool FunctionalCommand::IsFinished() {
+  return m_isFinished();
+}

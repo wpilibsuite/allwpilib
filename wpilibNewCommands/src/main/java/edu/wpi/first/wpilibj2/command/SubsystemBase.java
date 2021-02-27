@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
@@ -17,9 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
 
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();
     name = name.substring(name.lastIndexOf('.') + 1);
@@ -68,8 +63,7 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
   }
 
   /**
-   * Associates a {@link Sendable} with this Subsystem.
-   * Also update the child's name.
+   * Associates a {@link Sendable} with this Subsystem. Also update the child's name.
    *
    * @param name name to give child
    * @param child sendable
@@ -83,10 +77,14 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
     builder.setSmartDashboardType("Subsystem");
 
     builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
-    builder.addStringProperty(".default",
-        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none", null);
+    builder.addStringProperty(
+        ".default",
+        () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
+        null);
     builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
-    builder.addStringProperty(".command",
-        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none", null);
+    builder.addStringProperty(
+        ".command",
+        () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
+        null);
   }
 }

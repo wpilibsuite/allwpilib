@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/ParallelDeadlineGroup.h"
 
@@ -26,7 +23,9 @@ void ParallelDeadlineGroup::Initialize() {
 
 void ParallelDeadlineGroup::Execute() {
   for (auto& commandRunning : m_commands) {
-    if (!commandRunning.second) continue;
+    if (!commandRunning.second) {
+      continue;
+    }
     commandRunning.first->Execute();
     if (commandRunning.first->IsFinished()) {
       commandRunning.first->End(false);
@@ -46,7 +45,9 @@ void ParallelDeadlineGroup::End(bool interrupted) {
   }
 }
 
-bool ParallelDeadlineGroup::IsFinished() { return m_finished; }
+bool ParallelDeadlineGroup::IsFinished() {
+  return m_finished;
+}
 
 bool ParallelDeadlineGroup::RunsWhenDisabled() const {
   return m_runWhenDisabled;

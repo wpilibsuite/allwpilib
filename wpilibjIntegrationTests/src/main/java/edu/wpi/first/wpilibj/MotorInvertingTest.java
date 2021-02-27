@@ -1,16 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.test.AbstractComsSetup;
+import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,22 +20,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.test.AbstractComsSetup;
-import edu.wpi.first.wpilibj.test.TestBench;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-/**
- * Tests Inversion of motors using the SpeedController setInverted.
- */
+/** Tests Inversion of motors using the SpeedController setInverted. */
 @RunWith(Parameterized.class)
 public class MotorInvertingTest extends AbstractComsSetup {
   static MotorEncoderFixture<?> fixture = null;
   private static final double motorspeed = 0.2;
   private static final double delaytime = 0.3;
-
 
   /**
    * Constructs the test.
@@ -52,8 +44,12 @@ public class MotorInvertingTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}")
   public static Collection<MotorEncoderFixture<?>[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(new MotorEncoderFixture<?>[][]{{TestBench.getInstance().getTalonPair()},
-        {TestBench.getInstance().getVictorPair()}, {TestBench.getInstance().getJaguarPair()}});
+    return Arrays.asList(
+        new MotorEncoderFixture<?>[][] {
+          {TestBench.getInstance().getTalonPair()},
+          {TestBench.getInstance().getVictorPair()},
+          {TestBench.getInstance().getJaguarPair()}
+        });
   }
 
   private static final Logger logger = Logger.getLogger(MotorInvertingTest.class.getName());
@@ -85,8 +81,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
     fixture.getMotor().setInverted(true);
     fixture.getMotor().set(motorspeed);
     Timer.delay(delaytime);
-    assertFalse("Inverting with Positive value does not change direction", fixture.getEncoder()
-        .getDirection() == initDirection);
+    assertFalse(
+        "Inverting with Positive value does not change direction",
+        fixture.getEncoder().getDirection() == initDirection);
     fixture.getMotor().set(0);
   }
 
@@ -99,8 +96,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
     fixture.getMotor().setInverted(true);
     fixture.getMotor().set(-motorspeed);
     Timer.delay(delaytime);
-    assertFalse("Inverting with Negative value does not change direction", fixture.getEncoder()
-        .getDirection() == initDirection);
+    assertFalse(
+        "Inverting with Negative value does not change direction",
+        fixture.getEncoder().getDirection() == initDirection);
     fixture.getMotor().set(0);
   }
 
@@ -113,8 +111,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
     fixture.getMotor().setInverted(true);
     fixture.getMotor().set(-motorspeed);
     Timer.delay(delaytime);
-    assertTrue("Inverting with Switching value does change direction", fixture.getEncoder()
-        .getDirection() == initDirection);
+    assertTrue(
+        "Inverting with Switching value does change direction",
+        fixture.getEncoder().getDirection() == initDirection);
     fixture.getMotor().set(0);
   }
 
@@ -127,8 +126,9 @@ public class MotorInvertingTest extends AbstractComsSetup {
     fixture.getMotor().setInverted(true);
     fixture.getMotor().set(motorspeed);
     Timer.delay(delaytime);
-    assertTrue("Inverting with Switching value does change direction", fixture.getEncoder()
-        .getDirection() == initDirection);
+    assertTrue(
+        "Inverting with Switching value does change direction",
+        fixture.getEncoder().getDirection() == initDirection);
     fixture.getMotor().set(0);
   }
 }

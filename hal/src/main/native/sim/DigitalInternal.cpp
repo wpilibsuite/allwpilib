@@ -1,17 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "DigitalInternal.h"
 
-#include "ConstantsInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"
-#include "hal/HAL.h"
-#include "hal/Ports.h"
+#include "hal/Errors.h"
+#include "hal/handles/DigitalHandleResource.h"
+#include "hal/handles/HandlesInternal.h"
 
 namespace hal {
 
@@ -55,7 +52,9 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
   }
 }
 
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+int32_t remapMXPChannel(int32_t channel) {
+  return channel - 10;
+}
 
 int32_t remapMXPPWMChannel(int32_t channel) {
   if (channel < 14) {

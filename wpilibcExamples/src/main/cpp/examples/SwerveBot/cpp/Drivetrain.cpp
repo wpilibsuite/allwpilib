@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Drivetrain.h"
 
@@ -12,7 +9,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
                        units::radians_per_second_t rot, bool fieldRelative) {
   auto states = m_kinematics.ToSwerveModuleStates(
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-                          xSpeed, ySpeed, rot, GetAngle())
+                          xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   m_kinematics.NormalizeWheelSpeeds(&states, kMaxSpeed);
@@ -26,6 +23,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), m_frontLeft.GetState(), m_frontRight.GetState(),
-                    m_backLeft.GetState(), m_backRight.GetState());
+  m_odometry.Update(m_gyro.GetRotation2d(), m_frontLeft.GetState(),
+                    m_frontRight.GetState(), m_backLeft.GetState(),
+                    m_backRight.GetState());
 }

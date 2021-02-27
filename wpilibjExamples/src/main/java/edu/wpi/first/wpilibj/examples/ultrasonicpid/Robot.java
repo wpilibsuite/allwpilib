@@ -1,22 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.MedianFilter;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
- * This is a sample program to demonstrate the use of a PIDController with an
- * ultrasonic sensor to reach and maintain a set distance from an object.
+ * This is a sample program to demonstrate the use of a PIDController with an ultrasonic sensor to
+ * reach and maintain a set distance from an object.
  */
 public class Robot extends TimedRobot {
   // distance in inches the robot wants to stay from an object
@@ -42,9 +39,8 @@ public class Robot extends TimedRobot {
   private final MedianFilter m_filter = new MedianFilter(5);
 
   private final AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-  private final DifferentialDrive m_robotDrive
-      = new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort),
-      new PWMVictorSPX(kRightMotorPort));
+  private final DifferentialDrive m_robotDrive =
+      new DifferentialDrive(new PWMSparkMax(kLeftMotorPort), new PWMSparkMax(kRightMotorPort));
   private final PIDController m_pidController = new PIDController(kP, kI, kD);
 
   @Override
@@ -57,8 +53,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // returned value is filtered with a rolling median filter, since ultrasonics
     // tend to be quite noisy and susceptible to sudden outliers
-    double pidOutput
-        = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
+    double pidOutput = m_pidController.calculate(m_filter.calculate(m_ultrasonic.getVoltage()));
 
     m_robotDrive.arcadeDrive(pidOutput, 0);
   }

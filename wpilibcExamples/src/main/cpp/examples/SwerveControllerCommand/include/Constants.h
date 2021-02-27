@@ -1,14 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/math>
 
 #pragma once
@@ -52,8 +55,6 @@ constexpr bool kFrontLeftDriveEncoderReversed = false;
 constexpr bool kRearLeftDriveEncoderReversed = true;
 constexpr bool kFrontRightDriveEncoderReversed = false;
 constexpr bool kRearRightDriveEncoderReversed = true;
-
-constexpr bool kGyroReversed = false;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or

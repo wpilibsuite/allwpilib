@@ -1,22 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal.util;
 
-/**
- * Exception for bad status codes from the chip object.
- */
+/** Exception for bad status codes from the chip object. */
+@SuppressWarnings("serial")
 public final class UncleanStatusException extends IllegalStateException {
   private final int m_statusCode;
 
   /**
    * Create a new UncleanStatusException.
    *
-   * @param status  the status code that caused the exception
+   * @param status the status code that caused the exception
    * @param message A message describing the exception
    */
   public UncleanStatusException(int status, String message) {
@@ -42,9 +38,7 @@ public final class UncleanStatusException extends IllegalStateException {
     this(-1, message);
   }
 
-  /**
-   * Create a new UncleanStatusException.
-   */
+  /** Create a new UncleanStatusException. */
   public UncleanStatusException() {
     this(-1, "Status code was non-zero");
   }

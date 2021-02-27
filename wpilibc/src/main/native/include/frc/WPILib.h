@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 // clang-format off
 #ifdef _MSC_VER
-#pragma message "warning: Including this header drastically increases compilation times and is bad style. Include only what you use instead."
+#pragma message("warning: Including this header drastically increases compilation times and is bad style. Include only what you use instead.")
 #else
 #warning "Including this header drastically increases compilation times and is bad style. Include only what you use instead."
 #endif

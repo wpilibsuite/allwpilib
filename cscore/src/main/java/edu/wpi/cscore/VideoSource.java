@@ -1,22 +1,21 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
 /**
- * A source for video that provides a sequence of frames.  Each frame may
- * consist of multiple images (e.g. from a stereo or depth camera); these
- * are called channels.
+ * A source for video that provides a sequence of frames. Each frame may consist of multiple images
+ * (e.g. from a stereo or depth camera); these are called channels.
  */
 public class VideoSource implements AutoCloseable {
   public enum Kind {
-    kUnknown(0), kUsb(1), kHttp(2), kCv(4), kRaw(8);
+    kUnknown(0),
+    kUsb(1),
+    kHttp(2),
+    kCv(4),
+    kRaw(8);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     Kind(int value) {
@@ -28,29 +27,22 @@ public class VideoSource implements AutoCloseable {
     }
   }
 
-  /**
-   * Connection strategy.
-   */
+  /** Connection strategy. */
   public enum ConnectionStrategy {
     /**
-     * Automatically connect or disconnect based on whether any sinks are
-     * connected to this source.  This is the default behavior.
+     * Automatically connect or disconnect based on whether any sinks are connected to this source.
+     * This is the default behavior.
      */
     kAutoManage(0),
 
-    /**
-     * Try to keep the connection open regardless of whether any sinks are
-     * connected.
-     */
+    /** Try to keep the connection open regardless of whether any sinks are connected. */
     kKeepOpen(1),
 
     /**
-     * Never open the connection.  If this is set when the connection is open,
-     * close the connection.
+     * Never open the connection. If this is set when the connection is open, close the connection.
      */
     kForceClose(2);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     ConnectionStrategy(int value) {
@@ -70,10 +62,14 @@ public class VideoSource implements AutoCloseable {
    */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
-      case 1: return Kind.kUsb;
-      case 2: return Kind.kHttp;
-      case 4: return Kind.kCv;
-      default: return Kind.kUnknown;
+      case 1:
+        return Kind.kUsb;
+      case 2:
+        return Kind.kHttp;
+      case 4:
+        return Kind.kCv;
+      default:
+        return Kind.kUnknown;
     }
   }
 
@@ -117,30 +113,27 @@ public class VideoSource implements AutoCloseable {
     return m_handle;
   }
 
-  /**
-   * Get the kind of the source.
-   */
+  /** Get the kind of the source. */
   public Kind getKind() {
     return getKindFromInt(CameraServerJNI.getSourceKind(m_handle));
   }
 
   /**
-   * Get the name of the source.  The name is an arbitrary identifier
-   * provided when the source is created, and should be unique.
+   * Get the name of the source. The name is an arbitrary identifier provided when the source is
+   * created, and should be unique.
    */
   public String getName() {
     return CameraServerJNI.getSourceName(m_handle);
   }
 
-  /**
-   * Get the source description.  This is source-kind specific.
-   */
+  /** Get the source description. This is source-kind specific. */
   public String getDescription() {
     return CameraServerJNI.getSourceDescription(m_handle);
   }
 
   /**
    * Get the last time a frame was captured.
+   *
    * @return Time in 1 us increments.
    */
   public long getLastFrameTime() {
@@ -148,12 +141,11 @@ public class VideoSource implements AutoCloseable {
   }
 
   /**
-   * Sets the connection strategy.  By default, the source will automatically
-   * connect or disconnect based on whether any sinks are connected.
+   * Sets the connection strategy. By default, the source will automatically connect or disconnect
+   * based on whether any sinks are connected.
    *
-   * <p>This function is non-blocking; look for either a connection open or
-   * close event or call {@link #isConnected()} to determine the connection
-   * state.
+   * <p>This function is non-blocking; look for either a connection open or close event or call
+   * {@link #isConnected()} to determine the connection state.
    *
    * @param strategy connection strategy (auto, keep open, or force close)
    */
@@ -161,16 +153,14 @@ public class VideoSource implements AutoCloseable {
     CameraServerJNI.setSourceConnectionStrategy(m_handle, strategy.getValue());
   }
 
-  /**
-   * Returns if the source currently connected to whatever is providing the images.
-   */
+  /** Returns if the source currently connected to whatever is providing the images. */
   public boolean isConnected() {
     return CameraServerJNI.isSourceConnected(m_handle);
   }
 
   /**
-   * Gets source enable status.  This is determined with a combination of
-   * connection strategy and the number of sinks connected.
+   * Gets source enable status. This is determined with a combination of connection strategy and the
+   * number of sinks connected.
    *
    * @return True if enabled, false otherwise.
    */
@@ -182,16 +172,13 @@ public class VideoSource implements AutoCloseable {
    * Get a property.
    *
    * @param name Property name
-   * @return Property contents (of kind Property::kNone if no property with
-   *         the given name exists)
+   * @return Property contents (of kind Property::kNone if no property with the given name exists)
    */
   public VideoProperty getProperty(String name) {
     return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));
   }
 
-  /**
-   * Enumerate all properties of this source.
-   */
+  /** Enumerate all properties of this source. */
   @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSourceProperties(m_handle);
@@ -202,23 +189,19 @@ public class VideoSource implements AutoCloseable {
     return rv;
   }
 
-  /**
-   * Get the current video mode.
-   */
+  /** Get the current video mode. */
   public VideoMode getVideoMode() {
     return CameraServerJNI.getSourceVideoMode(m_handle);
   }
 
   /**
    * Set the video mode.
+   *
    * @param mode Video mode
    */
   public boolean setVideoMode(VideoMode mode) {
-    return CameraServerJNI.setSourceVideoMode(m_handle,
-        mode.pixelFormat.getValue(),
-        mode.width,
-        mode.height,
-        mode.fps);
+    return CameraServerJNI.setSourceVideoMode(
+        m_handle, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps);
   }
 
   /**
@@ -307,32 +290,30 @@ public class VideoSource implements AutoCloseable {
   /**
    * Get the actual FPS.
    *
-   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
-   * (throws VisionException if telemetry is not enabled).
+   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid (throws
+   * VisionException if telemetry is not enabled).
    *
    * @return Actual FPS averaged over the telemetry period.
    */
   public double getActualFPS() {
-    return CameraServerJNI.getTelemetryAverageValue(m_handle,
-        CameraServerJNI.TelemetryKind.kSourceFramesReceived);
+    return CameraServerJNI.getTelemetryAverageValue(
+        m_handle, CameraServerJNI.TelemetryKind.kSourceFramesReceived);
   }
 
   /**
    * Get the data rate (in bytes per second).
    *
-   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid
-   * (throws VisionException if telemetry is not enabled).
+   * <p>CameraServerJNI#setTelemetryPeriod() must be called for this to be valid (throws
+   * VisionException if telemetry is not enabled).
    *
    * @return Data rate averaged over the telemetry period.
    */
   public double getActualDataRate() {
-    return CameraServerJNI.getTelemetryAverageValue(m_handle,
-        CameraServerJNI.TelemetryKind.kSourceBytesReceived);
+    return CameraServerJNI.getTelemetryAverageValue(
+        m_handle, CameraServerJNI.TelemetryKind.kSourceBytesReceived);
   }
 
-  /**
-   * Enumerate all known video modes for this source.
-   */
+  /** Enumerate all known video modes for this source. */
   public VideoMode[] enumerateVideoModes() {
     return CameraServerJNI.enumerateSourceVideoModes(m_handle);
   }

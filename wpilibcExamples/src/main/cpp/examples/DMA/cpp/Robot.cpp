@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogInput.h>
 #include <frc/DMA.h>
@@ -54,7 +51,7 @@ class Robot : public frc::TimedRobot {
     int32_t remaining = 0;
     int32_t status = 0;
     // Update our sample. remaining is the number of samples remaining in the
-    // buffer status is more specfic error messages if readStatus is not OK.
+    // buffer status is more specific error messages if readStatus is not OK.
     // Wait 1ms if buffer is empty
     HAL_DMAReadStatus readStatus =
         sample.Update(&m_dma, 1_ms, &remaining, &status);
@@ -78,5 +75,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

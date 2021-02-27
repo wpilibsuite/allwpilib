@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/RobotBase.h"
 
@@ -17,6 +14,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
@@ -25,7 +23,6 @@
 #include "frc/WPIErrors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
-#include "frc/trajectory/TrajectoryGenerator.h"
 
 typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
 
@@ -69,6 +66,47 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
     return std::make_pair(RobotBase::GetThreadId(), true);
   }
 };
+class WPILibMathShared : public wpi::math::MathShared {
+ public:
+  void ReportError(const wpi::Twine& error) override {
+    DriverStation::ReportError(error);
+  }
+
+  void ReportUsage(wpi::math::MathUsageId id, int count) override {
+    switch (id) {
+      case wpi::math::MathUsageId::kKinematics_DifferentialDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_DifferentialDrive);
+        break;
+      case wpi::math::MathUsageId::kKinematics_MecanumDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_MecanumDrive);
+        break;
+      case wpi::math::MathUsageId::kKinematics_SwerveDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Kinematics,
+                   HALUsageReporting::kKinematics_SwerveDrive);
+        break;
+      case wpi::math::MathUsageId::kTrajectory_TrapezoidProfile:
+        HAL_Report(HALUsageReporting::kResourceType_TrapezoidProfile, count);
+        break;
+      case wpi::math::MathUsageId::kFilter_Linear:
+        HAL_Report(HALUsageReporting::kResourceType_LinearFilter, count);
+        break;
+      case wpi::math::MathUsageId::kOdometry_DifferentialDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_DifferentialDrive);
+        break;
+      case wpi::math::MathUsageId::kOdometry_SwerveDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_SwerveDrive);
+        break;
+      case wpi::math::MathUsageId::kOdometry_MecanumDrive:
+        HAL_Report(HALUsageReporting::kResourceType_Odometry,
+                   HALUsageReporting::kOdometry_MecanumDrive);
+        break;
+    }
+  }
+};
 }  // namespace
 
 static void SetupCameraServerShared() {
@@ -102,26 +140,52 @@ static void SetupCameraServerShared() {
 #endif
 }
 
-bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
+static void SetupMathShared() {
+  wpi::math::MathSharedStore::SetMathShared(
+      std::make_unique<WPILibMathShared>());
+}
 
-bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
+bool RobotBase::IsEnabled() const {
+  return m_ds.IsEnabled();
+}
 
-bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
+bool RobotBase::IsDisabled() const {
+  return m_ds.IsDisabled();
+}
 
-bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+bool RobotBase::IsAutonomous() const {
+  return m_ds.IsAutonomous();
+}
 
-bool RobotBase::IsTest() const { return m_ds.IsTest(); }
+bool RobotBase::IsAutonomousEnabled() const {
+  return m_ds.IsAutonomousEnabled();
+}
 
-bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
+bool RobotBase::IsOperatorControl() const {
+  return m_ds.IsOperatorControl();
+}
 
-std::thread::id RobotBase::GetThreadId() { return m_threadId; }
+bool RobotBase::IsOperatorControlEnabled() const {
+  return m_ds.IsOperatorControlEnabled();
+}
+
+bool RobotBase::IsTest() const {
+  return m_ds.IsTest();
+}
+
+bool RobotBase::IsNewDataAvailable() const {
+  return m_ds.IsNewControlData();
+}
+
+std::thread::id RobotBase::GetThreadId() {
+  return m_threadId;
+}
 
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();
-  TrajectoryGenerator::SetErrorHandler(
-      [](const char* error) { DriverStation::ReportError(error); });
+  SetupMathShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");
@@ -156,6 +220,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 RobotBase::RobotBase(RobotBase&&) noexcept
     : m_ds(DriverStation::GetInstance()) {}
 
-RobotBase::~RobotBase() {}
+RobotBase::~RobotBase() = default;
 
-RobotBase& RobotBase::operator=(RobotBase&&) noexcept { return *this; }
+RobotBase& RobotBase::operator=(RobotBase&&) noexcept {
+  return *this;
+}

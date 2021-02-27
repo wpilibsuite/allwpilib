@@ -1,12 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/GenericHID.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -16,13 +13,13 @@
  * Runs the motors with split arcade steering and an Xbox controller.
  */
 class Robot : public frc::TimedRobot {
-  frc::PWMVictorSPX m_leftMotor{0};
-  frc::PWMVictorSPX m_rightMotor{1};
+  frc::PWMSparkMax m_leftMotor{0};
+  frc::PWMSparkMax m_rightMotor{1};
   frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
   frc::XboxController m_driverController{0};
 
  public:
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     // Drive with split arcade style
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
@@ -33,5 +30,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

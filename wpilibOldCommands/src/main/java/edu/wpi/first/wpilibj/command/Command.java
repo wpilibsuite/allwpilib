@@ -1,19 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.command;
-
-import java.util.Enumeration;
 
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import java.util.Enumeration;
 
 /**
  * The Command class is at the very core of the entire command framework. Every command can be
@@ -22,16 +18,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * execute()} until the {@link Command#isFinished() isFinished()} returns true. Once it does, {@link
  * Command#end() end()} will be called.
  *
- * <p>However, if at any point while it is running {@link Command#cancel() cancel()} is called,
- * then the command will be stopped and {@link Command#interrupted() interrupted()} will be called.
+ * <p>However, if at any point while it is running {@link Command#cancel() cancel()} is called, then
+ * the command will be stopped and {@link Command#interrupted() interrupted()} will be called.
  *
  * <p>If a command uses a {@link Subsystem}, then it should specify that it does so by calling the
  * {@link Command#requires(Subsystem) requires(...)} method in its constructor. Note that a Command
  * may have multiple requirements, and {@link Command#requires(Subsystem) requires(...)} should be
  * called for each one.
  *
- * <p>If a command is running and a new command with shared requirements is started, then one of
- * two things will happen. If the active command is interruptible, then {@link Command#cancel()
+ * <p>If a command is running and a new command with shared requirements is started, then one of two
+ * things will happen. If the active command is interruptible, then {@link Command#cancel()
  * cancel()} will be called and the command will be removed to make way for the new one. If the
  * active command is not interruptible, the other one will not even be started, and the active one
  * will continue functioning.
@@ -40,66 +36,41 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-@SuppressWarnings("PMD.TooManyMethods")
 public abstract class Command implements Sendable, AutoCloseable {
-  /**
-   * The time since this command was initialized.
-   */
+  /** The time since this command was initialized. */
   private double m_startTime = -1;
 
-  /**
-   * The time (in seconds) before this command "times out" (or -1 if no timeout).
-   */
+  /** The time (in seconds) before this command "times out" (or -1 if no timeout). */
   private double m_timeout = -1;
 
-  /**
-   * Whether or not this command has been initialized.
-   */
+  /** Whether or not this command has been initialized. */
   private boolean m_initialized;
 
-  /**
-   * The required subsystems.
-   */
+  /** The required subsystems. */
   private final Set m_requirements = new Set();
 
-  /**
-   * Whether or not it is running.
-   */
+  /** Whether or not it is running. */
   private boolean m_running;
 
-  /**
-   * Whether or not it is interruptible.
-   */
+  /** Whether or not it is interruptible. */
   private boolean m_interruptible = true;
 
-  /**
-   * Whether or not it has been canceled.
-   */
+  /** Whether or not it has been canceled. */
   private boolean m_canceled;
 
-  /**
-   * Whether or not it has been locked.
-   */
+  /** Whether or not it has been locked. */
   private boolean m_locked;
 
-  /**
-   * Whether this command should run when the robot is disabled.
-   */
+  /** Whether this command should run when the robot is disabled. */
   private boolean m_runWhenDisabled;
 
-  /**
-   * Whether or not this command has completed running.
-   */
+  /** Whether or not this command has completed running. */
   private boolean m_completed;
 
-  /**
-   * The {@link CommandGroup} this is in.
-   */
+  /** The {@link CommandGroup} this is in. */
   private CommandGroup m_parent;
 
-  /**
-   * Creates a new command. The name of this command will be set to its class name.
-   */
+  /** Creates a new command. The name of this command will be set to its class name. */
   public Command() {
     String name = getClass().getName();
     SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
@@ -150,7 +121,7 @@ public abstract class Command implements Sendable, AutoCloseable {
   /**
    * Creates a new command with the given name.
    *
-   * @param name      the name for this command
+   * @param name the name for this command
    * @param subsystem the subsystem that this command requires
    * @throws IllegalArgumentException if name is null
    */
@@ -163,7 +134,7 @@ public abstract class Command implements Sendable, AutoCloseable {
    * Creates a new command with the given timeout and a default name. The default name is the name
    * of the class.
    *
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout the time (in seconds) before this command "times out"
    * @param subsystem the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout
    * @see Command#isTimedOut() isTimedOut()
@@ -176,7 +147,7 @@ public abstract class Command implements Sendable, AutoCloseable {
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name    the name of the command
+   * @param name the name of the command
    * @param timeout the time (in seconds) before this command "times out"
    * @throws IllegalArgumentException if given a negative timeout or name was null.
    * @see Command#isTimedOut() isTimedOut()
@@ -192,8 +163,8 @@ public abstract class Command implements Sendable, AutoCloseable {
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param name      the name of the command
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param name the name of the command
+   * @param timeout the time (in seconds) before this command "times out"
    * @param subsystem the subsystem that this command requires
    * @throws IllegalArgumentException if given a negative timeout
    * @throws IllegalArgumentException if given a negative timeout or name was null.
@@ -240,9 +211,9 @@ public abstract class Command implements Sendable, AutoCloseable {
    * <p>Note that the recommended way to call this method is in the constructor.
    *
    * @param subsystem the {@link Subsystem} required
-   * @throws IllegalArgumentException     if subsystem is null
+   * @throws IllegalArgumentException if subsystem is null
    * @throws IllegalUseOfCommandException if this command has started before or if it has been given
-   *                                      to a {@link CommandGroup}
+   *     to a {@link CommandGroup}
    * @see Subsystem
    */
   protected synchronized void requires(Subsystem subsystem) {
@@ -297,30 +268,20 @@ public abstract class Command implements Sendable, AutoCloseable {
     return !isFinished();
   }
 
-  /**
-   * The initialize method is called the first time this Command is run after being started.
-   */
+  /** The initialize method is called the first time this Command is run after being started. */
   protected void initialize() {}
 
-  /**
-   * A shadow method called before {@link Command#initialize() initialize()}.
-   */
+  /** A shadow method called before {@link Command#initialize() initialize()}. */
   @SuppressWarnings("MethodName")
-  void _initialize() {
-  }
+  void _initialize() {}
 
-  /**
-   * The execute method is called repeatedly until this Command either finishes or is canceled.
-   */
+  /** The execute method is called repeatedly until this Command either finishes or is canceled. */
   @SuppressWarnings("MethodName")
   protected void execute() {}
 
-  /**
-   * A shadow method called before {@link Command#execute() execute()}.
-   */
+  /** A shadow method called before {@link Command#execute() execute()}. */
   @SuppressWarnings("MethodName")
-  void _execute() {
-  }
+  void _execute() {}
 
   /**
    * Returns whether this command is finished. If it is, then the command will be removed and {@link
@@ -330,9 +291,8 @@ public abstract class Command implements Sendable, AutoCloseable {
    * method for time-sensitive commands.
    *
    * <p>Returning false will result in the command never ending automatically. It may still be
-   * cancelled manually or interrupted by another command. Returning true will result in the
-   * command executing once and finishing immediately. We recommend using {@link InstantCommand}
-   * for this.
+   * canceled manually or interrupted by another command. Returning true will result in the command
+   * executing once and finishing immediately. We recommend using {@link InstantCommand} for this.
    *
    * @return whether this command is finished.
    * @see Command#isTimedOut() isTimedOut()
@@ -345,12 +305,9 @@ public abstract class Command implements Sendable, AutoCloseable {
    */
   protected void end() {}
 
-  /**
-   * A shadow method called after {@link Command#end() end()}.
-   */
+  /** A shadow method called after {@link Command#end() end()}. */
   @SuppressWarnings("MethodName")
-  void _end() {
-  }
+  void _end() {}
 
   /**
    * Called when the command ends because somebody called {@link Command#cancel() cancel()} or
@@ -366,9 +323,7 @@ public abstract class Command implements Sendable, AutoCloseable {
     end();
   }
 
-  /**
-   * A shadow method called after {@link Command#interrupted() interrupted()}.
-   */
+  /** A shadow method called after {@link Command#interrupted() interrupted()}. */
   @SuppressWarnings("MethodName")
   void _interrupted() {}
 
@@ -396,15 +351,13 @@ public abstract class Command implements Sendable, AutoCloseable {
    * Subsystems}) of this command.
    *
    * @return the requirements (as an {@link Enumeration Enumeration} of {@link Subsystem
-   * Subsystems}) of this command
+   *     Subsystems}) of this command
    */
-  synchronized Enumeration getRequirements() {
+  synchronized Enumeration<?> getRequirements() {
     return m_requirements.getElements();
   }
 
-  /**
-   * Prevents further changes from being made.
-   */
+  /** Prevents further changes from being made. */
   synchronized void lockChanges() {
     m_locked = true;
   }
@@ -416,8 +369,8 @@ public abstract class Command implements Sendable, AutoCloseable {
    */
   synchronized void validate(String message) {
     if (m_locked) {
-      throw new IllegalUseOfCommandException(message
-          + " after being started or being added to a command group");
+      throw new IllegalUseOfCommandException(
+          message + " after being started or being added to a command group");
     }
   }
 
@@ -446,18 +399,18 @@ public abstract class Command implements Sendable, AutoCloseable {
   }
 
   /**
-   * Clears list of subsystem requirements. This is only used by
-   * {@link ConditionalCommand} so cancelling the chosen command works properly
-   * in {@link CommandGroup}.
+   * Clears list of subsystem requirements. This is only used by {@link ConditionalCommand} so
+   * canceling the chosen command works properly in {@link CommandGroup}.
    */
   protected void clearRequirements() {
     m_requirements.clear();
   }
 
   /**
-   * Starts up the command. Gets the command ready to start. <p> Note that the command will
-   * eventually start, however it will not necessarily do so immediately, and may in fact be
-   * canceled before initialize is even called. </p>
+   * Starts up the command. Gets the command ready to start.
+   *
+   * <p>Note that the command will eventually start, however it will not necessarily do so
+   * immediately, and may in fact be canceled before initialize is even called.
    *
    * @throws IllegalUseOfCommandException if the command is a part of a CommandGroup
    */
@@ -496,18 +449,21 @@ public abstract class Command implements Sendable, AutoCloseable {
   }
 
   /**
-   * This will cancel the current command. <p> This will cancel the current command eventually. It
-   * can be called multiple times. And it can be called when the command is not running. If the
-   * command is running though, then the command will be marked as canceled and eventually removed.
-   * </p> <p> A command can not be canceled if it is a part of a command group, you must cancel the
-   * command group instead. </p>
+   * This will cancel the current command.
+   *
+   * <p>This will cancel the current command eventually. It can be called multiple times. And it can
+   * be called when the command is not running. If the command is running though, then the command
+   * will be marked as canceled and eventually removed.
+   *
+   * <p>A command can not be canceled if it is a part of a command group, you must cancel the
+   * command group instead.
    *
    * @throws IllegalUseOfCommandException if this command is a part of a command group
    */
   public synchronized void cancel() {
     if (m_parent != null) {
-      throw new IllegalUseOfCommandException("Can not manually cancel a command in a command "
-          + "group");
+      throw new IllegalUseOfCommandException(
+          "Can not manually cancel a command in a command " + "group");
     }
     _cancel();
   }
@@ -654,17 +610,20 @@ public abstract class Command implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Command");
     builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty("running", this::isRunning, value -> {
-      if (value) {
-        if (!isRunning()) {
-          start();
-        }
-      } else {
-        if (isRunning()) {
-          cancel();
-        }
-      }
-    });
+    builder.addBooleanProperty(
+        "running",
+        this::isRunning,
+        value -> {
+          if (value) {
+            if (!isRunning()) {
+              start();
+            }
+          } else {
+            if (isRunning()) {
+              cancel();
+            }
+          }
+        });
     builder.addBooleanProperty(".isParented", this::isParented, null);
   }
 }

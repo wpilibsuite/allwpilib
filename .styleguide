@@ -2,6 +2,7 @@ cppHeaderFileInclude {
   \.h$
   \.hpp$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
@@ -11,7 +12,6 @@ cppSrcFileInclude {
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-  simulation/halsim_gui/src/main/native/include/portable-file-dialogs\.h$
 }
 
 repoRootNameOverride {
@@ -19,16 +19,22 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^Eigen/
   ^cameraserver/
   ^cscore
+  ^drake/
   ^hal/
   ^imgui
+  ^implot
   ^mockdata/
   ^networktables/
   ^ntcore
   ^opencv2/
   ^support/
   ^units/
+  ^unsupported/
   ^vision/
   ^wpi/
+  ^wpigui
+  ^wpimath/
 }

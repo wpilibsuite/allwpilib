@@ -1,13 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
@@ -156,11 +153,22 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestPeriodic();
 
   /**
+   * Enables or disables flushing NetworkTables every loop iteration.
+   * By default, this is disabled.
+   *
+   * @param enabled True to enable, false to disable
+   */
+  void SetNetworkTablesFlushEnabled(bool enabled);
+
+  /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period in seconds.
+   *
+   * @deprecated Use IterativeRobotBase(units::second_t period) with unit-safety
+   * instead
    */
-  WPI_DEPRECATED("Use ctor with unit-safety instead.")
+  WPI_DEPRECATED("Use constructor with unit-safety instead.")
   explicit IterativeRobotBase(double period);
 
   /**
@@ -170,7 +178,7 @@ class IterativeRobotBase : public RobotBase {
    */
   explicit IterativeRobotBase(units::second_t period);
 
-  virtual ~IterativeRobotBase() = default;
+  ~IterativeRobotBase() override = default;
 
  protected:
   IterativeRobotBase(IterativeRobotBase&&) = default;
@@ -185,6 +193,7 @@ class IterativeRobotBase : public RobotBase {
 
   Mode m_lastMode = Mode::kNone;
   Watchdog m_watchdog;
+  bool m_ntFlushEnabled = false;
 
   void PrintLoopOverrunMessage();
 };

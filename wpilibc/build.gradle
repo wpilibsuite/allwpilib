@@ -60,18 +60,34 @@ staticGtestConfigs["${nativeName}Test"] = []
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
-apply plugin: DisableBuildingGTest
-
 nativeUtils.exportsConfigs {
     wpilibc {
-        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x86ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
     }
 }
 
@@ -81,7 +97,10 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ['src/main/native/cpp', "$buildDir/generated/cpp"]
+                        srcDirs = [
+                            'src/main/native/cpp',
+                            "$buildDir/generated/cpp"
+                        ]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -98,6 +117,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
         }
         "${nativeName}"(NativeLibrarySpec) {
@@ -116,6 +136,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
                 if (it instanceof SharedLibraryBinarySpec) {
                     cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
@@ -152,6 +173,7 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
@@ -201,6 +223,7 @@ model {
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             lib library: nativeName, linkage: 'shared'

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "Drivetrain.h"
 
@@ -25,6 +22,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_odometry.Update(GetAngle(), units::meter_t(m_leftEncoder.GetDistance()),
+  m_odometry.Update(m_gyro.GetRotation2d(),
+                    units::meter_t(m_leftEncoder.GetDistance()),
                     units::meter_t(m_rightEncoder.GetDistance()));
 }

@@ -1,17 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/uv/GetAddrInfo.h"
 
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 GetAddrInfoReq::GetAddrInfoReq() {
   error = [this](Error err) { GetLoop().error(err); };
@@ -26,10 +22,11 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
       loop.GetRaw(), req->GetRaw(),
       [](uv_getaddrinfo_t* req, int status, addrinfo* res) {
         auto& h = *static_cast<GetAddrInfoReq*>(req->data);
-        if (status < 0)
+        if (status < 0) {
           h.ReportError(status);
-        else
+        } else {
           h.resolved(*res);
+        }
         uv_freeaddrinfo(res);
         h.Release();  // this is always a one-shot
       },
@@ -37,10 +34,11 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
       service.isNull() ? nullptr
                        : service.toNullTerminatedStringRef(serviceStr).data(),
       hints);
-  if (err < 0)
+  if (err < 0) {
     loop.ReportError(err);
-  else
+  } else {
     req->Keep();
+  }
 }
 
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
@@ -51,5 +49,4 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
   GetAddrInfo(loop, req, node, service, hints);
 }
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv

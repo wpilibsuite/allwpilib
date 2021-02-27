@@ -1,11 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+
+#include <utility>
 
 #include <frc/controller/PIDController.h>
 #include <frc/geometry/Translation2d.h>
@@ -16,7 +15,8 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/velocity.h>
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
@@ -63,20 +63,27 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       // Pass the config
       config);
 
+  frc::ProfiledPIDController<units::radians> thetaController{
+      AutoConstants::kPThetaController, 0, 0,
+      AutoConstants::kThetaControllerConstraints};
+
+  thetaController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
+                                        units::radian_t(wpi::math::pi));
+
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
       frc2::PIDController(AutoConstants::kPXController, 0, 0),
-      frc2::PIDController(AutoConstants::kPYController, 0, 0),
-      frc::ProfiledPIDController<units::radians>(
-          AutoConstants::kPThetaController, 0, 0,
-          AutoConstants::kThetaControllerConstraints),
+      frc2::PIDController(AutoConstants::kPYController, 0, 0), thetaController,
 
       [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
       {&m_drive});
+
+  // Reset odometry to the starting pose of the trajectory.
+  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
   return new frc2::SequentialCommandGroup(

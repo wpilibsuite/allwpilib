@@ -1,0 +1,71 @@
+apply plugin: 'maven-publish'
+
+def baseArtifactId = 'wpigui-cpp'
+def artifactGroupId = 'edu.wpi.first.wpigui'
+def zipBaseName = '_GROUP_edu_wpi_first_wpigui_ID_wpigui-cpp_CLS'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task cppSourcesZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+    from('src/main/native/directx11') {
+        into '/'
+    }
+    from('src/main/native/metal') {
+        into '/'
+    }
+    from('src/main/native/opengl3') {
+        into '/'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = zipBaseName
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+build.dependsOn cppHeadersZip
+build.dependsOn cppSourcesZip
+
+addTaskToCopyAllOutputs(cppHeadersZip)
+addTaskToCopyAllOutputs(cppSourcesZip)
+
+model {
+    publishing {
+        def wpiguiTaskList = createComponentZipTasks($.components, ['wpigui'], zipBaseName, Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                wpiguiTaskList.each {
+                    artifact it
+                }
+
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version wpilibVersioning.version.get()
+            }
+        }
+    }
+}

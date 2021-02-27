@@ -1,19 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat.triggers;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Trigger;
 
-/**
- * A custom button that is triggered when TWO buttons on a Joystick are
- * simultaneously pressed.
- */
+/** A custom button that is triggered when TWO buttons on a Joystick are simultaneously pressed. */
 public class DoubleButton extends Trigger {
   private final Joystick m_joy;
   private final int m_button1;
@@ -21,6 +15,7 @@ public class DoubleButton extends Trigger {
 
   /**
    * Create a new double button trigger.
+   *
    * @param joy The joystick
    * @param button1 The first button
    * @param button2 The second button

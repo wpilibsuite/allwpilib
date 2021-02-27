@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/PIDController.h"
 
@@ -12,7 +9,8 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/controller/ControllerUtil.h"
+#include "frc/DriverStation.h"
+#include "frc/MathUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -21,6 +19,12 @@ using namespace frc2;
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+  if (period <= 0_s) {
+    frc::DriverStation::ReportError(
+        "Controller period must be a non-zero positive number!");
+    m_period = 20_ms;
+    frc::DriverStation::ReportWarning("Controller period defaulted to 20ms.");
+  }
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
@@ -33,29 +37,55 @@ void PIDController::SetPID(double Kp, double Ki, double Kd) {
   m_Kd = Kd;
 }
 
-void PIDController::SetP(double Kp) { m_Kp = Kp; }
+void PIDController::SetP(double Kp) {
+  m_Kp = Kp;
+}
 
-void PIDController::SetI(double Ki) { m_Ki = Ki; }
+void PIDController::SetI(double Ki) {
+  m_Ki = Ki;
+}
 
-void PIDController::SetD(double Kd) { m_Kd = Kd; }
+void PIDController::SetD(double Kd) {
+  m_Kd = Kd;
+}
 
-double PIDController::GetP() const { return m_Kp; }
+double PIDController::GetP() const {
+  return m_Kp;
+}
 
-double PIDController::GetI() const { return m_Ki; }
+double PIDController::GetI() const {
+  return m_Ki;
+}
 
-double PIDController::GetD() const { return m_Kd; }
+double PIDController::GetD() const {
+  return m_Kd;
+}
 
 units::second_t PIDController::GetPeriod() const {
   return units::second_t(m_period);
 }
 
-void PIDController::SetSetpoint(double setpoint) { m_setpoint = setpoint; }
+void PIDController::SetSetpoint(double setpoint) {
+  m_setpoint = setpoint;
+}
 
-double PIDController::GetSetpoint() const { return m_setpoint; }
+double PIDController::GetSetpoint() const {
+  return m_setpoint;
+}
 
 bool PIDController::AtSetpoint() const {
-  return std::abs(m_positionError) < m_positionTolerance &&
-         std::abs(m_velocityError) < m_velocityTolerance;
+  double positionError;
+  if (m_continuous) {
+    positionError = frc::InputModulus(m_setpoint - m_measurement,
+                                      m_minimumInput, m_maximumInput);
+  } else {
+    positionError = m_setpoint - m_measurement;
+  }
+
+  double velocityError = (positionError - m_prevError) / m_period.to<double>();
+
+  return std::abs(positionError) < m_positionTolerance &&
+         std::abs(velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -65,9 +95,13 @@ void PIDController::EnableContinuousInput(double minimumInput,
   m_maximumInput = maximumInput;
 }
 
-void PIDController::DisableContinuousInput() { m_continuous = false; }
+void PIDController::DisableContinuousInput() {
+  m_continuous = false;
+}
 
-bool PIDController::IsContinuousInputEnabled() const { return m_continuous; }
+bool PIDController::IsContinuousInputEnabled() const {
+  return m_continuous;
+}
 
 void PIDController::SetIntegratorRange(double minimumIntegral,
                                        double maximumIntegral) {
@@ -81,16 +115,21 @@ void PIDController::SetTolerance(double positionTolerance,
   m_velocityTolerance = velocityTolerance;
 }
 
-double PIDController::GetPositionError() const { return m_positionError; }
+double PIDController::GetPositionError() const {
+  return m_positionError;
+}
 
-double PIDController::GetVelocityError() const { return m_velocityError; }
+double PIDController::GetVelocityError() const {
+  return m_velocityError;
+}
 
 double PIDController::Calculate(double measurement) {
+  m_measurement = measurement;
   m_prevError = m_positionError;
 
   if (m_continuous) {
-    m_positionError = frc::GetModulusError<double>(
-        m_setpoint, measurement, m_minimumInput, m_maximumInput);
+    m_positionError = frc::InputModulus(m_setpoint - measurement,
+                                        m_minimumInput, m_maximumInput);
   } else {
     m_positionError = m_setpoint - measurement;
   }
@@ -119,12 +158,13 @@ void PIDController::Reset() {
 
 void PIDController::InitSendable(frc::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
-  builder.AddDoubleProperty("p", [this] { return GetP(); },
-                            [this](double value) { SetP(value); });
-  builder.AddDoubleProperty("i", [this] { return GetI(); },
-                            [this](double value) { SetI(value); });
-  builder.AddDoubleProperty("d", [this] { return GetD(); },
-                            [this](double value) { SetD(value); });
-  builder.AddDoubleProperty("setpoint", [this] { return GetSetpoint(); },
-                            [this](double value) { SetSetpoint(value); });
+  builder.AddDoubleProperty(
+      "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+  builder.AddDoubleProperty(
+      "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+  builder.AddDoubleProperty(
+      "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+  builder.AddDoubleProperty(
+      "setpoint", [this] { return GetSetpoint(); },
+      [this](double value) { SetSetpoint(value); });
 }

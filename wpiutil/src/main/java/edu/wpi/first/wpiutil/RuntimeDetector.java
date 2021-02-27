@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpiutil;
 
@@ -23,7 +20,6 @@ public final class RuntimeDetector {
     if (fileExtension != null && filePath != null && filePrefix != null) {
       return;
     }
-
 
     boolean intel32 = is32BitIntel();
     boolean intel64 = is64BitIntel();
@@ -55,7 +51,7 @@ public final class RuntimeDetector {
         filePath = "/linux/athena/";
       } else if (isRaspbian()) {
         filePath = "/linux/raspbian/";
-      } else if (isAarch64Bionic()) {
+      } else if (isAarch64()) {
         filePath = "/linux/aarch64bionic/";
       } else {
         filePath = "/linux/nativearm/";
@@ -65,45 +61,35 @@ public final class RuntimeDetector {
     }
   }
 
-  /**
-   * Get the file prefix for the current system.
-   */
+  /** Get the file prefix for the current system. */
   public static synchronized String getFilePrefix() {
     computePlatform();
 
     return filePrefix;
   }
 
-  /**
-   * Get the file extension for the current system.
-   */
+  /** Get the file extension for the current system. */
   public static synchronized String getFileExtension() {
     computePlatform();
 
     return fileExtension;
   }
 
-  /**
-   * Get the platform path for the current system.
-   */
+  /** Get the platform path for the current system. */
   public static synchronized String getPlatformPath() {
     computePlatform();
 
     return filePath;
   }
 
-  /**
-   * Get the path to the requested resource.
-   */
+  /** Get the path to the requested resource. */
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 
     return filePath + filePrefix + libName + fileExtension;
   }
 
-  /**
-   * Get the path to the hash to the requested resource.
-   */
+  /** Get the path to the hash to the requested resource. */
   public static synchronized String getHashLibraryResource(String libName) {
     computePlatform();
 
@@ -115,7 +101,8 @@ public final class RuntimeDetector {
     return runRobotFile.exists();
   }
 
-  /** check if os is raspbian.
+  /**
+   * check if os is raspbian.
    *
    * @return if os is raspbian
    */
@@ -128,28 +115,13 @@ public final class RuntimeDetector {
     }
   }
 
-  /** check if os is bionic aarch64.
+  /**
+   * check if architecture is aarch64.
    *
-   * @return if os is bionic aarch64
+   * @return if architecture is aarch64
    */
-  public static boolean isAarch64Bionic() {
-    if (!System.getProperty("os.arch").equals("aarch64")) {
-      return false;
-    }
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
-      String value = reader.readLine();
-      String version = "";
-      while (value != null) {
-        if (value.contains("VERSION=")) {
-          version = value;
-          break;
-        }
-        value = reader.readLine();
-      }
-      return version.contains("Bionic");
-    } catch (IOException ex) {
-      return false;
-    }
+  public static boolean isAarch64() {
+    return System.getProperty("os.arch").equals("aarch64");
   }
 
   public static boolean isLinux() {
@@ -174,7 +146,5 @@ public final class RuntimeDetector {
     return "amd64".equals(arch) || "x86_64".equals(arch);
   }
 
-  private RuntimeDetector() {
-
-  }
+  private RuntimeDetector() {}
 }

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.encoder;
 
@@ -29,14 +26,13 @@ public class Robot extends TimedRobot {
    * The Encoder object is constructed with 4 parameters, the last two being optional. The first two
    * parameters (1, 2 in this case) refer to the ports on the roboRIO which the encoder uses.
    * Because a quadrature encoder has two signal wires, the signal from two DIO ports on the roboRIO
-   * are used. The third (optional)  parameter is a boolean which defaults to false. If you set this
-   *  parameter to true, the direction of the encoder will be reversed, in case it makes more sense
+   * are used. The third (optional) parameter is a boolean which defaults to false. If you set this
+   * parameter to true, the direction of the encoder will be reversed, in case it makes more sense
    * mechanically. The final (optional) parameter specifies encoding rate (k1X, k2X, or k4X) and
    * defaults to k4X. Faster (k4X) encoding gives greater positional precision but more noise in the
    * rate.
    */
-  private final Encoder m_encoder =
-      new Encoder(1, 2, false, CounterBase.EncodingType.k4X);
+  private final Encoder m_encoder = new Encoder(1, 2, false, CounterBase.EncodingType.k4X);
 
   @Override
   public void robotInit() {

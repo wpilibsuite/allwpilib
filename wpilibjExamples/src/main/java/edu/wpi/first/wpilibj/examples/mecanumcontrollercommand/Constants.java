@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
 
@@ -14,8 +11,8 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants.  This class should not be used for any other purpose.  All constants should be
- * declared globally (i.e. public static).  Do not put anything functional in this class.
+ * constants. This class should not be used for any other purpose. All constants should be declared
+ * globally (i.e. public static). Do not put anything functional in this class.
  *
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
@@ -27,10 +24,10 @@ public final class Constants {
     public static final int kFrontRightMotorPort = 2;
     public static final int kRearRightMotorPort = 3;
 
-    public static final int[] kFrontLeftEncoderPorts = new int[]{0, 1};
-    public static final int[] kRearLeftEncoderPorts = new int[]{2, 3};
-    public static final int[] kFrontRightEncoderPorts = new int[]{4, 5};
-    public static final int[] kRearRightEncoderPorts = new int[]{5, 6};
+    public static final int[] kFrontLeftEncoderPorts = new int[] {0, 1};
+    public static final int[] kRearLeftEncoderPorts = new int[] {2, 3};
+    public static final int[] kFrontRightEncoderPorts = new int[] {4, 5};
+    public static final int[] kRearRightEncoderPorts = new int[] {5, 6};
 
     public static final boolean kFrontLeftEncoderReversed = false;
     public static final boolean kRearLeftEncoderReversed = true;
@@ -44,18 +41,16 @@ public final class Constants {
 
     public static final MecanumDriveKinematics kDriveKinematics =
         new MecanumDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = 0.15;
     public static final double kEncoderDistancePerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts
         (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-
-    public static final boolean kGyroReversed = false;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
@@ -70,12 +65,10 @@ public final class Constants {
     public static final double kPRearLeftVel = 0.5;
     public static final double kPFrontRightVel = 0.5;
     public static final double kPRearRightVel = 0.5;
-
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 1;
-
   }
 
   public static final class AutoConstants {
@@ -88,10 +81,9 @@ public final class Constants {
     public static final double kPYController = 0.5;
     public static final double kPThetaController = 0.5;
 
-    //Constraint for the motion profilied robot angle controller
+    // Constraint for the motion profilied robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond,
-        kMaxAngularSpeedRadiansPerSecondSquared);
-
+        new TrapezoidProfile.Constraints(
+            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 }

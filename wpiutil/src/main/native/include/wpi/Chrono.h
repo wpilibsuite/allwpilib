@@ -22,7 +22,7 @@ class raw_ostream;
 namespace sys {
 
 /// A time point on the system clock. This is provided for two reasons:
-/// - to insulate us agains subtle differences in behavoir to differences in
+/// - to insulate us against subtle differences in behavior to differences in
 ///   system clock precision (which is implementation-defined and differs between
 ///   platforms).
 /// - to shorten the type name

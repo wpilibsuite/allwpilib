@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -755,6 +752,42 @@ class Color {
         green(roundAndClamp(g)),
         blue(roundAndClamp(b)) {}
 
+  /**
+   * Creates a Color from HSV values.
+   *
+   * @param h The h value [0-180]
+   * @param s The s value [0-255]
+   * @param v The v value [0-255]
+   * @return The color
+   */
+  static constexpr Color FromHSV(int h, int s, int v) {
+    if (s == 0) {
+      return {v / 255.0, v / 255.0, v / 255.0};
+    }
+
+    int region = h / 30;
+    int remainder = (h - (region * 30)) * 6;
+
+    int p = (v * (255 - s)) >> 8;
+    int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+      case 0:
+        return Color(v / 255.0, t / 255.0, p / 255.0);
+      case 1:
+        return Color(q / 255.0, v / 255.0, p / 255.0);
+      case 2:
+        return Color(p / 255.0, v / 255.0, t / 255.0);
+      case 3:
+        return Color(p / 255.0, q / 255.0, v / 255.0);
+      case 4:
+        return Color(t / 255.0, p / 255.0, v / 255.0);
+      default:
+        return Color(v / 255.0, p / 255.0, q / 255.0);
+    }
+  }
+
   double red = 0.0;
   double green = 0.0;
   double blue = 0.0;
@@ -771,6 +804,10 @@ class Color {
 
 inline bool operator==(const Color& c1, const Color& c2) {
   return c1.red == c2.red && c1.green == c2.green && c1.blue == c2.blue;
+}
+
+inline bool operator!=(const Color& c1, const Color& c2) {
+  return !(c1 == c2);
 }
 
 /*

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -67,6 +64,29 @@ class DoubleSolenoid : public SolenoidBase,
    * @return The current value of the solenoid.
    */
   virtual Value Get() const;
+
+  /**
+   * Toggle the value of the solenoid.
+   *
+   * If the solenoid is set to forward, it'll be set to reverse. If the solenoid
+   * is set to reverse, it'll be set to forward. If the solenoid is set to off,
+   * nothing happens.
+   */
+  void Toggle();
+
+  /**
+   * Get the forward channel.
+   *
+   * @return the forward channel.
+   */
+  int GetFwdChannel() const;
+
+  /**
+   * Get the reverse channel.
+   *
+   * @return the reverse channel.
+   */
+  int GetRevChannel() const;
 
   /**
    * Check if the forward solenoid is blacklisted.

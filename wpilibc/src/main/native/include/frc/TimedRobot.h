@@ -1,18 +1,22 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/math.h>
+#include <units/time.h>
 #include <wpi/deprecated.h>
+#include <wpi/priority_queue.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"
+#include "frc2/Timer.h"
 
 namespace frc {
 
@@ -47,6 +51,9 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   /**
    * Constructor for TimedRobot.
    *
+   * @deprecated use unit safe constructor instead.
+   * TimedRobot(units::second_t period = kDefaultPeriod)
+   *
    * @param period Period in seconds.
    */
   WPI_DEPRECATED("Use constructor with unit-safety instead.")
@@ -64,16 +71,57 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
 
- private:
-  hal::Handle<HAL_NotifierHandle> m_notifier;
-
-  // The absolute expiration time
-  units::second_t m_expirationTime{0};
-
   /**
-   * Update the HAL alarm time.
+   * Add a callback to run at a specific period with a starting time offset.
+   *
+   * This is scheduled on TimedRobot's Notifier, so TimedRobot and the callback
+   * run synchronously. Interactions between them are thread-safe.
+   *
+   * @param callback The callback to run.
+   * @param period   The period at which to run the callback.
+   * @param offset   The offset from the common starting time. This is useful
+   *                 for scheduling a callback in a different timeslot relative
+   *                 to TimedRobot.
    */
-  void UpdateAlarm();
+  void AddPeriodic(std::function<void()> callback, units::second_t period,
+                   units::second_t offset = 0_s);
+
+ private:
+  class Callback {
+   public:
+    std::function<void()> func;
+    units::second_t period;
+    units::second_t expirationTime;
+
+    /**
+     * Construct a callback container.
+     *
+     * @param func      The callback to run.
+     * @param startTime The common starting point for all callback scheduling.
+     * @param period    The period at which to run the callback.
+     * @param offset    The offset from the common starting time.
+     */
+    Callback(std::function<void()> func, units::second_t startTime,
+             units::second_t period, units::second_t offset)
+        : func{std::move(func)},
+          period{period},
+          expirationTime{
+              startTime + offset +
+              units::math::floor((frc2::Timer::GetFPGATimestamp() - startTime) /
+                                 period) *
+                  period +
+              period} {}
+
+    bool operator>(const Callback& rhs) const {
+      return expirationTime > rhs.expirationTime;
+    }
+  };
+
+  hal::Handle<HAL_NotifierHandle> m_notifier;
+  units::second_t m_startTime;
+
+  wpi::priority_queue<Callback, std::vector<Callback>, std::greater<Callback>>
+      m_callbacks;
 };
 
 }  // namespace frc

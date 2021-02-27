@@ -1,31 +1,28 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 class WaitUntilCommandTest extends CommandTestBase {
   @Test
   void waitUntilTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
 
-    ConditionHolder condition = new ConditionHolder();
+      Command command = new WaitUntilCommand(condition::getCondition);
 
-    Command command = new WaitUntilCommand(condition::getCondition);
-
-    scheduler.schedule(command);
-    scheduler.run();
-    assertTrue(scheduler.isScheduled(command));
-    condition.setCondition(true);
-    scheduler.run();
-    assertFalse(scheduler.isScheduled(command));
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
+      condition.setCondition(true);
+      scheduler.run();
+      assertFalse(scheduler.isScheduled(command));
+    }
   }
 }

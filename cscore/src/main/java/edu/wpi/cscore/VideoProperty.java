@@ -1,20 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
-/**
- * A source or sink property.
- */
+/** A source or sink property. */
 public class VideoProperty {
   public enum Kind {
-    kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
+    kNone(0),
+    kBoolean(1),
+    kInteger(2),
+    kString(4),
+    kEnum(8);
 
-    @SuppressWarnings("MemberName")
     private final int value;
 
     Kind(int value) {
@@ -34,11 +32,16 @@ public class VideoProperty {
    */
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
-      case 1: return Kind.kBoolean;
-      case 2: return Kind.kInteger;
-      case 4: return Kind.kString;
-      case 8: return Kind.kEnum;
-      default: return Kind.kNone;
+      case 1:
+        return Kind.kBoolean;
+      case 2:
+        return Kind.kInteger;
+      case 4:
+        return Kind.kString;
+      case 8:
+        return Kind.kEnum;
+      default:
+        return Kind.kNone;
     }
   }
 

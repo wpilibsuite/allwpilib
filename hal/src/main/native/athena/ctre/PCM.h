@@ -57,7 +57,7 @@ public:
 
     /* Get compressor state
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	status		-	True if compress ouput is on, false if otherwise
+     * @Param	-	status		-	True if compress output is on, false if otherwise
      */
     CTR_Code	GetCompressor(bool &status);
 

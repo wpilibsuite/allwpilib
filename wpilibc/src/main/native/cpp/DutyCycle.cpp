@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DutyCycle.h"
 
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Base.h"
 #include "frc/DigitalSource.h"
 #include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -39,7 +37,9 @@ DutyCycle::DutyCycle(std::shared_ptr<DigitalSource> source)
   }
 }
 
-DutyCycle::~DutyCycle() { HAL_FreeDutyCycle(m_handle); }
+DutyCycle::~DutyCycle() {
+  HAL_FreeDutyCycle(m_handle);
+}
 
 void DutyCycle::InitDutyCycle() {
   int32_t status = 0;
@@ -89,12 +89,14 @@ unsigned int DutyCycle::GetOutputScaleFactor() const {
   return retVal;
 }
 
-int DutyCycle::GetSourceChannel() const { return m_source->GetChannel(); }
+int DutyCycle::GetSourceChannel() const {
+  return m_source->GetChannel();
+}
 
 void DutyCycle::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
-  builder.AddDoubleProperty("Frequency",
-                            [this] { return this->GetFrequency(); }, nullptr);
-  builder.AddDoubleProperty("Output", [this] { return this->GetOutput(); },
-                            nullptr);
+  builder.AddDoubleProperty(
+      "Frequency", [this] { return this->GetFrequency(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Output", [this] { return this->GetOutput(); }, nullptr);
 }

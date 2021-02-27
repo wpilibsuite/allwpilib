@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
-/**
- * A source that represents a USB camera.
- */
+/** A source that represents a USB camera. */
 public class UsbCamera extends VideoCamera {
   /**
    * Create a source for a USB camera based on device number.
@@ -40,16 +35,17 @@ public class UsbCamera extends VideoCamera {
     return CameraServerJNI.enumerateUsbCameras();
   }
 
-  /**
-   * Get the path to the device.
-   */
+  /** Change the path to the device. */
+  void setPath(String path) {
+    CameraServerJNI.setUsbCameraPath(m_handle, path);
+  }
+
+  /** Get the path to the device. */
   public String getPath() {
     return CameraServerJNI.getUsbCameraPath(m_handle);
   }
 
-  /**
-   * Get the full camera information for the device.
-   */
+  /** Get the full camera information for the device. */
   public UsbCameraInfo getInfo() {
     return CameraServerJNI.getUsbCameraInfo(m_handle);
   }
@@ -60,7 +56,7 @@ public class UsbCamera extends VideoCamera {
    * @param level 0=don't display Connecting message, 1=do display message
    */
   public void setConnectVerbose(int level) {
-    CameraServerJNI.setProperty(CameraServerJNI.getSourceProperty(m_handle, "connect_verbose"),
-                                level);
+    CameraServerJNI.setProperty(
+        CameraServerJNI.getSourceProperty(m_handle, "connect_verbose"), level);
   }
 }

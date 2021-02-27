@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_RPCSERVER_H_
 #define NTCORE_RPCSERVER_H_
 
 #include <utility>
 
+#include <wpi/CallbackManager.h>
 #include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
 
-#include "CallbackManager.h"
 #include "Handle.h"
 #include "IRpcServer.h"
 #include "Log.h"
@@ -29,17 +26,17 @@ struct RpcNotifierData : public RpcAnswer {
                   StringRef params_, const ConnectionInfo& conn_,
                   IRpcServer::SendResponseFunc send_response_)
       : RpcAnswer{entry_, call_, name_, params_, conn_},
-        send_response{send_response_} {}
+        send_response{std::move(send_response_)} {}
 
   IRpcServer::SendResponseFunc send_response;
 };
 
 using RpcListenerData =
-    ListenerData<std::function<void(const RpcAnswer& answer)>>;
+    wpi::CallbackListenerData<std::function<void(const RpcAnswer& answer)>>;
 
 class RpcServerThread
-    : public CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
-                            RpcNotifierData> {
+    : public wpi::CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
+                                 RpcNotifierData> {
  public:
   RpcServerThread(int inst, wpi::Logger& logger)
       : m_inst(inst), m_logger(logger) {}
@@ -81,10 +78,11 @@ class RpcServerThread
 
 }  // namespace impl
 
-class RpcServer : public IRpcServer,
-                  public CallbackManager<RpcServer, impl::RpcServerThread> {
+class RpcServer
+    : public IRpcServer,
+      public wpi::CallbackManager<RpcServer, impl::RpcServerThread> {
   friend class RpcServerTest;
-  friend class CallbackManager<RpcServer, impl::RpcServerThread>;
+  friend class wpi::CallbackManager<RpcServer, impl::RpcServerThread>;
 
  public:
   RpcServer(int inst, wpi::Logger& logger);

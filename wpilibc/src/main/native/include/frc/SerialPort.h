@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -68,8 +65,9 @@ class SerialPort : public ErrorBase {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
-             Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
+  explicit SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
+                      Parity parity = kParity_None,
+                      StopBits stopBits = kStopBits_One);
 
   /**
    * Create an instance of a Serial Port class.
@@ -90,7 +88,7 @@ class SerialPort : public ErrorBase {
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
-  ~SerialPort();
+  ~SerialPort() override;
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;
@@ -106,7 +104,7 @@ class SerialPort : public ErrorBase {
    * Enable termination and specify the termination character.
    *
    * Termination is currently only implemented for receive.
-   * When the the terminator is recieved, the Read() or Scanf() will return
+   * When the the terminator is received, the Read() or Scanf() will return
    * fewer bytes than requested, stopping after the terminator.
    *
    * @param terminator The character to use for termination.
@@ -169,7 +167,7 @@ class SerialPort : public ErrorBase {
    *
    * Specify the amount of data that can be stored before data
    * from the device is returned to Read or Scanf.  If you want
-   * data that is recieved to be returned immediately, set this to 1.
+   * data that is received to be returned immediately, set this to 1.
    *
    * It the buffer is not filled before the read timeout expires, all
    * data that has been received so far will be returned.

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "SwerveModule.h"
 
@@ -35,7 +32,12 @@ frc::SwerveModuleState SwerveModule::GetState() const {
           frc::Rotation2d(units::radian_t(m_turningEncoder.Get()))};
 }
 
-void SwerveModule::SetDesiredState(const frc::SwerveModuleState& state) {
+void SwerveModule::SetDesiredState(
+    const frc::SwerveModuleState& referenceState) {
+  // Optimize the reference state to avoid spinning further than 90 degrees
+  const auto state = frc::SwerveModuleState::Optimize(
+      referenceState, units::radian_t(m_turningEncoder.Get()));
+
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
       m_driveEncoder.GetRate(), state.speed.to<double>());

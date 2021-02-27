@@ -8,39 +8,15 @@ include(AddTest)
 file(GLOB wpiutil_jni_src src/main/native/cpp/jni/WPIUtilJNI.cpp)
 
 # Java bindings
-if (NOT WITHOUT_JAVA)
+if (WITH_JAVA)
   find_package(Java REQUIRED)
   find_package(JNI REQUIRED)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
 
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml/ejml-simple-0.38.jar")
-      set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-      set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml")
-
-      message(STATUS "Downloading EJML jarfiles...")
-
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.38/ejml-cdense-0.38.jar"
-          "${JAR_ROOT}/ejml-cdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.38/ejml-core-0.38.jar"
-          "${JAR_ROOT}/ejml-core-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.38/ejml-ddense-0.38.jar"
-          "${JAR_ROOT}/ejml-ddense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.38/ejml-dsparse-0.38.jar"
-          "${JAR_ROOT}/ejml-dsparse-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.38/ejml-fdense-0.38.jar"
-          "${JAR_ROOT}/ejml-fdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.38/ejml-simple-0.38.jar"
-          "${JAR_ROOT}/ejml-simple-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.38/ejml-zdense-0.38.jar"
-          "${JAR_ROOT}/ejml-zdense-0.38.jar")
-
-      message(STATUS "All files downloaded.")
-  endif()
-
-  if(NOT EXISTS "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
-        set(JAR_ROOT "${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson")
+        set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
@@ -54,28 +30,20 @@ if (NOT WITHOUT_JAVA)
         message(STATUS "All files downloaded.")
     endif()
 
-  file(GLOB EJML_JARS
-      ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/ejml/*.jar)
-
   file(GLOB JACKSON_JARS
-        ${CMAKE_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
+        ${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/*.jar)
 
-  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${EJML_JARS})
-
-  execute_process(COMMAND python3 ${CMAKE_SOURCE_DIR}/wpiutil/generate_numbers.py ${CMAKE_BINARY_DIR}/wpiutil RESULT_VARIABLE generateResult)
-  if(NOT (generateResult EQUAL "0"))
-    message(FATAL_ERROR "python3 generate_numbers.py failed")
-  endif()
+  set(CMAKE_JAVA_INCLUDE_PATH wpiutil.jar ${JACKSON_JARS})
 
   set(CMAKE_JNI_TARGET true)
 
-  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java ${CMAKE_BINARY_DIR}/wpiutil/generated/*.java)
+  file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
 
   if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
     set(CMAKE_JAVA_COMPILE_FLAGS "-h" "${CMAKE_CURRENT_BINARY_DIR}/jniheaders")
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} ${JACKSON_JARS} OUTPUT_NAME wpiutil)
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil)
   else()
-    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${EJML_JARS} ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
+    add_jar(wpiutil_jar ${JAVA_SOURCES} INCLUDE_JARS ${JACKSON_JARS} OUTPUT_NAME wpiutil GENERATE_NATIVE_HEADERS wpiutil_jni_headers)
   endif()
 
   get_property(WPIUTIL_JAR_FILE TARGET wpiutil_jar PROPERTY JAR_FILE)
@@ -171,21 +139,11 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_17)
 if (MSVC)
-    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew)
+    target_compile_options(wpiutil PUBLIC /permissive- /Zc:throwingNew /MP /bigobj)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
-
-if (NOT USE_VCPKG_EIGEN)
-    install(DIRECTORY src/main/native/eigeninclude/ DESTINATION "${include_dest}/wpiutil")
-    target_include_directories(wpiutil PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/eigeninclude>
-                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
-else()
-    find_package(Eigen3 CONFIG REQUIRED)
-    target_link_libraries (wpiutil Eigen3::Eigen)
-endif()
 
 if (NOT USE_VCPKG_LIBUV)
     target_sources(wpiutil PRIVATE ${uv_native_src})
@@ -227,18 +185,18 @@ target_include_directories(wpiutil PUBLIC
 install(TARGETS wpiutil EXPORT wpiutil DESTINATION "${main_lib_dest}")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpiutil")
 
-if (NOT WITHOUT_JAVA AND MSVC)
+if (WITH_JAVA AND MSVC)
     install(TARGETS wpiutil RUNTIME DESTINATION "${jni_lib_dest}" COMPONENT Runtime)
 endif()
 
-if (MSVC OR FLAT_INSTALL_WPILIB)
+if (WITH_FLAT_INSTALL)
     set (wpiutil_config_dir ${wpilib_dest})
 else()
     set (wpiutil_config_dir share/wpiutil)
 endif()
 
-configure_file(wpiutil-config.cmake.in ${CMAKE_BINARY_DIR}/wpiutil-config.cmake )
-install(FILES ${CMAKE_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
+configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake )
+install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION ${wpiutil_config_dir})
 install(EXPORT wpiutil DESTINATION ${wpiutil_config_dir})
 
 SUBDIR_LIST(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
@@ -273,5 +231,6 @@ set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 
 if (WITH_TESTS)
     wpilib_add_test(wpiutil src/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/test/native/include)
     target_link_libraries(wpiutil_test wpiutil ${LIBUTIL} gmock_main)
 endif()

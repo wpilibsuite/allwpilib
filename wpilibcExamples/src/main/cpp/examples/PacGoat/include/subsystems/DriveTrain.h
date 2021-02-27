@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -31,7 +28,7 @@ class DriveTrain : public frc::Subsystem {
    * with
    * the joystick.
    */
-  void InitDefaultCommand();
+  void InitDefaultCommand() override;
 
   /**
    * @param leftAxis Left sides value
@@ -63,12 +60,12 @@ class DriveTrain : public frc::Subsystem {
 
  private:
   // Subsystem devices
-  frc::PWMVictorSPX m_frontLeftCIM{1};
-  frc::PWMVictorSPX m_rearLeftCIM{2};
+  frc::PWMSparkMax m_frontLeftCIM{1};
+  frc::PWMSparkMax m_rearLeftCIM{2};
   frc::SpeedControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
 
-  frc::PWMVictorSPX m_frontRightCIM{3};
-  frc::PWMVictorSPX m_rearRightCIM{4};
+  frc::PWMSparkMax m_frontRightCIM{3};
+  frc::PWMSparkMax m_rearRightCIM{4};
   frc::SpeedControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
 
   frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};

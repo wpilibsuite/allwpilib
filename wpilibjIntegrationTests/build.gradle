@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
     implementation project(':wpilibj')
+    implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
     implementation project(':ntcore')

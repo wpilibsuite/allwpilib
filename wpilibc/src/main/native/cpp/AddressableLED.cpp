@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/AddressableLED.h"
 
@@ -94,36 +91,5 @@ void AddressableLED::Stop() {
 }
 
 void AddressableLED::LEDData::SetHSV(int h, int s, int v) {
-  if (s == 0) {
-    SetRGB(v, v, v);
-    return;
-  }
-
-  int region = h / 30;
-  int remainder = (h - (region * 30)) * 6;
-
-  int p = (v * (255 - s)) >> 8;
-  int q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-  int t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
-
-  switch (region) {
-    case 0:
-      SetRGB(v, t, p);
-      break;
-    case 1:
-      SetRGB(q, v, p);
-      break;
-    case 2:
-      SetRGB(p, v, t);
-      break;
-    case 3:
-      SetRGB(p, q, v);
-      break;
-    case 4:
-      SetRGB(t, p, v);
-      break;
-    default:
-      SetRGB(v, p, q);
-      break;
-  }
+  SetLED(Color::FromHSV(h, s, v));
 }

@@ -18,7 +18,7 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-mainClassName = 'Main'
+mainClassName = 'edu.wpi.Main'
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -52,10 +52,10 @@ model {
                 }
             }
             binaries.all { binary ->
-                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
-                    lib project: ':ntcore', library: 'ntcore', linkage: 'static'
-                    lib project: ':cscore', library: 'cscore', linkage: 'static'
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                lib project: ':cscore', library: 'cscore', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
             }
         }
     }

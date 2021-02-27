@@ -15,15 +15,60 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
+model {
+    components {
+        cscoreJNICvStatic(JniNativeLibrarySpec) {
+            baseName = 'cscorejnicvstatic'
+
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/jni/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        include '**/*.h'
+                    }
+
+                }
+            }
+            binaries.all {
+                if (it instanceof StaticLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+
+                if (it.targetPlatform.operatingSystem.linux) {
+                    it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
+                } else if (it.targetPlatform.operatingSystem.macOsX) {
+                    it.linker.args '-exported_symbols_list'
+                    it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
+                }
+            }
+        }
+    }
+}
+
+
 ext {
     sharedCvConfigs = [cscore    : [],
-                       cscoreBase: [],
-                       cscoreDev : [],
-                       cscoreTest: [],
-                       cscoreJNIShared: []]
-    staticCvConfigs = [cscoreJNI: []]
+        cscoreBase: [],
+        cscoreDev : [],
+        cscoreTest: [],
+        cscoreJNIShared: []]
+    staticCvConfigs = [cscoreJNI: [],
+        cscoreJNICvStatic: []]
     useJava = true
     useCpp = true
+    cvStaticBuild = true
     splitSetup = {
         if (it.targetPlatform.operatingSystem.isMacOsX()) {
             it.sources {
@@ -82,29 +127,55 @@ def examplesMap = [:];
 
 File examplesTree = file("$projectDir/examples")
 examplesTree.list(new FilenameFilter() {
-    @Override
-    public boolean accept(File current, String name) {
-        return new File(current, name).isDirectory();
-    }
-}).each {
-    sharedCvConfigs.put(it, [])
-    examplesMap.put(it, [])
-}
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }).each {
+            sharedCvConfigs.put(it, [])
+            examplesMap.put(it, [])
+        }
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
 nativeUtils.exportsConfigs {
     cscore {
-        x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
-        x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
-                            '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
-                            '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
-                            '_TI3?AVout_of_range', '_CT??_R0?AVbad_cast']
+        x86ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
+        x64ExcludeSymbols = [
+            '_CT??_R0?AV_System_error',
+            '_CT??_R0?AVexception',
+            '_CT??_R0?AVfailure',
+            '_CT??_R0?AVruntime_error',
+            '_CT??_R0?AVsystem_error',
+            '_CTA5?AVfailure',
+            '_TI5?AVfailure',
+            '_CT??_R0?AVout_of_range',
+            '_CTA3?AVout_of_range',
+            '_TI3?AVout_of_range',
+            '_CT??_R0?AVbad_cast'
+        ]
     }
     cscoreJNI {
+        x86SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+        x64SymbolFilter = { symbols ->
+            symbols.removeIf({ !it.startsWith('CS_') })
+        }
+    }
+    cscoreJNICvStatic {
         x86SymbolFilter = { symbols ->
             symbols.removeIf({ !it.startsWith('CS_') })
         }
@@ -117,17 +188,50 @@ nativeUtils.exportsConfigs {
 model {
     components {
         examplesMap.each { key, value ->
-            "${key}"(NativeExecutableSpec) {
-                targetBuildTypes 'debug'
-                binaries.all {
-                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                    lib library: 'cscore', linkage: 'shared'
+            if (key == "usbviewer") {
+                if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxraspbian') && !project.hasProperty('onlylinuxaarch64bionic')) {
+                    "${key}"(NativeExecutableSpec) {
+                        targetBuildTypes 'debug'
+                        binaries.all {
+                            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                            lib library: 'cscore', linkage: 'shared'
+                            nativeUtils.useRequiredLibrary(it, 'imgui_static')
+                            if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
+                                it.buildable = false
+                                return
+                            }
+                            if (it.targetPlatform.operatingSystem.isWindows()) {
+                                it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                            } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                                it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
+                            } else {
+                                it.linker.args << '-lX11'
+                            }
+                        }
+                        sources {
+                            cpp {
+                                source {
+                                    srcDirs 'examples/' + "${key}"
+                                    include '**/*.cpp'
+                                }
+                            }
+                        }
+                    }
                 }
-                sources {
-                    cpp {
-                        source {
-                            srcDirs 'examples/' + "${key}"
-                            include '**/*.cpp'
+            } else {
+                "${key}"(NativeExecutableSpec) {
+                    targetBuildTypes 'debug'
+                    binaries.all {
+                        lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib library: 'cscore', linkage: 'shared'
+                    }
+                    sources {
+                        cpp {
+                            source {
+                                srcDirs 'examples/' + "${key}"
+                                include '**/*.cpp'
+                            }
                         }
                     }
                 }

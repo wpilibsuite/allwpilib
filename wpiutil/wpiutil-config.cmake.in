@@ -5,4 +5,5 @@ find_dependency(Threads)
 @LIBUV_VCPKG_REPLACE@
 @EIGEN_VCPKG_REPLACE@
 
+@FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/wpiutil.cmake)

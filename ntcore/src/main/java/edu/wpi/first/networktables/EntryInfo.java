@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.networktables;
 
-/**
- * NetworkTables Entry information.
- */
+/** NetworkTables Entry information. */
 public final class EntryInfo {
   /** Entry handle. */
   @SuppressWarnings("MemberName")
@@ -31,8 +26,8 @@ public final class EntryInfo {
   @SuppressWarnings("MemberName")
   public final long last_change;
 
-  /** Constructor.
-   * This should generally only be used internally to NetworkTables.
+  /**
+   * Constructor. This should generally only be used internally to NetworkTables.
    *
    * @param inst Instance
    * @param entry Entry handle
@@ -41,8 +36,8 @@ public final class EntryInfo {
    * @param flags Flags
    * @param lastChange Timestamp of last change
    */
-  public EntryInfo(NetworkTableInstance inst, int entry, String name, int type, int flags,
-                   long lastChange) {
+  public EntryInfo(
+      NetworkTableInstance inst, int entry, String name, int type, int flags, long lastChange) {
     this.m_inst = inst;
     this.entry = entry;
     this.name = name;

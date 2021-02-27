@@ -1,6 +1,7 @@
 cppHeaderFileInclude {
   \.h$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {
@@ -10,10 +11,7 @@ cppSrcFileInclude {
 generatedFileExclude {
   src/main/native/cpp/http_parser\.cpp$
   src/main/native/cpp/llvm/
-  src/main/native/eigeninclude/
   src/main/native/include/llvm/
-  src/main/native/include/units/units\.h$
-  src/main/native/include/unsupported/
   src/main/native/include/wpi/AlignOf\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
@@ -68,7 +66,6 @@ generatedFileExclude {
   src/main/native/include/uv/
   src/main/native/libuv/
   src/main/native/resources/
-  src/test/native/cpp/UnitsTest\.cpp$
   src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker
 }

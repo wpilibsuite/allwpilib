@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
@@ -129,9 +126,9 @@ TEST_F(ButtonTest, AndTest) {
   bool pressed2 = false;
   WaitUntilCommand command([&finished] { return finished; });
 
-  (Trigger([&pressed1] { return pressed1; }) &&
-   Trigger([&pressed2] { return pressed2; }))
-      .WhenActive(&command);
+  (Trigger([&pressed1] { return pressed1; }) && Trigger([&pressed2] {
+     return pressed2;
+   })).WhenActive(&command);
   pressed1 = true;
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
@@ -148,18 +145,18 @@ TEST_F(ButtonTest, OrTest) {
   WaitUntilCommand command1([&finished] { return finished; });
   WaitUntilCommand command2([&finished] { return finished; });
 
-  (Trigger([&pressed1] { return pressed1; }) ||
-   Trigger([&pressed2] { return pressed2; }))
-      .WhenActive(&command1);
+  (Trigger([&pressed1] { return pressed1; }) || Trigger([&pressed2] {
+     return pressed2;
+   })).WhenActive(&command1);
   pressed1 = true;
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command1));
 
   pressed1 = false;
 
-  (Trigger([&pressed1] { return pressed1; }) ||
-   Trigger([&pressed2] { return pressed2; }))
-      .WhenActive(&command2);
+  (Trigger([&pressed1] { return pressed1; }) || Trigger([&pressed2] {
+     return pressed2;
+   })).WhenActive(&command2);
   pressed2 = true;
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command2));

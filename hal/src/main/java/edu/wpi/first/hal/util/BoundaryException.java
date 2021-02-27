@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal.util;
 
 /**
  * This exception represents an error in which a lower limit was set as higher than an upper limit.
  */
+@SuppressWarnings("serial")
 public class BoundaryException extends RuntimeException {
   /**
    * Create a new exception with the given message.
@@ -30,8 +28,8 @@ public class BoundaryException extends RuntimeException {
    */
   public static void assertWithinBounds(double value, double lower, double upper) {
     if (value < lower || value > upper) {
-      throw new BoundaryException("Value must be between " + lower + " and " + upper + ", " + value
-          + " given");
+      throw new BoundaryException(
+          "Value must be between " + lower + " and " + upper + ", " + value + " given");
     }
   }
 

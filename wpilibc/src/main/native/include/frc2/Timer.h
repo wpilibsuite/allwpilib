@@ -1,17 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include <units/units.h>
-#include <wpi/deprecated.h>
+#include <units/time.h>
 #include <wpi/mutex.h>
-
-#include "frc/Base.h"
 
 namespace frc2 {
 
@@ -143,9 +137,6 @@ class Timer {
    * @return Time remaining in current match period (auto or teleop)
    */
   static units::second_t GetMatchTime();
-
-  // The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
-  static const units::second_t kRolloverTime;
 
  private:
   units::second_t m_startTime = 0_s;

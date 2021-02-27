@@ -1,19 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-
-/**
- * The base interface for objects that can be sent over the network through network tables.
- */
+/** The base interface for objects that can be sent over the network through network tables. */
 public interface Sendable {
   /**
    * Gets the name of this {@link Sendable} object.
@@ -53,7 +47,7 @@ public interface Sendable {
    * Sets the name of the sensor with a channel number.
    *
    * @param moduleType A string that defines the module name in the label for the value
-   * @param channel    The channel number the device is plugged into
+   * @param channel The channel number the device is plugged into
    * @deprecated Use SendableRegistry.setName()
    */
   @Deprecated(since = "2020", forRemoval = true)
@@ -64,9 +58,9 @@ public interface Sendable {
   /**
    * Sets the name of the sensor with a module and channel number.
    *
-   * @param moduleType   A string that defines the module name in the label for the value
+   * @param moduleType A string that defines the module name in the label for the value
    * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually PWM)
+   * @param channel The channel number the device is plugged into (usually PWM)
    * @deprecated Use SendableRegistry.setName()
    */
   @Deprecated(since = "2020", forRemoval = true)

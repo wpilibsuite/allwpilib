@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "drive_motor.h"
 
@@ -90,7 +87,9 @@ void DriveMotor::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
 static double computeForce(double input, double velocity, double max) {
   double output = input;
-  if (max == 0.0) return output;
+  if (max == 0.0) {
+    return output;
+  }
   if (std::fabs(velocity) >= max) {
     output = 0;
   } else {
@@ -107,7 +106,8 @@ void DriveMotor::Update(const gazebo::common::UpdateInfo& info) {
   ignition::math::Vector3d velocity = parent->GetRelativeLinearVel().Ign();
 #endif
 
-  if (signal == 0) return;
+  if (signal == 0)
+    return;
 
   double x = computeForce(signal * dx * multiplier, velocity.X(),
                           std::fabs(maxSpeed * dx));

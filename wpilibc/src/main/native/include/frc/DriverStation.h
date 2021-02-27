@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -16,11 +13,9 @@
 #include <hal/DriverStationTypes.h>
 #include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/ErrorBase.h"
-#include "frc/RobotState.h"
 
 namespace frc {
 
@@ -184,6 +179,17 @@ class DriverStation : public ErrorBase {
   int GetJoystickAxisType(int stick, int axis) const;
 
   /**
+   * Returns if a joystick is connected to the Driver Station.
+   *
+   * This makes a best effort guess by looking at the reported number of axis,
+   * buttons, and POVs attached.
+   *
+   * @param stick The joystick port number
+   * @return true if a joystick is connected
+   */
+  bool IsJoystickConnected(int stick) const;
+
+  /**
    * Check if the DS has enabled the robot.
    *
    * @return True if the robot is enabled and the DS is connected
@@ -212,11 +218,28 @@ class DriverStation : public ErrorBase {
   bool IsAutonomous() const;
 
   /**
+   * Check if the DS is commanding autonomous mode and if it has enabled the
+   * robot.
+   *
+   * @return True if the robot is being commanded to be in autonomous mode and
+   * enabled.
+   */
+  bool IsAutonomousEnabled() const;
+
+  /**
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
   bool IsOperatorControl() const;
+
+  /**
+   * Check if the DS is commanding teleop mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in teleop mode and
+   * enabled.
+   */
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Check if the DS is commanding test mode.
@@ -313,12 +336,18 @@ class DriverStation : public ErrorBase {
    *
    * This is a good way to delay processing until there is new driver station
    * data to act on.
+   *
+   * Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    */
   void WaitForData();
 
   /**
    * Wait until a new packet comes from the driver station, or wait for a
    * timeout.
+   *
+   * Checks if new control data has arrived since the last waitForData call
+   * on the current thread. If new data has not arrived, returns immediately.
    *
    * If the timeout is less then or equal to 0, wait indefinitely.
    *
@@ -345,7 +374,7 @@ class DriverStation : public ErrorBase {
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * The Practice Match function of the DS approximates the behaviour seen on
+   * The Practice Match function of the DS approximates the behavior seen on
    * the field.
    *
    * @return Time remaining in current match period (auto or teleop)
@@ -399,6 +428,23 @@ class DriverStation : public ErrorBase {
    */
   void WakeupWaitForData();
 
+  /**
+   * Allows the user to specify whether they want joystick connection warnings
+   * to be printed to the console. This setting is ignored when the FMS is
+   * connected -- warnings will always be on in that scenario.
+   *
+   * @param silence Whether warning messages should be silenced.
+   */
+  void SilenceJoystickConnectionWarning(bool silence);
+
+  /**
+   * Returns whether joystick connection warnings are silenced. This will
+   * always return false when connected to the FMS.
+   *
+   * @return Whether joystick connection warnings are silenced.
+   */
+  bool IsJoystickConnectionWarningSilenced() const;
+
  protected:
   /**
    * Copy data from the DS task for the user.
@@ -446,9 +492,11 @@ class DriverStation : public ErrorBase {
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
 
-  wpi::mutex m_waitForDataMutex;
+  mutable wpi::mutex m_waitForDataMutex;
   wpi::condition_variable m_waitForDataCond;
   int m_waitForDataCounter;
+
+  bool m_silenceJoystickWarning = false;
 
   // Robot state status variables
   bool m_userInDisabled = false;

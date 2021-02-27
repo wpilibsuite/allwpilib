@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
@@ -68,7 +65,9 @@ ShuffleboardContainer& ShuffleboardComponentBase::GetParent() {
   return m_parent;
 }
 
-const std::string& ShuffleboardComponentBase::GetType() const { return m_type; }
+const std::string& ShuffleboardComponentBase::GetType() const {
+  return m_type;
+}
 
 const wpi::StringMap<std::shared_ptr<nt::Value>>&
 ShuffleboardComponentBase::GetProperties() const {

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
 #include <cstring>
@@ -13,14 +10,12 @@
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAddressableLEDData() {
   static AddressableLEDData sad[kNumAddressableLEDs];
   ::hal::SimAddressableLEDData = sad;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 AddressableLEDData* hal::SimAddressableLEDData;
 
@@ -44,11 +39,24 @@ void AddressableLEDData::SetData(const HAL_AddressableLEDData* d, int32_t len) {
 int32_t AddressableLEDData::GetData(HAL_AddressableLEDData* d) {
   std::scoped_lock lock(m_dataMutex);
   int32_t len = length;
-  if (d) std::memcpy(d, m_data, len * sizeof(d[0]));
+  if (d) {
+    std::memcpy(d, m_data, len * sizeof(d[0]));
+  }
   return len;
 }
 
 extern "C" {
+
+int32_t HALSIM_FindAddressableLEDForChannel(int32_t channel) {
+  for (int i = 0; i < kNumAddressableLEDs; ++i) {
+    if (SimAddressableLEDData[i].initialized &&
+        SimAddressableLEDData[i].outputPort == channel) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 void HALSIM_ResetAddressableLEDData(int32_t index) {
   SimAddressableLEDData[index].ResetData();
 }

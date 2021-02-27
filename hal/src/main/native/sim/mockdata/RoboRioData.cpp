@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "RoboRioDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeRoboRioData() {
-  static RoboRioData srrd[1];
-  ::hal::SimRoboRioData = srrd;
+  static RoboRioData srrd;
+  ::hal::SimRoboRioData = &srrd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 RoboRioData* hal::SimRoboRioData;
 void RoboRioData::ResetData() {
@@ -39,13 +34,13 @@ void RoboRioData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetRoboRioData(int32_t index) {
-  SimRoboRioData[index].ResetData();
+void HALSIM_ResetRoboRioData(void) {
+  SimRoboRioData->ResetData();
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, RoboRio##CAPINAME, \
-                               SimRoboRioData, LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
+  HAL_SIMDATAVALUE_DEFINE_CAPI_NOINDEX(TYPE, HALSIM, RoboRio##CAPINAME, \
+                                       SimRoboRioData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, FPGAButton, fpgaButton)
 DEFINE_CAPI(double, VInVoltage, vInVoltage)
@@ -64,10 +59,9 @@ DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 
 #define REGISTER(NAME) \
-  SimRoboRioData[index].NAME.RegisterCallback(callback, param, initialNotify)
+  SimRoboRioData->NAME.RegisterCallback(callback, param, initialNotify)
 
-void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
-                                        HAL_NotifyCallback callback,
+void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify) {
   REGISTER(fpgaButton);
   REGISTER(vInVoltage);

@@ -5,7 +5,7 @@ project(imgui-download NONE)
 include(ExternalProject)
 ExternalProject_Add(glfw3
   GIT_REPOSITORY    https://github.com/glfw/glfw.git
-  GIT_TAG           7105ff2dfd004a46bd732c1d0c9f461bae6d51b3
+  GIT_TAG           2a5ac9a6d6cbe9f4113c0f17158cb13ab7f263bf
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/glfw-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/glfw-build"
   CONFIGURE_COMMAND ""
@@ -23,9 +23,19 @@ ExternalProject_Add(gl3w
 )
 ExternalProject_Add(imgui
   GIT_REPOSITORY    https://github.com/ocornut/imgui.git
-  GIT_TAG           v1.72b
+  GIT_TAG           v1.79
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-build"
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND     ""
+  INSTALL_COMMAND   ""
+  TEST_COMMAND      ""
+)
+ExternalProject_Add(implot
+  GIT_REPOSITORY    https://github.com/epezent/implot.git
+  GIT_TAG           a6bab98517b1baa3116db52518dda1eb2d7eaab7
+  SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-src"
+  BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/implot-build"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""
@@ -43,7 +53,7 @@ ExternalProject_Add(proggyfonts
 )
 ExternalProject_Add(stb
   GIT_REPOSITORY    https://github.com/nothings/stb.git
-  GIT_TAG           f67165c2bb2af3060ecae7d20d6f731173485ad0
+  GIT_TAG           f54acd4e13430c5122cab4ca657705c84aa61b08
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/stb-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/stb-build"
   CONFIGURE_COMMAND ""

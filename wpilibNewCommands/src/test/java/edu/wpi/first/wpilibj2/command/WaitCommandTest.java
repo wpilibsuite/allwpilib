@@ -1,15 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.Timer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,50 +11,70 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+
 class WaitCommandTest extends CommandTestBase {
-  @Test
-  void waitCommandTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+  @BeforeEach
+  void setup() {
+    HAL.initialize(500, 0);
+    SimHooks.pauseTiming();
+  }
 
-    WaitCommand waitCommand = new WaitCommand(2);
-
-    scheduler.schedule(waitCommand);
-    scheduler.run();
-    Timer.delay(1);
-    scheduler.run();
-
-    assertTrue(scheduler.isScheduled(waitCommand));
-
-    Timer.delay(2);
-
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(waitCommand));
+  @AfterEach
+  void cleanup() {
+    SimHooks.resumeTiming();
   }
 
   @Test
+  @ResourceLock("timing")
+  void waitCommandTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      WaitCommand waitCommand = new WaitCommand(2);
+
+      scheduler.schedule(waitCommand);
+      scheduler.run();
+      SimHooks.stepTiming(1);
+      scheduler.run();
+
+      assertTrue(scheduler.isScheduled(waitCommand));
+
+      SimHooks.stepTiming(2);
+
+      scheduler.run();
+
+      assertFalse(scheduler.isScheduled(waitCommand));
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
   void withTimeoutTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      MockCommandHolder command1Holder = new MockCommandHolder(true);
+      Command command1 = command1Holder.getMock();
+      when(command1.withTimeout(anyDouble())).thenCallRealMethod();
 
-    MockCommandHolder command1Holder = new MockCommandHolder(true);
-    Command command1 = command1Holder.getMock();
-    when(command1.withTimeout(anyDouble())).thenCallRealMethod();
+      Command timeout = command1.withTimeout(2);
 
-    Command timeout = command1.withTimeout(2);
+      scheduler.schedule(timeout);
+      scheduler.run();
 
-    scheduler.schedule(timeout);
-    scheduler.run();
+      verify(command1).initialize();
+      verify(command1).execute();
+      assertFalse(scheduler.isScheduled(command1));
+      assertTrue(scheduler.isScheduled(timeout));
 
-    verify(command1).initialize();
-    verify(command1).execute();
-    assertFalse(scheduler.isScheduled(command1));
-    assertTrue(scheduler.isScheduled(timeout));
+      SimHooks.stepTiming(3);
+      scheduler.run();
 
-    Timer.delay(3);
-    scheduler.run();
-
-    verify(command1).end(true);
-    verify(command1, never()).end(false);
-    assertFalse(scheduler.isScheduled(timeout));
+      verify(command1).end(true);
+      verify(command1, never()).end(false);
+      assertFalse(scheduler.isScheduled(timeout));
+    }
   }
 }

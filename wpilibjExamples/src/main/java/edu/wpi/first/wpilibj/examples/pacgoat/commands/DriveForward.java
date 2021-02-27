@@ -1,19 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
 /**
- * This command drives the robot over a given distance with simple proportional
- * control This command will drive a given distance limiting to a maximum speed.
+ * This command drives the robot over a given distance with simple proportional control This command
+ * will drive a given distance limiting to a maximum speed.
  */
 public class DriveForward extends Command {
   private final double m_driveForwardSpeed;
@@ -32,6 +28,7 @@ public class DriveForward extends Command {
 
   /**
    * Create a new drive forward command.
+   *
    * @param dist The distance to drive
    * @param maxSpeed The maximum speed to drive at
    */
@@ -53,8 +50,8 @@ public class DriveForward extends Command {
     if (m_driveForwardSpeed * kP * m_error >= m_driveForwardSpeed) {
       Robot.drivetrain.tankDrive(m_driveForwardSpeed, m_driveForwardSpeed);
     } else {
-      Robot.drivetrain.tankDrive(m_driveForwardSpeed * kP * m_error,
-          m_driveForwardSpeed * kP * m_error);
+      Robot.drivetrain.tankDrive(
+          m_driveForwardSpeed * kP * m_error, m_driveForwardSpeed * kP * m_error);
     }
   }
 

@@ -1,15 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <units/units.h>
+#include <units/acceleration.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/math>
 
 #include "ExampleSmartMotorController.h"
@@ -33,8 +34,8 @@ class Robot : public frc::TimedRobot {
     // Create a motion profile with the given maximum velocity and maximum
     // acceleration constraints for the next setpoint, the desired goal, and the
     // current setpoint.
-    frc::TrapezoidProfile<units::meter> profile{m_constraints, m_goal,
-                                                m_setpoint};
+    frc::TrapezoidProfile<units::meters> profile{m_constraints, m_goal,
+                                                 m_setpoint};
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
@@ -60,5 +61,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

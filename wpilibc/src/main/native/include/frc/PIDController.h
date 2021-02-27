@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -33,6 +30,8 @@ class PIDOutput;
  * This feedback controller runs in discrete time, so time deltas are not used
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
+ *
+ * @deprecated Use frc2::PIDController class instead.
  */
 class PIDController : public PIDBase, public Controller {
  public:
@@ -46,7 +45,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource* source,
@@ -62,7 +61,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource* source,
@@ -78,7 +77,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, PIDSource& source,
@@ -94,7 +93,7 @@ class PIDController : public PIDBase, public Controller {
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
    *               particularly affects calculations of the integral and
-   *               differental terms. The default is 0.05 (50ms).
+   *               differential terms. The default is 0.05 (50ms).
    */
   WPI_DEPRECATED("Use frc2::PIDController class instead.")
   PIDController(double p, double i, double d, double f, PIDSource& source,

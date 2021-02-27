@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/Servo.h"
 
@@ -31,11 +28,17 @@ Servo::Servo(int channel) : PWM(channel) {
   SendableRegistry::GetInstance().SetName(this, "Servo", channel);
 }
 
-void Servo::Set(double value) { SetPosition(value); }
+void Servo::Set(double value) {
+  SetPosition(value);
+}
 
-void Servo::SetOffline() { SetRaw(0); }
+void Servo::SetOffline() {
+  SetRaw(0);
+}
 
-double Servo::Get() const { return GetPosition(); }
+double Servo::Get() const {
+  return GetPosition();
+}
 
 void Servo::SetAngle(double degrees) {
   if (degrees < kMinServoAngle) {
@@ -51,14 +54,18 @@ double Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-double Servo::GetMaxAngle() const { return kMaxServoAngle; }
+double Servo::GetMaxAngle() const {
+  return kMaxServoAngle;
+}
 
-double Servo::GetMinAngle() const { return kMinServoAngle; }
+double Servo::GetMinAngle() const {
+  return kMinServoAngle;
+}
 
 void Servo::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Servo");
-  builder.AddDoubleProperty("Value", [=]() { return Get(); },
-                            [=](double value) { Set(value); });
+  builder.AddDoubleProperty(
+      "Value", [=]() { return Get(); }, [=](double value) { Set(value); });
 }
 
 double Servo::GetServoAngleRange() const {

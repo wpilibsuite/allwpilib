@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
 
-#include <frc/geometry/Rotation2d.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 
 #include "Constants.h"
 
@@ -30,9 +28,7 @@ DriveSubsystem::DriveSubsystem()
       m_rearRightEncoder{kRearRightEncoderPorts[0], kRearRightEncoderPorts[1],
                          kRearRightEncoderReversed},
 
-      m_odometry{kDriveKinematics,
-                 frc::Rotation2d(units::degree_t(GetHeading())),
-                 frc::Pose2d()} {
+      m_odometry{kDriveKinematics, m_gyro.GetRotation2d(), frc::Pose2d()} {
   // Set the distance per pulse for the encoders
   m_frontLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -43,7 +39,7 @@ DriveSubsystem::DriveSubsystem()
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
   m_odometry.Update(
-      frc::Rotation2d(units::degree_t(GetHeading())),
+      m_gyro.GetRotation2d(),
       frc::MecanumDriveWheelSpeeds{
           units::meters_per_second_t(m_frontLeftEncoder.GetRate()),
           units::meters_per_second_t(m_rearLeftEncoder.GetRate()),
@@ -52,8 +48,8 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
-                           bool feildRelative) {
-  if (feildRelative) {
+                           bool fieldRelative) {
+  if (fieldRelative) {
     m_drive.DriveCartesian(ySpeed, xSpeed, rot, -m_gyro.GetAngle());
   } else {
     m_drive.DriveCartesian(ySpeed, xSpeed, rot);
@@ -81,7 +77,9 @@ frc::Encoder& DriveSubsystem::GetFrontLeftEncoder() {
   return m_frontLeftEncoder;
 }
 
-frc::Encoder& DriveSubsystem::GetRearLeftEncoder() { return m_rearLeftEncoder; }
+frc::Encoder& DriveSubsystem::GetRearLeftEncoder() {
+  return m_rearLeftEncoder;
+}
 
 frc::Encoder& DriveSubsystem::GetFrontRightEncoder() {
   return m_frontRightEncoder;
@@ -103,19 +101,22 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1. : 1.);
+units::degree_t DriveSubsystem::GetHeading() const {
+  return m_gyro.GetRotation2d().Degrees();
 }
 
-void DriveSubsystem::ZeroHeading() { m_gyro.Reset(); }
+void DriveSubsystem::ZeroHeading() {
+  m_gyro.Reset();
+}
 
 double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1. : 1.);
+  return -m_gyro.GetRate();
 }
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() {
+  return m_odometry.GetPose();
+}
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  m_odometry.ResetPosition(pose,
-                           frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
 }

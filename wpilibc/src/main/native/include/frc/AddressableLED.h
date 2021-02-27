@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,7 +8,7 @@
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/time.h>
 #include <wpi/ArrayRef.h>
 
 #include "frc/ErrorBase.h"
@@ -151,7 +148,7 @@ class AddressableLED : public ErrorBase {
   /**
    * Starts the output.
    *
-   * <p>The output writes continously.
+   * <p>The output writes continuously.
    */
   void Start();
 

@@ -1,14 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_LOGGERIMPL_H_
 #define NTCORE_LOGGERIMPL_H_
 
-#include "CallbackManager.h"
+#include <wpi/CallbackManager.h>
+
 #include "Handle.h"
 #include "ntcore_cpp.h"
 
@@ -16,15 +14,17 @@ namespace nt {
 
 namespace impl {
 
-struct LoggerListenerData
-    : public ListenerData<std::function<void(const LogMessage& msg)>> {
+struct LoggerListenerData : public wpi::CallbackListenerData<
+                                std::function<void(const LogMessage& msg)>> {
   LoggerListenerData() = default;
   LoggerListenerData(std::function<void(const LogMessage& msg)> callback_,
                      unsigned int min_level_, unsigned int max_level_)
-      : ListenerData(callback_), min_level(min_level_), max_level(max_level_) {}
+      : CallbackListenerData(callback_),
+        min_level(min_level_),
+        max_level(max_level_) {}
   LoggerListenerData(unsigned int poller_uid_, unsigned int min_level_,
                      unsigned int max_level_)
-      : ListenerData(poller_uid_),
+      : CallbackListenerData(poller_uid_),
         min_level(min_level_),
         max_level(max_level_) {}
 
@@ -33,7 +33,7 @@ struct LoggerListenerData
 };
 
 class LoggerThread
-    : public CallbackThread<LoggerThread, LogMessage, LoggerListenerData> {
+    : public wpi::CallbackThread<LoggerThread, LogMessage, LoggerListenerData> {
  public:
   explicit LoggerThread(int inst) : m_inst(inst) {}
 
@@ -55,9 +55,9 @@ class LoggerThread
 
 }  // namespace impl
 
-class LoggerImpl : public CallbackManager<LoggerImpl, impl::LoggerThread> {
+class LoggerImpl : public wpi::CallbackManager<LoggerImpl, impl::LoggerThread> {
   friend class LoggerTest;
-  friend class CallbackManager<LoggerImpl, impl::LoggerThread>;
+  friend class wpi::CallbackManager<LoggerImpl, impl::LoggerThread>;
 
  public:
   explicit LoggerImpl(int inst);

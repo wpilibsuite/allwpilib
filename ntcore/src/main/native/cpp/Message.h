@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef NTCORE_MESSAGE_H_
 #define NTCORE_MESSAGE_H_
@@ -41,9 +38,8 @@ class Message {
   };
   typedef std::function<NT_Type(unsigned int id)> GetEntryTypeFunc;
 
-  Message() : m_type(kUnknown), m_id(0), m_flags(0), m_seq_num_uid(0) {}
-  Message(MsgType type, const private_init&)
-      : m_type(type), m_id(0), m_flags(0), m_seq_num_uid(0) {}
+  Message() = default;
+  Message(MsgType type, const private_init&) : m_type(type) {}
 
   MsgType type() const { return m_type; }
   bool Is(MsgType type) const { return type == m_type; }
@@ -102,14 +98,14 @@ class Message {
   Message& operator=(const Message&) = delete;
 
  private:
-  MsgType m_type;
+  MsgType m_type{kUnknown};
 
   // Message data.  Use varies by message type.
   std::string m_str;
   std::shared_ptr<Value> m_value;
-  unsigned int m_id;  // also used for proto_rev
-  unsigned int m_flags;
-  unsigned int m_seq_num_uid;
+  unsigned int m_id{0};  // also used for proto_rev
+  unsigned int m_flags{0};
+  unsigned int m_seq_num_uid{0};
 };
 
 }  // namespace nt

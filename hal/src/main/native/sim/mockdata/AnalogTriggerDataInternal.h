@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
-#include "mockdata/AnalogTriggerData.h"
-#include "mockdata/SimDataValue.h"
+#include "hal/simulation/AnalogTriggerData.h"
+#include "hal/simulation/SimDataValue.h"
 
 namespace hal {
 class AnalogTriggerData {
@@ -31,6 +28,7 @@ class AnalogTriggerData {
   SimDataValue<HALSIM_AnalogTriggerMode, MakeTriggerModeValue,
                GetTriggerModeName>
       triggerMode{static_cast<HALSIM_AnalogTriggerMode>(0)};
+  std::atomic<int32_t> inputPort;
 
   virtual void ResetData();
 };

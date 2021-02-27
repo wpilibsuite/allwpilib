@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -12,7 +9,7 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/units.h>
+#include <units/length.h>
 
 #include "Constants.h"
 #include "ExampleSmartMotorController.h"
@@ -77,14 +74,14 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  ExampleSmartMotorController m_leftMaster;
-  ExampleSmartMotorController m_leftSlave;
-  ExampleSmartMotorController m_rightMaster;
-  ExampleSmartMotorController m_rightSlave;
+  ExampleSmartMotorController m_leftLeader;
+  ExampleSmartMotorController m_leftFollower;
+  ExampleSmartMotorController m_rightLeader;
+  ExampleSmartMotorController m_rightFollower;
 
   // A feedforward component for the drive
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftMaster, m_rightMaster};
+  frc::DifferentialDrive m_drive{m_leftLeader, m_rightLeader};
 };

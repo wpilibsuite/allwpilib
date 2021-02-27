@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef WPIUTIL_WPI_UV_ASYNCFUNCTION_H_
 #define WPIUTIL_WPI_UV_ASYNCFUNCTION_H_
@@ -23,8 +20,7 @@
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Loop.h"
 
-namespace wpi {
-namespace uv {
+namespace wpi::uv {
 
 template <typename T>
 class AsyncFunction;
@@ -44,10 +40,11 @@ class AsyncFunction<R(T...)> final
                 std::function<void(promise<R>, T...)> func, const private_init&)
       : wakeup{func}, m_loop{loop} {}
   ~AsyncFunction() noexcept override {
-    if (auto loop = m_loop.lock())
+    if (auto loop = m_loop.lock()) {
       this->Close();
-    else
+    } else {
       this->ForceClosed();
+    }
   }
 
   /**
@@ -89,10 +86,11 @@ class AsyncFunction<R(T...)> final
             // waiting for it
             for (auto&& v : h.m_params) {
               auto p = h.m_promises.CreatePromise(v.first);
-              if (h.wakeup)
+              if (h.wakeup) {
                 std::apply(h.wakeup,
                            std::tuple_cat(std::make_tuple(std::move(p)),
                                           std::move(v.second)));
+              }
             }
             h.m_params.clear();
             // wake up any threads that might be waiting for the result
@@ -139,7 +137,9 @@ class AsyncFunction<R(T...)> final
     }
 
     // signal the loop
-    if (loop) this->Invoke(&uv_async_send, this->GetRaw());
+    if (loop) {
+      this->Invoke(&uv_async_send, this->GetRaw());
+    }
 
     // return future
     return m_promises.CreateFuture(req);
@@ -162,7 +162,6 @@ class AsyncFunction<R(T...)> final
   std::weak_ptr<Loop> m_loop;
 };
 
-}  // namespace uv
-}  // namespace wpi
+}  // namespace wpi::uv
 
 #endif  // WPIUTIL_WPI_UV_ASYNCFUNCTION_H_

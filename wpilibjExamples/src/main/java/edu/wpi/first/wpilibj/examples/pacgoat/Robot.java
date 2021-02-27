@@ -1,18 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.pacgoat;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveAndShootAutonomous;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveForward;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Collector;
@@ -20,15 +14,16 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pivot;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Pneumatics;
 import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Shooter;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is the main class for running the PacGoat code.
  *
- * <p>The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
+ * <p>The VM is configured to automatically run this class, and to call the functions corresponding
+ * to each mode, as described in the TimedRobot documentation. If you change the name of this class
+ * or the package after creating this project, you must also update the manifest file in the
+ * resource directory.
  */
 public class Robot extends TimedRobot {
   Command m_autonomousCommand;
@@ -100,8 +95,7 @@ public class Robot extends TimedRobot {
 
   // This function called periodically during test mode
   @Override
-  public void testPeriodic() {
-  }
+  public void testPeriodic() {}
 
   @Override
   public void disabledInit() {
@@ -114,15 +108,11 @@ public class Robot extends TimedRobot {
     log();
   }
 
-  /**
-   * Log interesting values to the SmartDashboard.
-   */
+  /** Log interesting values to the SmartDashboard. */
   private void log() {
     Robot.pneumatics.writePressure();
     SmartDashboard.putNumber("Pivot Pot Value", Robot.pivot.getAngle());
-    SmartDashboard.putNumber("Left Distance",
-        drivetrain.getLeftEncoder().getDistance());
-    SmartDashboard.putNumber("Right Distance",
-        drivetrain.getRightEncoder().getDistance());
+    SmartDashboard.putNumber("Left Distance", drivetrain.getLeftEncoder().getDistance());
+    SmartDashboard.putNumber("Right Distance", drivetrain.getRightEncoder().getDistance());
   }
 }

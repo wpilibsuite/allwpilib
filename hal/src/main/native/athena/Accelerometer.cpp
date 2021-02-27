@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Accelerometer.h"
 
@@ -78,11 +75,9 @@ enum Register {
   kReg_OffZ = 0x31
 };
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeAccelerometer() {}
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 namespace hal {
 
@@ -126,7 +121,8 @@ static void writeRegister(Register reg, uint8_t data) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+      break;
   }
 
   // Send a stop transmit/receive message with the data
@@ -137,7 +133,8 @@ static void writeRegister(Register reg, uint8_t data) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+      break;
   }
 }
 
@@ -154,7 +151,8 @@ static uint8_t readRegister(Register reg) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+      break;
   }
 
   // Receive a message with the data and stop
@@ -165,7 +163,8 @@ static uint8_t readRegister(Register reg) {
   // Execute and wait until it's done (up to a millisecond)
   initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000)
+      break;
   }
 
   return accel->readDATI(&status);
@@ -176,7 +175,7 @@ static uint8_t readRegister(Register reg) {
  * 1 g-force, taking into account the accelerometer range.
  */
 static double unpackAxis(int16_t raw) {
-  // The raw value is actually 12 bits, not 16, so we need to propogate the
+  // The raw value is actually 12 bits, not 16, so we need to propagate the
   // 2's complement sign bit to the unused 4 bits for this to work with
   // negative numbers.
   raw <<= 4;

@@ -1,13 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <stdint.h>
+
+#include <wpi/nodiscard.h>
 
 #include "hal/Types.h"
 
@@ -83,11 +82,14 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * Waits for the next alarm for the specific notifier.
  *
  * This is a blocking call until either the time elapses or HAL_StopNotifier
- * gets called.
+ * gets called. If the latter occurs, this function will return zero and any
+ * loops using this function should exit. Failing to do so can lead to
+ * use-after-frees.
  *
  * @param notifierHandle the notifier handle
  * @return               the FPGA time the notifier returned
  */
+WPI_NODISCARD
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status);
 

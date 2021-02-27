@@ -1,23 +1,19 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.examples.potentiometerpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 
 /**
- * This is a sample program to demonstrate how to use a soft potentiometer and a
- * PID controller to reach and maintain position setpoints on an elevator
- * mechanism.
+ * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to
+ * reach and maintain position setpoints on an elevator mechanism.
  */
 public class Robot extends TimedRobot {
   private static final int kPotChannel = 1;
@@ -46,17 +42,17 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_potentiometer = new AnalogInput(kPotChannel);
-    m_elevatorMotor = new PWMVictorSPX(kMotorChannel);
+    m_elevatorMotor = new PWMSparkMax(kMotorChannel);
     m_joystick = new Joystick(kJoystickChannel);
 
     m_pidController = new PIDController(kP, kI, kD);
+    m_pidController.setSetpoint(kSetPoints[m_index]);
   }
 
   @Override
   public void teleopPeriodic() {
     // Run the PID Controller
-    double pidOut
-        = m_pidController.calculate(m_potentiometer.getAverageVoltage());
+    double pidOut = m_pidController.calculate(m_potentiometer.getAverageVoltage());
     m_elevatorMotor.set(pidOut);
 
     // when the button is pressed once, the selected elevator setpoint
@@ -65,9 +61,8 @@ public class Robot extends TimedRobot {
     if (currentButtonValue && !m_previousButtonValue) {
       // index of the elevator setpoint wraps around.
       m_index = (m_index + 1) % kSetPoints.length;
+      m_pidController.setSetpoint(kSetPoints[m_index]);
     }
     m_previousButtonValue = currentButtonValue;
-
-    m_pidController.setSetpoint(kSetPoints[m_index]);
   }
 }

@@ -7,6 +7,7 @@ def baseArtifactId = nativeName
 def artifactGroupId = "edu.wpi.first.${nativeName}"
 def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
 def jniBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jni_CLS"
+def jniCvStaticBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
 
 def licenseFile = file("$rootDir/license.md")
 
@@ -49,8 +50,14 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 
-    from('src/main/native/include') {
-        into '/'
+    ext.includeDirs = [
+        project.file('src/main/native/include')
+    ]
+
+    ext.includeDirs.each {
+        from(it) {
+            into '/'
+        }
     }
 }
 
@@ -64,7 +71,10 @@ addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, [nativeName, "${nativeName}JNIShared"], zipBaseName, Zip, project, includeStandardZipFormat)
+        def taskList = createComponentZipTasks($.components, [
+            nativeName,
+            "${nativeName}JNIShared"
+        ], zipBaseName, Zip, project, includeStandardZipFormat)
 
         def jniTaskList = createComponentZipTasks($.components, ["${nativeName}JNI"], jniBaseName, Jar, project, { task, value ->
             value.each { binary ->
@@ -108,6 +118,40 @@ model {
                 artifactId = "${baseArtifactId}-jni"
                 groupId artifactGroupId
                 version wpilibVersioning.version.get()
+            }
+        }
+
+        if (project.hasProperty('cvStaticBuild') && project.getProperty('cvStaticBuild') == true) {
+            def jniCvTaskList = createComponentZipTasks($.components, ["${nativeName}JNICvStatic"], jniCvStaticBaseName, Zip, project, { task, value ->
+                value.each { binary ->
+                    if (binary.buildable) {
+                        if (binary instanceof SharedLibraryBinarySpec) {
+                            task.dependsOn binary.tasks.link
+                            task.inputs.file(binary.sharedLibraryFile)
+                            task.from(binary.sharedLibraryFile) {
+                                into nativeUtils.getPlatformPath(binary) + '/shared'
+                            }
+                            def sharedPath = binary.sharedLibraryFile.absolutePath
+                            sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
+
+                            task.from(new File(sharedPath + '.pdb')) {
+                                into nativeUtils.getPlatformPath(binary) + '/shared'
+                            }
+                        }
+                    }
+                }
+            })
+
+            publications {
+                jniCvStatic(MavenPublication) {
+                    jniCvTaskList.each {
+                        artifact it
+                    }
+
+                    artifactId = "${baseArtifactId}-jnicvstatic"
+                    groupId artifactGroupId
+                    version wpilibVersioning.version.get()
+                }
             }
         }
     }

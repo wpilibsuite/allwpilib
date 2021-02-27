@@ -1,15 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
@@ -25,14 +22,6 @@ class Drivetrain {
  public:
   Drivetrain() { m_gyro.Reset(); }
 
-  /**
-   * Get the robot angle as a Rotation2d
-   */
-  frc::Rotation2d GetAngle() const {
-    // Negating the angle because WPILib Gyros are CW positive.
-    return frc::Rotation2d(units::degree_t(-m_gyro.GetAngle()));
-  }
-
   frc::MecanumDriveWheelSpeeds GetCurrentState() const;
   void SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds);
   void Drive(units::meters_per_second_t xSpeed,
@@ -46,10 +35,10 @@ class Drivetrain {
       wpi::math::pi};  // 1/2 rotation per second
 
  private:
-  frc::PWMVictorSPX m_frontLeftMotor{1};
-  frc::PWMVictorSPX m_frontRightMotor{2};
-  frc::PWMVictorSPX m_backLeftMotor{3};
-  frc::PWMVictorSPX m_backRightMotor{4};
+  frc::PWMSparkMax m_frontLeftMotor{1};
+  frc::PWMSparkMax m_frontRightMotor{2};
+  frc::PWMSparkMax m_backLeftMotor{3};
+  frc::PWMSparkMax m_backRightMotor{4};
 
   frc::Encoder m_frontLeftEncoder{0, 1};
   frc::Encoder m_frontRightEncoder{2, 3};
@@ -72,7 +61,7 @@ class Drivetrain {
       m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation,
       m_backRightLocation};
 
-  frc::MecanumDriveOdometry m_odometry{m_kinematics, GetAngle()};
+  frc::MecanumDriveOdometry m_odometry{m_kinematics, m_gyro.GetRotation2d()};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

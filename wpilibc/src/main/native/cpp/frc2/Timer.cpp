@@ -1,16 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/Timer.h"
 
 #include <chrono>
 #include <thread>
-
-#include <hal/FRCUsageReporting.h>
 
 #include "frc/DriverStation.h"
 #include "frc/RobotController.h"
@@ -36,10 +31,9 @@ units::second_t GetTime() {
 
 using namespace frc2;
 
-// for compatibility with msvc12--see C2864
-const units::second_t Timer::kRolloverTime = units::second_t((1ll << 32) / 1e6);
-
-Timer::Timer() { Reset(); }
+Timer::Timer() {
+  Reset();
+}
 
 Timer::Timer(const Timer& rhs)
     : m_startTime(rhs.m_startTime),
@@ -77,13 +71,6 @@ units::second_t Timer::Get() const {
 
   std::scoped_lock lock(m_mutex);
   if (m_running) {
-    // If the current time is before the start time, then the FPGA clock rolled
-    // over. Compensate by adding the ~71 minutes that it takes to roll over to
-    // the current time.
-    if (currentTime < m_startTime) {
-      currentTime += kRolloverTime;
-    }
-
     result = (currentTime - m_startTime) + m_accumulatedTime;
   } else {
     result = m_accumulatedTime;
@@ -116,7 +103,9 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(units::second_t period) const { return Get() > period; }
+bool Timer::HasElapsed(units::second_t period) const {
+  return Get() > period;
+}
 
 bool Timer::HasPeriodPassed(units::second_t period) {
   return AdvanceIfElapsed(period);

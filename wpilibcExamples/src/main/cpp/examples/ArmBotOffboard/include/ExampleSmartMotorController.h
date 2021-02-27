@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -48,9 +45,9 @@ class ExampleSmartMotorController : public frc::SpeedController {
   /**
    * Places this motor controller in follower mode.
    *
-   * @param master The master to follow.
+   * @param leader The leader to follow.
    */
-  void Follow(ExampleSmartMotorController master) {}
+  void Follow(ExampleSmartMotorController leader) {}
 
   /**
    * Returns the encoder distance.

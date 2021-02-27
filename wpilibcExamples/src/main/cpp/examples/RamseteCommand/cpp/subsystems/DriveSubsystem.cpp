@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/DriveSubsystem.h"
 
@@ -19,7 +16,7 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]},
-      m_odometry{frc::Rotation2d(units::degree_t(GetHeading()))} {
+      m_odometry{m_gyro.GetRotation2d()} {
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -29,7 +26,7 @@ DriveSubsystem::DriveSubsystem()
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
-  m_odometry.Update(frc::Rotation2d(units::degree_t(GetHeading())),
+  m_odometry.Update(m_gyro.GetRotation2d(),
                     units::meter_t(m_leftEncoder.GetDistance()),
                     units::meter_t(m_rightEncoder.GetDistance()));
 }
@@ -53,23 +50,29 @@ double DriveSubsystem::GetAverageEncoderDistance() {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-frc::Encoder& DriveSubsystem::GetLeftEncoder() { return m_leftEncoder; }
+frc::Encoder& DriveSubsystem::GetLeftEncoder() {
+  return m_leftEncoder;
+}
 
-frc::Encoder& DriveSubsystem::GetRightEncoder() { return m_rightEncoder; }
+frc::Encoder& DriveSubsystem::GetRightEncoder() {
+  return m_rightEncoder;
+}
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
   m_drive.SetMaxOutput(maxOutput);
 }
 
-double DriveSubsystem::GetHeading() {
-  return std::remainder(m_gyro.GetAngle(), 360) * (kGyroReversed ? -1.0 : 1.0);
+units::degree_t DriveSubsystem::GetHeading() const {
+  return m_gyro.GetRotation2d().Degrees();
 }
 
 double DriveSubsystem::GetTurnRate() {
-  return m_gyro.GetRate() * (kGyroReversed ? -1.0 : 1.0);
+  return -m_gyro.GetRate();
 }
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() {
+  return m_odometry.GetPose();
+}
 
 frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
   return {units::meters_per_second_t(m_leftEncoder.GetRate()),
@@ -78,6 +81,5 @@ frc::DifferentialDriveWheelSpeeds DriveSubsystem::GetWheelSpeeds() {
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   ResetEncoders();
-  m_odometry.ResetPosition(pose,
-                           frc::Rotation2d(units::degree_t(GetHeading())));
+  m_odometry.ResetPosition(pose, m_gyro.GetRotation2d());
 }

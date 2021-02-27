@@ -8,6 +8,7 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':cscore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':cameraserver')
+evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpilibOldCommands')
@@ -24,20 +25,23 @@ def zipBaseNameJava = '_GROUP_edu_wpi_first_wpilibj_ID_documentation_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 def cppProjectZips = []
+def cppIncludeRoots = []
 
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
+cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpilibOldCommands').cppHeadersZip)
 cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
-  executables {
-     doxygen version : '1.8.16'
-  }
+    executables {
+        doxygen version : '1.8.18',
+        baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
+    }
 }
 
 doxygen {
@@ -46,6 +50,9 @@ doxygen {
     cppProjectZips.each {
         dependsOn it
         source it.source
+        it.ext.includeDirs.each {
+            cppIncludeRoots.add(it.absolutePath)
+        }
     }
 
     exclude 'Eigen/**'
@@ -53,7 +60,6 @@ doxygen {
     exclude 'units/**'
     exclude 'uv.h'
     exclude 'uv/**'
-
 
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
@@ -72,6 +78,9 @@ doxygen {
     html_timestamp true
     generate_treeview true
     extract_static true
+    full_path_names true
+    strip_from_inc_path cppIncludeRoots as String[]
+    strip_from_path cppIncludeRoots as String[]
 }
 
 tasks.register("zipCppDocs", Zip) {
@@ -101,17 +110,19 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 task generateJavaDocs(type: Javadoc) {
-    classpath += project(":wpiutil").sourceSets.main.compileClasspath
+    classpath += project(":wpimath").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
     options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
     options.addBooleanOption('html5', true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
+    dependsOn project(':wpimath').generateNat
     source project(':hal').sourceSets.main.java
     source project(':wpiutil').sourceSets.main.java
     source project(':cscore').sourceSets.main.java
     source project(':ntcore').sourceSets.main.java
+    source project(':wpimath').sourceSets.main.java
     source project(':wpilibj').sourceSets.main.java
     source project(':cameraserver').sourceSets.main.java
     source project(':wpilibOldCommands').sourceSets.main.java
@@ -125,7 +136,9 @@ task generateJavaDocs(type: Javadoc) {
     ext.entryPoint = "$destinationDir/index.html"
 
     if (JavaVersion.current().isJava11Compatible()) {
-        options.addBooleanOption('-no-module-directories', true)
+        if (!JavaVersion.current().isJava12Compatible()) {
+            options.addBooleanOption('-no-module-directories', true)
+        }
         doLast {
             // This is a work-around for https://bugs.openjdk.java.net/browse/JDK-8211194. Can be removed once that issue is fixed on JDK's side
             // Since JDK 11, package-list is missing from javadoc output files and superseded by element-list file, but a lot of external tools still need it
@@ -143,11 +156,10 @@ tasks.register("zipJavaDocs", Zip) {
     into '/'
 }
 
-addTaskToCopyAllOutputs(zipCppDocs)
-addTaskToCopyAllOutputs(zipJavaDocs)
-
-build.dependsOn zipCppDocs
-build.dependsOn zipJavaDocs
+tasks.register("zipDocs") {
+    dependsOn zipCppDocs
+    dependsOn zipJavaDocs
+}
 
 apply plugin: 'maven-publish'
 

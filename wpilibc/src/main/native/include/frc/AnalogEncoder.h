@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -11,7 +8,7 @@
 
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
-#include <units/units.h>
+#include <units/angle.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
@@ -107,6 +104,13 @@ class AnalogEncoder : public ErrorBase,
    * @return The distance driven since the last reset
    */
   double GetDistance() const;
+
+  /**
+   * Get the channel number.
+   *
+   * @return The channel number.
+   */
+  int GetChannel() const;
 
   void InitSendable(SendableBuilder& builder) override;
 

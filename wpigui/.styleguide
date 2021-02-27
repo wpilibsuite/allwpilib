@@ -1,0 +1,30 @@
+cppHeaderFileInclude {
+  \.h$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  wpigui/src/main/native/cpp/portable-file-dialogs\.cpp$
+  wpigui/src/main/native/include/portable-file-dialogs\.h$
+}
+
+repoRootNameOverride {
+  wpigui
+}
+
+includeGuardRoots {
+  wpigui/src/main/native/cpp/
+  wpigui/src/main/native/include/
+  wpigui/src/main/native/directx11/
+  wpigui/src/main/native/metal/
+  wpigui/src/main/native/opengl3/
+}
+
+includeOtherLibs {
+  ^imgui
+  ^implot
+  ^stb
+}

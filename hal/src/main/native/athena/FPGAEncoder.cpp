@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "FPGAEncoder.h"
 
@@ -30,16 +27,14 @@ static constexpr double DECODING_SCALING_FACTOR = 0.25;
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>* fpgaEncoderHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeFPGAEncoder() {
   static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
                                HAL_HandleEnum::FPGAEncoder>
       feH;
   fpgaEncoderHandles = &feH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 

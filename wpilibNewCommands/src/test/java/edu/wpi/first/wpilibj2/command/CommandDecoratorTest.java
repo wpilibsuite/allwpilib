@@ -1,182 +1,185 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import org.junit.jupiter.api.Test;
-
-import edu.wpi.first.wpilibj.Timer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.SimHooks;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+
 class CommandDecoratorTest extends CommandTestBase {
   @Test
+  @ResourceLock("timing")
   void withTimeoutTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    HAL.initialize(500, 0);
+    SimHooks.pauseTiming();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command command1 = new WaitCommand(10);
 
-    Command command1 = new WaitCommand(10);
+      Command timeout = command1.withTimeout(2);
 
-    Command timeout = command1.withTimeout(2);
+      scheduler.schedule(timeout);
+      scheduler.run();
 
-    scheduler.schedule(timeout);
-    scheduler.run();
+      assertFalse(scheduler.isScheduled(command1));
+      assertTrue(scheduler.isScheduled(timeout));
 
-    assertFalse(scheduler.isScheduled(command1));
-    assertTrue(scheduler.isScheduled(timeout));
+      SimHooks.stepTiming(3);
+      scheduler.run();
 
-    Timer.delay(3);
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(timeout));
+      assertFalse(scheduler.isScheduled(timeout));
+    } finally {
+      SimHooks.resumeTiming();
+    }
   }
 
   @Test
   void withInterruptTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
 
-    ConditionHolder condition = new ConditionHolder();
+      Command command = new WaitCommand(10).withInterrupt(condition::getCondition);
 
-    Command command = new WaitCommand(10).withInterrupt(condition::getCondition);
-
-    scheduler.schedule(command);
-    scheduler.run();
-    assertTrue(scheduler.isScheduled(command));
-    condition.setCondition(true);
-    scheduler.run();
-    assertFalse(scheduler.isScheduled(command));
+      scheduler.schedule(command);
+      scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
+      condition.setCondition(true);
+      scheduler.run();
+      assertFalse(scheduler.isScheduled(command));
+    }
   }
 
   @Test
   void beforeStartingTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
+      condition.setCondition(false);
 
-    ConditionHolder condition = new ConditionHolder();
-    condition.setCondition(false);
+      Command command = new InstantCommand();
 
-    Command command = new InstantCommand();
+      scheduler.schedule(command.beforeStarting(() -> condition.setCondition(true)));
 
-    scheduler.schedule(command.beforeStarting(() -> condition.setCondition(true)));
-
-    assertTrue(condition.getCondition());
+      assertTrue(condition.getCondition());
+    }
   }
 
   @Test
   void andThenLambdaTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
+      condition.setCondition(false);
 
-    ConditionHolder condition = new ConditionHolder();
-    condition.setCondition(false);
+      Command command = new InstantCommand();
 
-    Command command = new InstantCommand();
+      scheduler.schedule(command.andThen(() -> condition.setCondition(true)));
 
-    scheduler.schedule(command.andThen(() -> condition.setCondition(true)));
+      assertFalse(condition.getCondition());
 
-    assertFalse(condition.getCondition());
+      scheduler.run();
 
-    scheduler.run();
-
-    assertTrue(condition.getCondition());
+      assertTrue(condition.getCondition());
+    }
   }
 
   @Test
   void andThenTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
+      condition.setCondition(false);
 
-    ConditionHolder condition = new ConditionHolder();
-    condition.setCondition(false);
+      Command command1 = new InstantCommand();
+      Command command2 = new InstantCommand(() -> condition.setCondition(true));
 
-    Command command1 = new InstantCommand();
-    Command command2 = new InstantCommand(() -> condition.setCondition(true));
+      scheduler.schedule(command1.andThen(command2));
 
-    scheduler.schedule(command1.andThen(command2));
+      assertFalse(condition.getCondition());
 
-    assertFalse(condition.getCondition());
+      scheduler.run();
 
-    scheduler.run();
-
-    assertTrue(condition.getCondition());
+      assertTrue(condition.getCondition());
+    }
   }
 
   @Test
   void deadlineWithTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
+      condition.setCondition(false);
 
-    ConditionHolder condition = new ConditionHolder();
-    condition.setCondition(false);
+      Command dictator = new WaitUntilCommand(condition::getCondition);
+      Command endsBefore = new InstantCommand();
+      Command endsAfter = new WaitUntilCommand(() -> false);
 
-    Command dictator = new WaitUntilCommand(condition::getCondition);
-    Command endsBefore = new InstantCommand();
-    Command endsAfter = new WaitUntilCommand(() -> false);
+      Command group = dictator.deadlineWith(endsBefore, endsAfter);
 
-    Command group = dictator.deadlineWith(endsBefore, endsAfter);
+      scheduler.schedule(group);
+      scheduler.run();
 
-    scheduler.schedule(group);
-    scheduler.run();
+      assertTrue(scheduler.isScheduled(group));
 
-    assertTrue(scheduler.isScheduled(group));
+      condition.setCondition(true);
+      scheduler.run();
 
-    condition.setCondition(true);
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(group));
+      assertFalse(scheduler.isScheduled(group));
+    }
   }
 
   @Test
   void alongWithTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder condition = new ConditionHolder();
+      condition.setCondition(false);
 
-    ConditionHolder condition = new ConditionHolder();
-    condition.setCondition(false);
+      Command command1 = new WaitUntilCommand(condition::getCondition);
+      Command command2 = new InstantCommand();
 
-    Command command1 = new WaitUntilCommand(condition::getCondition);
-    Command command2 = new InstantCommand();
+      Command group = command1.alongWith(command2);
 
-    Command group = command1.alongWith(command2);
+      scheduler.schedule(group);
+      scheduler.run();
 
-    scheduler.schedule(group);
-    scheduler.run();
+      assertTrue(scheduler.isScheduled(group));
 
-    assertTrue(scheduler.isScheduled(group));
+      condition.setCondition(true);
+      scheduler.run();
 
-    condition.setCondition(true);
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(group));
+      assertFalse(scheduler.isScheduled(group));
+    }
   }
 
   @Test
   void raceWithTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command command1 = new WaitUntilCommand(() -> false);
+      Command command2 = new InstantCommand();
 
-    Command command1 = new WaitUntilCommand(() -> false);
-    Command command2 = new InstantCommand();
+      Command group = command1.raceWith(command2);
 
-    Command group = command1.raceWith(command2);
+      scheduler.schedule(group);
+      scheduler.run();
 
-    scheduler.schedule(group);
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(group));
+      assertFalse(scheduler.isScheduled(group));
+    }
   }
 
   @Test
   void perpetuallyTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Command command = new InstantCommand();
 
-    Command command = new InstantCommand();
+      Command perpetual = command.perpetually();
 
-    Command perpetual = command.perpetually();
+      scheduler.schedule(perpetual);
+      scheduler.run();
+      scheduler.run();
+      scheduler.run();
 
-    scheduler.schedule(perpetual);
-    scheduler.run();
-    scheduler.run();
-    scheduler.run();
-
-    assertTrue(scheduler.isScheduled(perpetual));
+      assertTrue(scheduler.isScheduled(perpetual));
+    }
   }
 }

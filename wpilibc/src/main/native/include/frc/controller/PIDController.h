@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <functional>
 #include <limits>
 
-#include <units/units.h>
+#include <units/time.h>
 
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -30,7 +27,7 @@ class PIDController : public frc::Sendable,
    * @param Ki     The integral coefficient.
    * @param Kd     The derivative coefficient.
    * @param period The period between controller updates in seconds. The
-   *               default is 20 milliseconds.
+   *               default is 20 milliseconds. Must be non-zero and positive.
    */
   PIDController(double Kp, double Ki, double Kd,
                 units::second_t period = 20_ms);
@@ -238,6 +235,7 @@ class PIDController : public frc::Sendable,
   double m_velocityTolerance = std::numeric_limits<double>::infinity();
 
   double m_setpoint = 0;
+  double m_measurement = 0;
 };
 
 }  // namespace frc2

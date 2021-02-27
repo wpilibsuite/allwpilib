@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -46,6 +43,8 @@ class SendableHelper {
   /**
    * Gets the name of this Sendable object.
    *
+   * @deprecated use SendableRegistry::GetName()
+   *
    * @return Name
    */
   WPI_DEPRECATED("use SendableRegistry::GetName()")
@@ -57,6 +56,8 @@ class SendableHelper {
   /**
    * Sets the name of this Sendable object.
    *
+   * @deprecated use SendableRegistry::SetName()
+   *
    * @param name name
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
@@ -66,6 +67,8 @@ class SendableHelper {
 
   /**
    * Sets both the subsystem name and device name of this Sendable object.
+   *
+   * @deprecated use SendableRegistry::SetName()
    *
    * @param subsystem subsystem name
    * @param name device name
@@ -79,6 +82,8 @@ class SendableHelper {
   /**
    * Gets the subsystem name of this Sendable object.
    *
+   * @deprecated use SendableRegistry::GetSubsystem().
+   *
    * @return Subsystem name
    */
   WPI_DEPRECATED("use SendableRegistry::GetSubsystem()")
@@ -89,6 +94,8 @@ class SendableHelper {
 
   /**
    * Sets the subsystem name of this Sendable object.
+   *
+   * @deprecated use SendableRegistry::SetSubsystem()
    *
    * @param subsystem subsystem name
    */
@@ -102,6 +109,8 @@ class SendableHelper {
   /**
    * Add a child component.
    *
+   * @deprecated use SendableRegistry::AddChild()
+   *
    * @param child child component
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
@@ -113,6 +122,8 @@ class SendableHelper {
   /**
    * Add a child component.
    *
+   * @deprecated use SendableRegistry::AddChild()
+   *
    * @param child child component
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
@@ -123,6 +134,8 @@ class SendableHelper {
 
   /**
    * Sets the name of the sensor with a channel number.
+   *
+   * @deprecated use SendableRegistry::SetName()
    *
    * @param moduleType A string that defines the module name in the label for
    *                   the value
@@ -136,6 +149,8 @@ class SendableHelper {
 
   /**
    * Sets the name of the sensor with a module and channel number.
+   *
+   * @deprecated use SendableRegistry::SetName()
    *
    * @param moduleType   A string that defines the module name in the label for
    *                     the value

@@ -1,18 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
+
 /**
- * A subsystem that uses a {@link PIDController} to control an output.  The controller is run
+ * A subsystem that uses a {@link PIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
  */
 public abstract class PIDSubsystem extends SubsystemBase {
@@ -30,10 +27,11 @@ public abstract class PIDSubsystem extends SubsystemBase {
   public PIDSubsystem(PIDController controller, double initialPosition) {
     setSetpoint(initialPosition);
     m_controller = requireNonNullParam(controller, "controller", "PIDSubsystem");
+    addChild("PID Controller", m_controller);
   }
 
   /**
-   * Creates a new PIDSubsystem.  Initial setpoint is zero.
+   * Creates a new PIDSubsystem. Initial setpoint is zero.
    *
    * @param controller the PIDController to use
    */
@@ -62,6 +60,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the current setpoint of the subsystem.
+   *
+   * @return The current setpoint
+   */
+  public double getSetpoint() {
+    return m_setpoint;
+  }
+
+  /**
    * Uses the output from the PIDController.
    *
    * @param output the output of the PIDController
@@ -76,17 +83,13 @@ public abstract class PIDSubsystem extends SubsystemBase {
    */
   protected abstract double getMeasurement();
 
-  /**
-   * Enables the PID control.  Resets the controller.
-   */
+  /** Enables the PID control. Resets the controller. */
   public void enable() {
     m_enabled = true;
     m_controller.reset();
   }
 
-  /**
-   * Disables the PID control.  Sets output to zero.
-   */
+  /** Disables the PID control. Sets output to zero. */
   public void disable() {
     m_enabled = false;
     useOutput(0, 0);

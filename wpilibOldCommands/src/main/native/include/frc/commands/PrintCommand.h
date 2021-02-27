@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2011-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -18,13 +15,13 @@ namespace frc {
 class PrintCommand : public InstantCommand {
  public:
   explicit PrintCommand(const wpi::Twine& message);
-  virtual ~PrintCommand() = default;
+  ~PrintCommand() override = default;
 
   PrintCommand(PrintCommand&&) = default;
   PrintCommand& operator=(PrintCommand&&) = default;
 
  protected:
-  virtual void Initialize();
+  void Initialize() override;
 
  private:
   std::string m_message;

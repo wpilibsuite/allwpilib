@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/Counter.h"
 
@@ -28,16 +25,14 @@ struct Counter {
 static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                              HAL_HandleEnum::Counter>* counterHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeCounter() {
   static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                                HAL_HandleEnum::Counter>
       ch;
   counterHandles = &ch;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 
@@ -362,10 +357,11 @@ void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
   }
   if (counter->counter->readConfig_Mode(status) ==
       HAL_Counter_kExternalDirection) {
-    if (reverseDirection)
+    if (reverseDirection) {
       HAL_SetCounterDownSourceEdge(counterHandle, true, true, status);
-    else
+    } else {
       HAL_SetCounterDownSourceEdge(counterHandle, false, true, status);
+    }
   }
 }
 

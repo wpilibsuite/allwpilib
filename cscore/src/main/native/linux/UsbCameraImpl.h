@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_USBCAMERAIMPL_H_
 #define CSCORE_USBCAMERAIMPL_H_
@@ -66,12 +63,14 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  std::string GetPath() { return m_path; }
+  void SetPath(const wpi::Twine& path, CS_Status* status);
+  std::string GetPath() const;
 
   // Messages passed to/from camera thread
   struct Message {
     enum Kind {
       kNone = 0,
+      kCmdSetPath,
       kCmdSetMode,
       kCmdSetPixelFormat,
       kCmdSetResolution,
@@ -132,6 +131,8 @@ class UsbCameraImpl : public SourceImpl {
                                   const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
                                       const Message& msg);
+  CS_StatusValue DeviceCmdSetPath(std::unique_lock<wpi::mutex>& lock,
+                                  const Message& msg);
 
   // Property helper functions
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
@@ -152,11 +153,6 @@ class UsbCameraImpl : public SourceImpl {
   static constexpr int kNumBuffers = 4;
   std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
 
-  //
-  // Path never changes, so not protected by mutex.
-  //
-  std::string m_path;
-
   std::atomic_int m_fd;
   std::atomic_int m_command_fd;  // for command eventfd
 
@@ -176,6 +172,9 @@ class UsbCameraImpl : public SourceImpl {
   mutable std::vector<Message> m_commands;
   mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
   mutable wpi::condition_variable m_responseCv;
+
+  // Path
+  std::string m_path;
 };
 
 }  // namespace cs

@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/AnalogGyro.h>
 #include <frc/AnalogInput.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc2/command/SubsystemBase.h>
@@ -67,12 +64,12 @@ class DriveTrain : public frc2::SubsystemBase {
   void Periodic() override;
 
  private:
-  frc::PWMVictorSPX m_frontLeft{1};
-  frc::PWMVictorSPX m_rearLeft{2};
+  frc::PWMSparkMax m_frontLeft{1};
+  frc::PWMSparkMax m_rearLeft{2};
   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
 
-  frc::PWMVictorSPX m_frontRight{3};
-  frc::PWMVictorSPX m_rearRight{4};
+  frc::PWMSparkMax m_frontRight{3};
+  frc::PWMSparkMax m_rearRight{4};
   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};

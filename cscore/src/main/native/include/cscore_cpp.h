@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_CPP_H_
 #define CSCORE_CSCORE_CPP_H_
@@ -119,7 +116,8 @@ struct RawEvent {
     kTelemetryUpdated = CS_TELEMETRY_UPDATED,
     kSinkPropertyCreated = CS_SINK_PROPERTY_CREATED,
     kSinkPropertyValueUpdated = CS_SINK_PROPERTY_VALUE_UPDATED,
-    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED
+    kSinkPropertyChoicesUpdated = CS_SINK_PROPERTY_CHOICES_UPDATED,
+    kUsbCamerasChanged = CS_USB_CAMERAS_CHANGED
   };
 
   RawEvent() = default;
@@ -127,10 +125,11 @@ struct RawEvent {
   RawEvent(const wpi::Twine& name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_.str()} {
     if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
-        kind_ == kSinkEnabled || kind_ == kSinkDisabled)
+        kind_ == kSinkEnabled || kind_ == kSinkDisabled) {
       sinkHandle = handle_;
-    else
+    } else {
       sourceHandle = handle_;
+    }
   }
   RawEvent(const wpi::Twine& name_, CS_Source source_, const VideoMode& mode_)
       : kind{kSourceVideoModeChanged},
@@ -165,6 +164,9 @@ struct RawEvent {
   CS_PropertyKind propertyKind;
   int value;
   std::string valueStr;
+
+  // Listener that was triggered
+  CS_Listener listener{0};
 };
 
 /**
@@ -274,6 +276,7 @@ void SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
  * @defgroup cscore_usbcamera_func UsbCamera Source Functions
  * @{
  */
+void SetUsbCameraPath(CS_Source, const wpi::Twine& path, CS_Status* status);
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
 UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status);
 /** @} */
@@ -379,6 +382,15 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify, CS_Status* status);
 
 void RemoveListener(CS_Listener handle, CS_Status* status);
+
+CS_ListenerPoller CreateListenerPoller();
+void DestroyListenerPoller(CS_ListenerPoller poller);
+CS_Listener AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                              bool immediateNotify, CS_Status* status);
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller);
+std::vector<RawEvent> PollListener(CS_ListenerPoller poller, double timeout,
+                                   bool* timedOut);
+void CancelPollListener(CS_ListenerPoller poller);
 /** @} */
 
 bool NotifierDestroyed();

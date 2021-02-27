@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
 
@@ -13,11 +10,11 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * A base for CommandGroups.  Statically tracks commands that have been allocated to groups to
- * ensure those commands are not also used independently, which can result in inconsistent command
- * state and unpredictable execution.
+ * A base for CommandGroups. Statically tracks commands that have been allocated to groups to ensure
+ * those commands are not also used independently, which can result in inconsistent command state
+ * and unpredictable execution.
  */
-public abstract class CommandGroupBase extends CommandBase implements Command {
+public abstract class CommandGroupBase extends CommandBase {
   private static final Set<Command> m_groupedCommands =
       Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -28,8 +25,8 @@ public abstract class CommandGroupBase extends CommandBase implements Command {
   /**
    * Clears the list of grouped commands, allowing all commands to be freely used again.
    *
-   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior.  Do not
-   * use this unless you fully understand what you are doing.
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
    */
   public static void clearGroupedCommands() {
     m_groupedCommands.clear();
@@ -39,8 +36,8 @@ public abstract class CommandGroupBase extends CommandBase implements Command {
    * Removes a single command from the list of grouped commands, allowing it to be freely used
    * again.
    *
-   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior.  Do not
-   * use this unless you fully understand what you are doing.
+   * <p>WARNING: Using this haphazardly can result in unexpected/undesirable behavior. Do not use
+   * this unless you fully understand what you are doing.
    *
    * @param command the command to remove from the list of grouped commands
    */

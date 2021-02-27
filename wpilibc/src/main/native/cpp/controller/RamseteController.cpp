@@ -1,13 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/controller/RamseteController.h"
 
 #include <cmath>
+
+#include <units/math.h>
 
 using namespace frc;
 
@@ -52,8 +51,8 @@ ChassisSpeeds RamseteController::Calculate(
   m_poseError = poseRef.RelativeTo(currentPose);
 
   // Aliases for equation readability
-  double eX = m_poseError.Translation().X().to<double>();
-  double eY = m_poseError.Translation().Y().to<double>();
+  double eX = m_poseError.X().to<double>();
+  double eY = m_poseError.Y().to<double>();
   double eTheta = m_poseError.Rotation().Radians().to<double>();
   double vRef = linearVelocityRef.to<double>();
   double omegaRef = angularVelocityRef.to<double>();
@@ -73,4 +72,6 @@ ChassisSpeeds RamseteController::Calculate(
                    desiredState.velocity * desiredState.curvature);
 }
 
-void RamseteController::SetEnabled(bool enabled) { m_enabled = enabled; }
+void RamseteController::SetEnabled(bool enabled) {
+  m_enabled = enabled;
+}

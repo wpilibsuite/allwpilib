@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
 
@@ -17,7 +14,7 @@
 #include "edu_wpi_first_hal_can_CANJNI.h"
 #include "hal/CAN.h"
 
-using namespace frc;
+using namespace hal;
 using namespace wpi::java;
 
 extern "C" {
@@ -64,7 +61,9 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
   HAL_CAN_ReceiveMessage(messageIDPtr, messageIDMask, buffer, &dataSize,
                          timeStampPtr, &status);
 
-  if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
+  if (!CheckCANStatus(env, status, *messageIDPtr)) {
+    return nullptr;
+  }
   return MakeJByteArray(env,
                         wpi::StringRef{reinterpret_cast<const char*>(buffer),
                                        static_cast<size_t>(dataSize)});
@@ -88,7 +87,9 @@ Java_edu_wpi_first_hal_can_CANJNI_GetCANStatus
   HAL_CAN_GetCANStatus(&percentBusUtilization, &busOffCount, &txFullCount,
                        &receiveErrorCount, &transmitErrorCount, &status);
 
-  if (!CheckStatus(env, status)) return;
+  if (!CheckStatus(env, status)) {
+    return;
+  }
 
   SetCanStatusObject(env, canStatus, percentBusUtilization, busOffCount,
                      txFullCount, receiveErrorCount, transmitErrorCount);

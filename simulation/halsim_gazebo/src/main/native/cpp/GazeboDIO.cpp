@@ -1,17 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "GazeboDIO.h"
 
 #include <string>
 
 #include <hal/Value.h>
-#include <mockdata/DIOData.h>
-#include <mockdata/NotifyListener.h>
+#include <hal/simulation/DIOData.h>
+#include <hal/simulation/NotifyListener.h>
 
 static void init_callback(const char* name, void* param,
                           const struct HAL_Value* value) {

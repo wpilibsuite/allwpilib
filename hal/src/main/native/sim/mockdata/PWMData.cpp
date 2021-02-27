@@ -1,23 +1,18 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
 #include "PWMDataInternal.h"
 
 using namespace hal;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializePWMData() {
   static PWMData spd[kNumPWMChannels];
   ::hal::SimPWMData = spd;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 PWMData* hal::SimPWMData;
 void PWMData::ResetData() {
@@ -30,7 +25,9 @@ void PWMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPWMData(int32_t index) { SimPWMData[index].ResetData(); }
+void HALSIM_ResetPWMData(int32_t index) {
+  SimPWMData[index].ResetData();
+}
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PWM##CAPINAME, SimPWMData, \

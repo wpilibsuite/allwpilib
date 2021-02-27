@@ -71,7 +71,7 @@ fi
 PARAM_COUNTER=1
 printf "Param Args ${PARAM_ARGS}\n"
 
-# Check for optional paramaters
+# Check for optional parameters
 while  getopts ':hmd:A' option $PARAM_ARGS ; do
     case "$option" in
     h)
@@ -103,7 +103,7 @@ if [[ "$RUN_WITH_DEFAULT_ARGS" == true ]]; then
     TEST_RUN_ARGS="${DEFAULT_ARGS} ${TEST_RUN_ARGS}"
 fi
 
-# Make sure at least two paramaters are passed or four if running with -d option
+# Make sure at least two parameters are passed or four if running with -d option
 if [[ $# -lt $PARAM_COUNTER ]]; then
     printf "Invalid arg count. Should be %s, was %s.\n" "${PARAM_COUNTER}" "$#"
     echo "$usage"

@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
 #include <string>
@@ -146,7 +143,9 @@ bool ReadConfig() {
   // cameras
   try {
     for (auto&& camera : j.at("cameras")) {
-      if (!ReadCameraConfig(camera)) return false;
+      if (!ReadCameraConfig(camera)) {
+        return false;
+      }
     }
   } catch (const wpi::json::exception& e) {
     ParseError() << "could not read cameras: " << e.what() << '\n';
@@ -167,10 +166,14 @@ void StartCamera(const CameraConfig& config) {
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  if (argc >= 2) configFile = argv[1];
+  if (argc >= 2) {
+    configFile = argv[1];
+  }
 
   // read configuration
-  if (!ReadConfig()) return EXIT_FAILURE;
+  if (!ReadConfig()) {
+    return EXIT_FAILURE;
+  }
 
   // start NetworkTables
   auto ntinst = nt::NetworkTableInstance::GetDefault();
@@ -183,8 +186,12 @@ int main(int argc, char* argv[]) {
   }
 
   // start cameras
-  for (auto&& camera : cameras) StartCamera(camera);
+  for (auto&& camera : cameras) {
+    StartCamera(camera);
+  }
 
   // loop forever
-  for (;;) std::this_thread::sleep_for(std::chrono::seconds(10));
+  for (;;) {
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+  }
 }

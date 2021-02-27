@@ -1,16 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "DSCommPacket.h"
 #include "gtest/gtest.h"
 
 class DSCommPacketTest : public ::testing::Test {
  public:
-  DSCommPacketTest() {}
+  DSCommPacketTest() = default;
 
   void SendJoysticks() { commPacket.SendJoysticks(); }
 
@@ -70,7 +67,8 @@ TEST_F(DSCommPacketTest, MainJoystickTag) {
     std::array<uint8_t, 12> _buttons{{0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1}};
 
     std::array<uint8_t, 2> _button_bytes{{0, 0}};
-    for (int btn = 0; btn < 8; btn++) _button_bytes[1] |= _buttons[btn] << btn;
+    for (int btn = 0; btn < 8; btn++)
+      _button_bytes[1] |= _buttons[btn] << btn;
     for (int btn = 8; btn < 12; btn++)
       _button_bytes[0] |= _buttons[btn] << (btn - 8);
 

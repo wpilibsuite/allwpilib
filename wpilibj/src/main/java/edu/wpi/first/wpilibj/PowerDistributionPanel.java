@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
@@ -19,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  */
 public class PowerDistributionPanel implements Sendable, AutoCloseable {
   private final int m_handle;
+  private final int m_module;
 
   /**
    * Constructor.
@@ -28,14 +26,13 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
   public PowerDistributionPanel(int module) {
     SensorUtil.checkPDPModule(module);
     m_handle = PDPJNI.initializePDP(module);
+    m_module = module;
 
     HAL.report(tResourceType.kResourceType_PDP, module + 1);
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
-  /**
-   * Constructor.  Uses the default CAN ID (0).
-   */
+  /** Constructor. Uses the default CAN ID (0). */
   public PowerDistributionPanel() {
     this(0);
   }
@@ -103,18 +100,19 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     return PDPJNI.getPDPTotalEnergy(m_handle);
   }
 
-  /**
-   * Reset the total energy to 0.
-   */
+  /** Reset the total energy to 0. */
   public void resetTotalEnergy() {
     PDPJNI.resetPDPTotalEnergy(m_handle);
   }
 
-  /**
-   * Clear all PDP sticky faults.
-   */
+  /** Clear all PDP sticky faults. */
   public void clearStickyFaults() {
     PDPJNI.clearPDPStickyFaults(m_handle);
+  }
+
+  /** Gets module number (CAN ID). */
+  public int getModule() {
+    return m_module;
   }
 
   @Override

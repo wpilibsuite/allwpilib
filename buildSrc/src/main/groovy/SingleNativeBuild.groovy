@@ -6,10 +6,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gradle.api.tasks.Delete
+
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.Copy;
+import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.language.base.internal.ProjectLayout;
@@ -32,6 +36,8 @@ import org.gradle.nativeplatform.toolchain.internal.ToolType;
 import org.gradle.nativeplatform.toolchain.internal.gcc.AbstractGccCompatibleToolChain;
 import org.gradle.nativeplatform.toolchain.internal.msvcpp.VisualCppToolChain;
 import org.gradle.nativeplatform.toolchain.internal.tools.ToolRegistry;
+import org.gradle.nativeplatform.tasks.CreateStaticLibrary;
+import org.gradle.nativeplatform.tasks.AbstractLinkTask;
 import org.gradle.platform.base.BinarySpec;
 import org.gradle.platform.base.ComponentSpec;
 import org.gradle.platform.base.ComponentSpecContainer;
@@ -79,8 +85,16 @@ class SingleNativeBuild implements Plugin<Project> {
             components.each { component ->
                 if (component.name == "${nativeName}Base") {
                     base = (NativeLibrarySpec) component
-                } else if (component.name == "${nativeName}" || component.name == "${nativeName}JNI") {
+                } else if (component.name == "${nativeName}" || component.name == "${nativeName}JNI" || component.name == "${nativeName}JNICvStatic") {
                     subs << component
+                }
+            }
+            Delete deleteObjects = null
+            if (project.hasProperty('buildServer')) {
+                deleteObjects = project.tasks.create('deleteObjects', Delete)
+                project.tasks.named('build').configure { Task t ->
+                    t.dependsOn deleteObjects
+                    return
                 }
             }
             subs.each {
@@ -100,6 +114,23 @@ class SingleNativeBuild implements Plugin<Project> {
                             baseBin = tmpBaseBin
                         }
                     }
+
+                    if (binary instanceof StaticLibraryBinarySpec) {
+                        File intoDir = ((CreateStaticLibrary)((StaticLibraryBinarySpec)binary).tasks.createStaticLib).outputFile.get().asFile.parentFile
+                        File fromDir = ((CreateStaticLibrary)((StaticLibraryBinarySpec)baseBin).tasks.createStaticLib).outputFile.get().asFile.parentFile
+
+                        def copyBasePdbName = "copyBasePdbFor" + binary.buildTask.name
+                        def copyTask = project.tasks.register(copyBasePdbName, Copy) { Copy t ->
+                            t.from (fromDir)
+                            t.include '*.pdb'
+                            t.into intoDir
+
+                            t.dependsOn (((StaticLibraryBinarySpec)baseBin).tasks.createStaticLib)
+                        }
+                        ((CreateStaticLibrary)((StaticLibraryBinarySpec)binary).tasks.createStaticLib).dependsOn(copyTask)
+
+                    }
+
                     baseBin.tasks.withType(AbstractNativeSourceCompileTask) { oCompileTask ->
                         def compileTask = (AbstractNativeSourceCompileTask) oCompileTask
                         if (binary instanceof SharedLibraryBinarySpec) {
@@ -115,6 +146,10 @@ class SingleNativeBuild implements Plugin<Project> {
                             tree.include '**/*.o'
                             tree.include '**/*.obj'
                             link.source tree
+                            if (project.hasProperty('buildServer')) {
+                                deleteObjects.dependsOn link
+                                deleteObjects.delete tree
+                            }
                         } else if (binary instanceof StaticLibraryBinarySpec) {
                             def sBinary = (StaticLibraryBinarySpec) binary
                             ObjectFilesToBinary assemble = (ObjectFilesToBinary) sBinary.tasks.createStaticLib
@@ -124,6 +159,10 @@ class SingleNativeBuild implements Plugin<Project> {
                             tree.include '**/*.o'
                             tree.include '**/*.obj'
                             assemble.source tree
+                            if (project.hasProperty('buildServer')) {
+                                deleteObjects.dependsOn assemble
+                                deleteObjects.delete tree
+                            }
                         }
                     }
                 }

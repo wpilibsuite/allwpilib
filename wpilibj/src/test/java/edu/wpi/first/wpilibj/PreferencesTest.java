@@ -1,12 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -14,7 +19,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,15 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class PreferencesTest {
   private final Preferences m_prefs = Preferences.getInstance();
@@ -76,8 +71,9 @@ class PreferencesTest {
     Set<String> keys = m_table.getKeys();
     keys.remove(".type");
 
-    assertTrue(keys.isEmpty(), "Preferences was not empty!  Preferences in table: "
-        + Arrays.toString(keys.toArray()));
+    assertTrue(
+        keys.isEmpty(),
+        "Preferences was not empty!  Preferences in table: " + Arrays.toString(keys.toArray()));
   }
 
   @ParameterizedTest
@@ -100,8 +96,7 @@ class PreferencesTest {
         () -> assertEquals("Hello. How are you?", m_prefs.getString("checkedValueString", "")),
         () -> assertEquals(2, m_prefs.getInt("checkedValueInt", 0)),
         () -> assertEquals(3.14, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
-        () -> assertFalse(m_prefs.getBoolean("checkedValueBoolean", true))
-    );
+        () -> assertFalse(m_prefs.getBoolean("checkedValueBoolean", true)));
   }
 
   @Test
@@ -114,8 +109,7 @@ class PreferencesTest {
         () -> assertEquals("", m_prefs.getString("checkedValueString", "")),
         () -> assertEquals(0, m_prefs.getInt("checkedValueInt", 0)),
         () -> assertEquals(0, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
-        () -> assertTrue(m_prefs.getBoolean("checkedValueBoolean", true))
-    );
+        () -> assertTrue(m_prefs.getBoolean("checkedValueBoolean", true)));
   }
 
   @Nested
@@ -129,8 +123,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getInt(key, -1)),
-          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).intValue())
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).intValue()));
     }
 
     @Test
@@ -142,8 +135,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getLong(key, -1)),
-          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).longValue())
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).longValue()));
     }
 
     @Test
@@ -155,8 +147,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getFloat(key, -1), 1e-6),
-          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).floatValue(), 1e-6)
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).floatValue(), 1e-6));
     }
 
     @Test
@@ -168,8 +159,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getDouble(key, -1), 1e-6),
-          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).doubleValue(), 1e-6)
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).doubleValue(), 1e-6));
     }
 
     @Test
@@ -181,8 +171,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getString(key, "")),
-          () -> assertEquals(value, m_table.getEntry(key).getString(""))
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getString("")));
     }
 
     @Test
@@ -194,8 +183,7 @@ class PreferencesTest {
 
       assertAll(
           () -> assertEquals(value, m_prefs.getBoolean(key, false)),
-          () -> assertEquals(value, m_table.getEntry(key).getBoolean(false))
-      );
+          () -> assertEquals(value, m_table.getEntry(key).getBoolean(false)));
     }
   }
 
@@ -206,7 +194,6 @@ class PreferencesTest {
         "checkedValueString",
         "checkedValueInt",
         "checkedValueFloat",
-        "checkedValueBoolean"
-    );
+        "checkedValueBoolean");
   }
 }

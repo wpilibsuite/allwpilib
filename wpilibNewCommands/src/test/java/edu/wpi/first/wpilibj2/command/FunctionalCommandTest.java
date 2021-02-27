@@ -1,43 +1,43 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj2.command;
-
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 class FunctionalCommandTest extends CommandTestBase {
   @Test
   void functionalCommandScheduleTest() {
-    CommandScheduler scheduler = new CommandScheduler();
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      ConditionHolder cond1 = new ConditionHolder();
+      ConditionHolder cond2 = new ConditionHolder();
+      ConditionHolder cond3 = new ConditionHolder();
+      ConditionHolder cond4 = new ConditionHolder();
 
-    ConditionHolder cond1 = new ConditionHolder();
-    ConditionHolder cond2 = new ConditionHolder();
-    ConditionHolder cond3 = new ConditionHolder();
-    ConditionHolder cond4 = new ConditionHolder();
+      FunctionalCommand command =
+          new FunctionalCommand(
+              () -> cond1.setCondition(true),
+              () -> cond2.setCondition(true),
+              interrupted -> cond3.setCondition(true),
+              cond4::getCondition);
 
-    FunctionalCommand command =
-        new FunctionalCommand(() -> cond1.setCondition(true), () -> cond2.setCondition(true),
-            interrupted -> cond3.setCondition(true), cond4::getCondition);
+      scheduler.schedule(command);
+      scheduler.run();
 
-    scheduler.schedule(command);
-    scheduler.run();
+      assertTrue(scheduler.isScheduled(command));
 
-    assertTrue(scheduler.isScheduled(command));
+      cond4.setCondition(true);
 
-    cond4.setCondition(true);
+      scheduler.run();
 
-    scheduler.run();
-
-    assertFalse(scheduler.isScheduled(command));
-    assertTrue(cond1.getCondition());
-    assertTrue(cond2.getCondition());
-    assertTrue(cond3.getCondition());
+      assertFalse(scheduler.isScheduled(command));
+      assertTrue(cond1.getCondition());
+      assertTrue(cond2.getCondition());
+      assertTrue(cond3.getCondition());
+    }
   }
 }

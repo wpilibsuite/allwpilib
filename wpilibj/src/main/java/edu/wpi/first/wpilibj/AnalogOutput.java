@@ -1,22 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2014-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.sim.AnalogOutSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/**
- * Analog output class.
- */
+/** Analog output class. */
 public class AnalogOutput implements Sendable, AutoCloseable {
   private int m_port;
   private int m_channel;
@@ -45,9 +39,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     m_channel = 0;
   }
 
-  /**
-   * Get the channel of this AnalogOutput.
-   */
+  /** Get the channel of this AnalogOutput. */
   public int getChannel() {
     return m_channel;
   }
@@ -64,9 +56,5 @@ public class AnalogOutput implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Analog Output");
     builder.addDoubleProperty("Value", this::getVoltage, this::setVoltage);
-  }
-
-  public AnalogOutSim getSimObject() {
-    return new AnalogOutSim(m_channel);
   }
 }

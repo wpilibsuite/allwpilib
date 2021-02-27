@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/future.h"
 
@@ -28,10 +25,14 @@ uint64_t PromiseFactoryBase::CreateRequest() {
 }
 
 bool PromiseFactoryBase::EraseRequest(uint64_t request) {
-  if (request == 0) return false;
+  if (request == 0) {
+    return false;
+  }
   auto it = std::find_if(m_requests.begin(), m_requests.end(),
                          [=](auto r) { return r == request; });
-  if (it == m_requests.end()) return false;  // no waiters
+  if (it == m_requests.end()) {
+    return false;  // no waiters
+  }
   m_requests.erase(it);
   return true;
 }
@@ -47,7 +48,9 @@ future<void> PromiseFactory<void>::MakeReadyFuture() {
 
 void PromiseFactory<void>::SetValue(uint64_t request) {
   std::unique_lock lock(GetResultMutex());
-  if (!EraseRequest(request)) return;
+  if (!EraseRequest(request)) {
+    return;
+  }
   auto it = std::find_if(m_thens.begin(), m_thens.end(),
                          [=](const auto& x) { return x.request == request; });
   if (it != m_thens.end()) {
@@ -105,7 +108,9 @@ void PromiseFactory<void>::WaitResult(uint64_t request) {
     // Did we get a response to *our* request?
     auto it = std::find_if(m_results.begin(), m_results.end(),
                            [=](const auto& r) { return r == request; });
-    if (it != m_results.end()) return;
+    if (it != m_results.end()) {
+      return;
+    }
     // No, keep waiting for a response
     Wait(lock);
   }

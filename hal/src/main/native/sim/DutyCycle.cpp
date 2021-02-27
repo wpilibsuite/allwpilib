@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "hal/DutyCycle.h"
 
@@ -26,16 +23,14 @@ struct Empty {};
 static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                              HAL_HandleEnum::DutyCycle>* dutyCycleHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeDutyCycle() {
   static LimitedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
                                HAL_HandleEnum::DutyCycle>
       dcH;
   dutyCycleHandles = &dcH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 extern "C" {
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
@@ -65,14 +60,18 @@ HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
 void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   auto dutyCycle = dutyCycleHandles->Get(dutyCycleHandle);
   dutyCycleHandles->Free(dutyCycleHandle);
-  if (dutyCycle == nullptr) return;
+  if (dutyCycle == nullptr) {
+    return;
+  }
   SimDutyCycleData[dutyCycle->index].initialized = false;
 }
 
 void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
                                HAL_SimDeviceHandle device) {
   auto dutyCycle = dutyCycleHandles->Get(handle);
-  if (dutyCycle == nullptr) return;
+  if (dutyCycle == nullptr) {
+    return;
+  }
   SimDutyCycleData[dutyCycle->index].simDevice = device;
 }
 

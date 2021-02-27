@@ -1,19 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
- * maintian rotation vectorsin relation to the starting orientation of the robot
+ * maintain rotation vectorsin relation to the starting orientation of the robot
  * (field-oriented controls).
  */
 class Robot : public frc::TimedRobot {
@@ -47,10 +44,10 @@ class Robot : public frc::TimedRobot {
   static constexpr int kGyroPort = 0;
   static constexpr int kJoystickPort = 0;
 
-  frc::PWMVictorSPX m_frontLeft{kFrontLeftMotorPort};
-  frc::PWMVictorSPX m_rearLeft{kRearLeftMotorPort};
-  frc::PWMVictorSPX m_frontRight{kFrontRightMotorPort};
-  frc::PWMVictorSPX m_rearRight{kRearRightMotorPort};
+  frc::PWMSparkMax m_frontLeft{kFrontLeftMotorPort};
+  frc::PWMSparkMax m_rearLeft{kRearLeftMotorPort};
+  frc::PWMSparkMax m_frontRight{kFrontRightMotorPort};
+  frc::PWMSparkMax m_rearRight{kRearRightMotorPort};
   frc::MecanumDrive m_robotDrive{m_frontLeft, m_rearLeft, m_frontRight,
                                  m_rearRight};
 
@@ -59,5 +56,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

@@ -1,16 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj.fixtures;
 
-import java.util.logging.Logger;
-
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
+import java.util.logging.Logger;
 
 /**
  * An encoder that uses two {@link DIOCrossConnectFixture DIOCrossConnectFixtures} to test the
@@ -28,9 +24,7 @@ public class FakeEncoderFixture implements ITestFixture {
   private final Encoder m_encoder;
   private int[] m_encoderPort = new int[2];
 
-  /**
-   * Constructs a FakeEncoderFixture from two DIOCrossConnectFixture.
-   */
+  /** Constructs a FakeEncoderFixture from two DIOCrossConnectFixture. */
   public FakeEncoderFixture(DIOCrossConnectFixture dio1, DIOCrossConnectFixture dio2) {
     assert dio1 != null;
     assert dio2 != null;
@@ -41,9 +35,7 @@ public class FakeEncoderFixture implements ITestFixture {
     m_encoder = new Encoder(dio1.getInput(), dio2.getInput());
   }
 
-  /**
-   * Construcst a FakeEncoderFixture from a set of Digital I/O ports.
-   */
+  /** Construcst a FakeEncoderFixture from a set of Digital I/O ports. */
   public FakeEncoderFixture(int inputA, int outputA, int inputB, int outputB) {
     assert outputA != outputB;
     assert outputA != inputA;
@@ -100,7 +92,7 @@ public class FakeEncoderFixture implements ITestFixture {
    */
   @Override
   public boolean teardown() {
-    logger.fine("Begining teardown");
+    logger.fine("Beginning teardown");
     m_source.close();
     logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
     m_encoder.close();
@@ -111,6 +103,4 @@ public class FakeEncoderFixture implements ITestFixture {
     }
     return true;
   }
-
-
 }

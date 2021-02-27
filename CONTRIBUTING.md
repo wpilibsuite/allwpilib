@@ -1,6 +1,6 @@
 # Contributing to WPILib
 
-So you want to contribute your changes back to WPILib. Great! We have a few contributing rules that will help you make sure your changes will be accepted into the project. Please remember to follow the rules written here, and behave with Gracious Professionalism.
+So you want to contribute your changes back to WPILib. Great! We have a few contributing rules that will help you make sure your changes will be accepted into the project. Please remember to follow the rules in the [code of conduct](https://github.com/wpilibsuite/allwpilib/blob/main/CODE_OF_CONDUCT.md), and behave with Gracious Professionalism.
 
 - [General Contribution Rules](#general-contribution-rules)
 - [What to Contribute](#what-to-contribute)
@@ -37,7 +37,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 
 ## Coding Guidelines
 
-WPILib uses modified Google style guides for both C++ and Java, which can be found in the [styleguide repository](https://github.com/wpilibsuite/styleguide). Autoformatters are available for many popular editors at https://github.com/google/styleguide. Running wpiformat is required for all contributions and is enforced by our continuous integration system. We currently use clang-format 6.0 with wpiformat.
+WPILib uses modified Google style guides for both C++ and Java, which can be found in the [styleguide repository](https://github.com/wpilibsuite/styleguide). Autoformatters are available for many popular editors at https://github.com/google/styleguide. Running wpiformat is required for all contributions and is enforced by our continuous integration system. We currently use clang-format 10.0 with wpiformat.
 
 While the library should be fully formatted according to the styles, additional elements of the style guide were not followed when the library was initially created. All new code should follow the guidelines. If you are looking for some easy ramp-up tasks, finding areas that don't follow the style guide and fixing them is very welcome.
 
@@ -45,11 +45,11 @@ While the library should be fully formatted according to the styles, additional 
 
 ### Pull Request Format
 
-Changes should be submitted as a Pull Request against the master branch of WPILib. For most changes, we ask that you squash your changes down to a single commit. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. No change will be merged unless it is up to date with the current master. We will also not merge any changes with merge commits in them; please rebase off of master before submitting a pull request. We do this to make sure that the git history isn't too cluttered.
+Changes should be submitted as a Pull Request against the main branch of WPILib. For most changes, commits will be squashed upon merge. For particularly large changes, multiple commits are ok, but assume one commit unless asked otherwise. We may ask you to break a PR into multiple standalone PRs or commits for rebase within one PR to separate unrelated changes. No change will be merged unless it is up to date with the current main branch. We do this to make sure that the git history isn't too cluttered.
 
 ### Merge Process
 
-When you first submit changes, Travis-CI will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Travis passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our Jenkins instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
+When you first submit changes, GitHub Actions will attempt to run `./gradlew check` on your change. If this fails, you will need to fix any issues that it sees. Once Actions passes, we will begin the review process in more earnest. One or more WPILib team members will review your change. This will be a back-and-forth process with the WPILib team and the greater community. Once we are satisfied that your change is ready, we will allow our hosted instance to test it. This will run the full gamut of checks, including integration tests on actual hardware. Once all tests have passed and the team is satisfied, we will merge your change into the WPILib repository.
 
 ## Licensing
 

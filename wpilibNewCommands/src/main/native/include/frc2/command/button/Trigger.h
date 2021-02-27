@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -108,7 +105,7 @@ class Trigger {
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
-   * cancelled when it becomes inactive.  Takes a raw pointer, and so is
+   * canceled when it becomes inactive.  Takes a raw pointer, and so is
    * non-owning; users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
@@ -119,7 +116,7 @@ class Trigger {
 
   /**
    * Binds a command to be started repeatedly while the trigger is active, and
-   * cancelled when it becomes inactive.  Transfers command ownership to the
+   * canceled when it becomes inactive.  Transfers command ownership to the
    * button scheduler, so the user does not have to worry about lifespan -
    * rvalue refs will be *moved*, lvalue refs will be *copied.*
    *
@@ -168,7 +165,7 @@ class Trigger {
 
   /**
    * Binds a command to be started when the trigger becomes active, and
-   * cancelled when it becomes inactive.  Takes a raw pointer, and so is
+   * canceled when it becomes inactive.  Takes a raw pointer, and so is
    * non-owning; users are responsible for the lifespan of the command.
    *
    * @param command The command to bind.
@@ -179,7 +176,7 @@ class Trigger {
 
   /**
    * Binds a command to be started when the trigger becomes active, and
-   * cancelled when it becomes inactive.  Transfers command ownership to the
+   * canceled when it becomes inactive.  Transfers command ownership to the
    * button scheduler, so the user does not have to worry about lifespan -
    * rvalue refs will be *moved*, lvalue refs will be *copied.*
    *
@@ -267,7 +264,7 @@ class Trigger {
                        wpi::ArrayRef<Subsystem*> requirements = {});
 
   /**
-   * Binds a command to start when the trigger becomes active, and be cancelled
+   * Binds a command to start when the trigger becomes active, and be canceled
    * when it again becomes active.  Takes a raw pointer, and so is non-owning;
    * users are responsible for the lifespan of the command.
    *
@@ -278,7 +275,7 @@ class Trigger {
   Trigger ToggleWhenActive(Command* command, bool interruptible = true);
 
   /**
-   * Binds a command to start when the trigger becomes active, and be cancelled
+   * Binds a command to start when the trigger becomes active, and be canceled
    * when it again becomes active.  Transfers command ownership to the button
    * scheduler, so the user does not have to worry about lifespan - rvalue refs
    * will be *moved*, lvalue refs will be *copied.*
@@ -311,7 +308,7 @@ class Trigger {
   }
 
   /**
-   * Binds a command to be cancelled when the trigger becomes active.  Takes a
+   * Binds a command to be canceled when the trigger becomes active.  Takes a
    * raw pointer, and so is non-owning; users are responsible for the lifespan
    *  and scheduling of the command.
    *

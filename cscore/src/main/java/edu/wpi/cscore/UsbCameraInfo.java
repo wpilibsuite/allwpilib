@@ -1,15 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.cscore;
 
-/**
- * USB camera information.
- */
+/** USB camera information. */
 public class UsbCameraInfo {
   /**
    * Create a new set of UsbCameraInfo.
@@ -22,8 +17,8 @@ public class UsbCameraInfo {
    * @param productId USB product id
    */
   @SuppressWarnings("PMD.ArrayIsStoredDirectly")
-  public UsbCameraInfo(int dev, String path, String name, String[] otherPaths, int vendorId,
-      int productId) {
+  public UsbCameraInfo(
+      int dev, String path, String name, String[] otherPaths, int vendorId, int productId) {
     this.dev = dev;
     this.path = path;
     this.name = name;
@@ -32,39 +27,27 @@ public class UsbCameraInfo {
     this.productId = productId;
   }
 
-  /**
-   * Device number (e.g. N in '/dev/videoN' on Linux).
-   */
+  /** Device number (e.g. N in '/dev/videoN' on Linux). */
   @SuppressWarnings("MemberName")
   public int dev;
 
-  /**
-   * Path to device if available (e.g. '/dev/video0' on Linux).
-   */
+  /** Path to device if available (e.g. '/dev/video0' on Linux). */
   @SuppressWarnings("MemberName")
   public String path;
 
-  /**
-   * Vendor/model name of the camera as provided by the USB driver.
-   */
+  /** Vendor/model name of the camera as provided by the USB driver. */
   @SuppressWarnings("MemberName")
   public String name;
 
-  /**
-   * Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux).
-   */
+  /** Other path aliases to device (e.g. '/dev/v4l/by-id/...' etc on Linux). */
   @SuppressWarnings("MemberName")
   public String[] otherPaths;
 
-  /**
-   * USB vendor id.
-   */
+  /** USB vendor id. */
   @SuppressWarnings("MemberName")
   public int vendorId;
 
-  /**
-   * USB product id.
-   */
+  /** USB product id. */
   @SuppressWarnings("MemberName")
   public int productId;
 }

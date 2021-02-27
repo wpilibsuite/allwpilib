@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.hal;
 
@@ -15,13 +12,21 @@ public class PWMJNI extends DIOJNI {
 
   public static native void freePWMPort(int pwmPortHandle);
 
-  public static native void setPWMConfigRaw(int pwmPortHandle, int maxPwm,
-                                            int deadbandMaxPwm, int centerPwm,
-                                            int deadbandMinPwm, int minPwm);
+  public static native void setPWMConfigRaw(
+      int pwmPortHandle,
+      int maxPwm,
+      int deadbandMaxPwm,
+      int centerPwm,
+      int deadbandMinPwm,
+      int minPwm);
 
-  public static native void setPWMConfig(int pwmPortHandle, double maxPwm,
-                                         double deadbandMaxPwm, double centerPwm,
-                                         double deadbandMinPwm, double minPwm);
+  public static native void setPWMConfig(
+      int pwmPortHandle,
+      double maxPwm,
+      double deadbandMaxPwm,
+      double centerPwm,
+      double deadbandMinPwm,
+      double minPwm);
 
   public static native PWMConfigDataResult getPWMConfigRaw(int pwmPortHandle);
 
@@ -41,7 +46,7 @@ public class PWMJNI extends DIOJNI {
 
   public static native double getPWMPosition(int pwmPortHandle);
 
-  public static native  void setPWMDisabled(int pwmPortHandle);
+  public static native void setPWMDisabled(int pwmPortHandle);
 
   public static native void latchPWMZero(int pwmPortHandle);
 

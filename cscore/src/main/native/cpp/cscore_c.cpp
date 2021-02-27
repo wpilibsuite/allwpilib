@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2016-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "cscore_c.h"
 
@@ -18,6 +15,39 @@
 #include "cscore_cpp.h"
 #include "cscore_raw.h"
 
+static CS_Event ConvertToC(const cs::RawEvent& rawEvent) {
+  CS_Event event;
+  event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
+  event.source = rawEvent.sourceHandle;
+  event.sink = rawEvent.sinkHandle;
+  event.name = rawEvent.name.c_str();
+  event.mode = rawEvent.mode;
+  event.property = rawEvent.propertyHandle;
+  event.propertyKind = rawEvent.propertyKind;
+  event.value = rawEvent.value;
+  event.valueStr = rawEvent.valueStr.c_str();
+  event.listener = rawEvent.listener;
+  return event;
+}
+
+template <typename O, typename I>
+static O* ConvertToC(std::vector<I>&& in, int* count) {
+  using T = std::vector<I>;
+  size_t size = in.size();
+  O* out = static_cast<O*>(wpi::safe_malloc(size * sizeof(O) + sizeof(T)));
+  *count = size;
+  for (size_t i = 0; i < size; ++i) {
+    out[i] = ConvertToC(in[i]);
+  }
+
+  // retain vector at end of returned array
+  alignas(T) unsigned char buf[sizeof(T)];
+  new (buf) T(std::move(in));
+  std::memcpy(out + size * sizeof(O), buf, sizeof(T));
+
+  return out;
+}
+
 extern "C" {
 
 CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
@@ -27,7 +57,9 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -58,7 +90,9 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -73,8 +107,9 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   char** out =
       static_cast<char**>(wpi::safe_malloc(choices.size() * sizeof(char*)));
   *count = choices.size();
-  for (size_t i = 0; i < choices.size(); ++i)
+  for (size_t i = 0; i < choices.size(); ++i) {
     out[i] = cs::ConvertToC(choices[i]);
+  }
   return out;
 }
 
@@ -85,14 +120,18 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -251,14 +290,18 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
   wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, status);
-  if (*status != 0) return nullptr;
+  if (*status != 0) {
+    return nullptr;
+  }
   return cs::ConvertToC(str);
 }
 
@@ -322,16 +365,7 @@ CS_Listener CS_AddListener(void* data,
                            CS_Status* status) {
   return cs::AddListener(
       [=](const cs::RawEvent& rawEvent) {
-        CS_Event event;
-        event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
-        event.source = rawEvent.sourceHandle;
-        event.sink = rawEvent.sinkHandle;
-        event.name = rawEvent.name.c_str();
-        event.mode = rawEvent.mode;
-        event.property = rawEvent.propertyHandle;
-        event.propertyKind = rawEvent.propertyKind;
-        event.value = rawEvent.value;
-        event.valueStr = rawEvent.valueStr.c_str();
+        CS_Event event = ConvertToC(rawEvent);
         callback(data, &event);
       },
       eventMask, immediateNotify, status);
@@ -341,9 +375,52 @@ void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
   return cs::RemoveListener(handle, status);
 }
 
-int CS_NotifierDestroyed(void) { return cs::NotifierDestroyed(); }
+CS_ListenerPoller CS_CreateListenerPoller(void) {
+  return cs::CreateListenerPoller();
+}
 
-void CS_SetTelemetryPeriod(double seconds) { cs::SetTelemetryPeriod(seconds); }
+void CS_DestroyListenerPoller(CS_ListenerPoller poller) {
+  cs::DestroyListenerPoller(poller);
+}
+
+CS_Listener CS_AddPolledListener(CS_ListenerPoller poller, int eventMask,
+                                 CS_Bool immediateNotify, CS_Status* status) {
+  return cs::AddPolledListener(poller, eventMask, immediateNotify, status);
+}
+
+struct CS_Event* CS_PollListener(CS_ListenerPoller poller, int* count) {
+  return ConvertToC<CS_Event>(cs::PollListener(poller), count);
+}
+
+struct CS_Event* CS_PollListenerTimeout(CS_ListenerPoller poller, int* count,
+                                        double timeout, CS_Bool* timedOut) {
+  bool cppTimedOut = false;
+  auto arrCpp = cs::PollListener(poller, timeout, &cppTimedOut);
+  *timedOut = cppTimedOut;
+  return ConvertToC<CS_Event>(std::move(arrCpp), count);
+}
+
+void CS_CancelPollListener(CS_ListenerPoller poller) {
+  cs::CancelPollListener(poller);
+}
+
+void CS_FreeEvents(CS_Event* arr, int count) {
+  // destroy vector saved at end of array
+  using T = std::vector<cs::RawEvent>;
+  alignas(T) unsigned char buf[sizeof(T)];
+  std::memcpy(buf, arr + count * sizeof(CS_Event), sizeof(T));
+  reinterpret_cast<T*>(buf)->~T();
+
+  std::free(arr);
+}
+
+int CS_NotifierDestroyed(void) {
+  return cs::NotifierDestroyed();
+}
+
+void CS_SetTelemetryPeriod(double seconds) {
+  cs::SetTelemetryPeriod(seconds);
+}
 
 double CS_GetTelemetryElapsedTime(void) {
   return cs::GetTelemetryElapsedTime();
@@ -367,7 +444,9 @@ void CS_SetDefaultLogger(unsigned int min_level) {
   cs::SetDefaultLogger(min_level);
 }
 
-void CS_Shutdown(void) { cs::Shutdown(); }
+void CS_Shutdown(void) {
+  cs::Shutdown();
+}
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   wpi::SmallVector<CS_Source, 32> buf;
@@ -380,10 +459,14 @@ CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
-  if (!sources) return;
+  if (!sources) {
+    return;
+  }
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sources[i] != 0) cs::ReleaseSource(sources[i], &status);
+    if (sources[i] != 0) {
+      cs::ReleaseSource(sources[i], &status);
+    }
   }
   std::free(sources);
 }
@@ -399,19 +482,29 @@ CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
 }
 
 void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count) {
-  if (!sinks) return;
+  if (!sinks) {
+    return;
+  }
   for (int i = 0; i < count; ++i) {
     CS_Status status = 0;
-    if (sinks[i] != 0) cs::ReleaseSink(sinks[i], &status);
+    if (sinks[i] != 0) {
+      cs::ReleaseSink(sinks[i], &status);
+    }
   }
   std::free(sinks);
 }
 
-void CS_FreeString(char* str) { std::free(str); }
+void CS_FreeString(char* str) {
+  std::free(str);
+}
 
 void CS_FreeEnumPropertyChoices(char** choices, int count) {
-  if (!choices) return;
-  for (int i = 0; i < count; ++i) std::free(choices[i]);
+  if (!choices) {
+    return;
+  }
+  for (int i = 0; i < count; ++i) {
+    std::free(choices[i]);
+  }
   std::free(choices);
 }
 
@@ -423,26 +516,35 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname() { return cs::ConvertToC(cs::GetHostname()); }
+char* CS_GetHostname() {
+  return cs::ConvertToC(cs::GetHostname());
+}
 
 char** CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
   char** out =
       static_cast<char**>(wpi::safe_malloc(interfaces.size() * sizeof(char*)));
   *count = interfaces.size();
-  for (size_t i = 0; i < interfaces.size(); ++i)
+  for (size_t i = 0; i < interfaces.size(); ++i) {
     out[i] = cs::ConvertToC(interfaces[i]);
+  }
   return out;
 }
 
 void CS_FreeNetworkInterfaces(char** interfaces, int count) {
-  if (!interfaces) return;
-  for (int i = 0; i < count; ++i) std::free(interfaces[i]);
+  if (!interfaces) {
+    return;
+  }
+  for (int i = 0; i < count; ++i) {
+    std::free(interfaces[i]);
+  }
   std::free(interfaces);
 }
 
 void CS_AllocateRawFrameData(CS_RawFrame* frame, int requestedSize) {
-  if (frame->dataLength >= requestedSize) return;
+  if (frame->dataLength >= requestedSize) {
+    return;
+  }
   if (frame->data) {
     frame->data =
         static_cast<char*>(wpi::safe_realloc(frame->data, requestedSize));

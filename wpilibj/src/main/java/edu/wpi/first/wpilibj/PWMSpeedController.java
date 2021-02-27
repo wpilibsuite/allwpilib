@@ -1,17 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-/**
- * Common base class for all PWM Speed Controllers.
- */
+/** Common base class for all PWM Speed Controllers. */
 public abstract class PWMSpeedController extends PWM implements SpeedController {
   private boolean m_isInverted;
 
@@ -19,7 +14,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
    * Constructor.
    *
    * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
-   *                on the MXP port
+   *     on the MXP port
    */
   protected PWMSpeedController(int channel) {
     super(channel);
@@ -45,13 +40,15 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
   }
 
   /**
-   * Get the recently set value of the PWM.
+   * Get the recently set value of the PWM. This value is affected by the inversion property. If you
+   * want the value that is sent directly to the SpeedController, use {@link
+   * edu.wpi.first.wpilibj.PWM#getSpeed()} instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
   @Override
   public double get() {
-    return getSpeed();
+    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
   @Override

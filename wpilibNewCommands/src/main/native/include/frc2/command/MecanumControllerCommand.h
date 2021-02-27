@@ -1,15 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include <cmath>
 #include <functional>
 #include <initializer_list>
 #include <memory>
 
+#include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -18,7 +16,10 @@
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
 #include <frc/trajectory/Trajectory.h>
-#include <units/units.h>
+#include <units/angle.h>
+#include <units/length.h>
+#include <units/velocity.h>
+#include <units/voltage.h>
 #include <wpi/ArrayRef.h>
 
 #include "CommandBase.h"
@@ -60,8 +61,61 @@ class MecanumControllerCommand
    * completion of the path this is left to the user, since it is not
    * appropriate for paths with nonstationary endstates.
    *
-   * <p>Note 2: The rotation controller will calculate the rotation based on the
-   * final pose in the trajectory, not the poses at each time step.
+   * @param trajectory           The trajectory to follow.
+   * @param pose                 A function that supplies the robot pose,
+   *                             provided by the odometry class.
+   * @param feedforward          The feedforward to use for the drivetrain.
+   * @param kinematics           The kinematics for the robot drivetrain.
+   * @param xController          The Trajectory Tracker PID controller
+   *                             for the robot's x position.
+   * @param yController          The Trajectory Tracker PID controller
+   *                             for the robot's y position.
+   * @param thetaController      The Trajectory Tracker PID controller
+   *                             for angle for the robot.
+   * @param desiredRotation      The angle that the robot should be facing.
+   *                             This is sampled at each time step.
+   * @param maxWheelVelocity     The maximum velocity of a drivetrain wheel.
+   * @param frontLeftController  The front left wheel velocity PID.
+   * @param rearLeftController   The rear left wheel velocity PID.
+   * @param frontRightController The front right wheel velocity PID.
+   * @param rearRightController  The rear right wheel velocity PID.
+   * @param currentWheelSpeeds   A MecanumDriveWheelSpeeds object containing
+   *                             the current wheel speeds.
+   * @param output               The output of the velocity PIDs.
+   * @param requirements         The subsystems to require.
+   */
+  MecanumControllerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::SimpleMotorFeedforward<units::meters> feedforward,
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController<units::radians> thetaController,
+      std::function<frc::Rotation2d()> desiredRotation,
+      units::meters_per_second_t maxWheelVelocity,
+      std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
+      frc2::PIDController frontLeftController,
+      frc2::PIDController rearLeftController,
+      frc2::PIDController frontRightController,
+      frc2::PIDController rearRightController,
+      std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                         units::volt_t)>
+          output,
+      std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. PID control and feedforward are handled
+   * internally. Outputs are scaled from -12 to 12 as a voltage output to the
+   * motor.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path this is left to the user, since it is not
+   * appropriate for paths with nonstationary endstates.
+   *
+   * <p>Note 2: The final rotation of the robot will be set to the rotation of
+   * the final pose in the trajectory. The robot will not follow the rotations
+   * from the poses at each timestep. If alternate rotation behavior is desired,
+   * the other constructor with a supplier for rotation should be used.
    *
    * @param trajectory           The trajectory to follow.
    * @param pose                 A function that supplies the robot pose,
@@ -111,8 +165,61 @@ class MecanumControllerCommand
    * completion of the path this is left to the user, since it is not
    * appropriate for paths with nonstationary endstates.
    *
-   * <p>Note 2: The rotation controller will calculate the rotation based on the
-   * final pose in the trajectory, not the poses at each time step.
+   * @param trajectory           The trajectory to follow.
+   * @param pose                 A function that supplies the robot pose,
+   *                             provided by the odometry class.
+   * @param feedforward          The feedforward to use for the drivetrain.
+   * @param kinematics           The kinematics for the robot drivetrain.
+   * @param xController          The Trajectory Tracker PID controller
+   *                             for the robot's x position.
+   * @param yController          The Trajectory Tracker PID controller
+   *                             for the robot's y position.
+   * @param thetaController      The Trajectory Tracker PID controller
+   *                             for angle for the robot.
+   * @param desiredRotation      The angle that the robot should be facing.
+   *                             This is sampled at each time step.
+   * @param maxWheelVelocity     The maximum velocity of a drivetrain wheel.
+   * @param frontLeftController  The front left wheel velocity PID.
+   * @param rearLeftController   The rear left wheel velocity PID.
+   * @param frontRightController The front right wheel velocity PID.
+   * @param rearRightController  The rear right wheel velocity PID.
+   * @param currentWheelSpeeds   A MecanumDriveWheelSpeeds object containing
+   *                             the current wheel speeds.
+   * @param output               The output of the velocity PIDs.
+   * @param requirements         The subsystems to require.
+   */
+  MecanumControllerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::SimpleMotorFeedforward<units::meters> feedforward,
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController<units::radians> thetaController,
+      std::function<frc::Rotation2d()> desiredRotation,
+      units::meters_per_second_t maxWheelVelocity,
+      std::function<frc::MecanumDriveWheelSpeeds()> currentWheelSpeeds,
+      frc2::PIDController frontLeftController,
+      frc2::PIDController rearLeftController,
+      frc2::PIDController frontRightController,
+      frc2::PIDController rearRightController,
+      std::function<void(units::volt_t, units::volt_t, units::volt_t,
+                         units::volt_t)>
+          output,
+      wpi::ArrayRef<Subsystem*> requirements = {});
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. PID control and feedforward are handled
+   * internally. Outputs are scaled from -12 to 12 as a voltage output to the
+   * motor.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path this is left to the user, since it is not
+   * appropriate for paths with nonstationary endstates.
+   *
+   * <p>Note 2: The final rotation of the robot will be set to the rotation of
+   * the final pose in the trajectory. The robot will not follow the rotations
+   * from the poses at each timestep. If alternate rotation behavior is desired,
+   * the other constructor with a supplier for rotation should be used.
    *
    * @param trajectory           The trajectory to follow.
    * @param pose                 A function that supplies the robot pose,
@@ -161,8 +268,48 @@ class MecanumControllerCommand
    * completion of the path - this is left to the user, since it is not
    * appropriate for paths with non-stationary end-states.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the
-   * final pose in the trajectory, not the poses at each time step.
+   * @param trajectory       The trajectory to follow.
+   * @param pose             A function that supplies the robot pose - use one
+   * of the odometry classes to provide this.
+   * @param kinematics       The kinematics for the robot drivetrain.
+   * @param xController      The Trajectory Tracker PID controller
+   *                         for the robot's x position.
+   * @param yController      The Trajectory Tracker PID controller
+   *                         for the robot's y position.
+   * @param thetaController  The Trajectory Tracker PID controller
+   *                         for angle for the robot.
+   * @param desiredRotation  The angle that the robot should be facing.
+   *                         This is sampled at each time step.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel.
+   * @param output           The output of the position PIDs.
+   * @param requirements     The subsystems to require.
+   */
+  MecanumControllerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController<units::radians> thetaController,
+      std::function<frc::Rotation2d()> desiredRotation,
+      units::meters_per_second_t maxWheelVelocity,
+      std::function<void(units::meters_per_second_t, units::meters_per_second_t,
+                         units::meters_per_second_t,
+                         units::meters_per_second_t)>
+          output,
+      std::initializer_list<Subsystem*> requirements);
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. The user should implement a velocity PID on the
+   * desired output wheel velocities.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path - this is left to the user, since it is not
+   * appropriate for paths with non-stationary end-states.
+   *
+   * <p>Note 2: The final rotation of the robot will be set to the rotation of
+   * the final pose in the trajectory. The robot will not follow the rotations
+   * from the poses at each timestep. If alternate rotation behavior is desired,
+   * the other constructor with a supplier for rotation should be used.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -199,8 +346,48 @@ class MecanumControllerCommand
    * completion of the path - this is left to the user, since it is not
    * appropriate for paths with non-stationary end-states.
    *
-   * <p>Note2: The rotation controller will calculate the rotation based on the
-   * final pose in the trajectory, not the poses at each time step.
+   * @param trajectory       The trajectory to follow.
+   * @param pose             A function that supplies the robot pose - use one
+   * of the odometry classes to provide this.
+   * @param kinematics       The kinematics for the robot drivetrain.
+   * @param xController      The Trajectory Tracker PID controller
+   *                         for the robot's x position.
+   * @param yController      The Trajectory Tracker PID controller
+   *                         for the robot's y position.
+   * @param thetaController  The Trajectory Tracker PID controller
+   *                         for angle for the robot.
+   * @param desiredRotation  The angle that the robot should be facing.
+   *                         This is sampled at every time step.
+   * @param maxWheelVelocity The maximum velocity of a drivetrain wheel.
+   * @param output           The output of the position PIDs.
+   * @param requirements     The subsystems to require.
+   */
+  MecanumControllerCommand(
+      frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
+      frc::MecanumDriveKinematics kinematics, frc2::PIDController xController,
+      frc2::PIDController yController,
+      frc::ProfiledPIDController<units::radians> thetaController,
+      std::function<frc::Rotation2d()> desiredRotation,
+      units::meters_per_second_t maxWheelVelocity,
+      std::function<void(units::meters_per_second_t, units::meters_per_second_t,
+                         units::meters_per_second_t,
+                         units::meters_per_second_t)>
+          output,
+      wpi::ArrayRef<Subsystem*> requirements = {});
+
+  /**
+   * Constructs a new MecanumControllerCommand that when executed will follow
+   * the provided trajectory. The user should implement a velocity PID on the
+   * desired output wheel velocities.
+   *
+   * <p>Note: The controllers will *not* set the outputVolts to zero upon
+   * completion of the path - this is left to the user, since it is not
+   * appropriate for paths with non-stationary end-states.
+   *
+   * <p>Note2: The final rotation of the robot will be set to the rotation of
+   * the final pose in the trajectory. The robot will not follow the rotations
+   * from the poses at each timestep. If alternate rotation behavior is desired,
+   * the other constructor with a supplier for rotation should be used.
    *
    * @param trajectory       The trajectory to follow.
    * @param pose             A function that supplies the robot pose - use one
@@ -241,9 +428,8 @@ class MecanumControllerCommand
   std::function<frc::Pose2d()> m_pose;
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
   frc::MecanumDriveKinematics m_kinematics;
-  std::unique_ptr<frc2::PIDController> m_xController;
-  std::unique_ptr<frc2::PIDController> m_yController;
-  std::unique_ptr<frc::ProfiledPIDController<units::radians>> m_thetaController;
+  frc::HolonomicDriveController m_controller;
+  std::function<frc::Rotation2d()> m_desiredRotation;
   const units::meters_per_second_t m_maxWheelVelocity;
   std::unique_ptr<frc2::PIDController> m_frontLeftController;
   std::unique_ptr<frc2::PIDController> m_rearLeftController;
@@ -261,6 +447,5 @@ class MecanumControllerCommand
   frc2::Timer m_timer;
   frc::MecanumDriveWheelSpeeds m_prevSpeeds;
   units::second_t m_prevTime;
-  frc::Pose2d m_finalPose;
 };
 }  // namespace frc2

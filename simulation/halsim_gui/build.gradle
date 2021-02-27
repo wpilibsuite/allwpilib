@@ -3,7 +3,6 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     description = "A plugin that creates a simulation gui"
 
     ext {
-        includeWpiutil = true
         pluginName = 'halsim_gui'
     }
 
@@ -22,17 +21,23 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
     model {
         binaries {
             all {
+                lib project: ':glass', library: 'glassnt', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 nativeUtils.useRequiredLibrary(it, 'imgui_static')
                 if (it.targetPlatform.name == nativeUtils.wpi.platforms.roborio || it.targetPlatform.name == nativeUtils.wpi.platforms.raspbian || it.targetPlatform.name == nativeUtils.wpi.platforms.aarch64bionic) {
                     it.buildable = false
                     return
                 }
                 if (it.targetPlatform.operatingSystem.isWindows()) {
-                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib'
+                    it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
                 } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-                    it.linker.args << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo'
+                    it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                 } else {
-                    it.linker.args << '-lX11' << '-lvulkan'
+                    it.linker.args << '-lX11'
                 }
             }
         }

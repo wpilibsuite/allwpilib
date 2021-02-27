@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/MathExtras.h"
 #include "wpi/SmallVector.h"
@@ -57,14 +54,14 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   return true;
 }
 
-static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
+static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out, int port,
                     bool broadcast) {
   sockaddr_in addr;
   if (broadcast) {
     out->SetBroadcast(true);
-    uv::NameToAddr("0.0.0.0", 6666, &addr);
+    uv::NameToAddr("0.0.0.0", port, &addr);
   } else {
-    uv::NameToAddr("127.0.0.1", 6666, &addr);
+    uv::NameToAddr("127.0.0.1", port, &addr);
   }
 
   in.data.connect(
@@ -72,11 +69,15 @@ static void CopyUdp(uv::Stream& in, std::shared_ptr<uv::Udp> out,
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) return;
+        if (!NewlineBuffer(*rem, buf, len, bufs, false, 0)) {
+          return;
+        }
 
         // send output
         outPtr->Send(addr, bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2) buf.Deallocate();
+          for (auto buf : bufs2) {
+            buf.Deallocate();
+          }
         });
       },
       out);
@@ -92,12 +93,15 @@ static void CopyTcp(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
           uv::Buffer& buf, size_t len) {
         // build buffers
         wpi::SmallVector<uv::Buffer, 4> bufs;
-        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++))
+        if (!NewlineBuffer(data->rem, buf, len, bufs, true, data->seq++)) {
           return;
+        }
 
         // send output
         outPtr->Write(bufs, [](auto bufs2, uv::Error) {
-          for (auto buf : bufs2) buf.Deallocate();
+          for (auto buf : bufs2) {
+            buf.Deallocate();
+          }
         });
       },
       out);
@@ -108,7 +112,9 @@ static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
     uv::Buffer buf2 = buf.Dup();
     buf2.len = len;
     out->Write(buf2, [](auto bufs, uv::Error) {
-      for (auto buf : bufs) buf.Deallocate();
+      for (auto buf : bufs) {
+        buf.Deallocate();
+      }
     });
   });
 }
@@ -119,6 +125,7 @@ int main(int argc, char* argv[]) {
   bool useUdp = false;
   bool broadcastUdp = false;
   bool err = false;
+  int port = -1;
 
   while (arg < argc && argv[arg][0] == '-') {
     if (wpi::StringRef(argv[arg]) == "-u") {
@@ -126,6 +133,13 @@ int main(int argc, char* argv[]) {
     } else if (wpi::StringRef(argv[arg]) == "-b") {
       useUdp = true;
       broadcastUdp = true;
+    } else if (wpi::StringRef(argv[arg]) == "-p") {
+      ++arg;
+      if (arg >= argc || argv[arg][0] == '-' ||
+          wpi::StringRef(argv[arg]).getAsInteger(10, port)) {
+        wpi::errs() << "-p must be followed by port number\n";
+        err = true;
+      }
     } else {
       wpi::errs() << "unrecognized command line option " << argv[arg] << '\n';
       err = true;
@@ -135,9 +149,10 @@ int main(int argc, char* argv[]) {
 
   if (err) {
     wpi::errs()
-        << argv[0] << " [-ub]\n"
-        << "  -u  send udp to localhost port 6666 instead of using tcp\n"
-        << "  -b  broadcast udp to port 6666 instead of using tcp\n";
+        << argv[0] << " [-ub] [-p PORT]\n"
+        << "  -u       send udp to localhost port 6666 instead of using tcp\n"
+        << "  -b       broadcast udp to port 6666 instead of using tcp\n"
+        << "  -p PORT  use port PORT instead of 6666 (udp) or 1740 (tcp)\n";
     return EXIT_FAILURE;
   }
 
@@ -150,10 +165,14 @@ int main(int argc, char* argv[]) {
   auto stdoutTty = uv::Tty::Create(loop, 1, false);
 
   // don't bother continuing if we don't have a stdin
-  if (!stdinTty) return EXIT_SUCCESS;
+  if (!stdinTty) {
+    return EXIT_SUCCESS;
+  }
 
   // pass through our input to output
-  if (stdoutTty) CopyStream(*stdinTty, stdoutTty);
+  if (stdoutTty) {
+    CopyStream(*stdinTty, stdoutTty);
+  }
 
   // when our stdin closes, exit
   stdinTty->end.connect([] { std::exit(EXIT_SUCCESS); });
@@ -161,17 +180,19 @@ int main(int argc, char* argv[]) {
   if (useUdp) {
     auto udp = uv::Udp::Create(loop);
     // tee
-    CopyUdp(*stdinTty, udp, broadcastUdp);
+    CopyUdp(*stdinTty, udp, port < 0 ? 6666 : port, broadcastUdp);
   } else {
     auto tcp = uv::Tcp::Create(loop);
 
     // bind to listen address and port
-    tcp->Bind("", 1740);
+    tcp->Bind("", port < 0 ? 1740 : port);
 
     // when we get a connection, accept it
     tcp->connection.connect([srv = tcp.get(), stdinTty] {
       auto tcp = srv->Accept();
-      if (!tcp) return;
+      if (!tcp) {
+        return;
+      }
 
       // close on error
       tcp->error.connect([s = tcp.get()](wpi::uv::Error err) { s->Close(); });
@@ -185,7 +206,9 @@ int main(int argc, char* argv[]) {
   }
 
   // start reading
-  if (stdinTty) stdinTty->StartRead();
+  if (stdinTty) {
+    stdinTty->StartRead();
+  }
 
   // run the loop!
   loop->Run();

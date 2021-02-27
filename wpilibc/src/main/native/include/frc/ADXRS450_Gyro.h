@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -51,21 +48,19 @@ class ADXRS450_Gyro : public GyroBase {
   /**
    * Return the actual angle in degrees that the robot is currently facing.
    *
-   * The angle is based on the current accumulator value corrected by the
-   * oversampling rate, the gyro type and the A/D calibration values.
+   * The angle is based on integration of the returned rate from the gyro.
    * The angle is continuous, that is it will continue from 360->361 degrees.
    * This allows algorithms that wouldn't want to see a discontinuity in the
    * gyro output as it sweeps from 360 to 0 on the second time around.
    *
-   * @return the current heading of the robot in degrees. This heading is based
-   *         on integration of the returned rate from the gyro.
+   * @return the current heading of the robot in degrees.
    */
   double GetAngle() const override;
 
   /**
    * Return the rate of rotation of the gyro
    *
-   * The rate is based on the most recent reading of the gyro analog value
+   * The rate is based on the most recent reading of the gyro.
    *
    * @return the current rate in degrees per second
    */
@@ -92,10 +87,18 @@ class ADXRS450_Gyro : public GyroBase {
    * robot is first turned on while it's sitting at rest before the competition
    * starts.
    */
-  void Calibrate() override;
+  void Calibrate() final;
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  int GetPort() const;
 
  private:
   SPI m_spi;
+  SPI::Port m_port;
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simAngle;

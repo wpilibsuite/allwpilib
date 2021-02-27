@@ -1,14 +1,11 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
 
@@ -69,7 +66,7 @@ class Collector : public frc::Subsystem {
 
  private:
   // Subsystem devices
-  frc::PWMVictorSPX m_rollerMotor{6};
+  frc::PWMSparkMax m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
   frc::Solenoid m_piston{1};
   frc::DigitalInput m_openDetector{6};

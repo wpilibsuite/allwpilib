@@ -6,6 +6,7 @@ cppHeaderFileInclude {
   (?<!_c)\.h$
   \.hpp$
   \.inc$
+  \.inl$
 }
 
 cppSrcFileInclude {

@@ -1,21 +1,17 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.InterruptJNI.InterruptJNIHandlerFunction;
-
 
 /**
  * It is recommended that you use this class in conjunction with classes from {@link
  * java.util.concurrent.atomic} as these objects are all thread safe.
  *
  * @param <T> The type of the parameter that should be returned to the the method {@link
- *            #interruptFired(int, Object)}
+ *     #interruptFired(int, Object)}
  */
 public abstract class InterruptHandlerFunction<T> {
   /**
@@ -37,11 +33,9 @@ public abstract class InterruptHandlerFunction<T> {
    * This method is run every time an interrupt is fired.
    *
    * @param interruptAssertedMask Interrupt Mask
-   * @param param                 The parameter provided by overriding the {@link
-   *                              #overridableParameter()} method.
+   * @param param The parameter provided by overriding the {@link #overridableParameter()} method.
    */
   public abstract void interruptFired(int interruptAssertedMask, T param);
-
 
   /**
    * Override this method if you would like to pass a specific parameter to the {@link

@@ -43,7 +43,7 @@ model {
                     source {
                         srcDirs 'src/main/native/cpp'
                         include '**/*.cpp'
-                        exclude '**/jni/*.cpp'
+                        exclude '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -99,7 +99,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -108,7 +108,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -117,7 +117,6 @@ model {
                         }
                         include '**/*.h'
                     }
-
                 }
             }
             binaries.all {
@@ -141,7 +140,7 @@ model {
                 baseName = nativeName + 'jni'
             }
 
-            enableCheckTask true
+            enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
@@ -150,7 +149,7 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/main/native/cpp'
-                        include '**/jni/*.cpp'
+                        include '**/jni/**/*.cpp'
                     }
                     exportedHeaders {
                         srcDir 'src/main/native/include'
@@ -257,6 +256,15 @@ model {
                                 commandLine it.tasks.install.runScriptFile.get().asFile.toString()
                                 def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
                                 test.dependsOn it.tasks.install
+
+                                if (project.hasProperty('buildServer')) {
+                                    def folderDir = it.tasks.install.installDirectory.get().toString()
+                                    test.doLast {
+                                        def folder = file(folderDir)
+                                        folder.deleteDir()
+                                    }
+                                }
+
                                 test.systemProperty 'java.library.path', filePath
                                 test.environment 'LD_LIBRARY_PATH', filePath
                                 test.workingDir filePath

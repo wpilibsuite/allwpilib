@@ -9,7 +9,7 @@ If you deploy code to the test stand using GradleRIO, you _must_ remove the buil
 ## roboRIO Setup
 The roboRIO on the test bench must be updated every time NI releases a new image.
 
-1. [Use the roboRIO Imaging Tool to format the roboRIO with the lastest image.](https://frcdocs.wpi.edu/en/latest/docs/getting-started/getting-started-frc-control-system/imaging-your-roborio.html)
+1. [Use the roboRIO Imaging Tool to format the roboRIO with the latest image.](https://frcdocs.wpi.edu/en/stable/docs/zero-to-robot/step-3/imaging-your-roborio.html)
 2. Set a static ip on the roboRIO web dashboard to `10.1.90.2`
 2. Install Java on the roboRIO
     1. [Download the JRE from Maven.](https://frcmaven.wpi.edu/artifactory/list/release/edu/wpi/first/jdk/)

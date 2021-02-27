@@ -1,0 +1,15 @@
+name: Gazebo
+
+on: [pull_request, push]
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    container: wpilib/gazebo-ubuntu:18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build with Gradle
+        run: ./gradlew build -PbuildServer -PmakeSim -Dorg.gradle.jvmargs=-Xmx2g

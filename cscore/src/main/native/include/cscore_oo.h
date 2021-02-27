@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2015-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #ifndef CSCORE_CSCORE_OO_H_
 #define CSCORE_CSCORE_OO_H_
@@ -51,7 +48,7 @@ class VideoProperty {
     kEnum = CS_PROP_ENUM
   };
 
-  VideoProperty() : m_status(0), m_handle(0), m_kind(kNone) {}
+  VideoProperty() = default;
 
   std::string GetName() const;
 
@@ -86,9 +83,9 @@ class VideoProperty {
   explicit VideoProperty(CS_Property handle);
   VideoProperty(CS_Property handle, Kind kind);
 
-  mutable CS_Status m_status;
-  CS_Property m_handle;
-  Kind m_kind;
+  mutable CS_Status m_status{0};
+  CS_Property m_handle{0};
+  Kind m_kind{kNone};
 };
 
 /**
@@ -127,7 +124,7 @@ class VideoSource {
     kConnectionForceClose = CS_CONNECTION_FORCE_CLOSE
   };
 
-  VideoSource() noexcept : m_handle(0) {}
+  VideoSource() noexcept = default;
   VideoSource(const VideoSource& source);
   VideoSource(VideoSource&& other) noexcept;
   VideoSource& operator=(VideoSource other) noexcept;
@@ -352,7 +349,7 @@ class VideoSource {
   explicit VideoSource(CS_Source handle) : m_handle(handle) {}
 
   mutable CS_Status m_status = 0;
-  CS_Source m_handle;
+  CS_Source m_handle{0};
 };
 
 /**
@@ -443,6 +440,11 @@ class UsbCamera : public VideoCamera {
    * @return Vector of USB camera information (one for each camera)
    */
   static std::vector<UsbCameraInfo> EnumerateUsbCameras();
+
+  /**
+   * Change the path to the device.
+   */
+  void SetPath(const wpi::Twine& path);
 
   /**
    * Get the path to the device.
@@ -731,7 +733,7 @@ class VideoSink {
     kCv = CS_SINK_CV
   };
 
-  VideoSink() noexcept : m_handle(0) {}
+  VideoSink() noexcept = default;
   VideoSink(const VideoSink& sink);
   VideoSink(VideoSink&& sink) noexcept;
   VideoSink& operator=(VideoSink other) noexcept;
@@ -864,7 +866,7 @@ class VideoSink {
   explicit VideoSink(CS_Sink handle) : m_handle(handle) {}
 
   mutable CS_Status m_status = 0;
-  CS_Sink m_handle;
+  CS_Sink m_handle{0};
 };
 
 /**
@@ -1006,7 +1008,7 @@ class VideoEvent : public RawEvent {
  */
 class VideoListener {
  public:
-  VideoListener() : m_handle(0) {}
+  VideoListener() = default;
 
   /**
    * Create an event listener.
@@ -1031,7 +1033,7 @@ class VideoListener {
   }
 
  private:
-  CS_Listener m_handle;
+  CS_Listener m_handle{0};
 };
 
 /** @} */

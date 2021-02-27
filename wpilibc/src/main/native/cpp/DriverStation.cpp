@@ -1,16 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #include "frc/DriverStation.h"
 
 #include <chrono>
+#include <string>
+#include <type_traits>
 
 #include <hal/DriverStation.h>
-#include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Power.h>
 #include <networktables/NetworkTable.h>
@@ -19,54 +17,89 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 
-#include "frc/AnalogInput.h"
 #include "frc/MotorSafety.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 #include "frc/WPIErrors.h"
 
 namespace frc {
+// A simple class which caches the previous value written to an NT entry
+// Used to prevent redundant, repeated writes of the same value
+template <class T>
+class MatchDataSenderEntry {
+ public:
+  MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
+                       const wpi::Twine& key, const T& initialVal) {
+    static_assert(std::is_same_v<T, bool> || std::is_same_v<T, double> ||
+                      std::is_same_v<T, std::string>,
+                  "Invalid type for MatchDataSenderEntry - must be "
+                  "to bool, double or std::string");
+
+    ntEntry = table->GetEntry(key);
+    if constexpr (std::is_same_v<T, bool>) {
+      ntEntry.ForceSetBoolean(initialVal);
+    } else if constexpr (std::is_same_v<T, double>) {
+      ntEntry.ForceSetDouble(initialVal);
+    } else if constexpr (std::is_same_v<T, std::string>) {
+      ntEntry.ForceSetString(initialVal);
+    }
+    prevVal = initialVal;
+  }
+
+  void Set(const T& val) {
+    if (val != prevVal) {
+      SetValue(val);
+      prevVal = val;
+    }
+  }
+
+ private:
+  nt::NetworkTableEntry ntEntry;
+  T prevVal;
+
+  void SetValue(bool val) { ntEntry.SetBoolean(val); }
+  void SetValue(double val) { ntEntry.SetDouble(val); }
+  void SetValue(const wpi::Twine& val) { ntEntry.SetString(val); }
+};
 
 class MatchDataSender {
  public:
   std::shared_ptr<nt::NetworkTable> table;
-  nt::NetworkTableEntry typeMetadata;
-  nt::NetworkTableEntry gameSpecificMessage;
-  nt::NetworkTableEntry eventName;
-  nt::NetworkTableEntry matchNumber;
-  nt::NetworkTableEntry replayNumber;
-  nt::NetworkTableEntry matchType;
-  nt::NetworkTableEntry alliance;
-  nt::NetworkTableEntry station;
-  nt::NetworkTableEntry controlWord;
+  MatchDataSenderEntry<std::string> typeMetaData;
+  MatchDataSenderEntry<std::string> gameSpecificMessage;
+  MatchDataSenderEntry<std::string> eventName;
+  MatchDataSenderEntry<double> matchNumber;
+  MatchDataSenderEntry<double> replayNumber;
+  MatchDataSenderEntry<double> matchType;
+  MatchDataSenderEntry<bool> alliance;
+  MatchDataSenderEntry<double> station;
+  MatchDataSenderEntry<double> controlWord;
 
-  MatchDataSender() {
-    table = nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
-    typeMetadata = table->GetEntry(".type");
-    typeMetadata.ForceSetString("FMSInfo");
-    gameSpecificMessage = table->GetEntry("GameSpecificMessage");
-    gameSpecificMessage.ForceSetString("");
-    eventName = table->GetEntry("EventName");
-    eventName.ForceSetString("");
-    matchNumber = table->GetEntry("MatchNumber");
-    matchNumber.ForceSetDouble(0);
-    replayNumber = table->GetEntry("ReplayNumber");
-    replayNumber.ForceSetDouble(0);
-    matchType = table->GetEntry("MatchType");
-    matchType.ForceSetDouble(0);
-    alliance = table->GetEntry("IsRedAlliance");
-    alliance.ForceSetBoolean(true);
-    station = table->GetEntry("StationNumber");
-    station.ForceSetDouble(1);
-    controlWord = table->GetEntry("FMSControlData");
-    controlWord.ForceSetDouble(0);
-  }
+  MatchDataSender()
+      : table(nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo")),
+        typeMetaData(table, ".type", "FMSInfo"),
+        gameSpecificMessage(table, "GameSpecificMessage", ""),
+        eventName(table, "EventName", ""),
+        matchNumber(table, "MatchNumber", 0.0),
+        replayNumber(table, "ReplayNumber", 0.0),
+        matchType(table, "MatchType", 0.0),
+        alliance(table, "IsRedAlliance", true),
+        station(table, "StationNumber", 1.0),
+        controlWord(table, "FMSControlData", 0.0) {}
 };
 }  // namespace frc
 
 using namespace frc;
 
 static constexpr double kJoystickUnpluggedMessageInterval = 1.0;
+
+static int& GetDSLastCount() {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
+  thread_local int lastCount{0};
+  return lastCount;
+}
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
@@ -325,6 +358,11 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   return static_cast<bool>(descriptor.axisTypes);
 }
 
+bool DriverStation::IsJoystickConnected(int stick) const {
+  return GetStickAxisCount(stick) > 0 || GetStickButtonCount(stick) > 0 ||
+         GetStickPOVCount(stick) > 0;
+}
+
 bool DriverStation::IsEnabled() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
@@ -349,10 +387,22 @@ bool DriverStation::IsAutonomous() const {
   return controlWord.autonomous;
 }
 
+bool DriverStation::IsAutonomousEnabled() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return controlWord.autonomous && controlWord.enabled;
+}
+
 bool DriverStation::IsOperatorControl() const {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
+}
+
+bool DriverStation::IsOperatorControlEnabled() const {
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
+  return !controlWord.autonomous && !controlWord.test && controlWord.enabled;
 }
 
 bool DriverStation::IsTest() const {
@@ -367,7 +417,16 @@ bool DriverStation::IsDSAttached() const {
   return controlWord.dsAttached;
 }
 
-bool DriverStation::IsNewControlData() const { return HAL_IsNewControlData(); }
+bool DriverStation::IsNewControlData() const {
+  std::unique_lock lock(m_waitForDataMutex);
+  int& lastCount = GetDSLastCount();
+  int currentCount = m_waitForDataCounter;
+  if (lastCount == currentCount) {
+    return false;
+  }
+  lastCount = currentCount;
+  return true;
+}
 
 bool DriverStation::IsFMSAttached() const {
   HAL_ControlWord controlWord;
@@ -441,14 +500,21 @@ int DriverStation::GetLocation() const {
   }
 }
 
-void DriverStation::WaitForData() { WaitForData(0); }
+void DriverStation::WaitForData() {
+  WaitForData(0);
+}
 
 bool DriverStation::WaitForData(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
   std::unique_lock lock(m_waitForDataMutex);
+  int& lastCount = GetDSLastCount();
   int currentCount = m_waitForDataCounter;
+  if (lastCount != currentCount) {
+    lastCount = currentCount;
+    return true;
+  }
   while (m_waitForDataCounter == currentCount) {
     if (timeout > 0) {
       auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
@@ -459,6 +525,7 @@ bool DriverStation::WaitForData(double timeout) {
       m_waitForDataCond.wait(lock);
     }
   }
+  lastCount = m_waitForDataCounter;
   return true;
 }
 
@@ -507,6 +574,14 @@ void DriverStation::GetData() {
   SendMatchData();
 }
 
+void DriverStation::SilenceJoystickConnectionWarning(bool silence) {
+  m_silenceJoystickWarning = silence;
+}
+
+bool DriverStation::IsJoystickConnectionWarningSilenced() const {
+  return !IsFMSAttached() && m_silenceJoystickWarning;
+}
+
 DriverStation::DriverStation() {
   HAL_Initialize(500, 0);
   m_waitForDataCounter = 0;
@@ -534,10 +609,12 @@ void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
 }
 
 void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
-  double currentTime = Timer::GetFPGATimestamp();
-  if (currentTime > m_nextMessageTime) {
-    ReportWarning(message);
-    m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+  if (IsFMSAttached() || !m_silenceJoystickWarning) {
+    double currentTime = Timer::GetFPGATimestamp();
+    if (currentTime > m_nextMessageTime) {
+      ReportWarning(message);
+      m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+    }
   }
 }
 
@@ -548,16 +625,26 @@ void DriverStation::Run() {
     HAL_WaitForDSData();
     GetData();
 
-    if (IsDisabled()) safetyCounter = 0;
+    if (IsDisabled()) {
+      safetyCounter = 0;
+    }
 
     if (++safetyCounter >= 4) {
       MotorSafety::CheckMotors();
       safetyCounter = 0;
     }
-    if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
-    if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
-    if (m_userInTeleop) HAL_ObserveUserProgramTeleop();
-    if (m_userInTest) HAL_ObserveUserProgramTest();
+    if (m_userInDisabled) {
+      HAL_ObserveUserProgramDisabled();
+    }
+    if (m_userInAutonomous) {
+      HAL_ObserveUserProgramAutonomous();
+    }
+    if (m_userInTeleop) {
+      HAL_ObserveUserProgramTeleop();
+    }
+    if (m_userInTest) {
+      HAL_ObserveUserProgramTest();
+    }
   }
 }
 
@@ -596,20 +683,19 @@ void DriverStation::SendMatchData() {
   HAL_MatchInfo tmpDataStore;
   HAL_GetMatchInfo(&tmpDataStore);
 
-  m_matchDataSender->alliance.SetBoolean(isRedAlliance);
-  m_matchDataSender->station.SetDouble(stationNumber);
-  m_matchDataSender->eventName.SetString(tmpDataStore.eventName);
-  m_matchDataSender->gameSpecificMessage.SetString(
+  m_matchDataSender->alliance.Set(isRedAlliance);
+  m_matchDataSender->station.Set(stationNumber);
+  m_matchDataSender->eventName.Set(tmpDataStore.eventName);
+  m_matchDataSender->gameSpecificMessage.Set(
       std::string(reinterpret_cast<char*>(tmpDataStore.gameSpecificMessage),
                   tmpDataStore.gameSpecificMessageSize));
-  m_matchDataSender->matchNumber.SetDouble(tmpDataStore.matchNumber);
-  m_matchDataSender->replayNumber.SetDouble(tmpDataStore.replayNumber);
-  m_matchDataSender->matchType.SetDouble(
-      static_cast<int>(tmpDataStore.matchType));
+  m_matchDataSender->matchNumber.Set(tmpDataStore.matchNumber);
+  m_matchDataSender->replayNumber.Set(tmpDataStore.replayNumber);
+  m_matchDataSender->matchType.Set(static_cast<int>(tmpDataStore.matchType));
 
   HAL_ControlWord ctlWord;
   HAL_GetControlWord(&ctlWord);
   int32_t wordInt = 0;
   std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
-  m_matchDataSender->controlWord.SetDouble(wordInt);
+  m_matchDataSender->controlWord.Set(wordInt);
 }

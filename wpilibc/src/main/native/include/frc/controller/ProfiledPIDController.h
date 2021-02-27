@@ -1,9 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019-2020 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
@@ -12,9 +9,9 @@
 #include <functional>
 #include <limits>
 
-#include <units/units.h>
+#include <units/time.h>
 
-#include "frc/controller/ControllerUtil.h"
+#include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -196,6 +193,8 @@ class ProfiledPIDController
   void EnableContinuousInput(Distance_t minimumInput, Distance_t maximumInput) {
     m_controller.EnableContinuousInput(minimumInput.template to<double>(),
                                        maximumInput.template to<double>());
+    m_minimumInput = minimumInput;
+    m_maximumInput = maximumInput;
   }
 
   /**
@@ -254,8 +253,10 @@ class ProfiledPIDController
   double Calculate(Distance_t measurement) {
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
-      auto error = frc::GetModulusError<Distance_t>(
-          m_goal.position, measurement, m_minimumInput, m_maximumInput);
+      auto goalMinDistance = frc::InputModulus<Distance_t>(
+          m_goal.position - measurement, m_minimumInput, m_maximumInput);
+      auto setpointMinDistance = frc::InputModulus<Distance_t>(
+          m_setpoint.position - measurement, m_minimumInput, m_maximumInput);
 
       // Recompute the profile goal with the smallest error, thus giving the
       // shortest path. The goal may be outside the input range after this
@@ -263,7 +264,8 @@ class ProfiledPIDController
       // report an error of zero. In other words, the setpoint only needs to be
       // offset from the measurement by the input range modulus; they don't need
       // to be equal.
-      m_goal.position = Distance_t{error} + measurement;
+      m_goal.position = goalMinDistance + measurement;
+      m_setpoint.position = setpointMinDistance + measurement;
     }
 
     frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
@@ -339,12 +341,12 @@ class ProfiledPIDController
 
   void InitSendable(frc::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");
-    builder.AddDoubleProperty("p", [this] { return GetP(); },
-                              [this](double value) { SetP(value); });
-    builder.AddDoubleProperty("i", [this] { return GetI(); },
-                              [this](double value) { SetI(value); });
-    builder.AddDoubleProperty("d", [this] { return GetD(); },
-                              [this](double value) { SetD(value); });
+    builder.AddDoubleProperty(
+        "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+    builder.AddDoubleProperty(
+        "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+    builder.AddDoubleProperty(
+        "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.template to<double>(); },
         [this](double value) { SetGoal(Distance_t{value}); });
