@@ -146,6 +146,10 @@ void RamseteCommand::Execute() {
 
 void RamseteCommand::End(bool interrupted) {
   m_timer.Stop();
+
+  if (interrupted) {
+    m_outputVel(0.0, 0.0);
+  }
 }
 
 bool RamseteCommand::IsFinished() {
