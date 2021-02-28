@@ -31,6 +31,25 @@ extern "C" {
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
 
 /**
+ * Sets the HAL notifier thread priority.
+ *
+ * The HAL notifier thread is responsible for managing the FPGA's notifier
+ * interrupt and waking up user's Notifiers when it's their time to run.
+ * Giving the HAL notifier thread real-time priority helps ensure the user's
+ * real-time Notifiers, if any, are notified to run in a timely manner.
+ *
+ * @param realTime Set to true to set a real-time priority, false for standard
+ *                 priority.
+ * @param priority Priority to set the thread to. For real-time, this is 1-99
+ *                 with 99 being highest. For non-real-time, this is forced to
+ *                 0. See "man 7 sched" for more details.
+ * @param status   Error status variable. 0 on success.
+ * @return         True on success.
+ */
+HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
+                                       int32_t* status);
+
+/**
  * Sets the name of a notifier.
  *
  * @param notifierHandle the notifier handle
