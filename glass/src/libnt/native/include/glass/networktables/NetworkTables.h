@@ -104,19 +104,39 @@ void DisplayNetworkTables(
     NetworkTablesModel* model,
     NetworkTablesFlags flags = NetworkTablesFlags_Default);
 
+class NetworkTablesFlagsSettings {
+ public:
+  explicit NetworkTablesFlagsSettings(
+      NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
+      : m_defaultFlags{defaultFlags}, m_flags{defaultFlags} {}
+
+  void Update();
+  void DisplayMenu();
+
+  NetworkTablesFlags GetFlags() const { return m_flags; }
+
+ private:
+  bool* m_pTreeView = nullptr;
+  bool* m_pShowConnections = nullptr;
+  bool* m_pShowFlags = nullptr;
+  bool* m_pShowTimestamp = nullptr;
+  bool* m_pCreateNoncanonicalKeys = nullptr;
+  NetworkTablesFlags m_defaultFlags;  // NOLINT
+  NetworkTablesFlags m_flags;         // NOLINT
+};
+
 class NetworkTablesView : public View {
  public:
   explicit NetworkTablesView(
       NetworkTablesModel* model,
       NetworkTablesFlags defaultFlags = NetworkTablesFlags_Default)
-      : m_model{model}, m_defaultFlags{defaultFlags}, m_flags{defaultFlags} {}
+      : m_model{model}, m_flags{defaultFlags} {}
 
   void Display() override;
 
  private:
   NetworkTablesModel* m_model;
-  NetworkTablesFlags m_defaultFlags;
-  NetworkTablesFlags m_flags;
+  NetworkTablesFlagsSettings m_flags;
 };
 
 }  // namespace glass
