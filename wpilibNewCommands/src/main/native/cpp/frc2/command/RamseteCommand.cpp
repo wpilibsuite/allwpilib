@@ -148,7 +148,11 @@ void RamseteCommand::End(bool interrupted) {
   m_timer.Stop();
 
   if (interrupted) {
-    m_outputVel(0.0, 0.0);
+    if (m_usePID) {
+      m_outputVolts(0_V, 0_V);
+    } else {
+      m_outputVel(0_mps, 0_mps);
+    }
   }
 }
 
