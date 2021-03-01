@@ -200,3 +200,8 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
 void Notifier::UpdateAlarm() {
   UpdateAlarm(static_cast<uint64_t>(m_expirationTime * 1e6));
 }
+
+bool Notifier::SetHALThreadPriority(bool realTime, int32_t priority) {
+  int32_t status = 0;
+  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
+}

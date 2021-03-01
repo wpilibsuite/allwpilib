@@ -38,6 +38,19 @@ Java_edu_wpi_first_hal_NotifierJNI_initializeNotifier
 
 /*
  * Class:     edu_wpi_first_hal_NotifierJNI
+ * Method:    setHALThreadPriority
+ * Signature: (ZI)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_NotifierJNI_setHALThreadPriority
+  (JNIEnv* env, jclass, jboolean realTime, jint priority)
+{
+  int32_t status = 0;
+  return HAL_SetNotifierThreadPriority(realTime, priority, &status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_NotifierJNI
  * Method:    setNotifierName
  * Signature: (ILjava/lang/String;)V
  */

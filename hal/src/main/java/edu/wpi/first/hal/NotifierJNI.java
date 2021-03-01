@@ -14,6 +14,9 @@ public class NotifierJNI extends JNIWrapper {
   /** Initializes the notifier. */
   public static native int initializeNotifier();
 
+  /** Sets the HAL notifier thread priority. */
+  public static native boolean setHALThreadPriority(boolean realTime, int priority);
+
   /** Sets the name of the notifier. */
   public static native void setNotifierName(int notifierHandle, String name);
 
