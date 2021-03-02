@@ -64,7 +64,7 @@ public class LinearPlantInversionFeedforward<
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_uff = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
-    reset(m_r);
+    reset();
   }
 
   /**
