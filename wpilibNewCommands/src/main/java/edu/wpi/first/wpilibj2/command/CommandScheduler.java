@@ -450,7 +450,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * requiring the subsystem
    *
    * @param subsystem the subsystem to be inquired about
-   * @return the command currently requiring the subsystem
+   * @return the command currently requiring the subsystem, or null if no command is currently scheduled
    */
   public Command requiring(Subsystem subsystem) {
     return m_requirements.get(subsystem);
