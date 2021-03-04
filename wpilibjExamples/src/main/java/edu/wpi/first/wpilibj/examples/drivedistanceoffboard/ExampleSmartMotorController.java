@@ -18,6 +18,8 @@ public class ExampleSmartMotorController implements SpeedController {
     kMovementWitchcraft
   }
 
+  double m_value;
+
   /**
    * Creates a new ExampleSmartMotorController.
    *
@@ -73,11 +75,13 @@ public class ExampleSmartMotorController implements SpeedController {
   public void resetEncoder() {}
 
   @Override
-  public void set(double speed) {}
+  public void set(double speed) {
+    m_value = speed;
+  }
 
   @Override
   public double get() {
-    return 0;
+    return m_value;
   }
 
   @Override
