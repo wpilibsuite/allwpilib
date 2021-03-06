@@ -10,12 +10,12 @@
 #include <wpi/SmallString.h>
 #include <wpigui.h>
 
-#include "NetworkTablesSettings.h"
 #include "glass/Context.h"
 #include "glass/Model.h"
 #include "glass/View.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesProvider.h"
+#include "glass/networktables/NetworkTablesSettings.h"
 #include "glass/other/Log.h"
 #include "glass/other/Plot.h"
 
@@ -37,7 +37,7 @@ static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<NetworkTablesSettings> gNetworkTablesSettings;
+static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
 static glass::LogData gNetworkTablesLog;
 static glass::Window* gNetworkTablesWindow;
 static glass::Window* gNetworkTablesSettingsWindow;
@@ -111,7 +111,7 @@ static void NtInitialize() {
   }
 
   // NetworkTables settings window
-  gNetworkTablesSettings = std::make_unique<NetworkTablesSettings>();
+  gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>();
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
   gNetworkTablesSettingsWindow = gNtProvider->AddWindow(
