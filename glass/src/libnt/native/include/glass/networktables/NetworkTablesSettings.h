@@ -13,6 +13,8 @@ template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
 
+namespace glass {
+
 class NetworkTablesSettings {
  public:
   explicit NetworkTablesSettings(
@@ -20,7 +22,7 @@ class NetworkTablesSettings {
       const char* storageName = "NetworkTables Settings");
 
   void Update();
-  void Display();
+  bool Display();
 
  private:
   NT_Inst m_inst;
@@ -30,3 +32,5 @@ class NetworkTablesSettings {
   std::string* m_pServerTeam;
   std::string* m_pListenAddress;
 };
+
+}  // namespace glass

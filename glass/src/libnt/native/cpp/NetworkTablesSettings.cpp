@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkTablesSettings.h"
+#include "glass/networktables/NetworkTablesSettings.h"
 
 #include <utility>
 
@@ -14,6 +14,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "glass/Context.h"
+
+using namespace glass;
 
 NetworkTablesSettings::NetworkTablesSettings(NT_Inst inst,
                                              const char* storageName)
@@ -53,7 +55,7 @@ void NetworkTablesSettings::Update() {
   }
 }
 
-void NetworkTablesSettings::Display() {
+bool NetworkTablesSettings::Display() {
   static const char* modeOptions[] = {"Disabled", "Client", "Server"};
   ImGui::Combo("Mode", m_pMode, modeOptions, 3);
   switch (*m_pMode) {
@@ -69,5 +71,7 @@ void NetworkTablesSettings::Display() {
   }
   if (ImGui::Button("Apply")) {
     m_restart = true;
+    return true;
   }
+  return false;
 }
