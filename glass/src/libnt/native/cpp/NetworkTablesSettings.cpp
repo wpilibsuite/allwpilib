@@ -110,7 +110,7 @@ void NetworkTablesSettings::Update() {
 
 bool NetworkTablesSettings::Display() {
   static const char* modeOptions[] = {"Disabled", "Client", "Server"};
-  ImGui::Combo("Mode", m_pMode, modeOptions, 3);
+  ImGui::Combo("Mode", m_pMode, modeOptions, m_serverOption ? 3 : 2);
   switch (*m_pMode) {
     case 1:
       ImGui::InputText("Team/IP", m_pServerTeam);
