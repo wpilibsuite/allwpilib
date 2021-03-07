@@ -29,17 +29,30 @@ void NetworkTablesSettings::Thread::Main() {
     // clear restart flag
     m_restart = false;
 
-    // if just changing servers in client mode, no need to stop and restart
-    unsigned int curMode = nt::GetNetworkMode(m_inst);
+    int mode;
+    bool dsClient;
 
-    if (m_mode != 1 || (curMode & NT_NET_MODE_SERVER) != 0) {
+    do {
+      mode = m_mode;
+      dsClient = m_dsClient;
+
       // release lock while stopping to avoid blocking GUI
       lock.unlock();
-      nt::StopClient(m_inst);
-      nt::StopServer(m_inst);
-      nt::StopLocal(m_inst);
+
+      // if just changing servers in client mode, no need to stop and restart
+      unsigned int curMode = nt::GetNetworkMode(m_inst);
+      if (mode != 1 || (curMode & NT_NET_MODE_SERVER) != 0) {
+        nt::StopClient(m_inst);
+        nt::StopServer(m_inst);
+        nt::StopLocal(m_inst);
+      }
+
+      if (m_mode != 1 || !dsClient) {
+        nt::StopDSClient(m_inst);
+      }
+
       lock.lock();
-    }
+    } while (mode != m_mode || dsClient != m_dsClient);
 
     if (m_mode == 1) {
       wpi::StringRef serverTeam{m_serverTeam};
@@ -55,6 +68,10 @@ void NetworkTablesSettings::Thread::Main() {
         }
         nt::StartClient(m_inst, servers);
       }
+
+      if (m_dsClient) {
+        nt::StartDSClient(m_inst, NT_DEFAULT_PORT);
+      }
     } else if (m_mode == 2) {
       nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
                       NT_DEFAULT_PORT);
@@ -69,6 +86,7 @@ NetworkTablesSettings::NetworkTablesSettings(NT_Inst inst,
   m_pIniName = storage.GetStringRef("iniName", "networktables.ini");
   m_pServerTeam = storage.GetStringRef("serverTeam");
   m_pListenAddress = storage.GetStringRef("listenAddress");
+  m_pDsClient = storage.GetBoolRef("dsClient", true);
 
   m_thread.Start(inst);
 }
@@ -86,6 +104,7 @@ void NetworkTablesSettings::Update() {
   thr->m_iniName = *m_pIniName;
   thr->m_serverTeam = *m_pServerTeam;
   thr->m_listenAddress = *m_pListenAddress;
+  thr->m_dsClient = *m_pDsClient;
   thr->m_cond.notify_one();
 }
 
@@ -95,6 +114,7 @@ bool NetworkTablesSettings::Display() {
   switch (*m_pMode) {
     case 1:
       ImGui::InputText("Team/IP", m_pServerTeam);
+      ImGui::Checkbox("Get Address from DS", m_pDsClient);
       break;
     case 2:
       ImGui::InputText("Listen Address", m_pListenAddress);
