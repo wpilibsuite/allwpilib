@@ -22,11 +22,17 @@ class NetworkTablesSettings {
       NT_Inst inst = nt::GetDefaultInstance(),
       const char* storageName = "NetworkTables Settings");
 
+  /**
+   * Enables or disables the server option.  Default is enabled.
+   */
+  void EnableServerOption(bool enable) { m_serverOption = enable; }
+
   void Update();
   bool Display();
 
  private:
   bool m_restart = true;
+  bool m_serverOption = true;
   int* m_pMode;
   std::string* m_pIniName;
   std::string* m_pServerTeam;
