@@ -257,7 +257,7 @@ class DifferentialDrivetrainSim {
                                                 * (26_in / 2) * (26_in / 2);
 
     return DifferentialDrivetrainSim{
-        motor,           gearing, batteryMoi + gearboxMoi, 25_kg,
+        motor,           gearing, batteryMoi + gearboxMoi, 60_lb,
         wheelSize / 2.0, 26_in,   measurementStdDevs};
   }
 
@@ -281,7 +281,7 @@ class DifferentialDrivetrainSim {
       units::kilogram_square_meter_t J,
       const std::array<double, 7>& measurementStdDevs = {}) {
     return DifferentialDrivetrainSim{
-        motor, gearing, J, 25_kg, wheelSize / 2.0, 26_in, measurementStdDevs};
+        motor, gearing, J, 60_lb, wheelSize / 2.0, 26_in, measurementStdDevs};
   }
 
  private:
