@@ -5,8 +5,11 @@
 #include "glass/networktables/NTField2D.h"
 
 #include <algorithm>
+#include <vector>
 
 #include <ntcore_cpp.h>
+#include <wpi/Endian.h>
+#include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 
 #include "glass/DataSource.h"
@@ -83,14 +86,36 @@ class NTField2DModel::GroupModel::ObjectModel : public FieldObjectModel {
 };
 
 void NTField2DModel::GroupModel::NTUpdate(const nt::Value& value) {
-  if (!value.IsDoubleArray()) {
-    m_count = 0;
-    return;
-  }
+  // Allow raw for large arrays (since NT is limited to 255 elements)
+  wpi::ArrayRef<double> arr;
+  std::vector<double> storage;
+  if (value.IsRaw()) {
+    // treat it simply as an array of doubles
+    wpi::StringRef data = value.GetRaw();
 
-  auto arr = value.GetDoubleArray();
-  // must be triples
-  if ((arr.size() % 3) != 0) {
+    // must be triples of doubles
+    if ((data.size() % (3*8)) != 0) {
+      m_count = 0;
+      return;
+    }
+    storage.reserve(data.size() / 8);
+    const char* p = data.begin();
+    while (p < data.end()) {
+      storage.emplace_back(wpi::BitsToDouble(
+          wpi::support::endian::readNext<uint64_t, wpi::support::big,
+                                         wpi::support::unaligned>(p)));
+    }
+
+    arr = storage;
+  } else if (value.IsDoubleArray()) {
+    arr = value.GetDoubleArray();
+
+    // must be triples
+    if ((arr.size() % 3) != 0) {
+      m_count = 0;
+      return;
+    }
+  } else {
     m_count = 0;
     return;
   }
@@ -143,34 +168,67 @@ void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
                                                           bool setRot) {
   // get from NT, validate type and size
   auto value = nt::GetEntryValue(m_entry);
-  if (!value || !value->IsDoubleArray()) {
-    return;
-  }
-  auto origArr = value->GetDoubleArray();
-  if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
+  if (!value) {
     return;
   }
 
-  // copy existing array
-  wpi::SmallVector<double, 8> arr;
-  arr.reserve(origArr.size());
-  for (auto&& elem : origArr) {
-    arr.emplace_back(elem);
-  }
+  if (value->IsDoubleArray()) {
+    auto origArr = value->GetDoubleArray();
+    if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
+      return;
+    }
 
-  // update value
-  if (setX) {
-    arr[m_index * 3 + 0] = x;
-  }
-  if (setY) {
-    arr[m_index * 3 + 1] = y;
-  }
-  if (setRot) {
-    arr[m_index * 3 + 2] = rot;
-  }
+    // copy existing array
+    wpi::SmallVector<double, 8> arr;
+    arr.reserve(origArr.size());
+    for (auto&& elem : origArr) {
+      arr.emplace_back(elem);
+    }
 
-  // set back to NT
-  nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
+    // update value
+    if (setX) {
+      arr[m_index * 3 + 0] = x;
+    }
+    if (setY) {
+      arr[m_index * 3 + 1] = y;
+    }
+    if (setRot) {
+      arr[m_index * 3 + 2] = rot;
+    }
+
+    // set back to NT
+    nt::SetEntryTypeValue(m_entry, nt::Value::MakeDoubleArray(arr));
+  } else if (value->IsRaw()) {
+    auto origData = value->GetRaw();
+    if (static_cast<int>(origData.size()) < ((m_index + 1) * 3)) {
+      return;
+    }
+
+    // copy existing array
+    std::vector<char> data;
+    data.reserve(origData.size());
+    for (auto&& elem : origData) {
+      data.emplace_back(elem);
+    }
+
+    // update value
+    if (setX) {
+      wpi::support::endian::write64be(&data[(m_index * 3 + 0) * 8],
+                                      wpi::DoubleToBits(x));
+    }
+    if (setY) {
+      wpi::support::endian::write64be(&data[(m_index * 3 + 1) * 8],
+                                      wpi::DoubleToBits(y));
+    }
+    if (setRot) {
+      wpi::support::endian::write64be(&data[(m_index * 3 + 2) * 8],
+                                      wpi::DoubleToBits(rot));
+    }
+
+    // set back to NT
+    nt::SetEntryTypeValue(
+        m_entry, nt::Value::MakeRaw(wpi::StringRef{data.data(), data.size()}));
+  }
 }
 
 NTField2DModel::NTField2DModel(wpi::StringRef path)
