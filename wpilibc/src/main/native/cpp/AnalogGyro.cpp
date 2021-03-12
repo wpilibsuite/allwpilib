@@ -15,6 +15,7 @@
 #include "frc/Base.h"
 #include "frc/Timer.h"
 #include "frc/WPIErrors.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -179,4 +180,10 @@ void AnalogGyro::Calibrate() {
 
 std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
   return m_analog;
+}
+
+void AnalogGyro::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Gyro");
+  builder.AddDoubleProperty(
+      "Value", [=]() { return GetAngle(); }, nullptr);
 }

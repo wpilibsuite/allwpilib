@@ -4,6 +4,8 @@
 
 #include "frc/romi/RomiGyro.h"
 
+#include "frc/smartdashboard/SendableBuilder.h"
+
 using namespace frc;
 
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
@@ -86,4 +88,10 @@ void RomiGyro::Reset() {
     m_angleYOffset = m_simAngleY.Get();
     m_angleZOffset = m_simAngleZ.Get();
   }
+}
+
+void RomiGyro::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Gyro");
+  builder.AddDoubleProperty(
+      "Value", [=]() { return GetAngle(); }, nullptr);
 }
