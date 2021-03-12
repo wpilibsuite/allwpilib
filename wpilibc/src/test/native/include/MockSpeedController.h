@@ -17,8 +17,6 @@ class MockSpeedController : public SpeedController {
   void Disable() override;
   void StopMotor() override;
 
-  void PIDWrite(double output) override;
-
  private:
   double m_speed = 0.0;
   bool m_isInverted = false;

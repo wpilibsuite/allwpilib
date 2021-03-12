@@ -59,10 +59,6 @@ void NidecBrushless::Enable() {
   m_disabled = false;
 }
 
-void NidecBrushless::PIDWrite(double output) {
-  Set(output);
-}
-
 void NidecBrushless::StopMotor() {
   m_dio.UpdateDutyCycle(0.5);
   m_pwm.SetDisabled();

@@ -18,7 +18,6 @@ public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseab
   private boolean m_initAnalogInput;
   private double m_fullRange;
   private double m_offset;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * AnalogPotentiometer constructor.
@@ -127,29 +126,6 @@ public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseab
     }
     return (m_analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * m_fullRange
         + m_offset;
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
-    }
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current reading.
-   */
-  @Override
-  public double pidGet() {
-    return get();
   }
 
   @Override

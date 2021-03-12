@@ -4,17 +4,15 @@
 
 #pragma once
 
-#include "frc/PIDSource.h"
-
 namespace frc {
 
 /**
  * Interface for potentiometers.
  */
-class Potentiometer : public PIDSource {
+class Potentiometer {
  public:
   Potentiometer() = default;
-  ~Potentiometer() override = default;
+  virtual ~Potentiometer() = default;
 
   Potentiometer(Potentiometer&&) = default;
   Potentiometer& operator=(Potentiometer&&) = default;
@@ -25,8 +23,6 @@ class Potentiometer : public PIDSource {
    * @return The current set speed. Value is between -1.0 and 1.0.
    */
   virtual double Get() const = 0;
-
-  void SetPIDSourceType(PIDSourceType pidSource) override;
 };
 
 }  // namespace frc

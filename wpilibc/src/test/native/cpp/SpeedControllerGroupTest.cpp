@@ -121,13 +121,5 @@ TEST_P(SpeedControllerGroupTest, StopMotor) {
   }
 }
 
-TEST_P(SpeedControllerGroupTest, PIDWrite) {
-  m_group->PIDWrite(1.0);
-
-  for (auto& speedController : m_speedControllers) {
-    EXPECT_FLOAT_EQ(speedController.Get(), 1.0);
-  }
-}
-
 INSTANTIATE_TEST_SUITE_P(Test, SpeedControllerGroupTest,
                          testing::Values(TEST_ONE, TEST_TWO, TEST_THREE));

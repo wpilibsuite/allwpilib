@@ -107,13 +107,6 @@ class AnalogPotentiometer : public ErrorBase,
    */
   double Get() const override;
 
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current reading.
-   */
-  double PIDGet() override;
-
   void InitSendable(SendableBuilder& builder) override;
 
  private:

@@ -6,14 +6,12 @@
 
 #include <units/voltage.h>
 
-#include "frc/PIDOutput.h"
-
 namespace frc {
 
 /**
  * Interface for speed controlling devices.
  */
-class SpeedController : public PIDOutput {
+class SpeedController {
  public:
   virtual ~SpeedController() = default;
 

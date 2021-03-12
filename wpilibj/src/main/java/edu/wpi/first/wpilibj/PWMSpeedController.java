@@ -92,16 +92,6 @@ public abstract class PWMSpeedController extends MotorSafety
     return m_pwm.getChannel();
   }
 
-  /**
-   * Write out the PID value as seen in the PIDOutput base object.
-   *
-   * @param output Write out the PWM value as was found in the PIDController
-   */
-  @Override
-  public void pidWrite(double output) {
-    set(output);
-  }
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");

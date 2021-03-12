@@ -32,7 +32,6 @@ class SpeedControllerGroup : public Sendable,
   bool GetInverted() const override;
   void Disable() override;
   void StopMotor() override;
-  void PIDWrite(double output) override;
 
   void InitSendable(SendableBuilder& builder) override;
 

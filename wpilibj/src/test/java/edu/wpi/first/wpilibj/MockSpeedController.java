@@ -37,9 +37,4 @@ public class MockSpeedController implements SpeedController {
   public void stopMotor() {
     disable();
   }
-
-  @Override
-  public void pidWrite(double output) {
-    set(output);
-  }
 }

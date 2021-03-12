@@ -254,13 +254,6 @@ double AnalogInput::GetSampleRate() {
   return sampleRate;
 }
 
-double AnalogInput::PIDGet() {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
-  return GetAverageVoltage();
-}
-
 void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }

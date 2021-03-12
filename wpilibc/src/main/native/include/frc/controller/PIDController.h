@@ -239,3 +239,9 @@ class PIDController : public frc::Sendable,
 };
 
 }  // namespace frc2
+
+namespace frc {
+
+using frc2::PIDController;
+
+}  // namespace frc

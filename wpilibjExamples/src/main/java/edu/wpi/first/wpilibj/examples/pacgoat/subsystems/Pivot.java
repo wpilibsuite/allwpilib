@@ -65,7 +65,7 @@ public class Pivot extends PIDSubsystem {
   /** Set the motor speed based off of the PID output. */
   @Override
   protected void usePIDOutput(double output) {
-    m_motor.pidWrite(output);
+    m_motor.set(output);
   }
 
   /** If the pivot is at its upper limit. */

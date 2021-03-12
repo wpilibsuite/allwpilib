@@ -73,14 +73,6 @@ class NidecBrushless : public SpeedController,
    */
   void Enable();
 
-  // PIDOutput interface
-  /**
-   * Write out the PID value as seen in the PIDOutput base object.
-   *
-   * @param output Write out the PWM value as was found in the PIDController
-   */
-  void PIDWrite(double output) override;
-
   // MotorSafety interface
   void StopMotor() override;
   void GetDescription(wpi::raw_ostream& desc) const override;

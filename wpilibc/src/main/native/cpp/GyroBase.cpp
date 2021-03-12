@@ -9,17 +9,6 @@
 
 using namespace frc;
 
-double GyroBase::PIDGet() {
-  switch (GetPIDSourceType()) {
-    case PIDSourceType::kRate:
-      return GetRate();
-    case PIDSourceType::kDisplacement:
-      return GetAngle();
-    default:
-      return 0;
-  }
-}
-
 void GyroBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
