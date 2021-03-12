@@ -80,8 +80,6 @@ class ExampleSmartMotorController : public frc::SpeedController {
 
   void StopMotor() override {}
 
-  void PIDWrite(double output) override {}
-
  private:
   double m_value = 0.0;
 };

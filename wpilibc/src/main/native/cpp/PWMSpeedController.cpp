@@ -42,10 +42,6 @@ int PWMSpeedController::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-void PWMSpeedController::PIDWrite(double output) {
-  Set(output);
-}
-
 PWMSpeedController::PWMSpeedController(const wpi::Twine& name, int channel)
     : m_pwm(channel, false) {
   SendableRegistry::GetInstance().AddLW(this, name, channel);

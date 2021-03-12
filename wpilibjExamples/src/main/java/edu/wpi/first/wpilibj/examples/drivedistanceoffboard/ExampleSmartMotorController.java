@@ -97,7 +97,4 @@ public class ExampleSmartMotorController implements SpeedController {
 
   @Override
   public void stopMotor() {}
-
-  @Override
-  public void pidWrite(double output) {}
 }

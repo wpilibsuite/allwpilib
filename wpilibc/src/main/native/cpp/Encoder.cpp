@@ -213,20 +213,6 @@ int Encoder::GetSamplesToAverage() const {
   return result;
 }
 
-double Encoder::PIDGet() {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
-  switch (GetPIDSourceType()) {
-    case PIDSourceType::kDisplacement:
-      return GetDistance();
-    case PIDSourceType::kRate:
-      return GetRate();
-    default:
-      return 0.0;
-  }
-}
-
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);

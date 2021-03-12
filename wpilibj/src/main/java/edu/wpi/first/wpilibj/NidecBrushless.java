@@ -90,16 +90,6 @@ public class NidecBrushless extends MotorSafety
   }
 
   /**
-   * Write out the PID value as seen in the PIDOutput base object.
-   *
-   * @param output Write out the PWM value as was found in the PIDController
-   */
-  @Override
-  public void pidWrite(double output) {
-    set(output);
-  }
-
-  /**
    * Stop the motor. This is called by the MotorSafety object when it has a timeout for this PWM and
    * needs to stop it from running. Calling set() will re-enable the motor.
    */

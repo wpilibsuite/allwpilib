@@ -4,9 +4,7 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
-import edu.wpi.first.wpilibj.PIDSource;
-
 /** Interface for a Potentiometer. */
-public interface Potentiometer extends PIDSource {
+public interface Potentiometer {
   double get();
 }

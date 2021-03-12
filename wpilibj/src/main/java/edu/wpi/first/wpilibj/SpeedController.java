@@ -5,8 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 /** Interface for speed controlling devices. */
-@SuppressWarnings("removal")
-public interface SpeedController extends PIDOutput {
+public interface SpeedController {
   /**
    * Common interface for setting the speed of a speed controller.
    *

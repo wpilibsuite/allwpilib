@@ -88,11 +88,6 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
   }
 
   @Override
-  public void pidWrite(double output) {
-    set(output);
-  }
-
-  @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");
     builder.setActuator(true);

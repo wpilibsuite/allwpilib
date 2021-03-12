@@ -60,13 +60,6 @@ class PWMSpeedController : public SpeedController,
 
   int GetChannel() const;
 
-  /**
-   * Write out the PID value as seen in the PIDOutput base object.
-   *
-   * @param output Write out the PWM value as was found in the PIDController
-   */
-  void PIDWrite(double output) override;
-
  protected:
   /**
    * Constructor for a PWM Speed Controller connected via PWM.

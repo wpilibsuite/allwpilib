@@ -98,15 +98,4 @@ class SpeedControllerGroupTest {
         Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
         0.00005);
   }
-
-  @ParameterizedTest
-  @MethodSource("speedControllerArguments")
-  void pidWriteTest(final SpeedControllerGroup group, final SpeedController[] speedControllers) {
-    group.pidWrite(1.0);
-
-    assertArrayEquals(
-        DoubleStream.generate(() -> 1.0).limit(speedControllers.length).toArray(),
-        Arrays.stream(speedControllers).mapToDouble(SpeedController::get).toArray(),
-        0.00005);
-  }
 }

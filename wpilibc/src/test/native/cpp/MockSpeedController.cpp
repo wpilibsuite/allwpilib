@@ -29,7 +29,3 @@ void MockSpeedController::Disable() {
 void MockSpeedController::StopMotor() {
   Disable();
 }
-
-void MockSpeedController::PIDWrite(double output) {
-  Set(output);
-}
