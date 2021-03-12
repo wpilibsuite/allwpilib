@@ -8,8 +8,11 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/GyroBase.h"
+#include "frc/ErrorBase.h"
 #include "frc/SPI.h"
+#include "frc/interfaces/Gyro.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -26,7 +29,10 @@ namespace frc {
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
  * Only one instance of an ADXRS Gyro is supported.
  */
-class ADXRS450_Gyro : public GyroBase {
+class ADXRS450_Gyro : public Gyro,
+                      public ErrorBase,
+                      public Sendable,
+                      public SendableHelper<ADXRS450_Gyro> {
  public:
   /**
    * Gyro constructor on onboard CS0.
@@ -95,6 +101,8 @@ class ADXRS450_Gyro : public GyroBase {
    * @return The SPI port number.
    */
   int GetPort() const;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   SPI m_spi;

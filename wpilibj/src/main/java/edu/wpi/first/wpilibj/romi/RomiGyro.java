@@ -7,9 +7,11 @@ package edu.wpi.first.wpilibj.romi;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.GyroBase;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public class RomiGyro extends GyroBase {
+public class RomiGyro implements Gyro, Sendable {
   private final SimDevice m_simDevice;
   private SimDouble m_simRateX;
   private SimDouble m_simRateY;
@@ -145,5 +147,11 @@ public class RomiGyro extends GyroBase {
     if (m_simDevice != null) {
       m_simDevice.close();
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", this::getAngle, null);
   }
 }

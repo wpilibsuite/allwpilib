@@ -8,6 +8,7 @@
 
 #include "frc/DriverStation.h"
 #include "frc/Timer.h"
+#include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -133,4 +134,10 @@ void ADXRS450_Gyro::Calibrate() {
 
 int ADXRS450_Gyro::GetPort() const {
   return m_port;
+}
+
+void ADXRS450_Gyro::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Gyro");
+  builder.AddDoubleProperty(
+      "Value", [=]() { return GetAngle(); }, nullptr);
 }
