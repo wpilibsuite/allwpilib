@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control of angle of the pivot
@@ -29,7 +28,7 @@ public class Pivot extends PIDSubsystem {
 
   // 0 degrees is vertical facing up.
   // Angle increases the more forward the pivot goes.
-  private final Potentiometer m_pot = new AnalogPotentiometer(1);
+  private final AnalogPotentiometer m_pot = new AnalogPotentiometer(1);
 
   // Motor to move the pivot.
   private final SpeedController m_motor = new Victor(5);
