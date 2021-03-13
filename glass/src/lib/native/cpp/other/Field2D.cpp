@@ -43,7 +43,7 @@ struct FieldFrameData {
 
 // Object drag state
 struct ObjectDragState {
-  int object = 0;
+  FieldObjectModel* object = nullptr;
   int corner = 0;
   ImVec2 initialOffset;
   double initialAngle = 0;
@@ -62,7 +62,7 @@ class ObjectFrameData {
   }
   void UpdateFrameData();
   int IsHovered(const ImVec2& cursor) const;
-  bool HandleDrag(const ImVec2& cursor, int hitCorner, ObjectDragState* drag);
+  bool HandleDrag(const ImVec2& cursor, int hitCorner);
   void Draw(ImDrawList* drawList, const gui::Texture& texture,
             int hitCorner) const;
 
@@ -96,7 +96,6 @@ class ObjectGroupInfo {
   std::unique_ptr<pfd::open_file> m_fileOpener;
   float* m_pWidth;
   float* m_pLength;
-  ObjectDragState m_dragState;
 
   void Reset();
   void LoadImage();
@@ -142,6 +141,8 @@ class FieldInfo {
 };
 
 }  // namespace
+
+static ObjectDragState gDragState;
 
 FieldInfo::FieldInfo() {
   auto& storage = GetStorage();
@@ -453,24 +454,27 @@ int ObjectFrameData::IsHovered(const ImVec2& cursor) const {
   }
 }
 
-bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner,
-                                 ObjectDragState* drag) {
+bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner) {
   bool rv = false;
   if (hitCorner > 0 && ImGui::IsMouseClicked(0)) {
     if (hitCorner == 1) {
-      drag->corner = hitCorner;
-      drag->initialOffset = cursor - m_center;
+      gDragState.corner = hitCorner;
+      gDragState.initialOffset = cursor - m_center;
     } else {
-      drag->corner = hitCorner;
+      gDragState.corner = hitCorner;
       ImVec2 off = cursor - m_center;
-      drag->initialAngle = std::atan2(off.y, off.x) + GetRotation();
+      gDragState.initialAngle = std::atan2(off.y, off.x) + GetRotation();
     }
     rv = true;
   }
 
-  if (drag->corner > 0 && ImGui::IsMouseDown(0)) {
-    if (drag->corner == 1) {
-      ImVec2 newPos = cursor - drag->initialOffset;
+  bool isDown = ImGui::IsMouseDown(0);
+  if (!isDown) {
+    gDragState.object = 0;
+  }
+  if (gDragState.corner > 0 && isDown) {
+    if (gDragState.corner == 1) {
+      ImVec2 newPos = cursor - gDragState.initialOffset;
       SetPosition(
           (std::clamp(newPos.x, m_ffd.min.x, m_ffd.max.x) - m_ffd.min.x) /
               m_ffd.scale,
@@ -479,10 +483,10 @@ bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner,
       UpdateFrameData();
     } else {
       ImVec2 off = cursor - m_center;
-      SetRotation(drag->initialAngle - std::atan2(off.y, off.x));
+      SetRotation(gDragState.initialAngle - std::atan2(off.y, off.x));
     }
   } else {
-    drag->corner = 0;
+    gDragState.corner = 0;
   }
 
   return rv;
@@ -617,11 +621,10 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
                           *objGroup->m_pLength};
 
       int hitCorner = 0;
-      if (objGroup->m_dragState.object == 0 ||
-          objGroup->m_dragState.object == i) {
+      if (!gDragState.object || gDragState.object == &objModel) {
         hitCorner = ofd.IsHovered(mousePos);
-        if (ofd.HandleDrag(mousePos, hitCorner, &objGroup->m_dragState)) {
-          objGroup->m_dragState.object = i;
+        if (ofd.HandleDrag(mousePos, hitCorner)) {
+          gDragState.object = &objModel;
         }
       }
 
