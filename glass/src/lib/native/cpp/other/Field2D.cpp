@@ -4,8 +4,10 @@
 
 #include "glass/other/Field2D.h"
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
+#include <utility>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -44,9 +46,22 @@ struct FieldFrameData {
 // Object drag state
 struct ObjectDragState {
   FieldObjectModel* object = nullptr;
-  int corner = 0;
+  int corner;
+  ImVec2 targetCenter;
+  float targetRadius;
   ImVec2 initialOffset;
   double initialAngle = 0;
+};
+
+// Object drag target info
+struct ObjectDragTargetInfo {
+  FieldObjectModel* objModel;
+  double rot;
+  ImVec2 objCenter;  // center of the object
+  ImVec2 center;     // center of the target
+  float radius;      // target radius
+  float dist;        // distance from center to mouse
+  int corner;        // corner (1 = center)
 };
 
 // Per-frame object data (not persistent)
@@ -60,11 +75,12 @@ class ObjectFrameData {
   double GetRotation() const {
     return units::convert<units::degrees, units::radians>(m_rot);
   }
+  float GetHitRadius() const { return m_hitRadius; }
   void UpdateFrameData();
-  int IsHovered(const ImVec2& cursor) const;
-  bool HandleDrag(const ImVec2& cursor, int hitCorner);
-  void Draw(ImDrawList* drawList, const gui::Texture& texture,
-            int hitCorner) const;
+  std::pair<int, float> IsHovered(const ImVec2& cursor) const;
+  ObjectDragTargetInfo GetDragTarget(int corner, float dist) const;
+  void HandleDrag(const ImVec2& cursor);
+  void Draw(ImDrawList* drawList, const gui::Texture& texture) const;
 
   // in window coordinates
   ImVec2 m_center;
@@ -429,71 +445,81 @@ void ObjectFrameData::UpdateFrameData() {
   m_center = center;
 }
 
-int ObjectFrameData::IsHovered(const ImVec2& cursor) const {
+std::pair<int, float> ObjectFrameData::IsHovered(const ImVec2& cursor) const {
   // only allow initiation of dragging when invisible button is hovered;
   // this prevents the window resize handles from simultaneously activating
   // the drag functionality
   if (!ImGui::IsItemHovered()) {
-    return 0;
+    return {0, 0.0};
   }
 
   float hitRadiusSquared = m_hitRadius * m_hitRadius;
+  float dist;
+
   // it's within the hit radius of the center?
-  if (gui::GetDistSquared(cursor, m_center) < hitRadiusSquared) {
-    return 1;
-  } else if (gui::GetDistSquared(cursor, m_corners[0]) < hitRadiusSquared) {
-    return 2;
-  } else if (gui::GetDistSquared(cursor, m_corners[1]) < hitRadiusSquared) {
-    return 3;
-  } else if (gui::GetDistSquared(cursor, m_corners[2]) < hitRadiusSquared) {
-    return 4;
-  } else if (gui::GetDistSquared(cursor, m_corners[3]) < hitRadiusSquared) {
-    return 5;
+  dist = gui::GetDistSquared(cursor, m_center);
+  if (dist < hitRadiusSquared) {
+    return {1, dist};
+  }
+
+  dist = gui::GetDistSquared(cursor, m_corners[0]);
+  if (dist < hitRadiusSquared) {
+    return {2, dist};
+  }
+
+  dist = gui::GetDistSquared(cursor, m_corners[1]);
+  if (dist < hitRadiusSquared) {
+    return {3, dist};
+  }
+
+  dist = gui::GetDistSquared(cursor, m_corners[2]);
+  if (dist < hitRadiusSquared) {
+    return {4, dist};
+  }
+
+  dist = gui::GetDistSquared(cursor, m_corners[3]);
+  if (dist < hitRadiusSquared) {
+    return {5, dist};
+  }
+
+  return {0, 0.0};
+}
+
+ObjectDragTargetInfo ObjectFrameData::GetDragTarget(int corner,
+                                                    float dist) const {
+  ObjectDragTargetInfo info;
+  info.objModel = &m_model;
+  info.rot = GetRotation();
+  info.objCenter = m_center;
+  if (corner == 1) {
+    info.center = m_center;
   } else {
-    return 0;
+    info.center = m_corners[corner - 2];
+  }
+  info.radius = m_hitRadius;
+  info.dist = dist;
+  info.corner = corner;
+  return info;
+}
+
+void ObjectFrameData::HandleDrag(const ImVec2& cursor) {
+  if (gDragState.corner == 1) {
+    ImVec2 newPos = cursor - gDragState.initialOffset;
+    SetPosition((std::clamp(newPos.x, m_ffd.min.x, m_ffd.max.x) - m_ffd.min.x) /
+                    m_ffd.scale,
+                (m_ffd.max.y - std::clamp(newPos.y, m_ffd.min.y, m_ffd.max.y)) /
+                    m_ffd.scale);
+    UpdateFrameData();
+    gDragState.targetCenter = m_center;
+  } else {
+    ImVec2 off = cursor - m_center;
+    SetRotation(gDragState.initialAngle - std::atan2(off.y, off.x));
+    gDragState.targetCenter = m_corners[gDragState.corner - 2];
   }
 }
 
-bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner) {
-  bool rv = false;
-  if (hitCorner > 0 && ImGui::IsMouseClicked(0)) {
-    if (hitCorner == 1) {
-      gDragState.corner = hitCorner;
-      gDragState.initialOffset = cursor - m_center;
-    } else {
-      gDragState.corner = hitCorner;
-      ImVec2 off = cursor - m_center;
-      gDragState.initialAngle = std::atan2(off.y, off.x) + GetRotation();
-    }
-    rv = true;
-  }
-
-  bool isDown = ImGui::IsMouseDown(0);
-  if (!isDown) {
-    gDragState.object = 0;
-  }
-  if (gDragState.corner > 0 && isDown) {
-    if (gDragState.corner == 1) {
-      ImVec2 newPos = cursor - gDragState.initialOffset;
-      SetPosition(
-          (std::clamp(newPos.x, m_ffd.min.x, m_ffd.max.x) - m_ffd.min.x) /
-              m_ffd.scale,
-          (m_ffd.max.y - std::clamp(newPos.y, m_ffd.min.y, m_ffd.max.y)) /
-              m_ffd.scale);
-      UpdateFrameData();
-    } else {
-      ImVec2 off = cursor - m_center;
-      SetRotation(gDragState.initialAngle - std::atan2(off.y, off.x));
-    }
-  } else {
-    gDragState.corner = 0;
-  }
-
-  return rv;
-}
-
-void ObjectFrameData::Draw(ImDrawList* drawList, const gui::Texture& texture,
-                           int hitCorner) const {
+void ObjectFrameData::Draw(ImDrawList* drawList,
+                           const gui::Texture& texture) const {
   if (texture) {
     drawList->AddImageQuad(texture, m_corners[0], m_corners[1], m_corners[2],
                            m_corners[3]);
@@ -502,15 +528,6 @@ void ObjectFrameData::Draw(ImDrawList* drawList, const gui::Texture& texture,
                       IM_COL32(255, 0, 0, 255), 4.0);
     drawList->AddTriangle(m_arrow[0], m_arrow[1], m_arrow[2],
                           IM_COL32(0, 255, 0, 255), 4.0);
-  }
-
-  if (hitCorner > 0) {
-    if (hitCorner == 1) {
-      drawList->AddCircle(m_center, m_hitRadius, IM_COL32(0, 255, 0, 255));
-    } else {
-      drawList->AddCircle(m_corners[hitCorner - 2], m_hitRadius,
-                          IM_COL32(0, 255, 0, 255));
-    }
   }
 }
 
@@ -602,6 +619,15 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   auto drawList = ImGui::GetWindowDrawList();
   field->Draw(drawList, ffd);
 
+  // stop dragging if mouse button not down
+  bool isDown = ImGui::IsMouseDown(0);
+  if (!isDown) {
+    gDragState.object = nullptr;
+  }
+
+  // drag targets
+  wpi::SmallVector<ObjectDragTargetInfo, 4> targets;
+
   model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
     if (!groupModel.Exists()) {
       return;
@@ -620,19 +646,63 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
       ObjectFrameData ofd{objModel, ffd, *objGroup->m_pWidth,
                           *objGroup->m_pLength};
 
-      int hitCorner = 0;
-      if (!gDragState.object || gDragState.object == &objModel) {
-        hitCorner = ofd.IsHovered(mousePos);
-        if (ofd.HandleDrag(mousePos, hitCorner)) {
-          gDragState.object = &objModel;
+      // check for potential drag targets
+      if (!gDragState.object) {
+        auto [corner, dist] = ofd.IsHovered(mousePos);
+        if (corner > 0) {
+          targets.emplace_back(ofd.GetDragTarget(corner, dist));
         }
       }
 
+      // handle active dragging of this object
+      if (gDragState.object == &objModel) {
+        ofd.HandleDrag(mousePos);
+      }
+
       // draw
-      ofd.Draw(drawList, objGroup->GetTexture(), hitCorner);
+      ofd.Draw(drawList, objGroup->GetTexture());
     });
     PopID();
   });
+
+  ImVec2 targetCenter;
+  float targetRadius = 0;
+
+  if (!targets.empty()) {
+    // Find the "best" drag target of the available options.  Prefer
+    // center to non-center, and then pick the closest hit.
+    std::sort(targets.begin(), targets.end(),
+              [](const auto& a, const auto& b) {
+                return a.corner == 0 || a.dist < b.dist;
+              });
+    auto& target = targets.front();
+
+    targetCenter = target.center;
+    targetRadius = target.radius;
+
+    if (ImGui::IsMouseClicked(0)) {
+      // initialize drag state
+      gDragState.object = target.objModel;
+      gDragState.corner = target.corner;
+      gDragState.targetCenter = target.center;
+      gDragState.targetRadius = target.radius;
+      gDragState.initialOffset = mousePos - target.objCenter;
+      if (target.corner != 1) {
+        gDragState.initialAngle =
+            std::atan2(gDragState.initialOffset.y, gDragState.initialOffset.x) +
+            target.rot;
+      }
+    }
+  } else if (gDragState.object) {
+    // keep drawing the target circle
+    targetCenter = gDragState.targetCenter;
+    targetRadius = gDragState.targetRadius;
+  }
+
+  // draw the target circle
+  if (targetRadius != 0) {
+    drawList->AddCircle(targetCenter, targetRadius, IM_COL32(0, 255, 0, 255));
+  }
 }
 
 void Field2DView::Display() {
