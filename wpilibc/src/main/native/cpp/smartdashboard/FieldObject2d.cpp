@@ -115,7 +115,7 @@ void FieldObject2d::UpdateFromEntry() const {
   }
   auto val = m_entry.GetValue();
   if (!val) {
-   return;
+    return;
   }
 
   if (val->IsDoubleArray()) {

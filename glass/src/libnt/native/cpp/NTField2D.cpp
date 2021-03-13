@@ -94,7 +94,7 @@ void NTField2DModel::GroupModel::NTUpdate(const nt::Value& value) {
     wpi::StringRef data = value.GetRaw();
 
     // must be triples of doubles
-    if ((data.size() % (3*8)) != 0) {
+    if ((data.size() % (3 * 8)) != 0) {
       m_count = 0;
       return;
     }

@@ -671,10 +671,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   if (!targets.empty()) {
     // Find the "best" drag target of the available options.  Prefer
     // center to non-center, and then pick the closest hit.
-    std::sort(targets.begin(), targets.end(),
-              [](const auto& a, const auto& b) {
-                return a.corner == 0 || a.dist < b.dist;
-              });
+    std::sort(targets.begin(), targets.end(), [](const auto& a, const auto& b) {
+      return a.corner == 0 || a.dist < b.dist;
+    });
     auto& target = targets.front();
 
     targetCenter = target.center;
