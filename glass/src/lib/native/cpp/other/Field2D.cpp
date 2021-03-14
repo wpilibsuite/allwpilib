@@ -65,17 +65,17 @@ struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
   enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
-  Style style;
-  float weight;
-  int color;
+  Style style = kBoxImage;
+  float weight = 4.0f;
+  int color = 0;
 
-  float width;
-  float length;
+  float width = 0.0f;
+  float length = 0.0f;
 
-  bool arrows;
-  int arrowSize;
-  float arrowWeight;
-  int arrowColor;
+  bool arrows = true;
+  int arrowSize = 50;
+  float arrowWeight = 4.0f;
+  int arrowColor = 0;
 
   const gui::Texture& texture;
 };
