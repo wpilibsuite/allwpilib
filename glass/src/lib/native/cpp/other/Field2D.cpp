@@ -833,7 +833,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 
       // check for potential drag targets
       if (isHovered && !gDragState.target.objModel) {
-        auto [corner, dist] = ofd.IsHovered(mousePos);
+        int corner;
+        double dist;
+        std::tie(corner, dist) = ofd.IsHovered(mousePos);
         if (corner > 0) {
           targets.emplace_back(ofd.GetDragTarget(corner, dist));
           targets.back().name = name;
