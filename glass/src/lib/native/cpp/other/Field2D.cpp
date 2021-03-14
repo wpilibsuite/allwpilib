@@ -34,6 +34,11 @@ namespace {
 
 // Per-frame field data (not persistent)
 struct FieldFrameData {
+  std::pair<double, double> GetPosFromScreen(const ImVec2& cursor) const {
+    return {(std::clamp(cursor.x, min.x, max.x) - min.x) / scale,
+            (max.y - std::clamp(cursor.y, min.y, max.y)) / scale};
+  }
+
   // in screen coordinates
   ImVec2 imageMin;
   ImVec2 imageMax;
@@ -46,9 +51,11 @@ struct FieldFrameData {
 // Object drag target info
 struct ObjectDragTargetInfo {
   FieldObjectModel* objModel = nullptr;
+  std::string name;
+  int index;
   double rot;
-  ImVec2 objCenter;  // center of the object
-  ImVec2 center;     // center of the target
+  ImVec2 objCenter;  // center of the object (screen coordinates)
+  ImVec2 center;     // center of the target (screen coordinates)
   float radius = 0;  // target radius
   float dist;        // distance from center to mouse
   int corner;        // corner (1 = center)
@@ -191,6 +198,12 @@ class FieldInfo {
 }  // namespace
 
 static ObjectDragState gDragState;
+
+static double RotToDegrees(double rot) {
+  double rotDegrees = units::convert<units::radians, units::degrees>(rot);
+  // force to -180 to +180 range
+  return rotDegrees + std::ceil((-rotDegrees - 180) / 360) * 360;
+}
 
 FieldInfo::FieldInfo() {
   auto& storage = GetStorage();
@@ -552,9 +565,7 @@ void ObjectFrameData::SetPosition(double x, double y) {
 }
 
 void ObjectFrameData::SetRotation(double rot) {
-  double rotDegrees = units::convert<units::radians, units::degrees>(rot);
-  // force to -180 to +180 range
-  rotDegrees = rotDegrees + std::ceil((-rotDegrees - 180) / 360) * 360;
+  double rotDegrees = RotToDegrees(rot);
   m_rot = rotDegrees;
   m_model.SetRotation(rotDegrees);
 }
@@ -654,17 +665,16 @@ ObjectDragTargetInfo ObjectFrameData::GetDragTarget(int corner,
 
 void ObjectFrameData::HandleDrag(const ImVec2& cursor) {
   if (gDragState.target.corner == 1) {
-    ImVec2 newPos = cursor - gDragState.initialOffset;
-    SetPosition((std::clamp(newPos.x, m_ffd.min.x, m_ffd.max.x) - m_ffd.min.x) /
-                    m_ffd.scale,
-                (m_ffd.max.y - std::clamp(newPos.y, m_ffd.min.y, m_ffd.max.y)) /
-                    m_ffd.scale);
+    auto [x, y] = m_ffd.GetPosFromScreen(cursor - gDragState.initialOffset);
+    SetPosition(x, y);
     UpdateFrameData();
     gDragState.target.center = m_center;
+    gDragState.target.objCenter = m_center;
   } else {
     ImVec2 off = cursor - m_center;
     SetRotation(gDragState.initialAngle - std::atan2(off.y, off.x));
     gDragState.target.center = m_corners[gDragState.target.corner - 2];
+    gDragState.target.rot = GetRotation();
   }
 }
 
@@ -788,7 +798,8 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   bool isHovered = ImGui::IsItemHovered();
 
   // drag targets
-  wpi::SmallVector<ObjectDragTargetInfo, 4> targets;
+  static std::vector<ObjectDragTargetInfo> targets;
+  targets.resize(0);
 
   // splitter so lines are put behind arrows
   static ImDrawListSplitter drawSplit;
@@ -816,6 +827,7 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
     rightLine.resize(0);
 
     drawSplit.SetCurrentChannel(drawList, 1);
+    int i = 0;
     groupModel.ForEachFieldObject([&](auto& objModel) {
       ObjectFrameData ofd{objModel, ffd, displayOptions};
 
@@ -824,6 +836,8 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
         auto [corner, dist] = ofd.IsHovered(mousePos);
         if (corner > 0) {
           targets.emplace_back(ofd.GetDragTarget(corner, dist));
+          targets.back().name = name;
+          targets.back().index = i;
         }
       }
 
@@ -834,6 +848,8 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 
       // draw
       ofd.Draw(drawList, &centerLine, &leftLine, &rightLine);
+
+      ++i;
     });
 
     drawSplit.SetCurrentChannel(drawList, 0);
@@ -869,6 +885,10 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 
   // draw the target circle; also draw a smaller circle on the object center
   if (target->radius != 0) {
+    auto [x, y] = ffd.GetPosFromScreen(target->objCenter);
+    ImGui::SetTooltip("%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f",
+                      target->name.c_str(), target->index, x, y,
+                      RotToDegrees(target->rot));
     drawList->AddCircle(target->center, target->radius,
                         IM_COL32(0, 255, 0, 255));
     if (target->corner != 1) {
