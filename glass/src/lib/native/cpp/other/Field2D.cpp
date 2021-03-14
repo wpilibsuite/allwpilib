@@ -790,9 +790,13 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
   // drag targets
   wpi::SmallVector<ObjectDragTargetInfo, 4> targets;
 
+  // splitter so lines are put behind arrows
+  static ImDrawListSplitter drawSplit;
+
   // lines; static so buffer gets reused
   static std::vector<ImVec2> centerLine, leftLine, rightLine;
 
+  drawSplit.Split(drawList, 2);
   model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
     if (!groupModel.Exists()) {
       return;
@@ -811,6 +815,7 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
     leftLine.resize(0);
     rightLine.resize(0);
 
+    drawSplit.SetCurrentChannel(drawList, 1);
     groupModel.ForEachFieldObject([&](auto& objModel) {
       ObjectFrameData ofd{objModel, ffd, displayOptions};
 
@@ -831,12 +836,14 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
       ofd.Draw(drawList, &centerLine, &leftLine, &rightLine);
     });
 
+    drawSplit.SetCurrentChannel(drawList, 0);
     objGroup->DrawLine(drawList, centerLine);
     objGroup->DrawLine(drawList, leftLine);
     objGroup->DrawLine(drawList, rightLine);
 
     PopID();
   });
+  drawSplit.Merge(drawList);
 
   ObjectDragTargetInfo* target = &gDragState.target;
 
