@@ -760,30 +760,57 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
   ImGui::PopItemWidth();
 }
 
-void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
-  auto& storage = GetStorage();
-  auto field = storage.GetData<FieldInfo>();
-  if (!field) {
-    storage.SetData(std::make_shared<FieldInfo>());
-    field = storage.GetData<FieldInfo>();
-  }
+namespace {
+class FieldDisplay {
+ public:
+  void Display(FieldInfo* field, Field2DModel* model,
+               const ImVec2& contentSize);
 
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  ImVec2 mousePos = ImGui::GetIO().MousePos;
+ private:
+  void DisplayGroup(FieldObjectGroupModel& model, wpi::StringRef name);
+  void DisplayObject(wpi::StringRef name, int i, FieldObjectModel& model,
+                     DisplayOptions& displayOptions);
+
+  FieldInfo* m_field;
+  ImVec2 m_mousePos;
+  ImDrawList* m_drawList;
+
+  // only allow initiation of dragging when invisible button is hovered;
+  // this prevents the window resize handles from simultaneously activating
+  // the drag functionality
+  bool m_isHovered;
+
+  FieldFrameData m_ffd;
+
+  // drag targets
+  std::vector<ObjectDragTargetInfo> m_targets;
+
+  // splitter so lines are put behind arrows
+  ImDrawListSplitter m_drawSplit;
+
+  // lines; static so buffer gets reused
+  std::vector<ImVec2> m_centerLine, m_leftLine, m_rightLine;
+};
+}  // namespace
+
+void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
+                           const ImVec2& contentSize) {
+  // screen coords
+  ImVec2 cursorPos = ImGui::GetWindowPos() + ImGui::GetCursorPos();
 
   // for dragging to work, there needs to be a button (otherwise the window is
   // dragged)
-  if (contentSize.x <= 0 || contentSize.y <= 0) {
-    return;
-  }
-  ImVec2 cursorPos = windowPos + ImGui::GetCursorPos();  // screen coords
   ImGui::InvisibleButton("field", contentSize);
+
+  m_field = field;
+  m_mousePos = ImGui::GetIO().MousePos;
+  m_drawList = ImGui::GetWindowDrawList();
+  m_isHovered = ImGui::IsItemHovered();
 
   // field
   field->LoadImage();
-  FieldFrameData ffd = field->GetFrameData(cursorPos, cursorPos + contentSize);
-  auto drawList = ImGui::GetWindowDrawList();
-  field->Draw(drawList, ffd);
+  m_ffd = field->GetFrameData(cursorPos, cursorPos + contentSize);
+  field->Draw(m_drawList, m_ffd);
 
   // stop dragging if mouse button not down
   bool isDown = ImGui::IsMouseDown(0);
@@ -792,91 +819,28 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
     gDragState.target.radius = 0;
   }
 
-  // only allow initiation of dragging when invisible button is hovered;
-  // this prevents the window resize handles from simultaneously activating
-  // the drag functionality
-  bool isHovered = ImGui::IsItemHovered();
-
-  // drag targets
-  static std::vector<ObjectDragTargetInfo> targets;
-  targets.resize(0);
-
-  // splitter so lines are put behind arrows
-  static ImDrawListSplitter drawSplit;
-
-  // lines; static so buffer gets reused
-  static std::vector<ImVec2> centerLine, leftLine, rightLine;
-
-  drawSplit.Split(drawList, 2);
-  model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
-    if (!groupModel.Exists()) {
-      return;
-    }
-    PushID(name);
-    auto& objGroupRef = field->m_objectGroups[name];
-    if (!objGroupRef) {
-      objGroupRef = std::make_unique<ObjectGroupInfo>();
-    }
-    auto objGroup = objGroupRef.get();
-    objGroup->LoadImage();
-
-    auto displayOptions = objGroup->GetDisplayOptions();
-
-    centerLine.resize(0);
-    leftLine.resize(0);
-    rightLine.resize(0);
-
-    drawSplit.SetCurrentChannel(drawList, 1);
-    int i = 0;
-    groupModel.ForEachFieldObject([&](auto& objModel) {
-      ObjectFrameData ofd{objModel, ffd, displayOptions};
-
-      // check for potential drag targets
-      if (isHovered && !gDragState.target.objModel) {
-        int corner;
-        double dist;
-        std::tie(corner, dist) = ofd.IsHovered(mousePos);
-        if (corner > 0) {
-          targets.emplace_back(ofd.GetDragTarget(corner, dist));
-          targets.back().name = name;
-          targets.back().index = i;
-        }
-      }
-
-      // handle active dragging of this object
-      if (gDragState.target.objModel == &objModel) {
-        ofd.HandleDrag(mousePos);
-      }
-
-      // draw
-      ofd.Draw(drawList, &centerLine, &leftLine, &rightLine);
-
-      ++i;
-    });
-
-    drawSplit.SetCurrentChannel(drawList, 0);
-    objGroup->DrawLine(drawList, centerLine);
-    objGroup->DrawLine(drawList, leftLine);
-    objGroup->DrawLine(drawList, rightLine);
-
-    PopID();
-  });
-  drawSplit.Merge(drawList);
+  // field objects
+  m_targets.resize(0);
+  m_drawSplit.Split(m_drawList, 2);
+  model->ForEachFieldObjectGroup(
+      [this](auto& groupModel, auto name) { DisplayGroup(groupModel, name); });
+  m_drawSplit.Merge(m_drawList);
 
   ObjectDragTargetInfo* target = &gDragState.target;
 
-  if (!targets.empty()) {
+  if (!m_targets.empty()) {
     // Find the "best" drag target of the available options.  Prefer
     // center to non-center, and then pick the closest hit.
-    std::sort(targets.begin(), targets.end(), [](const auto& a, const auto& b) {
-      return a.corner == 0 || a.dist < b.dist;
-    });
-    target = &targets.front();
+    std::sort(m_targets.begin(), m_targets.end(),
+              [](const auto& a, const auto& b) {
+                return a.corner == 0 || a.dist < b.dist;
+              });
+    target = &m_targets.front();
 
     if (ImGui::IsMouseClicked(0)) {
       // initialize drag state
       gDragState.target = *target;
-      gDragState.initialOffset = mousePos - target->objCenter;
+      gDragState.initialOffset = m_mousePos - target->objCenter;
       if (target->corner != 1) {
         gDragState.initialAngle =
             std::atan2(gDragState.initialOffset.y, gDragState.initialOffset.x) +
@@ -887,17 +851,91 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 
   // draw the target circle; also draw a smaller circle on the object center
   if (target->radius != 0) {
-    auto [x, y] = ffd.GetPosFromScreen(target->objCenter);
+    auto [x, y] = m_ffd.GetPosFromScreen(target->objCenter);
     ImGui::SetTooltip("%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f",
                       target->name.c_str(), target->index, x, y,
                       RotToDegrees(target->rot));
-    drawList->AddCircle(target->center, target->radius,
-                        IM_COL32(0, 255, 0, 255));
-    if (target->corner != 1) {
-      drawList->AddCircle(target->objCenter, target->radius / 2.0,
+    m_drawList->AddCircle(target->center, target->radius,
                           IM_COL32(0, 255, 0, 255));
+    if (target->corner != 1) {
+      m_drawList->AddCircle(target->objCenter, target->radius / 2.0,
+                            IM_COL32(0, 255, 0, 255));
     }
   }
+}
+
+void FieldDisplay::DisplayGroup(FieldObjectGroupModel& model,
+                                wpi::StringRef name) {
+  if (!model.Exists()) {
+    return;
+  }
+  PushID(name);
+  auto& objGroupRef = m_field->m_objectGroups[name];
+  if (!objGroupRef) {
+    objGroupRef = std::make_unique<ObjectGroupInfo>();
+  }
+  auto objGroup = objGroupRef.get();
+  objGroup->LoadImage();
+
+  auto displayOptions = objGroup->GetDisplayOptions();
+
+  m_centerLine.resize(0);
+  m_leftLine.resize(0);
+  m_rightLine.resize(0);
+
+  m_drawSplit.SetCurrentChannel(m_drawList, 1);
+  int i = 0;
+  model.ForEachFieldObject([&](auto& objModel) {
+    DisplayObject(name, i, objModel, displayOptions);
+    ++i;
+  });
+
+  m_drawSplit.SetCurrentChannel(m_drawList, 0);
+  objGroup->DrawLine(m_drawList, m_centerLine);
+  objGroup->DrawLine(m_drawList, m_leftLine);
+  objGroup->DrawLine(m_drawList, m_rightLine);
+
+  PopID();
+}
+
+void FieldDisplay::DisplayObject(wpi::StringRef name, int i,
+                                 FieldObjectModel& model,
+                                 DisplayOptions& displayOptions) {
+  ObjectFrameData ofd{model, m_ffd, displayOptions};
+
+  // check for potential drag targets
+  if (m_isHovered && !gDragState.target.objModel) {
+    auto [corner, dist] = ofd.IsHovered(m_mousePos);
+    if (corner > 0) {
+      m_targets.emplace_back(ofd.GetDragTarget(corner, dist));
+      m_targets.back().name = name;
+      m_targets.back().index = i;
+    }
+  }
+
+  // handle active dragging of this object
+  if (gDragState.target.objModel == &model) {
+    ofd.HandleDrag(m_mousePos);
+  }
+
+  // draw
+  ofd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+}
+
+void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
+  auto& storage = GetStorage();
+  auto field = storage.GetData<FieldInfo>();
+  if (!field) {
+    storage.SetData(std::make_shared<FieldInfo>());
+    field = storage.GetData<FieldInfo>();
+  }
+
+  if (contentSize.x <= 0 || contentSize.y <= 0) {
+    return;
+  }
+
+  static FieldDisplay display;
+  display.Display(field, model, contentSize);
 }
 
 void Field2DView::Display() {
