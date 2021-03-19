@@ -4,73 +4,113 @@
 
 package edu.wpi.first.wpilibj.trajectory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import edu.wpi.first.math.WPIMathJNI;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TrajectoryUtil {
-  private static final ObjectReader READER = new ObjectMapper().readerFor(Trajectory.State[].class);
-  private static final ObjectWriter WRITER = new ObjectMapper().writerFor(Trajectory.State[].class);
-
   private TrajectoryUtil() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 
   /**
+   * Creates a trajectory from a double[] of elements.
+   *
+   * @param elements A double[] containing the raw elements of the trajectory.
+   * @return A trajectory created from the elements.
+   */
+  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  private static Trajectory createTrajectoryFromElements(double[] elements) {
+    // Make sure that the elements have the correct length.
+    if (elements.length % 7 != 0) {
+      throw new TrajectorySerializationException(
+          "An error occurred when converting trajectory elements into a trajectory.");
+    }
+
+    // Create a list of states from the elements.
+    List<Trajectory.State> states = new ArrayList<>();
+    for (int i = 0; i < elements.length; i += 7) {
+      states.add(
+          new Trajectory.State(
+              elements[i],
+              elements[i + 1],
+              elements[i + 2],
+              new Pose2d(elements[i + 3], elements[i + 4], new Rotation2d(elements[i + 5])),
+              elements[i + 6]));
+    }
+    return new Trajectory(states);
+  }
+
+  /**
+   * Returns a double[] of elements from the given trajectory.
+   *
+   * @param trajectory The trajectory to retrieve raw elements from.
+   * @return A double[] of elements from the given trajectory.
+   */
+  private static double[] getElementsFromTrajectory(Trajectory trajectory) {
+    // Create a double[] of elements and fill it from the trajectory states.
+    double[] elements = new double[trajectory.getStates().size() * 7];
+
+    for (int i = 0; i < trajectory.getStates().size() * 7; i += 7) {
+      var state = trajectory.getStates().get(i / 7);
+      elements[i] = state.timeSeconds;
+      elements[i + 1] = state.velocityMetersPerSecond;
+      elements[i + 2] = state.accelerationMetersPerSecondSq;
+      elements[i + 3] = state.poseMeters.getX();
+      elements[i + 4] = state.poseMeters.getY();
+      elements[i + 5] = state.poseMeters.getRotation().getRadians();
+      elements[i + 6] = state.curvatureRadPerMeter;
+    }
+    return elements;
+  }
+
+  /**
    * Imports a Trajectory from a PathWeaver-style JSON file.
    *
-   * @param path the path of the json file to import from
+   * @param path The path of the json file to import from
    * @return The trajectory represented by the file.
-   * @throws IOException if reading from the file fails
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
-    try (BufferedReader reader = Files.newBufferedReader(path)) {
-      Trajectory.State[] state = READER.readValue(reader);
-      return new Trajectory(Arrays.asList(state));
-    }
+    return createTrajectoryFromElements(WPIMathJNI.fromPathweaverJson(path.toString()));
   }
 
   /**
    * Exports a Trajectory to a PathWeaver-style JSON file.
    *
-   * @param trajectory the trajectory to export
-   * @param path the path of the file to export to
-   * @throws IOException if writing to the file fails
+   * @param trajectory The trajectory to export
+   * @param path The path of the file to export to
    */
   public static void toPathweaverJson(Trajectory trajectory, Path path) throws IOException {
-    Files.createDirectories(path.getParent());
-    try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-      WRITER.writeValue(writer, trajectory.getStates().toArray(new Trajectory.State[0]));
-    }
+    WPIMathJNI.toPathweaverJson(getElementsFromTrajectory(trajectory), path.toString());
   }
 
   /**
    * Deserializes a Trajectory from PathWeaver-style JSON.
    *
-   * @param json the string containing the serialized JSON
+   * @param json The string containing the serialized JSON
    * @return the trajectory represented by the JSON
-   * @throws JsonProcessingException if deserializing the JSON fails
    */
-  public static Trajectory deserializeTrajectory(String json) throws JsonProcessingException {
-    Trajectory.State[] state = READER.readValue(json);
-    return new Trajectory(Arrays.asList(state));
+  public static Trajectory deserializeTrajectory(String json) {
+    return createTrajectoryFromElements(WPIMathJNI.deserializeTrajectory(json));
   }
 
   /**
    * Serializes a Trajectory to PathWeaver-style JSON.
    *
-   * @param trajectory the trajectory to export
-   * @return the string containing the serialized JSON
-   * @throws JsonProcessingException if serializing the Trajectory fails
+   * @param trajectory The trajectory to export
+   * @return The string containing the serialized JSON
    */
-  public static String serializeTrajectory(Trajectory trajectory) throws JsonProcessingException {
-    return WRITER.writeValueAsString(trajectory.getStates().toArray(new Trajectory.State[0]));
+  public static String serializeTrajectory(Trajectory trajectory) {
+    return WPIMathJNI.serializeTrajectory(getElementsFromTrajectory(trajectory));
+  }
+
+  public static class TrajectorySerializationException extends RuntimeException {
+    public TrajectorySerializationException(String message) {
+      super(message);
+    }
   }
 }
