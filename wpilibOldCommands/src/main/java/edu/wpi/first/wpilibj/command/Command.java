@@ -36,6 +36,7 @@ import java.util.Enumeration;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
+@SuppressWarnings("PMD.GodClass")
 public abstract class Command implements Sendable, AutoCloseable {
   /** The time since this command was initialized. */
   private double m_startTime = -1;
@@ -561,7 +562,6 @@ public abstract class Command implements Sendable, AutoCloseable {
    *
    * @return Name
    */
-  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }
@@ -571,7 +571,6 @@ public abstract class Command implements Sendable, AutoCloseable {
    *
    * @param name name
    */
-  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
@@ -581,7 +580,6 @@ public abstract class Command implements Sendable, AutoCloseable {
    *
    * @return Subsystem name
    */
-  @Override
   public String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
@@ -591,7 +589,6 @@ public abstract class Command implements Sendable, AutoCloseable {
    *
    * @param subsystem subsystem name
    */
-  @Override
   public void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }
