@@ -28,7 +28,6 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2020-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
