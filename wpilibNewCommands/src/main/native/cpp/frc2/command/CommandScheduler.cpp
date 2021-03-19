@@ -71,19 +71,19 @@ CommandScheduler::CommandScheduler()
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this] {
-    this->Disable();
-    this->CancelAll();
+  auto& scheduler = frc::LiveWindow::GetInstance();
+  scheduler.enabled = [this] {
+    Disable();
+    CancelAll();
   };
-  scheduler->disabled = [this] { this->Enable(); };
+  scheduler.disabled = [this] { Enable(); };
 }
 
 CommandScheduler::~CommandScheduler() {
   frc::SendableRegistry::GetInstance().Remove(this);
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = nullptr;
-  scheduler->disabled = nullptr;
+  auto& scheduler = frc::LiveWindow::GetInstance();
+  scheduler.enabled = nullptr;
+  scheduler.disabled = nullptr;
 
   std::unique_ptr<Impl>().swap(m_impl);
 }
