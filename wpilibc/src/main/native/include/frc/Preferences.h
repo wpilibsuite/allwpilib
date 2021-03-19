@@ -35,9 +35,9 @@ class Preferences : public ErrorBase {
   /**
    * Get the one and only {@link Preferences} object.
    *
-   * @return pointer to the {@link Preferences}
+   * @return reference to the {@link Preferences}
    */
-  static Preferences* GetInstance();
+  static Preferences& GetInstance();
 
   /**
    * Returns a vector of all the keys.

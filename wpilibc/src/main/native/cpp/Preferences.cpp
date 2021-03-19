@@ -17,9 +17,9 @@ using namespace frc;
 // The Preferences table name
 static wpi::StringRef kTableName{"Preferences"};
 
-Preferences* Preferences::GetInstance() {
+Preferences& Preferences::GetInstance() {
   static Preferences instance;
-  return &instance;
+  return instance;
 }
 
 std::vector<std::string> Preferences::GetKeys() {
