@@ -28,6 +28,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-latest
+    container: wpilib/roborio-cross-ubuntu:2020-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
@@ -35,12 +36,8 @@ jobs:
           git fetch --prune --unshallow
           git checkout -b pr
           git branch -f main origin/main
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - name: Install clang-format and clang-tidy
-        run: sudo apt-get update -q && sudo apt-get install -y clang-format-10 clang-tidy-10 libopencv-dev libgl1-mesa-dev libxrandr-dev
+        run: sudo apt-get update -q && sudo apt-get install -y clang-format-10 clang-tidy-10 python3.8
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json
