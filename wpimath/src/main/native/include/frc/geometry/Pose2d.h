@@ -58,18 +58,6 @@ class Pose2d {
   Pose2d operator+(const Transform2d& other) const;
 
   /**
-   * Transforms the current pose by the transformation.
-   *
-   * This is similar to the + operator, except that it mutates the current
-   * object.
-   *
-   * @param other The transform to transform the pose by.
-   *
-   * @return Reference to the new mutated object.
-   */
-  Pose2d& operator+=(const Transform2d& other);
-
-  /**
    * Returns the Transform2d that maps the one pose to another.
    *
    * @param other The initial pose of the transformation.

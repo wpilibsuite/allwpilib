@@ -115,7 +115,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
   const Transform2d flip{Translation2d(), Rotation2d(180_deg)};
   if (config.IsReversed()) {
     for (auto& waypoint : newWaypoints) {
-      waypoint += flip;
+      waypoint = waypoint + flip;
     }
   }
 

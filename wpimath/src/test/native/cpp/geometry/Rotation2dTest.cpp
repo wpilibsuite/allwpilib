@@ -39,7 +39,7 @@ TEST(Rotation2dTest, RotateByFromZero) {
 
 TEST(Rotation2dTest, RotateByNonZero) {
   auto rot = Rotation2d(90.0_deg);
-  rot += Rotation2d(30.0_deg);
+  rot = rot + Rotation2d(30.0_deg);
 
   EXPECT_NEAR(rot.Degrees().to<double>(), 120.0, kEpsilon);
 }

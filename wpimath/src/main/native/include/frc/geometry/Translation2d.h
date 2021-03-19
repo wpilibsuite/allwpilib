@@ -111,18 +111,6 @@ class Translation2d {
   Translation2d operator+(const Translation2d& other) const;
 
   /**
-   * Adds the new translation to the current translation.
-   *
-   * This is similar to the + operator, except that the current object is
-   * mutated.
-   *
-   * @param other The translation to add.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Translation2d& operator+=(const Translation2d& other);
-
-  /**
    * Subtracts the other translation from the other translation and returns the
    * difference.
    *
@@ -134,18 +122,6 @@ class Translation2d {
    * @return The difference between the two translations.
    */
   Translation2d operator-(const Translation2d& other) const;
-
-  /**
-   * Subtracts the new translation from the current translation.
-   *
-   * This is similar to the - operator, except that the current object is
-   * mutated.
-   *
-   * @param other The translation to subtract.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Translation2d& operator-=(const Translation2d& other);
 
   /**
    * Returns the inverse of the current translation. This is equivalent to
@@ -166,17 +142,6 @@ class Translation2d {
    * @return The scaled translation.
    */
   Translation2d operator*(double scalar) const;
-
-  /**
-   * Multiplies the current translation by a scalar.
-   *
-   * This is similar to the * operator, except that current object is mutated.
-   *
-   * @param scalar The scalar to multiply by.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Translation2d& operator*=(double scalar);
 
   /**
    * Divides the translation by a scalar and returns the new translation.
@@ -204,17 +169,6 @@ class Translation2d {
    * @return Whether the two objects are not equal.
    */
   bool operator!=(const Translation2d& other) const;
-
-  /*
-   * Divides the current translation by a scalar.
-   *
-   * This is similar to the / operator, except that current object is mutated.
-   *
-   * @param scalar The scalar to divide by.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Translation2d& operator/=(double scalar);
 
  private:
   units::meter_t m_x = 0_m;
