@@ -7,11 +7,14 @@
 #include <string>
 
 #include <ntcore_cpp.h>
+#include <wpi/SafeThread.h>
 
 namespace wpi {
 template <typename T>
 class SmallVectorImpl;
 }  // namespace wpi
+
+namespace glass {
 
 class NetworkTablesSettings {
  public:
@@ -19,14 +22,38 @@ class NetworkTablesSettings {
       NT_Inst inst = nt::GetDefaultInstance(),
       const char* storageName = "NetworkTables Settings");
 
+  /**
+   * Enables or disables the server option.  Default is enabled.
+   */
+  void EnableServerOption(bool enable) { m_serverOption = enable; }
+
   void Update();
-  void Display();
+  bool Display();
 
  private:
-  NT_Inst m_inst;
   bool m_restart = true;
+  bool m_serverOption = true;
   int* m_pMode;
   std::string* m_pIniName;
   std::string* m_pServerTeam;
   std::string* m_pListenAddress;
+  bool* m_pDsClient;
+
+  class Thread : public wpi::SafeThread {
+   public:
+    explicit Thread(NT_Inst inst) : m_inst{inst} {}
+
+    void Main() override;
+
+    NT_Inst m_inst;
+    bool m_restart = false;
+    int m_mode;
+    std::string m_iniName;
+    std::string m_serverTeam;
+    std::string m_listenAddress;
+    bool m_dsClient;
+  };
+  wpi::SafeThreadOwner<Thread> m_thread;
 };
+
+}  // namespace glass

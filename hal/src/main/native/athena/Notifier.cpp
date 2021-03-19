@@ -17,6 +17,7 @@
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HAL.h"
+#include "hal/Threads.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
 using namespace hal;
@@ -154,6 +155,12 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     return HAL_kInvalidHandle;
   }
   return handle;
+}
+
+HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
+                                       int32_t* status) {
+  auto native = notifierThread.native_handle();
+  return HAL_SetThreadPriority(&native, realTime, priority, status);
 }
 
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,

@@ -29,6 +29,27 @@ public class SimDeviceSim {
   }
 
   /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   * @param index device index number to append to name
+   */
+  public SimDeviceSim(String name, int index) {
+    this(name + "[" + index + "]");
+  }
+
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   * @param index device index number to append to name
+   * @param channel device channel number to append to name
+   */
+  public SimDeviceSim(String name, int index, int channel) {
+    this(name + "[" + index + "," + channel + "]");
+  }
+
+  /**
    * Get the property object with the given name.
    *
    * @param name the property name

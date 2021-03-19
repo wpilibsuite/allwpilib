@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -45,8 +45,8 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Robot drive system
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
+  frc::PWMSparkMax m_left{0};
+  frc::PWMSparkMax m_right{1};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::Joystick m_stick{0};

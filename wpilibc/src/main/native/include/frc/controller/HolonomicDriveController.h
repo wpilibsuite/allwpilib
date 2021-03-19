@@ -98,6 +98,7 @@ class HolonomicDriveController {
 
  private:
   Pose2d m_poseError;
+  Rotation2d m_rotationError;
   Pose2d m_poseTolerance;
   bool m_enabled = true;
 

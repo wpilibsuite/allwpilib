@@ -4,7 +4,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
@@ -81,7 +81,7 @@ class Robot : public frc::TimedRobot {
   // An encoder set up to measure elevator height in meters.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
-  frc::PWMVictorSPX m_motor{kMotorPort};
+  frc::PWMSparkMax m_motor{kMotorPort};
   frc::XboxController m_joystick{kJoystickPort};
 
   frc::TrapezoidProfile<units::meters>::Constraints m_constraints{3_fps,

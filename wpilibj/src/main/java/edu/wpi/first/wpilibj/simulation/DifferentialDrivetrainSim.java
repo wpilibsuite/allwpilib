@@ -480,7 +480,7 @@ public class DifferentialDrivetrainSim {
         motor.value,
         gearing.value,
         jKgMetersSquared,
-        25 / 2.2,
+        Units.lbsToKilograms(60),
         wheelSize.value / 2.0,
         Units.inchesToMeters(26),
         measurementStdDevs);

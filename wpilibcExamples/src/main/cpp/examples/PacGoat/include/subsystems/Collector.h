@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
 
@@ -66,7 +66,7 @@ class Collector : public frc::Subsystem {
 
  private:
   // Subsystem devices
-  frc::PWMVictorSPX m_rollerMotor{6};
+  frc::PWMSparkMax m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
   frc::Solenoid m_piston{1};
   frc::DigitalInput m_openDetector{6};

@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.mecanumbot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -22,10 +22,10 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final SpeedController m_frontLeftMotor = new PWMVictorSPX(1);
-  private final SpeedController m_frontRightMotor = new PWMVictorSPX(2);
-  private final SpeedController m_backLeftMotor = new PWMVictorSPX(3);
-  private final SpeedController m_backRightMotor = new PWMVictorSPX(4);
+  private final SpeedController m_frontLeftMotor = new PWMSparkMax(1);
+  private final SpeedController m_frontRightMotor = new PWMSparkMax(2);
+  private final SpeedController m_backLeftMotor = new PWMSparkMax(3);
+  private final SpeedController m_backRightMotor = new PWMSparkMax(4);
 
   private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
   private final Encoder m_frontRightEncoder = new Encoder(2, 3);

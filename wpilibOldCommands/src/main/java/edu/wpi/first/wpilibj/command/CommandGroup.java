@@ -81,7 +81,7 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+    for (Enumeration<?> e = command.getRequirements(); e.hasMoreElements(); ) {
       requires((Subsystem) e.nextElement());
     }
   }
@@ -119,7 +119,7 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.IN_SEQUENCE, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+    for (Enumeration<?> e = command.getRequirements(); e.hasMoreElements(); ) {
       requires((Subsystem) e.nextElement());
     }
   }
@@ -152,7 +152,7 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+    for (Enumeration<?> e = command.getRequirements(); e.hasMoreElements(); ) {
       requires((Subsystem) e.nextElement());
     }
   }
@@ -193,7 +193,7 @@ public class CommandGroup extends Command {
     command.setParent(this);
 
     m_commands.addElement(new Entry(command, Entry.BRANCH_CHILD, timeout));
-    for (Enumeration e = command.getRequirements(); e.hasMoreElements(); ) {
+    for (Enumeration<?> e = command.getRequirements(); e.hasMoreElements(); ) {
       requires((Subsystem) e.nextElement());
     }
   }
@@ -283,7 +283,7 @@ public class CommandGroup extends Command {
       cmd.removed();
     }
 
-    Enumeration children = m_children.elements();
+    Enumeration<?> children = m_children.elements();
     while (children.hasMoreElements()) {
       Command cmd = ((Entry) children.nextElement()).m_command;
       cmd._cancel();
@@ -361,7 +361,7 @@ public class CommandGroup extends Command {
     for (int i = 0; i < m_children.size(); i++) {
       Command child = m_children.elementAt(i).m_command;
 
-      Enumeration requirements = command.getRequirements();
+      Enumeration<?> requirements = command.getRequirements();
 
       while (requirements.hasMoreElements()) {
         Object requirement = requirements.nextElement();

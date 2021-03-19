@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.gyro;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   private static final int kJoystickPort = 0;
 
   private final DifferentialDrive m_myRobot =
-      new DifferentialDrive(new PWMVictorSPX(kLeftMotorPort), new PWMVictorSPX(kRightMotorPort));
+      new DifferentialDrive(new PWMSparkMax(kLeftMotorPort), new PWMSparkMax(kRightMotorPort));
   private final AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 

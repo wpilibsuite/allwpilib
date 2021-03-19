@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.armbot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.examples.armbot.Constants.ArmConstants;
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
 /** A robot arm subsystem that moves with a motion profile. */
 public class ArmSubsystem extends ProfiledPIDSubsystem {
-  private final PWMVictorSPX m_motor = new PWMVictorSPX(ArmConstants.kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(ArmConstants.kMotorPort);
   private final Encoder m_encoder =
       new Encoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =

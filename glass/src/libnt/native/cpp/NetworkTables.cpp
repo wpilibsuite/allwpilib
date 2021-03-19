@@ -266,8 +266,8 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
 static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
   in = in.trim();
   if (in.empty()) {
-    return nt::NetworkTableValue::MakeBooleanArray(
-        std::initializer_list<bool>{});
+    return nt::NetworkTableValue::MakeDoubleArray(
+        std::initializer_list<double>{});
   }
   if (in.front() == '[') {
     in = in.drop_front();
@@ -741,30 +741,20 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
   ImGui::Columns();
 }
 
-void NetworkTablesView::Display() {
-  auto& storage = GetStorage();
-  auto pTreeView =
-      storage.GetBoolRef("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-  auto pShowConnections = storage.GetBoolRef(
-      "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
-  auto pShowFlags = storage.GetBoolRef(
-      "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
-  auto pShowTimestamp = storage.GetBoolRef(
-      "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
-  auto pCreateNoncanonicalKeys = storage.GetBoolRef(
-      "createNonCanonical",
-      m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
-
-  if (ImGui::BeginPopupContextItem()) {
-    ImGui::MenuItem("Tree View", "", pTreeView);
-    ImGui::MenuItem("Show Connections", "", pShowConnections);
-    ImGui::MenuItem("Show Flags", "", pShowFlags);
-    ImGui::MenuItem("Show Timestamp", "", pShowTimestamp);
-    ImGui::Separator();
-    ImGui::MenuItem("Allow creation of non-canonical keys", "",
-                    pCreateNoncanonicalKeys);
-
-    ImGui::EndPopup();
+void NetworkTablesFlagsSettings::Update() {
+  if (!m_pTreeView) {
+    auto& storage = GetStorage();
+    m_pTreeView = storage.GetBoolRef(
+        "tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+    m_pShowConnections = storage.GetBoolRef(
+        "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
+    m_pShowFlags = storage.GetBoolRef(
+        "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
+    m_pShowTimestamp = storage.GetBoolRef(
+        "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
+    m_pCreateNoncanonicalKeys = storage.GetBoolRef(
+        "createNonCanonical",
+        m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
   }
 
   m_flags &=
@@ -772,11 +762,32 @@ void NetworkTablesView::Display() {
         NetworkTablesFlags_ShowFlags | NetworkTablesFlags_ShowTimestamp |
         NetworkTablesFlags_CreateNoncanonicalKeys);
   m_flags |=
-      (*pTreeView ? NetworkTablesFlags_TreeView : 0) |
-      (*pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
-      (*pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
-      (*pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
-      (*pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
-                                : 0);
-  DisplayNetworkTables(m_model, m_flags);
+      (*m_pTreeView ? NetworkTablesFlags_TreeView : 0) |
+      (*m_pShowConnections ? NetworkTablesFlags_ShowConnections : 0) |
+      (*m_pShowFlags ? NetworkTablesFlags_ShowFlags : 0) |
+      (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
+      (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
+                                  : 0);
+}
+
+void NetworkTablesFlagsSettings::DisplayMenu() {
+  if (!m_pTreeView) {
+    return;
+  }
+  ImGui::MenuItem("Tree View", "", m_pTreeView);
+  ImGui::MenuItem("Show Connections", "", m_pShowConnections);
+  ImGui::MenuItem("Show Flags", "", m_pShowFlags);
+  ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
+  ImGui::Separator();
+  ImGui::MenuItem("Allow creation of non-canonical keys", "",
+                  m_pCreateNoncanonicalKeys);
+}
+
+void NetworkTablesView::Display() {
+  m_flags.Update();
+  if (ImGui::BeginPopupContextItem()) {
+    m_flags.DisplayMenu();
+    ImGui::EndPopup();
+  }
+  DisplayNetworkTables(m_model, m_flags.GetFlags());
 }

@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -21,10 +21,10 @@ public class DriveTrain extends SubsystemBase {
    * These include four drive motors, a left and right encoder and a gyro.
    */
   private final SpeedController m_leftMotor =
-      new SpeedControllerGroup(new PWMVictorSPX(0), new PWMVictorSPX(1));
+      new SpeedControllerGroup(new PWMSparkMax(0), new PWMSparkMax(1));
 
   private final SpeedController m_rightMotor =
-      new SpeedControllerGroup(new PWMVictorSPX(2), new PWMVictorSPX(3));
+      new SpeedControllerGroup(new PWMSparkMax(2), new PWMSparkMax(3));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 

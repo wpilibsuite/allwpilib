@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.tankdrive;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_myRobot = new DifferentialDrive(new PWMVictorSPX(0), new PWMVictorSPX(1));
+    m_myRobot = new DifferentialDrive(new PWMSparkMax(0), new PWMSparkMax(1));
     m_leftStick = new Joystick(0);
     m_rightStick = new Joystick(1);
   }

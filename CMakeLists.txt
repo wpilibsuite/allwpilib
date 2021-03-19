@@ -187,6 +187,7 @@ if (WITH_GUI)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
+    add_subdirectory(outlineviewer)
 endif()
 
 if (WITH_CSCORE)

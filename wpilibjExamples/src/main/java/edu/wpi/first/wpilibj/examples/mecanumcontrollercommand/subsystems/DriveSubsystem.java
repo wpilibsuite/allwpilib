@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final PWMVictorSPX m_frontLeft = new PWMVictorSPX(DriveConstants.kFrontLeftMotorPort);
-  private final PWMVictorSPX m_rearLeft = new PWMVictorSPX(DriveConstants.kRearLeftMotorPort);
-  private final PWMVictorSPX m_frontRight = new PWMVictorSPX(DriveConstants.kFrontRightMotorPort);
-  private final PWMVictorSPX m_rearRight = new PWMVictorSPX(DriveConstants.kRearRightMotorPort);
+  private final PWMSparkMax m_frontLeft = new PWMSparkMax(DriveConstants.kFrontLeftMotorPort);
+  private final PWMSparkMax m_rearLeft = new PWMSparkMax(DriveConstants.kRearLeftMotorPort);
+  private final PWMSparkMax m_frontRight = new PWMSparkMax(DriveConstants.kFrontRightMotorPort);
+  private final PWMSparkMax m_rearRight = new PWMSparkMax(DriveConstants.kRearRightMotorPort);
 
   private final MecanumDrive m_drive =
       new MecanumDrive(m_frontLeft, m_rearLeft, m_frontRight, m_rearRight);

@@ -5,7 +5,7 @@
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
@@ -43,7 +43,7 @@ class Robot : public frc::TimedRobot {
   // Standard classes for controlling our arm
   frc2::PIDController m_controller{kArmKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
-  frc::PWMVictorSPX m_motor{kMotorPort};
+  frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
 
   // Simulation classes help us simulate what's going on, including gravity.

@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * The Collector subsystem has one motor for the rollers, a limit switch for ball detection, a
  * piston for opening and closing the claw, and a reed switch to check if the piston is open.
  */
-public class Collector extends Subsystem implements AutoCloseable {
+public class Collector extends Subsystem {
   // Constants for some useful speeds
   public static final double kForward = 1;
   public static final double kStop = 0;

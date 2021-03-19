@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 @SuppressWarnings("MemberName")
 public class HolonomicDriveController {
   private Pose2d m_poseError = new Pose2d();
+  private Rotation2d m_rotationError = new Rotation2d();
   private Pose2d m_poseTolerance = new Pose2d();
   private boolean m_enabled = true;
 
@@ -52,7 +53,7 @@ public class HolonomicDriveController {
    */
   public boolean atReference() {
     final var eTranslate = m_poseError.getTranslation();
-    final var eRotate = m_poseError.getRotation();
+    final var eRotate = m_rotationError;
     final var tolTranslate = m_poseTolerance.getTranslation();
     final var tolRotate = m_poseTolerance.getRotation();
     return Math.abs(eTranslate.getX()) < tolTranslate.getX()
@@ -88,6 +89,7 @@ public class HolonomicDriveController {
         m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
 
     m_poseError = poseRef.relativeTo(currentPose);
+    m_rotationError = angleRef.minus(currentPose.getRotation());
 
     if (!m_enabled) {
       return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());

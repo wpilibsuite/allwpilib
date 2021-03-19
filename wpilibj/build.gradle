@@ -56,7 +56,7 @@ compileJava {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {

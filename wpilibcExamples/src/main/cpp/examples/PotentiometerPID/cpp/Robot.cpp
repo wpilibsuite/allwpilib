@@ -6,7 +6,7 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
 
@@ -62,7 +62,7 @@ class Robot : public frc::TimedRobot {
 
   frc::AnalogInput m_potentiometer{kPotChannel};
   frc::Joystick m_joystick{kJoystickChannel};
-  frc::PWMVictorSPX m_elevatorMotor{kMotorChannel};
+  frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
 
   frc2::PIDController m_pidController{kP, kI, kD};
 };

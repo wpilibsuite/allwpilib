@@ -4,7 +4,7 @@
 
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
@@ -84,7 +84,7 @@ class Robot : public frc::TimedRobot {
   // An encoder set up to measure arm position in radians per second.
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
 
-  frc::PWMVictorSPX m_motor{kMotorPort};
+  frc::PWMSparkMax m_motor{kMotorPort};
   frc::XboxController m_joystick{kJoystickPort};
 
   frc::TrapezoidProfile<units::radians>::Constraints m_constraints{

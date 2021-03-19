@@ -182,8 +182,8 @@ public class SwerveDrivePoseEstimator {
    */
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     m_previousAngle = poseMeters.getRotation();
-    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
+    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
   }
 
   /**
@@ -218,6 +218,35 @@ public class SwerveDrivePoseEstimator {
         StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
         m_visionCorrect,
         timestampSeconds);
+  }
+
+  /**
+   * Add a vision measurement to the Unscented Kalman Filter. This will correct the odometry pose
+   * estimate while still accounting for measurement noise.
+   *
+   * <p>This method can be called as infrequently as you want, as long as you are calling {@link
+   * SwerveDrivePoseEstimator#update} every loop.
+   *
+   * <p>Note that the vision measurement standard deviations passed into this method will continue
+   * to apply to future measurements until a subsequent call to {@link
+   * SwerveDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
+   *
+   * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
+   * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
+   *     don't use your own time source by calling {@link SwerveDrivePoseEstimator#updateWithTime}
+   *     then you must use a timestamp with an epoch since FPGA startup (i.e. the epoch of this
+   *     timestamp is the same epoch as Timer.getFPGATimestamp.) This means that you should use
+   *     Timer.getFPGATimestamp as your time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
+   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
+   *     theta]^T, with units in meters and radians.
+   */
+  public void addVisionMeasurement(
+      Pose2d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+    setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 
   /**

@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,7 +24,7 @@ import java.nio.ByteOrder;
  * an ADXRS Gyro is supported.
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
-public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable, AutoCloseable {
+public class ADXRS450_Gyro extends GyroBase {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;

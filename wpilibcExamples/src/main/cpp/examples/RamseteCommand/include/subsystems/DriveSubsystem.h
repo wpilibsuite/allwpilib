@@ -6,7 +6,7 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/PWMSparkMax.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
@@ -117,10 +117,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMVictorSPX m_left1;
-  frc::PWMVictorSPX m_left2;
-  frc::PWMVictorSPX m_right1;
-  frc::PWMVictorSPX m_right2;
+  frc::PWMSparkMax m_left1;
+  frc::PWMSparkMax m_left2;
+  frc::PWMSparkMax m_right1;
+  frc::PWMSparkMax m_right2;
 
   // The motors on the left side of the drive
   frc::SpeedControllerGroup m_leftMotors{m_left1, m_left2};

@@ -19,7 +19,7 @@ HolonomicDriveController::HolonomicDriveController(
 
 bool HolonomicDriveController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();
-  const auto& eRotate = m_poseError.Rotation();
+  const auto& eRotate = m_rotationError;
   const auto& tolTranslate = m_poseTolerance.Translation();
   const auto& tolRotate = m_poseTolerance.Rotation();
   return units::math::abs(eTranslate.X()) < tolTranslate.X() &&
@@ -41,6 +41,7 @@ ChassisSpeeds HolonomicDriveController::Calculate(
       currentPose.Rotation().Radians(), angleRef.Radians()));
 
   m_poseError = poseRef.RelativeTo(currentPose);
+  m_rotationError = angleRef - currentPose.Rotation();
 
   if (!m_enabled) {
     return ChassisSpeeds::FromFieldRelativeSpeeds(xFF, yFF, thetaFF,
