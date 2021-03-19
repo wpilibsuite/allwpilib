@@ -143,3 +143,5 @@ Preferences::Preferences()
       NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
+
+Preferences::~Preferences() = default;
