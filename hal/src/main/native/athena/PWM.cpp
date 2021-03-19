@@ -277,13 +277,13 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
   if (speed == 0.0) {
     rawValue = GetCenterPwm(dPort);
   } else if (speed > 0.0) {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
-        static_cast<double>(GetMinPositivePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
+                    static_cast<double>(GetMinPositivePwm(dPort)));
   } else {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
-        static_cast<double>(GetMaxNegativePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
+                    static_cast<double>(GetMaxNegativePwm(dPort)));
   }
 
   if (!((rawValue >= GetMinNegativePwm(dPort)) &&
