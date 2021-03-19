@@ -4,7 +4,11 @@
 
 #pragma once
 
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Translation2d.h>
 #include <imgui.h>
+#include <wpi/ArrayRef.h>
 #include <wpi/STLExtras.h>
 #include <wpi/StringRef.h>
 
@@ -13,29 +17,23 @@
 
 namespace glass {
 
-class DataSource;
-
 class FieldObjectModel : public Model {
  public:
-  virtual DataSource* GetXData() = 0;
-  virtual DataSource* GetYData() = 0;
-  virtual DataSource* GetRotationData() = 0;
+  virtual const char* GetName() const = 0;
 
-  virtual void SetPose(double x, double y, double rot) = 0;
-  virtual void SetPosition(double x, double y) = 0;
-  virtual void SetRotation(double rot) = 0;
-};
-
-class FieldObjectGroupModel : public Model {
- public:
-  virtual void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model)> func) = 0;
+  virtual wpi::ArrayRef<frc::Pose2d> GetPoses() = 0;
+  virtual void SetPoses(wpi::ArrayRef<frc::Pose2d> poses) = 0;
+  virtual void SetPose(size_t i, frc::Pose2d pose) = 0;
+  virtual void SetPosition(size_t i, frc::Translation2d pos) = 0;
+  virtual void SetRotation(size_t i, frc::Rotation2d rot) = 0;
 };
 
 class Field2DModel : public Model {
  public:
-  virtual void ForEachFieldObjectGroup(
-      wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>
+  virtual FieldObjectModel* AddFieldObject(wpi::StringRef name) = 0;
+  virtual void RemoveFieldObject(wpi::StringRef name) = 0;
+  virtual void ForEachFieldObject(
+      wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
           func) = 0;
 };
 

@@ -32,8 +32,10 @@ class NTField2DModel : public Field2DModel {
   bool Exists() override;
   bool IsReadOnly() override;
 
-  void ForEachFieldObjectGroup(
-      wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>
+  FieldObjectModel* AddFieldObject(wpi::StringRef name) override;
+  void RemoveFieldObject(wpi::StringRef name) override;
+  void ForEachFieldObject(
+      wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
           func) override;
 
  private:
@@ -42,8 +44,8 @@ class NTField2DModel : public Field2DModel {
   NT_Entry m_name;
   std::string m_nameValue;
 
-  class GroupModel;
-  std::vector<std::unique_ptr<GroupModel>> m_groups;
+  class ObjectModel;
+  std::vector<std::unique_ptr<ObjectModel>> m_objects;
 };
 
 }  // namespace glass
