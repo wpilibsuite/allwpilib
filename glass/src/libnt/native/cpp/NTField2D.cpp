@@ -213,11 +213,11 @@ void NTField2DModel::Update() {
       if (name.empty() || name[0] == '.') {
         continue;
       }
-      auto it = std::lower_bound(m_groups.begin(), m_groups.end(), name,
+      auto it = std::lower_bound(m_groups.begin(), m_groups.end(), event.name,
                                  [](const auto& e, wpi::StringRef name) {
                                    return e->GetName() < name;
                                  });
-      bool match = (it != m_groups.end() && (*it)->GetName() == name);
+      bool match = (it != m_groups.end() && (*it)->GetName() == event.name);
       if (event.flags & NT_NOTIFY_DELETE) {
         if (match) {
           m_groups.erase(it);
