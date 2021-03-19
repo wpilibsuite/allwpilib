@@ -19,7 +19,7 @@
 
 using namespace frc;
 
-PWM::PWM(int channel) {
+PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
                                "PWM Channel " + wpi::Twine(channel));
@@ -44,9 +44,9 @@ PWM::PWM(int channel) {
   wpi_setHALError(status);
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
-
-  SetSafetyEnabled(false);
+  if (registerSendable) {
+    SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
+  }
 }
 
 PWM::~PWM() {
@@ -57,14 +57,6 @@ PWM::~PWM() {
 
   HAL_FreePWMPort(m_handle, &status);
   wpi_setHALError(status);
-}
-
-void PWM::StopMotor() {
-  SetDisabled();
-}
-
-void PWM::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "PWM " << GetChannel();
 }
 
 void PWM::SetRaw(uint16_t value) {
@@ -115,8 +107,6 @@ void PWM::SetSpeed(double speed) {
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
   wpi_setHALError(status);
-
-  Feed();
 }
 
 double PWM::GetSpeed() const {
@@ -223,8 +213,7 @@ int PWM::GetChannel() const {
 void PWM::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { SetDisabled(); });
+  builder.SetSafeState([=] { SetDisabled(); });
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetRaw(); },
-      [=](double value) { SetRaw(value); });
+      "Value", [=] { return GetRaw(); }, [=](double value) { SetRaw(value); });
 }

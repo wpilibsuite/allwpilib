@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Mindsensors SD540 Speed Controller.
@@ -26,17 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * </ul>
  */
 public class SD540 extends PWMSpeedController {
-  /** Common initialization code called by all constructors. */
-  protected void initSD540() {
-    setBounds(2.05, 1.55, 1.50, 1.44, 0.94);
-    setPeriodMultiplier(PeriodMultiplier.k1X);
-    setSpeed(0.0);
-    setZeroLatch();
-
-    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel() + 1);
-    SendableRegistry.setName(this, "SD540", getChannel());
-  }
-
   /**
    * Constructor.
    *
@@ -44,7 +32,13 @@ public class SD540 extends PWMSpeedController {
    *     the MXP port
    */
   public SD540(final int channel) {
-    super(channel);
-    initSD540();
+    super("SD540", channel);
+
+    m_pwm.setBounds(2.05, 1.55, 1.50, 1.44, 0.94);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
+    m_pwm.setSpeed(0.0);
+    m_pwm.setZeroLatch();
+
+    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel() + 1);
   }
 }

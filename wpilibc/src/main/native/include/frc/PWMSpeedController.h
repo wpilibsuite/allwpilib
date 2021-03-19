@@ -4,15 +4,27 @@
 
 #pragma once
 
+#include <wpi/Twine.h>
+
+#include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/SpeedController.h"
+#include "frc/smartdashboard/Sendable.h"
+#include "frc/smartdashboard/SendableHelper.h"
+
+namespace wpi {
+class raw_ostream;
+}  // namespace wpi
 
 namespace frc {
 
 /**
  * Common base class for all PWM Speed Controllers.
  */
-class PWMSpeedController : public PWM, public SpeedController {
+class PWMSpeedController : public SpeedController,
+                           public MotorSafety,
+                           public Sendable,
+                           public SendableHelper<PWMSpeedController> {
  public:
   PWMSpeedController(PWMSpeedController&&) = default;
   PWMSpeedController& operator=(PWMSpeedController&&) = default;
@@ -42,7 +54,11 @@ class PWMSpeedController : public PWM, public SpeedController {
 
   void Disable() override;
 
+  // MotorSafety interface
   void StopMotor() override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
+
+  int GetChannel() const;
 
   /**
    * Write out the PID value as seen in the PIDOutput base object.
@@ -55,12 +71,15 @@ class PWMSpeedController : public PWM, public SpeedController {
   /**
    * Constructor for a PWM Speed Controller connected via PWM.
    *
+   * @param name Name to use for SendableRegistry
    * @param channel The PWM channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  explicit PWMSpeedController(int channel);
+  PWMSpeedController(const wpi::Twine& name, int channel);
 
   void InitSendable(SendableBuilder& builder) override;
+
+  PWM m_pwm;
 
  private:
   bool m_isInverted = false;

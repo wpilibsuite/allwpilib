@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Cross the Road Electronics (CTRE) Talon FX Speed Controller with PWM control.
@@ -33,14 +32,13 @@ public class PWMTalonFX extends PWMSpeedController {
    *     the MXP port
    */
   public PWMTalonFX(final int channel) {
-    super(channel);
+    super("PWMTalonFX", channel);
 
-    setBounds(2.004, 1.52, 1.50, 1.48, 0.997);
-    setPeriodMultiplier(PeriodMultiplier.k1X);
-    setSpeed(0.0);
-    setZeroLatch();
+    m_pwm.setBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
+    m_pwm.setSpeed(0.0);
+    m_pwm.setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_TalonFX, getChannel() + 1);
-    SendableRegistry.setName(this, "PWMTalonFX", getChannel());
   }
 }

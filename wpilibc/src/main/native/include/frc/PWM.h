@@ -7,9 +7,8 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/MotorSafety.h"
+#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -34,7 +33,7 @@ class SendableBuilder;
  *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
+class PWM : public ErrorBase, public Sendable, public SendableHelper<PWM> {
  public:
   friend class AddressableLED;
   /**
@@ -64,8 +63,10 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
+   * @param registerSendable If true, adds this instance to SendableRegistry
+   *                         and LiveWindow
    */
-  explicit PWM(int channel);
+  explicit PWM(int channel, bool registerSendable = true);
 
   /**
    * Free the PWM channel.
@@ -76,10 +77,6 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
 
   PWM(PWM&&) = default;
   PWM& operator=(PWM&&) = default;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
 
   /**
    * Set the PWM value directly to the hardware.

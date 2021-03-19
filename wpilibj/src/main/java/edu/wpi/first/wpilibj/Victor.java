@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * VEX Robotics Victor 888 Speed Controller The Vex Robotics Victor 884 Speed Controller can also be
@@ -35,14 +34,13 @@ public class Victor extends PWMSpeedController {
    *     the MXP port
    */
   public Victor(final int channel) {
-    super(channel);
+    super("Victor", channel);
 
-    setBounds(2.027, 1.525, 1.507, 1.49, 1.026);
-    setPeriodMultiplier(PeriodMultiplier.k2X);
-    setSpeed(0.0);
-    setZeroLatch();
+    m_pwm.setBounds(2.027, 1.525, 1.507, 1.49, 1.026);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k2X);
+    m_pwm.setSpeed(0.0);
+    m_pwm.setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_Victor, getChannel() + 1);
-    SendableRegistry.setName(this, "Victor", getChannel());
   }
 }

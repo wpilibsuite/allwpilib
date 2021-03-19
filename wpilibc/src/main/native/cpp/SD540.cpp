@@ -6,17 +6,14 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
-SD540::SD540(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.05, 1.55, 1.50, 1.44, 0.94);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+SD540::SD540(int channel) : PWMSpeedController("SD540", channel) {
+  m_pwm.SetBounds(2.05, 1.55, 1.50, 1.44, 0.94);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_MindsensorsSD540,
              GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "SD540", GetChannel());
 }
