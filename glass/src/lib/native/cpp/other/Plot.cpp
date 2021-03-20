@@ -374,9 +374,15 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImPlot::EndLegendDragDropSource();
   }
 
+  // Show full source name tooltip
+  if (!m_name.empty() && ImPlot::IsLegendEntryHovered(label)) {
+    ImGui::SetTooltip("%s", m_id.c_str());
+  }
+
   // Edit settings via popup
   Action rv = kNone;
   if (ImPlot::BeginLegendPopup(label)) {
+    ImGui::TextUnformatted(m_id.c_str());
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
