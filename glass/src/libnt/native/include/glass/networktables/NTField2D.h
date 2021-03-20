@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ntcore_cpp.h>
@@ -32,8 +33,8 @@ class NTField2DModel : public Field2DModel {
   bool Exists() override;
   bool IsReadOnly() override;
 
-  FieldObjectModel* AddFieldObject(wpi::StringRef name) override;
-  void RemoveFieldObject(wpi::StringRef name) override;
+  FieldObjectModel* AddFieldObject(const wpi::Twine& name) override;
+  void RemoveFieldObject(const wpi::Twine& name) override;
   void ForEachFieldObject(
       wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
           func) override;
@@ -45,7 +46,10 @@ class NTField2DModel : public Field2DModel {
   std::string m_nameValue;
 
   class ObjectModel;
-  std::vector<std::unique_ptr<ObjectModel>> m_objects;
+  using Objects = std::vector<std::unique_ptr<ObjectModel>>;
+  Objects m_objects;
+
+  std::pair<Objects::iterator, bool> Find(wpi::StringRef fullName);
 };
 
 }  // namespace glass

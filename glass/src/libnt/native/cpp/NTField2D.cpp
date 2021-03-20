@@ -10,6 +10,7 @@
 #include <ntcore_cpp.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
+#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 
 using namespace glass;
@@ -186,11 +187,7 @@ void NTField2DModel::Update() {
       if (name.empty() || name[0] == '.') {
         continue;
       }
-      auto it = std::lower_bound(m_objects.begin(), m_objects.end(), event.name,
-                                 [](const auto& e, wpi::StringRef name) {
-                                   return e->GetName() < name;
-                                 });
-      bool match = (it != m_objects.end() && (*it)->GetName() == event.name);
+      auto [it, match] = Find(event.name);
       if (event.flags & NT_NOTIFY_DELETE) {
         if (match) {
           m_objects.erase(it);
@@ -219,28 +216,24 @@ bool NTField2DModel::IsReadOnly() {
   return false;
 }
 
-FieldObjectModel* NTField2DModel::AddFieldObject(wpi::StringRef name) {
-  auto it = std::lower_bound(
-      m_objects.begin(), m_objects.end(), name,
-      [](const auto& e, wpi::StringRef name) { return e->GetName() < name; });
-  bool match = (it != m_objects.end() && (*it)->GetName() == name);
+FieldObjectModel* NTField2DModel::AddFieldObject(const wpi::Twine& name) {
+  wpi::SmallString<128> fullNameBuf;
+  wpi::StringRef fullName = (m_path + name).toStringRef(fullNameBuf);
+  auto [it, match] = Find(fullName);
   if (!match) {
     it = m_objects.emplace(
-        it, std::make_unique<ObjectModel>(name, m_nt.GetEntry(name)));
+        it, std::make_unique<ObjectModel>(fullName, m_nt.GetEntry(fullName)));
   }
   return it->get();
 }
 
-void NTField2DModel::RemoveFieldObject(wpi::StringRef name) {
-  auto it = std::lower_bound(
-      m_objects.begin(), m_objects.end(), name,
-      [](const auto& e, wpi::StringRef name) { return e->GetName() < name; });
-  bool match = (it != m_objects.end() && (*it)->GetName() == name);
-  if (!match) {
-    return;
+void NTField2DModel::RemoveFieldObject(const wpi::Twine& name) {
+  wpi::SmallString<128> fullNameBuf;
+  auto [it, match] = Find((m_path + name).toStringRef(fullNameBuf));
+  if (match) {
+    nt::DeleteEntry((*it)->GetEntry());
+    m_objects.erase(it);
   }
-  nt::DeleteEntry((*it)->GetEntry());
-  m_objects.erase(it);
 }
 
 void NTField2DModel::ForEachFieldObject(
@@ -251,4 +244,12 @@ void NTField2DModel::ForEachFieldObject(
       func(*obj, wpi::StringRef{obj->GetName()}.drop_front(m_path.size()));
     }
   }
+}
+
+std::pair<NTField2DModel::Objects::iterator, bool> NTField2DModel::Find(
+    wpi::StringRef fullName) {
+  auto it = std::lower_bound(
+      m_objects.begin(), m_objects.end(), fullName,
+      [](const auto& e, wpi::StringRef name) { return e->GetName() < name; });
+  return {it, it != m_objects.end() && (*it)->GetName() == fullName};
 }

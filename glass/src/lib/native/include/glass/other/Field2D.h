@@ -11,6 +11,7 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/STLExtras.h>
 #include <wpi/StringRef.h>
+#include <wpi/Twine.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -30,8 +31,8 @@ class FieldObjectModel : public Model {
 
 class Field2DModel : public Model {
  public:
-  virtual FieldObjectModel* AddFieldObject(wpi::StringRef name) = 0;
-  virtual void RemoveFieldObject(wpi::StringRef name) = 0;
+  virtual FieldObjectModel* AddFieldObject(const wpi::Twine& name) = 0;
+  virtual void RemoveFieldObject(const wpi::Twine& name) = 0;
   virtual void ForEachFieldObject(
       wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
           func) = 0;

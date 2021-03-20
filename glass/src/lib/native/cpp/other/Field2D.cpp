@@ -16,6 +16,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -37,9 +38,14 @@ namespace {
 
 // Per-frame field data (not persistent)
 struct FieldFrameData {
-  std::pair<double, double> GetPosFromScreen(const ImVec2& cursor) const {
-    return {(std::clamp(cursor.x, min.x, max.x) - min.x) / scale,
-            (max.y - std::clamp(cursor.y, min.y, max.y)) / scale};
+  frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
+    return {
+        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
+        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+  }
+  ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
+    return {min.x + scale * pos.X().to<float>(),
+            max.y - scale * pos.Y().to<float>()};
   }
 
   // in screen coordinates
@@ -48,44 +54,80 @@ struct FieldFrameData {
   ImVec2 min;
   ImVec2 max;
 
-  float scale;  // scaling from field units to screen units
+  float scale;  // scaling from meters to screen units
 };
 
 // Pose drag target info
-struct PoseDragTargetInfo {
+struct SelectedTargetInfo {
   FieldObjectModel* objModel = nullptr;
   std::string name;
   size_t index;
   units::radian_t rot;
   ImVec2 poseCenter;  // center of the pose (screen coordinates)
   ImVec2 center;      // center of the target (screen coordinates)
-  float radius = 0;   // target radius
+  float radius;       // target radius
   float dist;         // distance from center to mouse
   int corner;         // corner (1 = center)
 };
 
 // Pose drag state
 struct PoseDragState {
-  PoseDragTargetInfo target;
+  SelectedTargetInfo target;
   ImVec2 initialOffset;
   units::radian_t initialAngle = 0_rad;
+};
+
+// Popup edit state
+class PopupState {
+ public:
+  void Open(SelectedTargetInfo* target, const frc::Translation2d& pos);
+  void Close();
+
+  SelectedTargetInfo* GetTarget() { return &m_target; }
+  FieldObjectModel* GetInsertModel() { return m_insertModel; }
+  wpi::ArrayRef<frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+
+  void Display(Field2DModel* model, const FieldFrameData& ffd);
+
+ private:
+  void DisplayTarget(Field2DModel* model, const FieldFrameData& ffd);
+  void DisplayInsert(Field2DModel* model);
+
+  SelectedTargetInfo m_target;
+
+  // for insert
+  FieldObjectModel* m_insertModel;
+  std::vector<frc::Pose2d> m_insertPoses;
+  std::string m_insertName;
+  int m_insertIndex;
 };
 
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
   enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
-  Style style = kBoxImage;
-  float weight = 4.0f;
-  int color = 0;
 
-  float width = 0.0f;
-  float length = 0.0f;
+  static constexpr Style kDefaultStyle = kBoxImage;
+  static constexpr float kDefaultWeight = 4.0f;
+  static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
+  static constexpr auto kDefaultWidth = 0.6858_m;
+  static constexpr auto kDefaultLength = 0.8204_m;
+  static constexpr bool kDefaultArrows = true;
+  static constexpr int kDefaultArrowSize = 50;
+  static constexpr float kDefaultArrowWeight = 4.0f;
+  static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
 
-  bool arrows = true;
-  int arrowSize = 50;
-  float arrowWeight = 4.0f;
-  int arrowColor = 0;
+  Style style = kDefaultStyle;
+  float weight = kDefaultWeight;
+  int color = kDefaultColor;
+
+  units::meter_t width = kDefaultWidth;
+  units::meter_t length = kDefaultLength;
+
+  bool arrows = kDefaultArrows;
+  int arrowSize = kDefaultArrowSize;
+  float arrowWeight = kDefaultArrowWeight;
+  int arrowColor = kDefaultArrowColor;
 
   const gui::Texture& texture;
 };
@@ -96,14 +138,14 @@ class PoseFrameData {
   explicit PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
                          size_t index, const FieldFrameData& ffd,
                          const DisplayOptions& displayOptions);
-  void SetPosition(double x, double y);
+  void SetPosition(const frc::Translation2d& pos);
   void SetRotation(units::radian_t rot);
   const frc::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
   const frc::Pose2d& GetPose() const { return m_pose; }
   float GetHitRadius() const { return m_hitRadius; }
   void UpdateFrameData();
   std::pair<int, float> IsHovered(const ImVec2& cursor) const;
-  PoseDragTargetInfo GetDragTarget(int corner, float dist) const;
+  SelectedTargetInfo GetDragTarget(int corner, float dist) const;
   void HandleDrag(const ImVec2& cursor);
   void Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
             std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
@@ -130,24 +172,22 @@ class PoseFrameData {
 
 class ObjectInfo {
  public:
-  static constexpr float kDefaultWidth = 0.6858f;
-  static constexpr float kDefaultLength = 0.8204f;
-
   ObjectInfo();
-
-  std::unique_ptr<pfd::open_file> m_fileOpener;
 
   DisplayOptions GetDisplayOptions() const;
   void DisplaySettings();
   void DrawLine(ImDrawList* drawList, wpi::ArrayRef<ImVec2> points) const;
 
-  void Reset();
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
 
  private:
+  void Reset();
   bool LoadImageImpl(const char* fn);
 
+  std::unique_ptr<pfd::open_file> m_fileOpener;
+
+  // in meters
   float* m_pWidth;
   float* m_pLength;
 
@@ -166,28 +206,34 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr float kDefaultWidth = 15.98f;
-  static constexpr float kDefaultHeight = 8.21f;
+  static constexpr auto kDefaultWidth = 15.98_m;
+  static constexpr auto kDefaultHeight = 8.21_m;
 
   FieldInfo();
 
-  std::unique_ptr<pfd::open_file> m_fileOpener;
-  float* m_pWidth;
-  float* m_pHeight;
+  void DisplaySettings();
 
-  void Reset();
   void LoadImage();
-  void LoadJson(const wpi::Twine& jsonfile);
   FieldFrameData GetFrameData(ImVec2 min, ImVec2 max) const;
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
   wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
 
  private:
+  void Reset();
   bool LoadImageImpl(const char* fn);
+  void LoadJson(const wpi::Twine& jsonfile);
+
+  std::unique_ptr<pfd::open_file> m_fileOpener;
 
   std::string* m_pFilename;
   gui::Texture m_texture;
+
+  // in meters
+  float* m_pWidth;
+  float* m_pHeight;
+
+  // in image pixels
   int m_imageWidth;
   int m_imageHeight;
   int* m_pTop;
@@ -198,7 +244,45 @@ class FieldInfo {
 
 }  // namespace
 
+static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
+                        double step_fast = 0.0, const char* format = "%.6f",
+                        ImGuiInputTextFlags flags = 0) {
+  double dv = v->to<double>();
+  if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
+    *v = units::meter_t{dv};
+    return true;
+  }
+  return false;
+}
+
+static bool InputAngle(const char* label, units::degree_t* v, double step = 0.0,
+                       double step_fast = 0.0, const char* format = "%.6f",
+                       ImGuiInputTextFlags flags = 0) {
+  double dv = v->to<double>();
+  if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
+    *v = units::degree_t{dv};
+    return true;
+  }
+  return false;
+}
+
+static bool InputPose(frc::Pose2d* pose) {
+  auto x = pose->X();
+  auto y = pose->Y();
+  auto rot = pose->Rotation().Degrees();
+
+  bool changed;
+  changed = InputLength("x", &x);
+  changed = InputLength("y", &y) || changed;
+  changed = InputAngle("rot", &rot) || changed;
+  if (changed) {
+    *pose = frc::Pose2d{x, y, rot};
+  }
+  return changed;
+}
+
 static PoseDragState gDragState;
+static PopupState gPopupState;
 
 FieldInfo::FieldInfo() {
   auto& storage = GetStorage();
@@ -207,8 +291,28 @@ FieldInfo::FieldInfo() {
   m_pLeft = storage.GetIntRef("left", 0);
   m_pBottom = storage.GetIntRef("bottom", -1);
   m_pRight = storage.GetIntRef("right", -1);
-  m_pWidth = storage.GetFloatRef("width", kDefaultWidth);
-  m_pHeight = storage.GetFloatRef("height", kDefaultHeight);
+  m_pWidth = storage.GetFloatRef("width", kDefaultWidth.to<float>());
+  m_pHeight = storage.GetFloatRef("height", kDefaultHeight.to<float>());
+}
+
+void FieldInfo::DisplaySettings() {
+  if (ImGui::Button("Choose image...")) {
+    m_fileOpener = std::make_unique<pfd::open_file>(
+        "Choose field image", "",
+        std::vector<std::string>{"Image File",
+                                 "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
+                                 "*.hdr *.pic *.ppm *.pgm",
+                                 "PathWeaver JSON File", "*.json"});
+  }
+  if (ImGui::Button("Reset image")) {
+    Reset();
+  }
+  ImGui::InputFloat("Field Width", m_pWidth);
+  ImGui::InputFloat("Field Height", m_pHeight);
+  // ImGui::InputInt("Field Top", m_pTop);
+  // ImGui::InputInt("Field Left", m_pLeft);
+  // ImGui::InputInt("Field Right", m_pRight);
+  // ImGui::InputInt("Field Bottom", m_pBottom);
 }
 
 void FieldInfo::Reset() {
@@ -390,15 +494,20 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 ObjectInfo::ObjectInfo() {
   auto& storage = GetStorage();
   m_pFilename = storage.GetStringRef("image");
-  m_pWidth = storage.GetFloatRef("width", kDefaultWidth);
-  m_pLength = storage.GetFloatRef("length", kDefaultLength);
-  m_pStyle = storage.GetIntRef("style", DisplayOptions::kBoxImage);
-  m_pWeight = storage.GetFloatRef("weight", 4.0);
-  m_pColor = storage.GetIntRef("color", IM_COL32(255, 0, 0, 255));
-  m_pArrows = storage.GetBoolRef("arrows", true);
-  m_pArrowSize = storage.GetIntRef("arrowSize", 50);
-  m_pArrowWeight = storage.GetFloatRef("arrowWeight", 4.0);
-  m_pArrowColor = storage.GetIntRef("arrowColor", IM_COL32(0, 255, 0, 255));
+  m_pWidth =
+      storage.GetFloatRef("width", DisplayOptions::kDefaultWidth.to<float>());
+  m_pLength =
+      storage.GetFloatRef("length", DisplayOptions::kDefaultLength.to<float>());
+  m_pStyle = storage.GetIntRef("style", DisplayOptions::kDefaultStyle);
+  m_pWeight = storage.GetFloatRef("weight", DisplayOptions::kDefaultWeight);
+  m_pColor = storage.GetIntRef("color", DisplayOptions::kDefaultColor);
+  m_pArrows = storage.GetBoolRef("arrows", DisplayOptions::kDefaultArrows);
+  m_pArrowSize =
+      storage.GetIntRef("arrowSize", DisplayOptions::kDefaultArrowSize);
+  m_pArrowWeight =
+      storage.GetFloatRef("arrowWeight", DisplayOptions::kDefaultArrowWeight);
+  m_pArrowColor =
+      storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
 }
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -406,8 +515,8 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.style = static_cast<DisplayOptions::Style>(*m_pStyle);
   rv.weight = *m_pWeight;
   rv.color = *m_pColor;
-  rv.width = *m_pWidth;
-  rv.length = *m_pLength;
+  rv.width = units::meter_t{*m_pWidth};
+  rv.length = units::meter_t{*m_pLength};
   rv.arrows = *m_pArrows;
   rv.arrowSize = *m_pArrowSize;
   rv.arrowWeight = *m_pArrowWeight;
@@ -546,9 +655,8 @@ PoseFrameData::PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
   UpdateFrameData();
 }
 
-void PoseFrameData::SetPosition(double x, double y) {
-  m_pose = frc::Pose2d{frc::Translation2d{units::meter_t{x}, units::meter_t{y}},
-                       m_pose.Rotation()};
+void PoseFrameData::SetPosition(const frc::Translation2d& pos) {
+  m_pose = frc::Pose2d{pos, m_pose.Rotation()};
   m_model.SetPose(m_index, m_pose);
 }
 
@@ -559,8 +667,7 @@ void PoseFrameData::SetRotation(units::radian_t rot) {
 
 void PoseFrameData::UpdateFrameData() {
   // (0,0) origin is bottom left
-  ImVec2 center(m_ffd.min.x + m_ffd.scale * m_pose.X().to<double>(),
-                m_ffd.max.y - m_ffd.scale * m_pose.Y().to<double>());
+  ImVec2 center = m_ffd.GetScreenFromPos(m_pose.Translation());
 
   // build rotated points around center
   float length2 = m_length2;
@@ -633,8 +740,8 @@ std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
   return {0, 0.0};
 }
 
-PoseDragTargetInfo PoseFrameData::GetDragTarget(int corner, float dist) const {
-  PoseDragTargetInfo info;
+SelectedTargetInfo PoseFrameData::GetDragTarget(int corner, float dist) const {
+  SelectedTargetInfo info;
   info.objModel = &m_model;
   info.rot = GetRotation().Radians();
   info.poseCenter = m_center;
@@ -651,8 +758,7 @@ PoseDragTargetInfo PoseFrameData::GetDragTarget(int corner, float dist) const {
 
 void PoseFrameData::HandleDrag(const ImVec2& cursor) {
   if (gDragState.target.corner == 1) {
-    auto [x, y] = m_ffd.GetPosFromScreen(cursor - gDragState.initialOffset);
-    SetPosition(x, y);
+    SetPosition(m_ffd.GetPosFromScreen(cursor - gDragState.initialOffset));
     UpdateFrameData();
     gDragState.target.center = m_center;
     gDragState.target.poseCenter = m_center;
@@ -707,23 +813,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
   if (ImGui::CollapsingHeader("Field")) {
     ImGui::PushID("Field");
-    if (ImGui::Button("Choose image...")) {
-      field->m_fileOpener = std::make_unique<pfd::open_file>(
-          "Choose field image", "",
-          std::vector<std::string>{"Image File",
-                                   "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                                   "*.hdr *.pic *.ppm *.pgm",
-                                   "PathWeaver JSON File", "*.json"});
-    }
-    if (ImGui::Button("Reset image")) {
-      field->Reset();
-    }
-    ImGui::InputFloat("Field Width", field->m_pWidth);
-    ImGui::InputFloat("Field Height", field->m_pHeight);
-    // ImGui::InputInt("Field Top", field->m_pTop);
-    // ImGui::InputInt("Field Left", field->m_pLeft);
-    // ImGui::InputInt("Field Right", field->m_pRight);
-    // ImGui::InputInt("Field Bottom", field->m_pBottom);
+    field->DisplaySettings();
     ImGui::PopID();
   }
 
@@ -768,7 +858,7 @@ class FieldDisplay {
   FieldFrameData m_ffd;
 
   // drag targets
-  std::vector<PoseDragTargetInfo> m_targets;
+  std::vector<SelectedTargetInfo> m_targets;
 
   // splitter so lines are put behind arrows
   ImDrawListSplitter m_drawSplit;
@@ -801,19 +891,31 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   bool isDown = ImGui::IsMouseDown(0);
   if (!isDown) {
     gDragState.target.objModel = nullptr;
-    gDragState.target.radius = 0;
+  }
+
+  // clear popup target if popup closed
+  bool isPopupOpen = ImGui::IsPopupOpen("edit");
+  if (!isPopupOpen) {
+    gPopupState.Close();
   }
 
   // field objects
   m_targets.resize(0);
   m_drawSplit.Split(m_drawList, 2);
-  model->ForEachFieldObject(
-      [this](auto& objModel, auto name) { DisplayObject(objModel, name); });
+  model->ForEachFieldObject([this](auto& objModel, auto name) {
+    if (objModel.Exists()) {
+      DisplayObject(objModel, name);
+    }
+  });
   m_drawSplit.Merge(m_drawList);
 
-  PoseDragTargetInfo* target = &gDragState.target;
+  SelectedTargetInfo* target = nullptr;
 
-  if (!m_targets.empty()) {
+  if (gDragState.target.objModel) {
+    target = &gDragState.target;
+  } else if (gPopupState.GetTarget()->objModel) {
+    target = gPopupState.GetTarget();
+  } else if (!m_targets.empty()) {
     // Find the "best" drag target of the available options.  Prefer
     // center to non-center, and then pick the closest hit.
     std::sort(m_targets.begin(), m_targets.end(),
@@ -821,8 +923,28 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
                 return a.corner == 0 || a.dist < b.dist;
               });
     target = &m_targets.front();
+  }
 
-    if (ImGui::IsMouseClicked(0)) {
+  if (target) {
+    // draw the target circle; also draw a smaller circle on the pose center
+    m_drawList->AddCircle(target->center, target->radius,
+                          IM_COL32(0, 255, 0, 255));
+    if (target->corner != 1) {
+      m_drawList->AddCircle(target->poseCenter, target->radius / 2.0,
+                            IM_COL32(0, 255, 0, 255));
+    }
+  }
+
+  // right-click popup for editing
+  if (m_isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+    gPopupState.Open(target, m_ffd.GetPosFromScreen(m_mousePos));
+    ImGui::OpenPopup("edit");
+  }
+  if (ImGui::BeginPopup("edit")) {
+    gPopupState.Display(model, m_ffd);
+    ImGui::EndPopup();
+  } else if (target) {
+    if (m_isHovered && ImGui::IsMouseClicked(0)) {
       // initialize drag state
       gDragState.target = *target;
       gDragState.initialOffset = m_mousePos - target->poseCenter;
@@ -833,27 +955,17 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
             target->rot;
       }
     }
-  }
 
-  // draw the target circle; also draw a smaller circle on the pose center
-  if (target->radius != 0) {
-    auto [x, y] = m_ffd.GetPosFromScreen(target->poseCenter);
+    // show tooltip and highlight
+    auto pos = m_ffd.GetPosFromScreen(target->poseCenter);
     ImGui::SetTooltip("%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f",
-                      target->name.c_str(), static_cast<int>(target->index), x,
-                      y, target->rot.convert<units::degree>().to<double>());
-    m_drawList->AddCircle(target->center, target->radius,
-                          IM_COL32(0, 255, 0, 255));
-    if (target->corner != 1) {
-      m_drawList->AddCircle(target->poseCenter, target->radius / 2.0,
-                            IM_COL32(0, 255, 0, 255));
-    }
+                      target->name.c_str(), static_cast<int>(target->index),
+                      pos.X().to<double>(), pos.Y().to<double>(),
+                      target->rot.convert<units::degree>().to<double>());
   }
 }
 
 void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
-  if (!model.Exists()) {
-    return;
-  }
   PushID(name);
   auto& objRef = m_field->m_objects[name];
   if (!objRef) {
@@ -869,8 +981,11 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
   m_rightLine.resize(0);
 
   m_drawSplit.SetCurrentChannel(m_drawList, 1);
+  wpi::ArrayRef<frc::Pose2d> poses = gPopupState.GetInsertModel() == &model
+                                         ? gPopupState.GetInsertPoses()
+                                         : model.GetPoses();
   size_t i = 0;
-  for (auto&& pose : model.GetPoses()) {
+  for (auto&& pose : poses) {
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
     // check for potential drag targets
@@ -899,6 +1014,130 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
   obj->DrawLine(m_drawList, m_rightLine);
 
   PopID();
+}
+
+void PopupState::Open(SelectedTargetInfo* target,
+                      const frc::Translation2d& pos) {
+  if (target) {
+    m_target = *target;
+  } else {
+    m_target.objModel = nullptr;
+    m_insertModel = nullptr;
+    m_insertPoses.resize(0);
+    m_insertPoses.emplace_back(pos, 0_deg);
+    m_insertName.clear();
+    m_insertIndex = 0;
+  }
+}
+
+void PopupState::Close() {
+  m_target.objModel = nullptr;
+  m_insertModel = nullptr;
+  m_insertPoses.resize(0);
+}
+
+void PopupState::Display(Field2DModel* model, const FieldFrameData& ffd) {
+  if (m_target.objModel) {
+    DisplayTarget(model, ffd);
+  } else {
+    DisplayInsert(model);
+  }
+}
+
+void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
+  ImGui::Text("%s[%d]", m_target.name.c_str(),
+              static_cast<int>(m_target.index));
+  frc::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter), m_target.rot};
+  if (InputPose(&pose)) {
+    m_target.poseCenter = ffd.GetScreenFromPos(pose.Translation());
+    m_target.rot = pose.Rotation().Radians();
+    m_target.objModel->SetPose(m_target.index, pose);
+  }
+  if (ImGui::Button("Delete Pose")) {
+    std::vector<frc::Pose2d> poses = m_target.objModel->GetPoses();
+    if (m_target.index < poses.size()) {
+      poses.erase(poses.begin() + m_target.index);
+      m_target.objModel->SetPoses(poses);
+    }
+    ImGui::CloseCurrentPopup();
+  }
+  if (ImGui::Button("Delete Object (ALL Poses)")) {
+    model->RemoveFieldObject(m_target.objModel->GetName());
+    ImGui::CloseCurrentPopup();
+  }
+}
+
+void PopupState::DisplayInsert(Field2DModel* model) {
+  ImGui::TextUnformatted("Insert New Pose");
+
+  InputPose(&m_insertPoses[m_insertIndex]);
+
+  const char* insertName = m_insertModel ? m_insertName.c_str() : "<new>";
+  if (ImGui::BeginCombo("object", insertName)) {
+    bool selected = !m_insertModel;
+    if (ImGui::Selectable("<new>", selected)) {
+      m_insertModel = nullptr;
+      auto pose = m_insertPoses[m_insertIndex];
+      m_insertPoses.resize(0);
+      m_insertPoses.emplace_back(std::move(pose));
+      m_insertName.clear();
+      m_insertIndex = 0;
+    }
+    if (selected) {
+      ImGui::SetItemDefaultFocus();
+    }
+    model->ForEachFieldObject([&](auto& objModel, auto name) {
+      bool selected = m_insertModel == &objModel;
+      if (ImGui::Selectable(name.data(), selected)) {
+        m_insertModel = &objModel;
+        auto pose = m_insertPoses[m_insertIndex];
+        m_insertPoses = objModel.GetPoses();
+        m_insertPoses.emplace_back(std::move(pose));
+        m_insertName = name;
+        m_insertIndex = m_insertPoses.size() - 1;
+      }
+      if (selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    });
+    ImGui::EndCombo();
+  }
+  if (m_insertModel) {
+    int oldIndex = m_insertIndex;
+    if (ImGui::InputInt("pos", &m_insertIndex, 1, 5)) {
+      if (m_insertIndex < 0) {
+        m_insertIndex = 0;
+      }
+      size_t size = m_insertPoses.size();
+      if (static_cast<size_t>(m_insertIndex) >= size) {
+        m_insertIndex = size - 1;
+      }
+      if (m_insertIndex < oldIndex) {
+        auto begin = m_insertPoses.begin();
+        std::rotate(begin + m_insertIndex, begin + oldIndex,
+                    begin + oldIndex + 1);
+      } else if (m_insertIndex > oldIndex) {
+        auto rbegin = m_insertPoses.rbegin();
+        std::rotate(rbegin + (size - m_insertIndex), rbegin + (size - oldIndex),
+                    rbegin + (size - oldIndex - 1));
+      }
+    }
+  } else {
+    ImGui::InputText("name", &m_insertName);
+  }
+
+  if (ImGui::Button("Apply")) {
+    if (m_insertModel) {
+      m_insertModel->SetPoses(m_insertPoses);
+    } else if (!m_insertName.empty()) {
+      model->AddFieldObject(m_insertName)->SetPoses(m_insertPoses);
+    }
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Cancel")) {
+    ImGui::CloseCurrentPopup();
+  }
 }
 
 void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
