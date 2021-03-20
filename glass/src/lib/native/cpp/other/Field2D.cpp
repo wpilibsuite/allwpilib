@@ -36,6 +36,8 @@ namespace gui = wpi::gui;
 
 namespace {
 
+enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
+
 // Per-frame field data (not persistent)
 struct FieldFrameData {
   frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
@@ -244,12 +246,55 @@ class FieldInfo {
 
 }  // namespace
 
+static PoseDragState gDragState;
+static PopupState gPopupState;
+static DisplayUnits gDisplayUnits = kDisplayMeters;
+
+static double ConvertDisplayLength(units::meter_t v) {
+  switch (gDisplayUnits) {
+    case kDisplayFeet:
+      return v.convert<units::feet>().to<double>();
+    case kDisplayInches:
+      return v.convert<units::inches>().to<double>();
+    case kDisplayMeters:
+    default:
+      return v.to<double>();
+  }
+}
+
+static double ConvertDisplayAngle(units::degree_t v) {
+  return v.to<double>();
+}
+
 static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
                         double step_fast = 0.0, const char* format = "%.6f",
                         ImGuiInputTextFlags flags = 0) {
-  double dv = v->to<double>();
+  double dv = ConvertDisplayLength(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
-    *v = units::meter_t{dv};
+    switch (gDisplayUnits) {
+      case kDisplayFeet:
+        *v = units::foot_t{dv};
+        break;
+      case kDisplayInches:
+        *v = units::inch_t{dv};
+        break;
+      case kDisplayMeters:
+      default:
+        *v = units::meter_t{dv};
+        break;
+    }
+    return true;
+  }
+  return false;
+}
+
+static bool InputFloatLength(const char* label, float* v, double step = 0.0,
+                             double step_fast = 0.0,
+                             const char* format = "%.3f",
+                             ImGuiInputTextFlags flags = 0) {
+  units::meter_t uv{*v};
+  if (InputLength(label, &uv, step, step_fast, format, flags)) {
+    *v = uv.to<float>();
     return true;
   }
   return false;
@@ -258,7 +303,7 @@ static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
 static bool InputAngle(const char* label, units::degree_t* v, double step = 0.0,
                        double step_fast = 0.0, const char* format = "%.6f",
                        ImGuiInputTextFlags flags = 0) {
-  double dv = v->to<double>();
+  double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     *v = units::degree_t{dv};
     return true;
@@ -280,9 +325,6 @@ static bool InputPose(frc::Pose2d* pose) {
   }
   return changed;
 }
-
-static PoseDragState gDragState;
-static PopupState gPopupState;
 
 FieldInfo::FieldInfo() {
   auto& storage = GetStorage();
@@ -307,8 +349,8 @@ void FieldInfo::DisplaySettings() {
   if (ImGui::Button("Reset image")) {
     Reset();
   }
-  ImGui::InputFloat("Field Width", m_pWidth);
-  ImGui::InputFloat("Field Height", m_pHeight);
+  InputFloatLength("Field Width", m_pWidth);
+  InputFloatLength("Field Height", m_pHeight);
   // ImGui::InputInt("Field Top", m_pTop);
   // ImGui::InputInt("Field Left", m_pLeft);
   // ImGui::InputInt("Field Right", m_pRight);
@@ -528,8 +570,7 @@ void ObjectInfo::DisplaySettings() {
   static const char* styleChoices[] = {"Box/Image", "Line", "Line (Closed)",
                                        "Track"};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  ImGui::Combo("Style", m_pStyle, styleChoices,
-               sizeof(styleChoices) / sizeof(styleChoices[0]));
+  ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
   switch (*m_pStyle) {
     case DisplayOptions::kBoxImage:
       if (ImGui::Button("Choose image...")) {
@@ -543,15 +584,16 @@ void ObjectInfo::DisplaySettings() {
       if (ImGui::Button("Reset image")) {
         Reset();
       }
-      ImGui::InputFloat("Width", m_pWidth);
-      ImGui::InputFloat("Length", m_pLength);
+      InputFloatLength("Width", m_pWidth);
+      InputFloatLength("Length", m_pLength);
       break;
     case DisplayOptions::kTrack:
-      ImGui::InputFloat("Width", m_pWidth);
+      InputFloatLength("Width", m_pWidth);
       break;
     default:
       break;
   }
+
   ImGui::InputFloat("Line Weight", m_pWeight);
   ImColor col(*m_pColor);
   if (ImGui::ColorEdit3("Line Color", &col.Value.x,
@@ -810,6 +852,12 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     field = storage.GetData<FieldInfo>();
   }
 
+  static const char* unitNames[] = {"meters", "feet", "inches"};
+  int* pDisplayUnits = GetStorage().GetIntRef("units", kDisplayMeters);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
+  ImGui::Combo("Units", pDisplayUnits, unitNames, IM_ARRAYSIZE(unitNames));
+  gDisplayUnits = static_cast<DisplayUnits>(*pDisplayUnits);
+
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
   if (ImGui::CollapsingHeader("Field")) {
     ImGui::PushID("Field");
@@ -958,10 +1006,10 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
 
     // show tooltip and highlight
     auto pos = m_ffd.GetPosFromScreen(target->poseCenter);
-    ImGui::SetTooltip("%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f",
-                      target->name.c_str(), static_cast<int>(target->index),
-                      pos.X().to<double>(), pos.Y().to<double>(),
-                      target->rot.convert<units::degree>().to<double>());
+    ImGui::SetTooltip(
+        "%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f", target->name.c_str(),
+        static_cast<int>(target->index), ConvertDisplayLength(pos.X()),
+        ConvertDisplayLength(pos.Y()), ConvertDisplayAngle(target->rot));
   }
 }
 
@@ -1073,7 +1121,7 @@ void PopupState::DisplayInsert(Field2DModel* model) {
   InputPose(&m_insertPoses[m_insertIndex]);
 
   const char* insertName = m_insertModel ? m_insertName.c_str() : "<new>";
-  if (ImGui::BeginCombo("object", insertName)) {
+  if (ImGui::BeginCombo("Object", insertName)) {
     bool selected = !m_insertModel;
     if (ImGui::Selectable("<new>", selected)) {
       m_insertModel = nullptr;
@@ -1104,7 +1152,7 @@ void PopupState::DisplayInsert(Field2DModel* model) {
   }
   if (m_insertModel) {
     int oldIndex = m_insertIndex;
-    if (ImGui::InputInt("pos", &m_insertIndex, 1, 5)) {
+    if (ImGui::InputInt("Pos", &m_insertIndex, 1, 5)) {
       if (m_insertIndex < 0) {
         m_insertIndex = 0;
       }
@@ -1123,7 +1171,7 @@ void PopupState::DisplayInsert(Field2DModel* model) {
       }
     }
   } else {
-    ImGui::InputText("name", &m_insertName);
+    ImGui::InputText("Name", &m_insertName);
   }
 
   if (ImGui::Button("Apply")) {
