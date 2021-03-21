@@ -118,6 +118,7 @@ struct DisplayOptions {
   static constexpr int kDefaultArrowSize = 50;
   static constexpr float kDefaultArrowWeight = 4.0f;
   static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
+  static constexpr bool kDefaultSelectable = true;
 
   Style style = kDefaultStyle;
   float weight = kDefaultWeight;
@@ -130,6 +131,8 @@ struct DisplayOptions {
   int arrowSize = kDefaultArrowSize;
   float arrowWeight = kDefaultArrowWeight;
   int arrowColor = kDefaultArrowColor;
+
+  bool selectable = kDefaultSelectable;
 
   const gui::Texture& texture;
 };
@@ -201,6 +204,8 @@ class ObjectInfo {
   int* m_pArrowSize;
   float* m_pArrowWeight;
   int* m_pArrowColor;
+
+  bool* m_pSelectable;
 
   std::string* m_pFilename;
   gui::Texture m_texture;
@@ -550,6 +555,8 @@ ObjectInfo::ObjectInfo() {
       storage.GetFloatRef("arrowWeight", DisplayOptions::kDefaultArrowWeight);
   m_pArrowColor =
       storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
+  m_pSelectable =
+      storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
 }
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -563,6 +570,7 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.arrowSize = *m_pArrowSize;
   rv.arrowWeight = *m_pArrowWeight;
   rv.arrowColor = *m_pArrowColor;
+  rv.selectable = *m_pSelectable;
   return rv;
 }
 
@@ -611,6 +619,8 @@ void ObjectInfo::DisplaySettings() {
       *m_pArrowColor = col;
     }
   }
+
+  ImGui::Checkbox("Selectable", m_pSelectable);
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
@@ -1037,7 +1047,8 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
     // check for potential drag targets
-    if (m_isHovered && !gDragState.target.objModel) {
+    if (displayOptions.selectable && m_isHovered &&
+        !gDragState.target.objModel) {
       auto [corner, dist] = pfd.IsHovered(m_mousePos);
       if (corner > 0) {
         m_targets.emplace_back(pfd.GetDragTarget(corner, dist));
