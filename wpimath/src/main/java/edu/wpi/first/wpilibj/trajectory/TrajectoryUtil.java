@@ -73,6 +73,7 @@ public final class TrajectoryUtil {
    *
    * @param path The path of the json file to import from
    * @return The trajectory represented by the file.
+   * @throws IOException if reading from the file fails.
    */
   public static Trajectory fromPathweaverJson(Path path) throws IOException {
     return createTrajectoryFromElements(WPIMathJNI.fromPathweaverJson(path.toString()));
@@ -83,6 +84,7 @@ public final class TrajectoryUtil {
    *
    * @param trajectory The trajectory to export
    * @param path The path of the file to export to
+   * @throws IOException if writing to the file fails.
    */
   public static void toPathweaverJson(Trajectory trajectory, Path path) throws IOException {
     WPIMathJNI.toPathweaverJson(getElementsFromTrajectory(trajectory), path.toString());
@@ -93,6 +95,7 @@ public final class TrajectoryUtil {
    *
    * @param json The string containing the serialized JSON
    * @return the trajectory represented by the JSON
+   * @throws TrajectorySerializationException if deserialization of the string fails.
    */
   public static Trajectory deserializeTrajectory(String json) {
     return createTrajectoryFromElements(WPIMathJNI.deserializeTrajectory(json));
@@ -103,6 +106,7 @@ public final class TrajectoryUtil {
    *
    * @param trajectory The trajectory to export
    * @return The string containing the serialized JSON
+   * @throws TrajectorySerializationException if serialization of the trajectory fails.
    */
   public static String serializeTrajectory(Trajectory trajectory) {
     return WPIMathJNI.serializeTrajectory(getElementsFromTrajectory(trajectory));
