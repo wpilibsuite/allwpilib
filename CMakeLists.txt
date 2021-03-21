@@ -119,13 +119,6 @@ FATAL: Cannot build wpilib without wpimath.
 ")
 endif()
 
-if (NOT WITH_OLD_COMMANDS AND WITH_EXAMPLES)
-    message(FATAL_ERROR "
-FATAL: Cannot build examples with old commands disabled.
-       Enable old commands by setting WITH_OLD_COMMANDS=ON
-")
-endif()
-
 set( wpilib_dest wpilib)
 set( include_dest wpilib/include )
 set( main_lib_dest wpilib/lib )
