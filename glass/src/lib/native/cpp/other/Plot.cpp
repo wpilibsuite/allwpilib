@@ -174,6 +174,7 @@ PlotSeries::PlotSeries(wpi::StringRef id) : m_id(id) {
 
 PlotSeries::PlotSeries(DataSource* source, int yAxis) : m_yAxis(yAxis) {
   SetSource(source);
+  m_id = source->GetId();
 }
 
 void PlotSeries::CheckSource() {
@@ -191,7 +192,6 @@ void PlotSeries::CheckSource() {
 
 void PlotSeries::SetSource(DataSource* source) {
   m_source = source;
-  m_id = source->GetId();
 
   // add initial value
   m_data[m_size++] = ImPlotPoint{wpi::Now() * 1.0e-6, source->GetValue()};
