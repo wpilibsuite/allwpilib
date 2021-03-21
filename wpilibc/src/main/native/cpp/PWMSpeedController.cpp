@@ -4,16 +4,18 @@
 
 #include "frc/PWMSpeedController.h"
 
+#include <wpi/raw_ostream.h>
+
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
 void PWMSpeedController::Set(double speed) {
-  SetSpeed(m_isInverted ? -speed : speed);
+  m_pwm.SetSpeed(m_isInverted ? -speed : speed);
 }
 
 double PWMSpeedController::Get() const {
-  return GetSpeed() * (m_isInverted ? -1.0 : 1.0);
+  return m_pwm.GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
 void PWMSpeedController::SetInverted(bool isInverted) {
@@ -25,24 +27,34 @@ bool PWMSpeedController::GetInverted() const {
 }
 
 void PWMSpeedController::Disable() {
-  SetDisabled();
+  m_pwm.SetDisabled();
 }
 
 void PWMSpeedController::StopMotor() {
-  PWM::StopMotor();
+  Disable();
+}
+
+void PWMSpeedController::GetDescription(wpi::raw_ostream& desc) const {
+  desc << "PWM " << GetChannel();
+}
+
+int PWMSpeedController::GetChannel() const {
+  return m_pwm.GetChannel();
 }
 
 void PWMSpeedController::PIDWrite(double output) {
   Set(output);
 }
 
-PWMSpeedController::PWMSpeedController(int channel) : PWM(channel) {}
+PWMSpeedController::PWMSpeedController(const wpi::Twine& name, int channel)
+    : m_pwm(channel, false) {
+  SendableRegistry::GetInstance().AddLW(this, name, channel);
+}
 
 void PWMSpeedController::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { SetDisabled(); });
+  builder.SetSafeState([=] { Disable(); });
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetSpeed(); },
-      [=](double value) { SetSpeed(value); });
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }

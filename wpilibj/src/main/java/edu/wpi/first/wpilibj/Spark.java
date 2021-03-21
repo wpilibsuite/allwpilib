@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * REV Robotics SPARK Speed Controller.
@@ -26,17 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * </ul>
  */
 public class Spark extends PWMSpeedController {
-  /** Common initialization code called by all constructors. */
-  protected void initSpark() {
-    setBounds(2.003, 1.55, 1.50, 1.46, 0.999);
-    setPeriodMultiplier(PeriodMultiplier.k1X);
-    setSpeed(0.0);
-    setZeroLatch();
-
-    HAL.report(tResourceType.kResourceType_RevSPARK, getChannel() + 1);
-    SendableRegistry.setName(this, "Spark", getChannel());
-  }
-
   /**
    * Constructor.
    *
@@ -44,7 +32,13 @@ public class Spark extends PWMSpeedController {
    *     the MXP port
    */
   public Spark(final int channel) {
-    super(channel);
-    initSpark();
+    super("Spark", channel);
+
+    m_pwm.setBounds(2.003, 1.55, 1.50, 1.46, 0.999);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
+    m_pwm.setSpeed(0.0);
+    m_pwm.setZeroLatch();
+
+    HAL.report(tResourceType.kResourceType_RevSPARK, getChannel() + 1);
   }
 }

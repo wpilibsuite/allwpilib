@@ -10,12 +10,12 @@
 
 using namespace frc;
 
-PWMSparkMax::PWMSparkMax(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.003, 1.55, 1.50, 1.46, 0.999);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+PWMSparkMax::PWMSparkMax(int channel)
+    : PWMSpeedController("PWMSparkMax", channel) {
+  m_pwm.SetBounds(2.003, 1.55, 1.50, 1.46, 0.999);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_RevSparkMaxPWM, GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "PWMSparkMax", GetChannel());
 }

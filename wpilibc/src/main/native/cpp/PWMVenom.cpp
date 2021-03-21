@@ -6,16 +6,13 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
-PWMVenom::PWMVenom(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+PWMVenom::PWMVenom(int channel) : PWMSpeedController("PWMVenom", channel) {
+  m_pwm.SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_FusionVenom, GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "PWMVenom", GetChannel());
 }

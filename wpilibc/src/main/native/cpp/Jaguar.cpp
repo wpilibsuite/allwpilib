@@ -6,16 +6,13 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
-Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.31, 1.55, 1.507, 1.454, 0.697);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+Jaguar::Jaguar(int channel) : PWMSpeedController("Jaguar", channel) {
+  m_pwm.SetBounds(2.31, 1.55, 1.507, 1.454, 0.697);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "Jaguar", GetChannel());
 }

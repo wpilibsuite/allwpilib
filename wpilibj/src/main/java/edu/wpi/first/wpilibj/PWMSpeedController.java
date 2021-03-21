@@ -5,24 +5,31 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /** Common base class for all PWM Speed Controllers. */
-public abstract class PWMSpeedController extends PWM implements SpeedController {
+public abstract class PWMSpeedController extends MotorSafety
+    implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
+  protected PWM m_pwm;
 
   /**
    * Constructor.
    *
+   * @param name Name to use for SendableRegistry
    * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
    *     on the MXP port
    */
-  protected PWMSpeedController(int channel) {
-    super(channel);
+  protected PWMSpeedController(final String name, final int channel) {
+    m_pwm = new PWM(channel, false);
+    SendableRegistry.addLW(this, name, channel);
   }
 
+  /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
-  public String getDescription() {
-    return "PWM " + getChannel();
+  public void close() {
+    SendableRegistry.remove(this);
+    m_pwm.close();
   }
 
   /**
@@ -35,7 +42,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
    */
   @Override
   public void set(double speed) {
-    setSpeed(m_isInverted ? -speed : speed);
+    m_pwm.setSpeed(m_isInverted ? -speed : speed);
     feed();
   }
 
@@ -48,7 +55,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
    */
   @Override
   public double get() {
-    return getSpeed() * (m_isInverted ? -1.0 : 1.0);
+    return m_pwm.getSpeed() * (m_isInverted ? -1.0 : 1.0);
   }
 
   @Override
@@ -63,7 +70,26 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
 
   @Override
   public void disable() {
-    setDisabled();
+    m_pwm.setDisabled();
+  }
+
+  @Override
+  public void stopMotor() {
+    disable();
+  }
+
+  @Override
+  public String getDescription() {
+    return "PWM " + getChannel();
+  }
+
+  /**
+   * Gets the PWM channel number.
+   *
+   * @return The channel number.
+   */
+  public int getChannel() {
+    return m_pwm.getChannel();
   }
 
   /**
@@ -80,7 +106,7 @@ public abstract class PWMSpeedController extends PWM implements SpeedController 
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Speed Controller");
     builder.setActuator(true);
-    builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
+    builder.setSafeState(this::disable);
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

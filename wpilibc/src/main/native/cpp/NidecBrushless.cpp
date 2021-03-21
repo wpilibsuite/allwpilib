@@ -5,6 +5,7 @@
 #include "frc/NidecBrushless.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/raw_ostream.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"

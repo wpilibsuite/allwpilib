@@ -6,16 +6,13 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
-DMC60::DMC60(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+DMC60::DMC60(int channel) : PWMSpeedController("DMC60", channel) {
+  m_pwm.SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_DigilentDMC60, GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "DMC60", GetChannel());
 }

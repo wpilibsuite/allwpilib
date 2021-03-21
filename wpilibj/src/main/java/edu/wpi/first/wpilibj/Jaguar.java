@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
@@ -32,14 +31,13 @@ public class Jaguar extends PWMSpeedController {
    *     the MXP port
    */
   public Jaguar(final int channel) {
-    super(channel);
+    super("Jaguar", channel);
 
-    setBounds(2.31, 1.55, 1.507, 1.454, 0.697);
-    setPeriodMultiplier(PeriodMultiplier.k1X);
-    setSpeed(0.0);
-    setZeroLatch();
+    m_pwm.setBounds(2.31, 1.55, 1.507, 1.454, 0.697);
+    m_pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
+    m_pwm.setSpeed(0.0);
+    m_pwm.setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_Jaguar, getChannel() + 1);
-    SendableRegistry.setName(this, "Jaguar", getChannel());
   }
 }

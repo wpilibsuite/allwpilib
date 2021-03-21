@@ -6,16 +6,13 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
-VictorSP::VictorSP(int channel) : PWMSpeedController(channel) {
-  SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
-  SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetSpeed(0.0);
-  SetZeroLatch();
+VictorSP::VictorSP(int channel) : PWMSpeedController("VictorSP", channel) {
+  m_pwm.SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
+  m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
+  m_pwm.SetSpeed(0.0);
+  m_pwm.SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel() + 1);
-  SendableRegistry::GetInstance().SetName(this, "VictorSP", GetChannel());
 }

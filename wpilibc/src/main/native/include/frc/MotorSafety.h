@@ -5,10 +5,13 @@
 #pragma once
 
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/ErrorBase.h"
 #include "frc/Timer.h"
+
+namespace wpi {
+class raw_ostream;
+}  // namespace wpi
 
 namespace frc {
 
