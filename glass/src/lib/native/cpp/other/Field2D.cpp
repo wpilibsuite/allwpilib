@@ -1110,7 +1110,7 @@ void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
     ImGui::CloseCurrentPopup();
   }
   if (ImGui::Button("Delete Object (ALL Poses)")) {
-    model->RemoveFieldObject(m_target.objModel->GetName());
+    model->RemoveFieldObject(m_target.name);
     ImGui::CloseCurrentPopup();
   }
 }
