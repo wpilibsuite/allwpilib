@@ -992,7 +992,9 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     std::snprintf(id, sizeof(id), "Plot <%d>",
                   static_cast<int>(m_windows.size()));
-    AddWindow(id, std::make_unique<PlotView>(this));
+    if (auto win = AddWindow(id, std::make_unique<PlotView>(this))) {
+      win->SetDefaultSize(700, 400);
+    }
   }
 }
 
