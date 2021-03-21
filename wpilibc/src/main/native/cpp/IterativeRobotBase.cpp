@@ -108,7 +108,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call DisabledInit() if we are now just entering disabled mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kDisabled) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::GetInstance().SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
@@ -122,7 +122,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call AutonomousInit() if we are now just entering autonomous mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kAutonomous) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::GetInstance().SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
@@ -136,7 +136,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call TeleopInit() if we are now just entering teleop mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTeleop) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::GetInstance().SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
@@ -150,7 +150,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call TestInit() if we are now just entering test mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTest) {
-      LiveWindow::GetInstance()->SetEnabled(true);
+      LiveWindow::GetInstance().SetEnabled(true);
       Shuffleboard::EnableActuatorWidgets();
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
@@ -167,7 +167,7 @@ void IterativeRobotBase::LoopFunc() {
 
   SmartDashboard::UpdateValues();
   m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-  LiveWindow::GetInstance()->UpdateValues();
+  LiveWindow::GetInstance().UpdateValues();
   m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
   Shuffleboard::Update();
   m_watchdog.AddEpoch("Shuffleboard::Update()");

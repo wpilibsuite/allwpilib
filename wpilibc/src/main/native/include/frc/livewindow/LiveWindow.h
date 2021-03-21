@@ -29,7 +29,7 @@ class LiveWindow {
    * This is a singleton to guarantee that there is only a single instance
    * regardless of how many times GetInstance is called.
    */
-  static LiveWindow* GetInstance();
+  static LiveWindow& GetInstance();
 
   /**
    * Enable telemetry for a single component.
@@ -69,6 +69,7 @@ class LiveWindow {
 
  private:
   LiveWindow();
+  ~LiveWindow() = default;
 
   struct Impl;
   std::unique_ptr<Impl> m_impl;
