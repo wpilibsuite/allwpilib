@@ -47,16 +47,10 @@ public class SimDeviceDataJNI extends JNIWrapper {
   public static native int registerSimValueCreatedCallback(
       int device, SimValueCallback callback, boolean initialNotify);
 
-  public static native int registerSimValueCreatedCallback2(
-      int device, SimValueCallback2 callback, boolean initialNotify);
-
   public static native void cancelSimValueCreatedCallback(int uid);
 
   public static native int registerSimValueChangedCallback(
       int handle, SimValueCallback callback, boolean initialNotify);
-
-  public static native int registerSimValueChangedCallback2(
-      int handle, SimValueCallback2 callback, boolean initialNotify);
 
   public static native void cancelSimValueChangedCallback(int uid);
 
@@ -69,7 +63,7 @@ public class SimDeviceDataJNI extends JNIWrapper {
    * @param initialNotify ignored (present for consistency)
    */
   public static native int registerSimValueResetCallback(
-      int handle, SimValueCallback2 callback, boolean initialNotify);
+      int handle, SimValueCallback callback, boolean initialNotify);
 
   public static native void cancelSimValueResetCallback(int uid);
 
