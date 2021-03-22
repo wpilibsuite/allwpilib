@@ -989,9 +989,22 @@ void PlotProvider::DisplayMenu() {
   }
 
   if (ImGui::MenuItem("New Plot Window")) {
+    // this is an inefficient algorithm, but the number of windows is small
     char id[32];
-    std::snprintf(id, sizeof(id), "Plot <%d>",
-                  static_cast<int>(m_windows.size()));
+    size_t numWindows = m_windows.size();
+    for (size_t i = 0; i <= numWindows; ++i) {
+      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      bool match = false;
+      for (size_t j = i; j < numWindows; ++j) {
+        if (m_windows[j]->GetId() == id) {
+          match = true;
+          break;
+        }
+      }
+      if (!match) {
+        break;
+      }
+    }
     if (auto win = AddWindow(id, std::make_unique<PlotView>(this))) {
       win->SetDefaultSize(700, 400);
     }
