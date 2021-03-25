@@ -28,6 +28,10 @@ Transform2d Transform2d::Inverse() const {
   return Transform2d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
 }
 
+Transform2d Transform2d::operator+(const Transform2d& other) const {
+  return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
+}
+
 bool Transform2d::operator==(const Transform2d& other) const {
   return m_translation == other.m_translation && m_rotation == other.m_rotation;
 }
