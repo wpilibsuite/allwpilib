@@ -4,12 +4,19 @@
 
 #include "glass/other/Field2D.h"
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
+#include <utility>
+
+#include <frc/geometry/Pose2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Translation2d.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <imgui_stdlib.h>
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -22,7 +29,6 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
-#include "glass/DataSource.h"
 
 using namespace glass;
 
@@ -30,50 +36,135 @@ namespace gui = wpi::gui;
 
 namespace {
 
+enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
+
 // Per-frame field data (not persistent)
 struct FieldFrameData {
+  frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
+    return {
+        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
+        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+  }
+  ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
+    return {min.x + scale * pos.X().to<float>(),
+            max.y - scale * pos.Y().to<float>()};
+  }
+
   // in screen coordinates
   ImVec2 imageMin;
   ImVec2 imageMax;
   ImVec2 min;
   ImVec2 max;
 
-  float scale;  // scaling from field units to screen units
+  float scale;  // scaling from meters to screen units
 };
 
-// Object drag state
-struct ObjectDragState {
-  int object = 0;
-  int corner = 0;
+// Pose drag target info
+struct SelectedTargetInfo {
+  FieldObjectModel* objModel = nullptr;
+  std::string name;
+  size_t index;
+  units::radian_t rot;
+  ImVec2 poseCenter;  // center of the pose (screen coordinates)
+  ImVec2 center;      // center of the target (screen coordinates)
+  float radius;       // target radius
+  float dist;         // distance from center to mouse
+  int corner;         // corner (1 = center)
+};
+
+// Pose drag state
+struct PoseDragState {
+  SelectedTargetInfo target;
   ImVec2 initialOffset;
-  double initialAngle = 0;
+  units::radian_t initialAngle = 0_rad;
 };
 
-// Per-frame object data (not persistent)
-class ObjectFrameData {
+// Popup edit state
+class PopupState {
  public:
-  explicit ObjectFrameData(FieldObjectModel& model, const FieldFrameData& ffd,
-                           float width, float length);
-  void SetPosition(double x, double y);
-  // set and get rotation in radians
-  void SetRotation(double rot);
-  double GetRotation() const {
-    return units::convert<units::degrees, units::radians>(m_rot);
-  }
+  void Open(SelectedTargetInfo* target, const frc::Translation2d& pos);
+  void Close();
+
+  SelectedTargetInfo* GetTarget() { return &m_target; }
+  FieldObjectModel* GetInsertModel() { return m_insertModel; }
+  wpi::ArrayRef<frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+
+  void Display(Field2DModel* model, const FieldFrameData& ffd);
+
+ private:
+  void DisplayTarget(Field2DModel* model, const FieldFrameData& ffd);
+  void DisplayInsert(Field2DModel* model);
+
+  SelectedTargetInfo m_target;
+
+  // for insert
+  FieldObjectModel* m_insertModel;
+  std::vector<frc::Pose2d> m_insertPoses;
+  std::string m_insertName;
+  int m_insertIndex;
+};
+
+struct DisplayOptions {
+  explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
+
+  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
+
+  static constexpr Style kDefaultStyle = kBoxImage;
+  static constexpr float kDefaultWeight = 4.0f;
+  static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
+  static constexpr auto kDefaultWidth = 0.6858_m;
+  static constexpr auto kDefaultLength = 0.8204_m;
+  static constexpr bool kDefaultArrows = true;
+  static constexpr int kDefaultArrowSize = 50;
+  static constexpr float kDefaultArrowWeight = 4.0f;
+  static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
+  static constexpr bool kDefaultSelectable = true;
+
+  Style style = kDefaultStyle;
+  float weight = kDefaultWeight;
+  int color = kDefaultColor;
+
+  units::meter_t width = kDefaultWidth;
+  units::meter_t length = kDefaultLength;
+
+  bool arrows = kDefaultArrows;
+  int arrowSize = kDefaultArrowSize;
+  float arrowWeight = kDefaultArrowWeight;
+  int arrowColor = kDefaultArrowColor;
+
+  bool selectable = kDefaultSelectable;
+
+  const gui::Texture& texture;
+};
+
+// Per-frame pose data (not persistent)
+class PoseFrameData {
+ public:
+  explicit PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
+                         size_t index, const FieldFrameData& ffd,
+                         const DisplayOptions& displayOptions);
+  void SetPosition(const frc::Translation2d& pos);
+  void SetRotation(units::radian_t rot);
+  const frc::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
+  const frc::Pose2d& GetPose() const { return m_pose; }
+  float GetHitRadius() const { return m_hitRadius; }
   void UpdateFrameData();
-  int IsHovered(const ImVec2& cursor) const;
-  bool HandleDrag(const ImVec2& cursor, int hitCorner, ObjectDragState* drag);
-  void Draw(ImDrawList* drawList, const gui::Texture& texture,
-            int hitCorner) const;
+  std::pair<int, float> IsHovered(const ImVec2& cursor) const;
+  SelectedTargetInfo GetDragTarget(int corner, float dist) const;
+  void HandleDrag(const ImVec2& cursor);
+  void Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
+            std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
 
   // in window coordinates
   ImVec2 m_center;
-  ImVec2 m_corners[4];
+  ImVec2 m_corners[6];  // 5 and 6 are used for track width
   ImVec2 m_arrow[3];
 
  private:
   FieldObjectModel& m_model;
+  size_t m_index;
   const FieldFrameData& m_ffd;
+  const DisplayOptions& m_displayOptions;
 
   // scaled width/2 and length/2, in screen units
   float m_width2;
@@ -81,29 +172,40 @@ class ObjectFrameData {
 
   float m_hitRadius;
 
-  double m_x = 0;
-  double m_y = 0;
-  double m_rot = 0;
+  frc::Pose2d m_pose;
 };
 
-class ObjectGroupInfo {
+class ObjectInfo {
  public:
-  static constexpr float kDefaultWidth = 0.6858f;
-  static constexpr float kDefaultLength = 0.8204f;
+  ObjectInfo();
 
-  ObjectGroupInfo();
+  DisplayOptions GetDisplayOptions() const;
+  void DisplaySettings();
+  void DrawLine(ImDrawList* drawList, wpi::ArrayRef<ImVec2> points) const;
 
-  std::unique_ptr<pfd::open_file> m_fileOpener;
-  float* m_pWidth;
-  float* m_pLength;
-  ObjectDragState m_dragState;
-
-  void Reset();
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
 
  private:
+  void Reset();
   bool LoadImageImpl(const char* fn);
+
+  std::unique_ptr<pfd::open_file> m_fileOpener;
+
+  // in meters
+  float* m_pWidth;
+  float* m_pLength;
+
+  int* m_pStyle;  // DisplayOptions::Style
+  float* m_pWeight;
+  int* m_pColor;
+
+  bool* m_pArrows;
+  int* m_pArrowSize;
+  float* m_pArrowWeight;
+  int* m_pArrowColor;
+
+  bool* m_pSelectable;
 
   std::string* m_pFilename;
   gui::Texture m_texture;
@@ -111,28 +213,34 @@ class ObjectGroupInfo {
 
 class FieldInfo {
  public:
-  static constexpr float kDefaultWidth = 15.98f;
-  static constexpr float kDefaultHeight = 8.21f;
+  static constexpr auto kDefaultWidth = 15.98_m;
+  static constexpr auto kDefaultHeight = 8.21_m;
 
   FieldInfo();
 
-  std::unique_ptr<pfd::open_file> m_fileOpener;
-  float* m_pWidth;
-  float* m_pHeight;
+  void DisplaySettings();
 
-  void Reset();
   void LoadImage();
-  void LoadJson(const wpi::Twine& jsonfile);
   FieldFrameData GetFrameData(ImVec2 min, ImVec2 max) const;
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
-  wpi::StringMap<std::unique_ptr<ObjectGroupInfo>> m_objectGroups;
+  wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
 
  private:
+  void Reset();
   bool LoadImageImpl(const char* fn);
+  void LoadJson(const wpi::Twine& jsonfile);
+
+  std::unique_ptr<pfd::open_file> m_fileOpener;
 
   std::string* m_pFilename;
   gui::Texture m_texture;
+
+  // in meters
+  float* m_pWidth;
+  float* m_pHeight;
+
+  // in image pixels
   int m_imageWidth;
   int m_imageHeight;
   int* m_pTop;
@@ -143,6 +251,86 @@ class FieldInfo {
 
 }  // namespace
 
+static PoseDragState gDragState;
+static PopupState gPopupState;
+static DisplayUnits gDisplayUnits = kDisplayMeters;
+
+static double ConvertDisplayLength(units::meter_t v) {
+  switch (gDisplayUnits) {
+    case kDisplayFeet:
+      return v.convert<units::feet>().to<double>();
+    case kDisplayInches:
+      return v.convert<units::inches>().to<double>();
+    case kDisplayMeters:
+    default:
+      return v.to<double>();
+  }
+}
+
+static double ConvertDisplayAngle(units::degree_t v) {
+  return v.to<double>();
+}
+
+static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
+                        double step_fast = 0.0, const char* format = "%.6f",
+                        ImGuiInputTextFlags flags = 0) {
+  double dv = ConvertDisplayLength(*v);
+  if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
+    switch (gDisplayUnits) {
+      case kDisplayFeet:
+        *v = units::foot_t{dv};
+        break;
+      case kDisplayInches:
+        *v = units::inch_t{dv};
+        break;
+      case kDisplayMeters:
+      default:
+        *v = units::meter_t{dv};
+        break;
+    }
+    return true;
+  }
+  return false;
+}
+
+static bool InputFloatLength(const char* label, float* v, double step = 0.0,
+                             double step_fast = 0.0,
+                             const char* format = "%.3f",
+                             ImGuiInputTextFlags flags = 0) {
+  units::meter_t uv{*v};
+  if (InputLength(label, &uv, step, step_fast, format, flags)) {
+    *v = uv.to<float>();
+    return true;
+  }
+  return false;
+}
+
+static bool InputAngle(const char* label, units::degree_t* v, double step = 0.0,
+                       double step_fast = 0.0, const char* format = "%.6f",
+                       ImGuiInputTextFlags flags = 0) {
+  double dv = ConvertDisplayAngle(*v);
+  if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
+    *v = units::degree_t{dv};
+    return true;
+  }
+  return false;
+}
+
+static bool InputPose(frc::Pose2d* pose) {
+  auto x = pose->X();
+  auto y = pose->Y();
+  auto rot = pose->Rotation().Degrees();
+
+  bool changed;
+  changed = InputLength("x", &x);
+  changed = InputLength("y", &y) || changed;
+  changed = InputAngle("rot", &rot) || changed;
+  if (changed) {
+    *pose = frc::Pose2d{x, y, rot};
+  }
+  return changed;
+}
+
 FieldInfo::FieldInfo() {
   auto& storage = GetStorage();
   m_pFilename = storage.GetStringRef("image");
@@ -150,8 +338,28 @@ FieldInfo::FieldInfo() {
   m_pLeft = storage.GetIntRef("left", 0);
   m_pBottom = storage.GetIntRef("bottom", -1);
   m_pRight = storage.GetIntRef("right", -1);
-  m_pWidth = storage.GetFloatRef("width", kDefaultWidth);
-  m_pHeight = storage.GetFloatRef("height", kDefaultHeight);
+  m_pWidth = storage.GetFloatRef("width", kDefaultWidth.to<float>());
+  m_pHeight = storage.GetFloatRef("height", kDefaultHeight.to<float>());
+}
+
+void FieldInfo::DisplaySettings() {
+  if (ImGui::Button("Choose image...")) {
+    m_fileOpener = std::make_unique<pfd::open_file>(
+        "Choose field image", "",
+        std::vector<std::string>{"Image File",
+                                 "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
+                                 "*.hdr *.pic *.ppm *.pgm",
+                                 "PathWeaver JSON File", "*.json"});
+  }
+  if (ImGui::Button("Reset image")) {
+    Reset();
+  }
+  InputFloatLength("Field Width", m_pWidth);
+  InputFloatLength("Field Height", m_pHeight);
+  // ImGui::InputInt("Field Top", m_pTop);
+  // ImGui::InputInt("Field Left", m_pLeft);
+  // ImGui::InputInt("Field Right", m_pRight);
+  // ImGui::InputInt("Field Bottom", m_pBottom);
 }
 
 void FieldInfo::Reset() {
@@ -330,19 +538,135 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
   drawList->AddRect(ffd.min, ffd.max, IM_COL32(255, 255, 0, 255));
 }
 
-ObjectGroupInfo::ObjectGroupInfo() {
+ObjectInfo::ObjectInfo() {
   auto& storage = GetStorage();
   m_pFilename = storage.GetStringRef("image");
-  m_pWidth = storage.GetFloatRef("width", kDefaultWidth);
-  m_pLength = storage.GetFloatRef("length", kDefaultLength);
+  m_pWidth =
+      storage.GetFloatRef("width", DisplayOptions::kDefaultWidth.to<float>());
+  m_pLength =
+      storage.GetFloatRef("length", DisplayOptions::kDefaultLength.to<float>());
+  m_pStyle = storage.GetIntRef("style", DisplayOptions::kDefaultStyle);
+  m_pWeight = storage.GetFloatRef("weight", DisplayOptions::kDefaultWeight);
+  m_pColor = storage.GetIntRef("color", DisplayOptions::kDefaultColor);
+  m_pArrows = storage.GetBoolRef("arrows", DisplayOptions::kDefaultArrows);
+  m_pArrowSize =
+      storage.GetIntRef("arrowSize", DisplayOptions::kDefaultArrowSize);
+  m_pArrowWeight =
+      storage.GetFloatRef("arrowWeight", DisplayOptions::kDefaultArrowWeight);
+  m_pArrowColor =
+      storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
+  m_pSelectable =
+      storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
 }
 
-void ObjectGroupInfo::Reset() {
+DisplayOptions ObjectInfo::GetDisplayOptions() const {
+  DisplayOptions rv{m_texture};
+  rv.style = static_cast<DisplayOptions::Style>(*m_pStyle);
+  rv.weight = *m_pWeight;
+  rv.color = *m_pColor;
+  rv.width = units::meter_t{*m_pWidth};
+  rv.length = units::meter_t{*m_pLength};
+  rv.arrows = *m_pArrows;
+  rv.arrowSize = *m_pArrowSize;
+  rv.arrowWeight = *m_pArrowWeight;
+  rv.arrowColor = *m_pArrowColor;
+  rv.selectable = *m_pSelectable;
+  return rv;
+}
+
+void ObjectInfo::DisplaySettings() {
+  static const char* styleChoices[] = {"Box/Image", "Line", "Line (Closed)",
+                                       "Track"};
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
+  ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
+  switch (*m_pStyle) {
+    case DisplayOptions::kBoxImage:
+      if (ImGui::Button("Choose image...")) {
+        m_fileOpener = std::make_unique<pfd::open_file>(
+            "Choose object image", "",
+            std::vector<std::string>{
+                "Image File",
+                "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
+                "*.hdr *.pic *.ppm *.pgm"});
+      }
+      if (ImGui::Button("Reset image")) {
+        Reset();
+      }
+      InputFloatLength("Width", m_pWidth);
+      InputFloatLength("Length", m_pLength);
+      break;
+    case DisplayOptions::kTrack:
+      InputFloatLength("Width", m_pWidth);
+      break;
+    default:
+      break;
+  }
+
+  ImGui::InputFloat("Line Weight", m_pWeight);
+  ImColor col(*m_pColor);
+  if (ImGui::ColorEdit3("Line Color", &col.Value.x,
+                        ImGuiColorEditFlags_NoInputs)) {
+    *m_pColor = col;
+  }
+  ImGui::Checkbox("Arrows", m_pArrows);
+  if (*m_pArrows) {
+    ImGui::SliderInt("Arrow Size", m_pArrowSize, 0, 100, "%d%%",
+                     ImGuiSliderFlags_AlwaysClamp);
+    ImGui::InputFloat("Arrow Weight", m_pArrowWeight);
+    ImColor col(*m_pArrowColor);
+    if (ImGui::ColorEdit3("Arrow Color", &col.Value.x,
+                          ImGuiColorEditFlags_NoInputs)) {
+      *m_pArrowColor = col;
+    }
+  }
+
+  ImGui::Checkbox("Selectable", m_pSelectable);
+}
+
+void ObjectInfo::DrawLine(ImDrawList* drawList,
+                          wpi::ArrayRef<ImVec2> points) const {
+  if (points.empty()) {
+    return;
+  }
+
+  if (points.size() == 1) {
+    drawList->AddCircleFilled(points.front(), *m_pWeight, *m_pWeight);
+    return;
+  }
+
+  // PolyLine doesn't handle acute angles well; workaround from
+  // https://github.com/ocornut/imgui/issues/3366
+  size_t i = 0;
+  while (i + 1 < points.size()) {
+    int nlin = 2;
+    while (i + nlin < points.size()) {
+      auto [x0, y0] = points[i + nlin - 2];
+      auto [x1, y1] = points[i + nlin - 1];
+      auto [x2, y2] = points[i + nlin];
+      auto s0x = x1 - x0, s0y = y1 - y0;
+      auto s1x = x2 - x1, s1y = y2 - y1;
+      auto dotprod = s1x * s0x + s1y * s0y;
+      if (dotprod < 0) {
+        break;
+      }
+      ++nlin;
+    }
+
+    drawList->AddPolyline(&points[i], nlin, *m_pColor, false, *m_pWeight);
+    i += nlin - 1;
+  }
+
+  if (points.size() > 2 && *m_pStyle == DisplayOptions::kLineClosed) {
+    drawList->AddLine(points.back(), points.front(), *m_pColor, *m_pWeight);
+  }
+}
+
+void ObjectInfo::Reset() {
   m_texture = gui::Texture{};
   m_pFilename->clear();
 }
 
-void ObjectGroupInfo::LoadImage() {
+void ObjectInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
@@ -357,7 +681,7 @@ void ObjectGroupInfo::LoadImage() {
   }
 }
 
-bool ObjectGroupInfo::LoadImageImpl(const char* fn) {
+bool ObjectInfo::LoadImageImpl(const char* fn) {
   wpi::outs() << "GUI: loading object image '" << fn << "'\n";
   auto texture = gui::Texture::CreateFromFile(fn);
   if (!texture) {
@@ -369,144 +693,164 @@ bool ObjectGroupInfo::LoadImageImpl(const char* fn) {
   return true;
 }
 
-ObjectFrameData::ObjectFrameData(FieldObjectModel& model,
-                                 const FieldFrameData& ffd, float width,
-                                 float length)
+PoseFrameData::PoseFrameData(const frc::Pose2d& pose, FieldObjectModel& model,
+                             size_t index, const FieldFrameData& ffd,
+                             const DisplayOptions& displayOptions)
     : m_model{model},
+      m_index{index},
       m_ffd{ffd},
-      m_width2(ffd.scale * width / 2),
-      m_length2(ffd.scale * length / 2),
-      m_hitRadius((std::min)(m_width2, m_length2) / 2) {
-  if (auto xData = model.GetXData()) {
-    m_x = xData->GetValue();
-  }
-  if (auto yData = model.GetYData()) {
-    m_y = yData->GetValue();
-  }
-  if (auto rotationData = model.GetRotationData()) {
-    m_rot = rotationData->GetValue();
-  }
+      m_displayOptions{displayOptions},
+      m_width2(ffd.scale * displayOptions.width / 2),
+      m_length2(ffd.scale * displayOptions.length / 2),
+      m_hitRadius((std::min)(m_width2, m_length2) / 2),
+      m_pose{pose} {
   UpdateFrameData();
 }
 
-void ObjectFrameData::SetPosition(double x, double y) {
-  m_x = x;
-  m_y = y;
-  m_model.SetPosition(x, y);
+void PoseFrameData::SetPosition(const frc::Translation2d& pos) {
+  m_pose = frc::Pose2d{pos, m_pose.Rotation()};
+  m_model.SetPose(m_index, m_pose);
 }
 
-void ObjectFrameData::SetRotation(double rot) {
-  double rotDegrees = units::convert<units::radians, units::degrees>(rot);
-  // force to -180 to +180 range
-  rotDegrees = rotDegrees + std::ceil((-rotDegrees - 180) / 360) * 360;
-  m_rot = rotDegrees;
-  m_model.SetRotation(rotDegrees);
+void PoseFrameData::SetRotation(units::radian_t rot) {
+  m_pose = frc::Pose2d{m_pose.Translation(), rot};
+  m_model.SetPose(m_index, m_pose);
 }
 
-void ObjectFrameData::UpdateFrameData() {
+void PoseFrameData::UpdateFrameData() {
   // (0,0) origin is bottom left
-  ImVec2 center(m_ffd.min.x + m_ffd.scale * m_x,
-                m_ffd.max.y - m_ffd.scale * m_y);
+  ImVec2 center = m_ffd.GetScreenFromPos(m_pose.Translation());
 
   // build rotated points around center
   float length2 = m_length2;
   float width2 = m_width2;
-  double rot = GetRotation();
-  float cos_a = std::cos(-rot);
-  float sin_a = std::sin(-rot);
+  auto& rot = GetRotation();
+  float cos_a = rot.Cos();
+  float sin_a = -rot.Sin();
 
   m_corners[0] = center + ImRotate(ImVec2(-length2, -width2), cos_a, sin_a);
   m_corners[1] = center + ImRotate(ImVec2(length2, -width2), cos_a, sin_a);
   m_corners[2] = center + ImRotate(ImVec2(length2, width2), cos_a, sin_a);
   m_corners[3] = center + ImRotate(ImVec2(-length2, width2), cos_a, sin_a);
+  m_corners[4] = center + ImRotate(ImVec2(0, -width2), cos_a, sin_a);
+  m_corners[5] = center + ImRotate(ImVec2(0, width2), cos_a, sin_a);
+
+  float arrowScale = m_displayOptions.arrowSize / 100.0f;
   m_arrow[0] =
-      center + ImRotate(ImVec2(-length2 / 2, -width2 / 2), cos_a, sin_a);
-  m_arrow[1] = center + ImRotate(ImVec2(length2 / 2, 0), cos_a, sin_a);
+      center + ImRotate(ImVec2(-length2 * arrowScale, -width2 * arrowScale),
+                        cos_a, sin_a);
+  m_arrow[1] = center + ImRotate(ImVec2(length2 * arrowScale, 0), cos_a, sin_a);
   m_arrow[2] =
-      center + ImRotate(ImVec2(-length2 / 2, width2 / 2), cos_a, sin_a);
+      center + ImRotate(ImVec2(-length2 * arrowScale, width2 * arrowScale),
+                        cos_a, sin_a);
 
   m_center = center;
 }
 
-int ObjectFrameData::IsHovered(const ImVec2& cursor) const {
-  // only allow initiation of dragging when invisible button is hovered;
-  // this prevents the window resize handles from simultaneously activating
-  // the drag functionality
-  if (!ImGui::IsItemHovered()) {
-    return 0;
-  }
-
+std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
   float hitRadiusSquared = m_hitRadius * m_hitRadius;
+  float dist;
+
   // it's within the hit radius of the center?
-  if (gui::GetDistSquared(cursor, m_center) < hitRadiusSquared) {
-    return 1;
-  } else if (gui::GetDistSquared(cursor, m_corners[0]) < hitRadiusSquared) {
-    return 2;
-  } else if (gui::GetDistSquared(cursor, m_corners[1]) < hitRadiusSquared) {
-    return 3;
-  } else if (gui::GetDistSquared(cursor, m_corners[2]) < hitRadiusSquared) {
-    return 4;
-  } else if (gui::GetDistSquared(cursor, m_corners[3]) < hitRadiusSquared) {
-    return 5;
+  dist = gui::GetDistSquared(cursor, m_center);
+  if (dist < hitRadiusSquared) {
+    return {1, dist};
+  }
+
+  if (m_displayOptions.style == DisplayOptions::kBoxImage) {
+    dist = gui::GetDistSquared(cursor, m_corners[0]);
+    if (dist < hitRadiusSquared) {
+      return {2, dist};
+    }
+
+    dist = gui::GetDistSquared(cursor, m_corners[1]);
+    if (dist < hitRadiusSquared) {
+      return {3, dist};
+    }
+
+    dist = gui::GetDistSquared(cursor, m_corners[2]);
+    if (dist < hitRadiusSquared) {
+      return {4, dist};
+    }
+
+    dist = gui::GetDistSquared(cursor, m_corners[3]);
+    if (dist < hitRadiusSquared) {
+      return {5, dist};
+    }
+  } else if (m_displayOptions.style == DisplayOptions::kTrack) {
+    dist = gui::GetDistSquared(cursor, m_corners[4]);
+    if (dist < hitRadiusSquared) {
+      return {6, dist};
+    }
+
+    dist = gui::GetDistSquared(cursor, m_corners[5]);
+    if (dist < hitRadiusSquared) {
+      return {7, dist};
+    }
+  }
+
+  return {0, 0.0};
+}
+
+SelectedTargetInfo PoseFrameData::GetDragTarget(int corner, float dist) const {
+  SelectedTargetInfo info;
+  info.objModel = &m_model;
+  info.rot = GetRotation().Radians();
+  info.poseCenter = m_center;
+  if (corner == 1) {
+    info.center = m_center;
   } else {
-    return 0;
+    info.center = m_corners[corner - 2];
+  }
+  info.radius = m_hitRadius;
+  info.dist = dist;
+  info.corner = corner;
+  return info;
+}
+
+void PoseFrameData::HandleDrag(const ImVec2& cursor) {
+  if (gDragState.target.corner == 1) {
+    SetPosition(m_ffd.GetPosFromScreen(cursor - gDragState.initialOffset));
+    UpdateFrameData();
+    gDragState.target.center = m_center;
+    gDragState.target.poseCenter = m_center;
+  } else {
+    ImVec2 off = cursor - m_center;
+    SetRotation(gDragState.initialAngle -
+                units::radian_t{std::atan2(off.y, off.x)});
+    gDragState.target.center = m_corners[gDragState.target.corner - 2];
+    gDragState.target.rot = GetRotation().Radians();
   }
 }
 
-bool ObjectFrameData::HandleDrag(const ImVec2& cursor, int hitCorner,
-                                 ObjectDragState* drag) {
-  bool rv = false;
-  if (hitCorner > 0 && ImGui::IsMouseClicked(0)) {
-    if (hitCorner == 1) {
-      drag->corner = hitCorner;
-      drag->initialOffset = cursor - m_center;
-    } else {
-      drag->corner = hitCorner;
-      ImVec2 off = cursor - m_center;
-      drag->initialAngle = std::atan2(off.y, off.x) + GetRotation();
-    }
-    rv = true;
+void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
+                         std::vector<ImVec2>* left,
+                         std::vector<ImVec2>* right) const {
+  switch (m_displayOptions.style) {
+    case DisplayOptions::kBoxImage:
+      if (m_displayOptions.texture) {
+        drawList->AddImageQuad(m_displayOptions.texture, m_corners[0],
+                               m_corners[1], m_corners[2], m_corners[3]);
+        return;
+      }
+      drawList->AddQuad(m_corners[0], m_corners[1], m_corners[2], m_corners[3],
+                        m_displayOptions.color, m_displayOptions.weight);
+      break;
+    case DisplayOptions::kLine:
+    case DisplayOptions::kLineClosed:
+      center->emplace_back(m_center);
+      break;
+    case DisplayOptions::kTrack:
+      center->emplace_back(m_center);
+      left->emplace_back(m_corners[4]);
+      right->emplace_back(m_corners[5]);
+      break;
   }
 
-  if (drag->corner > 0 && ImGui::IsMouseDown(0)) {
-    if (drag->corner == 1) {
-      ImVec2 newPos = cursor - drag->initialOffset;
-      SetPosition(
-          (std::clamp(newPos.x, m_ffd.min.x, m_ffd.max.x) - m_ffd.min.x) /
-              m_ffd.scale,
-          (m_ffd.max.y - std::clamp(newPos.y, m_ffd.min.y, m_ffd.max.y)) /
-              m_ffd.scale);
-      UpdateFrameData();
-    } else {
-      ImVec2 off = cursor - m_center;
-      SetRotation(drag->initialAngle - std::atan2(off.y, off.x));
-    }
-  } else {
-    drag->corner = 0;
-  }
-
-  return rv;
-}
-
-void ObjectFrameData::Draw(ImDrawList* drawList, const gui::Texture& texture,
-                           int hitCorner) const {
-  if (texture) {
-    drawList->AddImageQuad(texture, m_corners[0], m_corners[1], m_corners[2],
-                           m_corners[3]);
-  } else {
-    drawList->AddQuad(m_corners[0], m_corners[1], m_corners[2], m_corners[3],
-                      IM_COL32(255, 0, 0, 255), 4.0);
+  if (m_displayOptions.arrows) {
     drawList->AddTriangle(m_arrow[0], m_arrow[1], m_arrow[2],
-                          IM_COL32(0, 255, 0, 255), 4.0);
-  }
-
-  if (hitCorner > 0) {
-    if (hitCorner == 1) {
-      drawList->AddCircle(m_center, m_hitRadius, IM_COL32(0, 255, 0, 255));
-    } else {
-      drawList->AddCircle(m_corners[hitCorner - 2], m_hitRadius,
-                          IM_COL32(0, 255, 0, 255));
-    }
+                          m_displayOptions.arrowColor,
+                          m_displayOptions.arrowWeight);
   }
 }
 
@@ -518,59 +862,341 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     field = storage.GetData<FieldInfo>();
   }
 
+  static const char* unitNames[] = {"meters", "feet", "inches"};
+  int* pDisplayUnits = GetStorage().GetIntRef("units", kDisplayMeters);
+  ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
+  ImGui::Combo("Units", pDisplayUnits, unitNames, IM_ARRAYSIZE(unitNames));
+  gDisplayUnits = static_cast<DisplayUnits>(*pDisplayUnits);
+
   ImGui::PushItemWidth(ImGui::GetFontSize() * 4);
   if (ImGui::CollapsingHeader("Field")) {
     ImGui::PushID("Field");
-    if (ImGui::Button("Choose image...")) {
-      field->m_fileOpener = std::make_unique<pfd::open_file>(
-          "Choose field image", "",
-          std::vector<std::string>{"Image File",
-                                   "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                                   "*.hdr *.pic *.ppm *.pgm",
-                                   "PathWeaver JSON File", "*.json"});
-    }
-    if (ImGui::Button("Reset image")) {
-      field->Reset();
-    }
-    ImGui::InputFloat("Field Width", field->m_pWidth);
-    ImGui::InputFloat("Field Height", field->m_pHeight);
-    // ImGui::InputInt("Field Top", field->m_pTop);
-    // ImGui::InputInt("Field Left", field->m_pLeft);
-    // ImGui::InputInt("Field Right", field->m_pRight);
-    // ImGui::InputInt("Field Bottom", field->m_pBottom);
+    field->DisplaySettings();
     ImGui::PopID();
   }
 
-  model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
-    if (!groupModel.Exists()) {
+  model->ForEachFieldObject([&](auto& objModel, auto name) {
+    if (!objModel.Exists()) {
       return;
     }
     PushID(name);
-    auto& objGroupRef = field->m_objectGroups[name];
-    if (!objGroupRef) {
-      objGroupRef = std::make_unique<ObjectGroupInfo>();
+    auto& objRef = field->m_objects[name];
+    if (!objRef) {
+      objRef = std::make_unique<ObjectInfo>();
     }
-    auto objGroup = objGroupRef.get();
+    auto obj = objRef.get();
 
     wpi::SmallString<64> nameBuf = name;
     if (ImGui::CollapsingHeader(nameBuf.c_str())) {
-      if (ImGui::Button("Choose image...")) {
-        objGroup->m_fileOpener = std::make_unique<pfd::open_file>(
-            "Choose object image", "",
-            std::vector<std::string>{
-                "Image File",
-                "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                "*.hdr *.pic *.ppm *.pgm"});
-      }
-      if (ImGui::Button("Reset image")) {
-        objGroup->Reset();
-      }
-      ImGui::InputFloat("Width", objGroup->m_pWidth);
-      ImGui::InputFloat("Length", objGroup->m_pLength);
+      obj->DisplaySettings();
     }
     PopID();
   });
   ImGui::PopItemWidth();
+}
+
+namespace {
+class FieldDisplay {
+ public:
+  void Display(FieldInfo* field, Field2DModel* model,
+               const ImVec2& contentSize);
+
+ private:
+  void DisplayObject(FieldObjectModel& model, wpi::StringRef name);
+
+  FieldInfo* m_field;
+  ImVec2 m_mousePos;
+  ImDrawList* m_drawList;
+
+  // only allow initiation of dragging when invisible button is hovered;
+  // this prevents the window resize handles from simultaneously activating
+  // the drag functionality
+  bool m_isHovered;
+
+  FieldFrameData m_ffd;
+
+  // drag targets
+  std::vector<SelectedTargetInfo> m_targets;
+
+  // splitter so lines are put behind arrows
+  ImDrawListSplitter m_drawSplit;
+
+  // lines; static so buffer gets reused
+  std::vector<ImVec2> m_centerLine, m_leftLine, m_rightLine;
+};
+}  // namespace
+
+void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
+                           const ImVec2& contentSize) {
+  // screen coords
+  ImVec2 cursorPos = ImGui::GetWindowPos() + ImGui::GetCursorPos();
+
+  // for dragging to work, there needs to be a button (otherwise the window is
+  // dragged)
+  ImGui::InvisibleButton("field", contentSize);
+
+  m_field = field;
+  m_mousePos = ImGui::GetIO().MousePos;
+  m_drawList = ImGui::GetWindowDrawList();
+  m_isHovered = ImGui::IsItemHovered();
+
+  // field
+  field->LoadImage();
+  m_ffd = field->GetFrameData(cursorPos, cursorPos + contentSize);
+  field->Draw(m_drawList, m_ffd);
+
+  // stop dragging if mouse button not down
+  bool isDown = ImGui::IsMouseDown(0);
+  if (!isDown) {
+    gDragState.target.objModel = nullptr;
+  }
+
+  // clear popup target if popup closed
+  bool isPopupOpen = ImGui::IsPopupOpen("edit");
+  if (!isPopupOpen) {
+    gPopupState.Close();
+  }
+
+  // field objects
+  m_targets.resize(0);
+  model->ForEachFieldObject([this](auto& objModel, auto name) {
+    if (objModel.Exists()) {
+      DisplayObject(objModel, name);
+    }
+  });
+
+  SelectedTargetInfo* target = nullptr;
+
+  if (gDragState.target.objModel) {
+    target = &gDragState.target;
+  } else if (gPopupState.GetTarget()->objModel) {
+    target = gPopupState.GetTarget();
+  } else if (!m_targets.empty()) {
+    // Find the "best" drag target of the available options.  Prefer
+    // center to non-center, and then pick the closest hit.
+    std::sort(m_targets.begin(), m_targets.end(),
+              [](const auto& a, const auto& b) {
+                return a.corner == 0 || a.dist < b.dist;
+              });
+    target = &m_targets.front();
+  }
+
+  if (target) {
+    // draw the target circle; also draw a smaller circle on the pose center
+    m_drawList->AddCircle(target->center, target->radius,
+                          IM_COL32(0, 255, 0, 255));
+    if (target->corner != 1) {
+      m_drawList->AddCircle(target->poseCenter, target->radius / 2.0,
+                            IM_COL32(0, 255, 0, 255));
+    }
+  }
+
+  // right-click popup for editing
+  if (m_isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+    gPopupState.Open(target, m_ffd.GetPosFromScreen(m_mousePos));
+    ImGui::OpenPopup("edit");
+  }
+  if (ImGui::BeginPopup("edit")) {
+    gPopupState.Display(model, m_ffd);
+    ImGui::EndPopup();
+  } else if (target) {
+    if (m_isHovered && ImGui::IsMouseClicked(0)) {
+      // initialize drag state
+      gDragState.target = *target;
+      gDragState.initialOffset = m_mousePos - target->poseCenter;
+      if (target->corner != 1) {
+        gDragState.initialAngle =
+            units::radian_t{std::atan2(gDragState.initialOffset.y,
+                                       gDragState.initialOffset.x)} +
+            target->rot;
+      }
+    }
+
+    // show tooltip and highlight
+    auto pos = m_ffd.GetPosFromScreen(target->poseCenter);
+    ImGui::SetTooltip(
+        "%s[%d]\nx: %0.3f y: %0.3f rot: %0.3f", target->name.c_str(),
+        static_cast<int>(target->index), ConvertDisplayLength(pos.X()),
+        ConvertDisplayLength(pos.Y()), ConvertDisplayAngle(target->rot));
+  }
+}
+
+void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
+  PushID(name);
+  auto& objRef = m_field->m_objects[name];
+  if (!objRef) {
+    objRef = std::make_unique<ObjectInfo>();
+  }
+  auto obj = objRef.get();
+  obj->LoadImage();
+
+  auto displayOptions = obj->GetDisplayOptions();
+
+  m_centerLine.resize(0);
+  m_leftLine.resize(0);
+  m_rightLine.resize(0);
+
+  m_drawSplit.Split(m_drawList, 2);
+  m_drawSplit.SetCurrentChannel(m_drawList, 1);
+  wpi::ArrayRef<frc::Pose2d> poses = gPopupState.GetInsertModel() == &model
+                                         ? gPopupState.GetInsertPoses()
+                                         : model.GetPoses();
+  size_t i = 0;
+  for (auto&& pose : poses) {
+    PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
+
+    // check for potential drag targets
+    if (displayOptions.selectable && m_isHovered &&
+        !gDragState.target.objModel) {
+      auto [corner, dist] = pfd.IsHovered(m_mousePos);
+      if (corner > 0) {
+        m_targets.emplace_back(pfd.GetDragTarget(corner, dist));
+        m_targets.back().name = name;
+        m_targets.back().index = i;
+      }
+    }
+
+    // handle active dragging of this object
+    if (gDragState.target.objModel == &model && gDragState.target.index == i) {
+      pfd.HandleDrag(m_mousePos);
+    }
+
+    // draw
+    pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+    ++i;
+  }
+
+  m_drawSplit.SetCurrentChannel(m_drawList, 0);
+  obj->DrawLine(m_drawList, m_centerLine);
+  obj->DrawLine(m_drawList, m_leftLine);
+  obj->DrawLine(m_drawList, m_rightLine);
+  m_drawSplit.Merge(m_drawList);
+
+  PopID();
+}
+
+void PopupState::Open(SelectedTargetInfo* target,
+                      const frc::Translation2d& pos) {
+  if (target) {
+    m_target = *target;
+  } else {
+    m_target.objModel = nullptr;
+    m_insertModel = nullptr;
+    m_insertPoses.resize(0);
+    m_insertPoses.emplace_back(pos, 0_deg);
+    m_insertName.clear();
+    m_insertIndex = 0;
+  }
+}
+
+void PopupState::Close() {
+  m_target.objModel = nullptr;
+  m_insertModel = nullptr;
+  m_insertPoses.resize(0);
+}
+
+void PopupState::Display(Field2DModel* model, const FieldFrameData& ffd) {
+  if (m_target.objModel) {
+    DisplayTarget(model, ffd);
+  } else {
+    DisplayInsert(model);
+  }
+}
+
+void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
+  ImGui::Text("%s[%d]", m_target.name.c_str(),
+              static_cast<int>(m_target.index));
+  frc::Pose2d pose{ffd.GetPosFromScreen(m_target.poseCenter), m_target.rot};
+  if (InputPose(&pose)) {
+    m_target.poseCenter = ffd.GetScreenFromPos(pose.Translation());
+    m_target.rot = pose.Rotation().Radians();
+    m_target.objModel->SetPose(m_target.index, pose);
+  }
+  if (ImGui::Button("Delete Pose")) {
+    std::vector<frc::Pose2d> poses = m_target.objModel->GetPoses();
+    if (m_target.index < poses.size()) {
+      poses.erase(poses.begin() + m_target.index);
+      m_target.objModel->SetPoses(poses);
+    }
+    ImGui::CloseCurrentPopup();
+  }
+  if (ImGui::Button("Delete Object (ALL Poses)")) {
+    model->RemoveFieldObject(m_target.name);
+    ImGui::CloseCurrentPopup();
+  }
+}
+
+void PopupState::DisplayInsert(Field2DModel* model) {
+  ImGui::TextUnformatted("Insert New Pose");
+
+  InputPose(&m_insertPoses[m_insertIndex]);
+
+  const char* insertName = m_insertModel ? m_insertName.c_str() : "<new>";
+  if (ImGui::BeginCombo("Object", insertName)) {
+    bool selected = !m_insertModel;
+    if (ImGui::Selectable("<new>", selected)) {
+      m_insertModel = nullptr;
+      auto pose = m_insertPoses[m_insertIndex];
+      m_insertPoses.resize(0);
+      m_insertPoses.emplace_back(std::move(pose));
+      m_insertName.clear();
+      m_insertIndex = 0;
+    }
+    if (selected) {
+      ImGui::SetItemDefaultFocus();
+    }
+    model->ForEachFieldObject([&](auto& objModel, auto name) {
+      bool selected = m_insertModel == &objModel;
+      if (ImGui::Selectable(name.data(), selected)) {
+        m_insertModel = &objModel;
+        auto pose = m_insertPoses[m_insertIndex];
+        m_insertPoses = objModel.GetPoses();
+        m_insertPoses.emplace_back(std::move(pose));
+        m_insertName = name;
+        m_insertIndex = m_insertPoses.size() - 1;
+      }
+      if (selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    });
+    ImGui::EndCombo();
+  }
+  if (m_insertModel) {
+    int oldIndex = m_insertIndex;
+    if (ImGui::InputInt("Pos", &m_insertIndex, 1, 5)) {
+      if (m_insertIndex < 0) {
+        m_insertIndex = 0;
+      }
+      size_t size = m_insertPoses.size();
+      if (static_cast<size_t>(m_insertIndex) >= size) {
+        m_insertIndex = size - 1;
+      }
+      if (m_insertIndex < oldIndex) {
+        auto begin = m_insertPoses.begin();
+        std::rotate(begin + m_insertIndex, begin + oldIndex,
+                    begin + oldIndex + 1);
+      } else if (m_insertIndex > oldIndex) {
+        auto rbegin = m_insertPoses.rbegin();
+        std::rotate(rbegin + (size - m_insertIndex), rbegin + (size - oldIndex),
+                    rbegin + (size - oldIndex - 1));
+      }
+    }
+  } else {
+    ImGui::InputText("Name", &m_insertName);
+  }
+
+  if (ImGui::Button("Apply")) {
+    if (m_insertModel) {
+      m_insertModel->SetPoses(m_insertPoses);
+    } else if (!m_insertName.empty()) {
+      model->AddFieldObject(m_insertName)->SetPoses(m_insertPoses);
+    }
+    ImGui::CloseCurrentPopup();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Cancel")) {
+    ImGui::CloseCurrentPopup();
+  }
 }
 
 void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
@@ -581,55 +1207,12 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
     field = storage.GetData<FieldInfo>();
   }
 
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  ImVec2 mousePos = ImGui::GetIO().MousePos;
-
-  // for dragging to work, there needs to be a button (otherwise the window is
-  // dragged)
   if (contentSize.x <= 0 || contentSize.y <= 0) {
     return;
   }
-  ImVec2 cursorPos = windowPos + ImGui::GetCursorPos();  // screen coords
-  ImGui::InvisibleButton("field", contentSize);
 
-  // field
-  field->LoadImage();
-  FieldFrameData ffd = field->GetFrameData(cursorPos, cursorPos + contentSize);
-  auto drawList = ImGui::GetWindowDrawList();
-  field->Draw(drawList, ffd);
-
-  model->ForEachFieldObjectGroup([&](auto& groupModel, auto name) {
-    if (!groupModel.Exists()) {
-      return;
-    }
-    PushID(name);
-    auto& objGroupRef = field->m_objectGroups[name];
-    if (!objGroupRef) {
-      objGroupRef = std::make_unique<ObjectGroupInfo>();
-    }
-    auto objGroup = objGroupRef.get();
-    objGroup->LoadImage();
-
-    int i = 0;
-    groupModel.ForEachFieldObject([&](auto& objModel) {
-      ++i;
-      ObjectFrameData ofd{objModel, ffd, *objGroup->m_pWidth,
-                          *objGroup->m_pLength};
-
-      int hitCorner = 0;
-      if (objGroup->m_dragState.object == 0 ||
-          objGroup->m_dragState.object == i) {
-        hitCorner = ofd.IsHovered(mousePos);
-        if (ofd.HandleDrag(mousePos, hitCorner, &objGroup->m_dragState)) {
-          objGroup->m_dragState.object = i;
-        }
-      }
-
-      // draw
-      ofd.Draw(drawList, objGroup->GetTexture(), hitCorner);
-    });
-    PopID();
-  });
+  static FieldDisplay display;
+  display.Display(field, model, contentSize);
 }
 
 void Field2DView::Display() {
