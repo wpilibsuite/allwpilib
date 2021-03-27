@@ -205,15 +205,8 @@ public class Compressor implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
     builder.addBooleanProperty(
-        "Enabled",
-        this::enabled,
-        value -> {
-          if (value) {
-            start();
-          } else {
-            stop();
-          }
-        });
+        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
+    builder.addBooleanProperty("Enabled", this::enabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }
