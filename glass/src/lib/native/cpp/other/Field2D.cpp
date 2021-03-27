@@ -959,13 +959,11 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
 
   // field objects
   m_targets.resize(0);
-  m_drawSplit.Split(m_drawList, 2);
   model->ForEachFieldObject([this](auto& objModel, auto name) {
     if (objModel.Exists()) {
       DisplayObject(objModel, name);
     }
   });
-  m_drawSplit.Merge(m_drawList);
 
   SelectedTargetInfo* target = nullptr;
 
@@ -1038,6 +1036,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
   m_leftLine.resize(0);
   m_rightLine.resize(0);
 
+  m_drawSplit.Split(m_drawList, 2);
   m_drawSplit.SetCurrentChannel(m_drawList, 1);
   wpi::ArrayRef<frc::Pose2d> poses = gPopupState.GetInsertModel() == &model
                                          ? gPopupState.GetInsertPoses()
@@ -1071,6 +1070,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
   obj->DrawLine(m_drawList, m_centerLine);
   obj->DrawLine(m_drawList, m_leftLine);
   obj->DrawLine(m_drawList, m_rightLine);
+  m_drawSplit.Merge(m_drawList);
 
   PopID();
 }
