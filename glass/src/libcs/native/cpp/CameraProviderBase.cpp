@@ -84,3 +84,34 @@ void CameraProviderBase::UpdateModels() {
     model->Update();
   }
 }
+
+CameraProviderBase::IniSaver::IniSaver(const wpi::Twine& typeName,
+                                       CameraProviderBase* provider)
+    : IniSaverBase{typeName}, m_provider{provider} {}
+
+void* CameraProviderBase::IniSaver::IniReadOpen(const char* name) {
+  // get or create window
+  auto win = m_provider->GetOrAddWindow(name, true);
+  if (!win) {
+    return nullptr;
+  }
+
+  // get or create view
+  auto view = static_cast<CameraView*>(win->GetView());
+  if (!view) {
+    win->SetView(std::make_unique<CameraView>(m_provider));
+    view = static_cast<CameraView*>(win->GetView());
+  }
+}
+
+void CameraProviderBase::IniSaver::IniReadLine(void* entry,
+                                               const char* lineStr) {
+  auto [name, value] = wpi::StringRef{lineStr}.split('=');
+  name = name.trim();
+  value = value.trim();
+  static_cast<SourceInfo*>(entry)->ReadIni(name, value);
+}
+
+void CameraProviderBase::IniSaver::IniWriteAll(ImGuiTextBuffer* out_buf) {
+  m_provider->IniWriteAll(out_buf);
+}

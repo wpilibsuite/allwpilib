@@ -104,6 +104,8 @@ class CameraView : public View {
   void Display() override;
   void Hidden() override;
 
+  CameraModel* GetModel() { return m_model; }
+
  private:
   CameraModel* m_model;
 };

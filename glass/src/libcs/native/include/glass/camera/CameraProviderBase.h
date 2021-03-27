@@ -12,6 +12,7 @@
 #include <wpi/Twine.h>
 
 #include "glass/WindowManager.h"
+#include "glass/support/IniSaverBase.h"
 
 namespace glass {
 
@@ -40,10 +41,15 @@ class CameraProviderBase : protected WindowManager {
     bool connected = false;
     CameraModel* camera = nullptr;
     Window* window = nullptr;
+
+    virtual void ReadIni(wpi::StringRef name, wpi::StringRef value);
+    virtual void WriteIni(ImGuiTextBuffer* out_buf);
   };
 
   virtual void Update() = 0;
   virtual void InitCamera(SourceInfo* info) = 0;
+  virtual SourceInfo* IniReadOpen(const char* name) = 0;
+  virtual void IniWriteAll(ImGuiTextBuffer* out_buf) = 0;
 
   void MenuItem(const char* label, SourceInfo* info);
   void Show(SourceInfo* info, Window* window);
@@ -55,6 +61,20 @@ class CameraProviderBase : protected WindowManager {
 
  private:
   void UpdateModels();
+
+  class IniSaver : public IniSaverBase {
+   public:
+    IniSaver(const wpi::Twine& typeName, CameraProviderBase* provider);
+
+    void* IniReadOpen(const char* name) override;
+    void IniReadLine(void* entry, const char* lineStr) override;
+    void IniWriteAll(ImGuiTextBuffer* out_buf) override;
+
+   private:
+    CameraProviderBase* m_provider;
+  };
+
+  IniSaver m_cameraSaver;
 };
 
 }  // namespace glass
