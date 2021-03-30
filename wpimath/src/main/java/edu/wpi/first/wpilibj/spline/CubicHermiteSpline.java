@@ -80,6 +80,26 @@ public class CubicHermiteSpline extends Spline {
    */
   private SimpleMatrix makeHermiteBasis() {
     if (hermiteBasis == null) {
+      // Given P(i), P'(i), P(i+1), P'(i+1), the control vectors, we want to find
+      // the coefficients of the spline P(t) = a3 * t^3 + a2 * t^2 + a1 * t + a0.
+      //
+      // P(i)    = P(0)  = a0
+      // P'(i)   = P'(0) = a1
+      // P(i+1)  = P(1)  = a3 + a2 + a1 + a0
+      // P'(i+1) = P'(1) = 3 * a3 + 2 * a2 + a1
+      //
+      // [ P(i)    ] = [ 0 0 0 1 ][ a3 ]
+      // [ P'(i)   ] = [ 0 0 1 0 ][ a2 ]
+      // [ P(i+1)  ] = [ 1 1 1 1 ][ a1 ]
+      // [ P'(i+1) ] = [ 3 2 1 0 ][ a0 ]
+      //
+      // To solve for the coefficients, we can invert the 4x4 matrix and move it
+      // to the other side of the equation.
+      //
+      // [ a3 ] = [  2  1 -2  1 ][ P(i)    ]
+      // [ a2 ] = [ -3 -2  3 -1 ][ P'(i)   ]
+      // [ a1 ] = [  0  1  0  0 ][ P(i+1)  ]
+      // [ a0 ] = [  1  0  0  0 ][ P'(i+1) ]
       hermiteBasis =
           new SimpleMatrix(
               4,
