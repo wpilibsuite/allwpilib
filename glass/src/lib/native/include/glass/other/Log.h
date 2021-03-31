@@ -20,6 +20,7 @@ class LogData {
 
   void Clear();
   void Append(const wpi::Twine& msg);
+  char* GetContent();
 
  private:
   size_t m_maxLines;

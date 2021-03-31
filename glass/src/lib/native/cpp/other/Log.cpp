@@ -32,6 +32,10 @@ void LogData::Append(const wpi::Twine& msg) {
   }
 }
 
+char* LogData::GetContent() {
+  return m_buf.data();
+}
+
 void glass::DisplayLog(LogData* data, bool autoScroll) {
   if (data->m_buf.empty()) {
     return;
@@ -66,7 +70,7 @@ void LogView::Display() {
       m_data->Clear();
     }
     if (ImGui::Selectable("Copy to Clipboard")) {
-      ImGui::SetClipboardText(m_data);
+      ImGui::SetClipboardText(m_data->GetContent());
     }
     ImGui::EndPopup();
   }
