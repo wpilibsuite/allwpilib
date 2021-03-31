@@ -29,9 +29,9 @@ class AnalogEncoder : public ErrorBase,
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn port.
    *
-   * @param port the analog input port to attach to
+   * @param port the analog input channel to attach to
    */
-  explicit AnalogEncoder(int port);
+  explicit AnalogEncoder(int channel);
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
