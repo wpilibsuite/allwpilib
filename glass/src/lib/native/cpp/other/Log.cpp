@@ -70,7 +70,7 @@ void LogView::Display() {
       m_data->Clear();
     }
     if (ImGui::Selectable("Copy to Clipboard")) {
-      auto buf = m_data->GetBuffer();
+      const auto& buf = m_data->GetBuffer();
       if (!buf.empty()) {
         ImGui::SetClipboardText(buf.data());
       }
