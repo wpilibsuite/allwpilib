@@ -12,6 +12,13 @@
 
 using namespace frc;
 
+AnalogEncoder::AnalogEncoder(int port)
+    : m_analogInput{port},
+      m_analogTrigger{m_analogInput.get()},
+      m_counter{} {
+  Init();
+}
+
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
     : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},

@@ -27,6 +27,13 @@ class AnalogEncoder : public ErrorBase,
                       public SendableHelper<AnalogEncoder> {
  public:
   /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn port.
+   *
+   * @param port the analog input port to attach to
+   */
+  explicit AnalogEncoder(int port);
+
+  /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
