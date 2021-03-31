@@ -20,7 +20,7 @@ class LogData {
 
   void Clear();
   void Append(const wpi::Twine& msg);
-  char* GetContent();
+  const std::vector<char>& GetBuffer();
 
  private:
   size_t m_maxLines;
