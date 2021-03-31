@@ -65,6 +65,9 @@ void LogView::Display() {
     if (ImGui::Selectable("Clear")) {
       m_data->Clear();
     }
+    if (ImGui::Selectable("Copy to Clipboard")) {
+      ImGui::SetClipboardText(m_data);
+    }
     ImGui::EndPopup();
   }
 
