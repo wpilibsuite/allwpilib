@@ -82,7 +82,7 @@ class FieldObject2d {
    *
    * @param trajectory The trajectory from which poses should be added.
    */
-  void SetTrajectory(const frc::Trajectory& trajectory);
+  void SetTrajectory(const Trajectory& trajectory);
 
   /**
    * Get multiple poses.

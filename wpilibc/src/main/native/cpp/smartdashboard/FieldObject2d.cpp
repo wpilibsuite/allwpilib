@@ -55,7 +55,7 @@ void FieldObject2d::SetPoses(std::initializer_list<Pose2d> poses) {
   SetPoses(wpi::makeArrayRef(poses.begin(), poses.end()));
 }
 
-void FieldObject2d::SetTrajectory(const frc::Trajectory& trajectory) {
+void FieldObject2d::SetTrajectory(const Trajectory& trajectory) {
   std::scoped_lock lock(m_mutex);
   m_poses.clear();
   m_poses.reserve(trajectory.States().size());
