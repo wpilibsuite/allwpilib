@@ -21,6 +21,7 @@
 namespace frc {
 
 class Field2d;
+class Trajectory;
 
 /**
  * Game field object on a Field2d.
@@ -75,6 +76,13 @@ class FieldObject2d {
    * @param poses array of 2D poses
    */
   void SetPoses(std::initializer_list<Pose2d> poses);
+
+  /**
+   * Sets poses from a trajectory.
+   *
+   * @param trajectory The trajectory from which poses should be added.
+   */
+  void SetTrajectory(const frc::Trajectory& trajectory);
 
   /**
    * Get multiple poses.
