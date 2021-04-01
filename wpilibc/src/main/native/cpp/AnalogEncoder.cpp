@@ -13,10 +13,7 @@
 using namespace frc;
 
 AnalogEncoder::AnalogEncoder(int channel)
-    : m_analogInput{std::make_shared<AnalogInput>(channel)},
-      m_analogTrigger{m_analogInput.get()},
-      m_counter{} {
-  Init();
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
