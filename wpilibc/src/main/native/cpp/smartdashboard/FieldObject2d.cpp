@@ -9,6 +9,8 @@
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
 
+#include "frc/trajectory/Trajectory.h"
+
 using namespace frc;
 
 FieldObject2d::FieldObject2d(FieldObject2d&& rhs) {
@@ -51,6 +53,16 @@ void FieldObject2d::SetPoses(wpi::ArrayRef<Pose2d> poses) {
 
 void FieldObject2d::SetPoses(std::initializer_list<Pose2d> poses) {
   SetPoses(wpi::makeArrayRef(poses.begin(), poses.end()));
+}
+
+void FieldObject2d::SetTrajectory(const Trajectory& trajectory) {
+  std::scoped_lock lock(m_mutex);
+  m_poses.clear();
+  m_poses.reserve(trajectory.States().size());
+  for (auto&& state : trajectory.States()) {
+    m_poses.push_back(state.pose);
+  }
+  UpdateEntry();
 }
 
 std::vector<Pose2d> FieldObject2d::GetPoses() const {

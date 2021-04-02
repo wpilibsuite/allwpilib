@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -80,6 +81,19 @@ public class FieldObject2d {
     m_poses.clear();
     for (Pose2d pose : poses) {
       m_poses.add(pose);
+    }
+    updateEntry();
+  }
+
+  /**
+   * Sets poses from a trajectory.
+   *
+   * @param trajectory The trajectory from which the poses should be added.
+   */
+  public synchronized void setTrajectory(Trajectory trajectory) {
+    m_poses.clear();
+    for (Trajectory.State state : trajectory.getStates()) {
+      m_poses.add(state.poseMeters);
     }
     updateEntry();
   }
