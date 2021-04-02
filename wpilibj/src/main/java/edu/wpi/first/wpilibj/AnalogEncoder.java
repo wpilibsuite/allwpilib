@@ -24,12 +24,12 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   protected SimDouble m_simPosition;
 
   /**
-   * Construct a new AnalogEncoder attached to a specific AnalogIn port.
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
    *
-   * @param port the analog input port to attach to
+   * @param channel the analog input channel to attach to
    */
-  public AnalogEncoder(int port) {
-    this(new AnalogInput(port));
+  public AnalogEncoder(int channel) {
+    this(new AnalogInput(channel));
   }
 
   /**
