@@ -9,6 +9,7 @@ import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import java.util.HashMap;
 import java.util.Map;
+
 @Deprecated
 public class Mechanism2D {
   private static final SimDevice m_device = SimDevice.create("Mechanism2D");
