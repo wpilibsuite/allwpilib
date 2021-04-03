@@ -23,7 +23,7 @@ void LogData::Append(const wpi::Twine& msg) {
   }
 
   size_t oldSize = m_buf.size();
-  wpi::raw_vector_ostream os{m_buf};
+  wpi::raw_string_ostream os{m_buf};
   msg.print(os);
   for (size_t newSize = m_buf.size(); oldSize < newSize; ++oldSize) {
     if (m_buf[oldSize] == '\n') {
@@ -32,7 +32,7 @@ void LogData::Append(const wpi::Twine& msg) {
   }
 }
 
-const std::vector<char>& LogData::GetBuffer() {
+const std::string& LogData::GetBuffer() {
   return m_buf;
 }
 
@@ -72,7 +72,7 @@ void LogView::Display() {
     if (ImGui::Selectable("Copy to Clipboard")) {
       const auto& buf = m_data->GetBuffer();
       if (!buf.empty()) {
-        ImGui::SetClipboardText(buf.data());
+        ImGui::SetClipboardText(buf.c_str());
       }
     }
     ImGui::EndPopup();
