@@ -41,15 +41,11 @@ class CameraProviderBase : protected WindowManager {
     bool connected = false;
     CameraModel* camera = nullptr;
     Window* window = nullptr;
-
-    virtual void ReadIni(wpi::StringRef name, wpi::StringRef value);
-    virtual void WriteIni(ImGuiTextBuffer* out_buf);
   };
 
   virtual void Update() = 0;
   virtual void InitCamera(SourceInfo* info) = 0;
-  virtual SourceInfo* IniReadOpen(const char* name) = 0;
-  virtual void IniWriteAll(ImGuiTextBuffer* out_buf) = 0;
+  virtual CameraModel* IniReadOpen(const char* name) = 0;
 
   void MenuItem(const char* label, SourceInfo* info);
   void Show(SourceInfo* info, Window* window);

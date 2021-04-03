@@ -15,13 +15,92 @@
 #include <imgui_stdlib.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc.hpp>
+#include <wpi/SmallVector.h>
 #include <wpi/Twine.h>
 
 #include "glass/Context.h"
 
 using namespace glass;
 
-CameraModel::CameraModel(const wpi::Twine& name) {
+static const char* PixelFormatToString(int pixelFormat) {
+  switch (pixelFormat) {
+    case cs::VideoMode::kBGR:
+      return "BGR";
+    case cs::VideoMode::kGray:
+      return "Gray";
+    case cs::VideoMode::kMJPEG:
+      return "MJPEG";
+    case cs::VideoMode::kRGB565:
+      return "RGB565";
+    case cs::VideoMode::kYUYV:
+      return "YUYV";
+    default:
+      return "Unknown";
+  }
+}
+
+static int StringToPixelFormat(wpi::StringRef str) {
+  if (str == "BGR") {
+    return cs::VideoMode::kBGR;
+  } else if (str == "Gray") {
+    return cs::VideoMode::kGray;
+  } else if (str == "MJPEG") {
+    return cs::VideoMode::kMJPEG;
+  } else if (str == "RGB565") {
+    return cs::VideoMode::kRGB565;
+  } else if (str == "YUYV") {
+    return cs::VideoMode::kYUYV;
+  } else {
+    return cs::VideoMode::kUnknown;
+  }
+}
+
+static void VideoModeToString(char* buf, size_t len,
+                              const cs::VideoMode& mode) {
+  std::snprintf(buf, len, "%s (%dx%d %d FPS)",
+                PixelFormatToString(mode.pixelFormat), mode.width, mode.height,
+                mode.fps);
+}
+
+CameraModel::CameraModel(const wpi::Twine& name) : m_name{name.str()} {}
+
+CameraModel::~CameraModel() {
+  Stop();
+  delete m_latestFrame.load();
+  for (auto frame : m_sharedFreeList) {
+    delete frame;
+  }
+  for (auto frame : m_sourceFreeList) {
+    delete frame;
+  }
+}
+
+void CameraModel::Update() {
+  // create or update texture when we get a new frame
+  if (auto frame = m_latestFrame.exchange(nullptr)) {
+    if (!m_tex || frame->cols != m_tex.GetWidth() ||
+        frame->rows != m_tex.GetHeight()) {
+      m_tex = wpi::gui::Texture(wpi::gui::kPixelRGBA, frame->cols, frame->rows,
+                                frame->data);
+    } else {
+      m_tex.Update(frame->data);
+    }
+    // put back on shared freelist
+    std::scoped_lock lock(m_sharedFreeListMutex);
+    m_sharedFreeList.emplace_back(frame);
+  }
+}
+
+bool CameraModel::Exists() {
+  CS_Status status = 0;
+  return m_source != 0 && cs::IsSourceConnected(m_source, &status);
+}
+
+void CameraModel::Start() {
+  if (m_cvSink != 0) {
+    return;
+  }
+
   CS_Status status = 0;
   m_cvSink = cs::CreateCvSink("glass::CameraModel_" + name, &status);
 
@@ -55,45 +134,20 @@ CameraModel::CameraModel(const wpi::Twine& name) {
   });
 }
 
-CameraModel::~CameraModel() {
+void CameraModel::Stop() {
   m_stopCamera = true;
-  CS_Status status = 0;
-  cs::ReleaseSink(m_cvSink, &status);
-  m_frameThread.join();
-  delete m_latestFrame.load();
-  for (auto frame : m_sharedFreeList) {
-    delete frame;
+  if (m_cvSink != 0) {
+    CS_Status status = 0;
+    cs::ReleaseSink(m_cvSink, &status);
   }
-  for (auto frame : m_sourceFreeList) {
-    delete frame;
+  if (m_frameThread.joinable()) {
+    m_frameThread.join();
   }
-}
-
-void CameraModel::Update() {
-  // create or update texture when we get a new frame
-  if (auto frame = m_latestFrame.exchange(nullptr)) {
-    if (!m_tex || frame->cols != m_tex.GetWidth() ||
-        frame->rows != m_tex.GetHeight()) {
-      m_tex = wpi::gui::Texture(wpi::gui::kPixelRGBA, frame->cols, frame->rows,
-                                frame->data);
-    } else {
-      m_tex.Update(frame->data);
-    }
-    // put back on shared freelist
-    std::scoped_lock lock(m_sharedFreeListMutex);
-    m_sharedFreeList.emplace_back(frame);
-  }
-}
-
-bool CameraModel::Exists() {
-  CS_Status status = 0;
-  return m_source != 0 && cs::IsSourceConnected(m_source, &status);
+  m_cvSink = 0;
 }
 
 void CameraModel::SetSource(CS_Source source) {
-  CS_Status status = 0;
   m_source = source;
-  cs::SetSinkSource(m_cvSink, m_source, &status);
 }
 
 void CameraModel::SetEnabled(bool enabled) {
@@ -120,6 +174,83 @@ void CameraModel::SetUrls(wpi::ArrayRef<std::string> urls) {
   cs::SetHttpCameraUrls(m_source, urls, &status);
 }
 
+CS_SourceKind CameraModel::GetKind() const {
+  CS_Status status = 0;
+  return cs::GetSourceKind(m_source, &status);
+}
+
+cs::VideoMode CameraModel::GetVideoMode() const {
+  CS_Status status = 0;
+  return cs::GetSourceVideoMode(m_source, &status);
+}
+
+void CameraModel::SetVideoMode(const cs::VideoMode& mode) {
+  CS_Status status = 0;
+  cs::SetSourceVideoMode(m_source, mode, &status);
+  m_videoMode = mode;
+}
+
+void CameraModel::ResetVideoMode() {
+  SetVideoMode({cs::VideoMode::PixelFormat::kMJPEG, 0, 0, 0});
+}
+
+void CameraModel::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+  if (name == "usbPath") {
+    CS_Status status = 0;
+    m_source = cs::CreateUsbCameraPath(wpi::StringRef{"glass::usb::"} + m_name,
+                                       value, &status);
+  } else if (name == "httpUrls") {
+    wpi::SmallVector<wpi::StringRef, 4> urls;
+    value.split(urls, ',', -1, false);
+    std::vector<std::string> strUrls;
+    strUrls.reserve(urls.size());
+    for (auto&& stream : urls) {
+      strUrls.emplace_back(stream);
+    }
+    CS_Status status = 0;
+    m_source = cs::CreateHttpCamera(wpi::StringRef{"glass::http::"} + m_name,
+                                    strUrls, CS_HTTP_UNKNOWN, &status);
+  } else if (name == "videoMode") {
+    wpi::SmallVector<wpi::StringRef, 4> modeStr;
+    value.split(modeStr, ',');
+    if (modeStr.size() == 4) {
+      cs::VideoMode mode;
+      mode.pixelFormat = StringToPixelFormat(modeStr[0]);
+      if (mode.pixelFormat != cs::VideoMode::kUnknown &&
+          !modeStr[1].getAsInteger(10, mode.width) &&
+          !modeStr[2].getAsInteger(10, mode.height) &&
+          !modeStr[3].getAsInteger(10, mode.fps)) {
+        SetVideoMode(mode);
+      }
+    }
+  }
+}
+
+void CameraModel::WriteIni(ImGuiTextBuffer* out_buf) {
+  CS_Status status = 0;
+  switch (GetKind()) {
+    case CS_SOURCE_HTTP: {
+      out_buf->append("httpUrls=");
+      for (auto&& url : cs::GetHttpCameraUrls(m_source, &status)) {
+        out_buf->appendf("%s,", url.c_str());
+      }
+      out_buf->append("\n");
+      break;
+    }
+    case CS_SOURCE_USB:
+      out_buf->appendf("usbPath=%s\n",
+                       cs::GetUsbCameraPath(m_source, &status).c_str());
+      break;
+    default:
+      break;
+  }
+  if (m_videoMode.pixelFormat != cs::VideoMode::kUnknown) {
+    out_buf->appendf("videoMode=%s,%d,%d,%d\n",
+                     PixelFormatToString(m_videoMode.pixelFormat),
+                     m_videoMode.width, m_videoMode.height, m_videoMode.fps);
+  }
+}
+
 cv::Mat* CameraModel::AllocMat() {
   // get or create a mat, prefer sourceFreeList over sharedFreeList
   cv::Mat* out;
@@ -142,33 +273,6 @@ cv::Mat* CameraModel::AllocMat() {
     }
   }
   return out;
-}
-
-static void VideoModeToString(char* buf, size_t len,
-                              const cs::VideoMode& mode) {
-  const char* fmt;
-  switch (mode.pixelFormat) {
-    case cs::VideoMode::kBGR:
-      fmt = "BGR";
-      break;
-    case cs::VideoMode::kGray:
-      fmt = "Gray";
-      break;
-    case cs::VideoMode::kMJPEG:
-      fmt = "MJPEG";
-      break;
-    case cs::VideoMode::kRGB565:
-      fmt = "RGB565";
-      break;
-    case cs::VideoMode::kYUYV:
-      fmt = "YUYV";
-      break;
-    default:
-      fmt = "Unknown";
-      break;
-  }
-  std::snprintf(buf, len, "%s (%dx%d %d FPS)", fmt, mode.width, mode.height,
-                mode.fps);
 }
 
 static void EditProperty(const std::string& name, CS_Property prop) {
@@ -250,14 +354,14 @@ void glass::DisplayCameraSettings(CameraModel* model) {
   CS_Source source = model->GetSource();
   CS_Status status = 0;
 
-  auto kind = cs::GetSourceKind(source, &status);
+  auto kind = model->GetKind();
 
   // video mode; split out width/height/fps for HTTP cameras
   if (kind == CS_SOURCE_HTTP) {
     static int res[2];
     static int fps;
     if (ImGui::IsWindowAppearing()) {
-      auto mode = cs::GetSourceVideoMode(source, &status);
+      auto mode = model->GetVideoMode();
       res[0] = mode.width;
       res[1] = mode.height;
       fps = mode.fps;
@@ -266,14 +370,12 @@ void glass::DisplayCameraSettings(CameraModel* model) {
     ImGui::InputInt2("Resolution", res);
     ImGui::SliderInt("FPS", &fps, 0, 30);
     if (ImGui::Button("Apply")) {
-      cs::SetSourceVideoMode(
-          source, {cs::VideoMode::PixelFormat::kMJPEG, res[0], res[1], fps},
-          &status);
+      model->SetVideoMode(
+          {cs::VideoMode::PixelFormat::kMJPEG, res[0], res[1], fps});
     }
     ImGui::SameLine();
     if (ImGui::Button("Reset")) {
-      cs::SetSourceVideoMode(
-          source, {cs::VideoMode::PixelFormat::kMJPEG, 0, 0, 0}, &status);
+      model->ResetVideoMode();
       ImGui::CloseCurrentPopup();
     }
   } else {
@@ -286,7 +388,7 @@ void glass::DisplayCameraSettings(CameraModel* model) {
         bool selected = (amode == mode);
         VideoModeToString(modeStr, sizeof(modeStr), amode);
         if (ImGui::Selectable(modeStr, selected)) {
-          cs::SetSourceVideoMode(source, amode, &status);
+          model->SetVideoMode(amode);
         }
         if (selected) {
           ImGui::SetItemDefaultFocus();

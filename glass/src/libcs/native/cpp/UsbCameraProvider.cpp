@@ -106,10 +106,10 @@ void UsbCameraProvider::Update() {
 }
 
 void UsbCameraProvider::InitCamera(SourceInfo* info) {
-  info->camera = CreateModel(wpi::StringRef{"USB:"} + info->name);
+  info->camera = CreateModel(info->name);
   CS_Status status = 0;
   auto source = cs::CreateUsbCameraPath(
-      wpi::StringRef{"glass::UsbCameraProvider_"} + info->name,
+      wpi::StringRef{"glass::usb::"} + info->name,
       static_cast<UsbInfoThread::UsbSourceInfo*>(info)->usb.path, &status);
   info->camera->SetSource(source);
 }

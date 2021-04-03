@@ -88,10 +88,10 @@ void NTCameraProvider::Update() {
 }
 
 void NTCameraProvider::InitCamera(SourceInfo* info) {
-  info->camera = CreateModel(wpi::StringRef{"NT:"} + info->name);
+  info->camera = CreateModel(info->name);
   CS_Status status = 0;
   auto source = cs::CreateHttpCamera(
-      wpi::StringRef{"glass::NTCameraProvider_"} + info->name,
+      wpi::StringRef{"glass::http::"} + info->name,
       static_cast<NTSourceInfo*>(info)->streams, CS_HTTP_UNKNOWN, &status);
   info->camera->SetSource(source);
 }

@@ -7,6 +7,7 @@
 #include <atomic>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <cscore_cpp.h>
@@ -35,6 +36,11 @@ class CameraModel : public Model {
   void Update() override;
   bool Exists() override;
   bool IsReadOnly() override { return false; }
+
+  void Start();
+  void Stop();
+
+  const std::string& GetName() { return m_name; }
 
   wpi::gui::Texture& GetTexture() { return m_tex; }
 
@@ -76,11 +82,24 @@ class CameraModel : public Model {
    */
   void SetUrls(wpi::ArrayRef<std::string> urls);
 
+  CS_SourceKind GetKind() const;
+
+  cs::VideoMode GetVideoMode() const;
+  void SetVideoMode(const cs::VideoMode& mode);
+  void ResetVideoMode();
+
+  void ReadIni(wpi::StringRef name, wpi::StringRef value);
+  void WriteIni(ImGuiTextBuffer* out_buf);
+
  private:
   cv::Mat* AllocMat();
 
+  std::string m_name;
   CS_Source m_source{0};
-  CS_Sink m_cvSink;
+  CS_Sink m_cvSink{0};
+
+  cs::VideoMode m_videoMode;
+  std::vector<std::pair<std::string, int>> m_properties;
 
   std::atomic<cv::Mat*> m_latestFrame{nullptr};
   std::vector<cv::Mat*> m_sharedFreeList;
