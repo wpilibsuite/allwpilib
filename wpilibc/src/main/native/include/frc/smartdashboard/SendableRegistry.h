@@ -285,7 +285,7 @@ class SendableRegistry {
    * @param sendableUid sendable unique id
    * @param table network table
    */
-  void Publish(UID sendableUid, std::shared_ptr<NetworkTable> table);
+  void Publish(UID sendableUid, std::shared_ptr<nt::NetworkTable> table);
 
   /**
    * Updates network table information from an object.
