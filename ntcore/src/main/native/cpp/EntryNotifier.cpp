@@ -59,7 +59,7 @@ bool impl::EntryNotifierThread::Matches(const EntryListenerData& listener,
 
 unsigned int EntryNotifier::Add(
     std::function<void(const EntryNotification& event)> callback,
-    StringRef prefix, unsigned int flags) {
+    wpi::StringRef prefix, unsigned int flags) {
   if ((flags & NT_NOTIFY_LOCAL) != 0) {
     m_local_notifiers = true;
   }
@@ -93,7 +93,7 @@ unsigned int EntryNotifier::AddPolled(unsigned int poller_uid,
   return DoAdd(poller_uid, Handle(m_inst, local_id, Handle::kEntry), flags);
 }
 
-void EntryNotifier::NotifyEntry(unsigned int local_id, StringRef name,
+void EntryNotifier::NotifyEntry(unsigned int local_id, wpi::StringRef name,
                                 std::shared_ptr<Value> value,
                                 unsigned int flags,
                                 unsigned int only_listener) {

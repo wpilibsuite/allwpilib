@@ -27,7 +27,7 @@ void RpcServer::RemoveRpc(unsigned int rpc_uid) {
 }
 
 void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
-                           StringRef name, StringRef params,
+                           wpi::StringRef name, wpi::StringRef params,
                            const ConnectionInfo& conn,
                            SendResponseFunc send_response,
                            unsigned int rpc_uid) {

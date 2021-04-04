@@ -31,7 +31,7 @@ class IEntryNotifier {
   virtual unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) = 0;
 
-  virtual void NotifyEntry(unsigned int local_id, StringRef name,
+  virtual void NotifyEntry(unsigned int local_id, wpi::StringRef name,
                            std::shared_ptr<Value> value, unsigned int flags,
                            unsigned int only_listener = UINT_MAX) = 0;
 };

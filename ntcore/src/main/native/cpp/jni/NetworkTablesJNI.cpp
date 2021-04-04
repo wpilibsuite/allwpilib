@@ -1549,7 +1549,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
   }
 
   std::vector<std::string> names;
-  std::vector<std::pair<nt::StringRef, unsigned int>> servers;
+  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
   names.reserve(len);
   servers.reserve(len);
   for (int i = 0; i < len; ++i) {
@@ -1561,7 +1561,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
     }
     names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(
-        std::make_pair(nt::StringRef(names.back()), portInts[i]));
+        std::make_pair(wpi::StringRef(names.back()), portInts[i]));
   }
   env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::StartClient(inst, servers);
@@ -1636,7 +1636,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
   }
 
   std::vector<std::string> names;
-  std::vector<std::pair<nt::StringRef, unsigned int>> servers;
+  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
   names.reserve(len);
   servers.reserve(len);
   for (int i = 0; i < len; ++i) {
@@ -1648,7 +1648,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     }
     names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(
-        std::make_pair(nt::StringRef(names.back()), portInts[i]));
+        std::make_pair(wpi::StringRef(names.back()), portInts[i]));
   }
   env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::SetServer(inst, servers);

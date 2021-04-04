@@ -15,31 +15,31 @@
 
 using namespace nt;
 
-StringRef NetworkTable::BasenameKey(StringRef key) {
+wpi::StringRef NetworkTable::BasenameKey(wpi::StringRef key) {
   size_t slash = key.rfind(PATH_SEPARATOR_CHAR);
-  if (slash == StringRef::npos) {
+  if (slash == wpi::StringRef::npos) {
     return key;
   }
   return key.substr(slash + 1);
 }
 
-std::string NetworkTable::NormalizeKey(const Twine& key,
+std::string NetworkTable::NormalizeKey(const wpi::Twine& key,
                                        bool withLeadingSlash) {
   wpi::SmallString<128> buf;
   return NormalizeKey(key, buf, withLeadingSlash);
 }
 
-StringRef NetworkTable::NormalizeKey(const Twine& key,
-                                     wpi::SmallVectorImpl<char>& buf,
-                                     bool withLeadingSlash) {
+wpi::StringRef NetworkTable::NormalizeKey(const wpi::Twine& key,
+                                          wpi::SmallVectorImpl<char>& buf,
+                                          bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) {
     buf.push_back(PATH_SEPARATOR_CHAR);
   }
   // for each path element, add it with a slash following
   wpi::SmallString<128> keyBuf;
-  StringRef keyStr = key.toStringRef(keyBuf);
-  wpi::SmallVector<StringRef, 16> parts;
+  wpi::StringRef keyStr = key.toStringRef(keyBuf);
+  wpi::SmallVector<wpi::StringRef, 16> parts;
   keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   for (auto i = parts.begin(); i != parts.end(); ++i) {
     buf.append(i->begin(), i->end());
@@ -49,17 +49,17 @@ StringRef NetworkTable::NormalizeKey(const Twine& key,
   if (!keyStr.empty() && keyStr.back() != PATH_SEPARATOR_CHAR) {
     buf.pop_back();
   }
-  return StringRef(buf.data(), buf.size());
+  return wpi::StringRef(buf.data(), buf.size());
 }
 
-std::vector<std::string> NetworkTable::GetHierarchy(const Twine& key) {
+std::vector<std::string> NetworkTable::GetHierarchy(const wpi::Twine& key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
   wpi::SmallString<128> keyBuf;
-  StringRef keyStr = key.toStringRef(keyBuf);
+  wpi::StringRef keyStr = key.toStringRef(keyBuf);
   wpi::SmallString<128> path;
-  wpi::SmallVector<StringRef, 16> parts;
+  wpi::SmallVector<wpi::StringRef, 16> parts;
   keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   if (!parts.empty()) {
     for (auto i = parts.begin(); i != parts.end(); ++i) {
@@ -76,7 +76,8 @@ std::vector<std::string> NetworkTable::GetHierarchy(const Twine& key) {
   return hierarchy;
 }
 
-NetworkTable::NetworkTable(NT_Inst inst, const Twine& path, const private_init&)
+NetworkTable::NetworkTable(NT_Inst inst, const wpi::Twine& path,
+                           const private_init&)
     : m_inst(inst), m_path(path.str()) {}
 
 NetworkTable::~NetworkTable() {
@@ -89,13 +90,14 @@ NetworkTableInstance NetworkTable::GetInstance() const {
   return NetworkTableInstance{m_inst};
 }
 
-NetworkTableEntry NetworkTable::GetEntry(const Twine& key) const {
+NetworkTableEntry NetworkTable::GetEntry(const wpi::Twine& key) const {
   wpi::SmallString<128> keyBuf;
-  StringRef keyStr = key.toStringRef(keyBuf);
+  wpi::StringRef keyStr = key.toStringRef(keyBuf);
   std::scoped_lock lock(m_mutex);
   NT_Entry& entry = m_entries[keyStr];
   if (entry == 0) {
-    entry = nt::GetEntry(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR) + keyStr);
+    entry =
+        nt::GetEntry(m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR) + keyStr);
   }
   return NetworkTableEntry{entry};
 }
@@ -104,10 +106,10 @@ NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
                                                 unsigned int flags) const {
   size_t prefix_len = m_path.size() + 1;
   return nt::AddEntryListener(
-      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
+      m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
-        StringRef relative_key = event.name.substr(prefix_len);
-        if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) {
+        wpi::StringRef relative_key = event.name.substr(prefix_len);
+        if (relative_key.find(PATH_SEPARATOR_CHAR) != wpi::StringRef::npos) {
           return;
         }
         listener(const_cast<NetworkTable*>(this), relative_key,
@@ -116,7 +118,7 @@ NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
       flags);
 }
 
-NT_EntryListener NetworkTable::AddEntryListener(const Twine& key,
+NT_EntryListener NetworkTable::AddEntryListener(const wpi::Twine& key,
                                                 TableEntryListener listener,
                                                 unsigned int flags) const {
   size_t prefix_len = m_path.size() + 1;
@@ -147,14 +149,14 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
     flags |= NT_NOTIFY_LOCAL;
   }
   NT_EntryListener id = nt::AddEntryListener(
-      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
+      m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
-        StringRef relative_key = event.name.substr(prefix_len);
+        wpi::StringRef relative_key = event.name.substr(prefix_len);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
-        if (end_sub_table == StringRef::npos) {
+        if (end_sub_table == wpi::StringRef::npos) {
           return;
         }
-        StringRef sub_table_key = relative_key.substr(0, end_sub_table);
+        wpi::StringRef sub_table_key = relative_key.substr(0, end_sub_table);
         if (notified_tables->find(sub_table_key) == notified_tables->end()) {
           return;
         }
@@ -174,12 +176,12 @@ void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
 }
 
 std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(
-    const Twine& key) const {
+    const wpi::Twine& key) const {
   return std::make_shared<NetworkTable>(
-      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR) + key, private_init{});
+      m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR) + key, private_init{});
 }
 
-bool NetworkTable::ContainsKey(const Twine& key) const {
+bool NetworkTable::ContainsKey(const wpi::Twine& key) const {
   if (key.isTriviallyEmpty() ||
       (key.isSingleStringRef() && key.getSingleStringRef().empty())) {
     return false;
@@ -187,10 +189,10 @@ bool NetworkTable::ContainsKey(const Twine& key) const {
   return GetEntry(key).Exists();
 }
 
-bool NetworkTable::ContainsSubTable(const Twine& key) const {
+bool NetworkTable::ContainsSubTable(const wpi::Twine& key) const {
   return !GetEntryInfo(m_inst,
-                       m_path + Twine(PATH_SEPARATOR_CHAR) + key +
-                           Twine(PATH_SEPARATOR_CHAR),
+                       m_path + wpi::Twine(PATH_SEPARATOR_CHAR) + key +
+                           wpi::Twine(PATH_SEPARATOR_CHAR),
                        0)
               .empty();
 }
@@ -198,11 +200,12 @@ bool NetworkTable::ContainsSubTable(const Twine& key) const {
 std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
-  auto infos = GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), types);
+  auto infos =
+      GetEntryInfo(m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR), types);
   std::scoped_lock lock(m_mutex);
   for (auto& info : infos) {
-    auto relative_key = StringRef(info.name).substr(prefix_len);
-    if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) {
+    auto relative_key = wpi::StringRef(info.name).substr(prefix_len);
+    if (relative_key.find(PATH_SEPARATOR_CHAR) != wpi::StringRef::npos) {
       continue;
     }
     keys.push_back(relative_key);
@@ -215,10 +218,10 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto& entry :
-       GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), 0)) {
-    auto relative_key = StringRef(entry.name).substr(prefix_len);
+       GetEntryInfo(m_inst, m_path + wpi::Twine(PATH_SEPARATOR_CHAR), 0)) {
+    auto relative_key = wpi::StringRef(entry.name).substr(prefix_len);
     size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
-    if (end_subtable == StringRef::npos) {
+    if (end_subtable == wpi::StringRef::npos) {
       continue;
     }
     keys.push_back(relative_key.substr(0, end_subtable));
@@ -226,149 +229,157 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   return keys;
 }
 
-void NetworkTable::SetPersistent(StringRef key) {
+void NetworkTable::SetPersistent(wpi::StringRef key) {
   GetEntry(key).SetPersistent();
 }
 
-void NetworkTable::ClearPersistent(StringRef key) {
+void NetworkTable::ClearPersistent(wpi::StringRef key) {
   GetEntry(key).ClearPersistent();
 }
 
-bool NetworkTable::IsPersistent(StringRef key) const {
+bool NetworkTable::IsPersistent(wpi::StringRef key) const {
   return GetEntry(key).IsPersistent();
 }
 
-void NetworkTable::SetFlags(StringRef key, unsigned int flags) {
+void NetworkTable::SetFlags(wpi::StringRef key, unsigned int flags) {
   GetEntry(key).SetFlags(flags);
 }
 
-void NetworkTable::ClearFlags(StringRef key, unsigned int flags) {
+void NetworkTable::ClearFlags(wpi::StringRef key, unsigned int flags) {
   GetEntry(key).ClearFlags(flags);
 }
 
-unsigned int NetworkTable::GetFlags(StringRef key) const {
+unsigned int NetworkTable::GetFlags(wpi::StringRef key) const {
   return GetEntry(key).GetFlags();
 }
 
-void NetworkTable::Delete(const Twine& key) {
+void NetworkTable::Delete(const wpi::Twine& key) {
   GetEntry(key).Delete();
 }
 
-bool NetworkTable::PutNumber(StringRef key, double value) {
+bool NetworkTable::PutNumber(wpi::StringRef key, double value) {
   return GetEntry(key).SetDouble(value);
 }
 
-bool NetworkTable::SetDefaultNumber(StringRef key, double defaultValue) {
+bool NetworkTable::SetDefaultNumber(wpi::StringRef key, double defaultValue) {
   return GetEntry(key).SetDefaultDouble(defaultValue);
 }
 
-double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
+double NetworkTable::GetNumber(wpi::StringRef key, double defaultValue) const {
   return GetEntry(key).GetDouble(defaultValue);
 }
 
-bool NetworkTable::PutString(StringRef key, StringRef value) {
+bool NetworkTable::PutString(wpi::StringRef key, wpi::StringRef value) {
   return GetEntry(key).SetString(value);
 }
 
-bool NetworkTable::SetDefaultString(StringRef key, StringRef defaultValue) {
+bool NetworkTable::SetDefaultString(wpi::StringRef key,
+                                    wpi::StringRef defaultValue) {
   return GetEntry(key).SetDefaultString(defaultValue);
 }
 
-std::string NetworkTable::GetString(StringRef key,
-                                    StringRef defaultValue) const {
+std::string NetworkTable::GetString(wpi::StringRef key,
+                                    wpi::StringRef defaultValue) const {
   return GetEntry(key).GetString(defaultValue);
 }
 
-bool NetworkTable::PutBoolean(StringRef key, bool value) {
+bool NetworkTable::PutBoolean(wpi::StringRef key, bool value) {
   return GetEntry(key).SetBoolean(value);
 }
 
-bool NetworkTable::SetDefaultBoolean(StringRef key, bool defaultValue) {
+bool NetworkTable::SetDefaultBoolean(wpi::StringRef key, bool defaultValue) {
   return GetEntry(key).SetDefaultBoolean(defaultValue);
 }
 
-bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
+bool NetworkTable::GetBoolean(wpi::StringRef key, bool defaultValue) const {
   return GetEntry(key).GetBoolean(defaultValue);
 }
 
-bool NetworkTable::PutBooleanArray(StringRef key, ArrayRef<int> value) {
+bool NetworkTable::PutBooleanArray(wpi::StringRef key,
+                                   wpi::ArrayRef<int> value) {
   return GetEntry(key).SetBooleanArray(value);
 }
 
-bool NetworkTable::SetDefaultBooleanArray(StringRef key,
-                                          ArrayRef<int> defaultValue) {
+bool NetworkTable::SetDefaultBooleanArray(wpi::StringRef key,
+                                          wpi::ArrayRef<int> defaultValue) {
   return GetEntry(key).SetDefaultBooleanArray(defaultValue);
 }
 
 std::vector<int> NetworkTable::GetBooleanArray(
-    StringRef key, ArrayRef<int> defaultValue) const {
+    wpi::StringRef key, wpi::ArrayRef<int> defaultValue) const {
   return GetEntry(key).GetBooleanArray(defaultValue);
 }
 
-bool NetworkTable::PutNumberArray(StringRef key, ArrayRef<double> value) {
+bool NetworkTable::PutNumberArray(wpi::StringRef key,
+                                  wpi::ArrayRef<double> value) {
   return GetEntry(key).SetDoubleArray(value);
 }
 
-bool NetworkTable::SetDefaultNumberArray(StringRef key,
-                                         ArrayRef<double> defaultValue) {
+bool NetworkTable::SetDefaultNumberArray(wpi::StringRef key,
+                                         wpi::ArrayRef<double> defaultValue) {
   return GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> NetworkTable::GetNumberArray(
-    StringRef key, ArrayRef<double> defaultValue) const {
+    wpi::StringRef key, wpi::ArrayRef<double> defaultValue) const {
   return GetEntry(key).GetDoubleArray(defaultValue);
 }
 
-bool NetworkTable::PutStringArray(StringRef key, ArrayRef<std::string> value) {
+bool NetworkTable::PutStringArray(wpi::StringRef key,
+                                  wpi::ArrayRef<std::string> value) {
   return GetEntry(key).SetStringArray(value);
 }
 
-bool NetworkTable::SetDefaultStringArray(StringRef key,
-                                         ArrayRef<std::string> defaultValue) {
+bool NetworkTable::SetDefaultStringArray(
+    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) {
   return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> NetworkTable::GetStringArray(
-    StringRef key, ArrayRef<std::string> defaultValue) const {
+    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) const {
   return GetEntry(key).GetStringArray(defaultValue);
 }
 
-bool NetworkTable::PutRaw(StringRef key, StringRef value) {
+bool NetworkTable::PutRaw(wpi::StringRef key, wpi::StringRef value) {
   return GetEntry(key).SetRaw(value);
 }
 
-bool NetworkTable::SetDefaultRaw(StringRef key, StringRef defaultValue) {
+bool NetworkTable::SetDefaultRaw(wpi::StringRef key,
+                                 wpi::StringRef defaultValue) {
   return GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
-std::string NetworkTable::GetRaw(StringRef key, StringRef defaultValue) const {
+std::string NetworkTable::GetRaw(wpi::StringRef key,
+                                 wpi::StringRef defaultValue) const {
   return GetEntry(key).GetRaw(defaultValue);
 }
 
-bool NetworkTable::PutValue(const Twine& key, std::shared_ptr<Value> value) {
+bool NetworkTable::PutValue(const wpi::Twine& key,
+                            std::shared_ptr<Value> value) {
   return GetEntry(key).SetValue(value);
 }
 
-bool NetworkTable::SetDefaultValue(const Twine& key,
+bool NetworkTable::SetDefaultValue(const wpi::Twine& key,
                                    std::shared_ptr<Value> defaultValue) {
   return GetEntry(key).SetDefaultValue(defaultValue);
 }
 
-std::shared_ptr<Value> NetworkTable::GetValue(const Twine& key) const {
+std::shared_ptr<Value> NetworkTable::GetValue(const wpi::Twine& key) const {
   return GetEntry(key).GetValue();
 }
 
-StringRef NetworkTable::GetPath() const {
+wpi::StringRef NetworkTable::GetPath() const {
   return m_path;
 }
 
-const char* NetworkTable::SaveEntries(const Twine& filename) const {
-  return nt::SaveEntries(m_inst, filename, m_path + Twine(PATH_SEPARATOR_CHAR));
+const char* NetworkTable::SaveEntries(const wpi::Twine& filename) const {
+  return nt::SaveEntries(m_inst, filename,
+                         m_path + wpi::Twine(PATH_SEPARATOR_CHAR));
 }
 
 const char* NetworkTable::LoadEntries(
-    const Twine& filename,
+    const wpi::Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
-  return nt::LoadEntries(m_inst, filename, m_path + Twine(PATH_SEPARATOR_CHAR),
-                         warn);
+  return nt::LoadEntries(m_inst, filename,
+                         m_path + wpi::Twine(PATH_SEPARATOR_CHAR), warn);
 }
