@@ -12,22 +12,8 @@
 
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
-#include "tables/ITableListener.h"
 
 using namespace nt;
-
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif _WIN32
-#pragma warning(disable : 4996)
-#endif
-
-const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
-std::string NetworkTable::s_persistent_filename = "networktables.ini";
-bool NetworkTable::s_client = false;
-bool NetworkTable::s_enable_ds = true;
-bool NetworkTable::s_running = false;
-unsigned int NetworkTable::s_port = NT_DEFAULT_PORT;
 
 StringRef NetworkTable::BasenameKey(StringRef key) {
   size_t slash = key.rfind(PATH_SEPARATOR_CHAR);
@@ -90,141 +76,11 @@ std::vector<std::string> NetworkTable::GetHierarchy(const Twine& key) {
   return hierarchy;
 }
 
-void NetworkTable::Initialize() {
-  if (s_running) {
-    Shutdown();
-  }
-  auto inst = NetworkTableInstance::GetDefault();
-  if (s_client) {
-    inst.StartClient();
-    if (s_enable_ds) {
-      inst.StartDSClient(s_port);
-    }
-  } else {
-    inst.StartServer(s_persistent_filename, "", s_port);
-  }
-  s_running = true;
-}
-
-void NetworkTable::Shutdown() {
-  if (!s_running) {
-    return;
-  }
-  auto inst = NetworkTableInstance::GetDefault();
-  if (s_client) {
-    inst.StopDSClient();
-    inst.StopClient();
-  } else {
-    inst.StopServer();
-  }
-  s_running = false;
-}
-
-void NetworkTable::SetClientMode() {
-  s_client = true;
-}
-
-void NetworkTable::SetServerMode() {
-  s_client = false;
-}
-
-void NetworkTable::SetTeam(int team) {
-  auto inst = NetworkTableInstance::GetDefault();
-  inst.SetServerTeam(team, s_port);
-  if (s_enable_ds) {
-    inst.StartDSClient(s_port);
-  }
-}
-
-void NetworkTable::SetIPAddress(StringRef address) {
-  auto inst = NetworkTableInstance::GetDefault();
-  wpi::SmallString<32> addr_copy{address};
-  inst.SetServer(addr_copy.c_str(), s_port);
-
-  // Stop the DS client if we're explicitly connecting to localhost
-  if (address == "localhost" || address == "127.0.0.1") {
-    inst.StopDSClient();
-  } else if (s_enable_ds) {
-    inst.StartDSClient(s_port);
-  }
-}
-
-void NetworkTable::SetIPAddress(ArrayRef<std::string> addresses) {
-  auto inst = NetworkTableInstance::GetDefault();
-  wpi::SmallVector<StringRef, 8> servers;
-  for (const auto& ip_address : addresses) {
-    servers.emplace_back(ip_address);
-  }
-  inst.SetServer(servers, s_port);
-
-  // Stop the DS client if we're explicitly connecting to localhost
-  if (!addresses.empty() &&
-      (addresses[0] == "localhost" || addresses[0] == "127.0.0.1")) {
-    inst.StopDSClient();
-  } else if (s_enable_ds) {
-    inst.StartDSClient(s_port);
-  }
-}
-
-void NetworkTable::SetPort(unsigned int port) {
-  s_port = port;
-}
-
-void NetworkTable::SetDSClientEnabled(bool enabled) {
-  auto inst = NetworkTableInstance::GetDefault();
-  s_enable_ds = enabled;
-  if (s_enable_ds) {
-    inst.StartDSClient(s_port);
-  } else {
-    inst.StopDSClient();
-  }
-}
-
-void NetworkTable::SetPersistentFilename(StringRef filename) {
-  s_persistent_filename = filename;
-}
-
-void NetworkTable::SetNetworkIdentity(StringRef name) {
-  NetworkTableInstance::GetDefault().SetNetworkIdentity(name);
-}
-
-void NetworkTable::GlobalDeleteAll() {
-  NetworkTableInstance::GetDefault().DeleteAllEntries();
-}
-
-void NetworkTable::Flush() {
-  NetworkTableInstance::GetDefault().Flush();
-}
-
-void NetworkTable::SetUpdateRate(double interval) {
-  NetworkTableInstance::GetDefault().SetUpdateRate(interval);
-}
-
-const char* NetworkTable::SavePersistent(StringRef filename) {
-  return NetworkTableInstance::GetDefault().SavePersistent(filename);
-}
-
-const char* NetworkTable::LoadPersistent(
-    StringRef filename,
-    std::function<void(size_t line, const char* msg)> warn) {
-  return NetworkTableInstance::GetDefault().LoadPersistent(filename, warn);
-}
-
-std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
-  if (!s_running) {
-    Initialize();
-  }
-  return NetworkTableInstance::GetDefault().GetTable(key);
-}
-
 NetworkTable::NetworkTable(NT_Inst inst, const Twine& path, const private_init&)
     : m_inst(inst), m_path(path.str()) {}
 
 NetworkTable::~NetworkTable() {
-  for (auto& i : m_listeners) {
-    RemoveEntryListener(i.second);
-  }
-  for (auto i : m_lambdaListeners) {
+  for (auto i : m_listeners) {
     RemoveEntryListener(i);
   }
 }
@@ -278,66 +134,6 @@ void NetworkTable::RemoveEntryListener(NT_EntryListener listener) const {
   nt::RemoveEntryListener(listener);
 }
 
-void NetworkTable::AddTableListener(ITableListener* listener) {
-  AddTableListenerEx(listener, NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-}
-
-void NetworkTable::AddTableListener(ITableListener* listener,
-                                    bool immediateNotify) {
-  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_UPDATE;
-  if (immediateNotify) {
-    flags |= NT_NOTIFY_IMMEDIATE;
-  }
-  AddTableListenerEx(listener, flags);
-}
-
-void NetworkTable::AddTableListenerEx(ITableListener* listener,
-                                      unsigned int flags) {
-  std::scoped_lock lock(m_mutex);
-  wpi::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  size_t prefix_len = path.size();
-  NT_EntryListener id = nt::AddEntryListener(
-      m_inst, path,
-      [=](const EntryNotification& event) {
-        StringRef relative_key = event.name.substr(prefix_len);
-        if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) {
-          return;
-        }
-        listener->ValueChangedEx(this, relative_key, event.value, event.flags);
-      },
-      flags);
-  m_listeners.emplace_back(listener, id);
-}
-
-void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
-                                    bool immediateNotify) {
-  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_UPDATE;
-  if (immediateNotify) {
-    flags |= NT_NOTIFY_IMMEDIATE;
-  }
-  AddTableListenerEx(key, listener, flags);
-}
-
-void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
-                                      unsigned int flags) {
-  std::scoped_lock lock(m_mutex);
-  size_t prefix_len = m_path.size() + 1;
-  auto entry = GetEntry(key);
-  NT_EntryListener id = nt::AddEntryListener(
-      entry.GetHandle(),
-      [=](const EntryNotification& event) {
-        listener->ValueChangedEx(this, event.name.substr(prefix_len),
-                                 event.value, event.flags);
-      },
-      flags);
-  m_listeners.emplace_back(listener, id);
-}
-
-void NetworkTable::AddSubTableListener(ITableListener* listener) {
-  AddSubTableListener(listener, false);
-}
-
 NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
                                                    bool localNotify) {
   size_t prefix_len = m_path.size() + 1;
@@ -366,58 +162,14 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
         listener(this, sub_table_key, this->GetSubTable(sub_table_key));
       },
       flags);
-  m_lambdaListeners.emplace_back(id);
+  m_listeners.emplace_back(id);
   return id;
 }
 
 void NetworkTable::RemoveTableListener(NT_EntryListener listener) {
   nt::RemoveEntryListener(listener);
   auto matches_begin =
-      std::remove(m_lambdaListeners.begin(), m_lambdaListeners.end(), listener);
-  m_lambdaListeners.erase(matches_begin, m_lambdaListeners.end());
-}
-
-void NetworkTable::AddSubTableListener(ITableListener* listener,
-                                       bool localNotify) {
-  std::scoped_lock lock(m_mutex);
-  size_t prefix_len = m_path.size() + 1;
-
-  // The lambda needs to be copyable, but StringMap is not, so use
-  // a shared_ptr to it.
-  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
-
-  unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
-  if (localNotify) {
-    flags |= NT_NOTIFY_LOCAL;
-  }
-  NT_EntryListener id = nt::AddEntryListener(
-      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
-      [=](const EntryNotification& event) {
-        StringRef relative_key = event.name.substr(prefix_len);
-        auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
-        if (end_sub_table == StringRef::npos) {
-          return;
-        }
-        StringRef sub_table_key = relative_key.substr(0, end_sub_table);
-        if (notified_tables->find(sub_table_key) == notified_tables->end()) {
-          return;
-        }
-        notified_tables->insert(std::make_pair(sub_table_key, '\0'));
-        listener->ValueChangedEx(this, sub_table_key, nullptr, event.flags);
-      },
-      flags);
-  m_listeners.emplace_back(listener, id);
-}
-
-void NetworkTable::RemoveTableListener(ITableListener* listener) {
-  std::scoped_lock lock(m_mutex);
-  auto matches_begin =
-      std::remove_if(m_listeners.begin(), m_listeners.end(),
-                     [=](const Listener& x) { return x.first == listener; });
-
-  for (auto i = matches_begin; i != m_listeners.end(); ++i) {
-    RemoveEntryListener(i->second);
-  }
+      std::remove(m_listeners.begin(), m_listeners.end(), listener);
   m_listeners.erase(matches_begin, m_listeners.end());
 }
 
