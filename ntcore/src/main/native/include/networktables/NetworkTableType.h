@@ -22,7 +22,10 @@ enum class NetworkTableType {
   kBooleanArray = NT_BOOLEAN_ARRAY,
   kDoubleArray = NT_DOUBLE_ARRAY,
   kStringArray = NT_STRING_ARRAY,
-  kRpc = NT_RPC
+  kInteger = NT_INTEGER,
+  kFloat = NT_FLOAT,
+  kIntegerArray = NT_INTEGER_ARRAY,
+  kFloatArray = NT_FLOAT_ARRAY
 };
 
 }  // namespace nt

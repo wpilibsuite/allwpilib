@@ -7,10 +7,10 @@
 #include <string>
 #include <string_view>
 
-#include <ntcore_cpp.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/StringTopic.h>
 
 #include "glass/DataSource.h"
-#include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Subsystem.h"
 
 namespace glass {
@@ -19,7 +19,7 @@ class NTSubsystemModel : public SubsystemModel {
   static constexpr const char* kType = "Subsystem";
 
   explicit NTSubsystemModel(std::string_view path);
-  NTSubsystemModel(NT_Inst instance, std::string_view path);
+  NTSubsystemModel(nt::NetworkTableInstance inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetDefaultCommand() const override {
@@ -34,10 +34,10 @@ class NTSubsystemModel : public SubsystemModel {
   bool IsReadOnly() override { return true; }
 
  private:
-  NetworkTablesHelper m_nt;
-  NT_Entry m_name;
-  NT_Entry m_defaultCommand;
-  NT_Entry m_currentCommand;
+  nt::NetworkTableInstance m_inst;
+  nt::StringSubscriber m_name;
+  nt::StringSubscriber m_defaultCommand;
+  nt::StringSubscriber m_currentCommand;
 
   std::string m_nameValue;
   std::string m_defaultCommandValue;

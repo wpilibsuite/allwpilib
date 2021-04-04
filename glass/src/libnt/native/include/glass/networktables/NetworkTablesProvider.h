@@ -9,8 +9,10 @@
 #include <string_view>
 #include <vector>
 
+#include <networktables/StringTopic.h>
 #include <ntcore_c.h>
 #include <ntcore_cpp.h>
+#include <wpi/DenseMap.h>
 #include <wpi/StringMap.h>
 
 #include "glass/Model.h"
@@ -75,7 +77,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   void Update() override;
 
   NetworkTablesHelper m_nt;
-  NT_EntryListener m_listener{0};
+  NT_TopicListener m_listener{0};
 
   // cached mapping from table name to type string
   Storage& m_typeCache;
@@ -88,17 +90,25 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   // mapping from .type string to model/view creators
   wpi::StringMap<Builder> m_typeMap;
 
+  struct SubListener {
+    nt::StringSubscriber subscriber;
+    NT_ValueListener listener;
+  };
+
+  // mapping from .type topic to subscriber/listener
+  wpi::DenseMap<NT_Topic, SubListener> m_topicMap;
+
   struct Entry : public ModelEntry {
-    Entry(NT_Entry typeEntry, std::string_view name, const Builder& builder)
+    Entry(NT_Topic typeTopic, std::string_view name, const Builder& builder)
         : ModelEntry{name, [](NT_Inst, const char*) { return true; },
                      builder.createModel},
-          typeEntry{typeEntry} {}
-    NT_Entry typeEntry;
+          typeTopic{typeTopic} {}
+    NT_Topic typeTopic;
   };
 
   void Show(ViewEntry* entry, Window* window) override;
 
-  ViewEntry* GetOrCreateView(const Builder& builder, NT_Entry typeEntry,
+  ViewEntry* GetOrCreateView(const Builder& builder, NT_Topic typeTopic,
                              std::string_view name);
 };
 

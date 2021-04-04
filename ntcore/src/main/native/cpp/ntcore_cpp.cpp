@@ -4,20 +4,32 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 
+#include <wpi/json.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
 #include "InstanceImpl.h"
 #include "Log.h"
-#include "WireDecoder.h"
-#include "WireEncoder.h"
+#include "Types_internal.h"
 #include "ntcore.h"
 
+static std::atomic_bool gNowSet{false};
+static std::atomic<int64_t> gNowTime;
+
 namespace nt {
+
+wpi::json TopicInfo::GetProperties() const {
+  try {
+    return wpi::json::parse(properties);
+  } catch (wpi::json::parse_error&) {
+    return wpi::json::object();
+  }
+}
 
 /*
  * Instance Functions
@@ -42,7 +54,7 @@ void DestroyInstance(NT_Inst inst) {
 NT_Inst GetInstanceFromHandle(NT_Handle handle) {
   Handle h{handle};
   auto type = h.GetType();
-  if (type >= Handle::kConnectionListener && type <= Handle::kRpcCallPoller) {
+  if (type >= Handle::kConnectionListener && type < Handle::kTypeMax) {
     return Handle(h.GetInst(), 0, Handle::kInstance);
   }
 
@@ -54,770 +66,521 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle) {
  */
 
 NT_Entry GetEntry(NT_Inst inst, std::string_view name) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
-  }
-
-  unsigned int id = ii->storage.GetEntry(name);
-  if (id == UINT_MAX) {
-    return 0;
-  }
-  return Handle(i, id, Handle::kEntry);
-}
-
-std::vector<NT_Entry> GetEntries(NT_Inst inst, std::string_view prefix,
-                                 unsigned int types) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetEntry(name);
+  } else {
     return {};
   }
-
-  auto arr = ii->storage.GetEntries(prefix, types);
-  // convert indices to handles
-  for (auto& val : arr) {
-    val = Handle(i, val, Handle::kEntry);
-  }
-  return arr;
 }
 
 std::string GetEntryName(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    return ii->localStorage.GetEntryName(entry);
+  } else {
     return {};
   }
-
-  return ii->storage.GetEntryName(id);
 }
 
 NT_Type GetEntryType(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return NT_UNASSIGNED;
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    return ii->localStorage.GetEntryType(entry);
+  } else {
+    return {};
   }
-
-  return ii->storage.GetEntryType(id);
 }
 
-uint64_t GetEntryLastChange(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return 0;
+int64_t GetEntryLastChange(NT_Handle subentry) {
+  if (auto ii = InstanceImpl::GetHandle(subentry)) {
+    return ii->localStorage.GetEntryLastChange(subentry);
+  } else {
+    return {};
   }
-
-  return ii->storage.GetEntryLastChange(id);
 }
 
-std::shared_ptr<Value> GetEntryValue(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return nullptr;
+Value GetEntryValue(NT_Handle subentry) {
+  if (auto ii = InstanceImpl::GetHandle(subentry)) {
+    return ii->localStorage.GetEntryValue(subentry);
+  } else {
+    return {};
   }
-
-  return ii->storage.GetEntryValue(id);
 }
 
-bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return false;
+bool SetDefaultEntryValue(NT_Entry entry, const Value& value) {
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    return ii->localStorage.SetDefaultEntryValue(entry, value);
+  } else {
+    return {};
   }
-
-  return ii->storage.SetDefaultEntryValue(id, value);
 }
 
-bool SetEntryValue(NT_Entry entry, std::shared_ptr<Value> value) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return false;
+bool SetEntryValue(NT_Entry entry, const Value& value) {
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    return ii->localStorage.SetEntryValue(entry, value);
+  } else {
+    return {};
   }
-
-  return ii->storage.SetEntryValue(id, value);
-}
-
-void SetEntryTypeValue(NT_Entry entry, std::shared_ptr<Value> value) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->storage.SetEntryTypeValue(id, value);
 }
 
 void SetEntryFlags(NT_Entry entry, unsigned int flags) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    ii->localStorage.SetEntryFlags(entry, flags);
   }
-
-  ii->storage.SetEntryFlags(id, flags);
 }
 
 unsigned int GetEntryFlags(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  return ii->storage.GetEntryFlags(id);
-}
-
-void DeleteEntry(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->storage.DeleteEntry(id);
-}
-
-void DeleteAllEntries(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (i < 0 || !ii) {
-    return;
-  }
-
-  ii->storage.DeleteAllEntries();
-}
-
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, std::string_view prefix,
-                                    unsigned int types) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetHandle(entry)) {
+    return ii->localStorage.GetEntryFlags(entry);
+  } else {
     return {};
   }
-
-  return ii->storage.GetEntryInfo(i, prefix, types);
 }
 
-EntryInfo GetEntryInfo(NT_Entry entry) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    EntryInfo info;
-    info.entry = 0;
-    info.type = NT_UNASSIGNED;
-    info.flags = 0;
-    info.last_change = 0;
-    return info;
+std::vector<Value> ReadQueueValue(NT_Handle subentry) {
+  if (auto ii = InstanceImpl::GetHandle(subentry)) {
+    return ii->localStorage.ReadQueueValue(subentry);
+  } else {
+    return {};
   }
+}
 
-  return ii->storage.GetEntryInfo(i, id);
+/*
+ * Topic Functions
+ */
+
+std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
+                                unsigned int types) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetTopics(prefix, types);
+  } else {
+    return {};
+  }
+}
+
+std::vector<NT_Topic> GetTopics(NT_Inst inst, std::string_view prefix,
+                                wpi::span<const std::string_view> types) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetTopics(prefix, types);
+  } else {
+    return {};
+  }
+}
+
+std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
+                                    unsigned int types) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetTopicInfo(prefix, types);
+  } else {
+    return {};
+  }
+}
+
+std::vector<TopicInfo> GetTopicInfo(NT_Inst inst, std::string_view prefix,
+                                    wpi::span<const std::string_view> types) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetTopicInfo(prefix, types);
+  } else {
+    return {};
+  }
+}
+
+TopicInfo GetTopicInfo(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicInfo(topic);
+  } else {
+    return {};
+  }
+}
+
+NT_Topic GetTopic(NT_Inst inst, std::string_view name) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.GetTopic(name);
+  } else {
+    return {};
+  }
+}
+
+std::string GetTopicName(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicName(topic);
+  } else {
+    return {};
+  }
+}
+
+NT_Type GetTopicType(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicType(topic);
+  } else {
+    return {};
+  }
+}
+
+std::string GetTopicTypeString(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicTypeString(topic);
+  } else {
+    return {};
+  }
+}
+
+void SetTopicPersistent(NT_Topic topic, bool value) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicPersistent(topic, value);
+  } else {
+    return;
+  }
+}
+
+bool GetTopicPersistent(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicPersistent(topic);
+  } else {
+    return {};
+  }
+}
+
+void SetTopicRetained(NT_Topic topic, bool value) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicRetained(topic, value);
+  } else {
+    return;
+  }
+}
+
+bool GetTopicRetained(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicRetained(topic);
+  } else {
+    return {};
+  }
+}
+
+bool GetTopicExists(NT_Handle handle) {
+  if (auto ii = InstanceImpl::GetHandle(handle)) {
+    return ii->localStorage.GetTopicExists(handle);
+  }
+  return false;
+}
+
+wpi::json GetTopicProperty(NT_Topic topic, std::string_view name) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicProperty(topic, name);
+  } else {
+    return {};
+  }
+}
+
+void SetTopicProperty(NT_Topic topic, std::string_view name,
+                      const wpi::json& value) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicProperty(topic, name, value);
+  } else {
+    return;
+  }
+}
+
+void DeleteTopicProperty(NT_Topic topic, std::string_view name) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.DeleteTopicProperty(topic, name);
+  }
+}
+
+wpi::json GetTopicProperties(NT_Topic topic) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetTopicProperties(topic);
+  } else {
+    return {};
+  }
+}
+
+void SetTopicProperties(NT_Topic topic, const wpi::json& properties) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    ii->localStorage.SetTopicProperties(topic, properties);
+  }
+}
+
+NT_Subscriber Subscribe(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                        wpi::span<const PubSubOption> options) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.Subscribe(topic, type, typeStr, options);
+  } else {
+    return {};
+  }
+}
+
+void Unsubscribe(NT_Subscriber sub) {
+  if (auto ii = InstanceImpl::GetTyped(sub, Handle::kSubscriber)) {
+    ii->localStorage.Unsubscribe(sub);
+  }
+}
+
+NT_Publisher Publish(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                     wpi::span<const PubSubOption> options) {
+  return PublishEx(topic, type, typeStr, wpi::json::object(), options);
+}
+
+NT_Publisher PublishEx(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                       const wpi::json& properties,
+                       wpi::span<const PubSubOption> options) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.Publish(topic, type, typeStr, properties, options);
+  } else {
+    return {};
+  }
+}
+
+void Unpublish(NT_Handle pubentry) {
+  if (auto ii = InstanceImpl::GetHandle(pubentry)) {
+    ii->localStorage.Unpublish(pubentry);
+  }
+}
+
+NT_Entry GetEntry(NT_Topic topic, NT_Type type, std::string_view typeStr,
+                  wpi::span<const PubSubOption> options) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.GetEntry(topic, type, typeStr, options);
+  } else {
+    return {};
+  }
+}
+
+void ReleaseEntry(NT_Entry entry) {
+  if (auto ii = InstanceImpl::GetTyped(entry, Handle::kEntry)) {
+    ii->localStorage.ReleaseEntry(entry);
+  }
+}
+
+void Release(NT_Handle pubsubentry) {
+  if (auto ii = InstanceImpl::GetHandle(pubsubentry)) {
+    ii->localStorage.Release(pubsubentry);
+  }
+}
+
+NT_Topic GetTopicFromHandle(NT_Handle pubsubentry) {
+  if (auto ii = InstanceImpl::GetHandle(pubsubentry)) {
+    return ii->localStorage.GetTopicFromHandle(pubsubentry);
+  } else {
+    return {};
+  }
+}
+
+NT_MultiSubscriber SubscribeMultiple(NT_Inst inst,
+                                     wpi::span<const std::string_view> prefixes,
+                                     wpi::span<const PubSubOption> options) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.SubscribeMultiple(prefixes, options);
+  } else {
+    return {};
+  }
+}
+
+void UnsubscribeMultiple(NT_MultiSubscriber sub) {
+  if (auto ii = InstanceImpl::GetTyped(sub, Handle::kMultiSubscriber)) {
+    ii->localStorage.UnsubscribeMultiple(sub);
+  }
 }
 
 /*
  * Callback Creation Functions
  */
 
-NT_EntryListener AddEntryListener(
-    NT_Inst inst, std::string_view prefix,
-    std::function<void(const EntryNotification& event)> callback,
-    unsigned int flags) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (i < 0 || !ii) {
-    return 0;
-  }
-
-  unsigned int uid = ii->storage.AddListener(prefix, callback, flags);
-  return Handle(i, uid, Handle::kEntryListener);
-}
-
-NT_EntryListener AddEntryListener(
-    NT_Entry entry,
-    std::function<void(const EntryNotification& event)> callback,
-    unsigned int flags) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  unsigned int uid = ii->storage.AddListener(id, callback, flags);
-  return Handle(i, uid, Handle::kEntryListener);
-}
-
-NT_EntryListenerPoller CreateEntryListenerPoller(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
-  }
-
-  return Handle(i, ii->entry_notifier.CreatePoller(),
-                Handle::kEntryListenerPoller);
-}
-
-void DestroyEntryListenerPoller(NT_EntryListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->entry_notifier.RemovePoller(id);
-}
-
-NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        std::string_view prefix,
-                                        unsigned int flags) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  unsigned int uid = ii->storage.AddPolledListener(id, prefix, flags);
-  return Handle(i, uid, Handle::kEntryListener);
-}
-
-NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        NT_Entry entry, unsigned int flags) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  Handle phandle{poller};
-  int p_id = phandle.GetTypedIndex(Handle::kEntryListenerPoller);
-  if (p_id < 0) {
-    return 0;
-  }
-  if (handle.GetInst() != phandle.GetInst()) {
-    return 0;
-  }
-
-  unsigned int uid = ii->storage.AddPolledListener(p_id, id, flags);
-  return Handle(i, uid, Handle::kEntryListener);
-}
-
-std::vector<EntryNotification> PollEntryListener(
-    NT_EntryListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+NT_TopicListener AddTopicListener(
+    NT_Inst inst, wpi::span<const std::string_view> prefixes, unsigned int mask,
+    std::function<void(const TopicNotification&)> callback) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.AddTopicListener(prefixes, mask,
+                                             std::move(callback));
+  } else {
     return {};
   }
-
-  return ii->entry_notifier.Poll(static_cast<unsigned int>(id));
 }
 
-std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller,
-                                                 double timeout,
-                                                 bool* timed_out) {
-  *timed_out = false;
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+NT_TopicListener AddTopicListener(
+    NT_Topic topic, unsigned int mask,
+    std::function<void(const TopicNotification&)> callback) {
+  if (auto ii = InstanceImpl::GetTyped(topic, Handle::kTopic)) {
+    return ii->localStorage.AddTopicListener(topic, mask, std::move(callback));
+  } else {
     return {};
   }
-
-  return ii->entry_notifier.Poll(static_cast<unsigned int>(id), timeout,
-                                 timed_out);
 }
 
-void CancelPollEntryListener(NT_EntryListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+NT_TopicListenerPoller CreateTopicListenerPoller(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.CreateTopicListenerPoller();
+  } else {
+    return {};
   }
-
-  ii->entry_notifier.CancelPoll(id);
 }
 
-void RemoveEntryListener(NT_EntryListener entry_listener) {
-  Handle handle{entry_listener};
-  int uid = handle.GetTypedIndex(Handle::kEntryListener);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (uid < 0 || !ii) {
-    return;
+void DestroyTopicListenerPoller(NT_TopicListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
+    ii->localStorage.DestroyTopicListenerPoller(poller);
   }
-
-  ii->entry_notifier.Remove(uid);
 }
 
-bool WaitForEntryListenerQueue(NT_Inst inst, double timeout) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return true;
+NT_TopicListener AddPolledTopicListener(
+    NT_TopicListenerPoller poller, wpi::span<const std::string_view> prefixes,
+    unsigned int mask) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
+    return ii->localStorage.AddPolledTopicListener(poller, prefixes, mask);
+  } else {
+    return {};
   }
-  return ii->entry_notifier.WaitForQueue(timeout);
+}
+
+NT_TopicListener AddPolledTopicListener(NT_TopicListenerPoller poller,
+                                        NT_Topic topic, unsigned int mask) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
+    return ii->localStorage.AddPolledTopicListener(poller, topic, mask);
+  } else {
+    return {};
+  }
+}
+
+std::vector<TopicNotification> ReadTopicListenerQueue(
+    NT_TopicListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kTopicListenerPoller)) {
+    return ii->localStorage.ReadTopicListenerQueue(poller);
+  } else {
+    return {};
+  }
+}
+
+void RemoveTopicListener(NT_TopicListener listener) {
+  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kTopicListener)) {
+    return ii->localStorage.RemoveTopicListener(listener);
+  }
+}
+
+NT_ValueListener AddValueListener(
+    NT_Handle subentry, unsigned int mask,
+    std::function<void(const ValueNotification&)> callback) {
+  if (auto ii = InstanceImpl::GetHandle(subentry)) {
+    return ii->localStorage.AddValueListener(subentry, mask,
+                                             std::move(callback));
+  } else {
+    return {};
+  }
+}
+
+NT_ValueListenerPoller CreateValueListenerPoller(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.CreateValueListenerPoller();
+  } else {
+    return {};
+  }
+}
+
+void DestroyValueListenerPoller(NT_ValueListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
+    ii->localStorage.DestroyValueListenerPoller(poller);
+  }
+}
+
+NT_ValueListener AddPolledValueListener(NT_ValueListenerPoller poller,
+                                        NT_Handle subentry, unsigned int mask) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
+    return ii->localStorage.AddPolledValueListener(poller, subentry, mask);
+  } else {
+    return {};
+  }
+}
+
+std::vector<ValueNotification> ReadValueListenerQueue(
+    NT_ValueListenerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kValueListenerPoller)) {
+    return ii->localStorage.ReadValueListenerQueue(poller);
+  } else {
+    return {};
+  }
+}
+
+void RemoveValueListener(NT_ValueListener listener) {
+  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kValueListener)) {
+    return ii->localStorage.RemoveValueListener(listener);
+  }
 }
 
 NT_ConnectionListener AddConnectionListener(
     NT_Inst inst,
     std::function<void(const ConnectionNotification& event)> callback,
     bool immediate_notify) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->connectionList.AddListener(std::move(callback),
+                                          immediate_notify);
+  } else {
+    return {};
   }
-
-  unsigned int uid = ii->dispatcher.AddListener(callback, immediate_notify);
-  return Handle(i, uid, Handle::kConnectionListener);
 }
 
 NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->connectionList.CreateListenerPoller();
+  } else {
+    return {};
   }
-
-  return Handle(i, ii->connection_notifier.CreatePoller(),
-                Handle::kConnectionListenerPoller);
 }
 
 void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+  if (auto ii =
+          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
+    return ii->connectionList.DestroyListenerPoller(poller);
   }
-
-  ii->connection_notifier.RemovePoller(id);
 }
 
 NT_ConnectionListener AddPolledConnectionListener(
     NT_ConnectionListenerPoller poller, bool immediate_notify) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
+  if (auto ii =
+          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
+    return ii->connectionList.AddPolledListener(poller, immediate_notify);
+  } else {
+    return {};
   }
-
-  unsigned int uid = ii->dispatcher.AddPolledListener(id, immediate_notify);
-  return Handle(i, uid, Handle::kConnectionListener);
 }
 
-std::vector<ConnectionNotification> PollConnectionListener(
+std::vector<ConnectionNotification> ReadConnectionListenerQueue(
     NT_ConnectionListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+  if (auto ii =
+          InstanceImpl::GetTyped(poller, Handle::kConnectionListenerPoller)) {
+    return ii->connectionList.ReadListenerQueue(poller);
+  } else {
     return {};
   }
-
-  return ii->connection_notifier.Poll(static_cast<unsigned int>(id));
 }
 
-std::vector<ConnectionNotification> PollConnectionListener(
-    NT_ConnectionListenerPoller poller, double timeout, bool* timed_out) {
-  *timed_out = false;
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return {};
+void RemoveConnectionListener(NT_ConnectionListener listener) {
+  if (auto ii = InstanceImpl::GetTyped(listener, Handle::kConnectionListener)) {
+    return ii->connectionList.RemoveListener(listener);
   }
-
-  return ii->connection_notifier.Poll(static_cast<unsigned int>(id), timeout,
-                                      timed_out);
 }
 
-void CancelPollConnectionListener(NT_ConnectionListenerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+int64_t Now() {
+  if (gNowSet) {
+    return gNowTime;
   }
-
-  ii->connection_notifier.CancelPoll(id);
-}
-
-void RemoveConnectionListener(NT_ConnectionListener conn_listener) {
-  Handle handle{conn_listener};
-  int uid = handle.GetTypedIndex(Handle::kConnectionListener);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (uid < 0 || !ii) {
-    return;
-  }
-
-  ii->connection_notifier.Remove(uid);
-}
-
-bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return true;
-  }
-  return ii->connection_notifier.WaitForQueue(timeout);
-}
-
-/*
- * Remote Procedure Call Functions
- */
-
-void CreateRpc(NT_Entry entry, std::string_view def,
-               std::function<void(const RpcAnswer& answer)> callback) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  // only server can create RPCs
-  if ((ii->dispatcher.GetNetworkMode() & NT_NET_MODE_SERVER) == 0) {
-    return;
-  }
-  if (def.empty() || !callback) {
-    return;
-  }
-
-  ii->storage.CreateRpc(id, def, ii->rpc_server.Add(callback));
-}
-
-NT_RpcCallPoller CreateRpcCallPoller(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
-  }
-
-  return Handle(i, ii->rpc_server.CreatePoller(), Handle::kRpcCallPoller);
-}
-
-void DestroyRpcCallPoller(NT_RpcCallPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->rpc_server.RemovePoller(id);
-}
-
-void CreatePolledRpc(NT_Entry entry, std::string_view def,
-                     NT_RpcCallPoller poller) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  Handle phandle{poller};
-  int p_id = phandle.GetTypedIndex(Handle::kRpcCallPoller);
-  if (p_id < 0) {
-    return;
-  }
-  if (handle.GetInst() != phandle.GetInst()) {
-    return;
-  }
-
-  // only server can create RPCs
-  if ((ii->dispatcher.GetNetworkMode() & NT_NET_MODE_SERVER) == 0) {
-    return;
-  }
-  if (def.empty()) {
-    return;
-  }
-
-  ii->storage.CreateRpc(id, def, ii->rpc_server.AddPolled(p_id));
-}
-
-std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return {};
-  }
-
-  return ii->rpc_server.Poll(static_cast<unsigned int>(id));
-}
-
-std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller, double timeout,
-                               bool* timed_out) {
-  *timed_out = false;
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return {};
-  }
-
-  return ii->rpc_server.Poll(static_cast<unsigned int>(id), timeout, timed_out);
-}
-
-void CancelPollRpc(NT_RpcCallPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->rpc_server.CancelPoll(id);
-}
-
-bool WaitForRpcCallQueue(NT_Inst inst, double timeout) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return true;
-  }
-  return ii->rpc_server.WaitForQueue(timeout);
-}
-
-bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, std::string_view result) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return false;
-  }
-
-  Handle chandle{call};
-  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
-  if (call_uid < 0) {
-    return false;
-  }
-  if (handle.GetInst() != chandle.GetInst()) {
-    return false;
-  }
-
-  return ii->rpc_server.PostRpcResponse(id, call_uid, result);
-}
-
-NT_RpcCall CallRpc(NT_Entry entry, std::string_view params) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  unsigned int call_uid = ii->storage.CallRpc(id, params);
-  if (call_uid == 0) {
-    return 0;
-  }
-  return Handle(i, call_uid, Handle::kRpcCall);
-}
-
-bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return false;
-  }
-
-  Handle chandle{call};
-  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
-  if (call_uid < 0) {
-    return false;
-  }
-  if (handle.GetInst() != chandle.GetInst()) {
-    return false;
-  }
-
-  return ii->storage.GetRpcResult(id, call_uid, result);
-}
-
-bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result,
-                  double timeout, bool* timed_out) {
-  *timed_out = false;
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return false;
-  }
-
-  Handle chandle{call};
-  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
-  if (call_uid < 0) {
-    return false;
-  }
-  if (handle.GetInst() != chandle.GetInst()) {
-    return false;
-  }
-
-  return ii->storage.GetRpcResult(id, call_uid, result, timeout, timed_out);
-}
-
-void CancelRpcResult(NT_Entry entry, NT_RpcCall call) {
-  Handle handle{entry};
-  int id = handle.GetTypedIndex(Handle::kEntry);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  Handle chandle{call};
-  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
-  if (call_uid < 0) {
-    return;
-  }
-  if (handle.GetInst() != chandle.GetInst()) {
-    return;
-  }
-
-  ii->storage.CancelRpcResult(id, call_uid);
-}
-
-std::string PackRpcDefinition(const RpcDefinition& def) {
-  WireEncoder enc(0x0300);
-  enc.Write8(def.version);
-  enc.WriteString(def.name);
-
-  // parameters
-  unsigned int params_size = def.params.size();
-  if (params_size > 0xff) {
-    params_size = 0xff;
-  }
-  enc.Write8(params_size);
-  for (size_t i = 0; i < params_size; ++i) {
-    enc.WriteType(def.params[i].def_value->type());
-    enc.WriteString(def.params[i].name);
-    enc.WriteValue(*def.params[i].def_value);
-  }
-
-  // results
-  unsigned int results_size = def.results.size();
-  if (results_size > 0xff) {
-    results_size = 0xff;
-  }
-  enc.Write8(results_size);
-  for (size_t i = 0; i < results_size; ++i) {
-    enc.WriteType(def.results[i].type);
-    enc.WriteString(def.results[i].name);
-  }
-
-  return std::string{enc.ToStringView()};
-}
-
-bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def) {
-  wpi::raw_mem_istream is(packed.data(), packed.size());
-  wpi::Logger logger;
-  WireDecoder dec(is, 0x0300, logger);
-  if (!dec.Read8(&def->version)) {
-    return false;
-  }
-  if (!dec.ReadString(&def->name)) {
-    return false;
-  }
-
-  // parameters
-  unsigned int params_size;
-  if (!dec.Read8(&params_size)) {
-    return false;
-  }
-  def->params.resize(0);
-  def->params.reserve(params_size);
-  for (size_t i = 0; i < params_size; ++i) {
-    RpcParamDef pdef;
-    NT_Type type;
-    if (!dec.ReadType(&type)) {
-      return false;
-    }
-    if (!dec.ReadString(&pdef.name)) {
-      return false;
-    }
-    pdef.def_value = dec.ReadValue(type);
-    if (!pdef.def_value) {
-      return false;
-    }
-    def->params.emplace_back(std::move(pdef));
-  }
-
-  // results
-  unsigned int results_size;
-  if (!dec.Read8(&results_size)) {
-    return false;
-  }
-  def->results.resize(0);
-  def->results.reserve(results_size);
-  for (size_t i = 0; i < results_size; ++i) {
-    RpcResultDef rdef;
-    if (!dec.ReadType(&rdef.type)) {
-      return false;
-    }
-    if (!dec.ReadString(&rdef.name)) {
-      return false;
-    }
-    def->results.emplace_back(std::move(rdef));
-  }
-
-  return true;
-}
-
-std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values) {
-  WireEncoder enc(0x0300);
-  for (auto& value : values) {
-    enc.WriteValue(*value);
-  }
-  return std::string{enc.ToStringView()};
-}
-
-std::vector<std::shared_ptr<Value>> UnpackRpcValues(
-    std::string_view packed, wpi::span<const NT_Type> types) {
-  wpi::raw_mem_istream is(packed.data(), packed.size());
-  wpi::Logger logger;
-  WireDecoder dec(is, 0x0300, logger);
-  std::vector<std::shared_ptr<Value>> vec;
-  for (auto type : types) {
-    auto item = dec.ReadValue(type);
-    if (!item) {
-      return std::vector<std::shared_ptr<Value>>();
-    }
-    vec.emplace_back(std::move(item));
-  }
-  return vec;
-}
-
-uint64_t Now() {
   return wpi::Now();
+}
+
+void SetNow(int64_t timestamp) {
+  gNowTime = timestamp;
+  gNowSet = true;
+}
+
+NT_Type GetTypeFromString(std::string_view typeString) {
+  if (typeString.empty()) {
+    return NT_UNASSIGNED;
+  } else {
+    return StringToType(typeString);
+  }
+}
+
+std::string_view GetStringFromType(NT_Type type) {
+  if (type == NT_UNASSIGNED) {
+    return "";
+  } else {
+    return TypeToString(type);
+  }
 }
 
 /*
@@ -826,49 +589,33 @@ uint64_t Now() {
 NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
                                 std::string_view prefix,
                                 std::string_view logPrefix) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->localStorage.StartDataLog(log, prefix, logPrefix);
+  } else {
     return 0;
   }
-
-  return Handle(i, ii->storage.StartDataLog(log, prefix, logPrefix),
-                Handle::kDataLogger);
 }
 
 void StopEntryDataLog(NT_DataLogger logger) {
-  Handle handle{logger};
-  int id = handle.GetTypedIndex(Handle::kDataLogger);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kDataLogger)) {
+    ii->localStorage.StopDataLog(logger);
   }
-
-  ii->storage.StopDataLog(id);
 }
 
 NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
                                                wpi::log::DataLog& log,
                                                std::string_view name) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->connectionList.StartDataLog(log, name);
+  } else {
     return 0;
   }
-
-  return Handle(i, ii->dispatcher.StartDataLog(log, name),
-                Handle::kConnectionDataLogger);
 }
 
 void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
-  Handle handle{logger};
-  int id = handle.GetTypedIndex(Handle::kConnectionDataLogger);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kConnectionDataLogger)) {
+    ii->connectionList.StopDataLog(logger);
   }
-
-  ii->dispatcher.StopDataLog(id);
 }
 
 /*
@@ -876,349 +623,217 @@ void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
  */
 
 void SetNetworkIdentity(NT_Inst inst, std::string_view name) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->SetIdentity(name);
   }
-
-  ii->dispatcher.SetIdentity(name);
 }
 
 unsigned int GetNetworkMode(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return 0;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->networkMode;
+  } else {
+    return {};
   }
-
-  return ii->dispatcher.GetNetworkMode();
 }
 
 void StartLocal(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StartLocal();
   }
-
-  ii->dispatcher.StartLocal();
 }
 
 void StopLocal(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StopLocal();
   }
-
-  ii->dispatcher.Stop();
 }
 
 void StartServer(NT_Inst inst, std::string_view persist_filename,
-                 const char* listen_address, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+                 const char* listen_address, unsigned int port3,
+                 unsigned int port4) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StartServer(persist_filename, listen_address, port3, port4);
   }
-
-  ii->dispatcher.StartServer(persist_filename, listen_address, port);
 }
 
 void StopServer(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StopServer();
   }
-
-  ii->dispatcher.Stop();
 }
 
-void StartClient(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+void StartClient3(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StartClient3();
   }
-
-  ii->dispatcher.StartClient();
 }
 
-void StartClient(NT_Inst inst, const char* server_name, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+void StartClient4(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StartClient4();
   }
-
-  ii->dispatcher.SetServer(server_name, port);
-  ii->dispatcher.StartClient();
-}
-
-void StartClient(
-    NT_Inst inst,
-    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
-  }
-
-  ii->dispatcher.SetServer(servers);
-  ii->dispatcher.StartClient();
-}
-
-void StartClientTeam(NT_Inst inst, unsigned int team, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
-  }
-
-  ii->dispatcher.SetServerTeam(team, port);
-  ii->dispatcher.StartClient();
 }
 
 void StopClient(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    ii->StopClient();
   }
-
-  ii->dispatcher.Stop();
 }
 
 void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
-  }
-
-  ii->dispatcher.SetServer(server_name, port);
+  SetServer(inst, {{{server_name, port}}});
 }
 
 void SetServer(
     NT_Inst inst,
     wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      std::vector<std::pair<std::string, unsigned int>> serversCopy;
+      serversCopy.reserve(servers.size());
+      for (auto&& server : servers) {
+        serversCopy.emplace_back(std::string{server.first}, server.second);
+      }
+      client->SetServers(serversCopy);
+    }
   }
-
-  ii->dispatcher.SetServer(servers);
 }
 
 void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
-  }
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      std::vector<std::pair<std::string, unsigned int>> servers;
+      servers.reserve(5);
 
-  ii->dispatcher.SetServerTeam(team, port);
+      // 10.te.am.2
+      servers.emplace_back(
+          fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+                      static_cast<int>(team % 100)),
+          port);
+
+      // 172.22.11.2
+      servers.emplace_back("172.22.11.2", port);
+
+      // roboRIO-<team>-FRC.local
+      servers.emplace_back(fmt::format("roboRIO-{}-FRC.local", team), port);
+
+      // roboRIO-<team>-FRC.lan
+      servers.emplace_back(fmt::format("roboRIO-{}-FRC.lan", team), port);
+
+      // roboRIO-<team>-FRC.frc-field.local
+      servers.emplace_back(fmt::format("roboRIO-{}-FRC.frc-field.local", team),
+                           port);
+
+      client->SetServers(servers);
+    }
+  }
 }
 
 void StartDSClient(NT_Inst inst, unsigned int port) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->StartDSClient(port);
+    }
   }
-
-  ii->ds_client.Start(port);
 }
 
 void StopDSClient(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->StopDSClient();
+    }
   }
-
-  ii->ds_client.Stop();
 }
 
-void SetUpdateRate(NT_Inst inst, double interval) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+void FlushLocal(NT_Inst inst) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->FlushLocal();
+    } else if (auto server = ii->GetServer()) {
+      server->FlushLocal();
+    }
   }
-
-  ii->dispatcher.SetUpdateRate(interval);
 }
 
 void Flush(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (auto client = ii->GetClient()) {
+      client->Flush();
+    } else if (auto server = ii->GetServer()) {
+      server->Flush();
+    }
   }
-
-  ii->dispatcher.Flush();
 }
 
 std::vector<ConnectionInfo> GetConnections(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->connectionList.GetConnections();
+  } else {
     return {};
   }
-
-  return ii->dispatcher.GetConnections();
 }
 
 bool IsConnected(NT_Inst inst) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->networkMode == NT_NET_MODE_LOCAL ||
+           ii->connectionList.IsConnected();
+  } else {
     return false;
   }
-
-  return ii->dispatcher.IsConnected();
-}
-
-/*
- * Persistent Functions
- */
-
-const char* SavePersistent(NT_Inst inst, std::string_view filename) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return "invalid instance handle";
-  }
-
-  return ii->storage.SavePersistent(filename, false);
-}
-
-const char* LoadPersistent(
-    NT_Inst inst, std::string_view filename,
-    std::function<void(size_t line, const char* msg)> warn) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return "invalid instance handle";
-  }
-
-  return ii->storage.LoadPersistent(filename, warn);
-}
-
-const char* SaveEntries(NT_Inst inst, std::string_view filename,
-                        std::string_view prefix) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return "invalid instance handle";
-  }
-
-  return ii->storage.SaveEntries(filename, prefix);
-}
-
-const char* LoadEntries(
-    NT_Inst inst, std::string_view filename, std::string_view prefix,
-    std::function<void(size_t line, const char* msg)> warn) {
-  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
-  if (!ii) {
-    return "invalid instance handle";
-  }
-
-  return ii->storage.LoadEntries(filename, prefix, warn);
 }
 
 NT_Logger AddLogger(NT_Inst inst,
                     std::function<void(const LogMessage& msg)> func,
                     unsigned int minLevel, unsigned int maxLevel) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    if (minLevel < ii->logger.min_level()) {
+      ii->logger.set_min_level(minLevel);
+    }
+    return ii->logger_impl.Add(std::move(func), minLevel, maxLevel);
+  } else {
+    return {};
   }
-
-  if (minLevel < ii->logger.min_level()) {
-    ii->logger.set_min_level(minLevel);
-  }
-
-  return Handle(i, ii->logger_impl.Add(func, minLevel, maxLevel),
-                Handle::kLogger);
 }
 
 NT_LoggerPoller CreateLoggerPoller(NT_Inst inst) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return 0;
+  if (auto ii = InstanceImpl::GetTyped(inst, Handle::kInstance)) {
+    return ii->logger_impl.CreatePoller();
+  } else {
+    return {};
   }
-
-  return Handle(i, ii->logger_impl.CreatePoller(), Handle::kLoggerPoller);
 }
 
 void DestroyLoggerPoller(NT_LoggerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
+    ii->logger_impl.DestroyPoller(poller);
   }
-
-  ii->logger_impl.RemovePoller(id);
 }
 
 NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
                           unsigned int max_level) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
-  int i = handle.GetInst();
-  auto ii = InstanceImpl::Get(i);
-  if (id < 0 || !ii) {
-    return 0;
-  }
-
-  if (min_level < ii->logger.min_level()) {
-    ii->logger.set_min_level(min_level);
-  }
-
-  return Handle(i, ii->logger_impl.AddPolled(id, min_level, max_level),
-                Handle::kLogger);
-}
-
-std::vector<LogMessage> PollLogger(NT_LoggerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
+    if (min_level < ii->logger.min_level()) {
+      ii->logger.set_min_level(min_level);
+    }
+    return ii->logger_impl.AddPolled(poller, min_level, max_level);
+  } else {
     return {};
   }
-
-  return ii->logger_impl.Poll(static_cast<unsigned int>(id));
 }
 
-std::vector<LogMessage> PollLogger(NT_LoggerPoller poller, double timeout,
-                                   bool* timed_out) {
-  *timed_out = false;
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
+std::vector<LogMessage> ReadLoggerQueue(NT_LoggerPoller poller) {
+  if (auto ii = InstanceImpl::GetTyped(poller, Handle::kLoggerPoller)) {
+    return ii->logger_impl.ReadQueue(poller);
+  } else {
     return {};
   }
-
-  return ii->logger_impl.Poll(static_cast<unsigned int>(id), timeout,
-                              timed_out);
-}
-
-void CancelPollLogger(NT_LoggerPoller poller) {
-  Handle handle{poller};
-  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (id < 0 || !ii) {
-    return;
-  }
-
-  ii->logger_impl.CancelPoll(id);
 }
 
 void RemoveLogger(NT_Logger logger) {
-  Handle handle{logger};
-  int uid = handle.GetTypedIndex(Handle::kLogger);
-  auto ii = InstanceImpl::Get(handle.GetInst());
-  if (uid < 0 || !ii) {
-    return;
+  if (auto ii = InstanceImpl::GetTyped(logger, Handle::kLogger)) {
+    ii->logger_impl.Remove(logger);
+    ii->logger.set_min_level(ii->logger_impl.GetMinLevel());
   }
-
-  ii->logger_impl.Remove(uid);
-  ii->logger.set_min_level(ii->logger_impl.GetMinLevel());
-}
-
-bool WaitForLoggerQueue(NT_Inst inst, double timeout) {
-  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
-  auto ii = InstanceImpl::Get(i);
-  if (!ii) {
-    return true;
-  }
-  return ii->logger_impl.WaitForQueue(timeout);
 }
 
 }  // namespace nt

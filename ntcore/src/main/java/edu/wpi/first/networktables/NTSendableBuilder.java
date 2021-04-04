@@ -5,8 +5,6 @@
 package edu.wpi.first.networktables;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public interface NTSendableBuilder extends SendableBuilder {
   /**
@@ -23,19 +21,9 @@ public interface NTSendableBuilder extends SendableBuilder {
    * function called by setUpdateTable().
    *
    * @param key property name
-   * @return Network table entry
+   * @return Network table topic
    */
-  NetworkTableEntry getEntry(String key);
-
-  /**
-   * Add a NetworkTableValue property.
-   *
-   * @param key property name
-   * @param getter getter function (returns current value)
-   * @param setter setter function (sets new value)
-   */
-  void addValueProperty(
-      String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter);
+  Topic getTopic(String key);
 
   /**
    * Get the network table.

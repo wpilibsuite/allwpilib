@@ -31,12 +31,18 @@ class LoggerTest {
     List<LogMessage> msgs = new ArrayList<>();
     m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);
 
-    m_clientInst.startClient("127.0.0.1", 10000);
+    m_clientInst.startClient4();
+    m_clientInst.setServer("127.0.0.1", 10000);
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {
-      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeStarting) != 0) {
+      int count = 0;
+      while ((m_clientInst.getNetworkMode() & NetworkTableInstance.kNetModeClient4) == 0) {
         Thread.sleep(100);
+        count++;
+        if (count > 30) {
+          throw new InterruptedException();
+        }
       }
       Thread.sleep(100);
     } catch (InterruptedException ex) {

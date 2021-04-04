@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 
 /** A network table that knows its subtable path. */
 public final class NetworkTable {
@@ -129,6 +128,126 @@ public final class NetworkTable {
     return "NetworkTable: " + m_path;
   }
 
+  /**
+   * Get (generic) topic.
+   *
+   * @param name topic name
+   * @return Topic
+   */
+  public Topic getTopic(String name) {
+    return m_inst.getTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get boolean topic.
+   *
+   * @param name topic name
+   * @return BooleanTopic
+   */
+  public BooleanTopic getBooleanTopic(String name) {
+    return m_inst.getBooleanTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get long topic.
+   *
+   * @param name topic name
+   * @return IntegerTopic
+   */
+  public IntegerTopic getIntegerTopic(String name) {
+    return m_inst.getIntegerTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get float topic.
+   *
+   * @param name topic name
+   * @return FloatTopic
+   */
+  public FloatTopic getFloatTopic(String name) {
+    return m_inst.getFloatTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get double topic.
+   *
+   * @param name topic name
+   * @return DoubleTopic
+   */
+  public DoubleTopic getDoubleTopic(String name) {
+    return m_inst.getDoubleTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get String topic.
+   *
+   * @param name topic name
+   * @return StringTopic
+   */
+  public StringTopic getStringTopic(String name) {
+    return m_inst.getStringTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get raw topic.
+   *
+   * @param name topic name
+   * @return RawTopic
+   */
+  public RawTopic getRawTopic(String name) {
+    return m_inst.getRawTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get boolean[] topic.
+   *
+   * @param name topic name
+   * @return BooleanArrayTopic
+   */
+  public BooleanArrayTopic getBooleanArrayTopic(String name) {
+    return m_inst.getBooleanArrayTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get long[] topic.
+   *
+   * @param name topic name
+   * @return IntegerArrayTopic
+   */
+  public IntegerArrayTopic getIntegerArrayTopic(String name) {
+    return m_inst.getIntegerArrayTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get float[] topic.
+   *
+   * @param name topic name
+   * @return FloatArrayTopic
+   */
+  public FloatArrayTopic getFloatArrayTopic(String name) {
+    return m_inst.getFloatArrayTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get double[] topic.
+   *
+   * @param name topic name
+   * @return DoubleArrayTopic
+   */
+  public DoubleArrayTopic getDoubleArrayTopic(String name) {
+    return m_inst.getDoubleArrayTopic(m_pathWithSep + name);
+  }
+
+  /**
+   * Get String[] topic.
+   *
+   * @param name topic name
+   * @return StringArrayTopic
+   */
+  public StringArrayTopic getStringArrayTopic(String name) {
+    return m_inst.getStringArrayTopic(m_pathWithSep + name);
+  }
+
   private final ConcurrentMap<String, NetworkTableEntry> m_entries = new ConcurrentHashMap<>();
 
   /**
@@ -141,103 +260,12 @@ public final class NetworkTable {
     NetworkTableEntry entry = m_entries.get(key);
     if (entry == null) {
       entry = m_inst.getEntry(m_pathWithSep + key);
-      m_entries.putIfAbsent(key, entry);
+      NetworkTableEntry oldEntry = m_entries.putIfAbsent(key, entry);
+      if (oldEntry != null) {
+        entry = oldEntry;
+      }
     }
     return entry;
-  }
-
-  /**
-   * Listen to keys only within this table.
-   *
-   * @param listener listener to add
-   * @param flags {@link EntryListenerFlags} bitmask
-   * @return Listener handle
-   */
-  public int addEntryListener(TableEntryListener listener, int flags) {
-    final int prefixLen = m_path.length() + 1;
-    return m_inst.addEntryListener(
-        m_pathWithSep,
-        event -> {
-          String relativeKey = event.name.substring(prefixLen);
-          if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
-            // part of a sub table
-            return;
-          }
-          listener.valueChanged(this, relativeKey, event.getEntry(), event.value, event.flags);
-        },
-        flags);
-  }
-
-  /**
-   * Listen to a single key.
-   *
-   * @param key the key name
-   * @param listener listener to add
-   * @param flags {@link EntryListenerFlags} bitmask
-   * @return Listener handle
-   */
-  public int addEntryListener(String key, TableEntryListener listener, int flags) {
-    final NetworkTableEntry entry = getEntry(key);
-    return m_inst.addEntryListener(
-        entry, event -> listener.valueChanged(this, key, entry, event.value, event.flags), flags);
-  }
-
-  /**
-   * Remove an entry listener.
-   *
-   * @param listener listener handle
-   */
-  public void removeEntryListener(int listener) {
-    m_inst.removeEntryListener(listener);
-  }
-
-  /**
-   * Listen for sub-table creation. This calls the listener once for each newly created sub-table.
-   * It immediately calls the listener for any existing sub-tables.
-   *
-   * @param listener listener to add
-   * @param localNotify notify local changes as well as remote
-   * @return Listener handle
-   */
-  public int addSubTableListener(TableListener listener, boolean localNotify) {
-    int flags = EntryListenerFlags.kNew | EntryListenerFlags.kImmediate;
-    if (localNotify) {
-      flags |= EntryListenerFlags.kLocal;
-    }
-
-    final int prefixLen = m_path.length() + 1;
-    final NetworkTable parent = this;
-
-    return m_inst.addEntryListener(
-        m_pathWithSep,
-        new Consumer<>() {
-          final Set<String> m_notifiedTables = new HashSet<>();
-
-          @Override
-          public void accept(EntryNotification event) {
-            String relativeKey = event.name.substring(prefixLen);
-            int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
-            if (endSubTable == -1) {
-              return;
-            }
-            String subTableKey = relativeKey.substring(0, endSubTable);
-            if (m_notifiedTables.contains(subTableKey)) {
-              return;
-            }
-            m_notifiedTables.add(subTableKey);
-            listener.tableCreated(parent, subTableKey, parent.getSubTable(subTableKey));
-          }
-        },
-        flags);
-  }
-
-  /**
-   * Remove a sub-table listener.
-   *
-   * @param listener listener handle
-   */
-  public void removeTableListener(int listener) {
-    m_inst.removeEntryListener(listener);
   }
 
   /**
@@ -258,7 +286,7 @@ public final class NetworkTable {
    * @return true if the table as a value assigned to the given key
    */
   public boolean containsKey(String key) {
-    return !("".equals(key)) && getEntry(key).exists();
+    return !("".equals(key)) && getTopic(key).exists();
   }
 
   /**
@@ -269,9 +297,64 @@ public final class NetworkTable {
    *     its own
    */
   public boolean containsSubTable(String key) {
-    int[] handles =
-        NetworkTablesJNI.getEntries(m_inst.getHandle(), m_pathWithSep + key + PATH_SEPARATOR, 0);
-    return handles.length != 0;
+    Topic[] topics = m_inst.getTopics(m_pathWithSep + key + PATH_SEPARATOR, 0);
+    return topics.length != 0;
+  }
+
+  /**
+   * Gets topic information for all keys in the table (not including sub-tables).
+   *
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return topic information for keys currently in the table
+   */
+  public List<TopicInfo> getTopicInfo(int types) {
+    List<TopicInfo> infos = new ArrayList<>();
+    int prefixLen = m_path.length() + 1;
+    for (TopicInfo info : m_inst.getTopicInfo(m_pathWithSep, types)) {
+      String relativeKey = info.name.substring(prefixLen);
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+        continue;
+      }
+      infos.add(info);
+    }
+    return infos;
+  }
+
+  /**
+   * Gets topic information for all keys in the table (not including sub-tables).
+   *
+   * @return topic information for keys currently in the table
+   */
+  public List<TopicInfo> getTopicInfo() {
+    return getTopicInfo(0);
+  }
+
+  /**
+   * Gets all topics in the table (not including sub-tables).
+   *
+   * @param types bitmask of types; 0 is treated as a "don't care".
+   * @return topic for keys currently in the table
+   */
+  public List<Topic> getTopics(int types) {
+    List<Topic> topics = new ArrayList<>();
+    int prefixLen = m_path.length() + 1;
+    for (TopicInfo info : m_inst.getTopicInfo(m_pathWithSep, types)) {
+      String relativeKey = info.name.substring(prefixLen);
+      if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
+        continue;
+      }
+      topics.add(info.getTopic());
+    }
+    return topics;
+  }
+
+  /**
+   * Gets all topics in the table (not including sub-tables).
+   *
+   * @return topic for keys currently in the table
+   */
+  public List<Topic> getTopics() {
+    return getTopics(0);
   }
 
   /**
@@ -283,16 +366,12 @@ public final class NetworkTable {
   public Set<String> getKeys(int types) {
     Set<String> keys = new HashSet<>();
     int prefixLen = m_path.length() + 1;
-    for (EntryInfo info : m_inst.getEntryInfo(m_pathWithSep, types)) {
+    for (TopicInfo info : m_inst.getTopicInfo(m_pathWithSep, types)) {
       String relativeKey = info.name.substring(prefixLen);
       if (relativeKey.indexOf(PATH_SEPARATOR) != -1) {
         continue;
       }
       keys.add(relativeKey);
-      // populate entries as we go
-      if (m_entries.get(relativeKey) == null) {
-        m_entries.putIfAbsent(relativeKey, new NetworkTableEntry(m_inst, info.entry));
-      }
     }
     return keys;
   }
@@ -314,7 +393,7 @@ public final class NetworkTable {
   public Set<String> getSubTables() {
     Set<String> keys = new HashSet<>();
     int prefixLen = m_path.length() + 1;
-    for (EntryInfo info : m_inst.getEntryInfo(m_pathWithSep, 0)) {
+    for (TopicInfo info : m_inst.getTopicInfo(m_pathWithSep, 0)) {
       String relativeKey = info.name.substring(prefixLen);
       int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
       if (endSubTable == -1) {
@@ -323,15 +402,6 @@ public final class NetworkTable {
       keys.add(relativeKey.substring(0, endSubTable));
     }
     return keys;
-  }
-
-  /**
-   * Deletes the specified key in this table. The key can not be null.
-   *
-   * @param key the key name
-   */
-  public void delete(String key) {
-    getEntry(key).delete();
   }
 
   /**
@@ -373,28 +443,6 @@ public final class NetworkTable {
    */
   public String getPath() {
     return m_path;
-  }
-
-  /**
-   * Save table values to a file. The file format used is identical to that used for SavePersistent.
-   *
-   * @param filename filename
-   * @throws PersistentException if error saving file
-   */
-  public void saveEntries(String filename) throws PersistentException {
-    m_inst.saveEntries(filename, m_pathWithSep);
-  }
-
-  /**
-   * Load table values from a file. The file format used is identical to that used for
-   * SavePersistent / LoadPersistent.
-   *
-   * @param filename filename
-   * @return List of warnings (errors result in an exception instead)
-   * @throws PersistentException if error saving file
-   */
-  public String[] loadEntries(String filename) throws PersistentException {
-    return m_inst.loadEntries(filename, m_pathWithSep);
   }
 
   @Override

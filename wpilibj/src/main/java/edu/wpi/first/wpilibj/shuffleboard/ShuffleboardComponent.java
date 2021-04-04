@@ -115,21 +115,21 @@ public abstract class ShuffleboardComponent<C extends ShuffleboardComponent<C>>
     }
     // Component type
     if (getType() == null) {
-      metaTable.getEntry("PreferredComponent").delete();
+      metaTable.getEntry("PreferredComponent").unpublish();
     } else {
-      metaTable.getEntry("PreferredComponent").forceSetString(getType());
+      metaTable.getEntry("PreferredComponent").setString(getType());
     }
 
     // Tile size
     if (m_width <= 0 || m_height <= 0) {
-      metaTable.getEntry("Size").delete();
+      metaTable.getEntry("Size").unpublish();
     } else {
       metaTable.getEntry("Size").setDoubleArray(new double[] {m_width, m_height});
     }
 
     // Tile position
     if (m_column < 0 || m_row < 0) {
-      metaTable.getEntry("Position").delete();
+      metaTable.getEntry("Position").unpublish();
     } else {
       metaTable.getEntry("Position").setDoubleArray(new double[] {m_column, m_row});
     }

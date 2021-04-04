@@ -65,7 +65,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private Mode m_lastMode = Mode.kNone;
   private final double m_period;
   private final Watchdog m_watchdog;
-  private boolean m_ntFlushEnabled;
+  private boolean m_ntFlushEnabled = true;
 
   /**
    * Constructor for IterativeRobotBase.
@@ -235,7 +235,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void testExit() {}
 
   /**
-   * Enables or disables flushing NetworkTables every loop iteration. By default, this is disabled.
+   * Enables or disables flushing NetworkTables every loop iteration. By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
    */
@@ -343,7 +343,7 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // Flush NetworkTables
     if (m_ntFlushEnabled) {
-      NetworkTableInstance.getDefault().flush();
+      NetworkTableInstance.getDefault().flushLocal();
     }
 
     // Warn on loop time overruns

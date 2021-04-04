@@ -1,0 +1,50 @@
+[
+  {
+    "name": "/Preferences/checkedValueInt",
+    "type": "int",
+    "value": 2,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/checkedValueDouble",
+    "type": "double",
+    "value": 0.2,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/checkedValueFloat",
+    "type": "float",
+    "value": 3.4,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/checkedValueLong",
+    "type": "int",
+    "value": 172,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/checkedValueString",
+    "type": "string",
+    "value": "Hello. How are you?",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/checkedValueBoolean",
+    "type": "boolean",
+    "value": false,
+    "properties": {
+      "persistent": true
+    }
+  }
+]

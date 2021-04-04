@@ -12,8 +12,9 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/IntegerArrayTopic.h>
 #include <networktables/NTSendableBuilder.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/StringArrayTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -418,34 +419,35 @@ void CommandScheduler::OnCommandFinish(Action action) {
 
 void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
-  auto namesEntry = builder.GetEntry("Names");
-  auto idsEntry = builder.GetEntry("Ids");
-  auto cancelEntry = builder.GetEntry("Cancel");
+  builder.SetUpdateTable(
+      [this,
+       namesPub = nt::StringArrayTopic{builder.GetTopic("Names")}.Publish(),
+       idsPub = nt::IntegerArrayTopic{builder.GetTopic("Ids")}.Publish(),
+       cancelEntry = nt::IntegerArrayTopic{builder.GetTopic("Cancel")}.GetEntry(
+           {})]() mutable {
+        auto toCancel = cancelEntry.Get();
+        if (!toCancel.empty()) {
+          for (auto cancel : cancelEntry.Get()) {
+            uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
+            Command* command = reinterpret_cast<Command*>(ptrTmp);
+            if (m_impl->scheduledCommands.find(command) !=
+                m_impl->scheduledCommands.end()) {
+              Cancel(command);
+            }
+          }
+          cancelEntry.Set({});
+        }
 
-  builder.SetUpdateTable([=] {
-    double tmp[1];
-    tmp[0] = 0;
-    auto toCancel = cancelEntry.GetDoubleArray(tmp);
-    for (auto cancel : toCancel) {
-      uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
-      Command* command = reinterpret_cast<Command*>(ptrTmp);
-      if (m_impl->scheduledCommands.find(command) !=
-          m_impl->scheduledCommands.end()) {
-        Cancel(command);
-      }
-      nt::NetworkTableEntry(cancelEntry).SetDoubleArray({});
-    }
-
-    wpi::SmallVector<std::string, 8> names;
-    wpi::SmallVector<double, 8> ids;
-    for (Command* command : m_impl->scheduledCommands) {
-      names.emplace_back(command->GetName());
-      uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
-      ids.emplace_back(static_cast<double>(ptrTmp));
-    }
-    nt::NetworkTableEntry(namesEntry).SetStringArray(names);
-    nt::NetworkTableEntry(idsEntry).SetDoubleArray(ids);
-  });
+        wpi::SmallVector<std::string, 8> names;
+        wpi::SmallVector<int64_t, 8> ids;
+        for (Command* command : m_impl->scheduledCommands) {
+          names.emplace_back(command->GetName());
+          uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
+          ids.emplace_back(static_cast<int64_t>(ptrTmp));
+        }
+        namesPub.Set(names);
+        idsPub.Set(ids);
+      });
 }
 
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,

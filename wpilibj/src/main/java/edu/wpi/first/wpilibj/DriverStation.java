@@ -8,9 +8,11 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.ControlWord;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.MatchInfoData;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -83,15 +85,15 @@ public final class DriverStation {
   @SuppressWarnings("MemberName")
   private static class MatchDataSender {
     NetworkTable table;
-    NetworkTableEntry typeMetadata;
-    NetworkTableEntry gameSpecificMessage;
-    NetworkTableEntry eventName;
-    NetworkTableEntry matchNumber;
-    NetworkTableEntry replayNumber;
-    NetworkTableEntry matchType;
-    NetworkTableEntry alliance;
-    NetworkTableEntry station;
-    NetworkTableEntry controlWord;
+    StringPublisher typeMetadata;
+    StringPublisher gameSpecificMessage;
+    StringPublisher eventName;
+    IntegerPublisher matchNumber;
+    IntegerPublisher replayNumber;
+    IntegerPublisher matchType;
+    BooleanPublisher alliance;
+    IntegerPublisher station;
+    IntegerPublisher controlWord;
     boolean oldIsRedAlliance = true;
     int oldStationNumber = 1;
     String oldEventName = "";
@@ -103,24 +105,24 @@ public final class DriverStation {
 
     MatchDataSender() {
       table = NetworkTableInstance.getDefault().getTable("FMSInfo");
-      typeMetadata = table.getEntry(".type");
-      typeMetadata.forceSetString("FMSInfo");
-      gameSpecificMessage = table.getEntry("GameSpecificMessage");
-      gameSpecificMessage.forceSetString("");
-      eventName = table.getEntry("EventName");
-      eventName.forceSetString("");
-      matchNumber = table.getEntry("MatchNumber");
-      matchNumber.forceSetDouble(0);
-      replayNumber = table.getEntry("ReplayNumber");
-      replayNumber.forceSetDouble(0);
-      matchType = table.getEntry("MatchType");
-      matchType.forceSetDouble(0);
-      alliance = table.getEntry("IsRedAlliance");
-      alliance.forceSetBoolean(true);
-      station = table.getEntry("StationNumber");
-      station.forceSetDouble(1);
-      controlWord = table.getEntry("FMSControlData");
-      controlWord.forceSetDouble(0);
+      typeMetadata = table.getStringTopic(".type").publish();
+      typeMetadata.set("FMSInfo");
+      gameSpecificMessage = table.getStringTopic("GameSpecificMessage").publish();
+      gameSpecificMessage.set("");
+      eventName = table.getStringTopic("EventName").publish();
+      eventName.set("");
+      matchNumber = table.getIntegerTopic("MatchNumber").publish();
+      matchNumber.set(0);
+      replayNumber = table.getIntegerTopic("ReplayNumber").publish();
+      replayNumber.set(0);
+      matchType = table.getIntegerTopic("MatchType").publish();
+      matchType.set(0);
+      alliance = table.getBooleanTopic("IsRedAlliance").publish();
+      alliance.set(true);
+      station = table.getIntegerTopic("StationNumber").publish();
+      station.set(1);
+      controlWord = table.getIntegerTopic("FMSControlData").publish();
+      controlWord.set(0);
     }
 
     private void sendMatchData() {
@@ -173,35 +175,35 @@ public final class DriverStation {
       currentControlWord = HAL.nativeGetControlWord();
 
       if (oldIsRedAlliance != isRedAlliance) {
-        alliance.setBoolean(isRedAlliance);
+        alliance.set(isRedAlliance);
         oldIsRedAlliance = isRedAlliance;
       }
       if (oldStationNumber != stationNumber) {
-        station.setDouble(stationNumber);
+        station.set(stationNumber);
         oldStationNumber = stationNumber;
       }
       if (!oldEventName.equals(currentEventName)) {
-        eventName.setString(currentEventName);
+        eventName.set(currentEventName);
         oldEventName = currentEventName;
       }
       if (!oldGameSpecificMessage.equals(currentGameSpecificMessage)) {
-        gameSpecificMessage.setString(currentGameSpecificMessage);
+        gameSpecificMessage.set(currentGameSpecificMessage);
         oldGameSpecificMessage = currentGameSpecificMessage;
       }
       if (currentMatchNumber != oldMatchNumber) {
-        matchNumber.setDouble(currentMatchNumber);
+        matchNumber.set(currentMatchNumber);
         oldMatchNumber = currentMatchNumber;
       }
       if (currentReplayNumber != oldReplayNumber) {
-        replayNumber.setDouble(currentReplayNumber);
+        replayNumber.set(currentReplayNumber);
         oldReplayNumber = currentReplayNumber;
       }
       if (currentMatchType != oldMatchType) {
-        matchType.setDouble(currentMatchType);
+        matchType.set(currentMatchType);
         oldMatchType = currentMatchType;
       }
       if (currentControlWord != oldControlWord) {
-        controlWord.setDouble(currentControlWord);
+        controlWord.set(currentControlWord);
         oldControlWord = currentControlWord;
       }
     }

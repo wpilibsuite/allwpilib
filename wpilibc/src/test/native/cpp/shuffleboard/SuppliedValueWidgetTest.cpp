@@ -33,7 +33,7 @@ TEST_F(SuppliedValueWidgetTest, AddString) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/String");
 
   m_shuffleboardInst.Update();
-  EXPECT_EQ("foo", entry.GetValue()->GetString());
+  EXPECT_EQ("foo", entry.GetValue().GetString());
 }
 
 TEST_F(SuppliedValueWidgetTest, AddNumber) {
@@ -42,7 +42,7 @@ TEST_F(SuppliedValueWidgetTest, AddNumber) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Num");
 
   m_shuffleboardInst.Update();
-  EXPECT_FLOAT_EQ(1.0, entry.GetValue()->GetDouble());
+  EXPECT_FLOAT_EQ(1.0, entry.GetValue().GetDouble());
 }
 
 TEST_F(SuppliedValueWidgetTest, AddBoolean) {
@@ -51,7 +51,7 @@ TEST_F(SuppliedValueWidgetTest, AddBoolean) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Bool");
 
   m_shuffleboardInst.Update();
-  EXPECT_EQ(true, entry.GetValue()->GetBoolean());
+  EXPECT_EQ(true, entry.GetValue().GetBoolean());
 }
 
 TEST_F(SuppliedValueWidgetTest, AddStringArray) {
@@ -60,7 +60,7 @@ TEST_F(SuppliedValueWidgetTest, AddStringArray) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Strings");
 
   m_shuffleboardInst.Update();
-  auto actual = entry.GetValue()->GetStringArray();
+  auto actual = entry.GetValue().GetStringArray();
 
   EXPECT_EQ(strings.size(), actual.size());
   for (size_t i = 0; i < strings.size(); i++) {
@@ -74,7 +74,7 @@ TEST_F(SuppliedValueWidgetTest, AddNumberArray) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Numbers");
 
   m_shuffleboardInst.Update();
-  auto actual = entry.GetValue()->GetDoubleArray();
+  auto actual = entry.GetValue().GetDoubleArray();
 
   EXPECT_EQ(nums.size(), actual.size());
   for (size_t i = 0; i < nums.size(); i++) {
@@ -88,7 +88,7 @@ TEST_F(SuppliedValueWidgetTest, AddBooleanArray) {
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Booleans");
 
   m_shuffleboardInst.Update();
-  auto actual = entry.GetValue()->GetBooleanArray();
+  auto actual = entry.GetValue().GetBooleanArray();
 
   EXPECT_EQ(bools.size(), actual.size());
   for (size_t i = 0; i < bools.size(); i++) {
@@ -97,11 +97,11 @@ TEST_F(SuppliedValueWidgetTest, AddBooleanArray) {
 }
 
 TEST_F(SuppliedValueWidgetTest, AddRaw) {
-  std::string_view bytes = "\1\2\3";
+  std::vector<uint8_t> bytes = {1, 2, 3};
   m_tab->AddRaw("Raw", [&bytes]() { return bytes; });
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Raw");
 
   m_shuffleboardInst.Update();
-  auto actual = entry.GetValue()->GetRaw();
-  EXPECT_EQ(bytes, actual);
+  auto actual = entry.GetValue().GetRaw();
+  EXPECT_EQ(bytes, std::vector<uint8_t>(actual.begin(), actual.end()));
 }

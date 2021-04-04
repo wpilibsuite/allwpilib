@@ -6,9 +6,12 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -56,6 +59,14 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    m_mutex.lock();
+    try {
+      for (StringPublisher pub : m_activePubs) {
+        pub.close();
+      }
+    } finally {
+      m_mutex.unlock();
+    }
   }
 
   /**
@@ -104,13 +115,15 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
   }
 
   private String m_selected;
-  private final List<NetworkTableEntry> m_activeEntries = new ArrayList<>();
+  private final List<StringPublisher> m_activePubs = new ArrayList<>();
   private final ReentrantLock m_mutex = new ReentrantLock();
 
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
-    builder.getEntry(INSTANCE).setDouble(m_instance);
+    IntegerPublisher instancePub = new IntegerTopic(builder.getTopic(INSTANCE)).publish();
+    instancePub.set(m_instance);
+    builder.addCloseable(instancePub);
     builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);
     builder.addStringArrayProperty(OPTIONS, () -> m_map.keySet().toArray(new String[0]), null);
     builder.addStringProperty(
@@ -130,7 +143,7 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
         null);
     m_mutex.lock();
     try {
-      m_activeEntries.add(builder.getEntry(ACTIVE));
+      m_activePubs.add(new StringTopic(builder.getTopic(ACTIVE)).publish());
     } finally {
       m_mutex.unlock();
     }
@@ -141,8 +154,8 @@ public class SendableChooser<V> implements NTSendable, AutoCloseable {
           m_mutex.lock();
           try {
             m_selected = val;
-            for (NetworkTableEntry entry : m_activeEntries) {
-              entry.setString(val);
+            for (StringPublisher pub : m_activePubs) {
+              pub.set(val);
             }
           } finally {
             m_mutex.unlock();

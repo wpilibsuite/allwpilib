@@ -48,8 +48,7 @@ static void NtInitialize() {
     if (!win) {
       return;
     }
-    bool timedOut;
-    for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
+    for (auto&& event : nt::ReadConnectionListenerQueue(poller)) {
       if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
         // for server mode, just print number of clients connected
         glfwSetWindowTitle(win,
@@ -68,10 +67,9 @@ static void NtInitialize() {
 
   // handle NetworkTables log messages
   auto logPoller = nt::CreateLoggerPoller(inst);
-  nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
+  // nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([logPoller] {
-    bool timedOut;
-    for (auto&& msg : nt::PollLogger(logPoller, 0, &timedOut)) {
+    for (auto&& msg : nt::ReadLoggerQueue(logPoller)) {
       const char* level = "";
       if (msg.level >= NT_LOG_CRITICAL) {
         level = "CRITICAL: ";
@@ -91,6 +89,7 @@ static void NtInitialize() {
 
   // NetworkTables settings window
   gSettings = std::make_unique<glass::NetworkTablesSettings>(
+      "outlineviewer",
       glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gSettings->Update(); });
 }
@@ -193,6 +192,8 @@ static void DisplayGui() {
   }
 
   // display table view
+  glass::DisplayNetworkTablesInfo(gModel.get());
+  ImGui::Separator();
   glass::DisplayNetworkTables(gModel.get(), gFlagsSettings.GetFlags());
 
   ImGui::End();

@@ -20,36 +20,49 @@ class NetworkTablesHelper {
   NetworkTablesHelper& operator=(const NetworkTablesHelper&) = delete;
 
   NT_Inst GetInstance() const { return m_inst; }
-  NT_EntryListenerPoller GetPoller() const { return m_poller; }
+  NT_TopicListenerPoller GetTopicPoller() const { return m_topicPoller; }
+  NT_ValueListenerPoller GetValuePoller() const { return m_valuePoller; }
 
   NT_Entry GetEntry(std::string_view name) const {
     return nt::GetEntry(m_inst, name);
   }
 
-  static constexpr int kDefaultListenerFlags =
-      NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE | NT_NOTIFY_DELETE |
-      NT_NOTIFY_IMMEDIATE;
+  static constexpr int kDefaultTopicListenerFlags = NT_TOPIC_NOTIFY_PUBLISH |
+                                                    NT_TOPIC_NOTIFY_UNPUBLISH |
+                                                    NT_TOPIC_NOTIFY_IMMEDIATE;
+  static constexpr int kDefaultValueListenerFlags =
+      NT_VALUE_NOTIFY_IMMEDIATE | NT_VALUE_NOTIFY_LOCAL;
 
-  NT_EntryListener AddListener(NT_Entry entry,
-                               unsigned int flags = kDefaultListenerFlags) {
-    return nt::AddPolledEntryListener(m_poller, entry, flags);
+  NT_TopicListener AddTopicListener(
+      NT_Topic topic, unsigned int flags = kDefaultTopicListenerFlags) {
+    return nt::AddPolledTopicListener(m_topicPoller, topic, flags);
   }
 
-  NT_EntryListener AddListener(std::string_view prefix,
-                               unsigned int flags = kDefaultListenerFlags) {
-    return nt::AddPolledEntryListener(m_poller, prefix, flags);
+  NT_TopicListener AddTopicListener(
+      std::string_view prefix,
+      unsigned int flags = kDefaultTopicListenerFlags) {
+    return nt::AddPolledTopicListener(m_topicPoller, {&prefix, 1}, flags);
   }
 
-  std::vector<nt::EntryNotification> PollListener() {
-    bool timedOut = false;
-    return nt::PollEntryListener(m_poller, 0, &timedOut);
+  std::vector<nt::TopicNotification> PollTopicListener() {
+    return nt::ReadTopicListenerQueue(m_topicPoller);
+  }
+
+  NT_ValueListener AddValueListener(
+      NT_Handle subentry, unsigned int mask = kDefaultValueListenerFlags) {
+    return nt::AddPolledValueListener(m_valuePoller, subentry, mask);
+  }
+
+  std::vector<nt::ValueNotification> PollValueListener() {
+    return nt::ReadValueListenerQueue(m_valuePoller);
   }
 
   bool IsConnected() const;
 
  private:
   NT_Inst m_inst;
-  NT_EntryListenerPoller m_poller;
+  NT_TopicListenerPoller m_topicPoller;
+  NT_ValueListenerPoller m_valuePoller;
 };
 
 }  // namespace glass

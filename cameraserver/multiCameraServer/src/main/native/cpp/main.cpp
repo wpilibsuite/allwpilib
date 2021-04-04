@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
@@ -182,7 +183,8 @@ int main(int argc, char* argv[]) {
     ntinst.StartServer();
   } else {
     fmt::print("Setting up NetworkTables client for team {}\n", team);
-    ntinst.StartClientTeam(team);
+    ntinst.StartClient4();
+    ntinst.SetServerTeam(team);
   }
 
   // start cameras

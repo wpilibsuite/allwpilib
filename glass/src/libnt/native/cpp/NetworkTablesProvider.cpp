@@ -24,9 +24,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage, NT_Inst inst)
       m_nt{inst},
       m_typeCache{storage.GetChild("types")} {
   storage.SetCustomApply([this] {
-    m_listener =
-        m_nt.AddListener("", NT_NOTIFY_LOCAL | NT_NOTIFY_NEW |
-                                 NT_NOTIFY_DELETE | NT_NOTIFY_IMMEDIATE);
+    m_listener = m_nt.AddTopicListener("");
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
@@ -49,7 +47,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage, NT_Inst inst)
     }
   });
   storage.SetCustomClear([this, &storage] {
-    nt::RemoveEntryListener(m_listener);
+    nt::RemoveTopicListener(m_listener);
     m_listener = 0;
     for (auto&& modelEntry : m_modelEntries) {
       modelEntry->model.reset();
@@ -101,35 +99,56 @@ void NetworkTablesProvider::Update() {
   Provider::Update();
 
   // add/remove entries from NT changes
-  for (auto&& event : m_nt.PollListener()) {
+  for (auto&& event : m_nt.PollTopicListener()) {
     // look for .type fields
-    std::string_view eventName{event.name};
-    if (!wpi::ends_with(eventName, "/.type") || !event.value ||
-        !event.value->IsString()) {
+    if (!wpi::ends_with(event.info.name, "/.type") ||
+        event.info.type != NT_STRING || event.info.type_str != "string") {
       continue;
     }
-    auto tableName = wpi::drop_back(eventName, 6);
+
+    if (event.flags & NT_TOPIC_NOTIFY_UNPUBLISH) {
+      auto it = m_topicMap.find(event.info.topic);
+      if (it != m_topicMap.end()) {
+        nt::RemoveValueListener(it->second.listener);
+        m_topicMap.erase(it);
+      }
+
+      auto it2 = std::find_if(
+          m_viewEntries.begin(), m_viewEntries.end(), [&](const auto& elem) {
+            return static_cast<Entry*>(elem->modelEntry)->typeTopic ==
+                   event.info.topic;
+          });
+      if (it2 != m_viewEntries.end()) {
+        m_viewEntries.erase(it2);
+      }
+    } else if (event.flags & NT_TOPIC_NOTIFY_PUBLISH) {
+      // subscribe to it
+      SubListener sublistener;
+      sublistener.subscriber = nt::StringSubscriber{
+          nt::Subscribe(event.info.topic, NT_STRING, "string"), ""};
+      sublistener.listener =
+          m_nt.AddValueListener(sublistener.subscriber.GetHandle());
+      m_topicMap.try_emplace(event.info.topic, std::move(sublistener));
+    }
+  }
+
+  // handle actual .type strings
+  for (auto&& event : m_nt.PollValueListener()) {
+    if (!event.value.IsString()) {
+      continue;
+    }
 
     // only handle ones where we have a builder
-    auto builderIt = m_typeMap.find(event.value->GetString());
+    auto builderIt = m_typeMap.find(event.value.GetString());
     if (builderIt == m_typeMap.end()) {
       continue;
     }
 
-    if (event.flags & NT_NOTIFY_DELETE) {
-      auto it = std::find_if(
-          m_viewEntries.begin(), m_viewEntries.end(), [&](const auto& elem) {
-            return static_cast<Entry*>(elem->modelEntry)->typeEntry ==
-                   event.entry;
-          });
-      if (it != m_viewEntries.end()) {
-        m_viewEntries.erase(it);
-      }
-    } else if (event.flags & NT_NOTIFY_NEW) {
-      GetOrCreateView(builderIt->second, event.entry, tableName);
-      // cache the type
-      m_typeCache.SetString(tableName, event.value->GetString());
-    }
+    auto tableName = wpi::drop_back(nt::GetTopicName(event.topic), 6);
+
+    GetOrCreateView(builderIt->second, event.topic, tableName);
+    // cache the type
+    m_typeCache.SetString(tableName, event.value.GetString());
   }
 }
 
@@ -180,22 +199,22 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 }
 
 NetworkTablesProvider::ViewEntry* NetworkTablesProvider::GetOrCreateView(
-    const Builder& builder, NT_Entry typeEntry, std::string_view name) {
+    const Builder& builder, NT_Topic typeTopic, std::string_view name) {
   // get view entry if it already exists
   auto viewIt = FindViewEntry(name);
   if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {
     // make sure typeEntry is set in model
-    static_cast<Entry*>((*viewIt)->modelEntry)->typeEntry = typeEntry;
+    static_cast<Entry*>((*viewIt)->modelEntry)->typeTopic = typeTopic;
     return viewIt->get();
   }
 
   // get or create model entry
   auto modelIt = FindModelEntry(name);
   if (modelIt != m_modelEntries.end() && (*modelIt)->name == name) {
-    static_cast<Entry*>(modelIt->get())->typeEntry = typeEntry;
+    static_cast<Entry*>(modelIt->get())->typeTopic = typeTopic;
   } else {
     modelIt = m_modelEntries.emplace(
-        modelIt, std::make_unique<Entry>(typeEntry, name, builder));
+        modelIt, std::make_unique<Entry>(typeTopic, name, builder));
   }
 
   // create new view entry

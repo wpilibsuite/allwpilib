@@ -60,6 +60,28 @@ class SendableBuilder {
                                   std::function<void(bool)> setter) = 0;
 
   /**
+   * Add an integer property.
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddIntegerProperty(std::string_view key,
+                                  std::function<int64_t()> getter,
+                                  std::function<void(int64_t)> setter) = 0;
+
+  /**
+   * Add a float property.
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddFloatProperty(std::string_view key,
+                                std::function<float()> getter,
+                                std::function<void(float)> setter) = 0;
+
+  /**
    * Add a double property.
    *
    * @param key     property name
@@ -93,6 +115,28 @@ class SendableBuilder {
       std::function<void(wpi::span<const int>)> setter) = 0;
 
   /**
+   * Add an integer array property.
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddIntegerArrayProperty(
+      std::string_view key, std::function<std::vector<int64_t>()> getter,
+      std::function<void(wpi::span<const int64_t>)> setter) = 0;
+
+  /**
+   * Add a float array property.
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddFloatArrayProperty(
+      std::string_view key, std::function<std::vector<float>()> getter,
+      std::function<void(wpi::span<const float>)> setter) = 0;
+
+  /**
    * Add a double array property.
    *
    * @param key     property name
@@ -117,13 +161,15 @@ class SendableBuilder {
   /**
    * Add a raw property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key         property name
+   * @param typeString  type string
+   * @param getter      getter function (returns current value)
+   * @param setter      setter function (sets new value)
    */
-  virtual void AddRawProperty(std::string_view key,
-                              std::function<std::string()> getter,
-                              std::function<void(std::string_view)> setter) = 0;
+  virtual void AddRawProperty(
+      std::string_view key, std::string_view typeString,
+      std::function<std::vector<uint8_t>()> getter,
+      std::function<void(wpi::span<const uint8_t>)> setter) = 0;
 
   /**
    * Add a string property (SmallString form).
@@ -149,6 +195,33 @@ class SendableBuilder {
       std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)>
           getter,
       std::function<void(wpi::span<const int>)> setter) = 0;
+
+  /**
+   * Add an integer array property (SmallVector form).
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddSmallIntegerArrayProperty(
+      std::string_view key,
+      std::function<
+          wpi::span<const int64_t>(wpi::SmallVectorImpl<int64_t>& buf)>
+          getter,
+      std::function<void(wpi::span<const int64_t>)> setter) = 0;
+
+  /**
+   * Add a float array property (SmallVector form).
+   *
+   * @param key     property name
+   * @param getter  getter function (returns current value)
+   * @param setter  setter function (sets new value)
+   */
+  virtual void AddSmallFloatArrayProperty(
+      std::string_view key,
+      std::function<wpi::span<const float>(wpi::SmallVectorImpl<float>& buf)>
+          getter,
+      std::function<void(wpi::span<const float>)> setter) = 0;
 
   /**
    * Add a double array property (SmallVector form).
@@ -181,13 +254,15 @@ class SendableBuilder {
    * Add a raw property (SmallVector form).
    *
    * @param key     property name
+   * @param typeString  type string
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallRawProperty(
-      std::string_view key,
-      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(std::string_view)> setter) = 0;
+      std::string_view key, std::string_view typeString,
+      std::function<wpi::span<uint8_t>(wpi::SmallVectorImpl<uint8_t>& buf)>
+          getter,
+      std::function<void(wpi::span<const uint8_t>)> setter) = 0;
 
   /**
    * Gets the kind of backend being used.

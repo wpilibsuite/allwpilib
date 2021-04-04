@@ -14,23 +14,20 @@
 
 namespace nt {
 
-class ValueMatcher
-    : public ::testing::MatcherInterface<std::shared_ptr<Value>> {
+class ValueMatcher : public ::testing::MatcherInterface<Value> {
  public:
-  explicit ValueMatcher(std::shared_ptr<Value> goodval_)
-      : goodval(std::move(goodval_)) {}
+  explicit ValueMatcher(Value goodval_) : goodval(std::move(goodval_)) {}
 
-  bool MatchAndExplain(std::shared_ptr<Value> msg,
+  bool MatchAndExplain(Value msg,
                        ::testing::MatchResultListener* listener) const override;
   void DescribeTo(::std::ostream* os) const override;
   void DescribeNegationTo(::std::ostream* os) const override;
 
  private:
-  std::shared_ptr<Value> goodval;
+  Value goodval;
 };
 
-inline ::testing::Matcher<std::shared_ptr<Value>> ValueEq(
-    std::shared_ptr<Value> goodval) {
+inline ::testing::Matcher<Value> ValueEq(const Value& goodval) {
   return ::testing::MakeMatcher(new ValueMatcher(goodval));
 }
 

@@ -10,11 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.UtilityClassTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SmartDashboardTest extends UtilityClassTest<SmartDashboard> {
-  private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("SmartDashboard");
+  private NetworkTableInstance m_inst;
+  private NetworkTable m_table;
 
   SmartDashboardTest() {
     super(SmartDashboard.class);
@@ -22,7 +24,14 @@ class SmartDashboardTest extends UtilityClassTest<SmartDashboard> {
 
   @BeforeEach
   void beforeEach() {
-    m_table.getKeys().forEach(m_table::delete);
+    m_inst = NetworkTableInstance.create();
+    m_table = m_inst.getTable("SmartDashboard");
+    SmartDashboard.setNetworkTableInstance(m_inst);
+  }
+
+  @AfterEach
+  void afterEach() {
+    m_inst.close();
   }
 
   @Test

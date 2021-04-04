@@ -42,6 +42,7 @@ static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
 static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
 static glass::LogData gNetworkTablesLog;
 static std::unique_ptr<glass::Window> gNetworkTablesWindow;
+static std::unique_ptr<glass::Window> gNetworkTablesInfoWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesSettingsWindow;
 static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
 
@@ -78,8 +79,7 @@ static void NtInitialize() {
     if (!win) {
       return;
     }
-    bool timedOut;
-    for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
+    for (auto&& event : nt::ReadConnectionListenerQueue(poller)) {
       if (event.connected) {
         glfwSetWindowTitle(
             win, fmt::format("Glass - Connected ({})", event.conn.remote_ip)
@@ -94,8 +94,7 @@ static void NtInitialize() {
   auto logPoller = nt::CreateLoggerPoller(inst);
   nt::AddPolledLogger(logPoller, NT_LOG_INFO, 100);
   gui::AddEarlyExecute([logPoller] {
-    bool timedOut;
-    for (auto&& msg : nt::PollLogger(logPoller, 0, &timedOut)) {
+    for (auto&& msg : nt::ReadLoggerQueue(logPoller)) {
       const char* level = "";
       if (msg.level >= NT_LOG_CRITICAL) {
         level = "CRITICAL: ";
@@ -132,9 +131,18 @@ static void NtInitialize() {
   gNetworkTablesWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
 
+  // NetworkTables info window
+  gNetworkTablesInfoWindow = std::make_unique<glass::Window>(
+      glass::GetStorageRoot().GetChild("NetworkTables Info"),
+      "NetworkTables Info");
+  gNetworkTablesInfoWindow->SetView(glass::MakeFunctionView(
+      [&] { glass::DisplayNetworkTablesInfo(gNetworkTablesModel.get()); }));
+  gNetworkTablesInfoWindow->DisableRenamePopup();
+  gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
+
   // NetworkTables settings window
   gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>(
-      glass::GetStorageRoot().GetChild("NetworkTables Settings"));
+      "glass", glass::GetStorageRoot().GetChild("NetworkTables Settings"));
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
   gNetworkTablesSettingsWindow = std::make_unique<glass::Window>(
@@ -217,6 +225,9 @@ int main(int argc, char** argv) {
       }
       if (gNetworkTablesWindow) {
         gNetworkTablesWindow->DisplayMenuItem("NetworkTables View");
+      }
+      if (gNetworkTablesInfoWindow) {
+        gNetworkTablesInfoWindow->DisplayMenuItem("NetworkTables Info");
       }
       if (gNetworkTablesLogWindow) {
         gNetworkTablesLogWindow->DisplayMenuItem("NetworkTables Log");

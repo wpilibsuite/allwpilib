@@ -14,27 +14,28 @@
 using namespace frc2;
 
 class NetworkButtonTest : public CommandTestBase {
-  void SetUp() override { nt::NetworkTableInstance::GetDefault().StartLocal(); }
-
-  void TearDown() override {
-    nt::NetworkTableInstance::GetDefault().DeleteAllEntries();
-    nt::NetworkTableInstance::GetDefault().StopLocal();
+ public:
+  void SetUp() override {
+    inst = nt::NetworkTableInstance::Create();
+    inst.StartLocal();
   }
+
+  void TearDown() override { nt::NetworkTableInstance::Destroy(inst); }
+
+  nt::NetworkTableInstance inst;
 };
 
 TEST_F(NetworkButtonTest, SetNetworkButton) {
   auto& scheduler = CommandScheduler::GetInstance();
-  auto entry = nt::NetworkTableInstance::GetDefault()
-                   .GetTable("TestTable")
-                   ->GetEntry("Test");
+  auto pub = inst.GetTable("TestTable")->GetBooleanTopic("Test").Publish();
   bool finished = false;
 
   WaitUntilCommand command([&finished] { return finished; });
 
-  NetworkButton("TestTable", "Test").WhenActive(&command);
+  NetworkButton(inst, "TestTable", "Test").WhenActive(&command);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
-  entry.SetBoolean(true);
+  pub.Set(true);
   scheduler.Run();
   EXPECT_TRUE(scheduler.IsScheduled(&command));
   finished = true;

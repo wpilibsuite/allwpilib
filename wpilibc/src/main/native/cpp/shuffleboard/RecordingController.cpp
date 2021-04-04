@@ -9,29 +9,30 @@
 using namespace frc;
 using namespace frc::detail;
 
-RecordingController::RecordingController(nt::NetworkTableInstance ntInstance)
-    : m_recordingControlEntry(), m_recordingFileNameFormatEntry() {
+RecordingController::RecordingController(nt::NetworkTableInstance ntInstance) {
   m_recordingControlEntry =
-      ntInstance.GetEntry("/Shuffleboard/.recording/RecordData");
+      ntInstance.GetBooleanTopic("/Shuffleboard/.recording/RecordData")
+          .Publish();
   m_recordingFileNameFormatEntry =
-      ntInstance.GetEntry("/Shuffleboard/.recording/FileNameFormat");
+      ntInstance.GetStringTopic("/Shuffleboard/.recording/FileNameFormat")
+          .Publish();
   m_eventsTable = ntInstance.GetTable("/Shuffleboard/.recording/events");
 }
 
 void RecordingController::StartRecording() {
-  m_recordingControlEntry.SetBoolean(true);
+  m_recordingControlEntry.Set(true);
 }
 
 void RecordingController::StopRecording() {
-  m_recordingControlEntry.SetBoolean(false);
+  m_recordingControlEntry.Set(false);
 }
 
 void RecordingController::SetRecordingFileNameFormat(std::string_view format) {
-  m_recordingFileNameFormatEntry.SetString(format);
+  m_recordingFileNameFormatEntry.Set(format);
 }
 
 void RecordingController::ClearRecordingFileNameFormat() {
-  m_recordingFileNameFormatEntry.Delete();
+  m_recordingFileNameFormatEntry.Set("");
 }
 
 void RecordingController::AddEventMarker(
@@ -43,6 +44,6 @@ void RecordingController::AddEventMarker(
     return;
   }
   m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(
-      {std::string{description},
-       std::string{ShuffleboardEventImportanceName(importance)}});
+      {{std::string{description},
+        std::string{ShuffleboardEventImportanceName(importance)}}});
 }

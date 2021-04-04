@@ -7,10 +7,13 @@
 using namespace glass;
 
 NetworkTablesHelper::NetworkTablesHelper(NT_Inst inst)
-    : m_inst{inst}, m_poller{nt::CreateEntryListenerPoller(inst)} {}
+    : m_inst{inst},
+      m_topicPoller{nt::CreateTopicListenerPoller(inst)},
+      m_valuePoller{nt::CreateValueListenerPoller(inst)} {}
 
 NetworkTablesHelper::~NetworkTablesHelper() {
-  nt::DestroyEntryListenerPoller(m_poller);
+  nt::DestroyTopicListenerPoller(m_topicPoller);
+  nt::DestroyValueListenerPoller(m_valuePoller);
 }
 
 bool NetworkTablesHelper::IsConnected() const {

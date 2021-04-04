@@ -195,7 +195,7 @@ class IterativeRobotBase : public RobotBase {
 
   /**
    * Enables or disables flushing NetworkTables every loop iteration.
-   * By default, this is disabled.
+   * By default, this is enabled.
    *
    * @param enabled True to enable, false to disable
    */
@@ -227,7 +227,7 @@ class IterativeRobotBase : public RobotBase {
   Mode m_lastMode = Mode::kNone;
   units::second_t m_period;
   Watchdog m_watchdog;
-  bool m_ntFlushEnabled = false;
+  bool m_ntFlushEnabled = true;
 
   void PrintLoopOverrunMessage();
 };

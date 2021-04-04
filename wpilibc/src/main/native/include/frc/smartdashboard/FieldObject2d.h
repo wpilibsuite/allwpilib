@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/DoubleArrayTopic.h>
 #include <units/length.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
@@ -105,7 +105,7 @@ class FieldObject2d {
 
   mutable wpi::mutex m_mutex;
   std::string m_name;
-  nt::NetworkTableEntry m_entry;
+  nt::DoubleArrayEntry m_entry;
   mutable wpi::SmallVector<Pose2d, 1> m_poses;
 };
 

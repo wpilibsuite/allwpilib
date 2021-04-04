@@ -10,34 +10,28 @@
 using namespace glass;
 
 NTDigitalInputModel::NTDigitalInputModel(std::string_view path)
-    : NTDigitalInputModel{nt::GetDefaultInstance(), path} {}
+    : NTDigitalInputModel{nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTDigitalInputModel::NTDigitalInputModel(NT_Inst inst, std::string_view path)
-    : m_nt{inst},
-      m_value{m_nt.GetEntry(fmt::format("{}/Value", path))},
-      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))},
+NTDigitalInputModel::NTDigitalInputModel(nt::NetworkTableInstance inst,
+                                         std::string_view path)
+    : m_inst{inst},
+      m_value{inst.GetBooleanTopic(fmt::format("{}/Value", path))
+                  .Subscribe(false, {{nt::PubSubOption::SendAll(true)}})},
+      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
       m_valueData{fmt::format("NT_DIn:{}", path)},
       m_nameValue{wpi::rsplit(path, '/').second} {
-  m_nt.AddListener(m_value);
-  m_nt.AddListener(m_name);
-
   m_valueData.SetDigital(true);
 }
 
 void NTDigitalInputModel::Update() {
-  for (auto&& event : m_nt.PollListener()) {
-    if (event.entry == m_value) {
-      if (event.value && event.value->IsBoolean()) {
-        m_valueData.SetValue(event.value->GetBoolean());
-      }
-    } else if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
-      }
-    }
+  for (auto&& v : m_value.ReadQueue()) {
+    m_valueData.SetValue(v.value, v.time);
+  }
+  for (auto&& v : m_name.ReadQueue()) {
+    m_nameValue = std::move(v.value);
   }
 }
 
 bool NTDigitalInputModel::Exists() {
-  return m_nt.IsConnected() && nt::GetEntryType(m_value) != NT_UNASSIGNED;
+  return m_inst.IsConnected() && m_value.Exists();
 }

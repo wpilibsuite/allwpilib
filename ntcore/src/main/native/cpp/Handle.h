@@ -27,11 +27,19 @@ class Handle {
     kInstance,
     kLogger,
     kLoggerPoller,
-    kRpcCall,
-    kRpcCallPoller,
     kDataLogger,
-    kConnectionDataLogger
+    kConnectionDataLogger,
+    kMultiSubscriber,
+    kTopic,
+    kTopicListener,
+    kTopicListenerPoller,
+    kSubscriber,
+    kPublisher,
+    kValueListener,
+    kValueListenerPoller,
+    kTypeMax
   };
+  static_assert(kTypeMax <= wpi::kHandleTypeHALBase);
   enum { kIndexMax = 0xfffff };
 
   explicit Handle(NT_Handle handle) : m_handle(handle) {}
@@ -48,7 +56,9 @@ class Handle {
                (index & 0xfffff);
   }
 
-  int GetIndex() const { return static_cast<int>(m_handle) & 0xfffff; }
+  unsigned int GetIndex() const {
+    return static_cast<unsigned int>(m_handle) & 0xfffff;
+  }
   Type GetType() const {
     return static_cast<Type>((static_cast<int>(m_handle) >> 24) & 0x7f);
   }

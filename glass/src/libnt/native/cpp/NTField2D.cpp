@@ -28,7 +28,7 @@ class NTField2DModel::ObjectModel : public FieldObjectModel {
 
   void Update() override {
     if (auto value = nt::GetEntryValue(m_entry)) {
-      NTUpdate(*value);
+      NTUpdate(value);
     }
   }
   bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
@@ -64,7 +64,7 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
     }
   } else if (value.IsRaw()) {
     // treat it simply as an array of doubles
-    std::string_view data = value.GetRaw();
+    auto data = value.GetRaw();
 
     // must be triples of doubles
     auto size = data.size();
@@ -72,7 +72,7 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
       return;
     }
     m_poses.resize(size / (3 * 8));
-    const char* p = data.data();
+    auto p = data.data();
     for (size_t i = 0; i < size / (3 * 8); ++i) {
       double x = wpi::BitsToDouble(
           wpi::support::endian::readNext<uint64_t, wpi::support::big,
@@ -90,35 +90,14 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
 }
 
 void NTField2DModel::ObjectModel::UpdateNT() {
-  if (m_poses.size() < (255 / 3)) {
-    wpi::SmallVector<double, 9> arr;
-    for (auto&& pose : m_poses) {
-      auto& translation = pose.Translation();
-      arr.push_back(translation.X().value());
-      arr.push_back(translation.Y().value());
-      arr.push_back(pose.Rotation().Degrees().value());
-    }
-    nt::SetEntryTypeValue(m_entry, nt::Value::MakeDoubleArray(arr));
-  } else {
-    // send as raw array of doubles if too big for NT array
-    std::vector<char> arr;
-    arr.resize(m_poses.size() * 3 * 8);
-    char* p = arr.data();
-    for (auto&& pose : m_poses) {
-      auto& translation = pose.Translation();
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.X().value()));
-      p += 8;
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.Y().value()));
-      p += 8;
-      wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(pose.Rotation().Degrees().value()));
-      p += 8;
-    }
-    nt::SetEntryTypeValue(m_entry,
-                          nt::Value::MakeRaw({arr.data(), arr.size()}));
+  wpi::SmallVector<double, 9> arr;
+  for (auto&& pose : m_poses) {
+    auto& translation = pose.Translation();
+    arr.push_back(translation.X().value());
+    arr.push_back(translation.Y().value());
+    arr.push_back(pose.Rotation().Degrees().value());
   }
+  nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
 }
 
 void NTField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
@@ -155,18 +134,21 @@ NTField2DModel::NTField2DModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
       m_path{fmt::format("{}/", path)},
       m_name{m_nt.GetEntry(fmt::format("{}/.name", path))} {
+#if 0
   m_nt.AddListener(m_path, NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
+#endif
 }
 
 NTField2DModel::~NTField2DModel() = default;
 
 void NTField2DModel::Update() {
+#if 0
   for (auto&& event : m_nt.PollListener()) {
     // .name
     if (event.entry == m_name) {
-      if (event.value && event.value->IsString()) {
-        m_nameValue = event.value->GetString();
+      if (event.value && event.value.IsString()) {
+        m_nameValue = event.value.GetString();
       }
       continue;
     }
@@ -177,7 +159,7 @@ void NTField2DModel::Update() {
           m_objects.begin(), m_objects.end(),
           [&](const auto& e) { return e->GetEntry() == event.entry; });
       if (it != m_objects.end()) {
-        (*it)->NTUpdate(*event.value);
+        (*it)->NTUpdate(event.value);
         continue;
       }
     }
@@ -204,10 +186,11 @@ void NTField2DModel::Update() {
         continue;
       }
       if (event.flags & (NT_NOTIFY_NEW | NT_NOTIFY_UPDATE)) {
-        (*it)->NTUpdate(*event.value);
+        (*it)->NTUpdate(event.value);
       }
     }
   }
+#endif
 }
 
 bool NTField2DModel::Exists() {
@@ -231,7 +214,7 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
 void NTField2DModel::RemoveFieldObject(std::string_view name) {
   auto [it, match] = Find(fmt::format("{}{}", m_path, name));
   if (match) {
-    nt::DeleteEntry((*it)->GetEntry());
+    // nt::DeleteEntry((*it)->GetEntry());
     m_objects.erase(it);
   }
 }

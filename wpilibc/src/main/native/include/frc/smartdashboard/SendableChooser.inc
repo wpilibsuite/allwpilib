@@ -48,7 +48,14 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
 void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
-  builder.GetEntry(kInstance).SetDouble(m_instance);
+  {
+    std::scoped_lock lock(m_mutex);
+    m_instancePubs.emplace_back(
+        nt::IntegerTopic{builder.GetTopic(kInstance)}.Publish());
+    m_instancePubs.back().Set(m_instance);
+    m_activePubs.emplace_back(
+        nt::StringTopic{builder.GetTopic(kActive)}.Publish());
+  }
   builder.AddStringArrayProperty(
       kOptions,
       [=] {
@@ -82,16 +89,12 @@ void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
         }
       },
       nullptr);
-  {
-    std::scoped_lock lock(m_mutex);
-    m_activeEntries.emplace_back(builder.GetEntry(kActive));
-  }
   builder.AddStringProperty(kSelected, nullptr, [=](std::string_view val) {
     std::scoped_lock lock(m_mutex);
     m_haveSelected = true;
     m_selected = val;
-    for (auto& entry : m_activeEntries) {
-      entry.SetString(val);
+    for (auto& pub : m_activePubs) {
+      pub.Set(val);
     }
   });
 }

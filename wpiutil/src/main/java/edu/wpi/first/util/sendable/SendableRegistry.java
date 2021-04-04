@@ -17,12 +17,23 @@ import java.util.function.Supplier;
  * The SendableRegistry class is the public interface for registering sensors and actuators for use
  * on dashboards and LiveWindow.
  */
+@SuppressWarnings("PMD.AvoidCatchingGenericException")
 public final class SendableRegistry {
-  private static class Component {
+  private static class Component implements AutoCloseable {
     Component() {}
 
     Component(Sendable sendable) {
       m_sendable = new WeakReference<>(sendable);
+    }
+
+    @Override
+    public void close() throws Exception {
+      m_builder.close();
+      for (AutoCloseable data : m_data) {
+        if (data != null) {
+          data.close();
+        }
+      }
     }
 
     WeakReference<Sendable> m_sendable;
@@ -31,7 +42,7 @@ public final class SendableRegistry {
     String m_subsystem = "Ungrouped";
     WeakReference<Sendable> m_parent;
     boolean m_liveWindow;
-    Object[] m_data;
+    AutoCloseable[] m_data;
 
     void setName(String moduleType, int channel) {
       m_name = moduleType + "[" + channel + "]";
@@ -131,6 +142,13 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String name) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
+      if (comp.m_builder != null) {
+        try {
+          comp.m_builder.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
       comp.m_builder = liveWindowFactory.get();
     }
     comp.m_liveWindow = true;
@@ -147,6 +165,13 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String moduleType, int channel) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
+      if (comp.m_builder != null) {
+        try {
+          comp.m_builder.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
       comp.m_builder = liveWindowFactory.get();
     }
     comp.m_liveWindow = true;
@@ -165,6 +190,13 @@ public final class SendableRegistry {
       Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
+      if (comp.m_builder != null) {
+        try {
+          comp.m_builder.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
       comp.m_builder = liveWindowFactory.get();
     }
     comp.m_liveWindow = true;
@@ -181,6 +213,13 @@ public final class SendableRegistry {
   public static synchronized void addLW(Sendable sendable, String subsystem, String name) {
     Component comp = getOrAdd(sendable);
     if (liveWindowFactory != null) {
+      if (comp.m_builder != null) {
+        try {
+          comp.m_builder.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
       comp.m_builder = liveWindowFactory.get();
     }
     comp.m_liveWindow = true;
@@ -211,7 +250,15 @@ public final class SendableRegistry {
    * @return true if the object was removed; false if it was not present
    */
   public static synchronized boolean remove(Sendable sendable) {
-    return components.remove(sendable) != null;
+    Component comp = components.remove(sendable);
+    if (comp != null) {
+      try {
+        comp.close();
+      } catch (Exception e) {
+        // ignore
+      }
+    }
+    return comp != null;
   }
 
   /**
@@ -338,22 +385,33 @@ public final class SendableRegistry {
    * @param sendable object
    * @param handle data handle returned by getDataHandle()
    * @param data data to set
-   * @return Previous data (may be null)
+   * @return Previous data (may be null). If non-null, caller is responsible for calling close().
    */
-  public static synchronized Object setData(Sendable sendable, int handle, Object data) {
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  public static synchronized AutoCloseable setData(
+      Sendable sendable, int handle, AutoCloseable data) {
     Component comp = components.get(sendable);
     if (comp == null) {
       return null;
     }
-    Object rv = null;
+    AutoCloseable rv = null;
     if (comp.m_data == null) {
-      comp.m_data = new Object[handle + 1];
+      comp.m_data = new AutoCloseable[handle + 1];
     } else if (handle < comp.m_data.length) {
       rv = comp.m_data[handle];
     } else {
       comp.m_data = Arrays.copyOf(comp.m_data, handle + 1);
     }
-    comp.m_data[handle] = data;
+    if (comp.m_data[handle] != data) {
+      if (comp.m_data[handle] != null) {
+        try {
+          comp.m_data[handle].close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      comp.m_data[handle] = data;
+    }
     return rv;
   }
 
@@ -405,7 +463,11 @@ public final class SendableRegistry {
   public static synchronized void publish(Sendable sendable, SendableBuilder builder) {
     Component comp = getOrAdd(sendable);
     if (comp.m_builder != null) {
-      comp.m_builder.clearProperties();
+      try {
+        comp.m_builder.close();
+      } catch (Exception e) {
+        // ignore
+      }
     }
     comp.m_builder = builder; // clear any current builder
     sendable.initSendable(comp.m_builder);
@@ -440,7 +502,7 @@ public final class SendableRegistry {
     public Sendable parent;
 
     /** Data stored in object with setData(). Update this to change the data. */
-    public Object data;
+    public AutoCloseable data;
 
     /** Sendable builder for the sendable. */
     public SendableBuilder builder;
@@ -457,6 +519,7 @@ public final class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
@@ -494,11 +557,20 @@ public final class SendableRegistry {
         }
         if (cbdata.data != null) {
           if (comp.m_data == null) {
-            comp.m_data = new Object[dataHandle + 1];
+            comp.m_data = new AutoCloseable[dataHandle + 1];
           } else if (dataHandle >= comp.m_data.length) {
             comp.m_data = Arrays.copyOf(comp.m_data, dataHandle + 1);
           }
-          comp.m_data[dataHandle] = cbdata.data;
+          if (comp.m_data[dataHandle] != cbdata.data) {
+            if (comp.m_data[dataHandle] != null) {
+              try {
+                comp.m_data[dataHandle].close();
+              } catch (Exception e) {
+                // ignore
+              }
+            }
+            comp.m_data[dataHandle] = cbdata.data;
+          }
         }
       }
     }

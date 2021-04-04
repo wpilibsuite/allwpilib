@@ -8,8 +8,12 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <networktables/BooleanTopic.h>
+#include <networktables/IntegerTopic.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <networktables/StringArrayTopic.h>
+#include <networktables/StringTopic.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -24,9 +28,42 @@ using namespace frc;
 static constexpr char const* kPublishName = "/CameraPublisher";
 
 namespace {
+
+struct Instance;
+
+struct PropertyPublisher {
+  PropertyPublisher(nt::NetworkTable& table, const cs::VideoEvent& event);
+
+  void Update(const cs::VideoEvent& event);
+
+  nt::BooleanEntry booleanValueEntry;
+  nt::IntegerEntry integerValueEntry;
+  nt::StringEntry stringValueEntry;
+  nt::IntegerPublisher minPublisher;
+  nt::IntegerPublisher maxPublisher;
+  nt::IntegerPublisher stepPublisher;
+  nt::IntegerPublisher defaultPublisher;
+  nt::StringArrayTopic choicesTopic;
+  nt::StringArrayPublisher choicesPublisher;
+};
+
+struct SourcePublisher {
+  SourcePublisher(Instance& inst, std::shared_ptr<nt::NetworkTable> table,
+                  CS_Source source);
+
+  std::shared_ptr<nt::NetworkTable> table;
+  nt::StringPublisher sourcePublisher;
+  nt::StringPublisher descriptionPublisher;
+  nt::BooleanPublisher connectedPublisher;
+  nt::StringArrayPublisher streamsPublisher;
+  nt::StringEntry modeEntry;
+  nt::StringArrayPublisher modesPublisher;
+  wpi::DenseMap<CS_Property, PropertyPublisher> properties;
+};
+
 struct Instance {
   Instance();
-  std::shared_ptr<nt::NetworkTable> GetSourceTable(CS_Source source);
+  SourcePublisher* GetPublisher(CS_Source source);
   std::vector<std::string> GetSinkStreamValues(CS_Sink sink);
   std::vector<std::string> GetSourceStreamValues(CS_Source source);
   void UpdateStreamValues();
@@ -37,7 +74,7 @@ struct Instance {
   wpi::StringMap<cs::VideoSource> m_sources;
   wpi::StringMap<cs::VideoSink> m_sinks;
   wpi::DenseMap<CS_Sink, CS_Source> m_fixedSources;
-  wpi::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
+  wpi::DenseMap<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
       nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
   cs::VideoListener m_videoListener;
@@ -45,6 +82,7 @@ struct Instance {
   int m_nextPort{CameraServer::kBasePort};
   std::vector<std::string> m_addresses;
 };
+
 }  // namespace
 
 static Instance& GetInstance() {
@@ -86,9 +124,13 @@ static std::string MakeStreamValue(std::string_view address, int port) {
   return fmt::format("mjpg:http://{}:{}/?action=stream", address, port);
 }
 
-std::shared_ptr<nt::NetworkTable> Instance::GetSourceTable(CS_Source source) {
-  std::scoped_lock lock(m_mutex);
-  return m_tables.lookup(source);
+SourcePublisher* Instance::GetPublisher(CS_Source source) {
+  auto it = m_publishers.find(source);
+  if (it != m_publishers.end()) {
+    return &it->second;
+  } else {
+    return nullptr;
+  }
 }
 
 std::vector<std::string> Instance::GetSinkStreamValues(CS_Sink sink) {
@@ -158,7 +200,6 @@ std::vector<std::string> Instance::GetSourceStreamValues(CS_Source source) {
 }
 
 void Instance::UpdateStreamValues() {
-  std::scoped_lock lock(m_mutex);
   // Over all the sinks...
   for (const auto& i : m_sinks) {
     CS_Status status = 0;
@@ -172,8 +213,7 @@ void Instance::UpdateStreamValues() {
     if (source == 0) {
       continue;
     }
-    auto table = m_tables.lookup(source);
-    if (table) {
+    if (auto publisher = GetPublisher(source)) {
       // Don't set stream values if this is a HttpCamera passthrough
       if (cs::GetSourceKind(source, &status) == CS_SOURCE_HTTP) {
         continue;
@@ -182,7 +222,7 @@ void Instance::UpdateStreamValues() {
       // Set table value
       auto values = GetSinkStreamValues(sink);
       if (!values.empty()) {
-        table->GetEntry("streams").SetStringArray(values);
+        publisher->streamsPublisher.Set(values);
       }
     }
   }
@@ -192,12 +232,11 @@ void Instance::UpdateStreamValues() {
     CS_Source source = i.second.GetHandle();
 
     // Get the source's subtable (if none exists, we're done)
-    auto table = m_tables.lookup(source);
-    if (table) {
+    if (auto publisher = GetPublisher(source)) {
       // Set table value
       auto values = GetSourceStreamValues(source);
       if (!values.empty()) {
-        table->GetEntry("streams").SetStringArray(values);
+        publisher->streamsPublisher.Set(values);
       }
     }
   }
@@ -234,56 +273,98 @@ static std::vector<std::string> GetSourceModeValues(int source) {
   return rv;
 }
 
-static void PutSourcePropertyValue(nt::NetworkTable* table,
-                                   const cs::VideoEvent& event, bool isNew) {
-  std::string_view namePrefix;
-  std::string_view infoPrefix;
+PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
+                                     const cs::VideoEvent& event) {
+  std::string name;
+  std::string infoName;
   if (wpi::starts_with(event.name, "raw_")) {
-    namePrefix = "RawProperty";
-    infoPrefix = "RawPropertyInfo";
+    name = fmt::format("RawProperty/{}", event.name);
+    infoName = fmt::format("RawPropertyInfo/{}", event.name);
   } else {
-    namePrefix = "Property";
-    infoPrefix = "PropertyInfo";
+    name = fmt::format("Property/{}", event.name);
+    infoName = fmt::format("PropertyInfo/{}", event.name);
   }
 
-  wpi::SmallString<64> buf;
   CS_Status status = 0;
-  nt::NetworkTableEntry entry =
-      table->GetEntry(fmt::format("{}/{}", namePrefix, event.name));
   switch (event.propertyKind) {
     case CS_PROP_BOOLEAN:
-      if (isNew) {
-        entry.SetDefaultBoolean(event.value != 0);
-      } else {
-        entry.SetBoolean(event.value != 0);
+      booleanValueEntry = table.GetBooleanTopic(name).GetEntry(false);
+      booleanValueEntry.SetDefault(event.value != 0);
+      break;
+    case CS_PROP_ENUM:
+      choicesTopic =
+          table.GetStringArrayTopic(fmt::format("{}/choices", infoName));
+      [[fallthrough]];
+    case CS_PROP_INTEGER:
+      integerValueEntry = table.GetIntegerTopic(name).GetEntry(0);
+      minPublisher =
+          table.GetIntegerTopic(fmt::format("{}/min", infoName)).Publish();
+      maxPublisher =
+          table.GetIntegerTopic(fmt::format("{}/max", infoName)).Publish();
+      stepPublisher =
+          table.GetIntegerTopic(fmt::format("{}/step", infoName)).Publish();
+      defaultPublisher =
+          table.GetIntegerTopic(fmt::format("{}/default", infoName)).Publish();
+
+      integerValueEntry.SetDefault(event.value);
+      minPublisher.Set(cs::GetPropertyMin(event.propertyHandle, &status));
+      maxPublisher.Set(cs::GetPropertyMax(event.propertyHandle, &status));
+      stepPublisher.Set(cs::GetPropertyStep(event.propertyHandle, &status));
+      defaultPublisher.Set(
+          cs::GetPropertyDefault(event.propertyHandle, &status));
+      break;
+    case CS_PROP_STRING:
+      stringValueEntry = table.GetStringTopic(name).GetEntry("");
+      stringValueEntry.SetDefault(event.valueStr);
+      break;
+    default:
+      break;
+  }
+}
+
+void PropertyPublisher::Update(const cs::VideoEvent& event) {
+  switch (event.propertyKind) {
+    case CS_PROP_BOOLEAN:
+      if (booleanValueEntry) {
+        booleanValueEntry.Set(event.value != 0);
       }
       break;
     case CS_PROP_INTEGER:
     case CS_PROP_ENUM:
-      if (isNew) {
-        entry.SetDefaultDouble(event.value);
-        table->GetEntry(fmt::format("{}/{}/min", infoPrefix, event.name))
-            .SetDouble(cs::GetPropertyMin(event.propertyHandle, &status));
-        table->GetEntry(fmt::format("{}/{}/max", infoPrefix, event.name))
-            .SetDouble(cs::GetPropertyMax(event.propertyHandle, &status));
-        table->GetEntry(fmt::format("{}/{}/step", infoPrefix, event.name))
-            .SetDouble(cs::GetPropertyStep(event.propertyHandle, &status));
-        table->GetEntry(fmt::format("{}/{}/default", infoPrefix, event.name))
-            .SetDouble(cs::GetPropertyDefault(event.propertyHandle, &status));
-      } else {
-        entry.SetDouble(event.value);
+      if (integerValueEntry) {
+        integerValueEntry.Set(event.value);
       }
       break;
     case CS_PROP_STRING:
-      if (isNew) {
-        entry.SetDefaultString(event.valueStr);
-      } else {
-        entry.SetString(event.valueStr);
+      if (stringValueEntry) {
+        stringValueEntry.Set(event.valueStr);
       }
       break;
     default:
       break;
   }
+}
+
+SourcePublisher::SourcePublisher(Instance& inst,
+                                 std::shared_ptr<nt::NetworkTable> table,
+                                 CS_Source source)
+    : table{table},
+      sourcePublisher{table->GetStringTopic("source").Publish()},
+      descriptionPublisher{table->GetStringTopic("description").Publish()},
+      connectedPublisher{table->GetBooleanTopic("connected").Publish()},
+      streamsPublisher{table->GetStringArrayTopic("streams").Publish()},
+      modeEntry{table->GetStringTopic("mode").GetEntry("")},
+      modesPublisher{table->GetStringArrayTopic("modes").Publish()} {
+  CS_Status status = 0;
+  wpi::SmallString<64> buf;
+  sourcePublisher.Set(MakeSourceValue(source, buf));
+  wpi::SmallString<64> descBuf;
+  descriptionPublisher.Set(cs::GetSourceDescription(source, descBuf, &status));
+  connectedPublisher.Set(cs::IsSourceConnected(source, &status));
+  streamsPublisher.Set(inst.GetSourceStreamValues(source));
+  auto mode = cs::GetSourceVideoMode(source, &status);
+  modeEntry.SetDefault(VideoModeToString(mode));
+  modesPublisher.Set(GetSourceModeValues(source));
 }
 
 Instance::Instance() {
@@ -301,176 +382,87 @@ Instance::Instance() {
   // Listener for video events
   m_videoListener = cs::VideoListener{
       [=](const cs::VideoEvent& event) {
+        std::scoped_lock lock(m_mutex);
         CS_Status status = 0;
         switch (event.kind) {
           case cs::VideoEvent::kSourceCreated: {
             // Create subtable for the camera
             auto table = m_publishTable->GetSubTable(event.name);
-            {
-              std::scoped_lock lock(m_mutex);
-              m_tables.insert(std::make_pair(event.sourceHandle, table));
-            }
-            wpi::SmallString<64> buf;
-            table->GetEntry("source").SetString(
-                MakeSourceValue(event.sourceHandle, buf));
-            wpi::SmallString<64> descBuf;
-            table->GetEntry("description")
-                .SetString(cs::GetSourceDescription(event.sourceHandle, descBuf,
-                                                    &status));
-            table->GetEntry("connected")
-                .SetBoolean(cs::IsSourceConnected(event.sourceHandle, &status));
-            table->GetEntry("streams").SetStringArray(
-                GetSourceStreamValues(event.sourceHandle));
-            auto mode = cs::GetSourceVideoMode(event.sourceHandle, &status);
-            table->GetEntry("mode").SetDefaultString(VideoModeToString(mode));
-            table->GetEntry("modes").SetStringArray(
-                GetSourceModeValues(event.sourceHandle));
+            m_publishers.insert(
+                {event.sourceHandle,
+                 SourcePublisher{*this, table, event.sourceHandle}});
             break;
           }
-          case cs::VideoEvent::kSourceDestroyed: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              table->GetEntry("source").SetString("");
-              table->GetEntry("streams").SetStringArray(
-                  std::vector<std::string>{});
-              table->GetEntry("modes").SetStringArray(
-                  std::vector<std::string>{});
-            }
+          case cs::VideoEvent::kSourceDestroyed:
+            m_publishers.erase(event.sourceHandle);
             break;
-          }
-          case cs::VideoEvent::kSourceConnected: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
+          case cs::VideoEvent::kSourceConnected:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
               wpi::SmallString<64> descBuf;
-              table->GetEntry("description")
-                  .SetString(cs::GetSourceDescription(event.sourceHandle,
-                                                      descBuf, &status));
-              table->GetEntry("connected").SetBoolean(true);
+              publisher->descriptionPublisher.Set(cs::GetSourceDescription(
+                  event.sourceHandle, descBuf, &status));
+              publisher->connectedPublisher.Set(true);
             }
             break;
-          }
-          case cs::VideoEvent::kSourceDisconnected: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              table->GetEntry("connected").SetBoolean(false);
+          case cs::VideoEvent::kSourceDisconnected:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              publisher->connectedPublisher.Set(false);
             }
             break;
-          }
-          case cs::VideoEvent::kSourceVideoModesUpdated: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              table->GetEntry("modes").SetStringArray(
+          case cs::VideoEvent::kSourceVideoModesUpdated:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              publisher->modesPublisher.Set(
                   GetSourceModeValues(event.sourceHandle));
             }
             break;
-          }
-          case cs::VideoEvent::kSourceVideoModeChanged: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              table->GetEntry("mode").SetString(VideoModeToString(event.mode));
+          case cs::VideoEvent::kSourceVideoModeChanged:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              publisher->modeEntry.Set(VideoModeToString(event.mode));
             }
             break;
-          }
-          case cs::VideoEvent::kSourcePropertyCreated: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              PutSourcePropertyValue(table.get(), event, true);
+          case cs::VideoEvent::kSourcePropertyCreated:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              publisher->properties.insert(
+                  {event.propertyHandle,
+                   PropertyPublisher{*publisher->table, event}});
             }
             break;
-          }
-          case cs::VideoEvent::kSourcePropertyValueUpdated: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              PutSourcePropertyValue(table.get(), event, false);
+          case cs::VideoEvent::kSourcePropertyValueUpdated:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              auto ppIt = publisher->properties.find(event.propertyHandle);
+              if (ppIt != publisher->properties.end()) {
+                ppIt->second.Update(event);
+              }
             }
             break;
-          }
-          case cs::VideoEvent::kSourcePropertyChoicesUpdated: {
-            auto table = GetSourceTable(event.sourceHandle);
-            if (table) {
-              auto choices =
-                  cs::GetEnumPropertyChoices(event.propertyHandle, &status);
-              table
-                  ->GetEntry(fmt::format("PropertyInfo/{}/choices", event.name))
-                  .SetStringArray(choices);
+          case cs::VideoEvent::kSourcePropertyChoicesUpdated:
+            if (auto publisher = GetPublisher(event.sourceHandle)) {
+              auto ppIt = publisher->properties.find(event.propertyHandle);
+              if (ppIt != publisher->properties.end() &&
+                  ppIt->second.choicesTopic) {
+                auto choices =
+                    cs::GetEnumPropertyChoices(event.propertyHandle, &status);
+                if (!ppIt->second.choicesPublisher) {
+                  ppIt->second.choicesPublisher =
+                      ppIt->second.choicesTopic.Publish();
+                }
+                ppIt->second.choicesPublisher.Set(choices);
+              }
             }
             break;
-          }
           case cs::VideoEvent::kSinkSourceChanged:
           case cs::VideoEvent::kSinkCreated:
           case cs::VideoEvent::kSinkDestroyed:
-          case cs::VideoEvent::kNetworkInterfacesChanged: {
+          case cs::VideoEvent::kNetworkInterfacesChanged:
             m_addresses = cs::GetNetworkInterfaces();
             UpdateStreamValues();
             break;
-          }
           default:
             break;
         }
       },
       0x4fff, true};
-
-  // Listener for NetworkTable events
-  // We don't currently support changing settings via NT due to
-  // synchronization issues, so just update to current setting if someone
-  // else tries to change it.
-  wpi::SmallString<64> buf;
-  m_tableListener = nt::NetworkTableInstance::GetDefault().AddEntryListener(
-      fmt::format("{}/", kPublishName),
-      [=](const nt::EntryNotification& event) {
-        auto relativeKey = wpi::drop_front(
-            event.name, std::string_view{kPublishName}.size() + 1);
-
-        // get source (sourceName/...)
-        auto subKeyIndex = relativeKey.find('/');
-        if (subKeyIndex == std::string_view::npos) {
-          return;
-        }
-        auto sourceName = wpi::slice(relativeKey, 0, subKeyIndex);
-        auto sourceIt = m_sources.find(sourceName);
-        if (sourceIt == m_sources.end()) {
-          return;
-        }
-
-        // get subkey
-        relativeKey.remove_prefix(subKeyIndex + 1);
-
-        // handle standard names
-        std::string_view propName;
-        nt::NetworkTableEntry entry{event.entry};
-        if (relativeKey == "mode") {
-          // reset to current mode
-          entry.SetString(VideoModeToString(sourceIt->second.GetVideoMode()));
-          return;
-        } else if (wpi::starts_with(relativeKey, "Property/")) {
-          propName = wpi::substr(relativeKey, 9);
-        } else if (wpi::starts_with(relativeKey, "RawProperty/")) {
-          propName = wpi::substr(relativeKey, 12);
-        } else {
-          return;  // ignore
-        }
-
-        // everything else is a property
-        auto property = sourceIt->second.GetProperty(propName);
-        switch (property.GetKind()) {
-          case cs::VideoProperty::kNone:
-            return;
-          case cs::VideoProperty::kBoolean:
-            entry.SetBoolean(property.Get() != 0);
-            return;
-          case cs::VideoProperty::kInteger:
-          case cs::VideoProperty::kEnum:
-            entry.SetDouble(property.Get());
-            return;
-          case cs::VideoProperty::kString:
-            entry.SetString(property.GetString());
-            return;
-          default:
-            return;
-        }
-      },
-      NT_NOTIFY_IMMEDIATE | NT_NOTIFY_UPDATE);
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {

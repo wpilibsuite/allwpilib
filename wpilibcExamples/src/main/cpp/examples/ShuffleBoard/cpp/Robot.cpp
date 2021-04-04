@@ -11,7 +11,7 @@
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/ShuffleboardTab.h>
-#include <networktables/NetworkTableEntry.h>
+#include <networktables/GenericEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
 /**
@@ -31,10 +31,10 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Add a widget titled 'Max Speed' with a number slider.
-    m_maxSpeed = frc::Shuffleboard::GetTab("Configuration")
-                     .Add("Max Speed", 1)
-                     .WithWidget("Number Slider")
-                     .GetEntry();
+    m_maxSpeed = &frc::Shuffleboard::GetTab("Configuration")
+                      .Add("Max Speed", 1)
+                      .WithWidget("Number Slider")
+                      .GetEntry();
 
     // Create a 'DriveBase' tab and add the drivetrain object to it.
     frc::ShuffleboardTab& driveBaseTab = frc::Shuffleboard::GetTab("DriveBase");
@@ -57,7 +57,7 @@ class Robot : public frc::TimedRobot {
 
   void AutonomousInit() override {
     // Update the Max Output for the drivetrain.
-    m_robotDrive.SetMaxOutput(m_maxSpeed.GetDouble(1.0));
+    m_robotDrive.SetMaxOutput(m_maxSpeed->GetDouble(1.0));
   }
 
  private:
@@ -73,7 +73,7 @@ class Robot : public frc::TimedRobot {
   frc::Encoder m_rightEncoder{2, 3};
   frc::AnalogPotentiometer m_ElevatorPot{0};
 
-  nt::NetworkTableEntry m_maxSpeed;
+  nt::GenericEntry* m_maxSpeed;
 };
 
 #ifndef RUNNING_FRC_TESTS
