@@ -549,9 +549,4 @@ class NetworkTable final {
 
 }  // namespace nt
 
-// For backwards compatibility
-#ifndef NAMESPACED_NT
-using nt::NetworkTable;  // NOLINT
-#endif
-
 #endif  // NTCORE_NETWORKTABLES_NETWORKTABLE_H_

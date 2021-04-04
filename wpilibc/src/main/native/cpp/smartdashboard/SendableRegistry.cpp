@@ -352,7 +352,7 @@ Sendable* SendableRegistry::GetSendable(UID uid) {
 }
 
 void SendableRegistry::Publish(UID sendableUid,
-                               std::shared_ptr<NetworkTable> table) {
+                               std::shared_ptr<nt::NetworkTable> table) {
   std::scoped_lock lock(m_impl->mutex);
   if (sendableUid == 0 || (sendableUid - 1) >= m_impl->components.size() ||
       !m_impl->components[sendableUid - 1]) {

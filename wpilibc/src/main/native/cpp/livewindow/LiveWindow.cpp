@@ -154,7 +154,7 @@ void LiveWindow::UpdateValuesUnsafe() {
         return;
       }
       auto ssTable = m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
-      std::shared_ptr<NetworkTable> table;
+      std::shared_ptr<nt::NetworkTable> table;
       // Treat name==subsystem as top level of subsystem
       if (cbdata.name == cbdata.subsystem) {
         table = ssTable;
