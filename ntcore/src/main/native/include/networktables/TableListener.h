@@ -14,8 +14,6 @@ namespace nt {
 
 class NetworkTable;
 
-using wpi::StringRef;
-
 /**
  * A listener that listens to new sub-tables in a NetworkTable.
  *
@@ -27,7 +25,7 @@ using wpi::StringRef;
  *
  * @ingroup ntcore_cpp_api
  */
-typedef std::function<void(NetworkTable* parent, StringRef name,
+typedef std::function<void(NetworkTable* parent, wpi::StringRef name,
                            std::shared_ptr<NetworkTable> table)>
     TableListener;
 

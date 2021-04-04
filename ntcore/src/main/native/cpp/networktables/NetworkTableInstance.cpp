@@ -9,8 +9,8 @@
 using namespace nt;
 
 std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
-    const Twine& key) const {
-  StringRef simple;
+    const wpi::Twine& key) const {
+  wpi::StringRef simple;
   bool isSimple = key.isSingleStringRef();
   if (isSimple) {
     simple = key.getSingleStringRef();
@@ -23,23 +23,23 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
                                           NetworkTable::private_init{});
   } else {
     return std::make_shared<NetworkTable>(
-        m_handle, Twine(NetworkTable::PATH_SEPARATOR_CHAR) + key,
+        m_handle, wpi::Twine(NetworkTable::PATH_SEPARATOR_CHAR) + key,
         NetworkTable::private_init{});
   }
 }
 
-void NetworkTableInstance::StartClient(ArrayRef<StringRef> servers,
+void NetworkTableInstance::StartClient(wpi::ArrayRef<wpi::StringRef> servers,
                                        unsigned int port) {
-  wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
+  wpi::SmallVector<std::pair<wpi::StringRef, unsigned int>, 8> server_ports;
   for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
   }
   StartClient(server_ports);
 }
 
-void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
+void NetworkTableInstance::SetServer(wpi::ArrayRef<wpi::StringRef> servers,
                                      unsigned int port) {
-  wpi::SmallVector<std::pair<StringRef, unsigned int>, 8> server_ports;
+  wpi::SmallVector<std::pair<wpi::StringRef, unsigned int>, 8> server_ports;
   for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
   }
@@ -47,7 +47,7 @@ void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
 }
 
 NT_EntryListener NetworkTableInstance::AddEntryListener(
-    const Twine& prefix,
+    const wpi::Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
   return ::nt::AddEntryListener(m_handle, prefix, callback, flags);

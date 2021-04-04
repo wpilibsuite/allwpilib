@@ -66,7 +66,8 @@ inline double NetworkTableEntry::GetDouble(double defaultValue) const {
   return value->GetDouble();
 }
 
-inline std::string NetworkTableEntry::GetString(StringRef defaultValue) const {
+inline std::string NetworkTableEntry::GetString(
+    wpi::StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_STRING) {
     return defaultValue;
@@ -74,7 +75,8 @@ inline std::string NetworkTableEntry::GetString(StringRef defaultValue) const {
   return value->GetString();
 }
 
-inline std::string NetworkTableEntry::GetRaw(StringRef defaultValue) const {
+inline std::string NetworkTableEntry::GetRaw(
+    wpi::StringRef defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_RAW) {
     return defaultValue;
@@ -83,7 +85,7 @@ inline std::string NetworkTableEntry::GetRaw(StringRef defaultValue) const {
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
-    ArrayRef<int> defaultValue) const {
+    wpi::ArrayRef<int> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_BOOLEAN_ARRAY) {
     return defaultValue;
@@ -98,7 +100,7 @@ inline std::vector<int> NetworkTableEntry::GetBooleanArray(
 }
 
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
-    ArrayRef<double> defaultValue) const {
+    wpi::ArrayRef<double> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_DOUBLE_ARRAY) {
     return defaultValue;
@@ -113,7 +115,7 @@ inline std::vector<double> NetworkTableEntry::GetDoubleArray(
 }
 
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
-    ArrayRef<std::string> defaultValue) const {
+    wpi::ArrayRef<std::string> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_STRING_ARRAY) {
     return defaultValue;
@@ -139,16 +141,17 @@ inline bool NetworkTableEntry::SetDefaultDouble(double defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDouble(defaultValue));
 }
 
-inline bool NetworkTableEntry::SetDefaultString(const Twine& defaultValue) {
+inline bool NetworkTableEntry::SetDefaultString(
+    const wpi::Twine& defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeString(defaultValue));
 }
 
-inline bool NetworkTableEntry::SetDefaultRaw(StringRef defaultValue) {
+inline bool NetworkTableEntry::SetDefaultRaw(wpi::StringRef defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeRaw(defaultValue));
 }
 
 inline bool NetworkTableEntry::SetDefaultBooleanArray(
-    ArrayRef<int> defaultValue) {
+    wpi::ArrayRef<int> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
 }
 
@@ -158,7 +161,7 @@ inline bool NetworkTableEntry::SetDefaultBooleanArray(
 }
 
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
-    ArrayRef<double> defaultValue) {
+    wpi::ArrayRef<double> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
 }
 
@@ -168,7 +171,7 @@ inline bool NetworkTableEntry::SetDefaultDoubleArray(
 }
 
 inline bool NetworkTableEntry::SetDefaultStringArray(
-    ArrayRef<std::string> defaultValue) {
+    wpi::ArrayRef<std::string> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
 }
 
@@ -189,15 +192,15 @@ inline bool NetworkTableEntry::SetDouble(double value) {
   return SetEntryValue(m_handle, Value::MakeDouble(value));
 }
 
-inline bool NetworkTableEntry::SetString(const Twine& value) {
+inline bool NetworkTableEntry::SetString(const wpi::Twine& value) {
   return SetEntryValue(m_handle, Value::MakeString(value));
 }
 
-inline bool NetworkTableEntry::SetRaw(StringRef value) {
+inline bool NetworkTableEntry::SetRaw(wpi::StringRef value) {
   return SetEntryValue(m_handle, Value::MakeRaw(value));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(ArrayRef<bool> value) {
+inline bool NetworkTableEntry::SetBooleanArray(wpi::ArrayRef<bool> value) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -206,7 +209,7 @@ inline bool NetworkTableEntry::SetBooleanArray(
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(ArrayRef<int> value) {
+inline bool NetworkTableEntry::SetBooleanArray(wpi::ArrayRef<int> value) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -215,7 +218,7 @@ inline bool NetworkTableEntry::SetBooleanArray(
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline bool NetworkTableEntry::SetDoubleArray(ArrayRef<double> value) {
+inline bool NetworkTableEntry::SetDoubleArray(wpi::ArrayRef<double> value) {
   return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
 }
 
@@ -224,7 +227,8 @@ inline bool NetworkTableEntry::SetDoubleArray(
   return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
 }
 
-inline bool NetworkTableEntry::SetStringArray(ArrayRef<std::string> value) {
+inline bool NetworkTableEntry::SetStringArray(
+    wpi::ArrayRef<std::string> value) {
   return SetEntryValue(m_handle, Value::MakeStringArray(value));
 }
 
@@ -245,15 +249,15 @@ inline void NetworkTableEntry::ForceSetDouble(double value) {
   SetEntryTypeValue(m_handle, Value::MakeDouble(value));
 }
 
-inline void NetworkTableEntry::ForceSetString(const Twine& value) {
+inline void NetworkTableEntry::ForceSetString(const wpi::Twine& value) {
   SetEntryTypeValue(m_handle, Value::MakeString(value));
 }
 
-inline void NetworkTableEntry::ForceSetRaw(StringRef value) {
+inline void NetworkTableEntry::ForceSetRaw(wpi::StringRef value) {
   SetEntryTypeValue(m_handle, Value::MakeRaw(value));
 }
 
-inline void NetworkTableEntry::ForceSetBooleanArray(ArrayRef<bool> value) {
+inline void NetworkTableEntry::ForceSetBooleanArray(wpi::ArrayRef<bool> value) {
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -262,7 +266,7 @@ inline void NetworkTableEntry::ForceSetBooleanArray(
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline void NetworkTableEntry::ForceSetBooleanArray(ArrayRef<int> value) {
+inline void NetworkTableEntry::ForceSetBooleanArray(wpi::ArrayRef<int> value) {
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -271,7 +275,8 @@ inline void NetworkTableEntry::ForceSetBooleanArray(
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline void NetworkTableEntry::ForceSetDoubleArray(ArrayRef<double> value) {
+inline void NetworkTableEntry::ForceSetDoubleArray(
+    wpi::ArrayRef<double> value) {
   SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
 }
 
@@ -281,7 +286,7 @@ inline void NetworkTableEntry::ForceSetDoubleArray(
 }
 
 inline void NetworkTableEntry::ForceSetStringArray(
-    ArrayRef<std::string> value) {
+    wpi::ArrayRef<std::string> value) {
   SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
 }
 
@@ -316,10 +321,10 @@ inline void NetworkTableEntry::Delete() {
 
 inline void NetworkTableEntry::CreateRpc(
     std::function<void(const RpcAnswer& answer)> callback) {
-  ::nt::CreateRpc(m_handle, StringRef("\0", 1), callback);
+  ::nt::CreateRpc(m_handle, wpi::StringRef("\0", 1), callback);
 }
 
-inline RpcCall NetworkTableEntry::CallRpc(StringRef params) {
+inline RpcCall NetworkTableEntry::CallRpc(wpi::StringRef params) {
   return RpcCall{m_handle, ::nt::CallRpc(m_handle, params)};
 }
 

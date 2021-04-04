@@ -53,7 +53,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle) {
  * Table Functions
  */
 
-NT_Entry GetEntry(NT_Inst inst, const Twine& name) {
+NT_Entry GetEntry(NT_Inst inst, const wpi::Twine& name) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
   if (!ii) {
@@ -67,7 +67,7 @@ NT_Entry GetEntry(NT_Inst inst, const Twine& name) {
   return Handle(i, id, Handle::kEntry);
 }
 
-std::vector<NT_Entry> GetEntries(NT_Inst inst, const Twine& prefix,
+std::vector<NT_Entry> GetEntries(NT_Inst inst, const wpi::Twine& prefix,
                                  unsigned int types) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
@@ -203,7 +203,7 @@ void DeleteAllEntries(NT_Inst inst) {
   ii->storage.DeleteAllEntries();
 }
 
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const Twine& prefix,
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const wpi::Twine& prefix,
                                     unsigned int types) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
@@ -236,7 +236,7 @@ EntryInfo GetEntryInfo(NT_Entry entry) {
  */
 
 NT_EntryListener AddEntryListener(
-    NT_Inst inst, const Twine& prefix,
+    NT_Inst inst, const wpi::Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
@@ -288,7 +288,7 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller) {
 }
 
 NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        const Twine& prefix,
+                                        const wpi::Twine& prefix,
                                         unsigned int flags) {
   Handle handle{poller};
   int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
@@ -494,7 +494,7 @@ bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout) {
  * Remote Procedure Call Functions
  */
 
-void CreateRpc(NT_Entry entry, StringRef def,
+void CreateRpc(NT_Entry entry, wpi::StringRef def,
                std::function<void(const RpcAnswer& answer)> callback) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
@@ -535,7 +535,8 @@ void DestroyRpcCallPoller(NT_RpcCallPoller poller) {
   ii->rpc_server.RemovePoller(id);
 }
 
-void CreatePolledRpc(NT_Entry entry, StringRef def, NT_RpcCallPoller poller) {
+void CreatePolledRpc(NT_Entry entry, wpi::StringRef def,
+                     NT_RpcCallPoller poller) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
   auto ii = InstanceImpl::Get(handle.GetInst());
@@ -607,7 +608,7 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout) {
   return ii->rpc_server.WaitForQueue(timeout);
 }
 
-bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result) {
+bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, wpi::StringRef result) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
   auto ii = InstanceImpl::Get(handle.GetInst());
@@ -627,7 +628,7 @@ bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result) {
   return ii->rpc_server.PostRpcResponse(id, call_uid, result);
 }
 
-NT_RpcCall CallRpc(NT_Entry entry, StringRef params) {
+NT_RpcCall CallRpc(NT_Entry entry, wpi::StringRef params) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
   int i = handle.GetInst();
@@ -736,7 +737,7 @@ std::string PackRpcDefinition(const RpcDefinition& def) {
   return enc.ToStringRef();
 }
 
-bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
+bool UnpackRpcDefinition(wpi::StringRef packed, RpcDefinition* def) {
   wpi::raw_mem_istream is(packed.data(), packed.size());
   wpi::Logger logger;
   WireDecoder dec(is, 0x0300, logger);
@@ -791,7 +792,7 @@ bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
   return true;
 }
 
-std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values) {
+std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values) {
   WireEncoder enc(0x0300);
   for (auto& value : values) {
     enc.WriteValue(*value);
@@ -799,8 +800,8 @@ std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values) {
   return enc.ToStringRef();
 }
 
-std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
-                                                    ArrayRef<NT_Type> types) {
+std::vector<std::shared_ptr<Value>> UnpackRpcValues(
+    wpi::StringRef packed, wpi::ArrayRef<NT_Type> types) {
   wpi::raw_mem_istream is(packed.data(), packed.size());
   wpi::Logger logger;
   WireDecoder dec(is, 0x0300, logger);
@@ -823,7 +824,7 @@ uint64_t Now() {
  * Client/Server Functions
  */
 
-void SetNetworkIdentity(NT_Inst inst, const Twine& name) {
+void SetNetworkIdentity(NT_Inst inst, const wpi::Twine& name) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return;
@@ -859,7 +860,7 @@ void StopLocal(NT_Inst inst) {
   ii->dispatcher.Stop();
 }
 
-void StartServer(NT_Inst inst, const Twine& persist_filename,
+void StartServer(NT_Inst inst, const wpi::Twine& persist_filename,
                  const char* listen_address, unsigned int port) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
@@ -897,8 +898,9 @@ void StartClient(NT_Inst inst, const char* server_name, unsigned int port) {
   ii->dispatcher.StartClient();
 }
 
-void StartClient(NT_Inst inst,
-                 ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+void StartClient(
+    NT_Inst inst,
+    wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return;
@@ -937,7 +939,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
 }
 
 void SetServer(NT_Inst inst,
-               ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+               wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return;
@@ -1013,7 +1015,7 @@ bool IsConnected(NT_Inst inst) {
  * Persistent Functions
  */
 
-const char* SavePersistent(NT_Inst inst, const Twine& filename) {
+const char* SavePersistent(NT_Inst inst, const wpi::Twine& filename) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return "invalid instance handle";
@@ -1023,7 +1025,7 @@ const char* SavePersistent(NT_Inst inst, const Twine& filename) {
 }
 
 const char* LoadPersistent(
-    NT_Inst inst, const Twine& filename,
+    NT_Inst inst, const wpi::Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
@@ -1033,8 +1035,8 @@ const char* LoadPersistent(
   return ii->storage.LoadPersistent(filename, warn);
 }
 
-const char* SaveEntries(NT_Inst inst, const Twine& filename,
-                        const Twine& prefix) {
+const char* SaveEntries(NT_Inst inst, const wpi::Twine& filename,
+                        const wpi::Twine& prefix) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return "invalid instance handle";
@@ -1044,7 +1046,7 @@ const char* SaveEntries(NT_Inst inst, const Twine& filename,
 }
 
 const char* LoadEntries(
-    NT_Inst inst, const Twine& filename, const Twine& prefix,
+    NT_Inst inst, const wpi::Twine& filename, const wpi::Twine& prefix,
     std::function<void(size_t line, const char* msg)> warn) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {

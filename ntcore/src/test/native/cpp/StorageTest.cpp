@@ -19,6 +19,7 @@ using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::IsNull;
 using ::testing::Return;
+using wpi::StringRef;
 
 namespace nt {
 

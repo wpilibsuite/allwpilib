@@ -23,10 +23,6 @@
 
 namespace nt {
 
-using wpi::ArrayRef;
-using wpi::StringRef;
-using wpi::Twine;
-
 class NetworkTableInstance;
 
 /**
@@ -58,7 +54,7 @@ class NetworkTable final {
    * @param key key
    * @return base name
    */
-  static StringRef BasenameKey(StringRef key);
+  static wpi::StringRef BasenameKey(wpi::StringRef key);
 
   /**
    * Normalizes an network table key to contain no consecutive slashes and
@@ -76,12 +72,12 @@ class NetworkTable final {
    *                         with a leading slash
    * @return normalized key
    */
-  static std::string NormalizeKey(const Twine& key,
+  static std::string NormalizeKey(const wpi::Twine& key,
                                   bool withLeadingSlash = true);
 
-  static StringRef NormalizeKey(const Twine& key,
-                                wpi::SmallVectorImpl<char>& buf,
-                                bool withLeadingSlash = true);
+  static wpi::StringRef NormalizeKey(const wpi::Twine& key,
+                                     wpi::SmallVectorImpl<char>& buf,
+                                     bool withLeadingSlash = true);
 
   /**
    * Gets a list of the names of all the super tables of a given key. For
@@ -91,13 +87,13 @@ class NetworkTable final {
    * @param key the key
    * @return List of super tables
    */
-  static std::vector<std::string> GetHierarchy(const Twine& key);
+  static std::vector<std::string> GetHierarchy(const wpi::Twine& key);
 
   /**
    * Constructor.  Use NetworkTableInstance::GetTable() or GetSubTable()
    * instead.
    */
-  NetworkTable(NT_Inst inst, const Twine& path, const private_init&);
+  NetworkTable(NT_Inst inst, const wpi::Twine& path, const private_init&);
   virtual ~NetworkTable();
 
   /**
@@ -118,7 +114,7 @@ class NetworkTable final {
    * @param key the key name
    * @return Network table entry.
    */
-  NetworkTableEntry GetEntry(const Twine& key) const;
+  NetworkTableEntry GetEntry(const wpi::Twine& key) const;
 
   /**
    * Listen to keys only within this table.
@@ -138,7 +134,7 @@ class NetworkTable final {
    * @param flags       EntryListenerFlags bitmask
    * @return Listener handle
    */
-  NT_EntryListener AddEntryListener(const Twine& key,
+  NT_EntryListener AddEntryListener(const wpi::Twine& key,
                                     TableEntryListener listener,
                                     unsigned int flags) const;
 
@@ -175,7 +171,7 @@ class NetworkTable final {
    * @param key the key name
    * @return the networktable to be returned
    */
-  std::shared_ptr<NetworkTable> GetSubTable(const Twine& key) const;
+  std::shared_ptr<NetworkTable> GetSubTable(const wpi::Twine& key) const;
 
   /**
    * Determines whether the given key is in this table.
@@ -183,7 +179,7 @@ class NetworkTable final {
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
    */
-  bool ContainsKey(const Twine& key) const;
+  bool ContainsKey(const wpi::Twine& key) const;
 
   /**
    * Determines whether there exists a non-empty subtable for this key
@@ -193,7 +189,7 @@ class NetworkTable final {
    * @return true if there is a subtable with the key which contains at least
    * one key/subtable of its own
    */
-  bool ContainsSubTable(const Twine& key) const;
+  bool ContainsSubTable(const wpi::Twine& key) const;
 
   /**
    * Gets all keys in the table (not including sub-tables).
@@ -215,7 +211,7 @@ class NetworkTable final {
    *
    * @param key the key to make persistent
    */
-  void SetPersistent(StringRef key);
+  void SetPersistent(wpi::StringRef key);
 
   /**
    * Stop making a key's value persistent through program restarts.
@@ -223,7 +219,7 @@ class NetworkTable final {
    *
    * @param key the key name
    */
-  void ClearPersistent(StringRef key);
+  void ClearPersistent(wpi::StringRef key);
 
   /**
    * Returns whether the value is persistent through program restarts.
@@ -231,7 +227,7 @@ class NetworkTable final {
    *
    * @param key the key name
    */
-  bool IsPersistent(StringRef key) const;
+  bool IsPersistent(wpi::StringRef key) const;
 
   /**
    * Sets flags on the specified key in this table. The key can
@@ -240,7 +236,7 @@ class NetworkTable final {
    * @param key the key name
    * @param flags the flags to set (bitmask)
    */
-  void SetFlags(StringRef key, unsigned int flags);
+  void SetFlags(wpi::StringRef key, unsigned int flags);
 
   /**
    * Clears flags on the specified key in this table. The key can
@@ -249,7 +245,7 @@ class NetworkTable final {
    * @param key the key name
    * @param flags the flags to clear (bitmask)
    */
-  void ClearFlags(StringRef key, unsigned int flags);
+  void ClearFlags(wpi::StringRef key, unsigned int flags);
 
   /**
    * Returns the flags for the specified key.
@@ -257,14 +253,14 @@ class NetworkTable final {
    * @param key the key name
    * @return the flags, or 0 if the key is not defined
    */
-  unsigned int GetFlags(StringRef key) const;
+  unsigned int GetFlags(wpi::StringRef key) const;
 
   /**
    * Deletes the specified key in this table.
    *
    * @param key the key name
    */
-  void Delete(const Twine& key);
+  void Delete(const wpi::Twine& key);
 
   /**
    * Put a number in the table
@@ -273,7 +269,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutNumber(StringRef key, double value);
+  bool PutNumber(wpi::StringRef key, double value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -282,7 +278,7 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultNumber(StringRef key, double defaultValue);
+  bool SetDefaultNumber(wpi::StringRef key, double defaultValue);
 
   /**
    * Gets the number associated with the given name.
@@ -292,7 +288,7 @@ class NetworkTable final {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  double GetNumber(StringRef key, double defaultValue) const;
+  double GetNumber(wpi::StringRef key, double defaultValue) const;
 
   /**
    * Put a string in the table
@@ -301,7 +297,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutString(StringRef key, StringRef value);
+  bool PutString(wpi::StringRef key, wpi::StringRef value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -310,7 +306,7 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultString(StringRef key, StringRef defaultValue);
+  bool SetDefaultString(wpi::StringRef key, wpi::StringRef defaultValue);
 
   /**
    * Gets the string associated with the given name. If the key does not
@@ -321,7 +317,7 @@ class NetworkTable final {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  std::string GetString(StringRef key, StringRef defaultValue) const;
+  std::string GetString(wpi::StringRef key, wpi::StringRef defaultValue) const;
 
   /**
    * Put a boolean in the table
@@ -330,7 +326,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutBoolean(StringRef key, bool value);
+  bool PutBoolean(wpi::StringRef key, bool value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -339,7 +335,7 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultBoolean(StringRef key, bool defaultValue);
+  bool SetDefaultBoolean(wpi::StringRef key, bool defaultValue);
 
   /**
    * Gets the boolean associated with the given name. If the key does not
@@ -350,7 +346,7 @@ class NetworkTable final {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  bool GetBoolean(StringRef key, bool defaultValue) const;
+  bool GetBoolean(wpi::StringRef key, bool defaultValue) const;
 
   /**
    * Put a boolean array in the table
@@ -363,7 +359,7 @@ class NetworkTable final {
    *       std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  bool PutBooleanArray(StringRef key, ArrayRef<int> value);
+  bool PutBooleanArray(wpi::StringRef key, wpi::ArrayRef<int> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -372,7 +368,8 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  bool SetDefaultBooleanArray(StringRef key, ArrayRef<int> defaultValue);
+  bool SetDefaultBooleanArray(wpi::StringRef key,
+                              wpi::ArrayRef<int> defaultValue);
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
@@ -390,8 +387,8 @@ class NetworkTable final {
    *       because std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  std::vector<int> GetBooleanArray(StringRef key,
-                                   ArrayRef<int> defaultValue) const;
+  std::vector<int> GetBooleanArray(wpi::StringRef key,
+                                   wpi::ArrayRef<int> defaultValue) const;
 
   /**
    * Put a number array in the table
@@ -400,7 +397,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutNumberArray(StringRef key, ArrayRef<double> value);
+  bool PutNumberArray(wpi::StringRef key, wpi::ArrayRef<double> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -409,7 +406,8 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultNumberArray(StringRef key, ArrayRef<double> defaultValue);
+  bool SetDefaultNumberArray(wpi::StringRef key,
+                             wpi::ArrayRef<double> defaultValue);
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
@@ -423,8 +421,8 @@ class NetworkTable final {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::vector<double> GetNumberArray(StringRef key,
-                                     ArrayRef<double> defaultValue) const;
+  std::vector<double> GetNumberArray(wpi::StringRef key,
+                                     wpi::ArrayRef<double> defaultValue) const;
 
   /**
    * Put a string array in the table
@@ -433,7 +431,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutStringArray(StringRef key, ArrayRef<std::string> value);
+  bool PutStringArray(wpi::StringRef key, wpi::ArrayRef<std::string> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -442,7 +440,8 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultStringArray(StringRef key, ArrayRef<std::string> defaultValue);
+  bool SetDefaultStringArray(wpi::StringRef key,
+                             wpi::ArrayRef<std::string> defaultValue);
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
@@ -457,7 +456,7 @@ class NetworkTable final {
    *       concern, use GetValue() instead.
    */
   std::vector<std::string> GetStringArray(
-      StringRef key, ArrayRef<std::string> defaultValue) const;
+      wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) const;
 
   /**
    * Put a raw value (byte array) in the table
@@ -466,7 +465,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutRaw(StringRef key, StringRef value);
+  bool PutRaw(wpi::StringRef key, wpi::StringRef value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -475,7 +474,7 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  bool SetDefaultRaw(StringRef key, StringRef defaultValue);
+  bool SetDefaultRaw(wpi::StringRef key, wpi::StringRef defaultValue);
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
@@ -489,7 +488,7 @@ class NetworkTable final {
    * @note This makes a copy of the raw contents.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::string GetRaw(StringRef key, StringRef defaultValue) const;
+  std::string GetRaw(wpi::StringRef key, wpi::StringRef defaultValue) const;
 
   /**
    * Put a value in the table
@@ -498,7 +497,7 @@ class NetworkTable final {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutValue(const Twine& key, std::shared_ptr<Value> value);
+  bool PutValue(const wpi::Twine& key, std::shared_ptr<Value> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -507,7 +506,8 @@ class NetworkTable final {
    * @param defaultValue the default value to set if key doesn't exist.
    * @return False if the table key exists with a different type
    */
-  bool SetDefaultValue(const Twine& key, std::shared_ptr<Value> defaultValue);
+  bool SetDefaultValue(const wpi::Twine& key,
+                       std::shared_ptr<Value> defaultValue);
 
   /**
    * Gets the value associated with a key as an object
@@ -516,14 +516,14 @@ class NetworkTable final {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  std::shared_ptr<Value> GetValue(const Twine& key) const;
+  std::shared_ptr<Value> GetValue(const wpi::Twine& key) const;
 
   /**
    * Gets the full path of this table.  Does not include the trailing "/".
    *
    * @return The path (e.g "", "/foo").
    */
-  StringRef GetPath() const;
+  wpi::StringRef GetPath() const;
 
   /**
    * Save table values to a file.  The file format used is identical to
@@ -532,7 +532,7 @@ class NetworkTable final {
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
-  const char* SaveEntries(const Twine& filename) const;
+  const char* SaveEntries(const wpi::Twine& filename) const;
 
   /**
    * Load table values from a file.  The file format used is identical to
@@ -543,7 +543,7 @@ class NetworkTable final {
    * @return error string, or nullptr if successful
    */
   const char* LoadEntries(
-      const Twine& filename,
+      const wpi::Twine& filename,
       std::function<void(size_t line, const char* msg)> warn);
 };
 
