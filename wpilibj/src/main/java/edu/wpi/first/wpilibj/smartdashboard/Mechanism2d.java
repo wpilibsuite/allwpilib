@@ -56,12 +56,11 @@ public class Mechanism2d implements Sendable {
   /**
    * Get or create a root in this Mechanism2d window with the given name and position.
    *
+   * <p>If a root with the given name already exists, the given x and y coordinates are not used.
    * @param name the root name
    * @param x the root x coordinate
    * @param y the root y coordinate
    * @return a new root joint object, or the existing one with the given name.
-   * @implNote If a root with the given name already exists, the given x and y coordinates are not
-   *     used.
    */
   public MechanismJoint2d getRoot(String name, double x, double y) {
     var existing = m_roots.get(name);
