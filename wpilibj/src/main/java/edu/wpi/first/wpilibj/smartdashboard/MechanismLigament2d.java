@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -5,8 +9,18 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color;
 
+/**
+ * Ligament on a Mechanism2d.
+ *
+ * <p>Use {@link #getEnd()} to traverse to the joint at the end of this ligament.
+ *
+ * @see Mechanism2d
+ */
 public class MechanismLigament2d {
-  private final String m_name;
+  /** Relative to base table. */
+  private final String m_path;
+
+  private MechanismJoint2d m_end;
   private double m_angle;
   private NetworkTableEntry m_angleEntry;
   private String m_color;
@@ -15,38 +29,31 @@ public class MechanismLigament2d {
   private NetworkTableEntry m_lengthEntry;
   private double m_weight;
   private NetworkTableEntry m_weightEntry;
-  private MechanismJoint2d m_end;
 
   /** Package-private constructor. */
   MechanismLigament2d(String name) {
-    m_name = name;
+    m_path = name;
   }
 
-  void update(NetworkTable table) {
-    table.getEntry(".type").setString("line");
-    m_angleEntry = table.getEntry("angle");
-    m_lengthEntry = table.getEntry("length");
-    m_colorEntry = table.getEntry("color");
-    m_weightEntry = table.getEntry("weight");
-    flush();
-    if (m_end != null) {
-      m_end.update(table);
+  /**
+   * Get the joint at the end of this ligament.
+   *
+   * @return the MechanismJoint2d object representing the end of this ligament
+   */
+  public MechanismJoint2d getEnd() {
+    if (m_end == null) {
+      m_end = new MechanismJoint2d(m_path);
     }
+    return m_end;
   }
 
-  private synchronized void flush() {
-    if (m_angleEntry != null) {
-      m_angleEntry.setDouble(m_angle);
-    }
-    if (m_lengthEntry != null) {
-      m_lengthEntry.setDouble(m_length);
-    }
-    if (m_colorEntry != null) {
-      m_colorEntry.setString(m_color);
-    }
-    if (m_weightEntry != null) {
-      m_weightEntry.setDouble(m_weight);
-    }
+  /**
+   * Get the NetworkTables path to this ligament.
+   *
+   * @return the NT path, relative to the base entry
+   */
+  public String getPath() {
+    return m_path;
   }
 
   /**
@@ -117,14 +124,35 @@ public class MechanismLigament2d {
   }
 
   /**
-   * Get the joint at the end of this ligament.
+   * Update all cached entries with new ones.
    *
-   * @return the MechanismJoint2d object representing the end of this ligament
+   * @param table the new table.
    */
-  public MechanismJoint2d getEnd() {
-    if (m_end == null) {
-      m_end = new MechanismJoint2d(m_name, -1, -1);
+  void update(NetworkTable table) {
+    table.getEntry(".type").setString("line");
+    m_angleEntry = table.getEntry("angle");
+    m_lengthEntry = table.getEntry("length");
+    m_colorEntry = table.getEntry("color");
+    m_weightEntry = table.getEntry("weight");
+    flush();
+    if (m_end != null) {
+      m_end.update(table);
     }
-    return m_end;
+  }
+
+  /** Flush latest data to NT. */
+  private synchronized void flush() {
+    if (m_angleEntry != null) {
+      m_angleEntry.setDouble(m_angle);
+    }
+    if (m_lengthEntry != null) {
+      m_lengthEntry.setDouble(m_length);
+    }
+    if (m_colorEntry != null) {
+      m_colorEntry.setString(m_color);
+    }
+    if (m_weightEntry != null) {
+      m_weightEntry.setDouble(m_weight);
+    }
   }
 }
