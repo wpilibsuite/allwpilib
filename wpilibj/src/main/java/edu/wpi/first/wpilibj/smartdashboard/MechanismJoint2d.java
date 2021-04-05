@@ -55,11 +55,15 @@ public class MechanismJoint2d {
    */
   public MechanismLigament2d getLigament(String name) {
     var existing = m_ligaments.get(name);
-    if (existing != null) return existing;
+    if (existing != null) {
+      return existing;
+    }
 
     var ligament = new MechanismLigament2d(m_path + NetworkTable.PATH_SEPARATOR + name);
     m_ligaments.put(name, ligament);
-    if (m_table != null) ligament.update(m_table.getSubTable(name));
+    if (m_table != null) {
+      ligament.update(m_table.getSubTable(name));
+    }
     return ligament;
   }
 
