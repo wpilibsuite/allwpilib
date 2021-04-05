@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,7 +39,7 @@ public class Mechanism2d implements Sendable {
   private final Map<String, MechanismJoint2d> m_roots;
   private final double m_width;
   private final double m_height;
-  private String m_color = "#"; // TODO: decide on default color
+  private String m_color = "#5050FF";
 
   /**
    * Create a new Mechanism2d window with the given dimensions.
@@ -63,7 +63,7 @@ public class Mechanism2d implements Sendable {
    * @param y the root y coordinate
    * @return a new root joint object, or the existing one with the given name.
    */
-  public MechanismJoint2d getRoot(String name, double x, double y) {
+  public synchronized MechanismJoint2d getRoot(String name, double x, double y) {
     var existing = m_roots.get(name);
     if (existing != null) {
       return existing;
@@ -80,9 +80,8 @@ public class Mechanism2d implements Sendable {
    *
    * @param color the new background color
    */
-  public void setBackgroundColor(Color color) {
-    this.m_color =
-        String.format("#%02X%02X%02X", (int) color.red, (int) color.green, (int) color.blue);
+  public synchronized void setBackgroundColor(Color8Bit color) {
+    this.m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
     if (m_table != null) {
       m_table.getEntry(kBackgroundColor).setString(m_color);
     }

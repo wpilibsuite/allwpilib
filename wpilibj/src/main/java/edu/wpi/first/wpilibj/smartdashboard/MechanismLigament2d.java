@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.smartdashboard;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
  * Ligament on a Mechanism2d.
@@ -40,7 +40,7 @@ public class MechanismLigament2d {
    *
    * @return the MechanismJoint2d object representing the end of this ligament
    */
-  public MechanismJoint2d getEnd() {
+  public synchronized MechanismJoint2d getEnd() {
     if (m_end == null) {
       m_end = new MechanismJoint2d(m_path);
     }
@@ -108,8 +108,8 @@ public class MechanismLigament2d {
    *
    * @param color the color of the line
    */
-  public synchronized void setColor(Color color) {
-    m_color = String.format("#%02X%02X%02X", (int) color.red, (int) color.green, (int) color.blue);
+  public synchronized void setColor(Color8Bit color) {
+    m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
     flush();
   }
 
