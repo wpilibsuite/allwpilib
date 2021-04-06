@@ -71,7 +71,7 @@ void LogView::Display() {
     }
     const auto& buf = m_data->GetBuffer();
     if (ImGui::Selectable("Copy to Clipboard", false,
-                          buf.empty()? ImGuiSelectableFlags_Disabled : 0)) {
+                          buf.empty() ? ImGuiSelectableFlags_Disabled : 0)) {
       ImGui::SetClipboardText(buf.c_str());
     }
     ImGui::EndPopup();
