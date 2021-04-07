@@ -16,7 +16,7 @@ import java.util.Map.Entry;
  *
  * <p>Mechanisms consist of joints and ligament nodes. Obtain the root joint by calling {@link
  * #getRoot(String, double, double)} and add ligaments by traversing the tree with {@link
- * MechanismJoint2d#getLigament(String)} and {@link MechanismLigament2d#getEnd()}.
+ * MechanismRoot2d#getLigament(String)} and {@link MechanismLigament2d#getEnd()}.
  *
  * <p>Example code for an elevator with a wrist:
  *
@@ -31,12 +31,12 @@ import java.util.Map.Entry;
  * </code></pre>
  *
  * @see MechanismLigament2d
- * @see MechanismJoint2d
+ * @see MechanismRoot2d
  */
-public class Mechanism2d implements Sendable {
+public final class Mechanism2d implements Sendable {
   private static final String kBackgroundColor = "backgroundColor";
   private NetworkTable m_table;
-  private final Map<String, MechanismJoint2d> m_roots;
+  private final Map<String, MechanismRoot2d> m_roots;
   private final double m_width;
   private final double m_height;
   private String m_color = "#5050FF";
@@ -63,13 +63,13 @@ public class Mechanism2d implements Sendable {
    * @param y the root y coordinate
    * @return a new root joint object, or the existing one with the given name.
    */
-  public synchronized MechanismJoint2d getRoot(String name, double x, double y) {
+  public synchronized MechanismRoot2d getRoot(String name, double x, double y) {
     var existing = m_roots.get(name);
     if (existing != null) {
       return existing;
     }
 
-    var root = new MechanismJoint2d(name, x, y);
+    var root = new MechanismRoot2d(name, x, y);
     m_roots.put(name, root);
     root.update(m_table.getSubTable(name));
     return root;
@@ -94,9 +94,9 @@ public class Mechanism2d implements Sendable {
     m_table.getEntry("dims").setDoubleArray(new double[] {m_width, m_height});
     m_table.getEntry(kBackgroundColor).setString(m_color);
     synchronized (this) {
-      for (Entry<String, MechanismJoint2d> entry : m_roots.entrySet()) {
+      for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
         String name = entry.getKey();
-        MechanismJoint2d root = entry.getValue();
+        MechanismRoot2d root = entry.getValue();
         synchronized (root) {
           root.update(m_table.getSubTable(name));
         }

@@ -12,15 +12,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 /**
  * Ligament on a Mechanism2d.
  *
- * <p>Use {@link #getEnd()} to traverse to the joint at the end of this ligament.
- *
  * @see Mechanism2d
  */
-public class MechanismLigament2d {
-  /** Relative to base table. */
-  private final String m_path;
-
-  private MechanismJoint2d m_end;
+public class MechanismLigament2d extends MechanismObject2d {
   private double m_angle;
   private NetworkTableEntry m_angleEntry;
   private String m_color;
@@ -30,30 +24,13 @@ public class MechanismLigament2d {
   private double m_weight;
   private NetworkTableEntry m_weightEntry;
 
-  /** Package-private constructor. */
-  MechanismLigament2d(String name) {
-    m_path = name;
-  }
-
-  /**
-   * Get the joint at the end of this ligament.
-   *
-   * @return the MechanismJoint2d object representing the end of this ligament
-   */
-  public synchronized MechanismJoint2d getEnd() {
-    if (m_end == null) {
-      m_end = new MechanismJoint2d(m_path);
-    }
-    return m_end;
-  }
-
-  /**
-   * Get the NetworkTables path to this ligament.
-   *
-   * @return the NT path, relative to the base entry
-   */
-  public String getPath() {
-    return m_path;
+  public MechanismLigament2d(
+      String name, Color8Bit color, double length, double angle, double lineWidth) {
+    super(name);
+    setColor(color);
+    setLength(length);
+    setAngle(angle);
+    setLineWeight(lineWidth);
   }
 
   /**
@@ -118,26 +95,19 @@ public class MechanismLigament2d {
    *
    * @param weight the line thickness
    */
-  public synchronized void setWeight(double weight) {
+  public synchronized void setLineWeight(double weight) {
     m_weight = weight;
     flush();
   }
 
-  /**
-   * Update all cached entries with new ones.
-   *
-   * @param table the new table.
-   */
-  void update(NetworkTable table) {
+  @Override
+  protected void updateEntries(NetworkTable table) {
     table.getEntry(".type").setString("line");
     m_angleEntry = table.getEntry("angle");
     m_lengthEntry = table.getEntry("length");
     m_colorEntry = table.getEntry("color");
     m_weightEntry = table.getEntry("weight");
     flush();
-    if (m_end != null) {
-      m_end.update(table);
-    }
   }
 
   /** Flush latest data to NT. */
