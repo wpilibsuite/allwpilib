@@ -1,4 +1,4 @@
-package edu.wpi.first.wpilibj.examples.mechansim2d;
+package edu.wpi.first.wpilibj.examples.mechanism2d;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
