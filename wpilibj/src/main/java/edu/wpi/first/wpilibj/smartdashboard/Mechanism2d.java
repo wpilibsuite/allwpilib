@@ -14,22 +14,7 @@ import java.util.Map.Entry;
 /**
  * 2D representation of arms, elevators, and general mechanisms.
  *
- * <p>Mechanisms consist of joints and ligament nodes. Obtain the root joint by calling {@link
- * #getRoot(String, double, double)} and add ligaments by traversing the tree with {@link
- * MechanismRoot2d#getLigament(String)} and {@link MechanismLigament2d#getEnd()}.
- *
- * <p>Example code for an elevator with a wrist:
- *
- * <pre><code>
- *   Mechanism2d mech = new Mechanism2d(100, 200);
- * MechanismLigament2d elev = mech.getRoot("elevator", 50, 0).getLigament("elev");
- * MechanismLigament2d wrist = elev.getEnd().getLigament("wrist");
- * elev.setAngle(90);
- * elev.setLength(70);
- * wrist.setAngle(-90);
- * wrist.setLength(20);
- * </code></pre>
- *
+ * @see MechanismObject2d
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
@@ -37,8 +22,7 @@ public final class Mechanism2d implements Sendable {
   private static final String kBackgroundColor = "backgroundColor";
   private NetworkTable m_table;
   private final Map<String, MechanismRoot2d> m_roots;
-  private final double m_width;
-  private final double m_height;
+  private final double[] m_dims = new double[2];
   private String m_color = "#5050FF";
 
   /**
@@ -49,8 +33,8 @@ public final class Mechanism2d implements Sendable {
    */
   public Mechanism2d(double width, double height) {
     m_roots = new HashMap<>();
-    m_width = width;
-    m_height = height;
+    m_dims[0] = width;
+    m_dims[1] = height;
   }
 
   /**
@@ -71,7 +55,9 @@ public final class Mechanism2d implements Sendable {
 
     var root = new MechanismRoot2d(name, x, y);
     m_roots.put(name, root);
-    root.update(m_table.getSubTable(name));
+    if (m_table != null) {
+      root.update(m_table.getSubTable(name));
+    }
     return root;
   }
 
@@ -91,7 +77,7 @@ public final class Mechanism2d implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Mechanism2d");
     m_table = builder.getTable();
-    m_table.getEntry("dims").setDoubleArray(new double[] {m_width, m_height});
+    m_table.getEntry("dims").setDoubleArray(m_dims);
     m_table.getEntry(kBackgroundColor).setString(m_color);
     synchronized (this) {
       for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {

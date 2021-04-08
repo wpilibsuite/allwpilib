@@ -40,7 +40,9 @@ public final class MechanismRoot2d {
     if (m_objects.containsKey(object.getName()))
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     m_objects.put(object.getName(), object);
-    object.update(m_table.getSubTable(object.getName()));
+    if (m_table != null) {
+      object.update(m_table.getSubTable(object.getName()));
+    }
     return object;
   }
 
