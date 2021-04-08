@@ -72,4 +72,19 @@ class HolonomicDriveControllerTest {
                 MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
                 kAngularTolerance));
   }
+
+  @Test
+  void testDoesNotRotateUnnecessarily() {
+    var controller =
+        new HolonomicDriveController(
+            new PIDController(1, 0, 0),
+            new PIDController(1, 0, 0),
+            new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
+
+    ChassisSpeeds speeds =
+        controller.calculate(
+            new Pose2d(0, 0, new Rotation2d(1.57)), new Pose2d(), 0, new Rotation2d(1.57));
+
+    assertEquals(0.0, speeds.omegaRadiansPerSecond);
+  }
 }

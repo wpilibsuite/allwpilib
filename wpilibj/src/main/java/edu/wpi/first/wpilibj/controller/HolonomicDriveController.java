@@ -31,6 +31,8 @@ public class HolonomicDriveController {
   private final PIDController m_yController;
   private final ProfiledPIDController m_thetaController;
 
+  private boolean m_firstRun = true;
+
   /**
    * Constructs a holonomic drive controller.
    *
@@ -82,6 +84,13 @@ public class HolonomicDriveController {
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
+    // If this is the first run, then we need to reset the theta controller to the current pose's
+    // heading.
+    if (m_firstRun) {
+      m_thetaController.reset(currentPose.getRotation().getRadians());
+      m_firstRun = false;
+    }
+
     // Calculate feedforward velocities (field-relative).
     double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
     double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();

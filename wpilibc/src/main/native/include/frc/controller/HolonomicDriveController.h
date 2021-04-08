@@ -105,5 +105,7 @@ class HolonomicDriveController {
   frc2::PIDController m_xController;
   frc2::PIDController m_yController;
   ProfiledPIDController<units::radian> m_thetaController;
+
+  bool m_firstRun = true;
 };
 }  // namespace frc
