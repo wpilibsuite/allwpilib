@@ -41,3 +41,17 @@ TEST(TrajectoryGenertionTest, ReturnsEmptyOnMalformed) {
   ASSERT_EQ(t.States().size(), 1u);
   ASSERT_EQ(t.TotalTime(), 0_s);
 }
+
+TEST(TrajectoryGenerationTest, CurvatureOptimization) {
+  auto t = TrajectoryGenerator::GenerateTrajectory(
+      {{1_m, 0_m, 90_deg},
+       {0_m, 1_m, 180_deg},
+       {-1_m, 0_m, 270_deg},
+       {0_m, -1_m, 0_deg},
+       {1_m, 0_m, 90_deg}},
+      TrajectoryConfig{12_fps, 12_fps_sq});
+
+  for (size_t i = 1; i < t.States().size() - 1; ++i) {
+    EXPECT_NE(0, t.States()[i].curvature.to<double>());
+  }
+}

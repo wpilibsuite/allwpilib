@@ -34,7 +34,6 @@ class QuinticHermiteSpline : public Spline<5> {
                        wpi::array<double, 3> yInitialControlVector,
                        wpi::array<double, 3> yFinalControlVector);
 
- protected:
   /**
    * Returns the coefficients matrix.
    * @return The coefficients matrix.
@@ -43,9 +42,30 @@ class QuinticHermiteSpline : public Spline<5> {
     return m_coefficients;
   }
 
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  const ControlVector& GetInitialControlVector() const override {
+    return m_initialControlVector;
+  }
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  const ControlVector& GetFinalControlVector() const override {
+    return m_finalControlVector;
+  }
+
  private:
   Eigen::Matrix<double, 6, 6> m_coefficients =
       Eigen::Matrix<double, 6, 6>::Zero();
+
+  ControlVector m_initialControlVector;
+  ControlVector m_finalControlVector;
 
   /**
    * Returns the hermite basis matrix for quintic hermite spline interpolation.

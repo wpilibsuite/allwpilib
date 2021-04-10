@@ -6,6 +6,8 @@
 
 #include <cstddef>
 
+#include "frc/StateSpaceUtil.h"
+
 using namespace frc;
 
 std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
@@ -173,6 +175,81 @@ std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
                          controlVectorB.y);
   }
   return splines;
+}
+
+std::vector<QuinticHermiteSpline> SplineHelper::OptimizeCurvature(
+    const std::vector<QuinticHermiteSpline>& splines) {
+  // If there's only one spline in the vector, we can't optimize anything so
+  // just return that.
+  if (splines.size() < 2) {
+    return splines;
+  }
+
+  // Implements Section 4.1.2 of
+  // http://www2.informatik.uni-freiburg.de/~lau/students/Sprunk2008.pdf.
+
+  // Cubic splines minimize the integral of the second derivative's absolute
+  // value. Therefore, we can create cubic splines with the same 0th and 1st
+  // derivatives and the provided quintic splines, find the second derivative of
+  // those cubic splines and then use a weighted average for the second
+  // derivatives of the quintic splines.
+
+  std::vector<QuinticHermiteSpline> optimizedSplines;
+  optimizedSplines.reserve(splines.size());
+  optimizedSplines.push_back(splines[0]);
+
+  for (size_t i = 0; i < splines.size() - 1; ++i) {
+    const auto& a = splines[i];
+    const auto& b = splines[i + 1];
+
+    // Get the control vectors that created the quintic splines above.
+    const auto& aInitial = a.GetInitialControlVector();
+    const auto& aFinal = a.GetFinalControlVector();
+    const auto& bInitial = b.GetInitialControlVector();
+    const auto& bFinal = b.GetFinalControlVector();
+
+    // Create cubic splines with the same control vectors.
+    auto Trim = [](const wpi::array<double, 3>& a) {
+      return wpi::array<double, 2>{a[0], a[1]};
+    };
+    CubicHermiteSpline ca{Trim(aInitial.x), Trim(aFinal.x), Trim(aInitial.y),
+                          Trim(aFinal.y)};
+    CubicHermiteSpline cb{Trim(bInitial.x), Trim(bFinal.x), Trim(bInitial.y),
+                          Trim(bFinal.y)};
+
+    // Calculate the second derivatives at the knot points.
+    auto bases = frc::MakeMatrix<4, 1>(1.0, 1.0, 1.0, 1.0);
+    auto combinedA = ca.Coefficients() * bases;
+
+    double ddxA = combinedA(4);
+    double ddyA = combinedA(5);
+    double ddxB = cb.Coefficients()(4, 1);
+    double ddyB = cb.Coefficients()(5, 1);
+
+    // Calculate the parameters for weighted average.
+    double dAB =
+        std::hypot(aFinal.x[0] - aInitial.x[0], aFinal.y[0] - aInitial.y[0]);
+    double dBC =
+        std::hypot(bFinal.x[0] - bInitial.x[0], bFinal.y[0] - bInitial.y[0]);
+    double alpha = dBC / (dAB + dBC);
+    double beta = dAB / (dAB + dBC);
+
+    // Calculate the weighted average.
+    double ddx = alpha * ddxA + beta * ddxB;
+    double ddy = alpha * ddyA + beta * ddyB;
+
+    // Create new splines.
+    optimizedSplines[i] = {aInitial.x,
+                           {aFinal.x[0], aFinal.x[1], ddx},
+                           aInitial.y,
+                           {aFinal.y[0], aFinal.y[1], ddy}};
+    optimizedSplines.push_back({{bInitial.x[0], bInitial.x[1], ddx},
+                                bFinal.x,
+                                {bInitial.y[0], bInitial.y[1], ddy},
+                                bFinal.y});
+  }
+
+  return optimizedSplines;
 }
 
 void SplineHelper::ThomasAlgorithm(const std::vector<double>& a,

@@ -94,7 +94,6 @@ class Spline {
         units::curvature_t(curvature)};
   }
 
- protected:
   /**
    * Returns the coefficients of the spline.
    *
@@ -102,6 +101,21 @@ class Spline {
    */
   virtual Eigen::Matrix<double, 6, Degree + 1> Coefficients() const = 0;
 
+  /**
+   * Returns the initial control vector that created this spline.
+   *
+   * @return The initial control vector that created this spline.
+   */
+  virtual const ControlVector& GetInitialControlVector() const = 0;
+
+  /**
+   * Returns the final control vector that created this spline.
+   *
+   * @return The final control vector that created this spline.
+   */
+  virtual const ControlVector& GetFinalControlVector() const = 0;
+
+ protected:
   /**
    * Converts a Translation2d into a vector that is compatible with Eigen.
    *

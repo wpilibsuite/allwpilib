@@ -209,7 +209,10 @@ public final class TrajectoryGenerator {
     // Get the spline points
     List<PoseWithCurvature> points;
     try {
-      points = splinePointsFromSplines(SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints));
+      points =
+          splinePointsFromSplines(
+              SplineHelper.optimizeCurvature(
+                  SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints)));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
       return kDoNothingTrajectory;
