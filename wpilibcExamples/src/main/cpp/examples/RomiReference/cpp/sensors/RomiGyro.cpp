@@ -2,9 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/romi/RomiGyro.h"
-
-using namespace frc;
+#include "sensors/RomiGyro.h"
 
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   if (m_simDevice) {
@@ -24,15 +22,7 @@ RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   }
 }
 
-double RomiGyro::GetAngle() const {
-  return GetAngleZ();
-}
-
-double RomiGyro::GetRate() const {
-  return GetRateZ();
-}
-
-double RomiGyro::GetRateX() const {
+double RomiGyro::GetRateX() {
   if (m_simRateX) {
     return m_simRateX.Get();
   }
@@ -40,7 +30,7 @@ double RomiGyro::GetRateX() const {
   return 0.0;
 }
 
-double RomiGyro::GetRateY() const {
+double RomiGyro::GetRateY() {
   if (m_simRateY) {
     return m_simRateY.Get();
   }
@@ -48,7 +38,7 @@ double RomiGyro::GetRateY() const {
   return 0.0;
 }
 
-double RomiGyro::GetRateZ() const {
+double RomiGyro::GetRateZ() {
   if (m_simRateZ) {
     return m_simRateZ.Get();
   }
@@ -56,7 +46,7 @@ double RomiGyro::GetRateZ() const {
   return 0.0;
 }
 
-double RomiGyro::GetAngleX() const {
+double RomiGyro::GetAngleX() {
   if (m_simAngleX) {
     return m_simAngleX.Get() - m_angleXOffset;
   }
@@ -64,7 +54,7 @@ double RomiGyro::GetAngleX() const {
   return 0.0;
 }
 
-double RomiGyro::GetAngleY() const {
+double RomiGyro::GetAngleY() {
   if (m_simAngleY) {
     return m_simAngleY.Get() - m_angleYOffset;
   }
@@ -72,7 +62,7 @@ double RomiGyro::GetAngleY() const {
   return 0.0;
 }
 
-double RomiGyro::GetAngleZ() const {
+double RomiGyro::GetAngleZ() {
   if (m_simAngleZ) {
     return m_simAngleZ.Get() - m_angleZOffset;
   }
