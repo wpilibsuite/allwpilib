@@ -87,12 +87,12 @@ class SpeedController;
  *
  * <p>RobotDrive porting guide:
  * <br>TankDrive(double, double, bool) is equivalent to
- * RobotDrive#TankDrive(double, double, bool) if a deadband of 0 is used.
+ * RobotDrive's TankDrive(double, double, bool) if a deadband of 0 is used.
  * <br>ArcadeDrive(double, double, bool) is equivalent to
- * RobotDrive#ArcadeDrive(double, double, bool) if a deadband of 0 is used
+ * RobotDrive's ArcadeDrive(double, double, bool) if a deadband of 0 is used
  * and the the rotation input is inverted eg ArcadeDrive(y, -rotation, false)
  * <br>CurvatureDrive(double, double, bool) is similar in concept to
- * RobotDrive#Drive(double, double) with the addition of a quick turn
+ * RobotDrive's Drive(double, double) with the addition of a quick turn
  * mode. However, it is not designed to give exactly the same response.
  */
 class DifferentialDrive : public RobotDriveBase,

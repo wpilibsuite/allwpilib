@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * The motor speed is set from the joystick while the RobotDrive turning value is assigned from
-   * the error between the setpoint and the gyro angle.
+   * The motor speed is set from the joystick while the DifferentialDrive turning value is assigned
+   * from the error between the setpoint and the gyro angle.
    */
   @Override
   public void teleopPeriodic() {
