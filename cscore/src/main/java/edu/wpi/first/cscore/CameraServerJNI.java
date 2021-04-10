@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.cscore;
+package edu.wpi.first.cscore;
 
-import edu.wpi.cscore.raw.RawFrame;
+import edu.wpi.first.cscore.raw.RawFrame;
 import edu.wpi.first.wpiutil.RuntimeLoader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
