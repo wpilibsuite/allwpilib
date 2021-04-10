@@ -453,7 +453,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
+   *   <li>{@link edu.wpi.first.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
    * </ul>
    *
    * <br>
