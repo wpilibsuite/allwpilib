@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.

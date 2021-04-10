@@ -6,9 +6,9 @@ package edu.wpi.first.wpilibj.examples.motorcontrolencoder;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**

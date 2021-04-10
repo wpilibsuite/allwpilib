@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -18,6 +16,8 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 

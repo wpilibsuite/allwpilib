@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.examples.mecanumbot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -15,6 +13,8 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 
 /** Represents a mecanum drive style drivetrain. */
 @SuppressWarnings("PMD.TooManyFields")

@@ -9,7 +9,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/SpeedController.h"
+#include "frc/motorcontrol/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 

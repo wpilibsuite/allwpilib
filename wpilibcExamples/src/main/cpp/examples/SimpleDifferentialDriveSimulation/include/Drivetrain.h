@@ -6,12 +6,12 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc/motorcontrol/SpeedControllerGroup.h>
 #include <frc/simulation/AnalogGyroSim.h>
 #include <frc/simulation/DifferentialDrivetrainSim.h>
 #include <frc/simulation/EncoderSim.h>

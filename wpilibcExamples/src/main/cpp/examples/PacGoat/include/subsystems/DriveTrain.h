@@ -6,10 +6,10 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc/motorcontrol/SpeedControllerGroup.h>
 
 namespace frc {
 class Joystick;

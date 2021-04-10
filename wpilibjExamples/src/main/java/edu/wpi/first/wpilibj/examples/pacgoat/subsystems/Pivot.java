@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control of angle of the pivot

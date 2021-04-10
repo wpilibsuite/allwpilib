@@ -5,9 +5,9 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for

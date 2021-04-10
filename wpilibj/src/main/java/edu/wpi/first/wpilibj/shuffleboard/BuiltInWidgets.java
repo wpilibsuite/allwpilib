@@ -245,26 +245,26 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kEncoder("Encoder"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}. The speed controller
-   * will be controllable from the dashboard when test mode is enabled, but will otherwise be
-   * view-only. <br>
+   * Displays a {@link edu.wpi.first.wpilibj.motorcontrol.SpeedController SpeedController}. The
+   * speed controller will be controllable from the dashboard when test mode is enabled, but will
+   * otherwise be view-only. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}
-   *   <li>{@link edu.wpi.first.wpilibj.DMC60}
-   *   <li>{@link edu.wpi.first.wpilibj.Jaguar}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMVenom}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}
-   *   <li>{@link edu.wpi.first.wpilibj.SD540}
-   *   <li>{@link edu.wpi.first.wpilibj.Spark}
-   *   <li>{@link edu.wpi.first.wpilibj.Talon}
-   *   <li>{@link edu.wpi.first.wpilibj.Victor}
-   *   <li>{@link edu.wpi.first.wpilibj.VictorSP}
-   *   <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMSpeedController}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.DMC60}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Jaguar}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVenom}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.SD540}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Spark}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Talon}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Victor}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.VictorSP}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup}
    *   <li>Any custom subclass of {@code SpeedController}
    * </ul>
    *

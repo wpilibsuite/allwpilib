@@ -5,7 +5,6 @@
 #pragma once
 
 #include "frc/PWM.h"
-#include "frc/SpeedController.h"
 
 namespace frc {
 

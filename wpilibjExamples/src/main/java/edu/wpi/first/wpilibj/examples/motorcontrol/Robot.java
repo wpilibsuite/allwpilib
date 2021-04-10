@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.motorcontrol;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part

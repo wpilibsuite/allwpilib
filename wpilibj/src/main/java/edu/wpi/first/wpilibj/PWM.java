@@ -239,7 +239,7 @@ public class PWM implements Sendable, AutoCloseable {
     }
   }
 
-  protected void setZeroLatch() {
+  public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
   }
 

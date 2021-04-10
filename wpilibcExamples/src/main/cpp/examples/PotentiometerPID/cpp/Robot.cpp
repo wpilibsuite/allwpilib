@@ -6,9 +6,9 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a

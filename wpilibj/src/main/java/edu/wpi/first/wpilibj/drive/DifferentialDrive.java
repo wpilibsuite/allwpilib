@@ -8,8 +8,8 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -21,8 +21,8 @@ import java.util.StringJoiner;
  *
  * <p>These drive bases typically have drop-center / skid-steer with two or more wheels per side
  * (e.g., 6WD or 8WD). This class takes a SpeedController per side. For four and six motor
- * drivetrains, construct and pass in {@link edu.wpi.first.wpilibj.SpeedControllerGroup} instances
- * as follows.
+ * drivetrains, construct and pass in {@link
+ * edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup} instances as follows.
  *
  * <p>Four motor drivetrain:
  *

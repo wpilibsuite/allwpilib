@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
  * The DriveTrain subsystem controls the robot's chassis and reads in information about it's speed

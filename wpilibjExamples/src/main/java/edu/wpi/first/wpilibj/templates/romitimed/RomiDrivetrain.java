@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.templates.romitimed;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 public class RomiDrivetrain {
   private static final double kCountsPerRevolution = 1440.0;

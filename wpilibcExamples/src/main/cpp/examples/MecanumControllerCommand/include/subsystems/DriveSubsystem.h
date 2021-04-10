@@ -6,13 +6,13 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/interfaces/Gyro.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"

@@ -6,12 +6,12 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc/motorcontrol/SpeedControllerGroup.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>

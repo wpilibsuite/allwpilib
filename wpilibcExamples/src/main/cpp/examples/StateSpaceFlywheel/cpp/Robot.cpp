@@ -5,13 +5,13 @@
 #include <frc/DriverStation.h>
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/KalmanFilter.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/system/LinearSystemLoop.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>

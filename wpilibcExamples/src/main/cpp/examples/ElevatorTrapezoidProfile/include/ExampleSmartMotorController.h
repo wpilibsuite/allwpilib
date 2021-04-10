@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/SpeedController.h>
+#include <frc/motorcontrol/SpeedController.h>
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor

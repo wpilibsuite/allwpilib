@@ -4,10 +4,10 @@
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
-#include "frc/Jaguar.h"
-#include "frc/Talon.h"
 #include "frc/Timer.h"
-#include "frc/Victor.h"
+#include "frc/motorcontrol/Jaguar.h"
+#include "frc/motorcontrol/Talon.h"
+#include "frc/motorcontrol/Victor.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

@@ -6,13 +6,13 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/MecanumDriveKinematics.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <wpi/math>
 
 /**
