@@ -86,14 +86,13 @@ import java.util.StringJoiner;
  * value can be changed with {@link #setDeadband}.
  *
  * <p>RobotDrive porting guide: <br>
- * {@link #tankDrive(double, double)} is equivalent to
- * RobotDrive's tankDrive(double, double) if a deadband of 0 is used. <br>
- * {@link #arcadeDrive(double, double)} is equivalent to
- * RobotDrive's arcadeDrive(double, double) if a deadband of 0 is used and the
- * the rotation input is inverted eg arcadeDrive(y, -rotation) <br>
- * {@link #curvatureDrive(double, double, boolean)} is similar in concept to
- * RobotDrive's drive(double, double) with the addition of a quick turn mode.
- * However, it is not designed to give exactly the same response.
+ * {@link #tankDrive(double, double)} is equivalent to RobotDrive's tankDrive(double, double) if a
+ * deadband of 0 is used. <br>
+ * {@link #arcadeDrive(double, double)} is equivalent to RobotDrive's arcadeDrive(double, double) if
+ * a deadband of 0 is used and the the rotation input is inverted eg arcadeDrive(y, -rotation) <br>
+ * {@link #curvatureDrive(double, double, boolean)} is similar in concept to RobotDrive's
+ * drive(double, double) with the addition of a quick turn mode. However, it is not designed to give
+ * exactly the same response.
  */
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
