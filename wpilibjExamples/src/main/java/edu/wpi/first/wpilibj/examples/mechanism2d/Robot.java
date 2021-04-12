@@ -21,11 +21,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
 
-    Mechanism2d mech = new Mechanism2d(0, 0);
+    Mechanism2d mech = new Mechanism2d(200, 200);
     MechanismRoot2d root = mech.getRoot("climber", 80, 100);
     m_elevator =
         root.append(
             new MechanismLigament2d("elevator", new Color8Bit(Color.kDarkOrange), 10, 0, 10));
+    m_elevator.setAngle(90);
     m_wrist =
         m_elevator.append(
             new MechanismLigament2d("wrist", new Color8Bit(Color.kForestGreen), 6, 90, 4));
