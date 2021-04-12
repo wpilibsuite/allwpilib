@@ -183,10 +183,12 @@ void FrameData::DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
                            const frc::Pose2d& pose) const {
   const char* type = objModel.GetType();
   if (wpi::StringRef{type} == "line") {
+    auto startPose =
+        pose + frc::Transform2d{frc::Translation2d{}, objModel.GetAngle()};
     auto endPose =
-        pose + frc::Transform2d{frc::Translation2d{objModel.GetLength(), 0_m},
-                                objModel.GetAngle()};
-    drawList->AddLine(GetScreenFromPos(pose.Translation()),
+        startPose +
+        frc::Transform2d{frc::Translation2d{objModel.GetLength(), 0_m}, 0_deg};
+    drawList->AddLine(GetScreenFromPos(startPose.Translation()),
                       GetScreenFromPos(endPose.Translation()),
                       objModel.GetColor(), objModel.GetWeight());
     DrawGroup(drawList, objModel, endPose);

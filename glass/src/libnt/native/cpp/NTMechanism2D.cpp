@@ -32,8 +32,9 @@ class NTMechanismObjectModel;
 
 class NTMechanismGroupImpl final {
  public:
-  NTMechanismGroupImpl(NT_Inst inst, wpi::StringRef name)
-      : m_inst{inst}, m_name{name} {}
+  NTMechanismGroupImpl(NT_Inst inst, const wpi::Twine& path,
+                       wpi::StringRef name)
+      : m_inst{inst}, m_path{path.str()}, m_name{name} {}
 
   const char* GetName() const { return m_name.c_str(); }
   void ForEachObject(wpi::function_ref<void(MechanismObjectModel& model)> func);
@@ -41,19 +42,21 @@ class NTMechanismGroupImpl final {
 
  protected:
   NT_Inst m_inst;
+  std::string m_path;
   std::string m_name;
   std::vector<std::unique_ptr<NTMechanismObjectModel>> m_objects;
 };
 
 class NTMechanismObjectModel final : public MechanismObjectModel {
  public:
-  NTMechanismObjectModel(NT_Inst inst, wpi::StringRef name)
-      : m_group{inst, name},
-        m_type{nt::GetEntry(inst, name + "/.type")},
-        m_color{nt::GetEntry(inst, name + "/color")},
-        m_weight{nt::GetEntry(inst, name + "/weight")},
-        m_angle{nt::GetEntry(inst, name + "/angle")},
-        m_length{nt::GetEntry(inst, name + "/length")} {}
+  NTMechanismObjectModel(NT_Inst inst, const wpi::Twine& path,
+                         wpi::StringRef name)
+      : m_group{inst, path, name},
+        m_type{nt::GetEntry(inst, path + "/.type")},
+        m_color{nt::GetEntry(inst, path + "/color")},
+        m_weight{nt::GetEntry(inst, path + "/weight")},
+        m_angle{nt::GetEntry(inst, path + "/angle")},
+        m_length{nt::GetEntry(inst, path + "/length")} {}
 
   const char* GetName() const final { return m_group.GetName(); }
   void ForEachObject(
@@ -112,8 +115,8 @@ void NTMechanismGroupImpl::NTUpdate(const nt::EntryNotification& event,
 
   if (event.flags & NT_NOTIFY_NEW) {
     if (!match) {
-      it = m_objects.emplace(
-          it, std::make_unique<NTMechanismObjectModel>(m_inst, name));
+      it = m_objects.emplace(it, std::make_unique<NTMechanismObjectModel>(
+                                     m_inst, m_path + "/" + name, name));
       match = true;
     }
   }
@@ -157,10 +160,10 @@ bool NTMechanismObjectModel::NTUpdate(const nt::EntryNotification& event,
 
 class NTMechanism2DModel::RootModel final : public MechanismRootModel {
  public:
-  RootModel(NT_Inst inst, wpi::StringRef name)
-      : m_group{inst, name},
-        m_x{nt::GetEntry(inst, name + "/x")},
-        m_y{nt::GetEntry(inst, name + "/y")} {}
+  RootModel(NT_Inst inst, const wpi::Twine& path, wpi::StringRef name)
+      : m_group{inst, path, name},
+        m_x{nt::GetEntry(inst, path + "/x")},
+        m_y{nt::GetEntry(inst, path + "/y")} {}
 
   const char* GetName() const final { return m_group.GetName(); }
   void ForEachObject(
@@ -182,7 +185,7 @@ class NTMechanism2DModel::RootModel final : public MechanismRootModel {
 bool NTMechanism2DModel::RootModel::NTUpdate(const nt::EntryNotification& event,
                                              wpi::StringRef childName) {
   if ((event.flags & NT_NOTIFY_DELETE) != 0 &&
-             (event.entry == m_x || event.entry == m_y)) {
+      (event.entry == m_x || event.entry == m_y)) {
     return true;
   } else if (event.entry == m_x) {
     if (event.value && event.value->IsDouble()) {
@@ -263,8 +266,9 @@ void NTMechanism2DModel::Update() {
 
       if (event.flags & NT_NOTIFY_NEW) {
         if (!match) {
-          it = m_roots.emplace(
-              it, std::make_unique<RootModel>(m_nt.GetInstance(), name));
+          it =
+              m_roots.emplace(it, std::make_unique<RootModel>(
+                                      m_nt.GetInstance(), m_path + name, name));
           match = true;
         }
       }
