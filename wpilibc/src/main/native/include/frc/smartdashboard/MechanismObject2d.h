@@ -40,11 +40,11 @@ class MechanismObject2d {
    * @return the object given as a parameter, useful for variable assignments and call chaining.
    */
   template<typename T>
-  T Append(const T& object) const {
-      if (m_objects.count(object.getName())) {
+  T& Append(const T& object) {
+      if (m_objects.count(object.GetName())) {
         //   throw
       }
-      m_objects[object.GetName()] = object;
+      m_objects.try_emplace(object.GetName(), object);
   }
 
  private:

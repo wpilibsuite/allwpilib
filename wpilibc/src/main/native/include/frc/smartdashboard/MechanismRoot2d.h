@@ -13,9 +13,10 @@ namespace frc {
 
 class MechanismRoot2d {
   friend class Mechanism2d;
-  static constexpr char* kPosition {"pos"};
+  static constexpr char kPosition[] = "pos";
  
  public:
+  MechanismRoot2d(const frc::MechanismRoot2d& rhs);
   wpi::Twine& GetName();
 
   /**
@@ -33,11 +34,11 @@ class MechanismRoot2d {
    * @return the object given as a parameter, useful for variable assignments and call chaining.
    */
   template<typename T>
-  T Append(const std::shared_ptr<T> object) const {
-      if (m_objects.count(object.getName())) {
+  T& Append(const T& object) {
+      if (m_objects.count(object.GetName())) {
         //   throw
       }
-      m_objects[object.GetName()] = object;
+      m_objects.try_emplace(object.GetName(), object);
   }
 
   private:
@@ -46,7 +47,7 @@ class MechanismRoot2d {
   inline void Flush() const;
   std::string m_name;
   std::shared_ptr<NetworkTable> m_table;
-  wpi::StringMap<MechanismRoot2d> m_objects;
+  wpi::StringMap<MechanismObject2d> m_objects;
   mutable wpi::mutex m_mutex;
   double m_pos[2];
 

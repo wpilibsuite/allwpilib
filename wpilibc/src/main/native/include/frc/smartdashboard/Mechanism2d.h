@@ -16,7 +16,7 @@
 namespace frc {
 
 class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
-  static constexpr char* kBackgroundColor{"backgroundColor"};
+  static constexpr char kBackgroundColor[] = "backgroundColor";
  public:
   /**
    * Create a new Mechanism2d window with the given dimensions.

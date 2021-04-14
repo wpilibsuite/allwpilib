@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "MechanismRoot2d.h"
+#include "frc/smartdashboard/MechanismRoot2d.h"
 
 #include <map>
 
@@ -18,6 +18,9 @@ using namespace frc;
 
 MechanismRoot2d::MechanismRoot2d(wpi::Twine& name, double x, double y)
     : m_name{name.str()}, m_pos{x, y} {}
+
+MechanismRoot2d::MechanismRoot2d(const frc::MechanismRoot2d& rhs) : m_name {rhs.m_name},
+    m_objects {rhs.m_objects}, m_table {rhs.m_table} {}
 
 void MechanismRoot2d::SetPosition(double x, double y) {
   m_pos[0] = x;

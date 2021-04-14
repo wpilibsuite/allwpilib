@@ -20,7 +20,8 @@ MechanismRoot2d& Mechanism2d::GetRoot(const wpi::StringRef name, double x, doubl
   if (m_roots.count(name)) {
     return m_roots[name];
   }
-  MechanismRoot2d root {wpi::Twine(name), x, y};
+  wpi::Twine& twine {name};
+  MechanismRoot2d root {twine, x, y};
   m_roots.try_emplace(name, root);
   root.Update(m_table->GetSubTable(name));
   return root;

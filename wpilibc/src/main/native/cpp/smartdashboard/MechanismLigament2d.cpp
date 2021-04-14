@@ -9,6 +9,10 @@
 
 using namespace frc;
 
+MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color, double length, units::degree_t angle, double lineWeight) : MechanismObject2d(name), m_length {length}, m_angle {angle.to<double>()}, m_weight {lineWeight} {
+    SetColor(color);
+}
+
 void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
   table->GetEntry(".type").SetString("line");
   
@@ -21,8 +25,7 @@ void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
   wpi::raw_string_ostream os{m_color};
-  os << "#";
-  os << std::hex << (color.red << 16 | color.green << 8 | color.blue);
+  os << "#" << std::hex << (color.red << 16 | color.green << 8 | color.blue);
   Flush();
 }
 
