@@ -36,7 +36,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    * @param y the root y coordinate
    * @return a new root object, or the existing one with the given name.
    */
-  MechanismRoot2d& GetRoot(const wpi::StringRef name, double x, double y);
+  MechanismRoot2d* GetRoot(const wpi::StringRef name, double x, double y);
 
   /**
    * Set the Mechanism2d window background color.
@@ -52,6 +52,6 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
   std::string m_color;
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;
-  wpi::StringMap<MechanismRoot2d> m_roots;
+  wpi::StringMap<std::unique_ptr<MechanismRoot2d>> m_roots;
 };
 }

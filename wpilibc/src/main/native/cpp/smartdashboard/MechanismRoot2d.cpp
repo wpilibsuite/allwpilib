@@ -16,11 +16,10 @@
 
 using namespace frc;
 
-MechanismRoot2d::MechanismRoot2d(wpi::Twine& name, double x, double y)
-    : m_name{name.str()}, m_pos{x, y} {}
+MechanismRoot2d::MechanismRoot2d(const wpi::Twine& name, double x, double y)
+    : MechanismObject2d(name.str()), m_pos{x, y} {}
 
-MechanismRoot2d::MechanismRoot2d(const frc::MechanismRoot2d& rhs) : m_name {rhs.m_name},
-    m_objects {rhs.m_objects}, m_table {rhs.m_table} {}
+MechanismRoot2d::MechanismRoot2d(const frc::MechanismRoot2d& rhs) : MechanismObject2d(rhs.GetName()) {}
 
 void MechanismRoot2d::SetPosition(double x, double y) {
   m_pos[0] = x;
@@ -28,13 +27,13 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
-void MechanismRoot2d::Update(std::shared_ptr<NetworkTable> table) {
-  m_table = table;
+void MechanismRoot2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
+  m_posEntry = std::make_unique<nt::NetworkTableEntry>(table->GetEntry(kPosition));
   Flush();
 }
 
 inline void MechanismRoot2d::Flush() const {
-  if (m_table) {
-    m_table->GetEntry(kPosition).SetDoubleArray(m_pos);
+  if (m_posEntry) {
+    m_posEntry->SetDoubleArray(m_pos);
   }
 }

@@ -16,15 +16,15 @@ using namespace frc;
 
 Mechanism2d::Mechanism2d(double width, double height) : m_dims{width, height} {}
 
-MechanismRoot2d& Mechanism2d::GetRoot(const wpi::StringRef name, double x, double y) {
+MechanismRoot2d* Mechanism2d::GetRoot(const wpi::StringRef name, double x, double y) {
   if (m_roots.count(name)) {
-    return m_roots[name];
+    return m_roots[name].get();
   }
-  wpi::Twine& twine {name};
-  MechanismRoot2d root {twine, x, y};
-  m_roots.try_emplace(name, root);
-  root.Update(m_table->GetSubTable(name));
-  return root;
+  const auto& twine = wpi::Twine::Twine(name);
+  const std::unique_ptr<MechanismRoot2d> ptr = std::make_unique<MechanismRoot2d>(twine, x, y);
+  m_roots.try_emplace(name, ptr);
+  ptr->Update(m_table->GetSubTable(name));
+  return ptr.get();
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
@@ -42,9 +42,9 @@ void Mechanism2d::InitSendable(SendableBuilder& builder) {
   m_table = builder.GetTable();
 
   std::scoped_lock lock(m_mutex);
-  for (auto& entry : m_roots) {
-    auto& root = entry.getValue();
-    std::scoped_lock lock2(root.m_mutex);
-    root.Update(m_table->GetSubTable(entry.getKey()));
+  for (const auto& entry : m_roots) {
+    const auto& root = entry.getValue().get();
+    std::scoped_lock lock2(root->m_mutex);
+    root->Update(m_table->GetSubTable(entry.getKey()));
   }
 }

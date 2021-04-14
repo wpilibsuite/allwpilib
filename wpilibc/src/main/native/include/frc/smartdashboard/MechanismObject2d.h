@@ -14,7 +14,7 @@
 namespace frc {
 
 class MechanismObject2d {
-  friend class MechanismRoot2d;
+  friend class Mechanism2d;
  protected:
   explicit MechanismObject2d(const wpi::Twine& name);
   /**
@@ -39,17 +39,20 @@ class MechanismObject2d {
    * @param object the object to add.
    * @return the object given as a parameter, useful for variable assignments and call chaining.
    */
-  template<typename T>
-  T& Append(const T& object) {
-      if (m_objects.count(object.GetName())) {
-        //   throw
-      }
-      m_objects.try_emplace(object.GetName(), object);
+  template<typename T, typename... Args>
+  T* Append(wpi::StringRef name, Args&&... args) {
+    if (m_objects.count(name)) {
+      // throw or return?
+    }
+    std::unique_ptr<T> ptr = std::make_unique<T>(name, std::forward<Args>(args)...);
+    m_objects.try_emplace<std::unique_ptr<MechanismObject2d>>(name, std::move(ptr));
+    ptr->Update(m_table);
+    return ptr.get();
   }
 
  private:
   std::string m_name;
-  wpi::StringMap<MechanismObject2d> m_objects;
+  wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
   std::shared_ptr<NetworkTable> m_table;
   mutable wpi::mutex m_mutex;
   void Update(std::shared_ptr<NetworkTable> table);

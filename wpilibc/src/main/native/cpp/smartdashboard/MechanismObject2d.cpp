@@ -20,7 +20,7 @@ bool MechanismObject2d::operator==(MechanismObject2d& rhs) {
 void MechanismObject2d::Update(std::shared_ptr<NetworkTable> table) {
   m_table = table;
   UpdateEntries(m_table);
-  for (wpi::StringMapEntry<MechanismObject2d>& entry : m_objects) {
-    entry.getValue().Update(m_table->GetSubTable(entry.getKey()));
+  for (const wpi::StringMapEntry<std::unique_ptr<MechanismObject2d>>& entry : m_objects) {
+    entry.getValue()->Update(m_table->GetSubTable(entry.getKey()));
   }
 }

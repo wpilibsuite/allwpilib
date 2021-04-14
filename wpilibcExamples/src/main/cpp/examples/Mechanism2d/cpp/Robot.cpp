@@ -25,14 +25,13 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
-    m_root.Append<frc::MechanismLigament2d>(m_elevator);
-    m_elevator.Append(m_wrist);
 
     frc::SmartDashboard::PutData(wpi::StringRef("Mech2d"), &m_mech);
   }
+
   void RobotPeriodic() override {
-    m_elevator.SetLength(m_elevatorEncoder.GetDistance());
-    m_wrist.SetAngle(units::degree_t(m_wristPotentiometer.Get()));
+    m_elevator->SetLength(m_elevatorEncoder.GetDistance());
+    m_wrist->SetAngle(units::degree_t(m_wristPotentiometer.Get()));
   }
   void TeleopPeriodic() override { 
     m_elevatorMotor.Set(m_joystick.GetRawAxis(0));
@@ -47,9 +46,9 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{0};
 
   frc::Mechanism2d m_mech {200, 200};
-  frc::MechanismRoot2d m_root = m_mech.GetRoot("climber", 80, 100);
-  frc::MechanismLigament2d m_elevator {"elevator", frc::Color::kDarkOrange, 10, 0_deg, 10};
-  frc::MechanismLigament2d m_wrist {"wrist", frc::Color::kForestGreen, 6, 90_deg, 4};
+  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 80, 100);
+  frc::MechanismLigament2d* m_elevator = m_root->Append<frc::MechanismLigament2d>("elevator", frc::Color::kDarkOrange, 10, 0_deg, 10);
+  frc::MechanismLigament2d* m_wrist = m_elevator->Append<frc::MechanismLigament2d>("wrist", frc::Color::kForestGreen, 6, 90_deg, 4);
 };
 
 #ifndef RUNNING_FRC_TESTS
