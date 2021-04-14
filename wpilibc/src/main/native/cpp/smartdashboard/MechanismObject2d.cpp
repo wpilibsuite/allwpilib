@@ -3,12 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/smartdashboard/MechanismObject2d.h"
+#include <wpi/StringMap.h>
 
 using namespace frc;
 
-MechanismObject2d::MechanismObject2d(wpi::Twine& name) : m_name{name} {}
+MechanismObject2d::MechanismObject2d(const wpi::Twine& name) : m_name{name.str()} {}
 
-wpi::Twine& MechanismObject2d::GetName() const {
+const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
@@ -19,7 +20,7 @@ bool MechanismObject2d::operator==(MechanismObject2d& rhs) {
 void MechanismObject2d::Update(std::shared_ptr<NetworkTable> table) {
   m_table = table;
   UpdateEntries(m_table);
-  for (auto& [name, object] : m_objects) {
-    object.Update(m_table->GetSubTable(name));
+  for (wpi::StringMapEntry<MechanismObject2d>& entry : m_objects) {
+    entry.getValue().Update(m_table->GetSubTable(entry.getKey()));
   }
 }

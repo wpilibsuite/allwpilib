@@ -16,6 +16,16 @@ using namespace frc;
 
 Mechanism2d::Mechanism2d(double width, double height) : m_dims{width, height} {}
 
+MechanismRoot2d& Mechanism2d::GetRoot(const wpi::StringRef name, double x, double y) {
+  if (m_roots.count(name)) {
+    return m_roots[name];
+  }
+  MechanismRoot2d root {wpi::Twine(name), x, y};
+  m_roots.try_emplace(name, root);
+  root.Update(m_table->GetSubTable(name));
+  return root;
+}
+
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   std::string buf;
   wpi::raw_string_ostream os{buf};
@@ -31,8 +41,9 @@ void Mechanism2d::InitSendable(SendableBuilder& builder) {
   m_table = builder.GetTable();
 
   std::scoped_lock lock(m_mutex);
-  for (auto&& [name, root] : m_roots) {
+  for (auto& entry : m_roots) {
+    auto& root = entry.getValue();
     std::scoped_lock lock2(root.m_mutex);
-    root.UpdateEntries(m_table->GetSubTable(name));
+    root.Update(m_table->GetSubTable(entry.getKey()));
   }
 }

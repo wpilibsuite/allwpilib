@@ -16,7 +16,7 @@
 namespace frc {
 
 class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
-  const wpi::Twine& kBackgroundColor{"backgroundColor"};
+  static constexpr char* kBackgroundColor{"backgroundColor"};
  public:
   /**
    * Create a new Mechanism2d window with the given dimensions.
@@ -36,7 +36,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    * @param y the root y coordinate
    * @return a new root object, or the existing one with the given name.
    */
-  MechanismRoot2d GetRoot(const wpi::Twine& name);
+  MechanismRoot2d& GetRoot(const wpi::StringRef name, double x, double y);
 
   /**
    * Set the Mechanism2d window background color.
@@ -52,6 +52,6 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
   std::string m_color;
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;
-  std::map<wpi::Twine&, MechanismRoot2d> m_roots;
+  wpi::StringMap<MechanismRoot2d> m_roots;
 };
 }

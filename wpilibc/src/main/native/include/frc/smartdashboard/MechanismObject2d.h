@@ -7,7 +7,7 @@
 #include <map>
 #include <memory>
 
-#include <wpi/Twine.h>
+#include <wpi/StringMap.h>
 
 #include <networktables/NetworkTable.h>
 
@@ -16,7 +16,7 @@ namespace frc {
 class MechanismObject2d {
   friend class MechanismRoot2d;
  protected:
-  explicit MechanismObject2d(wpi::Twine& name) : m_name{name} {}
+  explicit MechanismObject2d(const wpi::Twine& name);
   /**
    * Update all entries with new ones from a new table.
    *
@@ -29,7 +29,7 @@ class MechanismObject2d {
    * 
    * @return the object's name relative to its parent.
    */
-  wpi::Twine& GetName() const;
+  const std::string& GetName() const;
 
   bool operator==(MechanismObject2d& rhs);
 
@@ -41,15 +41,15 @@ class MechanismObject2d {
    */
   template<typename T>
   T Append(const T& object) const {
-      if (m_objects.containsKey(object.getName())) {
+      if (m_objects.count(object.getName())) {
         //   throw
       }
       m_objects[object.GetName()] = object;
   }
 
  private:
-  wpi::Twine& m_name;
-  std::map<wpi::Twine&, MechanismObject2d> m_objects;
+  std::string m_name;
+  wpi::StringMap<MechanismObject2d> m_objects;
   std::shared_ptr<NetworkTable> m_table;
   mutable wpi::mutex m_mutex;
   void Update(std::shared_ptr<NetworkTable> table);
