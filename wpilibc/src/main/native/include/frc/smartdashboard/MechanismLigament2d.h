@@ -36,7 +36,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @return the line length
    */
-  double GetLength();
+  double GetLength() const;
 
   /**
    * Set the ligament's angle relative to its parent.
@@ -50,7 +50,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @return the angle
    */
-  double GetAngle();
+  double GetAngle() const;
 
   /**
    * Set the line thickness.

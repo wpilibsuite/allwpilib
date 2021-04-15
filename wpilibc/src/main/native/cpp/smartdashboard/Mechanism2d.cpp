@@ -14,11 +14,11 @@ using namespace frc;
 
 Mechanism2d::Mechanism2d(double width, double height) : m_width {width}, m_height{height} {}
 
-MechanismRoot2d* Mechanism2d::GetRoot(const wpi::StringRef name, double x, double y) {
-  // auto it = m_roots.find(name);
-  // if (it != m_roots.end()) {
-  //   return it->getValue().get();
-  // }
+MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
+  auto it = m_roots.find(name);
+  if (it != m_roots.end()) {
+    return it->getValue().get();
+  }
   std::unique_ptr<MechanismRoot2d> ptr = std::make_unique<MechanismRoot2d>(name, x, y, MechanismRoot2d::private_init{});
   MechanismRoot2d* ex = ptr.get();
   m_roots.try_emplace(name, std::move(ptr));

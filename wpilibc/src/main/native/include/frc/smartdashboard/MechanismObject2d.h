@@ -24,6 +24,7 @@ class MechanismObject2d {
    */
   virtual void UpdateEntries(std::shared_ptr<NetworkTable> table) = 0;
  public:
+  virtual ~MechanismObject2d() = default;
   /**
    * Retrieve the object's name.
    * 
@@ -39,13 +40,12 @@ class MechanismObject2d {
    * @return the constructed and appended object, useful for variable assignments and call chaining.
    * @throw if an object with the given name already exists.
    */
-  template<typename T, typename... Args>
+  template<typename T, typename... Args, typename = std::enable_if_t<std::is_convertible_v<T*, MechanismObject2d*>>>
   T* Append(wpi::StringRef name, Args&&... args) {    
     if (m_objects.count(name)) {
       throw std::runtime_error(("MechanismObject names must be unique! `" + name
                                + "` was inserted twice!").str());
     }
-    // return nullptr;
     std::unique_ptr<T> ptr = std::make_unique<T>(name, std::forward<Args>(args)...);
     T* ex = ptr.get();
     m_objects.try_emplace<std::unique_ptr<MechanismObject2d>>(name, std::move(ptr));

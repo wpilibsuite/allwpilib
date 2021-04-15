@@ -27,34 +27,34 @@ void MechanismLigament2d::SetColor(const Color8Bit& color) {
 }
 
 void MechanismLigament2d::SetAngle(units::degree_t angle) {
-    m_angle = angle.to<double>();
-    Flush();
+  m_angle = angle.to<double>();
+  Flush();
 }
 
 void MechanismLigament2d::SetLineWeight(double lineWidth) {
-    m_weight = lineWidth;
-    Flush();
+  m_weight = lineWidth;
+  Flush();
 }
 
-double MechanismLigament2d::GetAngle() {
-    return m_angle;
+double MechanismLigament2d::GetAngle() const {
+  return m_angle;
 }
 
-double MechanismLigament2d::GetLength() {
-    return m_length;
+double MechanismLigament2d::GetLength() const {
+  return m_length;
 }
 
 void MechanismLigament2d::SetLength(double length) {
-    m_length = length;
-    Flush();
+  m_length = length;
+  Flush();
 }
 
 #define SAFE_WRITE(data, Type) if (m_##data##Entry) {\
 m_##data##Entry.Set##Type(m_##data);\
 }
 void MechanismLigament2d::Flush() {
-    SAFE_WRITE(color, String)
-    SAFE_WRITE(angle, Double)
-    SAFE_WRITE(length, Double)
-    SAFE_WRITE(weight, Double)
+  SAFE_WRITE(color, String)
+  SAFE_WRITE(angle, Double)
+  SAFE_WRITE(length, Double)
+  SAFE_WRITE(weight, Double)
 }
