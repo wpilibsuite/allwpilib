@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#pragma once
-
 #include "frc/smartdashboard/MechanismLigament2d.h"
 #include <wpi/raw_ostream.h>
 
@@ -15,7 +13,7 @@ MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Colo
 
 void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
   table->GetEntry(".type").SetString("line");
-  
+
   m_colorEntry = table->GetEntry("color");
   m_angleEntry = table->GetEntry("angle");
   m_weightEntry = table->GetEntry("weight");

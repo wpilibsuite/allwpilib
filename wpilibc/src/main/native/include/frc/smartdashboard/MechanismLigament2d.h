@@ -5,9 +5,11 @@
 #pragma once
 
 #include "MechanismObject2d.h"
+
 #include <networktables/NetworkTableEntry.h>
-#include "frc/util/Color8Bit.h"
 #include <units/angle.h>
+
+#include "frc/util/Color8Bit.h"
 
 namespace frc {
 
@@ -19,9 +21,9 @@ class MechanismLigament2d : public MechanismObject2d {
    * Set the ligament color.
    *
    * @param color the color of the line
-   */ 
+   */
   void SetColor(const frc::Color8Bit& color);
- 
+
   /**
    * Set the ligament's length.
    *
@@ -35,7 +37,7 @@ class MechanismLigament2d : public MechanismObject2d {
    * @return the line length
    */
   double GetLength();
- 
+
   /**
    * Set the ligament's angle relative to its parent.
    *
@@ -63,11 +65,11 @@ class MechanismLigament2d : public MechanismObject2d {
  private:
   void Flush();
   char m_color[10];
+  nt::NetworkTableEntry m_lengthEntry;
+  double m_length;
   nt::NetworkTableEntry m_colorEntry;
   double m_angle;
   nt::NetworkTableEntry m_angleEntry;
-  double m_length;
-  nt::NetworkTableEntry m_lengthEntry;
   double m_weight;
   nt::NetworkTableEntry m_weightEntry;
 };
