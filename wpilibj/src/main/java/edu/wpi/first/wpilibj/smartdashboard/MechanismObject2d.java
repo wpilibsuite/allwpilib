@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -29,8 +33,9 @@ public abstract class MechanismObject2d {
    *     be unique.
    */
   public final <T extends MechanismObject2d> T append(T object) {
-    if (m_objects.containsKey(object.getName()))
+    if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
+    }
     m_objects.put(object.getName(), object);
     if (m_table != null) {
       object.update(m_table.getSubTable(object.getName()));

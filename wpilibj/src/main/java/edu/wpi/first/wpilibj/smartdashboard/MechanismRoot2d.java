@@ -36,9 +36,18 @@ public final class MechanismRoot2d {
     m_y = y;
   }
 
-  public final <T extends MechanismObject2d> T append(T object) {
-    if (m_objects.containsKey(object.getName()))
+  /**
+   * Append a Mechanism object that is based on this one.
+   *
+   * @param object the object to add.
+   * @return the object given as a parameter, useful for variable assignments and call chaining.
+   * @throws UnsupportedOperationException if the object's name is already used - object names must
+   *     be unique.
+   */
+  public <T extends MechanismObject2d> T append(T object) {
+    if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
+    }
     m_objects.put(object.getName(), object);
     if (m_table != null) {
       object.update(m_table.getSubTable(object.getName()));
@@ -57,7 +66,7 @@ public final class MechanismRoot2d {
     m_y = y;
   }
 
-  final void update(NetworkTable table) {
+  void update(NetworkTable table) {
     m_table = table;
     m_xEntry = m_table.getEntry("x");
     m_yEntry = m_table.getEntry("y");
@@ -67,7 +76,7 @@ public final class MechanismRoot2d {
     }
   }
 
-  public final String getName() {
+  public String getName() {
     return m_name;
   }
 

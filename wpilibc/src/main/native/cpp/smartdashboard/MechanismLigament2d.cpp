@@ -22,7 +22,7 @@ void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
 }
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
-  std::snprintf(m_color, sizeof(m_color), "#%02x%02x%02x", color.red, color.green, color.blue);
+  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red, color.green, color.blue);
   Flush();
 }
 

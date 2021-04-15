@@ -24,6 +24,9 @@ public class MechanismLigament2d extends MechanismObject2d {
   private double m_weight;
   private NetworkTableEntry m_weightEntry;
 
+  /**
+   * Create a new ligament.
+   */
   public MechanismLigament2d(
       String name, Color8Bit color, double length, double angle, double lineWidth) {
     super(name);
