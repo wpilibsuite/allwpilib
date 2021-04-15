@@ -74,7 +74,7 @@ public final class TestBench {
   public MotorEncoderFixture<Talon> getTalonPair() {
     return new MotorEncoderFixture<Talon>() {
       @Override
-      protected Talon giveSpeedController() {
+      protected Talon giveMotorController() {
         return new Talon(kTalonChannel);
       }
 
@@ -104,7 +104,7 @@ public final class TestBench {
   public MotorEncoderFixture<Victor> getVictorPair() {
     return new MotorEncoderFixture<Victor>() {
       @Override
-      protected Victor giveSpeedController() {
+      protected Victor giveMotorController() {
         return new Victor(kVictorChannel);
       }
 
@@ -134,7 +134,7 @@ public final class TestBench {
   public MotorEncoderFixture<Jaguar> getJaguarPair() {
     return new MotorEncoderFixture<Jaguar>() {
       @Override
-      protected Jaguar giveSpeedController() {
+      protected Jaguar giveMotorController() {
         return new Jaguar(kJaguarChannel);
       }
 

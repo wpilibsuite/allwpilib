@@ -56,7 +56,7 @@ void DriveSubsystem::Drive(double xSpeed, double ySpeed, double rot,
   }
 }
 
-void DriveSubsystem::SetSpeedControllersVolts(units::volt_t frontLeftPower,
+void DriveSubsystem::SetMotorControllersVolts(units::volt_t frontLeftPower,
                                               units::volt_t rearLeftPower,
                                               units::volt_t frontRightPower,
                                               units::volt_t rearRightPower) {

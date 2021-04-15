@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
@@ -22,14 +22,14 @@ import edu.wpi.first.wpilibj.motorcontrol.Victor;
  */
 public class DriveTrain extends Subsystem {
   // Subsystem devices
-  private final SpeedController m_frontLeftCIM = new Victor(1);
-  private final SpeedController m_frontRightCIM = new Victor(2);
-  private final SpeedController m_rearLeftCIM = new Victor(3);
-  private final SpeedController m_rearRightCIM = new Victor(4);
-  private final SpeedControllerGroup m_leftCIMs =
-      new SpeedControllerGroup(m_frontLeftCIM, m_rearLeftCIM);
-  private final SpeedControllerGroup m_rightCIMs =
-      new SpeedControllerGroup(m_frontRightCIM, m_rearRightCIM);
+  private final MotorController m_frontLeftCIM = new Victor(1);
+  private final MotorController m_frontRightCIM = new Victor(2);
+  private final MotorController m_rearLeftCIM = new Victor(3);
+  private final MotorController m_rearRightCIM = new Victor(4);
+  private final MotorControllerGroup m_leftCIMs =
+      new MotorControllerGroup(m_frontLeftCIM, m_rearLeftCIM);
+  private final MotorControllerGroup m_rightCIMs =
+      new MotorControllerGroup(m_frontRightCIM, m_rearRightCIM);
   private final DifferentialDrive m_drive;
   private final Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
   private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);

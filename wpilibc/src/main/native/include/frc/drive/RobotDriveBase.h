@@ -13,8 +13,6 @@
 
 namespace frc {
 
-class SpeedController;
-
 /**
  * Common base class for drive platforms.
  */

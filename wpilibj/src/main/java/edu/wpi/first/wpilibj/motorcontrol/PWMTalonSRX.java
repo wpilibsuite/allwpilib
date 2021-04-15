@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
+ * Cross the Road Electronics (CTRE) Talon SRX Motor Controller with PWM control.
  *
  * <p>Note that the TalonSRX uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.997ms = full "reverse"
  * </ul>
  */
-public class PWMTalonSRX extends PWMSpeedController {
+public class PWMTalonSRX extends PWMMotorController {
   /**
    * Constructor for a TalonSRX connected via PWM.
    *

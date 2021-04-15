@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * REV Robotics SPARK MAX Speed Controller.
+ * REV Robotics SPARK MAX Motor Controller.
  *
  * Note that the SPARK MAX uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
@@ -24,7 +24,7 @@ namespace frc {
  * \li 1.460ms = the "low end" of the deadband range
  * \li 0.999ms = full "reverse"
  */
-class PWMSparkMax : public PWMSpeedController {
+class PWMSparkMax : public PWMMotorController {
  public:
   /**
    * Constructor for a SPARK MAX.

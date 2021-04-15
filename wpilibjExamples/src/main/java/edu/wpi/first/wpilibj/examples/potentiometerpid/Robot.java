@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a PID controller to
@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
 
   private PIDController m_pidController;
   private AnalogInput m_potentiometer;
-  private SpeedController m_elevatorMotor;
+  private MotorController m_elevatorMotor;
   private Joystick m_joystick;
 
   private int m_index;

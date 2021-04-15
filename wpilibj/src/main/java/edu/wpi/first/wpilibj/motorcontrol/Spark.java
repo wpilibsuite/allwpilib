@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * REV Robotics SPARK Speed Controller.
+ * REV Robotics SPARK Motor Controller.
  *
  * <p>Note that the SPARK uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.999ms = full "reverse"
  * </ul>
  */
-public class Spark extends PWMSpeedController {
+public class Spark extends PWMMotorController {
   /**
    * Constructor.
    *

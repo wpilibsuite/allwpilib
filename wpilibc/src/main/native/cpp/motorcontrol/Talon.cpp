@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-Talon::Talon(int channel) : PWMSpeedController("Talon", channel) {
+Talon::Talon(int channel) : PWMMotorController("Talon", channel) {
   m_pwm.SetBounds(2.037, 1.539, 1.513, 1.487, 0.989);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);

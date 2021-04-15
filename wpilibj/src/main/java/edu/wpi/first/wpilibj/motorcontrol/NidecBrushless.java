@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /** Nidec Brushless Motor. */
 public class NidecBrushless extends MotorSafety
-    implements SpeedController, Sendable, AutoCloseable {
+    implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final DigitalOutput m_dio;
   private final PWM m_pwm;

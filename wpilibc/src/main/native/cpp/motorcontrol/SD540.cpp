@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-SD540::SD540(int channel) : PWMSpeedController("SD540", channel) {
+SD540::SD540(int channel) : PWMMotorController("SD540", channel) {
   m_pwm.SetBounds(2.05, 1.55, 1.50, 1.44, 0.94);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);

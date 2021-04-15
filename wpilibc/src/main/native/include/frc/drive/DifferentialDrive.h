@@ -12,16 +12,16 @@
 
 namespace frc {
 
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as
  * the Kit of Parts drive base, "tank drive", or West Coast Drive.
  *
  * These drive bases typically have drop-center / skid-steer with two or more
- * wheels per side (e.g., 6WD or 8WD). This class takes a SpeedController per
+ * wheels per side (e.g., 6WD or 8WD). This class takes a MotorController per
  * side. For four and six motor drivetrains, construct and pass in
- * SpeedControllerGroup instances as follows.
+ * MotorControllerGroup instances as follows.
  *
  * Four motor drivetrain:
  * @code{.cpp}
@@ -29,11 +29,11 @@ class SpeedController;
  *  public:
  *   frc::PWMVictorSPX m_frontLeft{1};
  *   frc::PWMVictorSPX m_rearLeft{2};
- *   frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
+ *   frc::MotorControllerGroup m_left{m_frontLeft, m_rearLeft};
  *
  *   frc::PWMVictorSPX m_frontRight{3};
  *   frc::PWMVictorSPX m_rearRight{4};
- *   frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
+ *   frc::MotorControllerGroup m_right{m_frontRight, m_rearRight};
  *
  *   frc::DifferentialDrive m_drive{m_left, m_right};
  * };
@@ -46,12 +46,12 @@ class SpeedController;
  *   frc::PWMVictorSPX m_frontLeft{1};
  *   frc::PWMVictorSPX m_midLeft{2};
  *   frc::PWMVictorSPX m_rearLeft{3};
- *   frc::SpeedControllerGroup m_left{m_frontLeft, m_midLeft, m_rearLeft};
+ *   frc::MotorControllerGroup m_left{m_frontLeft, m_midLeft, m_rearLeft};
  *
  *   frc::PWMVictorSPX m_frontRight{4};
  *   frc::PWMVictorSPX m_midRight{5};
  *   frc::PWMVictorSPX m_rearRight{6};
- *   frc::SpeedControllerGroup m_right{m_frontRight, m_midRight, m_rearRight};
+ *   frc::MotorControllerGroup m_right{m_frontRight, m_midRight, m_rearRight};
  *
  *   frc::DifferentialDrive m_drive{m_left, m_right};
  * };
@@ -105,10 +105,10 @@ class DifferentialDrive : public RobotDriveBase,
   /**
    * Construct a DifferentialDrive.
    *
-   * To pass multiple motors per side, use a SpeedControllerGroup. If a motor
+   * To pass multiple motors per side, use a MotorControllerGroup. If a motor
    * needs to be inverted, do so before passing it in.
    */
-  DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -210,8 +210,8 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
+  MotorController* m_leftMotor;
+  MotorController* m_rightMotor;
 
   double m_quickStopThreshold = kDefaultQuickStopThreshold;
   double m_quickStopAlpha = kDefaultQuickStopAlpha;

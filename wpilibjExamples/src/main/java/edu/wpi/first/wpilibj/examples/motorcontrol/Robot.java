@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.examples.motorcontrol;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part
@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private static final int kMotorPort = 0;
   private static final int kJoystickPort = 0;
 
-  private SpeedController m_motor;
+  private MotorController m_motor;
   private Joystick m_joystick;
 
   @Override

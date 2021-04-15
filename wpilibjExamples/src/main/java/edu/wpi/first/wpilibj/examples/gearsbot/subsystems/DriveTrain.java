@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -20,11 +20,11 @@ public class DriveTrain extends SubsystemBase {
    * The DriveTrain subsystem incorporates the sensors and actuators attached to the robots chassis.
    * These include four drive motors, a left and right encoder and a gyro.
    */
-  private final SpeedController m_leftMotor =
-      new SpeedControllerGroup(new PWMSparkMax(0), new PWMSparkMax(1));
+  private final MotorController m_leftMotor =
+      new MotorControllerGroup(new PWMSparkMax(0), new PWMSparkMax(1));
 
-  private final SpeedController m_rightMotor =
-      new SpeedControllerGroup(new PWMSparkMax(2), new PWMSparkMax(3));
+  private final MotorController m_rightMotor =
+      new MotorControllerGroup(new PWMSparkMax(2), new PWMSparkMax(3));
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotor, m_rightMotor);
 

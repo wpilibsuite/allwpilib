@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * VEX Robotics Victor SP Speed Controller.
+ * VEX Robotics Victor SP Motor Controller.
  *
  * <p>Note that the VictorSP uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.997ms = full "reverse"
  * </ul>
  */
-public class VictorSP extends PWMSpeedController {
+public class VictorSP extends PWMMotorController {
   /**
    * Constructor.
    *

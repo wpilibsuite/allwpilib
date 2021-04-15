@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * VEX Robotics Victor 888 Speed Controller The Vex Robotics Victor 884 Speed Controller can also be
+ * VEX Robotics Victor 888 Motor Controller The Vex Robotics Victor 884 Motor Controller can also be
  * used with this class but may need to be calibrated per the Victor 884 user manual.
  *
  * <p>Note that the Victor uses the following bounds for PWM values. These values were determined
@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>1.026ms = full "reverse"
  * </ul>
  */
-public class Victor extends PWMSpeedController {
+public class Victor extends PWMMotorController {
   /**
    * Constructor.
    *

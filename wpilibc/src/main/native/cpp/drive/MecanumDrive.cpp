@@ -11,16 +11,16 @@
 #include <wpi/math>
 
 #include "frc/drive/Vector2d.h"
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
-                           SpeedController& rearLeftMotor,
-                           SpeedController& frontRightMotor,
-                           SpeedController& rearRightMotor)
+MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
+                           MotorController& rearLeftMotor,
+                           MotorController& frontRightMotor,
+                           MotorController& rearRightMotor)
     : m_frontLeftMotor(&frontLeftMotor),
       m_rearLeftMotor(&rearLeftMotor),
       m_frontRightMotor(&frontRightMotor),

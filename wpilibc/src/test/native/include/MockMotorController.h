@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
 
-class MockSpeedController : public SpeedController {
+class MockMotorController : public MotorController {
  public:
   void Set(double speed) override;
   double Get() const override;

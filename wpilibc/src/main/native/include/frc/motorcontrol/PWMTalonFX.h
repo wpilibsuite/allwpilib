@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * Cross the Road Electronics (CTRE) Talon FX Speed Controller with PWM
+ * Cross the Road Electronics (CTRE) Talon FX Motor Controller with PWM
  * control.
  *
  * Note that the Talon FX uses the following bounds for PWM values. These
@@ -25,7 +25,7 @@ namespace frc {
  * \li 1.480ms = the "low end" of the deadband range
  * \li 0.997ms = full "reverse"
  */
-class PWMTalonFX : public PWMSpeedController {
+class PWMTalonFX : public PWMMotorController {
  public:
   /**
    * Construct a Talon FX connected via PWM.

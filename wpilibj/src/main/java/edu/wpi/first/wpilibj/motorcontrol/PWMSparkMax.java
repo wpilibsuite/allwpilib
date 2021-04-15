@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * REV Robotics SPARK MAX Speed Controller with PWM control.
+ * REV Robotics SPARK MAX Motor Controller with PWM control.
  *
  * <p>Note that the SPARK MAX uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.999ms = full "reverse"
  * </ul>
  */
-public class PWMSparkMax extends PWMSpeedController {
+public class PWMSparkMax extends PWMMotorController {
   /** Common initialization code called by all constructors. */
   public PWMSparkMax(final int channel) {
     super("PWMSparkMax", channel);

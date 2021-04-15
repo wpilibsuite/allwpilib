@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * Mindsensors SD540 Speed Controller.
+ * Mindsensors SD540 Motor Controller.
  *
  * Note that the SD540 uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience
@@ -24,7 +24,7 @@ namespace frc {
  * \li 1.44ms = the "low end" of the deadband range
  * \li 0.94ms = full "reverse"
  */
-class SD540 : public PWMSpeedController {
+class SD540 : public PWMMotorController {
  public:
   /**
    * Constructor for a SD540.

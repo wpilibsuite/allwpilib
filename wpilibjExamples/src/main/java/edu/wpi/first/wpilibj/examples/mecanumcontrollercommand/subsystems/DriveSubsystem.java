@@ -117,8 +117,8 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /** Sets the front left drive SpeedController to a voltage. */
-  public void setDriveSpeedControllersVolts(MecanumDriveMotorVoltages volts) {
+  /** Sets the front left drive MotorController to a voltage. */
+  public void setDriveMotorControllersVolts(MecanumDriveMotorVoltages volts) {
     m_frontLeft.setVoltage(volts.frontLeftVoltage);
     m_rearLeft.setVoltage(volts.rearLeftVoltage);
     m_frontRight.setVoltage(volts.frontRightVoltage);

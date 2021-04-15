@@ -2,14 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.motorcontrol;
+package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.Arrays;
 
-/** Allows multiple {@link SpeedController} objects to be linked together. */
+/**
+ * Allows multiple {@link SpeedController} objects to be linked together.
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}.
+ */
+@Deprecated(since = "2022", forRemoval = true)
+@SuppressWarnings("removal")
 public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
@@ -41,7 +46,7 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
       SendableRegistry.addChild(this, controller);
     }
     instances++;
-    SendableRegistry.addLW(this, "SpeedControllerGroup", instances);
+    SendableRegistry.addLW(this, "MotorControllerGroup", instances);
   }
 
   @Override
@@ -90,7 +95,7 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);

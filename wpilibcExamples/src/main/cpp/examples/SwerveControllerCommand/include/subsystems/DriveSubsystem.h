@@ -51,7 +51,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ResetEncoders();
 
   /**
-   * Sets the drive SpeedControllers to a power from -1 to 1.
+   * Sets the drive MotorControllers to a power from -1 to 1.
    */
   void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
 

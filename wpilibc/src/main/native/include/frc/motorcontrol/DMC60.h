@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * Digilent DMC 60 Speed Controller.
+ * Digilent DMC 60 Motor Controller.
  *
  * Note that the DMC 60 uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
@@ -24,7 +24,7 @@ namespace frc {
  * \li 1.480ms = the "low end" of the deadband range
  * \li 0.997ms = full "reverse"
  */
-class DMC60 : public PWMSpeedController {
+class DMC60 : public PWMMotorController {
  public:
   /**
    * Constructor for a Digilent DMC 60.

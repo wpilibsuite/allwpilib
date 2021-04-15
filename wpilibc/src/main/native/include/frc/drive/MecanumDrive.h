@@ -14,7 +14,7 @@
 
 namespace frc {
 
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -70,9 +70,9 @@ class MecanumDrive : public RobotDriveBase,
    *
    * If a motor needs to be inverted, do so before passing it in.
    */
-  MecanumDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
-               SpeedController& frontRightMotor,
-               SpeedController& rearRightMotor);
+  MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
+               MotorController& frontRightMotor,
+               MotorController& rearRightMotor);
 
   ~MecanumDrive() override = default;
 
@@ -135,10 +135,10 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_frontLeftMotor;
-  SpeedController* m_rearLeftMotor;
-  SpeedController* m_frontRightMotor;
-  SpeedController* m_rearRightMotor;
+  MotorController* m_frontLeftMotor;
+  MotorController* m_rearLeftMotor;
+  MotorController* m_frontRightMotor;
+  MotorController* m_rearRightMotor;
 
   double m_rightSideInvertMultiplier = -1.0;
 

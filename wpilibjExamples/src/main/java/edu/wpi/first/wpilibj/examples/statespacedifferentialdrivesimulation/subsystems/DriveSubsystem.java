@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -26,14 +26,14 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final SpeedControllerGroup m_leftMotors =
-      new SpeedControllerGroup(
+  private final MotorControllerGroup m_leftMotors =
+      new MotorControllerGroup(
           new PWMSparkMax(DriveConstants.kLeftMotor1Port),
           new PWMSparkMax(DriveConstants.kLeftMotor2Port));
 
   // The motors on the right side of the drive.
-  private final SpeedControllerGroup m_rightMotors =
-      new SpeedControllerGroup(
+  private final MotorControllerGroup m_rightMotors =
+      new MotorControllerGroup(
           new PWMSparkMax(DriveConstants.kRightMotor1Port),
           new PWMSparkMax(DriveConstants.kRightMotor2Port));
 

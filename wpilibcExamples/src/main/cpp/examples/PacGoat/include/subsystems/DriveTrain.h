@@ -8,8 +8,8 @@
 #include <frc/Encoder.h>
 #include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/motorcontrol/SpeedControllerGroup.h>
 
 namespace frc {
 class Joystick;
@@ -62,11 +62,11 @@ class DriveTrain : public frc::Subsystem {
   // Subsystem devices
   frc::PWMSparkMax m_frontLeftCIM{1};
   frc::PWMSparkMax m_rearLeftCIM{2};
-  frc::SpeedControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
+  frc::MotorControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
 
   frc::PWMSparkMax m_frontRightCIM{3};
   frc::PWMSparkMax m_rearRightCIM{4};
-  frc::SpeedControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
+  frc::MotorControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
 
   frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};
 

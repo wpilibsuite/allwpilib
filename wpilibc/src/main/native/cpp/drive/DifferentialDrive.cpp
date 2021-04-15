@@ -9,14 +9,14 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
-                                     SpeedController& rightMotor)
+DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
+                                     MotorController& rightMotor)
     : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
   auto& registry = SendableRegistry::GetInstance();
   registry.AddChild(this, m_leftMotor);

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control.
+ * Luminary Micro / Vex Robotics Jaguar Motor Controller with PWM control.
  *
  * Note that the Jaguar uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience
@@ -24,7 +24,7 @@ namespace frc {
  * \li 1.454ms = the "low end" of the deadband range
  * \li 0.697ms = full "reverse"
  */
-class Jaguar : public PWMSpeedController {
+class Jaguar : public PWMMotorController {
  public:
   /**
    * Constructor for a Jaguar connected via PWM.

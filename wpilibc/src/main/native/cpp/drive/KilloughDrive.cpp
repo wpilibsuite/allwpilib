@@ -10,21 +10,21 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-KilloughDrive::KilloughDrive(SpeedController& leftMotor,
-                             SpeedController& rightMotor,
-                             SpeedController& backMotor)
+KilloughDrive::KilloughDrive(MotorController& leftMotor,
+                             MotorController& rightMotor,
+                             MotorController& backMotor)
     : KilloughDrive(leftMotor, rightMotor, backMotor, kDefaultLeftMotorAngle,
                     kDefaultRightMotorAngle, kDefaultBackMotorAngle) {}
 
-KilloughDrive::KilloughDrive(SpeedController& leftMotor,
-                             SpeedController& rightMotor,
-                             SpeedController& backMotor, double leftMotorAngle,
+KilloughDrive::KilloughDrive(MotorController& leftMotor,
+                             MotorController& rightMotor,
+                             MotorController& backMotor, double leftMotorAngle,
                              double rightMotorAngle, double backMotorAngle)
     : m_leftMotor(&leftMotor),
       m_rightMotor(&rightMotor),

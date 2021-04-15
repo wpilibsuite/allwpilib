@@ -9,7 +9,7 @@
 using namespace frc;
 
 PWMVictorSPX::PWMVictorSPX(int channel)
-    : PWMSpeedController("PWMVictorSPX", channel) {
+    : PWMMotorController("PWMVictorSPX", channel) {
   m_pwm.SetBounds(2.004, 1.52, 1.50, 1.48, 0.997);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 namespace frc {
 
 /**
- * Vex Robotics Victor SP Speed Controller.
+ * Vex Robotics Victor SP Motor Controller.
  *
  * Note that the Victor SP uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
@@ -24,7 +24,7 @@ namespace frc {
  * \li 1.480ms = the "low end" of the deadband range
  * \li 0.997ms = full "reverse"
  */
-class VictorSP : public PWMSpeedController {
+class VictorSP : public PWMMotorController {
  public:
   /**
    * Constructor for a Victor SP.

@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * Mindsensors SD540 Speed Controller.
+ * Mindsensors SD540 Motor Controller.
  *
  * <p>Note that the SD540 uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.94ms = full "reverse"
  * </ul>
  */
-public class SD540 extends PWMSpeedController {
+public class SD540 extends PWMMotorController {
   /**
    * Constructor.
    *

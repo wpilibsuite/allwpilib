@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -42,10 +42,10 @@ public class Drivetrain {
   private final PWMSparkMax m_rightLeader = new PWMSparkMax(3);
   private final PWMSparkMax m_rightFollower = new PWMSparkMax(4);
 
-  private final SpeedControllerGroup m_leftGroup =
-      new SpeedControllerGroup(m_leftLeader, m_leftFollower);
-  private final SpeedControllerGroup m_rightGroup =
-      new SpeedControllerGroup(m_rightLeader, m_rightFollower);
+  private final MotorControllerGroup m_leftGroup =
+      new MotorControllerGroup(m_leftLeader, m_leftFollower);
+  private final MotorControllerGroup m_rightGroup =
+      new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);

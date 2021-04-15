@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-public class MockSpeedController implements SpeedController {
+public class MockMotorController implements MotorController {
   private double m_speed;
   private boolean m_isInverted;
 

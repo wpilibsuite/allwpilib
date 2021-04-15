@@ -8,7 +8,7 @@
 
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -19,15 +19,15 @@ class raw_ostream;
 namespace frc {
 
 /**
- * Common base class for all PWM Speed Controllers.
+ * Common base class for all PWM Motor Controllers.
  */
-class PWMSpeedController : public SpeedController,
+class PWMMotorController : public MotorController,
                            public MotorSafety,
                            public Sendable,
-                           public SendableHelper<PWMSpeedController> {
+                           public SendableHelper<PWMMotorController> {
  public:
-  PWMSpeedController(PWMSpeedController&&) = default;
-  PWMSpeedController& operator=(PWMSpeedController&&) = default;
+  PWMMotorController(PWMMotorController&&) = default;
+  PWMMotorController& operator=(PWMMotorController&&) = default;
 
   /**
    * Set the PWM value.
@@ -42,7 +42,7 @@ class PWMSpeedController : public SpeedController,
   /**
    * Get the recently set value of the PWM. This value is affected by the
    * inversion property. If you want the value that is sent directly to the
-   * SpeedController, use {@link PWM#getSpeed()} instead.
+   * MotorController, use {@link PWM#getSpeed()} instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
@@ -62,13 +62,13 @@ class PWMSpeedController : public SpeedController,
 
  protected:
   /**
-   * Constructor for a PWM Speed Controller connected via PWM.
+   * Constructor for a PWM Motor Controller connected via PWM.
    *
    * @param name Name to use for SendableRegistry
    * @param channel The PWM channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  PWMSpeedController(const wpi::Twine& name, int channel);
+  PWMMotorController(const wpi::Twine& name, int channel);
 
   void InitSendable(SendableBuilder& builder) override;
 

@@ -82,9 +82,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds();
 
   /**
-   * Sets the drive SpeedControllers to a desired voltage.
+   * Sets the drive MotorControllers to a desired voltage.
    */
-  void SetSpeedControllersVolts(units::volt_t frontLeftPower,
+  void SetMotorControllersVolts(units::volt_t frontLeftPower,
                                 units::volt_t rearLeftPower,
                                 units::volt_t frontRightPower,
                                 units::volt_t rearRightPower);

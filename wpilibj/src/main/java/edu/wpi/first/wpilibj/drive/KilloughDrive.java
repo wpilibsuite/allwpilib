@@ -8,7 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -46,9 +46,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   private static int instances;
 
-  private SpeedController m_leftMotor;
-  private SpeedController m_rightMotor;
-  private SpeedController m_backMotor;
+  private MotorController m_leftMotor;
+  private MotorController m_rightMotor;
+  private MotorController m_backMotor;
 
   private Vector2d m_leftVec;
   private Vector2d m_rightVec;
@@ -69,7 +69,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotor The motor on the back corner.
    */
   public KilloughDrive(
-      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
+      MotorController leftMotor, MotorController rightMotor, MotorController backMotor) {
     this(
         leftMotor,
         rightMotor,
@@ -92,9 +92,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotorAngle The angle of the back wheel's forward direction of travel.
    */
   public KilloughDrive(
-      SpeedController leftMotor,
-      SpeedController rightMotor,
-      SpeedController backMotor,
+      MotorController leftMotor,
+      MotorController rightMotor,
+      MotorController backMotor,
       double leftMotorAngle,
       double rightMotorAngle,
       double backMotorAngle) {
@@ -136,7 +136,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    */
   @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
   private void verify(
-      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
+      MotorController leftMotor, MotorController rightMotor, MotorController backMotor) {
     if (leftMotor != null && rightMotor != null && backMotor != null) {
       return;
     }

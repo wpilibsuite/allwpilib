@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/motorcontrol/PWMSpeedController.h"
+#include "frc/motorcontrol/PWMMotorController.h"
 
 #include <wpi/raw_ostream.h>
 
@@ -10,45 +10,45 @@
 
 using namespace frc;
 
-void PWMSpeedController::Set(double speed) {
+void PWMMotorController::Set(double speed) {
   m_pwm.SetSpeed(m_isInverted ? -speed : speed);
 }
 
-double PWMSpeedController::Get() const {
+double PWMMotorController::Get() const {
   return m_pwm.GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
-void PWMSpeedController::SetInverted(bool isInverted) {
+void PWMMotorController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool PWMSpeedController::GetInverted() const {
+bool PWMMotorController::GetInverted() const {
   return m_isInverted;
 }
 
-void PWMSpeedController::Disable() {
+void PWMMotorController::Disable() {
   m_pwm.SetDisabled();
 }
 
-void PWMSpeedController::StopMotor() {
+void PWMMotorController::StopMotor() {
   Disable();
 }
 
-void PWMSpeedController::GetDescription(wpi::raw_ostream& desc) const {
+void PWMMotorController::GetDescription(wpi::raw_ostream& desc) const {
   desc << "PWM " << GetChannel();
 }
 
-int PWMSpeedController::GetChannel() const {
+int PWMMotorController::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-PWMSpeedController::PWMSpeedController(const wpi::Twine& name, int channel)
+PWMMotorController::PWMMotorController(const wpi::Twine& name, int channel)
     : m_pwm(channel, false) {
   SendableRegistry::GetInstance().AddLW(this, name, channel);
 }
 
-void PWMSpeedController::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Speed Controller");
+void PWMMotorController::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Disable(); });
   builder.AddDoubleProperty(

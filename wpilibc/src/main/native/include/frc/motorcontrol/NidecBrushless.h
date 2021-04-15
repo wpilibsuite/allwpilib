@@ -8,7 +8,7 @@
 #include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
-#include "frc/motorcontrol/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -19,7 +19,7 @@ class SendableBuilder;
 /**
  * Nidec Brushless Motor.
  */
-class NidecBrushless : public SpeedController,
+class NidecBrushless : public MotorController,
                        public MotorSafety,
                        public Sendable,
                        public SendableHelper<NidecBrushless> {
@@ -39,7 +39,7 @@ class NidecBrushless : public SpeedController,
   NidecBrushless(NidecBrushless&&) = default;
   NidecBrushless& operator=(NidecBrushless&&) = default;
 
-  // SpeedController interface
+  // MotorController interface
   /**
    * Set the PWM value.
    *

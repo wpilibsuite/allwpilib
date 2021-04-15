@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.997ms = full "reverse"
  * </ul>
  */
-public class PWMVenom extends PWMSpeedController {
+public class PWMVenom extends PWMMotorController {
   /**
    * Constructor for a Venom connected via PWM.
    *

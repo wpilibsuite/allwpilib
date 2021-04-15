@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
@@ -31,7 +31,7 @@ public class Pivot extends PIDSubsystem {
   private final AnalogPotentiometer m_pot = new AnalogPotentiometer(1);
 
   // Motor to move the pivot.
-  private final SpeedController m_motor = new Victor(5);
+  private final MotorController m_motor = new Victor(5);
 
   /** Create a new pivot subsystem. */
   public Pivot() {

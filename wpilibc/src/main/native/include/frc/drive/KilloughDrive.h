@@ -15,7 +15,7 @@
 
 namespace frc {
 
-class SpeedController;
+class MotorController;
 
 /**
  * A class for driving Killough drive platforms.
@@ -63,8 +63,8 @@ class KilloughDrive : public RobotDriveBase,
    * @param rightMotor The motor on the right corner.
    * @param backMotor  The motor on the back corner.
    */
-  KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-                SpeedController& backMotor);
+  KilloughDrive(MotorController& leftMotor, MotorController& rightMotor,
+                MotorController& backMotor);
 
   /**
    * Construct a Killough drive with the given motors.
@@ -81,8 +81,8 @@ class KilloughDrive : public RobotDriveBase,
    * @param backMotorAngle  The angle of the back wheel's forward direction of
    *                        travel.
    */
-  KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
-                SpeedController& backMotor, double leftMotorAngle,
+  KilloughDrive(MotorController& leftMotor, MotorController& rightMotor,
+                MotorController& backMotor, double leftMotorAngle,
                 double rightMotorAngle, double backMotorAngle);
 
   ~KilloughDrive() override = default;
@@ -129,9 +129,9 @@ class KilloughDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  SpeedController* m_leftMotor;
-  SpeedController* m_rightMotor;
-  SpeedController* m_backMotor;
+  MotorController* m_leftMotor;
+  MotorController* m_rightMotor;
+  MotorController* m_backMotor;
 
   Vector2d m_leftVec;
   Vector2d m_rightVec;

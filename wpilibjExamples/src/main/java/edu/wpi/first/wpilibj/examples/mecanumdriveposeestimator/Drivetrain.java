@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
-import edu.wpi.first.wpilibj.motorcontrol.SpeedController;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
@@ -27,10 +27,10 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final SpeedController m_frontLeftMotor = new PWMSparkMax(1);
-  private final SpeedController m_frontRightMotor = new PWMSparkMax(2);
-  private final SpeedController m_backLeftMotor = new PWMSparkMax(3);
-  private final SpeedController m_backRightMotor = new PWMSparkMax(4);
+  private final MotorController m_frontLeftMotor = new PWMSparkMax(1);
+  private final MotorController m_frontRightMotor = new PWMSparkMax(2);
+  private final MotorController m_backLeftMotor = new PWMSparkMax(3);
+  private final MotorController m_backRightMotor = new PWMSparkMax(4);
 
   private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
   private final Encoder m_frontRightEncoder = new Encoder(2, 3);

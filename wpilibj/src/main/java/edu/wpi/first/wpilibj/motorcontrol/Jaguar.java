@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
+ * Texas Instruments / Vex Robotics Jaguar Motor Controller as a PWM device.
  *
  * <p>Note that the Jaguar uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.697ms = full "reverse"
  * </ul>
  */
-public class Jaguar extends PWMSpeedController {
+public class Jaguar extends PWMMotorController {
   /**
    * Constructor.
    *

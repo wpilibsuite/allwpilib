@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-Spark::Spark(int channel) : PWMSpeedController("Spark", channel) {
+Spark::Spark(int channel) : PWMMotorController("Spark", channel) {
   m_pwm.SetBounds(2.003, 1.55, 1.50, 1.46, 0.999);
   m_pwm.SetPeriodMultiplier(PWM::kPeriodMultiplier_1X);
   m_pwm.SetSpeed(0.0);

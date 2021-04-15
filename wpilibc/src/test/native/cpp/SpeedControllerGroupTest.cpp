@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/motorcontrol/SpeedControllerGroup.h"  // NOLINT(build/include_order)
+#include "frc/motorcontrol/MotorControllerGroup.h"  // NOLINT(build/include_order)
 
 #include <memory>
 #include <vector>
 
-#include "MockSpeedController.h"
+#include "MockMotorController.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-enum SpeedControllerGroupTestType { TEST_ONE, TEST_TWO, TEST_THREE };
+enum MotorControllerGroupTestType { TEST_ONE, TEST_TWO, TEST_THREE };
 
 std::ostream& operator<<(std::ostream& os,
-                         const SpeedControllerGroupTestType& type) {
+                         const MotorControllerGroupTestType& type) {
   switch (type) {
     case TEST_ONE:
-      os << "SpeedControllerGroup with one speed controller";
+      os << "MotorControllerGroup with one speed controller";
       break;
     case TEST_TWO:
-      os << "SpeedControllerGroup with two speed controllers";
+      os << "MotorControllerGroup with two speed controllers";
       break;
     case TEST_THREE:
-      os << "SpeedControllerGroup with three speed controllers";
+      os << "MotorControllerGroup with three speed controllers";
       break;
   }
 
@@ -32,26 +32,26 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 /**
- * A fixture used for SpeedControllerGroup testing.
+ * A fixture used for MotorControllerGroup testing.
  */
-class SpeedControllerGroupTest
-    : public testing::TestWithParam<SpeedControllerGroupTestType> {
+class MotorControllerGroupTest
+    : public testing::TestWithParam<MotorControllerGroupTestType> {
  protected:
-  std::vector<MockSpeedController> m_speedControllers;
-  std::unique_ptr<SpeedControllerGroup> m_group;
+  std::vector<MockMotorController> m_speedControllers;
+  std::unique_ptr<MotorControllerGroup> m_group;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_ONE: {
         m_speedControllers.emplace_back();
-        m_group = std::make_unique<SpeedControllerGroup>(m_speedControllers[0]);
+        m_group = std::make_unique<MotorControllerGroup>(m_speedControllers[0]);
         break;
       }
 
       case TEST_TWO: {
         m_speedControllers.emplace_back();
         m_speedControllers.emplace_back();
-        m_group = std::make_unique<SpeedControllerGroup>(m_speedControllers[0],
+        m_group = std::make_unique<MotorControllerGroup>(m_speedControllers[0],
                                                          m_speedControllers[1]);
         break;
       }
@@ -60,7 +60,7 @@ class SpeedControllerGroupTest
         m_speedControllers.emplace_back();
         m_speedControllers.emplace_back();
         m_speedControllers.emplace_back();
-        m_group = std::make_unique<SpeedControllerGroup>(m_speedControllers[0],
+        m_group = std::make_unique<MotorControllerGroup>(m_speedControllers[0],
                                                          m_speedControllers[1],
                                                          m_speedControllers[2]);
         break;
@@ -69,7 +69,7 @@ class SpeedControllerGroupTest
   }
 };
 
-TEST_P(SpeedControllerGroupTest, Set) {
+TEST_P(MotorControllerGroupTest, Set) {
   m_group->Set(1.0);
 
   for (auto& speedController : m_speedControllers) {
@@ -77,13 +77,13 @@ TEST_P(SpeedControllerGroupTest, Set) {
   }
 }
 
-TEST_P(SpeedControllerGroupTest, GetInverted) {
+TEST_P(MotorControllerGroupTest, GetInverted) {
   m_group->SetInverted(true);
 
   EXPECT_TRUE(m_group->GetInverted());
 }
 
-TEST_P(SpeedControllerGroupTest, SetInvertedDoesNotModifySpeedControllers) {
+TEST_P(MotorControllerGroupTest, SetInvertedDoesNotModifyMotorControllers) {
   for (auto& speedController : m_speedControllers) {
     speedController.SetInverted(false);
   }
@@ -94,7 +94,7 @@ TEST_P(SpeedControllerGroupTest, SetInvertedDoesNotModifySpeedControllers) {
   }
 }
 
-TEST_P(SpeedControllerGroupTest, SetInvertedDoesInvert) {
+TEST_P(MotorControllerGroupTest, SetInvertedDoesInvert) {
   m_group->SetInverted(true);
   m_group->Set(1.0);
 
@@ -103,7 +103,7 @@ TEST_P(SpeedControllerGroupTest, SetInvertedDoesInvert) {
   }
 }
 
-TEST_P(SpeedControllerGroupTest, Disable) {
+TEST_P(MotorControllerGroupTest, Disable) {
   m_group->Set(1.0);
   m_group->Disable();
 
@@ -112,7 +112,7 @@ TEST_P(SpeedControllerGroupTest, Disable) {
   }
 }
 
-TEST_P(SpeedControllerGroupTest, StopMotor) {
+TEST_P(MotorControllerGroupTest, StopMotor) {
   m_group->Set(1.0);
   m_group->StopMotor();
 
@@ -121,5 +121,5 @@ TEST_P(SpeedControllerGroupTest, StopMotor) {
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, SpeedControllerGroupTest,
+INSTANTIATE_TEST_SUITE_P(Test, MotorControllerGroupTest,
                          testing::Values(TEST_ONE, TEST_TWO, TEST_THREE));

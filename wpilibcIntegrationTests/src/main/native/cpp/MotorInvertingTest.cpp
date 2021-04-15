@@ -33,25 +33,25 @@ std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
-  SpeedController* m_speedController;
+  MotorController* m_motorController;
   Encoder* m_encoder;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_speedController = new Victor(TestBench::kVictorChannel);
+        m_motorController = new Victor(TestBench::kVictorChannel);
         m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
                                 TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_speedController = new Jaguar(TestBench::kJaguarChannel);
+        m_motorController = new Jaguar(TestBench::kJaguarChannel);
         m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
                                 TestBench::kJaguarEncoderChannelB);
         break;
 
       case TEST_TALON:
-        m_speedController = new Talon(TestBench::kTalonChannel);
+        m_motorController = new Talon(TestBench::kTalonChannel);
         m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
                                 TestBench::kTalonEncoderChannelB);
         break;
@@ -59,13 +59,13 @@ class MotorInvertingTest
   }
 
   void TearDown() override {
-    delete m_speedController;
+    delete m_motorController;
     delete m_encoder;
   }
 
   void Reset() {
-    m_speedController->SetInverted(false);
-    m_speedController->Set(0.0);
+    m_motorController->SetInverted(false);
+    m_motorController->Set(0.0);
     m_encoder->Reset();
   }
 };
@@ -73,13 +73,13 @@ class MotorInvertingTest
 TEST_P(MotorInvertingTest, InvertingPositive) {
   Reset();
 
-  m_speedController->Set(motorSpeed);
+  m_motorController->Set(motorSpeed);
 
   Wait(delayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(motorSpeed);
 
   Wait(delayTime);
 
@@ -92,14 +92,14 @@ TEST_P(MotorInvertingTest, InvertingPositive) {
 TEST_P(MotorInvertingTest, InvertingNegative) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(-motorSpeed);
 
   Wait(delayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(-motorSpeed);
 
   Wait(delayTime);
 
@@ -112,14 +112,14 @@ TEST_P(MotorInvertingTest, InvertingNegative) {
 TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(motorSpeed);
 
   Wait(delayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(-motorSpeed);
 
   Wait(delayTime);
 
@@ -132,14 +132,14 @@ TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
 TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   Reset();
 
-  m_speedController->SetInverted(false);
-  m_speedController->Set(-motorSpeed);
+  m_motorController->SetInverted(false);
+  m_motorController->Set(-motorSpeed);
 
   Wait(delayTime);
 
   bool initDirection = m_encoder->GetDirection();
-  m_speedController->SetInverted(true);
-  m_speedController->Set(motorSpeed);
+  m_motorController->SetInverted(true);
+  m_motorController->Set(motorSpeed);
 
   Wait(delayTime);
 

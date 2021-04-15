@@ -9,7 +9,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.PWM;
 
 /**
- * Digilent DMC 60 Speed Controller.
+ * Digilent DMC 60 Motor Controller.
  *
  * <p>Note that the DMC uses the following bounds for PWM values. These values should work
  * reasonably well for most controllers, but if users experience issues such as asymmetric behavior
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.PWM;
  *   <li>0.997ms = full "reverse"
  * </ul>
  */
-public class DMC60 extends PWMSpeedController {
+public class DMC60 extends PWMMotorController {
   /**
    * Constructor.
    *

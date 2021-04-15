@@ -7,7 +7,7 @@
 #include <functional>
 #include <vector>
 
-#include "frc/motorcontrol/SpeedControllerGroup.h"
+#include "frc/SpeedControllerGroup.h"
 
 namespace frc {
 

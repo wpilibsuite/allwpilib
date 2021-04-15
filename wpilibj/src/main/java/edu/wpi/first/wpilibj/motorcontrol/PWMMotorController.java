@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
-/** Common base class for all PWM Speed Controllers. */
-public abstract class PWMSpeedController extends MotorSafety
-    implements SpeedController, Sendable, AutoCloseable {
+/** Common base class for all PWM Motor Controllers. */
+public abstract class PWMMotorController extends MotorSafety
+    implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   protected PWM m_pwm;
 
@@ -23,7 +23,7 @@ public abstract class PWMSpeedController extends MotorSafety
    * @param channel The PWM channel that the controller is attached to. 0-9 are on-board, 10-19 are
    *     on the MXP port
    */
-  protected PWMSpeedController(final String name, final int channel) {
+  protected PWMMotorController(final String name, final int channel) {
     m_pwm = new PWM(channel, false);
     SendableRegistry.addLW(this, name, channel);
   }
@@ -51,7 +51,7 @@ public abstract class PWMSpeedController extends MotorSafety
 
   /**
    * Get the recently set value of the PWM. This value is affected by the inversion property. If you
-   * want the value that is sent directly to the SpeedController, use {@link
+   * want the value that is sent directly to the MotorController, use {@link
    * edu.wpi.first.wpilibj.PWM#getSpeed()} instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
@@ -97,7 +97,7 @@ public abstract class PWMSpeedController extends MotorSafety
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
     builder.setSafeState(this::disable);
     builder.addDoubleProperty("Value", this::get, this::set);
