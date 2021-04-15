@@ -31,23 +31,28 @@ class MechanismObject2d {
    */
   const std::string& GetName() const;
 
-  bool operator==(MechanismObject2d& rhs);
-
   /**
    * Append a Mechanism object that is based on this one.
    *
-   * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
+   * @param name the name of the new object.
+   * @param args constructor arguments of the object type.
+   * @return the constructed and appended object, useful for variable assignments and call chaining.
+   * @throw if an object with the given name already exists.
    */
   template<typename T, typename... Args>
-  T* Append(wpi::StringRef name, Args&&... args) {
+  T* Append(wpi::StringRef name, Args&&... args) {    
     if (m_objects.count(name)) {
-      // throw or return?
+      throw std::runtime_error(("MechanismObject names must be unique! `" + name
+                               + "` was inserted twice!").str());
     }
+    // return nullptr;
     std::unique_ptr<T> ptr = std::make_unique<T>(name, std::forward<Args>(args)...);
+    T* ex = ptr.get();
     m_objects.try_emplace<std::unique_ptr<MechanismObject2d>>(name, std::move(ptr));
-    ptr->Update(m_table);
-    return ptr.get();
+    if (m_table) {
+      ex->Update(m_table->GetSubTable(name));
+    }
+    return ex;
   }
 
  private:
@@ -58,4 +63,5 @@ class MechanismObject2d {
   void Update(std::shared_ptr<NetworkTable> table);
 
 };
+  bool operator==(MechanismObject2d& a, MechanismObject2d& b);
 }

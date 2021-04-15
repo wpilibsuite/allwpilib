@@ -8,15 +8,18 @@
 
 #include <wpi/Twine.h>
 #include "MechanismObject2d.h"
+#include <networktables/NetworkTableEntry.h>
 
 namespace frc {
 
-class MechanismRoot2d : private MechanismObject2d {
+class MechanismRoot2d : public MechanismObject2d {
   friend class Mechanism2d;
+  struct private_init {};
   friend std::unique_ptr<frc::MechanismRoot2d,std::default_delete<frc::MechanismRoot2d>> std::make_unique<MechanismRoot2d, const wpi::Twine&, double&, double&>(const wpi::Twine &,double &,double &);
   static constexpr char kPosition[] = "pos";
  
  public:
+  MechanismRoot2d(const wpi::Twine& name, double x, double y, const private_init& tag);
   MechanismRoot2d(const frc::MechanismRoot2d& rhs);
 
   /**
@@ -39,19 +42,21 @@ class MechanismRoot2d : private MechanismObject2d {
   /**
    * Append a Mechanism object that is based on this root.
    *
-   * @param object the object to add.
-   * @return the object given as a parameter, useful for variable assignments and call chaining.
+   * @param name the name of the new object.
+   * @param args constructor arguments of the object type.
+   * @return the constructed and appended object, useful for variable assignments and call chaining.
+   * @throw if an object with the given name already exists.
    */
-  template<typename T, typename... Args>
-  T* Append(wpi::StringRef name, Args&&... args) {
-    return MechanismObject2d::Append<T, Args...>(name, std::forward<Args>(args)...);
-  }
+  // template<typename T, typename... Args>
+  // T* Append(wpi::StringRef name, Args&&... args) {
+  //   return MechanismObject2d::Append<T>(name, std::forward<Args>(args)...);
+  // }
 
   private:
-  MechanismRoot2d(const wpi::Twine& name, double x, double y);
   void UpdateEntries(std::shared_ptr<NetworkTable> table) override;
-  inline void Flush() const;
-  double m_pos[2];
-  std::unique_ptr<nt::NetworkTableEntry> m_posEntry;
+  inline void Flush();
+  double m_x;
+  double m_y;
+  nt::NetworkTableEntry m_posEntry;
 };
 }

@@ -17,6 +17,8 @@ namespace frc {
 
 class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
   static constexpr char kBackgroundColor[] = "backgroundColor";
+  static constexpr char kDims[] = "dims";
+
  public:
   /**
    * Create a new Mechanism2d window with the given dimensions.
@@ -48,7 +50,8 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
   void InitSendable(SendableBuilder& builder) override;
 
   private:
-  double m_dims[2];
+  double m_width;
+  double m_height;
   std::string m_color;
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;

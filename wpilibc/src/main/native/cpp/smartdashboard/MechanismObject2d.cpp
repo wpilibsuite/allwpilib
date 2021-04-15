@@ -13,8 +13,8 @@ const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
-bool MechanismObject2d::operator==(MechanismObject2d& rhs) {
-  return m_name == rhs.m_name;
+bool operator==(MechanismObject2d& a, MechanismObject2d& b) {
+  return a.GetName() == b.GetName();
 }
 
 void MechanismObject2d::Update(std::shared_ptr<NetworkTable> table) {

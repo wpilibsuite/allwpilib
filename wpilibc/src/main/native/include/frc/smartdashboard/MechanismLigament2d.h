@@ -62,13 +62,13 @@ class MechanismLigament2d : public MechanismObject2d {
 
  private:
   void Flush();
-  std::string m_color;
-  std::unique_ptr<nt::NetworkTableEntry> m_colorEntry;
+  char m_color[10];
+  nt::NetworkTableEntry m_colorEntry;
   double m_angle;
-  std::unique_ptr<nt::NetworkTableEntry> m_angleEntry;
+  nt::NetworkTableEntry m_angleEntry;
   double m_length;
-  std::unique_ptr<nt::NetworkTableEntry> m_lengthEntry;
+  nt::NetworkTableEntry m_lengthEntry;
   double m_weight;
-  std::unique_ptr<nt::NetworkTableEntry> m_weightEntry;
+  nt::NetworkTableEntry m_weightEntry;
 };
 } // namespace frc

@@ -16,16 +16,15 @@ MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Colo
 void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
   table->GetEntry(".type").SetString("line");
   
-  m_colorEntry = std::make_unique<nt::NetworkTableEntry>(table->GetEntry("color"));
-  m_angleEntry = std::make_unique<nt::NetworkTableEntry>(table->GetEntry("angle"));
-  m_weightEntry = std::make_unique<nt::NetworkTableEntry>(table->GetEntry("weight"));
-  m_lengthEntry = std::make_unique<nt::NetworkTableEntry>(table->GetEntry("length"));
+  m_colorEntry = table->GetEntry("color");
+  m_angleEntry = table->GetEntry("angle");
+  m_weightEntry = table->GetEntry("weight");
+  m_lengthEntry = table->GetEntry("length");
   Flush();
 }
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
-  wpi::raw_string_ostream os{m_color};
-  os << "#" << std::hex << (color.red << 16 | color.green << 8 | color.blue);
+  std::snprintf(m_color, sizeof(m_color), "#%02x%02x%02x", color.red, color.green, color.blue);
   Flush();
 }
 
@@ -47,8 +46,13 @@ double MechanismLigament2d::GetLength() {
     return m_length;
 }
 
+void MechanismLigament2d::SetLength(double length) {
+    m_length = length;
+    Flush();
+}
+
 #define SAFE_WRITE(data, Type) if (m_##data##Entry) {\
-m_##data##Entry->Set##Type(m_##data);\
+m_##data##Entry.Set##Type(m_##data);\
 }
 void MechanismLigament2d::Flush() {
     SAFE_WRITE(color, String)

@@ -14,24 +14,25 @@
 
 using namespace frc;
 
-Mechanism2d::Mechanism2d(double width, double height) : m_dims{width, height} {}
+Mechanism2d::Mechanism2d(double width, double height) : m_width {width}, m_height{height} {}
 
 MechanismRoot2d* Mechanism2d::GetRoot(const wpi::StringRef name, double x, double y) {
-  if (m_roots.count(name)) {
-    return m_roots[name].get();
+  // auto it = m_roots.find(name);
+  // if (it != m_roots.end()) {
+  //   return it->getValue().get();
+  // }
+  std::unique_ptr<MechanismRoot2d> ptr = std::make_unique<MechanismRoot2d>(name, x, y, MechanismRoot2d::private_init{});
+  MechanismRoot2d* ex = ptr.get();
+  m_roots.try_emplace(name, std::move(ptr));
+  if (m_table) {
+    ex->Update(m_table->GetSubTable(name));
   }
-  const auto& twine = wpi::Twine::Twine(name);
-  const std::unique_ptr<MechanismRoot2d> ptr = std::make_unique<MechanismRoot2d>(twine, x, y);
-  m_roots.try_emplace(name, ptr);
-  ptr->Update(m_table->GetSubTable(name));
-  return ptr.get();
+  return ex;
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
-  std::string buf;
-  wpi::raw_string_ostream os{buf};
-  os << "#";
-  os << std::hex << (color.red << 16 | color.green << 8 | color.blue);
+  char buf[10];
+  std::snprintf(buf, sizeof(buf), "#%02x%02x%02x", color.red, color.green, color.blue);
   if (m_table) {
     m_table->GetEntry(kBackgroundColor).SetString(buf);
   }
@@ -40,6 +41,8 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
 void Mechanism2d::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Mechanism2d");
   m_table = builder.GetTable();
+
+  m_table->GetEntry(kDims).SetDoubleArray({m_width, m_height});
 
   std::scoped_lock lock(m_mutex);
   for (const auto& entry : m_roots) {

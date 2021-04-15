@@ -11,6 +11,7 @@
 #include <frc/Joystick.h>
 #include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
+#include <frc/simulation/SimHooks.h>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -33,6 +34,7 @@ class Robot : public frc::TimedRobot {
     m_elevator->SetLength(m_elevatorEncoder.GetDistance());
     m_wrist->SetAngle(units::degree_t(m_wristPotentiometer.Get()));
   }
+
   void TeleopPeriodic() override { 
     m_elevatorMotor.Set(m_joystick.GetRawAxis(0));
     m_wristMotor.Set(m_joystick.GetRawAxis(1));
@@ -46,9 +48,9 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{0};
 
   frc::Mechanism2d m_mech {200, 200};
-  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 80, 100);
-  frc::MechanismLigament2d* m_elevator = m_root->Append<frc::MechanismLigament2d>("elevator", frc::Color::kDarkOrange, 10, 0_deg, 10);
-  frc::MechanismLigament2d* m_wrist = m_elevator->Append<frc::MechanismLigament2d>("wrist", frc::Color::kForestGreen, 6, 90_deg, 4);
+  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 40, 50);
+  frc::MechanismLigament2d* m_elevator = m_root->Append<frc::MechanismLigament2d>("elevator", frc::Color::kDarkOrange, 50, 90_deg, 20);
+  frc::MechanismLigament2d* m_wrist = m_elevator->Append<frc::MechanismLigament2d>("wrist", frc::Color::kForestGreen, 30, 180_deg, 8);
 };
 
 #ifndef RUNNING_FRC_TESTS
