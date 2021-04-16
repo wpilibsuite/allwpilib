@@ -8,7 +8,7 @@
 using namespace frc;
 
 MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color, double length, units::degree_t angle, double lineWeight) : MechanismObject2d(name), m_length {length}, m_angle {angle.to<double>()}, m_weight {lineWeight} {
-    SetColor(color);
+  SetColor(color);
 }
 
 void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 
 #include <wpi/StringMap.h>
@@ -41,7 +40,8 @@ class MechanismObject2d {
    * @throw if an object with the given name already exists.
    */
   template<typename T, typename... Args, typename = std::enable_if_t<std::is_convertible_v<T*, MechanismObject2d*>>>
-  T* Append(wpi::StringRef name, Args&&... args) {    
+  T* Append(wpi::StringRef name, Args&&... args) {
+    std::scoped_lock lock(m_mutex);
     if (m_objects.count(name)) {
       throw std::runtime_error(("MechanismObject names must be unique! `" + name
                                + "` was inserted twice!").str());

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <map>
-
 #include <wpi/Twine.h>
 #include "MechanismObject2d.h"
 #include <networktables/NetworkTableEntry.h>

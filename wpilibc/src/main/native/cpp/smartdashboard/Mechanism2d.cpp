@@ -12,6 +12,9 @@
 
 using namespace frc;
 
+static constexpr char kBackgroundColor[] = "backgroundColor";
+static constexpr char kDims[] = "dims";
+
 Mechanism2d::Mechanism2d(double width, double height) : m_width {width}, m_height{height} {}
 
 MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {

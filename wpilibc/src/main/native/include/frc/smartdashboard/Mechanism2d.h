@@ -4,7 +4,11 @@
 
 #pragma once
 
-#include <map>
+#include <memory>
+#include <string>
+
+#include <wpi/StringMap.h>
+#include <wpi/mutex.h>
 
 #include "networktables/NetworkTableEntry.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -16,9 +20,6 @@
 namespace frc {
 
 class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
-  static constexpr char kBackgroundColor[] = "backgroundColor";
-  static constexpr char kDims[] = "dims";
-
  public:
   /**
    * Create a new Mechanism2d window with the given dimensions.

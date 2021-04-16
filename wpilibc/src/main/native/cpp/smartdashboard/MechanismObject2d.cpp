@@ -18,6 +18,7 @@ bool operator==(MechanismObject2d& a, MechanismObject2d& b) {
 }
 
 void MechanismObject2d::Update(std::shared_ptr<NetworkTable> table) {
+  std::scoped_lock lock(m_mutex);
   m_table = table;
   UpdateEntries(m_table);
   for (const wpi::StringMapEntry<std::unique_ptr<MechanismObject2d>>& entry : m_objects) {
