@@ -13,10 +13,6 @@ const std::string& MechanismObject2d::GetName() const {
   return m_name;
 }
 
-bool operator==(MechanismObject2d& a, MechanismObject2d& b) {
-  return a.GetName() == b.GetName();
-}
-
 void MechanismObject2d::Update(std::shared_ptr<NetworkTable> table) {
   std::scoped_lock lock(m_mutex);
   m_table = table;

@@ -63,5 +63,4 @@ class MechanismObject2d {
   void Update(std::shared_ptr<NetworkTable> table);
 
 };
-  bool operator==(MechanismObject2d& a, MechanismObject2d& b);
 }

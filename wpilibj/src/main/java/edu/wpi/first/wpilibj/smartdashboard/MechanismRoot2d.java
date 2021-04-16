@@ -88,9 +88,4 @@ public final class MechanismRoot2d {
       m_yEntry.setDouble(m_y);
     }
   }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj instanceof MechanismRoot2d && ((MechanismRoot2d) obj).m_name.equals(this.m_name);
-  }
 }

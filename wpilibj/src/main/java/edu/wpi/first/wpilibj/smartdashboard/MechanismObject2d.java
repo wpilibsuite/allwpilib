@@ -61,10 +61,4 @@ public abstract class MechanismObject2d {
   public final String getName() {
     return m_name;
   }
-
-  @Override
-  public boolean equals(Object obj) {
-    // we don't really care about types. We want to make sure that names are unique
-    return obj instanceof MechanismObject2d && ((MechanismObject2d) obj).m_name.equals(this.m_name);
-  }
 }
