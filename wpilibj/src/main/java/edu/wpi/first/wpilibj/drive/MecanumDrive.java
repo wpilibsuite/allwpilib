@@ -8,7 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -57,13 +57,14 @@ import java.util.StringJoiner;
  * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
  * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
  */
+@SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 
-  private final MotorController m_frontLeftMotor;
-  private final MotorController m_rearLeftMotor;
-  private final MotorController m_frontRightMotor;
-  private final MotorController m_rearRightMotor;
+  private final SpeedController m_frontLeftMotor;
+  private final SpeedController m_rearLeftMotor;
+  private final SpeedController m_frontRightMotor;
+  private final SpeedController m_rearRightMotor;
 
   private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported;
@@ -74,10 +75,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * <p>If a motor needs to be inverted, do so before passing it in.
    */
   public MecanumDrive(
-      MotorController frontLeftMotor,
-      MotorController rearLeftMotor,
-      MotorController frontRightMotor,
-      MotorController rearRightMotor) {
+      SpeedController frontLeftMotor,
+      SpeedController rearLeftMotor,
+      SpeedController frontRightMotor,
+      SpeedController rearRightMotor) {
     verify(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
@@ -106,10 +107,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    */
   @SuppressWarnings({"PMD.AvoidThrowingNullPointerException", "PMD.CyclomaticComplexity"})
   private void verify(
-      MotorController frontLeft,
-      MotorController rearLeft,
-      MotorController frontRight,
-      MotorController rearRightMotor) {
+      SpeedController frontLeft,
+      SpeedController rearLeft,
+      SpeedController frontRight,
+      SpeedController rearRightMotor) {
     if (frontLeft != null && rearLeft != null && frontRight != null && rearRightMotor != null) {
       return;
     }

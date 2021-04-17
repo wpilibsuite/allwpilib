@@ -8,7 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -39,6 +39,7 @@ import java.util.StringJoiner;
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
  */
+@SuppressWarnings("removal")
 public class KilloughDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultLeftMotorAngle = 60.0;
   public static final double kDefaultRightMotorAngle = 120.0;
@@ -46,9 +47,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   private static int instances;
 
-  private MotorController m_leftMotor;
-  private MotorController m_rightMotor;
-  private MotorController m_backMotor;
+  private SpeedController m_leftMotor;
+  private SpeedController m_rightMotor;
+  private SpeedController m_backMotor;
 
   private Vector2d m_leftVec;
   private Vector2d m_rightVec;
@@ -69,7 +70,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotor The motor on the back corner.
    */
   public KilloughDrive(
-      MotorController leftMotor, MotorController rightMotor, MotorController backMotor) {
+      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
     this(
         leftMotor,
         rightMotor,
@@ -92,9 +93,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    * @param backMotorAngle The angle of the back wheel's forward direction of travel.
    */
   public KilloughDrive(
-      MotorController leftMotor,
-      MotorController rightMotor,
-      MotorController backMotor,
+      SpeedController leftMotor,
+      SpeedController rightMotor,
+      SpeedController backMotor,
       double leftMotorAngle,
       double rightMotorAngle,
       double backMotorAngle) {
@@ -136,7 +137,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    */
   @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
   private void verify(
-      MotorController leftMotor, MotorController rightMotor, MotorController backMotor) {
+      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
     if (leftMotor != null && rightMotor != null && backMotor != null) {
       return;
     }

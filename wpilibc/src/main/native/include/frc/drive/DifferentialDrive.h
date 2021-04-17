@@ -12,7 +12,18 @@
 
 namespace frc {
 
-class MotorController;
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+class SpeedController;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as
@@ -108,7 +119,7 @@ class DifferentialDrive : public RobotDriveBase,
    * To pass multiple motors per side, use a MotorControllerGroup. If a motor
    * needs to be inverted, do so before passing it in.
    */
-  DifferentialDrive(MotorController& leftMotor, MotorController& rightMotor);
+  DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
 
   ~DifferentialDrive() override = default;
 
@@ -210,13 +221,21 @@ class DifferentialDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  MotorController* m_leftMotor;
-  MotorController* m_rightMotor;
+  SpeedController* m_leftMotor;
+  SpeedController* m_rightMotor;
 
   double m_quickStopThreshold = kDefaultQuickStopThreshold;
   double m_quickStopAlpha = kDefaultQuickStopAlpha;
   double m_quickStopAccumulator = 0.0;
   double m_rightSideInvertMultiplier = -1.0;
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 }  // namespace frc

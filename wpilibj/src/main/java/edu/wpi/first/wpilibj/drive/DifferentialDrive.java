@@ -8,8 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -94,14 +93,15 @@ import java.util.StringJoiner;
  * drive(double, double) with the addition of a quick turn mode. However, it is not designed to give
  * exactly the same response.
  */
+@SuppressWarnings("removal")
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
   private static int instances;
 
-  private final MotorController m_leftMotor;
-  private final MotorController m_rightMotor;
+  private final SpeedController m_leftMotor;
+  private final SpeedController m_rightMotor;
 
   private double m_quickStopThreshold = kDefaultQuickStopThreshold;
   private double m_quickStopAlpha = kDefaultQuickStopAlpha;
@@ -115,7 +115,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * <p>To pass multiple motors per side, use a {@link MotorControllerGroup}. If a motor needs to be
    * inverted, do so before passing it in.
    */
-  public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
+  public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
     verify(leftMotor, rightMotor);
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
@@ -139,7 +139,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @throws NullPointerException if any of the given motors are null
    */
   @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
-  private void verify(MotorController leftMotor, MotorController rightMotor) {
+  private void verify(SpeedController leftMotor, SpeedController rightMotor) {
     if (leftMotor != null && rightMotor != null) {
       return;
     }

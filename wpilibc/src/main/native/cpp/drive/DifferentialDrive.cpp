@@ -9,14 +9,22 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/motorcontrol/MotorController.h"
+#include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
-                                     MotorController& rightMotor)
+#if defined(_MSC_VER)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
+                                     SpeedController& rightMotor)
     : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
   auto& registry = SendableRegistry::GetInstance();
   registry.AddChild(this, m_leftMotor);

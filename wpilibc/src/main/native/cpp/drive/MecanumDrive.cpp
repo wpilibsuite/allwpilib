@@ -11,16 +11,24 @@
 #include <wpi/math>
 
 #include "frc/drive/Vector2d.h"
-#include "frc/motorcontrol/MotorController.h"
+#include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-MecanumDrive::MecanumDrive(MotorController& frontLeftMotor,
-                           MotorController& rearLeftMotor,
-                           MotorController& frontRightMotor,
-                           MotorController& rearRightMotor)
+#if defined(_MSC_VER)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
+                           SpeedController& rearLeftMotor,
+                           SpeedController& frontRightMotor,
+                           SpeedController& rearRightMotor)
     : m_frontLeftMotor(&frontLeftMotor),
       m_rearLeftMotor(&rearLeftMotor),
       m_frontRightMotor(&frontRightMotor),

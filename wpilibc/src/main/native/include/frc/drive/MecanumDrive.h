@@ -14,7 +14,18 @@
 
 namespace frc {
 
-class MotorController;
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+class SpeedController;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -70,9 +81,9 @@ class MecanumDrive : public RobotDriveBase,
    *
    * If a motor needs to be inverted, do so before passing it in.
    */
-  MecanumDrive(MotorController& frontLeftMotor, MotorController& rearLeftMotor,
-               MotorController& frontRightMotor,
-               MotorController& rearRightMotor);
+  MecanumDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
+               SpeedController& frontRightMotor,
+               SpeedController& rearRightMotor);
 
   ~MecanumDrive() override = default;
 
@@ -135,14 +146,22 @@ class MecanumDrive : public RobotDriveBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  MotorController* m_frontLeftMotor;
-  MotorController* m_rearLeftMotor;
-  MotorController* m_frontRightMotor;
-  MotorController* m_rearRightMotor;
+  SpeedController* m_frontLeftMotor;
+  SpeedController* m_rearLeftMotor;
+  SpeedController* m_frontRightMotor;
+  SpeedController* m_rearRightMotor;
 
   double m_rightSideInvertMultiplier = -1.0;
 
   bool reported = false;
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 }  // namespace frc

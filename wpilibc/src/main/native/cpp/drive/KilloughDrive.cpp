@@ -10,21 +10,29 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
-#include "frc/motorcontrol/MotorController.h"
+#include "frc/SpeedController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-KilloughDrive::KilloughDrive(MotorController& leftMotor,
-                             MotorController& rightMotor,
-                             MotorController& backMotor)
+#if defined(_MSC_VER)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+KilloughDrive::KilloughDrive(SpeedController& leftMotor,
+                             SpeedController& rightMotor,
+                             SpeedController& backMotor)
     : KilloughDrive(leftMotor, rightMotor, backMotor, kDefaultLeftMotorAngle,
                     kDefaultRightMotorAngle, kDefaultBackMotorAngle) {}
 
-KilloughDrive::KilloughDrive(MotorController& leftMotor,
-                             MotorController& rightMotor,
-                             MotorController& backMotor, double leftMotorAngle,
+KilloughDrive::KilloughDrive(SpeedController& leftMotor,
+                             SpeedController& rightMotor,
+                             SpeedController& backMotor, double leftMotorAngle,
                              double rightMotorAngle, double backMotorAngle)
     : m_leftMotor(&leftMotor),
       m_rightMotor(&rightMotor),
