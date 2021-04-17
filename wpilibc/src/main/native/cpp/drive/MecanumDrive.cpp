@@ -10,8 +10,8 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/math>
 
-#include "frc/drive/Vector2d.h"
 #include "frc/SpeedController.h"
+#include "frc/drive/Vector2d.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
