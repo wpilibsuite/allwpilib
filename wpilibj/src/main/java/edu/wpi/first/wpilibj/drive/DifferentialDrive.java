@@ -9,7 +9,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -20,21 +19,21 @@ import java.util.StringJoiner;
  * base, "tank drive", or West Coast Drive.
  *
  * <p>These drive bases typically have drop-center / skid-steer with two or more wheels per side
- * (e.g., 6WD or 8WD). This class takes a SpeedController per side. For four and six motor
- * drivetrains, construct and pass in {@link edu.wpi.first.wpilibj.SpeedControllerGroup} instances
- * as follows.
+ * (e.g., 6WD or 8WD). This class takes a MotorController per side. For four and six motor
+ * drivetrains, construct and pass in {@link
+ * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup} instances as follows.
  *
  * <p>Four motor drivetrain:
  *
  * <pre><code>
  * public class Robot {
- *   SpeedController m_frontLeft = new PWMVictorSPX(1);
- *   SpeedController m_rearLeft = new PWMVictorSPX(2);
- *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
+ *   MotorController m_frontLeft = new PWMVictorSPX(1);
+ *   MotorController m_rearLeft = new PWMVictorSPX(2);
+ *   MotorControllerGroup m_left = new MotorControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   SpeedController m_frontRight = new PWMVictorSPX(3);
- *   SpeedController m_rearRight = new PWMVictorSPX(4);
- *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
+ *   MotorController m_frontRight = new PWMVictorSPX(3);
+ *   MotorController m_rearRight = new PWMVictorSPX(4);
+ *   MotorControllerGroup m_right = new MotorControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
  * }
@@ -44,15 +43,15 @@ import java.util.StringJoiner;
  *
  * <pre><code>
  * public class Robot {
- *   SpeedController m_frontLeft = new PWMVictorSPX(1);
- *   SpeedController m_midLeft = new PWMVictorSPX(2);
- *   SpeedController m_rearLeft = new PWMVictorSPX(3);
- *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
+ *   MotorController m_frontLeft = new PWMVictorSPX(1);
+ *   MotorController m_midLeft = new PWMVictorSPX(2);
+ *   MotorController m_rearLeft = new PWMVictorSPX(3);
+ *   MotorControllerGroup m_left = new MotorControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   SpeedController m_frontRight = new PWMVictorSPX(4);
- *   SpeedController m_midRight = new PWMVictorSPX(5);
- *   SpeedController m_rearRight = new PWMVictorSPX(6);
- *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
+ *   MotorController m_frontRight = new PWMVictorSPX(4);
+ *   MotorController m_midRight = new PWMVictorSPX(5);
+ *   MotorController m_rearRight = new PWMVictorSPX(6);
+ *   MotorControllerGroup m_right = new MotorControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
  * }
@@ -94,6 +93,7 @@ import java.util.StringJoiner;
  * drive(double, double) with the addition of a quick turn mode. However, it is not designed to give
  * exactly the same response.
  */
+@SuppressWarnings("removal")
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
@@ -112,8 +112,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   /**
    * Construct a DifferentialDrive.
    *
-   * <p>To pass multiple motors per side, use a {@link SpeedControllerGroup}. If a motor needs to be
-   * inverted, do so before passing it in.
+   * <p>To pass multiple motors per side, use a {@link
+   * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
+   * so before passing it in.
    */
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
     verify(leftMotor, rightMotor);

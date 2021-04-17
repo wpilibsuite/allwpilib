@@ -7,15 +7,18 @@
 #include <functional>
 #include <vector>
 
-#include "frc/SpeedController.h"
+#include <wpi/deprecated.h>
+
+#include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SpeedControllerGroup : public Sendable,
-                             public SpeedController,
-                             public SendableHelper<SpeedControllerGroup> {
+class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
+    : public Sendable,
+      public MotorController,
+      public SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>
   explicit SpeedControllerGroup(SpeedController& speedController,

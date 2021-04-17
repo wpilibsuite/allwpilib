@@ -6,11 +6,11 @@ package edu.wpi.first.wpilibj.examples.statespacearm;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
   // An encoder set up to measure arm position in radians.
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
 
-  private final SpeedController m_motor = new PWMSparkMax(kMotorPort);
+  private final MotorController m_motor = new PWMSparkMax(kMotorPort);
 
   // A joystick to read the trigger from.
   private final Joystick m_joystick = new Joystick(kJoystickPort);

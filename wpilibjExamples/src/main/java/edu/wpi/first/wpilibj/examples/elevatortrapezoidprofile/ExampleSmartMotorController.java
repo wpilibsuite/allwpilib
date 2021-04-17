@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.
  *
  * <p>Has no actual functionality.
  */
-public class ExampleSmartMotorController implements SpeedController {
+public class ExampleSmartMotorController implements MotorController {
   public enum PIDMode {
     kPosition,
     kVelocity,

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.

@@ -57,6 +57,7 @@ import java.util.StringJoiner;
  * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
  * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
  */
+@SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 

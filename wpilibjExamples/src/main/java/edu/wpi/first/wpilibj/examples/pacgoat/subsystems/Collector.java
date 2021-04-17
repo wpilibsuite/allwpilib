@@ -6,9 +6,9 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for ball detection, a
@@ -21,7 +21,7 @@ public class Collector extends Subsystem {
   public static final double kReverse = -1;
 
   // Subsystem devices
-  private final SpeedController m_rollerMotor = new Victor(6);
+  private final MotorController m_rollerMotor = new Victor(6);
   private final DigitalInput m_ballDetector = new DigitalInput(10);
   private final DigitalInput m_openDetector = new DigitalInput(6);
   private final Solenoid m_piston = new Solenoid(1, 1);

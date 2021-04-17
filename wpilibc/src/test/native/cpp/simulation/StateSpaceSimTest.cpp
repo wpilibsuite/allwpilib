@@ -8,10 +8,10 @@
 #include <units/angular_velocity.h>
 
 #include "frc/Encoder.h"
-#include "frc/PWMVictorSPX.h"
 #include "frc/RobotController.h"
 #include "frc/controller/PIDController.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/BatterySim.h"
 #include "frc/simulation/DifferentialDrivetrainSim.h"
 #include "frc/simulation/ElevatorSim.h"

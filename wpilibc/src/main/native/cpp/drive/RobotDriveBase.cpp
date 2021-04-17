@@ -11,7 +11,7 @@
 #include <hal/FRCUsageReporting.h>
 
 #include "frc/Base.h"
-#include "frc/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
 

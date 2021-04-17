@@ -4,9 +4,9 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/MecanumDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to

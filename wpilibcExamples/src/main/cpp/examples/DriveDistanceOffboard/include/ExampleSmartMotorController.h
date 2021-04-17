@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc/SpeedController.h>
+#include <frc/motorcontrol/MotorController.h>
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor
@@ -12,7 +12,7 @@
  *
  * <p>Has no actual functionality.
  */
-class ExampleSmartMotorController : public frc::SpeedController {
+class ExampleSmartMotorController : public frc::MotorController {
  public:
   enum PIDMode { kPosition, kVelocity, kMovementWitchcraft };
 
