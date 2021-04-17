@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ import java.util.Arrays;
  */
 @Deprecated(since = "2022", forRemoval = true)
 @SuppressWarnings("removal")
-public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
+public class SpeedControllerGroup implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
   private static int instances;
