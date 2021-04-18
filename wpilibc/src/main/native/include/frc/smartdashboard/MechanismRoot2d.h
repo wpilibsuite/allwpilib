@@ -14,7 +14,7 @@ class MechanismRoot2d : private MechanismObject2d {
   friend class Mechanism2d;
   struct private_init {};
   static constexpr char kPosition[] = "pos";
- 
+
  public:
   MechanismRoot2d(const wpi::Twine& name, double x, double y, const private_init& tag);
   MechanismRoot2d(const frc::MechanismRoot2d& rhs);

@@ -32,7 +32,7 @@ class MechanismLigament2d : public MechanismObject2d {
   void SetLength(double length);
 
   /**
-   * Get the ligament  length.
+   * Get the ligament length.
    *
    * @return the line length
    */
@@ -64,13 +64,13 @@ class MechanismLigament2d : public MechanismObject2d {
 
  private:
   void Flush();
-  char m_color[10];
-  nt::NetworkTableEntry m_lengthEntry;
   double m_length;
-  nt::NetworkTableEntry m_colorEntry;
+  nt::NetworkTableEntry m_lengthEntry;
   double m_angle;
   nt::NetworkTableEntry m_angleEntry;
   double m_weight;
   nt::NetworkTableEntry m_weightEntry;
+  char m_color[10];
+  nt::NetworkTableEntry m_colorEntry;
 };
 } // namespace frc

@@ -7,7 +7,10 @@
 
 using namespace frc;
 
-MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color, double length, units::degree_t angle, double lineWeight) : MechanismObject2d(name), m_length {length}, m_angle {angle.to<double>()}, m_weight {lineWeight} {
+MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color,
+                                         double length, units::degree_t angle, double lineWeight)
+                                         : MechanismObject2d(name), m_length {length},
+                                         m_angle {angle.to<double>()}, m_weight {lineWeight} {
   SetColor(color);
 }
 
@@ -49,9 +52,10 @@ void MechanismLigament2d::SetLength(double length) {
   Flush();
 }
 
-#define SAFE_WRITE(data, Type) if (m_##data##Entry) {\
-m_##data##Entry.Set##Type(m_##data);\
-}
+#define SAFE_WRITE(data, Type)           \
+  if (m_##data##Entry) {                 \
+    m_##data##Entry.Set##Type(m_##data); \
+  }
 void MechanismLigament2d::Flush() {
   SAFE_WRITE(color, String)
   SAFE_WRITE(angle, Double)

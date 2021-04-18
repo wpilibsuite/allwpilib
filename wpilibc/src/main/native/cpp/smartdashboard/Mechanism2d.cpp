@@ -18,13 +18,12 @@ static constexpr char kDims[] = "dims";
 Mechanism2d::Mechanism2d(double width, double height) : m_width {width}, m_height{height} {}
 
 MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
-  auto it = m_roots.find(name);
-  if (it != m_roots.end()) {
-    return it->getValue().get();
+  auto& obj = m_roots[name];
+  if (obj.get()) {
+    return obj.get();
   }
-  std::unique_ptr<MechanismRoot2d> ptr = std::make_unique<MechanismRoot2d>(name, x, y, MechanismRoot2d::private_init{});
-  MechanismRoot2d* ex = ptr.get();
-  m_roots.try_emplace(name, std::move(ptr));
+  obj = std::make_unique<MechanismRoot2d>(name, x, y, MechanismRoot2d::private_init{});
+  MechanismRoot2d* ex = obj.get();
   if (m_table) {
     ex->Update(m_table->GetSubTable(name));
   }
@@ -48,7 +47,6 @@ void Mechanism2d::InitSendable(SendableBuilder& builder) {
   std::scoped_lock lock(m_mutex);
   for (const auto& entry : m_roots) {
     const auto& root = entry.getValue().get();
-    std::scoped_lock lock2(root->m_mutex);
     root->Update(m_table->GetSubTable(entry.getKey()));
   }
 }

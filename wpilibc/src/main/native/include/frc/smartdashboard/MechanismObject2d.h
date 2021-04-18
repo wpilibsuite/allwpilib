@@ -26,7 +26,7 @@ class MechanismObject2d {
   virtual ~MechanismObject2d() = default;
   /**
    * Retrieve the object's name.
-   * 
+   *
    * @return the object's name relative to its parent.
    */
   const std::string& GetName() const;
@@ -42,13 +42,13 @@ class MechanismObject2d {
   template<typename T, typename... Args, typename = std::enable_if_t<std::is_convertible_v<T*, MechanismObject2d*>>>
   T* Append(wpi::StringRef name, Args&&... args) {
     std::scoped_lock lock(m_mutex);
-    if (m_objects.count(name)) {
+    auto& obj = m_objects[name];
+    if (obj) {
       throw std::runtime_error(("MechanismObject names must be unique! `" + name
                                + "` was inserted twice!").str());
     }
-    std::unique_ptr<T> ptr = std::make_unique<T>(name, std::forward<Args>(args)...);
-    T* ex = ptr.get();
-    m_objects.try_emplace<std::unique_ptr<MechanismObject2d>>(name, std::move(ptr));
+    obj = std::make_unique<T>(name, std::forward<Args>(args)...);
+    T* ex = static_cast<T*>(obj.get());
     if (m_table) {
       ex->Update(m_table->GetSubTable(name));
     }
