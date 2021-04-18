@@ -108,8 +108,8 @@ void Scheduler::Run() {
     for (auto& addition : m_impl->additions) {
       // Check to make sure no adding during adding
       if (m_impl->adding) {
-        throw FRC_MakeError(err::IncompatibleState,
-                            "Can not start command from cancel method");
+        FRC_ReportError(warn::IncompatibleState,
+                        "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(addition);
       }
@@ -121,8 +121,8 @@ void Scheduler::Run() {
   for (auto& subsystem : m_impl->subsystems) {
     if (subsystem->GetCurrentCommand() == nullptr) {
       if (m_impl->adding) {
-        throw FRC_MakeError(err::IncompatibleState,
-                            "Can not start command from cancel method");
+        FRC_ReportError(warn::IncompatibleState,
+                        "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(subsystem->GetDefaultCommand());
       }
