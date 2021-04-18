@@ -6,8 +6,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 class Encoder;
 class Counter;
@@ -16,12 +14,12 @@ class DutyCycle;
 class AnalogInput;
 class DMASample;
 
-class DMA : public ErrorBase {
+class DMA {
   friend class DMASample;
 
  public:
   DMA();
-  ~DMA() override;
+  ~DMA();
 
   DMA& operator=(DMA&& other) = default;
   DMA(DMA&& other) = default;

@@ -4,8 +4,8 @@
 
 #include "frc/InterruptableSensorBase.h"
 
+#include "frc/Errors.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 
 using namespace frc;
 
@@ -20,15 +20,8 @@ InterruptableSensorBase::~InterruptableSensorBase() {
 
 void InterruptableSensorBase::RequestInterrupts(
     HAL_InterruptHandlerFunction handler, void* param) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
-  wpi_assert(m_interrupt == HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(false);
-  if (StatusIsFatal()) {
-    return;  // if allocate failed, out of interrupts
-  }
 
   int32_t status = 0;
   HAL_RequestInterrupts(
@@ -37,19 +30,12 @@ void InterruptableSensorBase::RequestInterrupts(
       &status);
   SetUpSourceEdge(true, false);
   HAL_AttachInterruptHandler(m_interrupt, handler, param, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "AttachInterruptHandler");
 }
 
 void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
-  wpi_assert(m_interrupt == HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(false);
-  if (StatusIsFatal()) {
-    return;  // if allocate failed, out of interrupts
-  }
 
   m_interruptHandler =
       std::make_unique<InterruptEventHandler>(std::move(handler));
@@ -74,34 +60,24 @@ void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
         (*self)(res);
       },
       m_interruptHandler.get(), &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "AttachInterruptHandler");
 }
 
 void InterruptableSensorBase::RequestInterrupts() {
-  if (StatusIsFatal()) {
-    return;
-  }
-
-  wpi_assert(m_interrupt == HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt == HAL_kInvalidHandle);
   AllocateInterrupts(true);
-  if (StatusIsFatal()) {
-    return;  // if allocate failed, out of interrupts
-  }
 
   int32_t status = 0;
   HAL_RequestInterrupts(
       m_interrupt, GetPortHandleForRouting(),
       static_cast<HAL_AnalogTriggerType>(GetAnalogTriggerTypeForRouting()),
       &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "RequestInterrupts");
   SetUpSourceEdge(true, false);
 }
 
 void InterruptableSensorBase::CancelInterrupts() {
-  if (StatusIsFatal()) {
-    return;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_CleanInterrupts(m_interrupt, &status);
   // Ignore status, as an invalid handle just needs to be ignored.
@@ -111,15 +87,12 @@ void InterruptableSensorBase::CancelInterrupts() {
 
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
     double timeout, bool ignorePrevious) {
-  if (StatusIsFatal()) {
-    return InterruptableSensorBase::kTimeout;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int result;
 
   result = HAL_WaitForInterrupt(m_interrupt, timeout, ignorePrevious, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "WaitForInterrupt");
 
   // Rising edge result is the interrupt bit set in the byte 0xFF
   // Falling edge result is the interrupt bit set in the byte 0xFF00
@@ -131,69 +104,53 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
 }
 
 void InterruptableSensorBase::EnableInterrupts() {
-  if (StatusIsFatal()) {
-    return;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_EnableInterrupts(m_interrupt, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "EnableInterrupts");
 }
 
 void InterruptableSensorBase::DisableInterrupts() {
-  if (StatusIsFatal()) {
-    return;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_DisableInterrupts(m_interrupt, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "DisableInterrupts");
 }
 
 double InterruptableSensorBase::ReadRisingTimestamp() {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "ReadRisingTimestamp");
   return timestamp * 1e-6;
 }
 
 double InterruptableSensorBase::ReadFallingTimestamp() {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
-  wpi_assert(m_interrupt != HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "ReadFallingTimestamp");
   return timestamp * 1e-6;
 }
 
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
                                               bool fallingEdge) {
-  if (StatusIsFatal()) {
-    return;
-  }
   if (m_interrupt == HAL_kInvalidHandle) {
-    wpi_setWPIErrorWithContext(
-        NullParameter,
+    throw FRC_MakeError(
+        err::NullParameter,
         "You must call RequestInterrupts before SetUpSourceEdge");
-    return;
   }
   if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_SetInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
-    wpi_setHALError(status);
+    FRC_CheckErrorStatus(status, "SetUpSourceEdge");
   }
 }
 
 void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
-  wpi_assert(m_interrupt == HAL_kInvalidHandle);
+  FRC_Assert(m_interrupt == HAL_kInvalidHandle);
   // Expects the calling leaf class to allocate an interrupt index.
   int32_t status = 0;
   m_interrupt = HAL_InitializeInterrupts(watcher, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "AllocateInterrupts");
 }

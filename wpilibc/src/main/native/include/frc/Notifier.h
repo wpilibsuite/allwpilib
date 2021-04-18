@@ -18,11 +18,9 @@
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
-class Notifier : public ErrorBase {
+class Notifier {
  public:
   /**
    * Create a Notifier for timer event notification.
@@ -63,7 +61,7 @@ class Notifier : public ErrorBase {
   /**
    * Free the resources for a timer event.
    */
-  ~Notifier() override;
+  ~Notifier();
 
   Notifier(Notifier&& rhs);
   Notifier& operator=(Notifier&& rhs);

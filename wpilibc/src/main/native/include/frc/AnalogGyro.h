@@ -8,7 +8,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/interfaces/Gyro.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -31,7 +30,6 @@ class AnalogInput;
  * This class is for gyro sensors that connect to an analog input.
  */
 class AnalogGyro : public Gyro,
-                   public ErrorBase,
                    public Sendable,
                    public SendableHelper<AnalogGyro> {
  public:

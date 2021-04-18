@@ -14,6 +14,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/Base.h"
+#include "frc/Errors.h"
 
 namespace frc {
 
@@ -25,12 +26,17 @@ namespace impl {
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
-  static Robot theRobot;
-  {
-    std::scoped_lock lock{m};
-    *robot = &theRobot;
+  try {
+    static Robot theRobot;
+    {
+      std::scoped_lock lock{m};
+      *robot = &theRobot;
+    }
+    theRobot.StartCompetition();
+  } catch (const frc::RuntimeError& e) {
+    e.Report();
+    throw;
   }
-  theRobot.StartCompetition();
 }
 
 }  // namespace impl

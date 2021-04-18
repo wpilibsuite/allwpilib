@@ -12,7 +12,6 @@
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -25,8 +24,7 @@ class DigitalSource;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public ErrorBase,
-                         public Sendable,
+class DutyCycleEncoder : public Sendable,
                          public SendableHelper<DutyCycleEncoder> {
  public:
   /**

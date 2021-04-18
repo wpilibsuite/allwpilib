@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
  */
-class SolenoidBase : public ErrorBase {
+class SolenoidBase {
  public:
+  virtual ~SolenoidBase() = default;
+
   /**
    * Get the CAN ID of the module this solenoid is connected to.
    *

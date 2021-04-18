@@ -65,9 +65,9 @@ void ParallelCommandGroup::AddCommands(
   }
 
   if (isRunning) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Commands cannot be added to a CommandGroup "
-                               "while the group is running");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands cannot be added to a CommandGroup "
+                        "while the group is running");
   }
 
   for (auto&& command : commands) {
@@ -77,10 +77,9 @@ void ParallelCommandGroup::AddCommands(
       m_runWhenDisabled &= command->RunsWhenDisabled();
       m_commands.emplace_back(std::move(command), false);
     } else {
-      wpi_setWPIErrorWithContext(CommandIllegalUse,
-                                 "Multiple commands in a parallel group cannot "
-                                 "require the same subsystems");
-      return;
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
+                          "Multiple commands in a parallel group cannot "
+                          "require the same subsystems");
     }
   }
 }

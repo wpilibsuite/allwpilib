@@ -8,8 +8,6 @@
 
 #include <string>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 class DriverStation;
@@ -17,7 +15,7 @@ class DriverStation;
 /**
  * GenericHID Interface.
  */
-class GenericHID : public ErrorBase {
+class GenericHID {
  public:
   enum RumbleType { kLeftRumble, kRightRumble };
 
@@ -44,7 +42,7 @@ class GenericHID : public ErrorBase {
   enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
 
   explicit GenericHID(int port);
-  ~GenericHID() override = default;
+  virtual ~GenericHID() = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;

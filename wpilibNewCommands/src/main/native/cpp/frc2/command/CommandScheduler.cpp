@@ -7,7 +7,6 @@
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/WPIErrors.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
@@ -112,9 +111,9 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 
   if (command->IsGrouped()) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "A command that is part of a command group "
-                               "cannot be independently scheduled");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "A command that is part of a command group "
+                        "cannot be independently scheduled");
     return;
   }
   if (m_impl->disabled ||

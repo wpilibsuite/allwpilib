@@ -11,8 +11,8 @@
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -24,24 +24,19 @@ Solenoid::Solenoid(int channel)
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
-                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
-    return;
+    throw FRC_MakeError(err::ModuleIndexOutOfRange,
+                        "Solenoid Module " + wpi::Twine{m_moduleNumber});
   }
   if (!SensorUtil::CheckSolenoidChannel(m_channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Solenoid Channel " + wpi::Twine(m_channel));
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "Solenoid Channel " + wpi::Twine{m_channel});
   }
 
   int32_t status = 0;
   m_solenoidHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, channel), &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(), channel);
-    m_solenoidHandle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "Solenoid Module " + wpi::Twine{m_moduleNumber} +
+                                   " Channel " + wpi::Twine{m_channel});
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_moduleNumber + 1);
@@ -54,23 +49,15 @@ Solenoid::~Solenoid() {
 }
 
 void Solenoid::Set(bool on) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Set");
 }
 
 bool Solenoid::Get() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
-
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Get");
 
   return value;
 }
@@ -90,21 +77,15 @@ bool Solenoid::IsBlackListed() const {
 
 void Solenoid::SetPulseDuration(double durationSeconds) {
   int32_t durationMS = durationSeconds * 1000;
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetPulseDuration");
 }
 
 void Solenoid::StartPulse() {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_FireOneShot(m_solenoidHandle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "StartPulse");
 }
 
 void Solenoid::InitSendable(SendableBuilder& builder) {

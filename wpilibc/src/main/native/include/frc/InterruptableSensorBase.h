@@ -10,11 +10,10 @@
 #include <hal/Interrupts.h>
 
 #include "frc/AnalogTriggerType.h"
-#include "frc/ErrorBase.h"
 
 namespace frc {
 
-class InterruptableSensorBase : public ErrorBase {
+class InterruptableSensorBase {
  public:
   enum WaitResult {
     kTimeout = 0x0,
@@ -35,7 +34,7 @@ class InterruptableSensorBase : public ErrorBase {
   /**
    * Free the resources for an interrupt event.
    */
-  ~InterruptableSensorBase() override;
+  virtual ~InterruptableSensorBase();
 
   InterruptableSensorBase(InterruptableSensorBase&&) = default;
   InterruptableSensorBase& operator=(InterruptableSensorBase&&) = default;

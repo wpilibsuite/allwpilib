@@ -18,9 +18,9 @@
 
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/RobotState.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
@@ -54,10 +54,10 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
     HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
   }
   void SetCameraServerError(const wpi::Twine& error) override {
-    wpi_setGlobalWPIErrorWithContext(CameraServerError, error);
+    FRC_ReportError(err::CameraServerError, error);
   }
   void SetVisionRunnerError(const wpi::Twine& error) override {
-    wpi_setGlobalErrorWithContext(-1, error);
+    FRC_ReportError(-1, error);
   }
   void ReportDriverStationError(const wpi::Twine& error) override {
     DriverStation::ReportError(error);

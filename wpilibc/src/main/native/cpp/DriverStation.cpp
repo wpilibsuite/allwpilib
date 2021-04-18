@@ -17,9 +17,9 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 
+#include "frc/Errors.h"
 #include "frc/MotorSafety.h"
 #include "frc/Timer.h"
-#include "frc/WPIErrors.h"
 
 namespace frc {
 // A simple class which caches the previous value written to an NT entry
@@ -140,7 +140,8 @@ void DriverStation::ReportError(bool isError, int32_t code,
 
 bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
   if (button <= 0) {
@@ -163,7 +164,8 @@ bool DriverStation::GetStickButton(int stick, int button) {
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
   if (button <= 0) {
@@ -192,7 +194,8 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
 
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
   if (button <= 0) {
@@ -221,11 +224,13 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
 
 double DriverStation::GetStickAxis(int stick, int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return 0.0;
   }
   if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    wpi_setWPIError(BadJoystickAxis);
+    FRC_ReportError(warn::BadJoystickAxis,
+                    "axis " + wpi::Twine{axis} + " out of range");
     return 0.0;
   }
 
@@ -243,11 +248,13 @@ double DriverStation::GetStickAxis(int stick, int axis) {
 
 int DriverStation::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return -1;
   }
   if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
-    wpi_setWPIError(BadJoystickAxis);
+    FRC_ReportError(warn::BadJoystickAxis,
+                    "POV " + wpi::Twine{pov} + " out of range");
     return -1;
   }
 
@@ -265,7 +272,8 @@ int DriverStation::GetStickPOV(int stick, int pov) {
 
 int DriverStation::GetStickButtons(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return 0;
   }
 
@@ -277,7 +285,8 @@ int DriverStation::GetStickButtons(int stick) const {
 
 int DriverStation::GetStickAxisCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return 0;
   }
 
@@ -289,7 +298,8 @@ int DriverStation::GetStickAxisCount(int stick) const {
 
 int DriverStation::GetStickPOVCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return 0;
   }
 
@@ -301,7 +311,8 @@ int DriverStation::GetStickPOVCount(int stick) const {
 
 int DriverStation::GetStickButtonCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return 0;
   }
 
@@ -313,7 +324,8 @@ int DriverStation::GetStickButtonCount(int stick) const {
 
 bool DriverStation::GetJoystickIsXbox(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
 
@@ -325,7 +337,8 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
 
 int DriverStation::GetJoystickType(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return -1;
   }
 
@@ -337,7 +350,8 @@ int DriverStation::GetJoystickType(int stick) const {
 
 std::string DriverStation::GetJoystickName(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
   }
 
   HAL_JoystickDescriptor descriptor;
@@ -348,7 +362,8 @@ std::string DriverStation::GetJoystickName(int stick) const {
 
 int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+    FRC_ReportError(warn::BadJoystickIndex,
+                    "stick " + wpi::Twine{stick} + " out of range");
     return -1;
   }
 
@@ -537,7 +552,7 @@ double DriverStation::GetMatchTime() const {
 double DriverStation::GetBatteryVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  wpi_setErrorWithContext(status, "getVinVoltage");
+  FRC_CheckErrorStatus(status, "getVinVoltage");
 
   return voltage;
 }

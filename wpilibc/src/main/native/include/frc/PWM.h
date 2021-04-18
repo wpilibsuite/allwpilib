@@ -8,7 +8,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -33,7 +32,7 @@ class SendableBuilder;
  *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public ErrorBase, public Sendable, public SendableHelper<PWM> {
+class PWM : public Sendable, public SendableHelper<PWM> {
  public:
   friend class AddressableLED;
   /**

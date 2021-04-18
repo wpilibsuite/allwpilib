@@ -11,8 +11,8 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -21,30 +21,20 @@ using namespace frc;
 DigitalOutput::DigitalOutput(int channel) {
   m_pwmGenerator = HAL_kInvalidHandle;
   if (!SensorUtil::CheckDigitalChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Digital Channel " + wpi::Twine(channel));
-    m_channel = std::numeric_limits<int>::max();
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "Digital Channel " + wpi::Twine{channel});
   }
   m_channel = channel;
 
   int32_t status = 0;
   m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), false, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumDigitalChannels(), channel);
-    m_channel = std::numeric_limits<int>::max();
-    m_handle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
-  if (StatusIsFatal()) {
-    return;
-  }
   // Disable the PWM in case it was running.
   DisablePWM();
 
@@ -52,23 +42,15 @@ DigitalOutput::~DigitalOutput() {
 }
 
 void DigitalOutput::Set(bool value) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_SetDIO(m_handle, value, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 }
 
 bool DigitalOutput::Get() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
-
   int32_t status = 0;
   bool val = HAL_GetDIO(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
   return val;
 }
 
@@ -89,34 +71,22 @@ int DigitalOutput::GetChannel() const {
 }
 
 void DigitalOutput::Pulse(double length) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_Pulse(m_handle, length, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 }
 
 bool DigitalOutput::IsPulsing() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
-
   int32_t status = 0;
   bool value = HAL_IsPulsing(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
   return value;
 }
 
 void DigitalOutput::SetPWMRate(double rate) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_SetDigitalPWMRate(rate, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 }
 
 void DigitalOutput::EnablePWM(double initialDutyCycle) {
@@ -126,29 +96,17 @@ void DigitalOutput::EnablePWM(double initialDutyCycle) {
 
   int32_t status = 0;
 
-  if (StatusIsFatal()) {
-    return;
-  }
   m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 
-  if (StatusIsFatal()) {
-    return;
-  }
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 
-  if (StatusIsFatal()) {
-    return;
-  }
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 }
 
 void DigitalOutput::DisablePWM() {
-  if (StatusIsFatal()) {
-    return;
-  }
   if (m_pwmGenerator == HAL_kInvalidHandle) {
     return;
   }
@@ -158,22 +116,18 @@ void DigitalOutput::DisablePWM() {
   // Disable the output by routing to a dead bit.
   HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorUtil::kDigitalChannels,
                                  &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 
   HAL_FreeDigitalPWM(m_pwmGenerator, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 
   m_pwmGenerator = HAL_kInvalidHandle;
 }
 
 void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{m_channel});
 }
 
 void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {

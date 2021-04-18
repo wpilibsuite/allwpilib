@@ -11,7 +11,6 @@
 #include <units/time.h>
 #include <wpi/ArrayRef.h>
 
-#include "frc/ErrorBase.h"
 #include "util/Color.h"
 #include "util/Color8Bit.h"
 
@@ -22,7 +21,7 @@ namespace frc {
  *
  * <p>Only 1 LED driver is currently supported by the roboRIO.
  */
-class AddressableLED : public ErrorBase {
+class AddressableLED {
  public:
   class LEDData : public HAL_AddressableLEDData {
    public:
@@ -86,7 +85,7 @@ class AddressableLED : public ErrorBase {
    */
   explicit AddressableLED(int port);
 
-  ~AddressableLED() override;
+  ~AddressableLED();
 
   /**
    * Sets the length of the LED strip.

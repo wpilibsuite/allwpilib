@@ -6,7 +6,6 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/interfaces/Gyro.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -19,10 +18,7 @@ namespace frc {
  * This class is for the Romi onboard gyro, and will only work in
  * simulation/Romi mode. Only one instance of a RomiGyro is supported.
  */
-class RomiGyro : public Gyro,
-                 public ErrorBase,
-                 public Sendable,
-                 public SendableHelper<RomiGyro> {
+class RomiGyro : public Gyro, public Sendable, public SendableHelper<RomiGyro> {
  public:
   RomiGyro();
 

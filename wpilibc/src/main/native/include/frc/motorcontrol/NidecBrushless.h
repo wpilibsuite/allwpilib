@@ -5,7 +5,6 @@
 #pragma once
 
 #include "frc/DigitalOutput.h"
-#include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/motorcontrol/MotorController.h"

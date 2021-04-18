@@ -8,7 +8,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -30,9 +29,7 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public ErrorBase,
-                    public Sendable,
-                    public SendableHelper<AnalogInput> {
+class AnalogInput : public Sendable, public SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;

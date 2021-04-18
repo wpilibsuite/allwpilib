@@ -10,8 +10,6 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringRef.h>
 
-#include "frc/WPIErrors.h"
-
 using namespace frc;
 
 // The Preferences table name
