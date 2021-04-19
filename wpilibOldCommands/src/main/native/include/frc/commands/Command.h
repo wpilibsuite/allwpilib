@@ -10,7 +10,6 @@
 #include <wpi/SmallPtrSet.h>
 #include <wpi/Twine.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/commands/Subsystem.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -43,9 +42,7 @@ class CommandGroup;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public ErrorBase,
-                public Sendable,
-                public SendableHelper<Command> {
+class Command : public Sendable, public SendableHelper<Command> {
   friend class CommandGroup;
   friend class Scheduler;
 

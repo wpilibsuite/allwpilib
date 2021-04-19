@@ -12,7 +12,6 @@
 #include <hal/SimDevice.h>
 
 #include "frc/Counter.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -33,9 +32,7 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public ErrorBase,
-                   public Sendable,
-                   public SendableHelper<Ultrasonic> {
+class Ultrasonic : public Sendable, public SendableHelper<Ultrasonic> {
  public:
   /**
    * Create an instance of the Ultrasonic Sensor.

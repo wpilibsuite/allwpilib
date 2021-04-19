@@ -9,7 +9,6 @@
 #include <memory>
 #include <string>
 
-#include <frc/ErrorBase.h>
 #include <units/time.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
@@ -46,10 +45,10 @@ class ProxyScheduleCommand;
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public frc::ErrorBase {
+class Command {
  public:
   Command() = default;
-  ~Command() override;
+  virtual ~Command();
 
   Command(const Command&);
   Command& operator=(const Command&);

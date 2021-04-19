@@ -9,7 +9,6 @@
 #include <hal/Types.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"

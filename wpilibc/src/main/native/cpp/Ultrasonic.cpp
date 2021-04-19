@@ -12,9 +12,9 @@
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
+#include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -40,9 +40,11 @@ Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
     : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
-  if (pingChannel == nullptr || echoChannel == nullptr) {
-    wpi_setWPIError(NullParameter);
-    return;
+  if (!pingChannel) {
+    throw FRC_MakeError(err::NullParameter, "pingChannel");
+  }
+  if (!echoChannel) {
+    throw FRC_MakeError(err::NullParameter, "echoChannel");
   }
   Initialize();
 }

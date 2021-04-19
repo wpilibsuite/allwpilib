@@ -10,7 +10,7 @@
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -85,9 +85,8 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
 }
 
 void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
-  if (data == nullptr) {
-    wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
-    return;
+  if (!data) {
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
@@ -103,9 +102,8 @@ void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
 }
 
 void SmartDashboard::PutData(Sendable* value) {
-  if (value == nullptr) {
-    wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
-    return;
+  if (!value) {
+    throw FRC_MakeError(err::NullParameter, "value");
   }
   auto name = SendableRegistry::GetInstance().GetName(value);
   if (!name.empty()) {
@@ -118,8 +116,7 @@ Sendable* SmartDashboard::GetData(wpi::StringRef key) {
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto it = inst.tablesToData.find(key);
   if (it == inst.tablesToData.end()) {
-    wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
-    return nullptr;
+    throw FRC_MakeError(err::SmartDashboardMissingKey, key);
   }
   return SendableRegistry::GetInstance().GetSendable(it->getValue());
 }

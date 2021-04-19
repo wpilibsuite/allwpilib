@@ -8,8 +8,7 @@
 #include <memory>
 #include <utility>
 
-#include <frc/ErrorBase.h>
-#include <frc/WPIErrors.h>
+#include <frc/Errors.h>
 #include <frc/Watchdog.h>
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
@@ -29,7 +28,6 @@ class Subsystem;
  * methods to be called and for their default commands to be scheduled.
  */
 class CommandScheduler final : public frc::Sendable,
-                               public frc::ErrorBase,
                                public frc::SendableHelper<CommandScheduler> {
  public:
   /**
@@ -182,14 +180,12 @@ class CommandScheduler final : public frc::Sendable,
                          Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      wpi_setWPIErrorWithContext(
-          CommandIllegalUse, "Default commands must require their subsystem!");
-      return;
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
+                          "Default commands must require their subsystem!");
     }
     if (defaultCommand.IsFinished()) {
-      wpi_setWPIErrorWithContext(CommandIllegalUse,
-                                 "Default commands should not end!");
-      return;
+      throw FRC_MakeError(frc::err::CommandIllegalUse,
+                          "Default commands should not end!");
     }
     SetDefaultCommandImpl(subsystem,
                           std::make_unique<std::remove_reference_t<T>>(

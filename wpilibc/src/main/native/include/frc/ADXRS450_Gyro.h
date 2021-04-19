@@ -8,7 +8,6 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Gyro.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -30,7 +29,6 @@ namespace frc {
  * Only one instance of an ADXRS Gyro is supported.
  */
 class ADXRS450_Gyro : public Gyro,
-                      public ErrorBase,
                       public Sendable,
                       public SendableHelper<ADXRS450_Gyro> {
  public:

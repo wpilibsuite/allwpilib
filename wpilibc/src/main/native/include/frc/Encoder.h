@@ -10,7 +10,6 @@
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -37,8 +36,7 @@ class DMASample;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public ErrorBase,
-                public CounterBase,
+class Encoder : public CounterBase,
                 public Sendable,
                 public SendableHelper<Encoder> {
   friend class DMA;

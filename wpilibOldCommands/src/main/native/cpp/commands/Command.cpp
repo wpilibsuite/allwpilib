@@ -6,9 +6,9 @@
 
 #include <typeinfo>
 
+#include "frc/Errors.h"
 #include "frc/RobotState.h"
 #include "frc/Timer.h"
-#include "frc/WPIErrors.h"
 #include "frc/commands/CommandGroup.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
@@ -32,7 +32,7 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
 Command::Command(const wpi::Twine& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
   }
 
   m_timeout = timeout;
@@ -77,15 +77,15 @@ void Command::Requires(Subsystem* subsystem) {
   if (subsystem != nullptr) {
     m_requirements.insert(subsystem);
   } else {
-    wpi_setWPIErrorWithContext(NullParameter, "subsystem");
+    throw FRC_MakeError(err::NullParameter, "subsystem");
   }
 }
 
 void Command::Start() {
   LockChanges();
   if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(
-        CommandIllegalUse,
+    throw FRC_MakeError(
+        err::CommandIllegalUse,
         "Can not start a command that is part of a command group");
   }
 
@@ -115,8 +115,8 @@ bool Command::Run() {
 
 void Command::Cancel() {
   if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(
-        CommandIllegalUse,
+    throw FRC_MakeError(
+        err::CommandIllegalUse,
         "Can not cancel a command that is part of a command group");
   }
 
@@ -173,7 +173,7 @@ int Command::GetID() const {
 
 void Command::SetTimeout(double timeout) {
   if (timeout < 0.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
   } else {
     m_timeout = timeout;
   }
@@ -185,21 +185,22 @@ bool Command::IsTimedOut() const {
 
 bool Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
-    std::string buf =
-        message + " after being started or being added to a command group";
-    wpi_setWPIErrorWithContext(CommandIllegalUse, buf);
-    return false;
+    throw FRC_MakeError(
+        err::CommandIllegalUse,
+        message +
+            wpi::Twine{
+                " after being started or being added to a command group"});
   }
   return true;
 }
 
 void Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "parent");
+    throw FRC_MakeError(err::NullParameter, "parent");
   } else if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Can not give command to a command group after "
-                               "already being put in a command group");
+    throw FRC_MakeError(err::CommandIllegalUse,
+                        "Can not give command to a command group after "
+                        "already being put in a command group");
   } else {
     LockChanges();
     m_parent = parent;

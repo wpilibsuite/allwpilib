@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "frc/AnalogInput.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -21,8 +20,7 @@ class SendableBuilder;
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public ErrorBase,
-                            public Sendable,
+class AnalogPotentiometer : public Sendable,
                             public SendableHelper<AnalogPotentiometer> {
  public:
   /**

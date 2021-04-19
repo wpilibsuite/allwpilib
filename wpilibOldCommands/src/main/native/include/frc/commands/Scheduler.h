@@ -6,7 +6,6 @@
 
 #include <memory>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -16,9 +15,7 @@ class ButtonScheduler;
 class Command;
 class Subsystem;
 
-class Scheduler : public ErrorBase,
-                  public Sendable,
-                  public SendableHelper<Scheduler> {
+class Scheduler : public Sendable, public SendableHelper<Scheduler> {
  public:
   /**
    * Returns the Scheduler, creating it if one does not exist.

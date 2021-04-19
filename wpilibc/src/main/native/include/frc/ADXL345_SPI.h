@@ -6,7 +6,6 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -20,8 +19,7 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public ErrorBase,
-                    public Accelerometer,
+class ADXL345_SPI : public Accelerometer,
                     public Sendable,
                     public SendableHelper<ADXL345_SPI> {
  public:

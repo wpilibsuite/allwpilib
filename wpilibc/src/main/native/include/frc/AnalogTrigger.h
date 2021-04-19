@@ -9,7 +9,6 @@
 #include <hal/Types.h>
 
 #include "frc/AnalogTriggerOutput.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -19,9 +18,7 @@ class AnalogInput;
 class DutyCycle;
 class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase,
-                      public Sendable,
-                      public SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
