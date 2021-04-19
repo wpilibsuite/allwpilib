@@ -142,7 +142,11 @@ Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
-  Disable();
+  try {
+    Disable();
+  } catch (const RuntimeError& e) {
+    e.Report();
+  }
 }
 
 Watchdog::Watchdog(Watchdog&& rhs) {

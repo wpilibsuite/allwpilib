@@ -37,7 +37,7 @@ class CommandScheduler final : public frc::Sendable,
    */
   static CommandScheduler& GetInstance();
 
-  ~CommandScheduler();
+  ~CommandScheduler() override;
   CommandScheduler(const CommandScheduler&) = delete;
   CommandScheduler& operator=(const CommandScheduler&) = delete;
 

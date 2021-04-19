@@ -6,8 +6,8 @@
 
 #include <stdint.h>
 
-#include <exception>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include <wpi/Twine.h>

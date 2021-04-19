@@ -84,7 +84,11 @@ Counter::Counter(EncodingType encodingType,
 }
 
 Counter::~Counter() {
-  SetUpdateWhenEmpty(true);
+  try {
+    SetUpdateWhenEmpty(true);
+  } catch (const RuntimeError& e) {
+    e.Report();
+  }
 
   int32_t status = 0;
   HAL_FreeCounter(m_counter, &status);

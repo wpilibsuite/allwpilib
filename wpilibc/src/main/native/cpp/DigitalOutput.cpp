@@ -36,7 +36,11 @@ DigitalOutput::DigitalOutput(int channel) {
 
 DigitalOutput::~DigitalOutput() {
   // Disable the PWM in case it was running.
-  DisablePWM();
+  try {
+    DisablePWM();
+  } catch (const RuntimeError& e) {
+    e.Report();
+  }
 
   HAL_FreeDIOPort(m_handle);
 }
