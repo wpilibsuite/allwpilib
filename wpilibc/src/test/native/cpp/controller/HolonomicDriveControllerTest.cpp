@@ -47,3 +47,17 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   EXPECT_NEAR_UNITS(frc::AngleModulus(robotPose.Rotation().Radians()), 0_rad,
                     kAngularTolerance);
 }
+
+TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
+  frc::HolonomicDriveController controller{
+      frc2::PIDController{1, 0, 0}, frc2::PIDController{1, 0, 0},
+      frc::ProfiledPIDController<units::radian>{
+          1, 0, 0,
+          frc::TrapezoidProfile<units::radian>::Constraints{
+              4_rad_per_s, 2_rad_per_s / 1_s}}};
+
+  frc::ChassisSpeeds speeds = controller.Calculate(
+      frc::Pose2d(0_m, 0_m, 1.57_rad), frc::Pose2d(), 0_mps, 1.57_rad);
+
+  EXPECT_EQ(0, speeds.omega.to<double>());
+}

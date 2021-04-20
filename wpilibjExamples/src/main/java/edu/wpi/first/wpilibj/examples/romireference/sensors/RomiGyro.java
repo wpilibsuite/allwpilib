@@ -2,17 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.romi;
+package edu.wpi.first.wpilibj.examples.romireference.sensors;
 
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
-public class RomiGyro implements Gyro, Sendable {
-  private final SimDevice m_simDevice;
+public class RomiGyro {
   private SimDouble m_simRateX;
   private SimDouble m_simRateY;
   private SimDouble m_simRateZ;
@@ -26,16 +22,16 @@ public class RomiGyro implements Gyro, Sendable {
 
   /** Create a new RomiGyro. */
   public RomiGyro() {
-    m_simDevice = SimDevice.create("Gyro:RomiGyro");
-    if (m_simDevice != null) {
-      m_simDevice.createBoolean("init", Direction.kOutput, true);
-      m_simRateX = m_simDevice.createDouble("rate_x", Direction.kInput, 0.0);
-      m_simRateY = m_simDevice.createDouble("rate_y", Direction.kInput, 0.0);
-      m_simRateZ = m_simDevice.createDouble("rate_z", Direction.kInput, 0.0);
+    SimDevice gyroSimDevice = SimDevice.create("Gyro:RomiGyro");
+    if (gyroSimDevice != null) {
+      gyroSimDevice.createBoolean("init", Direction.kOutput, true);
+      m_simRateX = gyroSimDevice.createDouble("rate_x", Direction.kInput, 0.0);
+      m_simRateY = gyroSimDevice.createDouble("rate_y", Direction.kInput, 0.0);
+      m_simRateZ = gyroSimDevice.createDouble("rate_z", Direction.kInput, 0.0);
 
-      m_simAngleX = m_simDevice.createDouble("angle_x", Direction.kInput, 0.0);
-      m_simAngleY = m_simDevice.createDouble("angle_y", Direction.kInput, 0.0);
-      m_simAngleZ = m_simDevice.createDouble("angle_z", Direction.kInput, 0.0);
+      m_simAngleX = gyroSimDevice.createDouble("angle_x", Direction.kInput, 0.0);
+      m_simAngleY = gyroSimDevice.createDouble("angle_y", Direction.kInput, 0.0);
+      m_simAngleZ = gyroSimDevice.createDouble("angle_z", Direction.kInput, 0.0);
     }
   }
 
@@ -118,40 +114,11 @@ public class RomiGyro implements Gyro, Sendable {
   }
 
   /** Reset the gyro angles to 0. */
-  @Override
   public void reset() {
     if (m_simAngleX != null) {
       m_angleXOffset = m_simAngleX.get();
       m_angleYOffset = m_simAngleY.get();
       m_angleZOffset = m_simAngleZ.get();
     }
-  }
-
-  @Override
-  public void calibrate() {
-    // no-op - Romi Gyro calibration is done via web UI
-  }
-
-  @Override
-  public double getAngle() {
-    return getAngleZ();
-  }
-
-  @Override
-  public double getRate() {
-    return getRateZ();
-  }
-
-  @Override
-  public void close() throws Exception {
-    if (m_simDevice != null) {
-      m_simDevice.close();
-    }
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Gyro");
-    builder.addDoubleProperty("Value", this::getAngle, null);
   }
 }

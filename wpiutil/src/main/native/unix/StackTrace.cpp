@@ -26,8 +26,11 @@ std::string GetStackTrace(int offset) {
       // extract just function name from "pathToExe(functionName+offset)"
       StringRef sym{mangledSymbols[i]};
       sym = sym.split('(').second;
-      sym = sym.split('+').first;
-      trace << "\tat " << Demangle(sym) << "\n";
+      StringRef offset;
+      std::tie(sym, offset) = sym.split('+');
+      StringRef addr;
+      std::tie(offset, addr) = offset.split(')');
+      trace << "\tat " << Demangle(sym) << " + " << offset << addr << "\n";
     }
   }
 

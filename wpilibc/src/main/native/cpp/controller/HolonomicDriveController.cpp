@@ -34,6 +34,13 @@ void HolonomicDriveController::SetTolerance(const Pose2d& tolerance) {
 ChassisSpeeds HolonomicDriveController::Calculate(
     const Pose2d& currentPose, const Pose2d& poseRef,
     units::meters_per_second_t linearVelocityRef, const Rotation2d& angleRef) {
+  // If this is the first run, then we need to reset the theta controller to the
+  // current pose's heading.
+  if (m_firstRun) {
+    m_thetaController.Reset(currentPose.Rotation().Radians());
+    m_firstRun = false;
+  }
+
   // Calculate feedforward velocities (field-relative)
   auto xFF = linearVelocityRef * poseRef.Rotation().Cos();
   auto yFF = linearVelocityRef * poseRef.Rotation().Sin();

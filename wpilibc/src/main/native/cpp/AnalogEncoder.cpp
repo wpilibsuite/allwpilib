@@ -12,6 +12,9 @@
 
 using namespace frc;
 
+AnalogEncoder::AnalogEncoder(int channel)
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
+
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
     : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},

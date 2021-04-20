@@ -125,14 +125,10 @@ int Compressor::GetModule() const {
 void Compressor::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
   builder.AddBooleanProperty(
-      "Enabled", [=]() { return Enabled(); },
-      [=](bool value) {
-        if (value) {
-          Start();
-        } else {
-          Stop();
-        }
-      });
+      "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
+      [=](bool value) { SetClosedLoopControl(value); });
+  builder.AddBooleanProperty(
+      "Enabled", [=] { return Enabled(); }, nullptr);
   builder.AddBooleanProperty(
       "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
 }

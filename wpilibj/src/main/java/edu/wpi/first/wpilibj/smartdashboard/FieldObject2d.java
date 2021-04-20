@@ -8,6 +8,9 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +86,19 @@ public class FieldObject2d {
   }
 
   /**
+   * Sets poses from a trajectory.
+   *
+   * @param trajectory The trajectory from which the poses should be added.
+   */
+  public synchronized void setTrajectory(Trajectory trajectory) {
+    m_poses.clear();
+    for (Trajectory.State state : trajectory.getStates()) {
+      m_poses.add(state.poseMeters);
+    }
+    updateEntry();
+  }
+
+  /**
    * Get multiple poses.
    *
    * @return list of 2D poses
@@ -101,20 +117,39 @@ public class FieldObject2d {
       return;
     }
 
-    double[] arr = new double[m_poses.size() * 3];
-    int ndx = 0;
-    for (Pose2d pose : m_poses) {
-      Translation2d translation = pose.getTranslation();
-      arr[ndx + 0] = translation.getX();
-      arr[ndx + 1] = translation.getY();
-      arr[ndx + 2] = pose.getRotation().getDegrees();
-      ndx += 3;
-    }
+    if (m_poses.size() < (255 / 3)) {
+      double[] arr = new double[m_poses.size() * 3];
+      int ndx = 0;
+      for (Pose2d pose : m_poses) {
+        Translation2d translation = pose.getTranslation();
+        arr[ndx + 0] = translation.getX();
+        arr[ndx + 1] = translation.getY();
+        arr[ndx + 2] = pose.getRotation().getDegrees();
+        ndx += 3;
+      }
 
-    if (setDefault) {
-      m_entry.setDefaultDoubleArray(arr);
+      if (setDefault) {
+        m_entry.setDefaultDoubleArray(arr);
+      } else {
+        m_entry.setDoubleArray(arr);
+      }
     } else {
-      m_entry.setDoubleArray(arr);
+      // send as raw array of doubles if too big for NT array
+      ByteBuffer output = ByteBuffer.allocate(m_poses.size() * 3 * 8);
+      output.order(ByteOrder.BIG_ENDIAN);
+
+      for (Pose2d pose : m_poses) {
+        Translation2d translation = pose.getTranslation();
+        output.putDouble(translation.getX());
+        output.putDouble(translation.getY());
+        output.putDouble(pose.getRotation().getDegrees());
+      }
+
+      if (setDefault) {
+        m_entry.setDefaultRaw(output.array());
+      } else {
+        m_entry.forceSetRaw(output.array());
+      }
     }
   }
 
@@ -125,17 +160,36 @@ public class FieldObject2d {
     }
 
     double[] arr = m_entry.getDoubleArray((double[]) null);
-    if (arr == null) {
-      return;
-    }
+    if (arr != null) {
+      if ((arr.length % 3) != 0) {
+        return;
+      }
 
-    if ((arr.length % 3) != 0) {
-      return;
-    }
+      m_poses.clear();
+      for (int i = 0; i < arr.length; i += 3) {
+        m_poses.add(new Pose2d(arr[i], arr[i + 1], Rotation2d.fromDegrees(arr[i + 2])));
+      }
+    } else {
+      // read as raw array of doubles
+      byte[] data = m_entry.getRaw((byte[]) null);
+      if (data == null) {
+        return;
+      }
 
-    m_poses.clear();
-    for (int i = 0; i < arr.length; i += 3) {
-      m_poses.add(new Pose2d(arr[i], arr[i + 1], Rotation2d.fromDegrees(arr[i + 2])));
+      // must be triples of doubles
+      if ((data.length % (3 * 8)) != 0) {
+        return;
+      }
+      ByteBuffer input = ByteBuffer.wrap(data);
+      input.order(ByteOrder.BIG_ENDIAN);
+
+      m_poses.clear();
+      for (int i = 0; i < (data.length / (3 * 8)); i++) {
+        double x = input.getDouble();
+        double y = input.getDouble();
+        double rot = input.getDouble();
+        m_poses.add(new Pose2d(x, y, Rotation2d.fromDegrees(rot)));
+      }
     }
   }
 

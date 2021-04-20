@@ -38,6 +38,4 @@ void glass::DisplayStringChooser(StringChooserModel* model) {
     }
     ImGui::EndCombo();
   }
-
-  ImGui::SameLine();
 }

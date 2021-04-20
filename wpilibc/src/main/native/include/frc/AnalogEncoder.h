@@ -24,6 +24,13 @@ class AnalogInput;
 class AnalogEncoder : public Sendable, public SendableHelper<AnalogEncoder> {
  public:
   /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  explicit AnalogEncoder(int channel);
+
+  /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
