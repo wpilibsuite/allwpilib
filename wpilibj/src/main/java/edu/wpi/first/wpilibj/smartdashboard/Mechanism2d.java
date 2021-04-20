@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * 2D representation of arms, elevators, and general mechanisms.
+ * Visual 2D representation of arms, elevators, and general mechanisms; through a node-based API.
+ *
+ * A Mechanism2d object is published and contains at least one root node. Other nodes (such as
+ * ligaments) are recursively based on other nodes.
  *
  * @see MechanismObject2d
  * @see MechanismLigament2d

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
- * Ligament on a Mechanism2d.
+ * Ligament node on a Mechanism2d.
  *
  * @see Mechanism2d
  */
@@ -59,6 +59,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the angle, in degrees
    */
   public synchronized double getAngle() {
+    if (m_angleEntry != null) {
+      m_angle = m_angleEntry.getDouble(0.0);
+    }
     return m_angle;
   }
 
@@ -78,6 +81,9 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the line length
    */
   public synchronized double getLength() {
+    if (m_lengthEntry != null) {
+      m_length = m_lengthEntry.getDouble(0.0);
+    }
     return m_length;
   }
 

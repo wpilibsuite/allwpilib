@@ -4,9 +4,7 @@
 
 #include "frc/smartdashboard/Mechanism2d.h"
 
-#include <ios>
-
-#include <wpi/raw_ostream.h>
+#include <cstdio>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 
@@ -15,14 +13,16 @@ using namespace frc;
 static constexpr char kBackgroundColor[] = "backgroundColor";
 static constexpr char kDims[] = "dims";
 
-Mechanism2d::Mechanism2d(double width, double height) : m_width {width}, m_height{height} {}
+Mechanism2d::Mechanism2d(double width, double height)
+    : m_width{width}, m_height{height} {}
 
 MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
   auto& obj = m_roots[name];
-  if (obj.get()) {
+  if (obj) {
     return obj.get();
   }
-  obj = std::make_unique<MechanismRoot2d>(name, x, y, MechanismRoot2d::private_init{});
+  obj = std::make_unique<MechanismRoot2d>(name, x, y,
+                                          MechanismRoot2d::private_init{});
   MechanismRoot2d* ex = obj.get();
   if (m_table) {
     ex->Update(m_table->GetSubTable(name));
@@ -32,7 +32,8 @@ MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   char buf[10];
-  std::snprintf(buf, sizeof(buf), "#%02x%02x%02x", color.red, color.green, color.blue);
+  std::snprintf(buf, sizeof(buf), "#%02x%02x%02x", color.red, color.green,
+                color.blue);
   if (m_table) {
     m_table->GetEntry(kBackgroundColor).SetString(buf);
   }

@@ -4,20 +4,29 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
-#include "MechanismObject2d.h"
+#include <memory>
+
 #include <networktables/NetworkTableEntry.h>
+#include <wpi/Twine.h>
+
+#include "MechanismObject2d.h"
 
 namespace frc {
 
+/**
+ * Root Mechanism2d node.
+ *
+ * Do not create objects of this class directly! Obtain pointers from the
+ * Mechanism2d.GetRoot() factory method.
+ */
 class MechanismRoot2d : private MechanismObject2d {
   friend class Mechanism2d;
   struct private_init {};
-  static constexpr char kPosition[] = "pos";
 
  public:
-  MechanismRoot2d(const wpi::Twine& name, double x, double y, const private_init& tag);
-  MechanismRoot2d(const frc::MechanismRoot2d& rhs);
+  MechanismRoot2d(const wpi::Twine& name, double x, double y,
+                  const private_init& tag);
+  explicit MechanismRoot2d(const frc::MechanismRoot2d& rhs);
   MechanismRoot2d& operator=(MechanismRoot2d&& rhs);
 
   /**
@@ -32,11 +41,11 @@ class MechanismRoot2d : private MechanismObject2d {
 
   using MechanismObject2d::Append;
 
-  private:
+ private:
   void UpdateEntries(std::shared_ptr<NetworkTable> table) override;
   inline void Flush();
   double m_x;
   double m_y;
   nt::NetworkTableEntry m_posEntry;
 };
-}
+}  // namespace frc

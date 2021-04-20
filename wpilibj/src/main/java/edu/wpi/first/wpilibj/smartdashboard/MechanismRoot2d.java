@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A Mechanism2d root node.
+ * Root Mechanism2d node.
  *
- * @see Mechanism2d
+ * <p>Do not create objects of this class directly! Obtain instances from the
+ * {@link Mechanism2d#getRoot(String, double, double)} factory method.
+ *
+ * <p>Append other nodes by using {@link #append<T>(T)}.
  */
 public final class MechanismRoot2d {
   private final String m_name;

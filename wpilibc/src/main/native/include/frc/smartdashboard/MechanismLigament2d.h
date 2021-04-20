@@ -4,18 +4,25 @@
 
 #pragma once
 
-#include "MechanismObject2d.h"
+#include <memory>
 
 #include <networktables/NetworkTableEntry.h>
 #include <units/angle.h>
 
+#include "MechanismObject2d.h"
 #include "frc/util/Color8Bit.h"
 
 namespace frc {
 
+/**
+ * Ligament node on a Mechanism2d.
+ *
+ * @see Mechanism2d
+ */
 class MechanismLigament2d : public MechanismObject2d {
  public:
-  MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color, double length, units::degree_t angle, double lineWidth);
+  MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color,
+                      double length, units::degree_t angle, double lineWidth);
 
   /**
    * Set the ligament color.
@@ -36,7 +43,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @return the line length
    */
-  double GetLength() const;
+  double GetLength();
 
   /**
    * Set the ligament's angle relative to its parent.
@@ -50,7 +57,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @return the angle
    */
-  double GetAngle() const;
+  double GetAngle();
 
   /**
    * Set the line thickness.
@@ -73,4 +80,4 @@ class MechanismLigament2d : public MechanismObject2d {
   char m_color[10];
   nt::NetworkTableEntry m_colorEntry;
 };
-} // namespace frc
+}  // namespace frc

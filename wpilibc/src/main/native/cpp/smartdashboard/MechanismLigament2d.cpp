@@ -3,14 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/smartdashboard/MechanismLigament2d.h"
-#include <wpi/raw_ostream.h>
+
+#include <cstdio>
 
 using namespace frc;
 
-MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, const frc::Color8Bit& color,
-                                         double length, units::degree_t angle, double lineWeight)
-                                         : MechanismObject2d(name), m_length {length},
-                                         m_angle {angle.to<double>()}, m_weight {lineWeight} {
+MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name,
+                                         const frc::Color8Bit& color,
+                                         double length, units::degree_t angle,
+                                         double lineWeight)
+    : MechanismObject2d(name),
+      m_length{length},
+      m_angle{angle.to<double>()},
+      m_weight{lineWeight} {
   SetColor(color);
 }
 
@@ -25,7 +30,8 @@ void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
 }
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
-  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red, color.green, color.blue);
+  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red,
+                color.green, color.blue);
   Flush();
 }
 
@@ -39,11 +45,17 @@ void MechanismLigament2d::SetLineWeight(double lineWidth) {
   Flush();
 }
 
-double MechanismLigament2d::GetAngle() const {
+double MechanismLigament2d::GetAngle() {
+  if (m_angleEntry) {
+    m_angle = m_angleEntry.GetDouble(0.0);
+  }
   return m_angle;
 }
 
-double MechanismLigament2d::GetLength() const {
+double MechanismLigament2d::GetLength() {
+  if (m_lengthEntry) {
+    m_length = m_lengthEntry.GetDouble(0.0);
+  }
   return m_length;
 }
 
