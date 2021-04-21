@@ -26,7 +26,7 @@ class MechanismRoot2d : private MechanismObject2d {
  public:
   MechanismRoot2d(const wpi::Twine& name, double x, double y,
                   const private_init& tag);
-  explicit MechanismRoot2d(const frc::MechanismRoot2d& rhs);
+  MechanismRoot2d(const frc::MechanismRoot2d& rhs);
   MechanismRoot2d& operator=(MechanismRoot2d&& rhs);
 
   /**
