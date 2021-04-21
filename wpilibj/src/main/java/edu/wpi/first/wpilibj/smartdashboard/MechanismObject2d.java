@@ -11,8 +11,8 @@ import java.util.Map;
 /**
  * Common base class for all Mechanism2d node types.
  *
- * <p>To append another node, call {@link #append(MechanismObject2d)}. Objects that aren't appended to a published
- * {@link Mechanism2d} container are nonfunctional.
+ * <p>To append another node, call {@link #append(MechanismObject2d)}. Objects that aren't appended
+ * to a published {@link Mechanism2d} container are nonfunctional.
  *
  * @see Mechanism2d
  */
