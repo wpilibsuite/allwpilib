@@ -49,29 +49,23 @@ public class EducationalRobot extends RobotBase {
         m_ds.InAutonomous(true);
         autonomous();
         m_ds.InAutonomous(false);
-        m_ds.InDisabled(true);
         while (isAutonomousEnabled()) {
           m_ds.waitForData();
         }
-        m_ds.InDisabled(false);
       } else if (isTest()) {
         m_ds.InTest(true);
         test();
         m_ds.InTest(false);
-        m_ds.InDisabled(true);
         while (isTest() && isEnabled()) {
           m_ds.waitForData();
         }
-        m_ds.InDisabled(false);
       } else {
         m_ds.InOperatorControl(true);
         teleop();
         m_ds.InOperatorControl(false);
-        m_ds.InDisabled(true);
         while (isOperatorControlEnabled()) {
           m_ds.waitForData();
         }
-        m_ds.InDisabled(false);
       }
     }
   }
