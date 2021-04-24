@@ -6,8 +6,6 @@ package edu.wpi.first.wpilibj.examples.mechanism2d;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of arms, elevators,
@@ -17,7 +15,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * Mechanism2d object.
  */
 public class Robot extends TimedRobot {
-  private static final double kMetersPerPulse = 0.1;
+  private static final double kMetersPerPulse = 0.01;
+  private static final double kElevatorMinimumLength = 0.5;
 
   private final PWMSparkMax m_elevatorMotor = new PWMSparkMax(0);
   private final PWMSparkMax m_wristMotor = new PWMSparkMax(1);
@@ -39,13 +38,8 @@ public class Robot extends TimedRobot {
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
-    m_elevator =
-        root.append(
-            new MechanismLigament2d("elevator", new Color8Bit(Color.kDarkOrange), 10, 0, 10));
-    m_elevator.setAngle(90);
-    m_wrist =
-        m_elevator.append(
-            new MechanismLigament2d("wrist", new Color8Bit(Color.kForestGreen), 6, 90, 4));
+    m_elevator = root.append(new MechanismLigament2d("elevator", 10, 90));
+    m_wrist = m_elevator.append(new MechanismLigament2d("wrist", 6, 90));
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("Mech2d", mech);
@@ -54,7 +48,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // update the dashboard mechanism's state
-    m_elevator.setLength(m_elevatorEncoder.getDistance());
+    m_elevator.setLength(kElevatorMinimumLength + m_elevatorEncoder.getDistance());
     m_wrist.setAngle(m_wristPot.get());
   }
 

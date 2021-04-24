@@ -44,7 +44,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    * @param width the window width
    * @param height the window height
    */
-  Mechanism2d(double width, double height);
+  Mechanism2d(double width, double height, const Color8Bit& backgroundColor = {0, 0, 32});
 
   /**
    * Get or create a root in this Mechanism2d window with the given name and
@@ -72,7 +72,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
  private:
   double m_width;
   double m_height;
-  std::string m_color;
+  char m_color[10];
   mutable wpi::mutex m_mutex;
   std::shared_ptr<nt::NetworkTable> m_table;
   wpi::StringMap<std::unique_ptr<MechanismRoot2d>> m_roots;

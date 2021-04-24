@@ -26,22 +26,34 @@ public final class Mechanism2d implements Sendable {
   private NetworkTable m_table;
   private final Map<String, MechanismRoot2d> m_roots;
   private final double[] m_dims = new double[2];
-  private String m_color = "#5050FF";
+  private String m_color;
 
   /**
-   * Create a new Mechanism2d window with the given dimensions.
+   * Create a new Mechanism2d with the given dimensions and default color (dark blue).
    *
-   * @param width the window width
-   * @param height the window height
+   * @param width the width
+   * @param height the height
    */
   public Mechanism2d(double width, double height) {
-    m_roots = new HashMap<>();
-    m_dims[0] = width;
-    m_dims[1] = height;
+    this(width, height, new Color8Bit(0, 0, 32));
   }
 
   /**
-   * Get or create a root in this Mechanism2d window with the given name and position.
+   * Create a new Mechanism2d with the given dimensions.
+   *
+   * @param width the width
+   * @param height the height
+   * @param backgroundColor the background color. Defaults to dark blue.
+   */
+  public Mechanism2d(double width, double height, Color8Bit backgroundColor) {
+    m_roots = new HashMap<>();
+    m_dims[0] = width;
+    m_dims[1] = height;
+    setBackgroundColor(backgroundColor);
+  }
+
+  /**
+   * Get or create a root in this Mechanism2d with the given name and position.
    *
    * <p>If a root with the given name already exists, the given x and y coordinates are not used.
    *
@@ -65,9 +77,9 @@ public final class Mechanism2d implements Sendable {
   }
 
   /**
-   * Set the Mechanism2d window background color.
+   * Set the Mechanism2d background color.
    *
-   * @param color the new background color
+   * @param color the new color
    */
   public synchronized void setBackgroundColor(Color8Bit color) {
     this.m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);

@@ -9,9 +9,9 @@
 using namespace frc;
 
 MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name,
-                                         const frc::Color8Bit& color,
                                          double length, units::degree_t angle,
-                                         double lineWeight)
+                                         double lineWeight,
+                                         const frc::Color8Bit& color)
     : MechanismObject2d(name),
       m_length{length},
       m_angle{angle.to<double>()},

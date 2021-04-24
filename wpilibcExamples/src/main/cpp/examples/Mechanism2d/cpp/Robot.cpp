@@ -24,7 +24,8 @@
  * destructed!
  */
 class Robot : public frc::TimedRobot {
-  static constexpr double kMetersPerPulse = 0.1;
+  static constexpr double kMetersPerPulse = 0.01;
+  static constexpr double kElevatorMinimumLength = 0.5;
 
  public:
   void RobotInit() override {
@@ -35,7 +36,7 @@ class Robot : public frc::TimedRobot {
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
-    m_elevator->SetLength(m_elevatorEncoder.GetDistance());
+    m_elevator->SetLength(kElevatorMinimumLength + m_elevatorEncoder.GetDistance());
     m_wrist->SetAngle(units::degree_t(m_wristPotentiometer.Get()));
   }
 
@@ -54,15 +55,13 @@ class Robot : public frc::TimedRobot {
   // the main mechanism object
   frc::Mechanism2d m_mech{200, 200};
   // the mechanism root node
-  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 40, 50);
+  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 80, 100);
   // MechanismLigament2d objects represent each "section"/"stage" of the
   // mechanism, and are based off the root node or another ligament object
   frc::MechanismLigament2d* m_elevator =
-      m_root->Append<frc::MechanismLigament2d>(
-          "elevator", frc::Color::kDarkOrange, 50, 90_deg, 20);
+      m_root->Append<frc::MechanismLigament2d>("elevator", 10, 0_deg);
   frc::MechanismLigament2d* m_wrist =
-      m_elevator->Append<frc::MechanismLigament2d>(
-          "wrist", frc::Color::kForestGreen, 30, 180_deg, 8);
+      m_elevator->Append<frc::MechanismLigament2d>("wrist", 6, 90_deg);
 };
 
 #ifndef RUNNING_FRC_TESTS

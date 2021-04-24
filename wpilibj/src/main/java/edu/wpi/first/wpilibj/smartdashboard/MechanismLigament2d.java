@@ -26,12 +26,17 @@ public class MechanismLigament2d extends MechanismObject2d {
 
   /** Create a new ligament. */
   public MechanismLigament2d(
-      String name, Color8Bit color, double length, double angle, double lineWidth) {
+      String name, double length, double angle, double lineWidth, Color8Bit color) {
     super(name);
     setColor(color);
     setLength(length);
     setAngle(angle);
     setLineWeight(lineWidth);
+  }
+
+  /** Create a new ligament with the default color (dark blue) and thickness (6). */
+  public MechanismLigament2d(String name, double length, double angle) {
+    this(name, length, angle, 10, new Color8Bit(235, 137, 52));
   }
 
   /**
