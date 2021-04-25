@@ -8,8 +8,8 @@
 
 using namespace frc;
 
-MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name,
-                                         double length, units::degree_t angle,
+MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, double length,
+                                         units::degree_t angle,
                                          double lineWeight,
                                          const frc::Color8Bit& color)
     : MechanismObject2d(name),

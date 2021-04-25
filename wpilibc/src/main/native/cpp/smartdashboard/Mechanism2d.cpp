@@ -13,7 +13,8 @@ using namespace frc;
 static constexpr char kBackgroundColor[] = "backgroundColor";
 static constexpr char kDims[] = "dims";
 
-Mechanism2d::Mechanism2d(double width, double height, const Color8Bit& backgroundColor)
+Mechanism2d::Mechanism2d(double width, double height,
+                         const Color8Bit& backgroundColor)
     : m_width{width}, m_height{height} {
   SetBackgroundColor(backgroundColor);
 }
@@ -33,8 +34,8 @@ MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
-  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red, color.green,
-                color.blue);
+  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red,
+                color.green, color.blue);
   if (m_table) {
     m_table->GetEntry(kBackgroundColor).SetString(m_color);
   }
