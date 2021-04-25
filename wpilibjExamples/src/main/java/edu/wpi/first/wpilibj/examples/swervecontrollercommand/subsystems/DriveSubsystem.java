@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -68,7 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        new Rotation2d(getHeading()),
+        m_gyro.getRotation2d(),
         m_frontLeft.getState(),
         m_rearLeft.getState(),
         m_frontRight.getState(),
