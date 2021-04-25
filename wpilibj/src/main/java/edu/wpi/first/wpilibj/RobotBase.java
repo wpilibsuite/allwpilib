@@ -300,7 +300,7 @@ public abstract class RobotBase implements AutoCloseable {
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
           elements);
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+      DriverStation.reportWarning("Unfortunately, your robot has quit", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
@@ -347,7 +347,7 @@ public abstract class RobotBase implements AutoCloseable {
       m_runMutex.unlock();
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
-        DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+        DriverStation.reportWarning("Unfortunately, your robot has quit", false);
         if (errorOnExit) {
           DriverStation.reportError(
               "The startCompetition() method (or methods called by it) should have "
