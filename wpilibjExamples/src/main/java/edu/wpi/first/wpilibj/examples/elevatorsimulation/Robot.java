@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.Encoder;

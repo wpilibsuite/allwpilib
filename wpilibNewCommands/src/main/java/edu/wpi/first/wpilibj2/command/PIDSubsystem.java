@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 
 /**
  * A subsystem that uses a {@link PIDController} to control an output. The controller is run
