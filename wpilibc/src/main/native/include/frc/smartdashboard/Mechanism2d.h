@@ -44,7 +44,8 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    * @param width the width
    * @param height the height
    */
-  Mechanism2d(double width, double height, const Color8Bit& backgroundColor = {0, 0, 32});
+  Mechanism2d(double width, double height,
+              const Color8Bit& backgroundColor = {0, 0, 32});
 
   /**
    * Get or create a root in this Mechanism2d with the given name and

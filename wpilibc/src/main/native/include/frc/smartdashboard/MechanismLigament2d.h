@@ -21,8 +21,9 @@ namespace frc {
  */
 class MechanismLigament2d : public MechanismObject2d {
  public:
-  MechanismLigament2d(const wpi::Twine& name, double length, units::degree_t angle,
-                      double lineWidth = 6, const frc::Color8Bit& color = {235, 137, 52});
+  MechanismLigament2d(const wpi::Twine& name, double length,
+                      units::degree_t angle, double lineWidth = 6,
+                      const frc::Color8Bit& color = {235, 137, 52});
 
   /**
    * Set the ligament color.
