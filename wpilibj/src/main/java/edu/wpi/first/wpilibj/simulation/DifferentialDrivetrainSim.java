@@ -421,15 +421,10 @@ public class DifferentialDrivetrainSim {
     kEightInch(Units.inchesToMeters(8)),
     kTenInch(Units.inchesToMeters(10)),
 
-    /** @deprecated Use kSixInch instead */
     @Deprecated
     SixInch(Units.inchesToMeters(6)),
-
-    /** @deprecated Use kEightInch instead */
     @Deprecated
     EightInch(Units.inchesToMeters(8)),
-
-    /** @deprecated Use kTenInch instead */
     @Deprecated
     TenInch(Units.inchesToMeters(10));
 
