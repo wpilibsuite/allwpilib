@@ -61,8 +61,7 @@ public interface Gyro extends AutoCloseable {
    *
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
-   * @return the current heading of the robot as a {@link
-   *     edu.wpi.first.math.geometry.Rotation2d}.
+   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    */
   default Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-getAngle());

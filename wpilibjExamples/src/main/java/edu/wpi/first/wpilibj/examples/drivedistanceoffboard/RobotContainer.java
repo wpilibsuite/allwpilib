@@ -6,13 +6,13 @@ package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;

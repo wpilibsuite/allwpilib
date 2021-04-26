@@ -7,8 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.math.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
 
 /**

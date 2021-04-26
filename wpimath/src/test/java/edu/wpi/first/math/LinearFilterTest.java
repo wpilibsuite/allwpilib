@@ -9,11 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import java.util.Random;
 import java.util.function.DoubleFunction;
 import java.util.stream.Stream;
-
-import edu.wpi.first.math.filter.LinearFilter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

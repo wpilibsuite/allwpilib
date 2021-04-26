@@ -5,7 +5,6 @@
 package edu.wpi.first.math;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;

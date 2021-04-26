@@ -4,12 +4,12 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.wpilibj.RobotController;
 import org.ejml.MatrixDimensionException;
 import org.ejml.simple.SimpleMatrix;
 

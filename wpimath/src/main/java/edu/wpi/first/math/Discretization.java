@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.Nat;
 import org.ejml.simple.SimpleMatrix;
 
 @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})

@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.math.MathUtil;
-
 public final class DevMain {
   /** Main entry point. */
   public static void main(String[] args) {

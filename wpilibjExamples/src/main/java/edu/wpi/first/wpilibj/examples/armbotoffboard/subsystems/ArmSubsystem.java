@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.armbotoffboard.subsystems;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.Constants.ArmConstants;
 import edu.wpi.first.wpilibj.examples.armbotoffboard.ExampleSmartMotorController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 
 /** A robot arm subsystem that moves with a motion profile. */

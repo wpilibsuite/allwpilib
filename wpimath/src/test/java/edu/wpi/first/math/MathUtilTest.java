@@ -6,7 +6,6 @@ package edu.wpi.first.math;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.math.MathUtil;
 import org.junit.jupiter.api.Test;
 
 class MathUtilTest {

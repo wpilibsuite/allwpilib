@@ -4,27 +4,27 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.Discretization;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 import java.util.function.BiConsumer;
 
 /**
  * This class wraps an {@link edu.wpi.first.math.estimator.UnscentedKalmanFilter Unscented Kalman
  * Filter} to fuse latency-compensated vision measurements with differential drive encoder
  * measurements. It will correct for noisy vision measurements and encoder drift. It is intended to
- * be an easy drop-in for {@link edu.wpi.first.math.kinematics.DifferentialDriveOdometry}; in
- * fact, if you never call {@link DifferentialDrivePoseEstimator#addVisionMeasurement} and only call
+ * be an easy drop-in for {@link edu.wpi.first.math.kinematics.DifferentialDriveOdometry}; in fact,
+ * if you never call {@link DifferentialDrivePoseEstimator#addVisionMeasurement} and only call
  * {@link DifferentialDrivePoseEstimator#update} then this will behave exactly the same as
  * DifferentialDriveOdometry.
  *

@@ -4,21 +4,21 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants;
-import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
-import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
+import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.MecanumControllerCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;

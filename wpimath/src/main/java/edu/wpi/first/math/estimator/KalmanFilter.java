@@ -4,15 +4,15 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathSharedStore;
-import edu.wpi.first.math.Discretization;
-import edu.wpi.first.math.StateSpaceUtil;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
