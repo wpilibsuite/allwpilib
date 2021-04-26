@@ -8,15 +8,19 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+=======
+import edu.wpi.first.math.controller.PIDController;
+>>>>>>> Move wpilibj and wpiutil.math inside wpimath to matedu.wpi.first.math
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.VecBuilder;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.VecBuilder;
 
 /** This is a sample program to demonstrate the use of elevator simulation with existing code. */
 public class Robot extends TimedRobot {

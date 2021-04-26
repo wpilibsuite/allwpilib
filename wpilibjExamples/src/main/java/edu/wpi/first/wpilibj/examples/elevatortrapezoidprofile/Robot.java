@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.examples.elevatortrapezoidprofile;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
   private static double kDt = 0.02;

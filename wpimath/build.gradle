@@ -5,7 +5,7 @@ ext {
     groupId = 'edu.wpi.first.wpimath'
 
     nativeName = 'wpimath'
-    devMain = 'edu.wpi.first.wpiutil.math.DevMain'
+    devMain = 'edu.wpi.first.math.DevMain'
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
@@ -111,7 +111,7 @@ task generateNat() {
         def importsString = "";
 
         for(i in 0..maxNum) {
-            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
+            importsString += "import edu.wpi.first.math.numbers.N${i};\n"
             template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
         }
         template += "}\n" // Close the class body

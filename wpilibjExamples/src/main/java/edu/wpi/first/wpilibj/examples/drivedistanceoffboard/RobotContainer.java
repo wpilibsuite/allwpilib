@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.DriveConst
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.commands.DriveDistanceProfiled;
 import edu.wpi.first.wpilibj.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;

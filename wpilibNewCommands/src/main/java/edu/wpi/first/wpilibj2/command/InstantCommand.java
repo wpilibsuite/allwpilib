@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.math.util.ErrorMessages.requireNonNullParam;
 
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on the same iteration of

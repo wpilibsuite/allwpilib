@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Class to control a simulated analog encoder. */
 public class AnalogEncoderSim {

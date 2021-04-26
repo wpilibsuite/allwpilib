@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.math.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
