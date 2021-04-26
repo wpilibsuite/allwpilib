@@ -38,7 +38,7 @@ def main():
         importsString = ""
 
         for i in range(MAX_NUM + 1):
-            importsString += f"import edu.wpi.first.wpiutil.math.numbers.N{i};\n"
+            importsString += f"import edu.wpi.first.math.numbers.N{i};\n"
             template += getter.replace("${num}", str(i))
 
         template += "}\n"

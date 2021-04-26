@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.math.Discretization;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Num;
-import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.math.Discretization;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
 import org.ejml.simple.SimpleMatrix;
 
 /**

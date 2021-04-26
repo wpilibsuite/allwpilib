@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.system.NumericalJacobian;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.Num;
-import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.NumericalJacobian;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -17,7 +17,7 @@ import java.util.function.Function;
  *
  * <p>If given the vector valued function as f(x, u) where x is the state vector and u is the input
  * vector, the B matrix(continuous input matrix) is calculated through a {@link
- * edu.wpi.first.wpilibj.system.NumericalJacobian}. In this case f has to be control-affine (of the
+ * edu.wpi.first.math.system.NumericalJacobian}. In this case f has to be control-affine (of the
  * form f(x) + Bu).
  *
  * <p>The feedforward is calculated as <strong> u_ff = B<sup>+</sup> (rDot - f(x))</strong>, where
