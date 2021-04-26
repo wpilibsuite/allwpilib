@@ -39,15 +39,15 @@ namespace frc {
 class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
  public:
   /**
-   * Create a new Mechanism2d window with the given dimensions.
+   * Create a new Mechanism2d with the given dimensions and background color.
    *
-   * @param width the window width
-   * @param height the window height
+   * @param width the width
+   * @param height the height
    */
   Mechanism2d(double width, double height, const Color8Bit& backgroundColor = {0, 0, 32});
 
   /**
-   * Get or create a root in this Mechanism2d window with the given name and
+   * Get or create a root in this Mechanism2d with the given name and
    * position.
    *
    * <p>If a root with the given name already exists, the given x and y
@@ -61,7 +61,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
   MechanismRoot2d* GetRoot(wpi::StringRef name, double x, double y);
 
   /**
-   * Set the Mechanism2d window background color.
+   * Set the Mechanism2d background color.
    *
    * @param color the new background color
    */
