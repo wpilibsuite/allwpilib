@@ -69,8 +69,8 @@ dependencies {
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
 def natFileInput = file("src/generate/Nat.java.in")
 def natGetterInput = file("src/generate/NatGetter.java.in")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/Nat.java")
+def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
+def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
 def maxNum = 20
 
 task generateNumbers() {
