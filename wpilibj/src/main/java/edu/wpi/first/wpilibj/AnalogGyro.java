@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import static edu.wpi.first.math.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.AnalogGyroJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;

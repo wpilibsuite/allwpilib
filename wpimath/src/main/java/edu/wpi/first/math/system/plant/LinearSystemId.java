@@ -137,7 +137,7 @@ public final class LinearSystemId {
    * inputs are [voltage], and outputs are [velocity].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
    *
    * @param kV The velocity gain, in volts per (units per second)
    * @param kA The acceleration gain, in volts per (units per second squared)
@@ -160,7 +160,7 @@ public final class LinearSystemId {
    * velocity]^T, inputs are [voltage], and outputs are [position].
    *
    * <p>The distance unit you choose MUST be an SI unit (i.e. meters or radians). You can use the
-   * {@link edu.wpi.first.math.util.Units} class for converting between unit types.
+   * {@link edu.wpi.first.wpilibj.util.Units} class for converting between unit types.
    *
    * @param kV The velocity gain, in volts per (units per second)
    * @param kA The acceleration gain, in volts per (units per second squared)

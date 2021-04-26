@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.shuffleboard;
 
-import static edu.wpi.first.math.util.ErrorMessages.requireNonNullParam;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;

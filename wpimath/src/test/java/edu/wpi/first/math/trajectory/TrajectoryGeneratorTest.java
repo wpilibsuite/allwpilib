@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.trajectory;
 
-import static edu.wpi.first.math.util.Units.feetToMeters;
+import static edu.wpi.first.wpilibj.util.Units.feetToMeters;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -7,7 +7,7 @@ package edu.wpi.first.math.trajectory;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Units;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 

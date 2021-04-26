@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.math.util.Color;
-import edu.wpi.first.math.util.Color8Bit;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /** Buffer storage for Addressable LEDs. */
 public class AddressableLEDBuffer {

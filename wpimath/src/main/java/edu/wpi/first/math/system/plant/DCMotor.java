@@ -4,7 +4,7 @@
 
 package edu.wpi.first.math.system.plant;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Units;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor {
