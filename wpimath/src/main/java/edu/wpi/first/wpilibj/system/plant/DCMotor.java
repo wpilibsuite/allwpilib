@@ -186,7 +186,7 @@ public class DCMotor {
    *
    * @param numMotors Number of motors in the gearbox.
    */
-  public static DCMotor getRomi_TI_RSLK_MAX(int numMotors) {
+  public static DCMotor getRomiBuiltIn(int numMotors) {
     // From https://www.pololu.com/product/1520/specs
     return new DCMotor(
         4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
