@@ -180,4 +180,15 @@ public class DCMotor {
     return new DCMotor(
         12, 4.69, 257, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
   }
+
+  /**
+   * Return a gearbox of Romi/TI_RSLK MAX motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   */
+  public static DCMotor getRomi_TI_RSLK_MAX(int numMotors) {
+    // From https://www.pololu.com/product/1520/specs
+    return new DCMotor(
+        4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
+  }
 }
