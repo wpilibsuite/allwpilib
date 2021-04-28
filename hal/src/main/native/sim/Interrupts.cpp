@@ -414,11 +414,13 @@ void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
     return;
   }
 
-  synchronousInterruptHandles->ForEach([interruptHandle](SynchronousWaitDataHandle handle, SynchronousWaitData* data){
-    if (data->interruptHandle == interruptHandle) {
-      data->waitPredicate = true;
-      data->waitCond.notify_all();
-    }
-  });
+  synchronousInterruptHandles->ForEach(
+      [interruptHandle](SynchronousWaitDataHandle handle,
+                        SynchronousWaitData* data) {
+        if (data->interruptHandle == interruptHandle) {
+          data->waitPredicate = true;
+          data->waitCond.notify_all();
+        }
+      });
 }
 }  // extern "C"
