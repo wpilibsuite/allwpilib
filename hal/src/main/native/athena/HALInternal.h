@@ -8,6 +8,6 @@
 
 namespace hal {
 void ReleaseFPGAInterrupt(int32_t interruptNumber);
-const char* HAL_GetLastError(int32_t* status);
+void SetLastError(int32_t status, const wpi::Twine& value);
 
 }  // namespace hal
