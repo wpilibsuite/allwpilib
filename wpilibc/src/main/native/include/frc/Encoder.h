@@ -10,8 +10,6 @@
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -38,9 +36,7 @@ class DMASample;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public ErrorBase,
-                public CounterBase,
-                public PIDSource,
+class Encoder : public CounterBase,
                 public Sendable,
                 public SendableHelper<Encoder> {
   friend class DMA;
@@ -313,8 +309,6 @@ class Encoder : public ErrorBase,
    * @return The number of samples being averaged (from 1 to 127)
    */
   int GetSamplesToAverage() const;
-
-  double PIDGet() override;
 
   /**
    * Set the index source for the encoder.

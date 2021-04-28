@@ -10,7 +10,6 @@
 #include <wpi/StringRef.h>
 #include <wpi/Twine.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -18,9 +17,7 @@ namespace frc {
 
 class Command;
 
-class Subsystem : public ErrorBase,
-                  public Sendable,
-                  public SendableHelper<Subsystem> {
+class Subsystem : public Sendable, public SendableHelper<Subsystem> {
   friend class Scheduler;
 
  public:

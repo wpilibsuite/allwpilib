@@ -18,9 +18,9 @@
 
 using namespace nt;
 
-void Dispatcher::StartServer(const Twine& persist_filename,
+void Dispatcher::StartServer(const wpi::Twine& persist_filename,
                              const char* listen_address, unsigned int port) {
-  std::string listen_address_copy(StringRef(listen_address).trim());
+  std::string listen_address_copy(wpi::StringRef(listen_address).trim());
   DispatcherBase::StartServer(
       persist_filename,
       std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
@@ -28,7 +28,7 @@ void Dispatcher::StartServer(const Twine& persist_filename,
 }
 
 void Dispatcher::SetServer(const char* server_name, unsigned int port) {
-  std::string server_name_copy(StringRef(server_name).trim());
+  std::string server_name_copy(wpi::StringRef(server_name).trim());
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
                                       static_cast<int>(port), m_logger, 1);
@@ -36,7 +36,7 @@ void Dispatcher::SetServer(const char* server_name, unsigned int port) {
 }
 
 void Dispatcher::SetServer(
-    ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+    wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers) {
   wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
   for (const auto& server : servers) {
     servers_copy.emplace_back(std::string{server.first.trim()},
@@ -53,7 +53,7 @@ void Dispatcher::SetServer(
 }
 
 void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
-  std::pair<StringRef, unsigned int> servers[5];
+  std::pair<wpi::StringRef, unsigned int> servers[5];
 
   // 10.te.am.2
   wpi::SmallString<32> fixed;
@@ -95,7 +95,7 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
 }
 
 void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
-  std::string server_name_copy(StringRef(server_name).trim());
+  std::string server_name_copy(wpi::StringRef(server_name).trim());
   SetConnectorOverride([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
                                       static_cast<int>(port), m_logger, 1);
@@ -134,7 +134,7 @@ void DispatcherBase::StartLocal() {
 }
 
 void DispatcherBase::StartServer(
-    const Twine& persist_filename,
+    const wpi::Twine& persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
   {
     std::scoped_lock lock(m_user_mutex);
@@ -230,7 +230,7 @@ void DispatcherBase::SetUpdateRate(double interval) {
   m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
-void DispatcherBase::SetIdentity(const Twine& name) {
+void DispatcherBase::SetIdentity(const wpi::Twine& name) {
   std::scoped_lock lock(m_user_mutex);
   m_identity = name.str();
 }

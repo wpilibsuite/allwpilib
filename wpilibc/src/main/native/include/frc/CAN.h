@@ -8,8 +8,6 @@
 
 #include <hal/CANAPITypes.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 struct CANData {
   uint8_t data[8];
@@ -27,7 +25,7 @@ struct CANData {
  * All methods are thread save, however the buffer objects passed in
  * by the user need to not be modified for the duration of their calls.
  */
-class CAN : public ErrorBase {
+class CAN {
  public:
   /**
    * Create a new CAN communication interface with the specific device ID.
@@ -52,7 +50,7 @@ class CAN : public ErrorBase {
   /**
    * Closes the CAN communication.
    */
-  ~CAN() override;
+  ~CAN();
 
   CAN(CAN&&) = default;
   CAN& operator=(CAN&&) = default;

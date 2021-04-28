@@ -11,8 +11,6 @@
 #include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
@@ -27,7 +25,7 @@ namespace frc {
  * and the NI-VISA Programmer's Reference Manual here:
  *   http://www.ni.com/pdf/manuals/370132c.pdf
  */
-class SerialPort : public ErrorBase {
+class SerialPort {
  public:
   enum Parity {
     kParity_None = 0,
@@ -88,7 +86,7 @@ class SerialPort : public ErrorBase {
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
-  ~SerialPort() override;
+  ~SerialPort();
 
   SerialPort(SerialPort&& rhs) = default;
   SerialPort& operator=(SerialPort&& rhs) = default;

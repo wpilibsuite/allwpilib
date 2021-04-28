@@ -6,13 +6,13 @@
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
-#include "frc/Jaguar.h"
 #include "frc/LinearFilter.h"
 #include "frc/Notifier.h"
-#include "frc/Talon.h"
 #include "frc/Timer.h"
-#include "frc/Victor.h"
 #include "frc/controller/PIDController.h"
+#include "frc/motorcontrol/Jaguar.h"
+#include "frc/motorcontrol/Talon.h"
+#include "frc/motorcontrol/Victor.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -38,31 +38,31 @@ std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
 static constexpr double kMotorTime = 0.5;
 
 /**
- * A fixture that includes a PWM speed controller and an encoder connected to
+ * A fixture that includes a PWM motor controller and an encoder connected to
  * the same motor.
  */
 class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
-  SpeedController* m_speedController;
+  MotorController* m_motorController;
   Encoder* m_encoder;
   LinearFilter<double>* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_speedController = new Victor(TestBench::kVictorChannel);
+        m_motorController = new Victor(TestBench::kVictorChannel);
         m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
                                 TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_speedController = new Jaguar(TestBench::kJaguarChannel);
+        m_motorController = new Jaguar(TestBench::kJaguarChannel);
         m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
                                 TestBench::kJaguarEncoderChannelB);
         break;
 
       case TEST_TALON:
-        m_speedController = new Talon(TestBench::kTalonChannel);
+        m_motorController = new Talon(TestBench::kTalonChannel);
         m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
                                 TestBench::kTalonEncoderChannelB);
         break;
@@ -72,13 +72,13 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
   }
 
   void TearDown() override {
-    delete m_speedController;
+    delete m_motorController;
     delete m_encoder;
     delete m_filter;
   }
 
   void Reset() {
-    m_speedController->Set(0.0);
+    m_motorController->Set(0.0);
     m_encoder->Reset();
     m_filter->Reset();
   }
@@ -90,10 +90,10 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
 TEST_P(MotorEncoderTest, Increment) {
   Reset();
 
-  /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(0.2f);
+  /* Drive the motor controller briefly to move the encoder */
+  m_motorController->Set(0.2f);
   Wait(kMotorTime);
-  m_speedController->Set(0.0);
+  m_motorController->Set(0.0);
 
   /* The encoder should be positive now */
   EXPECT_GT(m_encoder->Get(), 0)
@@ -106,10 +106,10 @@ TEST_P(MotorEncoderTest, Increment) {
 TEST_P(MotorEncoderTest, Decrement) {
   Reset();
 
-  /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(-0.2);
+  /* Drive the motor controller briefly to move the encoder */
+  m_motorController->Set(-0.2);
   Wait(kMotorTime);
-  m_speedController->Set(0.0);
+  m_motorController->Set(0.0);
 
   /* The encoder should be positive now */
   EXPECT_LT(m_encoder->Get(), 0.0)
@@ -122,15 +122,15 @@ TEST_P(MotorEncoderTest, Decrement) {
 TEST_P(MotorEncoderTest, ClampSpeed) {
   Reset();
 
-  m_speedController->Set(2.0);
+  m_motorController->Set(2.0);
   Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(1.0, m_speedController->Get());
+  EXPECT_FLOAT_EQ(1.0, m_motorController->Get());
 
-  m_speedController->Set(-2.0);
+  m_motorController->Set(-2.0);
   Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(-1.0, m_speedController->Get());
+  EXPECT_FLOAT_EQ(-1.0, m_motorController->Get());
 }
 
 /**
@@ -147,7 +147,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   /* 10 seconds should be plenty time to get to the reference */
   frc::Notifier pidRunner{[this, &pidController] {
     auto speed = pidController.Calculate(m_encoder->GetDistance());
-    m_speedController->Set(std::clamp(speed, -0.2, 0.2));
+    m_motorController->Set(std::clamp(speed, -0.2, 0.2));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);
@@ -174,7 +174,7 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   frc::Notifier pidRunner{[this, &pidController] {
     auto speed =
         pidController.Calculate(m_filter->Calculate(m_encoder->GetRate()));
-    m_speedController->Set(std::clamp(speed, -0.3, 0.3));
+    m_motorController->Set(std::clamp(speed, -0.3, 0.3));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
   Wait(10.0);

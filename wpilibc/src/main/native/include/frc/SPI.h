@@ -13,8 +13,6 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 class DigitalSource;
@@ -26,7 +24,7 @@ class DigitalSource;
  * It probably should not be used directly.
  *
  */
-class SPI : public ErrorBase {
+class SPI {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
 
@@ -37,7 +35,7 @@ class SPI : public ErrorBase {
    */
   explicit SPI(Port port);
 
-  ~SPI() override;
+  ~SPI();
 
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;

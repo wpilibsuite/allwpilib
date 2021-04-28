@@ -4,7 +4,7 @@
 
 #include "frc/commands/Subsystem.h"
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/commands/Command.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
@@ -24,9 +24,8 @@ void Subsystem::SetDefaultCommand(Command* command) {
   } else {
     const auto& reqs = command->GetRequirements();
     if (std::find(reqs.begin(), reqs.end(), this) == reqs.end()) {
-      wpi_setWPIErrorWithContext(
-          CommandIllegalUse, "A default command must require the subsystem");
-      return;
+      throw FRC_MakeError(err::CommandIllegalUse,
+                          "A default command must require the subsystem");
     }
 
     m_defaultCommand = command;

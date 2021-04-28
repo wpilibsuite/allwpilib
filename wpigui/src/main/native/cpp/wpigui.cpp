@@ -213,7 +213,23 @@ bool gui::Initialize(const char* title, int width, int height) {
 
   // Update window settings
   if (gContext->xPos != -1 && gContext->yPos != -1) {
-    glfwSetWindowPos(gContext->window, gContext->xPos, gContext->yPos);
+    // check to make sure the position isn't off-screen
+    bool found = false;
+    int monCount;
+    GLFWmonitor** monitors = glfwGetMonitors(&monCount);
+    for (int i = 0; i < monCount; ++i) {
+      int monXPos, monYPos, monWidth, monHeight;
+      glfwGetMonitorWorkarea(monitors[i], &monXPos, &monYPos, &monWidth,
+                             &monHeight);
+      if (gContext->xPos >= monXPos && gContext->xPos < (monXPos + monWidth) &&
+          gContext->yPos >= monYPos && gContext->yPos < (monYPos + monHeight)) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      glfwSetWindowPos(gContext->window, gContext->xPos, gContext->yPos);
+    }
     glfwShowWindow(gContext->window);
   }
 

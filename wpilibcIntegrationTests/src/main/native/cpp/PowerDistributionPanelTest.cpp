@@ -9,10 +9,10 @@
 #include <hal/Ports.h>
 
 #include "TestBench.h"
-#include "frc/Jaguar.h"
-#include "frc/Talon.h"
 #include "frc/Timer.h"
-#include "frc/Victor.h"
+#include "frc/motorcontrol/Jaguar.h"
+#include "frc/motorcontrol/Talon.h"
+#include "frc/motorcontrol/Victor.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -47,10 +47,8 @@ TEST_F(PowerDistributionPanelTest, CheckRepeatedCalls) {
   for (int i = 0; i < 50; i++) {
     for (int j = 0; j < numChannels; j++) {
       m_pdp->GetCurrent(j);
-      ASSERT_TRUE(m_pdp->GetError().GetCode() == 0);
     }
     m_pdp->GetVoltage();
-    ASSERT_TRUE(m_pdp->GetError().GetCode() == 0);
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
 }

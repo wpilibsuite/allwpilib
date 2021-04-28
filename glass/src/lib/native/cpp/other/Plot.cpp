@@ -174,6 +174,7 @@ PlotSeries::PlotSeries(wpi::StringRef id) : m_id(id) {
 
 PlotSeries::PlotSeries(DataSource* source, int yAxis) : m_yAxis(yAxis) {
   SetSource(source);
+  m_id = source->GetId();
 }
 
 void PlotSeries::CheckSource() {
@@ -191,7 +192,6 @@ void PlotSeries::CheckSource() {
 
 void PlotSeries::SetSource(DataSource* source) {
   m_source = source;
-  m_id = source->GetId();
 
   // add initial value
   m_data[m_size++] = ImPlotPoint{wpi::Now() * 1.0e-6, source->GetValue()};
@@ -374,9 +374,15 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImPlot::EndLegendDragDropSource();
   }
 
+  // Show full source name tooltip
+  if (!m_name.empty() && ImPlot::IsLegendEntryHovered(label)) {
+    ImGui::SetTooltip("%s", m_id.c_str());
+  }
+
   // Edit settings via popup
   Action rv = kNone;
   if (ImPlot::BeginLegendPopup(label)) {
+    ImGui::TextUnformatted(m_id.c_str());
     if (ImGui::Button("Close")) {
       ImGui::CloseCurrentPopup();
     }
@@ -983,10 +989,25 @@ void PlotProvider::DisplayMenu() {
   }
 
   if (ImGui::MenuItem("New Plot Window")) {
+    // this is an inefficient algorithm, but the number of windows is small
     char id[32];
-    std::snprintf(id, sizeof(id), "Plot <%d>",
-                  static_cast<int>(m_windows.size()));
-    AddWindow(id, std::make_unique<PlotView>(this));
+    size_t numWindows = m_windows.size();
+    for (size_t i = 0; i <= numWindows; ++i) {
+      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      bool match = false;
+      for (size_t j = i; j < numWindows; ++j) {
+        if (m_windows[j]->GetId() == id) {
+          match = true;
+          break;
+        }
+      }
+      if (!match) {
+        break;
+      }
+    }
+    if (auto win = AddWindow(id, std::make_unique<PlotView>(this))) {
+      win->SetDefaultSize(700, 400);
+    }
   }
 }
 

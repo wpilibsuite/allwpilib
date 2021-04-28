@@ -4,8 +4,8 @@
 
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <wpi/math>
 

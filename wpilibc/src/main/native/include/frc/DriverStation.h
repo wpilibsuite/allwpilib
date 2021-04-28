@@ -15,8 +15,6 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 class MatchDataSender;
@@ -25,12 +23,12 @@ class MatchDataSender;
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation : public ErrorBase {
+class DriverStation {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
-  ~DriverStation() override;
+  ~DriverStation();
 
   DriverStation(const DriverStation&) = delete;
   DriverStation& operator=(const DriverStation&) = delete;

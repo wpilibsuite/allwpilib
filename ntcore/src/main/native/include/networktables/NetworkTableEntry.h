@@ -23,10 +23,6 @@
 
 namespace nt {
 
-using wpi::ArrayRef;
-using wpi::StringRef;
-using wpi::Twine;
-
 class NetworkTableInstance;
 
 /**
@@ -147,7 +143,7 @@ class NetworkTableEntry final {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::string GetString(StringRef defaultValue) const;
+  std::string GetString(wpi::StringRef defaultValue) const;
 
   /**
    * Gets the entry's value as a raw. If the entry does not exist or is of
@@ -156,7 +152,7 @@ class NetworkTableEntry final {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::string GetRaw(StringRef defaultValue) const;
+  std::string GetRaw(wpi::StringRef defaultValue) const;
 
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
@@ -172,7 +168,7 @@ class NetworkTableEntry final {
    *       because std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  std::vector<int> GetBooleanArray(ArrayRef<int> defaultValue) const;
+  std::vector<int> GetBooleanArray(wpi::ArrayRef<int> defaultValue) const;
 
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
@@ -201,7 +197,7 @@ class NetworkTableEntry final {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::vector<double> GetDoubleArray(ArrayRef<double> defaultValue) const;
+  std::vector<double> GetDoubleArray(wpi::ArrayRef<double> defaultValue) const;
 
   /**
    * Gets the entry's value as a double array. If the entry does not exist
@@ -227,7 +223,7 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<std::string> GetStringArray(
-      ArrayRef<std::string> defaultValue) const;
+      wpi::ArrayRef<std::string> defaultValue) const;
 
   /**
    * Gets the entry's value as a string array. If the entry does not exist
@@ -272,7 +268,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultString(const Twine& defaultValue);
+  bool SetDefaultString(const wpi::Twine& defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -280,7 +276,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultRaw(StringRef defaultValue);
+  bool SetDefaultRaw(wpi::StringRef defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -288,7 +284,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultBooleanArray(ArrayRef<int> defaultValue);
+  bool SetDefaultBooleanArray(wpi::ArrayRef<int> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -304,7 +300,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultDoubleArray(ArrayRef<double> defaultValue);
+  bool SetDefaultDoubleArray(wpi::ArrayRef<double> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -320,7 +316,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultStringArray(ArrayRef<std::string> defaultValue);
+  bool SetDefaultStringArray(wpi::ArrayRef<std::string> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -360,7 +356,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetString(const Twine& value);
+  bool SetString(const wpi::Twine& value);
 
   /**
    * Sets the entry's value.
@@ -368,7 +364,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetRaw(StringRef value);
+  bool SetRaw(wpi::StringRef value);
 
   /**
    * Sets the entry's value.
@@ -376,7 +372,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(ArrayRef<bool> value);
+  bool SetBooleanArray(wpi::ArrayRef<bool> value);
 
   /**
    * Sets the entry's value.
@@ -392,7 +388,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(ArrayRef<int> value);
+  bool SetBooleanArray(wpi::ArrayRef<int> value);
 
   /**
    * Sets the entry's value.
@@ -408,7 +404,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDoubleArray(ArrayRef<double> value);
+  bool SetDoubleArray(wpi::ArrayRef<double> value);
 
   /**
    * Sets the entry's value.
@@ -424,7 +420,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetStringArray(ArrayRef<std::string> value);
+  bool SetStringArray(wpi::ArrayRef<std::string> value);
 
   /**
    * Sets the entry's value.
@@ -464,7 +460,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetString(const Twine& value);
+  void ForceSetString(const wpi::Twine& value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -472,7 +468,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetRaw(StringRef value);
+  void ForceSetRaw(wpi::StringRef value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -480,7 +476,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetBooleanArray(ArrayRef<bool> value);
+  void ForceSetBooleanArray(wpi::ArrayRef<bool> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -496,7 +492,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetBooleanArray(ArrayRef<int> value);
+  void ForceSetBooleanArray(wpi::ArrayRef<int> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -512,7 +508,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetDoubleArray(ArrayRef<double> value);
+  void ForceSetDoubleArray(wpi::ArrayRef<double> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -528,7 +524,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetStringArray(ArrayRef<std::string> value);
+  void ForceSetStringArray(wpi::ArrayRef<std::string> value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -600,7 +596,7 @@ class NetworkTableEntry final {
    * @param params      parameter
    * @return RPC call object.
    */
-  RpcCall CallRpc(StringRef params);
+  RpcCall CallRpc(wpi::StringRef params);
 
   /**
    * Add a listener for changes to this entry.

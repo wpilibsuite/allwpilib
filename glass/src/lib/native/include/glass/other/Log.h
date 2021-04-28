@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <wpi/Twine.h>
@@ -20,10 +21,11 @@ class LogData {
 
   void Clear();
   void Append(const wpi::Twine& msg);
+  const std::string& GetBuffer();
 
  private:
   size_t m_maxLines;
-  std::vector<char> m_buf;
+  std::string m_buf;
   std::vector<size_t> m_lineOffsets{0};
 };
 

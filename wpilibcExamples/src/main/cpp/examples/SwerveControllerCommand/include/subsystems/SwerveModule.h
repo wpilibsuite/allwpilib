@@ -5,11 +5,11 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/Spark.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/motorcontrol/Spark.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <wpi/math>
 

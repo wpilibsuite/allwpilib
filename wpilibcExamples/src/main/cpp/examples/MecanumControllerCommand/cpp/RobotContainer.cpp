@@ -96,7 +96,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
       [this](units::volt_t frontLeft, units::volt_t rearLeft,
              units::volt_t frontRight, units::volt_t rearRight) {
-        m_drive.SetSpeedControllersVolts(frontLeft, rearLeft, frontRight,
+        m_drive.SetMotorControllersVolts(frontLeft, rearLeft, frontRight,
                                          rearRight);
       },
 

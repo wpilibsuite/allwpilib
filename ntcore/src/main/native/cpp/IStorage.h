@@ -50,10 +50,10 @@ class IStorage {
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
-  virtual const char* SavePersistent(const Twine& filename,
+  virtual const char* SavePersistent(const wpi::Twine& filename,
                                      bool periodic) const = 0;
   virtual const char* LoadPersistent(
-      const Twine& filename,
+      const wpi::Twine& filename,
       std::function<void(size_t line, const char* msg)> warn) = 0;
 };
 

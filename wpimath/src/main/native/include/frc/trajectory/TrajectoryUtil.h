@@ -36,19 +36,19 @@ class TrajectoryUtil {
   static Trajectory FromPathweaverJson(const wpi::Twine& path);
 
   /**
-     * Deserializes a Trajectory from PathWeaver-style JSON.
-
-     * @param json the string containing the serialized JSON
-
-     * @return the trajectory represented by the JSON
-     */
+   * Deserializes a Trajectory from PathWeaver-style JSON.
+   *
+   * @param json the string containing the serialized JSON
+   *
+   * @return the trajectory represented by the JSON
+   */
   static std::string SerializeTrajectory(const Trajectory& trajectory);
 
   /**
    * Serializes a Trajectory to PathWeaver-style JSON.
-
+   *
    * @param trajectory the trajectory to export
-
+   *
    * @return the string containing the serialized JSON
    */
   static Trajectory DeserializeTrajectory(wpi::StringRef json_str);

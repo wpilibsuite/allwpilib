@@ -14,7 +14,7 @@ namespace nt {
 
 class IRpcServer {
  public:
-  typedef std::function<void(StringRef result)> SendResponseFunc;
+  typedef std::function<void(wpi::StringRef result)> SendResponseFunc;
 
   IRpcServer() = default;
   IRpcServer(const IRpcServer&) = delete;
@@ -24,7 +24,7 @@ class IRpcServer {
   virtual void RemoveRpc(unsigned int rpc_uid) = 0;
 
   virtual void ProcessRpc(unsigned int local_id, unsigned int call_uid,
-                          StringRef name, StringRef params,
+                          wpi::StringRef name, wpi::StringRef params,
                           const ConnectionInfo& conn,
                           SendResponseFunc send_response,
                           unsigned int rpc_uid) = 0;

@@ -7,8 +7,6 @@
 #include <memory>
 
 #include "frc/AnalogInput.h"
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -23,9 +21,7 @@ class SendableBuilder;
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public ErrorBase,
-                            public PIDSource,
-                            public Sendable,
+class AnalogAccelerometer : public Sendable,
                             public SendableHelper<AnalogAccelerometer> {
  public:
   /**
@@ -96,13 +92,6 @@ class AnalogAccelerometer : public ErrorBase,
    * @param zero The zero G voltage.
    */
   void SetZero(double zero);
-
-  /**
-   * Get the Acceleration for the PID Source parent.
-   *
-   * @return The current acceleration in Gs.
-   */
-  double PIDGet() override;
 
   void InitSendable(SendableBuilder& builder) override;
 

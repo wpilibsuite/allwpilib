@@ -9,7 +9,7 @@
 
 #include "frc/AnalogTrigger.h"
 #include "frc/AnalogTriggerType.h"
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -18,7 +18,7 @@ bool AnalogTriggerOutput::Get() const {
   bool result = HAL_GetAnalogTriggerOutput(
       m_trigger->m_trigger, static_cast<HAL_AnalogTriggerType>(m_outputType),
       &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Get");
   return result;
 }
 

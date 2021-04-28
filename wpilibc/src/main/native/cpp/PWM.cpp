@@ -11,140 +11,96 @@
 #include <hal/PWM.h>
 #include <hal/Ports.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-PWM::PWM(int channel) {
+PWM::PWM(int channel, bool registerSendable) {
   if (!SensorUtil::CheckPWMChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "PWM Channel " + wpi::Twine(channel));
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "PWM Channel " + wpi::Twine{channel});
     return;
   }
 
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPWMChannels(), channel);
-    m_channel = std::numeric_limits<int>::max();
-    m_handle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "PWM Channel " + wpi::Twine{channel});
 
   m_channel = channel;
 
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetPWMDisabled");
   status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, false, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetPWMEliminateDeadband");
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
-
-  SetSafetyEnabled(false);
+  if (registerSendable) {
+    SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
+  }
 }
 
 PWM::~PWM() {
   int32_t status = 0;
 
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "SetPWMDisabled");
 
   HAL_FreePWMPort(m_handle, &status);
-  wpi_setHALError(status);
-}
-
-void PWM::StopMotor() {
-  SetDisabled();
-}
-
-void PWM::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "PWM " << GetChannel();
+  FRC_ReportError(status, "FreePWM");
 }
 
 void PWM::SetRaw(uint16_t value) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
   HAL_SetPWMRaw(m_handle, value, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetRaw");
 }
 
 uint16_t PWM::GetRaw() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
-
   int32_t status = 0;
   uint16_t value = HAL_GetPWMRaw(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "GetRaw");
 
   return value;
 }
 
 void PWM::SetPosition(double pos) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetPWMPosition(m_handle, pos, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetPosition");
 }
 
 double PWM::GetPosition() const {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
   int32_t status = 0;
   double position = HAL_GetPWMPosition(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "GetPosition");
   return position;
 }
 
 void PWM::SetSpeed(double speed) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
-  wpi_setHALError(status);
-
-  Feed();
+  FRC_CheckErrorStatus(status, "SetSpeed");
 }
 
 double PWM::GetSpeed() const {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
   int32_t status = 0;
   double speed = HAL_GetPWMSpeed(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "GetSpeed");
   return speed;
 }
 
 void PWM::SetDisabled() {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
-
   HAL_SetPWMDisabled(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetDisabled");
 }
 
 void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
 
   switch (mult) {
@@ -163,49 +119,35 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
       wpi_assert(false);
   }
 
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetPeriodMultiplier");
 }
 
 void PWM::SetZeroLatch() {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   int32_t status = 0;
-
   HAL_LatchPWMZero(m_handle, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetZeroLatch");
 }
 
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "EnableDeadbandElimination");
 }
 
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
                    &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetBounds");
 }
 
 void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
                        int min) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
                       &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "SetRawBounds");
 }
 
 void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
@@ -213,7 +155,7 @@ void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
   int32_t status = 0;
   HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
                       &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "GetRawBounds");
 }
 
 int PWM::GetChannel() const {
@@ -223,8 +165,7 @@ int PWM::GetChannel() const {
 void PWM::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { SetDisabled(); });
+  builder.SetSafeState([=] { SetDisabled(); });
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetRaw(); },
-      [=](double value) { SetRaw(value); });
+      "Value", [=] { return GetRaw(); }, [=](double value) { SetRaw(value); });
 }

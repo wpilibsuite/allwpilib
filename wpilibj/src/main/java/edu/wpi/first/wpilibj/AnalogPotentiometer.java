@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
@@ -13,12 +12,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
  */
-public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseable {
+public class AnalogPotentiometer implements Sendable, AutoCloseable {
   private AnalogInput m_analogInput;
   private boolean m_initAnalogInput;
   private double m_fullRange;
   private double m_offset;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * AnalogPotentiometer constructor.
@@ -120,36 +118,12 @@ public class AnalogPotentiometer implements Potentiometer, Sendable, AutoCloseab
    *
    * @return The current position of the potentiometer.
    */
-  @Override
   public double get() {
     if (m_analogInput == null) {
       return m_offset;
     }
     return (m_analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * m_fullRange
         + m_offset;
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for potentiometers.");
-    }
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current reading.
-   */
-  @Override
-  public double pidGet() {
-    return get();
   }
 
   @Override

@@ -4,9 +4,9 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/MedianFilter.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and

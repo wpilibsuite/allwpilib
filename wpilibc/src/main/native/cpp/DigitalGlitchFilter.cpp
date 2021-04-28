@@ -14,9 +14,9 @@
 
 #include "frc/Counter.h"
 #include "frc/Encoder.h"
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -29,7 +29,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   std::scoped_lock lock(m_mutex);
   auto index =
       std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
-  wpi_assert(index != m_filterAllocated.end());
+  FRC_Assert(index != m_filterAllocated.end());
 
   m_channelIndex = std::distance(m_filterAllocated.begin(), index);
   *index = true;
@@ -48,12 +48,11 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
 }
 
 DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
-    : ErrorBase(std::move(rhs)), SendableHelper(std::move(rhs)) {
+    : SendableHelper(std::move(rhs)) {
   std::swap(m_channelIndex, rhs.m_channelIndex);
 }
 
 DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
   SendableHelper::operator=(std::move(rhs));
 
   std::swap(m_channelIndex, rhs.m_channelIndex);
@@ -71,35 +70,31 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
   if (input) {
     // We don't support GlitchFilters on AnalogTriggers.
     if (input->IsAnalogTrigger()) {
-      wpi_setErrorWithContext(
+      throw FRC_MakeError(
           -1, "Analog Triggers not supported for DigitalGlitchFilters");
-      return;
     }
     int32_t status = 0;
     HAL_SetFilterSelect(input->GetPortHandleForRouting(), requestedIndex,
                         &status);
-    wpi_setHALError(status);
+    FRC_CheckErrorStatus(status,
+                         "requested index " + wpi::Twine{requestedIndex});
 
     // Validate that we set it correctly.
     int actualIndex =
         HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
-    wpi_assertEqual(actualIndex, requestedIndex);
+    FRC_CheckErrorStatus(status,
+                         "requested index " + wpi::Twine{requestedIndex});
+    FRC_Assert(actualIndex == requestedIndex);
   }
 }
 
 void DigitalGlitchFilter::Add(Encoder* input) {
   Add(input->m_aSource.get());
-  if (StatusIsFatal()) {
-    return;
-  }
   Add(input->m_bSource.get());
 }
 
 void DigitalGlitchFilter::Add(Counter* input) {
   Add(input->m_upSource.get());
-  if (StatusIsFatal()) {
-    return;
-  }
   Add(input->m_downSource.get());
 }
 
@@ -109,24 +104,18 @@ void DigitalGlitchFilter::Remove(DigitalSource* input) {
 
 void DigitalGlitchFilter::Remove(Encoder* input) {
   Remove(input->m_aSource.get());
-  if (StatusIsFatal()) {
-    return;
-  }
   Remove(input->m_bSource.get());
 }
 
 void DigitalGlitchFilter::Remove(Counter* input) {
   Remove(input->m_upSource.get());
-  if (StatusIsFatal()) {
-    return;
-  }
   Remove(input->m_downSource.get());
 }
 
 void DigitalGlitchFilter::SetPeriodCycles(int fpgaCycles) {
   int32_t status = 0;
   HAL_SetFilterPeriod(m_channelIndex, fpgaCycles, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
 }
 
 void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
@@ -134,25 +123,20 @@ void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
   int fpgaCycles =
       nanoseconds * HAL_GetSystemClockTicksPerMicrosecond() / 4 / 1000;
   HAL_SetFilterPeriod(m_channelIndex, fpgaCycles, &status);
-
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
 }
 
 int DigitalGlitchFilter::GetPeriodCycles() {
   int32_t status = 0;
   int fpgaCycles = HAL_GetFilterPeriod(m_channelIndex, &status);
-
-  wpi_setHALError(status);
-
+  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
   return fpgaCycles;
 }
 
 uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
   int32_t status = 0;
   int fpgaCycles = HAL_GetFilterPeriod(m_channelIndex, &status);
-
-  wpi_setHALError(status);
-
+  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
   return static_cast<uint64_t>(fpgaCycles) * 1000L /
          static_cast<uint64_t>(HAL_GetSystemClockTicksPerMicrosecond() / 4);
 }

@@ -7,13 +7,15 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/Solenoid.h>
 
+#include "frc/Errors.h"
+
 using namespace frc;
 
 int SolenoidBase::GetAll(int module) {
   int value = 0;
   int32_t status = 0;
   value = HAL_GetAllSolenoids(module, &status);
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
   return value;
 }
 
@@ -23,7 +25,9 @@ int SolenoidBase::GetAll() const {
 
 int SolenoidBase::GetPCMSolenoidBlackList(int module) {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidBlackList(module, &status);
+  int rv = HAL_GetPCMSolenoidBlackList(module, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  return rv;
 }
 
 int SolenoidBase::GetPCMSolenoidBlackList() const {
@@ -32,7 +36,9 @@ int SolenoidBase::GetPCMSolenoidBlackList() const {
 
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
+  bool rv = HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  return rv;
 }
 
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
@@ -41,7 +47,9 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
 
 bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidVoltageFault(module, &status);
+  bool rv = HAL_GetPCMSolenoidVoltageFault(module, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  return rv;
 }
 
 bool SolenoidBase::GetPCMSolenoidVoltageFault() const {
@@ -50,7 +58,8 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault() const {
 
 void SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
-  return HAL_ClearAllPCMStickyFaults(module, &status);
+  HAL_ClearAllPCMStickyFaults(module, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
 }
 
 void SolenoidBase::ClearAllPCMStickyFaults() {

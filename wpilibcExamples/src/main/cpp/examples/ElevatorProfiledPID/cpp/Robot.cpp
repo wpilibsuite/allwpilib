@@ -4,9 +4,9 @@
 
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/ProfiledPIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/acceleration.h>
 #include <units/length.h>

@@ -22,10 +22,6 @@
 
 namespace nt {
 
-using wpi::ArrayRef;
-using wpi::StringRef;
-using wpi::Twine;
-
 /**
  * NetworkTables Instance.
  *
@@ -135,7 +131,7 @@ class NetworkTableInstance final {
    * @param name Key
    * @return Network table entry.
    */
-  NetworkTableEntry GetEntry(const Twine& name);
+  NetworkTableEntry GetEntry(const wpi::Twine& name);
 
   /**
    * Get entries starting with the given prefix.
@@ -148,7 +144,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entries.
    */
-  std::vector<NetworkTableEntry> GetEntries(const Twine& prefix,
+  std::vector<NetworkTableEntry> GetEntries(const wpi::Twine& prefix,
                                             unsigned int types);
 
   /**
@@ -162,7 +158,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entry information.
    */
-  std::vector<EntryInfo> GetEntryInfo(const Twine& prefix,
+  std::vector<EntryInfo> GetEntryInfo(const wpi::Twine& prefix,
                                       unsigned int types) const;
 
   /**
@@ -171,7 +167,7 @@ class NetworkTableInstance final {
    * @param key the key name
    * @return The network table
    */
-  std::shared_ptr<NetworkTable> GetTable(const Twine& key) const;
+  std::shared_ptr<NetworkTable> GetTable(const wpi::Twine& key) const;
 
   /**
    * Deletes ALL keys in ALL subtables (except persistent values).
@@ -193,7 +189,7 @@ class NetworkTableInstance final {
    * @return Listener handle
    */
   NT_EntryListener AddEntryListener(
-      const Twine& prefix,
+      const wpi::Twine& prefix,
       std::function<void(const EntryNotification& event)> callback,
       unsigned int flags) const;
 
@@ -287,7 +283,7 @@ class NetworkTableInstance final {
    *
    * @param name      identity to advertise
    */
-  void SetNetworkIdentity(const Twine& name);
+  void SetNetworkIdentity(const wpi::Twine& name);
 
   /**
    * Get the current network mode.
@@ -318,7 +314,7 @@ class NetworkTableInstance final {
    *                          address (UTF-8 string, null terminated)
    * @param port              port to communicate over
    */
-  void StartServer(const Twine& persist_filename = "networktables.ini",
+  void StartServer(const wpi::Twine& persist_filename = "networktables.ini",
                    const char* listen_address = "",
                    unsigned int port = kDefaultPort);
 
@@ -346,7 +342,8 @@ class NetworkTableInstance final {
    *
    * @param servers   array of server name and port pairs
    */
-  void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+  void StartClient(
+      wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers);
 
   /**
    * Starts a client using the specified servers and port.  The
@@ -355,7 +352,7 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over
    */
-  void StartClient(ArrayRef<StringRef> servers,
+  void StartClient(wpi::ArrayRef<wpi::StringRef> servers,
                    unsigned int port = kDefaultPort);
 
   /**
@@ -386,7 +383,8 @@ class NetworkTableInstance final {
    *
    * @param servers   array of server name and port pairs
    */
-  void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+  void SetServer(
+      wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers);
 
   /**
    * Sets server addresses and port for client (without restarting client).
@@ -395,7 +393,8 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over
    */
-  void SetServer(ArrayRef<StringRef> servers, unsigned int port = kDefaultPort);
+  void SetServer(wpi::ArrayRef<wpi::StringRef> servers,
+                 unsigned int port = kDefaultPort);
 
   /**
    * Sets server addresses and port for client (without restarting client).
@@ -466,7 +465,7 @@ class NetworkTableInstance final {
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
-  const char* SavePersistent(const Twine& filename) const;
+  const char* SavePersistent(const wpi::Twine& filename) const;
 
   /**
    * Load persistent values from a file.  The server automatically does this
@@ -478,7 +477,7 @@ class NetworkTableInstance final {
    * @return error string, or nullptr if successful
    */
   const char* LoadPersistent(
-      const Twine& filename,
+      const wpi::Twine& filename,
       std::function<void(size_t line, const char* msg)> warn);
 
   /**
@@ -489,7 +488,8 @@ class NetworkTableInstance final {
    * @param prefix    save only keys starting with this prefix
    * @return error string, or nullptr if successful
    */
-  const char* SaveEntries(const Twine& filename, const Twine& prefix) const;
+  const char* SaveEntries(const wpi::Twine& filename,
+                          const wpi::Twine& prefix) const;
 
   /**
    * Load table values from a file.  The file format used is identical to
@@ -501,7 +501,7 @@ class NetworkTableInstance final {
    * @return error string, or nullptr if successful
    */
   const char* LoadEntries(
-      const Twine& filename, const Twine& prefix,
+      const wpi::Twine& filename, const wpi::Twine& prefix,
       std::function<void(size_t line, const char* msg)> warn);
 
   /** @} */

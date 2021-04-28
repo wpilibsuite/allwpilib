@@ -14,6 +14,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc2/Timer.h"
 
 using namespace frc;
@@ -47,7 +48,7 @@ class Watchdog::Impl {
 Watchdog::Impl::Impl() {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
   m_thread = std::thread([=] { Main(); });
@@ -58,7 +59,7 @@ Watchdog::Impl::~Impl() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  wpi_setGlobalHALError(status);
+  FRC_ReportError(status, "stopping watchdog notifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -84,7 +85,7 @@ void Watchdog::Impl::UpdateAlarm() {
                               1e6),
         &status);
   }
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
 
 void Watchdog::Impl::Main() {
@@ -141,7 +142,11 @@ Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
-  Disable();
+  try {
+    Disable();
+  } catch (const RuntimeError& e) {
+    e.Report();
+  }
 }
 
 Watchdog::Watchdog(Watchdog&& rhs) {

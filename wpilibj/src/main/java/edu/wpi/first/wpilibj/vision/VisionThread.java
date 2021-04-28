@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.vision;
 
-import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cscore.VideoSource;
 
 /**
  * A vision thread is a special thread that runs a vision pipeline. It is a <i>daemon</i> thread; it

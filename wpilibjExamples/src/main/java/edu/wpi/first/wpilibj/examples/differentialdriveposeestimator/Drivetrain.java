@@ -6,9 +6,6 @@ package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -18,6 +15,9 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 
@@ -30,18 +30,18 @@ public class Drivetrain {
   private static final double kWheelRadius = 0.0508; // meters
   private static final int kEncoderResolution = 4096;
 
-  private final SpeedController m_leftLeader = new PWMSparkMax(1);
-  private final SpeedController m_leftFollower = new PWMSparkMax(2);
-  private final SpeedController m_rightLeader = new PWMSparkMax(3);
-  private final SpeedController m_rightFollower = new PWMSparkMax(4);
+  private final MotorController m_leftLeader = new PWMSparkMax(1);
+  private final MotorController m_leftFollower = new PWMSparkMax(2);
+  private final MotorController m_rightLeader = new PWMSparkMax(3);
+  private final MotorController m_rightFollower = new PWMSparkMax(4);
 
   private final Encoder m_leftEncoder = new Encoder(0, 1);
   private final Encoder m_rightEncoder = new Encoder(2, 3);
 
-  private final SpeedControllerGroup m_leftGroup =
-      new SpeedControllerGroup(m_leftLeader, m_leftFollower);
-  private final SpeedControllerGroup m_rightGroup =
-      new SpeedControllerGroup(m_rightLeader, m_rightFollower);
+  private final MotorControllerGroup m_leftGroup =
+      new MotorControllerGroup(m_leftLeader, m_leftFollower);
+  private final MotorControllerGroup m_rightGroup =
+      new MotorControllerGroup(m_rightLeader, m_rightFollower);
 
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 

@@ -5,11 +5,11 @@
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/RoboRioSim.h>

@@ -7,10 +7,10 @@
 #include <units/time.h>
 
 #include "frc/Encoder.h"
-#include "frc/PWMVictorSPX.h"
 #include "frc/RobotController.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/controller/PIDController.h"
+#include "frc/motorcontrol/PWMVictorSPX.h"
 #include "frc/simulation/ElevatorSim.h"
 #include "frc/simulation/EncoderSim.h"
 #include "frc/system/NumericalIntegration.h"

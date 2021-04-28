@@ -30,7 +30,7 @@ class MockEntryNotifier : public IEntryNotifier {
                unsigned int(unsigned int poller_uid, unsigned int local_id,
                             unsigned int flags));
   MOCK_METHOD5(NotifyEntry,
-               void(unsigned int local_id, StringRef name,
+               void(unsigned int local_id, wpi::StringRef name,
                     std::shared_ptr<Value> value, unsigned int flags,
                     unsigned int only_listener));
 };

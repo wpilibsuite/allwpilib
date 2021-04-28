@@ -27,7 +27,7 @@ class LoadPersistentImpl {
   LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)
       : m_is(is), m_warn(std::move(warn)) {}
 
-  bool Load(StringRef prefix, std::vector<Entry>* entries);
+  bool Load(wpi::StringRef prefix, std::vector<Entry>* entries);
 
  private:
   bool ReadLine();
@@ -138,7 +138,8 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
   return wpi::StringRef{buf.data(), buf.size()};
 }
 
-bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
+bool LoadPersistentImpl::Load(wpi::StringRef prefix,
+                              std::vector<Entry>* entries) {
   if (!ReadHeader()) {
     return false;  // header
   }
@@ -373,10 +374,10 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
 }
 
 bool Storage::LoadEntries(
-    wpi::raw_istream& is, const Twine& prefix, bool persistent,
+    wpi::raw_istream& is, const wpi::Twine& prefix, bool persistent,
     std::function<void(size_t line, const char* msg)> warn) {
   wpi::SmallString<128> prefixBuf;
-  StringRef prefixStr = prefix.toStringRef(prefixBuf);
+  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
 
   // entries to add
   std::vector<LoadPersistentImpl::Entry> entries;
@@ -456,7 +457,7 @@ bool Storage::LoadEntries(
 }
 
 const char* Storage::LoadPersistent(
-    const Twine& filename,
+    const wpi::Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
@@ -470,7 +471,7 @@ const char* Storage::LoadPersistent(
 }
 
 const char* Storage::LoadEntries(
-    const Twine& filename, const Twine& prefix,
+    const wpi::Twine& filename, const wpi::Twine& prefix,
     std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);

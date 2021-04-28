@@ -12,8 +12,6 @@
 
 #include <wpi/mutex.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
@@ -26,9 +24,9 @@ namespace frc {
  * resources; it just tracks which indices were marked in use by Allocate and
  * not yet freed by Free.
  */
-class Resource : public ErrorBase {
+class Resource {
  public:
-  ~Resource() override = default;
+  virtual ~Resource() = default;
 
   /**
    * Factory method to create a Resource allocation-tracker *if* needed.

@@ -22,8 +22,8 @@ namespace impl {
 typedef std::pair<unsigned int, unsigned int> RpcIdPair;
 
 struct RpcNotifierData : public RpcAnswer {
-  RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
-                  StringRef params_, const ConnectionInfo& conn_,
+  RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, wpi::StringRef name_,
+                  wpi::StringRef params_, const ConnectionInfo& conn_,
                   IRpcServer::SendResponseFunc send_response_)
       : RpcAnswer{entry_, call_, name_, params_, conn_},
         send_response{std::move(send_response_)} {}
@@ -93,9 +93,9 @@ class RpcServer
   unsigned int AddPolled(unsigned int poller_uid);
   void RemoveRpc(unsigned int rpc_uid) override;
 
-  void ProcessRpc(unsigned int local_id, unsigned int call_uid, StringRef name,
-                  StringRef params, const ConnectionInfo& conn,
-                  SendResponseFunc send_response,
+  void ProcessRpc(unsigned int local_id, unsigned int call_uid,
+                  wpi::StringRef name, wpi::StringRef params,
+                  const ConnectionInfo& conn, SendResponseFunc send_response,
                   unsigned int rpc_uid) override;
 
   bool PostRpcResponse(unsigned int local_id, unsigned int call_uid,

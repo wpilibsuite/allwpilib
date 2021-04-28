@@ -4,8 +4,7 @@
 
 #include "frc/Resource.h"
 
-#include "frc/ErrorBase.h"
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -31,19 +30,16 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
       return i;
     }
   }
-  wpi_setWPIErrorWithContext(NoAvailableResources, resourceDesc);
-  return std::numeric_limits<uint32_t>::max();
+  throw FRC_MakeError(err::NoAvailableResources, resourceDesc);
 }
 
 uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
   std::scoped_lock lock(m_allocateMutex);
   if (index >= m_isAllocated.size()) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
-    return std::numeric_limits<uint32_t>::max();
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, resourceDesc);
   }
   if (m_isAllocated[index]) {
-    wpi_setWPIErrorWithContext(ResourceAlreadyAllocated, resourceDesc);
-    return std::numeric_limits<uint32_t>::max();
+    throw FRC_MakeError(err::ResourceAlreadyAllocated, resourceDesc);
   }
   m_isAllocated[index] = true;
   return index;
@@ -55,12 +51,10 @@ void Resource::Free(uint32_t index) {
     return;
   }
   if (index >= m_isAllocated.size()) {
-    wpi_setWPIError(NotAllocated);
-    return;
+    throw FRC_MakeError(err::NotAllocated, "index " + wpi::Twine{index});
   }
   if (!m_isAllocated[index]) {
-    wpi_setWPIError(NotAllocated);
-    return;
+    throw FRC_MakeError(err::NotAllocated, "index " + wpi::Twine{index});
   }
   m_isAllocated[index] = false;
 }

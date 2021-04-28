@@ -7,7 +7,7 @@
 #include <hal/Accelerometer.h>
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -23,8 +23,8 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
 void BuiltInAccelerometer::SetRange(Range range) {
   if (range == kRange_16G) {
-    wpi_setWPIErrorWithContext(
-        ParameterOutOfRange, "16G range not supported (use k2G, k4G, or k8G)");
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "16G range not supported (use k2G, k4G, or k8G)");
   }
 
   HAL_SetAccelerometerActive(false);

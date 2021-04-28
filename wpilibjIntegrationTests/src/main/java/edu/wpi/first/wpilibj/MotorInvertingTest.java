@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/** Tests Inversion of motors using the SpeedController setInverted. */
+/** Tests Inversion of motors using the MotorController setInverted. */
 @RunWith(Parameterized.class)
 public class MotorInvertingTest extends AbstractComsSetup {
   static MotorEncoderFixture<?> fixture = null;

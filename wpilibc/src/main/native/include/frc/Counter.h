@@ -10,7 +10,6 @@
 
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -31,8 +30,7 @@ class DMASample;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public ErrorBase,
-                public CounterBase,
+class Counter : public CounterBase,
                 public Sendable,
                 public SendableHelper<Counter> {
   friend class DMA;

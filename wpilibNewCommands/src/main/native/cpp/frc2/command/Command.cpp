@@ -21,10 +21,9 @@ Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
 }
 
-Command::Command(const Command& rhs) : ErrorBase(rhs) {}
+Command::Command(const Command& rhs) = default;
 
 Command& Command::operator=(const Command& rhs) {
-  ErrorBase::operator=(rhs);
   m_isGrouped = false;
   return *this;
 }

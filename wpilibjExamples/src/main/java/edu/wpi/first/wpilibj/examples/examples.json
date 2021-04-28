@@ -12,7 +12,7 @@
   },
   {
     "name": "Tank Drive",
-    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with tank steering",
+    "description": "Demonstrate the use of the DifferentialDrive class doing teleop driving with tank steering",
     "tags": [
       "Actuators",
       "Joystick",
@@ -37,7 +37,7 @@
   },
   {
     "name": "Mecanum Drive",
-    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum steering",
+    "description": "Demonstrate the use of the MecanumDrive class doing teleop driving with Mecanum steering",
     "tags": [
       "Actuators",
       "Joystick",

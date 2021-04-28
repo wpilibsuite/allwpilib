@@ -12,8 +12,6 @@
 
 #include <networktables/NetworkTable.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
@@ -30,14 +28,14 @@ namespace frc {
  * This will also interact with {@link NetworkTable} by creating a table called
  * "Preferences" with all the key-value pairs.
  */
-class Preferences : public ErrorBase {
+class Preferences {
  public:
   /**
    * Get the one and only {@link Preferences} object.
    *
-   * @return pointer to the {@link Preferences}
+   * @return reference to the {@link Preferences}
    */
-  static Preferences* GetInstance();
+  static Preferences& GetInstance();
 
   /**
    * Returns a vector of all the keys.
@@ -226,7 +224,7 @@ class Preferences : public ErrorBase {
 
  protected:
   Preferences();
-  ~Preferences() override = default;
+  ~Preferences();
 
   Preferences(Preferences&&) = default;
   Preferences& operator=(Preferences&&) = default;
