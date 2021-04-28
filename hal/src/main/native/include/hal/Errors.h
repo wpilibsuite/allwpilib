@@ -126,7 +126,8 @@
 #define HAL_SIM_NOT_SUPPORTED_MESSAGE "HAL: Method not supported in sim"
 
 #define HAL_USE_LAST_ERROR -1156
-#define HAL_USE_LAST_ERROR_MESSAGE "HAL: Use HAL_GetLastError(status) to get last error"
+#define HAL_USE_LAST_ERROR_MESSAGE \
+  "HAL: Use HAL_GetLastError(status) to get last error"
 
 #define HAL_CAN_BUFFER_OVERRUN -35007
 #define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
