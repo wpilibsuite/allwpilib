@@ -408,6 +408,17 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
 
 void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
                                  int32_t* status) {
-  // Requires a fairly large rewrite to get working
+  auto interrupt = interruptHandles->Get(interruptHandle);
+  if (interrupt == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  synchronousInterruptHandles->ForEach([interruptHandle](SynchronousWaitDataHandle handle, SynchronousWaitData* data){
+    if (data->interruptHandle == interruptHandle) {
+      data->waitPredicate = true;
+      data->waitCond.notify_all();
+    }
+  });
 }
 }  // extern "C"
