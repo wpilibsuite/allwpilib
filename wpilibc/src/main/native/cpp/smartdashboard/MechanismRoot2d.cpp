@@ -16,9 +16,6 @@ MechanismRoot2d::MechanismRoot2d(const wpi::Twine& name, double x, double y,
                                  const private_init& tag)
     : MechanismObject2d(name.str()), m_x{x}, m_y{y} {}
 
-MechanismRoot2d::MechanismRoot2d(const frc::MechanismRoot2d& rhs)
-    : MechanismObject2d(rhs.GetName()) {}
-
 void MechanismRoot2d::SetPosition(double x, double y) {
   m_x = x;
   m_y = y;

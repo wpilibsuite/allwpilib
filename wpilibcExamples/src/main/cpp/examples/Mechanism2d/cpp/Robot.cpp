@@ -31,6 +31,7 @@ class Robot : public frc::TimedRobot {
   void RobotInit() override {
     m_elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
 
+    // publish to dashboard
     frc::SmartDashboard::PutData("Mech2d", &m_mech);
   }
 
@@ -54,15 +55,15 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{0};
 
   // the main mechanism object
-  frc::Mechanism2d m_mech{200, 200};
+  frc::Mechanism2d m_mech{3, 3};
   // the mechanism root node
-  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 80, 100);
+  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 3, 3);
   // MechanismLigament2d objects represent each "section"/"stage" of the
   // mechanism, and are based off the root node or another ligament object
   frc::MechanismLigament2d* m_elevator =
-      m_root->Append<frc::MechanismLigament2d>("elevator", 10, 0_deg);
+      m_root->Append<frc::MechanismLigament2d>("elevator", 1, 90_deg);
   frc::MechanismLigament2d* m_wrist =
-      m_elevator->Append<frc::MechanismLigament2d>("wrist", 6, 90_deg);
+      m_elevator->Append<frc::MechanismLigament2d>("wrist", 0.5, 90_deg);
 };
 
 #ifndef RUNNING_FRC_TESTS

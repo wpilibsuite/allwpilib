@@ -7,10 +7,12 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <networktables/NetworkTable.h>
 #include <wpi/StringMap.h>
+#include <wpi/Twine.h>
 
 namespace frc {
 

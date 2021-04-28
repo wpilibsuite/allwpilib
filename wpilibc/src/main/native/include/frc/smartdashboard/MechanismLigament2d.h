@@ -9,7 +9,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <units/angle.h>
 
-#include "MechanismObject2d.h"
+#include "frc/smartdashboard/MechanismObject2d.h"
 #include "frc/util/Color8Bit.h"
 
 namespace frc {
