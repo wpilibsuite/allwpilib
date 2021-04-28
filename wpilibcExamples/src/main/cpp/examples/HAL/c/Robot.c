@@ -65,7 +65,7 @@ int main(void) {
   HAL_DigitalHandle pwmPort = HAL_InitializePWMPort(HAL_GetPort(2), &status);
 
   if (status != 0) {
-    const char* message = HAL_GetErrorMessage(status);
+    const char* message = HAL_GetLastError(status);
     printf("%s\n", message);
     return 1;
   }
@@ -78,7 +78,7 @@ int main(void) {
   HAL_DigitalHandle dio = HAL_InitializeDIOPort(HAL_GetPort(2), 1, &status);
 
   if (status != 0) {
-    const char* message = HAL_GetErrorMessage(status);
+    const char* message = HAL_GetLastError(status);
     printf("%s\n", message);
     status = 0;
     HAL_FreePWMPort(pwmPort, &status);

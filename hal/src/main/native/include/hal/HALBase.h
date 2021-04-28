@@ -23,6 +23,17 @@ extern "C" {
 #endif
 
 /**
+ * Gets the last error set on this thread, or the message for the status code.
+ *
+ * If passed HAL_USE_LAST_ERROR, the last error set on the thread will be returned.
+ *
+ * @param code  the status code, set to the error status code if input is HAL_USE_LAST_ERROR
+ * @return      the error message for the code. This does not need to be freed, but can be
+ *      overwritten by another hal call on the same thread.
+ */
+const char* HAL_GetLastError(int32_t* status);
+
+/**
  * Gets the error message for a specific status code.
  *
  * @param code the status code

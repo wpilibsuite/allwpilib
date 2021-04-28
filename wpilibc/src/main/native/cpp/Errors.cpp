@@ -36,10 +36,10 @@ void RuntimeError::Report() const {
                 m_data->stack.c_str(), 1);
 }
 
-const char* frc::GetErrorMessage(int32_t code) {
+const char* frc::GetErrorMessage(int32_t* code) {
   using namespace err;
   using namespace warn;
-  switch (code) {
+  switch (*code) {
 #define S(label, offset, message) \
   case label:                     \
     return message;
@@ -47,7 +47,7 @@ const char* frc::GetErrorMessage(int32_t code) {
 #include "frc/WPIWarnings.mac"
 #undef S
     default:
-      return HAL_GetErrorMessage(code);
+      return HAL_GetLastError(code);
   }
 }
 
@@ -57,7 +57,7 @@ void frc::ReportError(int32_t status, const wpi::Twine& message,
   if (status == 0) {
     return;
   }
-  const char* statusMessage = GetErrorMessage(status);
+  const char* statusMessage = GetErrorMessage(&status);
   auto stack = wpi::GetStackTrace(2);
   wpi::SmallString<128> buf;
   HAL_SendError(status < 0, status, 0,
@@ -70,7 +70,7 @@ void frc::ReportError(int32_t status, const wpi::Twine& message,
 RuntimeError frc::MakeError(int32_t status, const wpi::Twine& message,
                             const char* fileName, int lineNumber,
                             const char* funcName) {
-  const char* statusMessage = GetErrorMessage(status);
+  const char* statusMessage = GetErrorMessage(&status);
   auto stack = wpi::GetStackTrace(2);
   return RuntimeError{status,   statusMessage + wpi::Twine{": "} + message,
                       fileName, lineNumber,
