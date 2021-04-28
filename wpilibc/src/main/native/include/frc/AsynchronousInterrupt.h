@@ -7,6 +7,7 @@
 #include <frc/SynchronousInterrupt.h>
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <thread>
 #include <utility>

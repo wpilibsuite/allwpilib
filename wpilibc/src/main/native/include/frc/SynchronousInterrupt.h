@@ -9,8 +9,6 @@
 #include <hal/Types.h>
 #include <units/time.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 class DigitalSource;
 
@@ -21,7 +19,7 @@ class DigitalSource;
  *
  * <p> Asynchronous interrupts are handled by the AsynchronousInterrupt class.
  */
-class SynchronousInterrupt : public ErrorBase {
+class SynchronousInterrupt {
  public:
   enum WaitResult {
     kTimeout = 0x0,
@@ -45,7 +43,7 @@ class SynchronousInterrupt : public ErrorBase {
    */
   explicit SynchronousInterrupt(std::shared_ptr<DigitalSource> source);
 
-  ~SynchronousInterrupt() override;
+  ~SynchronousInterrupt();
 
   SynchronousInterrupt(SynchronousInterrupt&&) = default;
   SynchronousInterrupt& operator=(SynchronousInterrupt&&) = default;

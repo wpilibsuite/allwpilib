@@ -7,7 +7,6 @@
 #include <hal/Types.h>
 
 #include "frc/AnalogTriggerType.h"
-#include "frc/ErrorBase.h"
 
 namespace frc {
 
@@ -20,7 +19,7 @@ namespace frc {
  * constructed and freed when finished for the source. The source can either be
  * a digital input or analog trigger but not both.
  */
-class DigitalSource : public ErrorBase {
+class DigitalSource {
  public:
   DigitalSource() = default;
   DigitalSource(DigitalSource&&) = default;
