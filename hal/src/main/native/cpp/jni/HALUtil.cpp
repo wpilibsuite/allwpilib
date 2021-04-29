@@ -85,7 +85,7 @@ void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
 
 void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
                               int32_t requestedValue, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
+  const char* message = HAL_GetLastError(&status);
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message
@@ -96,7 +96,7 @@ void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
 }
 
 void ThrowHalHandleException(JNIEnv* env, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
+  const char* message = HAL_GetLastError(&status);
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message;
@@ -110,7 +110,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
-  const char* message = HAL_GetErrorMessage(status);
+  const char* message = HAL_GetLastError(&status);
   if (doThrow && status < 0) {
     wpi::SmallString<1024> buf;
     wpi::raw_svector_ostream oss(buf);
@@ -119,7 +119,11 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
-    HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
+    // Make a copy of message for safety, calling back into the HAL might
+    // invalidate the string.
+    wpi::SmallString<256> lastMessage{wpi::StringRef{message}};
+    HAL_SendError(1, status, 0, lastMessage.c_str(), func.c_str(),
+                  stack.c_str(), 1);
   }
 }
 
