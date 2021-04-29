@@ -13,10 +13,11 @@ using namespace frc;
 static constexpr char kPosition[] = "pos";
 
 MechanismRoot2d::MechanismRoot2d(const wpi::Twine& name, double x, double y,
-                                 const private_init& tag)
+                                 const private_init&)
     : MechanismObject2d(name.str()), m_x{x}, m_y{y} {}
 
 void MechanismRoot2d::SetPosition(double x, double y) {
+  std::scoped_lock lock(m_mutex);
   m_x = x;
   m_y = y;
   Flush();

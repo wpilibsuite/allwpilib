@@ -30,17 +30,20 @@ void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
 }
 
 void MechanismLigament2d::SetColor(const Color8Bit& color) {
+  std::scoped_lock lock(m_mutex);
   std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red,
                 color.green, color.blue);
   Flush();
 }
 
 void MechanismLigament2d::SetAngle(units::degree_t angle) {
+  std::scoped_lock lock(m_mutex);
   m_angle = angle.to<double>();
   Flush();
 }
 
 void MechanismLigament2d::SetLineWeight(double lineWidth) {
+  std::scoped_lock lock(m_mutex);
   m_weight = lineWidth;
   Flush();
 }
@@ -60,6 +63,7 @@ double MechanismLigament2d::GetLength() {
 }
 
 void MechanismLigament2d::SetLength(double length) {
+  std::scoped_lock lock(m_mutex);
   m_length = length;
   Flush();
 }

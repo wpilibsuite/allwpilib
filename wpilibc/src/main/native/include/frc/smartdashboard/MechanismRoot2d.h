@@ -25,7 +25,7 @@ class MechanismRoot2d : private MechanismObject2d {
 
  public:
   MechanismRoot2d(const wpi::Twine& name, double x, double y,
-                  const private_init& tag);
+                  const private_init&);
 
   /**
    * Set the root's position.

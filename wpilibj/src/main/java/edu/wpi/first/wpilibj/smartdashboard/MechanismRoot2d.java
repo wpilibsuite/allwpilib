@@ -47,7 +47,7 @@ public final class MechanismRoot2d {
    * @throws UnsupportedOperationException if the object's name is already used - object names must
    *     be unique.
    */
-  public <T extends MechanismObject2d> T append(T object) {
+  public synchronized <T extends MechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }
@@ -64,7 +64,7 @@ public final class MechanismRoot2d {
    * @param x new x coordinate
    * @param y new y coordinate
    */
-  public void setPosition(double x, double y) {
+  public synchronized void setPosition(double x, double y) {
     m_x = x;
     m_y = y;
   }

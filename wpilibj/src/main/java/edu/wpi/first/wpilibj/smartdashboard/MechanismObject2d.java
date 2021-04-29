@@ -40,7 +40,7 @@ public abstract class MechanismObject2d {
    * @throws UnsupportedOperationException if the object's name is already used - object names must
    *     be unique.
    */
-  public final <T extends MechanismObject2d> T append(T object) {
+  public final synchronized <T extends MechanismObject2d> T append(T object) {
     if (m_objects.containsKey(object.getName())) {
       throw new UnsupportedOperationException("Mechanism object names must be unique!");
     }

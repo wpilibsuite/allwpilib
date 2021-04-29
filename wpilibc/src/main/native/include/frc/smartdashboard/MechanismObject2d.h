@@ -31,6 +31,7 @@ class MechanismObject2d {
 
  protected:
   explicit MechanismObject2d(const wpi::Twine& name);
+
   /**
    * Update all entries with new ones from a new table.
    *
@@ -38,8 +39,11 @@ class MechanismObject2d {
    */
   virtual void UpdateEntries(std::shared_ptr<NetworkTable> table) = 0;
 
+  mutable wpi::mutex m_mutex;
+
  public:
   virtual ~MechanismObject2d() = default;
+
   /**
    * Retrieve the object's name.
    *
@@ -79,7 +83,6 @@ class MechanismObject2d {
   std::string m_name;
   wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
   std::shared_ptr<NetworkTable> m_table;
-  mutable wpi::mutex m_mutex;
   void Update(std::shared_ptr<NetworkTable> table);
 };
 }  // namespace frc

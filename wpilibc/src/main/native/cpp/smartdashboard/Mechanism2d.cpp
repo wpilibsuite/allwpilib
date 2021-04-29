@@ -26,11 +26,10 @@ MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
   }
   obj = std::make_unique<MechanismRoot2d>(name, x, y,
                                           MechanismRoot2d::private_init{});
-  MechanismRoot2d* ex = obj.get();
   if (m_table) {
-    ex->Update(m_table->GetSubTable(name));
+    obj->Update(m_table->GetSubTable(name));
   }
-  return ex;
+  return obj.get();
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
