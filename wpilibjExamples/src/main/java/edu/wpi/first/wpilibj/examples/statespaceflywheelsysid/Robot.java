@@ -15,7 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
+import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 

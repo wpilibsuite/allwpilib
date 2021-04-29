@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;

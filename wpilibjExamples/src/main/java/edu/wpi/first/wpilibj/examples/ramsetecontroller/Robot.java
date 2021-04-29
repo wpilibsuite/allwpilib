@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.math.controller.RamseteController;
 import java.util.List;
 
 public class Robot extends TimedRobot {

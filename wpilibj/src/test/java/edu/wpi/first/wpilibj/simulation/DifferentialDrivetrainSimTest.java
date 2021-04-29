@@ -23,8 +23,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.controller.LinearPlantInversionFeedforward;
-import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
+import edu.wpi.first.math.controller.RamseteController;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

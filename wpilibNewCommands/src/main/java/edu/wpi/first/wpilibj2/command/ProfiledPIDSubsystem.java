@@ -8,7 +8,7 @@ import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
