@@ -45,7 +45,7 @@ class RuntimeError : public std::runtime_error {
 /**
  * Gets error message string for an error code.
  */
-const char* GetErrorMessage(int32_t code);
+const char* GetErrorMessage(int32_t* code);
 
 /**
  * Reports an error to the driver station (using HAL_SendError).
