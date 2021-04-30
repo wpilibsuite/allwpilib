@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import org.junit.jupiter.api.Test;
 
 class ProfiledPIDControllerTest {

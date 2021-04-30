@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj.controller;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
 import org.junit.jupiter.api.Test;
 
 class PIDToleranceTest {
