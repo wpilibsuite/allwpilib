@@ -9,6 +9,7 @@
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
 
@@ -17,7 +18,8 @@ using namespace frc;
 AddressableLED::AddressableLED(int port) {
   int32_t status = 0;
 
-  m_pwmHandle = HAL_InitializePWMPort(HAL_GetPort(port), &status);
+  auto stack = wpi::GetStackTrace(1);
+  m_pwmHandle = HAL_InitializePWMPort(HAL_GetPort(port), stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Port " + wpi::Twine{port});
   if (m_pwmHandle == HAL_kInvalidHandle) {
     return;

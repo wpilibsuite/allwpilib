@@ -62,7 +62,7 @@ int main(void) {
 
   // Create a Motor Controller
   status = 0;
-  HAL_DigitalHandle pwmPort = HAL_InitializePWMPort(HAL_GetPort(2), &status);
+  HAL_DigitalHandle pwmPort = HAL_InitializePWMPort(HAL_GetPort(2), NULL, &status);
 
   if (status != 0) {
     const char* message = HAL_GetLastError(&status);

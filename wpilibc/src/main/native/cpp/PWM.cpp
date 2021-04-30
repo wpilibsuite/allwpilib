@@ -10,6 +10,7 @@
 #include <hal/HALBase.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -26,8 +27,9 @@ PWM::PWM(int channel, bool registerSendable) {
     return;
   }
 
+  auto stack = wpi::GetStackTrace(1);
   int32_t status = 0;
-  m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), &status);
+  m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "PWM Channel " + wpi::Twine{channel});
 
   m_channel = channel;

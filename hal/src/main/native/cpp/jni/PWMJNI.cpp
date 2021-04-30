@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include <cassert>
+#include <wpi/jni_util.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PWMJNI.h"
@@ -27,9 +28,9 @@ Java_edu_wpi_first_hal_PWMJNI_initializePWMPort
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumPWMChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)pwm;
 }
 
