@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.frisbeebot.subsystems;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.examples.frisbeebot.Constants.ShooterConstants;

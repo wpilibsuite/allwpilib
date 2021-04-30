@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.TimedRobot;

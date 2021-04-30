@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  *
- * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.controller.PIDController} instead.
  */
 @Deprecated(since = "2020", forRemoval = true)
 public class PIDController extends PIDBase implements Controller {
