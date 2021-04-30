@@ -10,6 +10,7 @@
 #include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
+#include "HALInternal.h"
 #include "HALInitializer.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
@@ -43,26 +44,30 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   initializeDigital(status);
 
   if (*status != 0) {
+    hal::SetLastError(status, "initializeDigital failed");
     return HAL_kInvalidHandle;
   }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumDigitalChannels) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,  "Invalid Index for DIO: " + wpi::Twine(channel));
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
+  HAL_DigitalHandle handle;
+  std::shared_ptr<hal::DigitalPort> port;
+
+  *status =
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, &port);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastError(status, "PWM or DIO previously allocated at:\n" + port->previousAllocation);
+    } else {
+      hal::SetLastError(status, "Invalid Index for DIO: " + wpi::Twine(channel));
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = static_cast<uint8_t>(channel);

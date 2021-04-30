@@ -7,6 +7,7 @@
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
 #include "mockdata/PWMDataInternal.h"
@@ -22,13 +23,11 @@ extern "C" {
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,  "Invalid Index for PWM: " + wpi::Twine(channel));
     return HAL_kInvalidHandle;
   }
 
@@ -40,17 +39,19 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
+  HAL_DigitalHandle handle;
+  std::shared_ptr<hal::DigitalPort> port;
+
+  *status =
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, &handle, &port);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastError(status, "PWM or DIO previously allocated at:\n" + port->previousAllocation);
+    } else {
+      hal::SetLastError(status, "Invalid Index for PWM: " + wpi::Twine(channel));
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = origChannel;

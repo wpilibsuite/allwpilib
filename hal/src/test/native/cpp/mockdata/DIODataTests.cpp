@@ -38,6 +38,8 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestDigitalIoCallbackName.c_str());
 
@@ -56,6 +58,8 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestDigitalIoCallbackName.c_str());
 

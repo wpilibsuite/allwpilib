@@ -9,6 +9,5 @@
 #include <wpi/Twine.h>
 
 namespace hal {
-void ReleaseFPGAInterrupt(int32_t interruptNumber);
 void SetLastError(int32_t* status, const wpi::Twine& value);
 }  // namespace hal

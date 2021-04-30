@@ -21,11 +21,12 @@ static LastErrorStorage& GetThreadLastError() {
 }
 
 namespace hal {
-void SetLastError(int32_t status, const wpi::Twine& value) {
+void SetLastError(int32_t* status, const wpi::Twine& value) {
   LastErrorStorage& lastError = GetThreadLastError();
   lastError.message.clear();
   value.toVector(lastError.message);
-  lastError.status = status;
+  lastError.status = *status;
+  *status = HAL_USE_LAST_ERROR;
 }
 }  // namespace hal
 
