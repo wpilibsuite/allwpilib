@@ -11,6 +11,7 @@
 #include "glass/networktables/NTField2D.h"
 #include "glass/networktables/NTGyro.h"
 #include "glass/networktables/NTMecanumDrive.h"
+#include "glass/networktables/NTMechanism2D.h"
 #include "glass/networktables/NTPIDController.h"
 #include "glass/networktables/NTSpeedController.h"
 #include "glass/networktables/NTStringChooser.h"
@@ -116,6 +117,18 @@ void glass::AddStandardNetworkTablesViews(NetworkTablesProvider& provider) {
         win->SetDefaultSize(300, 350);
         return MakeFunctionView(
             [=] { DisplayDrive(static_cast<NTMecanumDriveModel*>(model)); });
+      });
+  provider.Register(
+      NTMechanism2DModel::kType,
+      [](NT_Inst inst, const char* path) {
+        return std::make_unique<NTMechanism2DModel>(inst, path);
+      },
+      [=](Window* win, Model* model, const char* path) {
+        win->SetDefaultPos(400, 400);
+        win->SetDefaultSize(200, 200);
+        win->SetPadding(0, 0);
+        return std::make_unique<Mechanism2DView>(
+            static_cast<NTMechanism2DModel*>(model));
       });
   provider.Register(
       NTPIDControllerModel::kType,
