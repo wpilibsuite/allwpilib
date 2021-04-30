@@ -39,7 +39,7 @@ TEST(PWMSimTests, TestPwmInitialization) {
   EXPECT_EQ(HAL_kInvalidHandle, pwmHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
 
   // Successful setup
