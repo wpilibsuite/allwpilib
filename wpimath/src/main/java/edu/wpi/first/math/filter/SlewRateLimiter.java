@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,
@@ -26,7 +27,7 @@ public class SlewRateLimiter {
   public SlewRateLimiter(double rateLimit, double initialValue) {
     m_rateLimit = rateLimit;
     m_prevVal = initialValue;
-    m_prevTime = Timer.getFPGATimestamp();
+    m_prevTime = WPIUtilJNI.now() / 1000.0;
   }
 
   /**
@@ -45,7 +46,7 @@ public class SlewRateLimiter {
    * @return The filtered value, which will not change faster than the slew rate.
    */
   public double calculate(double input) {
-    double currentTime = Timer.getFPGATimestamp();
+    double currentTime = WPIUtilJNI.now() / 1000.0;
     double elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
@@ -60,6 +61,6 @@ public class SlewRateLimiter {
    */
   public void reset(double value) {
     m_prevVal = value;
-    m_prevTime = Timer.getFPGATimestamp();
+    m_prevTime = WPIUtilJNI.now() / 1000.0;
   }
 }
