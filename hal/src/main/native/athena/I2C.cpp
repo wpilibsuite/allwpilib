@@ -67,11 +67,11 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
       return;
     }
     if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
-             HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(24), false, nullptr, status)) == HAL_kInvalidHandle) {
       return;
     }
     if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
-             HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(25), false, nullptr, status)) == HAL_kInvalidHandle) {
       HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
       return;
     }

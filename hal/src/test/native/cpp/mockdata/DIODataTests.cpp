@@ -36,7 +36,7 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   status = 0;
   portHandle = 8000;
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -47,7 +47,7 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
@@ -56,7 +56,7 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, digitalIoHandle);
   EXPECT_EQ(HAL_USE_LAST_ERROR, status);
   HAL_GetLastError(&status);
@@ -73,7 +73,7 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestDigitalIoCallbackName = "Unset";
-  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, &status);
+  digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != digitalIoHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());

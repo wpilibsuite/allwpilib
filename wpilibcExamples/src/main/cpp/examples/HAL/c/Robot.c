@@ -75,7 +75,7 @@ int main(void) {
 
   // Create an Input
   status = 0;
-  HAL_DigitalHandle dio = HAL_InitializeDIOPort(HAL_GetPort(2), 1, &status);
+  HAL_DigitalHandle dio = HAL_InitializeDIOPort(HAL_GetPort(2), 1, NULL, &status);
 
   if (status != 0) {
     const char* message = HAL_GetLastError(&status);

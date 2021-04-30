@@ -75,14 +75,14 @@ static void CommonSPIPortInit(int32_t* status) {
     }
     // MISO
     if ((digitalHandles[3] = HAL_InitializeDIOPort(createPortHandleForSPI(29),
-                                                   false, status)) ==
+                                                   false, nullptr, status)) ==
         HAL_kInvalidHandle) {
       std::printf("Failed to allocate DIO 29 (MISO)\n");
       return;
     }
     // MOSI
     if ((digitalHandles[4] = HAL_InitializeDIOPort(createPortHandleForSPI(30),
-                                                   false, status)) ==
+                                                   false, nullptr, status)) ==
         HAL_kInvalidHandle) {
       std::printf("Failed to allocate DIO 30 (MOSI)\n");
       HAL_FreeDIOPort(digitalHandles[3]);  // free the first port allocated
@@ -133,7 +133,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       // CS1, Allocate
       if ((digitalHandles[0] = HAL_InitializeDIOPort(createPortHandleForSPI(26),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 26 (CS1)\n");
         CommonSPIPortFree();
@@ -156,7 +156,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       // CS2, Allocate
       if ((digitalHandles[1] = HAL_InitializeDIOPort(createPortHandleForSPI(27),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 27 (CS2)\n");
         CommonSPIPortFree();
@@ -179,7 +179,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       // CS3, Allocate
       if ((digitalHandles[2] = HAL_InitializeDIOPort(createPortHandleForSPI(28),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 28 (CS3)\n");
         CommonSPIPortFree();
@@ -201,20 +201,20 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
         return;
       }
       if ((digitalHandles[5] = HAL_InitializeDIOPort(createPortHandleForSPI(14),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         wpi::outs() << "Failed to allocate DIO 14\n";
         return;
       }
       if ((digitalHandles[6] = HAL_InitializeDIOPort(createPortHandleForSPI(15),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         wpi::outs() << "Failed to allocate DIO 15\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         return;
       }
       if ((digitalHandles[7] = HAL_InitializeDIOPort(createPortHandleForSPI(16),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         wpi::outs() << "Failed to allocate DIO 16\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
@@ -222,7 +222,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
         return;
       }
       if ((digitalHandles[8] = HAL_InitializeDIOPort(createPortHandleForSPI(17),
-                                                     false, status)) ==
+                                                     false, nullptr, status)) ==
           HAL_kInvalidHandle) {
         wpi::outs() << "Failed to allocate DIO 17\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated

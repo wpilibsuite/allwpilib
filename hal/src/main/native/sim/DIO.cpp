@@ -32,7 +32,7 @@ void InitializeDIO() {
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, int32_t* status) {
+                                        HAL_Bool input, const char* allocationLocation, int32_t* status) {
   hal::init::CheckInit();
 
   int16_t channel = getPortHandleChannel(portHandle);
@@ -62,6 +62,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
+  port->previousAllocation = allocationLocation == nullptr ? "" : allocationLocation;
 
   return handle;
 }
