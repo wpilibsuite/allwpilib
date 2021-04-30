@@ -62,5 +62,4 @@ void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
                          1,  1, (rl.X() - rl.Y()).template to<double>(),
                          1, -1, (-(rr.X() + rr.Y())).template to<double>();
   // clang-format on
-  m_inverseKinematics /= std::sqrt(2);
 }
