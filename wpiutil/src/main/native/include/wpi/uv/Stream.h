@@ -7,6 +7,7 @@
 
 #include <uv.h>
 
+#include <cstdlib>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -292,7 +293,7 @@ class StreamImpl : public Stream {
   }
 
  protected:
-  StreamImpl() : Stream{reinterpret_cast<uv_stream_t*>(new U)} {}
+  StreamImpl() : Stream{static_cast<uv_stream_t*>(std::malloc(sizeof(U)))} {}
 };
 
 }  // namespace wpi::uv
