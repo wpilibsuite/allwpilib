@@ -38,7 +38,8 @@ class DigitalHandleResource : public HandleBase {
   DigitalHandleResource(const DigitalHandleResource&) = delete;
   DigitalHandleResource& operator=(const DigitalHandleResource&) = delete;
 
-  int32_t Allocate(int16_t index, HAL_HandleEnum enumValue, THandle* handle, std::shared_ptr<TStruct>* createdOrExisting);
+  int32_t Allocate(int16_t index, HAL_HandleEnum enumValue, THandle* handle,
+                   std::shared_ptr<TStruct>* createdOrExisting);
   int16_t GetIndex(THandle handle, HAL_HandleEnum enumValue) {
     return getHandleTypedIndex(handle, enumValue, m_version);
   }
@@ -53,7 +54,8 @@ class DigitalHandleResource : public HandleBase {
 
 template <typename THandle, typename TStruct, int16_t size>
 int32_t DigitalHandleResource<THandle, TStruct, size>::Allocate(
-    int16_t index, HAL_HandleEnum enumValue, THandle* handle, std::shared_ptr<TStruct>* createdOrExisting) {
+    int16_t index, HAL_HandleEnum enumValue, THandle* handle,
+    std::shared_ptr<TStruct>* createdOrExisting) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *handle = HAL_kInvalidHandle;
@@ -68,7 +70,8 @@ int32_t DigitalHandleResource<THandle, TStruct, size>::Allocate(
     return RESOURCE_IS_ALLOCATED;
   }
   m_structures[index] = std::make_shared<TStruct>();
-  *handle = static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  *handle =
+      static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
   *createdOrExisting = m_structures[index];
   return HAL_SUCCESS;
 }

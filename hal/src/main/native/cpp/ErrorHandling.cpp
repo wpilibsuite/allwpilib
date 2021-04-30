@@ -29,8 +29,13 @@ void SetLastError(int32_t* status, const wpi::Twine& value) {
   *status = HAL_USE_LAST_ERROR;
 }
 
-void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message, int32_t minimum, int32_t maximum, int32_t requested) {
-  SetLastError(status, message + "\n Status: " + wpi::Twine(*status) + "\n  Minimum: " + wpi::Twine(minimum) + " Maximum: " + wpi::Twine(maximum) + " Reequested: " + wpi::Twine(requested));
+void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message,
+                                 int32_t minimum, int32_t maximum,
+                                 int32_t requested) {
+  SetLastError(status, message + "\n Status: " + wpi::Twine(*status) +
+                           "\n  Minimum: " + wpi::Twine(minimum) +
+                           " Maximum: " + wpi::Twine(maximum) +
+                           " Reequested: " + wpi::Twine(requested));
 }
 }  // namespace hal
 

@@ -4,6 +4,7 @@
 
 #include "frc/DigitalInput.h"
 
+#include <iostream>
 #include <limits>
 
 #include <hal/DIO.h>
@@ -16,7 +17,6 @@
 #include "frc/SensorUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
-#include <iostream>
 
 using namespace frc;
 
@@ -29,7 +29,8 @@ DigitalInput::DigitalInput(int channel) {
 
   int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), true, stackTrace.c_str(), &status);
+  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), true,
+                                   stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);

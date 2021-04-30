@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include <cassert>
+
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
@@ -29,8 +30,8 @@ Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
 {
   int32_t status = 0;
   auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
-  auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id,
-                                   static_cast<uint8_t>(input), stack.c_str(), &status);
+  auto dio = HAL_InitializeDIOPort(
+      (HAL_PortHandle)id, static_cast<uint8_t>(input), stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
   return (jint)dio;
 }

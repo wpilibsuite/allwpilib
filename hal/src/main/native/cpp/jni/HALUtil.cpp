@@ -83,7 +83,8 @@ void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
   env->Throw(static_cast<jthrowable>(exception));
 }
 
-void ThrowAllocationException(JNIEnv* env, const char* lastError, int32_t status) {
+void ThrowAllocationException(JNIEnv* env, const char* lastError,
+                              int32_t status) {
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
 

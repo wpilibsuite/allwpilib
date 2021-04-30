@@ -5,6 +5,7 @@
 #include <jni.h>
 
 #include <cassert>
+
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"

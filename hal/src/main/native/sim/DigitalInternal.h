@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 
 #include "PortsInternal.h"
 #include "hal/AnalogTrigger.h"

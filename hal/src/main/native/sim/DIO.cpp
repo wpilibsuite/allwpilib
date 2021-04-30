@@ -32,27 +32,36 @@ void InitializeDIO() {
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, const char* allocationLocation, int32_t* status) {
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status) {
   hal::init::CheckInit();
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status,  "Invalid Index for DIO", 0, kNumDigitalChannels, channel);
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                     kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
 
   HAL_DigitalHandle handle;
   std::shared_ptr<hal::DigitalPort> port;
 
-  *status =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, &port);
+  *status = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
+                                            &handle, &port);
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastError(status, "PWM or DIO " + wpi::Twine(channel) + " previously allocated.\nLocation of the previous allocation:\n" + port->previousAllocation + "\nLocation of the current allocation:");
+      hal::SetLastError(
+          status,
+          "PWM or DIO " + wpi::Twine(channel) +
+              " previously allocated.\nLocation of the previous allocation:\n" +
+              port->previousAllocation +
+              "\nLocation of the current allocation:");
     } else {
-      hal::SetLastErrorIndexOutOfRange(status,  "Invalid Index for DIO", 0, kNumDigitalChannels, channel);
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -62,7 +71,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
-  port->previousAllocation = allocationLocation == nullptr ? "" : allocationLocation;
+  port->previousAllocation =
+      allocationLocation == nullptr ? "" : allocationLocation;
 
   return handle;
 }

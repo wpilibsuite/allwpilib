@@ -10,5 +10,7 @@
 
 namespace hal {
 void SetLastError(int32_t* status, const wpi::Twine& value);
-void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message, int32_t minimum, int32_t maximum, int32_t channel);
+void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message,
+                                 int32_t minimum, int32_t maximum,
+                                 int32_t channel);
 }  // namespace hal

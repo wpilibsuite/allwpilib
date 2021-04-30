@@ -10,8 +10,8 @@
 #include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
-#include "HALInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -39,7 +39,9 @@ void InitializeDIO() {
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, const char* allocationLocation, int32_t* status) {
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
 
@@ -51,21 +53,27 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumDigitalChannels) {
     *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status,  "Invalid Index for DIO", 0, kNumDigitalChannels, channel);
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                     kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
 
   HAL_DigitalHandle handle;
   std::shared_ptr<hal::DigitalPort> port;
 
-  *status =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, &port);
+  *status = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
+                                            &handle, &port);
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastError(status, "PWM or DIO previously allocated.\nLocation of the previous allocation:\n" + port->previousAllocation + "\nLocation of the current allocation:");
+      hal::SetLastError(status,
+                        "PWM or DIO previously allocated.\nLocation of the "
+                        "previous allocation:\n" +
+                            port->previousAllocation +
+                            "\nLocation of the current allocation:");
     } else {
-      hal::SetLastErrorIndexOutOfRange(status,  "Invalid Index for DIO", 0, kNumDigitalChannels, channel);
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -119,7 +127,8 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   digitalSystem->writeOutputEnable(outputEnable, status);
-  port->previousAllocation = allocationLocation == nullptr ? "" : allocationLocation;
+  port->previousAllocation =
+      allocationLocation == nullptr ? "" : allocationLocation;
 
   return handle;
 }

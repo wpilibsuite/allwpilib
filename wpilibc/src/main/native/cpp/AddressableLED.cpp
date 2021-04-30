@@ -19,7 +19,8 @@ AddressableLED::AddressableLED(int port) {
   int32_t status = 0;
 
   auto stack = wpi::GetStackTrace(1);
-  m_pwmHandle = HAL_InitializePWMPort(HAL_GetPort(port), stack.c_str(), &status);
+  m_pwmHandle =
+      HAL_InitializePWMPort(HAL_GetPort(port), stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Port " + wpi::Twine{port});
   if (m_pwmHandle == HAL_kInvalidHandle) {
     return;
