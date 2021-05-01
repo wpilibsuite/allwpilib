@@ -243,7 +243,6 @@ model {
                             def arch = it.targetPlatform.architecture.name
                             if (arch == 'x86-64' || arch == 'x86') {
                                 dependsOn it.tasks.install
-                                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
 
                                 found = true
                             }

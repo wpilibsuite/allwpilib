@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 @SuppressWarnings("all")
@@ -15,8 +14,6 @@ public class MyRobot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    DigitalInput dio = new DigitalInput(0);
-    DigitalInput dio2 = new DigitalInput(0);
   }
 
   /** This function is run once each time the robot enters autonomous mode */
