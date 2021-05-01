@@ -416,8 +416,15 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
+    kSixInch(Units.inchesToMeters(6)),
+    kEightInch(Units.inchesToMeters(8)),
+    kTenInch(Units.inchesToMeters(10)),
+
+    @Deprecated
     SixInch(Units.inchesToMeters(6)),
+    @Deprecated
     EightInch(Units.inchesToMeters(8)),
+    @Deprecated
     TenInch(Units.inchesToMeters(10));
 
     @SuppressWarnings("MemberName")
