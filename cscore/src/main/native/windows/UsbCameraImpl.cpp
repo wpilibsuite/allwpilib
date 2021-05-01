@@ -307,17 +307,16 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     ComPtr<IMF2DBuffer2> buffer2d2 = buf.As<IMF2DBuffer2>();
     if (buffer2d2) {
       BYTE* datastart;
-      result = buffer2d2->Lock2DSize(MF2DBuffer_LockFlags_Read, &scanline0, &pitch, &datastart, &length);
+      result = buffer2d2->Lock2DSize(MF2DBuffer_LockFlags_Read, &scanline0,
+                                     &pitch, &datastart, &length);
     } else {
       result = buffer2d->Lock2D(&scanline0, &pitch);
     }
     if (SUCCEEDED(result)) {
       BOOL isContiguous;
-      if (pitch > 0 &&
-          SUCCEEDED(buffer2d->IsContiguousFormat(&isContiguous)) &&
+      if (pitch > 0 && SUCCEEDED(buffer2d->IsContiguousFormat(&isContiguous)) &&
           isContiguous &&
-          (length ||
-            SUCCEEDED(buffer2d->GetContiguousLength(&length)))) {
+          (length || SUCCEEDED(buffer2d->GetContiguousLength(&length)))) {
         // Use the buffer pointer.
         ptr = scanline0;
       } else {
