@@ -4,7 +4,10 @@
 
 #include "hal/Relay.h"
 
+#include <string>
+
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 #include "mockdata/RelayDataInternal.h"
@@ -15,6 +18,7 @@ namespace {
 struct Relay {
   uint8_t channel;
   bool fwd;
+  std::string previousAllocation;
 };
 }  // namespace
 
@@ -32,6 +36,7 @@ void InitializeRelay() {
 
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   if (*status != 0) {
@@ -39,8 +44,10 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
   }
 
   int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+  if (channel == InvalidHandleIndex || channel >= kNumRelayChannels) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Relay", 0,
+                                     kNumRelayChannels, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -48,16 +55,18 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
     channel += kNumRelayHeaders;  // add 4 to reverse channels
   }
 
-  auto handle = relayHandles->Allocate(channel, status);
+  HAL_RelayHandle handle;
+  auto port = relayHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "Relay", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Relay", 0,
+                                       kNumRelayChannels, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = relayHandles->Get(handle);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   if (!fwd) {
@@ -73,6 +82,7 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
   }
 
   port->channel = static_cast<uint8_t>(channel);
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

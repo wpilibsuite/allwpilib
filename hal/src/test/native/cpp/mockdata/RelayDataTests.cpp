@@ -35,16 +35,18 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = 8000;
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
+  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestRelayCallbackName.c_str());
 
   // Successful setup
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
@@ -53,8 +55,10 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestRelayCallbackName.c_str());
 
@@ -67,7 +71,7 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());

@@ -70,16 +70,11 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status) {
-  auto handle = serialPortHandles->Allocate(static_cast<int16_t>(port), status);
+  HAL_SerialPortHandle handle;
+  auto serialPort =
+      serialPortHandles->Allocate(static_cast<int16_t>(port), &handle, status);
 
   if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
-
-  auto serialPort = serialPortHandles->Get(handle);
-
-  if (serialPort == nullptr) {
-    *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
 

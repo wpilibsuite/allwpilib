@@ -21,11 +21,31 @@ static LastErrorStorage& GetThreadLastError() {
 }
 
 namespace hal {
-void SetLastError(int32_t status, const wpi::Twine& value) {
+void SetLastError(int32_t* status, const wpi::Twine& value) {
   LastErrorStorage& lastError = GetThreadLastError();
   lastError.message.clear();
   value.toVector(lastError.message);
-  lastError.status = status;
+  lastError.status = *status;
+  *status = HAL_USE_LAST_ERROR;
+}
+
+void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message,
+                                 int32_t minimum, int32_t maximum,
+                                 int32_t requested) {
+  SetLastError(status, message + "\n Status: " + wpi::Twine(*status) +
+                           "\n  Minimum: " + wpi::Twine(minimum) +
+                           " Maximum: " + wpi::Twine(maximum) +
+                           " Reequested: " + wpi::Twine(requested));
+}
+
+void SetLastErrorPreviouslyAllocated(int32_t* status, const wpi::Twine& message,
+                                     int32_t channel,
+                                     const wpi::Twine& previousAllocation) {
+  hal::SetLastError(
+      status,
+      message + " " + wpi::Twine(channel) +
+          " previously allocated.\nLocation of the previous allocation:\n" +
+          previousAllocation + "\nLocation of the current allocation:");
 }
 }  // namespace hal
 

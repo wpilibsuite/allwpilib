@@ -593,6 +593,81 @@ class JSingletonCallbackManager : public JCallbackManager<T> {
   }
 };
 
+inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
+  // create a throwable
+  static JClass throwableCls(env, "java/lang/Throwable");
+  if (!throwableCls) {
+    return "";
+  }
+  static jmethodID constructorId = nullptr;
+  if (!constructorId) {
+    constructorId = env->GetMethodID(throwableCls, "<init>", "()V");
+  }
+  JLocal<jobject> throwable(env, env->NewObject(throwableCls, constructorId));
+
+  // retrieve information from the exception.
+  // get method id
+  // getStackTrace returns an array of StackTraceElement
+  static jmethodID getStackTraceId = nullptr;
+  if (!getStackTraceId) {
+    getStackTraceId = env->GetMethodID(throwableCls, "getStackTrace",
+                                       "()[Ljava/lang/StackTraceElement;");
+  }
+
+  // call getStackTrace
+  JLocal<jobjectArray> stackTrace(
+      env, static_cast<jobjectArray>(
+               env->CallObjectMethod(throwable, getStackTraceId)));
+
+  if (!stackTrace) {
+    return "";
+  }
+
+  // get length of the array
+  jsize stackTraceLength = env->GetArrayLength(stackTrace);
+
+  // get toString methodId of StackTraceElement class
+  static JClass stackTraceElementCls(env, "java/lang/StackTraceElement");
+  if (!stackTraceElementCls) {
+    return "";
+  }
+  static jmethodID toStringId = nullptr;
+  if (!toStringId) {
+    toStringId = env->GetMethodID(stackTraceElementCls, "toString",
+                                  "()Ljava/lang/String;");
+  }
+
+  bool foundFirst = false;
+  std::string buf;
+  raw_string_ostream oss(buf);
+  for (jsize i = 0; i < stackTraceLength; i++) {
+    // add the result of toString method of each element in the result
+    JLocal<jobject> curStackTraceElement(
+        env, env->GetObjectArrayElement(stackTrace, i));
+
+    // call to string on the object
+    JLocal<jstring> stackElementString(
+        env, static_cast<jstring>(
+                 env->CallObjectMethod(curStackTraceElement, toStringId)));
+
+    if (!stackElementString) {
+      return "";
+    }
+
+    // add a line to res
+    JStringRef elem(env, stackElementString);
+    if (!foundFirst) {
+      if (elem.str().startswith(skipPrefix)) {
+        continue;
+      }
+      foundFirst = true;
+    }
+    oss << "\tat " << elem << '\n';
+  }
+
+  return oss.str();
+}
+
 inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
                                      StringRef excludeFuncPrefix) {
   // create a throwable

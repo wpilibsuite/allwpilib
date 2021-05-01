@@ -41,6 +41,8 @@
 #define ERR_FRCSystem_NoDSConnection_MESSAGE \
   "FRCSystem: No driver station connected"
 
+#define HAL_SUCCESS 0
+
 #define SAMPLE_RATE_TOO_HIGH 1001
 #define SAMPLE_RATE_TOO_HIGH_MESSAGE \
   "HAL: Analog module sample rate is too high"

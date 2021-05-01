@@ -36,16 +36,18 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   status = 0;
   portHandle = 8000;
   gTestAnalogInCallbackName = "Unset";
-  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
+  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
+  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestAnalogInCallbackName.c_str());
 
   // Successful setup
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogInCallbackName = "Unset";
-  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
+  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
@@ -54,8 +56,10 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogInCallbackName = "Unset";
-  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
+  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, analogInHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestAnalogInCallbackName.c_str());
 
@@ -69,7 +73,7 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogInCallbackName = "Unset";
-  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
+  analogInHandle = HAL_InitializeAnalogInputPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());

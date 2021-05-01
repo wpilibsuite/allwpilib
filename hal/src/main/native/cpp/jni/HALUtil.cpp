@@ -83,15 +83,13 @@ void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
   env->Throw(static_cast<jthrowable>(exception));
 }
 
-void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
-                              int32_t requestedValue, int32_t status) {
-  const char* message = HAL_GetLastError(&status);
+void ThrowAllocationException(JNIEnv* env, const char* lastError,
+                              int32_t status) {
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message
-      << ", Minimum Value: " << minRange << ", Maximum Value: " << maxRange
-      << ", Requested Value: " << requestedValue;
-  env->ThrowNew(allocationExCls, buf.c_str());
+
+  oss << "Code: " << status << '\n' << lastError;
+
   allocationExCls.Throw(env, buf.c_str());
 }
 
@@ -107,10 +105,11 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   if (status == 0) {
     return;
   }
+  const char* message = HAL_GetLastError(&status);
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetLastError(&status);
   if (doThrow && status < 0) {
     wpi::SmallString<1024> buf;
     wpi::raw_svector_ostream oss(buf);
@@ -132,17 +131,19 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
   if (status == 0) {
     return;
   }
+  const char* lastError = HAL_GetLastError(&status);
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
-    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
+    ThrowAllocationException(env, lastError, status);
+    return;
   }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetErrorMessage(status);
   wpi::SmallString<1024> buf;
   wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message;
+  oss << " Code: " << status << ". " << lastError;
   ThrowUncleanStatusException(env, buf.c_str(), status);
 }
 

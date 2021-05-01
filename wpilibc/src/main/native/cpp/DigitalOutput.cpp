@@ -10,6 +10,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -27,7 +28,9 @@ DigitalOutput::DigitalOutput(int channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), false, &status);
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), false,
+                                   stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);

@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_AnalogGyroJNI.h"
 #include "hal/AnalogGyro.h"
@@ -24,8 +26,9 @@ Java_edu_wpi_first_hal_AnalogGyroJNI_initializeAnalogGyro
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  HAL_GyroHandle handle =
-      HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id, &status);
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  HAL_GyroHandle handle = HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id,
+                                                   stack.c_str(), &status);
   // Analog input does range checking, so we don't need to do so.
   CheckStatusForceThrow(env, status);
   return (jint)handle;
