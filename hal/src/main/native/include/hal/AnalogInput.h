@@ -24,8 +24,8 @@ extern "C" {
  * @param portHandle Handle to the port to initialize.
  * @return           the created analog input handle
  */
-HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
-                                                    int32_t* status);
+HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
+    HAL_PortHandle portHandle, const char* allocationLocation, int32_t* status);
 
 /**
  * Frees an analog input port.

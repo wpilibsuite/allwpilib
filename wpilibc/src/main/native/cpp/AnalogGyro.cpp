@@ -10,6 +10,7 @@
 #include <hal/AnalogGyro.h>
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/Base.h"
@@ -111,7 +112,9 @@ void AnalogGyro::Reset() {
 void AnalogGyro::InitGyro() {
   if (m_gyroHandle == HAL_kInvalidHandle) {
     int32_t status = 0;
-    m_gyroHandle = HAL_InitializeAnalogGyro(m_analog->m_port, &status);
+    std::string stackTrace = wpi::GetStackTrace(1);
+    m_gyroHandle =
+        HAL_InitializeAnalogGyro(m_analog->m_port, stackTrace.c_str(), &status);
     if (status == PARAMETER_OUT_OF_RANGE) {
       throw FRC_MakeError(err::ParameterOutOfRange,
                           "channel must be accumulator channel");

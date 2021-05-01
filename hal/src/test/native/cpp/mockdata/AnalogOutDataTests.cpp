@@ -36,16 +36,20 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   status = 0;
   portHandle = 8000;
   gTestAnalogOutCallbackName = "Unset";
-  analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
+  analogOutHandle =
+      HAL_InitializeAnalogOutputPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, analogOutHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
+  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestAnalogOutCallbackName.c_str());
 
   // Successful setup
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
-  analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
+  analogOutHandle =
+      HAL_InitializeAnalogOutputPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
@@ -54,8 +58,11 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
-  analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
+  analogOutHandle =
+      HAL_InitializeAnalogOutputPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, analogOutHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestAnalogOutCallbackName.c_str());
 
@@ -69,7 +76,8 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
-  analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
+  analogOutHandle =
+      HAL_InitializeAnalogOutputPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());

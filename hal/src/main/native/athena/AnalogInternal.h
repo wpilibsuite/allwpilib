@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include <wpi/mutex.h>
 
@@ -31,6 +32,7 @@ extern bool analogSampleRateSet;
 struct AnalogPort {
   uint8_t channel;
   std::unique_ptr<tAccumulator> accumulator;
+  std::string previousAllocation;
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,

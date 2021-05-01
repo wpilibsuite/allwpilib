@@ -4,12 +4,14 @@
 
 #include "hal/AnalogGyro.h"
 
+#include <string>
 #include <thread>
 
 #include <wpi/raw_ostream.h>
 
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogInput.h"
 #include "hal/handles/IndexedHandleResource.h"
@@ -21,6 +23,7 @@ struct AnalogGyro {
   double voltsPerDegreePerSecond;
   double offset;
   int32_t center;
+  std::string previousAllocation;
 };
 
 }  // namespace
@@ -55,35 +58,43 @@ static void Wait(double seconds) {
 extern "C" {
 
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
+  // Handle will be type checked by HAL_IsAccumulatorChannel
+  int16_t channel = getHandleIndex(analogHandle);
   if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
     if (*status == 0) {
       *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Gyro",
+                                       0, kNumAccumulators, channel);
     }
     return HAL_kInvalidHandle;
   }
 
-  // handle known to be correct, so no need to type check
-  int16_t channel = getHandleIndex(analogHandle);
-
-  auto handle = analogGyroHandles->Allocate(channel, status);
+  HAL_GyroHandle handle;
+  auto gyro = analogGyroHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
+    if (gyro) {
+      hal::SetLastErrorPreviouslyAllocated(status, "Analog Gyro", channel,
+                                           gyro->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Gyro",
+                                       0, kNumAccumulators, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
 
   // Initialize port structure
-  auto gyro = analogGyroHandles->Get(handle);
-  if (gyro == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
-  }
 
   gyro->handle = analogHandle;
   gyro->voltsPerDegreePerSecond = 0;
   gyro->offset = 0;
   gyro->center = 0;
+
+  gyro->previousAllocation =
+      allocationLocation == nullptr ? "" : allocationLocation;
 
   return handle;
 }

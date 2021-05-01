@@ -25,6 +25,7 @@ extern "C" {
  * @return       the initialized gyro handle
  */
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

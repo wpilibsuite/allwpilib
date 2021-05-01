@@ -9,6 +9,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -28,7 +29,8 @@ AnalogInput::AnalogInput(int channel) {
 
   HAL_PortHandle port = HAL_GetPort(channel);
   int32_t status = 0;
-  m_port = HAL_InitializeAnalogInputPort(port, &status);
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_port = HAL_InitializeAnalogInputPort(port, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);

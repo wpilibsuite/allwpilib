@@ -10,6 +10,7 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
+#include <wpi/StackTrace.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
@@ -31,13 +32,17 @@ Relay::Relay(int channel, Relay::Direction direction)
 
   if (m_direction == kBothDirections || m_direction == kForwardOnly) {
     int32_t status = 0;
-    m_forwardHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+    std::string stackTrace = wpi::GetStackTrace(1);
+    m_forwardHandle =
+        HAL_InitializeRelayPort(portHandle, true, stackTrace.c_str(), &status);
     FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
     HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel + 1);
   }
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
     int32_t status = 0;
-    m_reverseHandle = HAL_InitializeRelayPort(portHandle, false, &status);
+    std::string stackTrace = wpi::GetStackTrace(1);
+    m_reverseHandle =
+        HAL_InitializeRelayPort(portHandle, false, stackTrace.c_str(), &status);
     FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
     HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel + 128);
   }

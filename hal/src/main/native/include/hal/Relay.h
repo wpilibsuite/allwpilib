@@ -29,6 +29,7 @@ extern "C" {
  * @return           the created relay handle
  */
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

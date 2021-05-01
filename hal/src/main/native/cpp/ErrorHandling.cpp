@@ -37,6 +37,16 @@ void SetLastErrorIndexOutOfRange(int32_t* status, const wpi::Twine& message,
                            " Maximum: " + wpi::Twine(maximum) +
                            " Reequested: " + wpi::Twine(requested));
 }
+
+void SetLastErrorPreviouslyAllocated(int32_t* status, const wpi::Twine& message,
+                                     int32_t channel,
+                                     const wpi::Twine& previousAllocation) {
+  hal::SetLastError(
+      status,
+      message + " " + wpi::Twine(channel) +
+          " previously allocated.\nLocation of the previous allocation:\n" +
+          previousAllocation + "\nLocation of the current allocation:");
+}
 }  // namespace hal
 
 extern "C" {

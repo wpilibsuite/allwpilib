@@ -11,6 +11,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -29,7 +30,8 @@ AnalogOutput::AnalogOutput(int channel) {
 
   HAL_PortHandle port = HAL_GetPort(m_channel);
   int32_t status = 0;
-  m_port = HAL_InitializeAnalogOutputPort(port, &status);
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_port = HAL_InitializeAnalogOutputPort(port, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "analog output " + wpi::Twine(channel));
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
