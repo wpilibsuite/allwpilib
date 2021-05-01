@@ -1,6 +1,7 @@
 
 #include "wpi/span.h"
 
+#include <algorithm>
 #include <cassert>
 #include <deque>
 #include <initializer_list>

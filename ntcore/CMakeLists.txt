@@ -13,6 +13,7 @@ target_include_directories(ntcore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
 wpilib_target_warnings(ntcore)
+target_compile_features(ntcore PUBLIC cxx_std_17)
 target_link_libraries(ntcore PUBLIC wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
