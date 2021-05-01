@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 
+#include "HALInternal.h"
 #include "hal/cpp/SerialHelper.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
@@ -183,6 +184,7 @@ void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
     BAUDCASE(4000000)
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Invalid BaudRate: " + wpi::Twine(baud));
       return;
   }
   int err = cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
@@ -225,6 +227,7 @@ void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Invalid data bits: " + wpi::Twine(bits));
       return;
   }
 
@@ -272,6 +275,7 @@ void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Invalid parity bits: " + wpi::Twine(parity));
       return;
   }
 
@@ -299,6 +303,7 @@ void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Invalid stop bits: " + wpi::Twine(stopBits));
       return;
   }
 
@@ -334,6 +339,7 @@ void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Invalid fc bits: " + wpi::Twine(flow));
       return;
   }
 

@@ -119,12 +119,6 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterDownSource
   HAL_SetCounterDownSource((HAL_CounterHandle)id,
                            (HAL_Handle)digitalSourceHandle,
                            (HAL_AnalogTriggerType)analogTriggerType, &status);
-  if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowIllegalArgumentException(env,
-                                  "Counter only supports DownSource in "
-                                  "TwoPulse and ExternalDirection modes.");
-    return;
-  }
   CheckStatus(env, status);
 }
 
@@ -240,10 +234,6 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterSamplesToAverage
 {
   int32_t status = 0;
   HAL_SetCounterSamplesToAverage((HAL_CounterHandle)id, value, &status);
-  if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, value, 1, 127);
-    return;
-  }
   CheckStatus(env, status);
 }
 

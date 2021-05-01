@@ -18,6 +18,7 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "hal/DIO.h"
 #include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
@@ -103,6 +104,9 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   hal::init::CheckInit();
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Serial port must be between 0 and " +
+                                  wpi::Twine(kSpiMaxHandles) + ". Requested " +
+                                  wpi::Twine(static_cast<int>(port)));
     return;
   }
 
@@ -246,6 +250,8 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(
+          status, "Invalid SPI port " + wpi::Twine(static_cast<int>(port)));
       break;
   }
 }
@@ -374,6 +380,9 @@ void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
 void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Serial port must be between 0 and " +
+                                  wpi::Twine(kSpiMaxHandles) + ". Requested " +
+                                  wpi::Twine(static_cast<int>(port)));
     return;
   }
 
@@ -389,6 +398,9 @@ void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {
 void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status) {
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Serial port must be between 0 and " +
+                                  wpi::Twine(kSpiMaxHandles) + ". Requested " +
+                                  wpi::Twine(static_cast<int>(port)));
     return;
   }
 
@@ -453,6 +465,9 @@ void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle) {
 void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status) {
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Serial port must be between 0 and " +
+                                  wpi::Twine(kSpiMaxHandles) + ". Requested " +
+                                  wpi::Twine(static_cast<int>(port)));
     return;
   }
 
@@ -484,6 +499,9 @@ void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status) {
 void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status) {
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Serial port must be between 0 and " +
+                                  wpi::Twine(kSpiMaxHandles) + ". Requested " +
+                                  wpi::Twine(static_cast<int>(port)));
     return;
   }
 
@@ -586,11 +604,17 @@ void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
                                 int32_t* status) {
   if (dataSize < 0 || dataSize > 32) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status, "Data size must be between 0 and 32 inclusive. Requested " +
+                    wpi::Twine(dataSize));
     return;
   }
 
   if (zeroSize < 0 || zeroSize > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status, "Zero size must be between 0 and 127 inclusive. Requested " +
+                    wpi::Twine(zeroSize));
     return;
   }
 

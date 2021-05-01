@@ -7,6 +7,7 @@
 #include "AnalogInternal.h"
 #include "DutyCycleInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 #include "hal/DutyCycle.h"
@@ -138,6 +139,11 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
 
   if (lower < 0.0 || upper > 1.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    auto lowerStr = std::to_string(lower);
+    auto upperStr = std::to_string(upper);
+    hal::SetLastError(
+        status, "Lower must be >= 0 and upper must be <=1. Requested lower " +
+                    lowerStr + " Requested upper " + upperStr);
     return;
   }
 
