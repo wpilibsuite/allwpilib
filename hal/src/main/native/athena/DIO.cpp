@@ -61,7 +61,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   HAL_DigitalHandle handle;
 
   auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
-                                            &handle, status);
+                                              &handle, status);
 
   if (*status != 0) {
     if (port) {

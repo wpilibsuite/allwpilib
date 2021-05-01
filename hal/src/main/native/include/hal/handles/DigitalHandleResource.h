@@ -38,8 +38,8 @@ class DigitalHandleResource : public HandleBase {
   DigitalHandleResource(const DigitalHandleResource&) = delete;
   DigitalHandleResource& operator=(const DigitalHandleResource&) = delete;
 
-  std::shared_ptr<TStruct> Allocate(int16_t index, HAL_HandleEnum enumValue, THandle* handle,
-                   int32_t* status);
+  std::shared_ptr<TStruct> Allocate(int16_t index, HAL_HandleEnum enumValue,
+                                    THandle* handle, int32_t* status);
   int16_t GetIndex(THandle handle, HAL_HandleEnum enumValue) {
     return getHandleTypedIndex(handle, enumValue, m_version);
   }
@@ -53,7 +53,9 @@ class DigitalHandleResource : public HandleBase {
 };
 
 template <typename THandle, typename TStruct, int16_t size>
-std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Allocate(int16_t index, HAL_HandleEnum enumValue, THandle* handle, int32_t* status) {
+std::shared_ptr<TStruct>
+DigitalHandleResource<THandle, TStruct, size>::Allocate(
+    int16_t index, HAL_HandleEnum enumValue, THandle* handle, int32_t* status) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *handle = HAL_kInvalidHandle;

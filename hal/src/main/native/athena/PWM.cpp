@@ -95,7 +95,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   HAL_DigitalHandle handle;
 
   auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
-                                            &handle, status);
+                                              &handle, status);
 
   if (*status != 0) {
     if (port) {
