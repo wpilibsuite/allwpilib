@@ -293,32 +293,46 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
       return;
   }
 
-  bool lock2d = false;
   BYTE* ptr = NULL;
   LONG pitch = 0;
-  DWORD maxsize = 0, cursize = 0;
+  DWORD length = 0;
 
-  // "For 2-D buffers, the Lock2D method is more efficient than the Lock
-  // method" see IMFMediaBuffer::Lock method documentation:
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/bb970366(v=vs.85).aspx
-  ComPtr<IMF2DBuffer> buffer2d;
-  DWORD memLength2d = 0;
-  if (true) {
-    buffer2d = buf.As<IMF2DBuffer>();
-    if (buffer2d) {
-      buffer2d->GetContiguousLength(&memLength2d);
-      if (SUCCEEDED(buffer2d->Lock2D(&ptr, &pitch))) {
-        lock2d = true;
+  // First try to access using Lock2DSize, then try Lock2D, then fallback
+  // https://docs.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-imfmediabuffer-lock
+
+  ComPtr<IMF2DBuffer> buffer2d = buf.As<IMF2DBuffer>();
+  if (buffer2d) {
+    BYTE* scanline0 = nullptr;
+    HRESULT result;
+    ComPtr<IMF2DBuffer2> buffer2d2 = buf.As<IMF2DBuffer2>();
+    if (buffer2d2) {
+      BYTE* datastart;
+      result = buffer2d2->Lock2DSize(MF2DBuffer_LockFlags_Read, &scanline0, &pitch, &datastart, &length);
+    } else {
+      result = buffer2d->Lock2D(&scanline0, &pitch);
+    }
+    if (SUCCEEDED(result)) {
+      BOOL isContiguous;
+      if (pitch > 0 &&
+          SUCCEEDED(buffer2d->IsContiguousFormat(&isContiguous)) &&
+          isContiguous &&
+          (length ||
+            SUCCEEDED(buffer2d->GetContiguousLength(&length)))) {
+        // Use the buffer pointer.
+        ptr = scanline0;
+      } else {
+        // Release the buffer and fall back to Lock().
+        buffer2d->Unlock2D();
       }
     }
   }
   if (ptr == NULL) {
-    if (!SUCCEEDED(buf->Lock(&ptr, &maxsize, &cursize))) {
+    buffer2d = nullptr;
+    DWORD maxsize = 0;
+    if (!SUCCEEDED(buf->Lock(&ptr, &maxsize, &length))) {
       return;
     }
   }
-  if (!ptr)
-    return;
 
   cv::Mat tmpMat;
   std::unique_ptr<Image> dest;
@@ -328,7 +342,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     case cs::VideoMode::PixelFormat::kMJPEG: {
       // Special case
       PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-               wpi::StringRef(reinterpret_cast<char*>(ptr), cursize),
+               wpi::StringRef(reinterpret_cast<char*>(ptr), length),
                wpi::Now());
       doFinalSet = false;
       break;
@@ -360,10 +374,11 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     PutFrame(std::move(dest), wpi::Now());
   }
 
-  if (lock2d)
+  if (buffer2d) {
     buffer2d->Unlock2D();
-  else
+  } else {
     buf->Unlock();
+  }
 }
 
 LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
