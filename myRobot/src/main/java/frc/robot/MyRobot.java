@@ -13,8 +13,7 @@ public class MyRobot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {
-  }
+  public void robotInit() {}
 
   /** This function is run once each time the robot enters autonomous mode */
   @Override
