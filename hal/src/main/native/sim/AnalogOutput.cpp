@@ -69,7 +69,7 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
   // Initialize sim analog input
   SimAnalogOutData[channel].initialized = true;
 
-  port->previousAllocation = allocationLocation ? "" : allocationLocation;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
   return handle;
 }
 

@@ -57,7 +57,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   SimAnalogInData[channel].simDevice = 0;
 
   analog_port->previousAllocation =
-      allocationLocation ? "" : allocationLocation;
+      allocationLocation ? allocationLocation : "";
 
   return handle;
 }

@@ -120,7 +120,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   // Defaults to allow an always valid config.
   HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
 
-  port->previousAllocation = allocationLocation ? "" : allocationLocation;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

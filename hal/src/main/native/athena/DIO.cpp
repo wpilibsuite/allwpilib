@@ -122,7 +122,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   digitalSystem->writeOutputEnable(outputEnable, status);
-  port->previousAllocation = allocationLocation ? "" : allocationLocation;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

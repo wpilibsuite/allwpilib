@@ -67,7 +67,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
   HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
   HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
   analog_port->previousAllocation =
-      allocationLocation ? "" : allocationLocation;
+      allocationLocation ? allocationLocation : "";
   return handle;
 }
 
