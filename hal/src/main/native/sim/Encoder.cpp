@@ -6,6 +6,7 @@
 
 #include "CounterInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
@@ -246,6 +247,7 @@ void HAL_SetEncoderMinRate(HAL_EncoderHandle encoderHandle, double minRate,
 
   if (minRate == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "minRate must not be 0");
     return;
   }
 
@@ -262,6 +264,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 
   if (distancePerPulse == 0.0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "distancePerPulse must not be 0");
     return;
   }
   encoder->distancePerPulse = distancePerPulse;

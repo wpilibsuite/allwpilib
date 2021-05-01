@@ -8,6 +8,7 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
@@ -193,6 +194,11 @@ void HAL_SetFPGAEncoderSamplesToAverage(HAL_FPGAEncoderHandle fpgaEncoderHandle,
   }
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(
+        status,
+        "Samples to average must be between 1 and 127 inclusive. Requested " +
+            wpi::Twine(samplesToAverage));
+    return;
   }
   encoder->encoder->writeTimerConfig_AverageSize(samplesToAverage, status);
 }

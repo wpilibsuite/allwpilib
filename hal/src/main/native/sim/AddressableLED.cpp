@@ -6,6 +6,7 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
@@ -110,8 +111,11 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  if (length > HAL_kAddressableLEDMaxLength) {
+  if (length > HAL_kAddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "LED length must be less than or equal to " +
+                                  wpi::Twine(HAL_kAddressableLEDMaxLength) +
+                                  ". " + wpi::Twine(length) + " was requested");
     return;
   }
   SimAddressableLEDData[led->index].length = length;
@@ -127,6 +131,10 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
   }
   if (length > SimAddressableLEDData[led->index].length) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Data length must be less than or equal to " +
+                          wpi::Twine(SimAddressableLEDData[led->index].length) +
+                          ". " + wpi::Twine(length) + " was requested");
     return;
   }
   SimAddressableLEDData[led->index].SetData(data, length);

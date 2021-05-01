@@ -6,6 +6,7 @@
 
 #include "CANAPIInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
@@ -27,6 +28,7 @@ extern "C" {
 HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
   if (!HAL_CheckPDPModule(module)) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Invalid pdp module " + wpi::Twine(module));
     return HAL_kInvalidHandle;
   }
   hal::init::CheckInit();
