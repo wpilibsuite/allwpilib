@@ -26,6 +26,8 @@ extern "C" {
  *
  * @param portHandle the port handle to initialize
  * @param fwd        true for the forward port, false for the reverse port
+ * @param allocationLocation    the location where the allocation is occuring
+ * (can be null)
  * @return           the created relay handle
  */
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,

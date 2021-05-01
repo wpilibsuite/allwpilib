@@ -74,8 +74,7 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
   }
 
   port->channel = static_cast<uint8_t>(channel);
-  port->previousAllocation =
-      allocationLocation == nullptr ? "" : allocationLocation;
+  port->previousAllocation = allocationLocation ? "" : allocationLocation;
 
   return handle;
 }

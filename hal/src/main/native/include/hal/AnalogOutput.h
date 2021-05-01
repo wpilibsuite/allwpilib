@@ -22,6 +22,8 @@ extern "C" {
  * Initializes the analog output port using the given port object.
  *
  * @param handle handle to the port
+ * @param allocationLocation    the location where the allocation is occuring
+ * (can be null)
  * @return       the created analog output handle
  */
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(

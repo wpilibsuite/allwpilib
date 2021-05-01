@@ -93,8 +93,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
   gyro->offset = 0;
   gyro->center = 0;
 
-  gyro->previousAllocation =
-      allocationLocation == nullptr ? "" : allocationLocation;
+  gyro->previousAllocation = allocationLocation ? "" : allocationLocation;
 
   return handle;
 }

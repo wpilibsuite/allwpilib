@@ -22,6 +22,8 @@ extern "C" {
  * Initializes an analog gyro.
  *
  * @param handle handle to the analog port
+ * @param allocationLocation    the location where the allocation is occuring
+ * (can be null)
  * @return       the initialized gyro handle
  */
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
