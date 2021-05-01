@@ -4,6 +4,12 @@
 
 package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -12,12 +18,6 @@ import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.AutoCons
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.Constants.OIConstants;
 import edu.wpi.first.wpilibj.examples.swervecontrollercommand.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;

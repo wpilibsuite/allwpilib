@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpiutil.math;
+package edu.wpi.first.math;
 
 //CHECKSTYLE.OFF: ImportOrder
 {{REPLACEWITHIMPORTS}}
