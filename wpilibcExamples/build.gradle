@@ -253,3 +253,28 @@ ext {
     isCppCommands = true
 }
 apply from: "${rootDir}/shared/examplecheck.gradle"
+
+ext.examplesMap.each { key, value ->
+    Task deleteTask = tasks.findByPath("deleteMyRobot")
+    if (deleteTask == null) {
+        deleteTask = task("deleteMyRobot", type: Delete) {
+            delete "${rootDir}/myRobot/src/main/native/"
+        }
+    }
+    def copyTask = task("copy${key}ToMyRobotDir", type: Copy) {
+
+        from "${rootDir}/wpilibcExamples/src/main/cpp/examples/${key}/"
+        into "${rootDir}/myRobot/src/main/native/"
+        doLast {
+            println "copied to ${getDestinationDir()}"
+        }
+    }
+    def runTask = project.getParent().tasks.findByPath(':myRobot:runCpp')
+    project.tasks.register("Run${key}") {
+        dependsOn deleteTask
+        dependsOn copyTask
+        dependsOn runTask
+        copyTask.mustRunAfter(deleteTask)
+        runTask.mustRunAfter(copyTask)
+    }
+}
