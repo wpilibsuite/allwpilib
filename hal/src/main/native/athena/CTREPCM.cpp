@@ -290,9 +290,30 @@ HAL_Bool HAL_GetCTREPCMCompressorNotConnectedFault(HAL_CTREPCMHandle handle,
   return pcmStatus.bits.Fault_CompNoCurrent;
 }
 
-int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status);
+int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status) {
+  READ_STATUS(0);
+  return pcmStatus.bits.SolenoidBits & 0xFF;
+}
+
 void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
-                             int32_t values, int32_t* status);
+                             int32_t values, int32_t* status) {
+auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+
+
+  uint8_t smallMask = mask & 0xFF;
+  uint8_t smallValues = (values & 0xFF) & smallMask; // Enforce only masked values are set
+  uint8_t invertMask = ~smallMask;
+
+  std::scoped_lock lock{pcm->lock};
+  uint8_t existingValue = invertMask & pcm->control.bits.solenoidBits;
+  pcm->control.bits.solenoidBits = existingValue | smallValues;
+  SendControl(pcm.get(), status);
+}
 
 int32_t HAL_GetCTREPCMSolenoidBlackList(HAL_CTREPCMHandle handle,
                                         int32_t* status) {
@@ -305,6 +326,7 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageStickyFault(HAL_CTREPCMHandle handle,
   READ_STATUS(false);
   return pcmStatus.bits.stickyFaultFuseTripped;
 }
+
 HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
                                             int32_t* status) {
   READ_STATUS(false);

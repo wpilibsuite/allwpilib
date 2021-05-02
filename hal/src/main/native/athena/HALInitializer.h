@@ -16,6 +16,7 @@ inline void CheckInit() {
   RunInitialize();
 }
 
+extern void InitializeCTREPCM();
 extern void InitializeAccelerometer();
 extern void InitializeAddressableLED();
 extern void InitializeAnalogAccumulator();

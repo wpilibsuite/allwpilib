@@ -40,6 +40,7 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeCTREPCM();
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
