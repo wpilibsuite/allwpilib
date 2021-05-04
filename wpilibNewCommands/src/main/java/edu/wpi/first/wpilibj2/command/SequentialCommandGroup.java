@@ -92,4 +92,10 @@ public class SequentialCommandGroup extends CommandGroupBase {
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
   }
+
+  @Override
+  public SequentialCommandGroup andThen(Command... next) {
+    addCommands(next);
+    return this;
+  }
 }

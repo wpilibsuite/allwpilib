@@ -125,7 +125,7 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
-    return new SequentialCommandGroup(this, new InstantCommand(toRun, requirements));
+    return this.andThen(new InstantCommand(toRun, requirements));
   }
 
   /**
