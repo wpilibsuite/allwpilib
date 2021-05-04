@@ -266,10 +266,7 @@ public interface Command {
   }
 
   /**
-   * Whether the command requires a given subsystem. Named "hasRequirement" rather than "requires"
-   * to avoid confusion with {@link
-   * edu.wpi.first.wpilibj.command.Command#requires(edu.wpi.first.wpilibj.command.Subsystem)} - this
-   * may be able to be changed in a few years.
+   * Whether the command requires a given subsystem.
    *
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
