@@ -56,7 +56,7 @@ void Preferences::SetString(wpi::StringRef key, wpi::StringRef value) {
 }
 
 void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
-  Preferences::SetString(key, value);
+  SetString(key, value);
 }
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
@@ -71,7 +71,7 @@ void Preferences::SetInt(wpi::StringRef key, int value) {
 }
 
 void Preferences::PutInt(wpi::StringRef key, int value) {
-  Preferences::SetInt(key, value);
+  SetInt(key, value);
 }
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
@@ -86,7 +86,7 @@ void Preferences::SetDouble(wpi::StringRef key, double value) {
 }
 
 void Preferences::PutDouble(wpi::StringRef key, double value) {
-  Preferences::SetDouble(key, value);
+  SetDouble(key, value);
 }
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
@@ -101,7 +101,7 @@ void Preferences::SetFloat(wpi::StringRef key, float value) {
 }
 
 void Preferences::PutFloat(wpi::StringRef key, float value) {
-  Preferences::SetFloat(key, value);
+  SetFloat(key, value);
 }
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
@@ -131,7 +131,7 @@ void Preferences::SetLong(wpi::StringRef key, int64_t value) {
 }
 
 void Preferences::PutLong(wpi::StringRef key, int64_t value) {
-  Preferences::SetLong(key, value);
+  SetLong(key, value);
 }
 
 void Preferences::InitLong(wpi::StringRef key, int64_t value) {
