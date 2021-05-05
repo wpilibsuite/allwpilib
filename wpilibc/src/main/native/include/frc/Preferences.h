@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include <wpi/deprecated.h>
+
 #include <networktables/NetworkTable.h>
 
 namespace frc {
@@ -114,6 +116,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetString(wpi::StringRef key, wpi::StringRef value);
+
+  WPI_DEPRECATED("Use SetString instead.")
   void PutString(wpi::StringRef key, wpi::StringRef value);
 
   /**
@@ -130,6 +135,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetInt(wpi::StringRef key, int value);
+
+  WPI_DEPRECATED("Use SetInt instead.")
   void PutInt(wpi::StringRef key, int value);
 
   /**
@@ -146,6 +154,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetDouble(wpi::StringRef key, double value);
+
+  WPI_DEPRECATED("Use SetDouble instead.")
   void PutDouble(wpi::StringRef key, double value);
 
   /**
@@ -162,6 +173,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetFloat(wpi::StringRef key, float value);
+
+  WPI_DEPRECATED("Use SetFloat instead.")
   void PutFloat(wpi::StringRef key, float value);
 
   /**
@@ -178,6 +192,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetBoolean(wpi::StringRef key, bool value);
+
+  WPI_DEPRECATED("Use SetBoolean instead.")
   void PutBoolean(wpi::StringRef key, bool value);
 
   /**
@@ -194,6 +211,9 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
+  void SetLong(wpi::StringRef key, int64_t value);
+
+  WPI_DEPRECATED("Use SetLong instead.")
   void PutLong(wpi::StringRef key, int64_t value);
 
   /**
