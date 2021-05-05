@@ -193,7 +193,7 @@ public final class Preferences {
    *
    * @param key the key
    * @param value the value
-   * @deprecated Use {@link #setFloat(String, value)}
+   * @deprecated Use {@link #setFloat(String, float)}
    */
   @Deprecated
   public void putFloat(String key, float value) {
@@ -228,7 +228,7 @@ public final class Preferences {
    *
    * @param key the key
    * @param value the value
-   * @deprecated Use {@link #setBoolean(String, value)}
+   * @deprecated Use {@link #setBoolean(String, boolean)}
    */
   @Deprecated
   public void putBoolean(String key, boolean value) {
