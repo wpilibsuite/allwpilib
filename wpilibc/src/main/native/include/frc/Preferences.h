@@ -10,9 +10,8 @@
 #include <string>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 #include <networktables/NetworkTable.h>
+#include <wpi/deprecated.h>
 
 namespace frc {
 

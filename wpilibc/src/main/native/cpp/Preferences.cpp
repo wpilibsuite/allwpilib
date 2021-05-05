@@ -55,7 +55,9 @@ void Preferences::SetString(wpi::StringRef key, wpi::StringRef value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) { Preferences::SetString(key, value); }
+void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
+  Preferences::SetString(key, value);
+}
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
   auto entry = m_table->GetEntry(key);
@@ -68,7 +70,9 @@ void Preferences::SetInt(wpi::StringRef key, int value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutInt(wpi::StringRef key, int value) { Preferences::SetInt(key, value); }
+void Preferences::PutInt(wpi::StringRef key, int value) {
+  Preferences::SetInt(key, value);
+}
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
   auto entry = m_table->GetEntry(key);
@@ -81,7 +85,9 @@ void Preferences::SetDouble(wpi::StringRef key, double value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutDouble(wpi::StringRef key, double value) { Preferences::SetDouble(key, value); }
+void Preferences::PutDouble(wpi::StringRef key, double value) {
+  Preferences::SetDouble(key, value);
+}
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
   auto entry = m_table->GetEntry(key);
@@ -94,7 +100,9 @@ void Preferences::SetFloat(wpi::StringRef key, float value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutFloat(wpi::StringRef key, float value) { Preferences::SetFloat(key, value); }
+void Preferences::PutFloat(wpi::StringRef key, float value) {
+  Preferences::SetFloat(key, value);
+}
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
   auto entry = m_table->GetEntry(key);
@@ -107,7 +115,9 @@ void Preferences::SetBoolean(wpi::StringRef key, bool value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutBoolean(wpi::StringRef key, bool value) { Preferences::SetBoolean(key, value); }
+void Preferences::PutBoolean(wpi::StringRef key, bool value) {
+  Preferences::SetBoolean(key, value);
+}
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
   auto entry = m_table->GetEntry(key);
@@ -120,7 +130,9 @@ void Preferences::SetLong(wpi::StringRef key, int64_t value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutLong(wpi::StringRef key, int64_t value) { Preferences::SetLong(key, value); }
+void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+  Preferences::SetLong(key, value);
+}
 
 void Preferences::InitLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
