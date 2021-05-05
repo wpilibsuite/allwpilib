@@ -116,7 +116,7 @@ void Preferences::SetBoolean(wpi::StringRef key, bool value) {
 }
 
 void Preferences::PutBoolean(wpi::StringRef key, bool value) {
-  Preferences::SetBoolean(key, value);
+  SetBoolean(key, value);
 }
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
