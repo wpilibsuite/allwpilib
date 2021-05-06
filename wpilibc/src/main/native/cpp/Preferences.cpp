@@ -49,10 +49,14 @@ int64_t Preferences::GetLong(wpi::StringRef key, int64_t defaultValue) {
   return static_cast<int64_t>(m_table->GetNumber(key, defaultValue));
 }
 
-void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
+void Preferences::SetString(wpi::StringRef key, wpi::StringRef value) {
   auto entry = m_table->GetEntry(key);
   entry.SetString(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
+  SetString(key, value);
 }
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
@@ -60,10 +64,14 @@ void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
   entry.SetDefaultString(value);
 }
 
-void Preferences::PutInt(wpi::StringRef key, int value) {
+void Preferences::SetInt(wpi::StringRef key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutInt(wpi::StringRef key, int value) {
+  SetInt(key, value);
 }
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
@@ -71,10 +79,14 @@ void Preferences::InitInt(wpi::StringRef key, int value) {
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutDouble(wpi::StringRef key, double value) {
+void Preferences::SetDouble(wpi::StringRef key, double value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutDouble(wpi::StringRef key, double value) {
+  SetDouble(key, value);
 }
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
@@ -82,10 +94,14 @@ void Preferences::InitDouble(wpi::StringRef key, double value) {
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutFloat(wpi::StringRef key, float value) {
+void Preferences::SetFloat(wpi::StringRef key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutFloat(wpi::StringRef key, float value) {
+  SetFloat(key, value);
 }
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
@@ -93,10 +109,14 @@ void Preferences::InitFloat(wpi::StringRef key, float value) {
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutBoolean(wpi::StringRef key, bool value) {
+void Preferences::SetBoolean(wpi::StringRef key, bool value) {
   auto entry = m_table->GetEntry(key);
   entry.SetBoolean(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutBoolean(wpi::StringRef key, bool value) {
+  SetBoolean(key, value);
 }
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
@@ -104,10 +124,14 @@ void Preferences::InitBoolean(wpi::StringRef key, bool value) {
   entry.SetDefaultBoolean(value);
 }
 
-void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+void Preferences::SetLong(wpi::StringRef key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
+}
+
+void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+  SetLong(key, value);
 }
 
 void Preferences::InitLong(wpi::StringRef key, int64_t value) {
