@@ -9,7 +9,7 @@
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
-#include "hal/simulation/PCMData.h"
+#include "hal/simulation/CTREPCMData.h"
 
 namespace {
 struct Solenoid {
@@ -21,13 +21,13 @@ struct Solenoid {
 using namespace hal;
 
 static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
-                             kNumPCMModules * kNumSolenoidChannels,
+                             kNumCTREPCMModules * kNumSolenoidChannels,
                              HAL_HandleEnum::Solenoid>* solenoidHandles;
 
 namespace hal::init {
 void InitializeSolenoid() {
   static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
-                               kNumPCMModules * kNumSolenoidChannels,
+                               kNumCTREPCMModules * kNumSolenoidChannels,
                                HAL_HandleEnum::Solenoid>
       sH;
   solenoidHandles = &sH;
@@ -65,8 +65,8 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
   solenoidPort->module = static_cast<uint8_t>(module);
   solenoidPort->channel = static_cast<uint8_t>(channel);
 
-  HALSIM_SetPCMSolenoidInitialized(module, channel, true);
-  HALSIM_SetPCMAnySolenoidInitialized(module, true);
+  HALSIM_SetCTREPCMSolenoidInitialized(module, channel, true);
+  HALSIM_SetCTREPCMAnySolenoidInitialized(module, true);
 
   return handle;
 }
@@ -76,19 +76,19 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
     return;
   }
   solenoidHandles->Free(solenoidPortHandle);
-  HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
+  HALSIM_SetCTREPCMSolenoidInitialized(port->module, port->channel, false);
   int count = 0;
   for (int i = 0; i < kNumSolenoidChannels; ++i) {
-    if (HALSIM_GetPCMSolenoidInitialized(port->module, i)) {
+    if (HALSIM_GetCTREPCMSolenoidInitialized(port->module, i)) {
       ++count;
     }
   }
   if (count == 0) {
-    HALSIM_SetPCMAnySolenoidInitialized(port->module, false);
+    HALSIM_SetCTREPCMAnySolenoidInitialized(port->module, false);
   }
 }
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
-  return module < kNumPCMModules && module >= 0;
+  return module < kNumCTREPCMModules && module >= 0;
 }
 
 HAL_Bool HAL_CheckSolenoidChannel(int32_t channel) {
@@ -102,12 +102,12 @@ HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
     return false;
   }
 
-  return HALSIM_GetPCMSolenoidOutput(port->module, port->channel);
+  return HALSIM_GetCTREPCMSolenoidOutput(port->module, port->channel);
 }
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {
   int32_t total = 0;
   for (int i = 0; i < kNumSolenoidChannels; i++) {
-    int32_t channel = HALSIM_GetPCMSolenoidOutput(module, i) ? 1 : 0;
+    int32_t channel = HALSIM_GetCTREPCMSolenoidOutput(module, i) ? 1 : 0;
     total = total + (channel << i);
   }
 
@@ -121,13 +121,13 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
     return;
   }
 
-  HALSIM_SetPCMSolenoidOutput(port->module, port->channel, value);
+  HALSIM_SetCTREPCMSolenoidOutput(port->module, port->channel, value);
 }
 
 void HAL_SetAllSolenoids(int32_t module, int32_t state, int32_t* status) {
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     int set = state & 1;
-    HALSIM_SetPCMSolenoidOutput(module, i, set);
+    HALSIM_SetCTREPCMSolenoidOutput(module, i, set);
     state >>= 1;
   }
 }

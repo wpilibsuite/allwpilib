@@ -31,7 +31,7 @@ extern void InitializeDutyCycle();
 extern void InitializeDriverStationData();
 extern void InitializeEncoderData();
 extern void InitializeI2CData();
-extern void InitializePCMData();
+extern void InitializeCTREPCMData();
 extern void InitializePDPData();
 extern void InitializePWMData();
 extern void InitializeRelayData();

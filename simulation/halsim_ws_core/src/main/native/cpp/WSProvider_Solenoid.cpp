@@ -5,10 +5,10 @@
 #include "WSProvider_Solenoid.h"
 
 #include <hal/Ports.h>
-#include <hal/simulation/PCMData.h>
+#include <hal/simulation/CTREPCMData.h>
 
 #define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                  \
-  HALSIM_RegisterPCMSolenoid##halsim##Callback(                            \
+  HALSIM_RegisterCTREPCMSolenoid##halsim##Callback(                            \
       m_pcmIndex, m_solenoidIndex,                                         \
       [](const char* name, void* param, const struct HAL_Value* value) {   \
         static_cast<HALSimWSProviderSolenoid*>(param)->ProcessHalCallback( \
@@ -18,25 +18,25 @@
 
 namespace wpilibws {
 void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
-  for (int32_t pcmIndex = 0; pcmIndex < HAL_GetNumPCMModules(); ++pcmIndex) {
+  for (int32_t CTREPCMIndex = 0; CTREPCMIndex < HAL_GetNumCTREPCMModules(); ++CTREPCMIndex) {
     for (int32_t solenoidIndex = 0;
          solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
       auto key =
-          ("Solenoid/" + wpi::Twine(pcmIndex) + "," + wpi::Twine(solenoidIndex))
+          ("Solenoid/" + wpi::Twine(CTREPCMIndex) + "," + wpi::Twine(solenoidIndex))
               .str();
       auto ptr = std::make_unique<HALSimWSProviderSolenoid>(
-          pcmIndex, solenoidIndex, key, "Solenoid");
+          CTREPCMIndex, solenoidIndex, key, "Solenoid");
       webRegisterFunc(key, std::move(ptr));
     }
   }
 }
 
-HALSimWSProviderSolenoid::HALSimWSProviderSolenoid(int32_t pcmChannel,
+HALSimWSProviderSolenoid::HALSimWSProviderSolenoid(int32_t CTREPCMChannel,
                                                    int32_t solenoidChannel,
                                                    const std::string& key,
                                                    const std::string& type)
     : HALSimWSHalProvider(key, type),
-      m_pcmIndex(pcmChannel),
+      m_pcmIndex(CTREPCMChannel),
       m_solenoidIndex(solenoidChannel) {
   m_deviceId =
       std::to_string(m_pcmIndex) + "," + std::to_string(solenoidChannel);
@@ -56,9 +56,9 @@ void HALSimWSProviderSolenoid::CancelCallbacks() {
 }
 
 void HALSimWSProviderSolenoid::DoCancelCallbacks() {
-  HALSIM_CancelPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
+  HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
                                               m_initCbKey);
-  HALSIM_CancelPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
+  HALSIM_CancelCTREPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
                                          m_outputCbKey);
 
   m_initCbKey = 0;

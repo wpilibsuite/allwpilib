@@ -3,19 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "../PortsInternal.h"
-#include "PCMDataInternal.h"
+#include "CTREPCMDataInternal.h"
 
 using namespace hal;
 
 namespace hal::init {
-void InitializePCMData() {
-  static PCMData spd[kNumPCMModules];
-  ::hal::SimPCMData = spd;
+void InitializeCTREPCMData() {
+  static CTREPCMData spd[kNumCTREPCMModules];
+  ::hal::SimCTREPCMData = spd;
 }
 }  // namespace hal::init
 
-PCMData* hal::SimPCMData;
-void PCMData::ResetData() {
+CTREPCMData* hal::SimCTREPCMData;
+void CTREPCMData::ResetData() {
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     solenoidInitialized[i].Reset(false);
     solenoidOutput[i].Reset(false);
@@ -29,18 +29,18 @@ void PCMData::ResetData() {
 }
 
 extern "C" {
-void HALSIM_ResetPCMData(int32_t index) {
-  SimPCMData[index].ResetData();
+void HALSIM_ResetCTREPCMData(int32_t index) {
+  SimCTREPCMData[index].ResetData();
 }
 
 #define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PCM##CAPINAME, SimPCMData, \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, SimCTREPCMData, \
                                LOWERNAME)
 
-HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidInitialized,
-                                     SimPCMData, solenoidInitialized)
-HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, PCMSolenoidOutput,
-                                     SimPCMData, solenoidOutput)
+HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidInitialized,
+                                     SimCTREPCMData, solenoidInitialized)
+HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput,
+                                     SimCTREPCMData, solenoidOutput)
 DEFINE_CAPI(HAL_Bool, AnySolenoidInitialized, anySolenoidInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorInitialized, compressorInitialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
@@ -48,8 +48,8 @@ DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 
-void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
-  auto& data = SimPCMData[index].solenoidOutput;
+void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
+  auto& data = SimCTREPCMData[index].solenoidOutput;
   uint8_t ret = 0;
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     ret |= (data[i] << i);
@@ -57,8 +57,8 @@ void HALSIM_GetPCMAllSolenoids(int32_t index, uint8_t* values) {
   *values = ret;
 }
 
-void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {
-  auto& data = SimPCMData[index].solenoidOutput;
+void HALSIM_SetCTREPCMAllSolenoids(int32_t index, uint8_t values) {
+  auto& data = SimCTREPCMData[index].solenoidOutput;
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     data[i] = (values & 0x1) != 0;
     values >>= 1;
@@ -66,9 +66,9 @@ void HALSIM_SetPCMAllSolenoids(int32_t index, uint8_t values) {
 }
 
 #define REGISTER(NAME) \
-  SimPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)
+  SimCTREPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)
 
-void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
+void HALSIM_RegisterCTREPCMAllNonSolenoidCallbacks(int32_t index,
                                                HAL_NotifyCallback callback,
                                                void* param,
                                                HAL_Bool initialNotify) {
@@ -79,7 +79,7 @@ void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
   REGISTER(compressorCurrent);
 }
 
-void HALSIM_RegisterPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
+void HALSIM_RegisterCTREPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
                                             HAL_NotifyCallback callback,
                                             void* param,
                                             HAL_Bool initialNotify) {

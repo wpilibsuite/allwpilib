@@ -6,7 +6,8 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
-public class PCMDataJNI extends JNIWrapper {
+@SuppressWarnings("AbbreviationAsWordInName")
+public class CTREPCMDataJNI extends JNIWrapper {
   public static native int registerSolenoidInitializedCallback(
       int index, int channel, NotifyCallback callback, boolean initialNotify);
 

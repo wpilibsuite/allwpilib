@@ -5,11 +5,11 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/PCMData.h"
+#include "hal/simulation/CTREPCMData.h"
 #include "hal/simulation/SimDataValue.h"
 
 namespace hal {
-class PCMData {
+class CTREPCMData {
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
   HAL_SIMDATAVALUE_DEFINE_NAME(AnySolenoidInitialized)
@@ -50,5 +50,5 @@ class PCMData {
 
   virtual void ResetData();
 };
-extern PCMData* SimPCMData;
+extern CTREPCMData* SimCTREPCMData;
 }  // namespace hal

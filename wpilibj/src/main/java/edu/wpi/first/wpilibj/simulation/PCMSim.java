@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.hal.simulation.CTREPCMDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.hal.simulation.PCMDataJNI;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.SensorUtil;
 
@@ -48,8 +48,10 @@ public class PCMSim {
   public CallbackStore registerSolenoidInitializedCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
     int uid =
-        PCMDataJNI.registerSolenoidInitializedCallback(m_index, channel, callback, initialNotify);
-    return new CallbackStore(m_index, channel, uid, PCMDataJNI::cancelSolenoidInitializedCallback);
+        CTREPCMDataJNI.registerSolenoidInitializedCallback(
+            m_index, channel, callback, initialNotify);
+    return new CallbackStore(
+        m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidInitializedCallback);
   }
 
   /**
@@ -59,7 +61,7 @@ public class PCMSim {
    * @return true if initialized
    */
   public boolean getSolenoidInitialized(int channel) {
-    return PCMDataJNI.getSolenoidInitialized(m_index, channel);
+    return CTREPCMDataJNI.getSolenoidInitialized(m_index, channel);
   }
 
   /**
@@ -69,7 +71,7 @@ public class PCMSim {
    * @param solenoidInitialized is there a solenoid initialized on that channel
    */
   public void setSolenoidInitialized(int channel, boolean solenoidInitialized) {
-    PCMDataJNI.setSolenoidInitialized(m_index, channel, solenoidInitialized);
+    CTREPCMDataJNI.setSolenoidInitialized(m_index, channel, solenoidInitialized);
   }
 
   /**
@@ -83,8 +85,9 @@ public class PCMSim {
    */
   public CallbackStore registerSolenoidOutputCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
-    return new CallbackStore(m_index, channel, uid, PCMDataJNI::cancelSolenoidOutputCallback);
+    int uid =
+        CTREPCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
+    return new CallbackStore(m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidOutputCallback);
   }
 
   /**
@@ -94,7 +97,7 @@ public class PCMSim {
    * @return the solenoid output
    */
   public boolean getSolenoidOutput(int channel) {
-    return PCMDataJNI.getSolenoidOutput(m_index, channel);
+    return CTREPCMDataJNI.getSolenoidOutput(m_index, channel);
   }
 
   /**
@@ -104,7 +107,7 @@ public class PCMSim {
    * @param solenoidOutput the new solenoid output
    */
   public void setSolenoidOutput(int channel, boolean solenoidOutput) {
-    PCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
+    CTREPCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
   }
 
   /**
@@ -117,8 +120,9 @@ public class PCMSim {
    */
   public CallbackStore registerCompressorInitializedCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerCompressorInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorInitializedCallback);
+    int uid =
+        CTREPCMDataJNI.registerCompressorInitializedCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorInitializedCallback);
   }
 
   /**
@@ -127,7 +131,7 @@ public class PCMSim {
    * @return true if initialized
    */
   public boolean getCompressorInitialized() {
-    return PCMDataJNI.getCompressorInitialized(m_index);
+    return CTREPCMDataJNI.getCompressorInitialized(m_index);
   }
 
   /**
@@ -136,7 +140,7 @@ public class PCMSim {
    * @param compressorInitialized whether the compressor is initialized
    */
   public void setCompressorInitialized(boolean compressorInitialized) {
-    PCMDataJNI.setCompressorInitialized(m_index, compressorInitialized);
+    CTREPCMDataJNI.setCompressorInitialized(m_index, compressorInitialized);
   }
 
   /**
@@ -149,8 +153,8 @@ public class PCMSim {
    */
   public CallbackStore registerCompressorOnCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorOnCallback);
+    int uid = CTREPCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorOnCallback);
   }
 
   /**
@@ -159,7 +163,7 @@ public class PCMSim {
    * @return true if the compressor is active
    */
   public boolean getCompressorOn() {
-    return PCMDataJNI.getCompressorOn(m_index);
+    return CTREPCMDataJNI.getCompressorOn(m_index);
   }
 
   /**
@@ -168,7 +172,7 @@ public class PCMSim {
    * @param compressorOn the new value
    */
   public void setCompressorOn(boolean compressorOn) {
-    PCMDataJNI.setCompressorOn(m_index, compressorOn);
+    CTREPCMDataJNI.setCompressorOn(m_index, compressorOn);
   }
 
   /**
@@ -181,8 +185,8 @@ public class PCMSim {
    */
   public CallbackStore registerClosedLoopEnabledCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PCMDataJNI::cancelClosedLoopEnabledCallback);
+    int uid = CTREPCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelClosedLoopEnabledCallback);
   }
 
   /**
@@ -191,7 +195,7 @@ public class PCMSim {
    * @return true if active
    */
   public boolean getClosedLoopEnabled() {
-    return PCMDataJNI.getClosedLoopEnabled(m_index);
+    return CTREPCMDataJNI.getClosedLoopEnabled(m_index);
   }
 
   /**
@@ -200,7 +204,7 @@ public class PCMSim {
    * @param closedLoopEnabled whether the control loop is active
    */
   public void setClosedLoopEnabled(boolean closedLoopEnabled) {
-    PCMDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
+    CTREPCMDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
   }
 
   /**
@@ -213,8 +217,8 @@ public class PCMSim {
    */
   public CallbackStore registerPressureSwitchCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PCMDataJNI::cancelPressureSwitchCallback);
+    int uid = CTREPCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelPressureSwitchCallback);
   }
 
   /**
@@ -223,7 +227,7 @@ public class PCMSim {
    * @return the pressure switch value
    */
   public boolean getPressureSwitch() {
-    return PCMDataJNI.getPressureSwitch(m_index);
+    return CTREPCMDataJNI.getPressureSwitch(m_index);
   }
 
   /**
@@ -232,7 +236,7 @@ public class PCMSim {
    * @param pressureSwitch the new value
    */
   public void setPressureSwitch(boolean pressureSwitch) {
-    PCMDataJNI.setPressureSwitch(m_index, pressureSwitch);
+    CTREPCMDataJNI.setPressureSwitch(m_index, pressureSwitch);
   }
 
   /**
@@ -245,8 +249,8 @@ public class PCMSim {
    */
   public CallbackStore registerCompressorCurrentCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = PCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PCMDataJNI::cancelCompressorCurrentCallback);
+    int uid = CTREPCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorCurrentCallback);
   }
 
   /**
@@ -255,7 +259,7 @@ public class PCMSim {
    * @return the current of the compressor connected to this module
    */
   public double getCompressorCurrent() {
-    return PCMDataJNI.getCompressorCurrent(m_index);
+    return CTREPCMDataJNI.getCompressorCurrent(m_index);
   }
 
   /**
@@ -264,11 +268,11 @@ public class PCMSim {
    * @param compressorCurrent the new compressor current
    */
   public void setCompressorCurrent(double compressorCurrent) {
-    PCMDataJNI.setCompressorCurrent(m_index, compressorCurrent);
+    CTREPCMDataJNI.setCompressorCurrent(m_index, compressorCurrent);
   }
 
   /** Reset all simulation data for this object. */
   public void resetData() {
-    PCMDataJNI.resetData(m_index);
+    CTREPCMDataJNI.resetData(m_index);
   }
 }

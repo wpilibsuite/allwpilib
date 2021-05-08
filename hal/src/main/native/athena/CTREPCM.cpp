@@ -125,12 +125,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumPCMModules,
+static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                              HAL_HandleEnum::CTREPCM>* pcmHandles;
 
 namespace hal::init {
 void InitializeCTREPCM() {
-  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumPCMModules,
+  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
                                HAL_HandleEnum::CTREPCM>
       pH;
   pcmHandles = &pH;
@@ -216,7 +216,7 @@ void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
 }
 
 HAL_Bool HAL_CheckCTREPCM(int32_t module) {
-  return module < kNumPCMModules && module >= 0;
+  return module < kNumCTREPCMModules && module >= 0;
 }
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {

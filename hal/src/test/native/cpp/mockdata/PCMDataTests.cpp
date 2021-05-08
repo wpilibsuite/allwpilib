@@ -6,7 +6,7 @@
 #include "hal/HAL.h"
 #include "hal/Solenoid.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/PCMData.h"
+#include "hal/simulation/CTREPCMData.h"
 
 namespace hal {
 
@@ -24,7 +24,7 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   const int CHANNEL_TO_TEST = 3;
 
   int callbackParam = 0;
-  int callbackId = HALSIM_RegisterPCMSolenoidInitializedCallback(
+  int callbackId = HALSIM_RegisterCTREPCMSolenoidInitializedCallback(
       MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback,
       &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
@@ -62,8 +62,8 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
 
   // Reset, should allow you to re-register
   hal::HandleBase::ResetGlobalHandles();
-  HALSIM_ResetPCMData(MODULE_TO_TEST);
-  callbackId = HALSIM_RegisterPCMSolenoidInitializedCallback(
+  HALSIM_ResetCTREPCMData(MODULE_TO_TEST);
+  callbackId = HALSIM_RegisterCTREPCMSolenoidInitializedCallback(
       MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback,
       &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);

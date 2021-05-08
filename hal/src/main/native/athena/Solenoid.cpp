@@ -24,13 +24,13 @@ struct Solenoid {
 using namespace hal;
 
 static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
-                             kNumPCMModules * kNumSolenoidChannels,
+                             kNumCTREPCMModules * kNumSolenoidChannels,
                              HAL_HandleEnum::Solenoid>* solenoidHandles;
 
 namespace hal::init {
 void InitializeSolenoid() {
   static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
-                               kNumPCMModules * kNumSolenoidChannels,
+                               kNumCTREPCMModules * kNumSolenoidChannels,
                                HAL_HandleEnum::Solenoid>
       sH;
   solenoidHandles = &sH;
@@ -77,7 +77,7 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
 }
 
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
-  return module < kNumPCMModules && module >= 0;
+  return module < kNumCTREPCMModules && module >= 0;
 }
 
 HAL_Bool HAL_CheckSolenoidChannel(int32_t channel) {

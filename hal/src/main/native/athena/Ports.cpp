@@ -56,8 +56,8 @@ int32_t HAL_GetNumRelayChannels(void) {
 int32_t HAL_GetNumRelayHeaders(void) {
   return kNumRelayHeaders;
 }
-int32_t HAL_GetNumPCMModules(void) {
-  return kNumPCMModules;
+int32_t HAL_GetNumCTREPCMModules(void) {
+  return kNumCTREPCMModules;
 }
 int32_t HAL_GetNumSolenoidChannels(void) {
   return kNumSolenoidChannels;

@@ -73,7 +73,7 @@ void InitializeHAL() {
   InitializeDriverStationData();
   InitializeEncoderData();
   InitializeI2CData();
-  InitializePCMData();
+  InitializeCTREPCMData();
   InitializePDPData();
   InitializePWMData();
   InitializeRelayData();

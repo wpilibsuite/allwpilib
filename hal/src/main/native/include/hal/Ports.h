@@ -119,7 +119,7 @@ int32_t HAL_GetNumRelayHeaders(void);
  *
  * @return the number of PCM modules
  */
-int32_t HAL_GetNumPCMModules(void);
+int32_t HAL_GetNumCTREPCMModules(void);
 
 /**
  * Gets the number of solenoid channels in the current system.

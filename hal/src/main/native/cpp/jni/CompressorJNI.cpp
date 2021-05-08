@@ -23,7 +23,7 @@ Java_edu_wpi_first_hal_CompressorJNI_initializeCompressor
 {
   int32_t status = 0;
   auto handle = HAL_InitializeCompressor(module, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumPCMModules(), module);
+  CheckStatusRange(env, status, 0, HAL_GetNumCTREPCMModules(), module);
 
   return (jint)handle;
 }
