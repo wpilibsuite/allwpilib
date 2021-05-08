@@ -303,8 +303,6 @@ auto pcm = pcmHandles->Get(handle);
     return;
   }
 
-
-
   uint8_t smallMask = mask & 0xFF;
   uint8_t smallValues = (values & 0xFF) & smallMask; // Enforce only masked values are set
   uint8_t invertMask = ~smallMask;
@@ -333,10 +331,60 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
   return pcmStatus.bits.faultFuseTripped;
 }
 
-void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle, int32_t* status);
+void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle, int32_t* status) {
+  uint8_t controlData[] = { 0, 0, 0 , 0x80 };
+  HAL_WriteCANPacket(handle, controlData, sizeof(controlData), Control2, status);
+}
 
 void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
-                            int32_t* status);
-void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
-                                   int32_t durMS, int32_t* status);
+                            int32_t* status) {
+  if (index > 7 || index < 0) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " + wpi::Twine(index));
+    return;
+  }
+
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  std::scoped_lock lock{pcm->lock};
+  uint16_t oneShotField = pcm->control.bits.OneShotField_h8;
+  oneShotField <<= 8;
+  oneShotField |= pcm->control.bits.OneShotField_l8;
+
+  uint16_t shift = 2 * index;
+  uint16_t mask = 3;
+  uint8_t chBits = (oneShotField >> shift) & mask;
+  chBits = (chBits % 3) + 1;
+  oneShotField &= ~(mask << shift);
+  oneShotField |= (chBits << shift);
+  pcm->control.bits.OneShotField_h8 = oneShotField >> 8;
+  pcm->control.bits.OneShotField_l8 = oneShotField;
+  SendControl(pcm.get(), status);
 }
+
+void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
+                                   int32_t durMS, int32_t* status) {
+  if (index > 7 || index < 0) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " + wpi::Twine(index));
+    return;
+  }
+
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  std::scoped_lock lock{pcm->lock};
+  pcm->oneShot.sol10MsPerUnit[index] = (std::min)((uint32_t)(durMS)/10, (uint32_t)0xFF);
+  HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8, Control2,
+                              SendPeriod, status);
+
+}
+
+} // extern "C"
