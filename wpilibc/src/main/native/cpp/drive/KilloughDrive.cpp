@@ -60,26 +60,15 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
     reported = true;
   }
 
-  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
-
-  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  // Compensate for gyro angle.
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  auto [left, right, back] =
+      DriveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
 
-  double wheelSpeeds[3];
-  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
-  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
-  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
-
-  Normalize(wheelSpeeds);
-
-  m_leftMotor->Set(wheelSpeeds[kLeft] * m_maxOutput);
-  m_rightMotor->Set(wheelSpeeds[kRight] * m_maxOutput);
-  m_backMotor->Set(wheelSpeeds[kBack] * m_maxOutput);
+  m_leftMotor->Set(left * m_maxOutput);
+  m_rightMotor->Set(right * m_maxOutput);
+  m_backMotor->Set(back * m_maxOutput);
 
   Feed();
 }
@@ -95,6 +84,27 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
   DriveCartesian(magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
                  magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
                  zRotation, 0.0);
+}
+
+KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesianIK(double ySpeed,
+                                                           double xSpeed,
+                                                           double zRotation,
+                                                           double gyroAngle) {
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
+
+  // Compensate for gyro angle.
+  Vector2d input{ySpeed, xSpeed};
+  input.Rotate(-gyroAngle);
+
+  double wheelSpeeds[3];
+  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
+  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
+  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
+
+  Normalize(wheelSpeeds);
+
+  return {wheelSpeeds[kLeft], wheelSpeeds[kRight], wheelSpeeds[kBack]};
 }
 
 void KilloughDrive::StopMotor() {
