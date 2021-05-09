@@ -33,13 +33,15 @@ public final class Preferences {
   /** The singleton instance. */
   private static Preferences instance;
   /** The network table. */
-  private final NetworkTable m_table;
+  private static final NetworkTable m_table;
 
   /**
    * Returns the preferences instance.
    *
    * @return the preferences instance
+   * @deprecated Use the static methods
    */
+  @Deprecated
   public static synchronized Preferences getInstance() {
     if (instance == null) {
       instance = new Preferences();
@@ -48,7 +50,10 @@ public final class Preferences {
   }
 
   /** Creates a preference class. */
-  private Preferences() {
+  @Deprecated
+  private Preferences() {}
+
+  static {
     m_table = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
     m_table.getEntry(".type").setString("RobotPreferences");
     // Listener to set all Preferences values to persistent
@@ -64,7 +69,7 @@ public final class Preferences {
    *
    * @return a collection of the keys
    */
-  public Collection<String> getKeys() {
+  public static Collection<String> getKeys() {
     return m_table.getKeys();
   }
 
@@ -75,7 +80,7 @@ public final class Preferences {
    * @param value the value
    * @throws NullPointerException if value is null
    */
-  public void setString(String key, String value) {
+  public static void setString(String key, String value) {
     requireNonNullParam(value, "value", "setString");
 
     NetworkTableEntry entry = m_table.getEntry(key);
@@ -92,7 +97,7 @@ public final class Preferences {
    * @deprecated Use {@link #setString(String, String)}
    */
   @Deprecated
-  public void putString(String key, String value) {
+  public static void putString(String key, String value) {
     setString(key, value);
   }
 
@@ -102,7 +107,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initString(String key, String value) {
+  public static void initString(String key, String value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultString(value);
   }
@@ -113,7 +118,7 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void setInt(String key, int value) {
+  public static void setInt(String key, int value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
@@ -127,7 +132,7 @@ public final class Preferences {
    * @deprecated Use {@link #setInt(String, int)}
    */
   @Deprecated
-  public void putInt(String key, int value) {
+  public static void putInt(String key, int value) {
     setInt(key, value);
   }
 
@@ -137,7 +142,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initInt(String key, int value) {
+  public static void initInt(String key, int value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
   }
@@ -148,7 +153,7 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void setDouble(String key, double value) {
+  public static void setDouble(String key, double value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
@@ -161,7 +166,7 @@ public final class Preferences {
    * @param value the value
    * @deprecated Use {@link #setDouble(String, double)}
    */
-  public void putDouble(String key, double value) {
+  public static void putDouble(String key, double value) {
     setDouble(key, value);
   }
 
@@ -171,7 +176,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initDouble(String key, double value) {
+  public static void initDouble(String key, double value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
   }
@@ -182,7 +187,7 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void setFloat(String key, float value) {
+  public static void setFloat(String key, float value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
@@ -196,7 +201,7 @@ public final class Preferences {
    * @deprecated Use {@link #setFloat(String, float)}
    */
   @Deprecated
-  public void putFloat(String key, float value) {
+  public static void putFloat(String key, float value) {
     setFloat(key, value);
   }
 
@@ -206,7 +211,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initFloat(String key, float value) {
+  public static void initFloat(String key, float value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
   }
@@ -217,7 +222,7 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void setBoolean(String key, boolean value) {
+  public static void setBoolean(String key, boolean value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setBoolean(value);
     entry.setPersistent();
@@ -231,7 +236,7 @@ public final class Preferences {
    * @deprecated Use {@link #setBoolean(String, boolean)}
    */
   @Deprecated
-  public void putBoolean(String key, boolean value) {
+  public static void putBoolean(String key, boolean value) {
     setBoolean(key, value);
   }
 
@@ -241,7 +246,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initBoolean(String key, boolean value) {
+  public static void initBoolean(String key, boolean value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultBoolean(value);
   }
@@ -252,7 +257,7 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void setLong(String key, long value) {
+  public static void setLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
@@ -266,7 +271,7 @@ public final class Preferences {
    * @deprecated Use {@link #setLong(String, long)}
    */
   @Deprecated
-  public void putLong(String key, long value) {
+  public static void putLong(String key, long value) {
     setLong(key, value);
   }
 
@@ -276,7 +281,7 @@ public final class Preferences {
    * @param key The key
    * @param value The value
    */
-  public void initLong(String key, long value) {
+  public static void initLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
   }
@@ -287,7 +292,7 @@ public final class Preferences {
    * @param key the key
    * @return if there is a value at the given key
    */
-  public boolean containsKey(String key) {
+  public static boolean containsKey(String key) {
     return m_table.containsKey(key);
   }
 
@@ -296,12 +301,12 @@ public final class Preferences {
    *
    * @param key the key
    */
-  public void remove(String key) {
+  public static void remove(String key) {
     m_table.delete(key);
   }
 
   /** Remove all preferences. */
-  public void removeAll() {
+  public static void removeAll() {
     for (String key : m_table.getKeys()) {
       if (!".type".equals(key)) {
         remove(key);
@@ -317,7 +322,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public String getString(String key, String backup) {
+  public static String getString(String key, String backup) {
     return m_table.getEntry(key).getString(backup);
   }
 
@@ -329,7 +334,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public int getInt(String key, int backup) {
+  public static int getInt(String key, int backup) {
     return (int) m_table.getEntry(key).getDouble(backup);
   }
 
@@ -341,7 +346,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public double getDouble(String key, double backup) {
+  public static double getDouble(String key, double backup) {
     return m_table.getEntry(key).getDouble(backup);
   }
 
@@ -353,7 +358,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public boolean getBoolean(String key, boolean backup) {
+  public static boolean getBoolean(String key, boolean backup) {
     return m_table.getEntry(key).getBoolean(backup);
   }
 
@@ -365,7 +370,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public float getFloat(String key, float backup) {
+  public static float getFloat(String key, float backup) {
     return (float) m_table.getEntry(key).getDouble(backup);
   }
 
@@ -377,7 +382,7 @@ public final class Preferences {
    * @param backup the value to return if none exists in the table
    * @return either the value in the table, or the backup
    */
-  public long getLong(String key, long backup) {
+  public static long getLong(String key, long backup) {
     return (long) m_table.getEntry(key).getDouble(backup);
   }
 }
