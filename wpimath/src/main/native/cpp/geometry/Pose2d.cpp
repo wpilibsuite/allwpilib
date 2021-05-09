@@ -20,12 +20,6 @@ Pose2d Pose2d::operator+(const Transform2d& other) const {
   return TransformBy(other);
 }
 
-Pose2d& Pose2d::operator+=(const Transform2d& other) {
-  m_translation += other.Translation().RotateBy(m_rotation);
-  m_rotation += other.Rotation();
-  return *this;
-}
-
 Transform2d Pose2d::operator-(const Pose2d& other) const {
   const auto pose = this->RelativeTo(other);
   return Transform2d(pose.Translation(), pose.Rotation());

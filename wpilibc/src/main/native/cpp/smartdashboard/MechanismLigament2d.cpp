@@ -19,7 +19,8 @@ MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, double length,
   SetColor(color);
 }
 
-void MechanismLigament2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
+void MechanismLigament2d::UpdateEntries(
+    std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry(".type").SetString("line");
 
   m_colorEntry = table->GetEntry("color");

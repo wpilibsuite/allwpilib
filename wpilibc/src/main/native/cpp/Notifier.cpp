@@ -11,20 +11,20 @@
 #include <hal/Threads.h>
 #include <wpi/SmallString.h>
 
+#include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/Utility.h"
-#include "frc/WPIErrors.h"
 
 using namespace frc;
 
 Notifier::Notifier(std::function<void()> handler) {
-  if (handler == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
+  if (!handler) {
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=] {
     for (;;) {
@@ -60,13 +60,13 @@ Notifier::Notifier(std::function<void()> handler) {
 }
 
 Notifier::Notifier(int priority, std::function<void()> handler) {
-  if (handler == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
+  if (!handler) {
+    throw FRC_MakeError(err::NullParameter, "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "InitializeNotifier");
 
   m_thread = std::thread([=] {
     int32_t status = 0;
@@ -107,7 +107,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -118,8 +118,7 @@ Notifier::~Notifier() {
 }
 
 Notifier::Notifier(Notifier&& rhs)
-    : ErrorBase(std::move(rhs)),
-      m_thread(std::move(rhs.m_thread)),
+    : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_handler(std::move(rhs.m_handler)),
       m_expirationTime(std::move(rhs.m_expirationTime)),
@@ -129,8 +128,6 @@ Notifier::Notifier(Notifier&& rhs)
 }
 
 Notifier& Notifier::operator=(Notifier&& rhs) {
-  ErrorBase::operator=(std::move(rhs));
-
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
   rhs.m_notifier = HAL_kInvalidHandle;
@@ -183,7 +180,7 @@ void Notifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -194,7 +191,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm() {

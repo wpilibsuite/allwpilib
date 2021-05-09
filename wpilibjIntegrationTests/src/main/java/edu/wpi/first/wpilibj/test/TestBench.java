@@ -8,16 +8,16 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +74,7 @@ public final class TestBench {
   public MotorEncoderFixture<Talon> getTalonPair() {
     return new MotorEncoderFixture<Talon>() {
       @Override
-      protected Talon giveSpeedController() {
+      protected Talon giveMotorController() {
         return new Talon(kTalonChannel);
       }
 
@@ -104,7 +104,7 @@ public final class TestBench {
   public MotorEncoderFixture<Victor> getVictorPair() {
     return new MotorEncoderFixture<Victor>() {
       @Override
-      protected Victor giveSpeedController() {
+      protected Victor giveMotorController() {
         return new Victor(kVictorChannel);
       }
 
@@ -134,7 +134,7 @@ public final class TestBench {
   public MotorEncoderFixture<Jaguar> getJaguarPair() {
     return new MotorEncoderFixture<Jaguar>() {
       @Override
-      protected Jaguar giveSpeedController() {
+      protected Jaguar giveMotorController() {
         return new Jaguar(kJaguarChannel);
       }
 

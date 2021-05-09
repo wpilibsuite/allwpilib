@@ -7,8 +7,6 @@
 #include <memory>
 
 #include "frc/AnalogInput.h"
-#include "frc/ErrorBase.h"
-#include "frc/interfaces/Potentiometer.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -22,9 +20,7 @@ class SendableBuilder;
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public ErrorBase,
-                            public Potentiometer,
-                            public Sendable,
+class AnalogPotentiometer : public Sendable,
                             public SendableHelper<AnalogPotentiometer> {
  public:
   /**
@@ -105,14 +101,7 @@ class AnalogPotentiometer : public ErrorBase,
    * @return The current position of the potentiometer (in the units used for
    *         fullRange and offset).
    */
-  double Get() const override;
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current reading.
-   */
-  double PIDGet() override;
+  double Get() const;
 
   void InitSendable(SendableBuilder& builder) override;
 

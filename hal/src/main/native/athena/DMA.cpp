@@ -13,6 +13,7 @@
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
 #include "EncoderInternal.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/AnalogGyro.h"
@@ -528,6 +529,9 @@ void HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
 
   if (!success) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Digital Source unabled to be mapped properly. Likely "
+                      "invalid handle passed.");
     return;
   }
 

@@ -5,7 +5,7 @@ ext {
     groupId = 'edu.wpi.first.wpimath'
 
     nativeName = 'wpimath'
-    devMain = 'edu.wpi.first.wpiutil.math.DevMain'
+    devMain = 'edu.wpi.first.math.DevMain'
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
@@ -69,8 +69,8 @@ dependencies {
 def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
 def natFileInput = file("src/generate/Nat.java.in")
 def natGetterInput = file("src/generate/NatGetter.java.in")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/Nat.java")
+def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
+def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
 def maxNum = 20
 
 task generateNumbers() {
@@ -111,7 +111,7 @@ task generateNat() {
         def importsString = "";
 
         for(i in 0..maxNum) {
-            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
+            importsString += "import edu.wpi.first.math.numbers.N${i};\n"
             template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
         }
         template += "}\n" // Close the class body

@@ -6,8 +6,8 @@
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/DigitalInput.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/commands/PIDSubsystem.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control

@@ -68,7 +68,7 @@ class MechanismLigament2d : public MechanismObject2d {
   void SetLineWeight(double lineWidth);
 
  protected:
-  void UpdateEntries(std::shared_ptr<NetworkTable> table) override;
+  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
 
  private:
   void Flush();

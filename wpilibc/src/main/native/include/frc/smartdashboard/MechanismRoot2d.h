@@ -40,7 +40,7 @@ class MechanismRoot2d : private MechanismObject2d {
   using MechanismObject2d::Append;
 
  private:
-  void UpdateEntries(std::shared_ptr<NetworkTable> table) override;
+  void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;
   inline void Flush();
   double m_x;
   double m_y;

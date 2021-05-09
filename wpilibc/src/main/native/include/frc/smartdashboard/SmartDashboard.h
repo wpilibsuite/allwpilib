@@ -11,16 +11,13 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/ListenerExecutor.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SmartDashboard : public ErrorBase,
-                       public Sendable,
-                       public SendableHelper<SmartDashboard> {
+class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
  public:
   static void init();
 

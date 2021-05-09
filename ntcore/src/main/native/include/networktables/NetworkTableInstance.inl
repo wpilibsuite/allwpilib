@@ -35,12 +35,13 @@ inline NT_Inst NetworkTableInstance::GetHandle() const {
   return m_handle;
 }
 
-inline NetworkTableEntry NetworkTableInstance::GetEntry(const Twine& name) {
+inline NetworkTableEntry NetworkTableInstance::GetEntry(
+    const wpi::Twine& name) {
   return NetworkTableEntry{::nt::GetEntry(m_handle, name)};
 }
 
 inline std::vector<NetworkTableEntry> NetworkTableInstance::GetEntries(
-    const Twine& prefix, unsigned int types) {
+    const wpi::Twine& prefix, unsigned int types) {
   std::vector<NetworkTableEntry> entries;
   for (auto entry : ::nt::GetEntries(m_handle, prefix, types)) {
     entries.emplace_back(entry);
@@ -49,7 +50,7 @@ inline std::vector<NetworkTableEntry> NetworkTableInstance::GetEntries(
 }
 
 inline std::vector<EntryInfo> NetworkTableInstance::GetEntryInfo(
-    const Twine& prefix, unsigned int types) const {
+    const wpi::Twine& prefix, unsigned int types) const {
   return ::nt::GetEntryInfo(m_handle, prefix, types);
 }
 
@@ -80,7 +81,7 @@ inline bool NetworkTableInstance::WaitForRpcCallQueue(double timeout) {
   return ::nt::WaitForRpcCallQueue(m_handle, timeout);
 }
 
-inline void NetworkTableInstance::SetNetworkIdentity(const Twine& name) {
+inline void NetworkTableInstance::SetNetworkIdentity(const wpi::Twine& name) {
   ::nt::SetNetworkIdentity(m_handle, name);
 }
 
@@ -96,9 +97,9 @@ inline void NetworkTableInstance::StopLocal() {
   ::nt::StopLocal(m_handle);
 }
 
-inline void NetworkTableInstance::StartServer(const Twine& persist_filename,
-                                              const char* listen_address,
-                                              unsigned int port) {
+inline void NetworkTableInstance::StartServer(
+    const wpi::Twine& persist_filename, const char* listen_address,
+    unsigned int port) {
   ::nt::StartServer(m_handle, persist_filename, listen_address, port);
 }
 
@@ -116,7 +117,7 @@ inline void NetworkTableInstance::StartClient(const char* server_name,
 }
 
 inline void NetworkTableInstance::StartClient(
-    ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+    wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers) {
   ::nt::StartClient(m_handle, servers);
 }
 
@@ -135,7 +136,7 @@ inline void NetworkTableInstance::SetServer(const char* server_name,
 }
 
 inline void NetworkTableInstance::SetServer(
-    ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+    wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers) {
   ::nt::SetServer(m_handle, servers);
 }
 
@@ -170,23 +171,23 @@ inline bool NetworkTableInstance::IsConnected() const {
 }
 
 inline const char* NetworkTableInstance::SavePersistent(
-    const Twine& filename) const {
+    const wpi::Twine& filename) const {
   return ::nt::SavePersistent(m_handle, filename);
 }
 
 inline const char* NetworkTableInstance::LoadPersistent(
-    const Twine& filename,
+    const wpi::Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
   return ::nt::LoadPersistent(m_handle, filename, warn);
 }
 
 inline const char* NetworkTableInstance::SaveEntries(
-    const Twine& filename, const Twine& prefix) const {
+    const wpi::Twine& filename, const wpi::Twine& prefix) const {
   return ::nt::SaveEntries(m_handle, filename, prefix);
 }
 
 inline const char* NetworkTableInstance::LoadEntries(
-    const Twine& filename, const Twine& prefix,
+    const wpi::Twine& filename, const wpi::Twine& prefix,
     std::function<void(size_t line, const char* msg)> warn) {
   return ::nt::LoadEntries(m_handle, filename, prefix, warn);
 }

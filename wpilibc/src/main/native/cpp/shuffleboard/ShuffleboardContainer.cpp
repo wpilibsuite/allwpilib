@@ -7,6 +7,7 @@
 #include <wpi/SmallVector.h>
 #include <wpi/raw_ostream.h>
 
+#include "frc/Errors.h"
 #include "frc/shuffleboard/ComplexWidget.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
@@ -56,8 +57,8 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title) {
   wpi::SmallVector<char, 16> storage;
   auto titleRef = title.toStringRef(storage);
   if (m_layouts.count(titleRef) == 0) {
-    wpi_setWPIErrorWithContext(
-        InvalidParameter, "No layout with the given title has been defined");
+    throw FRC_MakeError(err::InvalidParameter,
+                        "No layout with the given title has been defined");
   }
   return *m_layouts[titleRef];
 }

@@ -22,9 +22,12 @@ extern "C" {
  * Initializes a PWM port.
  *
  * @param portHandle the port to initialize
+ * @param allocationLocation    the location where the allocation is occuring
+ * (can be null)
  * @return           the created pwm handle
  */
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+                                        const char* allocationLocation,
                                         int32_t* status);
 
 /**

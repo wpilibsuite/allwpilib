@@ -26,7 +26,7 @@ import java.nio.ByteOrder;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable {
+public class Counter implements CounterBase, Sendable, AutoCloseable {
   /** Mode determines how and what the counter counts. */
   public enum Mode {
     /** mode: two pulse. */
@@ -51,7 +51,6 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
   private boolean m_allocatedDownSource;
   private int m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
-  private PIDSourceType m_pidSource;
   private double m_distancePerPulse; // distance of travel for each tick
 
   /** Create an instance of a counter with the given mode. */
@@ -505,39 +504,6 @@ public class Counter implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public void setDistancePerPulse(double distancePerPulse) {
     m_distancePerPulse = distancePerPulse;
-  }
-
-  /**
-   * Set which parameter of the encoder you are using as a process control variable. The counter
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    requireNonNullParam(pidSource, "pidSource", "setPIDSourceType");
-    if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
-      throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
-    }
-
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
   }
 
   @Override

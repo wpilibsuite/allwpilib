@@ -190,7 +190,7 @@ void Storage::SavePersistent(wpi::raw_ostream& os, bool periodic) const {
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SavePersistent(const Twine& filename,
+const char* Storage::SavePersistent(const wpi::Twine& filename,
                                     bool periodic) const {
   wpi::SmallString<128> fn;
   filename.toVector(fn);
@@ -240,7 +240,8 @@ done:
   return err;
 }
 
-void Storage::SaveEntries(wpi::raw_ostream& os, const Twine& prefix) const {
+void Storage::SaveEntries(wpi::raw_ostream& os,
+                          const wpi::Twine& prefix) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetEntries(prefix, &entries)) {
     return;
@@ -248,8 +249,8 @@ void Storage::SaveEntries(wpi::raw_ostream& os, const Twine& prefix) const {
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SaveEntries(const Twine& filename,
-                                 const Twine& prefix) const {
+const char* Storage::SaveEntries(const wpi::Twine& filename,
+                                 const wpi::Twine& prefix) const {
   wpi::SmallString<128> fn;
   filename.toVector(fn);
   wpi::SmallString<128> tmp = fn;

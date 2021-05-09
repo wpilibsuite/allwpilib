@@ -23,7 +23,7 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   Flush();
 }
 
-void MechanismRoot2d::UpdateEntries(std::shared_ptr<NetworkTable> table) {
+void MechanismRoot2d::UpdateEntries(std::shared_ptr<nt::NetworkTable> table) {
   m_posEntry = table->GetEntry(kPosition);
   Flush();
 }

@@ -60,9 +60,9 @@ void SequentialCommandGroup::AddCommands(
   }
 
   if (m_currentCommandIndex != invalid_index) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Commands cannot be added to a CommandGroup "
-                               "while the group is running");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "Commands cannot be added to a CommandGroup "
+                        "while the group is running");
   }
 
   for (auto&& command : commands) {

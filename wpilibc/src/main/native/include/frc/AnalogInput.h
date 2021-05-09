@@ -8,8 +8,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -31,10 +29,7 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public ErrorBase,
-                    public PIDSource,
-                    public Sendable,
-                    public SendableHelper<AnalogInput> {
+class AnalogInput : public Sendable, public SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;
@@ -279,13 +274,6 @@ class AnalogInput : public ErrorBase,
    * @return Sample rate.
    */
   static double GetSampleRate();
-
-  /**
-   * Get the Average value for the PID Source base object.
-   *
-   * @return The average voltage.
-   */
-  double PIDGet() override;
 
   /**
    * Indicates this input is used by a simulated device.

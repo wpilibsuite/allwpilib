@@ -23,10 +23,6 @@
 
 namespace nt {
 
-using wpi::ArrayRef;
-using wpi::StringRef;
-using wpi::Twine;
-
 /**
  * A network table entry value.
  * @ingroup ntcore_cpp_api
@@ -167,7 +163,7 @@ class Value final {
    *
    * @return The string value.
    */
-  StringRef GetString() const {
+  wpi::StringRef GetString() const {
     assert(m_val.type == NT_STRING);
     return m_string;
   }
@@ -177,7 +173,7 @@ class Value final {
    *
    * @return The raw value.
    */
-  StringRef GetRaw() const {
+  wpi::StringRef GetRaw() const {
     assert(m_val.type == NT_RAW);
     return m_string;
   }
@@ -187,7 +183,7 @@ class Value final {
    *
    * @return The rpc definition value.
    */
-  StringRef GetRpc() const {
+  wpi::StringRef GetRpc() const {
     assert(m_val.type == NT_RPC);
     return m_string;
   }
@@ -197,10 +193,10 @@ class Value final {
    *
    * @return The boolean array value.
    */
-  ArrayRef<int> GetBooleanArray() const {
+  wpi::ArrayRef<int> GetBooleanArray() const {
     assert(m_val.type == NT_BOOLEAN_ARRAY);
-    return ArrayRef<int>(m_val.data.arr_boolean.arr,
-                         m_val.data.arr_boolean.size);
+    return wpi::ArrayRef<int>(m_val.data.arr_boolean.arr,
+                              m_val.data.arr_boolean.size);
   }
 
   /**
@@ -208,10 +204,10 @@ class Value final {
    *
    * @return The double array value.
    */
-  ArrayRef<double> GetDoubleArray() const {
+  wpi::ArrayRef<double> GetDoubleArray() const {
     assert(m_val.type == NT_DOUBLE_ARRAY);
-    return ArrayRef<double>(m_val.data.arr_double.arr,
-                            m_val.data.arr_double.size);
+    return wpi::ArrayRef<double>(m_val.data.arr_double.arr,
+                                 m_val.data.arr_double.size);
   }
 
   /**
@@ -219,7 +215,7 @@ class Value final {
    *
    * @return The string array value.
    */
-  ArrayRef<std::string> GetStringArray() const {
+  wpi::ArrayRef<std::string> GetStringArray() const {
     assert(m_val.type == NT_STRING_ARRAY);
     return m_string_array;
   }
@@ -267,7 +263,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeString(const Twine& value,
+  static std::shared_ptr<Value> MakeString(const wpi::Twine& value,
                                            uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
     val->m_string = value.str();
@@ -302,7 +298,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRaw(StringRef value, uint64_t time = 0) {
+  static std::shared_ptr<Value> MakeRaw(wpi::StringRef value,
+                                        uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -336,7 +333,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRpc(StringRef value, uint64_t time = 0) {
+  static std::shared_ptr<Value> MakeRpc(wpi::StringRef value,
+                                        uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RPC, time, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -369,7 +367,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(ArrayRef<bool> value,
+  static std::shared_ptr<Value> MakeBooleanArray(wpi::ArrayRef<bool> value,
                                                  uint64_t time = 0);
 
   /**
@@ -394,7 +392,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBooleanArray(ArrayRef<int> value,
+  static std::shared_ptr<Value> MakeBooleanArray(wpi::ArrayRef<int> value,
                                                  uint64_t time = 0);
 
   /**
@@ -419,7 +417,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeDoubleArray(ArrayRef<double> value,
+  static std::shared_ptr<Value> MakeDoubleArray(wpi::ArrayRef<double> value,
                                                 uint64_t time = 0);
 
   /**
@@ -443,8 +441,8 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeStringArray(ArrayRef<std::string> value,
-                                                uint64_t time = 0);
+  static std::shared_ptr<Value> MakeStringArray(
+      wpi::ArrayRef<std::string> value, uint64_t time = 0);
 
   /**
    * Creates a string array entry value.

@@ -4,22 +4,22 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumdriveposeestimator;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.MecanumDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.estimator.MecanumDrivePoseEstimator;
 import edu.wpi.first.wpilibj.examples.swervesdriveposeestimator.ExampleGlobalMeasurementSensor;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.VecBuilder;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /** Represents a mecanum drive style drivetrain. */
 @SuppressWarnings("PMD.TooManyFields")
@@ -27,10 +27,10 @@ public class Drivetrain {
   public static final double kMaxSpeed = 3.0; // 3 meters per second
   public static final double kMaxAngularSpeed = Math.PI; // 1/2 rotation per second
 
-  private final SpeedController m_frontLeftMotor = new PWMSparkMax(1);
-  private final SpeedController m_frontRightMotor = new PWMSparkMax(2);
-  private final SpeedController m_backLeftMotor = new PWMSparkMax(3);
-  private final SpeedController m_backRightMotor = new PWMSparkMax(4);
+  private final MotorController m_frontLeftMotor = new PWMSparkMax(1);
+  private final MotorController m_frontRightMotor = new PWMSparkMax(2);
+  private final MotorController m_backLeftMotor = new PWMSparkMax(3);
+  private final MotorController m_backRightMotor = new PWMSparkMax(4);
 
   private final Encoder m_frontLeftEncoder = new Encoder(0, 1);
   private final Encoder m_frontRightEncoder = new Encoder(2, 3);

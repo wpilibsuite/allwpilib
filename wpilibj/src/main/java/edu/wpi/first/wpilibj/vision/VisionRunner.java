@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.vision;
 
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.VideoSource;
 import org.opencv.core.Mat;
 
 /**

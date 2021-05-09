@@ -6,7 +6,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -17,9 +16,7 @@ class SendableBuilder;
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public ErrorBase,
-                     public Sendable,
-                     public SendableHelper<AnalogOutput> {
+class AnalogOutput : public Sendable, public SendableHelper<AnalogOutput> {
  public:
   /**
    * Construct an analog output on the given channel.

@@ -37,7 +37,7 @@ class MechanismObject2d {
    *
    * @param table the new table.
    */
-  virtual void UpdateEntries(std::shared_ptr<NetworkTable> table) = 0;
+  virtual void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) = 0;
 
   mutable wpi::mutex m_mutex;
 
@@ -82,7 +82,7 @@ class MechanismObject2d {
  private:
   std::string m_name;
   wpi::StringMap<std::unique_ptr<MechanismObject2d>> m_objects;
-  std::shared_ptr<NetworkTable> m_table;
-  void Update(std::shared_ptr<NetworkTable> table);
+  std::shared_ptr<nt::NetworkTable> m_table;
+  void Update(std::shared_ptr<nt::NetworkTable> table);
 };
 }  // namespace frc

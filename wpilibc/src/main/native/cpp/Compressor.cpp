@@ -9,7 +9,7 @@
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -18,10 +18,7 @@ using namespace frc;
 Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPCMModules(), pcmID);
-    return;
-  }
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   SetClosedLoopControl(true);
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID + 1);
@@ -29,204 +26,96 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
 }
 
 void Compressor::Start() {
-  if (StatusIsFatal()) {
-    return;
-  }
   SetClosedLoopControl(true);
 }
 
 void Compressor::Stop() {
-  if (StatusIsFatal()) {
-    return;
-  }
   SetClosedLoopControl(false);
 }
 
 bool Compressor::Enabled() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressor(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressor(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetPressureSwitchValue() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorPressureSwitch(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressorPressureSwitch(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 double Compressor::GetCompressorCurrent() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
-  double value;
-
-  value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  double value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 void Compressor::SetClosedLoopControl(bool on) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
-
   HAL_SetCompressorClosedLoopControl(m_compressorHandle, on, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
 }
 
 bool Compressor::GetClosedLoopControl() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorClosedLoopControl(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressorClosedLoopControl(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorCurrentTooHighFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorCurrentTooHighFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value =
+      HAL_GetCompressorCurrentTooHighFault(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value =
+  bool value =
       HAL_GetCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorShortedStickyFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorShortedStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressorShortedStickyFault(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorShortedFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorShortedFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressorShortedFault(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorNotConnectedStickyFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorNotConnectedStickyFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value =
+      HAL_GetCompressorNotConnectedStickyFault(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 bool Compressor::GetCompressorNotConnectedFault() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
-  bool value;
-
-  value = HAL_GetCompressorNotConnectedFault(m_compressorHandle, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
-
+  bool value = HAL_GetCompressorNotConnectedFault(m_compressorHandle, &status);
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
   return value;
 }
 
 void Compressor::ClearAllPCMStickyFaults() {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
-
   HAL_ClearAllPCMStickyFaults(m_module, &status);
-
-  if (status) {
-    wpi_setWPIError(Timeout);
-  }
+  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
 }
 
 int Compressor::GetModule() const {

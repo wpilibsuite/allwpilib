@@ -11,8 +11,8 @@
 #include <hal/Ports.h>
 #include <hal/Solenoid.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -28,42 +28,31 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
   if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange,
-                               "Solenoid Module " + wpi::Twine(m_moduleNumber));
-    return;
+    throw FRC_MakeError(err::ModuleIndexOutOfRange,
+                        "Solenoid Module " + wpi::Twine{m_moduleNumber});
   }
   if (!SensorUtil::CheckSolenoidChannel(m_forwardChannel)) {
-    wpi_setWPIErrorWithContext(
-        ChannelIndexOutOfRange,
-        "Solenoid Channel " + wpi::Twine(m_forwardChannel));
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "Solenoid Channel " + wpi::Twine{m_forwardChannel});
   }
   if (!SensorUtil::CheckSolenoidChannel(m_reverseChannel)) {
-    wpi_setWPIErrorWithContext(
-        ChannelIndexOutOfRange,
-        "Solenoid Channel " + wpi::Twine(m_reverseChannel));
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "Solenoid Channel " + wpi::Twine{m_reverseChannel});
   }
   int32_t status = 0;
   m_forwardHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_forwardChannel), &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
-                             forwardChannel);
-    m_forwardHandle = HAL_kInvalidHandle;
-    m_reverseHandle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "Solenoid Module " + wpi::Twine{m_moduleNumber} +
+                                   " Channel " + wpi::Twine{m_forwardChannel});
 
   m_reverseHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_reverseChannel), &status);
   if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumSolenoidChannels(),
-                             reverseChannel);
     // free forward solenoid
     HAL_FreeSolenoidPort(m_forwardHandle);
-    m_forwardHandle = HAL_kInvalidHandle;
-    m_reverseHandle = HAL_kInvalidHandle;
+    FRC_CheckErrorStatus(status, "Solenoid Module " +
+                                     wpi::Twine{m_moduleNumber} + " Channel " +
+                                     wpi::Twine{m_reverseChannel});
     return;
   }
 
@@ -85,10 +74,6 @@ DoubleSolenoid::~DoubleSolenoid() {
 }
 
 void DoubleSolenoid::Set(Value value) {
-  if (StatusIsFatal()) {
-    return;
-  }
-
   bool forward = false;
   bool reverse = false;
 
@@ -112,22 +97,26 @@ void DoubleSolenoid::Set(Value value) {
   int rstatus = 0;
   HAL_SetSolenoid(m_reverseHandle, reverse, &rstatus);
 
-  wpi_setHALError(fstatus);
-  wpi_setHALError(rstatus);
+  FRC_CheckErrorStatus(fstatus, "Solenoid Module " +
+                                    wpi::Twine{m_moduleNumber} + " Channel " +
+                                    wpi::Twine{m_forwardChannel});
+  FRC_CheckErrorStatus(rstatus, "Solenoid Module " +
+                                    wpi::Twine{m_moduleNumber} + " Channel " +
+                                    wpi::Twine{m_reverseChannel});
 }
 
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
-  if (StatusIsFatal()) {
-    return kOff;
-  }
-
   int fstatus = 0;
   int rstatus = 0;
   bool valueForward = HAL_GetSolenoid(m_forwardHandle, &fstatus);
   bool valueReverse = HAL_GetSolenoid(m_reverseHandle, &rstatus);
 
-  wpi_setHALError(fstatus);
-  wpi_setHALError(rstatus);
+  FRC_CheckErrorStatus(fstatus, "Solenoid Module " +
+                                    wpi::Twine{m_moduleNumber} + " Channel " +
+                                    wpi::Twine{m_forwardChannel});
+  FRC_CheckErrorStatus(rstatus, "Solenoid Module " +
+                                    wpi::Twine{m_moduleNumber} + " Channel " +
+                                    wpi::Twine{m_reverseChannel});
 
   if (valueForward) {
     return kForward;

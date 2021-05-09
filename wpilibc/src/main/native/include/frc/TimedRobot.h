@@ -14,7 +14,6 @@
 #include <wpi/deprecated.h>
 #include <wpi/priority_queue.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/IterativeRobotBase.h"
 #include "frc2/Timer.h"
 
@@ -29,7 +28,7 @@ namespace frc {
  * Periodic() functions from the base class are called on an interval by a
  * Notifier instance.
  */
-class TimedRobot : public IterativeRobotBase, public ErrorBase {
+class TimedRobot : public IterativeRobotBase {
  public:
   static constexpr units::second_t kDefaultPeriod = 20_ms;
 
@@ -42,11 +41,6 @@ class TimedRobot : public IterativeRobotBase, public ErrorBase {
    * Ends the main loop in StartCompetition().
    */
   void EndCompetition() override;
-
-  /**
-   * Get the time period between calls to Periodic() functions.
-   */
-  units::second_t GetPeriod() const;
 
   /**
    * Constructor for TimedRobot.

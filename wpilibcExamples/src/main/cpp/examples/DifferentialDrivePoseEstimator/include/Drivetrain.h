@@ -6,12 +6,12 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/estimator/DifferentialDrivePoseEstimator.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
@@ -57,8 +57,8 @@ class Drivetrain {
   frc::PWMSparkMax m_rightLeader{3};
   frc::PWMSparkMax m_rightFollower{4};
 
-  frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
-  frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
+  frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
+  frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};

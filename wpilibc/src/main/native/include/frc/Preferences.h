@@ -11,8 +11,7 @@
 #include <vector>
 
 #include <networktables/NetworkTable.h>
-
-#include "frc/ErrorBase.h"
+#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -30,14 +29,14 @@ namespace frc {
  * This will also interact with {@link NetworkTable} by creating a table called
  * "Preferences" with all the key-value pairs.
  */
-class Preferences : public ErrorBase {
+class Preferences {
  public:
   /**
    * Get the one and only {@link Preferences} object.
    *
-   * @return pointer to the {@link Preferences}
+   * @return reference to the {@link Preferences}
    */
-  static Preferences* GetInstance();
+  static Preferences& GetInstance();
 
   /**
    * Returns a vector of all the keys.
@@ -116,6 +115,18 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetString(wpi::StringRef key, wpi::StringRef value);
+
+  /**
+   * Puts the given string into the preferences table.
+   *
+   * The value may not have quotation marks, nor may the key have any whitespace
+   * nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetString instead.")
   void PutString(wpi::StringRef key, wpi::StringRef value);
 
   /**
@@ -132,6 +143,17 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetInt(wpi::StringRef key, int value);
+
+  /**
+   * Puts the given int into the preferences table.
+   *
+   * The key may not have any whitespace nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetInt instead.")
   void PutInt(wpi::StringRef key, int value);
 
   /**
@@ -148,6 +170,17 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetDouble(wpi::StringRef key, double value);
+
+  /**
+   * Puts the given double into the preferences table.
+   *
+   * The key may not have any whitespace nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetDouble instead.")
   void PutDouble(wpi::StringRef key, double value);
 
   /**
@@ -164,6 +197,17 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetFloat(wpi::StringRef key, float value);
+
+  /**
+   * Puts the given float into the preferences table.
+   *
+   * The key may not have any whitespace nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetFloat instead.")
   void PutFloat(wpi::StringRef key, float value);
 
   /**
@@ -180,6 +224,17 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetBoolean(wpi::StringRef key, bool value);
+
+  /**
+   * Puts the given boolean into the preferences table.
+   *
+   * The key may not have any whitespace nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetBoolean instead.")
   void PutBoolean(wpi::StringRef key, bool value);
 
   /**
@@ -196,6 +251,17 @@ class Preferences : public ErrorBase {
    * @param key   the key
    * @param value the value
    */
+  void SetLong(wpi::StringRef key, int64_t value);
+
+  /**
+   * Puts the given long (int64_t) into the preferences table.
+   *
+   * The key may not have any whitespace nor an equals sign.
+   *
+   * @param key   the key
+   * @param value the value
+   */
+  WPI_DEPRECATED("Use SetLong instead.")
   void PutLong(wpi::StringRef key, int64_t value);
 
   /**
@@ -226,7 +292,7 @@ class Preferences : public ErrorBase {
 
  protected:
   Preferences();
-  ~Preferences() override = default;
+  ~Preferences();
 
   Preferences(Preferences&&) = default;
   Preferences& operator=(Preferences&&) = default;

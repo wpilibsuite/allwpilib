@@ -9,10 +9,11 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 #include "frc/Timer.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -20,22 +21,17 @@ using namespace frc;
 
 AnalogInput::AnalogInput(int channel) {
   if (!SensorUtil::CheckAnalogInputChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Analog Input " + wpi::Twine(channel));
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange,
+                        "Analog Input " + wpi::Twine{channel});
   }
 
   m_channel = channel;
 
   HAL_PortHandle port = HAL_GetPort(channel);
   int32_t status = 0;
-  m_port = HAL_InitializeAnalogInputPort(port, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumAnalogInputs(), channel);
-    m_channel = std::numeric_limits<int>::max();
-    m_port = HAL_kInvalidHandle;
-    return;
-  }
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_port = HAL_InitializeAnalogInputPort(port, stackTrace.c_str(), &status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);
 
@@ -47,218 +43,152 @@ AnalogInput::~AnalogInput() {
 }
 
 int AnalogInput::GetValue() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int value = HAL_GetAnalogValue(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return value;
 }
 
 int AnalogInput::GetAverageValue() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int value = HAL_GetAnalogAverageValue(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return value;
 }
 
 double AnalogInput::GetVoltage() const {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
   int32_t status = 0;
   double voltage = HAL_GetAnalogVoltage(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return voltage;
 }
 
 double AnalogInput::GetAverageVoltage() const {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
   int32_t status = 0;
   double voltage = HAL_GetAnalogAverageVoltage(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return voltage;
 }
 
 int AnalogInput::GetChannel() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   return m_channel;
 }
 
 void AnalogInput::SetAverageBits(int bits) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetAnalogAverageBits(m_port, bits, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 }
 
 int AnalogInput::GetAverageBits() const {
   int32_t status = 0;
   int averageBits = HAL_GetAnalogAverageBits(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return averageBits;
 }
 
 void AnalogInput::SetOversampleBits(int bits) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetAnalogOversampleBits(m_port, bits, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 }
 
 int AnalogInput::GetOversampleBits() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return oversampleBits;
 }
 
 int AnalogInput::GetLSBWeight() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return lsbWeight;
 }
 
 int AnalogInput::GetOffset() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int offset = HAL_GetAnalogOffset(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return offset;
 }
 
 bool AnalogInput::IsAccumulatorChannel() const {
-  if (StatusIsFatal()) {
-    return false;
-  }
   int32_t status = 0;
   bool isAccum = HAL_IsAccumulatorChannel(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return isAccum;
 }
 
 void AnalogInput::InitAccumulator() {
-  if (StatusIsFatal()) {
-    return;
-  }
   m_accumulatorOffset = 0;
   int32_t status = 0;
   HAL_InitAccumulator(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 }
 
 void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
-  if (StatusIsFatal()) {
-    return;
-  }
   m_accumulatorOffset = initialValue;
 }
 
 void AnalogInput::ResetAccumulator() {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_ResetAccumulator(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 
-  if (!StatusIsFatal()) {
-    // Wait until the next sample, so the next call to GetAccumulator*()
-    // won't have old values.
-    const double sampleTime = 1.0 / GetSampleRate();
-    const double overSamples = 1 << GetOversampleBits();
-    const double averageSamples = 1 << GetAverageBits();
-    Wait(sampleTime * overSamples * averageSamples);
-  }
+  // Wait until the next sample, so the next call to GetAccumulator*()
+  // won't have old values.
+  const double sampleTime = 1.0 / GetSampleRate();
+  const double overSamples = 1 << GetOversampleBits();
+  const double averageSamples = 1 << GetAverageBits();
+  Wait(sampleTime * overSamples * averageSamples);
 }
 
 void AnalogInput::SetAccumulatorCenter(int center) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetAccumulatorCenter(m_port, center, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 }
 
 void AnalogInput::SetAccumulatorDeadband(int deadband) {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_SetAccumulatorDeadband(m_port, deadband, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
 }
 
 int64_t AnalogInput::GetAccumulatorValue() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int64_t value = HAL_GetAccumulatorValue(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return value + m_accumulatorOffset;
 }
 
 int64_t AnalogInput::GetAccumulatorCount() const {
-  if (StatusIsFatal()) {
-    return 0;
-  }
   int32_t status = 0;
   int64_t count = HAL_GetAccumulatorCount(m_port, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   return count;
 }
 
 void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
-  if (StatusIsFatal()) {
-    return;
-  }
   int32_t status = 0;
   HAL_GetAccumulatorOutput(m_port, &value, &count, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Analog Input " + wpi::Twine{m_channel});
   value += m_accumulatorOffset;
 }
 
 void AnalogInput::SetSampleRate(double samplesPerSecond) {
   int32_t status = 0;
   HAL_SetAnalogSampleRate(samplesPerSecond, &status);
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "SetSampleRate");
 }
 
 double AnalogInput::GetSampleRate() {
   int32_t status = 0;
   double sampleRate = HAL_GetAnalogSampleRate(&status);
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "GetSampleRate");
   return sampleRate;
-}
-
-double AnalogInput::PIDGet() {
-  if (StatusIsFatal()) {
-    return 0.0;
-  }
-  return GetAverageVoltage();
 }
 
 void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {

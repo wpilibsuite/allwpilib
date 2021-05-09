@@ -7,11 +7,11 @@ package edu.wpi.first.wpilibj.drive;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import java.util.StringJoiner;
 
 /**
@@ -50,14 +50,14 @@ import java.util.StringJoiner;
  * <p>RobotDrive porting guide: <br>
  * In MecanumDrive, the right side speed controllers are automatically inverted, while in
  * RobotDrive, no speed controllers are automatically inverted. <br>
- * {@link #driveCartesian(double, double, double, double)} is equivalent to {@link
- * edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Cartesian(double, double, double, double)} if a
- * deadband of 0 is used, and the ySpeed and gyroAngle values are inverted compared to RobotDrive
- * (eg driveCartesian(xSpeed, -ySpeed, zRotation, -gyroAngle). <br>
- * {@link #drivePolar(double, double, double)} is equivalent to {@link
- * edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a deadband of 0
- * is used.
+ * {@link #driveCartesian(double, double, double, double)} is equivalent to RobotDrive's
+ * mecanumDrive_Cartesian(double, double, double, double) if a deadband of 0 is used, and the ySpeed
+ * and gyroAngle values are inverted compared to RobotDrive (eg driveCartesian(xSpeed, -ySpeed,
+ * zRotation, -gyroAngle). <br>
+ * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
+ * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
  */
+@SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   private static int instances;
 

@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
  * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
  */
-public class PWM extends MotorSafety implements Sendable, AutoCloseable {
+public class PWM implements Sendable, AutoCloseable {
   /** Represents the amount to multiply the minimum servo-pulse pwm period by. */
   public enum PeriodMultiplier {
     /** Period Multiplier: don't skip pulses. PWM pulses occur every 5.005 ms */
@@ -42,9 +42,24 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
   /**
    * Allocate a PWM given a channel.
    *
+   * <p>Checks channel value range and allocates the appropriate channel. The allocation is only
+   * done to help users ensure that they don't double assign channels.
+   *
+   * <p>By default, adds itself to SendableRegistry and LiveWindow.
+   *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
+    this(channel, true);
+  }
+
+  /**
+   * Allocate a PWM given a channel.
+   *
+   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   * @param registerSendable If true, adds this instance to SendableRegistry and LiveWindow
+   */
+  public PWM(final int channel, final boolean registerSendable) {
     SensorUtil.checkPWMChannel(channel);
     m_channel = channel;
 
@@ -55,9 +70,9 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
     HAL.report(tResourceType.kResourceType_PWM, channel + 1);
-    SendableRegistry.addLW(this, "PWM", channel);
-
-    setSafetyEnabled(false);
+    if (registerSendable) {
+      SendableRegistry.addLW(this, "PWM", channel);
+    }
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */
@@ -70,16 +85,6 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     setDisabled();
     PWMJNI.freePWMPort(m_handle);
     m_handle = 0;
-  }
-
-  @Override
-  public void stopMotor() {
-    setDisabled();
-  }
-
-  @Override
-  public String getDescription() {
-    return "PWM " + getChannel();
   }
 
   /**
@@ -234,7 +239,7 @@ public class PWM extends MotorSafety implements Sendable, AutoCloseable {
     }
   }
 
-  protected void setZeroLatch() {
+  public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
   }
 

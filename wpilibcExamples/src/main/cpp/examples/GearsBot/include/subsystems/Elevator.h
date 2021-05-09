@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
-#include <frc/PWMSparkMax.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
 /**

@@ -5,10 +5,12 @@
 #pragma once
 
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/Timer.h"
+
+namespace wpi {
+class raw_ostream;
+}  // namespace wpi
 
 namespace frc {
 
@@ -18,10 +20,10 @@ namespace frc {
  *
  * The subclass should call Feed() whenever the motor value is updated.
  */
-class MotorSafety : public ErrorBase {
+class MotorSafety {
  public:
   MotorSafety();
-  ~MotorSafety() override;
+  virtual ~MotorSafety();
 
   MotorSafety(MotorSafety&& rhs);
   MotorSafety& operator=(MotorSafety&& rhs);

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "frc/ErrorBase.h"
 #include "frc/interfaces/Accelerometer.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -18,8 +17,7 @@ class SendableBuilder;
  *
  * This class allows access to the roboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public ErrorBase,
-                             public Accelerometer,
+class BuiltInAccelerometer : public Accelerometer,
                              public Sendable,
                              public SendableHelper<BuiltInAccelerometer> {
  public:

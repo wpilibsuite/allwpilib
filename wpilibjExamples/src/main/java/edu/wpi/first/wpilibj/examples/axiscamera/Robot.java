@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.axiscamera;
 
-import edu.wpi.cscore.AxisCamera;
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.AxisCamera;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;

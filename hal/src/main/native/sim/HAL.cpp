@@ -250,6 +250,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
     case HAL_LED_CHANNEL_ERROR:
       return HAL_LED_CHANNEL_ERROR_MESSAGE;
+    case HAL_USE_LAST_ERROR:
+      return HAL_USE_LAST_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }

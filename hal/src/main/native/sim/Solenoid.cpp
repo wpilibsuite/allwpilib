@@ -55,15 +55,11 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  auto handle = solenoidHandles->Allocate(
-      module * kNumSolenoidChannels + channel, status);
+  HAL_SolenoidHandle handle;
+  auto solenoidPort = solenoidHandles->Allocate(
+      module * kNumSolenoidChannels + channel, &handle, status);
   if (handle == HAL_kInvalidHandle) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
-  }
-  auto solenoidPort = solenoidHandles->Get(handle);
-  if (solenoidPort == nullptr) {  // would only occur on thread issues
-    *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
   solenoidPort->module = static_cast<uint8_t>(module);

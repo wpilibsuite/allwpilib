@@ -70,7 +70,7 @@ public class PDPTest extends AbstractComsSetup {
 
   /** Test if the current changes when the motor is driven using a talon. */
   @Test
-  public void checkStoppedCurrentForSpeedController() throws CANMessageNotFoundException {
+  public void checkStoppedCurrentForMotorController() throws CANMessageNotFoundException {
     Timer.delay(0.25);
 
     /* The Current should be 0 */
@@ -83,7 +83,7 @@ public class PDPTest extends AbstractComsSetup {
 
   /** Test if the current changes when the motor is driven using a talon. */
   @Test
-  public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
+  public void checkRunningCurrentForMotorController() throws CANMessageNotFoundException {
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

@@ -7,11 +7,11 @@ package edu.wpi.first.wpilibj.drive;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import java.util.StringJoiner;
 
 /**
@@ -39,6 +39,7 @@ import java.util.StringJoiner;
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
  */
+@SuppressWarnings("removal")
 public class KilloughDrive extends RobotDriveBase implements Sendable, AutoCloseable {
   public static final double kDefaultLeftMotorAngle = 60.0;
   public static final double kDefaultRightMotorAngle = 120.0;

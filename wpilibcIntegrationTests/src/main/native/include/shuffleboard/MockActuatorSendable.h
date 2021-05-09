@@ -6,7 +6,7 @@
 
 #include <wpi/StringRef.h>
 
-#include "frc/smartdashboard/SendableBase.h"
+#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 namespace frc {
@@ -14,7 +14,7 @@ namespace frc {
 /**
  * A mock sendable that marks itself as an actuator.
  */
-class MockActuatorSendable : public SendableBase {
+class MockActuatorSendable : public Sendable {
  public:
   explicit MockActuatorSendable(wpi::StringRef name);
 

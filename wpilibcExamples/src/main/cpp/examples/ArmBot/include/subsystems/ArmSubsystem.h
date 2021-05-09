@@ -5,8 +5,8 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/controller/ArmFeedforward.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/angle.h>
 

@@ -4,15 +4,15 @@
 
 package edu.wpi.first.wpilibj.examples.swervebot;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 public class SwerveModule {
   private static final double kWheelRadius = 0.0508;
@@ -22,8 +22,8 @@ public class SwerveModule {
   private static final double kModuleMaxAngularAcceleration =
       2 * Math.PI; // radians per second squared
 
-  private final SpeedController m_driveMotor;
-  private final SpeedController m_turningMotor;
+  private final MotorController m_driveMotor;
+  private final MotorController m_turningMotor;
 
   private final Encoder m_driveEncoder = new Encoder(0, 1);
   private final Encoder m_turningEncoder = new Encoder(2, 3);

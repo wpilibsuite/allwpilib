@@ -75,12 +75,25 @@ public final class Preferences {
    * @param value the value
    * @throws NullPointerException if value is null
    */
-  public void putString(String key, String value) {
-    requireNonNullParam(value, "value", "putString");
+  public void setString(String key, String value) {
+    requireNonNullParam(value, "value", "setString");
 
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setString(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given string into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @throws NullPointerException if value is null
+   * @deprecated Use {@link #setString(String, String)}
+   */
+  @Deprecated
+  public void putString(String key, String value) {
+    setString(key, value);
   }
 
   /**
@@ -100,10 +113,22 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void putInt(String key, int value) {
+  public void setInt(String key, int value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given int into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @deprecated Use {@link #setInt(String, int)}
+   */
+  @Deprecated
+  public void putInt(String key, int value) {
+    setInt(key, value);
   }
 
   /**
@@ -123,10 +148,21 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void putDouble(String key, double value) {
+  public void setDouble(String key, double value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given double into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @deprecated Use {@link #setDouble(String, double)}
+   */
+  public void putDouble(String key, double value) {
+    setDouble(key, value);
   }
 
   /**
@@ -146,10 +182,22 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void putFloat(String key, float value) {
+  public void setFloat(String key, float value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given float into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @deprecated Use {@link #setFloat(String, float)}
+   */
+  @Deprecated
+  public void putFloat(String key, float value) {
+    setFloat(key, value);
   }
 
   /**
@@ -169,10 +217,22 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void putBoolean(String key, boolean value) {
+  public void setBoolean(String key, boolean value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setBoolean(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given boolean into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @deprecated Use {@link #setBoolean(String, boolean)}
+   */
+  @Deprecated
+  public void putBoolean(String key, boolean value) {
+    setBoolean(key, value);
   }
 
   /**
@@ -192,10 +252,22 @@ public final class Preferences {
    * @param key the key
    * @param value the value
    */
-  public void putLong(String key, long value) {
+  public void setLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDouble(value);
     entry.setPersistent();
+  }
+
+  /**
+   * Puts the given long into the preferences table.
+   *
+   * @param key the key
+   * @param value the value
+   * @deprecated Use {@link #setLong(String, long)}
+   */
+  @Deprecated
+  public void putLong(String key, long value) {
+    setLong(key, value);
   }
 
   /**

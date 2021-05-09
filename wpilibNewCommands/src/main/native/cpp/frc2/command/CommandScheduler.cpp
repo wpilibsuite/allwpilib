@@ -7,7 +7,6 @@
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/WPIErrors.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <frc/smartdashboard/SendableRegistry.h>
@@ -71,19 +70,19 @@ CommandScheduler::CommandScheduler()
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this] {
-    this->Disable();
-    this->CancelAll();
+  auto& scheduler = frc::LiveWindow::GetInstance();
+  scheduler.enabled = [this] {
+    Disable();
+    CancelAll();
   };
-  scheduler->disabled = [this] { this->Enable(); };
+  scheduler.disabled = [this] { Enable(); };
 }
 
 CommandScheduler::~CommandScheduler() {
   frc::SendableRegistry::GetInstance().Remove(this);
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = nullptr;
-  scheduler->disabled = nullptr;
+  auto& scheduler = frc::LiveWindow::GetInstance();
+  scheduler.enabled = nullptr;
+  scheduler.disabled = nullptr;
 
   std::unique_ptr<Impl>().swap(m_impl);
 }
@@ -112,9 +111,9 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 
   if (command->IsGrouped()) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "A command that is part of a command group "
-                               "cannot be independently scheduled");
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
+                        "A command that is part of a command group "
+                        "cannot be independently scheduled");
     return;
   }
   if (m_impl->disabled ||
