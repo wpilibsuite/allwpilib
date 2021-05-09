@@ -15,9 +15,9 @@ using namespace frc;
 // The Preferences table name
 static wpi::StringRef kTableName{"Preferences"};
 
-Preferences& Preferences::GetInstance() {
+Preferences* Preferences::GetInstance() {
   static Preferences instance;
-  return instance;
+  return &instance;
 }
 
 std::vector<std::string> Preferences::GetKeys() {
@@ -165,5 +165,3 @@ Preferences::Preferences()
       NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
-
-Preferences::~Preferences() = default;

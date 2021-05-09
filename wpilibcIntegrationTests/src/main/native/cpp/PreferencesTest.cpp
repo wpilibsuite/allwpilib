@@ -44,14 +44,14 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
   preferencesFile.close();
   inst.StartServer();
 
-  Preferences& preferences = Preferences::GetInstance();
+  Preferences* preferences = Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
-            preferences.GetString("testFileGetString"));
-  EXPECT_EQ(1, preferences.GetInt("testFileGetInt"));
-  EXPECT_FLOAT_EQ(0.5, preferences.GetDouble("testFileGetDouble"));
-  EXPECT_FLOAT_EQ(0.25f, preferences.GetFloat("testFileGetFloat"));
-  EXPECT_TRUE(preferences.GetBoolean("testFileGetBoolean"));
-  EXPECT_EQ(1000000000000000000ll, preferences.GetLong("testFileGetLong"));
+            preferences->GetString("testFileGetString"));
+  EXPECT_EQ(1, preferences->GetInt("testFileGetInt"));
+  EXPECT_FLOAT_EQ(0.5, preferences->GetDouble("testFileGetDouble"));
+  EXPECT_FLOAT_EQ(0.25f, preferences->GetFloat("testFileGetFloat"));
+  EXPECT_TRUE(preferences->GetBoolean("testFileGetBoolean"));
+  EXPECT_EQ(1000000000000000000ll, preferences->GetLong("testFileGetLong"));
 }
 
 /**
@@ -61,22 +61,22 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.StartServer();
-  Preferences& preferences = Preferences::GetInstance();
-  preferences.Remove("testFileGetString");
-  preferences.Remove("testFileGetInt");
-  preferences.Remove("testFileGetDouble");
-  preferences.Remove("testFileGetFloat");
-  preferences.Remove("testFileGetBoolean");
-  preferences.Remove("testFileGetLong");
+  Preferences* preferences = Preferences::GetInstance();
+  preferences->Remove("testFileGetString");
+  preferences->Remove("testFileGetInt");
+  preferences->Remove("testFileGetDouble");
+  preferences->Remove("testFileGetFloat");
+  preferences->Remove("testFileGetBoolean");
+  preferences->Remove("testFileGetLong");
 
   Wait(kSaveTime);
 
-  preferences.PutString("testFilePutString", "Hello, preferences file");
-  preferences.PutInt("testFilePutInt", 1);
-  preferences.PutDouble("testFilePutDouble", 0.5);
-  preferences.PutFloat("testFilePutFloat", 0.25f);
-  preferences.PutBoolean("testFilePutBoolean", true);
-  preferences.PutLong("testFilePutLong", 1000000000000000000ll);
+  preferences->PutString("testFilePutString", "Hello, preferences file");
+  preferences->PutInt("testFilePutInt", 1);
+  preferences->PutDouble("testFilePutDouble", 0.5);
+  preferences->PutFloat("testFilePutFloat", 0.25f);
+  preferences->PutBoolean("testFilePutBoolean", true);
+  preferences->PutLong("testFilePutLong", 1000000000000000000ll);
 
   Wait(kSaveTime);
 
