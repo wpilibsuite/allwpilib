@@ -23,7 +23,7 @@ class DriverStationTest {
 
     DriverStationSim.notifyNewData();
 
-    assertEquals(expected, DriverStation.getInstance().isJoystickConnected(1));
+    assertEquals(expected, DriverStation.isJoystickConnected(1));
   }
 
   static Stream<Arguments> isConnectedProvider() {
@@ -41,8 +41,8 @@ class DriverStationTest {
     DriverStationSim.setFmsAttached(fms);
     DriverStationSim.notifyNewData();
 
-    DriverStation.getInstance().silenceJoystickConnectionWarning(silence);
-    assertEquals(expected, DriverStation.getInstance().isJoystickConnectionWarningSilenced());
+    DriverStation.silenceJoystickConnectionWarning(silence);
+    assertEquals(expected, DriverStation.isJoystickConnectionWarningSilenced());
   }
 
   static Stream<Arguments> connectionWarningProvider() {
