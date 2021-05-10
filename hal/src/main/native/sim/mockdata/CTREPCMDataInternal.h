@@ -10,35 +10,24 @@
 
 namespace hal {
 class CTREPCMData {
-  HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidInitialized)
+  HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(SolenoidOutput)
-  HAL_SIMDATAVALUE_DEFINE_NAME(AnySolenoidInitialized)
-  HAL_SIMDATAVALUE_DEFINE_NAME(CompressorInitialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorOn)
   HAL_SIMDATAVALUE_DEFINE_NAME(ClosedLoopEnabled)
   HAL_SIMDATAVALUE_DEFINE_NAME(PressureSwitch)
   HAL_SIMDATAVALUE_DEFINE_NAME(CompressorCurrent)
 
   static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
-  GetSolenoidInitializedDefault() {
-    return false;
-  }
-  static LLVM_ATTRIBUTE_ALWAYS_INLINE constexpr HAL_Bool
   GetSolenoidOutputDefault() {
     return false;
   }
 
  public:
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidInitializedName,
-               GetSolenoidInitializedDefault>
-      solenoidInitialized[kNumSolenoidChannels];
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName>
+      initialized{false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
-      solenoidOutput[kNumSolenoidChannels];
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetAnySolenoidInitializedName>
-      anySolenoidInitialized{false};
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorInitializedName>
-      compressorInitialized{false};
+      solenoidOutput[kNumCTRESolenoidChannels];
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetClosedLoopEnabledName>

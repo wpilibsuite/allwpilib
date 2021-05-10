@@ -14,54 +14,54 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    registerSolenoidInitializedCallback
- * Signature: (IILjava/lang/Object;Z)I
+ * Method:    registerInitializedCallback
+ * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerSolenoidInitializedCallback
-  (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
+Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerInitializedCallback
+  (JNIEnv* env, jclass, jint index, jobject callback,
    jboolean initialNotify)
 {
-  return sim::AllocateChannelCallback(
-      env, index, channel, callback, initialNotify,
-      &HALSIM_RegisterCTREPCMSolenoidInitializedCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterCTREPCMInitializedCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    cancelSolenoidInitializedCallback
- * Signature: (III)V
+ * Method:    cancelInitializedCallback
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelSolenoidInitializedCallback
-  (JNIEnv* env, jclass, jint index, jint channel, jint handle)
+Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelInitializedCallback
+  (JNIEnv* env, jclass, jint index, jint handle)
 {
-  return sim::FreeChannelCallback(env, handle, index, channel,
-                                  &HALSIM_CancelCTREPCMSolenoidInitializedCallback);
+  return sim::FreeCallback(env, handle, index,
+                                  &HALSIM_CancelCTREPCMInitializedCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    getSolenoidInitialized
- * Signature: (II)Z
+ * Method:    getInitialized
+ * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getSolenoidInitialized
-  (JNIEnv*, jclass, jint index, jint channel)
+Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getInitialized
+  (JNIEnv*, jclass, jint index)
 {
-  return HALSIM_GetCTREPCMSolenoidInitialized(index, channel);
+  return HALSIM_GetCTREPCMInitialized(index);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    setSolenoidInitialized
- * Signature: (IIZ)V
+ * Method:    setInitialized
+ * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setSolenoidInitialized
-  (JNIEnv*, jclass, jint index, jint channel, jboolean value)
+Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setInitialized
+  (JNIEnv*, jclass, jint index, jboolean value)
 {
-  HALSIM_SetCTREPCMSolenoidInitialized(index, channel, value);
+  HALSIM_SetCTREPCMInitialized(index, value);
 }
 
 /*
@@ -114,57 +114,6 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setSolenoidOutput
   (JNIEnv*, jclass, jint index, jint channel, jboolean value)
 {
   HALSIM_SetCTREPCMSolenoidOutput(index, channel, value);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    registerCompressorInitializedCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorInitializedCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterCTREPCMCompressorInitializedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    cancelCompressorInitializedCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelCompressorInitializedCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelCTREPCMCompressorInitializedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    getCompressorInitialized
- * Signature: (I)Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_getCompressorInitialized
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetCTREPCMCompressorInitialized(index);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_CTREPCMDataJNI
- * Method:    setCompressorInitialized
- * Signature: (IZ)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_setCompressorInitialized
-  (JNIEnv*, jclass, jint index, jboolean value)
-{
-  HALSIM_SetCTREPCMCompressorInitialized(index, value);
 }
 
 /*

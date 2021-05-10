@@ -167,11 +167,6 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
-  if (!HAL_CheckCTREPCM(module)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Invalid CTRE PCM module " + wpi::Twine(module));
-    return HAL_kInvalidHandle;
-  }
 
   HAL_CTREPCMHandle handle;
   auto pcm = pcmHandles->Allocate(module, &handle, status);
@@ -224,7 +219,7 @@ HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {
   return pcmStatus.bits.compressorOn;
 }
 
-void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool value,
+void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool enabled,
                                      int32_t* status) {
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
@@ -233,7 +228,7 @@ void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool value,
   }
 
   std::scoped_lock lock{pcm->lock};
-  pcm->control.bits.closedLoopEnable = value ? 1 : 0;
+  pcm->control.bits.closedLoopEnable = enabled ? 1 : 0;
   SendControl(pcm.get(), status);
 }
 
@@ -367,7 +362,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
 }
 
 void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
-                                   int32_t durMS, int32_t* status) {
+                                   int32_t durMs, int32_t* status) {
   if (index > 7 || index < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status, "Only [0-7] are valid index values. Requested " + wpi::Twine(index));
@@ -381,7 +376,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   }
 
   std::scoped_lock lock{pcm->lock};
-  pcm->oneShot.sol10MsPerUnit[index] = (std::min)((uint32_t)(durMS)/10, (uint32_t)0xFF);
+  pcm->oneShot.sol10MsPerUnit[index] = (std::min)((uint32_t)(durMs)/10, (uint32_t)0xFF);
   HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8, Control2,
                               SendPeriod, status);
 

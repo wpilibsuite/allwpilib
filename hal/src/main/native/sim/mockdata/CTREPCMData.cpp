@@ -16,12 +16,10 @@ void InitializeCTREPCMData() {
 
 CTREPCMData* hal::SimCTREPCMData;
 void CTREPCMData::ResetData() {
-  for (int i = 0; i < kNumSolenoidChannels; i++) {
-    solenoidInitialized[i].Reset(false);
+  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
     solenoidOutput[i].Reset(false);
   }
-  anySolenoidInitialized.Reset(false);
-  compressorInitialized.Reset(false);
+  initialized.Reset(false);
   compressorOn.Reset(false);
   closedLoopEnabled.Reset(true);
   pressureSwitch.Reset(false);
@@ -37,12 +35,9 @@ void HALSIM_ResetCTREPCMData(int32_t index) {
   HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, SimCTREPCMData, \
                                LOWERNAME)
 
-HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidInitialized,
-                                     SimCTREPCMData, solenoidInitialized)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput,
                                      SimCTREPCMData, solenoidOutput)
-DEFINE_CAPI(HAL_Bool, AnySolenoidInitialized, anySolenoidInitialized)
-DEFINE_CAPI(HAL_Bool, CompressorInitialized, compressorInitialized)
+DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
@@ -51,7 +46,7 @@ DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimCTREPCMData[index].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumSolenoidChannels; i++) {
+  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
     ret |= (data[i] << i);
   }
   *values = ret;
@@ -59,7 +54,7 @@ void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
 
 void HALSIM_SetCTREPCMAllSolenoids(int32_t index, uint8_t values) {
   auto& data = SimCTREPCMData[index].solenoidOutput;
-  for (int i = 0; i < kNumSolenoidChannels; i++) {
+  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
     data[i] = (values & 0x1) != 0;
     values >>= 1;
   }
@@ -72,7 +67,7 @@ void HALSIM_RegisterCTREPCMAllNonSolenoidCallbacks(int32_t index,
                                                HAL_NotifyCallback callback,
                                                void* param,
                                                HAL_Bool initialNotify) {
-  REGISTER(compressorInitialized);
+  REGISTER(initialized);
   REGISTER(compressorOn);
   REGISTER(closedLoopEnabled);
   REGISTER(pressureSwitch);
@@ -83,7 +78,6 @@ void HALSIM_RegisterCTREPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
                                             HAL_NotifyCallback callback,
                                             void* param,
                                             HAL_Bool initialNotify) {
-  REGISTER(solenoidInitialized[channel]);
   REGISTER(solenoidOutput[channel]);
 }
 }  // extern "C"

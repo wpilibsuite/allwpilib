@@ -60,7 +60,7 @@ int32_t HAL_GetNumCTREPCMModules(void) {
   return kNumCTREPCMModules;
 }
 int32_t HAL_GetNumSolenoidChannels(void) {
-  return kNumSolenoidChannels;
+  return kNumCTRESolenoidChannels;
 }
 int32_t HAL_GetNumPDPModules(void) {
   return kNumPDPModules;

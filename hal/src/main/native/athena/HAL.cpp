@@ -51,7 +51,6 @@ void InitializeHAL() {
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
-  InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();
@@ -65,14 +64,12 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
-  InitializePCMInternal();
   InitializePDP();
   InitializePorts();
   InitializePower();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
-  InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();
 }

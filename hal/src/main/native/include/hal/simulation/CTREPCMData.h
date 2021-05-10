@@ -12,13 +12,13 @@ extern "C" {
 #endif
 
 void HALSIM_ResetCTREPCMData(int32_t index);
-int32_t HALSIM_RegisterCTREPCMSolenoidInitializedCallback(
-    int32_t index, int32_t channel, HAL_NotifyCallback callback, void* param,
+int32_t HALSIM_RegisterCTREPCMInitializedCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);
-void HALSIM_CancelCTREPCMSolenoidInitializedCallback(int32_t index, int32_t channel,
+void HALSIM_CancelCTREPCMInitializedCallback(int32_t index,
                                                  int32_t uid);
-HAL_Bool HALSIM_GetCTREPCMSolenoidInitialized(int32_t index, int32_t channel);
-void HALSIM_SetCTREPCMSolenoidInitialized(int32_t index, int32_t channel,
+HAL_Bool HALSIM_GetCTREPCMInitialized(int32_t index);
+void HALSIM_SetCTREPCMInitialized(int32_t index,
                                       HAL_Bool solenoidInitialized);
 
 int32_t HALSIM_RegisterCTREPCMSolenoidOutputCallback(int32_t index, int32_t channel,
@@ -30,22 +30,6 @@ void HALSIM_CancelCTREPCMSolenoidOutputCallback(int32_t index, int32_t channel,
 HAL_Bool HALSIM_GetCTREPCMSolenoidOutput(int32_t index, int32_t channel);
 void HALSIM_SetCTREPCMSolenoidOutput(int32_t index, int32_t channel,
                                  HAL_Bool solenoidOutput);
-
-int32_t HALSIM_RegisterCTREPCMAnySolenoidInitializedCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelCTREPCMAnySolenoidInitializedCallback(int32_t index, int32_t uid);
-HAL_Bool HALSIM_GetCTREPCMAnySolenoidInitialized(int32_t index);
-void HALSIM_SetCTREPCMAnySolenoidInitialized(int32_t index,
-                                         HAL_Bool anySolenoidInitialized);
-
-int32_t HALSIM_RegisterCTREPCMCompressorInitializedCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelCTREPCMCompressorInitializedCallback(int32_t index, int32_t uid);
-HAL_Bool HALSIM_GetCTREPCMCompressorInitialized(int32_t index);
-void HALSIM_SetCTREPCMCompressorInitialized(int32_t index,
-                                        HAL_Bool compressorInitialized);
 
 int32_t HALSIM_RegisterCTREPCMCompressorOnCallback(int32_t index,
                                                HAL_NotifyCallback callback,

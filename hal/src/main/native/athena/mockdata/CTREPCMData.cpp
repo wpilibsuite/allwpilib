@@ -12,10 +12,8 @@ void HALSIM_ResetCTREPCMData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, RETURN)
 
-HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidInitialized,
-                                   false)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput, false)
-DEFINE_CAPI(HAL_Bool, CompressorInitialized, false)
+DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(HAL_Bool, CompressorOn, false)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, false)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, false)
