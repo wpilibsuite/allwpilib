@@ -67,14 +67,12 @@ public abstract class GenericHID {
     }
   }
 
-  private DriverStation m_ds;
   private final int m_port;
   private int m_outputs;
   private short m_leftRumble;
   private short m_rightRumble;
 
   public GenericHID(int port) {
-    m_ds = DriverStation.getInstance();
     m_port = port;
   }
 
@@ -125,7 +123,7 @@ public abstract class GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(int button) {
-    return m_ds.getStickButton(m_port, (byte) button);
+    return DriverStation.getStickButton(m_port, (byte) button);
   }
 
   /**
@@ -139,7 +137,7 @@ public abstract class GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRawButtonPressed(int button) {
-    return m_ds.getStickButtonPressed(m_port, (byte) button);
+    return DriverStation.getStickButtonPressed(m_port, (byte) button);
   }
 
   /**
@@ -153,7 +151,7 @@ public abstract class GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getRawButtonReleased(int button) {
-    return m_ds.getStickButtonReleased(m_port, button);
+    return DriverStation.getStickButtonReleased(m_port, button);
   }
 
   /**
@@ -163,7 +161,7 @@ public abstract class GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(int axis) {
-    return m_ds.getStickAxis(m_port, axis);
+    return DriverStation.getStickAxis(m_port, axis);
   }
 
   /**
@@ -176,7 +174,7 @@ public abstract class GenericHID {
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public int getPOV(int pov) {
-    return m_ds.getStickPOV(m_port, pov);
+    return DriverStation.getStickPOV(m_port, pov);
   }
 
   public int getPOV() {
@@ -189,17 +187,17 @@ public abstract class GenericHID {
    * @return the number of axis for the current HID
    */
   public int getAxisCount() {
-    return m_ds.getStickAxisCount(m_port);
+    return DriverStation.getStickAxisCount(m_port);
   }
 
   /** For the current HID, return the number of POVs. */
   public int getPOVCount() {
-    return m_ds.getStickPOVCount(m_port);
+    return DriverStation.getStickPOVCount(m_port);
   }
 
   /** For the current HID, return the number of buttons. */
   public int getButtonCount() {
-    return m_ds.getStickButtonCount(m_port);
+    return DriverStation.getStickButtonCount(m_port);
   }
 
   /**
@@ -208,7 +206,7 @@ public abstract class GenericHID {
    * @return true if the HID is connected
    */
   public boolean isConnected() {
-    return m_ds.isJoystickConnected(m_port);
+    return DriverStation.isJoystickConnected(m_port);
   }
 
   /**
@@ -217,7 +215,7 @@ public abstract class GenericHID {
    * @return the type of the HID.
    */
   public HIDType getType() {
-    return HIDType.of(m_ds.getJoystickType(m_port));
+    return HIDType.of(DriverStation.getJoystickType(m_port));
   }
 
   /**
@@ -226,7 +224,7 @@ public abstract class GenericHID {
    * @return the name of the HID.
    */
   public String getName() {
-    return m_ds.getJoystickName(m_port);
+    return DriverStation.getJoystickName(m_port);
   }
 
   /**
@@ -235,7 +233,7 @@ public abstract class GenericHID {
    * @return the axis type of a joystick axis.
    */
   public int getAxisType(int axis) {
-    return m_ds.getJoystickAxisType(m_port, axis);
+    return DriverStation.getJoystickAxisType(m_port, axis);
   }
 
   /**

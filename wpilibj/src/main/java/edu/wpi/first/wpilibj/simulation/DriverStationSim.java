@@ -313,7 +313,7 @@ public final class DriverStationSim {
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
     DriverStationDataJNI.notifyNewData();
-    DriverStation.getInstance().waitForData();
+    DriverStation.waitForData();
   }
 
   /**
