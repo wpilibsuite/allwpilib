@@ -72,7 +72,7 @@ public interface Command {
    * @return the command with the timeout added
    */
   default ParallelRaceGroup withTimeout(double seconds) {
-    return new ParallelRaceGroup(this, new WaitCommand(seconds));
+    return this.raceWith(new WaitCommand(seconds));
   }
 
   /**
@@ -91,7 +91,7 @@ public interface Command {
    * @return the command with the interrupt condition added
    */
   default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
-    return new ParallelRaceGroup(this, new WaitUntilCommand(condition));
+    return this.raceWith(new WaitUntilCommand(condition));
   }
 
   /**
@@ -108,7 +108,23 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
-    return new SequentialCommandGroup(new InstantCommand(toRun, requirements), this);
+    return this.beforeStarting(new InstantCommand(toRun, requirements));
+  }
+
+  /**
+   * Decorates this command with another command to run before this command starts.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @param before the command to run before this one
+   * @return the decorated command
+   */
+  default SequentialCommandGroup beforeStarting(Command before) {
+    return new SequentialCommandGroup(before, this);
   }
 
   /**

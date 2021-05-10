@@ -94,6 +94,24 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
+  public SequentialCommandGroup beforeStarting(Command before) {
+    // store all the commands
+    var commands = new ArrayList<Command>();
+    commands.add(before);
+    commands.addAll(m_commands);
+
+    // reset current state
+    commands.forEach(CommandGroupBase::clearGroupedCommand);
+    m_commands.clear();
+    m_requirements.clear();
+    m_runWhenDisabled = true;
+
+    // add them back
+    addCommands(commands.toArray(Command[]::new));
+    return this;
+  }
+
+  @Override
   public SequentialCommandGroup andThen(Command... next) {
     addCommands(next);
     return this;
