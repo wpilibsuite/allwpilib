@@ -75,5 +75,16 @@
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Educational Robot",
+    "description": "Educational Robot - Not for competition use",
+    "tags": [
+      "Educational"
+    ],
+    "foldername": "educational",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
   }
 ]

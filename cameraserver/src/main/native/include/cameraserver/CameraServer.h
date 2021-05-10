@@ -32,7 +32,7 @@ class CameraServer {
   /**
    * Get the CameraServer instance.
    */
-  static CameraServer& GetInstance();
+  static CameraServer* GetInstance();
 
   /**
    * Start automatically capturing images to send to the dashboard.

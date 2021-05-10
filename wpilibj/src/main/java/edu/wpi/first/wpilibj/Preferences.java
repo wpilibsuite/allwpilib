@@ -166,6 +166,7 @@ public final class Preferences {
    * @param value the value
    * @deprecated Use {@link #setDouble(String, double)}
    */
+  @Deprecated
   public static void putDouble(String key, double value) {
     setDouble(key, value);
   }

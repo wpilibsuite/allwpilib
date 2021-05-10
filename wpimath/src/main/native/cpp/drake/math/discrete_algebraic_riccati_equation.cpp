@@ -7,9 +7,6 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 
-// This code has https://github.com/RobotLocomotion/drake/pull/11118 applied to
-// fix an infinite loop in reorder_eigen().
-
 namespace drake {
 namespace math {
 namespace {

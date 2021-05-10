@@ -21,7 +21,6 @@
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
 #include "HALSimGui.h"
-#include "Mechanism2D.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
 #include "PDPSimGui.h"
@@ -60,7 +59,6 @@ __declspec(dllexport)
   gui::AddInit(AnalogInputSimGui::Initialize);
   gui::AddInit(AnalogOutputSimGui::Initialize);
   gui::AddInit(DIOSimGui::Initialize);
-  gui::AddInit(Mechanism2D::Initialize);
   gui::AddInit(NetworkTablesSimGui::Initialize);
   gui::AddInit(PCMSimGui::Initialize);
   gui::AddInit(PDPSimGui::Initialize);
