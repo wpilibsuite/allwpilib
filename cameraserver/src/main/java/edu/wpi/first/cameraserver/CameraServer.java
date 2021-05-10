@@ -33,6 +33,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Singleton class for creating and keeping camera servers. Also publishes camera information to
  * NetworkTables.
  */
+@SuppressWarnings({
+  "MissingJavadocMethod",
+  "PMD.UnusedLocalVariable",
+  "PMD.ExcessiveMethodLength",
+  "PMD.NPathComplexity",
+  "PMD.CyclomaticComplexity"
+})
 public final class CameraServer {
   public static final int kBasePort = 1181;
 
@@ -41,9 +48,14 @@ public final class CameraServer {
   @Deprecated public static final int kSize160x120 = 2;
 
   private static final String kPublishName = "/CameraPublisher";
-  private static CameraServer server;
+  @Deprecated private static CameraServer server;
 
-  /** Get the CameraServer instance. */
+  /**
+   * Get the CameraServer instance.
+   *
+   * @deprecated Use the static methods
+   */
+  @Deprecated
   public static synchronized CameraServer getInstance() {
     if (server == null) {
       server = new CameraServer();
@@ -51,18 +63,18 @@ public final class CameraServer {
     return server;
   }
 
-  private final AtomicInteger m_defaultUsbDevice;
-  private String m_primarySourceName;
-  private final Map<String, VideoSource> m_sources;
-  private final Map<String, VideoSink> m_sinks;
-  private final Map<Integer, NetworkTable> m_tables; // indexed by source handle
+  private static final AtomicInteger m_defaultUsbDevice;
+  private static String m_primarySourceName;
+  private static final Map<String, VideoSource> m_sources;
+  private static final Map<String, VideoSink> m_sinks;
+  private static final Map<Integer, NetworkTable> m_tables; // indexed by source handle
   // source handle indexed by sink handle
-  private final Map<Integer, Integer> m_fixedSources;
-  private final NetworkTable m_publishTable;
-  private final VideoListener m_videoListener; // NOPMD
-  private final int m_tableListener; // NOPMD
-  private int m_nextPort;
-  private String[] m_addresses;
+  private static final Map<Integer, Integer> m_fixedSources;
+  private static final NetworkTable m_publishTable;
+  private static final VideoListener m_videoListener; // NOPMD
+  private static final int m_tableListener; // NOPMD
+  private static int m_nextPort;
+  private static String[] m_addresses;
 
   @SuppressWarnings("MissingJavadocMethod")
   private static String makeSourceValue(int source) {
@@ -91,7 +103,7 @@ public final class CameraServer {
   }
 
   @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
-  private synchronized String[] getSinkStreamValues(int sink) {
+  private static synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
     if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
       return new String[0];
@@ -121,7 +133,7 @@ public final class CameraServer {
   }
 
   @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
-  private synchronized String[] getSourceStreamValues(int source) {
+  private static synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
         != VideoSource.Kind.kHttp) {
@@ -160,7 +172,7 @@ public final class CameraServer {
     "PMD.AvoidUsingHardCodedIP",
     "PMD.CyclomaticComplexity"
   })
-  private synchronized void updateStreamValues() {
+  private static synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
       int sink = i.getHandle();
@@ -304,13 +316,10 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings({
-    "MissingJavadocMethod",
-    "PMD.UnusedLocalVariable",
-    "PMD.ExcessiveMethodLength",
-    "PMD.NPathComplexity"
-  })
-  private CameraServer() {
+  @Deprecated
+  private CameraServer() {}
+
+  static {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new HashMap<>();
     m_sinks = new HashMap<>();
@@ -532,7 +541,7 @@ public final class CameraServer {
    * device 0, creating a camera named "USB Camera 0". Subsequent calls increment the device number
    * (e.g. 1, 2, etc).
    */
-  public UsbCamera startAutomaticCapture() {
+  public static UsbCamera startAutomaticCapture() {
     UsbCamera camera = startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
     CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
     return camera;
@@ -546,7 +555,7 @@ public final class CameraServer {
    *
    * @param dev The device number of the camera interface
    */
-  public UsbCamera startAutomaticCapture(int dev) {
+  public static UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
     startAutomaticCapture(camera);
     CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
@@ -559,7 +568,7 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param dev The device number of the camera interface
    */
-  public UsbCamera startAutomaticCapture(String name, int dev) {
+  public static UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
     CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
@@ -572,7 +581,7 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  public UsbCamera startAutomaticCapture(String name, String path) {
+  public static UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
     startAutomaticCapture(camera);
     CameraServerSharedStore.getCameraServerShared().reportUsbCamera(camera.getHandle());
@@ -584,7 +593,7 @@ public final class CameraServer {
    *
    * @param camera Camera
    */
-  public MjpegServer startAutomaticCapture(VideoSource camera) {
+  public static MjpegServer startAutomaticCapture(VideoSource camera) {
     addCamera(camera);
     MjpegServer server = addServer("serve_" + camera.getName());
     server.setSource(camera);
@@ -598,7 +607,7 @@ public final class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  public AxisCamera addAxisCamera(String host) {
+  public static AxisCamera addAxisCamera(String host) {
     return addAxisCamera("Axis Camera", host);
   }
 
@@ -609,7 +618,7 @@ public final class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
-  public AxisCamera addAxisCamera(String[] hosts) {
+  public static AxisCamera addAxisCamera(String[] hosts) {
     return addAxisCamera("Axis Camera", hosts);
   }
 
@@ -619,7 +628,7 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  public AxisCamera addAxisCamera(String name, String host) {
+  public static AxisCamera addAxisCamera(String name, String host) {
     AxisCamera camera = new AxisCamera(name, host);
     // Create a passthrough MJPEG server for USB access
     startAutomaticCapture(camera);
@@ -633,7 +642,7 @@ public final class CameraServer {
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
    */
-  public AxisCamera addAxisCamera(String name, String[] hosts) {
+  public static AxisCamera addAxisCamera(String name, String[] hosts) {
     AxisCamera camera = new AxisCamera(name, hosts);
     // Create a passthrough MJPEG server for USB access
     startAutomaticCapture(camera);
@@ -646,11 +655,11 @@ public final class CameraServer {
    * this returns a VideoSink rather than a VideoSource. Calling setSource() on the returned object
    * can be used to switch the actual source of the stream.
    */
-  public MjpegServer addSwitchedCamera(String name) {
+  public static MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
     CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, 160, 120, 30);
     MjpegServer server = startAutomaticCapture(source);
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       m_fixedSources.put(server.getHandle(), source.getHandle());
     }
 
@@ -664,9 +673,9 @@ public final class CameraServer {
    * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
    * or addServer().
    */
-  public CvSink getVideo() {
+  public static CvSink getVideo() {
     VideoSource source;
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       if (m_primarySourceName == null) {
         throw new VideoException("no camera available");
       }
@@ -684,10 +693,10 @@ public final class CameraServer {
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    */
-  public CvSink getVideo(VideoSource camera) {
+  public static CvSink getVideo(VideoSource camera) {
     String name = "opencv_" + camera.getName();
 
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       VideoSink sink = m_sinks.get(name);
       if (sink != null) {
         VideoSink.Kind kind = sink.getKind();
@@ -710,9 +719,9 @@ public final class CameraServer {
    *
    * @param name Camera name
    */
-  public CvSink getVideo(String name) {
+  public static CvSink getVideo(String name) {
     VideoSource source;
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       source = m_sources.get(name);
       if (source == null) {
         throw new VideoException("could not find camera " + name);
@@ -729,7 +738,7 @@ public final class CameraServer {
    * @param width Width of the image being sent
    * @param height Height of the image being sent
    */
-  public CvSource putVideo(String name, int width, int height) {
+  public static CvSource putVideo(String name, int width, int height) {
     CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, width, height, 30);
     startAutomaticCapture(source);
     return source;
@@ -740,9 +749,9 @@ public final class CameraServer {
    *
    * @param name Server name
    */
-  public MjpegServer addServer(String name) {
+  public static MjpegServer addServer(String name) {
     int port;
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       port = m_nextPort;
       m_nextPort++;
     }
@@ -754,7 +763,7 @@ public final class CameraServer {
    *
    * @param name Server name
    */
-  public MjpegServer addServer(String name, int port) {
+  public static MjpegServer addServer(String name, int port) {
     MjpegServer server = new MjpegServer(name, port);
     addServer(server);
     return server;
@@ -765,8 +774,8 @@ public final class CameraServer {
    *
    * @param server Server
    */
-  public void addServer(VideoSink server) {
-    synchronized (this) {
+  public static void addServer(VideoSink server) {
+    synchronized (CameraServer.class) {
       m_sinks.put(server.getName(), server);
     }
   }
@@ -776,8 +785,8 @@ public final class CameraServer {
    *
    * @param name Server name
    */
-  public void removeServer(String name) {
-    synchronized (this) {
+  public static void removeServer(String name) {
+    synchronized (CameraServer.class) {
       m_sinks.remove(name);
     }
   }
@@ -788,8 +797,8 @@ public final class CameraServer {
    * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
    * or addServer().
    */
-  public VideoSink getServer() {
-    synchronized (this) {
+  public static VideoSink getServer() {
+    synchronized (CameraServer.class) {
       if (m_primarySourceName == null) {
         throw new VideoException("no camera available");
       }
@@ -802,8 +811,8 @@ public final class CameraServer {
    *
    * @param name Server name
    */
-  public VideoSink getServer(String name) {
-    synchronized (this) {
+  public static VideoSink getServer(String name) {
+    synchronized (CameraServer.class) {
       return m_sinks.get(name);
     }
   }
@@ -813,9 +822,9 @@ public final class CameraServer {
    *
    * @param camera Camera
    */
-  public void addCamera(VideoSource camera) {
+  public static void addCamera(VideoSource camera) {
     String name = camera.getName();
-    synchronized (this) {
+    synchronized (CameraServer.class) {
       if (m_primarySourceName == null) {
         m_primarySourceName = name;
       }
@@ -828,8 +837,8 @@ public final class CameraServer {
    *
    * @param name Camera name
    */
-  public void removeCamera(String name) {
-    synchronized (this) {
+  public static void removeCamera(String name) {
+    synchronized (CameraServer.class) {
       m_sources.remove(name);
     }
   }
