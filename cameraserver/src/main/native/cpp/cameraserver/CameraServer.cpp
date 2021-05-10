@@ -45,7 +45,7 @@ struct CameraServer::Impl {
   std::vector<std::string> m_addresses;
 };
 
-CameraServer& CameraServer::GetInstance() {
+CameraServer* CameraServer::GetInstance() {
   struct Creator {
     static void* call() { return new CameraServer{}; }
   };
@@ -53,7 +53,7 @@ CameraServer& CameraServer::GetInstance() {
     static void call(void* ptr) { delete static_cast<CameraServer*>(ptr); }
   };
   static wpi::ManagedStatic<CameraServer, Creator, Deleter> instance;
-  return *instance;
+  return &(*instance);
 }
 
 static wpi::StringRef MakeSourceValue(CS_Source source,

@@ -61,9 +61,9 @@ std::shared_ptr<LiveWindow::Impl::Component> LiveWindow::Impl::GetOrAdd(
   return data;
 }
 
-LiveWindow& LiveWindow::GetInstance() {
+LiveWindow* LiveWindow::GetInstance() {
   static LiveWindow instance;
-  return instance;
+  return &instance;
 }
 
 void LiveWindow::EnableTelemetry(Sendable* sendable) {

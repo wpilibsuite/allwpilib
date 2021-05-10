@@ -34,9 +34,9 @@ class Preferences {
   /**
    * Get the one and only {@link Preferences} object.
    *
-   * @return reference to the {@link Preferences}
+   * @return pointer to the {@link Preferences}
    */
-  static Preferences& GetInstance();
+  static Preferences* GetInstance();
 
   /**
    * Returns a vector of all the keys.
@@ -292,7 +292,6 @@ class Preferences {
 
  protected:
   Preferences();
-  ~Preferences();
 
   Preferences(Preferences&&) = default;
   Preferences& operator=(Preferences&&) = default;
