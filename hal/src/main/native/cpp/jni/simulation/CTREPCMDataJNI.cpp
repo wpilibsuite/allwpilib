@@ -19,12 +19,10 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerInitializedCallback
-  (JNIEnv* env, jclass, jint index, jobject callback,
-   jboolean initialNotify)
+  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterCTREPCMInitializedCallback);
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterCTREPCMInitializedCallback);
 }
 
 /*
@@ -37,7 +35,7 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_cancelInitializedCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
-                                  &HALSIM_CancelCTREPCMInitializedCallback);
+                           &HALSIM_CancelCTREPCMInitializedCallback);
 }
 
 /*
@@ -175,8 +173,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerClosedLoopEnabledCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterCTREPCMClosedLoopEnabledCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterCTREPCMClosedLoopEnabledCallback);
 }
 
 /*
@@ -275,8 +274,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterCTREPCMCompressorCurrentCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterCTREPCMCompressorCurrentCallback);
 }
 
 /*
@@ -347,7 +347,8 @@ Java_edu_wpi_first_hal_simulation_CTREPCMDataJNI_registerAllSolenoidCallbacks
       env, index, channel, callback, initialNotify,
       [](int32_t index, int32_t channel, HAL_NotifyCallback cb, void* param,
          HAL_Bool in) {
-        HALSIM_RegisterCTREPCMAllSolenoidCallbacks(index, channel, cb, param, in);
+        HALSIM_RegisterCTREPCMAllSolenoidCallbacks(index, channel, cb, param,
+                                                   in);
         return 0;
       });
 }

@@ -1,11 +1,15 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "hal/CTREPCM.h"
 
-#include "hal/handles/IndexedHandleResource.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 
@@ -292,14 +296,15 @@ int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status) {
 
 void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
                              int32_t values, int32_t* status) {
-auto pcm = pcmHandles->Get(handle);
+  auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
   uint8_t smallMask = mask & 0xFF;
-  uint8_t smallValues = (values & 0xFF) & smallMask; // Enforce only masked values are set
+  uint8_t smallValues =
+      (values & 0xFF) & smallMask;  // Enforce only masked values are set
   uint8_t invertMask = ~smallMask;
 
   std::scoped_lock lock{pcm->lock};
@@ -326,16 +331,19 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
   return pcmStatus.bits.faultFuseTripped;
 }
 
-void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle, int32_t* status) {
-  uint8_t controlData[] = { 0, 0, 0 , 0x80 };
-  HAL_WriteCANPacket(handle, controlData, sizeof(controlData), Control2, status);
+void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle,
+                                     int32_t* status) {
+  uint8_t controlData[] = {0, 0, 0, 0x80};
+  HAL_WriteCANPacket(handle, controlData, sizeof(controlData), Control2,
+                     status);
 }
 
 void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
                             int32_t* status) {
   if (index > 7 || index < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " + wpi::Twine(index));
+    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " +
+                                  wpi::Twine(index));
     return;
   }
 
@@ -365,7 +373,8 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
                                    int32_t durMs, int32_t* status) {
   if (index > 7 || index < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " + wpi::Twine(index));
+    hal::SetLastError(status, "Only [0-7] are valid index values. Requested " +
+                                  wpi::Twine(index));
     return;
   }
 
@@ -376,10 +385,11 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   }
 
   std::scoped_lock lock{pcm->lock};
-  pcm->oneShot.sol10MsPerUnit[index] = (std::min)((uint32_t)(durMs)/10, (uint32_t)0xFF);
-  HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8, Control2,
-                              SendPeriod, status);
-
+  pcm->oneShot.sol10MsPerUnit[index] =
+      (std::min)(static_cast<uint32_t>(durMs) / 10,
+                 static_cast<uint32_t>(0xFF));
+  HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
+                              Control2, SendPeriod, status);
 }
 
-} // extern "C"
+}  // extern "C"

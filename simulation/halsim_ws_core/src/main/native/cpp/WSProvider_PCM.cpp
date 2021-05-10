@@ -7,8 +7,8 @@
 #include <hal/Ports.h>
 #include <hal/simulation/CTREPCMData.h>
 
-#define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                     \
-  HALSIM_RegisterCTREPCM##halsim##Callback(                                  \
+#define REGISTER_CTREPCM(halsim, jsonid, ctype, haltype)                 \
+  HALSIM_RegisterCTREPCM##halsim##Callback(                              \
       m_channel,                                                         \
       [](const char* name, void* param, const struct HAL_Value* value) { \
         static_cast<HALSimWSProviderPCM*>(param)->ProcessHalCallback(    \
@@ -32,7 +32,8 @@ void HALSimWSProviderPCM::RegisterCallbacks() {
       REGISTER_CTREPCM(ClosedLoopEnabled, "<closed_loop", bool, boolean);
   m_pressureSwitchCbKey =
       REGISTER_CTREPCM(PressureSwitch, ">pressure_switch", bool, boolean);
-  m_currentCbKey = REGISTER_CTREPCM(CompressorCurrent, ">current", double, double);
+  m_currentCbKey =
+      REGISTER_CTREPCM(CompressorCurrent, ">current", double, double);
 }
 
 void HALSimWSProviderPCM::CancelCallbacks() {

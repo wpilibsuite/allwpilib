@@ -31,9 +31,9 @@ void HALSIM_ResetCTREPCMData(int32_t index) {
   SimCTREPCMData[index].ResetData();
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, SimCTREPCMData, \
-                               LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, \
+                               SimCTREPCMData, LOWERNAME)
 
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput,
                                      SimCTREPCMData, solenoidOutput)
@@ -64,9 +64,9 @@ void HALSIM_SetCTREPCMAllSolenoids(int32_t index, uint8_t values) {
   SimCTREPCMData[index].NAME.RegisterCallback(callback, param, initialNotify)
 
 void HALSIM_RegisterCTREPCMAllNonSolenoidCallbacks(int32_t index,
-                                               HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify) {
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(compressorOn);
   REGISTER(closedLoopEnabled);
@@ -75,9 +75,9 @@ void HALSIM_RegisterCTREPCMAllNonSolenoidCallbacks(int32_t index,
 }
 
 void HALSIM_RegisterCTREPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
-                                            HAL_NotifyCallback callback,
-                                            void* param,
-                                            HAL_Bool initialNotify) {
+                                                HAL_NotifyCallback callback,
+                                                void* param,
+                                                HAL_Bool initialNotify) {
   REGISTER(solenoidOutput[channel]);
 }
 }  // extern "C"

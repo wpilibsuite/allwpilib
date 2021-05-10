@@ -3,22 +3,24 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/TimedRobot.h>
-#include "hal/CTREPCM.h"
+
+#include <hal/CTREPCM.h>
+
 #include "frc/Solenoid.h"
 
 class MyRobot : public frc::TimedRobot {
-  //HAL_CTREPCMHandle handle;
+  // HAL_CTREPCMHandle handle;
   frc::Solenoid* solenoid;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   void RobotInit() override {
-    //int32_t status = 0;
+    // int32_t status = 0;
 
     solenoid = new frc::Solenoid{0};
-    //handle = HAL_InitializeCTREPCM(0, nullptr, &status);
-    //printf("Status %d\n", status);
+    // handle = HAL_InitializeCTREPCM(0, nullptr, &status);
+    // std::printf("Status %d\n", status);
   }
 
   /**
@@ -40,10 +42,10 @@ class MyRobot : public frc::TimedRobot {
    * This function is called periodically during operator control
    */
   void TeleopPeriodic() override {
-    //int32_t status = 0;
+    // int32_t status = 0;
     solenoid->Set(true);
-    //HAL_SetCTREPCMSolenoids(handle, 0xFF, 1, &status);
-    //printf("Status %d\n", status);
+    // HAL_SetCTREPCMSolenoids(handle, 0xFF, 1, &status);
+    // std::printf("Status %d\n", status);
   }
 
   /**

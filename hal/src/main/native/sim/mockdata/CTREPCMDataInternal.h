@@ -23,8 +23,8 @@ class CTREPCMData {
   }
 
  public:
-  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName>
-      initialized{false};
+  SimDataValue<HAL_Bool, HAL_MakeBoolean, GetInitializedName> initialized{
+      false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
       solenoidOutput[kNumCTRESolenoidChannels];

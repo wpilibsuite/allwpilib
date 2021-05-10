@@ -12,7 +12,8 @@ void HALSIM_ResetCTREPCMData(int32_t index) {}
 #define DEFINE_CAPI(TYPE, CAPINAME, RETURN) \
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, CTREPCM##CAPINAME, RETURN)
 
-HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput, false)
+HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, CTREPCMSolenoidOutput,
+                                   false)
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(HAL_Bool, CompressorOn, false)
 DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, false)
@@ -26,12 +27,12 @@ void HALSIM_GetCTREPCMAllSolenoids(int32_t index, uint8_t* values) {
 void HALSIM_SetCTREPCMAllSolenoids(int32_t index, uint8_t values) {}
 
 void HALSIM_RegisterCTREPCMAllNonSolenoidCallbacks(int32_t index,
-                                               HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify) {}
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {}
 
 void HALSIM_RegisterCTREPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
-                                            HAL_NotifyCallback callback,
-                                            void* param,
-                                            HAL_Bool initialNotify) {}
+                                                HAL_NotifyCallback callback,
+                                                void* param,
+                                                HAL_Bool initialNotify) {}
 }  // extern "C"

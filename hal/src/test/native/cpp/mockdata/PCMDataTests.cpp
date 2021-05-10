@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "gtest/gtest.h"
-#include "hal/HAL.h"
 #include "hal/CTREPCM.h"
+#include "hal/HAL.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/simulation/CTREPCMData.h"
 
@@ -24,8 +24,8 @@ TEST(SolenoidSimTests, TestPCMInitialization) {
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterCTREPCMInitializedCallback(
-      MODULE_TO_TEST, &TestSolenoidInitializationCallback,
-      &callbackParam, false);
+      MODULE_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam,
+      false);
   ASSERT_TRUE(0 != callbackId);
 
   int32_t status;
@@ -67,8 +67,8 @@ TEST(SolenoidSimTests, TestPCMInitialization) {
   hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetCTREPCMData(MODULE_TO_TEST);
   callbackId = HALSIM_RegisterCTREPCMInitializedCallback(
-      MODULE_TO_TEST, &TestSolenoidInitializationCallback,
-      &callbackParam, false);
+      MODULE_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam,
+      false);
   ASSERT_TRUE(0 != callbackId);
 
   status = 0;

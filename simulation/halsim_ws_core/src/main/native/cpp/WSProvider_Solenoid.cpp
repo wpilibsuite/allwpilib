@@ -8,7 +8,7 @@
 #include <hal/simulation/CTREPCMData.h>
 
 #define REGISTER_SOLENOID(halsim, jsonid, ctype, haltype)                  \
-  HALSIM_RegisterCTREPCMSolenoid##halsim##Callback(                            \
+  HALSIM_RegisterCTREPCMSolenoid##halsim##Callback(                        \
       m_pcmIndex, m_solenoidIndex,                                         \
       [](const char* name, void* param, const struct HAL_Value* value) {   \
         static_cast<HALSimWSProviderSolenoid*>(param)->ProcessHalCallback( \
@@ -18,12 +18,13 @@
 
 namespace wpilibws {
 void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
-  for (int32_t CTREPCMIndex = 0; CTREPCMIndex < HAL_GetNumCTREPCMModules(); ++CTREPCMIndex) {
+  for (int32_t CTREPCMIndex = 0; CTREPCMIndex < HAL_GetNumCTREPCMModules();
+       ++CTREPCMIndex) {
     for (int32_t solenoidIndex = 0;
          solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
-      auto key =
-          ("Solenoid/" + wpi::Twine(CTREPCMIndex) + "," + wpi::Twine(solenoidIndex))
-              .str();
+      auto key = ("Solenoid/" + wpi::Twine(CTREPCMIndex) + "," +
+                  wpi::Twine(solenoidIndex))
+                     .str();
       auto ptr = std::make_unique<HALSimWSProviderSolenoid>(
           CTREPCMIndex, solenoidIndex, key, "Solenoid");
       webRegisterFunc(key, std::move(ptr));
@@ -57,9 +58,9 @@ void HALSimWSProviderSolenoid::CancelCallbacks() {
 
 void HALSimWSProviderSolenoid::DoCancelCallbacks() {
   HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
-                                              m_initCbKey);
+                                                  m_initCbKey);
   HALSIM_CancelCTREPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
-                                         m_outputCbKey);
+                                             m_outputCbKey);
 
   m_initCbKey = 0;
   m_outputCbKey = 0;

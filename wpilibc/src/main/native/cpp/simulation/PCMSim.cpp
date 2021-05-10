@@ -43,7 +43,8 @@ void PCMSim::SetSolenoidInitialized(int channel, bool solenoidInitialized) {
 std::unique_ptr<CallbackStore> PCMSim::RegisterSolenoidOutputCallback(
     int channel, NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, channel, -1, callback, &HALSIM_CancelCTREPCMSolenoidOutputCallback);
+      m_index, channel, -1, callback,
+      &HALSIM_CancelCTREPCMSolenoidOutputCallback);
   store->SetUid(HALSIM_RegisterCTREPCMSolenoidOutputCallback(
       m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
@@ -60,7 +61,8 @@ void PCMSim::SetSolenoidOutput(int channel, bool solenoidOutput) {
 std::unique_ptr<CallbackStore> PCMSim::RegisterCompressorInitializedCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelCTREPCMCompressorInitializedCallback);
+      m_index, -1, callback,
+      &HALSIM_CancelCTREPCMCompressorInitializedCallback);
   store->SetUid(HALSIM_RegisterCTREPCMCompressorInitializedCallback(
       m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
