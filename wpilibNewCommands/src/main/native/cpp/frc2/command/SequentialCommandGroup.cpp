@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc2/command/SequentialCommandGroup.h"
+
 #include "frc2/command/InstantCommand.h"
 
 using namespace frc2;
@@ -75,31 +76,32 @@ void SequentialCommandGroup::AddCommands(
 }
 
 SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
-      std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements) && {
+    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
   // store all the commands
   std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(std::make_unique<InstantCommand>(std::move(toRun), requirements));
+  tmp.emplace_back(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements));
   for (size_t i = 0; i < m_commands.size(); i++) {
-    auto& command = m_commands[i];
+    auto command = m_commands[i];
     command->SetGrouped(false);
     tmp.emplace_back(command);
   }
-  
+
   // reset current state
   tmp.clear();
   m_requirements.clear();
   m_runWhenDisabled = true;
-  
+
   // add the commands back
   AddCommands(std::move(tmp));
   return std::move(*this);
 }
 
-SequentialCommandGroup SequentialCommandGroup::AndThen(std::function<void()> toRun,
-                                                       wpi::ArrayRef<Subsystem*> requirements) && {
+SequentialCommandGroup SequentialCommandGroup::AndThen(
+    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
   std::vector<std::unique_ptr<Command>> tmp;
-  tmp.emplace_back(std::make_unique<InstantCommand>(std::move(toRun), requirements));
+  tmp.emplace_back(
+      std::make_unique<InstantCommand>(std::move(toRun), requirements));
   AddCommands(std::move(tmp));
   return std::move(*this);
 }

@@ -90,11 +90,12 @@ class SequentialCommandGroup
 
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) && override;
+      wpi::ArrayRef<Subsystem*> requirements = {}) &&
+      override;
 
-  SequentialCommandGroup AndThen(
-      std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) && override;
+  SequentialCommandGroup AndThen(std::function<void()> toRun,
+                                 wpi::ArrayRef<Subsystem*> requirements = {}) &&
+      override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;
