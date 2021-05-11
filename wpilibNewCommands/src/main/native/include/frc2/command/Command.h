@@ -108,7 +108,7 @@ class Command : public frc::ErrorBase {
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  ParallelRaceGroup WithTimeout(units::second_t duration) &&;
+  virtual ParallelRaceGroup WithTimeout(units::second_t duration) &&;
 
   /**
    * Decorates this command with an interrupt condition.  If the specified
@@ -119,7 +119,7 @@ class Command : public frc::ErrorBase {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
+  virtual ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**
    * Decorates this command with a runnable to run before this command starts.
@@ -128,7 +128,7 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(
+  virtual SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -139,7 +139,7 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup BeforeStarting(
+  virtual SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
       wpi::ArrayRef<Subsystem*> requirements = {}) &&;
 
@@ -150,7 +150,7 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(
+  virtual SequentialCommandGroup AndThen(
       std::function<void()> toRun,
       std::initializer_list<Subsystem*> requirements) &&;
 
@@ -161,7 +161,7 @@ class Command : public frc::ErrorBase {
    * @param requirements the required subsystems
    * @return the decorated command
    */
-  SequentialCommandGroup AndThen(
+  virtual SequentialCommandGroup AndThen(
       std::function<void()> toRun,
       wpi::ArrayRef<Subsystem*> requirements = {}) &&;
 
@@ -171,7 +171,7 @@ class Command : public frc::ErrorBase {
    *
    * @return the decorated command
    */
-  PerpetualCommand Perpetually() &&;
+  virtual PerpetualCommand Perpetually() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a {@link
@@ -181,7 +181,7 @@ class Command : public frc::ErrorBase {
    *
    * @return the decorated command
    */
-  ProxyScheduleCommand AsProxy();
+  virtual ProxyScheduleCommand AsProxy();
 
   /**
    * Schedules this command.
