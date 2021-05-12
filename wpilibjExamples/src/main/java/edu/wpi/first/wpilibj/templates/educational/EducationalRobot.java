@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.templates.educational;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /** Educational robot base class. */
@@ -39,32 +40,32 @@ public class EducationalRobot extends RobotBase {
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       if (isDisabled()) {
-        m_ds.InDisabled(true);
+        DriverStation.InDisabled(true);
         disabled();
-        m_ds.InDisabled(false);
+        DriverStation.InDisabled(false);
         while (isDisabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       } else if (isAutonomous()) {
-        m_ds.InAutonomous(true);
+        DriverStation.InAutonomous(true);
         autonomous();
-        m_ds.InAutonomous(false);
+        DriverStation.InAutonomous(false);
         while (isAutonomousEnabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       } else if (isTest()) {
-        m_ds.InTest(true);
+        DriverStation.InTest(true);
         test();
-        m_ds.InTest(false);
+        DriverStation.InTest(false);
         while (isTest() && isEnabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       } else {
-        m_ds.InOperatorControl(true);
+        DriverStation.InOperatorControl(true);
         teleop();
-        m_ds.InOperatorControl(false);
+        DriverStation.InOperatorControl(false);
         while (isOperatorControlEnabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       }
     }
