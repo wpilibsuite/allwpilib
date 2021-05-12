@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 /** Interface for motor controlling devices. */
 @SuppressWarnings("removal")
 public interface MotorController extends SpeedController {
+  @Override
   default void setVoltage(double outputVolts) {
     set(outputVolts / RobotController.getBatteryVoltage());
   }
