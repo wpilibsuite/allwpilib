@@ -23,7 +23,7 @@ using namespace frc;
 
 AnalogGyro::AnalogGyro(int channel)
     : AnalogGyro(std::make_shared<AnalogInput>(channel)) {
-  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
+  SendableRegistry::AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(AnalogInput* channel)
@@ -41,7 +41,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
 
 AnalogGyro::AnalogGyro(int channel, int center, double offset)
     : AnalogGyro(std::make_shared<AnalogInput>(channel), center, offset) {
-  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
+  SendableRegistry::AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
@@ -124,8 +124,7 @@ void AnalogGyro::InitGyro() {
 
   HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel() + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "AnalogGyro",
-                                        m_analog->GetChannel());
+  SendableRegistry::AddLW(this, "AnalogGyro", m_analog->GetChannel());
 }
 
 void AnalogGyro::Calibrate() {

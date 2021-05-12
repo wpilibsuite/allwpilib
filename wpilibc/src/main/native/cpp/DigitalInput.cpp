@@ -34,7 +34,7 @@ DigitalInput::DigitalInput(int channel) {
   FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalInput", channel);
+  SendableRegistry::AddLW(this, "DigitalInput", channel);
 }
 
 DigitalInput::~DigitalInput() {

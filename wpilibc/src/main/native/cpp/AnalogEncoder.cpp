@@ -49,8 +49,8 @@ void AnalogEncoder::Init() {
   m_counter.SetDownSource(
       m_analogTrigger.CreateOutput(AnalogTriggerType::kFallingPulse));
 
-  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                        m_analogInput->GetChannel());
+  SendableRegistry::AddLW(this, "DutyCycle Encoder",
+                          m_analogInput->GetChannel());
 }
 
 units::turn_t AnalogEncoder::Get() const {

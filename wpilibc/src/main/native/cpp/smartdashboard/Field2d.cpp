@@ -13,7 +13,7 @@ Field2d::Field2d() {
   m_objects.emplace_back(
       std::make_unique<FieldObject2d>("Robot", FieldObject2d::private_init{}));
   m_objects[0]->SetPose(Pose2d{});
-  SendableRegistry::GetInstance().Add(this, "Field");
+  SendableRegistry::Add(this, "Field");
 }
 
 Field2d::Field2d(Field2d&& rhs) : SendableHelper(std::move(rhs)) {

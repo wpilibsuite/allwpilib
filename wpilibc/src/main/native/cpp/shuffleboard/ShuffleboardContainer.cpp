@@ -73,7 +73,7 @@ ComplexWidget& ShuffleboardContainer::Add(const wpi::Twine& title,
 }
 
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
-  auto name = SendableRegistry::GetInstance().GetName(&sendable);
+  auto name = SendableRegistry::GetName(&sendable);
   if (name.empty()) {
     wpi::outs() << "Sendable must have a name\n";
   }

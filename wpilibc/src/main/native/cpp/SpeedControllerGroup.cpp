@@ -20,11 +20,11 @@ SpeedControllerGroup::SpeedControllerGroup(
 
 void SpeedControllerGroup::Initialize() {
   for (auto& speedController : m_speedControllers) {
-    SendableRegistry::GetInstance().AddChild(this, &speedController.get());
+    SendableRegistry::AddChild(this, &speedController.get());
   }
   static int instances = 0;
   ++instances;
-  SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup", instances);
+  SendableRegistry::Add(this, "SpeedControllerGroup", instances);
 }
 
 void SpeedControllerGroup::Set(double speed) {

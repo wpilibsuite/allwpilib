@@ -58,7 +58,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
+  SendableRegistry::AddLW(this, "ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {

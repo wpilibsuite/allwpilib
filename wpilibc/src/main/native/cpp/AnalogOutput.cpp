@@ -35,7 +35,7 @@ AnalogOutput::AnalogOutput(int channel) {
   FRC_CheckErrorStatus(status, "analog output " + wpi::Twine(channel));
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
+  SendableRegistry::AddLW(this, "AnalogOutput", m_channel);
 }
 
 AnalogOutput::~AnalogOutput() {

@@ -10,7 +10,7 @@
 using namespace frc2;
 
 CommandBase::CommandBase() {
-  frc::SendableRegistry::GetInstance().Add(this, GetTypeName(*this));
+  frc::SendableRegistry::Add(this, GetTypeName(*this));
 }
 
 void CommandBase::AddRequirements(
@@ -31,19 +31,19 @@ wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
 }
 
 void CommandBase::SetName(const wpi::Twine& name) {
-  frc::SendableRegistry::GetInstance().SetName(this, name);
+  frc::SendableRegistry::SetName(this, name);
 }
 
 std::string CommandBase::GetName() const {
-  return frc::SendableRegistry::GetInstance().GetName(this);
+  return frc::SendableRegistry::GetName(this);
 }
 
 std::string CommandBase::GetSubsystem() const {
-  return frc::SendableRegistry::GetInstance().GetSubsystem(this);
+  return frc::SendableRegistry::GetSubsystem(this);
 }
 
 void CommandBase::SetSubsystem(const wpi::Twine& subsystem) {
-  frc::SendableRegistry::GetInstance().SetSubsystem(this, subsystem);
+  frc::SendableRegistry::SetSubsystem(this, subsystem);
 }
 
 void CommandBase::InitSendable(frc::SendableBuilder& builder) {

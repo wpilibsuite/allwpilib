@@ -19,7 +19,7 @@ using namespace frc;
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
+  SendableRegistry::AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
@@ -30,7 +30,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::AnalogTrigger(DutyCycle* input) {
@@ -41,7 +41,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::~AnalogTrigger() {

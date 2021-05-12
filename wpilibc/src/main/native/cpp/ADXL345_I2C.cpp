@@ -30,7 +30,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_I2C, 0);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL345_I2C", port);
+  SendableRegistry::AddLW(this, "ADXL345_I2C", port);
 }
 
 void ADXL345_I2C::SetRange(Range range) {

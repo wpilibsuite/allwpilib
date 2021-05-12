@@ -22,7 +22,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
   SetClosedLoopControl(true);
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Compressor", pcmID);
+  SendableRegistry::AddLW(this, "Compressor", pcmID);
 }
 
 void Compressor::Start() {

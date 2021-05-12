@@ -27,7 +27,6 @@ struct LiveWindow::Impl {
 
   wpi::mutex mutex;
 
-  SendableRegistry& registry;
   int dataHandle;
 
   std::shared_ptr<nt::NetworkTable> liveWindowTable;
@@ -42,8 +41,7 @@ struct LiveWindow::Impl {
 };
 
 LiveWindow::Impl::Impl()
-    : registry(SendableRegistry::GetInstance()),
-      dataHandle(registry.GetDataHandle()),
+    : dataHandle(SendableRegistry::GetDataHandle()),
       liveWindowTable(
           nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow")) {
   statusTable = liveWindowTable->GetSubTable(".status");
@@ -53,10 +51,10 @@ LiveWindow::Impl::Impl()
 std::shared_ptr<LiveWindow::Impl::Component> LiveWindow::Impl::GetOrAdd(
     Sendable* sendable) {
   auto data = std::static_pointer_cast<Component>(
-      registry.GetData(sendable, dataHandle));
+      SendableRegistry::GetData(sendable, dataHandle));
   if (!data) {
     data = std::make_shared<Component>();
-    registry.SetData(sendable, dataHandle, data);
+    SendableRegistry::SetData(sendable, dataHandle, data);
   }
   return data;
 }
@@ -81,7 +79,7 @@ void LiveWindow::DisableTelemetry(Sendable* sendable) {
 void LiveWindow::DisableAllTelemetry() {
   std::scoped_lock lock(m_impl->mutex);
   m_impl->telemetryEnabled = false;
-  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+  SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
     if (!cbdata.data) {
       cbdata.data = std::make_shared<Impl::Component>();
     }
@@ -109,7 +107,7 @@ void LiveWindow::SetEnabled(bool enabled) {
       this->enabled();
     }
   } else {
-    m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+    SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
       cbdata.builder.StopLiveWindowMode();
     });
     if (this->disabled) {
@@ -130,7 +128,7 @@ void LiveWindow::UpdateValuesUnsafe() {
     return;
   }
 
-  m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
+  SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
     if (!cbdata.sendable || cbdata.parent) {
       return;
     }

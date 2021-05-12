@@ -49,7 +49,7 @@ void DutyCycle::InitDutyCycle() {
   FRC_CheckErrorStatus(status, "InitDutyCycle");
   int index = GetFPGAIndex();
   HAL_Report(HALUsageReporting::kResourceType_DutyCycle, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", index);
+  SendableRegistry::AddLW(this, "Duty Cycle", index);
 }
 
 int DutyCycle::GetFPGAIndex() const {

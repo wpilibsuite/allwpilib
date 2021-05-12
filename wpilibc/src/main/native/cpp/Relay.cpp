@@ -57,7 +57,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
   }
 
-  SendableRegistry::GetInstance().AddLW(this, "Relay", m_channel);
+  SendableRegistry::AddLW(this, "Relay", m_channel);
 }
 
 Relay::~Relay() {

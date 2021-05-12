@@ -14,7 +14,7 @@
 using namespace frc;
 
 Subsystem::Subsystem(const wpi::Twine& name) {
-  SendableRegistry::GetInstance().AddLW(this, name, name);
+  SendableRegistry::AddLW(this, name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 
@@ -43,7 +43,7 @@ Command* Subsystem::GetDefaultCommand() {
 wpi::StringRef Subsystem::GetDefaultCommandName() {
   Command* defaultCommand = GetDefaultCommand();
   if (defaultCommand) {
-    return SendableRegistry::GetInstance().GetName(defaultCommand);
+    return SendableRegistry::GetName(defaultCommand);
   } else {
     return wpi::StringRef();
   }
@@ -61,7 +61,7 @@ Command* Subsystem::GetCurrentCommand() const {
 wpi::StringRef Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
   if (currentCommand) {
-    return SendableRegistry::GetInstance().GetName(currentCommand);
+    return SendableRegistry::GetName(currentCommand);
   } else {
     return wpi::StringRef();
   }
@@ -72,19 +72,19 @@ void Subsystem::Periodic() {}
 void Subsystem::InitDefaultCommand() {}
 
 std::string Subsystem::GetName() const {
-  return SendableRegistry::GetInstance().GetName(this);
+  return SendableRegistry::GetName(this);
 }
 
 void Subsystem::SetName(const wpi::Twine& name) {
-  SendableRegistry::GetInstance().SetName(this, name);
+  SendableRegistry::SetName(this, name);
 }
 
 std::string Subsystem::GetSubsystem() const {
-  return SendableRegistry::GetInstance().GetSubsystem(this);
+  return SendableRegistry::GetSubsystem(this);
 }
 
 void Subsystem::SetSubsystem(const wpi::Twine& name) {
-  SendableRegistry::GetInstance().SetSubsystem(this, name);
+  SendableRegistry::SetSubsystem(this, name);
 }
 
 void Subsystem::AddChild(const wpi::Twine& name,
@@ -97,8 +97,7 @@ void Subsystem::AddChild(const wpi::Twine& name, Sendable* child) {
 }
 
 void Subsystem::AddChild(const wpi::Twine& name, Sendable& child) {
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddLW(&child, registry.GetSubsystem(this), name);
+  SendableRegistry::AddLW(&child, SendableRegistry::GetSubsystem(this), name);
 }
 
 void Subsystem::AddChild(std::shared_ptr<Sendable> child) {
@@ -110,9 +109,8 @@ void Subsystem::AddChild(Sendable* child) {
 }
 
 void Subsystem::AddChild(Sendable& child) {
-  auto& registry = SendableRegistry::GetInstance();
-  registry.SetSubsystem(&child, registry.GetSubsystem(this));
-  registry.EnableLiveWindow(&child);
+  SendableRegistry::SetSubsystem(&child, SendableRegistry::GetSubsystem(this));
+  SendableRegistry::EnableLiveWindow(&child);
 }
 
 void Subsystem::ConfirmCommand() {

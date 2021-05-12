@@ -43,7 +43,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
   if (registerSendable) {
-    SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
+    SendableRegistry::AddLW(this, "PWM", channel);
   }
 }
 

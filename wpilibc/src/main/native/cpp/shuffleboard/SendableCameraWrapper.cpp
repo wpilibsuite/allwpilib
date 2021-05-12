@@ -22,7 +22,7 @@ std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
 }
 
 void AddToSendableRegistry(frc::Sendable* sendable, std::string name) {
-  SendableRegistry::GetInstance().Add(sendable, name);
+  SendableRegistry::Add(sendable, name);
 }
 }  // namespace detail
 

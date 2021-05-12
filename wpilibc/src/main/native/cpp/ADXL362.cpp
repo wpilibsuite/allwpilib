@@ -72,7 +72,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL362, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL362", port);
+  SendableRegistry::AddLW(this, "ADXL362", port);
 }
 
 void ADXL362::SetRange(Range range) {

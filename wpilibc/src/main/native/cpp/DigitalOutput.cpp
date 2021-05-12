@@ -34,7 +34,7 @@ DigitalOutput::DigitalOutput(int channel) {
   FRC_CheckErrorStatus(status, "Digital Channel " + wpi::Twine{channel});
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
+  SendableRegistry::AddLW(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {

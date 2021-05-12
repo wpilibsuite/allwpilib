@@ -14,9 +14,8 @@ using namespace frc;
 
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_dio(dioChannel), m_pwm(pwmChannel) {
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, &m_dio);
-  registry.AddChild(this, &m_pwm);
+  SendableRegistry::AddChild(this, &m_dio);
+  SendableRegistry::AddChild(this, &m_pwm);
   SetExpiration(0.0);
   SetSafetyEnabled(false);
 
@@ -25,7 +24,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.EnablePWM(0.5);
 
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel + 1);
-  registry.AddLW(this, "Nidec Brushless", pwmChannel);
+  SendableRegistry::AddLW(this, "Nidec Brushless", pwmChannel);
 }
 
 void NidecBrushless::Set(double speed) {

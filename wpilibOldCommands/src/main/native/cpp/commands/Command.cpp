@@ -40,10 +40,9 @@ Command::Command(const wpi::Twine& name, double timeout) {
   // If name contains an empty string
   if (name.isTriviallyEmpty() ||
       (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
-    SendableRegistry::GetInstance().Add(
-        this, "Command_" + wpi::Twine(typeid(*this).name()));
+    SendableRegistry::Add(this, "Command_" + wpi::Twine(typeid(*this).name()));
   } else {
-    SendableRegistry::GetInstance().Add(this, name);
+    SendableRegistry::Add(this, name);
   }
 }
 
@@ -276,26 +275,25 @@ void Command::StartTiming() {
 }
 
 std::string Command::GetName() const {
-  return SendableRegistry::GetInstance().GetName(this);
+  return SendableRegistry::GetName(this);
 }
 
 void Command::SetName(const wpi::Twine& name) {
-  SendableRegistry::GetInstance().SetName(this, name);
+  SendableRegistry::SetName(this, name);
 }
 
 std::string Command::GetSubsystem() const {
-  return SendableRegistry::GetInstance().GetSubsystem(this);
+  return SendableRegistry::GetSubsystem(this);
 }
 
 void Command::SetSubsystem(const wpi::Twine& name) {
-  SendableRegistry::GetInstance().SetSubsystem(this, name);
+  SendableRegistry::SetSubsystem(this, name);
 }
 
 void Command::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(
-      ".name", [=]() { return SendableRegistry::GetInstance().GetName(this); },
-      nullptr);
+      ".name", [=]() { return SendableRegistry::GetName(this); }, nullptr);
   builder.AddBooleanProperty(
       "running", [=]() { return IsRunning(); },
       [=](bool value) {

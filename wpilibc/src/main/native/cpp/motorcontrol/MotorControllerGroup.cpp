@@ -20,11 +20,11 @@ MotorControllerGroup::MotorControllerGroup(
 
 void MotorControllerGroup::Initialize() {
   for (auto& motorController : m_motorControllers) {
-    SendableRegistry::GetInstance().AddChild(this, &motorController.get());
+    SendableRegistry::AddChild(this, &motorController.get());
   }
   static int instances = 0;
   ++instances;
-  SendableRegistry::GetInstance().Add(this, "MotorControllerGroup", instances);
+  SendableRegistry::Add(this, "MotorControllerGroup", instances);
 }
 
 void MotorControllerGroup::Set(double speed) {

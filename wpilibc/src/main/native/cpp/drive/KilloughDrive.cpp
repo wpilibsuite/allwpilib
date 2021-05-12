@@ -43,13 +43,12 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                 std::sin(rightMotorAngle * (wpi::math::pi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
                std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, m_leftMotor);
-  registry.AddChild(this, m_rightMotor);
-  registry.AddChild(this, m_backMotor);
+  SendableRegistry::AddChild(this, m_leftMotor);
+  SendableRegistry::AddChild(this, m_rightMotor);
+  SendableRegistry::AddChild(this, m_backMotor);
   static int instances = 0;
   ++instances;
-  registry.AddLW(this, "KilloughDrive", instances);
+  SendableRegistry::AddLW(this, "KilloughDrive", instances);
 }
 
 void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,

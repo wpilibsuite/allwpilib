@@ -26,12 +26,11 @@ using namespace frc;
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
     : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, m_leftMotor);
-  registry.AddChild(this, m_rightMotor);
+  SendableRegistry::AddChild(this, m_leftMotor);
+  SendableRegistry::AddChild(this, m_rightMotor);
   static int instances = 0;
   ++instances;
-  registry.AddLW(this, "DifferentialDrive", instances);
+  SendableRegistry::AddLW(this, "DifferentialDrive", instances);
 }
 
 void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,

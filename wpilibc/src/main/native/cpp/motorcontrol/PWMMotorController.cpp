@@ -44,7 +44,7 @@ int PWMMotorController::GetChannel() const {
 
 PWMMotorController::PWMMotorController(const wpi::Twine& name, int channel)
     : m_pwm(channel, false) {
-  SendableRegistry::GetInstance().AddLW(this, name, channel);
+  SendableRegistry::AddLW(this, name, channel);
 }
 
 void PWMMotorController::InitSendable(SendableBuilder& builder) {

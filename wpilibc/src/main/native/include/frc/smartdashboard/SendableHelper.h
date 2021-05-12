@@ -29,14 +29,14 @@ class SendableHelper {
 
   SendableHelper(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
-    SendableRegistry::GetInstance().Move(static_cast<Derived*>(this),
-                                         static_cast<Derived*>(&rhs));
+    SendableRegistry::Move(static_cast<Derived*>(this),
+                           static_cast<Derived*>(&rhs));
   }
 
   SendableHelper& operator=(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
-    SendableRegistry::GetInstance().Move(static_cast<Derived*>(this),
-                                         static_cast<Derived*>(&rhs));
+    SendableRegistry::Move(static_cast<Derived*>(this),
+                           static_cast<Derived*>(&rhs));
     return *this;
   }
 
@@ -49,8 +49,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::GetName()")
   std::string GetName() const {
-    return SendableRegistry::GetInstance().GetName(
-        static_cast<const Derived*>(this));
+    return SendableRegistry::GetName(static_cast<const Derived*>(this));
   }
 
   /**
@@ -62,7 +61,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(const wpi::Twine& name) {
-    SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this), name);
+    SendableRegistry::SetName(static_cast<Derived*>(this), name);
   }
 
   /**
@@ -75,8 +74,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(const wpi::Twine& subsystem, const wpi::Twine& name) {
-    SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
-                                            subsystem, name);
+    SendableRegistry::SetName(static_cast<Derived*>(this), subsystem, name);
   }
 
   /**
@@ -88,8 +86,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::GetSubsystem()")
   std::string GetSubsystem() const {
-    return SendableRegistry::GetInstance().GetSubsystem(
-        static_cast<const Derived*>(this));
+    return SendableRegistry::GetSubsystem(static_cast<const Derived*>(this));
   }
 
   /**
@@ -101,8 +98,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetSubsystem()")
   void SetSubsystem(const wpi::Twine& subsystem) {
-    SendableRegistry::GetInstance().SetSubsystem(static_cast<Derived*>(this),
-                                                 subsystem);
+    SendableRegistry::SetSubsystem(static_cast<Derived*>(this), subsystem);
   }
 
  protected:
@@ -115,8 +111,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
   void AddChild(std::shared_ptr<Sendable> child) {
-    SendableRegistry::GetInstance().AddChild(static_cast<Derived*>(this),
-                                             child.get());
+    SendableRegistry::AddChild(static_cast<Derived*>(this), child.get());
   }
 
   /**
@@ -128,8 +123,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
   void AddChild(void* child) {
-    SendableRegistry::GetInstance().AddChild(static_cast<Derived*>(this),
-                                             child);
+    SendableRegistry::AddChild(static_cast<Derived*>(this), child);
   }
 
   /**
@@ -143,8 +137,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(const wpi::Twine& moduleType, int channel) {
-    SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
-                                            moduleType, channel);
+    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType, channel);
   }
 
   /**
@@ -160,8 +153,8 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel) {
-    SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
-                                            moduleType, moduleNumber, channel);
+    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType,
+                              moduleNumber, channel);
   }
 
  protected:
@@ -169,7 +162,7 @@ class SendableHelper {
 
   ~SendableHelper() {
     // it is safe to call Remove() multiple times with the same object
-    SendableRegistry::GetInstance().Remove(static_cast<Derived*>(this));
+    SendableRegistry::Remove(static_cast<Derived*>(this));
   }
 };
 

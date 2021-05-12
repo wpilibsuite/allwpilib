@@ -26,7 +26,7 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
-  SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel", module);
+  SendableRegistry::AddLW(this, "PowerDistributionPanel", module);
 }
 
 double PowerDistributionPanel::GetVoltage() const {

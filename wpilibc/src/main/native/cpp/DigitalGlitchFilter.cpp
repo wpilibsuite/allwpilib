@@ -36,8 +36,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
              m_channelIndex + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
-                                        m_channelIndex);
+  SendableRegistry::AddLW(this, "DigitalGlitchFilter", m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
