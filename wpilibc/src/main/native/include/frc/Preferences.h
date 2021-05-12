@@ -43,7 +43,7 @@ class Preferences {
    *
    * @return a vector of the keys
    */
-  std::vector<std::string> GetKeys();
+  static std::vector<std::string> GetKeys();
 
   /**
    * Returns the string at the given key.  If this table does not have a value
@@ -53,7 +53,8 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  std::string GetString(wpi::StringRef key, wpi::StringRef defaultValue = "");
+  static std::string GetString(wpi::StringRef key,
+                               wpi::StringRef defaultValue = "");
 
   /**
    * Returns the int at the given key.  If this table does not have a value for
@@ -63,7 +64,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int GetInt(wpi::StringRef key, int defaultValue = 0);
+  static int GetInt(wpi::StringRef key, int defaultValue = 0);
 
   /**
    * Returns the double at the given key.  If this table does not have a value
@@ -73,7 +74,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  double GetDouble(wpi::StringRef key, double defaultValue = 0.0);
+  static double GetDouble(wpi::StringRef key, double defaultValue = 0.0);
 
   /**
    * Returns the float at the given key.  If this table does not have a value
@@ -83,7 +84,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  float GetFloat(wpi::StringRef key, float defaultValue = 0.0);
+  static float GetFloat(wpi::StringRef key, float defaultValue = 0.0);
 
   /**
    * Returns the boolean at the given key.  If this table does not have a value
@@ -93,7 +94,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  bool GetBoolean(wpi::StringRef key, bool defaultValue = false);
+  static bool GetBoolean(wpi::StringRef key, bool defaultValue = false);
 
   /**
    * Returns the long (int64_t) at the given key.  If this table does not have a
@@ -104,7 +105,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int64_t GetLong(wpi::StringRef key, int64_t defaultValue = 0);
+  static int64_t GetLong(wpi::StringRef key, int64_t defaultValue = 0);
 
   /**
    * Puts the given string into the preferences table.
@@ -115,7 +116,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetString(wpi::StringRef key, wpi::StringRef value);
+  static void SetString(wpi::StringRef key, wpi::StringRef value);
 
   /**
    * Puts the given string into the preferences table.
@@ -127,13 +128,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetString instead.")
-  void PutString(wpi::StringRef key, wpi::StringRef value);
+  static void PutString(wpi::StringRef key, wpi::StringRef value);
 
   /**
    * Puts the given string into the preferences table if it doesn't
    * already exist.
    */
-  void InitString(wpi::StringRef key, wpi::StringRef value);
+  static void InitString(wpi::StringRef key, wpi::StringRef value);
 
   /**
    * Puts the given int into the preferences table.
@@ -143,7 +144,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetInt(wpi::StringRef key, int value);
+  static void SetInt(wpi::StringRef key, int value);
 
   /**
    * Puts the given int into the preferences table.
@@ -154,13 +155,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetInt instead.")
-  void PutInt(wpi::StringRef key, int value);
+  static void PutInt(wpi::StringRef key, int value);
 
   /**
    * Puts the given int into the preferences table if it doesn't
    * already exist.
    */
-  void InitInt(wpi::StringRef key, int value);
+  static void InitInt(wpi::StringRef key, int value);
 
   /**
    * Puts the given double into the preferences table.
@@ -170,7 +171,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetDouble(wpi::StringRef key, double value);
+  static void SetDouble(wpi::StringRef key, double value);
 
   /**
    * Puts the given double into the preferences table.
@@ -181,13 +182,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetDouble instead.")
-  void PutDouble(wpi::StringRef key, double value);
+  static void PutDouble(wpi::StringRef key, double value);
 
   /**
    * Puts the given double into the preferences table if it doesn't
    * already exist.
    */
-  void InitDouble(wpi::StringRef key, double value);
+  static void InitDouble(wpi::StringRef key, double value);
 
   /**
    * Puts the given float into the preferences table.
@@ -197,7 +198,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetFloat(wpi::StringRef key, float value);
+  static void SetFloat(wpi::StringRef key, float value);
 
   /**
    * Puts the given float into the preferences table.
@@ -208,13 +209,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetFloat instead.")
-  void PutFloat(wpi::StringRef key, float value);
+  static void PutFloat(wpi::StringRef key, float value);
 
   /**
    * Puts the given float into the preferences table if it doesn't
    * already exist.
    */
-  void InitFloat(wpi::StringRef key, float value);
+  static void InitFloat(wpi::StringRef key, float value);
 
   /**
    * Puts the given boolean into the preferences table.
@@ -224,7 +225,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetBoolean(wpi::StringRef key, bool value);
+  static void SetBoolean(wpi::StringRef key, bool value);
 
   /**
    * Puts the given boolean into the preferences table.
@@ -235,13 +236,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetBoolean instead.")
-  void PutBoolean(wpi::StringRef key, bool value);
+  static void PutBoolean(wpi::StringRef key, bool value);
 
   /**
    * Puts the given boolean into the preferences table if it doesn't
    * already exist.
    */
-  void InitBoolean(wpi::StringRef key, bool value);
+  static void InitBoolean(wpi::StringRef key, bool value);
 
   /**
    * Puts the given long (int64_t) into the preferences table.
@@ -251,7 +252,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetLong(wpi::StringRef key, int64_t value);
+  static void SetLong(wpi::StringRef key, int64_t value);
 
   /**
    * Puts the given long (int64_t) into the preferences table.
@@ -262,13 +263,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetLong instead.")
-  void PutLong(wpi::StringRef key, int64_t value);
+  static void PutLong(wpi::StringRef key, int64_t value);
 
   /**
    * Puts the given long into the preferences table if it doesn't
    * already exist.
    */
-  void InitLong(wpi::StringRef key, int64_t value);
+  static void InitLong(wpi::StringRef key, int64_t value);
 
   /**
    * Returns whether or not there is a key with the given name.
@@ -276,19 +277,19 @@ class Preferences {
    * @param key the key
    * @return if there is a value at the given key
    */
-  bool ContainsKey(wpi::StringRef key);
+  static bool ContainsKey(wpi::StringRef key);
 
   /**
    * Remove a preference.
    *
    * @param key the key
    */
-  void Remove(wpi::StringRef key);
+  static void Remove(wpi::StringRef key);
 
   /**
    * Remove all preferences.
    */
-  void RemoveAll();
+  static void RemoveAll();
 
  protected:
   Preferences();

@@ -139,13 +139,14 @@ void DriverStation::ReportError(bool isError, int32_t code,
 }
 
 bool DriverStation::GetStickButton(int stick, int button) {
+  auto& inst = GetInstance();
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
   if (button <= 0) {
-    ReportJoystickUnpluggedError(
+    inst.ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
@@ -154,7 +155,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if (button > buttons.count) {
-    ReportJoystickUnpluggedWarning(
+    inst.ReportJoystickUnpluggedWarning(
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
@@ -163,13 +164,14 @@ bool DriverStation::GetStickButton(int stick, int button) {
 }
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
+  auto& inst = GetInstance();
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
     return false;
   }
   if (button <= 0) {
-    ReportJoystickUnpluggedError(
+    inst.ReportJoystickUnpluggedError(
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
@@ -178,21 +180,21 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if (button > buttons.count) {
-    ReportJoystickUnpluggedWarning(
+    inst.ReportJoystickUnpluggedWarning(
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock lock(m_buttonEdgeMutex);
+  std::unique_lock lock(inst.m_buttonEdgeMutex);
   // If button was pressed, clear flag and return true
-  if (m_joystickButtonsPressed[stick] & 1 << (button - 1)) {
-    m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
+  if (inst.m_joystickButtonsPressed[stick] & 1 << (button - 1)) {
+    inst.m_joystickButtonsPressed[stick] &= ~(1 << (button - 1));
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
+  auto& inst = GetInstance();
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -208,18 +210,17 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
   HAL_GetJoystickButtons(stick, &buttons);
 
   if (button > buttons.count) {
-    ReportJoystickUnpluggedWarning(
+    inst.ReportJoystickUnpluggedWarning(
         "Joystick Button missing, check if all controllers are plugged in");
     return false;
   }
-  std::unique_lock lock(m_buttonEdgeMutex);
+  std::unique_lock lock(inst.m_buttonEdgeMutex);
   // If button was released, clear flag and return true
-  if (m_joystickButtonsReleased[stick] & 1 << (button - 1)) {
-    m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
+  if (inst.m_joystickButtonsReleased[stick] & 1 << (button - 1)) {
+    inst.m_joystickButtonsReleased[stick] &= ~(1 << (button - 1));
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 double DriverStation::GetStickAxis(int stick, int axis) {
@@ -270,7 +271,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
   return povs.povs[pov];
 }
 
-int DriverStation::GetStickButtons(int stick) const {
+int DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -283,7 +284,7 @@ int DriverStation::GetStickButtons(int stick) const {
   return buttons.buttons;
 }
 
-int DriverStation::GetStickAxisCount(int stick) const {
+int DriverStation::GetStickAxisCount(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -296,7 +297,7 @@ int DriverStation::GetStickAxisCount(int stick) const {
   return axes.count;
 }
 
-int DriverStation::GetStickPOVCount(int stick) const {
+int DriverStation::GetStickPOVCount(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -309,7 +310,7 @@ int DriverStation::GetStickPOVCount(int stick) const {
   return povs.count;
 }
 
-int DriverStation::GetStickButtonCount(int stick) const {
+int DriverStation::GetStickButtonCount(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -322,7 +323,7 @@ int DriverStation::GetStickButtonCount(int stick) const {
   return buttons.count;
 }
 
-bool DriverStation::GetJoystickIsXbox(int stick) const {
+bool DriverStation::GetJoystickIsXbox(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -335,7 +336,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
   return static_cast<bool>(descriptor.isXbox);
 }
 
-int DriverStation::GetJoystickType(int stick) const {
+int DriverStation::GetJoystickType(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -348,7 +349,7 @@ int DriverStation::GetJoystickType(int stick) const {
   return static_cast<int>(descriptor.type);
 }
 
-std::string DriverStation::GetJoystickName(int stick) const {
+std::string DriverStation::GetJoystickName(int stick) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -360,7 +361,7 @@ std::string DriverStation::GetJoystickName(int stick) const {
   return descriptor.name;
 }
 
-int DriverStation::GetJoystickAxisType(int stick, int axis) const {
+int DriverStation::GetJoystickAxisType(int stick, int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex,
                     "stick " + wpi::Twine{stick} + " out of range");
@@ -373,69 +374,70 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   return static_cast<bool>(descriptor.axisTypes);
 }
 
-bool DriverStation::IsJoystickConnected(int stick) const {
+bool DriverStation::IsJoystickConnected(int stick) {
   return GetStickAxisCount(stick) > 0 || GetStickButtonCount(stick) > 0 ||
          GetStickPOVCount(stick) > 0;
 }
 
-bool DriverStation::IsEnabled() const {
+bool DriverStation::IsEnabled() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.enabled && controlWord.dsAttached;
 }
 
-bool DriverStation::IsDisabled() const {
+bool DriverStation::IsDisabled() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
 }
 
-bool DriverStation::IsEStopped() const {
+bool DriverStation::IsEStopped() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.eStop;
 }
 
-bool DriverStation::IsAutonomous() const {
+bool DriverStation::IsAutonomous() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.autonomous;
 }
 
-bool DriverStation::IsAutonomousEnabled() const {
+bool DriverStation::IsAutonomousEnabled() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.autonomous && controlWord.enabled;
 }
 
-bool DriverStation::IsOperatorControl() const {
+bool DriverStation::IsOperatorControl() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
 
-bool DriverStation::IsOperatorControlEnabled() const {
+bool DriverStation::IsOperatorControlEnabled() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !controlWord.autonomous && !controlWord.test && controlWord.enabled;
 }
 
-bool DriverStation::IsTest() const {
+bool DriverStation::IsTest() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.test;
 }
 
-bool DriverStation::IsDSAttached() const {
+bool DriverStation::IsDSAttached() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.dsAttached;
 }
 
-bool DriverStation::IsNewControlData() const {
-  std::unique_lock lock(m_waitForDataMutex);
+bool DriverStation::IsNewControlData() {
+  auto& inst = GetInstance();
+  std::unique_lock lock(inst.m_waitForDataMutex);
   int& lastCount = GetDSLastCount();
-  int currentCount = m_waitForDataCounter;
+  int currentCount = inst.m_waitForDataCounter;
   if (lastCount == currentCount) {
     return false;
   }
@@ -443,44 +445,44 @@ bool DriverStation::IsNewControlData() const {
   return true;
 }
 
-bool DriverStation::IsFMSAttached() const {
+bool DriverStation::IsFMSAttached() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return controlWord.fmsAttached;
 }
 
-std::string DriverStation::GetGameSpecificMessage() const {
+std::string DriverStation::GetGameSpecificMessage() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
   return std::string(reinterpret_cast<char*>(info.gameSpecificMessage),
                      info.gameSpecificMessageSize);
 }
 
-std::string DriverStation::GetEventName() const {
+std::string DriverStation::GetEventName() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
   return info.eventName;
 }
 
-DriverStation::MatchType DriverStation::GetMatchType() const {
+DriverStation::MatchType DriverStation::GetMatchType() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
   return static_cast<DriverStation::MatchType>(info.matchType);
 }
 
-int DriverStation::GetMatchNumber() const {
+int DriverStation::GetMatchNumber() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
   return info.matchNumber;
 }
 
-int DriverStation::GetReplayNumber() const {
+int DriverStation::GetReplayNumber() {
   HAL_MatchInfo info;
   HAL_GetMatchInfo(&info);
   return info.replayNumber;
 }
 
-DriverStation::Alliance DriverStation::GetAlliance() const {
+DriverStation::Alliance DriverStation::GetAlliance() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
@@ -497,7 +499,7 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
   }
 }
 
-int DriverStation::GetLocation() const {
+int DriverStation::GetLocation() {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
@@ -520,36 +522,37 @@ void DriverStation::WaitForData() {
 }
 
 bool DriverStation::WaitForData(double timeout) {
+  auto& inst = GetInstance();
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock lock(m_waitForDataMutex);
+  std::unique_lock lock(inst.m_waitForDataMutex);
   int& lastCount = GetDSLastCount();
-  int currentCount = m_waitForDataCounter;
+  int currentCount = inst.m_waitForDataCounter;
   if (lastCount != currentCount) {
     lastCount = currentCount;
     return true;
   }
-  while (m_waitForDataCounter == currentCount) {
+  while (inst.m_waitForDataCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
+      auto timedOut = inst.m_waitForDataCond.wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
     } else {
-      m_waitForDataCond.wait(lock);
+      inst.m_waitForDataCond.wait(lock);
     }
   }
-  lastCount = m_waitForDataCounter;
+  lastCount = inst.m_waitForDataCounter;
   return true;
 }
 
-double DriverStation::GetMatchTime() const {
+double DriverStation::GetMatchTime() {
   int32_t status;
   return HAL_GetMatchTime(&status);
 }
 
-double DriverStation::GetBatteryVoltage() const {
+double DriverStation::GetBatteryVoltage() {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
   FRC_CheckErrorStatus(status, "getVinVoltage");
@@ -558,43 +561,46 @@ double DriverStation::GetBatteryVoltage() const {
 }
 
 void DriverStation::WakeupWaitForData() {
-  std::scoped_lock waitLock(m_waitForDataMutex);
+  auto& inst = GetInstance();
+  std::scoped_lock waitLock(inst.m_waitForDataMutex);
   // Nofify all threads
-  m_waitForDataCounter++;
-  m_waitForDataCond.notify_all();
+  inst.m_waitForDataCounter++;
+  inst.m_waitForDataCond.notify_all();
 }
 
 void DriverStation::GetData() {
+  auto& inst = GetInstance();
   {
     // Compute the pressed and released buttons
     HAL_JoystickButtons currentButtons;
-    std::unique_lock lock(m_buttonEdgeMutex);
+    std::unique_lock lock(inst.m_buttonEdgeMutex);
 
     for (int32_t i = 0; i < kJoystickPorts; i++) {
       HAL_GetJoystickButtons(i, &currentButtons);
 
       // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-      m_joystickButtonsPressed[i] |=
-          ~m_previousButtonStates[i].buttons & currentButtons.buttons;
+      inst.m_joystickButtonsPressed[i] |=
+          ~inst.m_previousButtonStates[i].buttons & currentButtons.buttons;
 
       // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-      m_joystickButtonsReleased[i] |=
-          m_previousButtonStates[i].buttons & ~currentButtons.buttons;
+      inst.m_joystickButtonsReleased[i] |=
+          inst.m_previousButtonStates[i].buttons & ~currentButtons.buttons;
 
-      m_previousButtonStates[i] = currentButtons;
+      inst.m_previousButtonStates[i] = currentButtons;
     }
   }
 
-  WakeupWaitForData();
-  SendMatchData();
+  inst.WakeupWaitForData();
+  inst.SendMatchData();
 }
 
 void DriverStation::SilenceJoystickConnectionWarning(bool silence) {
-  m_silenceJoystickWarning = silence;
+  GetInstance().m_silenceJoystickWarning = silence;
 }
 
-bool DriverStation::IsJoystickConnectionWarningSilenced() const {
-  return !IsFMSAttached() && m_silenceJoystickWarning;
+bool DriverStation::IsJoystickConnectionWarningSilenced() {
+  auto& inst = GetInstance();
+  return !inst.IsFMSAttached() && inst.m_silenceJoystickWarning;
 }
 
 DriverStation::DriverStation() {
@@ -616,19 +622,21 @@ DriverStation::DriverStation() {
 }
 
 void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
+  auto& inst = GetInstance();
   double currentTime = Timer::GetFPGATimestamp();
-  if (currentTime > m_nextMessageTime) {
-    ReportError(message);
-    m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+  if (currentTime > inst.m_nextMessageTime) {
+    inst.ReportError(message);
+    inst.m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
   }
 }
 
 void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
-  if (IsFMSAttached() || !m_silenceJoystickWarning) {
+  auto& inst = GetInstance();
+  if (inst.IsFMSAttached() || !inst.m_silenceJoystickWarning) {
     double currentTime = Timer::GetFPGATimestamp();
-    if (currentTime > m_nextMessageTime) {
-      ReportWarning(message);
-      m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
+    if (currentTime > inst.m_nextMessageTime) {
+      inst.ReportWarning(message);
+      inst.m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
     }
   }
 }
@@ -664,6 +672,7 @@ void DriverStation::Run() {
 }
 
 void DriverStation::SendMatchData() {
+  auto& inst = GetInstance();
   int32_t status = 0;
   HAL_AllianceStationID alliance = HAL_GetAllianceStation(&status);
   bool isRedAlliance = false;
@@ -698,19 +707,20 @@ void DriverStation::SendMatchData() {
   HAL_MatchInfo tmpDataStore;
   HAL_GetMatchInfo(&tmpDataStore);
 
-  m_matchDataSender->alliance.Set(isRedAlliance);
-  m_matchDataSender->station.Set(stationNumber);
-  m_matchDataSender->eventName.Set(tmpDataStore.eventName);
-  m_matchDataSender->gameSpecificMessage.Set(
+  inst.m_matchDataSender->alliance.Set(isRedAlliance);
+  inst.m_matchDataSender->station.Set(stationNumber);
+  inst.m_matchDataSender->eventName.Set(tmpDataStore.eventName);
+  inst.m_matchDataSender->gameSpecificMessage.Set(
       std::string(reinterpret_cast<char*>(tmpDataStore.gameSpecificMessage),
                   tmpDataStore.gameSpecificMessageSize));
-  m_matchDataSender->matchNumber.Set(tmpDataStore.matchNumber);
-  m_matchDataSender->replayNumber.Set(tmpDataStore.replayNumber);
-  m_matchDataSender->matchType.Set(static_cast<int>(tmpDataStore.matchType));
+  inst.m_matchDataSender->matchNumber.Set(tmpDataStore.matchNumber);
+  inst.m_matchDataSender->replayNumber.Set(tmpDataStore.replayNumber);
+  inst.m_matchDataSender->matchType.Set(
+      static_cast<int>(tmpDataStore.matchType));
 
   HAL_ControlWord ctlWord;
   HAL_GetControlWord(&ctlWord);
   int32_t wordInt = 0;
   std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
-  m_matchDataSender->controlWord.Set(wordInt);
+  inst.m_matchDataSender->controlWord.Set(wordInt);
 }

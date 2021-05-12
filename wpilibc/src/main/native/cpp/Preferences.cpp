@@ -21,36 +21,37 @@ Preferences* Preferences::GetInstance() {
 }
 
 std::vector<std::string> Preferences::GetKeys() {
-  return m_table->GetKeys();
+  return GetInstance()->m_table->GetKeys();
 }
 
 std::string Preferences::GetString(wpi::StringRef key,
                                    wpi::StringRef defaultValue) {
-  return m_table->GetString(key, defaultValue);
+  return GetInstance()->m_table->GetString(key, defaultValue);
 }
 
 int Preferences::GetInt(wpi::StringRef key, int defaultValue) {
-  return static_cast<int>(m_table->GetNumber(key, defaultValue));
+  return static_cast<int>(GetInstance()->m_table->GetNumber(key, defaultValue));
 }
 
 double Preferences::GetDouble(wpi::StringRef key, double defaultValue) {
-  return m_table->GetNumber(key, defaultValue);
+  return GetInstance()->m_table->GetNumber(key, defaultValue);
 }
 
 float Preferences::GetFloat(wpi::StringRef key, float defaultValue) {
-  return m_table->GetNumber(key, defaultValue);
+  return GetInstance()->m_table->GetNumber(key, defaultValue);
 }
 
 bool Preferences::GetBoolean(wpi::StringRef key, bool defaultValue) {
-  return m_table->GetBoolean(key, defaultValue);
+  return GetInstance()->m_table->GetBoolean(key, defaultValue);
 }
 
 int64_t Preferences::GetLong(wpi::StringRef key, int64_t defaultValue) {
-  return static_cast<int64_t>(m_table->GetNumber(key, defaultValue));
+  return static_cast<int64_t>(
+      GetInstance()->m_table->GetNumber(key, defaultValue));
 }
 
 void Preferences::SetString(wpi::StringRef key, wpi::StringRef value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetString(value);
   entry.SetPersistent();
 }
@@ -60,12 +61,12 @@ void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
 }
 
 void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultString(value);
 }
 
 void Preferences::SetInt(wpi::StringRef key, int value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
@@ -75,12 +76,12 @@ void Preferences::PutInt(wpi::StringRef key, int value) {
 }
 
 void Preferences::InitInt(wpi::StringRef key, int value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
 void Preferences::SetDouble(wpi::StringRef key, double value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
@@ -90,12 +91,12 @@ void Preferences::PutDouble(wpi::StringRef key, double value) {
 }
 
 void Preferences::InitDouble(wpi::StringRef key, double value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
 void Preferences::SetFloat(wpi::StringRef key, float value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
@@ -105,12 +106,12 @@ void Preferences::PutFloat(wpi::StringRef key, float value) {
 }
 
 void Preferences::InitFloat(wpi::StringRef key, float value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
 void Preferences::SetBoolean(wpi::StringRef key, bool value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetBoolean(value);
   entry.SetPersistent();
 }
@@ -120,12 +121,12 @@ void Preferences::PutBoolean(wpi::StringRef key, bool value) {
 }
 
 void Preferences::InitBoolean(wpi::StringRef key, bool value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultBoolean(value);
 }
 
 void Preferences::SetLong(wpi::StringRef key, int64_t value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
@@ -135,16 +136,16 @@ void Preferences::PutLong(wpi::StringRef key, int64_t value) {
 }
 
 void Preferences::InitLong(wpi::StringRef key, int64_t value) {
-  auto entry = m_table->GetEntry(key);
+  auto entry = GetInstance()->m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
 bool Preferences::ContainsKey(wpi::StringRef key) {
-  return m_table->ContainsKey(key);
+  return GetInstance()->m_table->ContainsKey(key);
 }
 
 void Preferences::Remove(wpi::StringRef key) {
-  m_table->Delete(key);
+  GetInstance()->m_table->Delete(key);
 }
 
 void Preferences::RemoveAll() {
