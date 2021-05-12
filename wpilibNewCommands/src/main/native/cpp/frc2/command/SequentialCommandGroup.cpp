@@ -81,7 +81,7 @@ SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
   std::vector<std::unique_ptr<Command>> tmp;
   tmp.emplace_back(
       std::make_unique<InstantCommand>(std::move(toRun), requirements));
-  for (auto&& command: m_commands) {
+  for (auto&& command : m_commands) {
     command->SetGrouped(false);
     tmp.emplace_back(command);
   }
