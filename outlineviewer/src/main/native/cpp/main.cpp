@@ -218,7 +218,7 @@ int main() {
 
   gui::AddLateExecute(DisplayGui);
 
-  gui::Initialize("OutlineViewer - DISCONNECTED", 1024, 768);
+  gui::Initialize("OutlineViewer - DISCONNECTED", 600, 400);
   gui::Main();
 
   gModel.reset();
