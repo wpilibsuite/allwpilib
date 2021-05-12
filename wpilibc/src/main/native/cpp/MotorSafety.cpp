@@ -84,8 +84,7 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  DriverStation& ds = DriverStation::GetInstance();
-  if (!enabled || ds.IsDisabled() || ds.IsTest()) {
+  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
     return;
   }
 

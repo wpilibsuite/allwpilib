@@ -30,36 +30,36 @@ void Robot::StartCompetition() {
 
   while (!m_exit) {
     if (IsDisabled()) {
-      m_ds.InDisabled(true);
+      frc::DriverStation::InDisabled(true);
       Disabled();
-      m_ds.InDisabled(false);
+      frc::DriverStation::InDisabled(false);
       while (IsDisabled()) {
-        m_ds.WaitForData();
+        frc::DriverStation::WaitForData();
       }
     } else if (IsAutonomous()) {
-      m_ds.InAutonomous(true);
+      frc::DriverStation::InAutonomous(true);
       Autonomous();
-      m_ds.InAutonomous(false);
+      frc::DriverStation::InAutonomous(false);
       while (IsAutonomousEnabled()) {
-        m_ds.WaitForData();
+        frc::DriverStation::WaitForData();
       }
     } else if (IsTest()) {
       lw.SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
-      m_ds.InTest(true);
+      frc::DriverStation::InTest(true);
       Test();
-      m_ds.InTest(false);
+      frc::DriverStation::InTest(false);
       while (IsTest() && IsEnabled()) {
-        m_ds.WaitForData();
+        frc::DriverStation::WaitForData();
       }
       lw.SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
-      m_ds.InOperatorControl(true);
+      frc::DriverStation::InOperatorControl(true);
       Teleop();
-      m_ds.InOperatorControl(false);
+      frc::DriverStation::InOperatorControl(false);
       while (IsOperatorControlEnabled()) {
-        m_ds.WaitForData();
+        frc::DriverStation::WaitForData();
       }
     }
   }

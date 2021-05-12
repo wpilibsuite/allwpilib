@@ -22,7 +22,7 @@ TEST_F(DriverStationTest, WaitForData) {
   uint64_t initialTime = RobotController::GetFPGATime();
 
   for (int i = 0; i < 50; i++) {
-    DriverStation::GetInstance().WaitForData();
+    DriverStation::WaitForData();
   }
 
   uint64_t finalTime = RobotController::GetFPGATime();

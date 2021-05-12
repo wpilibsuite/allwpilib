@@ -72,7 +72,7 @@ units::turn_t AnalogEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  frc::DriverStation::ReportWarning(
       "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
       "value");
   return m_lastPosition;

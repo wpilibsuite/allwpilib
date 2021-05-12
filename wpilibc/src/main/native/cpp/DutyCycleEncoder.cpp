@@ -94,7 +94,7 @@ units::turn_t DutyCycleEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  frc::DriverStation::ReportWarning(
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;
