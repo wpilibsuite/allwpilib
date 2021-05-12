@@ -38,7 +38,11 @@ public final class WPIUtilJNI {
     }
   }
 
-  /** Force load the library. */
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if the library failed to load
+   */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;

@@ -65,7 +65,11 @@ public class RamseteController {
     this(2.0, 0.7);
   }
 
-  /** Returns true if the pose error is within tolerance of the reference. */
+  /**
+   * Returns true if the pose error is within tolerance of the reference.
+   *
+   * @return True if the pose error is within tolerance of the reference.
+   */
   public boolean atReference() {
     final var eTranslate = m_poseError.getTranslation();
     final var eRotate = m_poseError.getRotation();
@@ -95,6 +99,7 @@ public class RamseteController {
    * @param poseRef The desired pose.
    * @param linearVelocityRefMeters The desired linear velocity in meters per second.
    * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
+   * @return The next controller output.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
@@ -131,6 +136,7 @@ public class RamseteController {
    *
    * @param currentPose The current pose.
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
+   * @return The next controller output.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(Pose2d currentPose, Trajectory.State desiredState) {

@@ -18,12 +18,20 @@ public class VideoCamera extends VideoSource {
     super(handle);
   }
 
-  /** Set the brightness, as a percentage (0-100). */
+  /**
+   * Set the brightness, as a percentage (0-100).
+   *
+   * @param brightness Brightness as a percentage (0-100).
+   */
   public synchronized void setBrightness(int brightness) {
     CameraServerJNI.setCameraBrightness(m_handle, brightness);
   }
 
-  /** Get the brightness, as a percentage (0-100). */
+  /**
+   * Get the brightness, as a percentage (0-100).
+   *
+   * @return The brightness as a percentage (0-100).
+   */
   public synchronized int getBrightness() {
     return CameraServerJNI.getCameraBrightness(m_handle);
   }
@@ -38,7 +46,11 @@ public class VideoCamera extends VideoSource {
     CameraServerJNI.setCameraWhiteBalanceHoldCurrent(m_handle);
   }
 
-  /** Set the white balance to manual, with specified color temperature. */
+  /**
+   * Set the white balance to manual, with specified color temperature.
+   *
+   * @param value The specified color temperature.
+   */
   public synchronized void setWhiteBalanceManual(int value) {
     CameraServerJNI.setCameraWhiteBalanceManual(m_handle, value);
   }
@@ -53,7 +65,11 @@ public class VideoCamera extends VideoSource {
     CameraServerJNI.setCameraExposureHoldCurrent(m_handle);
   }
 
-  /** Set the exposure to manual, as a percentage (0-100). */
+  /**
+   * Set the exposure to manual, as a percentage (0-100).
+   *
+   * @param value The exposure as a percentage (0-100).
+   */
   public synchronized void setExposureManual(int value) {
     CameraServerJNI.setCameraExposureManual(m_handle, value);
   }

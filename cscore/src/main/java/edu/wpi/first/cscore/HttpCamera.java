@@ -88,17 +88,27 @@ public class HttpCamera extends VideoCamera {
    * Get the kind of HTTP camera.
    *
    * <p>Autodetection can result in returning a different value than the camera was created with.
+   *
+   * @return The kind of HTTP camera.
    */
   public HttpCameraKind getHttpCameraKind() {
     return getHttpCameraKindFromInt(CameraServerJNI.getHttpCameraKind(m_handle));
   }
 
-  /** Change the URLs used to connect to the camera. */
+  /**
+   * Change the URLs used to connect to the camera.
+   *
+   * @param urls Array of Camera URLs
+   */
   public void setUrls(String[] urls) {
     CameraServerJNI.setHttpCameraUrls(m_handle, urls);
   }
 
-  /** Get the URLs used to connect to the camera. */
+  /**
+   * Get the URLs used to connect to the camera.
+   *
+   * @return Array of camera URLs.
+   */
   public String[] getUrls() {
     return CameraServerJNI.getHttpCameraUrls(m_handle);
   }

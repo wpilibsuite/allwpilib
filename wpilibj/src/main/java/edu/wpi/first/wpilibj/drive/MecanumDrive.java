@@ -99,6 +99,11 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * Construct a MecanumDrive.
    *
    * <p>If a motor needs to be inverted, do so before passing it in.
+   *
+   * @param frontLeftMotor The motor on the front-left corner.
+   * @param rearLeftMotor The motor on the rear-left corner.
+   * @param frontRightMotor The motor on the front-right corner.
+   * @param rearRightMotor The motor on the rear-right corner.
    */
   public MecanumDrive(
       SpeedController frontLeftMotor,
@@ -214,6 +219,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
+   * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds driveCartesianIK(

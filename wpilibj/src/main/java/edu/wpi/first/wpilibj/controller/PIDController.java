@@ -234,7 +234,11 @@ public class PIDController implements Sendable, AutoCloseable {
     m_continuous = false;
   }
 
-  /** Returns true if continuous input is enabled. */
+  /**
+   * Returns true if continuous input is enabled.
+   *
+   * @return True if continuous input is enabled.
+   */
   public boolean isContinuousInputEnabled() {
     return m_continuous;
   }
@@ -282,7 +286,11 @@ public class PIDController implements Sendable, AutoCloseable {
     return m_positionError;
   }
 
-  /** Returns the velocity error. */
+  /**
+   * Returns the velocity error.
+   *
+   * @return The velocity error.
+   */
   public double getVelocityError() {
     return m_velocityError;
   }
@@ -292,6 +300,7 @@ public class PIDController implements Sendable, AutoCloseable {
    *
    * @param measurement The current measurement of the process variable.
    * @param setpoint The new setpoint of the controller.
+   * @return The next controller output.
    */
   public double calculate(double measurement, double setpoint) {
     // Set setpoint to provided value
@@ -303,6 +312,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
+   * @return The next controller output.
    */
   public double calculate(double measurement) {
     m_measurement = measurement;

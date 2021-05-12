@@ -31,7 +31,14 @@ public class VideoMode {
     return m_pixelFormatValues[pixelFormat];
   }
 
-  /** Create a new video mode. */
+  /**
+   * Create a new video mode.
+   *
+   * @param pixelFormat The pixel format enum as an integer.
+   * @param width The image width in pixels.
+   * @param height The image height in pixels.
+   * @param fps The camera's frames per second.
+   */
   public VideoMode(int pixelFormat, int width, int height, int fps) {
     this.pixelFormat = getPixelFormatFromInt(pixelFormat);
     this.width = width;
@@ -39,7 +46,14 @@ public class VideoMode {
     this.fps = fps;
   }
 
-  /** Create a new video mode. */
+  /**
+   * Create a new video mode.
+   *
+   * @param pixelFormat The pixel format.
+   * @param width The image width in pixels.
+   * @param height The image height in pixels.
+   * @param fps The camera's frames per second.
+   */
   public VideoMode(PixelFormat pixelFormat, int width, int height, int fps) {
     this.pixelFormat = pixelFormat;
     this.width = width;

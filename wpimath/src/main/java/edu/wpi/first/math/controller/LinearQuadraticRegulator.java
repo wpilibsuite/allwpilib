@@ -222,6 +222,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * Returns the next output of the controller.
    *
    * @param x The current state x.
+   * @return The next controller output.
    */
   @SuppressWarnings("ParameterName")
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> x) {
@@ -234,6 +235,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    *
    * @param x The current state x.
    * @param nextR the next reference vector r.
+   * @return The next controller output.
    */
   @SuppressWarnings("ParameterName")
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> x, Matrix<States, N1> nextR) {

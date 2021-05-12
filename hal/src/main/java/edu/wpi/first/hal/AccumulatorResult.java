@@ -13,7 +13,12 @@ public class AccumulatorResult {
   @SuppressWarnings("MemberName")
   public long count;
 
-  /** Set the value and count. */
+  /**
+   * Set the value and count.
+   *
+   * @param value The total value accumulated.
+   * @param count The number of samples accumulated.
+   */
   public void set(long value, long count) {
     this.value = value;
     this.count = count;

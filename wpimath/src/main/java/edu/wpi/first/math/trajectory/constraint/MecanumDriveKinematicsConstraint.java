@@ -18,8 +18,9 @@ public class MecanumDriveKinematicsConstraint implements TrajectoryConstraint {
   private final MecanumDriveKinematics m_kinematics;
 
   /**
-   * Constructs a mecanum drive dynamics constraint.
+   * Constructs a mecanum drive kinematics constraint.
    *
+   * @param kinematics Mecanum drive kinematics.
    * @param maxSpeedMetersPerSecond The max speed that a side of the robot can travel at.
    */
   public MecanumDriveKinematicsConstraint(

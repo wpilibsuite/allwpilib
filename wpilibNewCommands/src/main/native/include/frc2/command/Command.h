@@ -173,8 +173,8 @@ class Command {
   PerpetualCommand Perpetually() &&;
 
   /**
-   * Decorates this command to run "by proxy" by wrapping it in a {@link
-   * ProxyScheduleCommand}. This is useful for "forking off" from command groups
+   * Decorates this command to run "by proxy" by wrapping it in a
+   * ProxyScheduleCommand. This is useful for "forking off" from command groups
    * when the user does not wish to extend the command's requirements to the
    * entire command group.
    *

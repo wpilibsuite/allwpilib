@@ -9,6 +9,7 @@ public interface MathShared {
    * Report an error.
    *
    * @param error the error to set
+   * @param stackTrace array of stacktrace elements
    */
   void reportError(String error, StackTraceElement[] stackTrace);
 

@@ -177,6 +177,7 @@ public class Button extends Trigger {
    *
    * @param command the command to start
    * @param interruptible whether the command is interruptible
+   * @return this button, so calls can be chained
    */
   public Button toggleWhenPressed(final Command command, boolean interruptible) {
     toggleWhenActive(command, interruptible);

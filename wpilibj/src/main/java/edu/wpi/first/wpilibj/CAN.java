@@ -96,6 +96,7 @@ public class CAN implements Closeable {
    *
    * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
+   * @return TODO
    */
   public int writePacketNoThrow(byte[] data, int apiId) {
     return CANAPIJNI.writeCANPacketNoThrow(m_handle, data, apiId);
@@ -108,6 +109,7 @@ public class CAN implements Closeable {
    * @param data The data to write (8 bytes max)
    * @param apiId The API ID to write.
    * @param repeatMs The period to repeat the packet at.
+   * @return TODO
    */
   public int writePacketRepeatingNoThrow(byte[] data, int apiId, int repeatMs) {
     return CANAPIJNI.writeCANPacketRepeatingNoThrow(m_handle, data, apiId, repeatMs);
@@ -119,6 +121,7 @@ public class CAN implements Closeable {
    *
    * @param length The length to request (0 to 8)
    * @param apiId The API ID to write.
+   * @return TODO
    */
   public int writeRTRFrameNoThrow(int length, int apiId) {
     return CANAPIJNI.writeCANRTRFrameNoThrow(m_handle, length, apiId);

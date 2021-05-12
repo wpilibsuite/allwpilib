@@ -240,6 +240,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    *     positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
+   * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
   public WheelSpeeds driveCartesianIK(

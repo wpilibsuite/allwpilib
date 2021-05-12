@@ -9,7 +9,11 @@ public final class CameraServerSharedStore {
 
   private CameraServerSharedStore() {}
 
-  /** get the CameraServerShared object. */
+  /**
+   * Get the CameraServerShared object.
+   *
+   * @return The CameraServerSharedObject
+   */
   public static synchronized CameraServerShared getCameraServerShared() {
     if (cameraServerShared == null) {
       cameraServerShared =
@@ -36,7 +40,11 @@ public final class CameraServerSharedStore {
     return cameraServerShared;
   }
 
-  /** set the CameraServerShared object. */
+  /**
+   * Set the CameraServerShared object.
+   *
+   * @param shared The CameraServerShared object.
+   */
   public static synchronized void setCameraServerShared(CameraServerShared shared) {
     cameraServerShared = shared;
   }

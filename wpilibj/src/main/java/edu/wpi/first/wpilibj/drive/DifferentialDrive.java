@@ -120,6 +120,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * <p>To pass multiple motors per side, use a {@link
    * edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}. If a motor needs to be inverted, do
    * so before passing it in.
+   *
+   * @param leftMotor Left motor.
+   * @param rightMotor Right motor.
    */
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
     requireNonNull(leftMotor, "Left motor cannot be null");
@@ -256,6 +259,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
@@ -317,6 +321,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    *     positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers.
+   * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds curvatureDriveIK(
@@ -352,6 +357,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   * @return Wheel speeds.
    */
   public static WheelSpeeds tankDriveIK(double leftSpeed, double rightSpeed, boolean squareInputs) {
     leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);

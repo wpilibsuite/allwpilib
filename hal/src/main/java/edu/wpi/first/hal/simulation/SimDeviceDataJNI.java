@@ -61,6 +61,7 @@ public class SimDeviceDataJNI extends JNIWrapper {
    * @param handle simulated value handle
    * @param callback callback
    * @param initialNotify ignored (present for consistency)
+   * @return TODO
    */
   public static native int registerSimValueResetCallback(
       int handle, SimValueCallback callback, boolean initialNotify);

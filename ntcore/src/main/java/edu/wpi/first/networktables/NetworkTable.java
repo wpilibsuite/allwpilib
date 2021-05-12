@@ -366,7 +366,11 @@ public final class NetworkTable {
     return getEntry(key).getValue();
   }
 
-  /** Get the path of the NetworkTable. */
+  /**
+   * Get the path of the NetworkTable.
+   *
+   * @return The path of the NetworkTable.
+   */
   public String getPath() {
     return m_path;
   }

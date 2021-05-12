@@ -14,7 +14,13 @@ public class CANData {
   @SuppressWarnings("MemberName")
   public long timestamp;
 
-  /** API used from JNI to set the data. */
+  /**
+   * API used from JNI to set the data.
+   *
+   * @param length Length of packet in bytes.
+   * @param timestamp CAN frame timestamp in microseconds.
+   * @return Buffer containing CAN frame.
+   */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] setData(int length, long timestamp) {
     this.length = length;

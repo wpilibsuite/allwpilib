@@ -96,6 +96,7 @@ public final class WPIMathJNI {
    *
    * @param path The path to the JSON.
    * @return A double array with the trajectory states from the JSON.
+   * @throws IOException if the JSON could not be read.
    */
   public static native double[] fromPathweaverJson(String path) throws IOException;
 
@@ -104,6 +105,7 @@ public final class WPIMathJNI {
    *
    * @param elements The elements of the trajectory.
    * @param path The location to save the JSON to.
+   * @throws IOException if the JSON could not be written.
    */
   public static native void toPathweaverJson(double[] elements, String path) throws IOException;
 

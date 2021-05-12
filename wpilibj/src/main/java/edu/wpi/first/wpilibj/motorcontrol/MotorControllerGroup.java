@@ -18,6 +18,7 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
    *
+   * @param motorController The first MotorController to add
    * @param motorControllers The MotorControllers to add
    */
   public MotorControllerGroup(

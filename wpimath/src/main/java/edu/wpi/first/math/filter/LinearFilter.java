@@ -81,6 +81,7 @@ public class LinearFilter {
    *
    * @param timeConstant The discrete-time time constant in seconds.
    * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
    */
   public static LinearFilter singlePoleIIR(double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
@@ -101,6 +102,7 @@ public class LinearFilter {
    *
    * @param timeConstant The discrete-time time constant in seconds.
    * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
    */
   public static LinearFilter highPass(double timeConstant, double period) {
     double gain = Math.exp(-period / timeConstant);
@@ -117,6 +119,7 @@ public class LinearFilter {
    * <p>This filter is always stable.
    *
    * @param taps The number of samples to average over. Higher = smoother but slower.
+   * @return Linear filter.
    * @throws IllegalArgumentException if number of taps is less than 1.
    */
   public static LinearFilter movingAverage(int taps) {

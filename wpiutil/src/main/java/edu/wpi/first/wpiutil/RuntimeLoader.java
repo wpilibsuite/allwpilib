@@ -20,7 +20,11 @@ import java.util.Scanner;
 public final class RuntimeLoader<T> {
   private static String defaultExtractionRoot;
 
-  /** Gets the default extration root location (~/.wpilib/nativecache). */
+  /**
+   * Gets the default extration root location (~/.wpilib/nativecache).
+   *
+   * @return The default extraction root location.
+   */
   public static synchronized String getDefaultExtractionRoot() {
     if (defaultExtractionRoot != null) {
       return defaultExtractionRoot;
@@ -37,8 +41,9 @@ public final class RuntimeLoader<T> {
   /**
    * Creates a new library loader.
    *
-   * <p>Resources loaded on disk from extractionRoot, and from classpath from the passed in class.
-   * Library name is the passed in name.
+   * @param libraryName Name of library to load.
+   * @param extractionRoot Location from which to load the library.
+   * @param cls Class whose classpath the given library belongs.
    */
   public RuntimeLoader(String libraryName, String extractionRoot, Class<T> cls) {
     m_libraryName = libraryName;
@@ -46,6 +51,12 @@ public final class RuntimeLoader<T> {
     m_extractionRoot = extractionRoot;
   }
 
+  /**
+   * Returns a load error message given the information in the provided UnsatisfiedLinkError.
+   *
+   * @param ule UnsatisfiedLinkError object.
+   * @return A load error message.
+   */
   private String getLoadErrorMessage(UnsatisfiedLinkError ule) {
     StringBuilder msg = new StringBuilder(512);
     msg.append(m_libraryName)
@@ -64,7 +75,11 @@ public final class RuntimeLoader<T> {
     return msg.toString();
   }
 
-  /** Loads a native library. */
+  /**
+   * Loads a native library.
+   *
+   * @throws IOException if the library fails to load
+   */
   @SuppressWarnings("PMD.PreserveStackTrace")
   public void loadLibrary() throws IOException {
     try {
@@ -106,7 +121,11 @@ public final class RuntimeLoader<T> {
     }
   }
 
-  /** Load a native library by directly hashing the file. */
+  /**
+   * Load a native library by directly hashing the file.
+   *
+   * @throws IOException if the library failed to load
+   */
   @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.EmptyWhileStmt"})
   public void loadLibraryHashed() throws IOException {
     try {

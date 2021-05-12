@@ -33,7 +33,11 @@ public class DutyCycleEncoderSim {
     m_simPosition.set(turns);
   }
 
-  /** Set the position. */
+  /**
+   * Set the position.
+   *
+   * @param distance The position.
+   */
   public void setDistance(double distance) {
     m_simPosition.set(distance / m_simDistancePerRotation.get());
   }
