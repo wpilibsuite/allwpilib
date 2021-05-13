@@ -20,8 +20,8 @@ class LiveWindow {
   LiveWindow(const LiveWindow&) = delete;
   LiveWindow& operator=(const LiveWindow&) = delete;
 
-  std::function<void()> enabled;
-  std::function<void()> disabled;
+  static std::function<void()> enabled;
+  static std::function<void()> disabled;
 
   /**
    * Get an instance of the LiveWindow main class.
@@ -36,28 +36,28 @@ class LiveWindow {
    *
    * @param sendable component
    */
-  void EnableTelemetry(Sendable* component);
+  static void EnableTelemetry(Sendable* component);
 
   /**
    * Disable telemetry for a single component.
    *
    * @param sendable component
    */
-  void DisableTelemetry(Sendable* component);
+  static void DisableTelemetry(Sendable* component);
 
   /**
    * Disable ALL telemetry.
    */
-  void DisableAllTelemetry();
+  static void DisableAllTelemetry();
 
-  bool IsEnabled() const;
+  static bool IsEnabled();
 
   /**
    * Change the enabled status of LiveWindow.
    *
    * If it changes to enabled, start livewindow running otherwise stop it
    */
-  void SetEnabled(bool enabled);
+  static void SetEnabled(bool enabled);
 
   /**
    * Tell all the sensors to update (send) their values.
@@ -65,7 +65,7 @@ class LiveWindow {
    * Actuators are handled through callbacks on their value changing from the
    * SmartDashboard widgets.
    */
-  void UpdateValues();
+  static void UpdateValues();
 
  private:
   LiveWindow();
@@ -76,7 +76,7 @@ class LiveWindow {
   /**
    * Updates the entries, without using a mutex or lock.
    */
-  void UpdateValuesUnsafe();
+  static void UpdateValuesUnsafe();
 };
 
 }  // namespace frc

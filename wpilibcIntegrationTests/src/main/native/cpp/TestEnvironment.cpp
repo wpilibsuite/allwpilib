@@ -40,7 +40,7 @@ class TestEnvironment : public testing::Environment {
             station returns that the robot is enabled, to ensure that tests
             will be able to run on the hardware. */
     HAL_ObserveUserProgramStarting();
-    LiveWindow::GetInstance()->SetEnabled(false);
+    LiveWindow::SetEnabled(false);
 
     wpi::outs() << "Started coms\n";
 

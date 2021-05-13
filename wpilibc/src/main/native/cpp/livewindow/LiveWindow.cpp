@@ -65,115 +65,128 @@ LiveWindow* LiveWindow::GetInstance() {
 }
 
 void LiveWindow::EnableTelemetry(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
   // Re-enable global setting in case DisableAllTelemetry() was called.
-  m_impl->telemetryEnabled = true;
-  m_impl->GetOrAdd(sendable)->telemetryEnabled = true;
+  inst->m_impl->telemetryEnabled = true;
+  inst->m_impl->GetOrAdd(sendable)->telemetryEnabled = true;
 }
 
 void LiveWindow::DisableTelemetry(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
-  m_impl->GetOrAdd(sendable)->telemetryEnabled = false;
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
+  inst->m_impl->GetOrAdd(sendable)->telemetryEnabled = false;
 }
 
 void LiveWindow::DisableAllTelemetry() {
-  std::scoped_lock lock(m_impl->mutex);
-  m_impl->telemetryEnabled = false;
-  SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.data) {
-      cbdata.data = std::make_shared<Impl::Component>();
-    }
-    std::static_pointer_cast<Impl::Component>(cbdata.data)->telemetryEnabled =
-        false;
-  });
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
+  inst->m_impl->telemetryEnabled = false;
+  SendableRegistry::ForeachLiveWindow(
+      inst->m_impl->dataHandle, [&](auto& cbdata) {
+        if (!cbdata.data) {
+          cbdata.data = std::make_shared<Impl::Component>();
+        }
+        std::static_pointer_cast<Impl::Component>(cbdata.data)
+            ->telemetryEnabled = false;
+      });
 }
 
-bool LiveWindow::IsEnabled() const {
-  std::scoped_lock lock(m_impl->mutex);
-  return m_impl->liveWindowEnabled;
+bool LiveWindow::IsEnabled() {
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
+  return inst->m_impl->liveWindowEnabled;
 }
 
 void LiveWindow::SetEnabled(bool enabled) {
-  std::scoped_lock lock(m_impl->mutex);
-  if (m_impl->liveWindowEnabled == enabled) {
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
+  if (inst->m_impl->liveWindowEnabled == enabled) {
     return;
   }
-  m_impl->startLiveWindow = enabled;
-  m_impl->liveWindowEnabled = enabled;
+  inst->m_impl->startLiveWindow = enabled;
+  inst->m_impl->liveWindowEnabled = enabled;
   // Force table generation now to make sure everything is defined
   UpdateValuesUnsafe();
   if (enabled) {
-    if (this->enabled) {
-      this->enabled();
+    if (LiveWindow::enabled) {
+      LiveWindow::enabled();
     }
   } else {
-    SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-      cbdata.builder.StopLiveWindowMode();
-    });
-    if (this->disabled) {
-      this->disabled();
+    SendableRegistry::ForeachLiveWindow(
+        inst->m_impl->dataHandle,
+        [&](auto& cbdata) { cbdata.builder.StopLiveWindowMode(); });
+    if (LiveWindow::disabled) {
+      LiveWindow::disabled();
     }
   }
-  m_impl->enabledEntry.SetBoolean(enabled);
+  inst->m_impl->enabledEntry.SetBoolean(enabled);
 }
 
 void LiveWindow::UpdateValues() {
-  std::scoped_lock lock(m_impl->mutex);
+  auto* inst = GetInstance();
+  std::scoped_lock lock(inst->m_impl->mutex);
   UpdateValuesUnsafe();
 }
 
 void LiveWindow::UpdateValuesUnsafe() {
+  auto* inst = GetInstance();
   // Only do this if either LiveWindow mode or telemetry is enabled.
-  if (!m_impl->liveWindowEnabled && !m_impl->telemetryEnabled) {
+  if (!inst->m_impl->liveWindowEnabled && !inst->m_impl->telemetryEnabled) {
     return;
   }
 
-  SendableRegistry::ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-    if (!cbdata.sendable || cbdata.parent) {
-      return;
-    }
+  SendableRegistry::ForeachLiveWindow(
+      inst->m_impl->dataHandle, [&](auto& cbdata) {
+        if (!cbdata.sendable || cbdata.parent) {
+          return;
+        }
 
-    if (!cbdata.data) {
-      cbdata.data = std::make_shared<Impl::Component>();
-    }
+        if (!cbdata.data) {
+          cbdata.data = std::make_shared<Impl::Component>();
+        }
 
-    auto& comp = *std::static_pointer_cast<Impl::Component>(cbdata.data);
+        auto& comp = *std::static_pointer_cast<Impl::Component>(cbdata.data);
 
-    if (!m_impl->liveWindowEnabled && !comp.telemetryEnabled) {
-      return;
-    }
+        if (!inst->m_impl->liveWindowEnabled && !comp.telemetryEnabled) {
+          return;
+        }
 
-    if (comp.firstTime) {
-      // By holding off creating the NetworkTable entries, it allows the
-      // components to be redefined. This allows default sensor and actuator
-      // values to be created that are replaced with the custom names from
-      // users calling setName.
-      if (cbdata.name.empty()) {
-        return;
-      }
-      auto ssTable = m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
-      std::shared_ptr<nt::NetworkTable> table;
-      // Treat name==subsystem as top level of subsystem
-      if (cbdata.name == cbdata.subsystem) {
-        table = ssTable;
-      } else {
-        table = ssTable->GetSubTable(cbdata.name);
-      }
-      table->GetEntry(".name").SetString(cbdata.name);
-      cbdata.builder.SetTable(table);
-      cbdata.sendable->InitSendable(cbdata.builder);
-      ssTable->GetEntry(".type").SetString("LW Subsystem");
+        if (comp.firstTime) {
+          // By holding off creating the NetworkTable entries, it allows the
+          // components to be redefined. This allows default sensor and actuator
+          // values to be created that are replaced with the custom names from
+          // users calling setName.
+          if (cbdata.name.empty()) {
+            return;
+          }
+          auto ssTable =
+              inst->m_impl->liveWindowTable->GetSubTable(cbdata.subsystem);
+          std::shared_ptr<nt::NetworkTable> table;
+          // Treat name==subsystem as top level of subsystem
+          if (cbdata.name == cbdata.subsystem) {
+            table = ssTable;
+          } else {
+            table = ssTable->GetSubTable(cbdata.name);
+          }
+          table->GetEntry(".name").SetString(cbdata.name);
+          cbdata.builder.SetTable(table);
+          cbdata.sendable->InitSendable(cbdata.builder);
+          ssTable->GetEntry(".type").SetString("LW Subsystem");
 
-      comp.firstTime = false;
-    }
+          comp.firstTime = false;
+        }
 
-    if (m_impl->startLiveWindow) {
-      cbdata.builder.StartLiveWindowMode();
-    }
-    cbdata.builder.UpdateTable();
-  });
+        if (inst->m_impl->startLiveWindow) {
+          cbdata.builder.StartLiveWindowMode();
+        }
+        cbdata.builder.UpdateTable();
+      });
 
-  m_impl->startLiveWindow = false;
+  inst->m_impl->startLiveWindow = false;
 }
 
 LiveWindow::LiveWindow() : m_impl(new Impl) {}
+
+std::function<void()> LiveWindow::enabled = nullptr;
+std::function<void()> LiveWindow::disabled = nullptr;

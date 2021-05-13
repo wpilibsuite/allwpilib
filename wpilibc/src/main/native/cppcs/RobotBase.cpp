@@ -214,7 +214,7 @@ RobotBase::RobotBase() {
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 
-  LiveWindow::GetInstance()->SetEnabled(false);
+  LiveWindow::SetEnabled(false);
 }
 
 RobotBase::RobotBase(RobotBase&&) noexcept {}
