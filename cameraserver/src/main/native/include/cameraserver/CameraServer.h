@@ -45,7 +45,7 @@ class CameraServer {
    * with device 0, creating a camera named "USB Camera 0".  Subsequent calls
    * increment the device number (e.g. 1, 2, etc).
    */
-  cs::UsbCamera StartAutomaticCapture();
+  static cs::UsbCamera StartAutomaticCapture();
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -55,7 +55,7 @@ class CameraServer {
    *
    * @param dev The device number of the camera interface
    */
-  cs::UsbCamera StartAutomaticCapture(int dev);
+  static cs::UsbCamera StartAutomaticCapture(int dev);
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -63,7 +63,7 @@ class CameraServer {
    * @param name The name to give the camera
    * @param dev  The device number of the camera interface
    */
-  cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name, int dev);
+  static cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name, int dev);
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -71,8 +71,8 @@ class CameraServer {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name,
-                                      const wpi::Twine& path);
+  static cs::UsbCamera StartAutomaticCapture(const wpi::Twine& name,
+                                             const wpi::Twine& path);
 
   /**
    * Start automatically capturing images to send to the dashboard from
@@ -80,7 +80,7 @@ class CameraServer {
    *
    * @param camera Camera
    */
-  cs::MjpegServer StartAutomaticCapture(const cs::VideoSource& camera);
+  static cs::MjpegServer StartAutomaticCapture(const cs::VideoSource& camera);
 
   /**
    * Adds an Axis IP camera.
@@ -89,7 +89,7 @@ class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& host);
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& host);
 
   /**
    * Adds an Axis IP camera.
@@ -98,7 +98,7 @@ class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(const char* host);
+  static cs::AxisCamera AddAxisCamera(const char* host);
 
   /**
    * Adds an Axis IP camera.
@@ -107,16 +107,7 @@ class CameraServer {
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
    */
-  cs::AxisCamera AddAxisCamera(const std::string& host);
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * This overload calls AddAxisCamera() with name "Axis Camera".
-   *
-   * @param hosts Array of Camera host IPs/DNS names
-   */
-  cs::AxisCamera AddAxisCamera(wpi::ArrayRef<std::string> hosts);
+  static cs::AxisCamera AddAxisCamera(const std::string& host);
 
   /**
    * Adds an Axis IP camera.
@@ -125,51 +116,62 @@ class CameraServer {
    *
    * @param hosts Array of Camera host IPs/DNS names
    */
-  template <typename T>
-  cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
+  static cs::AxisCamera AddAxisCamera(wpi::ArrayRef<std::string> hosts);
 
   /**
    * Adds an Axis IP camera.
    *
-   * @param name The name to give the camera
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const wpi::Twine& host);
-
-  /**
-   * Adds an Axis IP camera.
+   * This overload calls AddAxisCamera() with name "Axis Camera".
    *
-   * @param name The name to give the camera
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const char* host);
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * @param name The name to give the camera
-   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   */
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const std::string& host);
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * @param name The name to give the camera
-   * @param hosts Array of Camera host IPs/DNS names
-   */
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
-                               wpi::ArrayRef<std::string> hosts);
-
-  /**
-   * Adds an Axis IP camera.
-   *
-   * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
    */
   template <typename T>
-  cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
-                               std::initializer_list<T> hosts);
+  static cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+                                      const wpi::Twine& host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& name, const char* host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+                                      const std::string& host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+                                      wpi::ArrayRef<std::string> hosts);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  template <typename T>
+  static cs::AxisCamera AddAxisCamera(const wpi::Twine& name,
+                                      std::initializer_list<T> hosts);
 
   /**
    * Adds a virtual camera for switching between two streams.  Unlike the
@@ -177,7 +179,7 @@ class CameraServer {
    * VideoSource.  Calling SetSource() on the returned object can be used
    * to switch the actual source of the stream.
    */
-  cs::MjpegServer AddSwitchedCamera(const wpi::Twine& name);
+  static cs::MjpegServer AddSwitchedCamera(const wpi::Twine& name);
 
   /**
    * Get OpenCV access to the primary camera feed.  This allows you to
@@ -186,7 +188,7 @@ class CameraServer {
    * <p>This is only valid to call after a camera feed has been added
    * with startAutomaticCapture() or addServer().
    */
-  cs::CvSink GetVideo();
+  static cs::CvSink GetVideo();
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
@@ -194,7 +196,7 @@ class CameraServer {
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
    */
-  cs::CvSink GetVideo(const cs::VideoSource& camera);
+  static cs::CvSink GetVideo(const cs::VideoSource& camera);
 
   /**
    * Get OpenCV access to the specified camera.  This allows you to get
@@ -202,7 +204,7 @@ class CameraServer {
    *
    * @param name Camera name
    */
-  cs::CvSink GetVideo(const wpi::Twine& name);
+  static cs::CvSink GetVideo(const wpi::Twine& name);
 
   /**
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom
@@ -212,35 +214,35 @@ class CameraServer {
    * @param width Width of the image being sent
    * @param height Height of the image being sent
    */
-  cs::CvSource PutVideo(const wpi::Twine& name, int width, int height);
+  static cs::CvSource PutVideo(const wpi::Twine& name, int width, int height);
 
   /**
    * Adds a MJPEG server at the next available port.
    *
    * @param name Server name
    */
-  cs::MjpegServer AddServer(const wpi::Twine& name);
+  static cs::MjpegServer AddServer(const wpi::Twine& name);
 
   /**
    * Adds a MJPEG server.
    *
    * @param name Server name
    */
-  cs::MjpegServer AddServer(const wpi::Twine& name, int port);
+  static cs::MjpegServer AddServer(const wpi::Twine& name, int port);
 
   /**
    * Adds an already created server.
    *
    * @param server Server
    */
-  void AddServer(const cs::VideoSink& server);
+  static void AddServer(const cs::VideoSink& server);
 
   /**
    * Removes a server by name.
    *
    * @param name Server name
    */
-  void RemoveServer(const wpi::Twine& name);
+  static void RemoveServer(const wpi::Twine& name);
 
   /**
    * Get server for the primary camera feed.
@@ -248,28 +250,28 @@ class CameraServer {
    * This is only valid to call after a camera feed has been added with
    * StartAutomaticCapture() or AddServer().
    */
-  cs::VideoSink GetServer();
+  static cs::VideoSink GetServer();
 
   /**
    * Gets a server by name.
    *
    * @param name Server name
    */
-  cs::VideoSink GetServer(const wpi::Twine& name);
+  static cs::VideoSink GetServer(const wpi::Twine& name);
 
   /**
    * Adds an already created camera.
    *
    * @param camera Camera
    */
-  void AddCamera(const cs::VideoSource& camera);
+  static void AddCamera(const cs::VideoSource& camera);
 
   /**
    * Removes a camera by name.
    *
    * @param name Camera name
    */
-  void RemoveCamera(const wpi::Twine& name);
+  static void RemoveCamera(const wpi::Twine& name);
 
   /**
    * Sets the size of the image to use. Use the public kSize constants to set
@@ -280,7 +282,7 @@ class CameraServer {
    *             StartAutomaticCapture() instead.
    * @param size The size to use
    */
-  void SetSize(int size);
+  static void SetSize(int size);
 
  private:
   CameraServer();
