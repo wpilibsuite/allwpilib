@@ -1,0 +1,48 @@
+load("@wpi_bazel_rules//rules:halsim_binary.bzl", "wpilib_cc_halsim_binary", "wpilib_java_halsim_binary")
+
+halsim_deps = [
+    "//simulation/halsim_ws_client:halsim_ws_client",
+    # "//simulation/halsim_ws_server:halsim_ws_server",
+    # "//simulation/halsim_gui:halsim_gui",
+    "//simulation/halsim_ds_socket:halsim_ds_socket",
+]
+
+wpilib_java_halsim_binary(
+    name = "java",
+    srcs = glob(["src/main/java/frc/robot/*.java"]),
+    halsim_deps = halsim_deps,
+    main_class = "frc.robot.Main",
+    raw_jni_deps = [
+        "@local_opencv//:opencv-cpp-shared-libs",
+    ],
+    wpi_shared_deps = [
+        "//cscore:cscore",
+        "//cscore:cscorejni",
+        "//ntcore:ntcore",
+        "//ntcore:ntcorejni",
+        "//wpimath:wpimath",
+        "//wpimath:wpimathjni",
+        "//wpiutil:wpiutil",
+        "//wpiutil:wpiutiljni",
+        "//hal:wpiHal",
+        "//hal:wpiHaljni",
+    ],
+    deps = [
+        "//cameraserver:java",
+        "//cscore:java",
+        "//hal:java",
+        "//ntcore:java",
+        "//wpilibj:java",
+        "//wpimath:java",
+    ],
+)
+
+wpilib_cc_halsim_binary(
+    name = "cpp",
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    halsim_deps = halsim_deps,
+    visibility = ["//visibility:public"],
+    wpi_shared_deps = [
+        "//wpilibc:wpilibc",
+    ],
+)

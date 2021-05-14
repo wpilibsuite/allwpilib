@@ -1,0 +1,32 @@
+#
+#load("//simulation:plugin.bzl", "wpilib_hal_plugin")
+#
+#wpilib_hal_plugin(
+#    name="halsim_ws_server",
+#    deps = [
+#        "//simulation/halsim_ws_core:halsim_ws_core",
+#        "//glass:glassnt",
+#    ],
+#)
+
+load("//simulation:plugin.bzl", "wpilib_hal_plugin")
+load("@wpi_bazel_rules//rules:cc.bzl", "get_wpigui_linker_flags")
+
+wpilib_hal_plugin(
+    name = "halsim_gui",
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.h",
+    ]),
+    hdrs = glob(["src/main/native/include/*.h"]),
+    has_test = True,
+    linkopts = get_wpigui_linker_flags(),
+    raw_deps = [
+        "//glass:libglass",
+        "//glass:libglassnt",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    wpi_shared_deps = [
+        "//hal:wpiHal",
+    ],
+)

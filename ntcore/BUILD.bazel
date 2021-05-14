@@ -1,0 +1,18 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_library")
+load("@wpi_bazel_rules//rules/projects:jni_project.bzl", "jni_project")
+
+wpilib_cc_library(
+    name = "private_includes",
+    hdrs = glob(["src/main/native/cpp/*.h"]),
+    strip_include_prefix = "src/main/native/cpp",
+)
+
+jni_project(
+    name = "ntcore",
+    cc_raw_deps = [":private_includes"],
+    cc_shared_deps = ["//wpiutil:wpiutil"],
+    java_deps = [
+        "//wpiutil:java",
+    ],
+    java_dev_main_class = "edu.wpi.ntcore.first.DevMain",
+)

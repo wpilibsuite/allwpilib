@@ -1,0 +1,22 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_library")
+load("//simulation:plugin.bzl", "wpilib_hal_plugin")
+
+wpilib_hal_plugin(
+    name = "halsim_ws_server",
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob(["src/main/native/include/*.h"]),
+    has_test = True,
+    raw_deps = [
+        "//simulation/halsim_ws_core:halsim_ws_core",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    test_deps = [":test-utils"],
+)
+
+wpilib_cc_library(
+    name = "test-utils",
+    testonly = True,
+    hdrs = glob(["src/test/native/include/*.h"]),
+    strip_include_prefix = "src/test/native/include",
+    wpi_shared_deps = [":halsim_ws_server"],
+)

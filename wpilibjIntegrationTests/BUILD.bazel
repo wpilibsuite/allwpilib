@@ -1,0 +1,19 @@
+load("@wpi_bazel_rules//rules:java.bzl", "wpilib_junit5_test")
+
+wpilib_junit5_test(
+    name = "java",
+    srcs = glob([
+        "src/main/java/edu/wpi/first/wpilibj/*.java",
+        "src/main/java/edu/wpi/first/wpilibj/can/*.java",
+        "src/main/java/edu/wpi/first/wpilibj/fixtures/*.java",
+        "src/main/java/edu/wpi/first/wpilibj/mockhardware/*.java",
+        "src/main/java/edu/wpi/first/wpilibj/test/*.java",
+    ]),
+    deps = [
+        "//wpilibj:java",
+        "@maven//:com_googlecode_junit_toolbox_junit_toolbox",
+        "@maven//:org_apache_ant_ant",
+        "@maven//:org_apache_ant_ant_junit",
+        "@maven//:org_hamcrest_hamcrest_all",
+    ],
+)

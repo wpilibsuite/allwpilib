@@ -1,0 +1,151 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_binary", "wpilib_cc_library")
+load("@wpi_bazel_rules//rules/projects:jni_project.bzl", "jni_project")
+load("@wpi_bazel_rules//rules/gen:gen-resources.bzl", "generate_resources")
+
+WIN_UV_SRCS = glob([
+    "src/main/native/libuv/src/win/*.cpp",
+    "src/main/native/libuv/src/win/*.h",
+])
+
+UNIX_UV_SRCS = [
+    "src/main/native/libuv/src/unix/async.cpp",
+    "src/main/native/libuv/src/unix/core.cpp",
+    "src/main/native/libuv/src/unix/dl.cpp",
+    "src/main/native/libuv/src/unix/fs.cpp",
+    "src/main/native/libuv/src/unix/getaddrinfo.cpp",
+    "src/main/native/libuv/src/unix/getnameinfo.cpp",
+    "src/main/native/libuv/src/unix/loop-watcher.cpp",
+    "src/main/native/libuv/src/unix/loop.cpp",
+    "src/main/native/libuv/src/unix/pipe.cpp",
+    "src/main/native/libuv/src/unix/poll.cpp",
+    "src/main/native/libuv/src/unix/process.cpp",
+    "src/main/native/libuv/src/unix/signal.cpp",
+    "src/main/native/libuv/src/unix/stream.cpp",
+    "src/main/native/libuv/src/unix/tcp.cpp",
+    "src/main/native/libuv/src/unix/thread.cpp",
+    # 'main/native/libuv/src/unix/timer.cpp',
+    "src/main/native/libuv/src/unix/tty.cpp",
+    "src/main/native/libuv/src/unix/udp.cpp",
+] + glob(["src/main/native/libuv/src/unix/*.h"])
+
+MAC_UV_SRCS = [
+    "src/main/native/libuv/src/unix/bsd-ifaddrs.cpp",
+    "src/main/native/libuv/src/unix/darwin.cpp",
+    "src/main/native/libuv/src/unix/darwin-proctitle.cpp",
+    "src/main/native/libuv/src/unix/fsevents.cpp",
+    "src/main/native/libuv/src/unix/kqueue.cpp",
+    "src/main/native/libuv/src/unix/proctitle.cpp",
+]
+
+LINUX_UV_SRCS = [
+    "src/main/native/libuv/src/unix/linux-core.cpp",
+    "src/main/native/libuv/src/unix/linux-inotify.cpp",
+    "src/main/native/libuv/src/unix/linux-syscalls.cpp",
+    "src/main/native/libuv/src/unix/procfs-exepath.cpp",
+    "src/main/native/libuv/src/unix/proctitle.cpp",
+    "src/main/native/libuv/src/unix/sysinfo-loadavg.cpp",
+]
+
+filegroup(
+    name = "native-uv-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": WIN_UV_SRCS,
+        "@bazel_tools//src/conditions:darwin": UNIX_UV_SRCS + MAC_UV_SRCS,
+        "@bazel_tools//src/conditions:linux_x86_64": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@wpi_bazel_rules//toolchains/conditions:raspbian": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@wpi_bazel_rules//toolchains/conditions:bionic": UNIX_UV_SRCS + LINUX_UV_SRCS,
+        "@wpi_bazel_rules//toolchains/conditions:roborio": UNIX_UV_SRCS + LINUX_UV_SRCS,
+    }),
+)
+
+filegroup(
+    name = "native-llvm-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": [
+            "src/main/native/cpp/llvm/Windows/Path.inc",
+            "src/main/native/cpp/llvm/Windows/WindowsSupport.h",
+        ],
+        "@wpi_bazel_rules//toolchains/conditions:raspbian": ["src/main/native/cpp/llvm/Unix/Path.inc"],
+        "@wpi_bazel_rules//toolchains/conditions:bionic": ["src/main/native/cpp/llvm/Unix/Path.inc"],
+        "@wpi_bazel_rules//toolchains/conditions:roborio": ["src/main/native/cpp/llvm/Unix/Path.inc"],
+        "//conditions:default": ["src/main/native/cpp/llvm/Unix/Path.inc"],
+    }),
+)
+
+wpilib_cc_library(
+    name = "libuv-headers",
+    hdrs = glob([
+        "src/main/native/libuv/include/*.h",
+        "src/main/native/libuv/include/uv/*.h",
+        #        "src/main/native/libuv/src/unix/*.h",
+    ]),
+    includes = ["src/main/native/libuv/src"],
+    strip_include_prefix = "src/main/native/libuv/include",
+)
+
+filegroup(
+    name = "native-srcs",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": glob([
+            "src/main/native/windows/*.cpp",
+            "src/main/native/windows/*.h",
+        ]),
+        "@wpi_bazel_rules//toolchains/conditions:raspbian": glob(["src/main/native/unix/*.cpp"]),
+        "@wpi_bazel_rules//toolchains/conditions:bionic": glob(["src/main/native/unix/*.cpp"]),
+        "@wpi_bazel_rules//toolchains/conditions:roborio": glob(["src/main/native/unix/*.cpp"]),
+        "//conditions:default": glob(["src/main/native/unix/*.cpp"]),
+    }),
+)
+
+generate_resources(
+    name = "generate-resources",
+    namespace = "wpi",
+    prefix = "WPI",
+    resource_files = glob(["src/main/native/resources/*"]),
+)
+
+jni_project(
+    name = "wpiutil",
+    cc_additional_srcs = [
+        ":native-srcs",
+        ":native-uv-srcs",
+        ":native-llvm-srcs",
+        ":generate-resources",
+    ] + glob([
+        "src/main/native/libuv/src/*.cpp",
+        "src/main/native/libuv/src/*.h",
+    ]),
+    cc_raw_deps = [":libuv-headers"],
+    export_jni_symbols = False,
+    java_deps = [
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+    ],
+    java_dev_main_class = "edu.wpi.first.wpiutil.DevMain",
+)
+
+wpilib_cc_binary(
+    name = "netconsoleServer",
+    srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
+    linkopts = select({
+        "@bazel_tools//src/conditions:linux_x86_64": ["-lutil"],
+        "@wpi_bazel_rules//toolchains/conditions:raspbian": ["-lutil"],
+        "@wpi_bazel_rules//toolchains/conditions:bionic": ["-lutil"],
+        "@wpi_bazel_rules//toolchains/conditions:roborio": ["-lutil"],
+        "//conditions:default": [],
+    }),
+    wpi_shared_deps = [":wpiutil"],
+)
+
+wpilib_cc_binary(
+    name = "netconsoleTee",
+    srcs = ["src/netconsoleTee/native/cpp/main.cpp"],
+    wpi_shared_deps = [":wpiutil"],
+)
+
+wpilib_cc_binary(
+    name = "webserverExample",
+    srcs = ["examples/webserver/webserver.cpp"],
+    wpi_shared_deps = [":wpiutil"],
+)

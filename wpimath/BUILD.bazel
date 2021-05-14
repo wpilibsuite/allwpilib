@@ -1,0 +1,37 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_library")
+load("//wpimath:generate_numbers.bzl", "wpimath_java_nat_file_gen")
+load("@wpi_bazel_rules//rules/projects:jni_project.bzl", "jni_project")
+
+wpimath_java_nat_file_gen(name = "gen-nat")
+
+wpilib_cc_library(
+    name = "eigen",
+    hdrs = glob([
+        "src/main/native/eigeninclude/**",
+    ]),
+    strip_include_prefix = "src/main/native/eigeninclude",
+)
+
+wpilib_cc_library(
+    name = "cpp-test-utils",
+    hdrs = glob([
+        "src/test/native/include/drake/common/*.h",
+        "src/test/native/include/drake/common/test_utilities/*.h",
+        "src/test/native/include/drake/math/*.h",
+        "src/test/native/include/trajectory/*.h",
+    ]),
+    strip_include_prefix = "src/test/native/include",
+)
+
+jni_project(
+    name = "wpimath",
+    cc_raw_deps = [":eigen"],
+    cc_shared_deps = ["//wpiutil:wpiutil"],
+    cc_test_deps = ["cpp-test-utils"],
+    java_additional_srcs = ["gen-nat"],
+    java_deps = [
+        "//wpiutil:java",
+        "@maven//:org_ejml_ejml_simple",
+    ],
+    java_dev_main_class = "edu.wpi.first.hal.DevMain",
+)

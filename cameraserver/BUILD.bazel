@@ -1,0 +1,27 @@
+load("@wpi_bazel_rules//rules/projects:java_project.bzl", "java_project")
+load("@wpi_bazel_rules//rules/projects:cc_project.bzl", "cc_project")
+
+java_project(
+    name = "java",
+    dev_main_main_class = "edu.wpi.first.cameraserver.DevMain",
+    has_test = False,
+    wpi_shared_deps = [
+        "//cscore:cscore",
+        "//ntcore:ntcore",
+    ],
+    deps = [
+        "//cscore:java",
+        "//ntcore:java",
+        "//wpiutil:java",
+        "@local_opencv//:edu_wpi_first_thirdparty_opencv_opencv_java",
+    ],
+)
+
+cc_project(
+    name = "cpp",
+    build_as_shared = True,
+    wpi_shared_deps = [
+        "//cscore:cscore",
+        "//ntcore:ntcore",
+    ],
+)

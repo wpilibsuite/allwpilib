@@ -1,0 +1,36 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "default_wpilib_cc_dev_main")
+load("@wpi_bazel_rules//rules/projects:java_project.bzl", "java_project")
+load("@wpi_bazel_rules//rules/gen:gen-version-file.bzl", "generate_version_file")
+
+generate_version_file(
+    name = "generate-version",
+    output_file = "WPILibVersion.java",
+    template = "src/generate/WPILibVersion.java.in",
+)
+
+java_project(
+    name = "java",
+    additional_srcs = [":generate-version"],
+    dev_main_main_class = "edu.wpi.first.wpilibj.DevMain",
+    wpi_shared_deps = [
+        "//cscore:cscorejni",
+        "//cscore:cscore",
+        "//ntcore:ntcorejni",
+        "//ntcore:ntcore",
+        "//wpimath:wpimathjni",
+        "//wpimath:wpimath",
+        "//wpiutil:wpiutiljni",
+        "//wpiutil:wpiutil",
+        "//hal:wpiHaljni",
+        "//hal:wpiHal",
+    ],
+    deps = [
+        "//cameraserver:java",
+        "//cscore:java",
+        "//hal:java",
+        "//ntcore:java",
+        "//wpimath:java",
+    ],
+)
+
+default_wpilib_cc_dev_main(name = "DevMainCpp")

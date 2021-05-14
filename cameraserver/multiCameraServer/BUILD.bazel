@@ -1,0 +1,20 @@
+load("@wpi_bazel_rules//rules:java.bzl", "wpilib_java_binary")
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_binary")
+
+wpilib_cc_binary(
+    name = "cpp",
+    srcs = ["src/main/native/cpp/main.cpp"],
+    wpi_shared_deps = [
+        "//cameraserver:cpp",
+    ],
+)
+
+wpilib_java_binary(
+    name = "java",
+    srcs = ["src/main/java/edu/wpi/Main.java"],
+    main_class = "edu.wpi.Main",
+    deps = [
+        "//cameraserver:java",
+        "@maven//:com_google_code_gson_gson",
+    ],
+)

@@ -1,0 +1,20 @@
+load("//wpilibjExamples:build_java_examples.bzl", "build_commands", "build_examples", "build_templates")
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_binary")
+
+halsim_deps = [
+    "//simulation/halsim_ws_client:halsim_ws_client",
+    #        "//simulation/halsim_ws_server:halsim_ws_server",
+    "//simulation/halsim_gui:halsim_gui",
+    "//simulation/halsim_ds_socket:halsim_ds_socket",
+]
+
+build_commands()
+
+build_examples(halsim_deps = halsim_deps)
+
+build_templates()
+
+wpilib_cc_binary(
+    name = "DevMainCpp",
+    srcs = ["src/dev/native/cpp/main.cpp"],
+)

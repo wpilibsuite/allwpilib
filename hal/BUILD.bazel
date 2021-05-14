@@ -1,0 +1,81 @@
+load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@wpi_bazel_rules//rules/projects:jni_project.bzl", "jni_project")
+
+ATHENA_SRCS = glob([
+    "src/main/native/athena/*.cpp",
+    "src/main/native/athena/*.h",
+    "src/main/native/athena/cpp/*.cpp",
+    "src/main/native/athena/ctre/*.cpp",
+    "src/main/native/athena/ctre/*.h",
+    "src/main/native/athena/frccansae/*.h",
+    "src/main/native/athena/mockdata/*.cpp",
+])
+
+ATHENA_DEPS = [
+    "@local_ni//:ni-libraries",
+]
+
+SIM_SRCS = glob([
+    "src/main/native/sim/*.cpp",
+    "src/main/native/sim/mockdata/*.cpp",
+    "src/main/native/sim/*.h",
+    "src/main/native/sim/mockdata/*.h",
+])
+
+SIM_DEPS = []
+
+HAL_DEPS = select({
+    "@wpi_bazel_rules//toolchains/conditions:roborio": ATHENA_DEPS,
+    "//conditions:default": SIM_DEPS,
+})
+
+filegroup(
+    name = "platform-srcs",
+    srcs = select({
+        "@wpi_bazel_rules//toolchains/conditions:roborio": ATHENA_SRCS,
+        "//conditions:default": SIM_SRCS,
+    }),
+)
+
+genrule(
+    name = "java-usage-gen",
+    outs = ["FRCNetComm.java"],
+    cmd = "$(locations //hal/src/generate:generate-java-resources) $@",
+    tools = ["//hal/src/generate:generate-java-resources"],
+)
+
+java_library(
+    name = "java-usage",
+    srcs = [":java-usage-gen"],
+)
+
+genrule(
+    name = "cpp-usage-gen",
+    outs = ["hal/FRCUsageReporting.h"],
+    cmd = "$(locations //hal/src/generate:generate-java-resources) $@",
+    tools = ["//hal/src/generate:generate-java-resources"],
+)
+
+cc_library(
+    name = "gen-cpp",
+    hdrs = [":cpp-usage-gen"],
+    strip_include_prefix = ".",
+)
+
+jni_project(
+    name = "wpiHal",
+    cc_additional_srcs = [":platform-srcs"],
+    cc_raw_deps = [":gen-cpp"] + HAL_DEPS,
+    cc_shared_deps = ["//wpiutil:wpiutil"],
+    java_additional_java_jni_files = [
+        "src/main/java/edu/wpi/first/hal/HAL.java",
+        "src/main/java/edu/wpi/first/hal/HALUtil.java",
+    ],
+    java_deps = [
+        "//wpiutil:java",
+        "java-usage",
+    ],
+    java_dev_main_class = "edu.wpi.first.hal.DevMain",
+    java_has_test = False,
+)

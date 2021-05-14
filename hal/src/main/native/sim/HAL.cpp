@@ -11,6 +11,7 @@
 #include <wpi/spinlock.h>
 
 #ifdef _WIN32
+#undef NOMINMAX
 #include <Windows.h>
 #pragma comment(lib, "Winmm.lib")
 #endif  // _WIN32

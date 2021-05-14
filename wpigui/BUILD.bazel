@@ -1,0 +1,48 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "get_wpigui_linker_flags", "wpilib_cc_library")
+load("@wpi_bazel_rules//rules/projects:cc_project.bzl", "cc_project")
+load("@wpi_bazel_rules//rules:objectivec.bzl", "wpilib_objc_library")
+
+WIN_SRCS = glob(["src/main/native/directx11/**/*.cpp"])
+
+LINUX_SRCS = glob(["src/main/native/opengl3/**/*.cpp"])
+
+MAC_SRCS = glob(["src/main/native/metal/**/*.mm"])
+
+wpilib_cc_library(
+    name = "headers",
+    hdrs = glob(["src/main/native/include/**/*"]),
+    strip_include_prefix = "src/main/native/include",
+)
+
+wpilib_objc_library(
+    name = "wpigui-mac",
+    srcs = MAC_SRCS,
+    deps = [
+        ":headers",
+        "@local_imgui//:imgui",
+    ],
+)
+
+cc_project(
+    name = "wpigui",
+    additional_srcs = select({
+        "@bazel_tools//src/conditions:windows": WIN_SRCS,
+        "@bazel_tools//src/conditions:linux_x86_64": LINUX_SRCS,
+        "@bazel_tools//src/conditions:darwin": [],
+    }),
+    has_test = False,
+    raw_deps = [
+        "@local_imgui//:imgui",
+        ":headers",
+    ] + select({
+        "@bazel_tools//src/conditions:darwin": [":wpigui-mac"],
+        "//conditions:default": [],
+    }),
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    test_linkopts = get_wpigui_linker_flags(),
+    wpi_shared_deps = ["//wpiutil:wpiutil"],
+)

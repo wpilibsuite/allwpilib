@@ -1,0 +1,12 @@
+load("//simulation:plugin.bzl", "wpilib_hal_plugin")
+
+wpilib_hal_plugin(
+    name = "halsim_ws_client",
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob(["src/main/native/include/*.h"]),
+    has_test = False,
+    raw_deps = [
+        "//simulation/halsim_ws_core:halsim_ws_core",
+    ],
+    strip_include_prefix = "src/main/native/include",
+)

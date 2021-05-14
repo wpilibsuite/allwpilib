@@ -225,3 +225,7 @@ compile_commands.json
 .cache/
 
 imgui.ini
+
+/.ijwb/
+/bazel-*
+user.bazelrc

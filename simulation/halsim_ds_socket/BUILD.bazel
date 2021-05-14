@@ -1,0 +1,13 @@
+load("//simulation:plugin.bzl", "wpilib_hal_plugin")
+
+wpilib_hal_plugin(
+    name = "halsim_ds_socket",
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob(["src/main/native/include/*.h"]),
+    has_test = True,
+    strip_include_prefix = "src/main/native/include",
+    wpi_shared_deps = [
+        "//hal:wpiHal",
+        "//wpiutil:wpiutil",
+    ],
+)

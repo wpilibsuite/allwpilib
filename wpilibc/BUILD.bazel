@@ -1,0 +1,36 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_library")
+load("@wpi_bazel_rules//rules/gen:gen-version-file.bzl", "generate_version_file")
+load("@wpi_bazel_rules//rules/projects:cc_project.bzl", "cc_project")
+
+generate_version_file(
+    name = "generate-version",
+    output_file = "WPILibVersion.cpp",
+    template = "src/generate/WPILibVersion.cpp.in",
+)
+
+cc_project(
+    name = "wpilibc",
+    additional_srcs = [
+        ":generate-version",
+        "src/main/native/cppcs/RobotBase.cpp",
+    ],
+    build_as_shared = True,
+    test_libraries = ["test-util"],
+    wpi_shared_deps = [
+        "//wpiutil:wpiutil",
+        "//hal:wpiHal",
+        "//cscore:cscore",
+        "//wpimath:wpimath",
+        "//ntcore:ntcore",
+        "//cameraserver:cpp",
+    ],
+)
+
+wpilib_cc_library(
+    name = "test-util",
+    hdrs = glob([
+        "src/test/native/include/*.h",
+        "src/test/native/include/shuffleboard/*.h",
+    ]),
+    strip_include_prefix = "src/test/native/include",
+)

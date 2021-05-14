@@ -1,0 +1,38 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "wpilib_cc_library", "wpilib_cc_test")
+
+wpilib_cc_library(
+    name = "test-utils",
+    hdrs = glob([
+        "src/main/native/include/*.h",
+        "src/main/native/include/command/*.h",
+        "src/main/native/include/shuffleboard/*.h",
+    ]),
+    strip_include_prefix = "src/main/native/include",
+)
+
+ATHENA_SRCS = glob([
+    "src/main/native/cpp/*.cpp",
+    "src/main/native/cpp/command/*.cpp",
+    "src/main/native/cpp/mockds/*.cpp",
+    "src/main/native/cpp/mockds/*.h",
+    "src/main/native/cpp/shuffleboard/*.cpp",
+])
+
+NON_ATHENA_SRCS = glob([
+    "src/main/native/dt/*.cpp",
+])
+
+wpilib_cc_test(
+    name = "cpp-test",
+    srcs = select({
+        "@wpi_bazel_rules//toolchains/conditions:roborio": ATHENA_SRCS,
+        "//conditions:default": NON_ATHENA_SRCS,
+    }),
+    raw_deps = [
+        "//wpilibOldCommands:cpp",
+        ":test-utils",
+    ],
+    wpi_shared_deps = [
+        "//wpilibc:wpilibc",
+    ],
+)

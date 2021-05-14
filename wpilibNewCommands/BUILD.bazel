@@ -1,0 +1,25 @@
+load("@wpi_bazel_rules//rules/projects:java_project.bzl", "java_project")
+load("@wpi_bazel_rules//rules/projects:cc_project.bzl", "cc_project")
+
+java_project(
+    name = "java",
+    dev_main_main_class = "edu.wpi.first.wpilibj.commands.DevMain",
+    test_deps = [
+        "@maven//:com_google_guava_guava",
+        "@maven//:org_mockito_mockito_core",
+    ],
+    wpi_shared_deps = [
+        "//ntcore:ntcorejni",
+        "//ntcore:ntcore",
+        "//wpiutil:wpiutiljni",
+        "//wpiutil:wpiutil",
+        "//hal:wpiHaljni",
+        "//hal:wpiHal",
+    ],
+    deps = ["//wpilibj:java"],
+)
+
+cc_project(
+    name = "cpp",
+    wpi_shared_deps = ["//wpilibc:wpilibc"],
+)

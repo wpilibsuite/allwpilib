@@ -1,0 +1,89 @@
+load("@wpi_bazel_rules//rules:cc.bzl", "get_wpigui_linker_flags", "wpilib_cc_binary", "wpilib_cc_library")
+load("@wpi_bazel_rules//rules/gen:gen-version-file.bzl", "generate_version_file")
+load("@wpi_bazel_rules//rules/gen:gen-resources.bzl", "generate_resources")
+
+wpilib_cc_library(
+    name = "libglass",
+    srcs = glob([
+        "src/lib/native/cpp/*.cpp",
+        "src/lib/native/cpp/hardware/*.cpp",
+        "src/lib/native/cpp/other/*.cpp",
+        "src/lib/native/cpp/support/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/lib/native/include/glass/*.h",
+        "src/lib/native/include/glass/*.inc",
+        "src/lib/native/include/glass/hardware/*.h",
+        "src/lib/native/include/glass/other/*.h",
+        "src/lib/native/include/glass/support/*.h",
+        "src/lib/native/include/glass/support/*.inl",
+    ]),
+    raw_deps = ["//wpigui:wpigui"],
+    strip_include_prefix = "src/lib/native/include",
+    #    features = ['windows_export_all_symbols'],
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    wpi_shared_deps = [
+        "//wpiutil:wpiutil",
+        "//wpimath:wpimath",
+        "//ntcore:ntcore",
+    ],
+)
+
+wpilib_cc_library(
+    name = "libglassnt",
+    srcs = glob(["src/libnt/native/cpp/*.cpp"]),
+    hdrs = glob(["src/libnt/native/include/**/*.h"]),
+    raw_deps = [":libglass"],
+    strip_include_prefix = "src/libnt/native/include",
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+    visibility = ["//visibility:public"],
+    wpi_shared_deps = [
+        "//ntcore:ntcore",
+    ],
+)
+
+generate_version_file(
+    name = "generate-version",
+    output_file = "WPILibVersion.cpp",
+    template = "src/app/generate/WPILibVersion.cpp.in",
+)
+
+generate_resources(
+    name = "generate-resources",
+    namespace = "glass",
+    prefix = "Hello",
+    resource_files = glob(["src/app/native/resources/*"]),
+)
+
+wpilib_cc_library(
+    name = "app-gen",
+    srcs = [
+        ":generate-resources",
+        ":generate-version",
+    ],
+    wpi_shared_deps = ["//wpiutil:wpiutil"],
+)
+
+wpilib_cc_binary(
+    name = "glassApp",
+    srcs = ["src/app/native/cpp/main.cpp"],
+    linkopts = get_wpigui_linker_flags(console = False),
+    raw_deps = [
+        "app-gen",
+        ":libglassnt",
+    ],
+    tags = [
+        "no-bionic",
+        "no-raspbian",
+        "no-roborio",
+    ],
+)
