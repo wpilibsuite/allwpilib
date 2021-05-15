@@ -35,6 +35,7 @@ class Preferences {
    * Get the one and only {@link Preferences} object.
    *
    * @return pointer to the {@link Preferences}
+   * @deprecated Use the static methods
    */
   static Preferences* GetInstance();
 

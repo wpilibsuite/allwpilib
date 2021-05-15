@@ -31,6 +31,7 @@ class CameraServer {
 
   /**
    * Get the CameraServer instance.
+   * @deprecated Use the static methods
    */
   static CameraServer* GetInstance();
 

@@ -241,7 +241,7 @@ public class DriverStation {
     }
   }
 
-  @Deprecated private static DriverStation instance = new DriverStation();
+  private static DriverStation instance = new DriverStation();
 
   // Joystick User Data
   private static HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
@@ -308,7 +308,6 @@ public class DriverStation {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
-  @Deprecated
   private DriverStation() {}
 
   static {

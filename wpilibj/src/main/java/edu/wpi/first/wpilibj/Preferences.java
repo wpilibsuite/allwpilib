@@ -50,7 +50,6 @@ public final class Preferences {
   }
 
   /** Creates a preference class. */
-  @Deprecated
   private Preferences() {}
 
   static {

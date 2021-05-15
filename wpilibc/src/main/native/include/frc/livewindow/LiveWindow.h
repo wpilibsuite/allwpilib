@@ -28,6 +28,8 @@ class LiveWindow {
    *
    * This is a singleton to guarantee that there is only a single instance
    * regardless of how many times GetInstance is called.
+   * @deprecated Use the static methods unless guaranteeing LiveWindow is
+   * instantiated
    */
   static LiveWindow* GetInstance();
 
