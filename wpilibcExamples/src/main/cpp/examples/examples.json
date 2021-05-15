@@ -52,6 +52,14 @@
     "commandversion": 2
   },
   {
+    "name":"Mechanism2d",
+    "foldername":"Mechanism2d",
+    "gradlebase":"cpp",
+    "description":"An example usage of Mechanism2d to display mechanism states on a dashboard.",
+    "tags":[],
+    "commandversion": 2
+  },
+  {
     "name": "Solenoids",
     "description": "Demonstrate controlling a single and double solenoid from Joystick buttons.",
     "tags": [

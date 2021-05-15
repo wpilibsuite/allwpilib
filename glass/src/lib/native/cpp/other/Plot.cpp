@@ -369,9 +369,9 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   }
 
   // DND source for PlotSeries
-  if (ImPlot::BeginLegendDragDropSource(label)) {
+  if (ImPlot::BeginDragDropSourceItem(label)) {
     EmitDragDropPayload(view, i, plotIndex);
-    ImPlot::EndLegendDragDropSource();
+    ImPlot::EndDragDropSource();
   }
 
   // Show full source name tooltip

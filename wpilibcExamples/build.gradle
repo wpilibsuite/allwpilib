@@ -46,6 +46,8 @@ ext {
     useCpp = true
 }
 
+def simModules = ["halsim_gui"]
+
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -95,6 +97,11 @@ model {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    }
+                    if (binary.targetPlatform.name == getCurrentArch()) {
+                        simModules.each {
+                            lib project: ":simulation:$it", library: it, linkage: 'shared'
+                        }
                     }
                 }
                 sources {
@@ -248,6 +255,54 @@ ext {
     commandDirectory = new File("$projectDir/src/main/cpp/commands/")
     commandFile = new File("$projectDir/src/main/cpp/commands/commands.json")
 }
+
+model {
+    // Create run tasks for all examples.
+    tasks {
+        // Iterate through the components and check if it is an example.
+        $.components.each { component ->
+            if (examplesMap.containsKey(component.name)) {
+                // Get the appropriate binary and create the run task.
+                component.binaries.each { binary ->
+                    if (binary.targetPlatform.name == getCurrentArch() && binary.buildType.name == "debug") {
+                        project.tasks.create("run${component.name}", Exec) {
+                            // Add simulation modules to HALSIM_EXTENSIONS environment variable.
+                            def setupEnv = {
+                                String extensions = ""
+                                binary.tasks.install.installDirectory.get().getAsFile().eachFileRecurse {
+                                    def name = it.name
+
+                                    // If we don't have a shared library, skip.
+                                    if (!(name.endsWith('.dll') || name.endsWith('.so') || name.endsWith('.dylib')))
+                                        return
+
+                                    def file = it
+                                    simModules.each {
+                                        if (name.startsWith(it) || name.startsWith("lib$it".toString())) {
+                                            extensions += file.absolutePath + File.pathSeparator
+                                        }
+                                    }
+                                }
+
+                                if (extensions != '') {
+                                    environment 'HALSIM_EXTENSIONS', extensions
+                                }
+                            }
+
+                            // Create the task dependency and run the executable.
+                            doFirst { setupEnv() }
+                            dependsOn binary.tasks.install
+                            commandLine binary.tasks.install.runScriptFile.get().asFile.toString()
+
+                            group = "application"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 ext {
     isCppCommands = true

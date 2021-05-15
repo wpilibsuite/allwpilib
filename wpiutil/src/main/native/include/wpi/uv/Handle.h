@@ -7,6 +7,7 @@
 
 #include <uv.h>
 
+#include <cstdlib>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -288,7 +289,7 @@ class HandleImpl : public Handle {
   }
 
  protected:
-  HandleImpl() : Handle{reinterpret_cast<uv_handle_t*>(new U)} {}
+  HandleImpl() : Handle{static_cast<uv_handle_t*>(std::malloc(sizeof(U)))} {}
 };
 
 }  // namespace wpi::uv

@@ -46,8 +46,8 @@ class MecanumDriveOdometryTest {
     var pose = m_odometry.updateWithTime(0.10, new Rotation2d(), wheelSpeeds);
 
     assertAll(
-        () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
-        () -> assertEquals(0, pose.getY(), 0.01),
+        () -> assertEquals(0.3536, pose.getX(), 0.01),
+        () -> assertEquals(0.0, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01));
   }
 
@@ -61,8 +61,8 @@ class MecanumDriveOdometryTest {
     final var pose = m_odometry.updateWithTime(1.0, Rotation2d.fromDegrees(90.0), wheelSpeeds);
 
     assertAll(
-        () -> assertEquals(12.0, pose.getX(), 0.01),
-        () -> assertEquals(12.0, pose.getY(), 0.01),
+        () -> assertEquals(8.4855, pose.getX(), 0.01),
+        () -> assertEquals(8.4855, pose.getY(), 0.01),
         () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01));
   }
 
@@ -76,8 +76,8 @@ class MecanumDriveOdometryTest {
     var pose = m_odometry.updateWithTime(1.0, gyro, speeds);
 
     assertAll(
-        () -> assertEquals(5.0, pose.getX(), 0.1),
-        () -> assertEquals(0.00, pose.getY(), 0.1),
-        () -> assertEquals(0.00, pose.getRotation().getRadians(), 0.1));
+        () -> assertEquals(3.536, pose.getX(), 0.1),
+        () -> assertEquals(0.0, pose.getY(), 0.1),
+        () -> assertEquals(0.0, pose.getRotation().getRadians(), 0.1));
   }
 }

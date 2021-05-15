@@ -4,8 +4,14 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SpeedController;
 
 /** Interface for motor controlling devices. */
 @SuppressWarnings("removal")
-public interface MotorController extends SpeedController {}
+public interface MotorController extends SpeedController {
+  @Override
+  default void setVoltage(double outputVolts) {
+    set(outputVolts / RobotController.getBatteryVoltage());
+  }
+}

@@ -11,7 +11,7 @@ def main():
     with open(f"{dirname}/src/generate/GenericNumber.java.in",
               "r") as templateFile:
         template = templateFile.read()
-        rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/wpiutil/math/numbers"
+        rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/numbers"
 
         if not os.path.exists(rootPath):
             os.makedirs(rootPath)
@@ -30,7 +30,7 @@ def main():
 
     with open(f"{dirname}/src/generate/Nat.java.in", "r") as templateFile:
         template = templateFile.read()
-        outputPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/wpiutil/math/Nat.java"
+        outputPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/Nat.java"
         with open(f"{dirname}/src/generate/NatGetter.java.in",
                   "r") as getterFile:
             getter = getterFile.read()

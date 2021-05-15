@@ -214,7 +214,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 
-  LiveWindow::GetInstance().SetEnabled(false);
+  LiveWindow::GetInstance()->SetEnabled(false);
 }
 
 RobotBase::RobotBase(RobotBase&&) noexcept

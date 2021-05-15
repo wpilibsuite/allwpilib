@@ -201,19 +201,19 @@ Scheduler::Scheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
   SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto& scheduler = frc::LiveWindow::GetInstance();
-  scheduler.enabled = [this] {
-    SetEnabled(false);
-    RemoveAll();
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this] {
+    this->SetEnabled(false);
+    this->RemoveAll();
   };
-  scheduler.disabled = [this] { SetEnabled(true); };
+  scheduler->disabled = [this] { this->SetEnabled(true); };
 }
 
 Scheduler::~Scheduler() {
   SendableRegistry::GetInstance().Remove(this);
-  auto& scheduler = frc::LiveWindow::GetInstance();
-  scheduler.enabled = nullptr;
-  scheduler.disabled = nullptr;
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
 }
 
 void Scheduler::Impl::Remove(Command* command) {

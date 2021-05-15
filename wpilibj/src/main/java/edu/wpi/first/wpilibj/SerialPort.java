@@ -95,6 +95,7 @@ public class SerialPort implements AutoCloseable {
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    * @deprecated Will be removed for 2019
    */
+  @Deprecated
   public SerialPort(
       final int baudRate,
       String portName,
