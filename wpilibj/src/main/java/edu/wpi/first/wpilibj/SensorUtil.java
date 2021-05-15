@@ -11,7 +11,6 @@ import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.RelayJNI;
-import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
@@ -55,14 +54,15 @@ public final class SensorUtil {
    * @param moduleNumber The solenoid module module number to check.
    */
   public static void checkSolenoidModule(final int moduleNumber) {
-    if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
-          .append(kPCMModules)
-          .append(", Requested: ")
-          .append(moduleNumber);
-      throw new IllegalArgumentException(buf.toString());
-    }
+    // TODO Fix me
+    // if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
+    //   StringBuilder buf = new StringBuilder();
+    //   buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
+    //       .append(kPCMModules)
+    //       .append(", Requested: ")
+    //       .append(moduleNumber);
+    //   throw new IllegalArgumentException(buf.toString());
+    // }
   }
 
   /**
@@ -156,14 +156,15 @@ public final class SensorUtil {
    * @param channel The channel number to check.
    */
   public static void checkSolenoidChannel(final int channel) {
-    if (!SolenoidJNI.checkSolenoidChannel(channel)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
-          .append(kSolenoidChannels)
-          .append(", Requested: ")
-          .append(channel);
-      throw new IllegalArgumentException(buf.toString());
-    }
+    // TODO Fix me
+    // if (!SolenoidJNI.checkSolenoidChannel(channel)) {
+    //   StringBuilder buf = new StringBuilder();
+    //   buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
+    //       .append(kSolenoidChannels)
+    //       .append(", Requested: ")
+    //       .append(channel);
+    //   throw new IllegalArgumentException(buf.toString());
+    // }
   }
 
   /**

@@ -6,8 +6,8 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.CTREPCMDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.SensorUtil;
+import edu.wpi.first.wpilibj.PneumaticsBase;
 
 /** Class to control a simulated Pneumatic Control Module (PCM). */
 public class PCMSim {
@@ -32,46 +32,8 @@ public class PCMSim {
    *
    * @param compressor Compressor connected to PCM to simulate
    */
-  public PCMSim(Compressor compressor) {
-    m_index = compressor.getModule();
-  }
-
-  /**
-   * Register a callback to be run when a solenoid is initialized on a channel.
-   *
-   * @param channel the channel to monitor
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
-   */
-  public CallbackStore registerSolenoidInitializedCallback(
-      int channel, NotifyCallback callback, boolean initialNotify) {
-    int uid =
-        CTREPCMDataJNI.registerSolenoidInitializedCallback(
-            m_index, channel, callback, initialNotify);
-    return new CallbackStore(
-        m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidInitializedCallback);
-  }
-
-  /**
-   * Check if a solenoid has been initialized on a specific channel.
-   *
-   * @param channel the channel to check
-   * @return true if initialized
-   */
-  public boolean getSolenoidInitialized(int channel) {
-    return CTREPCMDataJNI.getSolenoidInitialized(m_index, channel);
-  }
-
-  /**
-   * Define whether a solenoid has been initialized on a specific channel.
-   *
-   * @param channel the channel
-   * @param solenoidInitialized is there a solenoid initialized on that channel
-   */
-  public void setSolenoidInitialized(int channel, boolean solenoidInitialized) {
-    CTREPCMDataJNI.setSolenoidInitialized(m_index, channel, solenoidInitialized);
+  public PCMSim(PneumaticsBase module) {
+    m_index = module.getModuleNumber();
   }
 
   /**
@@ -118,11 +80,11 @@ public class PCMSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerCompressorInitializedCallback(
+  public CallbackStore registerInitializedCallback(
       NotifyCallback callback, boolean initialNotify) {
     int uid =
-        CTREPCMDataJNI.registerCompressorInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorInitializedCallback);
+        CTREPCMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelInitializedCallback);
   }
 
   /**
@@ -130,17 +92,17 @@ public class PCMSim {
    *
    * @return true if initialized
    */
-  public boolean getCompressorInitialized() {
-    return CTREPCMDataJNI.getCompressorInitialized(m_index);
+  public boolean getInitialized() {
+    return CTREPCMDataJNI.getInitialized(m_index);
   }
 
   /**
    * Define whether the compressor has been initialized.
    *
-   * @param compressorInitialized whether the compressor is initialized
+   * @param initialized whether the compressor is initialized
    */
-  public void setCompressorInitialized(boolean compressorInitialized) {
-    CTREPCMDataJNI.setCompressorInitialized(m_index, compressorInitialized);
+  public void setInitialized(boolean initialized) {
+    CTREPCMDataJNI.setInitialized(m_index, initialized);
   }
 
   /**
