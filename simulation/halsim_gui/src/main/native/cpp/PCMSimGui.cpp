@@ -40,7 +40,7 @@ class CompressorSimModel : public glass::CompressorModel {
   void Update() override {}
 
   bool Exists() override {
-    return HALSIM_GetCTREPCMCompressorInitialized(m_index);
+    return HALSIM_GetCTREPCMInitialized(m_index);
   }
 
   glass::DataSource* GetRunningData() override { return &m_running; }
@@ -79,7 +79,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
   void Update() override {}
 
   bool Exists() override {
-    return HALSIM_GetCTREPCMSolenoidInitialized(m_index, m_channel);
+    return HALSIM_GetCTREPCMInitialized(m_index);
   }
 
   glass::DataSource* GetOutputData() override { return &m_output; }
@@ -141,7 +141,7 @@ void PCMSimModel::Update() {
   m_solenoidInitCount = 0;
   for (int32_t i = 0; i < numChannels; ++i) {
     auto& model = m_solenoids[i];
-    if (HALSIM_GetCTREPCMSolenoidInitialized(m_index, i)) {
+    if (HALSIM_GetCTREPCMInitialized(m_index)) {
       if (!model) {
         model = std::make_unique<SolenoidSimModel>(m_index, i);
       }
@@ -169,8 +169,7 @@ void PCMsSimModel::Update() {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     auto& model = m_models[i];
-    if (HALSIM_GetCTREPCMCompressorInitialized(i) ||
-        HALSIM_GetCTREPCMAnySolenoidInitialized(i)) {
+    if (HALSIM_GetCTREPCMInitialized(i)) {
       if (!model) {
         model = std::make_unique<PCMSimModel>(i);
       }
@@ -194,8 +193,7 @@ void PCMsSimModel::ForEachPCM(
 static bool PCMsAnyInitialized() {
   static const int32_t num = HAL_GetNumCTREPCMModules();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetCTREPCMCompressorInitialized(i) ||
-        HALSIM_GetCTREPCMAnySolenoidInitialized(i)) {
+    if (HALSIM_GetCTREPCMInitialized(i)) {
       return true;
     }
   }
