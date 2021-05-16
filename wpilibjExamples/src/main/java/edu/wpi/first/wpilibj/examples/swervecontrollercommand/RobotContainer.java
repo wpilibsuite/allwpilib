@@ -53,7 +53,8 @@ public class RobotContainer {
                     m_driverController.getY(GenericHID.Hand.kLeft),
                     m_driverController.getX(GenericHID.Hand.kRight),
                     m_driverController.getX(GenericHID.Hand.kLeft),
-                    false)));
+                    false),
+            m_robotDrive));
   }
 
   /**
