@@ -39,17 +39,17 @@ constexpr int kRearRightTurningMotorPort = 7;
 constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
 constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
 constexpr int kFrontRightTurningEncoderPorts[2]{4, 5};
-constexpr int kRearRightTurningEncoderPorts[2]{5, 6};
+constexpr int kRearRightTurningEncoderPorts[2]{6, 7};
 
 constexpr bool kFrontLeftTurningEncoderReversed = false;
 constexpr bool kRearLeftTurningEncoderReversed = true;
 constexpr bool kFrontRightTurningEncoderReversed = false;
 constexpr bool kRearRightTurningEncoderReversed = true;
 
-constexpr int kFrontLeftDriveEncoderPorts[2]{0, 1};
-constexpr int kRearLeftDriveEncoderPorts[2]{2, 3};
-constexpr int kFrontRightDriveEncoderPorts[2]{4, 5};
-constexpr int kRearRightDriveEncoderPorts[2]{5, 6};
+constexpr int kFrontLeftDriveEncoderPorts[2]{8, 9};
+constexpr int kRearLeftDriveEncoderPorts[2]{10, 11};
+constexpr int kFrontRightDriveEncoderPorts[2]{12, 13};
+constexpr int kRearRightDriveEncoderPorts[2]{14, 15};
 
 constexpr bool kFrontLeftDriveEncoderReversed = false;
 constexpr bool kRearLeftDriveEncoderReversed = true;

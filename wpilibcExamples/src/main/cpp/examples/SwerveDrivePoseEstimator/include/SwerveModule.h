@@ -18,7 +18,9 @@
 
 class SwerveModule {
  public:
-  SwerveModule(int driveMotorChannel, int turningMotorChannel);
+  SwerveModule(int driveMotorChannel, int turningMotorChannel,
+               int driveEncoderChannelA, int driveEncoderChannelB,
+               int turningEncoderChannelA, int turningEncoderChannelB);
   frc::SwerveModuleState GetState() const;
   void SetDesiredState(const frc::SwerveModuleState& state);
 
@@ -34,8 +36,8 @@ class SwerveModule {
   frc::PWMSparkMax m_driveMotor;
   frc::PWMSparkMax m_turningMotor;
 
-  frc::Encoder m_driveEncoder{0, 1};
-  frc::Encoder m_turningEncoder{2, 3};
+  frc::Encoder m_driveEncoder;
+  frc::Encoder m_turningEncoder;
 
   frc2::PIDController m_drivePIDController{1.0, 0, 0};
   frc::ProfiledPIDController<units::radians> m_turningPIDController{

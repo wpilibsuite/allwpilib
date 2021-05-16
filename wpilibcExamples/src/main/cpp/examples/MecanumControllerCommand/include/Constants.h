@@ -34,7 +34,7 @@ constexpr int kRearRightMotorPort = 3;
 constexpr int kFrontLeftEncoderPorts[]{0, 1};
 constexpr int kRearLeftEncoderPorts[]{2, 3};
 constexpr int kFrontRightEncoderPorts[]{4, 5};
-constexpr int kRearRightEncoderPorts[]{5, 6};
+constexpr int kRearRightEncoderPorts[]{6, 7};
 
 constexpr bool kFrontLeftEncoderReversed = false;
 constexpr bool kRearLeftEncoderReversed = true;
