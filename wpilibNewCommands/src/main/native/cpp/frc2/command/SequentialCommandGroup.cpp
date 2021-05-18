@@ -83,7 +83,7 @@ SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
       std::make_unique<InstantCommand>(std::move(toRun), requirements));
   for (auto&& command : m_commands) {
     command->SetGrouped(false);
-    tmp.emplace_back(command);
+    tmp.emplace_back(std::move(command));
   }
 
   // reset current state
