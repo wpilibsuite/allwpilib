@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <shared_mutex>
+#include <mutex>
 
 #include <wpi/StringMap.h>
 
