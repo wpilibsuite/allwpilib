@@ -46,13 +46,13 @@
 #include "src/Eigenvalues/MatrixBaseEigenvalues.h"
 #ifdef EIGEN_USE_LAPACKE
 #ifdef EIGEN_USE_MKL
-#include "mkl_lapacke.h"
+// #include "mkl_lapacke.h"
 #else
-#include "src/misc/lapacke.h"
+// #include "src/misc/lapacke.h"
 #endif
-#include "src/Eigenvalues/RealSchur_LAPACKE.h"
-#include "src/Eigenvalues/ComplexSchur_LAPACKE.h"
-#include "src/Eigenvalues/SelfAdjointEigenSolver_LAPACKE.h"
+// #include "src/Eigenvalues/RealSchur_LAPACKE.h"
+// #include "src/Eigenvalues/ComplexSchur_LAPACKE.h"
+// #include "src/Eigenvalues/SelfAdjointEigenSolver_LAPACKE.h"
 #endif
 
 #include "src/Core/util/ReenableStupidWarnings.h"
