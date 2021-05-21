@@ -302,7 +302,7 @@ public abstract class RobotBase implements AutoCloseable {
           elements);
       DriverStation.reportWarning("Robots should not quit, but yours did!"
           + " Please read the above stacktrace and verify your robot logic."
-          + " Go to https://wpilib.org/stacktrace for help debuging.", false);
+          + " Go to https://wpilib.org/stacktrace for help debugging.", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
