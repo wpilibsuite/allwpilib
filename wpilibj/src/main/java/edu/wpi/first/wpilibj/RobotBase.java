@@ -300,9 +300,11 @@ public abstract class RobotBase implements AutoCloseable {
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
           elements);
-      DriverStation.reportWarning("Robots should not quit, but yours did!"
-          + " Please read the above stacktrace and verify your robot logic."
-          + " Go to https://wpilib.org/stacktrace for help debugging.", false);
+      DriverStation.reportWarning(
+        "The robot program quit unexpectedly."
+            + " This is usually due to a code error."
+            + " The above stacktrace can help determine where the error occurred."
+            + " See https://wpilib.org/stacktrace for more information.", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
@@ -349,9 +351,11 @@ public abstract class RobotBase implements AutoCloseable {
       m_runMutex.unlock();
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
-        DriverStation.reportWarning("Robots should not quit, but yours did!"
-          + " Please read the above stacktrace and verify your robot logic."
-          + " Go to https://wpilib.org/stacktrace for help debuging.", false);
+        DriverStation.reportWarning(
+            "The robot program quit unexpectedly."
+                + " This is usually due to a code error."
+                + " The above stacktrace can help determine where the error occurred."
+                + " See https://wpilib.org/stacktrace for more information.", false);
         if (errorOnExit) {
           DriverStation.reportError(
               "The startCompetition() method (or methods called by it) should have "
