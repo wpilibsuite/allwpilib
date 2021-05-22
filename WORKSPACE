@@ -21,9 +21,9 @@ http_archive(
 #############################################
 git_repository(
     name = "wpi_bazel_deps",
-    commit = "8a30cd98ea9e60f6fec1cb3c05403c32e065bd09",
+    commit = "5afa8e5524e49c054a89d26886feff2735fbacc1",
     remote = "https://github.com/bazelRio/wpi-bazel-deps-rules",
-    shallow_since = "1621631074 -0400",
+    shallow_since = "1621648470 -0400",
 )
 
 git_repository(
