@@ -58,6 +58,8 @@ generatedFileExclude {
   src/main/native/include/wpi/iterator_range\.h$
   src/main/native/include/wpi/raw_os_ostream\.h$
   src/main/native/include/wpi/raw_ostream\.h$
+  src/main/native/include/wpi/span\.h$
+  src/test/native/cpp/span/
   src/main/native/include/wpi/type_traits\.h$
   src/main/native/cpp/json
   src/main/native/include/wpi/json
