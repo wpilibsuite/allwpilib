@@ -57,7 +57,7 @@ def eigen_inclusions(dp, f):
     if f == "CMakeLists.txt":
         return False
 
-    # Exclude code licensed under MPL2
+    # Exclude NonMPL2.h since all non-MPL2 code will be excluded anyway
     if f == "NonMPL2.h":
         return False
 
