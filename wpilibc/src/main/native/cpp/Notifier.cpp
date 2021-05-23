@@ -13,7 +13,6 @@
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 
 using namespace frc;
 

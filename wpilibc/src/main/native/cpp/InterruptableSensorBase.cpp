@@ -5,7 +5,6 @@
 #include "frc/InterruptableSensorBase.h"
 
 #include "frc/Errors.h"
-#include "frc/Utility.h"
 
 using namespace frc;
 

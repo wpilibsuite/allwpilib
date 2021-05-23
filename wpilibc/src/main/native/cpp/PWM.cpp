@@ -14,7 +14,6 @@
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/Utility.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -119,7 +118,7 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
       HAL_SetPWMPeriodScale(m_handle, 0, &status);  // Don't squelch any outputs
       break;
     default:
-      wpi_assert(false);
+      throw FRC_MakeError(err::InvalidParameter, "PeriodMultiplier value");
   }
 
   FRC_CheckErrorStatus(status, "SetPeriodMultiplier");

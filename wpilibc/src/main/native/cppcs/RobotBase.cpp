@@ -20,7 +20,6 @@
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc/RobotState.h"
-#include "frc/Utility.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
