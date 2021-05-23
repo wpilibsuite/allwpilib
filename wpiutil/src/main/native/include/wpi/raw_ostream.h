@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <system_error>
 
@@ -182,6 +183,21 @@ public:
   }
 
   raw_ostream &operator<<(StringRef Str) {
+    // Inline fast path, particularly for strings with a known length.
+    size_t Size = Str.size();
+
+    // Make sure we can use the fast path.
+    if (Size > (size_t)(OutBufEnd - OutBufCur))
+      return write(Str.data(), Size);
+
+    if (Size) {
+      memcpy(OutBufCur, Str.data(), Size);
+      OutBufCur += Size;
+    }
+    return *this;
+  }
+
+  raw_ostream &operator<<(std::string_view Str) {
     // Inline fast path, particularly for strings with a known length.
     size_t Size = Str.size();
 
