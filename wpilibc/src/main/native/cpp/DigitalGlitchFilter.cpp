@@ -16,7 +16,6 @@
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/Utility.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;

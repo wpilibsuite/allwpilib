@@ -14,7 +14,6 @@
 #include "frc/DigitalOutput.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -83,7 +82,10 @@ Ultrasonic::~Ultrasonic() {
 }
 
 void Ultrasonic::Ping() {
-  wpi_assert(!m_automaticEnabled);
+  if (m_automaticEnabled) {
+    throw FRC_MakeError(err::IncompatibleMode,
+                        "cannot call Ping() in automatic mode");
+  }
 
   // Reset the counter to zero (invalid data now)
   m_counter.Reset();
