@@ -17,6 +17,9 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/n4820.pdf
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
+#if __has_include(<span>)
+#include <span>
+#endif
 
 namespace wpi {
 
@@ -219,6 +222,12 @@ public:
         : storage_(other.data(), other.size())
     {}
 
+#ifdef __cpp_lib_span
+    constexpr span(std::span<ElementType> other) noexcept
+        : storage_(other.data(), other.size())
+    {}
+#endif
+
     ~span() noexcept = default;
 
     constexpr span&
@@ -326,6 +335,15 @@ public:
     {
         return reverse_iterator(begin());
     }
+
+#ifdef __cpp_lib_span
+    constexpr operator auto() const {
+      return std::span < ElementType,
+             (Extent == dynamic_extent)
+                 ? std::dynamic_extent
+                 : Extent > (storage_.ptr, storage_.size);
+    }
+#endif
 
 private:
     storage_type storage_{};
