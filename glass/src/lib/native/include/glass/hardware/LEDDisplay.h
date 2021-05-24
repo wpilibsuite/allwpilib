@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
+#include <wpi/function_ref.h>
 #include <wpi/span.h>
 
 #include "glass/Model.h"

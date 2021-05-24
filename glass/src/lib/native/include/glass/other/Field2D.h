@@ -10,7 +10,7 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
-#include <wpi/STLExtras.h>
+#include <wpi/function_ref.h>
 #include <wpi/span.h>
 
 #include "glass/Model.h"

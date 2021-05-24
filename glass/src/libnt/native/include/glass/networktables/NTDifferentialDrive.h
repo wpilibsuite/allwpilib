@@ -9,7 +9,6 @@
 #include <vector>
 
 #include <ntcore_cpp.h>
-#include <wpi/STLExtras.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
