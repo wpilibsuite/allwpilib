@@ -8,20 +8,20 @@
 
 using namespace frc;
 
-PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d)
+PIDSubsystem::PIDSubsystem(std::string_view name, double p, double i, double d)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
   AddChild("PIDController", m_controller);
 }
 
-PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d,
+PIDSubsystem::PIDSubsystem(std::string_view name, double p, double i, double d,
                            double f)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
   AddChild("PIDController", m_controller);
 }
 
-PIDSubsystem::PIDSubsystem(const wpi::Twine& name, double p, double i, double d,
+PIDSubsystem::PIDSubsystem(std::string_view name, double p, double i, double d,
                            double f, double period)
     : Subsystem(name) {
   m_controller =

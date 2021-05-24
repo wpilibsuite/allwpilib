@@ -4,6 +4,7 @@
 
 #include "frc/PowerDistributionPanel.h"
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/Ports.h>
@@ -99,7 +100,7 @@ void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty(
-        "Chan" + wpi::Twine(i), [=]() { return GetCurrent(i); }, nullptr);
+        fmt::format("Chan{}", i), [=]() { return GetCurrent(i); }, nullptr);
   }
   builder.AddDoubleProperty(
       "Voltage", [=]() { return GetVoltage(); }, nullptr);

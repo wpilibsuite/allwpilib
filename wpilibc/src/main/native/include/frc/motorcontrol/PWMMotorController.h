@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
@@ -68,7 +68,7 @@ class PWMMotorController : public MotorController,
    * @param channel The PWM channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  PWMMotorController(const wpi::Twine& name, int channel);
+  PWMMotorController(std::string_view name, int channel);
 
   void InitSendable(SendableBuilder& builder) override;
 

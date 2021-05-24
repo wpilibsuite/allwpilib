@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/Command.h"
 
@@ -23,7 +23,7 @@ class TimedCommand : public Command {
    * @param name    the name of the command
    * @param timeout the time (in seconds) before this command "times out"
    */
-  TimedCommand(const wpi::Twine& name, double timeout);
+  TimedCommand(std::string_view name, double timeout);
 
   /**
    * Creates a new WaitCommand with the given timeout.
@@ -39,7 +39,7 @@ class TimedCommand : public Command {
    * @param timeout   the time (in seconds) before this command "times out"
    * @param subsystem the subsystem that the command requires
    */
-  TimedCommand(const wpi::Twine& name, double timeout, Subsystem& subsystem);
+  TimedCommand(std::string_view name, double timeout, Subsystem& subsystem);
 
   /**
    * Creates a new WaitCommand with the given timeout.

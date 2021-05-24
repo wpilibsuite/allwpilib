@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-MechanismLigament2d::MechanismLigament2d(const wpi::Twine& name, double length,
+MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          units::degree_t angle,
                                          double lineWeight,
                                          const frc::Color8Bit& color)

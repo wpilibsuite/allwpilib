@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/Command.h"
 
@@ -13,7 +13,7 @@ namespace frc {
 class WaitForChildren : public Command {
  public:
   explicit WaitForChildren(double timeout);
-  WaitForChildren(const wpi::Twine& name, double timeout);
+  WaitForChildren(std::string_view name, double timeout);
   ~WaitForChildren() override = default;
 
   WaitForChildren(WaitForChildren&&) = default;

@@ -4,9 +4,8 @@
 
 #pragma once
 
+#include <string_view>
 #include <vector>
-
-#include <wpi/Twine.h>
 
 #include "frc/commands/Command.h"
 #include "frc/commands/CommandGroupEntry.h"
@@ -39,7 +38,7 @@ class CommandGroup : public Command {
    *
    * @param name The name for this command group
    */
-  explicit CommandGroup(const wpi::Twine& name);
+  explicit CommandGroup(std::string_view name);
 
   ~CommandGroup() override = default;
 

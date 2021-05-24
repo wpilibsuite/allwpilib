@@ -13,7 +13,7 @@ WaitUntilCommand::WaitUntilCommand(double time)
   m_time = time;
 }
 
-WaitUntilCommand::WaitUntilCommand(const wpi::Twine& name, double time)
+WaitUntilCommand::WaitUntilCommand(std::string_view name, double time)
     : Command(name, time) {
   m_time = time;
 }

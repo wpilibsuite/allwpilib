@@ -6,8 +6,7 @@
 
 using namespace frc;
 
-MechanismObject2d::MechanismObject2d(const wpi::Twine& name)
-    : m_name{name.str()} {}
+MechanismObject2d::MechanismObject2d(std::string_view name) : m_name{name} {}
 
 const std::string& MechanismObject2d::GetName() const {
   return m_name;

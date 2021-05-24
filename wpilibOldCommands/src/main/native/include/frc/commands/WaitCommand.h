@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/TimedCommand.h"
 
@@ -25,7 +25,7 @@ class WaitCommand : public TimedCommand {
    *
    * @param timeout the time (in seconds) before this command "times out"
    */
-  WaitCommand(const wpi::Twine& name, double timeout);
+  WaitCommand(std::string_view name, double timeout);
 
   ~WaitCommand() override = default;
 

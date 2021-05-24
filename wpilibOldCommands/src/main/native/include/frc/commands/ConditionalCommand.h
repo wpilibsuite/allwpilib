@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/Command.h"
 
@@ -46,7 +46,7 @@ class ConditionalCommand : public Command {
    * @param onTrue  The Command to execute if Condition() returns true
    * @param onFalse The Command to execute if Condition() returns false
    */
-  ConditionalCommand(const wpi::Twine& name, Command* onTrue,
+  ConditionalCommand(std::string_view name, Command* onTrue,
                      Command* onFalse = nullptr);
 
   ~ConditionalCommand() override = default;

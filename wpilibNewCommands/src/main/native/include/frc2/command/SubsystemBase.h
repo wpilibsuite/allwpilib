@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
@@ -34,7 +35,7 @@ class SubsystemBase : public Subsystem,
    *
    * @param name name
    */
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
 
   /**
    * Gets the subsystem name of this Subsystem.
@@ -48,7 +49,7 @@ class SubsystemBase : public Subsystem,
    *
    * @param subsystem subsystem name
    */
-  void SetSubsystem(const wpi::Twine& name);
+  void SetSubsystem(std::string_view name);
 
   /**
    * Associate a Sendable with this Subsystem.

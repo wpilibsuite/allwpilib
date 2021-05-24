@@ -8,13 +8,13 @@
 
 #include <atomic>
 #include <functional>
+#include <string_view>
 #include <thread>
 #include <type_traits>
 #include <utility>
 
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
@@ -71,7 +71,7 @@ class Notifier {
    *
    * @param name Name
    */
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
 
   /**
    * Change the handler function.

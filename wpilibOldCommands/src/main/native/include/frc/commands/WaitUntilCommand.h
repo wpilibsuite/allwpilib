@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/Command.h"
 
@@ -22,7 +22,7 @@ class WaitUntilCommand : public Command {
    */
   explicit WaitUntilCommand(double time);
 
-  WaitUntilCommand(const wpi::Twine& name, double time);
+  WaitUntilCommand(std::string_view name, double time);
 
   ~WaitUntilCommand() override = default;
 

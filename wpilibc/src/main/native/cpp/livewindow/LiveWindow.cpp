@@ -15,8 +15,6 @@
 
 using namespace frc;
 
-using wpi::Twine;
-
 struct LiveWindow::Impl {
   Impl();
 

@@ -4,10 +4,12 @@
 
 #include "frc/commands/WaitCommand.h"
 
+#include <fmt/format.h>
+
 using namespace frc;
 
 WaitCommand::WaitCommand(double timeout)
-    : TimedCommand("Wait(" + std::to_string(timeout) + ")", timeout) {}
+    : TimedCommand(fmt::format("Wait({})", timeout), timeout) {}
 
-WaitCommand::WaitCommand(const wpi::Twine& name, double timeout)
+WaitCommand::WaitCommand(std::string_view name, double timeout)
     : TimedCommand(name, timeout) {}

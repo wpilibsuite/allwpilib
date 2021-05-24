@@ -5,10 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <hal/Types.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 
 namespace frc {
@@ -82,7 +81,7 @@ class SerialPort {
    * @param stopBits The number of stop bits to use as defined by the enum
    *                 StopBits.
    */
-  SerialPort(int baudRate, const wpi::Twine& portName, Port port = kOnboard,
+  SerialPort(int baudRate, std::string_view portName, Port port = kOnboard,
              int dataBits = 8, Parity parity = kParity_None,
              StopBits stopBits = kStopBits_One);
 
@@ -148,7 +147,7 @@ class SerialPort {
    * @param buffer StringRef to the buffer to read the bytes from.
    * @return The number of bytes actually written into the port.
    */
-  int Write(wpi::StringRef buffer);
+  int Write(std::string_view buffer);
 
   /**
    * Configure the timeout of the serial port.

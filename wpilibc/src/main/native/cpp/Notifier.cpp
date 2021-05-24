@@ -6,10 +6,10 @@
 
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 #include <hal/Threads.h>
-#include <wpi/SmallString.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
@@ -138,11 +138,12 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   return *this;
 }
 
-void Notifier::SetName(const wpi::Twine& name) {
-  wpi::SmallString<64> nameBuf;
+void Notifier::SetName(std::string_view name) {
+  fmt::memory_buffer buf;
+  fmt::format_to(buf, "{}", name);
+  buf.push_back('\0');  // null terminate
   int32_t status = 0;
-  HAL_SetNotifierName(m_notifier,
-                      name.toNullTerminatedStringRef(nameBuf).data(), &status);
+  HAL_SetNotifierName(m_notifier, buf.data(), &status);
 }
 
 void Notifier::SetHandler(std::function<void()> handler) {
