@@ -1,5 +1,5 @@
 name: Does this Work? lol
-on: [push]
+on: [pull_request, push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
