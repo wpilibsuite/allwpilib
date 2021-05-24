@@ -58,7 +58,7 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(const wpi::Twine& title) {
   auto titleRef = title.toStringRef(storage);
   if (m_layouts.count(titleRef) == 0) {
     throw FRC_MakeError(err::InvalidParameter,
-                        "No layout with the given title has been defined");
+                        "No layout with title {} has been defined", titleRef);
   }
   return *m_layouts[titleRef];
 }

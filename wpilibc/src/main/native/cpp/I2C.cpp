@@ -17,7 +17,7 @@ I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
-  FRC_CheckErrorStatus(status, "Port " + wpi::Twine{static_cast<int>(port)});
+  FRC_CheckErrorStatus(status, "Port {}", port);
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
@@ -55,10 +55,10 @@ bool I2C::WriteBulk(uint8_t* data, int count) {
 
 bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
   if (count < 1) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "count " + wpi::Twine{count});
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
   if (!buffer) {
-    throw FRC_MakeError(err::NullParameter, "buffer");
+    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
   }
   uint8_t regAddr = registerAddress;
   return Transaction(&regAddr, sizeof(regAddr), buffer, count);
@@ -66,10 +66,10 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
 
 bool I2C::ReadOnly(int count, uint8_t* buffer) {
   if (count < 1) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "count " + wpi::Twine{count});
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
   if (!buffer) {
-    throw FRC_MakeError(err::NullParameter, "buffer");
+    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
   }
   return HAL_ReadI2C(m_port, m_deviceAddress, buffer, count) < 0;
 }

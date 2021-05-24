@@ -23,8 +23,7 @@ using namespace frc;
 Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   if (!SensorUtil::CheckRelayChannel(m_channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange,
-                        "Relay Channel " + wpi::Twine{m_channel});
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
     return;
   }
 
@@ -35,7 +34,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     std::string stackTrace = wpi::GetStackTrace(1);
     m_forwardHandle =
         HAL_InitializeRelayPort(portHandle, true, stackTrace.c_str(), &status);
-    FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
+    FRC_CheckErrorStatus(status, "Channel {}", m_channel);
     HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel + 1);
   }
   if (m_direction == kBothDirections || m_direction == kReverseOnly) {
@@ -43,18 +42,18 @@ Relay::Relay(int channel, Relay::Direction direction)
     std::string stackTrace = wpi::GetStackTrace(1);
     m_reverseHandle =
         HAL_InitializeRelayPort(portHandle, false, stackTrace.c_str(), &status);
-    FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
+    FRC_CheckErrorStatus(status, "Channel {}", m_channel);
     HAL_Report(HALUsageReporting::kResourceType_Relay, m_channel + 128);
   }
 
   int32_t status = 0;
   if (m_forwardHandle != HAL_kInvalidHandle) {
     HAL_SetRelay(m_forwardHandle, false, &status);
-    FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
+    FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   }
   if (m_reverseHandle != HAL_kInvalidHandle) {
     HAL_SetRelay(m_reverseHandle, false, &status);
-    FRC_CheckErrorStatus(status, "Relay Channel " + wpi::Twine{m_channel});
+    FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   }
 
   SendableRegistry::GetInstance().AddLW(this, "Relay", m_channel);
@@ -95,7 +94,8 @@ void Relay::Set(Relay::Value value) {
       break;
     case kForward:
       if (m_direction == kReverseOnly) {
-        FRC_ReportError(err::IncompatibleMode, "setting forward");
+        FRC_ReportError(err::IncompatibleMode, "channel {} setting {}",
+                        m_channel, "forward");
         break;
       }
       if (m_direction == kBothDirections || m_direction == kForwardOnly) {
@@ -107,7 +107,8 @@ void Relay::Set(Relay::Value value) {
       break;
     case kReverse:
       if (m_direction == kForwardOnly) {
-        FRC_ReportError(err::IncompatibleMode, "setting reverse");
+        FRC_ReportError(err::IncompatibleMode, "channel {} setting {}",
+                        m_channel, "reverse");
         break;
       }
       if (m_direction == kBothDirections) {
@@ -119,7 +120,7 @@ void Relay::Set(Relay::Value value) {
       break;
   }
 
-  FRC_CheckErrorStatus(status, "Set");
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 Relay::Value Relay::Get() const {
@@ -154,7 +155,7 @@ Relay::Value Relay::Get() const {
     }
   }
 
-  FRC_CheckErrorStatus(status, "Get");
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
   return value;
 }

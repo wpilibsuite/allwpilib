@@ -32,7 +32,7 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
 Command::Command(const wpi::Twine& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
   }
 
   m_timeout = timeout;
@@ -77,7 +77,7 @@ void Command::Requires(Subsystem* subsystem) {
   if (subsystem != nullptr) {
     m_requirements.insert(subsystem);
   } else {
-    throw FRC_MakeError(err::NullParameter, "subsystem");
+    throw FRC_MakeError(err::NullParameter, "{}", "subsystem");
   }
 }
 
@@ -85,7 +85,7 @@ void Command::Start() {
   LockChanges();
   if (m_parent != nullptr) {
     throw FRC_MakeError(
-        err::CommandIllegalUse,
+        err::CommandIllegalUse, "{}",
         "Can not start a command that is part of a command group");
   }
 
@@ -116,7 +116,7 @@ bool Command::Run() {
 void Command::Cancel() {
   if (m_parent != nullptr) {
     throw FRC_MakeError(
-        err::CommandIllegalUse,
+        err::CommandIllegalUse, "{}",
         "Can not cancel a command that is part of a command group");
   }
 
@@ -173,7 +173,7 @@ int Command::GetID() const {
 
 void Command::SetTimeout(double timeout) {
   if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
   } else {
     m_timeout = timeout;
   }
@@ -187,18 +187,16 @@ bool Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
     throw FRC_MakeError(
         err::CommandIllegalUse,
-        message +
-            wpi::Twine{
-                " after being started or being added to a command group"});
+        "{} after being started or being added to a command group", message);
   }
   return true;
 }
 
 void Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "parent");
+    throw FRC_MakeError(err::NullParameter, "{}", "parent");
   } else if (m_parent != nullptr) {
-    throw FRC_MakeError(err::CommandIllegalUse,
+    throw FRC_MakeError(err::CommandIllegalUse, "{}",
                         "Can not give command to a command group after "
                         "already being put in a command group");
   } else {

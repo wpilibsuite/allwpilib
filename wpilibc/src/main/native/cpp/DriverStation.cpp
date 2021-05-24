@@ -140,8 +140,7 @@ void DriverStation::ReportError(bool isError, int32_t code,
 
 bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button <= 0) {
@@ -164,8 +163,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
 
 bool DriverStation::GetStickButtonPressed(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button <= 0) {
@@ -194,8 +192,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
 
 bool DriverStation::GetStickButtonReleased(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
   if (button <= 0) {
@@ -224,13 +221,11 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
 
 double DriverStation::GetStickAxis(int stick, int axis) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0.0;
   }
   if (axis < 0 || axis >= HAL_kMaxJoystickAxes) {
-    FRC_ReportError(warn::BadJoystickAxis,
-                    "axis " + wpi::Twine{axis} + " out of range");
+    FRC_ReportError(warn::BadJoystickAxis, "axis {} out of range", axis);
     return 0.0;
   }
 
@@ -248,13 +243,11 @@ double DriverStation::GetStickAxis(int stick, int axis) {
 
 int DriverStation::GetStickPOV(int stick, int pov) {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
   if (pov < 0 || pov >= HAL_kMaxJoystickPOVs) {
-    FRC_ReportError(warn::BadJoystickAxis,
-                    "POV " + wpi::Twine{pov} + " out of range");
+    FRC_ReportError(warn::BadJoystickAxis, "POV {} out of range", pov);
     return -1;
   }
 
@@ -272,8 +265,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
 
 int DriverStation::GetStickButtons(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -285,8 +277,7 @@ int DriverStation::GetStickButtons(int stick) const {
 
 int DriverStation::GetStickAxisCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -298,8 +289,7 @@ int DriverStation::GetStickAxisCount(int stick) const {
 
 int DriverStation::GetStickPOVCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -311,8 +301,7 @@ int DriverStation::GetStickPOVCount(int stick) const {
 
 int DriverStation::GetStickButtonCount(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return 0;
   }
 
@@ -324,8 +313,7 @@ int DriverStation::GetStickButtonCount(int stick) const {
 
 bool DriverStation::GetJoystickIsXbox(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return false;
   }
 
@@ -337,8 +325,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
 
 int DriverStation::GetJoystickType(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
 
@@ -350,8 +337,7 @@ int DriverStation::GetJoystickType(int stick) const {
 
 std::string DriverStation::GetJoystickName(int stick) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
   }
 
   HAL_JoystickDescriptor descriptor;
@@ -362,8 +348,7 @@ std::string DriverStation::GetJoystickName(int stick) const {
 
 int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   if (stick < 0 || stick >= kJoystickPorts) {
-    FRC_ReportError(warn::BadJoystickIndex,
-                    "stick " + wpi::Twine{stick} + " out of range");
+    FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
     return -1;
   }
 
@@ -552,7 +537,7 @@ double DriverStation::GetMatchTime() const {
 double DriverStation::GetBatteryVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetVinVoltage(&status);
-  FRC_CheckErrorStatus(status, "getVinVoltage");
+  FRC_CheckErrorStatus(status, "{}", "getVinVoltage");
 
   return voltage;
 }

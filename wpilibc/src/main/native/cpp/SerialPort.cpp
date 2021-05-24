@@ -20,17 +20,15 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 
   m_portHandle =
       HAL_InitializeSerialPort(static_cast<HAL_SerialPort>(port), &status);
-  FRC_CheckErrorStatus(status, "Port " + wpi::Twine{static_cast<int>(port)});
+  FRC_CheckErrorStatus(status, "Port {}", port);
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
-  FRC_CheckErrorStatus(status, "SetSerialBaudRate " + wpi::Twine{baudRate});
+  FRC_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
-  FRC_CheckErrorStatus(status, "SetSerialDataBits " + wpi::Twine{dataBits});
+  FRC_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  FRC_CheckErrorStatus(
-      status, "SetSerialParity " + wpi::Twine{static_cast<int>(parity)});
+  FRC_CheckErrorStatus(status, "SetSerialParity {}", parity);
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
-  FRC_CheckErrorStatus(
-      status, "SetSerialStopBits " + wpi::Twine{static_cast<int>(stopBits)});
+  FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5.0);
@@ -54,17 +52,15 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
 
   m_portHandle = HAL_InitializeSerialPortDirect(
       static_cast<HAL_SerialPort>(port), portNameC, &status);
-  FRC_CheckErrorStatus(status, "Port " + wpi::Twine{static_cast<int>(port)});
+  FRC_CheckErrorStatus(status, "Port {}", port);
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
-  FRC_CheckErrorStatus(status, "SetSerialBaudRate " + wpi::Twine{baudRate});
+  FRC_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
   HAL_SetSerialDataBits(m_portHandle, dataBits, &status);
-  FRC_CheckErrorStatus(status, "SetSerialDataBits " + wpi::Twine{dataBits});
+  FRC_CheckErrorStatus(status, "SetSerialDataBits {}", dataBits);
   HAL_SetSerialParity(m_portHandle, parity, &status);
-  FRC_CheckErrorStatus(
-      status, "SetSerialParity " + wpi::Twine{static_cast<int>(parity)});
+  FRC_CheckErrorStatus(status, "SetSerialParity {}", parity);
   HAL_SetSerialStopBits(m_portHandle, stopBits, &status);
-  FRC_CheckErrorStatus(
-      status, "SetSerialStopBits " + wpi::Twine{static_cast<int>(stopBits)});
+  FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
 
   // Set the default timeout to 5 seconds.
   SetTimeout(5.0);
@@ -81,40 +77,38 @@ SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
 SerialPort::~SerialPort() {
   int32_t status = 0;
   HAL_CloseSerial(m_portHandle, &status);
-  FRC_ReportError(status, "CloseSerial");
+  FRC_ReportError(status, "{}", "CloseSerial");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
   HAL_SetSerialFlowControl(m_portHandle, flowControl, &status);
-  FRC_CheckErrorStatus(
-      status, "SetFlowControl " + wpi::Twine{static_cast<int>(flowControl)});
+  FRC_CheckErrorStatus(status, "SetFlowControl {}", flowControl);
 }
 
 void SerialPort::EnableTermination(char terminator) {
   int32_t status = 0;
   HAL_EnableSerialTermination(m_portHandle, terminator, &status);
-  FRC_CheckErrorStatus(
-      status, "EnableTermination " + wpi::Twine{static_cast<int>(terminator)});
+  FRC_CheckErrorStatus(status, "EnableTermination {}", terminator);
 }
 
 void SerialPort::DisableTermination() {
   int32_t status = 0;
   HAL_DisableSerialTermination(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "DisableTermination");
+  FRC_CheckErrorStatus(status, "{}", "DisableTermination");
 }
 
 int SerialPort::GetBytesReceived() {
   int32_t status = 0;
   int retVal = HAL_GetSerialBytesReceived(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "GetBytesReceived");
+  FRC_CheckErrorStatus(status, "{}", "GetBytesReceived");
   return retVal;
 }
 
 int SerialPort::Read(char* buffer, int count) {
   int32_t status = 0;
   int retVal = HAL_ReadSerial(m_portHandle, buffer, count, &status);
-  FRC_CheckErrorStatus(status, "Read");
+  FRC_CheckErrorStatus(status, "{}", "Read");
   return retVal;
 }
 
@@ -126,43 +120,42 @@ int SerialPort::Write(wpi::StringRef buffer) {
   int32_t status = 0;
   int retVal =
       HAL_WriteSerial(m_portHandle, buffer.data(), buffer.size(), &status);
-  FRC_CheckErrorStatus(status, "Write");
+  FRC_CheckErrorStatus(status, "{}", "Write");
   return retVal;
 }
 
 void SerialPort::SetTimeout(double timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_portHandle, timeout, &status);
-  FRC_CheckErrorStatus(status, "SetTimeout");
+  FRC_CheckErrorStatus(status, "{}", "SetTimeout");
 }
 
 void SerialPort::SetReadBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialReadBufferSize(m_portHandle, size, &status);
-  FRC_CheckErrorStatus(status, "SetReadBufferSize " + wpi::Twine{size});
+  FRC_CheckErrorStatus(status, "SetReadBufferSize {}", size);
 }
 
 void SerialPort::SetWriteBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialWriteBufferSize(m_portHandle, size, &status);
-  FRC_CheckErrorStatus(status, "SetWriteBufferSize " + wpi::Twine{size});
+  FRC_CheckErrorStatus(status, "SetWriteBufferSize {}", size);
 }
 
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
   HAL_SetSerialWriteMode(m_portHandle, mode, &status);
-  FRC_CheckErrorStatus(
-      status, "SetWriteBufferMode " + wpi::Twine{static_cast<int>(mode)});
+  FRC_CheckErrorStatus(status, "SetWriteBufferMode {}", mode);
 }
 
 void SerialPort::Flush() {
   int32_t status = 0;
   HAL_FlushSerial(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "Flush");
+  FRC_CheckErrorStatus(status, "{}", "Flush");
 }
 
 void SerialPort::Reset() {
   int32_t status = 0;
   HAL_ClearSerial(m_portHandle, &status);
-  FRC_CheckErrorStatus(status, "Reset");
+  FRC_CheckErrorStatus(status, "{}", "Reset");
 }
