@@ -7,7 +7,9 @@ build --javacopt="-XepDisableAllChecks"
 
 test --test_output=errors
 
-
 import .bazelrc-roborio
 import .bazelrc-bionic
 import .bazelrc-raspbian
+
+# TODO investigate if this is a worthwhile pursuit
+import .bazelrc-buildbuddy
