@@ -26,7 +26,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
-  FRC_CheckErrorStatus(status, "InitializeAnalogTrigger");
+  FRC_CheckErrorStatus(status, "Channel {}", input->GetChannel());
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
@@ -37,7 +37,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   m_dutyCycle = input;
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
-  FRC_CheckErrorStatus(status, "InitializeAnalogTriggerDutyCycle");
+  FRC_CheckErrorStatus(status, "Channel {}", m_dutyCycle->GetSourceChannel());
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
@@ -47,7 +47,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
 AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   HAL_CleanAnalogTrigger(m_trigger, &status);
-  FRC_ReportError(status, "CleanAnalogTrigger");
+  FRC_ReportError(status, "Channel {}", GetSourceChannel());
 
   if (m_ownsAnalog) {
     delete m_analogInput;
@@ -75,51 +75,51 @@ AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsVoltage");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsDutyCycle");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsRaw");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetAveraged(bool useAveragedValue) {
   int32_t status = 0;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
-  FRC_CheckErrorStatus(status, "SetAveraged");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
   int32_t status = 0;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
-  FRC_CheckErrorStatus(status, "SetFiltered");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 int AnalogTrigger::GetIndex() const {
   int32_t status = 0;
   auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetIndex");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return ret;
 }
 
 bool AnalogTrigger::GetInWindow() {
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerInWindow(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetInWindow");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return result;
 }
 
 bool AnalogTrigger::GetTriggerState() {
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerTriggerState(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetTriggerState");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return result;
 }
 
@@ -132,5 +132,15 @@ std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
 void AnalogTrigger::InitSendable(SendableBuilder& builder) {
   if (m_ownsAnalog) {
     m_analogInput->InitSendable(builder);
+  }
+}
+
+int AnalogTrigger::GetSourceChannel() const {
+  if (m_analogInput) {
+    return m_analogInput->GetChannel();
+  } else if (m_dutyCycle) {
+    return m_dutyCycle->GetSourceChannel();
+  } else {
+    return -1;
   }
 }

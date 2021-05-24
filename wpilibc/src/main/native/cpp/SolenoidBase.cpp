@@ -15,7 +15,7 @@ int SolenoidBase::GetAll(int module) {
   int value = 0;
   int32_t status = 0;
   value = HAL_GetAllSolenoids(module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  FRC_CheckErrorStatus(status, "Module {}", module);
   return value;
 }
 
@@ -26,7 +26,7 @@ int SolenoidBase::GetAll() const {
 int SolenoidBase::GetPCMSolenoidBlackList(int module) {
   int32_t status = 0;
   int rv = HAL_GetPCMSolenoidBlackList(module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  FRC_CheckErrorStatus(status, "Module {}", module);
   return rv;
 }
 
@@ -37,7 +37,7 @@ int SolenoidBase::GetPCMSolenoidBlackList() const {
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {
   int32_t status = 0;
   bool rv = HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  FRC_CheckErrorStatus(status, "Module {}", module);
   return rv;
 }
 
@@ -48,7 +48,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
 bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) {
   int32_t status = 0;
   bool rv = HAL_GetPCMSolenoidVoltageFault(module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  FRC_CheckErrorStatus(status, "Module {}", module);
   return rv;
 }
 
@@ -59,7 +59,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault() const {
 void SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
   HAL_ClearAllPCMStickyFaults(module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{module});
+  FRC_CheckErrorStatus(status, "Module {}", module);
 }
 
 void SolenoidBase::ClearAllPCMStickyFaults() {

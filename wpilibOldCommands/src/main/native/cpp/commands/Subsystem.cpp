@@ -24,7 +24,7 @@ void Subsystem::SetDefaultCommand(Command* command) {
   } else {
     const auto& reqs = command->GetRequirements();
     if (std::find(reqs.begin(), reqs.end(), this) == reqs.end()) {
-      throw FRC_MakeError(err::CommandIllegalUse,
+      throw FRC_MakeError(err::CommandIllegalUse, "{}",
                           "A default command must require the subsystem");
     }
 

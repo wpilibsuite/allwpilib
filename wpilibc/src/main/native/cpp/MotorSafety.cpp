@@ -93,8 +93,8 @@ void MotorSafety::Check() {
     wpi::SmallString<128> buf;
     wpi::raw_svector_ostream desc(buf);
     GetDescription(desc);
-    desc << "... Output not updated often enough.";
-    FRC_ReportError(err::Timeout, desc.str());
+    FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
+                    desc.str());
     StopMotor();
   }
 }

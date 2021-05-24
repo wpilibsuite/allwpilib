@@ -14,6 +14,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/SmallString.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
@@ -53,10 +54,12 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
     HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
   }
   void SetCameraServerError(const wpi::Twine& error) override {
-    FRC_ReportError(err::CameraServerError, error);
+    wpi::SmallString<128> buf;
+    FRC_ReportError(err::CameraServerError, "{}", error.toStringRef(buf));
   }
   void SetVisionRunnerError(const wpi::Twine& error) override {
-    FRC_ReportError(-1, error);
+    wpi::SmallString<128> buf;
+    FRC_ReportError(-1, "{}", error.toStringRef(buf));
   }
   void ReportDriverStationError(const wpi::Twine& error) override {
     DriverStation::ReportError(error);

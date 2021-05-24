@@ -24,19 +24,18 @@ Solenoid::Solenoid(int channel)
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
-    throw FRC_MakeError(err::ModuleIndexOutOfRange,
-                        "Solenoid Module " + wpi::Twine{m_moduleNumber});
+    throw FRC_MakeError(err::ModuleIndexOutOfRange, "Module {}",
+                        m_moduleNumber);
   }
   if (!SensorUtil::CheckSolenoidChannel(m_channel)) {
-    throw FRC_MakeError(err::ChannelIndexOutOfRange,
-                        "Solenoid Channel " + wpi::Twine{m_channel});
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }
 
   int32_t status = 0;
   m_solenoidHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, channel), &status);
-  FRC_CheckErrorStatus(status, "Solenoid Module " + wpi::Twine{m_moduleNumber} +
-                                   " Channel " + wpi::Twine{m_channel});
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
+                       m_channel);
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_moduleNumber + 1);
@@ -51,13 +50,15 @@ Solenoid::~Solenoid() {
 void Solenoid::Set(bool on) {
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
-  FRC_CheckErrorStatus(status, "Set");
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
+                       m_channel);
 }
 
 bool Solenoid::Get() const {
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
-  FRC_CheckErrorStatus(status, "Get");
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
+                       m_channel);
 
   return value;
 }
@@ -79,13 +80,15 @@ void Solenoid::SetPulseDuration(double durationSeconds) {
   int32_t durationMS = durationSeconds * 1000;
   int32_t status = 0;
   HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
-  FRC_CheckErrorStatus(status, "SetPulseDuration");
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
+                       m_channel);
 }
 
 void Solenoid::StartPulse() {
   int32_t status = 0;
   HAL_FireOneShot(m_solenoidHandle, &status);
-  FRC_CheckErrorStatus(status, "StartPulse");
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
+                       m_channel);
 }
 
 void Solenoid::InitSendable(SendableBuilder& builder) {

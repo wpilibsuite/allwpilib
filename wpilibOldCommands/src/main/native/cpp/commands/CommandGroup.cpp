@@ -12,7 +12,7 @@ CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
 
 void CommandGroup::AddSequential(Command* command) {
   if (!command) {
-    throw FRC_MakeError(err::NullParameter, "command");
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
@@ -31,13 +31,13 @@ void CommandGroup::AddSequential(Command* command) {
 
 void CommandGroup::AddSequential(Command* command, double timeout) {
   if (!command) {
-    throw FRC_MakeError(err::NullParameter, "command");
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
   if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence,
@@ -54,7 +54,7 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
 
 void CommandGroup::AddParallel(Command* command) {
   if (!command) {
-    throw FRC_MakeError(err::NullParameter, "command");
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
     return;
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
@@ -74,13 +74,13 @@ void CommandGroup::AddParallel(Command* command) {
 
 void CommandGroup::AddParallel(Command* command, double timeout) {
   if (!command) {
-    throw FRC_MakeError(err::NullParameter, "command");
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
   if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout < 0.0");
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild,
