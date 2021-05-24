@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-#include <wpi/STLExtras.h>
+#include <wpi/function_ref.h>
 
 #include "glass/Model.h"
 

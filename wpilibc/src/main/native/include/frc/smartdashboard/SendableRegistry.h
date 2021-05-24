@@ -9,7 +9,7 @@
 #include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/STLExtras.h>
+#include <wpi/function_ref.h>
 
 namespace frc {
 

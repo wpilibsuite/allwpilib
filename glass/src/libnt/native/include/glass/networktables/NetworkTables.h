@@ -11,7 +11,6 @@
 
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
-#include <wpi/STLExtras.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
