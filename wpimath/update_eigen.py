@@ -187,6 +187,10 @@ def main():
             os.makedirs(dest_dir)
         shutil.copyfile(f, dest_file)
 
+    # Apply patches
+    os.chdir(cwd)
+    subprocess.check_output(["git", "apply", "eigen-maybe-uninitialized.patch"])
+
     # Comment out missing headers
     for f in files:
         dest_file = os.path.join(include_root, f)
