@@ -9,7 +9,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/MathUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -20,10 +20,13 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   if (period <= 0_s) {
-    frc::DriverStation::ReportError(
-        "Controller period must be a non-zero positive number!");
+    FRC_ReportError(
+        frc::err::Error,
+        "Controller period must be a non-zero positive number, got {}!",
+        period.to<double>());
     m_period = 20_ms;
-    frc::DriverStation::ReportWarning("Controller period defaulted to 20ms.");
+    FRC_ReportError(frc::warn::Warning, "{}",
+                    "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;

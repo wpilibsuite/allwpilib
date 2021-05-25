@@ -54,18 +54,24 @@ TEST_P(JoystickConnectionWarningTests, JoystickConnectionWarnings) {
   EXPECT_EQ(
       frc::DriverStation::GetInstance().IsJoystickConnectionWarningSilenced(),
       std::get<2>(GetParam()));
-  EXPECT_EQ(::testing::internal::GetCapturedStderr(), std::get<3>(GetParam()));
+  EXPECT_EQ(::testing::internal::GetCapturedStderr().substr(
+                0, std::get<3>(GetParam()).size()),
+            std::get<3>(GetParam()));
 }
 
 INSTANTIATE_TEST_SUITE_P(
     DriverStation, JoystickConnectionWarningTests,
-    ::testing::Values(std::make_tuple(false, true, true, ""),
-                      std::make_tuple(false, false, false,
-                                      "Joystick Button missing, check if all "
-                                      "controllers are plugged in\n"),
-                      std::make_tuple(true, true, false,
-                                      "Joystick Button missing, check if all "
-                                      "controllers are plugged in\n"),
-                      std::make_tuple(true, false, false,
-                                      "Joystick Button missing, check if all "
-                                      "controllers are plugged in\n")));
+    ::testing::Values(
+        std::make_tuple(false, true, true, ""),
+        std::make_tuple(
+            false, false, false,
+            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "controllers are plugged in\n"),
+        std::make_tuple(
+            true, true, false,
+            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "controllers are plugged in\n"),
+        std::make_tuple(
+            true, false, false,
+            "Warning: Joystick Button 1 missing (max 0), check if all "
+            "controllers are plugged in\n")));

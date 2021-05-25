@@ -5,15 +5,14 @@
 #include "frc/Watchdog.h"
 
 #include <atomic>
+#include <thread>
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/Notifier.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
+#include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc2/Timer.h"
 
@@ -114,11 +113,8 @@ void Watchdog::Impl::Main() {
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
-        wpi::SmallString<128> buf;
-        wpi::raw_svector_ostream err(buf);
-        err << "Watchdog not fed within "
-            << wpi::format("%.6f", watchdog->m_timeout.to<double>()) << "s\n";
-        frc::DriverStation::ReportWarning(err.str());
+        FRC_ReportError(warn::Warning, "Watchdog not fed within {:.6f}s",
+                        watchdog->m_timeout.to<double>());
       }
     }
 

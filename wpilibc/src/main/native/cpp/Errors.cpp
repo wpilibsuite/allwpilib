@@ -35,13 +35,15 @@ void RuntimeError::Report() const {
 }
 
 const char* frc::GetErrorMessage(int32_t* code) {
-  using namespace err;
-  using namespace warn;
   switch (*code) {
 #define S(label, offset, message) \
-  case label:                     \
+  case err::label:                \
     return message;
 #include "frc/WPIErrors.mac"
+#undef S
+#define S(label, offset, message) \
+  case warn::label:               \
+    return message;
 #include "frc/WPIWarnings.mac"
 #undef S
     default:

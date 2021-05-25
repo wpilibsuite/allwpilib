@@ -6,7 +6,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -46,7 +46,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
   if (!m_simDevice) {
     // Validate the part ID
     if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      DriverStation::ReportError("could not find ADXRS450 gyro");
+      FRC_ReportError(err::Error, "{}", "could not find ADXRS450 gyro");
       return;
     }
 
