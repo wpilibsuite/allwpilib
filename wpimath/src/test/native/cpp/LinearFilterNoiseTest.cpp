@@ -8,7 +8,7 @@
 #include <memory>
 #include <random>
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 #include "units/time.h"
@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 static double GetData(double t) {
-  return 100.0 * std::sin(2.0 * wpi::math::pi * t);
+  return 100.0 * std::sin(2.0 * wpi::numbers::pi * t);
 }
 
 class LinearFilterNoiseTest

@@ -7,7 +7,7 @@
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 DriveTrain::DriveTrain() {
 // Encoders may measure differently in the real world and in
@@ -21,9 +21,9 @@ DriveTrain::DriveTrain() {
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
   m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                    wpi::math::pi / 360.0);
+                                    wpi::numbers::pi / 360.0);
   m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                     wpi::math::pi / 360.0);
+                                     wpi::numbers::pi / 360.0);
 #endif
   SetName("DriveTrain");
   // Let's show everything on the LiveWindow

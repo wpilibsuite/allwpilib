@@ -17,7 +17,7 @@
 #include <frc/system/plant/LinearSystemId.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -40,7 +40,7 @@ class Robot : public frc::TimedRobot {
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::math::pi * kElevatorDrumRadius.to<double>() / 4096.0;
+      2.0 * wpi::numbers::pi * kElevatorDrumRadius.to<double>() / 4096.0;
 
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);

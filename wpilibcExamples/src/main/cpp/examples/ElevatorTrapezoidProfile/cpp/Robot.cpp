@@ -11,7 +11,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "ExampleSmartMotorController.h"
 

@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 using namespace frc;
 
@@ -16,8 +16,8 @@ Vector2d::Vector2d(double x, double y) {
 }
 
 void Vector2d::Rotate(double angle) {
-  double cosA = std::cos(angle * (wpi::math::pi / 180.0));
-  double sinA = std::sin(angle * (wpi::math::pi / 180.0));
+  double cosA = std::cos(angle * (wpi::numbers::pi / 180.0));
+  double sinA = std::sin(angle * (wpi::numbers::pi / 180.0));
   double out[2];
   out[0] = x * cosA - y * sinA;
   out[1] = x * sinA + y * cosA;
