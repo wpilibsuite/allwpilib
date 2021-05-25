@@ -67,6 +67,7 @@ generatedFileExclude {
   src/main/native/include/uv\.h$
   src/main/native/include/uv/
   src/main/native/libuv/
+  src/main/native/fmtlib/
   src/main/native/resources/
   src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker
