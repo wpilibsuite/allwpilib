@@ -21,6 +21,11 @@ Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
 }
 
+Command& Command::operator=(const Command& rhs) {
+  m_isGrouped = false;
+  return *this;
+}
+
 void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
