@@ -54,24 +54,6 @@ AnalogTrigger::~AnalogTrigger() {
   }
 }
 
-AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
-    : SendableHelper(std::move(rhs)), m_trigger(std::move(rhs.m_trigger)) {
-  std::swap(m_analogInput, rhs.m_analogInput);
-  std::swap(m_dutyCycle, rhs.m_dutyCycle);
-  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
-}
-
-AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
-
-  m_trigger = std::move(rhs.m_trigger);
-  std::swap(m_analogInput, rhs.m_analogInput);
-  std::swap(m_dutyCycle, rhs.m_dutyCycle);
-  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
-
-  return *this;
-}
-
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);

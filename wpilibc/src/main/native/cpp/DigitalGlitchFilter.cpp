@@ -46,19 +46,6 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
   }
 }
 
-DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
-    : SendableHelper(std::move(rhs)) {
-  std::swap(m_channelIndex, rhs.m_channelIndex);
-}
-
-DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
-
-  std::swap(m_channelIndex, rhs.m_channelIndex);
-
-  return *this;
-}
-
 void DigitalGlitchFilter::Add(DigitalSource* input) {
   DoAdd(input, m_channelIndex + 1);
 }
