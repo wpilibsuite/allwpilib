@@ -8,6 +8,10 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  \.patch$
+}
+
 generatedFileExclude {
   src/main/native/cpp/drake/
   src/main/native/eigeninclude/
