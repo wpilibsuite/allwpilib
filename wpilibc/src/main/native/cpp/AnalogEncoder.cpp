@@ -7,7 +7,7 @@
 #include "frc/AnalogInput.h"
 #include "frc/Base.h"
 #include "frc/Counter.h"
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
@@ -72,7 +72,8 @@ units::turn_t AnalogEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  FRC_ReportError(
+      warn::Warning, "{}",
       "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
       "value");
   return m_lastPosition;

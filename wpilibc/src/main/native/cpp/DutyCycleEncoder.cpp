@@ -8,8 +8,8 @@
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
-#include "frc/DriverStation.h"
 #include "frc/DutyCycle.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
@@ -94,7 +94,8 @@ units::turn_t DutyCycleEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  FRC_ReportError(
+      warn::Warning, "{}",
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;

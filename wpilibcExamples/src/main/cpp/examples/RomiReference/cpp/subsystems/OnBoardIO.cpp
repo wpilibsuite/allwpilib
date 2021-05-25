@@ -6,7 +6,7 @@
 
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
-#include <frc/DriverStation.h>
+#include <frc/Errors.h>
 #include <frc2/Timer.h>
 
 OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
@@ -32,7 +32,7 @@ bool OnBoardIO::GetButtonBPressed() {
 
   auto currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
-    frc::DriverStation::ReportError("Button B was not configured");
+    FRC_ReportError(frc::err::Error, "Button {} was not configured", "B");
     m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
@@ -45,7 +45,7 @@ bool OnBoardIO::GetButtonCPressed() {
 
   auto currentTime = frc2::Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
-    frc::DriverStation::ReportError("Button C was not configured");
+    FRC_ReportError(frc::err::Error, "Button {} was not configured", "C");
     m_nextMessageTime = currentTime + kMessageInterval;
   }
   return false;
@@ -57,7 +57,7 @@ void OnBoardIO::SetGreenLed(bool value) {
   } else {
     auto currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      frc::DriverStation::ReportError("Green LED was not configured");
+      FRC_ReportError(frc::err::Error, "{} LED was not configured", "Green");
       m_nextMessageTime = currentTime + kMessageInterval;
     }
   }
@@ -69,7 +69,7 @@ void OnBoardIO::SetRedLed(bool value) {
   } else {
     auto currentTime = frc2::Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      frc::DriverStation::ReportError("Red LED was not configured");
+      FRC_ReportError(frc::err::Error, "{} LED was not configured", "Red");
       m_nextMessageTime = currentTime + kMessageInterval;
     }
   }

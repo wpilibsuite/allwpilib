@@ -14,8 +14,6 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
 
 #include "frc/Errors.h"
 #include "frc/MotorSafety.h"
@@ -113,31 +111,6 @@ DriverStation& DriverStation::GetInstance() {
   return instance;
 }
 
-void DriverStation::ReportError(const wpi::Twine& error) {
-  wpi::SmallString<128> temp;
-  HAL_SendError(1, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
-                1);
-}
-
-void DriverStation::ReportWarning(const wpi::Twine& error) {
-  wpi::SmallString<128> temp;
-  HAL_SendError(0, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
-                1);
-}
-
-void DriverStation::ReportError(bool isError, int32_t code,
-                                const wpi::Twine& error,
-                                const wpi::Twine& location,
-                                const wpi::Twine& stack) {
-  wpi::SmallString<128> errorTemp;
-  wpi::SmallString<128> locationTemp;
-  wpi::SmallString<128> stackTemp;
-  HAL_SendError(isError, code, 0,
-                error.toNullTerminatedStringRef(errorTemp).data(),
-                location.toNullTerminatedStringRef(locationTemp).data(),
-                stack.toNullTerminatedStringRef(stackTemp).data(), 1);
-}
-
 bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
@@ -145,7 +118,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
   }
   if (button <= 0) {
     ReportJoystickUnpluggedError(
-        "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+        "Joystick Button {} index out of range; indexes begin at 1", button);
     return false;
   }
 
@@ -154,7 +127,9 @@ bool DriverStation::GetStickButton(int stick, int button) {
 
   if (button > buttons.count) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are plugged in");
+        "Joystick Button {} missing (max {}), check if all controllers are "
+        "plugged in",
+        button, buttons.count);
     return false;
   }
 
@@ -168,7 +143,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
   }
   if (button <= 0) {
     ReportJoystickUnpluggedError(
-        "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+        "Joystick Button {} index out of range; indexes begin at 1", button);
     return false;
   }
 
@@ -177,7 +152,9 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
 
   if (button > buttons.count) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are plugged in");
+        "Joystick Button {} missing (max {}), check if all controllers are "
+        "plugged in",
+        button, buttons.count);
     return false;
   }
   std::unique_lock lock(m_buttonEdgeMutex);
@@ -197,7 +174,7 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
   }
   if (button <= 0) {
     ReportJoystickUnpluggedError(
-        "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
+        "Joystick Button {} index out of range; indexes begin at 1", button);
     return false;
   }
 
@@ -206,7 +183,9 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
 
   if (button > buttons.count) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Button missing, check if all controllers are plugged in");
+        "Joystick Button {} missing (max {}), check if all controllers are "
+        "plugged in",
+        button, buttons.count);
     return false;
   }
   std::unique_lock lock(m_buttonEdgeMutex);
@@ -234,7 +213,9 @@ double DriverStation::GetStickAxis(int stick, int axis) {
 
   if (axis >= axes.count) {
     ReportJoystickUnpluggedWarning(
-        "Joystick Axis missing, check if all controllers are plugged in");
+        "Joystick Axis {} missing (max {}), check if all controllers are "
+        "plugged in",
+        axis, axes.count);
     return 0.0;
   }
 
@@ -256,7 +237,9 @@ int DriverStation::GetStickPOV(int stick, int pov) {
 
   if (pov >= povs.count) {
     ReportJoystickUnpluggedWarning(
-        "Joystick POV missing, check if all controllers are plugged in");
+        "Joystick POV {} missing (max {}), check if all controllers are "
+        "plugged in",
+        pov, povs.count);
     return -1;
   }
 
@@ -600,19 +583,21 @@ DriverStation::DriverStation() {
   m_dsThread = std::thread(&DriverStation::Run, this);
 }
 
-void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedErrorV(fmt::string_view format,
+                                                  fmt::format_args args) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
-    ReportError(message);
+    ReportErrorV(err::Error, "", 0, "", format, args);
     m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
   }
 }
 
-void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedWarningV(fmt::string_view format,
+                                                    fmt::format_args args) {
   if (IsFMSAttached() || !m_silenceJoystickWarning) {
     double currentTime = Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
-      ReportWarning(message);
+      ReportErrorV(warn::Warning, "", 0, "", format, args);
       m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
     }
   }

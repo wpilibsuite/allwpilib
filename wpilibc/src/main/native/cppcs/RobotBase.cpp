@@ -11,10 +11,10 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/SmallString.h>
 #include <wpimath/MathShared.h>
 
 #include "WPILibVersion.h"
@@ -53,16 +53,18 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
   void ReportVideoServer(int id) override {
     HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
   }
-  void SetCameraServerError(const wpi::Twine& error) override {
-    wpi::SmallString<128> buf;
-    FRC_ReportError(err::CameraServerError, "{}", error.toStringRef(buf));
+  void SetCameraServerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {
+    ReportErrorV(err::CameraServerError, __FILE__, __LINE__, __FUNCTION__,
+                 format, args);
   }
-  void SetVisionRunnerError(const wpi::Twine& error) override {
-    wpi::SmallString<128> buf;
-    FRC_ReportError(-1, "{}", error.toStringRef(buf));
+  void SetVisionRunnerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
-  void ReportDriverStationError(const wpi::Twine& error) override {
-    DriverStation::ReportError(error);
+  void ReportDriverStationErrorV(fmt::string_view format,
+                                 fmt::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
     return std::make_pair(RobotBase::GetThreadId(), true);
@@ -70,8 +72,9 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
 };
 class WPILibMathShared : public wpi::math::MathShared {
  public:
-  void ReportError(const wpi::Twine& error) override {
-    DriverStation::ReportError(error);
+  void ReportErrorV(fmt::string_view format, fmt::format_args args) override {
+    frc::ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
+                      args);
   }
 
   void ReportUsage(wpi::math::MathUsageId id, int count) override {

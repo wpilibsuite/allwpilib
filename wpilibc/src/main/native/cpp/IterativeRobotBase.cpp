@@ -6,11 +6,9 @@
 
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -197,11 +195,6 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  wpi::SmallString<128> str;
-  wpi::raw_svector_ostream buf(str);
-
-  buf << "Loop time of " << wpi::format("%.6f", m_period.to<double>())
-      << "s overrun\n";
-
-  DriverStation::ReportWarning(str);
+  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun",
+                  m_period.to<double>());
 }
