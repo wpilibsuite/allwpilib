@@ -4,19 +4,13 @@
 
 #include "frc/simulation/ADXRS450_GyroSim.h"
 
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
-
 #include "frc/ADXRS450_Gyro.h"
 #include "frc/simulation/SimDeviceSim.h"
 
 using namespace frc::sim;
 
 ADXRS450_GyroSim::ADXRS450_GyroSim(const frc::ADXRS450_Gyro& gyro) {
-  wpi::SmallString<128> fullname;
-  wpi::raw_svector_ostream os(fullname);
-  os << "Gyro:ADXRS450" << '[' << gyro.GetPort() << ']';
-  frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
+  frc::sim::SimDeviceSim deviceSim{"Gyro:ADXRS450", gyro.GetPort()};
   m_simAngle = deviceSim.GetDouble("angle_x");
   m_simRate = deviceSim.GetDouble("rate_x");
 }

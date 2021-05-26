@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include "frc/MotorSafety.h"
@@ -11,10 +12,6 @@
 #include "frc/motorcontrol/MotorController.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
-
-namespace wpi {
-class raw_ostream;
-}  // namespace wpi
 
 namespace frc {
 
@@ -56,7 +53,7 @@ class PWMMotorController : public MotorController,
 
   // MotorSafety interface
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   int GetChannel() const;
 

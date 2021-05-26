@@ -10,7 +10,6 @@
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
-#include "frc/Base.h"
 #include "frc/LinearFilter.h"
 #include "frc/PIDInterface.h"
 #include "frc/PIDOutput.h"

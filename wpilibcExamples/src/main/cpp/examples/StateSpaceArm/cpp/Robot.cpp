@@ -18,7 +18,7 @@
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -66,7 +66,8 @@ class Robot : public frc::TimedRobot {
       // qelms. Velocity error tolerance, in radians and radians per second.
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
-      {1.0 * 2.0 * wpi::math::pi / 360.0, 10.0 * 2.0 * wpi::math::pi / 360.0},
+      {1.0 * 2.0 * wpi::numbers::pi / 360.0,
+       10.0 * 2.0 * wpi::numbers::pi / 360.0},
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the
@@ -95,7 +96,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi / 4096.0);
+    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi / 4096.0);
   }
 
   void TeleopInit() override {

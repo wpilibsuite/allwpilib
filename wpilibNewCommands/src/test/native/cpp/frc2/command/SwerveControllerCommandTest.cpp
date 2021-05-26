@@ -15,7 +15,7 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 

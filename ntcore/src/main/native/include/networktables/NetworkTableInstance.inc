@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INL_
-#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INL_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_
 
 #include <utility>
 #include <vector>
@@ -208,4 +208,4 @@ inline bool NetworkTableInstance::WaitForLoggerQueue(double timeout) {
 
 }  // namespace nt
 
-#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INL_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_INC_

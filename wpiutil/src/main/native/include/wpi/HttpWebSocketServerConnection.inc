@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
-#define WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
+#ifndef WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INC_
+#define WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INC_
 
 #include <memory>
 
@@ -52,4 +52,4 @@ HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INL_
+#endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_INC_

@@ -4,7 +4,7 @@
 
 #include "frc/motorcontrol/PWMMotorController.h"
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 
@@ -34,8 +34,8 @@ void PWMMotorController::StopMotor() {
   Disable();
 }
 
-void PWMMotorController::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "PWM " << GetChannel();
+std::string PWMMotorController::GetDescription() const {
+  return fmt::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {

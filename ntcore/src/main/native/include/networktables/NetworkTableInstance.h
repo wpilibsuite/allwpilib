@@ -567,6 +567,6 @@ class NetworkTableInstance final {
 
 }  // namespace nt
 
-#include "networktables/NetworkTableInstance.inl"
+#include "networktables/NetworkTableInstance.inc"
 
 #endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_

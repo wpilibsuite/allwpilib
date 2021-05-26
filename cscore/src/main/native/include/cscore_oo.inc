@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef CSCORE_CSCORE_OO_INL_
-#define CSCORE_CSCORE_OO_INL_
+#ifndef CSCORE_CSCORE_OO_INC_
+#define CSCORE_CSCORE_OO_INC_
 
 #include <string>
 #include <utility>
@@ -648,4 +648,4 @@ inline VideoListener::~VideoListener() {
 
 }  // namespace cs
 
-#endif  // CSCORE_CSCORE_OO_INL_
+#endif  // CSCORE_CSCORE_OO_INC_

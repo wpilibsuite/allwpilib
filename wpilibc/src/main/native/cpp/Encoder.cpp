@@ -8,8 +8,8 @@
 
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
-#include "frc/Base.h"
 #include "frc/DigitalInput.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -29,8 +29,8 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
                  bool reverseDirection, EncodingType encodingType)
-    : m_aSource(aSource, NullDeleter<DigitalSource>()),
-      m_bSource(bSource, NullDeleter<DigitalSource>()) {
+    : m_aSource(aSource, wpi::NullDeleter<DigitalSource>()),
+      m_bSource(bSource, wpi::NullDeleter<DigitalSource>()) {
   if (!m_aSource) {
     throw FRC_MakeError(err::NullParameter, "{}", "aSource");
   }
@@ -42,8 +42,8 @@ Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
 
 Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
                  bool reverseDirection, EncodingType encodingType)
-    : m_aSource(&aSource, NullDeleter<DigitalSource>()),
-      m_bSource(&bSource, NullDeleter<DigitalSource>()) {
+    : m_aSource(&aSource, wpi::NullDeleter<DigitalSource>()),
+      m_bSource(&bSource, wpi::NullDeleter<DigitalSource>()) {
   InitEncoder(reverseDirection, encodingType);
 }
 

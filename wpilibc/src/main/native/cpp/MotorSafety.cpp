@@ -8,8 +8,6 @@
 #include <utility>
 
 #include <wpi/SmallPtrSet.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
@@ -90,11 +88,8 @@ void MotorSafety::Check() {
   }
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    wpi::SmallString<128> buf;
-    wpi::raw_svector_ostream desc(buf);
-    GetDescription(desc);
     FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
-                    desc.str());
+                    GetDescription());
     StopMotor();
   }
 }

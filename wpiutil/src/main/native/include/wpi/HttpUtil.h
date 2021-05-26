@@ -411,6 +411,6 @@ class HttpMultipartScanner {
 
 }  // namespace wpi
 
-#include "HttpUtil.inl"
+#include "HttpUtil.inc"
 
 #endif  // WPIUTIL_WPI_HTTPUTIL_H_

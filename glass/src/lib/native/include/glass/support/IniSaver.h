@@ -40,4 +40,4 @@ class IniSaver : public IniSaverBase {
 
 }  // namespace glass
 
-#include "IniSaver.inl"
+#include "IniSaver.inc"

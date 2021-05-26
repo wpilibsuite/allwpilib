@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/raw_ostream.h>
+#include <string>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -206,7 +206,7 @@ class DifferentialDrive : public RobotDriveBase,
                                  bool squareInputs = true);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

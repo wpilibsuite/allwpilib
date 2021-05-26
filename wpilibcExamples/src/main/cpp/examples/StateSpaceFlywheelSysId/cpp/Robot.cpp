@@ -16,7 +16,7 @@
 #include <frc/system/LinearSystemLoop.h>
 #include <frc/system/plant/DCMotor.h>
 #include <frc/system/plant/LinearSystemId.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -84,7 +84,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // We go 2 pi radians per 4096 clicks.
-    m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi / 4096.0);
+    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi / 4096.0);
   }
 
   void TeleopInit() override {

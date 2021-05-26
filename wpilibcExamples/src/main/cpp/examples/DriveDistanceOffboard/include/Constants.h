@@ -9,7 +9,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide

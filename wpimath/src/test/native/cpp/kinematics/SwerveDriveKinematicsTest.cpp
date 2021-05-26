@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -75,7 +75,7 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematics) {
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t(2 * wpi::math::pi)};
+                       units::radians_per_second_t(2 * wpi::numbers::pi)};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
   EXPECT_NEAR(fl.speed.to<double>(), 106.63, kEpsilon);
@@ -99,12 +99,12 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
 
   EXPECT_NEAR(chassisSpeeds.vx.to<double>(), 0.0, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.vy.to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 2 * wpi::math::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 2 * wpi::numbers::pi, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t(2 * wpi::math::pi)};
+                       units::radians_per_second_t(2 * wpi::numbers::pi)};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
   EXPECT_NEAR(fl.speed.to<double>(), 0.0, kEpsilon);
@@ -128,7 +128,7 @@ TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationForwardKinematics) {
 
   EXPECT_NEAR(chassisSpeeds.vx.to<double>(), 75.398, kEpsilon);
   EXPECT_NEAR(chassisSpeeds.vy.to<double>(), -75.398, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 2 * wpi::math::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 2 * wpi::numbers::pi, kEpsilon);
 }
 
 TEST_F(SwerveDriveKinematicsTest,

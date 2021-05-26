@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 int main() {
-  std::cout << wpi::math::pi << std::endl;
+  std::cout << wpi::numbers::pi << std::endl;
 }

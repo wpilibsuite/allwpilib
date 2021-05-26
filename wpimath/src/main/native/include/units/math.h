@@ -28,8 +28,6 @@
 
 #include <cmath>
 
-#include <wpi/math>
-
 #include "units/angle.h"
 #include "units/base.h"
 #include "units/dimensionless.h"

@@ -10,7 +10,6 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/Base.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;

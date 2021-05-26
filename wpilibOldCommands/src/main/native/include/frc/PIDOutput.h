@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "frc/Base.h"
-
 namespace frc {
 
 /**

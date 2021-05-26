@@ -13,7 +13,6 @@
 #include <wpi/mutex.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/Base.h"
 #include "frc/Errors.h"
 
 namespace frc {
