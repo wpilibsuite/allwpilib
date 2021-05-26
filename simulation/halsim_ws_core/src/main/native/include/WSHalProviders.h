@@ -63,4 +63,4 @@ void CreateSingleProvider(const std::string& key,
 
 }  // namespace wpilibws
 
-#include "WSHalProviders.inl"
+#include "WSHalProviders.inc"
