@@ -4,27 +4,33 @@
 
 #include "glass/networktables/NTMecanumDrive.h"
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <wpi/MathExtras.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-NTMecanumDriveModel::NTMecanumDriveModel(wpi::StringRef path)
+NTMecanumDriveModel::NTMecanumDriveModel(std::string_view path)
     : NTMecanumDriveModel(nt::GetDefaultInstance(), path) {}
 
-NTMecanumDriveModel::NTMecanumDriveModel(NT_Inst instance, wpi::StringRef path)
+NTMecanumDriveModel::NTMecanumDriveModel(NT_Inst instance,
+                                         std::string_view path)
     : m_nt(instance),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_controllable(m_nt.GetEntry(path + "/.controllable")),
-      m_flPercent(m_nt.GetEntry(path + "/Front Left Motor Speed")),
-      m_frPercent(m_nt.GetEntry(path + "/Front Right Motor Speed")),
-      m_rlPercent(m_nt.GetEntry(path + "/Rear Left Motor Speed")),
-      m_rrPercent(m_nt.GetEntry(path + "/Rear Right Motor Speed")),
-      m_nameValue(path.rsplit('/').second),
-      m_flPercentData("NTMcnmDriveFL:" + path),
-      m_frPercentData("NTMcnmDriveFR:" + path),
-      m_rlPercentData("NTMcnmDriveRL:" + path),
-      m_rrPercentData("NTMcnmDriveRR:" + path) {
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
+      m_flPercent(
+          m_nt.GetEntry(fmt::format("{}/Front Left Motor Speed", path))),
+      m_frPercent(
+          m_nt.GetEntry(fmt::format("{}/Front Right Motor Speed", path))),
+      m_rlPercent(m_nt.GetEntry(fmt::format("{}/Rear Left Motor Speed", path))),
+      m_rrPercent(
+          m_nt.GetEntry(fmt::format("{}/Rear Right Motor Speed", path))),
+      m_nameValue(wpi::rsplit(path, '/').second),
+      m_flPercentData(fmt::format("NTMcnmDriveFL:{}", path)),
+      m_frPercentData(fmt::format("NTMcnmDriveFR:{}", path)),
+      m_rlPercentData(fmt::format("NTMcnmDriveRL:{}", path)),
+      m_rrPercentData(fmt::format("NTMcnmDriveRR:{}", path)) {
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_flPercent);

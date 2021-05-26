@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <imgui.h>
 #include <wpi/DenseMap.h>
-#include <wpi/Twine.h>
 
 #include "glass/support/IniSaverBase.h"
 
@@ -15,7 +16,7 @@ namespace glass {
 template <typename Info>
 class IniSaver : public IniSaverBase {
  public:
-  explicit IniSaver(const wpi::Twine& typeName,
+  explicit IniSaver(std::string_view typeName,
                     IniSaverBackend* backend = nullptr)
       : IniSaverBase(typeName, backend) {}
 

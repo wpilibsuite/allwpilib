@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/StringExtras.h>
 
 #include "glass/support/IniSaverString.h"
 
@@ -16,13 +18,10 @@ void* IniSaverString<Info>::IniReadOpen(const char* name) {
 }
 
 template <typename Info>
-void IniSaverString<Info>::IniReadLine(void* entry, const char* lineStr) {
+void IniSaverString<Info>::IniReadLine(void* entry, const char* line) {
   auto element = static_cast<Info*>(entry);
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  element->ReadIni(name, value);
+  auto [name, value] = wpi::split(line, '=');
+  element->ReadIni(wpi::trim(name), wpi::trim(value));
 }
 
 template <typename Info>

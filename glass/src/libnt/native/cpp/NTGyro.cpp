@@ -4,17 +4,20 @@
 
 #include "glass/networktables/NTGyro.h"
 
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
+
 using namespace glass;
 
-NTGyroModel::NTGyroModel(wpi::StringRef path)
+NTGyroModel::NTGyroModel(std::string_view path)
     : NTGyroModel(nt::GetDefaultInstance(), path) {}
 
-NTGyroModel::NTGyroModel(NT_Inst instance, wpi::StringRef path)
+NTGyroModel::NTGyroModel(NT_Inst instance, std::string_view path)
     : m_nt(instance),
-      m_angle(m_nt.GetEntry(path + "/Value")),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_angleData("NT_Gyro:" + path),
-      m_nameValue(path.rsplit('/').second) {
+      m_angle(m_nt.GetEntry(fmt::format("{}/Value", path))),
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_angleData(fmt::format("NT_Gyro:{}", path)),
+      m_nameValue(wpi::rsplit(path, '/').second) {
   m_nt.AddListener(m_angle);
   m_nt.AddListener(m_name);
 }

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <string_view>
 
 #include <hal/DriverStation.h>
 #include <hal/Extensions.h>
@@ -32,7 +33,7 @@ void HALSimWSProviderDriverStation::Initialize(WSRegisterFunc webRegisterFunc) {
     registered = true;
     HAL_RegisterExtensionListener(
         nullptr, [](void*, const char* name, void* data) {
-          if (wpi::StringRef{name} == "ds_socket") {
+          if (std::string_view{name} == "ds_socket") {
             gDSSocketConnected = static_cast<std::atomic<bool>*>(data);
           }
         });

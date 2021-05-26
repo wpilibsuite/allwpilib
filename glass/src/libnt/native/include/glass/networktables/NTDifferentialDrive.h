@@ -5,11 +5,11 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <ntcore_cpp.h>
 #include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
@@ -20,8 +20,8 @@ class NTDifferentialDriveModel : public DriveModel {
  public:
   static constexpr const char* kType = "DifferentialDrive";
 
-  explicit NTDifferentialDriveModel(wpi::StringRef path);
-  NTDifferentialDriveModel(NT_Inst instance, wpi::StringRef path);
+  explicit NTDifferentialDriveModel(std::string_view path);
+  NTDifferentialDriveModel(NT_Inst instance, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const std::vector<DriveModel::WheelInfo>& GetWheels() const override {

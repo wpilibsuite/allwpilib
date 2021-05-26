@@ -9,7 +9,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
-#include <wpi/StringRef.h>
 
 #include "HALSimGui.h"
 

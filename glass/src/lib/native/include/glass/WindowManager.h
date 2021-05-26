@@ -6,13 +6,12 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
 #include <imgui.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "glass/Window.h"
 #include "glass/support/IniSaverBase.h"
@@ -34,7 +33,7 @@ class WindowManager {
    *
    * @param iniName Group name to use in ini file
    */
-  explicit WindowManager(const wpi::Twine& iniName);
+  explicit WindowManager(std::string_view iniName);
   virtual ~WindowManager() = default;
 
   WindowManager(const WindowManager&) = delete;
@@ -67,7 +66,7 @@ class WindowManager {
    * @param id unique identifier of the window (title bar)
    * @param display window contents display function
    */
-  Window* AddWindow(wpi::StringRef id, wpi::unique_function<void()> display);
+  Window* AddWindow(std::string_view id, wpi::unique_function<void()> display);
 
   /**
    * Adds window to GUI.  The view's display function is called from within a
@@ -85,7 +84,7 @@ class WindowManager {
    * @param view view object
    * @return Window, or nullptr on duplicate window
    */
-  Window* AddWindow(wpi::StringRef id, std::unique_ptr<View> view);
+  Window* AddWindow(std::string_view id, std::unique_ptr<View> view);
 
   /**
    * Adds window to GUI.  A View must be assigned to the returned Window
@@ -102,7 +101,7 @@ class WindowManager {
    * @param id unique identifier of the window (default title bar)
    * @return Window, or nullptr on duplicate window
    */
-  Window* GetOrAddWindow(wpi::StringRef id, bool duplicateOk = false);
+  Window* GetOrAddWindow(std::string_view id, bool duplicateOk = false);
 
   /**
    * Gets existing window.  If none exists, returns nullptr.
@@ -110,7 +109,7 @@ class WindowManager {
    * @param id unique identifier of the window (default title bar)
    * @return Window, or nullptr if window does not exist
    */
-  Window* GetWindow(wpi::StringRef id);
+  Window* GetWindow(std::string_view id);
 
  protected:
   virtual void DisplayWindows();
@@ -121,7 +120,7 @@ class WindowManager {
  private:
   class IniSaver : public IniSaverBase {
    public:
-    explicit IniSaver(const wpi::Twine& typeName, WindowManager* manager)
+    explicit IniSaver(std::string_view typeName, WindowManager* manager)
         : IniSaverBase{typeName}, m_manager{manager} {}
 
     void* IniReadOpen(const char* name) override;

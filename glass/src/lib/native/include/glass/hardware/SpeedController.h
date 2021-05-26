@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
-
 #include "glass/Model.h"
 
 namespace glass {

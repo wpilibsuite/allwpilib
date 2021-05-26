@@ -6,10 +6,15 @@
 
 #include <uv.h>
 
+#include <string_view>
+
+#include <fmt/format.h>
 #include <wpi/FileSystem.h>
 #include <wpi/MimeTypes.h>
 #include <wpi/Path.h>
+#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 #include <wpi/UrlParser.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -30,7 +35,7 @@ bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
 }
 
 void HALSimHttpConnection::ProcessWsUpgrade() {
-  m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
+  m_websocket->open.connect_extended([this](auto conn, auto) {
     conn.disconnect();  // one-shot
 
     if (!m_server->RegisterWebsocket(shared_from_this())) {
@@ -45,7 +50,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   });
 
   // parse incoming JSON, dispatch to parent
-  m_websocket->text.connect([this](wpi::StringRef msg, bool) {
+  m_websocket->text.connect([this](auto msg, bool) {
     if (!m_isWsConnected) {
       return;
     }
@@ -62,7 +67,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
     m_server->OnNetValueChanged(j);
   });
 
-  m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
+  m_websocket->closed.connect([this](uint16_t, auto) {
     // unset the global, allow another websocket to connect
     if (m_isWsConnected) {
       wpi::errs() << "HALWebSim: websocket disconnected\n";
@@ -99,11 +104,10 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
   });
 }
 
-void HALSimHttpConnection::SendFileResponse(int code,
-                                            const wpi::Twine& codeText,
-                                            const wpi::Twine& contentType,
-                                            const wpi::Twine& filename,
-                                            const wpi::Twine& extraHeader) {
+void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
+                                            std::string_view contentType,
+                                            std::string_view filename,
+                                            std::string_view extraHeader) {
   // open file
   int infd;
   if (wpi::sys::fs::openFileForRead(filename, infd)) {
@@ -168,21 +172,20 @@ void HALSimHttpConnection::ProcessRequest() {
     return;
   }
 
-  wpi::StringRef path;
+  std::string_view path;
   if (url.HasPath()) {
     path = url.GetPath();
   }
 
-  if (m_request.GetMethod() == wpi::HTTP_GET && path.startswith("/") &&
-      !path.contains("..")) {
+  if (m_request.GetMethod() == wpi::HTTP_GET && wpi::starts_with(path, '/') &&
+      !wpi::contains(path, "..")) {
     // convert to fs native representation
-    wpi::SmallVector<char, 32> nativePath;
+    wpi::SmallString<32> nativePath;
     wpi::sys::path::native(path, nativePath);
 
-    if (path.startswith("/user/")) {
-      std::string prefix = (wpi::sys::path::get_separator() + "user" +
-                            wpi::sys::path::get_separator())
-                               .str();
+    if (wpi::starts_with(path, "/user/")) {
+      auto prefix = fmt::format("{}user{}", wpi::sys::path::get_separator(),
+                                wpi::sys::path::get_separator());
       wpi::sys::path::replace_path_prefix(nativePath, prefix,
                                           m_server->GetWebrootUser());
     } else {
@@ -197,17 +200,17 @@ void HALSimHttpConnection::ProcessRequest() {
 
     if (!wpi::sys::fs::exists(nativePath) ||
         wpi::sys::fs::is_directory(nativePath)) {
-      MySendError(404, "Resource '" + path + "' not found");
+      MySendError(404, fmt::format("Resource '{}' not found", path));
     } else {
-      auto contentType = wpi::MimeTypeFromPath(wpi::Twine(nativePath).str());
-      SendFileResponse(200, "OK", contentType, nativePath);
+      auto contentType = wpi::MimeTypeFromPath(nativePath);
+      SendFileResponse(200, "OK", contentType, nativePath.str());
     }
   } else {
     MySendError(404, "Resource not found");
   }
 }
 
-void HALSimHttpConnection::MySendError(int code, const wpi::Twine& message) {
+void HALSimHttpConnection::MySendError(int code, std::string_view message) {
   Log(code);
   SendError(code, message);
 }

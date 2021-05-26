@@ -4,6 +4,7 @@
 
 #include "WSProvider_Solenoid.h"
 
+#include <fmt/format.h>
 #include <hal/Ports.h>
 #include <hal/simulation/PCMData.h>
 
@@ -21,9 +22,7 @@ void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
   for (int32_t pcmIndex = 0; pcmIndex < HAL_GetNumPCMModules(); ++pcmIndex) {
     for (int32_t solenoidIndex = 0;
          solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
-      auto key =
-          ("Solenoid/" + wpi::Twine(pcmIndex) + "," + wpi::Twine(solenoidIndex))
-              .str();
+      auto key = fmt::format("Solenoid/{},{}", pcmIndex, solenoidIndex);
       auto ptr = std::make_unique<HALSimWSProviderSolenoid>(
           pcmIndex, solenoidIndex, key, "Solenoid");
       webRegisterFunc(key, std::move(ptr));
@@ -38,8 +37,7 @@ HALSimWSProviderSolenoid::HALSimWSProviderSolenoid(int32_t pcmChannel,
     : HALSimWSHalProvider(key, type),
       m_pcmIndex(pcmChannel),
       m_solenoidIndex(solenoidChannel) {
-  m_deviceId =
-      std::to_string(m_pcmIndex) + "," + std::to_string(solenoidChannel);
+  m_deviceId = fmt::format("{},{}", m_pcmIndex, solenoidChannel);
 }
 
 HALSimWSProviderSolenoid::~HALSimWSProviderSolenoid() {

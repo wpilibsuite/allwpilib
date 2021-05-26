@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include <frc/geometry/Pose2d.h>
@@ -182,7 +183,7 @@ void glass::DisplayMechanism2DSettings(Mechanism2DModel* model) {
 void FrameData::DrawObject(ImDrawList* drawList, MechanismObjectModel& objModel,
                            const frc::Pose2d& pose) const {
   const char* type = objModel.GetType();
-  if (wpi::StringRef{type} == "line") {
+  if (std::string_view{type} == "line") {
     auto startPose =
         pose + frc::Transform2d{frc::Translation2d{}, objModel.GetAngle()};
     auto endPose =

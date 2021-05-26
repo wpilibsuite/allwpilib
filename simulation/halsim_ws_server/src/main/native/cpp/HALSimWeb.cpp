@@ -7,7 +7,6 @@
 #include <wpi/FileSystem.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
-#include <wpi/Twine.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
 #include <wpi/raw_uv_ostream.h>
@@ -42,31 +41,28 @@ bool HALSimWeb::Initialize() {
   }
 
   // determine where to get static content from
-  // wpi::SmallVector<char, 64> tmp;
   wpi::SmallString<64> tmp;
 
   const char* webroot_sys = std::getenv("HALSIMWS_SYSROOT");
   if (webroot_sys != nullptr) {
-    wpi::StringRef tstr(webroot_sys);
-    tmp.append(tstr);
+    tmp.append(webroot_sys);
   } else {
     wpi::sys::fs::current_path(tmp);
     wpi::sys::path::append(tmp, "sim");
   }
   wpi::sys::fs::make_absolute(tmp);
-  m_webroot_sys = wpi::Twine(tmp).str();
+  m_webroot_sys = tmp.str();
 
   tmp.clear();
   const char* webroot_user = std::getenv("HALSIMWS_USERROOT");
   if (webroot_user != nullptr) {
-    wpi::StringRef tstr(webroot_user);
-    tmp.append(tstr);
+    tmp.append(webroot_user);
   } else {
     wpi::sys::fs::current_path(tmp);
     wpi::sys::path::append(tmp, "sim", "user");
   }
   wpi::sys::fs::make_absolute(tmp);
-  m_webroot_user = wpi::Twine(tmp).str();
+  m_webroot_user = tmp.str();
 
   const char* uri = std::getenv("HALSIMWS_URI");
   if (uri != nullptr) {

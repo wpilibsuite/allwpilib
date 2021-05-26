@@ -6,6 +6,7 @@
 
 #include <cinttypes>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include <HALSimBaseWebSocketConnection.h>
@@ -40,12 +41,11 @@ class HALSimHttpConnection
   void ProcessRequest() override;
   bool IsValidWsUpgrade(wpi::StringRef protocol) override;
   void ProcessWsUpgrade() override;
-  void SendFileResponse(int code, const wpi::Twine& codeText,
-                        const wpi::Twine& contentType,
-                        const wpi::Twine& filename,
-                        const wpi::Twine& extraHeader = wpi::Twine{});
+  void SendFileResponse(int code, std::string_view codeText,
+                        std::string_view contentType, std::string_view filename,
+                        std::string_view extraHeader = {});
 
-  void MySendError(int code, const wpi::Twine& message);
+  void MySendError(int code, std::string_view message);
   void Log(int code);
 
  private:

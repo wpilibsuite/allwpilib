@@ -4,32 +4,34 @@
 
 #include "glass/networktables/NTStringChooser.h"
 
+#include <fmt/format.h>
+
 using namespace glass;
 
-NTStringChooserModel::NTStringChooserModel(wpi::StringRef path)
+NTStringChooserModel::NTStringChooserModel(std::string_view path)
     : NTStringChooserModel{nt::GetDefaultInstance(), path} {}
 
-NTStringChooserModel::NTStringChooserModel(NT_Inst inst, wpi::StringRef path)
+NTStringChooserModel::NTStringChooserModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_default{m_nt.GetEntry(path + "/default")},
-      m_selected{m_nt.GetEntry(path + "/selected")},
-      m_active{m_nt.GetEntry(path + "/active")},
-      m_options{m_nt.GetEntry(path + "/options")} {
+      m_default{m_nt.GetEntry(fmt::format("{}/default", path))},
+      m_selected{m_nt.GetEntry(fmt::format("{}/selected", path))},
+      m_active{m_nt.GetEntry(fmt::format("{}/active", path))},
+      m_options{m_nt.GetEntry(fmt::format("{}/options", path))} {
   m_nt.AddListener(m_default);
   m_nt.AddListener(m_selected);
   m_nt.AddListener(m_active);
   m_nt.AddListener(m_options);
 }
 
-void NTStringChooserModel::SetDefault(wpi::StringRef val) {
+void NTStringChooserModel::SetDefault(std::string_view val) {
   nt::SetEntryValue(m_default, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetSelected(wpi::StringRef val) {
+void NTStringChooserModel::SetSelected(std::string_view val) {
   nt::SetEntryValue(m_selected, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetActive(wpi::StringRef val) {
+void NTStringChooserModel::SetActive(std::string_view val) {
   nt::SetEntryValue(m_active, nt::Value::MakeString(val));
 }
 

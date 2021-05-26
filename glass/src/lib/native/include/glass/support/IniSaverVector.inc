@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/StringExtras.h>
 
 #include "glass/support/IniSaverVector.h"
 
@@ -12,24 +14,21 @@ namespace glass {
 
 template <typename Info>
 void* IniSaverVector<Info>::IniReadOpen(const char* name) {
-  unsigned int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) {
+  if (auto num = wpi::parse_integer<unsigned int>(name, 10)) {
+    if (num.value() >= this->size()) {
+      this->resize(num.value() + 1);
+    }
+    return &(*this)[num.value()];
+  } else {
     return nullptr;
   }
-  if (num >= this->size()) {
-    this->resize(num + 1);
-  }
-  return &(*this)[num];
 }
 
 template <typename Info>
-void IniSaverVector<Info>::IniReadLine(void* entry, const char* lineStr) {
+void IniSaverVector<Info>::IniReadLine(void* entry, const char* line) {
   auto element = static_cast<Info*>(entry);
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
-  element->ReadIni(name, value);
+  auto [name, value] = wpi::split(line, '=');
+  element->ReadIni(wpi::trim(name), wpi::trim(value));
 }
 
 template <typename Info>

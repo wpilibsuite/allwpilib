@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <memory>
+#include <string_view>
 #include <utility>
 
 #include <frc/geometry/Pose2d.h>
@@ -22,6 +23,7 @@
 #include <units/length.h>
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
@@ -229,7 +231,7 @@ class FieldInfo {
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
-  void LoadJson(const wpi::Twine& jsonfile);
+  void LoadJson(std::string_view jsonfile);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
 
@@ -377,7 +379,7 @@ void FieldInfo::LoadImage() {
   if (m_fileOpener && m_fileOpener->ready(0)) {
     auto result = m_fileOpener->result();
     if (!result.empty()) {
-      if (wpi::StringRef(result[0]).endswith(".json")) {
+      if (wpi::ends_with(result[0], ".json")) {
         LoadJson(result[0]);
       } else {
         LoadImageImpl(result[0].c_str());
@@ -396,7 +398,7 @@ void FieldInfo::LoadImage() {
   }
 }
 
-void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
+void FieldInfo::LoadJson(std::string_view jsonfile) {
   std::error_code ec;
   wpi::raw_fd_istream f(jsonfile, ec);
   if (ec) {
@@ -468,8 +470,7 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   }
 
   // the image filename is relative to the json file
-  wpi::SmallString<128> pathname;
-  jsonfile.toVector(pathname);
+  wpi::SmallString<128> pathname{jsonfile};
   wpi::sys::path::remove_filename(pathname);
   wpi::sys::path::append(pathname, image);
 
@@ -886,7 +887,7 @@ void glass::DisplayField2DSettings(Field2DModel* model) {
     }
     auto obj = objRef.get();
 
-    wpi::SmallString<64> nameBuf = name;
+    wpi::SmallString<64> nameBuf{name};
     if (ImGui::CollapsingHeader(nameBuf.c_str())) {
       obj->DisplaySettings();
     }
@@ -902,7 +903,7 @@ class FieldDisplay {
                const ImVec2& contentSize);
 
  private:
-  void DisplayObject(FieldObjectModel& model, wpi::StringRef name);
+  void DisplayObject(FieldObjectModel& model, std::string_view name);
 
   FieldInfo* m_field;
   ImVec2 m_mousePos;
@@ -1021,7 +1022,8 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   }
 }
 
-void FieldDisplay::DisplayObject(FieldObjectModel& model, wpi::StringRef name) {
+void FieldDisplay::DisplayObject(FieldObjectModel& model,
+                                 std::string_view name) {
   PushID(name);
   auto& objRef = m_field->m_objects[name];
   if (!objRef) {

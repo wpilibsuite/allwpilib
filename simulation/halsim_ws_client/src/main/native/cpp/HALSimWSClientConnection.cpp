@@ -4,6 +4,7 @@
 
 #include "HALSimWSClientConnection.h"
 
+#include <fmt/format.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 
@@ -17,17 +18,17 @@ void HALSimWSClientConnection::Initialize() {
   // Get a shared pointer to ourselves
   auto self = this->shared_from_this();
 
-  auto ws =
-      wpi::WebSocket::CreateClient(*m_stream, m_client->GetTargetUri(),
-                                   wpi::Twine{m_client->GetTargetHost()} + ":" +
-                                       wpi::Twine{m_client->GetTargetPort()});
+  auto ws = wpi::WebSocket::CreateClient(
+      *m_stream, m_client->GetTargetUri(),
+      fmt::format("{}:{}", m_client->GetTargetHost(),
+                  m_client->GetTargetPort()));
 
   ws->SetData(self);
 
   m_websocket = ws.get();
 
   // Hook up events
-  m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
+  m_websocket->open.connect_extended([this](auto conn, auto) {
     conn.disconnect();
 
     if (!m_client->RegisterWebsocket(shared_from_this())) {
@@ -39,7 +40,7 @@ void HALSimWSClientConnection::Initialize() {
     wpi::outs() << "HALSimWS: WebSocket Connected\n";
   });
 
-  m_websocket->text.connect([this](wpi::StringRef msg, bool) {
+  m_websocket->text.connect([this](auto msg, bool) {
     if (!m_ws_connected) {
       return;
     }
@@ -58,7 +59,7 @@ void HALSimWSClientConnection::Initialize() {
     m_client->OnNetValueChanged(j);
   });
 
-  m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
+  m_websocket->closed.connect([this](uint16_t, auto) {
     if (m_ws_connected) {
       wpi::outs() << "HALSimWS: Websocket Disconnected\n";
       m_ws_connected = false;

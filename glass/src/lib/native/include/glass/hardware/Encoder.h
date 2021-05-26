@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 
@@ -15,7 +16,7 @@ class DataSource;
 
 class EncoderModel : public Model {
  public:
-  virtual void SetName(const wpi::Twine& name);
+  virtual void SetName(std::string_view name);
 
   virtual const char* GetSimDevice() const = 0;
 
@@ -51,6 +52,6 @@ class EncodersModel : public Model {
 
 void DisplayEncoder(EncoderModel* model);
 void DisplayEncoders(EncodersModel* model,
-                     wpi::StringRef noneMsg = "No encoders");
+                     std::string_view noneMsg = "No encoders");
 
 }  // namespace glass
