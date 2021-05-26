@@ -5,8 +5,7 @@
 #pragma once
 
 #include <memory>
-
-#include <wpi/raw_ostream.h>
+#include <string>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -149,7 +148,7 @@ class MecanumDrive : public RobotDriveBase,
                                       double zRotation, double gyroAngle = 0.0);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "frc/DigitalOutput.h"
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
@@ -74,7 +76,7 @@ class NidecBrushless : public MotorController,
 
   // MotorSafety interface
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   /**
    * Gets the channel number associated with the object.

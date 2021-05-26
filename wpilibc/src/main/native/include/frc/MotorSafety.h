@@ -4,13 +4,11 @@
 
 #pragma once
 
+#include <string>
+
 #include <wpi/mutex.h>
 
 #include "frc/Timer.h"
-
-namespace wpi {
-class raw_ostream;
-}  // namespace wpi
 
 namespace frc {
 
@@ -92,7 +90,7 @@ class MotorSafety {
   static void CheckMotors();
 
   virtual void StopMotor() = 0;
-  virtual void GetDescription(wpi::raw_ostream& desc) const = 0;
+  virtual std::string GetDescription() const = 0;
 
  private:
   static constexpr double kDefaultSafetyExpiration = 0.1;

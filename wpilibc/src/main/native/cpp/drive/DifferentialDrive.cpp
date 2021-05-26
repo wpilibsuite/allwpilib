@@ -189,8 +189,8 @@ void DifferentialDrive::StopMotor() {
   Feed();
 }
 
-void DifferentialDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "DifferentialDrive";
+std::string DifferentialDrive::GetDescription() const {
+  return "DifferentialDrive";
 }
 
 void DifferentialDrive::InitSendable(SendableBuilder& builder) {
