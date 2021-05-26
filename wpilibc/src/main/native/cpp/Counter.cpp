@@ -8,9 +8,9 @@
 
 #include <hal/Counter.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
 #include "frc/AnalogTrigger.h"
-#include "frc/Base.h"
 #include "frc/DigitalInput.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -54,9 +54,9 @@ Counter::Counter(EncodingType encodingType, DigitalSource* upSource,
                  DigitalSource* downSource, bool inverted)
     : Counter(encodingType,
               std::shared_ptr<DigitalSource>(upSource,
-                                             NullDeleter<DigitalSource>()),
+                                             wpi::NullDeleter<DigitalSource>()),
               std::shared_ptr<DigitalSource>(downSource,
-                                             NullDeleter<DigitalSource>()),
+                                             wpi::NullDeleter<DigitalSource>()),
               inverted) {}
 
 Counter::Counter(EncodingType encodingType,
@@ -103,7 +103,7 @@ void Counter::SetUpSource(int channel) {
 void Counter::SetUpSource(AnalogTrigger* analogTrigger,
                           AnalogTriggerType triggerType) {
   SetUpSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
-                                             NullDeleter<AnalogTrigger>()),
+                                             wpi::NullDeleter<AnalogTrigger>()),
               triggerType);
 }
 
@@ -113,8 +113,8 @@ void Counter::SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
 }
 
 void Counter::SetUpSource(DigitalSource* source) {
-  SetUpSource(
-      std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+  SetUpSource(std::shared_ptr<DigitalSource>(
+      source, wpi::NullDeleter<DigitalSource>()));
 }
 
 void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
@@ -128,8 +128,8 @@ void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
 }
 
 void Counter::SetUpSource(DigitalSource& source) {
-  SetUpSource(
-      std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+  SetUpSource(std::shared_ptr<DigitalSource>(
+      &source, wpi::NullDeleter<DigitalSource>()));
 }
 
 void Counter::SetUpSourceEdge(bool risingEdge, bool fallingEdge) {
@@ -157,8 +157,8 @@ void Counter::SetDownSource(int channel) {
 
 void Counter::SetDownSource(AnalogTrigger* analogTrigger,
                             AnalogTriggerType triggerType) {
-  SetDownSource(std::shared_ptr<AnalogTrigger>(analogTrigger,
-                                               NullDeleter<AnalogTrigger>()),
+  SetDownSource(std::shared_ptr<AnalogTrigger>(
+                    analogTrigger, wpi::NullDeleter<AnalogTrigger>()),
                 triggerType);
 }
 
@@ -168,13 +168,13 @@ void Counter::SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
 }
 
 void Counter::SetDownSource(DigitalSource* source) {
-  SetDownSource(
-      std::shared_ptr<DigitalSource>(source, NullDeleter<DigitalSource>()));
+  SetDownSource(std::shared_ptr<DigitalSource>(
+      source, wpi::NullDeleter<DigitalSource>()));
 }
 
 void Counter::SetDownSource(DigitalSource& source) {
-  SetDownSource(
-      std::shared_ptr<DigitalSource>(&source, NullDeleter<DigitalSource>()));
+  SetDownSource(std::shared_ptr<DigitalSource>(
+      &source, wpi::NullDeleter<DigitalSource>()));
 }
 
 void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {

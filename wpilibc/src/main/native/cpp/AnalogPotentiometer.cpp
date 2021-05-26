@@ -6,7 +6,8 @@
 
 #include <utility>
 
-#include "frc/Base.h"
+#include <wpi/NullDeleter.h>
+
 #include "frc/RobotController.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -23,7 +24,7 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
 AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
                                          double offset)
     : AnalogPotentiometer(
-          std::shared_ptr<AnalogInput>(input, NullDeleter<AnalogInput>()),
+          std::shared_ptr<AnalogInput>(input, wpi::NullDeleter<AnalogInput>()),
           fullRange, offset) {}
 
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,

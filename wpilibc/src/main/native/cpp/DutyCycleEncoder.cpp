@@ -4,7 +4,8 @@
 
 #include "frc/DutyCycleEncoder.h"
 
-#include "frc/Base.h"
+#include <wpi/NullDeleter.h>
+
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
@@ -21,12 +22,12 @@ DutyCycleEncoder::DutyCycleEncoder(int channel)
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
-    : m_dutyCycle{&dutyCycle, NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
   Init();
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle)
-    : m_dutyCycle{dutyCycle, NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
   Init();
 }
 
