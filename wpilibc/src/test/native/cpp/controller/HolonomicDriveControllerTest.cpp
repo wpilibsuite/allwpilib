@@ -4,7 +4,7 @@
 
 #include <units/math.h>
 #include <units/time.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
@@ -15,7 +15,8 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * wpi::math::pi / 180.0};
+static constexpr units::radian_t kAngularTolerance{2.0 * wpi::numbers::pi /
+                                                   180.0};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
   frc::HolonomicDriveController controller{

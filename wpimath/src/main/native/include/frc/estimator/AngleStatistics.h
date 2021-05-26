@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "Eigen/Core"
 #include "frc/MathUtil.h"
@@ -59,7 +59,7 @@ Eigen::Matrix<double, States, 1> AngleAdd(
     const Eigen::Matrix<double, States, 1>& b, int angleStateIdx) {
   Eigen::Matrix<double, States, 1> ret = a + b;
   ret[angleStateIdx] =
-      InputModulus(ret[angleStateIdx], -wpi::math::pi, wpi::math::pi);
+      InputModulus(ret[angleStateIdx], -wpi::numbers::pi, wpi::numbers::pi);
   return ret;
 }
 

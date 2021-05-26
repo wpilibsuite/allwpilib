@@ -8,7 +8,7 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/SpeedController.h"
 #include "frc/drive/Vector2d.h"
@@ -73,8 +73,8 @@ void MecanumDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
-                 magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
+  DriveCartesian(magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
+                 magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
                  zRotation, 0.0);
 }
 

@@ -7,7 +7,7 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 using namespace frc;
 
@@ -114,5 +114,5 @@ double Joystick::GetDirectionRadians() const {
 }
 
 double Joystick::GetDirectionDegrees() const {
-  return (180 / wpi::math::pi) * GetDirectionRadians();
+  return (180 / wpi::numbers::pi) * GetDirectionRadians();
 }

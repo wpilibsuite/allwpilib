@@ -6,7 +6,7 @@
 
 #include <frc/Joystick.h>
 #include <units/length.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "commands/DriveWithJoystick.h"
 
@@ -31,9 +31,9 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
   m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                     wpi::math::pi / 360.0);
+                                     wpi::numbers::pi / 360.0);
   m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                    wpi::math::pi / 360.0);
+                                    wpi::numbers::pi / 360.0);
 #endif
 
   AddChild("Right Encoder", m_rightEncoder);

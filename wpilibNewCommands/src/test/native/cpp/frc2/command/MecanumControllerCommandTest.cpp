@@ -14,7 +14,7 @@
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/simulation/SimHooks.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "gtest/gtest.h"
 
