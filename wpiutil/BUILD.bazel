@@ -83,6 +83,14 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/libuv/include",
 )
 
+wpilib_cc_library(
+    name = "fmtlib-headers",
+    hdrs = glob([
+        "src/main/native/fmtlib/include/fmt/*.h",
+    ]),
+    strip_include_prefix = "src/main/native/fmtlib/include",
+)
+
 filegroup(
     name = "native-srcs",
     srcs = select({
@@ -114,8 +122,9 @@ jni_project(
     ] + glob([
         "src/main/native/libuv/src/*.cpp",
         "src/main/native/libuv/src/*.h",
+        "src/main/native/fmtlib/src/*.cpp",
     ]),
-    cc_raw_deps = [":libuv-headers"],
+    cc_raw_deps = [":libuv-headers", "fmtlib-headers"],
     export_jni_symbols = False,
     java_deps = [
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
