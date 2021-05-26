@@ -4,19 +4,13 @@
 
 #include "frc/simulation/AnalogEncoderSim.h"
 
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
-
 #include "frc/AnalogEncoder.h"
 #include "frc/simulation/SimDeviceSim.h"
 
 using namespace frc::sim;
 
 AnalogEncoderSim::AnalogEncoderSim(const frc::AnalogEncoder& encoder) {
-  wpi::SmallString<128> fullname;
-  wpi::raw_svector_ostream os(fullname);
-  os << "AnalogEncoder" << '[' << encoder.GetChannel() << ']';
-  frc::sim::SimDeviceSim deviceSim{fullname.c_str()};
+  frc::sim::SimDeviceSim deviceSim{"AnalogEncoder", encoder.GetChannel()};
   m_positionSim = deviceSim.GetDouble("Position");
 }
 
