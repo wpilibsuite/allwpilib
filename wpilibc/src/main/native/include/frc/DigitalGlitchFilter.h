@@ -32,8 +32,8 @@ class DigitalGlitchFilter : public Sendable,
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;
 
-  DigitalGlitchFilter(DigitalGlitchFilter&& rhs);
-  DigitalGlitchFilter& operator=(DigitalGlitchFilter&& rhs);
+  DigitalGlitchFilter(DigitalGlitchFilter&&) = default;
+  DigitalGlitchFilter& operator=(DigitalGlitchFilter&&) = default;
 
   /**
    * Assigns the DigitalSource to this glitch filter.
