@@ -109,8 +109,8 @@ MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double ySpeed,
           wheelSpeeds[kRearLeft], wheelSpeeds[kRearRight]};
 }
 
-void MecanumDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "MecanumDrive";
+std::string MecanumDrive::GetDescription() const {
+  return "MecanumDrive";
 }
 
 void MecanumDrive::InitSendable(SendableBuilder& builder) {

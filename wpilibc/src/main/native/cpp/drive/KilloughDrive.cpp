@@ -114,8 +114,8 @@ void KilloughDrive::StopMotor() {
   Feed();
 }
 
-void KilloughDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "KilloughDrive";
+std::string KilloughDrive::GetDescription() const {
+  return "KilloughDrive";
 }
 
 void KilloughDrive::InitSendable(SendableBuilder& builder) {

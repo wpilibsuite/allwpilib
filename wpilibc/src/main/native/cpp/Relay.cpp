@@ -6,12 +6,12 @@
 
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
 #include <wpi/StackTrace.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -168,8 +168,8 @@ void Relay::StopMotor() {
   Set(kOff);
 }
 
-void Relay::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "Relay " << GetChannel();
+std::string Relay::GetDescription() const {
+  return fmt::format("Relay {}", GetChannel());
 }
 
 void Relay::InitSendable(SendableBuilder& builder) {

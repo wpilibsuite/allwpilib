@@ -5,8 +5,7 @@
 #pragma once
 
 #include <memory>
-
-#include <wpi/raw_ostream.h>
+#include <string>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/drive/Vector2d.h"
@@ -159,7 +158,7 @@ class KilloughDrive : public RobotDriveBase,
                                double gyroAngle = 0.0);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

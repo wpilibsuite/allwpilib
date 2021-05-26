@@ -4,8 +4,8 @@
 
 #include "frc/motorcontrol/NidecBrushless.h"
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -64,8 +64,8 @@ void NidecBrushless::StopMotor() {
   m_pwm.SetDisabled();
 }
 
-void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "Nidec " << GetChannel();
+std::string NidecBrushless::GetDescription() const {
+  return fmt::format("Nidec {}", GetChannel());
 }
 
 int NidecBrushless::GetChannel() const {
