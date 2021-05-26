@@ -4,16 +4,6 @@
 
 #pragma once
 
-#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 5
-static_assert(0,
-              "GCC must be 5 or greater. If building for the roboRIO, please "
-              "update to the 2018 toolchains.");
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-static_assert(0, "Visual Studio 2015 or greater required.");
-#endif
-
 /** WPILib FRC namespace */
 namespace frc {
 
