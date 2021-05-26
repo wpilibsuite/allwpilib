@@ -15,8 +15,3 @@ struct NullDeleter {
 };
 
 }  // namespace frc
-
-// For backwards compatibility
-#ifdef NO_NAMESPACED_WPILIB
-using namespace frc;  // NOLINT
-#endif
