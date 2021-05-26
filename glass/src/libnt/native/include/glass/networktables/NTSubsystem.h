@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
@@ -18,8 +18,8 @@ class NTSubsystemModel : public SubsystemModel {
  public:
   static constexpr const char* kType = "Subsystem";
 
-  explicit NTSubsystemModel(wpi::StringRef path);
-  NTSubsystemModel(NT_Inst instance, wpi::StringRef path);
+  explicit NTSubsystemModel(std::string_view path);
+  NTSubsystemModel(NT_Inst instance, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetDefaultCommand() const override {

@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 
@@ -33,6 +34,6 @@ class PDPsModel : public Model {
 };
 
 void DisplayPDP(PDPModel* model, int index);
-void DisplayPDPs(PDPsModel* model, wpi::StringRef noneMsg = "No PDPs");
+void DisplayPDPs(PDPsModel* model, std::string_view noneMsg = "No PDPs");
 
 }  // namespace glass

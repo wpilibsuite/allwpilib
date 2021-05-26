@@ -6,13 +6,12 @@
 
 #include <algorithm>
 
-#include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
 using namespace glass;
 
-WindowManager::WindowManager(const wpi::Twine& iniName)
+WindowManager::WindowManager(std::string_view iniName)
     : m_iniSaver{iniName, this} {}
 
 // read/write open state to ini file
@@ -31,7 +30,7 @@ void WindowManager::IniSaver::IniWriteAll(ImGuiTextBuffer* out_buf) {
   }
 }
 
-Window* WindowManager::AddWindow(wpi::StringRef id,
+Window* WindowManager::AddWindow(std::string_view id,
                                  wpi::unique_function<void()> display) {
   auto win = GetOrAddWindow(id, false);
   if (!win) {
@@ -45,7 +44,7 @@ Window* WindowManager::AddWindow(wpi::StringRef id,
   return win;
 }
 
-Window* WindowManager::AddWindow(wpi::StringRef id,
+Window* WindowManager::AddWindow(std::string_view id,
                                  std::unique_ptr<View> view) {
   auto win = GetOrAddWindow(id, false);
   if (!win) {
@@ -59,11 +58,11 @@ Window* WindowManager::AddWindow(wpi::StringRef id,
   return win;
 }
 
-Window* WindowManager::GetOrAddWindow(wpi::StringRef id, bool duplicateOk) {
+Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk) {
   // binary search
   auto it = std::lower_bound(
       m_windows.begin(), m_windows.end(), id,
-      [](const auto& elem, wpi::StringRef s) { return elem->GetId() < s; });
+      [](const auto& elem, std::string_view s) { return elem->GetId() < s; });
   if (it != m_windows.end() && (*it)->GetId() == id) {
     if (!duplicateOk) {
       wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
@@ -75,11 +74,11 @@ Window* WindowManager::GetOrAddWindow(wpi::StringRef id, bool duplicateOk) {
   return m_windows.emplace(it, std::make_unique<Window>(id))->get();
 }
 
-Window* WindowManager::GetWindow(wpi::StringRef id) {
+Window* WindowManager::GetWindow(std::string_view id) {
   // binary search
   auto it = std::lower_bound(
       m_windows.begin(), m_windows.end(), id,
-      [](const auto& elem, wpi::StringRef s) { return elem->GetId() < s; });
+      [](const auto& elem, std::string_view s) { return elem->GetId() < s; });
   if (it == m_windows.end() || (*it)->GetId() != id) {
     return nullptr;
   }

@@ -41,8 +41,8 @@ class HALSimWS : public std::enable_shared_from_this<HALSimWS> {
 
   void OnNetValueChanged(const wpi::json& msg);
 
-  wpi::StringRef GetTargetHost() const { return m_host; }
-  wpi::StringRef GetTargetUri() const { return m_uri; }
+  const std::string& GetTargetHost() const { return m_host; }
+  const std::string& GetTargetUri() const { return m_uri; }
   int GetTargetPort() const { return m_port; }
   wpi::uv::Loop& GetLoop() { return m_loop; }
 

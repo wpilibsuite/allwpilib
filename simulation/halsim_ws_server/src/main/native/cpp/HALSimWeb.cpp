@@ -5,7 +5,6 @@
 #include "HALSimWeb.h"
 
 #include <wpi/SmallString.h>
-#include <wpi/Twine.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
 #include <wpi/fs.h>

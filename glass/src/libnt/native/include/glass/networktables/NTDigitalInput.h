@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/hardware/DIO.h"
@@ -20,8 +20,8 @@ class NTDigitalInputModel : public DIOModel {
   static constexpr const char* kType = "Digital Input";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTDigitalInputModel(wpi::StringRef path);
-  NTDigitalInputModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTDigitalInputModel(std::string_view path);
+  NTDigitalInputModel(NT_Inst inst, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
 

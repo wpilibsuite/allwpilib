@@ -27,7 +27,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
       wpi::WebSocket::CreateClient(*m_tcp_client.get(), uri, ss.str());
 
   // Hook up events
-  m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
+  m_websocket->open.connect_extended([this](auto conn, auto) {
     conn.disconnect();
     m_buffers = std::make_unique<BufferPool>();
 
@@ -41,7 +41,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     wpi::errs() << "WebServerClientTest: WebSocket Connected\n";
   });
 
-  m_websocket->text.connect([this](wpi::StringRef msg, bool) {
+  m_websocket->text.connect([this](auto msg, bool) {
     wpi::json j;
     try {
       j = wpi::json::parse(msg);
@@ -56,7 +56,7 @@ void WebServerClientTest::InitializeWebSocket(const std::string& host, int port,
     m_json = j;
   });
 
-  m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
+  m_websocket->closed.connect([this](uint16_t, auto) {
     if (m_ws_connected) {
       wpi::errs() << "WebServerClientTest: Websocket Disconnected\n";
       m_ws_connected = false;

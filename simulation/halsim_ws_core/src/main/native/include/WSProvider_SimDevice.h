@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <hal/SimDevice.h>
@@ -34,9 +35,8 @@ struct SimDeviceValueData {
 
 class HALSimWSProviderSimDevice : public HALSimWSBaseProvider {
  public:
-  HALSimWSProviderSimDevice(HAL_SimDeviceHandle handle, const std::string& key,
-                            const std::string& type,
-                            const std::string& deviceId)
+  HALSimWSProviderSimDevice(HAL_SimDeviceHandle handle, std::string_view key,
+                            std::string_view type, std::string_view deviceId)
       : HALSimWSBaseProvider(key, type), m_handle(handle) {
     m_deviceId = deviceId;
   }

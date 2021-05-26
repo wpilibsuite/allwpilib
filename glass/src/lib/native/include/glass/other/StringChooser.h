@@ -5,10 +5,10 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 
@@ -21,9 +21,9 @@ class StringChooserModel : public Model {
   virtual const std::string& GetActive() = 0;
   virtual const std::vector<std::string>& GetOptions() = 0;
 
-  virtual void SetDefault(wpi::StringRef val) = 0;
-  virtual void SetSelected(wpi::StringRef val) = 0;
-  virtual void SetActive(wpi::StringRef val) = 0;
+  virtual void SetDefault(std::string_view val) = 0;
+  virtual void SetSelected(std::string_view val) = 0;
+  virtual void SetActive(std::string_view val) = 0;
   virtual void SetOptions(wpi::ArrayRef<std::string> val) = 0;
 };
 

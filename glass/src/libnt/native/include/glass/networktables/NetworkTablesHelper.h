@@ -4,11 +4,10 @@
 
 #pragma once
 
+#include <string_view>
 #include <vector>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 namespace glass {
 
@@ -23,7 +22,7 @@ class NetworkTablesHelper {
   NT_Inst GetInstance() const { return m_inst; }
   NT_EntryListenerPoller GetPoller() const { return m_poller; }
 
-  NT_Entry GetEntry(const wpi::Twine& name) const {
+  NT_Entry GetEntry(std::string_view name) const {
     return nt::GetEntry(m_inst, name);
   }
 
@@ -36,7 +35,7 @@ class NetworkTablesHelper {
     return nt::AddPolledEntryListener(m_poller, entry, flags);
   }
 
-  NT_EntryListener AddListener(const wpi::Twine& prefix,
+  NT_EntryListener AddListener(std::string_view prefix,
                                unsigned int flags = kDefaultListenerFlags) {
     return nt::AddPolledEntryListener(m_poller, prefix, flags);
   }

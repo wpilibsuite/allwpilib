@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <wpi/json.h>
 
@@ -16,7 +17,8 @@ namespace wpilibws {
 
 class HALSimWSBaseProvider {
  public:
-  explicit HALSimWSBaseProvider(std::string key, std::string type = "");
+  explicit HALSimWSBaseProvider(std::string_view key,
+                                std::string_view type = "");
   virtual ~HALSimWSBaseProvider() = default;
 
   HALSimWSBaseProvider(const HALSimWSBaseProvider&) = delete;
@@ -34,8 +36,8 @@ class HALSimWSBaseProvider {
   // network -> sim
   virtual void OnNetValueChanged(const wpi::json& json);
 
-  const std::string GetDeviceType() { return m_type; }
-  const std::string GetDeviceId() { return m_deviceId; }
+  const std::string& GetDeviceType() { return m_type; }
+  const std::string& GetDeviceId() { return m_deviceId; }
 
  protected:
   // sim -> network

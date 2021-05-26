@@ -4,19 +4,19 @@
 
 #include "glass/networktables/NTDigitalOutput.h"
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
 
 using namespace glass;
 
-NTDigitalOutputModel::NTDigitalOutputModel(wpi::StringRef path)
+NTDigitalOutputModel::NTDigitalOutputModel(std::string_view path)
     : NTDigitalOutputModel{nt::GetDefaultInstance(), path} {}
 
-NTDigitalOutputModel::NTDigitalOutputModel(NT_Inst inst, wpi::StringRef path)
+NTDigitalOutputModel::NTDigitalOutputModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_value{m_nt.GetEntry(path + "/Value")},
-      m_name{m_nt.GetEntry(path + "/.name")},
-      m_controllable{m_nt.GetEntry(path + "/.controllable")},
-      m_valueData{"NT_DOut:" + path} {
+      m_value{m_nt.GetEntry(fmt::format("{}/Value", path))},
+      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))},
+      m_controllable{m_nt.GetEntry(fmt::format("{}/.controllable", path))},
+      m_valueData{fmt::format("NT_DOut:{}", path)} {
   m_nt.AddListener(m_value);
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_controllable);

@@ -5,25 +5,27 @@
 #include "glass/networktables/NTMechanism2D.h"
 
 #include <algorithm>
+#include <string_view>
 #include <vector>
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/other/Mechanism2D.h"
 
 using namespace glass;
 
 // Convert "#RRGGBB" hex color to ImU32 color
-static void ConvertColor(wpi::StringRef in, ImU32* out) {
+static void ConvertColor(std::string_view in, ImU32* out) {
   if (in.size() != 7 || in[0] != '#') {
     return;
   }
-  ImU32 val = 0;
-  if (in.drop_front().getAsInteger(16, val)) {
-    return;
+  if (auto v = wpi::parse_integer<ImU32>(wpi::drop_front(in), 16)) {
+    ImU32 val = v.value();
+    *out = IM_COL32((val >> 16) & 0xff, (val >> 8) & 0xff, val & 0xff, 255);
   }
-  *out = IM_COL32((val >> 16) & 0xff, (val >> 8) & 0xff, val & 0xff, 255);
 }
 
 namespace {
@@ -32,13 +34,13 @@ class NTMechanismObjectModel;
 
 class NTMechanismGroupImpl final {
  public:
-  NTMechanismGroupImpl(NT_Inst inst, const wpi::Twine& path,
-                       wpi::StringRef name)
-      : m_inst{inst}, m_path{path.str()}, m_name{name} {}
+  NTMechanismGroupImpl(NT_Inst inst, std::string_view path,
+                       std::string_view name)
+      : m_inst{inst}, m_path{path}, m_name{name} {}
 
   const char* GetName() const { return m_name.c_str(); }
   void ForEachObject(wpi::function_ref<void(MechanismObjectModel& model)> func);
-  void NTUpdate(const nt::EntryNotification& event, wpi::StringRef name);
+  void NTUpdate(const nt::EntryNotification& event, std::string_view name);
 
  protected:
   NT_Inst m_inst;
@@ -49,14 +51,14 @@ class NTMechanismGroupImpl final {
 
 class NTMechanismObjectModel final : public MechanismObjectModel {
  public:
-  NTMechanismObjectModel(NT_Inst inst, const wpi::Twine& path,
-                         wpi::StringRef name)
+  NTMechanismObjectModel(NT_Inst inst, std::string_view path,
+                         std::string_view name)
       : m_group{inst, path, name},
-        m_type{nt::GetEntry(inst, path + "/.type")},
-        m_color{nt::GetEntry(inst, path + "/color")},
-        m_weight{nt::GetEntry(inst, path + "/weight")},
-        m_angle{nt::GetEntry(inst, path + "/angle")},
-        m_length{nt::GetEntry(inst, path + "/length")} {}
+        m_type{nt::GetEntry(inst, fmt::format("{}/.type", path))},
+        m_color{nt::GetEntry(inst, fmt::format("{}/color", path))},
+        m_weight{nt::GetEntry(inst, fmt::format("{}/weight", path))},
+        m_angle{nt::GetEntry(inst, fmt::format("{}/angle", path))},
+        m_length{nt::GetEntry(inst, fmt::format("{}/length", path))} {}
 
   const char* GetName() const final { return m_group.GetName(); }
   void ForEachObject(
@@ -70,7 +72,7 @@ class NTMechanismObjectModel final : public MechanismObjectModel {
   frc::Rotation2d GetAngle() const final { return m_angleValue; }
   units::meter_t GetLength() const final { return m_lengthValue; }
 
-  bool NTUpdate(const nt::EntryNotification& event, wpi::StringRef childName);
+  bool NTUpdate(const nt::EntryNotification& event, std::string_view childName);
 
  private:
   NTMechanismGroupImpl m_group;
@@ -98,25 +100,26 @@ void NTMechanismGroupImpl::ForEachObject(
 }
 
 void NTMechanismGroupImpl::NTUpdate(const nt::EntryNotification& event,
-                                    wpi::StringRef name) {
+                                    std::string_view name) {
   if (name.empty()) {
     return;
   }
-  wpi::StringRef childName;
-  std::tie(name, childName) = name.split('/');
+  std::string_view childName;
+  std::tie(name, childName) = wpi::split(name, '/');
   if (childName.empty()) {
     return;
   }
 
   auto it = std::lower_bound(
       m_objects.begin(), m_objects.end(), name,
-      [](const auto& e, wpi::StringRef name) { return e->GetName() < name; });
+      [](const auto& e, std::string_view name) { return e->GetName() < name; });
   bool match = it != m_objects.end() && (*it)->GetName() == name;
 
   if (event.flags & NT_NOTIFY_NEW) {
     if (!match) {
-      it = m_objects.emplace(it, std::make_unique<NTMechanismObjectModel>(
-                                     m_inst, m_path + "/" + name, name));
+      it = m_objects.emplace(
+          it, std::make_unique<NTMechanismObjectModel>(
+                  m_inst, fmt::format("{}/{}", m_path, name), name));
       match = true;
     }
   }
@@ -128,7 +131,7 @@ void NTMechanismGroupImpl::NTUpdate(const nt::EntryNotification& event,
 }
 
 bool NTMechanismObjectModel::NTUpdate(const nt::EntryNotification& event,
-                                      wpi::StringRef childName) {
+                                      std::string_view childName) {
   if (event.entry == m_type) {
     if ((event.flags & NT_NOTIFY_DELETE) != 0) {
       return true;
@@ -160,10 +163,10 @@ bool NTMechanismObjectModel::NTUpdate(const nt::EntryNotification& event,
 
 class NTMechanism2DModel::RootModel final : public MechanismRootModel {
  public:
-  RootModel(NT_Inst inst, const wpi::Twine& path, wpi::StringRef name)
+  RootModel(NT_Inst inst, std::string_view path, std::string_view name)
       : m_group{inst, path, name},
-        m_x{nt::GetEntry(inst, path + "/x")},
-        m_y{nt::GetEntry(inst, path + "/y")} {}
+        m_x{nt::GetEntry(inst, fmt::format("{}/x", path))},
+        m_y{nt::GetEntry(inst, fmt::format("{}/y", path))} {}
 
   const char* GetName() const final { return m_group.GetName(); }
   void ForEachObject(
@@ -171,7 +174,7 @@ class NTMechanism2DModel::RootModel final : public MechanismRootModel {
     m_group.ForEachObject(func);
   }
 
-  bool NTUpdate(const nt::EntryNotification& event, wpi::StringRef childName);
+  bool NTUpdate(const nt::EntryNotification& event, std::string_view childName);
 
   frc::Translation2d GetPosition() const override { return m_pos; };
 
@@ -183,7 +186,7 @@ class NTMechanism2DModel::RootModel final : public MechanismRootModel {
 };
 
 bool NTMechanism2DModel::RootModel::NTUpdate(const nt::EntryNotification& event,
-                                             wpi::StringRef childName) {
+                                             std::string_view childName) {
   if ((event.flags & NT_NOTIFY_DELETE) != 0 &&
       (event.entry == m_x || event.entry == m_y)) {
     return true;
@@ -203,15 +206,15 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const nt::EntryNotification& event,
   return false;
 }
 
-NTMechanism2DModel::NTMechanism2DModel(wpi::StringRef path)
+NTMechanism2DModel::NTMechanism2DModel(std::string_view path)
     : NTMechanism2DModel{nt::GetDefaultInstance(), path} {}
 
-NTMechanism2DModel::NTMechanism2DModel(NT_Inst inst, wpi::StringRef path)
+NTMechanism2DModel::NTMechanism2DModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_path{(path + "/").str()},
-      m_name{m_nt.GetEntry(path + "/.name")},
-      m_dimensions{m_nt.GetEntry(path + "/dims")},
-      m_bgColor{m_nt.GetEntry(path + "/backgroundColor")},
+      m_path{fmt::format("{}/", path)},
+      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))},
+      m_dimensions{m_nt.GetEntry(fmt::format("{}/dims", path))},
+      m_bgColor{m_nt.GetEntry(fmt::format("{}/backgroundColor", path))},
       m_dimensionsValue{1_m, 1_m} {
   m_nt.AddListener(m_path, NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
@@ -247,28 +250,30 @@ void NTMechanism2DModel::Update() {
       }
     }
 
-    if (wpi::StringRef{event.name}.startswith(m_path)) {
-      auto name = wpi::StringRef{event.name}.drop_front(m_path.size());
+    std::string_view name = event.name;
+    if (wpi::starts_with(name, m_path)) {
+      name.remove_prefix(m_path.size());
       if (name.empty() || name[0] == '.') {
         continue;
       }
-      wpi::StringRef childName;
-      std::tie(name, childName) = name.split('/');
+      std::string_view childName;
+      std::tie(name, childName) = wpi::split(name, '/');
       if (childName.empty()) {
         continue;
       }
 
       auto it = std::lower_bound(m_roots.begin(), m_roots.end(), name,
-                                 [](const auto& e, wpi::StringRef name) {
+                                 [](const auto& e, std::string_view name) {
                                    return e->GetName() < name;
                                  });
       bool match = it != m_roots.end() && (*it)->GetName() == name;
 
       if (event.flags & NT_NOTIFY_NEW) {
         if (!match) {
-          it =
-              m_roots.emplace(it, std::make_unique<RootModel>(
-                                      m_nt.GetInstance(), m_path + name, name));
+          it = m_roots.emplace(
+              it,
+              std::make_unique<RootModel>(
+                  m_nt.GetInstance(), fmt::format("{}{}", m_path, name), name));
           match = true;
         }
       }

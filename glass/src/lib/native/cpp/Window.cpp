@@ -5,7 +5,7 @@
 #include "glass/Window.h"
 
 #include <imgui_internal.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 
@@ -86,26 +86,21 @@ void Window::ScaleDefault(float scale) {
   }
 }
 
-void Window::IniReadLine(const char* lineStr) {
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
+void Window::IniReadLine(const char* line) {
+  auto [name, value] = wpi::split(line, '=');
+  name = wpi::trim(name);
+  value = wpi::trim(value);
 
   if (name == "name") {
     m_name = value;
   } else if (name == "visible") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_visible = num.value();
     }
-    m_visible = num;
   } else if (name == "enabled") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_enabled = num.value();
     }
-    m_enabled = num;
   }
 }
 

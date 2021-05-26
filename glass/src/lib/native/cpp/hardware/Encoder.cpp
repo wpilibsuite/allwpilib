@@ -4,6 +4,7 @@
 
 #include "glass/hardware/Encoder.h"
 
+#include <fmt/format.h>
 #include <imgui.h>
 
 #include "glass/Context.h"
@@ -11,8 +12,8 @@
 
 using namespace glass;
 
-void EncoderModel::SetName(const wpi::Twine& name) {
-  if (name.str().empty()) {
+void EncoderModel::SetName(std::string_view name) {
+  if (name.empty()) {
     if (auto distancePerPulse = GetDistancePerPulseData()) {
       distancePerPulse->SetName("");
     }
@@ -33,22 +34,22 @@ void EncoderModel::SetName(const wpi::Twine& name) {
     }
   } else {
     if (auto distancePerPulse = GetDistancePerPulseData()) {
-      distancePerPulse->SetName(name + " Distance/Count");
+      distancePerPulse->SetName(fmt::format("{} Distance/Count", name));
     }
     if (auto count = GetCountData()) {
-      count->SetName(name + " Count");
+      count->SetName(fmt::format("{} Count", name));
     }
     if (auto period = GetPeriodData()) {
-      period->SetName(name + " Period");
+      period->SetName(fmt::format("{} Period", name));
     }
     if (auto direction = GetDirectionData()) {
-      direction->SetName(name + " Direction");
+      direction->SetName(fmt::format("{} Direction", name));
     }
     if (auto distance = GetDistanceData()) {
-      distance->SetName(name + " Distance");
+      distance->SetName(fmt::format("{} Distance", name));
     }
     if (auto rate = GetRateData()) {
-      rate->SetName(name + " Rate");
+      rate->SetName(fmt::format("{} Rate", name));
     }
   }
 }
@@ -153,7 +154,7 @@ void glass::DisplayEncoder(EncoderModel* model) {
   ImGui::PopItemWidth();
 }
 
-void glass::DisplayEncoders(EncodersModel* model, wpi::StringRef noneMsg) {
+void glass::DisplayEncoders(EncodersModel* model, std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachEncoder([&](EncoderModel& encoder, int i) {
     hasAny = true;
@@ -162,6 +163,6 @@ void glass::DisplayEncoders(EncodersModel* model, wpi::StringRef noneMsg) {
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }
