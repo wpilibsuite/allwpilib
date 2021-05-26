@@ -6,8 +6,8 @@
 
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
-#include "frc/Base.h"
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -15,7 +15,7 @@
 using namespace frc;
 
 DutyCycle::DutyCycle(DigitalSource* source)
-    : m_source{source, NullDeleter<DigitalSource>()} {
+    : m_source{source, wpi::NullDeleter<DigitalSource>()} {
   if (!m_source) {
     throw FRC_MakeError(err::NullParameter, "{}", "source");
   }
@@ -23,7 +23,7 @@ DutyCycle::DutyCycle(DigitalSource* source)
 }
 
 DutyCycle::DutyCycle(DigitalSource& source)
-    : m_source{&source, NullDeleter<DigitalSource>()} {
+    : m_source{&source, wpi::NullDeleter<DigitalSource>()} {
   InitDutyCycle();
 }
 

@@ -7,8 +7,8 @@
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
-#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
@@ -36,8 +36,8 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel)
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
-    : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
+    : m_pingChannel(pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   if (!pingChannel) {
     throw FRC_MakeError(err::NullParameter, "{}", "pingChannel");
@@ -49,8 +49,8 @@ Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel)
-    : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
+    : m_pingChannel(&pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(&echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   Initialize();
 }

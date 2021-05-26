@@ -4,8 +4,9 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <wpi/NullDeleter.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -16,14 +17,14 @@ AnalogEncoder::AnalogEncoder(int channel)
     : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
 
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
-    : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
-    : m_analogInput{analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();

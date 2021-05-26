@@ -7,9 +7,9 @@
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -108,7 +108,8 @@ bool AnalogTrigger::GetTriggerState() {
 std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
   return std::shared_ptr<AnalogTriggerOutput>(
-      new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
+      new AnalogTriggerOutput(*this, type),
+      wpi::NullDeleter<AnalogTriggerOutput>());
 }
 
 void AnalogTrigger::InitSendable(SendableBuilder& builder) {

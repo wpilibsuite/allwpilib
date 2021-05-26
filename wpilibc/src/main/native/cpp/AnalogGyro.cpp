@@ -10,10 +10,10 @@
 #include <hal/AnalogGyro.h>
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -27,8 +27,8 @@ AnalogGyro::AnalogGyro(int channel)
 }
 
 AnalogGyro::AnalogGyro(AnalogInput* channel)
-    : AnalogGyro(
-          std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}
+    : AnalogGyro(std::shared_ptr<AnalogInput>(
+          channel, wpi::NullDeleter<AnalogInput>())) {}
 
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
     : m_analog(channel) {
