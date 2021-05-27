@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 #include <hal/DriverStation.h>
@@ -26,7 +27,7 @@ template <class T>
 class MatchDataSenderEntry {
  public:
   MatchDataSenderEntry(const std::shared_ptr<nt::NetworkTable>& table,
-                       const wpi::Twine& key, const T& initialVal) {
+                       std::string_view key, const T& initialVal) {
     static_assert(std::is_same_v<T, bool> || std::is_same_v<T, double> ||
                       std::is_same_v<T, std::string>,
                   "Invalid type for MatchDataSenderEntry - must be "
@@ -56,7 +57,7 @@ class MatchDataSenderEntry {
 
   void SetValue(bool val) { ntEntry.SetBoolean(val); }
   void SetValue(double val) { ntEntry.SetDouble(val); }
-  void SetValue(const wpi::Twine& val) { ntEntry.SetString(val); }
+  void SetValue(std::string_view val) { ntEntry.SetString(val); }
 };
 
 class MatchDataSender {

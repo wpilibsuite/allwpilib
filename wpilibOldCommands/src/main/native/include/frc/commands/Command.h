@@ -6,9 +6,9 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <wpi/SmallPtrSet.h>
-#include <wpi/Twine.h>
 
 #include "frc/commands/Subsystem.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -59,7 +59,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    *
    * @param name the name for this command
    */
-  explicit Command(const wpi::Twine& name);
+  explicit Command(std::string_view name);
 
   /**
    * Creates a new command with the given timeout and a default name.
@@ -83,7 +83,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    * @param timeout the time (in seconds) before this command "times out"
    * @see IsTimedOut()
    */
-  Command(const wpi::Twine& name, double timeout);
+  Command(std::string_view name, double timeout);
 
   /**
    * Creates a new command with the given name and timeout.
@@ -91,7 +91,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    * @param name      the name of the command
    * @param subsystem the subsystem that the command requires
    */
-  Command(const wpi::Twine& name, Subsystem& subsystem);
+  Command(std::string_view name, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
@@ -108,7 +108,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    * @param timeout   the time (in seconds) before this command "times out"
    * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(const wpi::Twine& name, double timeout, Subsystem& subsystem);
+  Command(std::string_view name, double timeout, Subsystem& subsystem);
 
   ~Command() override = default;
 
@@ -293,7 +293,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    *                message)
    * @return True if assert passed, false if assert failed.
    */
-  bool AssertUnlocked(const std::string& message);
+  bool AssertUnlocked(std::string_view message);
 
   /**
    * Sets the parent of this command. No actual change is made to the group.
@@ -395,7 +395,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    *
    * @param name name
    */
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
 
   /**
    * Gets the subsystem name of this Command.
@@ -409,7 +409,7 @@ class Command : public Sendable, public SendableHelper<Command> {
    *
    * @param subsystem subsystem name
    */
-  void SetSubsystem(const wpi::Twine& subsystem);
+  void SetSubsystem(std::string_view subsystem);
 
  private:
   /**

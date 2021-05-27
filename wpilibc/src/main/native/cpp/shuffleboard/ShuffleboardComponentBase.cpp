@@ -4,21 +4,15 @@
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
-#include <wpi/SmallVector.h>
-
 using namespace frc;
 
 ShuffleboardComponentBase::ShuffleboardComponentBase(
-    ShuffleboardContainer& parent, const wpi::Twine& title,
-    const wpi::Twine& type)
-    : ShuffleboardValue(title), m_parent(parent) {
-  wpi::SmallVector<char, 16> storage;
-  m_type = type.toStringRef(storage);
-}
+    ShuffleboardContainer& parent, std::string_view title,
+    std::string_view type)
+    : ShuffleboardValue(title), m_parent(parent), m_type(type) {}
 
-void ShuffleboardComponentBase::SetType(const wpi::Twine& type) {
-  wpi::SmallVector<char, 16> storage;
-  m_type = type.toStringRef(storage);
+void ShuffleboardComponentBase::SetType(std::string_view type) {
+  m_type = type;
   m_metadataDirty = true;
 }
 

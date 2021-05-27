@@ -6,6 +6,7 @@
 
 #include <initializer_list>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -31,8 +32,7 @@ class FieldObject2d {
   struct private_init {};
 
  public:
-  FieldObject2d(std::string&& name, const private_init&)
-      : m_name{std::move(name)} {}
+  FieldObject2d(std::string_view name, const private_init&) : m_name{name} {}
 
   FieldObject2d(FieldObject2d&& rhs);
   FieldObject2d& operator=(FieldObject2d&& rhs);

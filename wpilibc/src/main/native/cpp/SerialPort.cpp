@@ -42,16 +42,14 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
              static_cast<uint8_t>(port) + 1);
 }
 
-SerialPort::SerialPort(int baudRate, const wpi::Twine& portName, Port port,
+SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
                        int dataBits, SerialPort::Parity parity,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
 
-  wpi::SmallVector<char, 64> buf;
-  const char* portNameC = portName.toNullTerminatedStringRef(buf).data();
-
-  m_portHandle = HAL_InitializeSerialPortDirect(
-      static_cast<HAL_SerialPort>(port), portNameC, &status);
+  m_portHandle =
+      HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
+                                     std::string(portName).c_str(), &status);
   FRC_CheckErrorStatus(status, "Port {}", port);
   HAL_SetSerialBaudRate(m_portHandle, baudRate, &status);
   FRC_CheckErrorStatus(status, "SetSerialBaudRate {}", baudRate);
@@ -113,10 +111,10 @@ int SerialPort::Read(char* buffer, int count) {
 }
 
 int SerialPort::Write(const char* buffer, int count) {
-  return Write(wpi::StringRef(buffer, static_cast<size_t>(count)));
+  return Write(std::string_view(buffer, static_cast<size_t>(count)));
 }
 
-int SerialPort::Write(wpi::StringRef buffer) {
+int SerialPort::Write(std::string_view buffer) {
   int32_t status = 0;
   int retVal =
       HAL_WriteSerial(m_portHandle, buffer.data(), buffer.size(), &status);

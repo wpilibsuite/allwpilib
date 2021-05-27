@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTableEntry.h>
 #include <units/angle.h>
@@ -21,7 +22,7 @@ namespace frc {
  */
 class MechanismLigament2d : public MechanismObject2d {
  public:
-  MechanismLigament2d(const wpi::Twine& name, double length,
+  MechanismLigament2d(std::string_view name, double length,
                       units::degree_t angle, double lineWidth = 6,
                       const frc::Color8Bit& color = {235, 137, 52});
 

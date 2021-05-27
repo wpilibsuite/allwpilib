@@ -9,7 +9,7 @@
 using namespace frc;
 
 ComplexWidget::ComplexWidget(ShuffleboardContainer& parent,
-                             const wpi::Twine& title, Sendable& sendable)
+                             std::string_view title, Sendable& sendable)
     : ShuffleboardValue(title),
       ShuffleboardWidget(parent, title),
       m_sendable(sendable) {}

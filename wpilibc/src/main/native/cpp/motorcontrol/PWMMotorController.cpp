@@ -42,7 +42,7 @@ int PWMMotorController::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-PWMMotorController::PWMMotorController(const wpi::Twine& name, int channel)
+PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   SendableRegistry::GetInstance().AddLW(this, name, channel);
 }

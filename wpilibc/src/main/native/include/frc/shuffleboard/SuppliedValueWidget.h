@@ -6,10 +6,10 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardComponent.inc"
@@ -22,7 +22,7 @@ class ShuffleboardContainer;
 template <typename T>
 class SuppliedValueWidget : public ShuffleboardWidget<SuppliedValueWidget<T> > {
  public:
-  SuppliedValueWidget(ShuffleboardContainer& parent, const wpi::Twine& title,
+  SuppliedValueWidget(ShuffleboardContainer& parent, std::string_view title,
                       std::function<T()> supplier,
                       std::function<void(nt::NetworkTableEntry, T)> setter)
       : ShuffleboardValue(title),

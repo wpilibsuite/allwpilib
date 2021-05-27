@@ -21,7 +21,7 @@ int Command::m_commandCounter = 0;
 
 Command::Command() : Command("", -1.0) {}
 
-Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
+Command::Command(std::string_view name) : Command(name, -1.0) {}
 
 Command::Command(double timeout) : Command("", timeout) {}
 
@@ -29,7 +29,7 @@ Command::Command(Subsystem& subsystem) : Command("", -1.0) {
   Requires(&subsystem);
 }
 
-Command::Command(const wpi::Twine& name, double timeout) {
+Command::Command(std::string_view name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0) {
     throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
@@ -38,16 +38,15 @@ Command::Command(const wpi::Twine& name, double timeout) {
   m_timeout = timeout;
 
   // If name contains an empty string
-  if (name.isTriviallyEmpty() ||
-      (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
+  if (name.empty()) {
     SendableRegistry::GetInstance().Add(
-        this, "Command_" + wpi::Twine(typeid(*this).name()));
+        this, fmt::format("Command_{}", typeid(*this).name()));
   } else {
     SendableRegistry::GetInstance().Add(this, name);
   }
 }
 
-Command::Command(const wpi::Twine& name, Subsystem& subsystem)
+Command::Command(std::string_view name, Subsystem& subsystem)
     : Command(name, -1.0) {
   Requires(&subsystem);
 }
@@ -56,7 +55,7 @@ Command::Command(double timeout, Subsystem& subsystem) : Command("", timeout) {
   Requires(&subsystem);
 }
 
-Command::Command(const wpi::Twine& name, double timeout, Subsystem& subsystem)
+Command::Command(std::string_view name, double timeout, Subsystem& subsystem)
     : Command(name, timeout) {
   Requires(&subsystem);
 }
@@ -183,7 +182,7 @@ bool Command::IsTimedOut() const {
   return m_timeout != -1 && TimeSinceInitialized() >= m_timeout;
 }
 
-bool Command::AssertUnlocked(const std::string& message) {
+bool Command::AssertUnlocked(std::string_view message) {
   if (m_locked) {
     throw FRC_MakeError(
         err::CommandIllegalUse,
@@ -277,7 +276,7 @@ std::string Command::GetName() const {
   return SendableRegistry::GetInstance().GetName(this);
 }
 
-void Command::SetName(const wpi::Twine& name) {
+void Command::SetName(std::string_view name) {
   SendableRegistry::GetInstance().SetName(this, name);
 }
 
@@ -285,7 +284,7 @@ std::string Command::GetSubsystem() const {
   return SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
-void Command::SetSubsystem(const wpi::Twine& name) {
+void Command::SetSubsystem(std::string_view name) {
   SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 

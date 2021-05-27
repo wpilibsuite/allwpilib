@@ -9,13 +9,12 @@
 
 using namespace frc;
 
-NetworkButton::NetworkButton(const wpi::Twine& tableName,
-                             const wpi::Twine& field)
+NetworkButton::NetworkButton(std::string_view tableName, std::string_view field)
     : NetworkButton(nt::NetworkTableInstance::GetDefault().GetTable(tableName),
                     field) {}
 
 NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                             const wpi::Twine& field)
+                             std::string_view field)
     : m_entry(table->GetEntry(field)) {}
 
 bool NetworkButton::Get() {

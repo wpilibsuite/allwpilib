@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,
                        double f, double period)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
@@ -19,12 +19,12 @@ PIDCommand::PIDCommand(double p, double i, double d, double f, double period) {
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d)
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,
                        double period)
     : Command(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
@@ -38,7 +38,7 @@ PIDCommand::PIDCommand(double p, double i, double d, double period) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
 }
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,
                        double f, double period, Subsystem& subsystem)
     : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
@@ -51,13 +51,13 @@ PIDCommand::PIDCommand(double p, double i, double d, double f, double period,
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
 }
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,
                        Subsystem& subsystem)
     : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
 
-PIDCommand::PIDCommand(const wpi::Twine& name, double p, double i, double d,
+PIDCommand::PIDCommand(std::string_view name, double p, double i, double d,
                        double period, Subsystem& subsystem)
     : Command(name, subsystem) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);

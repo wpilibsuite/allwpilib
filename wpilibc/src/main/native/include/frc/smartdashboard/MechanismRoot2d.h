@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
 
 #include "MechanismObject2d.h"
 
@@ -24,7 +24,7 @@ class MechanismRoot2d : private MechanismObject2d {
   struct private_init {};
 
  public:
-  MechanismRoot2d(const wpi::Twine& name, double x, double y,
+  MechanismRoot2d(std::string_view name, double x, double y,
                   const private_init&);
 
   /**

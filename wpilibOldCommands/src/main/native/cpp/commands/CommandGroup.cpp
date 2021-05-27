@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
+CommandGroup::CommandGroup(std::string_view name) : Command(name) {}
 
 void CommandGroup::AddSequential(Command* command) {
   if (!command) {
