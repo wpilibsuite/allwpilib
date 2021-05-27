@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 //===- llvm/ADT/StringExtras.h - Useful string functions --------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
@@ -11,395 +15,650 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef WPIUTIL_WPI_STRINGEXTRAS_H
-#define WPIUTIL_WPI_STRINGEXTRAS_H
+#pragma once
 
-#include "wpi/ArrayRef.h"
-#include "wpi/SmallString.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <iterator>
+#include <limits>
+#include <optional>
 #include <string>
+#include <string_view>
+#include <type_traits>
 #include <utility>
 
 namespace wpi {
 
-template<typename T> class SmallVectorImpl;
-class raw_ostream;
+template <typename T>
+class SmallVectorImpl;
 
 /// hexdigit - Return the hexadecimal character for the
 /// given number \p X (which should be less than 16).
-inline char hexdigit(unsigned X, bool LowerCase = false) {
+constexpr char hexdigit(unsigned X, bool LowerCase = false) noexcept {
   const char HexChar = LowerCase ? 'a' : 'A';
   return X < 10 ? '0' + X : HexChar + X - 10;
-}
-
-/// Construct a string ref from a boolean.
-inline StringRef toStringRef(bool B) { return StringRef(B ? "true" : "false"); }
-
-/// Construct a string ref from an array ref of unsigned chars.
-inline StringRef toStringRef(ArrayRef<uint8_t> Input) {
-  return StringRef(reinterpret_cast<const char *>(Input.begin()), Input.size());
-}
-
-/// Construct a string ref from an array ref of unsigned chars.
-inline ArrayRef<uint8_t> arrayRefFromStringRef(StringRef Input) {
-  return {Input.bytes_begin(), Input.bytes_end()};
 }
 
 /// Interpret the given character \p C as a hexadecimal digit and return its
 /// value.
 ///
 /// If \p C is not a valid hex digit, -1U is returned.
-inline unsigned hexDigitValue(char C) {
-  if (C >= '0' && C <= '9') return C-'0';
-  if (C >= 'a' && C <= 'f') return C-'a'+10U;
-  if (C >= 'A' && C <= 'F') return C-'A'+10U;
+constexpr unsigned hexDigitValue(char C) noexcept {
+  if (C >= '0' && C <= '9') {
+    return C - '0';
+  }
+  if (C >= 'a' && C <= 'f') {
+    return C - 'a' + 10U;
+  }
+  if (C >= 'A' && C <= 'F') {
+    return C - 'A' + 10U;
+  }
   return (std::numeric_limits<unsigned>::max)();
 }
 
 /// Checks if character \p C is one of the 10 decimal digits.
-inline bool isDigit(char C) { return C >= '0' && C <= '9'; }
+constexpr bool isDigit(char C) noexcept {
+  return C >= '0' && C <= '9';
+}
 
 /// Checks if character \p C is a hexadecimal numeric character.
-inline bool isHexDigit(char C) { return hexDigitValue(C) != (std::numeric_limits<unsigned>::max)(); }
+constexpr bool isHexDigit(char C) noexcept {
+  return hexDigitValue(C) != (std::numeric_limits<unsigned>::max)();
+}
 
 /// Checks if character \p C is a valid letter as classified by "C" locale.
-inline bool isAlpha(char C) {
+constexpr bool isAlpha(char C) noexcept {
   return ('a' <= C && C <= 'z') || ('A' <= C && C <= 'Z');
 }
 
 /// Checks whether character \p C is either a decimal digit or an uppercase or
 /// lowercase letter as classified by "C" locale.
-inline bool isAlnum(char C) { return isAlpha(C) || isDigit(C); }
+constexpr bool isAlnum(char C) noexcept {
+  return isAlpha(C) || isDigit(C);
+}
 
 /// Checks whether character \p C is valid ASCII (high bit is zero).
-inline bool isASCII(char C) { return static_cast<unsigned char>(C) <= 127; }
-
-/// Checks whether all characters in S are ASCII.
-inline bool isASCII(wpi::StringRef S) {
-  for (char C : S)
-    if (LLVM_UNLIKELY(!isASCII(C)))
-      return false;
-  return true;
+constexpr bool isASCII(char C) noexcept {
+  return static_cast<unsigned char>(C) <= 127;
 }
 
 /// Checks whether character \p C is printable.
 ///
 /// Locale-independent version of the C standard library isprint whose results
 /// may differ on different platforms.
-inline bool isPrint(char C) {
+constexpr bool isPrint(char C) noexcept {
   unsigned char UC = static_cast<unsigned char>(C);
   return (0x20 <= UC) && (UC <= 0x7E);
 }
 
 /// Returns the corresponding lowercase character if \p x is uppercase.
-inline char toLower(char x) {
-  if (x >= 'A' && x <= 'Z')
+constexpr char toLower(char x) noexcept {
+  if (x >= 'A' && x <= 'Z') {
     return x - 'A' + 'a';
+  }
   return x;
 }
 
 /// Returns the corresponding uppercase character if \p x is lowercase.
-inline char toUpper(char x) {
-  if (x >= 'a' && x <= 'z')
+constexpr char toUpper(char x) noexcept {
+  if (x >= 'a' && x <= 'z') {
     return x - 'a' + 'A';
+  }
   return x;
 }
 
-inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
-  char Buffer[17];
-  char *BufPtr = std::end(Buffer);
+inline std::string utohexstr(unsigned long long val,  // NOLINT(runtime/int)
+                             bool lowerCase = false) {
+  char buf[17];
+  char* bufptr = std::end(buf);
 
-  if (X == 0) *--BufPtr = '0';
-
-  while (X) {
-    unsigned char Mod = static_cast<unsigned char>(X) & 15;
-    *--BufPtr = hexdigit(Mod, LowerCase);
-    X >>= 4;
+  if (val == 0) {
+    *--bufptr = '0';
   }
 
-  return std::string(BufPtr, std::end(Buffer));
-}
-
-/// Convert buffer \p Input to its hexadecimal representation.
-/// The returned string is double the size of \p Input.
-inline std::string toHex(StringRef Input, bool LowerCase = false) {
-  static const char *const LUT = "0123456789ABCDEF";
-  const uint8_t Offset = LowerCase ? 32 : 0;
-  size_t Length = Input.size();
-
-  std::string Output;
-  Output.reserve(2 * Length);
-  for (size_t i = 0; i < Length; ++i) {
-    const unsigned char c = Input[i];
-    Output.push_back(LUT[c >> 4] | Offset);
-    Output.push_back(LUT[c & 15] | Offset);
-  }
-  return Output;
-}
-
-inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
-  return toHex(toStringRef(Input), LowerCase);
-}
-
-inline uint8_t hexFromNibbles(char MSB, char LSB) {
-  unsigned U1 = hexDigitValue(MSB);
-  unsigned U2 = hexDigitValue(LSB);
-  assert(U1 != (std::numeric_limits<unsigned>::max)() && U2 != (std::numeric_limits<unsigned>::max)());
-
-  return static_cast<uint8_t>((U1 << 4) | U2);
-}
-
-/// Convert hexadecimal string \p Input to its binary representation.
-/// The return string is half the size of \p Input.
-inline std::string fromHex(StringRef Input) {
-  if (Input.empty())
-    return std::string();
-
-  std::string Output;
-  Output.reserve((Input.size() + 1) / 2);
-  if (Input.size() % 2 == 1) {
-    Output.push_back(hexFromNibbles('0', Input.front()));
-    Input = Input.drop_front();
+  while (val) {
+    unsigned char mod = static_cast<unsigned char>(val) & 15;
+    *--bufptr = hexdigit(mod, lowerCase);
+    val >>= 4;
   }
 
-  assert(Input.size() % 2 == 0);
-  while (!Input.empty()) {
-    uint8_t Hex = hexFromNibbles(Input[0], Input[1]);
-    Output.push_back(Hex);
-    Input = Input.drop_front(2);
-  }
-  return Output;
+  return std::string(bufptr, std::end(buf));
 }
 
-/// Convert the string \p S to an integer of the specified type using
-/// the radix \p Base.  If \p Base is 0, auto-detects the radix.
-/// Returns true if the number was successfully converted, false otherwise.
-template <typename N> bool to_integer(StringRef S, N &Num, unsigned Base = 0) {
-  return !S.getAsInteger(Base, Num);
+/**
+ * equals - Check for string equality, this is more efficient than
+ * compare() when the relative ordering of inequal strings isn't needed.
+ */
+constexpr bool equals(std::string_view lhs, std::string_view rhs) noexcept {
+  auto length = lhs.size();
+  return length == rhs.size() && std::string_view::traits_type::compare(
+                                     lhs.data(), rhs.data(), length) == 0;
+}
+
+/**
+ * compare_lower - Compare two strings, ignoring case.
+ */
+int compare_lower(std::string_view lhs, std::string_view rhs) noexcept;
+
+/**
+ * equals_lower - Check for string equality, ignoring case.
+ */
+constexpr bool equals_lower(std::string_view lhs,
+                            std::string_view rhs) noexcept {
+  return lhs.size() == rhs.size() && compare_lower(lhs, rhs) == 0;
+}
+
+/**
+ * Search for the first character @p ch in @p str, ignoring case.
+ *
+ * @returns The index of the first occurrence of @p ch, or npos if not
+ * found.
+ */
+std::string_view::size_type find_lower(
+    std::string_view str, char ch,
+    std::string_view::size_type from = 0) noexcept;
+
+/**
+ * Search for the first string @p other in @p str, ignoring case.
+ *
+ * @returns The index of the first occurrence of @p other, or npos if not
+ * found.
+ */
+std::string_view::size_type find_lower(
+    std::string_view str, std::string_view other,
+    std::string_view::size_type from = 0) noexcept;
+
+/**
+ * Search for the first string @p other in @p str, ignoring case.
+ *
+ * @returns The index of the first occurrence of @p other, or npos if not
+ * found.
+ */
+inline std::string_view::size_type find_lower(
+    std::string_view str, const char* other,
+    std::string_view::size_type from = 0) noexcept {
+  return find_lower(str, std::string_view{other}, from);
+}
+
+/**
+ * Search for the last character @p ch in @p str, ignoring case.
+ *
+ * @returns The index of the last occurrence of @p ch, or npos if not
+ * found.
+ */
+std::string_view::size_type rfind_lower(
+    std::string_view str, char ch,
+    std::string_view::size_type from = std::string_view::npos) noexcept;
+
+/**
+ * Search for the last string @p other in @p str, ignoring case.
+ *
+ * @returns The index of the last occurrence of @p other, or npos if not
+ * found.
+ */
+std::string_view::size_type rfind_lower(std::string_view str,
+                                        std::string_view other) noexcept;
+
+/**
+ * Search for the last string @p other in @p str, ignoring case.
+ *
+ * @returns The index of the last occurrence of @p other, or npos if not
+ * found.
+ */
+inline std::string_view::size_type rfind_lower(std::string_view str,
+                                               const char* other) noexcept {
+  return rfind_lower(str, std::string_view{other});
+}
+
+/**
+ * Checks if @p str starts with the given @p prefix.
+ */
+constexpr bool starts_with(std::string_view str,
+                           std::string_view prefix) noexcept {
+  return str.substr(0, prefix.size()) == prefix;
+}
+
+/**
+ * Checks if @p str starts with the given @p prefix.
+ */
+constexpr bool starts_with(std::string_view str, char prefix) noexcept {
+  return !str.empty() && std::string_view::traits_type::eq(str.front(), prefix);
+}
+
+/**
+ * Checks if @p str starts with the given @p prefix.
+ */
+constexpr bool starts_with(std::string_view str, const char* prefix) noexcept {
+  return starts_with(str, std::string_view(prefix));
+}
+
+/**
+ * Checks if @p str starts with the given @p prefix, ignoring case.
+ */
+bool starts_with_lower(std::string_view str, std::string_view prefix) noexcept;
+
+/**
+ * Checks if @p str starts with the given @p prefix, ignoring case.
+ */
+constexpr bool starts_with_lower(std::string_view str, char prefix) noexcept {
+  return !str.empty() && toLower(str.front()) == toLower(prefix);
+}
+
+/**
+ * Checks if @p str starts with the given @p prefix, ignoring case.
+ */
+inline bool starts_with_lower(std::string_view str,
+                              const char* prefix) noexcept {
+  return starts_with_lower(str, std::string_view(prefix));
+}
+
+/**
+ * Checks if @p str ends with the given @p suffix.
+ */
+constexpr bool ends_with(std::string_view str,
+                         std::string_view suffix) noexcept {
+  return str.size() >= suffix.size() &&
+         str.compare(str.size() - suffix.size(), std::string_view::npos,
+                     suffix) == 0;
+}
+
+/**
+ * Checks if @p str ends with the given @p suffix.
+ */
+constexpr bool ends_with(std::string_view str, char suffix) noexcept {
+  return !str.empty() && std::string_view::traits_type::eq(str.back(), suffix);
+}
+
+/**
+ * Checks if @p str ends with the given @p suffix.
+ */
+constexpr bool ends_with(std::string_view str, const char* suffix) noexcept {
+  return ends_with(str, std::string_view(suffix));
+}
+
+/**
+ * Checks if @p str ends with the given @p suffix, ignoring case.
+ */
+bool ends_with_lower(std::string_view str, std::string_view suffix) noexcept;
+
+/**
+ * Checks if @p str ends with the given @p suffix, ignoring case.
+ */
+constexpr bool ends_with_lower(std::string_view str, char suffix) noexcept {
+  return !str.empty() && toLower(str.back()) == toLower(suffix);
+}
+
+/**
+ * Checks if @p str ends with the given @p suffix, ignoring case.
+ */
+inline bool ends_with_lower(std::string_view str, const char* suffix) noexcept {
+  return ends_with_lower(str, std::string_view(suffix));
+}
+
+/**
+ * Checks if @p str contains the substring @p other.
+ */
+constexpr bool contains(std::string_view str, std::string_view other) noexcept {
+  return str.find(other) != std::string_view::npos;
+}
+
+/**
+ * Checks if @p str contains the substring @p other.
+ */
+constexpr bool contains(std::string_view str, char ch) noexcept {
+  return str.find(ch) != std::string_view::npos;
+}
+
+/**
+ * Checks if @p str contains the substring @p other.
+ */
+constexpr bool contains(std::string_view str, const char* other) noexcept {
+  return str.find(other) != std::string_view::npos;
+}
+
+/**
+ * Checks if @p str contains the substring @p other, ignoring case.
+ */
+inline bool contains_lower(std::string_view str,
+                           std::string_view other) noexcept {
+  return find_lower(str, other) != std::string_view::npos;
+}
+
+/**
+ * Checks if @p str contains the substring @p other, ignoring case.
+ */
+inline bool contains_lower(std::string_view str, char ch) noexcept {
+  return find_lower(str, ch) != std::string_view::npos;
+}
+
+/**
+ * Checks if @p str contains the substring @p other, ignoring case.
+ */
+inline bool contains_lower(std::string_view str, const char* other) noexcept {
+  return find_lower(str, other) != std::string_view::npos;
+}
+
+/**
+ * Return a string_view equal to @p str but with the first @p n elements
+ * dropped.
+ */
+constexpr std::string_view drop_front(
+    std::string_view str, std::string_view::size_type n = 1) noexcept {
+  str.remove_prefix(n);
+  return str;
+}
+
+/**
+ * Return a string_view equal to @p str but with the last @p n elements dropped.
+ */
+constexpr std::string_view drop_back(
+    std::string_view str, std::string_view::size_type n = 1) noexcept {
+  str.remove_suffix(n);
+  return str;
+}
+
+/**
+ * Returns a reference to the substring of @p str from [start, end).
+ *
+ * @param start The index of the starting character in the substring; if
+ * the index is npos or greater than the length of the string then the
+ * empty substring will be returned.
+ *
+ * @param end The index following the last character to include in the
+ * substring. If this is npos or exceeds the number of characters
+ * remaining in the string, the string suffix (starting with @p start)
+ * will be returned. If this is less than @p start, an empty string will
+ * be returned.
+ */
+constexpr std::string_view slice(std::string_view str,
+                                 std::string_view::size_type start,
+                                 std::string_view::size_type end) noexcept {
+  auto length = str.size();
+  start = (std::min)(start, length);
+  end = (std::min)((std::max)(start, end), length);
+  return {str.data() + start, end - start};
+}
+
+/**
+ * Splits @p str into two substrings around the first occurrence of a separator
+ * character.
+ *
+ * If @p separator is in the string, then the result is a pair (LHS, RHS)
+ * such that (str == LHS + separator + RHS) is true and RHS is
+ * maximal. If @p separator is not in the string, then the result is a
+ * pair (LHS, RHS) where (str == LHS) and (RHS == "").
+ *
+ * @param separator The character to split on.
+ * @returns The split substrings.
+ */
+constexpr std::pair<std::string_view, std::string_view> split(
+    std::string_view str, char separator) noexcept {
+  auto idx = str.find(separator);
+  if (idx == std::string_view::npos) {
+    return {str, {}};
+  }
+  return {slice(str, 0, idx), slice(str, idx + 1, std::string_view::npos)};
+}
+
+/**
+ * Splits @p str into two substrings around the first occurrence of a separator
+ * string.
+ *
+ * If @p separator is in the string, then the result is a pair (LHS, RHS)
+ * such that (str == LHS + separator + RHS) is true and RHS is
+ * maximal. If @p separator is not in the string, then the result is a
+ * pair (LHS, RHS) where (str == LHS) and (RHS == "").
+ *
+ * @param separator The string to split on.
+ * @return The split substrings.
+ */
+constexpr std::pair<std::string_view, std::string_view> split(
+    std::string_view str, std::string_view separator) noexcept {
+  auto idx = str.find(separator);
+  if (idx == std::string_view::npos) {
+    return {str, {}};
+  }
+  return {slice(str, 0, idx),
+          slice(str, idx + separator.size(), std::string_view::npos)};
+}
+
+/**
+ * Splits @p str into two substrings around the last occurrence of a separator
+ * character.
+ *
+ * If @p separator is in the string, then the result is a pair (LHS, RHS)
+ * such that (str == LHS + separator + RHS) is true and RHS is
+ * minimal. If @p separator is not in the string, then the result is a
+ * pair (LHS, RHS) where (str == LHS) and (RHS == "").
+ *
+ * @param separator The string to split on.
+ * @return The split substrings.
+ */
+constexpr std::pair<std::string_view, std::string_view> rsplit(
+    std::string_view str, char separator) noexcept {
+  auto idx = str.rfind(separator);
+  if (idx == std::string_view::npos) {
+    return {str, {}};
+  }
+  return {slice(str, 0, idx), slice(str, idx + 1, std::string_view::npos)};
+}
+
+/**
+ * Splits @p str into two substrings around the last occurrence of a separator
+ * string.
+ *
+ * If @p separator is in the string, then the result is a pair (LHS, RHS)
+ * such that (str == LHS + separator + RHS) is true and RHS is
+ * minimal. If @p separator is not in the string, then the result is a
+ * pair (LHS, RHS) where (str == LHS) and (RHS == "").
+ *
+ * @param separator The string to split on.
+ * @return The split substrings.
+ */
+constexpr std::pair<std::string_view, std::string_view> rsplit(
+    std::string_view str, std::string_view separator) noexcept {
+  auto idx = str.rfind(separator);
+  if (idx == std::string_view::npos) {
+    return {str, {}};
+  }
+  return {slice(str, 0, idx),
+          slice(str, idx + separator.size(), std::string_view::npos)};
+}
+
+/**
+ * Splits @p str into substrings around the occurrences of a separator string.
+ *
+ * Each substring is stored in @p arr. If @p maxSplit is >= 0, at most
+ * @p maxSplit splits are done and consequently <= @p maxSplit + 1
+ * elements are added to arr.
+ * If @p keepEmpty is false, empty strings are not added to @p arr. They
+ * still count when considering @p maxSplit
+ * An useful invariant is that
+ * separator.join(arr) == str if maxSplit == -1 and keepEmpty == true
+ *
+ * @param arr Where to put the substrings.
+ * @param separator The string to split on.
+ * @param maxSplit The maximum number of times the string is split.
+ * @param keepEmpty True if empty substring should be added.
+ */
+void split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
+           std::string_view separator, int maxSplit = -1,
+           bool keepEmpty = true) noexcept;
+
+/**
+ * Splits @p str into substrings around the occurrences of a separator
+ * character.
+ *
+ * Each substring is stored in @p arr. If @p maxSplit is >= 0, at most
+ * @p maxSplit splits are done and consequently <= @p maxSplit + 1
+ * elements are added to arr.
+ * If @p keepEmpty is false, empty strings are not added to @p arr. They
+ * still count when considering @p maxSplit
+ * An useful invariant is that
+ * separator.join(arr) == str if maxSplit == -1 and keepEmpty == true
+ *
+ * @param arr Where to put the substrings.
+ * @param separator The character to split on.
+ * @param maxSplit The maximum number of times the string is split.
+ * @param keepEmpty True if empty substring should be added.
+ */
+void split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
+           char separator, int maxSplit = -1, bool keepEmpty = true) noexcept;
+
+/**
+ * Returns @p str with consecutive @p ch characters starting from the
+ * the left removed.
+ */
+constexpr std::string_view ltrim(std::string_view str, char ch) noexcept {
+  return drop_front(str, (std::min)(str.size(), str.find_first_not_of(ch)));
+}
+
+/**
+ * Returns @p str with consecutive characters in @p chars starting from
+ * the left removed.
+ */
+constexpr std::string_view ltrim(
+    std::string_view str, std::string_view chars = " \t\n\v\f\r") noexcept {
+  return drop_front(str, (std::min)(str.size(), str.find_first_not_of(chars)));
+}
+
+/**
+ * Returns @p str with consecutive @p Char characters starting from the
+ * right removed.
+ */
+constexpr std::string_view rtrim(std::string_view str, char ch) noexcept {
+  return drop_back(
+      str, str.size() - (std::min)(str.size(), str.find_last_not_of(ch) + 1));
+}
+
+/**
+ * Returns @p str with consecutive characters in @p chars starting from
+ * the right removed.
+ */
+constexpr std::string_view rtrim(
+    std::string_view str, std::string_view chars = " \t\n\v\f\r") noexcept {
+  return drop_back(
+      str,
+      str.size() - (std::min)(str.size(), str.find_last_not_of(chars) + 1));
+}
+
+/**
+ * Returns @p str with consecutive @p ch characters starting from the
+ * left and right removed.
+ */
+constexpr std::string_view trim(std::string_view str, char ch) noexcept {
+  return rtrim(ltrim(str, ch), ch);
+}
+
+/**
+ * Returns @p str with consecutive characters in @p chars starting from
+ * the left and right removed.
+ */
+constexpr std::string_view trim(
+    std::string_view str, std::string_view chars = " \t\n\v\f\r") noexcept {
+  return rtrim(ltrim(str, chars), chars);
 }
 
 namespace detail {
-template <typename N>
-inline bool to_float(const Twine &T, N &Num, N (*StrTo)(const char *, char **)) {
-  SmallString<32> Storage;
-  StringRef S = T.toNullTerminatedStringRef(Storage);
-  char *End;
-  N Temp = StrTo(S.data(), &End);
-  if (*End != '\0')
-    return false;
-  Num = Temp;
-  return true;
-}
-}
+bool GetAsUnsignedInteger(
+    std::string_view str, unsigned radix,
+    unsigned long long& result) noexcept;  // NOLINT(runtime/int)
+bool GetAsSignedInteger(std::string_view str, unsigned radix,
+                        long long& result) noexcept;  // NOLINT(runtime/int)
 
-inline bool to_float(const Twine &T, float &Num) {
-  return detail::to_float(T, Num, strtof);
-}
+bool ConsumeUnsignedInteger(
+    std::string_view& str, unsigned radix,
+    unsigned long long& result) noexcept;  // NOLINT(runtime/int)
+bool ConsumeSignedInteger(std::string_view& str, unsigned radix,
+                          long long& result) noexcept;  // NOLINT(runtime/int)
+}  // namespace detail
 
-inline bool to_float(const Twine &T, double &Num) {
-  return detail::to_float(T, Num, strtod);
-}
-
-inline bool to_float(const Twine &T, long double &Num) {
-  return detail::to_float(T, Num, strtold);
-}
-
-inline std::string utostr(uint64_t X, bool isNeg = false) {
-  char Buffer[21];
-  char *BufPtr = std::end(Buffer);
-
-  if (X == 0) *--BufPtr = '0';  // Handle special case...
-
-  while (X) {
-    *--BufPtr = '0' + char(X % 10);
-    X /= 10;
+/**
+ * Parses the string @p str as an integer of the specified radix.  If
+ * @p radix is specified as zero, this does radix autosensing using
+ * extended C rules: 0 is octal, 0x is hex, 0b is binary.
+ *
+ * If the string is invalid or if only a subset of the string is valid,
+ * this returns nullopt to signify the error.  The string is considered
+ * erroneous if empty or if it overflows T.
+ */
+template <typename T,
+          std::enable_if_t<std::numeric_limits<T>::is_signed, bool> = true>
+inline std::optional<T> to_integer(std::string_view str,
+                                   unsigned radix) noexcept {
+  long long val;  // NOLINT(runtime/int)
+  if (detail::GetAsSignedInteger(str, radix, val) ||
+      static_cast<T>(val) != val) {
+    return std::nullopt;
   }
-
-  if (isNeg) *--BufPtr = '-';   // Add negative sign...
-  return std::string(BufPtr, std::end(Buffer));
+  return val;
 }
 
-inline std::string itostr(int64_t X) {
-  if (X < 0)
-    return utostr(static_cast<uint64_t>(-X), true);
-  else
-    return utostr(static_cast<uint64_t>(X));
-}
-
-/// StrInStrNoCase - Portable version of strcasestr.  Locates the first
-/// occurrence of string 's1' in string 's2', ignoring case.  Returns
-/// the offset of s2 in s1 or npos if s2 cannot be found.
-StringRef::size_type StrInStrNoCase(StringRef s1, StringRef s2);
-
-/// getToken - This function extracts one token from source, ignoring any
-/// leading characters that appear in the Delimiters string, and ending the
-/// token at any of the characters that appear in the Delimiters string.  If
-/// there are no tokens in the source string, an empty string is returned.
-/// The function returns a pair containing the extracted token and the
-/// remaining tail string.
-std::pair<StringRef, StringRef> getToken(StringRef Source,
-                                         StringRef Delimiters = " \t\n\v\f\r");
-
-/// SplitString - Split up the specified string according to the specified
-/// delimiters, appending the result fragments to the output list.
-void SplitString(StringRef Source,
-                 SmallVectorImpl<StringRef> &OutFragments,
-                 StringRef Delimiters = " \t\n\v\f\r");
-
-/// HashString - Hash function for strings.
-///
-/// This is the Bernstein hash function.
-//
-// FIXME: Investigate whether a modified bernstein hash function performs
-// better: http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
-//   X*33+c -> X*33^c
-static inline unsigned HashString(StringRef Str, unsigned Result = 0) {
-  for (StringRef::size_type i = 0, e = Str.size(); i != e; ++i)
-    Result = Result * 33 + (unsigned char)Str[i];
-  return Result;
-}
-
-/// Returns the English suffix for an ordinal integer (-st, -nd, -rd, -th).
-inline StringRef getOrdinalSuffix(unsigned Val) {
-  // It is critically important that we do this perfectly for
-  // user-written sequences with over 100 elements.
-  switch (Val % 100) {
-  case 11:
-  case 12:
-  case 13:
-    return "th";
-  default:
-    switch (Val % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
-    }
+template <typename T,
+          std::enable_if_t<!std::numeric_limits<T>::is_signed, bool> = true>
+inline std::optional<T> to_integer(std::string_view str,
+                                   unsigned radix) noexcept {
+  using Int = unsigned long long;  // NOLINT(runtime/int)
+  Int val;
+  // The additional cast to unsigned long long is required to avoid the
+  // Visual C++ warning C4805: '!=' : unsafe mix of type 'bool' and type
+  // 'unsigned __int64' when instantiating getAsInteger with T = bool.
+  if (detail::GetAsUnsignedInteger(str, radix, val) ||
+      static_cast<Int>(static_cast<T>(val)) != val) {
+    return std::nullopt;
   }
+  return val;
 }
 
-/// Print each character of the specified string, escaping it if it is not
-/// printable or if it is an escape char.
-void printEscapedString(StringRef Name, raw_ostream &Out);
-
-/// Print each character of the specified string, escaping HTML special
-/// characters.
-void printHTMLEscaped(StringRef String, raw_ostream &Out);
-
-/// printLowerCase - Print each character as lowercase if it is uppercase.
-void printLowerCase(StringRef String, raw_ostream &Out);
-
-namespace detail {
-
-template <typename IteratorT>
-inline std::string join_impl(IteratorT Begin, IteratorT End,
-                             StringRef Separator, std::input_iterator_tag) {
-  std::string S;
-  if (Begin == End)
-    return S;
-
-  S += (*Begin);
-  while (++Begin != End) {
-    S += Separator;
-    S += (*Begin);
+/**
+ * Parses the string @p str as an integer of the specified radix.  If
+ * @p radix is specified as zero, this does radix autosensing using
+ * extended C rules: 0 is octal, 0x is hex, 0b is binary.
+ *
+ * If the string does not begin with a number of the specified radix,
+ * this returns nullopt to signify the error. The string is considered
+ * erroneous if empty or if it overflows T.
+ * The portion of the string representing the discovered numeric value
+ * is removed from the beginning of the string.
+ */
+template <typename T,
+          std::enable_if_t<std::numeric_limits<T>::is_signed, bool> = true>
+inline std::optional<T> consume_integer(std::string_view* str,
+                                        unsigned radix) noexcept {
+  using Int = long long;  // NOLINT(runtime/int)
+  Int val;
+  if (detail::ConsumeSignedInteger(*str, radix, val) ||
+      static_cast<Int>(static_cast<T>(val)) != val) {
+    return std::nullopt;
   }
-  return S;
+  return val;
 }
 
-template <typename IteratorT>
-inline std::string join_impl(IteratorT Begin, IteratorT End,
-                             StringRef Separator, std::forward_iterator_tag) {
-  std::string S;
-  if (Begin == End)
-    return S;
-
-  size_t Len = (std::distance(Begin, End) - 1) * Separator.size();
-  for (IteratorT I = Begin; I != End; ++I)
-    Len += (*Begin).size();
-  S.reserve(Len);
-  S += (*Begin);
-  while (++Begin != End) {
-    S += Separator;
-    S += (*Begin);
+template <typename T,
+          std::enable_if_t<!std::numeric_limits<T>::is_signed, bool> = true>
+inline std::optional<T> consume_integer(std::string_view* str,
+                                        unsigned radix) noexcept {
+  using Int = unsigned long long;  // NOLINT(runtime/int)
+  Int val;
+  if (detail::ConsumeUnsignedInteger(*str, radix, val) ||
+      static_cast<Int>(static_cast<T>(val)) != val) {
+    return std::nullopt;
   }
-  return S;
+  return val;
 }
 
-template <typename Sep>
-inline void join_items_impl(std::string &Result, Sep Separator) {}
+/**
+ * Parses the string @p str as a floating point value.
+ *
+ * If the string is invalid or if only a subset of the string is valid,
+ * this returns nullopt to signify the error.  The string is considered
+ * erroneous if empty or if it overflows T.
+ */
+template <typename T>
+std::optional<T> to_float(std::string_view str) noexcept;
 
-template <typename Sep, typename Arg>
-inline void join_items_impl(std::string &Result, Sep Separator,
-                            const Arg &Item) {
-  Result += Item;
-}
+template <>
+std::optional<float> to_float<float>(std::string_view str) noexcept;
+template <>
+std::optional<double> to_float<double>(std::string_view str) noexcept;
+template <>
+std::optional<long double> to_float<long double>(std::string_view str) noexcept;
 
-template <typename Sep, typename Arg1, typename... Args>
-inline void join_items_impl(std::string &Result, Sep Separator, const Arg1 &A1,
-                            Args &&... Items) {
-  Result += A1;
-  Result += Separator;
-  join_items_impl(Result, Separator, std::forward<Args>(Items)...);
-}
-
-inline size_t join_one_item_size(char C) { return 1; }
-inline size_t join_one_item_size(const char *S) { return S ? ::strlen(S) : 0; }
-
-template <typename T> inline size_t join_one_item_size(const T &Str) {
-  return Str.size();
-}
-
-inline size_t join_items_size() { return 0; }
-
-template <typename A1> inline size_t join_items_size(const A1 &A) {
-  return join_one_item_size(A);
-}
-template <typename A1, typename... Args>
-inline size_t join_items_size(const A1 &A, Args &&... Items) {
-  return join_one_item_size(A) + join_items_size(std::forward<Args>(Items)...);
-}
-
-} // end namespace detail
-
-/// Joins the strings in the range [Begin, End), adding Separator between
-/// the elements.
-template <typename IteratorT>
-inline std::string join(IteratorT Begin, IteratorT End, StringRef Separator) {
-  using tag = typename std::iterator_traits<IteratorT>::iterator_category;
-  return detail::join_impl(Begin, End, Separator, tag());
-}
-
-/// Joins the strings in the range [R.begin(), R.end()), adding Separator
-/// between the elements.
-template <typename Range>
-inline std::string join(Range &&R, StringRef Separator) {
-  return join(R.begin(), R.end(), Separator);
-}
-
-/// Joins the strings in the parameter pack \p Items, adding \p Separator
-/// between the elements.  All arguments must be implicitly convertible to
-/// std::string, or there should be an overload of std::string::operator+=()
-/// that accepts the argument explicitly.
-template <typename Sep, typename... Args>
-inline std::string join_items(Sep Separator, Args &&... Items) {
-  std::string Result;
-  if (sizeof...(Items) == 0)
-    return Result;
-
-  size_t NS = detail::join_one_item_size(Separator);
-  size_t NI = detail::join_items_size(std::forward<Args>(Items)...);
-  Result.reserve(NI + (sizeof...(Items) - 1) * NS + 1);
-  detail::join_items_impl(Result, Separator, std::forward<Args>(Items)...);
-  return Result;
-}
-
-} // end namespace wpi
-
-#endif // WPIUTIL_WPI_STRINGEXTRAS_H
+}  // namespace wpi

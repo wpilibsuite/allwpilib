@@ -19,6 +19,21 @@
 
 using namespace wpi;
 
+/// HashString - Hash function for strings.
+///
+/// This is the Bernstein hash function.
+//
+// FIXME: Investigate whether a modified bernstein hash function performs
+// better: http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
+//   X*33+c -> X*33^c
+static inline unsigned HashString(std::string_view str,
+                                  unsigned result = 0) noexcept {
+  for (std::string_view::size_type i = 0, e = str.size(); i != e; ++i) {
+    result = result * 33 + static_cast<unsigned char>(str[i]);
+  }
+  return result;
+}
+
 /// Returns the number of buckets to allocate to ensure that the DenseMap can
 /// accommodate \p NumEntries without need to grow().
 static unsigned getMinBucketToReserveForEntries(unsigned NumEntries) {
