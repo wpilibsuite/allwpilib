@@ -17,7 +17,7 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/n4820.pdf
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
-#if __has_include(<span>)
+#if __cplusplus >= 202002L && __has_include(<span>)
 #include <span>
 #endif
 

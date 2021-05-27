@@ -25,7 +25,7 @@
 #include <optional>
 #include <type_traits>
 #include <vector>
-#if __has_include(<span>)
+#if __cplusplus >= 202002L && __has_include(<span>)
 #include <span>
 #endif
 
