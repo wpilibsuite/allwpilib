@@ -9,6 +9,7 @@
 #include <mfreadwrite.h>
 
 #include <memory>
+#include <string_view>
 
 #include <Dshow.h>
 #include <wpi/mutex.h>
@@ -21,19 +22,19 @@ namespace cs {
 class UsbCameraProperty : public PropertyImpl {
  public:
   UsbCameraProperty() = default;
-  explicit UsbCameraProperty(const wpi::Twine& name_) : PropertyImpl{name_} {}
+  explicit UsbCameraProperty(std::string_view name_) : PropertyImpl{name_} {}
 
   // Software property constructor
-  UsbCameraProperty(const wpi::Twine& name_, unsigned id_,
-                    CS_PropertyKind kind_, int minimum_, int maximum_,
-                    int step_, int defaultValue_, int value_)
+  UsbCameraProperty(std::string_view name_, unsigned id_, CS_PropertyKind kind_,
+                    int minimum_, int maximum_, int step_, int defaultValue_,
+                    int value_)
       : PropertyImpl(name_, kind_, minimum_, maximum_, step_, defaultValue_,
                      value_),
         device{false},
         id{id_} {}
 
   // Normalized property constructor
-  UsbCameraProperty(const wpi::Twine& name_, int rawIndex_,
+  UsbCameraProperty(std::string_view name_, int rawIndex_,
                     const UsbCameraProperty& rawProp, int defaultValue_,
                     int value_)
       : PropertyImpl(name_, rawProp.propKind, 1, defaultValue_, value_),
@@ -47,10 +48,10 @@ class UsbCameraProperty : public PropertyImpl {
     maximum = 100;
   }
 
-  UsbCameraProperty(const wpi::Twine& name_, tagVideoProcAmpProperty tag,
+  UsbCameraProperty(std::string_view name_, tagVideoProcAmpProperty tag,
                     bool autoProp, IAMVideoProcAmp* pProcAmp, bool* isValid);
 
-  UsbCameraProperty(const wpi::Twine& name_, tagCameraControlProperty tag,
+  UsbCameraProperty(std::string_view name_, tagCameraControlProperty tag,
                     bool autoProp, IAMCameraControl* pProcAmp, bool* isValid);
 
   bool DeviceGet(std::unique_lock<wpi::mutex>& lock,

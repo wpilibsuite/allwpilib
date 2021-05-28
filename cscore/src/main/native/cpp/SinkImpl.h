@@ -7,10 +7,9 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <wpi/Logger.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "SourceImpl.h"
@@ -27,16 +26,16 @@ class Telemetry;
 
 class SinkImpl : public PropertyContainer {
  public:
-  explicit SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+  explicit SinkImpl(std::string_view name, wpi::Logger& logger,
                     Notifier& notifier, Telemetry& telemetry);
   ~SinkImpl() override;
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
-  wpi::StringRef GetName() const { return m_name; }
+  std::string_view GetName() const { return m_name; }
 
-  void SetDescription(const wpi::Twine& description);
-  wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
+  void SetDescription(std::string_view description);
+  std::string_view GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void Enable();
   void Disable();
@@ -50,9 +49,9 @@ class SinkImpl : public PropertyContainer {
   }
 
   std::string GetError() const;
-  wpi::StringRef GetError(wpi::SmallVectorImpl<char>& buf) const;
+  std::string_view GetError(wpi::SmallVectorImpl<char>& buf) const;
 
-  bool SetConfigJson(wpi::StringRef config, CS_Status* status);
+  bool SetConfigJson(std::string_view config, CS_Status* status);
   virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
   std::string GetConfigJson(CS_Status* status);
   virtual wpi::json GetConfigJsonObject(CS_Status* status);
@@ -61,7 +60,7 @@ class SinkImpl : public PropertyContainer {
   // PropertyContainer implementation
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
-                           const wpi::Twine& valueStr) override;
+                           std::string_view valueStr) override;
 
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
 

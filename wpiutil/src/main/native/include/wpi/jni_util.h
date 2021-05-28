@@ -9,6 +9,7 @@
 
 #include <queue>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -18,7 +19,7 @@
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
+#include "wpi/StringExtras.h"
 #include "wpi/deprecated.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
@@ -30,7 +31,7 @@ namespace wpi::java {
 // in the stack trace not starting with excludeFuncPrefix (useful for e.g.
 // finding the first user call to a series of library functions).
 std::string GetJavaStackTrace(JNIEnv* env, std::string* func = nullptr,
-                              StringRef excludeFuncPrefix = StringRef());
+                              std::string_view excludeFuncPrefix = {});
 
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
@@ -148,8 +149,8 @@ class JStringRef {
     m_str.pop_back();
   }
 
-  operator StringRef() const { return m_str; }  // NOLINT
-  StringRef str() const { return m_str; }
+  operator std::string_view() const { return m_str.str(); }  // NOLINT
+  std::string_view str() const { return m_str.str(); }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
 
@@ -163,18 +164,18 @@ namespace detail {
 template <typename C, typename T>
 class JArrayRefInner {};
 
-// Specialization of JArrayRefBase to provide StringRef conversion.
+// Specialization of JArrayRefBase to provide std::string_view conversion.
 template <typename C>
 class JArrayRefInner<C, jbyte> {
  public:
-  operator StringRef() const { return str(); }
+  operator std::string_view() const { return str(); }
 
-  StringRef str() const {
+  std::string_view str() const {
     auto arr = static_cast<const C*>(this)->array();
     if (arr.empty()) {
       return {};
     }
-    return StringRef{reinterpret_cast<const char*>(arr.data()), arr.size()};
+    return {reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 };
 
@@ -326,7 +327,7 @@ WPI_JNI_JARRAYREF(jdouble, Double)
 //
 
 // Convert a UTF8 string into a jstring.
-inline jstring MakeJString(JNIEnv* env, StringRef str) {
+inline jstring MakeJString(JNIEnv* env, std::string_view str) {
   SmallVector<UTF16, 128> chars;
   convertUTF8ToUTF16String(str, chars);
   return env->NewString(chars.begin(), chars.size());
@@ -395,8 +396,8 @@ inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
-// Convert a StringRef into a jbyteArray.
-inline jbyteArray MakeJByteArray(JNIEnv* env, StringRef str) {
+// Convert a std::string_view into a jbyteArray.
+inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
   jbyteArray jarr = env->NewByteArray(str.size());
   if (!jarr) {
     return nullptr;
@@ -593,7 +594,7 @@ class JSingletonCallbackManager : public JCallbackManager<T> {
   }
 };
 
-inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
+inline std::string GetJavaStackTrace(JNIEnv* env, std::string_view skipPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
   if (!throwableCls) {
@@ -657,7 +658,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
     // add a line to res
     JStringRef elem(env, stackElementString);
     if (!foundFirst) {
-      if (elem.str().startswith(skipPrefix)) {
+      if (wpi::starts_with(elem, skipPrefix)) {
         continue;
       }
       foundFirst = true;
@@ -669,7 +670,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
 }
 
 inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
-                                     StringRef excludeFuncPrefix) {
+                                     std::string_view excludeFuncPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
   if (!throwableCls) {
@@ -740,7 +741,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
       if (i == 1) {
         *func = elem.str();
       } else if (i > 1 && !haveLoc && !excludeFuncPrefix.empty() &&
-                 !elem.str().startswith(excludeFuncPrefix)) {
+                 !wpi::starts_with(elem, excludeFuncPrefix)) {
         *func = elem.str();
         haveLoc = true;
       }
@@ -769,7 +770,9 @@ class JException : public JClass {
     env->Throw(static_cast<jthrowable>(exception));
   }
 
-  void Throw(JNIEnv* env, StringRef msg) { Throw(env, MakeJString(env, msg)); }
+  void Throw(JNIEnv* env, std::string_view msg) {
+    Throw(env, MakeJString(env, msg));
+  }
 
   explicit operator bool() const { return m_constructor; }
 

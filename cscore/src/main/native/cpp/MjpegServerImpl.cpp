@@ -6,8 +6,10 @@
 
 #include <chrono>
 
+#include <fmt/format.h>
 #include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/TCPAcceptor.h>
 #include <wpi/raw_socket_istream.h>
 #include <wpi/raw_socket_ostream.h>
@@ -72,13 +74,13 @@ static const char* endRootPage = "</div></body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
-  explicit ConnThread(const wpi::Twine& name, wpi::Logger& logger)
-      : m_name(name.str()), m_logger(logger) {}
+  explicit ConnThread(std::string_view name, wpi::Logger& logger)
+      : m_name(name), m_logger(logger) {}
 
   void Main() override;
 
   bool ProcessCommand(wpi::raw_ostream& os, SourceImpl& source,
-                      wpi::StringRef parameters, bool respond);
+                      std::string_view parameters, bool respond);
   void SendJSON(wpi::raw_ostream& os, SourceImpl& source, bool header);
   void SendHTMLHeadTitle(wpi::raw_ostream& os) const;
   void SendHTML(wpi::raw_ostream& os, SourceImpl& source, bool header);
@@ -99,7 +101,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   std::string m_name;
   wpi::Logger& m_logger;
 
-  wpi::StringRef GetName() { return m_name; }
+  std::string_view GetName() { return m_name; }
 
   std::shared_ptr<SourceImpl> GetSource() {
     std::scoped_lock lock(m_mutex);
@@ -130,9 +132,8 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 // Using cached pictures would lead to showing old/outdated pictures.
 // Many browsers seem to ignore, or at least not always obey, those headers.
 static void SendHeader(wpi::raw_ostream& os, int code,
-                       const wpi::Twine& codeText,
-                       const wpi::Twine& contentType,
-                       const wpi::Twine& extra = wpi::Twine{}) {
+                       std::string_view codeText, std::string_view contentType,
+                       std::string_view extra = {}) {
   os << "HTTP/1.0 " << code << ' ' << codeText << "\r\n";
   os << "Connection: close\r\n"
         "Server: CameraServer/1.0\r\n"
@@ -142,10 +143,8 @@ static void SendHeader(wpi::raw_ostream& os, int code,
         "Expires: Mon, 3 Jan 2000 12:34:56 GMT\r\n";
   os << "Content-Type: " << contentType << "\r\n";
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
-  wpi::SmallString<128> extraBuf;
-  wpi::StringRef extraStr = extra.toStringRef(extraBuf);
-  if (!extraStr.empty()) {
-    os << extraStr << "\r\n";
+  if (!extra.empty()) {
+    os << extra << "\r\n";
   }
   os << "\r\n";  // header ends with a blank line
 }
@@ -154,8 +153,8 @@ static void SendHeader(wpi::raw_ostream& os, int code,
 // @param code HTTP error code (e.g. 404)
 // @param message Additional message text
 static void SendError(wpi::raw_ostream& os, int code,
-                      const wpi::Twine& message) {
-  wpi::StringRef codeText, extra, baseMessage;
+                      std::string_view message) {
+  std::string_view codeText, extra, baseMessage;
   switch (code) {
     case 401:
       codeText = "Unauthorized";
@@ -195,19 +194,19 @@ static void SendError(wpi::raw_ostream& os, int code,
 // Perform a command specified by HTTP GET parameters.
 bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
                                                  SourceImpl& source,
-                                                 wpi::StringRef parameters,
+                                                 std::string_view parameters,
                                                  bool respond) {
   wpi::SmallString<256> responseBuf;
   wpi::raw_svector_ostream response{responseBuf};
   // command format: param1=value1&param2=value2...
   while (!parameters.empty()) {
     // split out next param and value
-    wpi::StringRef rawParam, rawValue;
-    std::tie(rawParam, parameters) = parameters.split('&');
+    std::string_view rawParam, rawValue;
+    std::tie(rawParam, parameters) = wpi::split(parameters, '&');
     if (rawParam.empty()) {
       continue;  // ignore "&&"
     }
-    std::tie(rawParam, rawValue) = rawParam.split('=');
+    std::tie(rawParam, rawValue) = wpi::split(rawParam, '=');
     if (rawParam.empty() || rawValue.empty()) {
       continue;  // ignore "param="
     }
@@ -217,41 +216,37 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
     // unescape param
     bool error = false;
     wpi::SmallString<64> paramBuf;
-    wpi::StringRef param = wpi::UnescapeURI(rawParam, paramBuf, &error);
+    std::string_view param = wpi::UnescapeURI(rawParam, paramBuf, &error);
     if (error) {
-      wpi::SmallString<128> error;
-      wpi::raw_svector_ostream oss{error};
-      oss << "could not unescape parameter \"" << rawParam << "\"";
-      SendError(os, 500, error.str());
-      SDEBUG(error.str());
+      auto estr = fmt::format("could not unescape parameter \"{}\"", rawParam);
+      SendError(os, 500, estr);
+      SDEBUG(estr);
       return false;
     }
 
     // unescape value
     wpi::SmallString<64> valueBuf;
-    wpi::StringRef value = wpi::UnescapeURI(rawValue, valueBuf, &error);
+    std::string_view value = wpi::UnescapeURI(rawValue, valueBuf, &error);
     if (error) {
-      wpi::SmallString<128> error;
-      wpi::raw_svector_ostream oss{error};
-      oss << "could not unescape value \"" << rawValue << "\"";
-      SendError(os, 500, error.str());
-      SDEBUG(error.str());
+      auto estr = fmt::format("could not unescape value \"{}\"", rawValue);
+      SendError(os, 500, estr);
+      SDEBUG(estr);
       return false;
     }
 
     // Handle resolution, compression, and FPS.  These are handled locally
     // rather than passed to the source.
     if (param == "resolution") {
-      wpi::StringRef widthStr, heightStr;
-      std::tie(widthStr, heightStr) = value.split('x');
-      int width, height;
-      if (widthStr.getAsInteger(10, width)) {
+      auto [widthStr, heightStr] = wpi::split(value, 'x');
+      int width = wpi::parse_integer<int>(widthStr, 10).value_or(-1);
+      int height = wpi::parse_integer<int>(heightStr, 10).value_or(-1);
+      if (width < 0) {
         response << param << ": \"width is not an integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" width \"" << widthStr
                                      << "\" is not an integer");
         continue;
       }
-      if (heightStr.getAsInteger(10, height)) {
+      if (height < 0) {
         response << param << ": \"height is not an integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" height \"" << heightStr
                                      << "\" is not an integer");
@@ -264,29 +259,25 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
     }
 
     if (param == "fps") {
-      int fps;
-      if (value.getAsInteger(10, fps)) {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_fps = v.value();
+        response << param << ": \"ok\"\r\n";
+      } else {
         response << param << ": \"invalid integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" value \"" << value
                                      << "\" is not an integer");
-        continue;
-      } else {
-        m_fps = fps;
-        response << param << ": \"ok\"\r\n";
       }
       continue;
     }
 
     if (param == "compression") {
-      int compression;
-      if (value.getAsInteger(10, compression)) {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_compression = v.value();
+        response << param << ": \"ok\"\r\n";
+      } else {
         response << param << ": \"invalid integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" value \"" << value
                                      << "\" is not an integer");
-        continue;
-      } else {
-        m_compression = compression;
-        response << param << ": \"ok\"\r\n";
       }
       continue;
     }
@@ -310,15 +301,14 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
-        int val = 0;
-        if (value.getAsInteger(10, val)) {
+        if (auto v = wpi::parse_integer<int>(value, 10)) {
+          response << param << ": " << v.value() << "\r\n";
+          SDEBUG4("HTTP parameter \"" << param << "\" value " << value);
+          source.SetProperty(prop, v.value(), &status);
+        } else {
           response << param << ": \"invalid integer\"\r\n";
           SWARNING("HTTP parameter \"" << param << "\" value \"" << value
                                        << "\" is not an integer");
-        } else {
-          response << param << ": " << val << "\r\n";
-          SDEBUG4("HTTP parameter \"" << param << "\" value " << value);
-          source.SetProperty(prop, val, &status);
         }
         break;
       }
@@ -362,7 +352,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
   for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
     wpi::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
-    if (name.startswith("raw_")) {
+    if (wpi::starts_with(name, "raw_")) {
       continue;
     }
     auto kind = source.GetPropertyKind(prop);
@@ -404,7 +394,7 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
           // replace any non-printable characters in name with spaces
           wpi::SmallString<128> ch_name;
           for (char ch : *choice) {
-            ch_name.push_back(std::isprint(ch) ? ch : ' ');
+            ch_name.push_back(wpi::isPrint(ch) ? ch : ' ');
           }
           os << "<input id=\"" << name << j << "\" type=\"radio\" name=\""
              << name << "\" value=\"" << ch_name << "\" onclick=\"update('"
@@ -588,20 +578,17 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
   os.flush();
 }
 
-MjpegServerImpl::MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
+MjpegServerImpl::MjpegServerImpl(std::string_view name, wpi::Logger& logger,
                                  Notifier& notifier, Telemetry& telemetry,
-                                 const wpi::Twine& listenAddress, int port,
+                                 std::string_view listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
     : SinkImpl{name, logger, notifier, telemetry},
-      m_listenAddress(listenAddress.str()),
+      m_listenAddress(listenAddress),
       m_port(port),
       m_acceptor{std::move(acceptor)} {
   m_active = true;
 
-  wpi::SmallString<128> descBuf;
-  wpi::raw_svector_ostream desc{descBuf};
-  desc << "HTTP Server on port " << port;
-  SetDescription(desc.str());
+  SetDescription(fmt::format("HTTP Server on port {}", port));
 
   // Create properties
   m_widthProp = CreateProperty("width", [] {
@@ -773,11 +760,11 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     os << oss.str();
     if (addDHT) {
       // Insert DHT data immediately before SOF
-      os << wpi::StringRef(data, locSOF);
+      os << std::string_view(data, locSOF);
       os << JpegGetDHT();
-      os << wpi::StringRef(data + locSOF, image->size() - locSOF);
+      os << std::string_view(data + locSOF, image->size() - locSOF);
     } else {
-      os << wpi::StringRef(data, size);
+      os << std::string_view(data, size);
     }
     // os.flush();
   }
@@ -790,45 +777,47 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
   // Read the request string from the stream
   wpi::SmallString<128> reqBuf;
-  wpi::StringRef req = is.getline(reqBuf, 4096);
+  std::string_view req = is.getline(reqBuf, 4096);
   if (is.has_error()) {
     SDEBUG("error getting request string");
     return;
   }
 
   enum { kCommand, kStream, kGetSettings, kGetSourceConfig, kRootPage } kind;
-  wpi::StringRef parameters;
+  std::string_view parameters;
   size_t pos;
 
   SDEBUG("HTTP request: '" << req << "'\n");
 
   // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility, others are for Axis camera compatibility.
-  if ((pos = req.find("POST /stream")) != wpi::StringRef::npos) {
+  if ((pos = req.find("POST /stream")) != std::string_view::npos) {
     kind = kStream;
     parameters = req.substr(req.find('?', pos + 12)).substr(1);
-  } else if ((pos = req.find("GET /?action=stream")) != wpi::StringRef::npos) {
+  } else if ((pos = req.find("GET /?action=stream")) !=
+             std::string_view::npos) {
     kind = kStream;
     parameters = req.substr(req.find('&', pos + 19)).substr(1);
-  } else if ((pos = req.find("GET /stream.mjpg")) != wpi::StringRef::npos) {
+  } else if ((pos = req.find("GET /stream.mjpg")) != std::string_view::npos) {
     kind = kStream;
     parameters = req.substr(req.find('?', pos + 16)).substr(1);
-  } else if (req.find("GET /settings") != wpi::StringRef::npos &&
-             req.find(".json") != wpi::StringRef::npos) {
+  } else if (req.find("GET /settings") != std::string_view::npos &&
+             req.find(".json") != std::string_view::npos) {
     kind = kGetSettings;
-  } else if (req.find("GET /config") != wpi::StringRef::npos &&
-             req.find(".json") != wpi::StringRef::npos) {
+  } else if (req.find("GET /config") != std::string_view::npos &&
+             req.find(".json") != std::string_view::npos) {
     kind = kGetSourceConfig;
-  } else if (req.find("GET /input") != wpi::StringRef::npos &&
-             req.find(".json") != wpi::StringRef::npos) {
+  } else if (req.find("GET /input") != std::string_view::npos &&
+             req.find(".json") != std::string_view::npos) {
     kind = kGetSettings;
-  } else if (req.find("GET /output") != wpi::StringRef::npos &&
-             req.find(".json") != wpi::StringRef::npos) {
+  } else if (req.find("GET /output") != std::string_view::npos &&
+             req.find(".json") != std::string_view::npos) {
     kind = kGetSettings;
-  } else if ((pos = req.find("GET /?action=command")) != wpi::StringRef::npos) {
+  } else if ((pos = req.find("GET /?action=command")) !=
+             std::string_view::npos) {
     kind = kCommand;
     parameters = req.substr(req.find('&', pos + 20)).substr(1);
-  } else if (req.find("GET / ") != wpi::StringRef::npos || req == "GET /\n") {
+  } else if (req.find("GET / ") != std::string_view::npos || req == "GET /\n") {
     kind = kRootPage;
   } else {
     SDEBUG("HTTP request resource not found");
@@ -1007,19 +996,15 @@ void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
 
 namespace cs {
 
-CS_Sink CreateMjpegServer(const wpi::Twine& name,
-                          const wpi::Twine& listenAddress, int port,
-                          CS_Status* status) {
+CS_Sink CreateMjpegServer(std::string_view name, std::string_view listenAddress,
+                          int port, CS_Status* status) {
   auto& inst = Instance::GetInstance();
-  wpi::SmallString<128> listenAddressBuf;
   return inst.CreateSink(
       CS_SINK_MJPEG,
       std::make_shared<MjpegServerImpl>(
           name, inst.logger, inst.notifier, inst.telemetry, listenAddress, port,
-          std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-              port,
-              listenAddress.toNullTerminatedStringRef(listenAddressBuf).data(),
-              inst.logger))));
+          std::unique_ptr<wpi::NetworkAcceptor>(
+              new wpi::TCPAcceptor(port, listenAddress, inst.logger))));
 }
 
 std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {

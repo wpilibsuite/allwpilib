@@ -8,6 +8,7 @@
 #include <cstring>
 #include <memory>
 
+#include <wpi/StringExtras.h>
 #include <wpi/json.h>
 #include <wpi/timestamp.h>
 
@@ -19,13 +20,13 @@ using namespace cs;
 
 static constexpr size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+SourceImpl::SourceImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
     : m_logger(logger),
       m_notifier(notifier),
       m_telemetry(telemetry),
-      m_name{name.str()} {
-  m_frame = Frame{*this, wpi::StringRef{}, 0};
+      m_name{name} {
+  m_frame = Frame{*this, std::string_view{}, 0};
 }
 
 SourceImpl::~SourceImpl() {
@@ -41,16 +42,16 @@ SourceImpl::~SourceImpl() {
   // Everything else can clean up itself.
 }
 
-void SourceImpl::SetDescription(const wpi::Twine& description) {
+void SourceImpl::SetDescription(std::string_view description) {
   std::scoped_lock lock(m_mutex);
-  m_description = description.str();
+  m_description = description;
 }
 
-wpi::StringRef SourceImpl::GetDescription(
+std::string_view SourceImpl::GetDescription(
     wpi::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
-  return wpi::StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
 void SourceImpl::SetConnected(bool connected) {
@@ -93,7 +94,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 void SourceImpl::Wakeup() {
   {
     std::scoped_lock lock{m_frameMutex};
-    m_frame = Frame{*this, wpi::StringRef{}, 0};
+    m_frame = Frame{*this, std::string_view{}, 0};
   }
   m_frameCv.notify_all();
 }
@@ -168,7 +169,7 @@ bool SourceImpl::SetFPS(int fps, CS_Status* status) {
   return SetVideoMode(mode, status);
 }
 
-bool SourceImpl::SetConfigJson(wpi::StringRef config, CS_Status* status) {
+bool SourceImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   wpi::json j;
   try {
     j = wpi::json::parse(config);
@@ -188,16 +189,15 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   if (config.count("pixel format") != 0) {
     try {
       auto str = config.at("pixel format").get<std::string>();
-      wpi::StringRef s(str);
-      if (s.equals_lower("mjpeg")) {
+      if (wpi::equals_lower(str, "mjpeg")) {
         mode.pixelFormat = cs::VideoMode::kMJPEG;
-      } else if (s.equals_lower("yuyv")) {
+      } else if (wpi::equals_lower(str, "yuyv")) {
         mode.pixelFormat = cs::VideoMode::kYUYV;
-      } else if (s.equals_lower("rgb565")) {
+      } else if (wpi::equals_lower(str, "rgb565")) {
         mode.pixelFormat = cs::VideoMode::kRGB565;
-      } else if (s.equals_lower("bgr")) {
+      } else if (wpi::equals_lower(str, "bgr")) {
         mode.pixelFormat = cs::VideoMode::kBGR;
-      } else if (s.equals_lower("gray")) {
+      } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '"
@@ -276,11 +276,10 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       auto& setting = config.at("white balance");
       if (setting.is_string()) {
         auto str = setting.get<std::string>();
-        wpi::StringRef s(str);
-        if (s.equals_lower("auto")) {
+        if (wpi::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting white balance to auto");
           SetWhiteBalanceAuto(status);
-        } else if (s.equals_lower("hold")) {
+        } else if (wpi::equals_lower(str, "hold")) {
           SINFO("SetConfigJson: setting white balance to hold current");
           SetWhiteBalanceHoldCurrent(status);
         } else {
@@ -303,11 +302,10 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       auto& setting = config.at("exposure");
       if (setting.is_string()) {
         auto str = setting.get<std::string>();
-        wpi::StringRef s(str);
-        if (s.equals_lower("auto")) {
+        if (wpi::equals_lower(str, "auto")) {
           SINFO("SetConfigJson: setting exposure to auto");
           SetExposureAuto(status);
-        } else if (s.equals_lower("hold")) {
+        } else if (wpi::equals_lower(str, "hold")) {
           SINFO("SetConfigJson: setting exposure to hold current");
           SetExposureHoldCurrent(status);
         } else {
@@ -344,7 +342,7 @@ wpi::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   wpi::json j;
 
   // pixel format
-  wpi::StringRef pixelFormat;
+  std::string_view pixelFormat;
   switch (m_mode.pixelFormat) {
     case VideoMode::kMJPEG:
       pixelFormat = "mjpeg";
@@ -440,7 +438,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 }
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
-                          int height, wpi::StringRef data, Frame::Time time) {
+                          int height, std::string_view data, Frame::Time time) {
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
@@ -468,7 +466,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   m_frameCv.notify_all();
 }
 
-void SourceImpl::PutError(const wpi::Twine& msg, Frame::Time time) {
+void SourceImpl::PutError(std::string_view msg, Frame::Time time) {
   // Update frame
   {
     std::scoped_lock lock{m_frameMutex};
@@ -487,12 +485,12 @@ void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   if (prop.propKind == CS_PROP_ENUM) {
     m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
                                     prop.name, propIndex, prop.propKind,
-                                    prop.value, wpi::Twine{});
+                                    prop.value, {});
   }
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                     const wpi::Twine& valueStr) {
+                                     std::string_view valueStr) {
   auto prop = GetProperty(property);
   if (!prop) {
     return;

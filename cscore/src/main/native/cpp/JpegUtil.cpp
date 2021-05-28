@@ -46,20 +46,20 @@ static const unsigned char dhtData[] = {
     0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7,
     0xe8, 0xe9, 0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa};
 
-bool IsJpeg(wpi::StringRef data) {
+bool IsJpeg(std::string_view data) {
   if (data.size() < 11) {
     return false;
   }
 
   // Check for valid SOI
-  auto bytes = data.bytes_begin();
+  auto bytes = reinterpret_cast<const unsigned char*>(data.data());
   if (bytes[0] != 0xff || bytes[1] != 0xd8) {
     return false;
   }
   return true;
 }
 
-bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
+bool GetJpegSize(std::string_view data, int* width, int* height) {
   if (!IsJpeg(data)) {
     return false;
   }
@@ -69,7 +69,7 @@ bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
     if (data.size() < 4) {
       return false;  // EOF
     }
-    auto bytes = data.bytes_begin();
+    auto bytes = reinterpret_cast<const unsigned char*>(data.data());
     if (bytes[0] != 0xff) {
       return false;  // not a tag
     }
@@ -94,7 +94,7 @@ bool GetJpegSize(wpi::StringRef data, int* width, int* height) {
 }
 
 bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
-  wpi::StringRef sdata(data, *size);
+  std::string_view sdata(data, *size);
   if (!IsJpeg(sdata)) {
     return false;
   }
@@ -107,7 +107,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
     if (sdata.size() < 4) {
       return false;  // EOF
     }
-    auto bytes = sdata.bytes_begin();
+    auto bytes = reinterpret_cast<const unsigned char*>(sdata.data());
     if (bytes[0] != 0xff) {
       return false;  // not a tag
     }
@@ -132,9 +132,8 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   return false;
 }
 
-wpi::StringRef JpegGetDHT() {
-  return wpi::StringRef(reinterpret_cast<const char*>(dhtData),
-                        sizeof(dhtData));
+std::string_view JpegGetDHT() {
+  return {reinterpret_cast<const char*>(dhtData), sizeof(dhtData)};
 }
 
 static inline void ReadInto(wpi::raw_istream& is, std::string& buf,

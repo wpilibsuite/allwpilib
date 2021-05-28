@@ -16,10 +16,10 @@
 
 using namespace cs;
 
-Frame::Frame(SourceImpl& source, const wpi::Twine& error, Time time)
+Frame::Frame(SourceImpl& source, std::string_view error, Time time)
     : m_impl{source.AllocFrameImpl().release()} {
   m_impl->refcount = 1;
-  m_impl->error = error.str();
+  m_impl->error = error;
   m_impl->time = time;
 }
 

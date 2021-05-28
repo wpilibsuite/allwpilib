@@ -4,9 +4,10 @@
 
 #include "Instance.h"
 
+#include <string_view>
+
 #include <wpi/Path.h>
 #include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
 
 using namespace cs;
@@ -21,7 +22,7 @@ static void def_log_func(unsigned int level, const char* file,
     return;
   }
 
-  wpi::StringRef levelmsg;
+  std::string_view levelmsg;
   if (level >= 50) {
     levelmsg = "CRITICAL: ";
   } else if (level >= 40) {

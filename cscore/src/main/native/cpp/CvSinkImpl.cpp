@@ -18,14 +18,14 @@
 
 using namespace cs;
 
-CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
     : SinkImpl{name, logger, notifier, telemetry} {
   m_active = true;
   // m_thread = std::thread(&CvSinkImpl::ThreadMain, this);
 }
 
-CvSinkImpl::CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+CvSinkImpl::CvSinkImpl(std::string_view name, wpi::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry,
                        std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier, telemetry} {}
@@ -127,14 +127,14 @@ void CvSinkImpl::ThreadMain() {
 
 namespace cs {
 
-CS_Sink CreateCvSink(const wpi::Twine& name, CS_Status* status) {
+CS_Sink CreateCvSink(std::string_view name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(
       CS_SINK_CV, std::make_shared<CvSinkImpl>(name, inst.logger, inst.notifier,
                                                inst.telemetry));
 }
 
-CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
+CS_Sink CreateCvSinkCallback(std::string_view name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto& inst = Instance::GetInstance();
@@ -145,7 +145,7 @@ CS_Sink CreateCvSinkCallback(const wpi::Twine& name,
 
 static constexpr unsigned SinkMask = CS_SINK_CV | CS_SINK_RAW;
 
-void SetSinkDescription(CS_Sink sink, const wpi::Twine& description,
+void SetSinkDescription(CS_Sink sink, std::string_view description,
                         CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
@@ -183,12 +183,12 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return static_cast<CvSinkImpl&>(*data->sink).GetError();
 }
 
-wpi::StringRef GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                            CS_Status* status) {
+std::string_view GetSinkError(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+                              CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data || (data->kind & SinkMask) == 0) {
     *status = CS_INVALID_HANDLE;
-    return wpi::StringRef{};
+    return {};
   }
   return static_cast<CvSinkImpl&>(*data->sink).GetError(buf);
 }

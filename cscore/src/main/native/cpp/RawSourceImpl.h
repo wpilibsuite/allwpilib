@@ -9,10 +9,10 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
-#include <wpi/Twine.h>
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
@@ -22,7 +22,7 @@ namespace cs {
 
 class RawSourceImpl : public ConfigurableSourceImpl {
  public:
-  RawSourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  RawSourceImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
                 Telemetry& telemetry, const VideoMode& mode);
   ~RawSourceImpl() override;
 
