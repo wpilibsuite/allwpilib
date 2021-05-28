@@ -12,12 +12,12 @@
 
 using namespace cs;
 
-SinkImpl::SinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+SinkImpl::SinkImpl(std::string_view name, wpi::Logger& logger,
                    Notifier& notifier, Telemetry& telemetry)
     : m_logger(logger),
       m_notifier(notifier),
       m_telemetry(telemetry),
-      m_name{name.str()} {}
+      m_name{name} {}
 
 SinkImpl::~SinkImpl() {
   if (m_source) {
@@ -28,15 +28,16 @@ SinkImpl::~SinkImpl() {
   }
 }
 
-void SinkImpl::SetDescription(const wpi::Twine& description) {
+void SinkImpl::SetDescription(std::string_view description) {
   std::scoped_lock lock(m_mutex);
-  m_description = description.str();
+  m_description = description;
 }
 
-wpi::StringRef SinkImpl::GetDescription(wpi::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetDescription(
+    wpi::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
-  return wpi::StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
 void SinkImpl::Enable() {
@@ -106,22 +107,22 @@ std::string SinkImpl::GetError() const {
   if (!m_source) {
     return "no source connected";
   }
-  return m_source->GetCurFrame().GetError();
+  return std::string{m_source->GetCurFrame().GetError()};
 }
 
-wpi::StringRef SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
+std::string_view SinkImpl::GetError(wpi::SmallVectorImpl<char>& buf) const {
   std::scoped_lock lock(m_mutex);
   if (!m_source) {
     return "no source connected";
   }
   // Make a copy as it's shared data
-  wpi::StringRef error = m_source->GetCurFrame().GetError();
+  std::string_view error = m_source->GetCurFrame().GetError();
   buf.clear();
   buf.append(error.data(), error.data() + error.size());
-  return wpi::StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
-bool SinkImpl::SetConfigJson(wpi::StringRef config, CS_Status* status) {
+bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   wpi::json j;
   try {
     j = wpi::json::parse(config);
@@ -169,12 +170,12 @@ void SinkImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   if (prop.propKind == CS_PROP_ENUM) {
     m_notifier.NotifySinkProperty(*this, CS_SINK_PROPERTY_CHOICES_UPDATED,
                                   prop.name, propIndex, prop.propKind,
-                                  prop.value, wpi::Twine{});
+                                  prop.value, {});
   }
 }
 
 void SinkImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                   const wpi::Twine& valueStr) {
+                                   std::string_view valueStr) {
   auto prop = GetProperty(property);
   if (!prop) {
     return;

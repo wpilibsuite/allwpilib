@@ -235,7 +235,7 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       break;
     }
   }
-  videoEx.Throw(env, msg);
+  videoEx.Throw(env, msg.str());
 }
 
 static inline bool CheckStatus(JNIEnv* env, CS_Status status) {
@@ -577,7 +577,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
       // TODO
       return 0;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   auto val =
@@ -1172,7 +1172,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setHttpCameraUrls
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetHttpCameraUrls(source, vec, &status);
@@ -1353,7 +1353,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSourceEnumPropertyChoices
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetSourceEnumPropertyChoices(source, property, vec, &status);

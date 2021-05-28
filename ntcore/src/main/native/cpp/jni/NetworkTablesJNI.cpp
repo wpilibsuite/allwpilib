@@ -113,7 +113,7 @@ inline std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv* env, jbyteArray jarr,
   if (!ref) {
     return nullptr;
   }
-  return nt::Value::MakeRaw(ref, time);
+  return nt::Value::MakeRaw(ref.str(), time);
 }
 
 inline std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv* env, jobject jbb,
@@ -170,7 +170,7 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv* env, jobjectArray jarr,
     if (!elem) {
       return nullptr;
     }
-    arr.push_back(JStringRef{env, elem}.str());
+    arr.emplace_back(JStringRef{env, elem}.str());
   }
   return nt::Value::MakeStringArray(std::move(arr), time);
 }
@@ -1251,7 +1251,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createPolledRpc
     nullPointerEx.Throw(env, "def cannot be null");
     return;
   }
-  nt::CreatePolledRpc(entry, JByteArrayRef{env, def}, poller);
+  nt::CreatePolledRpc(entry, JByteArrayRef{env, def}.str(), poller);
 }
 
 /*
@@ -1326,7 +1326,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
     nullPointerEx.Throw(env, "result cannot be null");
     return false;
   }
-  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
+  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result}.str());
 }
 
 /*
@@ -1342,7 +1342,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_callRpc
     nullPointerEx.Throw(env, "params cannot be null");
     return 0;
   }
-  return nt::CallRpc(entry, JByteArrayRef{env, params});
+  return nt::CallRpc(entry, JByteArrayRef{env, params}.str());
 }
 
 /*

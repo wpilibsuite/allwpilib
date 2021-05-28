@@ -70,12 +70,12 @@ std::string GetPropertyName(CS_Property property, CS_Status* status) {
   if (!container) {
     return {};
   }
-  return container->GetPropertyName(propertyIndex, buf, status);
+  return std::string{container->GetPropertyName(propertyIndex, buf, status)};
 }
 
-wpi::StringRef GetPropertyName(CS_Property property,
-                               wpi::SmallVectorImpl<char>& buf,
-                               CS_Status* status) {
+std::string_view GetPropertyName(CS_Property property,
+                                 wpi::SmallVectorImpl<char>& buf,
+                                 CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
   if (!container) {
@@ -145,12 +145,12 @@ std::string GetStringProperty(CS_Property property, CS_Status* status) {
   if (!container) {
     return {};
   }
-  return container->GetStringProperty(propertyIndex, buf, status);
+  return std::string{container->GetStringProperty(propertyIndex, buf, status)};
 }
 
-wpi::StringRef GetStringProperty(CS_Property property,
-                                 wpi::SmallVectorImpl<char>& buf,
-                                 CS_Status* status) {
+std::string_view GetStringProperty(CS_Property property,
+                                   wpi::SmallVectorImpl<char>& buf,
+                                   CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
   if (!container) {
@@ -159,7 +159,7 @@ wpi::StringRef GetStringProperty(CS_Property property,
   return container->GetStringProperty(propertyIndex, buf, status);
 }
 
-void SetStringProperty(CS_Property property, const wpi::Twine& value,
+void SetStringProperty(CS_Property property, std::string_view value,
                        CS_Status* status) {
   int propertyIndex;
   auto container = GetPropertyContainer(property, &propertyIndex, status);
@@ -196,17 +196,18 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return std::string{};
+    return {};
   }
-  return data->source->GetName();
+  return std::string{data->source->GetName()};
 }
 
-wpi::StringRef GetSourceName(CS_Source source, wpi::SmallVectorImpl<char>& buf,
-                             CS_Status* status) {
+std::string_view GetSourceName(CS_Source source,
+                               wpi::SmallVectorImpl<char>& buf,
+                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return wpi::StringRef{};
+    return {};
   }
   return data->source->GetName();
 }
@@ -215,19 +216,19 @@ std::string GetSourceDescription(CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return std::string{};
+    return {};
   }
   wpi::SmallString<128> buf;
-  return data->source->GetDescription(buf);
+  return std::string{data->source->GetDescription(buf)};
 }
 
-wpi::StringRef GetSourceDescription(CS_Source source,
-                                    wpi::SmallVectorImpl<char>& buf,
-                                    CS_Status* status) {
+std::string_view GetSourceDescription(CS_Source source,
+                                      wpi::SmallVectorImpl<char>& buf,
+                                      CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return wpi::StringRef{};
+    return {};
   }
   return data->source->GetDescription(buf);
 }
@@ -270,7 +271,7 @@ bool IsSourceEnabled(CS_Source source, CS_Status* status) {
   return data->source->IsEnabled();
 }
 
-CS_Property GetSourceProperty(CS_Source source, const wpi::Twine& name,
+CS_Property GetSourceProperty(CS_Source source, std::string_view name,
                               CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
@@ -349,7 +350,7 @@ bool SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
   return data->source->SetFPS(fps, status);
 }
 
-bool SetSourceConfigJson(CS_Source source, wpi::StringRef config,
+bool SetSourceConfigJson(CS_Source source, std::string_view config,
                          CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
@@ -531,17 +532,17 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return std::string{};
+    return {};
   }
-  return data->sink->GetName();
+  return std::string{data->sink->GetName()};
 }
 
-wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                           CS_Status* status) {
+std::string_view GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+                             CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return wpi::StringRef{};
+    return {};
   }
   return data->sink->GetName();
 }
@@ -550,23 +551,24 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return std::string{};
+    return {};
   }
   wpi::SmallString<128> buf;
-  return data->sink->GetDescription(buf);
+  return std::string{data->sink->GetDescription(buf)};
 }
 
-wpi::StringRef GetSinkDescription(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
-                                  CS_Status* status) {
+std::string_view GetSinkDescription(CS_Sink sink,
+                                    wpi::SmallVectorImpl<char>& buf,
+                                    CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return wpi::StringRef{};
+    return {};
   }
   return data->sink->GetDescription(buf);
 }
 
-CS_Property GetSinkProperty(CS_Sink sink, const wpi::Twine& name,
+CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
                             CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
@@ -596,7 +598,8 @@ wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
   return vec;
 }
 
-bool SetSinkConfigJson(CS_Sink sink, wpi::StringRef config, CS_Status* status) {
+bool SetSinkConfigJson(CS_Sink sink, std::string_view config,
+                       CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
@@ -663,7 +666,7 @@ CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
   return data->sourceHandle.load();
 }
 
-CS_Property GetSinkSourceProperty(CS_Sink sink, const wpi::Twine& name,
+CS_Property GetSinkSourceProperty(CS_Sink sink, std::string_view name,
                                   CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {

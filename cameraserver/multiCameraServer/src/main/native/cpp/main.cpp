@@ -4,10 +4,11 @@
 
 #include <cstdio>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -127,10 +128,9 @@ bool ReadConfig() {
   if (j.count("ntmode") != 0) {
     try {
       auto str = j.at("ntmode").get<std::string>();
-      wpi::StringRef s(str);
-      if (s.equals_lower("client")) {
+      if (wpi::equals_lower(str, "client")) {
         server = false;
-      } else if (s.equals_lower("server")) {
+      } else if (wpi::equals_lower(str, "server")) {
         server = true;
       } else {
         ParseError() << "could not understand ntmode value '" << str << "'\n";

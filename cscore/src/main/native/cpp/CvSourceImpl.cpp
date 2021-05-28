@@ -19,7 +19,7 @@
 
 using namespace cs;
 
-CvSourceImpl::CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+CvSourceImpl::CvSourceImpl(std::string_view name, wpi::Logger& logger,
                            Notifier& notifier, Telemetry& telemetry,
                            const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
@@ -62,7 +62,7 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
 
 namespace cs {
 
-CS_Source CreateCvSource(const wpi::Twine& name, const VideoMode& mode,
+CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
                          CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSource(CS_SOURCE_CV, std::make_shared<CvSourceImpl>(
@@ -81,7 +81,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
 
 static constexpr unsigned SourceMask = CS_SINK_CV | CS_SINK_RAW;
 
-void NotifySourceError(CS_Source source, const wpi::Twine& msg,
+void NotifySourceError(CS_Source source, std::string_view msg,
                        CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || (data->kind & SourceMask) == 0) {
@@ -100,7 +100,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
   static_cast<CvSourceImpl&>(*data->source).SetConnected(connected);
 }
 
-void SetSourceDescription(CS_Source source, const wpi::Twine& description,
+void SetSourceDescription(CS_Source source, std::string_view description,
                           CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || (data->kind & SourceMask) == 0) {
@@ -110,7 +110,7 @@ void SetSourceDescription(CS_Source source, const wpi::Twine& description,
   static_cast<CvSourceImpl&>(*data->source).SetDescription(description);
 }
 
-CS_Property CreateSourceProperty(CS_Source source, const wpi::Twine& name,
+CS_Property CreateSourceProperty(CS_Source source, std::string_view name,
                                  CS_PropertyKind kind, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status) {
@@ -126,7 +126,7 @@ CS_Property CreateSourceProperty(CS_Source source, const wpi::Twine& name,
 }
 
 CS_Property CreateSourcePropertyCallback(
-    CS_Source source, const wpi::Twine& name, CS_PropertyKind kind, int minimum,
+    CS_Source source, std::string_view name, CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);

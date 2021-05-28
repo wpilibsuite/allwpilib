@@ -44,7 +44,7 @@
 
 using namespace wpi;
 
-TCPAcceptor::TCPAcceptor(int port, const char* address, Logger& logger)
+TCPAcceptor::TCPAcceptor(int port, std::string_view address, Logger& logger)
     : m_lsd(0),
       m_port(port),
       m_address(address),

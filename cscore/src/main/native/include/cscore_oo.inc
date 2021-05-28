@@ -6,6 +6,7 @@
 #define CSCORE_CSCORE_OO_INC_
 
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -53,13 +54,13 @@ inline std::string VideoProperty::GetString() const {
   return GetStringProperty(m_handle, &m_status);
 }
 
-inline wpi::StringRef VideoProperty::GetString(
+inline std::string_view VideoProperty::GetString(
     wpi::SmallVectorImpl<char>& buf) const {
   m_status = 0;
   return GetStringProperty(m_handle, buf, &m_status);
 }
 
-inline void VideoProperty::SetString(const wpi::Twine& value) {
+inline void VideoProperty::SetString(std::string_view value) {
   m_status = 0;
   SetStringProperty(m_handle, value, &m_status);
 }
@@ -139,7 +140,7 @@ inline bool VideoSource::IsEnabled() const {
   return IsSourceEnabled(m_handle, &m_status);
 }
 
-inline VideoProperty VideoSource::GetProperty(const wpi::Twine& name) {
+inline VideoProperty VideoSource::GetProperty(std::string_view name) {
   m_status = 0;
   return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
 }
@@ -176,7 +177,7 @@ inline bool VideoSource::SetFPS(int fps) {
   return SetSourceFPS(m_handle, fps, &m_status);
 }
 
-inline bool VideoSource::SetConfigJson(wpi::StringRef config) {
+inline bool VideoSource::SetConfigJson(std::string_view config) {
   m_status = 0;
   return SetSourceConfigJson(m_handle, config, &m_status);
 }
@@ -248,11 +249,11 @@ inline void VideoCamera::SetExposureManual(int value) {
   SetCameraExposureManual(m_handle, value, &m_status);
 }
 
-inline UsbCamera::UsbCamera(const wpi::Twine& name, int dev) {
+inline UsbCamera::UsbCamera(std::string_view name, int dev) {
   m_handle = CreateUsbCameraDev(name, dev, &m_status);
 }
 
-inline UsbCamera::UsbCamera(const wpi::Twine& name, const wpi::Twine& path) {
+inline UsbCamera::UsbCamera(std::string_view name, std::string_view path) {
   m_handle = CreateUsbCameraPath(name, path, &m_status);
 }
 
@@ -261,7 +262,7 @@ inline std::vector<UsbCameraInfo> UsbCamera::EnumerateUsbCameras() {
   return ::cs::EnumerateUsbCameras(&status);
 }
 
-inline void UsbCamera::SetPath(const wpi::Twine& path) {
+inline void UsbCamera::SetPath(std::string_view path) {
   m_status = 0;
   return ::cs::SetUsbCameraPath(m_handle, path, &m_status);
 }
@@ -282,25 +283,25 @@ inline void UsbCamera::SetConnectVerbose(int level) {
               &m_status);
 }
 
-inline HttpCamera::HttpCamera(const wpi::Twine& name, const wpi::Twine& url,
+inline HttpCamera::HttpCamera(std::string_view name, std::string_view url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(const wpi::Twine& name, const char* url,
+inline HttpCamera::HttpCamera(std::string_view name, const char* url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(const wpi::Twine& name, const std::string& url,
+inline HttpCamera::HttpCamera(std::string_view name, const std::string& url,
                               HttpCameraKind kind)
-    : HttpCamera(name, wpi::Twine{url}, kind) {}
+    : HttpCamera(name, std::string_view{url}, kind) {}
 
-inline HttpCamera::HttpCamera(const wpi::Twine& name,
+inline HttpCamera::HttpCamera(std::string_view name,
                               wpi::ArrayRef<std::string> urls,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
@@ -309,7 +310,7 @@ inline HttpCamera::HttpCamera(const wpi::Twine& name,
 }
 
 template <typename T>
-inline HttpCamera::HttpCamera(const wpi::Twine& name,
+inline HttpCamera::HttpCamera(std::string_view name,
                               std::initializer_list<T> urls,
                               HttpCameraKind kind) {
   std::vector<std::string> vec;
@@ -349,16 +350,12 @@ inline std::vector<std::string> HttpCamera::GetUrls() const {
   return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
 
-inline std::string AxisCamera::HostToUrl(const wpi::Twine& host) {
-  return ("http://" + host + "/mjpg/video.mjpg").str();
-}
-
 inline std::vector<std::string> AxisCamera::HostToUrl(
     wpi::ArrayRef<std::string> hosts) {
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
   for (const auto& host : hosts) {
-    rv.emplace_back(HostToUrl(wpi::StringRef{host}));
+    rv.emplace_back(HostToUrl(std::string_view{host}));
   }
   return rv;
 }
@@ -369,33 +366,30 @@ inline std::vector<std::string> AxisCamera::HostToUrl(
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
   for (const auto& host : hosts) {
-    rv.emplace_back(HostToUrl(wpi::StringRef{host}));
+    rv.emplace_back(HostToUrl(std::string_view{host}));
   }
   return rv;
 }
 
-inline AxisCamera::AxisCamera(const wpi::Twine& name, const wpi::Twine& host)
+inline AxisCamera::AxisCamera(std::string_view name, std::string_view host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(const wpi::Twine& name, const char* host)
+inline AxisCamera::AxisCamera(std::string_view name, const char* host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(const wpi::Twine& name, const std::string& host)
-    : HttpCamera(name, HostToUrl(wpi::Twine{host}), kAxis) {}
+inline AxisCamera::AxisCamera(std::string_view name, const std::string& host)
+    : HttpCamera(name, HostToUrl(std::string_view{host}), kAxis) {}
 
-inline AxisCamera::AxisCamera(const wpi::Twine& name, wpi::StringRef host)
-    : HttpCamera(name, HostToUrl(host), kAxis) {}
-
-inline AxisCamera::AxisCamera(const wpi::Twine& name,
+inline AxisCamera::AxisCamera(std::string_view name,
                               wpi::ArrayRef<std::string> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
 template <typename T>
-inline AxisCamera::AxisCamera(const wpi::Twine& name,
+inline AxisCamera::AxisCamera(std::string_view name,
                               std::initializer_list<T> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
-inline void ImageSource::NotifyError(const wpi::Twine& msg) {
+inline void ImageSource::NotifyError(std::string_view msg) {
   m_status = 0;
   NotifySourceError(m_handle, msg, &m_status);
 }
@@ -405,12 +399,12 @@ inline void ImageSource::SetConnected(bool connected) {
   SetSourceConnected(m_handle, connected, &m_status);
 }
 
-inline void ImageSource::SetDescription(const wpi::Twine& description) {
+inline void ImageSource::SetDescription(std::string_view description) {
   m_status = 0;
   SetSourceDescription(m_handle, description, &m_status);
 }
 
-inline VideoProperty ImageSource::CreateProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateProperty(std::string_view name,
                                                  VideoProperty::Kind kind,
                                                  int minimum, int maximum,
                                                  int step, int defaultValue,
@@ -421,7 +415,7 @@ inline VideoProperty ImageSource::CreateProperty(const wpi::Twine& name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty ImageSource::CreateIntegerProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateIntegerProperty(std::string_view name,
                                                         int minimum,
                                                         int maximum, int step,
                                                         int defaultValue,
@@ -434,7 +428,7 @@ inline VideoProperty ImageSource::CreateIntegerProperty(const wpi::Twine& name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty ImageSource::CreateBooleanProperty(const wpi::Twine& name,
+inline VideoProperty ImageSource::CreateBooleanProperty(std::string_view name,
                                                         bool defaultValue,
                                                         bool value) {
   m_status = 0;
@@ -445,8 +439,8 @@ inline VideoProperty ImageSource::CreateBooleanProperty(const wpi::Twine& name,
       0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
 }
 
-inline VideoProperty ImageSource::CreateStringProperty(
-    const wpi::Twine& name, const wpi::Twine& value) {
+inline VideoProperty ImageSource::CreateStringProperty(std::string_view name,
+                                                       std::string_view value) {
   m_status = 0;
   auto prop = VideoProperty{
       CreateSourceProperty(m_handle, name,
@@ -509,7 +503,7 @@ inline std::string VideoSink::GetDescription() const {
   return GetSinkDescription(m_handle, &m_status);
 }
 
-inline VideoProperty VideoSink::GetProperty(const wpi::Twine& name) {
+inline VideoProperty VideoSink::GetProperty(std::string_view name) {
   m_status = 0;
   return VideoProperty{GetSinkProperty(m_handle, name, &m_status)};
 }
@@ -529,12 +523,12 @@ inline VideoSource VideoSink::GetSource() const {
   return VideoSource{handle == 0 ? 0 : CopySource(handle, &m_status)};
 }
 
-inline VideoProperty VideoSink::GetSourceProperty(const wpi::Twine& name) {
+inline VideoProperty VideoSink::GetSourceProperty(std::string_view name) {
   m_status = 0;
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
-inline bool VideoSink::SetConfigJson(wpi::StringRef config) {
+inline bool VideoSink::SetConfigJson(std::string_view config) {
   m_status = 0;
   return SetSinkConfigJson(m_handle, config, &m_status);
 }
@@ -549,8 +543,8 @@ inline std::string VideoSink::GetConfigJson() const {
   return GetSinkConfigJson(m_handle, &m_status);
 }
 
-inline MjpegServer::MjpegServer(const wpi::Twine& name,
-                                const wpi::Twine& listenAddress, int port) {
+inline MjpegServer::MjpegServer(std::string_view name,
+                                std::string_view listenAddress, int port) {
   m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
 }
 
@@ -588,7 +582,7 @@ inline void MjpegServer::SetDefaultCompression(int quality) {
               quality, &m_status);
 }
 
-inline void ImageSink::SetDescription(const wpi::Twine& description) {
+inline void ImageSink::SetDescription(std::string_view description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);
 }

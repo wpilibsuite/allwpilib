@@ -8,11 +8,11 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "Image.h"
@@ -44,7 +44,7 @@ class Frame {
  public:
   Frame() noexcept = default;
 
-  Frame(SourceImpl& source, const wpi::Twine& error, Time time);
+  Frame(SourceImpl& source, std::string_view error, Time time);
 
   Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time);
 
@@ -72,7 +72,7 @@ class Frame {
 
   Time GetTime() const { return m_impl ? m_impl->time : 0; }
 
-  wpi::StringRef GetError() const {
+  std::string_view GetError() const {
     if (!m_impl) {
       return {};
     }

@@ -8,6 +8,7 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -15,7 +16,6 @@
 #include <wpi/NetworkStream.h>
 #include <wpi/SafeThread.h>
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_ostream.h>
@@ -28,9 +28,9 @@ class SourceImpl;
 
 class MjpegServerImpl : public SinkImpl {
  public:
-  MjpegServerImpl(const wpi::Twine& name, wpi::Logger& logger,
+  MjpegServerImpl(std::string_view name, wpi::Logger& logger,
                   Notifier& notifier, Telemetry& telemetry,
-                  const wpi::Twine& listenAddress, int port,
+                  std::string_view listenAddress, int port,
                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MjpegServerImpl() override;
 

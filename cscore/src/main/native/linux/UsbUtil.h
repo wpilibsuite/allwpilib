@@ -7,13 +7,14 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
 #include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
 
 namespace cs {
 
-wpi::StringRef GetUsbNameFromId(int vendor, int product,
-                                wpi::SmallVectorImpl<char>& buf);
+std::string_view GetUsbNameFromId(int vendor, int product,
+                                  wpi::SmallVectorImpl<char>& buf);
 
 int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
                  const char* name, const char* file, int line, bool quiet);

@@ -32,7 +32,7 @@ unsigned int Notifier::AddPolled(unsigned int pollerUid, int eventMask) {
   return DoAdd(pollerUid, eventMask);
 }
 
-void Notifier::NotifySource(const wpi::Twine& name, CS_Source source,
+void Notifier::NotifySource(std::string_view name, CS_Source source,
                             CS_EventKind kind) {
   Send(UINT_MAX, name, source, static_cast<RawEvent::Kind>(kind));
 }
@@ -49,9 +49,9 @@ void Notifier::NotifySourceVideoMode(const SourceImpl& source,
 }
 
 void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                                    const wpi::Twine& propertyName,
-                                    int property, CS_PropertyKind propertyKind,
-                                    int value, const wpi::Twine& valueStr) {
+                                    std::string_view propertyName, int property,
+                                    CS_PropertyKind propertyKind, int value,
+                                    std::string_view valueStr) {
   auto handleData = Instance::GetInstance().FindSource(source);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),
@@ -59,7 +59,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
        value, valueStr);
 }
 
-void Notifier::NotifySink(const wpi::Twine& name, CS_Sink sink,
+void Notifier::NotifySink(std::string_view name, CS_Sink sink,
                           CS_EventKind kind) {
   Send(UINT_MAX, name, sink, static_cast<RawEvent::Kind>(kind));
 }
@@ -69,7 +69,7 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
   NotifySink(sink.GetName(), handleData.first, kind);
 }
 
-void Notifier::NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
+void Notifier::NotifySinkSourceChanged(std::string_view name, CS_Sink sink,
                                        CS_Source source) {
   RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
   event.sourceHandle = source;
@@ -77,9 +77,9 @@ void Notifier::NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
 }
 
 void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
-                                  const wpi::Twine& propertyName, int property,
+                                  std::string_view propertyName, int property,
                                   CS_PropertyKind propertyKind, int value,
-                                  const wpi::Twine& valueStr) {
+                                  std::string_view valueStr) {
   auto handleData = Instance::GetInstance().FindSink(sink);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),

@@ -18,8 +18,8 @@
 
 namespace cs {
 
-static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
-                                         wpi::SmallVectorImpl<char>& buf) {
+static std::string_view GetUsbNameFromFile(int vendor, int product,
+                                           wpi::SmallVectorImpl<char>& buf) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
   if (fd < 0) {
     return {};
@@ -72,10 +72,10 @@ static wpi::StringRef GetUsbNameFromFile(int vendor, int product,
   return {};
 }
 
-wpi::StringRef GetUsbNameFromId(int vendor, int product,
-                                wpi::SmallVectorImpl<char>& buf) {
+std::string_view GetUsbNameFromId(int vendor, int product,
+                                  wpi::SmallVectorImpl<char>& buf) {
   // try reading usb.ids
-  wpi::StringRef rv = GetUsbNameFromFile(vendor, product, buf);
+  std::string_view rv = GetUsbNameFromFile(vendor, product, buf);
   if (!rv.empty()) {
     return rv;
   }

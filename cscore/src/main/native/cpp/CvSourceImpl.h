@@ -9,11 +9,11 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <opencv2/core/core.hpp>
 #include <wpi/ArrayRef.h>
-#include <wpi/Twine.h>
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
@@ -22,7 +22,7 @@ namespace cs {
 
 class CvSourceImpl : public ConfigurableSourceImpl {
  public:
-  CvSourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  CvSourceImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
                Telemetry& telemetry, const VideoMode& mode);
   ~CvSourceImpl() override;
 
