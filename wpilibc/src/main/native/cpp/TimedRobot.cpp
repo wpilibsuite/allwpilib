@@ -71,7 +71,7 @@ void TimedRobot::EndCompetition() {
 TimedRobot::TimedRobot(double period) : TimedRobot(units::second_t(period)) {}
 
 TimedRobot::TimedRobot(units::second_t period) : IterativeRobotBase(period) {
-  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetFPGATimestamp();
   AddPeriodic([=] { LoopFunc(); }, period);
 
   int32_t status = 0;

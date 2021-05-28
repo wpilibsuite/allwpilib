@@ -4,9 +4,8 @@
 
 #include "frc/PowerDistributionPanel.h"  // NOLINT(build/include_order)
 
-#include <thread>
-
 #include <hal/Ports.h>
+#include <units/time.h>
 
 #include "TestBench.h"
 #include "frc/Timer.h"
@@ -17,7 +16,7 @@
 
 using namespace frc;
 
-static const double kMotorTime = 0.25;
+static constexpr auto kMotorTime = 0.25_s;
 
 class PowerDistributionPanelTest : public testing::Test {
  protected:
@@ -50,7 +49,7 @@ TEST_F(PowerDistributionPanelTest, CheckRepeatedCalls) {
     }
     m_pdp->GetVoltage();
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  Wait(20_ms);
 }
 
 /**

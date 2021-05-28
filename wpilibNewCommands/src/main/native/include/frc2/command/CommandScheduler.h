@@ -249,9 +249,9 @@ class CommandScheduler final : public frc::Sendable,
    * them.
    *
    * @param command the command to query
-   * @return the time since the command was scheduled, in seconds
+   * @return the time since the command was scheduled
    */
-  double TimeSinceScheduled(const Command* command) const;
+  units::second_t TimeSinceScheduled(const Command* command) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on

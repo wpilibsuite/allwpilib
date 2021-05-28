@@ -76,10 +76,10 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::SetPulseDuration(double durationSeconds) {
-  int32_t durationMS = durationSeconds * 1000;
+void Solenoid::SetPulseDuration(units::second_t duration) {
   int32_t status = 0;
-  HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
+  HAL_SetOneShotDuration(m_solenoidHandle,
+                         units::millisecond_t{duration}.to<int32_t>(), &status);
   FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
                        m_channel);
 }

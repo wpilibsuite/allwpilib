@@ -29,7 +29,7 @@ DriveForward::DriveForward(double dist, double maxSpeed) {
 // Called just before this Command runs the first time
 void DriveForward::Initialize() {
   Robot::drivetrain.GetRightEncoder().Reset();
-  SetTimeout(2);
+  SetTimeout(2_s);
 }
 
 // Called repeatedly when this Command is scheduled to run

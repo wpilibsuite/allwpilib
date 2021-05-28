@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <frc2/Timer.h>
-
 #include <algorithm>
 
 #include <units/time.h>
+
+#include "frc/Timer.h"
 
 namespace frc {
 /**
@@ -36,7 +36,7 @@ class SlewRateLimiter {
   explicit SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue = Unit_t{0})
       : m_rateLimit{rateLimit},
         m_prevVal{initialValue},
-        m_prevTime{frc2::Timer::GetFPGATimestamp()} {}
+        m_prevTime{Timer::GetFPGATimestamp()} {}
 
   /**
    * Filters the input to limit its slew rate.
@@ -46,7 +46,7 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    units::second_t currentTime = frc2::Timer::GetFPGATimestamp();
+    units::second_t currentTime = Timer::GetFPGATimestamp();
     units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal += std::clamp(input - m_prevVal, -m_rateLimit * elapsedTime,
                             m_rateLimit * elapsedTime);
@@ -62,7 +62,7 @@ class SlewRateLimiter {
    */
   void Reset(Unit_t value) {
     m_prevVal = value;
-    m_prevTime = frc2::Timer::GetFPGATimestamp();
+    m_prevTime = Timer::GetFPGATimestamp();
   }
 
  private:

@@ -34,14 +34,14 @@ class AnalogPotentiometerTest : public testing::Test {
 
 TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
   m_fakePot->SetVoltage(0.0);
-  Wait(0.1);
+  Wait(0.1_s);
   EXPECT_NEAR(0.0, m_pot->Get(), 5.0)
       << "The potentiometer did not initialize to 0.";
 }
 
 TEST_F(AnalogPotentiometerTest, TestRangeValues) {
   m_fakePot->SetVoltage(kAngle / kScale * RobotController::GetVoltage5V());
-  Wait(0.1);
+  Wait(0.1_s);
   EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
       << "The potentiometer did not measure the correct angle.";
 }

@@ -47,12 +47,12 @@ void MotorSafety::Feed() {
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
-void MotorSafety::SetExpiration(double expirationTime) {
+void MotorSafety::SetExpiration(units::second_t expirationTime) {
   std::scoped_lock lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
-double MotorSafety::GetExpiration() const {
+units::second_t MotorSafety::GetExpiration() const {
   std::scoped_lock lock(m_thisMutex);
   return m_expiration;
 }
@@ -74,7 +74,7 @@ bool MotorSafety::IsSafetyEnabled() const {
 
 void MotorSafety::Check() {
   bool enabled;
-  double stopTime;
+  units::second_t stopTime;
 
   {
     std::scoped_lock lock(m_thisMutex);

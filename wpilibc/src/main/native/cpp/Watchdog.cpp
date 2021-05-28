@@ -14,7 +14,7 @@
 #include <wpi/priority_queue.h>
 
 #include "frc/Errors.h"
-#include "frc2/Timer.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 
@@ -131,9 +131,6 @@ void Watchdog::Impl::Main() {
   }
 }
 
-Watchdog::Watchdog(double timeout, std::function<void()> callback)
-    : Watchdog(units::second_t{timeout}, callback) {}
-
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
@@ -167,16 +164,12 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   return *this;
 }
 
-double Watchdog::GetTime() const {
-  return (frc2::Timer::GetFPGATimestamp() - m_startTime).to<double>();
-}
-
-void Watchdog::SetTimeout(double timeout) {
-  SetTimeout(units::second_t{timeout});
+units::second_t Watchdog::GetTime() const {
+  return Timer::GetFPGATimestamp() - m_startTime;
 }
 
 void Watchdog::SetTimeout(units::second_t timeout) {
-  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
@@ -189,9 +182,9 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->UpdateAlarm();
 }
 
-double Watchdog::GetTimeout() const {
+units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
-  return m_timeout.to<double>();
+  return m_timeout;
 }
 
 bool Watchdog::IsExpired() const {
@@ -212,7 +205,7 @@ void Watchdog::Reset() {
 }
 
 void Watchdog::Enable() {
-  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);

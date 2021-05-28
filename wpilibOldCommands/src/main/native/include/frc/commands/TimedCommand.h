@@ -6,6 +6,8 @@
 
 #include <string_view>
 
+#include <units/time.h>
+
 #include "frc/commands/Command.h"
 
 namespace frc {
@@ -21,33 +23,34 @@ class TimedCommand : public Command {
    * Creates a new TimedCommand with the given name and timeout.
    *
    * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    */
-  TimedCommand(std::string_view name, double timeout);
+  TimedCommand(std::string_view name, units::second_t timeout);
 
   /**
    * Creates a new WaitCommand with the given timeout.
    *
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    */
-  explicit TimedCommand(double timeout);
+  explicit TimedCommand(units::second_t timeout);
 
   /**
    * Creates a new TimedCommand with the given name and timeout.
    *
    * @param name      the name of the command
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires
    */
-  TimedCommand(std::string_view name, double timeout, Subsystem& subsystem);
+  TimedCommand(std::string_view name, units::second_t timeout,
+               Subsystem& subsystem);
 
   /**
    * Creates a new WaitCommand with the given timeout.
    *
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires
    */
-  TimedCommand(double timeout, Subsystem& subsystem);
+  TimedCommand(units::second_t timeout, Subsystem& subsystem);
 
   ~TimedCommand() override = default;
 

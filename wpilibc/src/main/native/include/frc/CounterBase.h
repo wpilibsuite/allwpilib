@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/time.h>
+
 namespace frc {
 
 /**
@@ -27,8 +29,8 @@ class CounterBase {
 
   virtual int Get() const = 0;
   virtual void Reset() = 0;
-  virtual double GetPeriod() const = 0;
-  virtual void SetMaxPeriod(double maxPeriod) = 0;
+  virtual units::second_t GetPeriod() const = 0;
+  virtual void SetMaxPeriod(units::second_t maxPeriod) = 0;
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };

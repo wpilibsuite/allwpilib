@@ -6,20 +6,26 @@
 
 #include "frc/DigitalOutput.h"  // NOLINT(build/include_order)
 
+#include <units/math.h>
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/Counter.h"
 #include "frc/InterruptableSensorBase.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
+#define EXPECT_NEAR_UNITS(val1, val2, eps) \
+  EXPECT_LE(units::math::abs(val1 - val2), eps)
+
 using namespace frc;
 
-static const double kCounterTime = 0.001;
+static constexpr auto kCounterTime = 1_ms;
 
-static const double kDelayTime = 0.1;
+static constexpr auto kDelayTime = 100_ms;
 
-static const double kSynchronousInterruptTime = 2.0;
-static const double kSynchronousInterruptTimeTolerance = 0.01;
+static constexpr auto kSynchronousInterruptTime = 2_s;
+static constexpr auto kSynchronousInterruptTimeTolerance = 10_ms;
 
 /**
  * A fixture with a digital input and a digital output physically wired
@@ -75,31 +81,31 @@ TEST_F(DIOLoopTest, DIOPWM) {
   m_output->SetPWMRate(2.0);
   // Enable PWM, but leave it off
   m_output->EnablePWM(0.0);
-  Wait(0.5);
+  Wait(0.5_s);
   m_output->UpdateDutyCycle(0.5);
   m_input->RequestInterrupts();
   m_input->SetUpSourceEdge(false, true);
   InterruptableSensorBase::WaitResult result =
-      m_input->WaitForInterrupt(3.0, true);
+      m_input->WaitForInterrupt(3_s, true);
 
-  Wait(0.5);
+  Wait(0.5_s);
   bool firstCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool secondCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool thirdCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool forthCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool fifthCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool sixthCycle = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool seventhCycle = m_input->Get();
   m_output->DisablePWM();
-  Wait(0.5);
+  Wait(0.5_s);
   bool firstAfterStop = m_input->Get();
-  Wait(0.5);
+  Wait(0.5_s);
   bool secondAfterStop = m_input->Get();
 
   EXPECT_EQ(InterruptableSensorBase::WaitResult::kFallingEdge, result)
@@ -179,7 +185,7 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
   // Then this thread should pause and resume after that number of seconds
   Timer timer;
   timer.Start();
-  m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
-  EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(),
-              kSynchronousInterruptTimeTolerance);
+  m_input->WaitForInterrupt(kSynchronousInterruptTime + 1_s);
+  EXPECT_NEAR_UNITS(kSynchronousInterruptTime, timer.Get(),
+                    kSynchronousInterruptTimeTolerance);
 }

@@ -151,26 +151,18 @@ void Notifier::SetHandler(std::function<void()> handler) {
   m_handler = handler;
 }
 
-void Notifier::StartSingle(double delay) {
-  StartSingle(units::second_t(delay));
-}
-
 void Notifier::StartSingle(units::second_t delay) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;
-  m_period = delay.to<double>();
+  m_period = delay;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
-}
-
-void Notifier::StartPeriodic(double period) {
-  StartPeriodic(units::second_t(period));
 }
 
 void Notifier::StartPeriodic(units::second_t period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
-  m_period = period.to<double>();
+  m_period = period;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }

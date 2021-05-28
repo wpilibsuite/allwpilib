@@ -17,7 +17,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   auto& registry = SendableRegistry::GetInstance();
   registry.AddChild(this, &m_dio);
   registry.AddChild(this, &m_pwm);
-  SetExpiration(0.0);
+  SetExpiration(0_s);
   SetSafetyEnabled(false);
 
   // the dio controls the output (in PWM mode)

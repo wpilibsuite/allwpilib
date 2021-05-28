@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 
+#include <units/time.h>
 #include <wpi/SmallPtrSet.h>
 
 #include "frc/commands/Subsystem.h"
@@ -64,10 +65,10 @@ class Command : public Sendable, public SendableHelper<Command> {
   /**
    * Creates a new command with the given timeout and a default name.
    *
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    * @see IsTimedOut()
    */
-  explicit Command(double timeout);
+  explicit Command(units::second_t timeout);
 
   /**
    * Creates a new command with the given timeout and a default name.
@@ -80,10 +81,10 @@ class Command : public Sendable, public SendableHelper<Command> {
    * Creates a new command with the given name and timeout.
    *
    * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    * @see IsTimedOut()
    */
-  Command(std::string_view name, double timeout);
+  Command(std::string_view name, units::second_t timeout);
 
   /**
    * Creates a new command with the given name and timeout.
@@ -96,19 +97,19 @@ class Command : public Sendable, public SendableHelper<Command> {
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(double timeout, Subsystem& subsystem);
+  Command(units::second_t timeout, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
    *
    * @param name      the name of the command
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(std::string_view name, double timeout, Subsystem& subsystem);
+  Command(std::string_view name, units::second_t timeout, Subsystem& subsystem);
 
   ~Command() override = default;
 
@@ -116,13 +117,13 @@ class Command : public Sendable, public SendableHelper<Command> {
   Command& operator=(Command&&) = default;
 
   /**
-   * Returns the time since this command was initialized (in seconds).
+   * Returns the time since this command was initialized.
    *
    * This function will work even if there is no specified timeout.
    *
-   * @return the time since this command was initialized (in seconds).
+   * @return the time since this command was initialized.
    */
-  double TimeSinceInitialized() const;
+  units::second_t TimeSinceInitialized() const;
 
   /**
    * This method specifies that the given Subsystem is used by this command.
@@ -271,10 +272,10 @@ class Command : public Sendable, public SendableHelper<Command> {
   /**
    * Sets the timeout of this command.
    *
-   * @param timeout the timeout (in seconds)
+   * @param timeout the timeout
    * @see IsTimedOut()
    */
-  void SetTimeout(double timeout);
+  void SetTimeout(units::second_t timeout);
 
   /**
    * Returns whether or not the TimeSinceInitialized() method returns a number
@@ -445,10 +446,10 @@ class Command : public Sendable, public SendableHelper<Command> {
   void StartTiming();
 
   // The time since this command was initialized
-  double m_startTime = -1;
+  units::second_t m_startTime = -1_s;
 
   // The time (in seconds) before this command "times out" (-1 if no timeout)
-  double m_timeout;
+  units::second_t m_timeout;
 
   // Whether or not this command has been initialized
   bool m_initialized = false;

@@ -8,10 +8,10 @@
 
 using namespace frc;
 
-WaitForChildren::WaitForChildren(double timeout)
+WaitForChildren::WaitForChildren(units::second_t timeout)
     : Command("WaitForChildren", timeout) {}
 
-WaitForChildren::WaitForChildren(std::string_view name, double timeout)
+WaitForChildren::WaitForChildren(std::string_view name, units::second_t timeout)
     : Command(name, timeout) {}
 
 bool WaitForChildren::IsFinished() {

@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/AnalogInput.h"
 #include "frc/AnalogOutput.h"
@@ -12,7 +14,7 @@
 
 using namespace frc;
 
-static const double kDelayTime = 0.01;
+static constexpr auto kDelayTime = 10_ms;
 
 /**
  * A fixture with an analog input and an analog output wired together

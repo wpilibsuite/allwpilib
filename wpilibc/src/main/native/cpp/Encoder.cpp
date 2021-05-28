@@ -79,16 +79,16 @@ void Encoder::Reset() {
   FRC_CheckErrorStatus(status, "{}", "Reset");
 }
 
-double Encoder::GetPeriod() const {
+units::second_t Encoder::GetPeriod() const {
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
   FRC_CheckErrorStatus(status, "{}", "GetPeriod");
-  return value;
+  return units::second_t{value};
 }
 
-void Encoder::SetMaxPeriod(double maxPeriod) {
+void Encoder::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
+  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.to<double>(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
 

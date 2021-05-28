@@ -29,15 +29,16 @@ void CommandGroup::AddSequential(Command* command) {
   }
 }
 
-void CommandGroup::AddSequential(Command* command, double timeout) {
+void CommandGroup::AddSequential(Command* command, units::second_t timeout) {
   if (!command) {
     throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
-  if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence,
@@ -72,15 +73,16 @@ void CommandGroup::AddParallel(Command* command) {
   }
 }
 
-void CommandGroup::AddParallel(Command* command, double timeout) {
+void CommandGroup::AddParallel(Command* command, units::second_t timeout) {
   if (!command) {
     throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
-  if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild,

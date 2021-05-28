@@ -9,6 +9,7 @@
 
 #include <networktables/NetworkTableInstance.h>
 #include <ntcore.h>
+#include <units/time.h>
 
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
@@ -16,7 +17,7 @@
 using namespace frc;
 
 static const char* kFileName = "networktables.ini";
-static const double kSaveTime = 1.2;
+static constexpr auto kSaveTime = 1.2_s;
 
 /**
  * If we write a new networktables.ini with some sample values, test that
@@ -71,24 +72,24 @@ TEST(PreferencesTest, WritePreferencesToFile) {
 
   Wait(kSaveTime);
 
-  preferences->PutString("testFilePutString", "Hello, preferences file");
-  preferences->PutInt("testFilePutInt", 1);
-  preferences->PutDouble("testFilePutDouble", 0.5);
-  preferences->PutFloat("testFilePutFloat", 0.25f);
-  preferences->PutBoolean("testFilePutBoolean", true);
-  preferences->PutLong("testFilePutLong", 1000000000000000000ll);
+  preferences->SetString("testFileSetString", "Hello, preferences file");
+  preferences->SetInt("testFileSetInt", 1);
+  preferences->SetDouble("testFileSetDouble", 0.5);
+  preferences->SetFloat("testFileSetFloat", 0.25f);
+  preferences->SetBoolean("testFileSetBoolean", true);
+  preferences->SetLong("testFileSetLong", 1000000000000000000ll);
 
   Wait(kSaveTime);
 
   static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",
       "string \"/Preferences/.type\"=\"RobotPreferences\"",
-      "boolean \"/Preferences/testFilePutBoolean\"=true",
-      "double \"/Preferences/testFilePutDouble\"=0.5",
-      "double \"/Preferences/testFilePutFloat\"=0.25",
-      "double \"/Preferences/testFilePutInt\"=1",
-      "double \"/Preferences/testFilePutLong\"=1e+18",
-      "string \"/Preferences/testFilePutString\"=\"Hello, preferences file\""};
+      "boolean \"/Preferences/testFileSetBoolean\"=true",
+      "double \"/Preferences/testFileSetDouble\"=0.5",
+      "double \"/Preferences/testFileSetFloat\"=0.25",
+      "double \"/Preferences/testFileSetInt\"=1",
+      "double \"/Preferences/testFileSetLong\"=1e+18",
+      "string \"/Preferences/testFileSetString\"=\"Hello, preferences file\""};
 
   std::ifstream preferencesFile(kFileName);
   for (auto& kExpectedFileContent : kExpectedFileContents) {

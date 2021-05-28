@@ -13,8 +13,8 @@
 
 using namespace frc;
 
-static constexpr auto kSamplePeriod = 0.0005_s;
-static constexpr double kCalibrationSampleTime = 5.0;
+static constexpr auto kSamplePeriod = 0.5_ms;
+static constexpr auto kCalibrationSampleTime = 5_s;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
 // static constexpr int kRateRegister = 0x00;
@@ -121,7 +121,7 @@ void ADXRS450_Gyro::Reset() {
 }
 
 void ADXRS450_Gyro::Calibrate() {
-  Wait(0.1);
+  Wait(100_ms);
 
   m_spi.SetAccumulatorIntegratedCenter(0);
   m_spi.ResetAccumulator();

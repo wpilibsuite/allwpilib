@@ -27,10 +27,10 @@ TEST(NotifierTest, DISABLED_TestTimerNotifications) {
   wpi::outs() << "notifier(notifierHandler, nullptr)...\n";
   Notifier notifier(notifierHandler, nullptr);
   wpi::outs() << "Start Periodic...\n";
-  notifier.StartPeriodic(1.0);
+  notifier.StartPeriodic(1_s);
 
   wpi::outs() << "Wait...\n";
-  Wait(10.5);
+  Wait(10.5_s);
   wpi::outs() << "...Wait\n";
 
   EXPECT_EQ(10u, notifierCounter)

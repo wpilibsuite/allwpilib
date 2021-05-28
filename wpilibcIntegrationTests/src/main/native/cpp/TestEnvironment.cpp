@@ -53,7 +53,7 @@ class TestEnvironment : public testing::Environment {
         std::terminate();
       }
 
-      Wait(0.1);
+      Wait(0.1_s);
 
       wpi::outs() << "Waiting for enable: " << enableCounter++ << "\n";
     }

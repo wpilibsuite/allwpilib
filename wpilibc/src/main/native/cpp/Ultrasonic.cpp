@@ -142,14 +142,16 @@ double Ultrasonic::GetRangeInches() const {
     if (m_simRange) {
       return m_simRange.Get();
     }
-    return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+    return units::inch_t{m_counter.GetPeriod() * kSpeedOfSound / 2.0}
+        .to<double>();
   } else {
     return 0;
   }
 }
 
 double Ultrasonic::GetRangeMM() const {
-  return GetRangeInches() * 25.4;
+  return units::millimeter_t{m_counter.GetPeriod() * kSpeedOfSound / 2.0}
+      .to<double>();
 }
 
 bool Ultrasonic::IsEnabled() const {
@@ -180,7 +182,7 @@ void Ultrasonic::Initialize() {
   // Link this instance on the list
   m_sensors.emplace_back(this);
 
-  m_counter.SetMaxPeriod(1.0);
+  m_counter.SetMaxPeriod(1_s);
   m_counter.SetSemiPeriodMode(true);
   m_counter.Reset();
   m_enabled = true;  // Make it available for round robin scheduling
@@ -204,7 +206,7 @@ void Ultrasonic::UltrasonicChecker() {
         sensor->m_pingChannel->Pulse(kPingTime);  // do the ping
       }
 
-      Wait(0.1);  // wait for ping to return
+      Wait(100_ms);  // wait for ping to return
     }
   }
 }

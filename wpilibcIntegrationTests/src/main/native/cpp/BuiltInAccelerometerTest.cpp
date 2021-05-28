@@ -19,7 +19,7 @@ TEST(BuiltInAccelerometerTest, Accelerometer) {
 
   /* The testbench sometimes shakes a little from a previous test.  Give it
           some time. */
-  Wait(1.0);
+  Wait(1_s);
 
   ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
   ASSERT_NEAR(1.0, accelerometer.GetY(), kAccelerationTolerance);

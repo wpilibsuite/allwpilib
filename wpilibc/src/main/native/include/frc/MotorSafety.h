@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include <units/time.h>
 #include <wpi/mutex.h>
 
 #include "frc/Timer.h"
@@ -36,16 +37,16 @@ class MotorSafety {
   /**
    * Set the expiration time for the corresponding motor safety object.
    *
-   * @param expirationTime The timeout value in seconds.
+   * @param expirationTime The timeout value.
    */
-  void SetExpiration(double expirationTime);
+  void SetExpiration(units::second_t expirationTime);
 
   /**
    * Retrieve the timeout value for the corresponding motor safety object.
    *
-   * @return the timeout value in seconds.
+   * @return the timeout value.
    */
-  double GetExpiration() const;
+  units::second_t GetExpiration() const;
 
   /**
    * Determine if the motor is still operating or has timed out.
@@ -93,16 +94,16 @@ class MotorSafety {
   virtual std::string GetDescription() const = 0;
 
  private:
-  static constexpr double kDefaultSafetyExpiration = 0.1;
+  static constexpr auto kDefaultSafetyExpiration = 100_ms;
 
   // The expiration time for this object
-  double m_expiration = kDefaultSafetyExpiration;
+  units::second_t m_expiration = kDefaultSafetyExpiration;
 
   // True if motor safety is enabled for this motor
   bool m_enabled = false;
 
   // The FPGA clock value when the motor has expired
-  double m_stopTime = Timer::GetFPGATimestamp();
+  units::second_t m_stopTime = Timer::GetFPGATimestamp();
 
   mutable wpi::mutex m_thisMutex;
 };

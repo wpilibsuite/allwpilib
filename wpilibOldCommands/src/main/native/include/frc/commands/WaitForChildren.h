@@ -6,14 +6,16 @@
 
 #include <string_view>
 
+#include <units/time.h>
+
 #include "frc/commands/Command.h"
 
 namespace frc {
 
 class WaitForChildren : public Command {
  public:
-  explicit WaitForChildren(double timeout);
-  WaitForChildren(std::string_view name, double timeout);
+  explicit WaitForChildren(units::second_t timeout);
+  WaitForChildren(std::string_view name, units::second_t timeout);
   ~WaitForChildren() override = default;
 
   WaitForChildren(WaitForChildren&&) = default;

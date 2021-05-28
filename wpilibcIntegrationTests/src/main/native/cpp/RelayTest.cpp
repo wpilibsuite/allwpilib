@@ -4,6 +4,8 @@
 
 #include "frc/Relay.h"  // NOLINT(build/include_order)
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/DigitalInput.h"
 #include "frc/Timer.h"
@@ -11,7 +13,7 @@
 
 using namespace frc;
 
-static const double kDelayTime = 0.01;
+static constexpr auto kDelayTime = 10_ms;
 
 class RelayTest : public testing::Test {
  protected:
