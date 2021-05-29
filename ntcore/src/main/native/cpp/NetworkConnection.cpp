@@ -142,7 +142,7 @@ std::string NetworkConnection::remote_id() const {
   return m_remote_id;
 }
 
-void NetworkConnection::set_remote_id(wpi::StringRef remote_id) {
+void NetworkConnection::set_remote_id(std::string_view remote_id) {
   std::scoped_lock lock(m_remote_id_mutex);
   m_remote_id = remote_id;
 }

@@ -242,6 +242,6 @@ bool WireDecoder::ReadString(std::string* str) {
   if (!Read(&buf, len)) {
     return false;
   }
-  *str = wpi::StringRef(buf, len);
+  str->assign(buf, len);
   return true;
 }

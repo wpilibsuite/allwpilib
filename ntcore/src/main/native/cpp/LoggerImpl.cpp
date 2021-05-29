@@ -5,7 +5,6 @@
 #include "LoggerImpl.h"
 
 #include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
 #include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 
@@ -21,7 +20,7 @@ static void DefaultLogger(unsigned int level, const char* file,
     return;
   }
 
-  wpi::StringRef levelmsg;
+  std::string_view levelmsg;
   if (level >= 50) {
     levelmsg = "CRITICAL: ";
   } else if (level >= 40) {

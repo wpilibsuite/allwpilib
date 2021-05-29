@@ -126,7 +126,7 @@ void PrintTo(const Value& value, std::ostream* os) {
       *os << value.GetDouble();
       break;
     case NT_STRING:
-      *os << '"' << value.GetString().str() << '"';
+      *os << '"' << value.GetString() << '"';
       break;
     case NT_RAW:
       *os << ::testing::PrintToString(value.GetRaw());

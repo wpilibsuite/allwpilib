@@ -4,6 +4,7 @@
 
 #include "Storage.h"
 
+#include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
 #include "Handle.h"
@@ -91,7 +92,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
   std::unique_lock lock(m_mutex);
   unsigned int id = msg->id();
-  wpi::StringRef name = msg->str();
+  std::string_view name = msg->str();
   Entry* entry;
   bool may_need_update = false;
   SequenceNumber seq_num(msg->seq_num_uid());
@@ -359,7 +360,7 @@ void Storage::ProcessIncomingExecuteRpc(
   unsigned int call_uid = msg->seq_num_uid();
   m_rpc_server.ProcessRpc(
       entry->local_id, call_uid, entry->name, msg->str(), conn_info,
-      [=](wpi::StringRef result) {
+      [=](std::string_view result) {
         auto c = conn_weak.lock();
         if (c) {
           c->QueueOutgoing(Message::RpcResponse(id, call_uid, result));
@@ -388,8 +389,8 @@ void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
     DEBUG0("received RPC response to non-RPC entry");
     return;
   }
-  m_rpc_results.insert(std::make_pair(
-      RpcIdPair{entry->local_id, msg->seq_num_uid()}, msg->str()));
+  m_rpc_results.insert({RpcIdPair{entry->local_id, msg->seq_num_uid()},
+                        std::string{msg->str()}});
   m_rpc_results_cond.notify_all();
 }
 
@@ -442,7 +443,7 @@ void Storage::ApplyInitialAssignments(
     }
 
     SequenceNumber seq_num(msg->seq_num_uid());
-    wpi::StringRef name = msg->str();
+    std::string_view name = msg->str();
 
     Entry* entry = GetOrNew(name);
     entry->seq_num = seq_num;
@@ -509,7 +510,7 @@ void Storage::ApplyInitialAssignments(
   }
 }
 
-std::shared_ptr<Value> Storage::GetEntryValue(wpi::StringRef name) const {
+std::shared_ptr<Value> Storage::GetEntryValue(std::string_view name) const {
   std::scoped_lock lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) {
@@ -526,7 +527,7 @@ std::shared_ptr<Value> Storage::GetEntryValue(unsigned int local_id) const {
   return m_localmap[local_id]->value;
 }
 
-bool Storage::SetDefaultEntryValue(wpi::StringRef name,
+bool Storage::SetDefaultEntryValue(std::string_view name,
                                    std::shared_ptr<Value> value) {
   if (name.empty()) {
     return false;
@@ -566,7 +567,8 @@ bool Storage::SetDefaultEntryValue(unsigned int local_id,
   return true;
 }
 
-bool Storage::SetEntryValue(wpi::StringRef name, std::shared_ptr<Value> value) {
+bool Storage::SetEntryValue(std::string_view name,
+                            std::shared_ptr<Value> value) {
   if (name.empty()) {
     return true;
   }
@@ -664,7 +666,7 @@ void Storage::SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
   }
 }
 
-void Storage::SetEntryTypeValue(wpi::StringRef name,
+void Storage::SetEntryTypeValue(std::string_view name,
                                 std::shared_ptr<Value> value) {
   if (name.empty()) {
     return;
@@ -695,7 +697,7 @@ void Storage::SetEntryTypeValue(unsigned int local_id,
   SetEntryValueImpl(entry, value, lock, true);
 }
 
-void Storage::SetEntryFlags(wpi::StringRef name, unsigned int flags) {
+void Storage::SetEntryFlags(std::string_view name, unsigned int flags) {
   if (name.empty()) {
     return;
   }
@@ -747,7 +749,7 @@ void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
   }
 }
 
-unsigned int Storage::GetEntryFlags(wpi::StringRef name) const {
+unsigned int Storage::GetEntryFlags(std::string_view name) const {
   std::scoped_lock lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) {
@@ -764,7 +766,7 @@ unsigned int Storage::GetEntryFlags(unsigned int local_id) const {
   return m_localmap[local_id]->flags;
 }
 
-void Storage::DeleteEntry(wpi::StringRef name) {
+void Storage::DeleteEntry(std::string_view name) {
   std::unique_lock lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) {
@@ -873,37 +875,32 @@ void Storage::DeleteAllEntries() {
   dispatcher->QueueOutgoing(Message::ClearEntries(), nullptr, nullptr);
 }
 
-Storage::Entry* Storage::GetOrNew(const wpi::Twine& name) {
-  wpi::SmallString<128> nameBuf;
-  wpi::StringRef nameStr = name.toStringRef(nameBuf);
-  auto& entry = m_entries[nameStr];
+Storage::Entry* Storage::GetOrNew(std::string_view name) {
+  auto& entry = m_entries[name];
   if (!entry) {
-    m_localmap.emplace_back(new Entry(nameStr));
+    m_localmap.emplace_back(new Entry(name));
     entry = m_localmap.back().get();
     entry->local_id = m_localmap.size() - 1;
   }
   return entry;
 }
 
-unsigned int Storage::GetEntry(const wpi::Twine& name) {
-  if (name.isTriviallyEmpty() ||
-      (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
+unsigned int Storage::GetEntry(std::string_view name) {
+  if (name.empty()) {
     return UINT_MAX;
   }
   std::unique_lock lock(m_mutex);
   return GetOrNew(name)->local_id;
 }
 
-std::vector<unsigned int> Storage::GetEntries(const wpi::Twine& prefix,
+std::vector<unsigned int> Storage::GetEntries(std::string_view prefix,
                                               unsigned int types) {
-  wpi::SmallString<128> prefixBuf;
-  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::scoped_lock lock(m_mutex);
   std::vector<unsigned int> ids;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     auto value = entry->value.get();
-    if (!value || !i.getKey().startswith(prefixStr)) {
+    if (!value || !wpi::starts_with(i.getKey(), prefix)) {
       continue;
     }
     if (types != 0 && (types & value->type()) == 0) {
@@ -970,16 +967,14 @@ uint64_t Storage::GetEntryLastChange(unsigned int local_id) const {
   return entry->value->last_change();
 }
 
-std::vector<EntryInfo> Storage::GetEntryInfo(int inst, const wpi::Twine& prefix,
+std::vector<EntryInfo> Storage::GetEntryInfo(int inst, std::string_view prefix,
                                              unsigned int types) {
-  wpi::SmallString<128> prefixBuf;
-  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::scoped_lock lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     auto value = entry->value.get();
-    if (!value || !i.getKey().startswith(prefixStr)) {
+    if (!value || !wpi::starts_with(i.getKey(), prefix)) {
       continue;
     }
     if (types != 0 && (types & value->type()) == 0) {
@@ -997,18 +992,16 @@ std::vector<EntryInfo> Storage::GetEntryInfo(int inst, const wpi::Twine& prefix,
 }
 
 unsigned int Storage::AddListener(
-    const wpi::Twine& prefix,
+    std::string_view prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
-  wpi::SmallString<128> prefixBuf;
-  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::scoped_lock lock(m_mutex);
-  unsigned int uid = m_notifier.Add(callback, prefixStr, flags);
+  unsigned int uid = m_notifier.Add(callback, prefix, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
-      if (!entry->value || !i.getKey().startswith(prefixStr)) {
+      if (!entry->value || !wpi::starts_with(i.getKey(), prefix)) {
         continue;
       }
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
@@ -1037,16 +1030,14 @@ unsigned int Storage::AddListener(
 }
 
 unsigned int Storage::AddPolledListener(unsigned int poller,
-                                        const wpi::Twine& prefix,
+                                        std::string_view prefix,
                                         unsigned int flags) const {
-  wpi::SmallString<128> prefixBuf;
-  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::scoped_lock lock(m_mutex);
-  unsigned int uid = m_notifier.AddPolled(poller, prefixStr, flags);
+  unsigned int uid = m_notifier.AddPolled(poller, prefix, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
     for (auto& i : m_entries) {
-      if (!i.getKey().startswith(prefixStr)) {
+      if (!wpi::starts_with(i.getKey(), prefix)) {
         continue;
       }
       Entry* entry = i.getValue();
@@ -1111,11 +1102,9 @@ bool Storage::GetPersistentEntries(
 }
 
 bool Storage::GetEntries(
-    const wpi::Twine& prefix,
+    std::string_view prefix,
     std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
     const {
-  wpi::SmallString<128> prefixBuf;
-  wpi::StringRef prefixStr = prefix.toStringRef(prefixBuf);
   // copy values out of storage as quickly as possible so lock isn't held
   {
     std::scoped_lock lock(m_mutex);
@@ -1123,7 +1112,7 @@ bool Storage::GetEntries(
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
       // only write values with given prefix
-      if (!entry->value || !i.getKey().startswith(prefixStr)) {
+      if (!entry->value || !wpi::starts_with(i.getKey(), prefix)) {
         continue;
       }
       entries->emplace_back(i.getKey(), entry->value);
@@ -1139,7 +1128,7 @@ bool Storage::GetEntries(
   return true;
 }
 
-void Storage::CreateRpc(unsigned int local_id, wpi::StringRef def,
+void Storage::CreateRpc(unsigned int local_id, std::string_view def,
                         unsigned int rpc_uid) {
   std::unique_lock lock(m_mutex);
   if (local_id >= m_localmap.size()) {
@@ -1184,7 +1173,7 @@ void Storage::CreateRpc(unsigned int local_id, wpi::StringRef def,
   }
 }
 
-unsigned int Storage::CallRpc(unsigned int local_id, wpi::StringRef params) {
+unsigned int Storage::CallRpc(unsigned int local_id, std::string_view params) {
   std::unique_lock lock(m_mutex);
   if (local_id >= m_localmap.size()) {
     return 0;
@@ -1202,7 +1191,7 @@ unsigned int Storage::CallRpc(unsigned int local_id, wpi::StringRef params) {
   unsigned int call_uid = entry->rpc_call_uid;
 
   auto msg = Message::ExecuteRpc(entry->id, call_uid, params);
-  wpi::StringRef name{entry->name};
+  std::string_view name{entry->name};
 
   if (m_server) {
     // RPCs are unlikely to be used locally on the server, but handle it
@@ -1218,10 +1207,10 @@ unsigned int Storage::CallRpc(unsigned int local_id, wpi::StringRef params) {
     unsigned int call_uid = msg->seq_num_uid();
     m_rpc_server.ProcessRpc(
         local_id, call_uid, name, msg->str(), conn_info,
-        [=](wpi::StringRef result) {
+        [=](std::string_view result) {
           std::scoped_lock lock(m_mutex);
-          m_rpc_results.insert(
-              std::make_pair(RpcIdPair{local_id, call_uid}, result));
+          m_rpc_results.insert(std::make_pair(RpcIdPair{local_id, call_uid},
+                                              std::string{result}));
           m_rpc_results_cond.notify_all();
         },
         rpc_uid);

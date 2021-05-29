@@ -9,12 +9,11 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -45,12 +44,12 @@ class DispatcherBase : public IDispatcher {
 
   unsigned int GetNetworkMode() const;
   void StartLocal();
-  void StartServer(const wpi::Twine& persist_filename,
+  void StartServer(std::string_view persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();
   void Stop();
   void SetUpdateRate(double interval);
-  void SetIdentity(const wpi::Twine& name);
+  void SetIdentity(std::string_view name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
   bool IsConnected() const;
@@ -132,12 +131,12 @@ class Dispatcher : public DispatcherBase {
              wpi::Logger& logger)
       : DispatcherBase(storage, notifier, logger) {}
 
-  void StartServer(const wpi::Twine& persist_filename,
+  void StartServer(std::string_view persist_filename,
                    const char* listen_address, unsigned int port);
 
   void SetServer(const char* server_name, unsigned int port);
   void SetServer(
-      wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers);
+      wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
   void SetServerTeam(unsigned int team, unsigned int port);
 
   void SetServerOverride(const char* server_name, unsigned int port);

@@ -16,7 +16,7 @@ class MockRpcServer : public IRpcServer {
   MOCK_METHOD1(RemoveRpc, void(unsigned int rpc_uid));
   MOCK_METHOD7(ProcessRpc,
                void(unsigned int local_id, unsigned int call_uid,
-                    wpi::StringRef name, wpi::StringRef params,
+                    std::string_view name, std::string_view params,
                     const ConnectionInfo& conn, SendResponseFunc send_response,
                     unsigned int rpc_uid));
 };

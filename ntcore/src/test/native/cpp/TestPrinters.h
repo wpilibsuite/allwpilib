@@ -7,15 +7,15 @@
 
 #include <memory>
 #include <ostream>
-
-#include <wpi/StringRef.h>
+#include <string>
+#include <string_view>
 
 #include "gtest/gtest.h"
 
 namespace wpi {
 
-inline void PrintTo(StringRef str, ::std::ostream* os) {
-  ::testing::internal::PrintStringTo(str.str(), os);
+inline void PrintTo(std::string_view str, ::std::ostream* os) {
+  ::testing::internal::PrintStringTo(std::string{str}, os);
 }
 
 }  // namespace wpi

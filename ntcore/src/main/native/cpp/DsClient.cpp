@@ -126,12 +126,12 @@ void DsClient::Thread::Main() {
 
       // Look for "robotIP":12345, and get 12345 portion
       size_t pos = json.find("\"robotIP\"");
-      if (pos == wpi::StringRef::npos) {
+      if (pos == std::string_view::npos) {
         continue;  // could not find?
       }
       pos += 9;
       pos = json.find(':', pos);
-      if (pos == wpi::StringRef::npos) {
+      if (pos == std::string_view::npos) {
         continue;  // could not find?
       }
       size_t endpos = json.find_first_not_of("0123456789", pos + 1);

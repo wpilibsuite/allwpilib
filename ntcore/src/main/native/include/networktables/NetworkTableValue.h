@@ -11,13 +11,12 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "ntcore_c.h"
 
@@ -163,7 +162,7 @@ class Value final {
    *
    * @return The string value.
    */
-  wpi::StringRef GetString() const {
+  std::string_view GetString() const {
     assert(m_val.type == NT_STRING);
     return m_string;
   }
@@ -173,7 +172,7 @@ class Value final {
    *
    * @return The raw value.
    */
-  wpi::StringRef GetRaw() const {
+  std::string_view GetRaw() const {
     assert(m_val.type == NT_RAW);
     return m_string;
   }
@@ -183,7 +182,7 @@ class Value final {
    *
    * @return The rpc definition value.
    */
-  wpi::StringRef GetRpc() const {
+  std::string_view GetRpc() const {
     assert(m_val.type == NT_RPC);
     return m_string;
   }
@@ -263,10 +262,10 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeString(const wpi::Twine& value,
+  static std::shared_ptr<Value> MakeString(std::string_view value,
                                            uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
-    val->m_string = value.str();
+    val->m_string = value;
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
     val->m_val.data.v_string.len = val->m_string.size();
     return val;
@@ -298,7 +297,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRaw(wpi::StringRef value,
+  static std::shared_ptr<Value> MakeRaw(std::string_view value,
                                         uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = value;
@@ -333,7 +332,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRpc(wpi::StringRef value,
+  static std::shared_ptr<Value> MakeRpc(std::string_view value,
                                         uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RPC, time, private_init());
     val->m_string = value;

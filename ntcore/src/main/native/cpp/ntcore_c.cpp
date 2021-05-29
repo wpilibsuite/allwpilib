@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <string_view>
 
 #include <wpi/MemAlloc.h>
 #include <wpi/timestamp.h>
@@ -17,7 +18,7 @@ using namespace nt;
 
 // Conversion helpers
 
-static void ConvertToC(wpi::StringRef in, char** out) {
+static void ConvertToC(std::string_view in, char** out) {
   *out = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
   std::memmove(*out, in.data(), in.size());  // NOLINT
   (*out)[in.size()] = '\0';
@@ -192,12 +193,12 @@ NT_Inst NT_GetInstanceFromHandle(NT_Handle handle) {
  */
 
 NT_Entry NT_GetEntry(NT_Inst inst, const char* name, size_t name_len) {
-  return nt::GetEntry(inst, wpi::StringRef(name, name_len));
+  return nt::GetEntry(inst, {name, name_len});
 }
 
 NT_Entry* NT_GetEntries(NT_Inst inst, const char* prefix, size_t prefix_len,
                         unsigned int types, size_t* count) {
-  auto info_v = nt::GetEntries(inst, wpi::StringRef(prefix, prefix_len), types);
+  auto info_v = nt::GetEntries(inst, {prefix, prefix_len}, types);
   *count = info_v.size();
   if (info_v.size() == 0) {
     return nullptr;
@@ -266,8 +267,7 @@ void NT_DeleteAllEntries(NT_Inst inst) {
 struct NT_EntryInfo* NT_GetEntryInfo(NT_Inst inst, const char* prefix,
                                      size_t prefix_len, unsigned int types,
                                      size_t* count) {
-  auto info_v =
-      nt::GetEntryInfo(inst, wpi::StringRef(prefix, prefix_len), types);
+  auto info_v = nt::GetEntryInfo(inst, {prefix, prefix_len}, types);
   return ConvertToC<NT_EntryInfo>(info_v, count);
 }
 
@@ -289,7 +289,7 @@ NT_EntryListener NT_AddEntryListener(NT_Inst inst, const char* prefix,
                                      NT_EntryListenerCallback callback,
                                      unsigned int flags) {
   return nt::AddEntryListener(
-      inst, wpi::StringRef(prefix, prefix_len),
+      inst, {prefix, prefix_len},
       [=](const EntryNotification& event) {
         NT_EntryNotification c_event;
         ConvertToC(event, &c_event);
@@ -325,8 +325,7 @@ NT_EntryListener NT_AddPolledEntryListener(NT_EntryListenerPoller poller,
                                            const char* prefix,
                                            size_t prefix_len,
                                            unsigned int flags) {
-  return nt::AddPolledEntryListener(poller, wpi::StringRef(prefix, prefix_len),
-                                    flags);
+  return nt::AddPolledEntryListener(poller, {prefix, prefix_len}, flags);
 }
 
 NT_EntryListener NT_AddPolledEntryListenerSingle(NT_EntryListenerPoller poller,
@@ -422,13 +421,12 @@ NT_Bool NT_WaitForConnectionListenerQueue(NT_Inst inst, double timeout) {
 
 void NT_CreateRpc(NT_Entry entry, const char* def, size_t def_len, void* data,
                   NT_RpcCallback callback) {
-  nt::CreateRpc(entry, wpi::StringRef(def, def_len),
-                [=](const RpcAnswer& answer) {
-                  NT_RpcAnswer answer_c;
-                  ConvertToC(answer, &answer_c);
-                  callback(data, &answer_c);
-                  NT_DisposeRpcAnswer(&answer_c);
-                });
+  nt::CreateRpc(entry, {def, def_len}, [=](const RpcAnswer& answer) {
+    NT_RpcAnswer answer_c;
+    ConvertToC(answer, &answer_c);
+    callback(data, &answer_c);
+    NT_DisposeRpcAnswer(&answer_c);
+  });
 }
 
 NT_RpcCallPoller NT_CreateRpcCallPoller(NT_Inst inst) {
@@ -441,7 +439,7 @@ void NT_DestroyRpcCallPoller(NT_RpcCallPoller poller) {
 
 void NT_CreatePolledRpc(NT_Entry entry, const char* def, size_t def_len,
                         NT_RpcCallPoller poller) {
-  nt::CreatePolledRpc(entry, wpi::StringRef(def, def_len), poller);
+  nt::CreatePolledRpc(entry, {def, def_len}, poller);
 }
 
 NT_RpcAnswer* NT_PollRpc(NT_RpcCallPoller poller, size_t* len) {
@@ -467,11 +465,11 @@ NT_Bool NT_WaitForRpcCallQueue(NT_Inst inst, double timeout) {
 
 NT_Bool NT_PostRpcResponse(NT_Entry entry, NT_RpcCall call, const char* result,
                            size_t result_len) {
-  return nt::PostRpcResponse(entry, call, wpi::StringRef(result, result_len));
+  return nt::PostRpcResponse(entry, call, {result, result_len});
 }
 
 NT_RpcCall NT_CallRpc(NT_Entry entry, const char* params, size_t params_len) {
-  return nt::CallRpc(entry, wpi::StringRef(params, params_len));
+  return nt::CallRpc(entry, {params, params_len});
 }
 
 char* NT_GetRpcResult(NT_Entry entry, NT_RpcCall call, size_t* result_len) {
@@ -522,7 +520,7 @@ char* NT_PackRpcDefinition(const NT_RpcDefinition* def, size_t* packed_len) {
 NT_Bool NT_UnpackRpcDefinition(const char* packed, size_t packed_len,
                                NT_RpcDefinition* def) {
   nt::RpcDefinition def_v;
-  if (!nt::UnpackRpcDefinition(wpi::StringRef(packed, packed_len), &def_v)) {
+  if (!nt::UnpackRpcDefinition({packed, packed_len}, &def_v)) {
     return 0;
   }
 
@@ -552,7 +550,7 @@ char* NT_PackRpcValues(const NT_Value** values, size_t values_len,
 
 NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
                               const NT_Type* types, size_t types_len) {
-  auto values_v = nt::UnpackRpcValues(wpi::StringRef(packed, packed_len),
+  auto values_v = nt::UnpackRpcValues({packed, packed_len},
                                       wpi::ArrayRef<NT_Type>(types, types_len));
   if (values_v.size() == 0) {
     return nullptr;
@@ -573,7 +571,7 @@ NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
  */
 
 void NT_SetNetworkIdentity(NT_Inst inst, const char* name, size_t name_len) {
-  nt::SetNetworkIdentity(inst, wpi::StringRef(name, name_len));
+  nt::SetNetworkIdentity(inst, {name, name_len});
 }
 
 unsigned int NT_GetNetworkMode(NT_Inst inst) {
@@ -607,7 +605,7 @@ void NT_StartClient(NT_Inst inst, const char* server_name, unsigned int port) {
 
 void NT_StartClientMulti(NT_Inst inst, size_t count, const char** server_names,
                          const unsigned int* ports) {
-  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
   servers.reserve(count);
   for (size_t i = 0; i < count; ++i) {
     servers.emplace_back(std::make_pair(server_names[i], ports[i]));
@@ -629,7 +627,7 @@ void NT_SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
 
 void NT_SetServerMulti(NT_Inst inst, size_t count, const char** server_names,
                        const unsigned int* ports) {
-  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
   servers.reserve(count);
   for (size_t i = 0; i < count; ++i) {
     servers.emplace_back(std::make_pair(server_names[i], ports[i]));
@@ -681,14 +679,13 @@ const char* NT_LoadPersistent(NT_Inst inst, const char* filename,
 
 const char* NT_SaveEntries(NT_Inst inst, const char* filename,
                            const char* prefix, size_t prefix_len) {
-  return nt::SaveEntries(inst, filename, wpi::StringRef(prefix, prefix_len));
+  return nt::SaveEntries(inst, filename, {prefix, prefix_len});
 }
 
 const char* NT_LoadEntries(NT_Inst inst, const char* filename,
                            const char* prefix, size_t prefix_len,
                            void (*warn)(size_t line, const char* msg)) {
-  return nt::LoadEntries(inst, filename, wpi::StringRef(prefix, prefix_len),
-                         warn);
+  return nt::LoadEntries(inst, filename, {prefix, prefix_len}, warn);
 }
 
 /*
@@ -954,24 +951,20 @@ NT_Bool NT_SetEntryBoolean(NT_Entry entry, uint64_t time, NT_Bool v_boolean,
 NT_Bool NT_SetEntryString(NT_Entry entry, uint64_t time, const char* str,
                           size_t str_len, NT_Bool force) {
   if (force != 0) {
-    nt::SetEntryTypeValue(
-        entry, Value::MakeString(wpi::StringRef(str, str_len), time));
+    nt::SetEntryTypeValue(entry, Value::MakeString({str, str_len}, time));
     return 1;
   } else {
-    return nt::SetEntryValue(
-        entry, Value::MakeString(wpi::StringRef(str, str_len), time));
+    return nt::SetEntryValue(entry, Value::MakeString({str, str_len}, time));
   }
 }
 
 NT_Bool NT_SetEntryRaw(NT_Entry entry, uint64_t time, const char* raw,
                        size_t raw_len, NT_Bool force) {
   if (force != 0) {
-    nt::SetEntryTypeValue(entry,
-                          Value::MakeRaw(wpi::StringRef(raw, raw_len), time));
+    nt::SetEntryTypeValue(entry, Value::MakeRaw({raw, raw_len}, time));
     return 1;
   } else {
-    return nt::SetEntryValue(
-        entry, Value::MakeRaw(wpi::StringRef(raw, raw_len), time));
+    return nt::SetEntryValue(entry, Value::MakeRaw({raw, raw_len}, time));
   }
 }
 
@@ -1006,7 +999,7 @@ NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
   std::vector<std::string> v;
   v.reserve(size);
   for (size_t i = 0; i < size; ++i) {
-    v.push_back(ConvertFromC(arr[i]));
+    v.emplace_back(ConvertFromC(arr[i]));
   }
 
   if (force != 0) {
@@ -1132,14 +1125,13 @@ NT_Bool NT_SetDefaultEntryString(NT_Entry entry, uint64_t time,
                                  const char* default_value,
                                  size_t default_len) {
   return nt::SetDefaultEntryValue(
-      entry,
-      Value::MakeString(wpi::StringRef(default_value, default_len), time));
+      entry, Value::MakeString({default_value, default_len}, time));
 }
 
 NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, uint64_t time,
                               const char* default_value, size_t default_len) {
   return nt::SetDefaultEntryValue(
-      entry, Value::MakeRaw(wpi::StringRef(default_value, default_len), time));
+      entry, Value::MakeRaw({default_value, default_len}, time));
 }
 
 NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, uint64_t time,
@@ -1164,7 +1156,7 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
   std::vector<std::string> vec;
   vec.reserve(default_size);
   for (size_t i = 0; i < default_size; ++i) {
-    vec.push_back(ConvertFromC(default_value[i]));
+    vec.emplace_back(ConvertFromC(default_value[i]));
   }
 
   return nt::SetDefaultEntryValue(entry,

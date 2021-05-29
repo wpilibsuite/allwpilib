@@ -114,9 +114,9 @@ void FieldObject2d::UpdateEntry(bool setDefault) {
       p += 8;
     }
     if (setDefault) {
-      m_entry.SetDefaultRaw(wpi::StringRef{arr.data(), arr.size()});
+      m_entry.SetDefaultRaw({arr.data(), arr.size()});
     } else {
-      m_entry.ForceSetRaw(wpi::StringRef{arr.data(), arr.size()});
+      m_entry.ForceSetRaw({arr.data(), arr.size()});
     }
   }
 }
@@ -144,7 +144,7 @@ void FieldObject2d::UpdateFromEntry() const {
     }
   } else if (val->IsRaw()) {
     // treat it simply as an array of doubles
-    wpi::StringRef data = val->GetRaw();
+    std::string_view data = val->GetRaw();
 
     // must be triples of doubles
     auto size = data.size();

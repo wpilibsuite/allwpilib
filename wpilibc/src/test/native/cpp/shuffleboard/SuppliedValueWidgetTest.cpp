@@ -97,7 +97,7 @@ TEST_F(SuppliedValueWidgetTest, AddBooleanArray) {
 }
 
 TEST_F(SuppliedValueWidgetTest, AddRaw) {
-  wpi::StringRef bytes = "\1\2\3";
+  std::string_view bytes = "\1\2\3";
   m_tab->AddRaw("Raw", [&bytes]() { return bytes; });
   auto entry = m_ntInst.inst.GetEntry("/Shuffleboard/Tab/Raw");
 

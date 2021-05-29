@@ -12,6 +12,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -72,35 +73,36 @@ class Storage : public IStorage {
 
   // User functions.  These are the actual implementations of the corresponding
   // user API functions in ntcore_cpp.
-  std::shared_ptr<Value> GetEntryValue(wpi::StringRef name) const;
+  std::shared_ptr<Value> GetEntryValue(std::string_view name) const;
   std::shared_ptr<Value> GetEntryValue(unsigned int local_id) const;
 
-  bool SetDefaultEntryValue(wpi::StringRef name, std::shared_ptr<Value> value);
+  bool SetDefaultEntryValue(std::string_view name,
+                            std::shared_ptr<Value> value);
   bool SetDefaultEntryValue(unsigned int local_id,
                             std::shared_ptr<Value> value);
 
-  bool SetEntryValue(wpi::StringRef name, std::shared_ptr<Value> value);
+  bool SetEntryValue(std::string_view name, std::shared_ptr<Value> value);
   bool SetEntryValue(unsigned int local_id, std::shared_ptr<Value> value);
 
-  void SetEntryTypeValue(wpi::StringRef name, std::shared_ptr<Value> value);
+  void SetEntryTypeValue(std::string_view name, std::shared_ptr<Value> value);
   void SetEntryTypeValue(unsigned int local_id, std::shared_ptr<Value> value);
 
-  void SetEntryFlags(wpi::StringRef name, unsigned int flags);
+  void SetEntryFlags(std::string_view name, unsigned int flags);
   void SetEntryFlags(unsigned int local_id, unsigned int flags);
 
-  unsigned int GetEntryFlags(wpi::StringRef name) const;
+  unsigned int GetEntryFlags(std::string_view name) const;
   unsigned int GetEntryFlags(unsigned int local_id) const;
 
-  void DeleteEntry(wpi::StringRef name);
+  void DeleteEntry(std::string_view name);
   void DeleteEntry(unsigned int local_id);
 
   void DeleteAllEntries();
 
-  std::vector<EntryInfo> GetEntryInfo(int inst, const wpi::Twine& prefix,
+  std::vector<EntryInfo> GetEntryInfo(int inst, std::string_view prefix,
                                       unsigned int types);
 
   unsigned int AddListener(
-      const wpi::Twine& prefix,
+      std::string_view prefix,
       std::function<void(const EntryNotification& event)> callback,
       unsigned int flags) const;
   unsigned int AddListener(
@@ -109,14 +111,14 @@ class Storage : public IStorage {
       unsigned int flags) const;
 
   unsigned int AddPolledListener(unsigned int poller_uid,
-                                 const wpi::Twine& prefix,
+                                 std::string_view prefix,
                                  unsigned int flags) const;
   unsigned int AddPolledListener(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) const;
 
   // Index-only
-  unsigned int GetEntry(const wpi::Twine& name);
-  std::vector<unsigned int> GetEntries(const wpi::Twine& prefix,
+  unsigned int GetEntry(std::string_view name);
+  std::vector<unsigned int> GetEntries(std::string_view prefix,
                                        unsigned int types);
   EntryInfo GetEntryInfo(int inst, unsigned int local_id) const;
   std::string GetEntryName(unsigned int local_id) const;
@@ -125,32 +127,32 @@ class Storage : public IStorage {
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
-  const char* SavePersistent(const wpi::Twine& filename,
+  const char* SavePersistent(std::string_view filename,
                              bool periodic) const override;
   const char* LoadPersistent(
-      const wpi::Twine& filename,
+      std::string_view filename,
       std::function<void(size_t line, const char* msg)> warn) override;
 
-  const char* SaveEntries(const wpi::Twine& filename,
-                          const wpi::Twine& prefix) const;
+  const char* SaveEntries(std::string_view filename,
+                          std::string_view prefix) const;
   const char* LoadEntries(
-      const wpi::Twine& filename, const wpi::Twine& prefix,
+      std::string_view filename, std::string_view prefix,
       std::function<void(size_t line, const char* msg)> warn);
 
   // Stream-based save/load functions (exposed for testing purposes).  These
   // implement the guts of the filename-based functions.
   void SavePersistent(wpi::raw_ostream& os, bool periodic) const;
-  bool LoadEntries(wpi::raw_istream& is, const wpi::Twine& prefix,
+  bool LoadEntries(wpi::raw_istream& is, std::string_view prefix,
                    bool persistent,
                    std::function<void(size_t line, const char* msg)> warn);
 
-  void SaveEntries(wpi::raw_ostream& os, const wpi::Twine& prefix) const;
+  void SaveEntries(wpi::raw_ostream& os, std::string_view prefix) const;
 
   // RPC configuration needs to come through here as RPC definitions are
   // actually special Storage value types.
-  void CreateRpc(unsigned int local_id, wpi::StringRef def,
+  void CreateRpc(unsigned int local_id, std::string_view def,
                  unsigned int rpc_uid);
-  unsigned int CallRpc(unsigned int local_id, wpi::StringRef params);
+  unsigned int CallRpc(unsigned int local_id, std::string_view params);
   bool GetRpcResult(unsigned int local_id, unsigned int call_uid,
                     std::string* result);
   bool GetRpcResult(unsigned int local_id, unsigned int call_uid,
@@ -160,7 +162,7 @@ class Storage : public IStorage {
  private:
   // Data for each table entry.
   struct Entry {
-    explicit Entry(wpi::StringRef name_) : name(name_) {}
+    explicit Entry(std::string_view name_) : name(name_) {}
     bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
 
     // We redundantly store the name so that it's available when accessing the
@@ -242,7 +244,7 @@ class Storage : public IStorage {
       bool periodic,
       std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
       const;
-  bool GetEntries(const wpi::Twine& prefix,
+  bool GetEntries(std::string_view prefix,
                   std::vector<std::pair<std::string, std::shared_ptr<Value>>>*
                       entries) const;
   void SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
@@ -256,7 +258,7 @@ class Storage : public IStorage {
   template <typename F>
   void DeleteAllEntriesImpl(bool local, F should_delete);
   void DeleteAllEntriesImpl(bool local);
-  Entry* GetOrNew(const wpi::Twine& name);
+  Entry* GetOrNew(std::string_view name);
 };
 
 }  // namespace nt

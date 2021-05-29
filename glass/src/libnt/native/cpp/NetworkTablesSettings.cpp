@@ -64,7 +64,7 @@ void NetworkTablesSettings::Thread::Main() {
         nt::StartClientTeam(m_inst, team.value(), NT_DEFAULT_PORT);
       } else {
         wpi::SmallVector<std::string_view, 4> serverNames;
-        wpi::SmallVector<std::pair<wpi::StringRef, unsigned int>, 4> servers;
+        wpi::SmallVector<std::pair<std::string_view, unsigned int>, 4> servers;
         wpi::split(serverTeam, serverNames, ',', -1, false);
         for (auto&& serverName : serverNames) {
           servers.emplace_back(serverName, NT_DEFAULT_PORT);

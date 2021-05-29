@@ -14,6 +14,8 @@
 #include <networktables/NetworkTable.h>
 #include <wpi/StringMap.h>
 
+#include "frc/Errors.h"
+
 namespace frc {
 
 /**
@@ -63,13 +65,14 @@ class MechanismObject2d {
   template <typename T, typename... Args,
             typename =
                 std::enable_if_t<std::is_convertible_v<T*, MechanismObject2d*>>>
-  T* Append(wpi::StringRef name, Args&&... args) {
+  T* Append(std::string_view name, Args&&... args) {
     std::scoped_lock lock(m_mutex);
     auto& obj = m_objects[name];
     if (obj) {
-      throw std::runtime_error(("MechanismObject names must be unique! `" +
-                                name + "` was inserted twice!")
-                                   .str());
+      throw FRC_MakeError(
+          err::Error,
+          "MechanismObject names must be unique! `{}` was inserted twice!",
+          name);
     }
     obj = std::make_unique<T>(name, std::forward<Args>(args)...);
     T* ex = static_cast<T*>(obj.get());
