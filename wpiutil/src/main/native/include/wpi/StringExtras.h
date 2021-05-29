@@ -581,8 +581,8 @@ bool ConsumeSignedInteger(std::string_view& str, unsigned radix,
  */
 template <typename T,
           std::enable_if_t<std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> to_integer(std::string_view str,
-                                   unsigned radix) noexcept {
+inline std::optional<T> parse_integer(std::string_view str,
+                                      unsigned radix) noexcept {
   long long val;  // NOLINT(runtime/int)
   if (detail::GetAsSignedInteger(str, radix, val) ||
       static_cast<T>(val) != val) {
@@ -593,8 +593,8 @@ inline std::optional<T> to_integer(std::string_view str,
 
 template <typename T,
           std::enable_if_t<!std::numeric_limits<T>::is_signed, bool> = true>
-inline std::optional<T> to_integer(std::string_view str,
-                                   unsigned radix) noexcept {
+inline std::optional<T> parse_integer(std::string_view str,
+                                      unsigned radix) noexcept {
   using Int = unsigned long long;  // NOLINT(runtime/int)
   Int val;
   // The additional cast to unsigned long long is required to avoid the
@@ -652,13 +652,14 @@ inline std::optional<T> consume_integer(std::string_view* str,
  * erroneous if empty or if it overflows T.
  */
 template <typename T>
-std::optional<T> to_float(std::string_view str) noexcept;
+std::optional<T> parse_float(std::string_view str) noexcept;
 
 template <>
-std::optional<float> to_float<float>(std::string_view str) noexcept;
+std::optional<float> parse_float<float>(std::string_view str) noexcept;
 template <>
-std::optional<double> to_float<double>(std::string_view str) noexcept;
+std::optional<double> parse_float<double>(std::string_view str) noexcept;
 template <>
-std::optional<long double> to_float<long double>(std::string_view str) noexcept;
+std::optional<long double> parse_float<long double>(
+    std::string_view str) noexcept;
 
 }  // namespace wpi

@@ -209,7 +209,7 @@ bool wpi::detail::ConsumeSignedInteger(
 }
 
 template <>
-std::optional<float> wpi::to_float<float>(std::string_view str) noexcept {
+std::optional<float> wpi::parse_float<float>(std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
   }
@@ -223,7 +223,7 @@ std::optional<float> wpi::to_float<float>(std::string_view str) noexcept {
 }
 
 template <>
-std::optional<double> wpi::to_float<double>(std::string_view str) noexcept {
+std::optional<double> wpi::parse_float<double>(std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
   }
@@ -237,7 +237,7 @@ std::optional<double> wpi::to_float<double>(std::string_view str) noexcept {
 }
 
 template <>
-std::optional<long double> wpi::to_float<long double>(
+std::optional<long double> wpi::parse_float<long double>(
     std::string_view str) noexcept {
   if (str.empty()) {
     return std::nullopt;
