@@ -48,7 +48,6 @@ generatedFileExclude {
   src/main/native/include/wpi/SmallSet\.h$
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
-  src/main/native/include/wpi/StringExtras\.h$
   src/main/native/include/wpi/StringMap\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$

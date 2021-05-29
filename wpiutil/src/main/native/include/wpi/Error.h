@@ -887,16 +887,6 @@ Expected<T> handleExpected(Expected<T> ValOrErr, RecoveryFtor &&RecoveryPath,
 /// information to the user.
 void logAllUnhandledErrors(Error E, raw_ostream &OS, Twine ErrorBanner = {});
 
-/// Write all error messages (if any) in E to a string. The newline character
-/// is used to separate error messages.
-inline std::string toString(Error E) {
-  SmallVector<std::string, 2> Errors;
-  handleAllErrors(std::move(E), [&Errors](const ErrorInfoBase &EI) {
-    Errors.push_back(EI.message());
-  });
-  return join(Errors.begin(), Errors.end(), "\n");
-}
-
 /// Consume a Error without doing anything. This method should be used
 /// only where an error can be considered a reasonable and expected return
 /// value.
