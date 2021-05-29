@@ -152,7 +152,7 @@ void FieldObject2d::UpdateFromEntry() const {
       return;
     }
     m_poses.resize(size / (3 * 8));
-    const char* p = data.begin();
+    const char* p = data.data();
     for (size_t i = 0; i < size / (3 * 8); ++i) {
       double x = wpi::BitsToDouble(
           wpi::support::endian::readNext<uint64_t, wpi::support::big,

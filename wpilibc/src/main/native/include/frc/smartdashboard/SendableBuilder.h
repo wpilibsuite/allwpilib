@@ -96,7 +96,7 @@ class SendableBuilder {
    */
   virtual void AddStringProperty(
       std::string_view key, std::function<std::string()> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a boolean array property.
@@ -140,7 +140,7 @@ class SendableBuilder {
    */
   virtual void AddRawProperty(std::string_view key,
                               std::function<std::string()> getter,
-                              std::function<void(wpi::StringRef)> setter) = 0;
+                              std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a NetworkTableValue property.
@@ -162,8 +162,8 @@ class SendableBuilder {
    */
   virtual void AddSmallStringProperty(
       std::string_view key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a boolean array property (SmallVector form).
@@ -213,8 +213,8 @@ class SendableBuilder {
    */
   virtual void AddSmallRawProperty(
       std::string_view key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Get the network table.

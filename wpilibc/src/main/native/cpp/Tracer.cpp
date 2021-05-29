@@ -25,7 +25,7 @@ void Tracer::ClearEpochs() {
   m_epochs.clear();
 }
 
-void Tracer::AddEpoch(wpi::StringRef epochName) {
+void Tracer::AddEpoch(std::string_view epochName) {
   auto currentTime = hal::fpga_clock::now();
   m_epochs[epochName] = currentTime - m_startTime;
   m_startTime = currentTime;

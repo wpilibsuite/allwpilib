@@ -178,7 +178,7 @@ void Relay::InitSendable(SendableBuilder& builder) {
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
+      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kOn:
             return "On";
@@ -190,7 +190,7 @@ void Relay::InitSendable(SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](wpi::StringRef value) {
+      [=](std::string_view value) {
         if (value == "Off") {
           Set(kOff);
         } else if (value == "Forward") {

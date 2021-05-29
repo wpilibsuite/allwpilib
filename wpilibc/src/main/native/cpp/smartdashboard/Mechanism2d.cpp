@@ -19,7 +19,8 @@ Mechanism2d::Mechanism2d(double width, double height,
   SetBackgroundColor(backgroundColor);
 }
 
-MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
+MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
+                                      double y) {
   auto& obj = m_roots[name];
   if (obj) {
     return obj.get();

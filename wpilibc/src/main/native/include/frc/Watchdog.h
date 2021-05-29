@@ -5,10 +5,10 @@
 #pragma once
 
 #include <functional>
+#include <string_view>
 #include <utility>
 
 #include <units/time.h>
-#include <wpi/StringRef.h>
 
 #include "frc/Tracer.h"
 
@@ -76,7 +76,7 @@ class Watchdog {
    *
    * @param epochName The name to associate with the epoch.
    */
-  void AddEpoch(wpi::StringRef epochName);
+  void AddEpoch(std::string_view epochName);
 
   /**
    * Prints list of epochs added so far and their times.

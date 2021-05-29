@@ -298,8 +298,8 @@ class SendableRegistry {
    * Data passed to ForeachLiveWindow() callback function
    */
   struct CallbackData {
-    CallbackData(Sendable* sendable_, wpi::StringRef name_,
-                 wpi::StringRef subsystem_, Sendable* parent_,
+    CallbackData(Sendable* sendable_, std::string_view name_,
+                 std::string_view subsystem_, Sendable* parent_,
                  std::shared_ptr<void>& data_, SendableBuilderImpl& builder_)
         : sendable(sendable_),
           name(name_),
@@ -309,8 +309,8 @@ class SendableRegistry {
           builder(builder_) {}
 
     Sendable* sendable;
-    wpi::StringRef name;
-    wpi::StringRef subsystem;
+    std::string_view name;
+    std::string_view subsystem;
     Sendable* parent;
     std::shared_ptr<void>& data;
     SendableBuilderImpl& builder;
