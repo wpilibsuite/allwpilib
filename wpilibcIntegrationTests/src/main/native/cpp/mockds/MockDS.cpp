@@ -6,35 +6,32 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
+#include <fmt/core.h>
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/Logger.h>
-#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UDPClient.h>
-#include <wpi/raw_ostream.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
-  wpi::SmallString<128> buf;
-  wpi::raw_svector_ostream oss(buf);
   if (level == 20) {
-    oss << "DS: " << msg << '\n';
-    wpi::errs() << oss.str();
+    fmt::print(stderr, "DS: {}\n", msg);
     return;
   }
 
-  wpi::StringRef levelmsg;
+  std::string_view levelmsg;
   if (level >= 50) {
-    levelmsg = "CRITICAL: ";
+    levelmsg = "CRITICAL";
   } else if (level >= 40) {
-    levelmsg = "ERROR: ";
+    levelmsg = "ERROR";
   } else if (level >= 30) {
-    levelmsg = "WARNING: ";
+    levelmsg = "WARNING";
   } else {
     return;
   }
-  oss << "DS: " << levelmsg << msg << " (" << file << ':' << line << ")\n";
-  wpi::errs() << oss.str();
+  fmt::print(stderr, "DS: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
 static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
@@ -48,9 +45,7 @@ static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
   data.push_back(0x00);  // red 1 station
 }
 
-using namespace frc;
-
-void MockDS::start() {
+void MockDS::Start() {
   if (m_active) {
     return;
   }
@@ -83,7 +78,7 @@ void MockDS::start() {
   });
 }
 
-void MockDS::stop() {
+void MockDS::Stop() {
   m_active = false;
   if (m_thread.joinable()) {
     m_thread.join();

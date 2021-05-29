@@ -3,15 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "frc/shuffleboard/Shuffleboard.h"
-#include "frc/shuffleboard/ShuffleboardTab.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
-class ShuffleboardTest : public testing::Test {};
-
-TEST_F(ShuffleboardTest, TabObjectsCached) {
-  ShuffleboardTab& tab1 = Shuffleboard::GetTab("testTabObjectsCached");
-  ShuffleboardTab& tab2 = Shuffleboard::GetTab("testTabObjectsCached");
+TEST(ShuffleboardTest, TabObjectsCached) {
+  auto& tab1 = frc::Shuffleboard::GetTab("testTabObjectsCached");
+  auto& tab2 = frc::Shuffleboard::GetTab("testTabObjectsCached");
   EXPECT_EQ(&tab1, &tab2) << "Tab objects were not cached";
 }

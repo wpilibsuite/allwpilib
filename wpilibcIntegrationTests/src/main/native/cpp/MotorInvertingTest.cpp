@@ -12,8 +12,6 @@
 #include "frc/motorcontrol/Victor.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
 static constexpr double kMotorSpeed = 0.15;
@@ -37,34 +35,34 @@ std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
 class MotorInvertingTest
     : public testing::TestWithParam<MotorInvertingTestType> {
  protected:
-  MotorController* m_motorController;
-  Encoder* m_encoder;
+  frc::MotorController* m_motorController;
+  frc::Encoder* m_encoder;
 
-  void SetUp() override {
+  MotorInvertingTest() {
     switch (GetParam()) {
       case TEST_VICTOR:
-        m_motorController = new Victor(TestBench::kVictorChannel);
-        m_encoder = new Encoder(TestBench::kVictorEncoderChannelA,
-                                TestBench::kVictorEncoderChannelB);
+        m_motorController = new frc::Victor(TestBench::kVictorChannel);
+        m_encoder = new frc::Encoder(TestBench::kVictorEncoderChannelA,
+                                     TestBench::kVictorEncoderChannelB);
         break;
 
       case TEST_JAGUAR:
-        m_motorController = new Jaguar(TestBench::kJaguarChannel);
-        m_encoder = new Encoder(TestBench::kJaguarEncoderChannelA,
-                                TestBench::kJaguarEncoderChannelB);
+        m_motorController = new frc::Jaguar(TestBench::kJaguarChannel);
+        m_encoder = new frc::Encoder(TestBench::kJaguarEncoderChannelA,
+                                     TestBench::kJaguarEncoderChannelB);
         break;
 
       case TEST_TALON:
-        m_motorController = new Talon(TestBench::kTalonChannel);
-        m_encoder = new Encoder(TestBench::kTalonEncoderChannelA,
-                                TestBench::kTalonEncoderChannelB);
+        m_motorController = new frc::Talon(TestBench::kTalonChannel);
+        m_encoder = new frc::Encoder(TestBench::kTalonEncoderChannelA,
+                                     TestBench::kTalonEncoderChannelB);
         break;
     }
   }
 
-  void TearDown() override {
-    delete m_motorController;
+  ~MotorInvertingTest() {
     delete m_encoder;
+    delete m_motorController;
   }
 
   void Reset() {
@@ -79,13 +77,13 @@ TEST_P(MotorInvertingTest, InvertingPositive) {
 
   m_motorController->Set(kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
   m_motorController->Set(kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Positive value does not change direction";
@@ -99,13 +97,13 @@ TEST_P(MotorInvertingTest, InvertingNegative) {
   m_motorController->SetInverted(false);
   m_motorController->Set(-kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
   m_motorController->Set(-kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Negative value does not change direction";
@@ -119,13 +117,13 @@ TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
   m_motorController->SetInverted(false);
   m_motorController->Set(kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
   m_motorController->Set(-kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
@@ -139,13 +137,13 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   m_motorController->SetInverted(false);
   m_motorController->Set(-kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
   m_motorController->Set(kMotorSpeed);
 
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
