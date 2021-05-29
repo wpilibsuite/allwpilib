@@ -7,6 +7,17 @@ def zipBaseName = '_GROUP_edu_wpi_first_tools_ID_OutlineViewer_CLS'
 def outputsFolder = file("$project.buildDir/outputs")
 
 model {
+    tasks {
+        // Create the run task.
+        $.components.outlineviewer.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug")) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
     publishing {
         def outlineViewerTaskList = []
         $.components.each { component ->
