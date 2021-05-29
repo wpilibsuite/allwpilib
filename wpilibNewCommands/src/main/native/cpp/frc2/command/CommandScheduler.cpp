@@ -359,12 +359,13 @@ void CommandScheduler::CancelAll() {
   Cancel(commands);
 }
 
-double CommandScheduler::TimeSinceScheduled(const Command* command) const {
+units::second_t CommandScheduler::TimeSinceScheduled(
+    const Command* command) const {
   auto find = m_impl->scheduledCommands.find(command);
   if (find != m_impl->scheduledCommands.end()) {
     return find->second.TimeSinceInitialized();
   } else {
-    return -1;
+    return -1_s;
   }
 }
 bool CommandScheduler::IsScheduled(

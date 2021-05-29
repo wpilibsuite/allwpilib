@@ -4,6 +4,8 @@
 
 #include "frc/Encoder.h"  // NOLINT(build/include_order)
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/AnalogOutput.h"
 #include "frc/AnalogTrigger.h"
@@ -13,7 +15,7 @@
 
 using namespace frc;
 
-static const double kDelayTime = 0.001;
+static constexpr auto kDelayTime = 1_ms;
 
 class FakeEncoderTest : public testing::Test {
  protected:

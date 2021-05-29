@@ -4,12 +4,12 @@
 
 #include <frc/SlewRateLimiter.h>
 #include <frc/TimedRobot.h>
+#include <frc/Timer.h>
 #include <frc/XboxController.h>
 #include <frc/controller/RamseteController.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc2/Timer.h>
 
 #include "Drivetrain.h"
 
@@ -89,7 +89,7 @@ class Robot : public frc::TimedRobot {
   frc::RamseteController m_ramseteController;
 
   // The timer to use during the autonomous period.
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
 
   // Create Field2d for robot and trajectory visualizations.
   frc::Field2d m_field;

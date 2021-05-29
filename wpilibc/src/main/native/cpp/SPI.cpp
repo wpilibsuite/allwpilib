@@ -307,10 +307,6 @@ int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
   return val;
 }
 
-int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout) {
-  return ReadAutoReceivedData(buffer, numToRead, units::second_t(timeout));
-}
-
 int SPI::GetAutoDroppedCount() {
   int32_t status = 0;
   int32_t val = HAL_GetSPIAutoDroppedCount(m_port, &status);

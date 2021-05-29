@@ -31,7 +31,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
 
   // Set the default timeout to 5 seconds.
-  SetTimeout(5.0);
+  SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
   SetWriteBufferMode(kFlushOnAccess);
@@ -61,7 +61,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
   FRC_CheckErrorStatus(status, "SetSerialStopBits {}", stopBits);
 
   // Set the default timeout to 5 seconds.
-  SetTimeout(5.0);
+  SetTimeout(5_s);
 
   // Don't wait until the buffer is full to transmit.
   SetWriteBufferMode(kFlushOnAccess);
@@ -122,9 +122,9 @@ int SerialPort::Write(std::string_view buffer) {
   return retVal;
 }
 
-void SerialPort::SetTimeout(double timeout) {
+void SerialPort::SetTimeout(units::second_t timeout) {
   int32_t status = 0;
-  HAL_SetSerialTimeout(m_portHandle, timeout, &status);
+  HAL_SetSerialTimeout(m_portHandle, timeout.to<double>(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetTimeout");
 }
 

@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/ADXL345_SPI.h"
 #include "frc/AnalogGyro.h"
@@ -13,14 +15,14 @@
 
 using namespace frc;
 
-static constexpr double kServoResetTime = 2.0;
+static constexpr auto kServoResetTime = 2_s;
 
 static constexpr double kTestAngle = 90.0;
 
 static constexpr double kTiltSetpoint0 = 0.22;
 static constexpr double kTiltSetpoint45 = 0.45;
 static constexpr double kTiltSetpoint90 = 0.68;
-static constexpr double kTiltTime = 1.0;
+static constexpr auto kTiltTime = 1_s;
 static constexpr double kAccelerometerTolerance = 0.2;
 static constexpr double kSensitivity = 0.013;
 
@@ -84,12 +86,12 @@ void TiltPanCameraTest::DefaultGyroAngle() {
 void TiltPanCameraTest::GyroAngle() {
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.5);
+  Wait(0.5_s);
   m_gyro->Reset();
 
   for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
-    Wait(0.001);
+    Wait(1_ms);
   }
 
   double gyroAngle = m_gyro->GetAngle();
@@ -114,18 +116,18 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
   // Default gyro angle test
   // Accumulator needs a small amount of time to reset before being tested
   m_gyro->Reset();
-  Wait(0.001);
+  Wait(1_ms);
   EXPECT_NEAR(0.0, m_gyro->GetAngle(), 1.0);
 
   // Gyro angle test
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.5);
+  Wait(0.5_s);
   m_gyro->Reset();
 
   for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
-    Wait(0.001);
+    Wait(1_ms);
   }
 
   double gyroAngle = m_gyro->GetAngle();

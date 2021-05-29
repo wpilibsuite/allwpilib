@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include <hal/Types.h>
-#include <wpi/deprecated.h>
+#include <units/time.h>
 
 namespace frc {
 
@@ -155,9 +155,9 @@ class SerialPort {
    * This defines the timeout for transactions with the hardware.
    * It will affect reads and very large writes.
    *
-   * @param timeout The number of seconds to to wait for I/O.
+   * @param timeout The time to wait for I/O.
    */
-  void SetTimeout(double timeout);
+  void SetTimeout(units::second_t timeout);
 
   /**
    * Specify the size of the input buffer.

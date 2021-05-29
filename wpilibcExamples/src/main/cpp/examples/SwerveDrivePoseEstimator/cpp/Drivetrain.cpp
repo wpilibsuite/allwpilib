@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include <frc2/Timer.h>
+#include <frc/Timer.h>
 
 #include "ExampleGlobalMeasurementSensor.h"
 
@@ -37,5 +37,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc2::Timer::GetFPGATimestamp() - 0.3_s);
+      frc::Timer::GetFPGATimestamp() - 0.3_s);
 }

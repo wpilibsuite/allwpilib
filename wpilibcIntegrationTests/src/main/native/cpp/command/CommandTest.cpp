@@ -149,8 +149,8 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
   command3->Requires(&subsystem);
 
   CommandGroup commandGroup;
-  commandGroup.AddSequential(command1, 1.0);
-  commandGroup.AddSequential(command2, 2.0);
+  commandGroup.AddSequential(command1, 1_s);
+  commandGroup.AddSequential(command2, 2_s);
   commandGroup.AddSequential(command3);
 
   AssertCommandState(command1, 0, 0, 0, 0, 0);
@@ -171,7 +171,7 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
   AssertCommandState(command1, 1, 1, 1, 0, 0);
   AssertCommandState(command2, 0, 0, 0, 0, 0);
   AssertCommandState(command3, 0, 0, 0, 0, 0);
-  Wait(1);  // command 1 timeout
+  Wait(1_s);
 
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 1, 1, 0, 1);
@@ -182,7 +182,7 @@ TEST_F(CommandTest, ThreeCommandOnSubSystem) {
   AssertCommandState(command1, 1, 1, 1, 0, 1);
   AssertCommandState(command2, 1, 2, 2, 0, 0);
   AssertCommandState(command3, 0, 0, 0, 0, 0);
-  Wait(2);  // command 2 timeout
+  Wait(2_s);
 
   Scheduler::GetInstance()->Run();
   AssertCommandState(command1, 1, 1, 1, 0, 1);
@@ -315,7 +315,7 @@ TEST_F(CommandTest,
 
 class ModifiedMockCommand : public MockCommand {
  public:
-  ModifiedMockCommand() : MockCommand() { SetTimeout(2.0); }
+  ModifiedMockCommand() : MockCommand() { SetTimeout(2_s); }
   bool IsFinished() override {
     return MockCommand::IsFinished() || IsTimedOut();
   }
@@ -336,7 +336,7 @@ TEST_F(CommandTest, TwoSecondTimeout) {
   AssertCommandState(&command, 1, 2, 2, 0, 0);
   Scheduler::GetInstance()->Run();
   AssertCommandState(&command, 1, 3, 3, 0, 0);
-  Wait(2);
+  Wait(2_s);
   Scheduler::GetInstance()->Run();
   AssertCommandState(&command, 1, 4, 4, 1, 0);
   Scheduler::GetInstance()->Run();

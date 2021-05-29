@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <memory>
 
+#include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -24,7 +25,6 @@
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc2/Timer.h"
 
 #pragma once
 
@@ -444,7 +444,7 @@ class MecanumControllerCommand
       m_outputVolts;
 
   bool m_usePID;
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   frc::MecanumDriveWheelSpeeds m_prevSpeeds;
   units::second_t m_prevTime;
 };

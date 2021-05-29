@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/LinearFilter.h"
@@ -35,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {
   return os;
 }
 
-static constexpr double kMotorTime = 0.5;
+static constexpr auto kMotorTime = 0.5_s;
 
 /**
  * A fixture that includes a PWM motor controller and an encoder connected to
@@ -150,7 +152,7 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
     m_motorController->Set(std::clamp(speed, -0.2, 0.2));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
-  Wait(10.0);
+  Wait(10_s);
   pidRunner.Stop();
 
   RecordProperty("PIDError", pidController.GetPositionError());
@@ -177,7 +179,7 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
     m_motorController->Set(std::clamp(speed, -0.3, 0.3));
   }};
   pidRunner.StartPeriodic(pidController.GetPeriod());
-  Wait(10.0);
+  Wait(10_s);
   pidRunner.Stop();
   RecordProperty("PIDError", pidController.GetPositionError());
 

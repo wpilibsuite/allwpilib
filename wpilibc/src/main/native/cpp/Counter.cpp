@@ -24,7 +24,7 @@ Counter::Counter(Mode mode) {
                                     &m_index, &status);
   FRC_CheckErrorStatus(status, "{}", "InitializeCounter");
 
-  SetMaxPeriod(0.5);
+  SetMaxPeriod(0.5_s);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1, mode + 1);
   SendableRegistry::GetInstance().AddLW(this, "Counter", m_index);
@@ -273,16 +273,16 @@ void Counter::Reset() {
   FRC_CheckErrorStatus(status, "{}", "Reset");
 }
 
-double Counter::GetPeriod() const {
+units::second_t Counter::GetPeriod() const {
   int32_t status = 0;
   double value = HAL_GetCounterPeriod(m_counter, &status);
   FRC_CheckErrorStatus(status, "{}", "GetPeriod");
-  return value;
+  return units::second_t{value};
 }
 
-void Counter::SetMaxPeriod(double maxPeriod) {
+void Counter::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetCounterMaxPeriod(m_counter, maxPeriod, &status);
+  HAL_SetCounterMaxPeriod(m_counter, maxPeriod.to<double>(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
 

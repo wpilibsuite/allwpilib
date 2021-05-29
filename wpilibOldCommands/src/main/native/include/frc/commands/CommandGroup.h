@@ -7,6 +7,8 @@
 #include <string_view>
 #include <vector>
 
+#include <units/time.h>
+
 #include "frc/commands/Command.h"
 #include "frc/commands/CommandGroupEntry.h"
 
@@ -74,9 +76,9 @@ class CommandGroup : public Command {
    * It is recommended that this method be called in the constructor.
    *
    * @param command The Command to be added
-   * @param timeout The timeout (in seconds)
+   * @param timeout The timeout
    */
-  void AddSequential(Command* command, double timeout);
+  void AddSequential(Command* command, units::second_t timeout);
 
   /**
    * Adds a new child Command to the group. The Command will be started after
@@ -121,9 +123,9 @@ class CommandGroup : public Command {
    * It is recommended that this method be called in the constructor.
    *
    * @param command The command to be added
-   * @param timeout The timeout (in seconds)
+   * @param timeout The timeout
    */
-  void AddParallel(Command* command, double timeout);
+  void AddParallel(Command* command, units::second_t timeout);
 
   bool IsInterruptible() const;
 

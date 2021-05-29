@@ -8,8 +8,8 @@
 
 using namespace frc;
 
-WaitCommand::WaitCommand(double timeout)
-    : TimedCommand(fmt::format("Wait({})", timeout), timeout) {}
+WaitCommand::WaitCommand(units::second_t timeout)
+    : TimedCommand(fmt::format("Wait({})", timeout.to<double>()), timeout) {}
 
-WaitCommand::WaitCommand(std::string_view name, double timeout)
+WaitCommand::WaitCommand(std::string_view name, units::second_t timeout)
     : TimedCommand(name, timeout) {}

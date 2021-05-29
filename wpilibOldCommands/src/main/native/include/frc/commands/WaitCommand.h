@@ -6,6 +6,8 @@
 
 #include <string_view>
 
+#include <units/time.h>
+
 #include "frc/commands/TimedCommand.h"
 
 namespace frc {
@@ -16,16 +18,16 @@ class WaitCommand : public TimedCommand {
    * Creates a new WaitCommand with the given name and timeout.
    *
    * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    */
-  explicit WaitCommand(double timeout);
+  explicit WaitCommand(units::second_t timeout);
 
   /**
    * Creates a new WaitCommand with the given timeout.
    *
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    */
-  WaitCommand(std::string_view name, double timeout);
+  WaitCommand(std::string_view name, units::second_t timeout);
 
   ~WaitCommand() override = default;
 

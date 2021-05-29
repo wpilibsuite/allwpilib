@@ -89,7 +89,7 @@ class MatchDataSender {
 
 using namespace frc;
 
-static constexpr double kJoystickUnpluggedMessageInterval = 1.0;
+static constexpr auto kJoystickUnpluggedMessageInterval = 1_s;
 
 static int& GetDSLastCount() {
   // There is a rollover error condition here. At Packet# = n * (uintmax), this
@@ -485,12 +485,12 @@ int DriverStation::GetLocation() const {
 }
 
 void DriverStation::WaitForData() {
-  WaitForData(0);
+  WaitForData(0_s);
 }
 
-bool DriverStation::WaitForData(double timeout) {
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+bool DriverStation::WaitForData(units::second_t timeout) {
+  auto timeoutTime = std::chrono::steady_clock::now() +
+                     std::chrono::steady_clock::duration{timeout};
 
   std::unique_lock lock(m_waitForDataMutex);
   int& lastCount = GetDSLastCount();
@@ -500,7 +500,7 @@ bool DriverStation::WaitForData(double timeout) {
     return true;
   }
   while (m_waitForDataCounter == currentCount) {
-    if (timeout > 0) {
+    if (timeout > 0_s) {
       auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
@@ -586,7 +586,7 @@ DriverStation::DriverStation() {
 
 void DriverStation::ReportJoystickUnpluggedErrorV(fmt::string_view format,
                                                   fmt::format_args args) {
-  double currentTime = Timer::GetFPGATimestamp();
+  auto currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportErrorV(err::Error, "", 0, "", format, args);
     m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
@@ -596,7 +596,7 @@ void DriverStation::ReportJoystickUnpluggedErrorV(fmt::string_view format,
 void DriverStation::ReportJoystickUnpluggedWarningV(fmt::string_view format,
                                                     fmt::format_args args) {
   if (IsFMSAttached() || !m_silenceJoystickWarning) {
-    double currentTime = Timer::GetFPGATimestamp();
+    auto currentTime = Timer::GetFPGATimestamp();
     if (currentTime > m_nextMessageTime) {
       ReportErrorV(warn::Warning, "", 0, "", format, args);
       m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;

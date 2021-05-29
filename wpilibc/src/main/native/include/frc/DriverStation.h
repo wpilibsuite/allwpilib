@@ -12,6 +12,7 @@
 
 #include <fmt/format.h>
 #include <hal/DriverStationTypes.h>
+#include <units/time.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -334,11 +335,11 @@ class DriverStation {
    * This is a good way to delay processing until there is new driver station
    * data to act on.
    *
-   * @param timeout Timeout time in seconds
+   * @param timeout Timeout
    *
    * @return true if new data, otherwise false
    */
-  bool WaitForData(double timeout);
+  bool WaitForData(units::second_t timeout);
 
   /**
    * Return the approximate match time.
@@ -494,7 +495,7 @@ class DriverStation {
   bool m_userInTeleop = false;
   bool m_userInTest = false;
 
-  double m_nextMessageTime = 0;
+  units::second_t m_nextMessageTime = 0_s;
 };
 
 }  // namespace frc

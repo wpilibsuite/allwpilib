@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <units/time.h>
+
 #include "TestBench.h"
 #include "frc/Encoder.h"
 #include "frc/Timer.h"
@@ -13,8 +15,10 @@
 using namespace frc;
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
-static const double motorSpeed = 0.15;
-static const double delayTime = 0.5;
+
+static constexpr double kMotorSpeed = 0.15;
+static constexpr auto kDelayTime = 0.5_s;
+
 std::ostream& operator<<(std::ostream& os, MotorInvertingTestType const& type) {
   switch (type) {
     case TEST_VICTOR:
@@ -73,15 +77,15 @@ class MotorInvertingTest
 TEST_P(MotorInvertingTest, InvertingPositive) {
   Reset();
 
-  m_motorController->Set(motorSpeed);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
-  m_motorController->Set(motorSpeed);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Positive value does not change direction";
@@ -93,15 +97,15 @@ TEST_P(MotorInvertingTest, InvertingNegative) {
   Reset();
 
   m_motorController->SetInverted(false);
-  m_motorController->Set(-motorSpeed);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
-  m_motorController->Set(-motorSpeed);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Negative value does not change direction";
@@ -113,15 +117,15 @@ TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
   Reset();
 
   m_motorController->SetInverted(false);
-  m_motorController->Set(motorSpeed);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
-  m_motorController->Set(-motorSpeed);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
@@ -133,15 +137,15 @@ TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   Reset();
 
   m_motorController->SetInverted(false);
-  m_motorController->Set(-motorSpeed);
+  m_motorController->Set(-kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   bool initDirection = m_encoder->GetDirection();
   m_motorController->SetInverted(true);
-  m_motorController->Set(motorSpeed);
+  m_motorController->Set(kMotorSpeed);
 
-  Wait(delayTime);
+  Wait(kDelayTime);
 
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";

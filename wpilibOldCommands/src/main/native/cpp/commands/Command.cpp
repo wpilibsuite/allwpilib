@@ -19,20 +19,21 @@ using namespace frc;
 
 int Command::m_commandCounter = 0;
 
-Command::Command() : Command("", -1.0) {}
+Command::Command() : Command("", -1_s) {}
 
-Command::Command(std::string_view name) : Command(name, -1.0) {}
+Command::Command(std::string_view name) : Command(name, -1_s) {}
 
-Command::Command(double timeout) : Command("", timeout) {}
+Command::Command(units::second_t timeout) : Command("", timeout) {}
 
-Command::Command(Subsystem& subsystem) : Command("", -1.0) {
+Command::Command(Subsystem& subsystem) : Command("", -1_s) {
   Requires(&subsystem);
 }
 
-Command::Command(std::string_view name, double timeout) {
+Command::Command(std::string_view name, units::second_t timeout) {
   // We use -1.0 to indicate no timeout.
-  if (timeout < 0.0 && timeout != -1.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
+  if (timeout < 0_s && timeout != -1_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_timeout = timeout;
@@ -47,22 +48,24 @@ Command::Command(std::string_view name, double timeout) {
 }
 
 Command::Command(std::string_view name, Subsystem& subsystem)
-    : Command(name, -1.0) {
+    : Command(name, -1_s) {
   Requires(&subsystem);
 }
 
-Command::Command(double timeout, Subsystem& subsystem) : Command("", timeout) {
+Command::Command(units::second_t timeout, Subsystem& subsystem)
+    : Command("", timeout) {
   Requires(&subsystem);
 }
 
-Command::Command(std::string_view name, double timeout, Subsystem& subsystem)
+Command::Command(std::string_view name, units::second_t timeout,
+                 Subsystem& subsystem)
     : Command(name, timeout) {
   Requires(&subsystem);
 }
 
-double Command::TimeSinceInitialized() const {
-  if (m_startTime < 0.0) {
-    return 0.0;
+units::second_t Command::TimeSinceInitialized() const {
+  if (m_startTime < 0_s) {
+    return 0_s;
   } else {
     return Timer::GetFPGATimestamp() - m_startTime;
   }
@@ -170,16 +173,17 @@ int Command::GetID() const {
   return m_commandID;
 }
 
-void Command::SetTimeout(double timeout) {
-  if (timeout < 0.0) {
-    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0.0", timeout);
+void Command::SetTimeout(units::second_t timeout) {
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   } else {
     m_timeout = timeout;
   }
 }
 
 bool Command::IsTimedOut() const {
-  return m_timeout != -1 && TimeSinceInitialized() >= m_timeout;
+  return m_timeout != -1_s && TimeSinceInitialized() >= m_timeout;
 }
 
 bool Command::AssertUnlocked(std::string_view message) {
@@ -264,7 +268,7 @@ void Command::Removed() {
 
 void Command::StartRunning() {
   m_running = true;
-  m_startTime = -1;
+  m_startTime = -1_s;
   m_completed = false;
 }
 

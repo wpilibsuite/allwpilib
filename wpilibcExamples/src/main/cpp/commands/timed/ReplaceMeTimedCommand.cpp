@@ -4,7 +4,7 @@
 
 #include "ReplaceMeTimedCommand.h"
 
-ReplaceMeTimedCommand::ReplaceMeTimedCommand(double timeout)
+ReplaceMeTimedCommand::ReplaceMeTimedCommand(units::second_t timeout)
     : TimedCommand(timeout) {
   // Use Requires() here to declare subsystem dependencies
   // eg. Requires(Robot::chassis.get());

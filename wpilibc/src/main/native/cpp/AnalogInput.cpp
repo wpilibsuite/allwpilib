@@ -141,7 +141,7 @@ void AnalogInput::ResetAccumulator() {
   const double sampleTime = 1.0 / GetSampleRate();
   const double overSamples = 1 << GetOversampleBits();
   const double averageSamples = 1 << GetAverageBits();
-  Wait(sampleTime * overSamples * averageSamples);
+  Wait(units::second_t{sampleTime * overSamples * averageSamples});
 }
 
 void AnalogInput::SetAccumulatorCenter(int center) {

@@ -16,10 +16,10 @@ using namespace frc;
 
 /* The PCM switches the compressor up to a couple seconds after the pressure
         switch changes. */
-static const double kCompressorDelayTime = 3.0;
+static constexpr auto kCompressorDelayTime = 3_s;
 
 /* Solenoids should change much more quickly */
-static const double kSolenoidDelayTime = 0.5;
+static constexpr auto kSolenoidDelayTime = 0.5_s;
 
 /* The voltage divider on the test bench should bring the compressor output
         to around these values. */

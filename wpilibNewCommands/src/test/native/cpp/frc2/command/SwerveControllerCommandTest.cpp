@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc2/Timer.h>
 #include <frc2/command/Subsystem.h>
 #include <frc2/command/SwerveControllerCommand.h>
 
+#include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
 #include <frc/geometry/Rotation2d.h>
@@ -28,7 +28,7 @@ class SwerveControllerCommandTest : public ::testing::Test {
                            units::inverse<units::squared<units::second>>>;
 
  protected:
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   frc::Rotation2d m_angle{0_rad};
 
   wpi::array<frc::SwerveModuleState, 4> m_moduleStates{
