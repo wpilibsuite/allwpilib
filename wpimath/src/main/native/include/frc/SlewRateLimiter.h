@@ -6,9 +6,9 @@
 
 #include <algorithm>
 
-#include <units/time.h>
+#include <wpi/timestamp.h>
 
-#include "frc/Timer.h"
+#include "units/time.h"
 
 namespace frc {
 /**
@@ -36,7 +36,7 @@ class SlewRateLimiter {
   explicit SlewRateLimiter(Rate_t rateLimit, Unit_t initialValue = Unit_t{0})
       : m_rateLimit{rateLimit},
         m_prevVal{initialValue},
-        m_prevTime{Timer::GetFPGATimestamp()} {}
+        m_prevTime{units::microsecond_t(wpi::Now())} {}
 
   /**
    * Filters the input to limit its slew rate.
@@ -46,7 +46,7 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    units::second_t currentTime = Timer::GetFPGATimestamp();
+    units::second_t currentTime = units::microsecond_t(wpi::Now());
     units::second_t elapsedTime = currentTime - m_prevTime;
     m_prevVal += std::clamp(input - m_prevVal, -m_rateLimit * elapsedTime,
                             m_rateLimit * elapsedTime);
@@ -62,7 +62,7 @@ class SlewRateLimiter {
    */
   void Reset(Unit_t value) {
     m_prevVal = value;
-    m_prevTime = Timer::GetFPGATimestamp();
+    m_prevTime = units::microsecond_t(wpi::Now());
   }
 
  private:
