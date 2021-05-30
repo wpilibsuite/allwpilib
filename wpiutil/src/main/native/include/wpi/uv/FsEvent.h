@@ -9,9 +9,9 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "wpi/Signal.h"
-#include "wpi/Twine.h"
 #include "wpi/uv/Handle.h"
 
 namespace wpi::uv {
@@ -51,7 +51,7 @@ class FsEvent final : public HandleImpl<FsEvent, uv_fs_event_t> {
    * @param events Bitmask of event flags.  Only UV_FS_EVENT_RECURSIVE is
    *               supported (and only on OSX and Windows).
    */
-  void Start(const Twine& path, unsigned int flags = 0);
+  void Start(std::string_view path, unsigned int flags = 0);
 
   /**
    * Stop watching for changes.

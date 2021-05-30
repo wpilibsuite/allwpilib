@@ -91,10 +91,10 @@
 #define LLVM_SUPPORT_CONVERTUTF_H
 
 #include "wpi/ArrayRef.h"
-#include "wpi/StringRef.h"
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 #include <system_error>
 
 // Wrap everything in namespace wpi so that programs can link with wpiutil and
@@ -243,15 +243,15 @@ bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
  *
  * \returns true on success
  */
-bool convertUTF8ToUTF16String(StringRef SrcUTF8,
+bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
                               SmallVectorImpl<UTF16> &DstUTF16);
 
 #if defined(_WIN32)
 namespace sys {
 namespace windows {
-std::error_code UTF8ToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
+std::error_code UTF8ToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
 /// Convert to UTF16 from the current code page used in the system
-std::error_code CurCPToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
+std::error_code CurCPToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
 std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
                             SmallVectorImpl<char> &utf8);
 /// Convert from UTF16 to the current code page used in the system

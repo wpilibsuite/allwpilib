@@ -10,6 +10,7 @@
 
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 
@@ -48,9 +49,9 @@ static std::string_view GetUsbNameFromFile(int vendor, int product,
     }
 
     // look for vendor at start of line
-    if (line.startswith(vendorStr)) {
+    if (wpi::starts_with(line, vendorStr)) {
       foundVendor = true;
-      os << line.substr(5).trim() << ' ';
+      os << wpi::trim(line.substr(5)) << ' ';
       continue;
     }
 
@@ -62,8 +63,8 @@ static std::string_view GetUsbNameFromFile(int vendor, int product,
       }
 
       // look for product
-      if (line.substr(1).startswith(productStr)) {
-        os << line.substr(6).trim();
+      if (wpi::starts_with(line.substr(1), productStr)) {
+        os << wpi::trim(line.substr(6));
         return os.str();
       }
     }

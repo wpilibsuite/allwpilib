@@ -836,7 +836,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // The end of the request is marked by a single, empty line
   wpi::SmallString<128> lineBuf;
   for (;;) {
-    if (is.getline(lineBuf, 4096).startswith("\n")) {
+    if (wpi::starts_with(is.getline(lineBuf, 4096), "\n")) {
       break;
     }
     if (is.has_error()) {

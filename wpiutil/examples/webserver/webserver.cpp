@@ -32,20 +32,20 @@ void MyHttpServerConnection::ProcessRequest() {
     return;
   }
 
-  wpi::StringRef path;
+  std::string_view path;
   if (url.HasPath()) {
     path = url.GetPath();
   }
   wpi::errs() << "path: \"" << path << "\"\n";
 
-  wpi::StringRef query;
+  std::string_view query;
   if (url.HasQuery()) {
     query = url.GetQuery();
   }
   wpi::errs() << "query: \"" << query << "\"\n";
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
-  if (isGET && path.equals("/")) {
+  if (isGET && path == "/") {
     // build HTML root page
     wpi::SmallString<256> buf;
     wpi::raw_svector_ostream os{buf};

@@ -56,9 +56,9 @@ void ConstBufferCallbackStore::performCallback(const char* name,
     wpi::outs().flush();
   }
 
-  auto toCallbackArr =
-      MakeJByteArray(env, wpi::StringRef{reinterpret_cast<const char*>(buffer),
-                                         static_cast<size_t>(length)});
+  auto toCallbackArr = MakeJByteArray(
+      env, std::string_view{reinterpret_cast<const char*>(buffer),
+                            static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
                       MakeJString(env, name), toCallbackArr,

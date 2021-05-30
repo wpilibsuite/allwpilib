@@ -24,11 +24,11 @@
 #define WPIUTIL_WPI_FORMAT_H
 
 #include "wpi/ArrayRef.h"
-#include "wpi/StringRef.h"
 #include <cassert>
 #include <cstdint>
 #include <cstdio>
 #include <optional>
+#include <string_view>
 #include <tuple>
 #include <utility>
 
@@ -137,11 +137,11 @@ inline format_object<Ts...> format(const char *Fmt, const Ts &... Vals) {
 class FormattedString {
 public:
   enum Justification { JustifyNone, JustifyLeft, JustifyRight, JustifyCenter };
-  FormattedString(StringRef S, unsigned W, Justification J)
+  FormattedString(std::string_view S, unsigned W, Justification J)
       : Str(S), Width(W), Justify(J) {}
 
 private:
-  StringRef Str;
+  std::string_view Str;
   unsigned Width;
   Justification Justify;
   friend class raw_ostream;
@@ -150,21 +150,21 @@ private:
 /// left_justify - append spaces after string so total output is
 /// \p Width characters.  If \p Str is larger that \p Width, full string
 /// is written with no padding.
-inline FormattedString left_justify(StringRef Str, unsigned Width) {
+inline FormattedString left_justify(std::string_view Str, unsigned Width) {
   return FormattedString(Str, Width, FormattedString::JustifyLeft);
 }
 
 /// right_justify - add spaces before string so total output is
 /// \p Width characters.  If \p Str is larger that \p Width, full string
 /// is written with no padding.
-inline FormattedString right_justify(StringRef Str, unsigned Width) {
+inline FormattedString right_justify(std::string_view Str, unsigned Width) {
   return FormattedString(Str, Width, FormattedString::JustifyRight);
 }
 
 /// center_justify - add spaces before and after string so total output is
 /// \p Width characters.  If \p Str is larger that \p Width, full string
 /// is written with no padding.
-inline FormattedString center_justify(StringRef Str, unsigned Width) {
+inline FormattedString center_justify(std::string_view Str, unsigned Width) {
   return FormattedString(Str, Width, FormattedString::JustifyCenter);
 }
 

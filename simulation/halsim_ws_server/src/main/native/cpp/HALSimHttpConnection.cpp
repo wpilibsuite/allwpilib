@@ -23,7 +23,7 @@ namespace uv = wpi::uv;
 
 using namespace wpilibws;
 
-bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
+bool HALSimHttpConnection::IsValidWsUpgrade(std::string_view protocol) {
   if (m_request.GetUrl() != m_server->GetServerUri()) {
     MySendError(404, "invalid websocket address");
     return false;

@@ -11,13 +11,12 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "wpi/ArrayRef.h"
 #include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
 #include "wpi/uv/Buffer.h"
 #include "wpi/uv/Error.h"
 #include "wpi/uv/Timer.h"
@@ -79,7 +78,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
     uv::Timer::Time handshakeTimeout;  // NOLINT
 
     /** Additional headers to include in handshake. */
-    ArrayRef<std::pair<StringRef, StringRef>> extraHeaders;
+    ArrayRef<std::pair<std::string_view, std::string_view>> extraHeaders;
   };
 
   /**
@@ -93,9 +92,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocket> CreateClient(
-      uv::Stream& stream, const Twine& uri, const Twine& host,
-      ArrayRef<StringRef> protocols = ArrayRef<StringRef>{},
-      const ClientOptions& options = ClientOptions{});
+      uv::Stream& stream, std::string_view uri, std::string_view host,
+      ArrayRef<std::string_view> protocols = {},
+      const ClientOptions& options = {});
 
   /**
    * Starts a client connection by performing the initial client handshake.
@@ -108,9 +107,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocket> CreateClient(
-      uv::Stream& stream, const Twine& uri, const Twine& host,
-      std::initializer_list<StringRef> protocols,
-      const ClientOptions& options = ClientOptions{}) {
+      uv::Stream& stream, std::string_view uri, std::string_view host,
+      std::initializer_list<std::string_view> protocols,
+      const ClientOptions& options = {}) {
     return CreateClient(stream, uri, host,
                         makeArrayRef(protocols.begin(), protocols.end()),
                         options);
@@ -130,8 +129,8 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    *                 Sec-WebSocket-Protocol header field).
    */
   static std::shared_ptr<WebSocket> CreateServer(
-      uv::Stream& stream, StringRef key, StringRef version,
-      StringRef protocol = StringRef{});
+      uv::Stream& stream, std::string_view key, std::string_view version,
+      std::string_view protocol = {});
 
   /**
    * Get connection state.
@@ -152,7 +151,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   /**
    * Get the selected sub-protocol.  Only valid in or after the open() event.
    */
-  StringRef GetProtocol() const { return m_protocol; }
+  std::string_view GetProtocol() const { return m_protocol; }
 
   /**
    * Set the maximum message size.  Default is 128 KB.  If configured to combine
@@ -176,7 +175,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * @param reason A human-readable string explaining why the connection is
    *               closing (optional).
    */
-  void Close(uint16_t code = 1005, const Twine& reason = Twine{});
+  void Close(uint16_t code = 1005, std::string_view reason = {});
 
   /**
    * Send a text message.
@@ -292,12 +291,12 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   /**
    * Fail the connection.
    */
-  void Fail(uint16_t code = 1002, const Twine& reason = "protocol error");
+  void Fail(uint16_t code = 1002, std::string_view reason = "protocol error");
 
   /**
    * Forcibly close the connection.
    */
-  void Terminate(uint16_t code = 1006, const Twine& reason = "terminated");
+  void Terminate(uint16_t code = 1006, std::string_view reason = "terminated");
 
   /**
    * Gets user-defined data.
@@ -318,7 +317,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * Open event.  Emitted when the connection is open and ready to communicate.
    * The parameter is the selected subprotocol.
    */
-  sig::Signal<StringRef> open;
+  sig::Signal<std::string_view> open;
 
   /**
    * Close event.  Emitted when the connection is closed.  The first parameter
@@ -326,14 +325,14 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    * has been closed.  The second parameter is a human-readable string
    * explaining the reason why the connection has been closed.
    */
-  sig::Signal<uint16_t, StringRef> closed;
+  sig::Signal<uint16_t, std::string_view> closed;
 
   /**
    * Text message event.  Emitted when a text message is received.
    * The first parameter is the data, the second parameter is true if the
    * data is the last fragment of the message.
    */
-  sig::Signal<StringRef, bool> text;
+  sig::Signal<std::string_view, bool> text;
 
   /**
    * Binary message event.  Emitted when a binary message is received.
@@ -382,11 +381,13 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   class ClientHandshakeData;
   std::unique_ptr<ClientHandshakeData> m_clientHandshake;
 
-  void StartClient(const Twine& uri, const Twine& host,
-                   ArrayRef<StringRef> protocols, const ClientOptions& options);
-  void StartServer(StringRef key, StringRef version, StringRef protocol);
-  void SendClose(uint16_t code, const Twine& reason);
-  void SetClosed(uint16_t code, const Twine& reason, bool failed = false);
+  void StartClient(std::string_view uri, std::string_view host,
+                   ArrayRef<std::string_view> protocols,
+                   const ClientOptions& options);
+  void StartServer(std::string_view key, std::string_view version,
+                   std::string_view protocol);
+  void SendClose(uint16_t code, std::string_view reason);
+  void SetClosed(uint16_t code, std::string_view reason, bool failed = false);
   void Shutdown();
   void HandleIncoming(uv::Buffer& buf, size_t size);
   void Send(

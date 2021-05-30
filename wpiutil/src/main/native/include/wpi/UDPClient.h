@@ -6,11 +6,10 @@
 #define WPIUTIL_WPI_UDPCLIENT_H_
 
 #include <string>
+#include <string_view>
 
 #include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
 #include "wpi/mutex.h"
 
 namespace wpi {
@@ -25,7 +24,7 @@ class UDPClient {
 
  public:
   explicit UDPClient(Logger& logger);
-  UDPClient(const Twine& address, Logger& logger);
+  UDPClient(std::string_view address, Logger& logger);
   UDPClient(const UDPClient& other) = delete;
   UDPClient(UDPClient&& other);
   ~UDPClient();
@@ -37,8 +36,8 @@ class UDPClient {
   int start(int port);
   void shutdown();
   // The passed in address MUST be a resolved IP address.
-  int send(ArrayRef<uint8_t> data, const Twine& server, int port);
-  int send(StringRef data, const Twine& server, int port);
+  int send(ArrayRef<uint8_t> data, std::string_view server, int port);
+  int send(std::string_view data, std::string_view server, int port);
   int receive(uint8_t* data_received, int receive_len);
   int receive(uint8_t* data_received, int receive_len,
               SmallVectorImpl<char>* addr_received, int* port_received);

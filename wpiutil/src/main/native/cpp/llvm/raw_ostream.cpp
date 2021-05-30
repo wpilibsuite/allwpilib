@@ -138,7 +138,7 @@ raw_ostream &raw_ostream::write_hex(unsigned long long N) {
   return *this;
 }
 
-raw_ostream &raw_ostream::write_escaped(StringRef Str,
+raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                         bool UseHexEscapes) {
   for (unsigned char c : Str) {
     switch (c) {
@@ -486,7 +486,7 @@ void format_object_base::home() {
 //  raw_fd_ostream
 //===----------------------------------------------------------------------===//
 
-static int getFD(StringRef Filename, std::error_code &EC,
+static int getFD(std::string_view Filename, std::error_code &EC,
                  fs::CreationDisposition Disp, fs::FileAccess Access,
                  fs::OpenFlags Flags) {
   assert((Access & fs::FA_Write) &&
@@ -521,25 +521,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
   return FD;
 }
 
-raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC)
+raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC)
     : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, fs::FA_Write,
                      fs::OF_None) {}
 
-raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                                fs::CreationDisposition Disp)
     : raw_fd_ostream(Filename, EC, Disp, fs::FA_Write, fs::OF_None) {}
 
-raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                                fs::FileAccess Access)
     : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, Access,
                      fs::OF_None) {}
 
-raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                                fs::OpenFlags Flags)
     : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, fs::FA_Write,
                      Flags) {}
 
-raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
+raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                                fs::CreationDisposition Disp,
                                fs::FileAccess Access,
                                fs::OpenFlags Flags)
@@ -622,7 +622,7 @@ raw_fd_ostream::~raw_fd_ostream() {
 // the input is UTF-8 or transcode from the local codepage to UTF-8 before
 // quoting it. If they don't, this may mess up the encoding, but this is still
 // probably the best compromise we can make.
-static bool write_console_impl(int FD, StringRef Data) {
+static bool write_console_impl(int FD, std::string_view Data) {
   SmallVector<wchar_t, 256> WideText;
 
   // Fall back to ::write if it wasn't valid UTF-8.
@@ -665,7 +665,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
   // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
   // and using WriteConsoleW. If that fails, fall back to plain write().
   if (IsWindowsConsole)
-    if (write_console_impl(FD, StringRef(Ptr, Size)))
+    if (write_console_impl(FD, std::string_view(Ptr, Size)))
       return;
 #endif
 

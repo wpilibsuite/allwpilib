@@ -7,6 +7,7 @@
 #include "WebSocketTest.h"
 
 #include "wpi/HttpParser.h"
+#include "wpi/StringExtras.h"
 
 namespace wpi {
 
@@ -106,24 +107,24 @@ TEST_F(WebSocketTest, CreateClientBasic) {
   int gotVersion = 0;
 
   HttpParser req{HttpParser::kRequest};
-  req.url.connect([](StringRef url) { ASSERT_EQ(url, "/test"); });
-  req.header.connect([&](StringRef name, StringRef value) {
-    if (name.equals_lower("host")) {
+  req.url.connect([](std::string_view url) { ASSERT_EQ(url, "/test"); });
+  req.header.connect([&](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "host")) {
       ASSERT_EQ(value, pipeName);
       ++gotHost;
-    } else if (name.equals_lower("upgrade")) {
+    } else if (equals_lower(name, "upgrade")) {
       ASSERT_EQ(value, "websocket");
       ++gotUpgrade;
-    } else if (name.equals_lower("connection")) {
+    } else if (equals_lower(name, "connection")) {
       ASSERT_EQ(value, "Upgrade");
       ++gotConnection;
-    } else if (name.equals_lower("sec-websocket-key")) {
+    } else if (equals_lower(name, "sec-websocket-key")) {
       ++gotKey;
-    } else if (name.equals_lower("sec-websocket-version")) {
+    } else if (equals_lower(name, "sec-websocket-version")) {
       ASSERT_EQ(value, "13");
       ++gotVersion;
     } else {
-      FAIL() << "unexpected header " << name.str();
+      FAIL() << "unexpected header " << name;
     }
   });
   req.headersComplete.connect([&](bool) { Finish(); });
@@ -132,7 +133,7 @@ TEST_F(WebSocketTest, CreateClientBasic) {
     auto conn = serverPipe->Accept();
     conn->StartRead();
     conn->data.connect([&](uv::Buffer& buf, size_t size) {
-      req.Execute(StringRef{buf.base, size});
+      req.Execute(std::string_view{buf.base, size});
       if (req.HasError()) {
         Finish();
       }
@@ -159,11 +160,11 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   int gotExtra1 = 0;
   int gotExtra2 = 0;
   HttpParser req{HttpParser::kRequest};
-  req.header.connect([&](StringRef name, StringRef value) {
-    if (name.equals("Extra1")) {
+  req.header.connect([&](std::string_view name, std::string_view value) {
+    if (equals(name, "Extra1")) {
       ASSERT_EQ(value, "Data1");
       ++gotExtra1;
-    } else if (name.equals("Extra2")) {
+    } else if (equals(name, "Extra2")) {
       ASSERT_EQ(value, "Data2");
       ++gotExtra2;
     }
@@ -174,7 +175,7 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
     auto conn = serverPipe->Accept();
     conn->StartRead();
     conn->data.connect([&](uv::Buffer& buf, size_t size) {
-      req.Execute(StringRef{buf.base, size});
+      req.Execute(std::string_view{buf.base, size});
       if (req.HasError()) {
         Finish();
       }
@@ -183,12 +184,12 @@ TEST_F(WebSocketTest, CreateClientExtraHeaders) {
   });
   clientPipe->Connect(pipeName, [&]() {
     WebSocket::ClientOptions options;
-    SmallVector<std::pair<StringRef, StringRef>, 4> extraHeaders;
+    SmallVector<std::pair<std::string_view, std::string_view>, 4> extraHeaders;
     extraHeaders.emplace_back("Extra1", "Data1");
     extraHeaders.emplace_back("Extra2", "Data2");
     options.extraHeaders = extraHeaders;
-    auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName,
-                                      ArrayRef<StringRef>{}, options);
+    auto ws =
+        WebSocket::CreateClient(*clientPipe, "/test", pipeName, {}, options);
   });
 
   loop->Run();
@@ -206,9 +207,9 @@ TEST_F(WebSocketTest, CreateClientTimeout) {
   clientPipe->Connect(pipeName, [&]() {
     WebSocket::ClientOptions options;
     options.handshakeTimeout = uv::Timer::Time{100};
-    auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName,
-                                      ArrayRef<StringRef>{}, options);
-    ws->closed.connect([&](uint16_t code, StringRef) {
+    auto ws =
+        WebSocket::CreateClient(*clientPipe, "/test", pipeName, {}, options);
+    ws->closed.connect([&](uint16_t code, std::string_view) {
       Finish();
       ++gotClosed;
       ASSERT_EQ(code, 1006);
@@ -231,22 +232,22 @@ TEST_F(WebSocketTest, CreateServerBasic) {
   int gotOpen = 0;
 
   HttpParser resp{HttpParser::kResponse};
-  resp.status.connect([&](StringRef status) {
+  resp.status.connect([&](std::string_view status) {
     ++gotStatus;
     ASSERT_EQ(resp.GetStatusCode(), 101u) << "status: " << status;
   });
-  resp.header.connect([&](StringRef name, StringRef value) {
-    if (name.equals_lower("upgrade")) {
+  resp.header.connect([&](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "upgrade")) {
       ASSERT_EQ(value, "websocket");
       ++gotUpgrade;
-    } else if (name.equals_lower("connection")) {
+    } else if (equals_lower(name, "connection")) {
       ASSERT_EQ(value, "Upgrade");
       ++gotConnection;
-    } else if (name.equals_lower("sec-websocket-accept")) {
+    } else if (equals_lower(name, "sec-websocket-accept")) {
       ASSERT_EQ(value, "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=");
       ++gotAccept;
     } else {
-      FAIL() << "unexpected header " << name.str();
+      FAIL() << "unexpected header " << name;
     }
   });
   resp.headersComplete.connect([&](bool) { Finish(); });
@@ -254,7 +255,7 @@ TEST_F(WebSocketTest, CreateServerBasic) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto ws = WebSocket::CreateServer(*conn, "dGhlIHNhbXBsZSBub25jZQ==", "13");
-    ws->open.connect([&](StringRef protocol) {
+    ws->open.connect([&](std::string_view protocol) {
       ++gotOpen;
       ASSERT_TRUE(protocol.empty());
     });
@@ -262,7 +263,7 @@ TEST_F(WebSocketTest, CreateServerBasic) {
   clientPipe->Connect(pipeName, [&] {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
-      resp.Execute(StringRef{buf.base, size});
+      resp.Execute(std::string_view{buf.base, size});
       if (resp.HasError()) {
         Finish();
       }
@@ -287,8 +288,8 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
   int gotOpen = 0;
 
   HttpParser resp{HttpParser::kResponse};
-  resp.header.connect([&](StringRef name, StringRef value) {
-    if (name.equals_lower("sec-websocket-protocol")) {
+  resp.header.connect([&](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "sec-websocket-protocol")) {
       ++gotProtocol;
       ASSERT_EQ(value, "myProtocol");
     }
@@ -298,7 +299,7 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto ws = WebSocket::CreateServer(*conn, "foo", "13", "myProtocol");
-    ws->open.connect([&](StringRef protocol) {
+    ws->open.connect([&](std::string_view protocol) {
       ++gotOpen;
       ASSERT_EQ(protocol, "myProtocol");
     });
@@ -306,7 +307,7 @@ TEST_F(WebSocketTest, CreateServerProtocol) {
   clientPipe->Connect(pipeName, [&] {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
-      resp.Execute(StringRef{buf.base, size});
+      resp.Execute(std::string_view{buf.base, size});
       if (resp.HasError()) {
         Finish();
       }
@@ -329,19 +330,19 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
   int gotUpgrade = 0;
 
   HttpParser resp{HttpParser::kResponse};
-  resp.status.connect([&](StringRef status) {
+  resp.status.connect([&](std::string_view status) {
     ++gotStatus;
     ASSERT_EQ(resp.GetStatusCode(), 426u) << "status: " << status;
   });
-  resp.header.connect([&](StringRef name, StringRef value) {
-    if (name.equals_lower("sec-websocket-version")) {
+  resp.header.connect([&](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "sec-websocket-version")) {
       ++gotVersion;
       ASSERT_EQ(value, "13");
-    } else if (name.equals_lower("upgrade")) {
+    } else if (equals_lower(name, "upgrade")) {
       ++gotUpgrade;
       ASSERT_EQ(value, "WebSocket");
     } else {
-      FAIL() << "unexpected header " << name.str();
+      FAIL() << "unexpected header " << name;
     }
   });
   resp.headersComplete.connect([&](bool) { Finish(); });
@@ -349,7 +350,7 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
   serverPipe->Listen([&] {
     auto conn = serverPipe->Accept();
     auto ws = WebSocket::CreateServer(*conn, "foo", "14");
-    ws->open.connect([&](StringRef) {
+    ws->open.connect([&](std::string_view) {
       Finish();
       FAIL();
     });
@@ -357,7 +358,7 @@ TEST_F(WebSocketTest, CreateServerBadVersion) {
   clientPipe->Connect(pipeName, [&] {
     clientPipe->StartRead();
     clientPipe->data.connect([&](uv::Buffer& buf, size_t size) {
-      resp.Execute(StringRef{buf.base, size});
+      resp.Execute(std::string_view{buf.base, size});
       if (resp.HasError()) {
         Finish();
       }

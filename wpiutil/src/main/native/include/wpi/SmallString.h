@@ -15,8 +15,8 @@
 #define WPIUTIL_WPI_SMALLSTRING_H
 
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 #include <cstddef>
+#include <string_view>
 
 namespace wpi {
 
@@ -28,8 +28,9 @@ public:
   /// Default ctor - Initialize to empty.
   SmallString() = default;
 
-  /// Initialize from a StringRef.
-  SmallString(StringRef S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+  /// Initialize from a std::string_view.
+  SmallString(std::string_view S)
+    : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
 
   /// Initialize with a range.
   template<typename ItTy>
@@ -54,8 +55,8 @@ public:
     SmallVectorImpl<char>::append(S, E);
   }
 
-  /// Assign from a StringRef.
-  void assign(StringRef RHS) {
+  /// Assign from a std::string_view.
+  void assign(std::string_view RHS) {
     this->clear();
     SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
   }
@@ -80,8 +81,8 @@ public:
     SmallVectorImpl<char>::append(NumInputs, Elt);
   }
 
-  /// Append from a StringRef.
-  void append(StringRef RHS) {
+  /// Append from a std::string_view.
+  void append(std::string_view RHS) {
     SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
   }
 
@@ -94,46 +95,10 @@ public:
   /// @name String Comparison
   /// @{
 
-  /// Check for string equality.  This is more efficient than compare() when
-  /// the relative ordering of inequal strings isn't needed.
-  bool equals(StringRef RHS) const {
-    return str().equals(RHS);
-  }
-
-  /// Check for string equality, ignoring case.
-  bool equals_lower(StringRef RHS) const {
-    return str().equals_lower(RHS);
-  }
-
   /// Compare two strings; the result is -1, 0, or 1 if this string is
   /// lexicographically less than, equal to, or greater than the \p RHS.
-  int compare(StringRef RHS) const {
+  int compare(std::string_view RHS) const {
     return str().compare(RHS);
-  }
-
-  /// compare_lower - Compare two strings, ignoring case.
-  int compare_lower(StringRef RHS) const {
-    return str().compare_lower(RHS);
-  }
-
-  /// compare_numeric - Compare two strings, treating sequences of digits as
-  /// numbers.
-  int compare_numeric(StringRef RHS) const {
-    return str().compare_numeric(RHS);
-  }
-
-  /// @}
-  /// @name String Predicates
-  /// @{
-
-  /// startswith - Check if this string starts with the given \p Prefix.
-  bool startswith(StringRef Prefix) const {
-    return str().startswith(Prefix);
-  }
-
-  /// endswith - Check if this string ends with the given \p Suffix.
-  bool endswith(StringRef Suffix) const {
-    return str().endswith(Suffix);
   }
 
   /// @}
@@ -152,7 +117,7 @@ public:
   ///
   /// \returns The index of the first occurrence of \p Str, or npos if not
   /// found.
-  size_t find(StringRef Str, size_t From = 0) const {
+  size_t find(std::string_view Str, size_t From = 0) const {
     return str().find(Str, From);
   }
 
@@ -160,7 +125,7 @@ public:
   ///
   /// \returns The index of the last occurrence of \p C, or npos if not
   /// found.
-  size_t rfind(char C, size_t From = StringRef::npos) const {
+  size_t rfind(char C, size_t From = std::string_view::npos) const {
     return str().rfind(C, From);
   }
 
@@ -168,7 +133,7 @@ public:
   ///
   /// \returns The index of the last occurrence of \p Str, or npos if not
   /// found.
-  size_t rfind(StringRef Str) const {
+  size_t rfind(std::string_view Str) const {
     return str().rfind(Str);
   }
 
@@ -182,7 +147,7 @@ public:
   /// not found.
   ///
   /// Complexity: O(size() + Chars.size())
-  size_t find_first_of(StringRef Chars, size_t From = 0) const {
+  size_t find_first_of(std::string_view Chars, size_t From = 0) const {
     return str().find_first_of(Chars, From);
   }
 
@@ -196,13 +161,13 @@ public:
   /// \p Chars, or npos if not found.
   ///
   /// Complexity: O(size() + Chars.size())
-  size_t find_first_not_of(StringRef Chars, size_t From = 0) const {
+  size_t find_first_not_of(std::string_view Chars, size_t From = 0) const {
     return str().find_first_not_of(Chars, From);
   }
 
   /// Find the last character in the string that is \p C, or npos if not
   /// found.
-  size_t find_last_of(char C, size_t From = StringRef::npos) const {
+  size_t find_last_of(char C, size_t From = std::string_view::npos) const {
     return str().find_last_of(C, From);
   }
 
@@ -211,23 +176,8 @@ public:
   ///
   /// Complexity: O(size() + Chars.size())
   size_t find_last_of(
-      StringRef Chars, size_t From = StringRef::npos) const {
+      std::string_view Chars, size_t From = std::string_view::npos) const {
     return str().find_last_of(Chars, From);
-  }
-
-  /// @}
-  /// @name Helpful Algorithms
-  /// @{
-
-  /// Return the number of occurrences of \p C in the string.
-  size_t count(char C) const {
-    return str().count(C);
-  }
-
-  /// Return the number of non-overlapped occurrences of \p Str in the
-  /// string.
-  size_t count(StringRef Str) const {
-    return str().count(Str);
   }
 
   /// @}
@@ -243,28 +193,14 @@ public:
   /// \param N The number of characters to included in the substring. If \p N
   /// exceeds the number of characters remaining in the string, the string
   /// suffix (starting with \p Start) will be returned.
-  StringRef substr(size_t Start, size_t N = StringRef::npos) const {
+  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
     return str().substr(Start, N);
-  }
-
-  /// Return a reference to the substring from [Start, End).
-  ///
-  /// \param Start The index of the starting character in the substring; if
-  /// the index is npos or greater than the length of the string then the
-  /// empty substring will be returned.
-  ///
-  /// \param End The index following the last character to include in the
-  /// substring. If this is npos, or less than \p Start, or exceeds the
-  /// number of characters remaining in the string, the string suffix
-  /// (starting with \p Start) will be returned.
-  StringRef slice(size_t Start, size_t End) const {
-    return str().slice(Start, End);
   }
 
   // Extra methods.
 
-  /// Explicit conversion to StringRef.
-  StringRef str() const { return StringRef(this->begin(), this->size()); }
+  /// Explicit conversion to std::string_view.
+  std::string_view str() const { return {this->begin(), this->size()}; }
 
   /// Explicit conversion to std::string.
   std::string string() const { return {this->begin(), this->size()}; }
@@ -276,19 +212,19 @@ public:
     return this->data();
   }
 
-  /// Implicit conversion to StringRef.
-  operator StringRef() const { return str(); }
+  /// Implicit conversion to std::string_view.
+  operator std::string_view() const { return str(); }
 
   /// Implicit conversion to std::string.
   operator std::string() const { return string(); }
 
   // Extra operators.
-  const SmallString &operator=(StringRef RHS) {
+  const SmallString &operator=(std::string_view RHS) {
     this->clear();
     return *this += RHS;
   }
 
-  SmallString &operator+=(StringRef RHS) {
+  SmallString &operator+=(std::string_view RHS) {
     this->append(RHS.begin(), RHS.end());
     return *this;
   }

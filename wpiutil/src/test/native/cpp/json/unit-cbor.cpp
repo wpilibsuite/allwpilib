@@ -1181,9 +1181,9 @@ TEST(CborErrorTest, TooShortByteVector)
 TEST(CborErrorTest, UnsupportedBytesConcrete)
 {
     EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0x1c})), json::parse_error,
-                     "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0x1c");
+                     "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0x1C");
     EXPECT_THROW_MSG(json::from_cbor(std::vector<uint8_t>({0xf8})), json::parse_error,
-                     "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0xf8");
+                     "[json.exception.parse_error.112] parse error at 1: error reading CBOR; last byte: 0xF8");
 }
 
 class CborUnsupportedBytesTest : public ::testing::TestWithParam<uint8_t> {

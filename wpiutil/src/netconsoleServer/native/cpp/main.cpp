@@ -10,6 +10,7 @@
 
 #include "wpi/MathExtras.h"
 #include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
 #include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/timestamp.h"
@@ -30,9 +31,9 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
                           wpi::SmallVectorImpl<uv::Buffer>& bufs, bool tcp,
                           uint16_t tcpSeq) {
   // scan for last newline
-  wpi::StringRef str(buf.base, len);
+  std::string_view str(buf.base, len);
   size_t idx = str.rfind('\n');
-  if (idx == wpi::StringRef::npos) {
+  if (idx == std::string_view::npos) {
     // no newline yet, just keep appending to remainder
     rem += str;
     return false;
@@ -40,7 +41,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
 
   // build output
   wpi::raw_uv_ostream out(bufs, 4096);
-  wpi::StringRef toCopy = str.slice(0, idx + 1);
+  std::string_view toCopy = wpi::slice(str, 0, idx + 1);
   if (tcp) {
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
     uint32_t ts = wpi::FloatToBits((wpi::Now() - startTime) * 1.0e-6);
@@ -59,7 +60,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   out << rem << toCopy;
 
   // reset remainder
-  rem = str.slice(idx + 1, wpi::StringRef::npos);
+  rem = wpi::slice(str, idx + 1, std::string_view::npos);
   return true;
 }
 
@@ -136,9 +137,9 @@ int main(int argc, char* argv[]) {
   bool err = false;
 
   while (programArgc < argc && argv[programArgc][0] == '-') {
-    if (wpi::StringRef(argv[programArgc]) == "-u") {
+    if (std::string_view(argv[programArgc]) == "-u") {
       useUdp = true;
-    } else if (wpi::StringRef(argv[programArgc]) == "-b") {
+    } else if (std::string_view(argv[programArgc]) == "-b") {
       useUdp = true;
       broadcastUdp = true;
     } else {

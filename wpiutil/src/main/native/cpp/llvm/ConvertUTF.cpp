@@ -744,10 +744,10 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
 namespace sys {
 namespace windows {
 std::error_code CodePageToUTF16(unsigned codepage,
-                                wpi::StringRef original,
+                                std::string_view original,
                                 wpi::SmallVectorImpl<wchar_t> &utf16) {
   if (!original.empty()) {
-    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.begin(),
+    int len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
                                     original.size(), utf16.begin(), 0);
 
     if (len == 0) {
@@ -757,7 +757,7 @@ std::error_code CodePageToUTF16(unsigned codepage,
     utf16.reserve(len + 1);
     utf16.set_size(len);
 
-    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.begin(),
+    len = ::MultiByteToWideChar(codepage, MB_ERR_INVALID_CHARS, original.data(),
                                 original.size(), utf16.begin(), utf16.size());
 
     if (len == 0) {
@@ -772,12 +772,12 @@ std::error_code CodePageToUTF16(unsigned codepage,
   return std::error_code();
 }
 
-std::error_code UTF8ToUTF16(wpi::StringRef utf8,
+std::error_code UTF8ToUTF16(std::string_view utf8,
                             wpi::SmallVectorImpl<wchar_t> &utf16) {
   return CodePageToUTF16(CP_UTF8, utf8, utf16);
 }
 
-std::error_code CurCPToUTF16(wpi::StringRef curcp,
+std::error_code CurCPToUTF16(std::string_view curcp,
                             wpi::SmallVectorImpl<wchar_t> &utf16) {
   return CodePageToUTF16(CP_ACP, curcp, utf16);
 }

@@ -16,11 +16,11 @@
 
 #include "wpi/ArrayRef.h"
 #include "wpi/Hashing.h"
-#include "wpi/StringRef.h"
 #include "wpi/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <string_view>
 #include <utility>
 
 namespace wpi {
@@ -206,26 +206,26 @@ struct DenseMapInfo<std::pair<T, U>> {
   }
 };
 
-// Provide DenseMapInfo for StringRefs.
-template <> struct DenseMapInfo<StringRef> {
-  static inline StringRef getEmptyKey() {
-    return StringRef(reinterpret_cast<const char *>(~static_cast<uintptr_t>(0)),
+// Provide DenseMapInfo for std::string_view.
+template <> struct DenseMapInfo<std::string_view> {
+  static inline std::string_view getEmptyKey() {
+    return std::string_view(reinterpret_cast<const char *>(~static_cast<uintptr_t>(0)),
                      0);
   }
 
-  static inline StringRef getTombstoneKey() {
-    return StringRef(reinterpret_cast<const char *>(~static_cast<uintptr_t>(1)),
+  static inline std::string_view getTombstoneKey() {
+    return std::string_view(reinterpret_cast<const char *>(~static_cast<uintptr_t>(1)),
                      0);
   }
 
-  static unsigned getHashValue(StringRef Val) {
+  static unsigned getHashValue(std::string_view Val) {
     assert(Val.data() != getEmptyKey().data() && "Cannot hash the empty key!");
     assert(Val.data() != getTombstoneKey().data() &&
            "Cannot hash the tombstone key!");
     return (unsigned)(hash_value(Val));
   }
 
-  static bool isEqual(StringRef LHS, StringRef RHS) {
+  static bool isEqual(std::string_view LHS, std::string_view RHS) {
     if (RHS.data() == getEmptyKey().data())
       return LHS.data() == getEmptyKey().data();
     if (RHS.data() == getTombstoneKey().data())

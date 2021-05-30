@@ -6,6 +6,7 @@
 #include <thread>
 
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
 
 #include "cscore.h"
@@ -18,7 +19,9 @@ int main(int argc, char** argv) {
   }
 
   int id;
-  if (wpi::StringRef{argv[1]}.getAsInteger(10, id)) {
+  if (auto v = wpi::parse_integer<int>(argv[1], 10)) {
+    id = v.value();
+  } else {
     wpi::errs() << "Expected number for camera\n";
     return 2;
   }
@@ -27,22 +30,21 @@ int main(int argc, char** argv) {
 
   // Set prior to connect
   int arg = 2;
-  wpi::StringRef propName;
-  for (; arg < argc && wpi::StringRef{argv[arg]} != "--"; ++arg) {
+  std::string_view propName;
+  for (; arg < argc && std::string_view{argv[arg]} != "--"; ++arg) {
     if (propName.empty()) {
       propName = argv[arg];
     } else {
-      wpi::StringRef propVal{argv[arg]};
-      int intVal;
-      if (propVal.getAsInteger(10, intVal)) {
-        camera.GetProperty(propName).SetString(propVal);
+      std::string_view propVal{argv[arg]};
+      if (auto v = wpi::parse_integer<int>(propVal, 10)) {
+        camera.GetProperty(propName).Set(v.value());
       } else {
-        camera.GetProperty(propName).Set(intVal);
+        camera.GetProperty(propName).SetString(propVal);
       }
-      propName = wpi::StringRef{};
+      propName = {};
     }
   }
-  if (arg < argc && wpi::StringRef{argv[arg]} == "--") {
+  if (arg < argc && std::string_view{argv[arg]} == "--") {
     ++arg;
   }
 
@@ -52,19 +54,18 @@ int main(int argc, char** argv) {
   }
 
   // Set rest
-  propName = wpi::StringRef{};
+  propName = {};
   for (; arg < argc; ++arg) {
     if (propName.empty()) {
       propName = argv[arg];
     } else {
-      wpi::StringRef propVal{argv[arg]};
-      int intVal;
-      if (propVal.getAsInteger(10, intVal)) {
-        camera.GetProperty(propName).SetString(propVal);
+      std::string_view propVal{argv[arg]};
+      if (auto v = wpi::parse_integer<int>(propVal, 10)) {
+        camera.GetProperty(propName).Set(v.value());
       } else {
-        camera.GetProperty(propName).Set(intVal);
+        camera.GetProperty(propName).SetString(propVal);
       }
-      propName = wpi::StringRef{};
+      propName = {};
     }
   }
 

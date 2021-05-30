@@ -98,7 +98,7 @@ class json::serializer
 
     @complexity Linear in the length of string @a s.
     */
-    void dump_escaped(StringRef s, const bool ensure_ascii);
+    void dump_escaped(std::string_view s, const bool ensure_ascii);
 
     template <typename NumberType,
               detail::enable_if_t<std::is_same_v<NumberType, uint64_t>, int> = 0>

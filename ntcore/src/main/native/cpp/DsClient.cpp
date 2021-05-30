@@ -5,6 +5,7 @@
 #include "DsClient.h"
 
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/TCPConnector.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_istream.h>
@@ -135,11 +136,14 @@ void DsClient::Thread::Main() {
         continue;  // could not find?
       }
       size_t endpos = json.find_first_not_of("0123456789", pos + 1);
-      DEBUG3("found robotIP=" << json.slice(pos + 1, endpos));
+      DEBUG3("found robotIP=" << wpi::slice(json, pos + 1, endpos));
 
       // Parse into number
       unsigned int ip = 0;
-      if (json.slice(pos + 1, endpos).getAsInteger(10, ip)) {
+      if (auto v = wpi::parse_integer<unsigned int>(
+              wpi::slice(json, pos + 1, endpos), 10)) {
+        ip = v.value();
+      } else {
         continue;  // error
       }
 

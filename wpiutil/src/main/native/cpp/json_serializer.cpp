@@ -34,6 +34,7 @@ SOFTWARE.
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
+#include "fmt/format.h"
 #include "wpi/Format.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"
@@ -1332,7 +1333,7 @@ void json::serializer::dump(const json& val, const bool pretty_print,
     }
 }
 
-void json::serializer::dump_escaped(StringRef s, const bool ensure_ascii)
+void json::serializer::dump_escaped(std::string_view s, const bool ensure_ascii)
 {
     uint32_t codepoint;
     uint8_t state = UTF8_ACCEPT;
@@ -1419,7 +1420,7 @@ void json::serializer::dump_escaped(StringRef s, const bool ensure_ascii)
 
             case UTF8_REJECT:  // decode found invalid UTF-8 byte
             {
-                JSON_THROW(type_error::create(316, "invalid UTF-8 byte at index " + Twine(i) + ": 0x" + Twine::utohexstr(byte)));
+                JSON_THROW(type_error::create(316, fmt::format("invalid UTF-8 byte at index {}: 0x{}", i, utohexstr(byte))));
             }
 
             default:  // decode found yet incomplete multi-byte code point
@@ -1437,7 +1438,7 @@ void json::serializer::dump_escaped(StringRef s, const bool ensure_ascii)
     if (JSON_UNLIKELY(state != UTF8_ACCEPT))
     {
         // we finish reading, but do not accept: string was incomplete
-        JSON_THROW(type_error::create(316, "incomplete UTF-8 string; last byte: 0x" + Twine::utohexstr(static_cast<uint8_t>(s.back()))));
+        JSON_THROW(type_error::create(316, fmt::format("incomplete UTF-8 string; last byte: 0x{}", utohexstr(static_cast<uint8_t>(s.back())))));
     }
 }
 

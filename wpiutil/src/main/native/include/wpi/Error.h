@@ -17,7 +17,6 @@
 #include "wpi/STLExtras.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/Twine.h"
 #include "wpi/AlignOf.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
@@ -32,6 +31,7 @@
 #include <memory>
 #include <new>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -885,7 +885,7 @@ Expected<T> handleExpected(Expected<T> ValOrErr, RecoveryFtor &&RecoveryPath,
 /// This is useful in the base level of your program to allow clean termination
 /// (allowing clean deallocation of resources, etc.), while reporting error
 /// information to the user.
-void logAllUnhandledErrors(Error E, raw_ostream &OS, Twine ErrorBanner = {});
+void logAllUnhandledErrors(Error E, raw_ostream &OS, std::string_view ErrorBanner = {});
 
 /// Consume a Error without doing anything. This method should be used
 /// only where an error can be considered a reasonable and expected return
@@ -1058,10 +1058,10 @@ public:
   static char ID;
 
   // Prints EC + S and converts to EC
-  StringError(std::error_code EC, const Twine &S = Twine());
+  StringError(std::error_code EC, std::string_view S = {});
 
   // Prints S and converts to EC
-  StringError(const Twine &S, std::error_code EC);
+  StringError(std::string_view S, std::error_code EC);
 
   void log(raw_ostream &OS) const override;
   std::error_code convertToErrorCode() const override;

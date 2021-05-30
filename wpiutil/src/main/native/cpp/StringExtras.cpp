@@ -181,19 +181,19 @@ void wpi::split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
 bool wpi::detail::GetAsUnsignedInteger(
     std::string_view str, unsigned radix,
     unsigned long long& result) noexcept {  // NOLINT(runtime/int)
-  return wpi::getAsUnsignedInteger(str, radix, result);
+  return wpi::getAsUnsignedInteger(wpi::StringRef{str}, radix, result);
 }
 
 bool wpi::detail::GetAsSignedInteger(
     std::string_view str, unsigned radix,
     long long& result) noexcept {  // NOLINT(runtime/int)
-  return wpi::getAsSignedInteger(str, radix, result);
+  return wpi::getAsSignedInteger(wpi::StringRef{str}, radix, result);
 }
 
 bool wpi::detail::ConsumeUnsignedInteger(
     std::string_view& str, unsigned radix,
     unsigned long long& result) noexcept {  // NOLINT(runtime/int)
-  wpi::StringRef sref = str;
+  wpi::StringRef sref{str};
   bool rv = wpi::consumeUnsignedInteger(sref, radix, result);
   str = sref;
   return rv;
@@ -202,7 +202,7 @@ bool wpi::detail::ConsumeUnsignedInteger(
 bool wpi::detail::ConsumeSignedInteger(
     std::string_view& str, unsigned radix,
     long long& result) noexcept {  // NOLINT(runtime/int)
-  wpi::StringRef sref = str;
+  wpi::StringRef sref{str};
   bool rv = wpi::consumeSignedInteger(sref, radix, result);
   str = sref;
   return rv;

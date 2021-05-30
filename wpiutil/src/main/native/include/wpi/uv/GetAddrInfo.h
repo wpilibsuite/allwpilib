@@ -9,9 +9,9 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 
 #include "wpi/Signal.h"
-#include "wpi/Twine.h"
 #include "wpi/uv/Request.h"
 
 namespace wpi::uv {
@@ -40,7 +40,7 @@ class GetAddrInfoReq : public RequestImpl<GetAddrInfoReq, uv_getaddrinfo_t> {
  * request when the resolution completes.  HandleError() is called on the
  * request if any errors occur.
  *
- * Either node or service may be null (`Twine::createNull()`) but not both.
+ * Either node or service may be empty but not both.
  *
  * @param loop Event loop
  * @param req request
@@ -50,7 +50,7 @@ class GetAddrInfoReq : public RequestImpl<GetAddrInfoReq, uv_getaddrinfo_t> {
  *              type constraints.
  */
 void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
-                 const Twine& node, const Twine& service = Twine::createNull(),
+                 std::string_view node, std::string_view service = {},
                  const addrinfo* hints = nullptr);
 
 /**
@@ -58,7 +58,7 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
  * request when the resolution completes.  HandleError() is called on the
  * request if any errors occur.
  *
- * Either node or service may be null (`Twine::createNull()`) but not both.
+ * Either node or service may be empty but not both.
  *
  * @param loop Event loop
  * @param req request
@@ -69,8 +69,7 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
  */
 inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
                         const std::shared_ptr<GetAddrInfoReq>& req,
-                        const Twine& node,
-                        const Twine& service = Twine::createNull(),
+                        std::string_view node, std::string_view service = {},
                         const addrinfo* hints = nullptr) {
   GetAddrInfo(*loop, req, node, service, hints);
 }
@@ -80,7 +79,7 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
  * completes, and errors are forwarded to the loop.  This is a convenience
  * wrapper.
  *
- * Either node or service may be null (`Twine::createNull()`) but not both.
+ * Either node or service may be empty but not both.
  *
  * @param loop Event loop
  * @param callback Callback function to call when resolution completes
@@ -90,7 +89,7 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
  *              type constraints.
  */
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
-                 const Twine& node, const Twine& service = Twine::createNull(),
+                 std::string_view node, std::string_view service = {},
                  const addrinfo* hints = nullptr);
 
 /**
@@ -98,7 +97,7 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
  * completes, and errors are forwarded to the loop.  This is a convenience
  * wrapper.
  *
- * Either node or service may be null (`Twine::createNull()`) but not both.
+ * Either node or service may be empty but not both.
  *
  * @param loop Event loop
  * @param callback Callback function to call when resolution completes
@@ -109,8 +108,7 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
  */
 inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
                         std::function<void(const addrinfo&)> callback,
-                        const Twine& node,
-                        const Twine& service = Twine::createNull(),
+                        std::string_view node, std::string_view service = {},
                         const addrinfo* hints = nullptr) {
   GetAddrInfo(*loop, callback, node, service, hints);
 }

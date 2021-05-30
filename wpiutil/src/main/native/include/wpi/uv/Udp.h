@@ -9,10 +9,10 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 
 #include "wpi/ArrayRef.h"
 #include "wpi/Signal.h"
-#include "wpi/Twine.h"
 #include "wpi/uv/Handle.h"
 #include "wpi/uv/Request.h"
 
@@ -100,7 +100,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param port The port to which to bind.
    * @param flags Optional additional flags.
    */
-  void Bind(const Twine& ip, unsigned int port, unsigned int flags = 0);
+  void Bind(std::string_view ip, unsigned int port, unsigned int flags = 0);
 
   /**
    * Bind the handle to an IPv6 address and port.
@@ -109,7 +109,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param port The port to which to bind.
    * @param flags Optional additional flags.
    */
-  void Bind6(const Twine& ip, unsigned int port, unsigned int flags = 0);
+  void Bind6(std::string_view ip, unsigned int port, unsigned int flags = 0);
 
   /**
    * Associate the handle to a remote address and port, so every message sent
@@ -136,7 +136,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param ip The address to which to bind.
    * @param port The port to which to bind.
    */
-  void Connect(const Twine& ip, unsigned int port);
+  void Connect(std::string_view ip, unsigned int port);
 
   /**
    * Associate the handle to an IPv6 address and port, so every message sent
@@ -146,7 +146,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param port The port to which to bind.
    * @param flags Optional additional flags.
    */
-  void Connect6(const Twine& ip, unsigned int port);
+  void Connect6(std::string_view ip, unsigned int port);
 
   /**
    * Get the remote IP and port on connected UDP handles.
@@ -167,8 +167,8 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    * @param interfaceAddr Interface address
    * @param membership Should be UV_JOIN_GROUP or UV_LEAVE_GROUP
    */
-  void SetMembership(const Twine& multicastAddr, const Twine& interfaceAddr,
-                     uv_membership membership);
+  void SetMembership(std::string_view multicastAddr,
+                     std::string_view interfaceAddr, uv_membership membership);
 
   /**
    * Set IP multicast loop flag.  Makes multicast packets loop back to local
@@ -194,7 +194,7 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
    *
    * @param interfaceAddr Interface address
    */
-  void SetMulticastInterface(const Twine& interfaceAddr);
+  void SetMulticastInterface(std::string_view interfaceAddr);
 
   /**
    * Set broadcast on or off.

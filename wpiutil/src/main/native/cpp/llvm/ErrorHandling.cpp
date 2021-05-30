@@ -14,7 +14,6 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
-#include "wpi/Twine.h"
 #include "wpi/Error.h"
 #include "wpi/WindowsError.h"
 #include "wpi/raw_ostream.h"
@@ -68,18 +67,14 @@ void wpi::remove_fatal_error_handler() {
 }
 
 void wpi::report_fatal_error(const char *Reason, bool GenCrashDiag) {
-  report_fatal_error(Twine(Reason), GenCrashDiag);
+  report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
 void wpi::report_fatal_error(const std::string &Reason, bool GenCrashDiag) {
-  report_fatal_error(Twine(Reason), GenCrashDiag);
+  report_fatal_error(std::string_view(Reason), GenCrashDiag);
 }
 
-void wpi::report_fatal_error(StringRef Reason, bool GenCrashDiag) {
-  report_fatal_error(Twine(Reason), GenCrashDiag);
-}
-
-void wpi::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   wpi::fatal_error_handler_t handler = nullptr;
   void* handlerData = nullptr;
   {
@@ -91,7 +86,7 @@ void wpi::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
   }
 
   if (handler) {
-    handler(handlerData, Reason.str(), GenCrashDiag);
+    handler(handlerData, std::string{Reason}, GenCrashDiag);
   } else {
     // Blast the result out to stderr.  We don't try hard to make sure this
     // succeeds (e.g. handling EINTR) and we can't use errs() here because
@@ -99,7 +94,7 @@ void wpi::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
     SmallVector<char, 64> Buffer;
     raw_svector_ostream OS(Buffer);
     OS << "LLVM ERROR: " << Reason << "\n";
-    StringRef MessageStr = OS.str();
+    std::string_view MessageStr = OS.str();
 #ifdef _WIN32
     int written = ::_write(2, MessageStr.data(), MessageStr.size());
 #else

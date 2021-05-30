@@ -8,8 +8,7 @@
 #pragma once
 
 #include <memory>
-
-#include "wpi/Twine.h"
+#include <string_view>
 
 namespace wpi {
 
@@ -38,7 +37,8 @@ class PortForwarder {
    * @param remoteHost remote IP address / DNS name
    * @param remotePort remote port number
    */
-  void Add(unsigned int port, const Twine& remoteHost, unsigned int remotePort);
+  void Add(unsigned int port, std::string_view remoteHost,
+           unsigned int remotePort);
 
   /**
    * Stop TCP forwarding on a port.

@@ -216,7 +216,7 @@ SHA1::SHA1() {
   reset(digest, buf_size, transforms);
 }
 
-void SHA1::Update(StringRef s) {
+void SHA1::Update(std::string_view s) {
   raw_mem_istream is(makeArrayRef(s.data(), s.size()));
   Update(is);
 }
@@ -293,7 +293,7 @@ std::string SHA1::Final() {
   return os.str();
 }
 
-StringRef SHA1::Final(SmallVectorImpl<char>& buf) {
+std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
   raw_svector_ostream os(buf);
 
   finalize(digest, buffer, buf_size, transforms, os, true);
@@ -301,7 +301,7 @@ StringRef SHA1::Final(SmallVectorImpl<char>& buf) {
   return os.str();
 }
 
-StringRef SHA1::RawFinal(SmallVectorImpl<char>& buf) {
+std::string_view SHA1::RawFinal(SmallVectorImpl<char>& buf) {
   raw_svector_ostream os(buf);
 
   finalize(digest, buffer, buf_size, transforms, os, false);
@@ -309,7 +309,7 @@ StringRef SHA1::RawFinal(SmallVectorImpl<char>& buf) {
   return os.str();
 }
 
-std::string SHA1::FromFile(StringRef filename) {
+std::string SHA1::FromFile(std::string_view filename) {
   std::error_code ec;
   raw_fd_istream stream(filename, ec);
   SHA1 checksum;

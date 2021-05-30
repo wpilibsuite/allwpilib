@@ -18,7 +18,7 @@ inline HttpPathRef HttpPath::drop_front(size_t n) const {
 template <typename T>
 HttpRequest::HttpRequest(const HttpLocation& loc, const T& extraParams)
     : host{loc.host}, port{loc.port} {
-  StringMap<StringRef> params;
+  StringMap<std::string_view> params;
   for (const auto& p : loc.params) {
     params.insert(std::make_pair(GetFirst(p), GetSecond(p)));
   }
@@ -30,7 +30,7 @@ HttpRequest::HttpRequest(const HttpLocation& loc, const T& extraParams)
 }
 
 template <typename T>
-void HttpRequest::SetPath(StringRef path_, const T& params) {
+void HttpRequest::SetPath(std::string_view path_, const T& params) {
   // Build location including query string
   raw_svector_ostream pathOs{path};
   pathOs << path_;

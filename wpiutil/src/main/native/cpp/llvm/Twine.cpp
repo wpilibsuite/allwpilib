@@ -62,7 +62,7 @@ void Twine::printOneChild(raw_ostream &OS, Child Ptr,
     OS << *Ptr.stdString;
     break;
   case Twine::StringRefKind:
-    OS << *Ptr.stringRef;
+    OS << std::string_view(Ptr.stringRef->data(), Ptr.stringRef->size());
     break;
   case Twine::StringViewKind:
     OS << *Ptr.stringView;

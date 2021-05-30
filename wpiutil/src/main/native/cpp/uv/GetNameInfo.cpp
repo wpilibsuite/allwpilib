@@ -44,7 +44,7 @@ void GetNameInfo(Loop& loop,
 }
 
 void GetNameInfo4(Loop& loop, const std::shared_ptr<GetNameInfoReq>& req,
-                  const Twine& ip, unsigned int port, int flags) {
+                  std::string_view ip, unsigned int port, int flags) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -56,7 +56,7 @@ void GetNameInfo4(Loop& loop, const std::shared_ptr<GetNameInfoReq>& req,
 
 void GetNameInfo4(Loop& loop,
                   std::function<void(const char*, const char*)> callback,
-                  const Twine& ip, unsigned int port, int flags) {
+                  std::string_view ip, unsigned int port, int flags) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -67,7 +67,7 @@ void GetNameInfo4(Loop& loop,
 }
 
 void GetNameInfo6(Loop& loop, const std::shared_ptr<GetNameInfoReq>& req,
-                  const Twine& ip, unsigned int port, int flags) {
+                  std::string_view ip, unsigned int port, int flags) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -79,7 +79,7 @@ void GetNameInfo6(Loop& loop, const std::shared_ptr<GetNameInfoReq>& req,
 
 void GetNameInfo6(Loop& loop,
                   std::function<void(const char*, const char*)> callback,
-                  const Twine& ip, unsigned int port, int flags) {
+                  std::string_view ip, unsigned int port, int flags) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {

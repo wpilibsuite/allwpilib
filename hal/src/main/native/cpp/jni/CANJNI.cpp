@@ -65,8 +65,8 @@ Java_edu_wpi_first_hal_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage
     return nullptr;
   }
   return MakeJByteArray(env,
-                        wpi::StringRef{reinterpret_cast<const char*>(buffer),
-                                       static_cast<size_t>(dataSize)});
+                        std::string_view{reinterpret_cast<const char*>(buffer),
+                                         static_cast<size_t>(dataSize)});
 }
 
 /*

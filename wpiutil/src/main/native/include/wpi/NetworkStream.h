@@ -6,8 +6,7 @@
 #define WPIUTIL_WPI_NETWORKSTREAM_H_
 
 #include <cstddef>
-
-#include "wpi/StringRef.h"
+#include <string_view>
 
 namespace wpi {
 
@@ -28,7 +27,7 @@ class NetworkStream {
                          int timeout = 0) = 0;
   virtual void close() = 0;
 
-  virtual StringRef getPeerIP() const = 0;
+  virtual std::string_view getPeerIP() const = 0;
   virtual int getPeerPort() const = 0;
   virtual void setNoDelay() = 0;
 

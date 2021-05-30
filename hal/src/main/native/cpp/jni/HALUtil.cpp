@@ -72,7 +72,7 @@ static const JExceptionInit exceptions[] = {
 
 namespace hal {
 
-void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
+void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
                                  int32_t status) {
   static jmethodID func =
       env->GetMethodID(uncleanStatusExCls, "<init>", "(ILjava/lang/String;)V");
@@ -120,7 +120,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
     // Make a copy of message for safety, calling back into the HAL might
     // invalidate the string.
-    wpi::SmallString<256> lastMessage{wpi::StringRef{message}};
+    wpi::SmallString<256> lastMessage{message};
     HAL_SendError(1, status, 0, lastMessage.c_str(), func.c_str(),
                   stack.c_str(), 1);
   }
@@ -209,7 +209,7 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
   }
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
+void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgExCls.Throw(env, msg);
 }
 
@@ -266,9 +266,9 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
   env->CallVoidMethod(
       matchStatus, func, MakeJString(env, matchInfo.eventName),
-      MakeJString(env, wpi::StringRef{reinterpret_cast<const char*>(
-                                          matchInfo.gameSpecificMessage),
-                                      matchInfo.gameSpecificMessageSize}),
+      MakeJString(env,
+                  {reinterpret_cast<const char*>(matchInfo.gameSpecificMessage),
+                   matchInfo.gameSpecificMessageSize}),
       static_cast<jint>(matchInfo.matchNumber),
       static_cast<jint>(matchInfo.replayNumber),
       static_cast<jint>(matchInfo.matchType));
@@ -387,9 +387,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGAVersion(JNIEnv* env, jclass) {
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
   CheckStatus(env, status);
@@ -402,9 +400,7 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGARevision(JNIEnv* env, jclass) {
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
   CheckStatus(env, status);
@@ -416,10 +412,8 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision
  * Method:    getFPGATime
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGATime
-  (JNIEnv* env, jclass)
-{
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_HALUtil_getFPGATime(JNIEnv* env,
+                                                                   jclass) {
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
   CheckStatus(env, status);
@@ -432,9 +426,7 @@ Java_edu_wpi_first_hal_HALUtil_getFPGATime
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
   jint returnValue = HAL_GetRuntimeType();
   return returnValue;
 }
@@ -445,9 +437,7 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGAButton(JNIEnv* env, jclass) {
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
   CheckStatus(env, status);
@@ -459,10 +449,8 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAButton
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
-  (JNIEnv* paramEnv, jclass, jint paramId)
-{
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage(
+    JNIEnv* paramEnv, jclass, jint paramId) {
   const char* msg = HAL_GetErrorMessage(paramId);
   return MakeJString(paramEnv, msg);
 }
@@ -472,10 +460,8 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
  * Method:    getHALErrno
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrno
-  (JNIEnv*, jclass)
-{
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrno(JNIEnv*,
+                                                                  jclass) {
   return errno;
 }
 
@@ -484,10 +470,8 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrno
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALstrerror
-  (JNIEnv* env, jclass, jint errorCode)
-{
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALstrerror(
+    JNIEnv* env, jclass, jint errorCode) {
   const char* msg = std::strerror(errno);
   return MakeJString(env, msg);
 }

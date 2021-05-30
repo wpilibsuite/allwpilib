@@ -97,7 +97,7 @@ namespace wpi {
       : Data(Str.data()), Length(Str.length()) {}
 
     /// Construct a string ref from an std::string_view.
-    /*implicit*/ constexpr StringRef(std::string_view Str)
+    explicit constexpr StringRef(std::string_view Str)
         : Data(Str.data()), Length(Str.size()) {}
 
     static StringRef withNullAsEmpty(const char *data) noexcept {

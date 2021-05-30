@@ -45,7 +45,7 @@ static void CopyStream(uv::Stream& in, std::weak_ptr<uv::Stream> outWeak) {
   });
 }
 
-void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
+void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
                         unsigned int remotePort) {
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
@@ -55,7 +55,7 @@ void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
 
     // when we get a connection, accept it
     server->connection.connect([serverPtr = server.get(),
-                                host = remoteHost.str(), remotePort] {
+                                host = std::string{remoteHost}, remotePort] {
       auto& loop = serverPtr->GetLoopRef();
       auto client = serverPtr->Accept();
       if (!client) {

@@ -281,7 +281,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
 
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
-      !contentTypeBuf.str().startswith("image/jpeg")) {
+      !wpi::starts_with(contentTypeBuf, "image/jpeg")) {
     wpi::SmallString<64> errBuf;
     wpi::raw_svector_ostream errMsg{errBuf};
     errMsg << "received unknown Content-Type \"" << contentTypeBuf << "\"";
@@ -291,7 +291,9 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   }
 
   unsigned int contentLength = 0;
-  if (contentLengthBuf.str().getAsInteger(10, contentLength)) {
+  if (auto v = wpi::parse_integer<unsigned int>(contentLengthBuf, 10)) {
+    contentLength = v.value();
+  } else {
     // Ugh, no Content-Length?  Read the blocks of the JPEG file.
     int width, height;
     if (!ReadJpeg(is, imageBuf, &width, &height)) {

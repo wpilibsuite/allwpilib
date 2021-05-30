@@ -37,7 +37,7 @@ HttpParser::HttpParser(Type type) {
     if ((self.m_urlBuf.size() + length) > self.m_maxLength) {
       return 1;
     }
-    self.m_urlBuf += StringRef{at, length};
+    self.m_urlBuf += std::string_view{at, length};
     self.m_state = kUrl;
     return 0;
   };
@@ -50,7 +50,7 @@ HttpParser::HttpParser(Type type) {
     if ((self.m_valueBuf.size() + length) > self.m_maxLength) {
       return 1;
     }
-    self.m_valueBuf += StringRef{at, length};
+    self.m_valueBuf += std::string_view{at, length};
     self.m_state = kStatus;
     return 0;
   };
@@ -95,7 +95,7 @@ HttpParser::HttpParser(Type type) {
     if ((self.m_fieldBuf.size() + length) > self.m_maxLength) {
       return 1;
     }
-    self.m_fieldBuf += StringRef{at, length};
+    self.m_fieldBuf += std::string_view{at, length};
     return 0;
   };
 
@@ -114,7 +114,7 @@ HttpParser::HttpParser(Type type) {
     if ((self.m_valueBuf.size() + length) > self.m_maxLength) {
       return 1;
     }
-    self.m_valueBuf += StringRef{at, length};
+    self.m_valueBuf += std::string_view{at, length};
     return 0;
   };
 
@@ -154,7 +154,7 @@ HttpParser::HttpParser(Type type) {
   m_settings.on_body = [](http_parser* p, const char* at,
                           size_t length) -> int {
     auto& self = *static_cast<HttpParser*>(p->data);
-    self.body(StringRef{at, length}, self.IsBodyFinal());
+    self.body(std::string_view{at, length}, self.IsBodyFinal());
     return self.m_aborted;
   };
 

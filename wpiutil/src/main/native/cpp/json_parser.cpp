@@ -38,6 +38,7 @@ SOFTWARE.
 #include <cmath>
 #include <cstdlib>
 
+#include "fmt/format.h"
 #include "wpi/Format.h"
 #include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
@@ -336,7 +337,7 @@ class json::lexer
     }
 
     /// return current string value
-    StringRef get_string()
+    std::string_view get_string()
     {
         return token_buffer;
     }
@@ -1605,7 +1606,7 @@ void json::parser::parse_internal(bool keep, json& result)
 
                 if (keep and keep_tag and not value.is_discarded())
                 {
-                    result.m_value.object->try_emplace(StringRef(key.data(), key.size()), std::move(value));
+                    result.m_value.object->try_emplace(std::string_view(key.data(), key.size()), std::move(value));
                 }
 
                 // comma -> next value
@@ -1757,8 +1758,8 @@ void json::parser::parse_internal(bool keep, json& result)
             {
                 if (allow_exceptions)
                 {
-                    JSON_THROW(out_of_range::create(406, "number overflow parsing '" +
-                                                    Twine(m_lexer.get_token_string()) + "'"));
+                    JSON_THROW(out_of_range::create(406,
+                        fmt::format("number overflow parsing '{}'", m_lexer.get_token_string())));
                 }
                 expect(token_type::uninitialized);
             }
@@ -1917,7 +1918,7 @@ void json::parser::throw_exception() const
     JSON_THROW(parse_error::create(101, m_lexer.get_position(), error_msg));
 }
 
-json json::parse(StringRef s,
+json json::parse(std::string_view s,
                         const parser_callback_t cb,
                         const bool allow_exceptions)
 {
@@ -1942,7 +1943,7 @@ json json::parse(raw_istream& i,
     return result;
 }
 
-bool json::accept(StringRef s)
+bool json::accept(std::string_view s)
 {
     raw_mem_istream is(makeArrayRef(s.data(), s.size()));
     return parser(is).accept(true);

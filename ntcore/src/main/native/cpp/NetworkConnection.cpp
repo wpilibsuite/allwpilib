@@ -103,7 +103,7 @@ void NetworkConnection::Stop() {
 }
 
 ConnectionInfo NetworkConnection::info() const {
-  return ConnectionInfo{remote_id(), m_stream->getPeerIP(),
+  return ConnectionInfo{remote_id(), std::string{m_stream->getPeerIP()},
                         static_cast<unsigned int>(m_stream->getPeerPort()),
                         m_last_update, m_proto_rev};
 }

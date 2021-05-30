@@ -13,15 +13,16 @@ namespace wpi {
 
 template <typename Derived>
 HttpWebSocketServerConnection<Derived>::HttpWebSocketServerConnection(
-    std::shared_ptr<uv::Stream> stream, ArrayRef<StringRef> protocols)
+    std::shared_ptr<uv::Stream> stream, ArrayRef<std::string_view> protocols)
     : HttpServerConnection{stream},
       m_helper{m_request},
       m_protocols{protocols.begin(), protocols.end()} {
   // Handle upgrade event
   m_helper.upgrade.connect([this] {
     // Negotiate sub-protocol
-    SmallVector<StringRef, 2> protocols{m_protocols.begin(), m_protocols.end()};
-    StringRef protocol = m_helper.MatchProtocol(protocols).second;
+    SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
+                                               m_protocols.end()};
+    std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
     // Check that the upgrade is valid
     if (!IsValidWsUpgrade(protocol)) {

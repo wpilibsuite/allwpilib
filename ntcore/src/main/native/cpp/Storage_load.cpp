@@ -183,7 +183,7 @@ bool LoadPersistentImpl::ReadLine() {
   // ignore blank lines and lines that start with ; or # (comments)
   while (!m_is.has_error()) {
     ++m_line_num;
-    m_line = m_is.getline(m_line_buf, INT_MAX).trim();
+    m_line = wpi::trim(m_is.getline(m_line_buf, INT_MAX));
     if (!m_line.empty() && m_line.front() != ';' && m_line.front() != '#') {
       return true;
     }

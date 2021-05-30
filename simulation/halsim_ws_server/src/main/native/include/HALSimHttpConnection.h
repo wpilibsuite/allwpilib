@@ -39,7 +39,7 @@ class HALSimHttpConnection
 
  protected:
   void ProcessRequest() override;
-  bool IsValidWsUpgrade(wpi::StringRef protocol) override;
+  bool IsValidWsUpgrade(std::string_view protocol) override;
   void ProcessWsUpgrade() override;
   void SendFileResponse(int code, std::string_view codeText,
                         std::string_view contentType, std::string_view filename,

@@ -8,7 +8,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/Error.h"
-#include "wpi/Twine.h"
 #include "wpi/ErrorHandling.h"
 #include "wpi/ManagedStatic.h"
 #include <system_error>
@@ -59,7 +58,7 @@ char ECError::ID = 0;
 char StringError::ID = 0;
 char FileError::ID = 0;
 
-void logAllUnhandledErrors(Error E, raw_ostream &OS, Twine ErrorBanner) {
+void logAllUnhandledErrors(Error E, raw_ostream &OS, std::string_view ErrorBanner) {
   if (!E)
     return;
   OS << ErrorBanner;
@@ -101,11 +100,11 @@ std::error_code errorToErrorCode(Error Err) {
   return EC;
 }
 
-StringError::StringError(std::error_code EC, const Twine &S)
-    : Msg(S.str()), EC(EC) {}
+StringError::StringError(std::error_code EC, std::string_view S)
+    : Msg(S), EC(EC) {}
 
-StringError::StringError(const Twine &S, std::error_code EC)
-    : Msg(S.str()), EC(EC), PrintMsgOnly(true) {}
+StringError::StringError(std::string_view S, std::error_code EC)
+    : Msg(S), EC(EC), PrintMsgOnly(true) {}
 
 void StringError::log(raw_ostream &OS) const {
   if (PrintMsgOnly) {

@@ -22,8 +22,8 @@ std::shared_ptr<FsEvent> FsEvent::Create(Loop& loop) {
   return h;
 }
 
-void FsEvent::Start(const Twine& path, unsigned int flags) {
-  SmallString<128> pathBuf;
+void FsEvent::Start(std::string_view path, unsigned int flags) {
+  SmallString<128> pathBuf{path};
   Invoke(
       &uv_fs_event_start, GetRaw(),
       [](uv_fs_event_t* handle, const char* filename, int events, int status) {
@@ -34,7 +34,7 @@ void FsEvent::Start(const Twine& path, unsigned int flags) {
           h.fsEvent(filename, events);
         }
       },
-      path.toNullTerminatedStringRef(pathBuf).data(), flags);
+      pathBuf.c_str(), flags);
 }
 
 std::string FsEvent::GetPath() {
