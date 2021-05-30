@@ -5,9 +5,7 @@
 #pragma once
 
 #include <string>
-
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/trajectory/Trajectory.h"
 
@@ -25,7 +23,7 @@ class TrajectoryUtil {
    * @return The interpolated state.
    */
   static void ToPathweaverJson(const Trajectory& trajectory,
-                               const wpi::Twine& path);
+                               std::string_view path);
   /**
    * Imports a Trajectory from a PathWeaver-style JSON file.
    *
@@ -33,7 +31,7 @@ class TrajectoryUtil {
    *
    * @return The trajectory represented by the file.
    */
-  static Trajectory FromPathweaverJson(const wpi::Twine& path);
+  static Trajectory FromPathweaverJson(std::string_view path);
 
   /**
    * Deserializes a Trajectory from PathWeaver-style JSON.
@@ -51,6 +49,6 @@ class TrajectoryUtil {
    *
    * @return the string containing the serialized JSON
    */
-  static Trajectory DeserializeTrajectory(wpi::StringRef json_str);
+  static Trajectory DeserializeTrajectory(std::string_view json_str);
 };
 }  // namespace frc

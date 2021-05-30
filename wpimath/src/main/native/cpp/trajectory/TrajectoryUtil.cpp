@@ -6,6 +6,7 @@
 
 #include <system_error>
 
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
@@ -14,13 +15,12 @@
 using namespace frc;
 
 void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
-                                      const wpi::Twine& path) {
+                                      std::string_view path) {
   std::error_code error_code;
 
-  wpi::SmallString<128> buf;
-  wpi::raw_fd_ostream output{path.toStringRef(buf), error_code};
+  wpi::raw_fd_ostream output{path, error_code};
   if (error_code) {
-    throw std::runtime_error(("Cannot open file: " + path).str());
+    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
   wpi::json json = trajectory.States();
@@ -28,13 +28,12 @@ void TrajectoryUtil::ToPathweaverJson(const Trajectory& trajectory,
   output.flush();
 }
 
-Trajectory TrajectoryUtil::FromPathweaverJson(const wpi::Twine& path) {
+Trajectory TrajectoryUtil::FromPathweaverJson(std::string_view path) {
   std::error_code error_code;
 
-  wpi::SmallString<128> buf;
-  wpi::raw_fd_istream input{path.toStringRef(buf), error_code};
+  wpi::raw_fd_istream input{path, error_code};
   if (error_code) {
-    throw std::runtime_error(("Cannot open file: " + path).str());
+    throw std::runtime_error(fmt::format("Cannot open file: {}", path));
   }
 
   wpi::json json;
@@ -48,8 +47,7 @@ std::string TrajectoryUtil::SerializeTrajectory(const Trajectory& trajectory) {
   return json.dump();
 }
 
-Trajectory TrajectoryUtil::DeserializeTrajectory(
-    const wpi::StringRef json_str) {
+Trajectory TrajectoryUtil::DeserializeTrajectory(std::string_view json_str) {
   wpi::json json = wpi::json::parse(json_str);
   return Trajectory{json.get<std::vector<Trajectory::State>>()};
 }
