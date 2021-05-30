@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include <FRC_FPGA_ChipObject/fpgainterfacecapi/NiFpga_HMB.h>
+#include <fmt/format.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
@@ -145,9 +146,11 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
 
   if (length > HAL_kAddressableLEDMaxLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "LED length must be less than or equal to " +
-                                  wpi::Twine(HAL_kAddressableLEDMaxLength) +
-                                  ". " + wpi::Twine(length) + " was requested");
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "LED length must be less than or equal to {}. {} was requested",
+            HAL_kAddressableLEDMaxLength, length));
     return;
   }
 
@@ -179,9 +182,11 @@ void HAL_WriteAddressableLEDData(HAL_AddressableLEDHandle handle,
 
   if (length > led->stringLength || length < 0) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Data length must be less than or equal to " +
-                                  wpi::Twine(led->stringLength) + ". " +
-                                  wpi::Twine(length) + " was requested");
+    hal::SetLastError(
+        status,
+        fmt::format(
+            "Data length must be less than or equal to {}. {} was requested",
+            led->stringLength, length));
     return;
   }
 

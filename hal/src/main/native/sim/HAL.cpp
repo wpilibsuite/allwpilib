@@ -4,10 +4,10 @@
 
 #include "hal/HAL.h"
 
+#include <cstdio>
 #include <vector>
 
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/spinlock.h>
 
 #ifdef _WIN32
@@ -351,7 +351,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   }
 #endif  // _WIN32
 
-  wpi::outs().SetUnbuffered();
+#ifndef _WIN32
+  setlinebuf(stdin);
+  setlinebuf(stdout);
+#endif
+
   if (HAL_LoadExtensions() < 0) {
     return false;
   }

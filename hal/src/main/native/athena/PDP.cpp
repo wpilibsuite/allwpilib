@@ -4,6 +4,7 @@
 
 #include "hal/PDP.h"
 
+#include <fmt/format.h>
 #include <wpi/mutex.h>
 
 #include "HALInitializer.h"
@@ -118,7 +119,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Invalid pdp module " + wpi::Twine(module));
+    hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));
     return HAL_kInvalidHandle;
   }
 
@@ -194,7 +195,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status) {
   if (!HAL_CheckPDPChannel(channel)) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(status, "Invalid pdp channel " + wpi::Twine(channel));
+    hal::SetLastError(status, fmt::format("Invalid pdp channel {}", channel));
     return 0;
   }
 

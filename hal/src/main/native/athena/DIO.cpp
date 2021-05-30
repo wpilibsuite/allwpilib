@@ -5,9 +5,8 @@
 #include "hal/DIO.h"
 
 #include <cmath>
+#include <cstdio>
 #include <thread>
-
-#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -143,8 +142,8 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "DIO handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("DIO handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();

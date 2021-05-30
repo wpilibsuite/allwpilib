@@ -4,6 +4,8 @@
 
 #include "hal/Counter.h"
 
+#include <fmt/format.h>
+
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -264,10 +266,9 @@ void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
   }
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
-        status,
-        "Samples to average must be between 1 and 127 inclusive. Requested " +
-            wpi::Twine(samplesToAverage));
+    hal::SetLastError(status, fmt::format("Samples to average must be between "
+                                          "1 and 127 inclusive. Requested {}",
+                                          samplesToAverage));
     return;
   }
   counter->counter->writeTimerConfig_AverageSize(samplesToAverage, status);

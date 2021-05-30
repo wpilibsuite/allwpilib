@@ -4,9 +4,10 @@
 
 #include "hal/cpp/fpga_clock.h"
 
+#include <cstdio>
 #include <limits>
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "hal/HALBase.h"
 
@@ -19,11 +20,12 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   int32_t status = 0;
   uint64_t currentTime = HAL_GetFPGATime(&status);
   if (status != 0) {
-    wpi::errs()
-        << "Call to HAL_GetFPGATime failed in fpga_clock::now() with status "
-        << status
-        << ". Initialization might have failed. Time will not be correct\n";
-    wpi::errs().flush();
+    fmt::print(
+        stderr,
+        "Call to HAL_GetFPGATime failed in fpga_clock::now() with status {}. "
+        "Initialization might have failed. Time will not be correct\n",
+        status);
+    std::fflush(stderr);
     return epoch();
   }
   return time_point(std::chrono::microseconds(currentTime));

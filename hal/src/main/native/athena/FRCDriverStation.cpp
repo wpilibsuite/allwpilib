@@ -7,13 +7,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <string>
+#include <string_view>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
+#include <fmt/format.h>
 #include <wpi/SafeThread.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "hal/DriverStation.h"
 
@@ -161,9 +163,9 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
-    wpi::StringRef detailsRef{details};
-    wpi::StringRef locationRef{location};
-    wpi::StringRef callStackRef{callStack};
+    std::string_view detailsRef{details};
+    std::string_view locationRef{location};
+    std::string_view callStackRef{callStack};
 
     // 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
@@ -199,14 +201,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                                                   newCallStack.c_str());
     }
     if (printMsg) {
+      fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
-        wpi::errs() << (isError ? "Error" : "Warning") << " at " << location
-                    << ": ";
+        fmt::format_to(buf, "{} at {}: ", isError ? "Error" : "Warning",
+                       location);
       }
-      wpi::errs() << details << "\n";
+      fmt::format_to(buf, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        wpi::errs() << callStack << "\n";
+        fmt::format_to(buf, "{}\n", callStack);
       }
+      std::fwrite(buf.data(), buf.size(), 1, stderr);
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -226,7 +230,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
-  wpi::StringRef lineRef{line};
+  std::string_view lineRef{line};
   if (lineRef.size() <= 65535) {
     // Send directly
     return FRC_NetworkCommunication_sendConsoleLine(line);
