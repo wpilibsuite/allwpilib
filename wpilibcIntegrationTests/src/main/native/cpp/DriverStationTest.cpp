@@ -14,20 +14,18 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-using namespace frc;
-
 /**
  * Test if the WaitForData function works
  */
 TEST(DriverStationTest, WaitForData) {
-  units::microsecond_t initialTime(RobotController::GetFPGATime());
+  units::microsecond_t initialTime(frc::RobotController::GetFPGATime());
 
   // 20ms waiting intervals * 50 = 1s
   for (int i = 0; i < 50; i++) {
-    DriverStation::GetInstance().WaitForData();
+    frc::DriverStation::GetInstance().WaitForData();
   }
 
-  units::microsecond_t finalTime(RobotController::GetFPGATime());
+  units::microsecond_t finalTime(frc::RobotController::GetFPGATime());
 
   EXPECT_NEAR_UNITS(1_s, finalTime - initialTime, 200_ms);
 }

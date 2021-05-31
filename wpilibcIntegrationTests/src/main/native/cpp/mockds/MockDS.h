@@ -7,19 +7,17 @@
 #include <atomic>
 #include <thread>
 
-namespace frc {
 class MockDS {
  public:
   MockDS() = default;
-  ~MockDS() { stop(); }
+  ~MockDS() { Stop(); }
   MockDS(const MockDS& other) = delete;
   MockDS& operator=(const MockDS& other) = delete;
 
-  void start();
-  void stop();
+  void Start();
+  void Stop();
 
  private:
   std::thread m_thread;
   std::atomic_bool m_active{false};
 };
-}  // namespace frc

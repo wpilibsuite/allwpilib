@@ -14,8 +14,6 @@
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const char* kFileName = "networktables.ini";
 static constexpr auto kSaveTime = 1.2_s;
 
@@ -26,6 +24,7 @@ static constexpr auto kSaveTime = 1.2_s;
 TEST(PreferencesTest, ReadPreferencesFromFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.StopServer();
+
   std::remove(kFileName);
   std::ofstream preferencesFile(kFileName);
   preferencesFile << "[NetworkTables Storage 3.0]" << std::endl;
@@ -43,16 +42,17 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
       << "double \"/Preferences/testFileGetLong\"=1000000000000000000"
       << std::endl;
   preferencesFile.close();
+
   inst.StartServer();
 
-  Preferences* preferences = Preferences::GetInstance();
+  auto& preferences = *frc::Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
-            preferences->GetString("testFileGetString"));
-  EXPECT_EQ(1, preferences->GetInt("testFileGetInt"));
-  EXPECT_FLOAT_EQ(0.5, preferences->GetDouble("testFileGetDouble"));
-  EXPECT_FLOAT_EQ(0.25f, preferences->GetFloat("testFileGetFloat"));
-  EXPECT_TRUE(preferences->GetBoolean("testFileGetBoolean"));
-  EXPECT_EQ(1000000000000000000ll, preferences->GetLong("testFileGetLong"));
+            preferences.GetString("testFileGetString"));
+  EXPECT_EQ(1, preferences.GetInt("testFileGetInt"));
+  EXPECT_FLOAT_EQ(0.5, preferences.GetDouble("testFileGetDouble"));
+  EXPECT_FLOAT_EQ(0.25f, preferences.GetFloat("testFileGetFloat"));
+  EXPECT_TRUE(preferences.GetBoolean("testFileGetBoolean"));
+  EXPECT_EQ(1000000000000000000ll, preferences.GetLong("testFileGetLong"));
 }
 
 /**
@@ -62,24 +62,24 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.StartServer();
-  Preferences* preferences = Preferences::GetInstance();
-  preferences->Remove("testFileGetString");
-  preferences->Remove("testFileGetInt");
-  preferences->Remove("testFileGetDouble");
-  preferences->Remove("testFileGetFloat");
-  preferences->Remove("testFileGetBoolean");
-  preferences->Remove("testFileGetLong");
+  auto& preferences = *frc::Preferences::GetInstance();
+  preferences.Remove("testFileGetString");
+  preferences.Remove("testFileGetInt");
+  preferences.Remove("testFileGetDouble");
+  preferences.Remove("testFileGetFloat");
+  preferences.Remove("testFileGetBoolean");
+  preferences.Remove("testFileGetLong");
 
-  Wait(kSaveTime);
+  frc::Wait(kSaveTime);
 
-  preferences->SetString("testFileSetString", "Hello, preferences file");
-  preferences->SetInt("testFileSetInt", 1);
-  preferences->SetDouble("testFileSetDouble", 0.5);
-  preferences->SetFloat("testFileSetFloat", 0.25f);
-  preferences->SetBoolean("testFileSetBoolean", true);
-  preferences->SetLong("testFileSetLong", 1000000000000000000ll);
+  preferences.SetString("testFileSetString", "Hello, preferences file");
+  preferences.SetInt("testFileSetInt", 1);
+  preferences.SetDouble("testFileSetDouble", 0.5);
+  preferences.SetFloat("testFileSetFloat", 0.25f);
+  preferences.SetBoolean("testFileSetBoolean", true);
+  preferences.SetLong("testFileSetLong", 1000000000000000000ll);
 
-  Wait(kSaveTime);
+  frc::Wait(kSaveTime);
 
   static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",

@@ -7,19 +7,18 @@
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static constexpr double kAccelerationTolerance = 0.1;
+
 /**
  * There's not much we can automatically test with the on-board accelerometer,
  * but checking for gravity is probably good enough to tell that it's working.
  */
 TEST(BuiltInAccelerometerTest, Accelerometer) {
-  BuiltInAccelerometer accelerometer;
+  frc::BuiltInAccelerometer accelerometer;
 
-  /* The testbench sometimes shakes a little from a previous test.  Give it
-          some time. */
-  Wait(1_s);
+  // The testbench sometimes shakes a little from a previous test. Give it some
+  // time.
+  frc::Wait(1_s);
 
   ASSERT_NEAR(0.0, accelerometer.GetX(), kAccelerationTolerance);
   ASSERT_NEAR(1.0, accelerometer.GetY(), kAccelerationTolerance);
