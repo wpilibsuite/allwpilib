@@ -2,28 +2,32 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <thread>
-
-#include <units/length.h>
-#include <units/time.h>
-#include <units/velocity.h>
+#include <wpi/timestamp.h>
 
 #include "frc/SlewRateLimiter.h"
-#include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
+#include "units/length.h"
+#include "units/time.h"
+#include "units/velocity.h"
+
+static units::second_t now = 0_s;
 
 TEST(SlewRateLimiterTest, SlewRateLimitTest) {
+  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 
-  frc::sim::StepTiming(1.0_s);
+  now += 1_s;
 
-  EXPECT_TRUE(limiter.Calculate(2_m) < 2_m);
+  EXPECT_LT(limiter.Calculate(2_m), 2_m);
 }
 
 TEST(SlewRateLimiterTest, SlewRateNoLimitTest) {
+  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 
-  frc::sim::StepTiming(1.0_s);
+  now += 1_s;
 
   EXPECT_EQ(limiter.Calculate(0.5_m), 0.5_m);
 }

@@ -11,6 +11,9 @@
 
 using namespace wpi::java;
 
+static bool mockTimeEnabled = false;
+static uint64_t mockNow = 0;
+
 extern "C" {
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -26,6 +29,31 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
  * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
+ * Method:    enableMockTime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpiutil_WPIUtilJNI_enableMockTime
+  (JNIEnv*, jclass)
+{
+  mockTimeEnabled = true;
+  wpi::SetNowImpl([] { return mockNow; });
+}
+
+/*
+ * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
+ * Method:    setMockTime
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpiutil_WPIUtilJNI_setMockTime
+  (JNIEnv*, jclass, jlong time)
+{
+  mockNow = time;
+}
+
+/*
+ * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
  * Method:    now
  * Signature: ()J
  */
@@ -33,7 +61,11 @@ JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpiutil_WPIUtilJNI_now
   (JNIEnv*, jclass)
 {
-  return wpi::Now();
+  if (mockTimeEnabled) {
+    return mockNow;
+  } else {
+    return wpi::Now();
+  }
 }
 
 /*
