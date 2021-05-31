@@ -4,9 +4,9 @@
 
 #include "LoggerImpl.h"
 
-#include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
+#include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 
 using namespace nt;
@@ -70,13 +70,12 @@ unsigned int LoggerImpl::GetMinLevel() {
 
 void LoggerImpl::Log(unsigned int level, const char* file, unsigned int line,
                      const char* msg) {
-  // this is safe because it's null terminated and always the end
-  const char* filename = wpi::sys::path::filename(file).data();
+  auto filename = fs::path{file}.filename();
   {
     auto thr = GetThread();
     if (!thr || thr->m_listeners.empty()) {
-      DefaultLogger(level, filename, line, msg);
+      DefaultLogger(level, filename.string().c_str(), line, msg);
     }
   }
-  Send(UINT_MAX, 0, level, filename, line, msg);
+  Send(UINT_MAX, 0, level, filename.string().c_str(), line, msg);
 }

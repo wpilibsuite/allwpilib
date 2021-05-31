@@ -6,9 +6,9 @@
 
 #include <vector>
 
-#include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
+#include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/spinlock.h>
 
@@ -54,7 +54,7 @@ extern "C" {
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
   wpi::outs() << "HAL Extensions: Attempting to load: "
-              << wpi::sys::path::stem(library) << "\n";
+              << fs::path{library}.stem().string() << "\n";
   wpi::outs().flush();
   HTYPE handle = DLOPEN(library);
 #if !defined(WIN32) && !defined(_WIN32)
@@ -68,7 +68,7 @@ int HAL_LoadOneExtension(const char* library) {
 #endif
     wpi::outs() << "HAL Extensions: Load failed: " << DLERROR
                 << "\nTrying modified name: "
-                << wpi::sys::path::stem(libraryName) << "\n";
+                << fs::path{libraryName.str()}.stem() << "\n";
     wpi::outs().flush();
     handle = DLOPEN(libraryName.c_str());
   }

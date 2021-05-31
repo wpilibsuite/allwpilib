@@ -26,20 +26,18 @@
 #include <vector>
 #include <system_error>
 
+namespace fs {
+enum FileAccess : unsigned;
+enum OpenFlags : unsigned;
+enum CreationDisposition : unsigned;
+} // end namespace fs
+
 namespace wpi {
 
 class format_object_base;
 class FormattedString;
 class FormattedNumber;
 class FormattedBytes;
-
-namespace sys {
-namespace fs {
-enum FileAccess : unsigned;
-enum OpenFlags : unsigned;
-enum CreationDisposition : unsigned;
-} // end namespace fs
-} // end namespace sys
 
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
@@ -447,14 +445,14 @@ public:
   /// descriptor.
   raw_fd_ostream(StringRef Filename, std::error_code &EC);
   raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                 sys::fs::CreationDisposition Disp);
+                 fs::CreationDisposition Disp);
   raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                 sys::fs::FileAccess Access);
+                 fs::FileAccess Access);
   raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                 sys::fs::OpenFlags Flags);
+                 fs::OpenFlags Flags);
   raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                 sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
-                 sys::fs::OpenFlags Flags);
+                 fs::CreationDisposition Disp, fs::FileAccess Access,
+                 fs::OpenFlags Flags);
 
   /// FD is the file descriptor that this writes to.  If ShouldClose is true,
   /// this closes the file when the stream is destroyed. If FD is for stdout or
