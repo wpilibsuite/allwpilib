@@ -159,7 +159,7 @@ void Ultrasonic::SetEnabled(bool enable) {
 void Ultrasonic::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetRange().to<double>(); }, nullptr);
+      "Value", [=] { return units::inch_t{GetRange()}.to<double>(); }, nullptr);
 }
 
 void Ultrasonic::Initialize() {
