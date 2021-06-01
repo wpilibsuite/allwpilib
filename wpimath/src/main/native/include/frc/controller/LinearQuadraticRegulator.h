@@ -388,4 +388,40 @@ class LinearQuadraticRegulator<2, 1>
   LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
 };
 
+// Template specializations are used here to make common state-input pairs
+// compile faster.
+template <>
+class LinearQuadraticRegulator<2, 2>
+    : public detail::LinearQuadraticRegulatorImpl<2, 2> {
+ public:
+  template <int Outputs>
+  LinearQuadraticRegulator(const LinearSystem<2, 2, Outputs>& plant,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 2>& Relems,
+                           units::second_t dt)
+      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
+
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
+                           const Eigen::Matrix<double, 2, 2>& B,
+                           const wpi::array<double, 2>& Qelems,
+                           const wpi::array<double, 2>& Relems,
+                           units::second_t dt);
+
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
+                           const Eigen::Matrix<double, 2, 2>& B,
+                           const Eigen::Matrix<double, 2, 2>& Q,
+                           const Eigen::Matrix<double, 2, 2>& R,
+                           units::second_t dt);
+
+  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
+                           const Eigen::Matrix<double, 2, 2>& B,
+                           const Eigen::Matrix<double, 2, 2>& Q,
+                           const Eigen::Matrix<double, 2, 2>& R,
+                           const Eigen::Matrix<double, 2, 2>& N,
+                           units::second_t dt);
+
+  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
+  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
+};
+
 }  // namespace frc
