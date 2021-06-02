@@ -4,9 +4,9 @@
 
 #include "Instance.h"
 
-#include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
+#include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 
 using namespace cs;
@@ -31,7 +31,7 @@ static void def_log_func(unsigned int level, const char* file,
   } else {
     return;
   }
-  oss << "CS: " << levelmsg << msg << " (" << wpi::sys::path::filename(file)
+  oss << "CS: " << levelmsg << msg << " (" << fs::path{file}.filename().string()
       << ':' << line << ")\n";
   wpi::errs() << oss.str();
 }

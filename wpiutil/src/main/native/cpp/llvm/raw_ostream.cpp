@@ -22,11 +22,11 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
-#include "wpi/FileSystem.h"
 #include "wpi/Format.h"
 #include "wpi/MathExtras.h"
 #include "wpi/NativeFormatting.h"
 #include "wpi/WindowsError.h"
+#include "wpi/fs.h"
 #include <algorithm>
 #include <cctype>
 #include <cerrno>
@@ -487,9 +487,9 @@ void format_object_base::home() {
 //===----------------------------------------------------------------------===//
 
 static int getFD(StringRef Filename, std::error_code &EC,
-                 sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
-                 sys::fs::OpenFlags Flags) {
-  assert((Access & sys::fs::FA_Write) &&
+                 fs::CreationDisposition Disp, fs::FileAccess Access,
+                 fs::OpenFlags Flags) {
+  assert((Access & fs::FA_Write) &&
          "Cannot make a raw_ostream from a read-only descriptor!");
 
   // Handle "-" as stdout. Note that when we do this, we consider ourself
@@ -498,7 +498,7 @@ static int getFD(StringRef Filename, std::error_code &EC,
     EC = std::error_code();
     // If user requested binary then put stdout into binary mode if
     // possible.
-    if (!(Flags & sys::fs::OF_Text)) {
+    if (!(Flags & fs::OF_Text)) {
 #if defined(_WIN32)
       _setmode(_fileno(stdout), _O_BINARY);
 #endif
@@ -506,11 +506,15 @@ static int getFD(StringRef Filename, std::error_code &EC,
     return STDOUT_FILENO;
   }
 
-  int FD;
-  if (Access & sys::fs::FA_Read)
-    EC = sys::fs::openFileForReadWrite(Filename, FD, Disp, Flags);
-  else
-    EC = sys::fs::openFileForWrite(Filename, FD, Disp, Flags);
+  fs::file_t F;
+  if (Access & fs::FA_Read) {
+    F = fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+  } else {
+    F = fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+  }
+  if (EC)
+    return -1;
+  int FD = fs::FileToFd(F, EC, Flags);
   if (EC)
     return -1;
 
@@ -518,27 +522,27 @@ static int getFD(StringRef Filename, std::error_code &EC,
 }
 
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC)
-    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, sys::fs::FA_Write,
-                     sys::fs::OF_None) {}
+    : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, fs::FA_Write,
+                     fs::OF_None) {}
 
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                               sys::fs::CreationDisposition Disp)
-    : raw_fd_ostream(Filename, EC, Disp, sys::fs::FA_Write, sys::fs::OF_None) {}
+                               fs::CreationDisposition Disp)
+    : raw_fd_ostream(Filename, EC, Disp, fs::FA_Write, fs::OF_None) {}
 
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                               sys::fs::FileAccess Access)
-    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, Access,
-                     sys::fs::OF_None) {}
+                               fs::FileAccess Access)
+    : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, Access,
+                     fs::OF_None) {}
 
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                               sys::fs::OpenFlags Flags)
-    : raw_fd_ostream(Filename, EC, sys::fs::CD_CreateAlways, sys::fs::FA_Write,
+                               fs::OpenFlags Flags)
+    : raw_fd_ostream(Filename, EC, fs::CD_CreateAlways, fs::FA_Write,
                      Flags) {}
 
 raw_fd_ostream::raw_fd_ostream(StringRef Filename, std::error_code &EC,
-                               sys::fs::CreationDisposition Disp,
-                               sys::fs::FileAccess Access,
-                               sys::fs::OpenFlags Flags)
+                               fs::CreationDisposition Disp,
+                               fs::FileAccess Access,
+                               fs::OpenFlags Flags)
     : raw_fd_ostream(getFD(Filename, EC, Disp, Access, Flags), true) {}
 
 /// FD is the file descriptor that this writes to.  If ShouldClose is true, this
@@ -783,7 +787,7 @@ void raw_fd_ostream::anchor() {}
 raw_ostream &wpi::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
-  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, sys::fs::F_None);
+  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::F_None);
   assert(!EC);
   return *S;
 }

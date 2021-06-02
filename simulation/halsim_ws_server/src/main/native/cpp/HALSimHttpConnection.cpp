@@ -6,11 +6,10 @@
 
 #include <uv.h>
 
-#include <wpi/FileSystem.h>
 #include <wpi/MimeTypes.h>
-#include <wpi/Path.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UrlParser.h>
+#include <wpi/fs.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
@@ -104,35 +103,26 @@ void HALSimHttpConnection::SendFileResponse(int code,
                                             const wpi::Twine& contentType,
                                             const wpi::Twine& filename,
                                             const wpi::Twine& extraHeader) {
-  // open file
-  int infd;
-  if (wpi::sys::fs::openFileForRead(filename, infd)) {
-    MySendError(404, "error opening file");
-    return;
-  }
+  std::string fn = filename.str();
+  std::error_code ec;
 
-  // get status (to get file size)
-  wpi::sys::fs::file_status status;
-  if (wpi::sys::fs::status(infd, status)) {
+  // get file size
+  auto size = fs::file_size(fn, ec);
+  if (ec) {
     MySendError(404, "error getting file size");
-    wpi::sys::fs::file_t file = uv_get_osfhandle(infd);
-    wpi::sys::fs::closeFile(file);
     return;
   }
 
-  uv_os_fd_t outfd;
-  int err = uv_fileno(m_stream.GetRawHandle(), &outfd);
-  if (err < 0) {
-    m_stream.GetLoopRef().ReportError(err);
-    MySendError(404, "error getting fd");
-    wpi::sys::fs::file_t file = uv_get_osfhandle(infd);
-    wpi::sys::fs::closeFile(file);
+  // open file
+  wpi::raw_fd_istream is{fn, ec, true};
+  if (ec) {
+    MySendError(404, "error opening file");
     return;
   }
 
   wpi::SmallVector<uv::Buffer, 4> toSend;
   wpi::raw_uv_ostream os{toSend, 4096};
-  BuildHeader(os, code, codeText, contentType, status.getSize(), extraHeader);
+  BuildHeader(os, code, codeText, contentType, size, extraHeader);
   SendData(os.bufs(), false);
 
   Log(code);
@@ -141,11 +131,10 @@ void HALSimHttpConnection::SendFileResponse(int code,
   wpi::SmallVector<uv::Buffer, 4> bodyData;
   wpi::raw_uv_ostream bodyOs{bodyData, 4096};
 
-  wpi::raw_fd_istream is{infd, true};
   std::string fileBuf;
   size_t oldSize = 0;
 
-  while (fileBuf.size() < status.getSize()) {
+  while (fileBuf.size() < size) {
     oldSize = fileBuf.size();
     fileBuf.resize(oldSize + 1);
     is.read(&(*fileBuf.begin()) + oldSize, 1);
@@ -174,33 +163,28 @@ void HALSimHttpConnection::ProcessRequest() {
   }
 
   if (m_request.GetMethod() == wpi::HTTP_GET && path.startswith("/") &&
-      !path.contains("..")) {
+      !path.contains("..") && !path.contains("//")) {
     // convert to fs native representation
-    wpi::SmallVector<char, 32> nativePath;
-    wpi::sys::path::native(path, nativePath);
-
+    fs::path nativePath;
     if (path.startswith("/user/")) {
-      std::string prefix = (wpi::sys::path::get_separator() + "user" +
-                            wpi::sys::path::get_separator())
-                               .str();
-      wpi::sys::path::replace_path_prefix(nativePath, prefix,
-                                          m_server->GetWebrootUser());
+      nativePath = fs::path{std::string{m_server->GetWebrootSys()}} /
+                   fs::path{std::string{path.drop_front(6)},
+                            fs::path::format::generic_format};
     } else {
-      wpi::sys::path::replace_path_prefix(nativePath,
-                                          wpi::sys::path::get_separator(),
-                                          m_server->GetWebrootSys());
+      nativePath = fs::path{std::string{m_server->GetWebrootSys()}} /
+                   fs::path{std::string{path.drop_front(1)},
+                            fs::path::format::generic_format};
     }
 
-    if (wpi::sys::fs::is_directory(nativePath)) {
-      wpi::sys::path::append(nativePath, "index.html");
+    if (fs::is_directory(nativePath)) {
+      nativePath.append("index.html");
     }
 
-    if (!wpi::sys::fs::exists(nativePath) ||
-        wpi::sys::fs::is_directory(nativePath)) {
+    if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
       MySendError(404, "Resource '" + path + "' not found");
     } else {
-      auto contentType = wpi::MimeTypeFromPath(wpi::Twine(nativePath).str());
-      SendFileResponse(200, "OK", contentType, nativePath);
+      auto contentType = wpi::MimeTypeFromPath(nativePath.string());
+      SendFileResponse(200, "OK", contentType, nativePath.string());
     }
   } else {
     MySendError(404, "Resource not found");

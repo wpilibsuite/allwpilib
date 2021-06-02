@@ -8,8 +8,8 @@
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
-#include <wpi/Path.h>
 #include <wpi/StackTrace.h>
+#include <wpi/fs.h>
 
 using namespace frc;
 
@@ -24,10 +24,11 @@ RuntimeError::RuntimeError(int32_t code, std::string&& loc, std::string&& stack,
 RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
                            const char* funcName, std::string&& stack,
                            std::string&& message)
-    : RuntimeError{code,
-                   fmt::format("{} [{}:{}]", funcName,
-                               wpi::sys::path::filename(fileName), lineNumber),
-                   std::move(stack), std::move(message)} {}
+    : RuntimeError{
+          code,
+          fmt::format("{} [{}:{}]", funcName,
+                      fs::path{fileName}.filename().string(), lineNumber),
+          std::move(stack), std::move(message)} {}
 
 void RuntimeError::Report() const {
   HAL_SendError(m_data->code < 0, m_data->code, 0, what(), m_data->loc.c_str(),

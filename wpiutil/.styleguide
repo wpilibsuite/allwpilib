@@ -60,6 +60,9 @@ generatedFileExclude {
   src/main/native/include/wpi/raw_os_ostream\.h$
   src/main/native/include/wpi/raw_ostream\.h$
   src/main/native/include/wpi/span\.h$
+  src/main/native/include/wpi/fs\.h$
+  src/main/native/cpp/fs\.cpp$
+  src/main/native/include/wpi/ghc/
   src/test/native/cpp/span/
   src/main/native/include/wpi/type_traits\.h$
   src/main/native/cpp/json
