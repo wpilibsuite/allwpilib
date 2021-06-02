@@ -137,21 +137,15 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
   }
 }
 
-double Ultrasonic::GetRangeInches() const {
+units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return m_simRange.Get();
+      return units::meter_t{m_simRange.Get()};
     }
-    return units::inch_t{m_counter.GetPeriod() * kSpeedOfSound / 2.0}
-        .to<double>();
+    return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {
-    return 0;
+    return 0_m;
   }
-}
-
-double Ultrasonic::GetRangeMM() const {
-  return units::millimeter_t{m_counter.GetPeriod() * kSpeedOfSound / 2.0}
-      .to<double>();
 }
 
 bool Ultrasonic::IsEnabled() const {
@@ -165,7 +159,7 @@ void Ultrasonic::SetEnabled(bool enable) {
 void Ultrasonic::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetRangeInches(); }, nullptr);
+      "Value", [=] { return units::inch_t{GetRange()}.to<double>(); }, nullptr);
 }
 
 void Ultrasonic::Initialize() {
