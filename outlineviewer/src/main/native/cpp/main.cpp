@@ -21,13 +21,13 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 namespace ov {
-wpi::StringRef GetResource_ov_16_png();
-wpi::StringRef GetResource_ov_32_png();
-wpi::StringRef GetResource_ov_48_png();
-wpi::StringRef GetResource_ov_64_png();
-wpi::StringRef GetResource_ov_128_png();
-wpi::StringRef GetResource_ov_256_png();
-wpi::StringRef GetResource_ov_512_png();
+std::string_view GetResource_ov_16_png();
+std::string_view GetResource_ov_32_png();
+std::string_view GetResource_ov_48_png();
+std::string_view GetResource_ov_64_png();
+std::string_view GetResource_ov_128_png();
+std::string_view GetResource_ov_256_png();
+std::string_view GetResource_ov_512_png();
 }  // namespace ov
 
 static std::unique_ptr<glass::NetworkTablesModel> gModel;

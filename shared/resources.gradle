@@ -19,7 +19,7 @@ ext.createGenerateResourcesTask = { name, prefix, namespace, project ->
                 outputFile.withWriter { out ->
                     def inputBytes = inputFile.bytes
                     out.print '''#include <stddef.h>
-#include <wpi/StringRef.h>
+#include <string_view>
 extern "C" {
 static const unsigned char contents[] = { '''
 
@@ -36,8 +36,8 @@ const unsigned char* ${prefix}${funcName}(size_t* len) {
                     if (!namespace.isEmpty()) {
                         out.println "namespace ${namespace} {"
                     }
-                    out.println """wpi::StringRef ${funcName}() {
-  return wpi::StringRef(reinterpret_cast<const char*>(contents), ${fileBytes.size()});
+                    out.println """std::string_view ${funcName}() {
+  return std::string_view(reinterpret_cast<const char*>(contents), ${fileBytes.size()});
 }"""
                     if (!namespace.isEmpty()) {
                         out.println '}'

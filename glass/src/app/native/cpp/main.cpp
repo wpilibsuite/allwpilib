@@ -24,13 +24,13 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 namespace glass {
-wpi::StringRef GetResource_glass_16_png();
-wpi::StringRef GetResource_glass_32_png();
-wpi::StringRef GetResource_glass_48_png();
-wpi::StringRef GetResource_glass_64_png();
-wpi::StringRef GetResource_glass_128_png();
-wpi::StringRef GetResource_glass_256_png();
-wpi::StringRef GetResource_glass_512_png();
+std::string_view GetResource_glass_16_png();
+std::string_view GetResource_glass_32_png();
+std::string_view GetResource_glass_48_png();
+std::string_view GetResource_glass_64_png();
+std::string_view GetResource_glass_128_png();
+std::string_view GetResource_glass_256_png();
+std::string_view GetResource_glass_512_png();
 }  // namespace glass
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
