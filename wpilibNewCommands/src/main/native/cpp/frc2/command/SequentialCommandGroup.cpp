@@ -87,7 +87,7 @@ SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
   }
 
   // reset current state
-  tmp.clear();
+  m_commands.clear();
   m_requirements.clear();
   m_runWhenDisabled = true;
 
