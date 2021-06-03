@@ -72,7 +72,7 @@ public interface Command {
    * @return the command with the timeout added
    */
   default ParallelRaceGroup withTimeout(double seconds) {
-    return this.raceWith(new WaitCommand(seconds));
+    return raceWith(new WaitCommand(seconds));
   }
 
   /**
@@ -91,7 +91,7 @@ public interface Command {
    * @return the command with the interrupt condition added
    */
   default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
-    return this.raceWith(new WaitUntilCommand(condition));
+    return raceWith(new WaitUntilCommand(condition));
   }
 
   /**
@@ -108,7 +108,7 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
-    return this.beforeStarting(new InstantCommand(toRun, requirements));
+    return beforeStarting(new InstantCommand(toRun, requirements));
   }
 
   /**
@@ -141,7 +141,7 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
-    return this.andThen(new InstantCommand(toRun, requirements));
+    return andThen(new InstantCommand(toRun, requirements));
   }
 
   /**
