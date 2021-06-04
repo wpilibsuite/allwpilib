@@ -35,9 +35,7 @@ SOFTWARE.
 #include "wpi/json.h"
 
 #include "fmt/format.h"
-#include "wpi/Format.h"
 #include "wpi/SmallString.h"
-#include "wpi/StringExtras.h"
 #include "wpi/raw_os_ostream.h"
 
 #include "json_serializer.h"
@@ -1398,12 +1396,12 @@ void json::serializer::dump_escaped(std::string_view s, const bool ensure_ascii)
                         {
                             if (codepoint <= 0xFFFF)
                             {
-                                o << '\\' << 'u' << format_hex_no_prefix(codepoint, 4);
+                                o << fmt::format("\\u{:04x}", codepoint);
                             }
                             else
                             {
-                                o << '\\' << 'u' << format_hex_no_prefix(0xD7C0 + (codepoint >> 10), 4);
-                                o << '\\' << 'u' << format_hex_no_prefix(0xDC00 + (codepoint & 0x3FF), 4);
+                                o << fmt::format("\\u{:04x}", 0xD7C0 + (codepoint >> 10));
+                                o << fmt::format("\\u{:04x}", 0xDC00 + (codepoint & 0x3FF));
                             }
                         }
                         else
@@ -1420,7 +1418,7 @@ void json::serializer::dump_escaped(std::string_view s, const bool ensure_ascii)
 
             case UTF8_REJECT:  // decode found invalid UTF-8 byte
             {
-                JSON_THROW(type_error::create(316, fmt::format("invalid UTF-8 byte at index {}: 0x{}", i, utohexstr(byte))));
+                JSON_THROW(type_error::create(316, fmt::format("invalid UTF-8 byte at index {}: {:#02x}", i, byte)));
             }
 
             default:  // decode found yet incomplete multi-byte code point
@@ -1438,7 +1436,7 @@ void json::serializer::dump_escaped(std::string_view s, const bool ensure_ascii)
     if (JSON_UNLIKELY(state != UTF8_ACCEPT))
     {
         // we finish reading, but do not accept: string was incomplete
-        JSON_THROW(type_error::create(316, fmt::format("incomplete UTF-8 string; last byte: 0x{}", utohexstr(static_cast<uint8_t>(s.back())))));
+        JSON_THROW(type_error::create(316, fmt::format("incomplete UTF-8 string; last byte: {:#02x}", s.back())));
     }
 }
 

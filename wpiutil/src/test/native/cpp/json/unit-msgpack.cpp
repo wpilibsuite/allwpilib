@@ -1051,9 +1051,9 @@ TEST(MessagePackErrorTest, TooShortByteVector)
 TEST(MessagePackErrorTest, UnsupportedBytesConcrete)
 {
     EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xc1})), json::parse_error,
-                     "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xC1");
+                     "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xc1");
     EXPECT_THROW_MSG(json::from_msgpack(std::vector<uint8_t>({0xc6})), json::parse_error,
-                     "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xC6");
+                     "[json.exception.parse_error.112] parse error at 1: error reading MessagePack; last byte: 0xc6");
 }
 
 TEST(MessagePackErrorTest, UnsupportedBytesAll)

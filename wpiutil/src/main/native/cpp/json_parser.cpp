@@ -39,7 +39,6 @@ SOFTWARE.
 #include <cstdlib>
 
 #include "fmt/format.h"
-#include "wpi/Format.h"
 #include "wpi/SmallString.h"
 #include "wpi/raw_istream.h"
 #include "wpi/raw_ostream.h"
@@ -1408,7 +1407,7 @@ std::string json::lexer::get_token_string() const
         if (c <= '\x1F')
         {
             // escape control characters
-            ss << "<U+" << format_hex_no_prefix(c, 4, true) << '>';
+            ss << fmt::format("<U+{:04X}>", c);
         }
         else
         {
