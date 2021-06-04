@@ -266,6 +266,9 @@ public:
   /// Explicit conversion to StringRef.
   StringRef str() const { return StringRef(this->begin(), this->size()); }
 
+  /// Explicit conversion to std::string.
+  std::string string() const { return {this->begin(), this->size()}; }
+
   // TODO: Make this const, if it's safe...
   const char* c_str() {
     this->push_back(0);
@@ -275,6 +278,9 @@ public:
 
   /// Implicit conversion to StringRef.
   operator StringRef() const { return str(); }
+
+  /// Implicit conversion to std::string.
+  operator std::string() const { return string(); }
 
   // Extra operators.
   const SmallString &operator=(StringRef RHS) {
