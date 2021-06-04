@@ -14,7 +14,6 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
-#include "wpi/Error.h"
 #include "wpi/WindowsError.h"
 #include "wpi/raw_ostream.h"
 #include <cassert>
