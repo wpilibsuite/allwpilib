@@ -7,7 +7,6 @@
 
 #include <fmt/format.h>
 #include <wpi/Base64.h>
-#include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -136,7 +135,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       m_os << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      m_os << wpi::format("%g", value.GetDouble());
+      m_os << fmt::format("{:g}", value.GetDouble());
       break;
     case NT_STRING:
       WriteString(value.GetString());
@@ -163,7 +162,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
           m_os << ',';
         }
         first = false;
-        m_os << wpi::format("%g", elem);
+        m_os << fmt::format("{:g}", elem);
       }
       break;
     }
