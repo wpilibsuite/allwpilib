@@ -85,7 +85,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     // (this will result in an error at the read point, and ultimately
     // a reconnect attempt)
     if (m_streamConn && m_frameCount == 0) {
-      SWARNING("Monitor detected stream hung, disconnecting");
+      SWARNING("{}", "Monitor detected stream hung, disconnecting");
       m_streamConn->stream->close();
     }
 
@@ -93,7 +93,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     m_frameCount = 0;
   }
 
-  SDEBUG("Monitor Thread exiting");
+  SDEBUG("{}", "Monitor Thread exiting");
 }
 
 void HttpCameraImpl::StreamThreadMain() {
@@ -140,7 +140,7 @@ void HttpCameraImpl::StreamThreadMain() {
     }
   }
 
-  SDEBUG("Camera Thread exiting");
+  SDEBUG("{}", "Camera Thread exiting");
   SetConnected(false);
 }
 
@@ -151,7 +151,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   {
     std::scoped_lock lock(m_mutex);
     if (m_locations.empty()) {
-      SERROR("locations array is empty!?");
+      SERROR("{}", "locations array is empty!?");
       std::this_thread::sleep_for(std::chrono::seconds(1));
       return nullptr;
     }
@@ -182,7 +182,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   std::string warn;
   if (!conn->Handshake(req, &warn)) {
-    SWARNING(GetName() << ": " << warn);
+    SWARNING("{}", warn);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -192,8 +192,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   auto [mediaType, contentType] = wpi::split(conn->contentType.str(), ';');
   mediaType = wpi::trim(mediaType);
   if (mediaType != "multipart/x-mixed-replace") {
-    SWARNING("\"" << req.host << "\": unrecognized Content-Type \"" << mediaType
-                  << "\"");
+    SWARNING("\"{}\": unrecognized Content-Type \"{}\"", req.host, mediaType);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -216,8 +215,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
   }
 
   if (boundary.empty()) {
-    SWARNING("\"" << req.host
-                  << "\": empty multi-part boundary or no Content-Type");
+    SWARNING("\"{}\": empty multi-part boundary or no Content-Type", req.host);
     std::scoped_lock lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -274,7 +272,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   wpi::SmallString<64> contentTypeBuf;
   wpi::SmallString<64> contentLengthBuf;
   if (!ParseHttpHeaders(is, &contentTypeBuf, &contentLengthBuf)) {
-    SWARNING("disconnected during headers");
+    SWARNING("{}", "disconnected during headers");
     PutError("disconnected during headers", wpi::Now());
     return false;
   }
@@ -282,11 +280,10 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
       !wpi::starts_with(contentTypeBuf, "image/jpeg")) {
-    wpi::SmallString<64> errBuf;
-    wpi::raw_svector_ostream errMsg{errBuf};
-    errMsg << "received unknown Content-Type \"" << contentTypeBuf << "\"";
-    SWARNING(errMsg.str());
-    PutError(errMsg.str(), wpi::Now());
+    auto errMsg =
+        fmt::format("received unknown Content-Type \"{}\"", contentTypeBuf);
+    SWARNING("{}", errMsg);
+    PutError(errMsg, wpi::Now());
     return false;
   }
 
@@ -297,7 +294,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
     // Ugh, no Content-Length?  Read the blocks of the JPEG file.
     int width, height;
     if (!ReadJpeg(is, imageBuf, &width, &height)) {
-      SWARNING("did not receive a JPEG image");
+      SWARNING("{}", "did not receive a JPEG image");
       PutError("did not receive a JPEG image", wpi::Now());
       return false;
     }
@@ -316,7 +313,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
   }
   int width, height;
   if (!GetJpegSize(image->str(), &width, &height)) {
-    SWARNING("did not receive a JPEG image");
+    SWARNING("{}", "did not receive a JPEG image");
     PutError("did not receive a JPEG image", wpi::Now());
     return false;
   }
@@ -346,7 +343,7 @@ void HttpCameraImpl::SettingsThreadMain() {
     DeviceSendSettings(req);
   }
 
-  SDEBUG("Settings Thread exiting");
+  SDEBUG("{}", "Settings Thread exiting");
 }
 
 void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
@@ -370,7 +367,7 @@ void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
   // Just need a handshake as settings are sent via GET parameters
   std::string warn;
   if (!conn->Handshake(req, &warn)) {
-    SWARNING(GetName() << ": " << warn);
+    SWARNING("{}", warn);
   }
 
   conn->stream->close();
@@ -389,7 +386,7 @@ bool HttpCameraImpl::SetUrls(wpi::ArrayRef<std::string> urls,
     std::string errorMsg;
     locations.emplace_back(url, &error, &errorMsg);
     if (error) {
-      SERROR(GetName() << ": " << errorMsg);
+      SERROR("{}", errorMsg);
       *status = CS_BAD_URL;
       return false;
     }

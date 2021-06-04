@@ -55,7 +55,7 @@ class RpcServerThread
 
   void DoCallback(std::function<void(const RpcAnswer& call)> callback,
                   const RpcNotifierData& data) {
-    DEBUG4("rpc calling " << data.name);
+    DEBUG4("rpc calling {}", data.name);
     unsigned int local_id = Handle{data.entry}.GetIndex();
     unsigned int call_uid = Handle{data.call}.GetIndex();
     RpcIdPair lookup_uid{local_id, call_uid};

@@ -243,9 +243,8 @@ bool PropertyContainer::SetPropertiesJson(const wpi::json& config,
     try {
       name = prop.at("name").get<std::string>();
     } catch (const wpi::json::exception& e) {
-      WPI_WARNING(logger,
-                  logName << ": SetConfigJson: could not read property name: "
-                          << e.what());
+      WPI_WARNING(logger, "{}: SetConfigJson: could not read property name: {}",
+                  logName, e.what());
       continue;
     }
     int n = GetPropertyIndex(name);
@@ -253,24 +252,24 @@ bool PropertyContainer::SetPropertiesJson(const wpi::json& config,
       auto& v = prop.at("value");
       if (v.is_string()) {
         std::string val = v.get<std::string>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to '" << val << '\'');
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to '{}'",
+                 logName, name, val);
         SetStringProperty(n, val, status);
       } else if (v.is_boolean()) {
         bool val = v.get<bool>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to " << val);
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
+                 logName, name, val);
         SetProperty(n, val, status);
       } else {
         int val = v.get<int>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to " << val);
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
+                 logName, name, val);
         SetProperty(n, val, status);
       }
     } catch (const wpi::json::exception& e) {
       WPI_WARNING(logger,
-                  logName << ": SetConfigJson: could not read property value: "
-                          << e.what());
+                  "{}: SetConfigJson: could not read property value: {}",
+                  logName, e.what());
       continue;
     }
   }

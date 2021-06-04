@@ -4,6 +4,7 @@
 
 #include "StorageTest.h"
 
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>

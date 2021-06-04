@@ -127,8 +127,7 @@ bool SinkImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   try {
     j = wpi::json::parse(config);
   } catch (const wpi::json::parse_error& e) {
-    SWARNING("SetConfigJson: parse error at byte " << e.byte << ": "
-                                                   << e.what());
+    SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
   }

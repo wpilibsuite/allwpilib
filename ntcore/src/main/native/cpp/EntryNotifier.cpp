@@ -103,8 +103,7 @@ void EntryNotifier::NotifyEntry(unsigned int local_id, std::string_view name,
   if ((flags & NT_NOTIFY_LOCAL) != 0 && !m_local_notifiers) {
     return;
   }
-  DEBUG0("notifying '" << name << "' (local=" << local_id
-                       << "), flags=" << flags);
+  DEBUG0("notifying '{}' (local={}), flags={}", name, local_id, flags);
   Send(only_listener, 0, Handle(m_inst, local_id, Handle::kEntry).handle(),
        name, value, flags);
 }

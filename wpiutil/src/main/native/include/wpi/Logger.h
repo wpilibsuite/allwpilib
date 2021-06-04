@@ -8,8 +8,7 @@
 #include <functional>
 #include <utility>
 
-#include "wpi/SmallString.h"
-#include "wpi/raw_ostream.h"
+#include "fmt/format.h"
 
 namespace wpi {
 
@@ -40,12 +39,19 @@ class Logger {
   void set_min_level(unsigned int level) { m_min_level = level; }
   unsigned int min_level() const { return m_min_level; }
 
+  void DoLog(unsigned int level, const char* file, unsigned int line,
+             const char* msg);
+
+  void LogV(unsigned int level, const char* file, unsigned int line,
+            fmt::string_view format, fmt::format_args args);
+
+  template <typename S, typename... Args>
   void Log(unsigned int level, const char* file, unsigned int line,
-           const char* msg) {
-    if (!m_func || level < m_min_level) {
-      return;
+           const S& format, Args&&... args) {
+    if (m_func && level >= m_min_level) {
+      LogV(level, file, line, format,
+           fmt::make_args_checked<Args...>(format, args...));
     }
-    m_func(level, file, line, msg);
   }
 
   bool HasLogger() const { return m_func != nullptr; }
@@ -55,44 +61,43 @@ class Logger {
   unsigned int m_min_level = 20;
 };
 
-#define WPI_LOG(logger_inst, level, x)                                 \
-  do {                                                                 \
-    ::wpi::Logger& WPI_logger_ = logger_inst;                          \
-    if (WPI_logger_.min_level() <= static_cast<unsigned int>(level) && \
-        WPI_logger_.HasLogger()) {                                     \
-      ::wpi::SmallString<128> log_buf_;                                \
-      ::wpi::raw_svector_ostream log_os_{log_buf_};                    \
-      log_os_ << x;                                                    \
-      WPI_logger_.Log(level, __FILE__, __LINE__, log_buf_.c_str());    \
-    }                                                                  \
-  } while (0)
+#define WPI_LOG(logger_inst, level, format, ...) \
+  logger_inst.Log(level, __FILE__, __LINE__, FMT_STRING(format), __VA_ARGS__)
 
-#define WPI_ERROR(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, x)
-#define WPI_WARNING(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, x)
-#define WPI_INFO(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_INFO, x)
+#define WPI_ERROR(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_ERROR, format, __VA_ARGS__)
+#define WPI_WARNING(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_WARNING, format, __VA_ARGS__)
+#define WPI_INFO(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_INFO, format, __VA_ARGS__)
 
 #ifdef NDEBUG
-#define WPI_DEBUG(inst, x) \
-  do {                     \
+#define WPI_DEBUG(inst, format, ...) \
+  do {                               \
   } while (0)
-#define WPI_DEBUG1(inst, x) \
-  do {                      \
+#define WPI_DEBUG1(inst, format, ...) \
+  do {                                \
   } while (0)
-#define WPI_DEBUG2(inst, x) \
-  do {                      \
+#define WPI_DEBUG2(inst, format, ...) \
+  do {                                \
   } while (0)
-#define WPI_DEBUG3(inst, x) \
-  do {                      \
+#define WPI_DEBUG3(inst, format, ...) \
+  do {                                \
   } while (0)
-#define WPI_DEBUG4(inst, x) \
-  do {                      \
+#define WPI_DEBUG4(inst, format, ...) \
+  do {                                \
   } while (0)
 #else
-#define WPI_DEBUG(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, x)
-#define WPI_DEBUG1(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, x)
-#define WPI_DEBUG2(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG2, x)
-#define WPI_DEBUG3(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, x)
-#define WPI_DEBUG4(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, x)
+#define WPI_DEBUG(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, format, __VA_ARGS__)
+#define WPI_DEBUG1(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, format, __VA_ARGS__)
+#define WPI_DEBUG2(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG2, format, __VA_ARGS__)
+#define WPI_DEBUG3(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG3, format, __VA_ARGS__)
+#define WPI_DEBUG4(inst, format, ...) \
+  WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, format, __VA_ARGS__)
 #endif
 
 }  // namespace wpi

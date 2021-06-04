@@ -57,40 +57,24 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
   std::pair<std::string_view, unsigned int> servers[5];
 
   // 10.te.am.2
-  wpi::SmallString<32> fixed;
-  {
-    wpi::raw_svector_ostream oss{fixed};
-    oss << "10." << static_cast<int>(team / 100) << '.'
-        << static_cast<int>(team % 100) << ".2";
-    servers[0] = std::make_pair(oss.str(), port);
-  }
+  auto fixed = fmt::format("10.{}.{}.2", static_cast<int>(team / 100),
+                           static_cast<int>(team % 100));
+  servers[0] = {fixed, port};
 
   // 172.22.11.2
-  servers[1] = std::make_pair("172.22.11.2", port);
+  servers[1] = {"172.22.11.2", port};
 
   // roboRIO-<team>-FRC.local
-  wpi::SmallString<32> mdns;
-  {
-    wpi::raw_svector_ostream oss{mdns};
-    oss << "roboRIO-" << team << "-FRC.local";
-    servers[2] = std::make_pair(oss.str(), port);
-  }
+  auto mdns = fmt::format("roboRIO-{}-FRC.local", team);
+  servers[2] = {mdns, port};
 
   // roboRIO-<team>-FRC.lan
-  wpi::SmallString<32> mdns_lan;
-  {
-    wpi::raw_svector_ostream oss{mdns_lan};
-    oss << "roboRIO-" << team << "-FRC.lan";
-    servers[3] = std::make_pair(oss.str(), port);
-  }
+  auto mdns_lan = fmt::format("roboRIO-{}-FRC.lan", team);
+  servers[3] = {mdns_lan, port};
 
   // roboRIO-<team>-FRC.frc-field.local
-  wpi::SmallString<64> field_local;
-  {
-    wpi::raw_svector_ostream oss{field_local};
-    oss << "roboRIO-" << team << "-FRC.frc-field.local";
-    servers[4] = std::make_pair(oss.str(), port);
-  }
+  auto field_local = fmt::format("roboRIO-{}-FRC.frc-field.local", team);
+  servers[4] = {field_local, port};
 
   SetServer(servers);
 }
@@ -155,10 +139,10 @@ void DispatcherBase::StartServer(
         persist_filename, [&](size_t line, const char* msg) {
           if (first) {
             first = false;
-            WARNING("When reading initial persistent values from '"
-                    << persist_filename << "':");
+            WARNING("When reading initial persistent values from '{}':",
+                    persist_filename);
           }
-          WARNING(persist_filename << ":" << line << ": " << msg);
+          WARNING("{}:{}: {}", persist_filename, line, msg);
         });
   }
 
@@ -368,7 +352,7 @@ void DispatcherBase::DispatchThreadMain() {
       }
       const char* err = m_storage.SavePersistent(m_persist_filename, true);
       if (err) {
-        WARNING("periodic persistent save: " << err);
+        WARNING("periodic persistent save: {}", err);
       }
     }
 
@@ -377,7 +361,7 @@ void DispatcherBase::DispatchThreadMain() {
       bool reconnect = false;
 
       if (++count > 10) {
-        DEBUG0("dispatch running " << m_connections.size() << " connections");
+        DEBUG0("dispatch running {} connections", m_connections.size());
         count = 0;
       }
 
@@ -440,8 +424,8 @@ void DispatcherBase::ServerThreadMain() {
       m_networkMode = NT_NET_MODE_NONE;
       return;
     }
-    DEBUG0("server: client connection from " << stream->getPeerIP() << " port "
-                                             << stream->getPeerPort());
+    DEBUG0("server: client connection from {} port {}", stream->getPeerIP(),
+           stream->getPeerPort());
 
     // add to connections list
     using namespace std::placeholders;
@@ -493,13 +477,13 @@ void DispatcherBase::ClientThreadMain() {
     }
 
     // try to connect (with timeout)
-    DEBUG0("client trying to connect");
+    DEBUG0("{}", "client trying to connect");
     auto stream = connect();
     if (!stream) {
       m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_FAILURE;
       continue;  // keep retrying
     }
-    DEBUG0("client connected");
+    DEBUG0("{}", "client connected");
     m_networkMode = NT_NET_MODE_CLIENT;
 
     std::unique_lock lock(m_user_mutex);
@@ -537,14 +521,14 @@ bool DispatcherBase::ClientHandshake(
   }
 
   // send client hello
-  DEBUG0("client: sending hello");
+  DEBUG0("{}", "client: sending hello");
   send_msgs(Message::ClientHello(self_id));
 
   // wait for response
   auto msg = get_msg();
   if (!msg) {
     // disconnected, retry
-    DEBUG0("client: server disconnected before first response");
+    DEBUG0("{}", "client: server disconnected before first response");
     return false;
   }
 
@@ -574,11 +558,11 @@ bool DispatcherBase::ClientHandshake(
   for (;;) {
     if (!msg) {
       // disconnected, retry
-      DEBUG0("client: server disconnected during initial entries");
+      DEBUG0("{}", "client: server disconnected during initial entries");
       return false;
     }
-    DEBUG4("received init str=" << msg->str() << " id=" << msg->id()
-                                << " seq_num=" << msg->seq_num_uid());
+    DEBUG4("received init str={} id={} seq_num={}", msg->str(), msg->id(),
+           msg->seq_num_uid());
     if (msg->Is(Message::kServerHelloDone)) {
       break;
     }
@@ -589,9 +573,10 @@ bool DispatcherBase::ClientHandshake(
     }
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
-      DEBUG0("client: received message ("
-             << msg->type()
-             << ") other than entry assignment during initial handshake");
+      DEBUG0(
+          "client: received message ({}) other than entry assignment during "
+          "initial handshake",
+          msg->type());
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -612,8 +597,8 @@ bool DispatcherBase::ClientHandshake(
     send_msgs(outgoing);
   }
 
-  INFO("client: CONNECTED to server " << conn.stream().getPeerIP() << " port "
-                                      << conn.stream().getPeerPort());
+  INFO("client: CONNECTED to server {} port {}", conn.stream().getPeerIP(),
+       conn.stream().getPeerPort());
   return true;
 }
 
@@ -623,18 +608,18 @@ bool DispatcherBase::ServerHandshake(
   // Wait for the client to send us a hello.
   auto msg = get_msg();
   if (!msg) {
-    DEBUG0("server: client disconnected before sending hello");
+    DEBUG0("{}", "server: client disconnected before sending hello");
     return false;
   }
   if (!msg->Is(Message::kClientHello)) {
-    DEBUG0("server: client initial message was not client hello");
+    DEBUG0("{}", "server: client initial message was not client hello");
     return false;
   }
 
   // Check that the client requested version is not too high.
   unsigned int proto_rev = msg->id();
   if (proto_rev > 0x0300) {
-    DEBUG0("server: client requested proto > 0x0300");
+    DEBUG0("{}", "server: client requested proto > 0x0300");
     send_msgs(Message::ProtoUnsup());
     return false;
   }
@@ -644,7 +629,7 @@ bool DispatcherBase::ServerHandshake(
   }
 
   // Set the proto version to the client requested version
-  DEBUG0("server: client protocol " << proto_rev);
+  DEBUG0("server: client protocol {}", proto_rev);
   conn.set_proto_rev(proto_rev);
 
   // Send initial set of assignments
@@ -663,7 +648,7 @@ bool DispatcherBase::ServerHandshake(
   outgoing.emplace_back(Message::ServerHelloDone());
 
   // Batch transmit
-  DEBUG0("server: sending initial assignments");
+  DEBUG0("{}", "server: sending initial assignments");
   send_msgs(outgoing);
 
   // In proto rev 3.0 and later, the handshake concludes with a client hello
@@ -677,7 +662,7 @@ bool DispatcherBase::ServerHandshake(
     for (;;) {
       if (!msg) {
         // disconnected, retry
-        DEBUG0("server: disconnected waiting for initial entries");
+        DEBUG0("{}", "server: disconnected waiting for initial entries");
         return false;
       }
       if (msg->Is(Message::kClientHelloDone)) {
@@ -690,9 +675,10 @@ bool DispatcherBase::ServerHandshake(
       }
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
-        DEBUG0("server: received message ("
-               << msg->type()
-               << ") other than entry assignment during initial handshake");
+        DEBUG0(
+            "server: received message ({}) other than entry assignment during "
+            "initial handshake",
+            msg->type());
         return false;
       }
       incoming.push_back(msg);
@@ -704,8 +690,8 @@ bool DispatcherBase::ServerHandshake(
     }
   }
 
-  INFO("server: client CONNECTED: " << conn.stream().getPeerIP() << " port "
-                                    << conn.stream().getPeerPort());
+  INFO("server: client CONNECTED: {} port {}", conn.stream().getPeerIP(),
+       conn.stream().getPeerPort());
   return true;
 }
 

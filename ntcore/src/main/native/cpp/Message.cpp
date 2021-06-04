@@ -106,7 +106,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       } else {
         type = get_entry_type(msg->m_id);
       }
-      WPI_DEBUG4(decoder.logger(), "update message data type: " << type);
+      WPI_DEBUG4(decoder.logger(), "update message data type: {}", type);
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) {
         return nullptr;
@@ -198,7 +198,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
     }
     default:
       decoder.set_error("unrecognized message type");
-      WPI_INFO(decoder.logger(), "unrecognized message type: " << msg_type);
+      WPI_INFO(decoder.logger(), "unrecognized message type: {}", msg_type);
       return nullptr;
   }
   return msg;

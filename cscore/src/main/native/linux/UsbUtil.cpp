@@ -153,10 +153,9 @@ int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
                  const char* name, const char* file, int line, bool quiet) {
   int retval = ioctl(fd, req, data);
   if (!quiet && retval < 0) {
-    WPI_ERROR(Instance::GetInstance().logger,
-              "ioctl " << name << " failed at "
-                       << fs::path{file}.filename().string() << ":" << line
-                       << ": " << std::strerror(errno));
+    WPI_ERROR(Instance::GetInstance().logger, "ioctl {} failed at {}:{}: {}",
+              name, fs::path{file}.filename().string(), line,
+              std::strerror(errno));
   }
   return retval;
 }

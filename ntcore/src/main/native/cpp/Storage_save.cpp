@@ -211,7 +211,7 @@ const char* Storage::SavePersistent(std::string_view filename,
     err = "could not open file";
     goto done;
   }
-  DEBUG0("saving persistent file '" << filename << "'");
+  DEBUG0("saving persistent file '{}'", filename);
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {
@@ -263,7 +263,7 @@ const char* Storage::SaveEntries(std::string_view filename,
   if (ec.value() != 0) {
     return "could not open file";
   }
-  DEBUG0("saving file '" << filename << "'");
+  DEBUG0("saving file '{}'", filename);
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {

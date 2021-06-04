@@ -174,8 +174,7 @@ bool SourceImpl::SetConfigJson(std::string_view config, CS_Status* status) {
   try {
     j = wpi::json::parse(config);
   } catch (const wpi::json::parse_error& e) {
-    SWARNING("SetConfigJson: parse error at byte " << e.byte << ": "
-                                                   << e.what());
+    SWARNING("SetConfigJson: parse error at byte {}: {}", e.byte, e.what());
     *status = CS_PROPERTY_WRITE_FAILED;
     return false;
   }
@@ -200,11 +199,11 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       } else if (wpi::equals_lower(str, "gray")) {
         mode.pixelFormat = cs::VideoMode::kGray;
       } else {
-        SWARNING("SetConfigJson: could not understand pixel format value '"
-                 << str << '\'');
+        SWARNING("SetConfigJson: could not understand pixel format value '{}'",
+                 str);
       }
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read pixel format: " << e.what());
+      SWARNING("SetConfigJson: could not read pixel format: {}", e.what());
     }
   }
 
@@ -213,7 +212,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
     try {
       mode.width = config.at("width").get<unsigned int>();
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read width: " << e.what());
+      SWARNING("SetConfigJson: could not read width: {}", e.what());
     }
   }
 
@@ -222,7 +221,7 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
     try {
       mode.height = config.at("height").get<unsigned int>();
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read height: " << e.what());
+      SWARNING("SetConfigJson: could not read height: {}", e.what());
     }
   }
 
@@ -231,30 +230,31 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
     try {
       mode.fps = config.at("fps").get<unsigned int>();
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read fps: " << e.what());
+      SWARNING("SetConfigJson: could not read fps: {}", e.what());
     }
   }
 
   // if all of video mode is set, use SetVideoMode, otherwise piecemeal it
   if (mode.pixelFormat != VideoMode::kUnknown && mode.width != 0 &&
       mode.height != 0 && mode.fps != 0) {
-    SINFO("SetConfigJson: setting video mode to pixelFormat "
-          << mode.pixelFormat << ", width " << mode.width << ", height "
-          << mode.height << ", fps " << mode.fps);
+    SINFO(
+        "SetConfigJson: setting video mode to pixelFormat {}, width {}, height "
+        "{}, fps {}",
+        mode.pixelFormat, mode.width, mode.height, mode.fps);
     SetVideoMode(mode, status);
   } else {
     if (mode.pixelFormat != cs::VideoMode::kUnknown) {
-      SINFO("SetConfigJson: setting pixelFormat " << mode.pixelFormat);
+      SINFO("SetConfigJson: setting pixelFormat {}", mode.pixelFormat);
       SetPixelFormat(static_cast<cs::VideoMode::PixelFormat>(mode.pixelFormat),
                      status);
     }
     if (mode.width != 0 && mode.height != 0) {
-      SINFO("SetConfigJson: setting width " << mode.width << ", height "
-                                            << mode.height);
+      SINFO("SetConfigJson: setting width {}, height {}", mode.width,
+            mode.height);
       SetResolution(mode.width, mode.height, status);
     }
     if (mode.fps != 0) {
-      SINFO("SetConfigJson: setting fps " << mode.fps);
+      SINFO("SetConfigJson: setting fps {}", mode.fps);
       SetFPS(mode.fps, status);
     }
   }
@@ -263,10 +263,10 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
   if (config.count("brightness") != 0) {
     try {
       int val = config.at("brightness").get<int>();
-      SINFO("SetConfigJson: setting brightness to " << val);
+      SINFO("SetConfigJson: setting brightness to {}", val);
       SetBrightness(val, status);
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read brightness: " << e.what());
+      SWARNING("SetConfigJson: could not read brightness: {}", e.what());
     }
   }
 
@@ -277,22 +277,23 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       if (setting.is_string()) {
         auto str = setting.get<std::string>();
         if (wpi::equals_lower(str, "auto")) {
-          SINFO("SetConfigJson: setting white balance to auto");
+          SINFO("SetConfigJson: setting white balance to {}", "auto");
           SetWhiteBalanceAuto(status);
         } else if (wpi::equals_lower(str, "hold")) {
-          SINFO("SetConfigJson: setting white balance to hold current");
+          SINFO("SetConfigJson: setting white balance to {}", "hold current");
           SetWhiteBalanceHoldCurrent(status);
         } else {
-          SWARNING("SetConfigJson: could not understand white balance value '"
-                   << str << '\'');
+          SWARNING(
+              "SetConfigJson: could not understand white balance value '{}'",
+              str);
         }
       } else {
         int val = setting.get<int>();
-        SINFO("SetConfigJson: setting white balance to " << val);
+        SINFO("SetConfigJson: setting white balance to {}", val);
         SetWhiteBalanceManual(val, status);
       }
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read white balance: " << e.what());
+      SWARNING("SetConfigJson: could not read white balance: {}", e.what());
     }
   }
 
@@ -303,22 +304,22 @@ bool SourceImpl::SetConfigJson(const wpi::json& config, CS_Status* status) {
       if (setting.is_string()) {
         auto str = setting.get<std::string>();
         if (wpi::equals_lower(str, "auto")) {
-          SINFO("SetConfigJson: setting exposure to auto");
+          SINFO("SetConfigJson: setting exposure to {}", "auto");
           SetExposureAuto(status);
         } else if (wpi::equals_lower(str, "hold")) {
-          SINFO("SetConfigJson: setting exposure to hold current");
+          SINFO("SetConfigJson: setting exposure to {}", "hold current");
           SetExposureHoldCurrent(status);
         } else {
-          SWARNING("SetConfigJson: could not understand exposure value '"
-                   << str << '\'');
+          SWARNING("SetConfigJson: could not understand exposure value '{}'",
+                   str);
         }
       } else {
         int val = setting.get<int>();
-        SINFO("SetConfigJson: setting exposure to " << val);
+        SINFO("SetConfigJson: setting exposure to {}", val);
         SetExposureManual(val, status);
       }
     } catch (const wpi::json::exception& e) {
-      SWARNING("SetConfigJson: could not read exposure: " << e.what());
+      SWARNING("SetConfigJson: could not read exposure: {}", e.what());
     }
   }
 
@@ -442,10 +443,8 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
-  SDEBUG4("Copying data to "
-          << reinterpret_cast<const void*>(image->data()) << " from "
-          << reinterpret_cast<const void*>(data.data()) << " (" << data.size()
-          << " bytes)");
+  SDEBUG4("Copying data to {} from {} ({} bytes)", fmt::ptr(image->data()),
+          fmt::ptr(data.data()), data.size());
   std::memcpy(image->data(), data.data(), data.size());
 
   PutFrame(std::move(image), time);

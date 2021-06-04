@@ -41,7 +41,8 @@ bool RpcServer::PostRpcResponse(unsigned int local_id, unsigned int call_uid,
   auto thr = GetThread();
   auto i = thr->m_response_map.find(impl::RpcIdPair{local_id, call_uid});
   if (i == thr->m_response_map.end()) {
-    WARNING("posting RPC response to nonexistent call (or duplicate response)");
+    WARNING("{}",
+            "posting RPC response to nonexistent call (or duplicate response)");
     return false;
   }
   (i->getSecond())(result);

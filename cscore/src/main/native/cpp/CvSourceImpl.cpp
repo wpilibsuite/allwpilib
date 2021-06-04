@@ -53,8 +53,7 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
       cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
       break;
     default:
-      SERROR("PutFrame: " << image.channels()
-                          << "-channel images not supported");
+      SERROR("PutFrame: {}-channel images not supported", image.channels());
       return;
   }
   SourceImpl::PutFrame(std::move(dest), wpi::Now());

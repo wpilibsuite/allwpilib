@@ -73,7 +73,7 @@ int UDPClient::start(int port) {
   m_lsd = socket(AF_INET, SOCK_DGRAM, 0);
 
   if (m_lsd < 0) {
-    WPI_ERROR(m_logger, "could not create socket");
+    WPI_ERROR(m_logger, "{}", "could not create socket");
     return -1;
   }
 
@@ -89,7 +89,7 @@ int UDPClient::start(int port) {
     int res = inet_pton(PF_INET, m_address.c_str(), &(addr.sin_addr));
 #endif
     if (res != 1) {
-      WPI_ERROR(m_logger, "could not resolve " << m_address << " address");
+      WPI_ERROR(m_logger, "could not resolve {} address", m_address);
       return -1;
     }
   } else {
@@ -111,7 +111,7 @@ int UDPClient::start(int port) {
 
   int result = bind(m_lsd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
   if (result != 0) {
-    WPI_ERROR(m_logger, "bind() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "bind() failed: {}", SocketStrerror());
     return result;
   }
   m_port = port;
@@ -140,7 +140,7 @@ int UDPClient::send(ArrayRef<uint8_t> data, std::string_view server, int port) {
   addr.sin_family = AF_INET;
   SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "server must be passed");
+    WPI_ERROR(m_logger, "{}", "server must be passed");
     return -1;
   }
 
@@ -150,7 +150,7 @@ int UDPClient::send(ArrayRef<uint8_t> data, std::string_view server, int port) {
   int res = inet_pton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #endif
   if (res != 1) {
-    WPI_ERROR(m_logger, "could not resolve " << server << " address");
+    WPI_ERROR(m_logger, "could not resolve {} address", server);
     return -1;
   }
   addr.sin_port = htons(port);
@@ -169,7 +169,7 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
   addr.sin_family = AF_INET;
   SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "server must be passed");
+    WPI_ERROR(m_logger, "{}", "server must be passed");
     return -1;
   }
 
@@ -179,7 +179,7 @@ int UDPClient::send(std::string_view data, std::string_view server, int port) {
   int res = inet_pton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #endif
   if (res != 1) {
-    WPI_ERROR(m_logger, "could not resolve " << server << " address");
+    WPI_ERROR(m_logger, "could not resolve {} address", server);
     return -1;
   }
   addr.sin_port = htons(port);
@@ -241,7 +241,7 @@ int UDPClient::set_timeout(double timeout) {
   int ret = setsockopt(m_lsd, SOL_SOCKET, SO_RCVTIMEO,
                        reinterpret_cast<char*>(&tv), sizeof(tv));
   if (ret < 0) {
-    WPI_ERROR(m_logger, "set timeout failed");
+    WPI_ERROR(m_logger, "{}", "set timeout failed");
   }
   return ret;
 }
