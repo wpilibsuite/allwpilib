@@ -235,10 +235,9 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   if (wpi::starts_with(card, "UVC Camera (") &&
       (vendor = wpi::parse_integer<int>(card.substr(12, 4), 16)) &&
       (product = wpi::parse_integer<int>(card.substr(17, 4), 16))) {
-    wpi::SmallString<64> card2Buf;
-    auto card2 = GetUsbNameFromId(vendor.value(), product.value(), card2Buf);
+    std::string card2 = GetUsbNameFromId(vendor.value(), product.value());
     if (!card2.empty()) {
-      *desc = card2;
+      *desc = std::move(card2);
       return true;
     }
   }
