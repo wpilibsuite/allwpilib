@@ -4,10 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsControlModule;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 @SuppressWarnings("all")
 public class MyRobot extends TimedRobot {
+  PneumaticsControlModule pcm = new PneumaticsControlModule();
+  Solenoid solenoid = new Solenoid(pcm, 1);
+  DoubleSolenoid doubleSolenoid = new DoubleSolenoid(pcm, 2, 3);
+  XboxController xbox = new XboxController(0);
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -29,7 +40,16 @@ public class MyRobot extends TimedRobot {
 
   /** This function is called periodically during operator control */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    solenoid.set(xbox.getAButton());
+    if (xbox.getBButton()) {
+      doubleSolenoid.set(Value.kForward);
+    } else if (xbox.getYButton()) {
+      doubleSolenoid.set(Value.kReverse);
+    } else {
+      doubleSolenoid.set(Value.kOff);
+    }
+  }
 
   /** This function is called periodically during test mode */
   @Override

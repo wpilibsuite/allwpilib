@@ -112,7 +112,6 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public boolean checkSolenoidChannel(int channel) {
-    // TODO Auto-generated method stub
-    return false;
+    return CTREPCMJNI.checkSolenoidChannel(channel);
   }
 }

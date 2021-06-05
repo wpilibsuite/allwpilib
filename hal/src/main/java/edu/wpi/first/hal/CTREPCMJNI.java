@@ -10,6 +10,8 @@ public class CTREPCMJNI extends JNIWrapper {
 
   public static native void free(int handle);
 
+  public static native boolean checkSolenoidChannel(int channel);
+
   public static native boolean getCompressor(int handle);
 
   public static native void setClosedLoopControl(int handle, boolean enabled);

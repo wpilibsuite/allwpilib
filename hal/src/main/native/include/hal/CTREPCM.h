@@ -22,7 +22,8 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status);
 void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle);
-HAL_Bool HAL_CheckCTREPCM(int32_t module);
+
+HAL_Bool HAL_CheckCTREPCMSolenoidChannel(int32_t channel);
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status);
 void HAL_SetCTREPCMClosedLoopControl(HAL_CTREPCMHandle handle, HAL_Bool enabled,

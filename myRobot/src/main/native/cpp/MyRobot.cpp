@@ -40,7 +40,7 @@ class MyRobot : public frc::TimedRobot {
    * This function is called periodically during operator control
    */
   void TeleopPeriodic() override {
-    //solenoid.Set(joystick.GetAButton());
+    solenoid.Set(joystick.GetAButton());
     if (joystick.GetBButton()) {
       doubleSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
     } else if (joystick.GetYButton()) {

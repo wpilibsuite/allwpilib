@@ -158,6 +158,5 @@ void PneumaticsControlModule::SetOneShotDuration(int index,
 }
 
 bool PneumaticsControlModule::CheckSolenoidChannel(int channel) const {
-  // TODO Fix me
-  return true;
+  return HAL_CheckCTREPCMSolenoidChannel(channel);
 }
