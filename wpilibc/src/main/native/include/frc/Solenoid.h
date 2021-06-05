@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <hal/Types.h>
 #include <units/time.h>
 
