@@ -22,9 +22,7 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
-#include "Format.h"
 #include "wpi/MathExtras.h"
-#include "NativeFormatting.h"
 #include "wpi/WindowsError.h"
 #include "wpi/fs.h"
 #include <algorithm>
@@ -113,31 +111,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
   assert(OutBufStart <= OutBufEnd && "Invalid size!");
 }
 
-raw_ostream &raw_ostream::operator<<(unsigned long N) {
-  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
-  return *this;
-}
-
-raw_ostream &raw_ostream::operator<<(long N) {
-  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
-  return *this;
-}
-
-raw_ostream &raw_ostream::operator<<(unsigned long long N) {
-  write_integer(*this, static_cast<uint64_t>(N), 0, IntegerStyle::Integer);
-  return *this;
-}
-
-raw_ostream &raw_ostream::operator<<(long long N) {
-  write_integer(*this, static_cast<int64_t>(N), 0, IntegerStyle::Integer);
-  return *this;
-}
-
-raw_ostream &raw_ostream::write_hex(unsigned long long N) {
-  wpi::write_hex(*this, N, HexPrintStyle::Lower);
-  return *this;
-}
-
 raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                         bool UseHexEscapes) {
   for (unsigned char c : Str) {
@@ -175,16 +148,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
     }
   }
 
-  return *this;
-}
-
-raw_ostream &raw_ostream::operator<<(const void *P) {
-  wpi::write_hex(*this, (uintptr_t)P, HexPrintStyle::PrefixLower);
-  return *this;
-}
-
-raw_ostream &raw_ostream::operator<<(double N) {
-  wpi::write_double(*this, N, FloatStyle::Exponent);
   return *this;
 }
 
@@ -309,14 +272,6 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
 }
 
 void raw_ostream::anchor() {}
-
-//===----------------------------------------------------------------------===//
-//  Formatted Output
-//===----------------------------------------------------------------------===//
-
-// Out of line virtual method.
-void format_object_base::home() {
-}
 
 //===----------------------------------------------------------------------===//
 //  raw_fd_ostream

@@ -214,25 +214,6 @@ public:
     return write(Arr.data(), Arr.size());
   }
 
-  raw_ostream &operator<<(unsigned long N);
-  raw_ostream &operator<<(long N);
-  raw_ostream &operator<<(unsigned long long N);
-  raw_ostream &operator<<(long long N);
-  raw_ostream &operator<<(const void *P);
-
-  raw_ostream &operator<<(unsigned int N) {
-    return this->operator<<(static_cast<unsigned long>(N));
-  }
-
-  raw_ostream &operator<<(int N) {
-    return this->operator<<(static_cast<long>(N));
-  }
-
-  raw_ostream &operator<<(double N);
-
-  /// Output \p N in hexadecimal, without any prefix or padding.
-  raw_ostream &write_hex(unsigned long long N);
-
   /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
   /// satisfy wpi::isPrint into an escape sequence.
   raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
