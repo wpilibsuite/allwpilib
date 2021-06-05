@@ -7,12 +7,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/NativeFormatting.h"
+#include "NativeFormatting.h"
 
 #include "wpi/ArrayRef.h"
 #include "wpi/SmallString.h"
 #include "wpi/StringExtras.h"
-#include "wpi/Format.h"
+#include "Format.h"
 
 #include <float.h>
 

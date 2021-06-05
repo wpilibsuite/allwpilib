@@ -33,11 +33,6 @@ enum CreationDisposition : unsigned;
 
 namespace wpi {
 
-class format_object_base;
-class FormattedString;
-class FormattedNumber;
-class FormattedBytes;
-
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
 /// buffered disciplines etc. It is a simple buffer that outputs
@@ -247,18 +242,6 @@ public:
   raw_ostream &write(const uint8_t *Ptr, size_t Size) {
     return write(reinterpret_cast<const char *>(Ptr), Size);
   }
-
-  // Formatted output, see the format() function in Support/Format.h.
-  raw_ostream &operator<<(const format_object_base &Fmt);
-
-  // Formatted output, see the leftJustify() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedString &);
-
-  // Formatted output, see the formatHex() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedNumber &);
-
-  // Formatted output, see the format_bytes() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedBytes &);
 
   /// indent - Insert 'NumSpaces' spaces.
   raw_ostream &indent(unsigned NumSpaces);

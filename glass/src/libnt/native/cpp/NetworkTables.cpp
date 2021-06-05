@@ -18,7 +18,6 @@
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpi/ArrayRef.h>
-#include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
@@ -58,7 +57,7 @@ static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
       os << ',';
     }
     first = false;
-    os << wpi::format("%.6f", v);
+    os << fmt::format("{:.6f}", v);
   }
   os << ']';
   return rv;
