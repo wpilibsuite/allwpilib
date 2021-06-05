@@ -85,16 +85,13 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to the blacklist and
-   * disabled until power cycle, or until faults are cleared.
+   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to the Disabled
+   * List and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
    */
-  public boolean isBlackListed() {
-    // TODO
-    return false;
-    // int value = getPCMSolenoidBlackList() & (1 << m_channel);
-    // return value != 0;
+  public boolean isDisabled() {
+    return (m_module.getSolenoidDisabledList() & m_mask) != 0;
   }
 
   /**
@@ -106,8 +103,8 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @see #startPulse()
    */
   public void setPulseDuration(double durationSeconds) {
-    // long durationMS = (long) (durationSeconds * 1000);
-    // SolenoidJNI.setOneShotDuration(m_solenoidHandle, durationMS);
+    long durationMS = (long) (durationSeconds * 1000);
+    m_module.setOneShotDuration(m_channel, (int) durationMS);
   }
 
   /**
@@ -116,7 +113,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @see #setPulseDuration(double)
    */
   public void startPulse() {
-    // SolenoidJNI.fireOneShot(m_solenoidHandle);
+    m_module.fireOneShot(m_channel);
   }
 
   @Override

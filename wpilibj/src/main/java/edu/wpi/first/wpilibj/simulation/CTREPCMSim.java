@@ -17,7 +17,7 @@ public class CTREPCMSim {
 
   /** Constructs for the default PCM. */
   public CTREPCMSim() {
-    m_index = SensorUtil.getDefaultSolenoidModule();
+    m_index = SensorUtil.getDefaultCTREPCMModule();
   }
 
   /**

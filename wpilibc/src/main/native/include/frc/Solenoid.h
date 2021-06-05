@@ -73,16 +73,16 @@ class Solenoid : public SolenoidBase,
   int GetChannel() const;
 
   /**
-   * Check if solenoid is blacklisted.
+   * Check if solenoid is DisabledListed.
    *
-   * If a solenoid is shorted, it is added to the blacklist and
+   * If a solenoid is shorted, it is added to the DisabledList and
    * disabled until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    *
    * @return If solenoid is disabled due to short.
    */
-  bool IsBlackListed() const;
+  bool IsDisabledListed() const;
 
   /**
    * Set the pulse duration in the PCM. This is used in conjunction with

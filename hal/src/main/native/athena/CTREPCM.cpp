@@ -94,7 +94,7 @@ union PcmStatusFault {
   uint8_t data[8];
   struct Bits {
     /* Byte 0 */
-    unsigned SolenoidBlacklist : 8;
+    unsigned SolenoidDisabledList : 8;
     /* Byte 1 */
     unsigned reserved_bit0 : 1;
     unsigned reserved_bit1 : 1;
@@ -313,10 +313,10 @@ void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
   SendControl(pcm.get(), status);
 }
 
-int32_t HAL_GetCTREPCMSolenoidBlackList(HAL_CTREPCMHandle handle,
+int32_t HAL_GetCTREPCMSolenoidDisabledList(HAL_CTREPCMHandle handle,
                                         int32_t* status) {
   READ_SOL_FAULTS(0);
-  return pcmStatus.bits.SolenoidBlacklist;
+  return pcmStatus.bits.SolenoidDisabledList;
 }
 
 HAL_Bool HAL_GetCTREPCMSolenoidVoltageStickyFault(HAL_CTREPCMHandle handle,

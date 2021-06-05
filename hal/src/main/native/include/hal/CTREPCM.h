@@ -51,7 +51,7 @@ int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status);
 void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
                              int32_t values, int32_t* status);
 
-int32_t HAL_GetCTREPCMSolenoidBlackList(HAL_CTREPCMHandle handle,
+int32_t HAL_GetCTREPCMSolenoidDisabledList(HAL_CTREPCMHandle handle,
                                         int32_t* status);
 HAL_Bool HAL_GetCTREPCMSolenoidVoltageStickyFault(HAL_CTREPCMHandle handle,
                                                   int32_t* status);

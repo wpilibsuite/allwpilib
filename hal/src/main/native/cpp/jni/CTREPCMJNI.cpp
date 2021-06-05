@@ -241,15 +241,15 @@ Java_edu_wpi_first_hal_CTREPCMJNI_setSolenoids
 
 /*
  * Class:     edu_wpi_first_hal_CTREPCMJNI
- * Method:    getSolenoidBlacklist
+ * Method:    getSolenoidDisabledList
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CTREPCMJNI_getSolenoidBlacklist
+Java_edu_wpi_first_hal_CTREPCMJNI_getSolenoidDisabledList
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  auto result = HAL_GetCTREPCMSolenoidBlackList(handle, &status);
+  auto result = HAL_GetCTREPCMSolenoidDisabledList(handle, &status);
   CheckStatus(env, status, false);
   return result;
 }

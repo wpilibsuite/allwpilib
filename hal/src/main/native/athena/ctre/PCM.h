@@ -153,26 +153,26 @@ public:
      */
 	CTR_Code GetNumberOfFailedControlFrames(UINT16 &status);
 
-    /* Get raw Solenoid Blacklist
+    /* Get raw Solenoid DisabledList
      * @Return	-	CTR_Code	-	Error code (if any)
-     * @Param	-	status		-	Raw binary breakdown of Solenoid Blacklist
+     * @Param	-	status		-	Raw binary breakdown of Solenoid DisabledList
      * 								BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
      * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
      * 				See function SeekStatusFaultFrames
      * 				See function EnableSeekStatusFaultFrames
      */
-    CTR_Code 	GetSolenoidBlackList(UINT8 &status);
+    CTR_Code 	GetSolenoidDisabledList(UINT8 &status);
 
-    /* Get solenoid Blacklist status
-     * - Blacklisted solenoids cannot be enabled until PCM is power cycled
+    /* Get solenoid DisabledList status
+     * - DisabledListed solenoids cannot be enabled until PCM is power cycled
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	idx			-	ID of solenoid [0,7]
-     * @Param	-	status		-	True if Solenoid is blacklisted, false if otherwise
+     * @Param	-	status		-	True if Solenoid is DisabledListed, false if otherwise
      * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
      * 				See function SeekStatusFaultFrames
      * 				See function EnableSeekStatusFaultFrames
      */
-    CTR_Code 	IsSolenoidBlacklisted(UINT8 idx, bool &status);
+    CTR_Code 	IsSolenoidDisabledListed(UINT8 idx, bool &status);
 
     /* Return status of module enable/disable
      * @Return	-	CTR_Code	-	Error code (if any)
@@ -180,7 +180,7 @@ public:
      */
     CTR_Code	isModuleEnabled(bool &status);
 
-    /* Get solenoid Blacklist status
+    /* Get solenoid DisabledList status
      * @Return	-	CTR_Code	-	Error code (if any)
      * @Param	-	idx			-	ID of solenoid [0,7] to fire one shot pulse.
      */
@@ -220,7 +220,7 @@ extern "C" {
 	void c_EnableSeekStatusFaultFrames(void * handle,INT8 enable);
 	void c_EnableSeekDebugFrames(void * handle,INT8 enable);
 	CTR_Code c_GetNumberOfFailedControlFrames(void * handle,UINT16*status);
-	CTR_Code c_GetSolenoidBlackList(void * handle,UINT8 *status);
-	CTR_Code c_IsSolenoidBlacklisted(void * handle,UINT8 idx,INT8*status);
+	CTR_Code c_GetSolenoidDisabledList(void * handle,UINT8 *status);
+	CTR_Code c_IsSolenoidDisabledListed(void * handle,UINT8 idx,INT8*status);
 }
 #endif

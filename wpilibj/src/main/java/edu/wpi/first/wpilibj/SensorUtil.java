@@ -205,7 +205,8 @@ public final class SensorUtil {
    *
    * @return The number of the default solenoid module.
    */
-  public static int getDefaultSolenoidModule() {
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static int getDefaultCTREPCMModule() {
     return 0;
   }
 

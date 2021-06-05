@@ -89,26 +89,26 @@ class DoubleSolenoid : public SolenoidBase,
   int GetRevChannel() const;
 
   /**
-   * Check if the forward solenoid is blacklisted.
+   * Check if the forward solenoid is DisabledListed.
    *
-   * If a solenoid is shorted, it is added to the blacklist and disabled until
+   * If a solenoid is shorted, it is added to the DisabledList and disabled until
    * power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.
    */
-  bool IsFwdSolenoidBlackListed() const;
+  bool IsFwdSolenoidDisabledListed() const;
 
   /**
-   * Check if the reverse solenoid is blacklisted.
+   * Check if the reverse solenoid is DisabledListed.
    *
-   * If a solenoid is shorted, it is added to the blacklist and disabled until
+   * If a solenoid is shorted, it is added to the DisabledList and disabled until
    * power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.
    */
-  bool IsRevSolenoidBlackListed() const;
+  bool IsRevSolenoidDisabledListed() const;
 
   void InitSendable(SendableBuilder& builder) override;
 

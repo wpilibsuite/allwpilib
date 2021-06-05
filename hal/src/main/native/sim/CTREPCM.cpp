@@ -188,7 +188,7 @@ void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
   }
 }
 
-int32_t HAL_GetCTREPCMSolenoidBlackList(HAL_CTREPCMHandle handle,
+int32_t HAL_GetCTREPCMSolenoidDisabledList(HAL_CTREPCMHandle handle,
                                         int32_t* status) {
   return 0;
 }

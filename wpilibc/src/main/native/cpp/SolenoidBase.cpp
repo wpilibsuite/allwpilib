@@ -23,15 +23,15 @@ int SolenoidBase::GetAll() const {
   return SolenoidBase::GetAll(m_moduleNumber);
 }
 
-int SolenoidBase::GetPCMSolenoidBlackList(int module) {
+int SolenoidBase::GetPCMSolenoidDisabledList(int module) {
   int32_t status = 0;
-  int rv = HAL_GetPCMSolenoidBlackList(module, &status);
+  int rv = HAL_GetPCMSolenoidDisabledList(module, &status);
   FRC_CheckErrorStatus(status, "Module {}", module);
   return rv;
 }
 
-int SolenoidBase::GetPCMSolenoidBlackList() const {
-  return SolenoidBase::GetPCMSolenoidBlackList(m_moduleNumber);
+int SolenoidBase::GetPCMSolenoidDisabledList() const {
+  return SolenoidBase::GetPCMSolenoidDisabledList(m_moduleNumber);
 }
 
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {

@@ -25,7 +25,7 @@ public class CTREPCMJNI extends JNIWrapper {
     public static native int getSolenoids(int handle);
     public static native void setSolenoids(int handle, int mask, int values);
 
-    public static native int getSolenoidBlacklist(int handle);
+    public static native int getSolenoidDisabledList(int handle);
     public static native boolean getSolenoidVoltageFault(int handle);
     public static native boolean getSolenoidVoltageStickyFault(int handle);
 

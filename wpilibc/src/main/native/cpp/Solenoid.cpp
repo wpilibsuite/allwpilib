@@ -71,8 +71,8 @@ int Solenoid::GetChannel() const {
   return m_channel;
 }
 
-bool Solenoid::IsBlackListed() const {
-  int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
+bool Solenoid::IsDisabledListed() const {
+  int value = GetPCMSolenoidDisabledList(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
 }
 

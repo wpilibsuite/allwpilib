@@ -37,27 +37,27 @@ class SolenoidBase {
   int GetAll() const;
 
   /**
-   * Reads complete solenoid blacklist for all 8 solenoids as a single byte.
+   * Reads complete solenoid DisabledList for all 8 solenoids as a single byte.
    *
-   * If a solenoid is shorted, it is added to the blacklist and
+   * If a solenoid is shorted, it is added to the DisabledList and
    * disabled until power cycle, or until faults are cleared.
    * @see ClearAllPCMStickyFaults()
    *
    * @param module the module to read from
-   * @return The solenoid blacklist of all 8 solenoids on the module.
+   * @return The solenoid DisabledList of all 8 solenoids on the module.
    */
-  static int GetPCMSolenoidBlackList(int module);
+  static int GetPCMSolenoidDisabledList(int module);
 
   /**
-   * Reads complete solenoid blacklist for all 8 solenoids as a single byte.
+   * Reads complete solenoid DisabledList for all 8 solenoids as a single byte.
    *
-   * If a solenoid is shorted, it is added to the blacklist and
+   * If a solenoid is shorted, it is added to the DisabledList and
    * disabled until power cycle, or until faults are cleared.
    * @see ClearAllPCMStickyFaults()
    *
-   * @return The solenoid blacklist of all 8 solenoids on the module.
+   * @return The solenoid DisabledList of all 8 solenoids on the module.
    */
-  int GetPCMSolenoidBlackList() const;
+  int GetPCMSolenoidDisabledList() const;
 
   /**
    * @param module the module to read from

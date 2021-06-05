@@ -145,28 +145,23 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if the forward solenoid is blacklisted. If a solenoid is shorted, it is added to the
-   * blacklist and disabled until power cycle, or until faults are cleared.
+   * Check if the forward solenoid is Disabled. If a solenoid is shorted, it is added to the
+   * DisabledList and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
    */
-  public boolean isFwdSolenoidBlackListed() {
-    // TODO
-    // int blackList = getPCMSolenoidBlackList();
-    // return (blackList & m_forwardMask) != 0;
-    return false;
+  public boolean isFwdSolenoidDisabled() {
+    return (m_module.getSolenoidDisabledList() & m_forwardMask) != 0;
   }
 
   /**
-   * Check if the reverse solenoid is blacklisted. If a solenoid is shorted, it is added to the
-   * blacklist and disabled until power cycle, or until faults are cleared.
+   * Check if the reverse solenoid is Disabled. If a solenoid is shorted, it is added to the
+   * DisabledList and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
    */
-  public boolean isRevSolenoidBlackListed() {
-    // int blackList = getPCMSolenoidBlackList();
-    // return (blackList & m_reverseMask) != 0;
-    return false;
+  public boolean isRevSolenoidDisabled() {
+    return (m_module.getSolenoidDisabledList() & m_reverseMask) != 0;
   }
 
   @Override

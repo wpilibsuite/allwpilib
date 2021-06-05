@@ -140,14 +140,14 @@ int DoubleSolenoid::GetRevChannel() const {
   return m_reverseChannel;
 }
 
-bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
-  int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
-  return (blackList & m_forwardMask) != 0;
+bool DoubleSolenoid::IsFwdSolenoidDisabledListed() const {
+  int DisabledList = GetPCMSolenoidDisabledList(m_moduleNumber);
+  return (DisabledList & m_forwardMask) != 0;
 }
 
-bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
-  int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
-  return (blackList & m_reverseMask) != 0;
+bool DoubleSolenoid::IsRevSolenoidDisabledListed() const {
+  int DisabledList = GetPCMSolenoidDisabledList(m_moduleNumber);
+  return (DisabledList & m_reverseMask) != 0;
 }
 
 void DoubleSolenoid::InitSendable(SendableBuilder& builder) {

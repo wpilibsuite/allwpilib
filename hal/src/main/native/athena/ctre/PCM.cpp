@@ -76,7 +76,7 @@ typedef struct _PcmControlSetOneShotDur_t{
 
 typedef struct _PcmStatusFault_t{
 	/* Byte 0 */
-	unsigned SolenoidBlacklist:8;
+	unsigned SolenoidDisabledList:8;
 	/* Byte 1 */
 	unsigned reserved_bit0 :1;
 	unsigned reserved_bit1 :1;
@@ -182,7 +182,7 @@ CTR_Code PCM::SetClosedLoopControl(bool en)
 	FlushTx(toFill);
 	return CTR_OKAY;
 }
-/* Get solenoid Blacklist status
+/* Get solenoid DisabledList status
  * @Return	-	CTR_Code	-	Error code (if any)
  * @Param	-	idx			-	ID of solenoid [0,7] to fire one shot pulse.
  */
@@ -439,25 +439,25 @@ CTR_Code PCM::GetNumberOfFailedControlFrames(UINT16 &status)
 	status |= rx->tokFailsBtm8;
 	return rx.err;
 }
-/* Get raw Solenoid Blacklist
+/* Get raw Solenoid DisabledList
  *
- * @Return	-	BINARY	-	Raw binary breakdown of Solenoid Blacklist
+ * @Return	-	BINARY	-	Raw binary breakdown of Solenoid DisabledList
  * 							BIT7 = Solenoid 1, BIT6 = Solenoid 2, etc.
  *
  * @WARNING	-	Return only valid if [SeekStatusFaultFrames] is enabled
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
  */
-CTR_Code PCM::GetSolenoidBlackList(UINT8 &status)
+CTR_Code PCM::GetSolenoidDisabledList(UINT8 &status)
 {
 	GET_PCM_SOL_FAULTS();
-	status = rx->SolenoidBlacklist;
+	status = rx->SolenoidDisabledList;
 	return rx.err;
 }
-/* Get solenoid Blacklist status
- * - Blacklisted solenoids cannot be enabled until PCM is power cycled
+/* Get solenoid DisabledList status
+ * - DisabledListed solenoids cannot be enabled until PCM is power cycled
  *
- * @Return	-	True/False	-	True if Solenoid is blacklisted, false if otherwise
+ * @Return	-	True/False	-	True if Solenoid is DisabledListed, false if otherwise
  *
  * @Param	-	idx			-	ID of solenoid [0,7]
  *
@@ -465,10 +465,10 @@ CTR_Code PCM::GetSolenoidBlackList(UINT8 &status)
  * 				See function SeekStatusFaultFrames
  * 				See function EnableSeekStatusFaultFrames
  */
-CTR_Code PCM::IsSolenoidBlacklisted(UINT8 idx, bool &status)
+CTR_Code PCM::IsSolenoidDisabledListed(UINT8 idx, bool &status)
 {
 	GET_PCM_SOL_FAULTS();
-	status = (rx->SolenoidBlacklist & (1ul<<(idx)) )? 1 : 0;
+	status = (rx->SolenoidDisabledList & (1ul<<(idx)) )? 1 : 0;
 	return rx.err;
 }
 //------------------ C interface --------------------------------------------//
@@ -561,12 +561,12 @@ extern "C" {
 	CTR_Code c_GetNumberOfFailedControlFrames(void * handle, UINT16*status) {
 		return ((PCM*) handle)->GetNumberOfFailedControlFrames(*status);
 	}
-	CTR_Code c_GetSolenoidBlackList(void * handle, UINT8 *status) {
-		return ((PCM*) handle)->GetSolenoidBlackList(*status);
+	CTR_Code c_GetSolenoidDisabledList(void * handle, UINT8 *status) {
+		return ((PCM*) handle)->GetSolenoidDisabledList(*status);
 	}
-	CTR_Code c_IsSolenoidBlacklisted(void * handle, UINT8 idx, INT8*status) {
+	CTR_Code c_IsSolenoidDisabledListed(void * handle, UINT8 idx, INT8*status) {
 		bool bstatus;
-		CTR_Code retval = ((PCM*) handle)->IsSolenoidBlacklisted(idx, bstatus);
+		CTR_Code retval = ((PCM*) handle)->IsSolenoidDisabledListed(idx, bstatus);
 		*status = bstatus;
 		return retval;
 	}
