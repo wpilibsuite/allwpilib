@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <memory>
 
+#include <fmt/format.h>
 #include <wpi/MemAlloc.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
@@ -155,11 +156,8 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
 }
 
 static bool GetVendorProduct(int dev, int* vendor, int* product) {
-  wpi::SmallString<64> ifpath;
-  {
-    wpi::raw_svector_ostream oss{ifpath};
-    oss << "/sys/class/video4linux/video" << dev << "/device/modalias";
-  }
+  auto ifpath =
+      fmt::format("/sys/class/video4linux/video{}/device/modalias", dev);
 
   int fd = open(ifpath.c_str(), O_RDONLY);
   if (fd < 0) {
@@ -191,11 +189,8 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
 }
 
 static bool GetDescriptionSysV4L(int dev, std::string* desc) {
-  wpi::SmallString<64> ifpath;
-  {
-    wpi::raw_svector_ostream oss{ifpath};
-    oss << "/sys/class/video4linux/video" << dev << "/device/interface";
-  }
+  auto ifpath =
+      fmt::format("/sys/class/video4linux/video{}/device/interface", dev);
 
   int fd = open(ifpath.c_str(), O_RDONLY);
   if (fd < 0) {
@@ -1539,10 +1534,7 @@ namespace cs {
 
 CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
-  wpi::SmallString<32> path;
-  wpi::raw_svector_ostream oss{path};
-  oss << "/dev/video" << dev;
-  return CreateUsbCameraPath(name, oss.str(), status);
+  return CreateUsbCameraPath(name, fmt::format("/dev/video{}", dev), status);
 }
 
 CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,

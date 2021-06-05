@@ -3,18 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
+#include <cstdio>
 #include <thread>
 
-#include <wpi/SmallString.h>
+#include <fmt/format.h>
 #include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
 
 #include "cscore.h"
 
 int main(int argc, char** argv) {
   if (argc < 2) {
-    wpi::errs() << "Usage: settings camera [prop val] ... -- [prop val]...\n";
-    wpi::errs() << "  Example: settings 1 brightness 30 raw_contrast 10\n";
+    std::fputs("Usage: settings camera [prop val] ... -- [prop val]...\n",
+               stderr);
+    std::fputs("  Example: settings 1 brightness 30 raw_contrast 10\n", stderr);
     return 1;
   }
 
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
   if (auto v = wpi::parse_integer<int>(argv[1], 10)) {
     id = v.value();
   } else {
-    wpi::errs() << "Expected number for camera\n";
+    std::fputs("Expected number for camera\n", stderr);
     return 2;
   }
 
@@ -70,40 +71,35 @@ int main(int argc, char** argv) {
   }
 
   // Print settings
-  wpi::SmallString<64> buf;
-  wpi::outs() << "Properties:\n";
+  std::puts("Properties:");
   for (const auto& prop : camera.EnumerateProperties()) {
-    wpi::outs() << "  " << prop.GetName();
+    fmt::print("  {}", prop.GetName());
     switch (prop.GetKind()) {
       case cs::VideoProperty::kBoolean:
-        wpi::outs() << " (bool): "
-                    << "value=" << prop.Get()
-                    << " default=" << prop.GetDefault();
+        fmt::print(" (bool): value={} default={}", prop.Get(),
+                   prop.GetDefault());
         break;
       case cs::VideoProperty::kInteger:
-        wpi::outs() << " (int): "
-                    << "value=" << prop.Get() << " min=" << prop.GetMin()
-                    << " max=" << prop.GetMax() << " step=" << prop.GetStep()
-                    << " default=" << prop.GetDefault();
+        fmt::print(" (int): value={} min={} max={} step={} default={}",
+                   prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
+                   prop.GetDefault());
         break;
       case cs::VideoProperty::kString:
-        wpi::outs() << " (string): " << prop.GetString(buf);
+        fmt::print(" (string): {}", prop.GetString());
         break;
       case cs::VideoProperty::kEnum: {
-        wpi::outs() << " (enum): "
-                    << "value=" << prop.Get();
+        fmt::print(" (enum): value={}", prop.Get());
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {
-          if (choices[i].empty()) {
-            continue;
+          if (!choices[i].empty()) {
+            fmt::print("\n    {}: {}", i, choices[i]);
           }
-          wpi::outs() << "\n    " << i << ": " << choices[i];
         }
         break;
       }
       default:
         break;
     }
-    wpi::outs() << '\n';
+    std::fputc('\n', stdout);
   }
 }

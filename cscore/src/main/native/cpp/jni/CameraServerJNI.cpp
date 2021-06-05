@@ -5,9 +5,9 @@
 #include <exception>
 
 #include <opencv2/core/core.hpp>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "cscore_cpp.h"
 #include "cscore_cv.h"
@@ -197,7 +197,8 @@ static void ReportError(JNIEnv* env, CS_Status status) {
   if (status == CS_OK) {
     return;
   }
-  wpi::SmallString<64> msg;
+  std::string_view msg;
+  std::string msgBuf;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
       msg = "property write failed";
@@ -230,12 +231,12 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       msg = "telemetry not enabled";
       break;
     default: {
-      wpi::raw_svector_ostream oss{msg};
-      oss << "unknown error code=" << status;
+      msgBuf = fmt::format("unknown error code={}", status);
+      msg = msgBuf;
       break;
     }
   }
-  videoEx.Throw(env, msg.str());
+  videoEx.Throw(env, msg);
 }
 
 static inline bool CheckStatus(JNIEnv* env, CS_Status status) {

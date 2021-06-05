@@ -4,8 +4,8 @@
 
 #include "UsbCameraProperty.h"
 
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "UsbUtil.h"
 
@@ -252,8 +252,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
         continue;
       }
       if (prop->intMenu) {
-        wpi::raw_string_ostream os(prop->enumChoices[i]);
-        os << qmenu.value;
+        prop->enumChoices[i] = fmt::to_string(qmenu.value);
       } else {
         prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
       }

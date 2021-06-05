@@ -9,6 +9,7 @@
 
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringExtras.h>
+#include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -106,7 +107,7 @@ bool ReadConfig() {
   try {
     j = wpi::json::parse(is);
   } catch (const wpi::json::parse_error& e) {
-    ParseError() << "byte " << e.byte << ": " << e.what() << '\n';
+    fmt::print(ParseError(), "byte {}: {}\n", e.byte, e.what());
     return false;
   }
 
@@ -178,10 +179,10 @@ int main(int argc, char* argv[]) {
   // start NetworkTables
   auto ntinst = nt::NetworkTableInstance::GetDefault();
   if (server) {
-    wpi::outs() << "Setting up NetworkTables server\n";
+    std::puts("Setting up NetworkTables server");
     ntinst.StartServer();
   } else {
-    wpi::outs() << "Setting up NetworkTables client for team " << team << '\n';
+    fmt::print("Setting up NetworkTables client for team {}\n", team);
     ntinst.StartClientTeam(team);
   }
 

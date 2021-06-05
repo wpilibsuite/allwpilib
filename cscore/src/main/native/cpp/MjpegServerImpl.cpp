@@ -11,6 +11,7 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/TCPAcceptor.h>
+#include <wpi/fmt/raw_ostream.h>
 #include <wpi/raw_socket_istream.h>
 #include <wpi/raw_socket_ostream.h>
 
@@ -134,7 +135,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
 static void SendHeader(wpi::raw_ostream& os, int code,
                        std::string_view codeText, std::string_view contentType,
                        std::string_view extra = {}) {
-  os << "HTTP/1.0 " << code << ' ' << codeText << "\r\n";
+  fmt::print(os, "HTTP/1.0 {} {}\r\n", code, codeText);
   os << "Connection: close\r\n"
         "Server: CameraServer/1.0\r\n"
         "Cache-Control: no-store, no-cache, must-revalidate, pre-check=0, "
@@ -301,7 +302,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::raw_ostream& os,
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
         if (auto v = wpi::parse_integer<int>(value, 10)) {
-          response << param << ": " << v.value() << "\r\n";
+          fmt::print(response, "{}: {}\r\n", param, v.value());
           SDEBUG4("HTTP parameter \"{}\" value {}", param, value);
           source.SetProperty(prop, v.value(), &status);
         } else {
@@ -355,13 +356,13 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
       continue;
     }
     auto kind = source.GetPropertyKind(prop);
-    os << "<p />"
-       << "<label for=\"" << name << "\">" << name << "</label>\n";
+    fmt::print(os, "<p /><label for=\"{0}\">{0}</label>\n", name);
     switch (kind) {
       case CS_PROP_BOOLEAN:
-        os << "<input id=\"" << name
-           << "\" type=\"checkbox\" onclick=\"update('" << name
-           << "', this.checked ? 1 : 0)\" ";
+        fmt::print(os,
+                   "<input id=\"{0}\" type=\"checkbox\" "
+                   "onclick=\"update('{0}', this.checked ? 1 : 0)\" ",
+                   name);
         if (source.GetProperty(prop, &status) != 0) {
           os << "checked />\n";
         } else {
@@ -373,12 +374,13 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         auto min = source.GetPropertyMin(prop, &status);
         auto max = source.GetPropertyMax(prop, &status);
         auto step = source.GetPropertyStep(prop, &status);
-        os << "<input type=\"range\" min=\"" << min << "\" max=\"" << max
-           << "\" value=\"" << valI << "\" id=\"" << name << "\" step=\""
-           << step << "\" oninput=\"updateInt('#" << name << "op', '" << name
-           << "', value)\" />\n";
-        os << "<output for=\"" << name << "\" id=\"" << name << "op\">" << valI
-           << "</output>\n";
+        fmt::print(os,
+                   "<input type=\"range\" min=\"{1}\" max=\"{2}\" "
+                   "value=\"{3}\" id=\"{0}\" step=\"{4}\" "
+                   "oninput=\"updateInt('#{0}op', '{0}', value)\" />\n",
+                   name, min, max, valI, step);
+        fmt::print(os, "<output for=\"{0}\" id=\"{0}op\">{1}</output>\n", name,
+                   valI);
         break;
       }
       case CS_PROP_ENUM: {
@@ -395,24 +397,28 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
           for (char ch : *choice) {
             ch_name.push_back(wpi::isPrint(ch) ? ch : ' ');
           }
-          os << "<input id=\"" << name << j << "\" type=\"radio\" name=\""
-             << name << "\" value=\"" << ch_name << "\" onclick=\"update('"
-             << name << "', " << j << ")\"";
+          fmt::print(os,
+                     "<input id=\"{0}{1}\" type=\"radio\" name=\"{0}\" "
+                     "value=\"{2}\" onclick=\"update('{0}', {1})\"",
+                     name, j, ch_name);
           if (j == valE) {
             os << " checked";
           }
-          os << " /><label for=\"" << name << j << "\">" << ch_name
-             << "</label>\n";
+          fmt::print(os, " /><label for=\"{}{}\">{}</label>\n", name, j,
+                     ch_name);
         }
         break;
       }
       case CS_PROP_STRING: {
         wpi::SmallString<128> strval_buf;
-        os << "<input type=\"text\" id=\"" << name << "box\" name=\"" << name
-           << "\" value=\""
-           << source.GetStringProperty(prop, strval_buf, &status) << "\" />\n";
-        os << "<input type=\"button\" value =\"Submit\" onclick=\"update('"
-           << name << "', " << name << "box.value)\" />\n";
+        fmt::print(os,
+                   "<input type=\"text\" id=\"{0}box\" name=\"{0}\" "
+                   "value=\"{1}\" />\n",
+                   name, source.GetStringProperty(prop, strval_buf, &status));
+        fmt::print(os,
+                   "<input type=\"button\" value =\"Submit\" "
+                   "onclick=\"update('{0}', {0}box.value)\" />\n",
+                   name);
         break;
       }
       default:
@@ -458,10 +464,8 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::raw_ostream& os,
         os << "unknown";
         break;
     }
-    os << "</td><td>" << mode.width;
-    os << "</td><td>" << mode.height;
-    os << "</td><td>" << mode.fps;
-    os << "</td></tr>";
+    fmt::print(os, "</td><td>{}</td><td>{}</td><td>{}</td></tr>", mode.width,
+               mode.height, mode.fps);
   }
   os << "</table>\n";
   os << endRootPage << "\r\n";
@@ -489,20 +493,21 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
     wpi::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
     auto kind = source.GetPropertyKind(prop);
-    os << "\n\"name\": \"" << name << '"';
-    os << ",\n\"id\": \"" << prop << '"';
-    os << ",\n\"type\": \"" << kind << '"';
-    os << ",\n\"min\": \"" << source.GetPropertyMin(prop, &status) << '"';
-    os << ",\n\"max\": \"" << source.GetPropertyMax(prop, &status) << '"';
-    os << ",\n\"step\": \"" << source.GetPropertyStep(prop, &status) << '"';
-    os << ",\n\"default\": \"" << source.GetPropertyDefault(prop, &status)
-       << '"';
+    fmt::print(os, "\n\"name\": \"{}\"", name);
+    fmt::print(os, ",\n\"id\": \"{}\"", prop);
+    fmt::print(os, ",\n\"type\": \"{}\"", kind);
+    fmt::print(os, ",\n\"min\": \"{}\"", source.GetPropertyMin(prop, &status));
+    fmt::print(os, ",\n\"max\": \"{}\"", source.GetPropertyMax(prop, &status));
+    fmt::print(os, ",\n\"step\": \"{}\"",
+               source.GetPropertyStep(prop, &status));
+    fmt::print(os, ",\n\"default\": \"{}\"",
+               source.GetPropertyDefault(prop, &status));
     os << ",\n\"value\": \"";
     switch (kind) {
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM:
-        os << source.GetProperty(prop, &status);
+        fmt::print(os, "{}", source.GetProperty(prop, &status));
         break;
       case CS_PROP_STRING: {
         wpi::SmallString<128> strval_buf;
@@ -532,7 +537,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         for (char ch : *choice) {
           ch_name.push_back(std::isprint(ch) ? ch : ' ');
         }
-        os << '"' << j << "\": \"" << ch_name << '"';
+        fmt::print(os, "\"{}\": \"{}\"", j, ch_name);
       }
       os << "}\n";
     }
@@ -568,9 +573,9 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::raw_ostream& os,
         os << "unknown";
         break;
     }
-    os << "\",\n\"width\": \"" << mode.width << '"';
-    os << ",\n\"height\": \"" << mode.height << '"';
-    os << ",\n\"fps\": \"" << mode.fps << '"';
+    fmt::print(os, "\",\n\"width\": \"{}\"", mode.width);
+    fmt::print(os, ",\n\"height\": \"{}\"", mode.height);
+    fmt::print(os, ",\n\"fps\": \"{}\"", mode.fps);
     os << '}';
   }
   os << "\n]\n}\n";
@@ -752,10 +757,10 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     double timestamp = lastFrameTime / 1000000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
-        << "Content-Type: image/jpeg\r\n"
-        << "Content-Length: " << size << "\r\n"
-        << "X-Timestamp: " << timestamp << "\r\n"
-        << "\r\n";
+        << "Content-Type: image/jpeg\r\n";
+    fmt::print(oss, "Content-Length: {}\r\n", size);
+    fmt::print(oss, "X-Timestamp: {}\r\n", timestamp);
+    oss << "\r\n";
     os << oss.str();
     if (addDHT) {
       // Insert DHT data immediately before SOF
