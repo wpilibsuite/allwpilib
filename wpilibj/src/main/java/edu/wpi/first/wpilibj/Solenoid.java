@@ -30,17 +30,15 @@ public class Solenoid implements Sendable, AutoCloseable {
   public Solenoid(PneumaticsBase module, final int channel) {
     m_module = Objects.requireNonNull(module, "Module cannot be null");
 
-    SensorUtil.checkSolenoidChannel(channel);
+    if (!module.checkSolenoidChannel(channel)) {
+      throw new IllegalArgumentException(); // TODO fix me
+    }
 
     m_mask = 1 << channel;
     m_channel = channel;
 
     HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, module.getModuleNumber() + 1);
     SendableRegistry.addLW(this, "Solenoid", module.getModuleNumber(), channel);
-  }
-
-  public PneumaticsBase getModule() {
-    return m_module;
   }
 
   @Override

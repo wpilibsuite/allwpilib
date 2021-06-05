@@ -44,6 +44,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
     m_module = Objects.requireNonNull(module, "Module cannot be null");
 
+    // TODO check channels
+
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
 
@@ -56,10 +58,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     HAL.report(tResourceType.kResourceType_Solenoid,
       reverseChannel + 1, module.getModuleNumber() + 1);
     SendableRegistry.addLW(this, "DoubleSolenoid", module.getModuleNumber(), forwardChannel);
-  }
-
-  public PneumaticsBase getModule() {
-    return m_module;
   }
 
   @Override

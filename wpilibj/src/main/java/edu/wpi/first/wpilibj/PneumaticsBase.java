@@ -45,4 +45,6 @@ public interface PneumaticsBase extends AutoCloseable {
      * @param durMs shot duration
      */
     void setOneShotDuration(int index, int durMs);
+
+    boolean checkSolenoidChannel(int channel);
 }

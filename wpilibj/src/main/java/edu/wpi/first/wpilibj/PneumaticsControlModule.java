@@ -105,4 +105,10 @@ public class PneumaticsControlModule implements PneumaticsBase {
     public void setOneShotDuration(int index, int durMs) {
         CTREPCMJNI.setOneShotDuration(m_handle, index, durMs);
     }
+
+    @Override
+    public boolean checkSolenoidChannel(int channel) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

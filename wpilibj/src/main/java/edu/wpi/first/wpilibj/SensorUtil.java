@@ -49,23 +49,6 @@ public final class SensorUtil {
   public static final int kPCMModules = PortsJNI.getNumPCMModules();
 
   /**
-   * Verify that the solenoid module is correct.
-   *
-   * @param moduleNumber The solenoid module module number to check.
-   */
-  public static void checkSolenoidModule(final int moduleNumber) {
-    // TODO Fix me
-    // if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
-    //   StringBuilder buf = new StringBuilder();
-    //   buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
-    //       .append(kPCMModules)
-    //       .append(", Requested: ")
-    //       .append(moduleNumber);
-    //   throw new IllegalArgumentException(buf.toString());
-    // }
-  }
-
-  /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
    * legal channel numbers. Channel numbers are 0-based.
    *
@@ -148,23 +131,6 @@ public final class SensorUtil {
           .append(channel);
       throw new IllegalArgumentException(buf.toString());
     }
-  }
-
-  /**
-   * Verify that the solenoid channel number is within limits. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkSolenoidChannel(final int channel) {
-    // TODO Fix me
-    // if (!SolenoidJNI.checkSolenoidChannel(channel)) {
-    //   StringBuilder buf = new StringBuilder();
-    //   buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
-    //       .append(kSolenoidChannels)
-    //       .append(", Requested: ")
-    //       .append(channel);
-    //   throw new IllegalArgumentException(buf.toString());
-    // }
   }
 
   /**

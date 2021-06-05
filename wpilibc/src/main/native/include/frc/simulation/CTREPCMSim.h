@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "frc/simulation/CallbackStore.h"
+#include "frc/PneumaticsBase.h"
 
 namespace frc {
 
@@ -17,26 +18,21 @@ namespace sim {
 /**
  * Class to control a simulated Pneumatic Control Module (PCM).
  */
-class PCMSim {
+class CTREPCMSim {
  public:
   /**
    * Constructs with the default PCM module number (CAN ID).
    */
-  PCMSim();
+  CTREPCMSim();
 
   /**
    * Constructs from a PCM module number (CAN ID).
    *
    * @param module module number
    */
-  explicit PCMSim(int module);
+  explicit CTREPCMSim(int module);
 
-  /**
-   * Constructs from a Compressor object.
-   *
-   * @param compressor Compressor connected to PCM to simulate
-   */
-  explicit PCMSim(const Compressor& compressor);
+  explicit CTREPCMSim(const PneumaticsBase& pneumatics);
 
   /**
    * Register a callback to be run when a solenoid is initialized on a channel.
@@ -47,16 +43,15 @@ class PCMSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterSolenoidInitializedCallback(int channel, NotifyCallback callback,
+  RegisterInitializedCallback(NotifyCallback callback,
                                       bool initialNotify);
 
   /**
    * Check if a solenoid has been initialized on a specific channel.
    *
-   * @param channel the channel to check
    * @return true if initialized
    */
-  bool GetSolenoidInitialized(int channel) const;
+  bool GetInitialized() const;
 
   /**
    * Define whether a solenoid has been initialized on a specific channel.
@@ -64,7 +59,7 @@ class PCMSim {
    * @param channel the channel
    * @param solenoidInitialized is there a solenoid initialized on that channel
    */
-  void SetSolenoidInitialized(int channel, bool solenoidInitialized);
+  void SetInitialized(bool solenoidInitialized);
 
   /**
    * Register a callback to be run when the solenoid output on a channel
@@ -93,31 +88,6 @@ class PCMSim {
    * @param solenoidOutput the new solenoid output
    */
   void SetSolenoidOutput(int channel, bool solenoidOutput);
-
-  /**
-   * Register a callback to be run when the compressor is initialized.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterCompressorInitializedCallback(NotifyCallback callback,
-                                        bool initialNotify);
-
-  /**
-   * Check whether the compressor has been initialized.
-   *
-   * @return true if initialized
-   */
-  bool GetCompressorInitialized() const;
-
-  /**
-   * Define whether the compressor has been initialized.
-   *
-   * @param compressorInitialized whether the compressor is initialized
-   */
-  void SetCompressorInitialized(bool compressorInitialized);
 
   /**
    * Register a callback to be run when the compressor activates.
