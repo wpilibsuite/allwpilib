@@ -4,8 +4,8 @@
 
 #include <exception>
 
-#include <opencv2/core/core.hpp>
 #include <fmt/format.h>
+#include <opencv2/core/core.hpp>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
 

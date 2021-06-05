@@ -134,8 +134,8 @@ void NetworkListener::Impl::Thread::Main() {
       if (errno == EWOULDBLOCK || errno == EAGAIN) {
         continue;
       }
-      ERROR(
-          "NetworkListener: could not read netlink: {}", std::strerror(errno));
+      ERROR("NetworkListener: could not read netlink: {}",
+            std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
     if (len == 0) {

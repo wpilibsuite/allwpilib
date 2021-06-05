@@ -372,7 +372,9 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion(JNIEnv* env, jclass) {
+Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
   CheckStatus(env, status);
@@ -385,7 +387,9 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAVersion(JNIEnv* env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision(JNIEnv* env, jclass) {
+Java_edu_wpi_first_hal_HALUtil_getFPGARevision
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
   CheckStatus(env, status);
@@ -397,8 +401,10 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision(JNIEnv* env, jclass) {
  * Method:    getFPGATime
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_HALUtil_getFPGATime(JNIEnv* env,
-                                                                   jclass) {
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_hal_HALUtil_getFPGATime
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
   CheckStatus(env, status);
@@ -411,7 +417,9 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_HALUtil_getFPGATime(JNIEnv* env,
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
+Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
+  (JNIEnv* env, jclass)
+{
   jint returnValue = HAL_GetRuntimeType();
   return returnValue;
 }
@@ -422,7 +430,9 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton(JNIEnv* env, jclass) {
+Java_edu_wpi_first_hal_HALUtil_getFPGAButton
+  (JNIEnv* env, jclass)
+{
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
   CheckStatus(env, status);
@@ -434,8 +444,10 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAButton(JNIEnv* env, jclass) {
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage(
-    JNIEnv* paramEnv, jclass, jint paramId) {
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
+  (JNIEnv* paramEnv, jclass, jint paramId)
+{
   const char* msg = HAL_GetErrorMessage(paramId);
   return MakeJString(paramEnv, msg);
 }
@@ -445,8 +457,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage(
  * Method:    getHALErrno
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrno(JNIEnv*,
-                                                                  jclass) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_HALUtil_getHALErrno
+  (JNIEnv*, jclass)
+{
   return errno;
 }
 
@@ -455,8 +469,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrno(JNIEnv*,
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALstrerror(
-    JNIEnv* env, jclass, jint errorCode) {
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_hal_HALUtil_getHALstrerror
+  (JNIEnv* env, jclass, jint errorCode)
+{
   const char* msg = std::strerror(errno);
   return MakeJString(env, msg);
 }
