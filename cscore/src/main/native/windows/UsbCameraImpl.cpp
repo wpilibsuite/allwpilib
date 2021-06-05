@@ -26,9 +26,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
 #include "COMCreators.h"
@@ -258,7 +256,7 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 
 void UsbCameraImpl::DeviceDisconnect() {
   if (m_connectVerbose)
-    SINFO("Disconnected from " << m_path);
+    SINFO("Disconnected from {}", m_path);
   m_sourceReader.Reset();
   m_mediaSource.Reset();
   if (m_imageCallback) {
@@ -477,9 +475,9 @@ bool UsbCameraImpl::DeviceConnect() {
     return true;
 
   if (m_connectVerbose)
-    SINFO("Connecting to USB camera on " << m_path);
+    SINFO("Connecting to USB camera on {}", m_path);
 
-  SDEBUG3("opening device");
+  SDEBUG3("{}", "opening device");
 
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
@@ -506,13 +504,13 @@ bool UsbCameraImpl::DeviceConnect() {
   }
 
   if (!m_properties_cached) {
-    SDEBUG3("caching properties");
+    SDEBUG3("{}", "caching properties");
     DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
   } else {
-    SDEBUG3("restoring video mode");
+    SDEBUG3("{}", "restoring video mode");
     DeviceSetMode();
   }
 
@@ -669,7 +667,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   } else {
     // Read current raw value and set percentage from it
     if (!rawProp->DeviceGet(lock, pProcAmp))
-      SWARNING("failed to get property " << rawProp->name);
+      SWARNING("failed to get property {}", rawProp->name);
 
     if (perProp) {
       perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
@@ -680,7 +678,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   // Set value on device if user-configured
   if (rawProp->valueSet) {
     if (!rawProp->DeviceSet(lock, pProcAmp))
-      SWARNING("failed to set property " << rawProp->name);
+      SWARNING("failed to set property {}", rawProp->name);
   }
 
   // Update pointers since we released the lock

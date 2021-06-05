@@ -13,7 +13,7 @@ FMT_BEGIN_NAMESPACE
 inline void vprint(wpi::raw_ostream& os, string_view format_str,
                    fmt::format_args args) {
   memory_buffer buffer;
-  vformat_to(buffer, format_str, args);
+  detail::vformat_to(buffer, format_str, args);
   os.write(buffer.data(), buffer.size());
 }
 
