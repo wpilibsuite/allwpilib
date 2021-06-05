@@ -113,9 +113,9 @@ TEST(AnalogLoopTest, AsynchronusInterruptWorks) {
   output.SetVoltage(0.0);
   frc::Wait(kDelayTime);
   output.SetVoltage(5.0);
+   // Then the int32_t should be 12345
+  frc::Wait(kDelayTime);
   interrupt.Disable();
 
-  // Then the int32_t should be 12345
-  frc::Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
