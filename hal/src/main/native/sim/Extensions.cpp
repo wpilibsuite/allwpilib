@@ -26,7 +26,7 @@
 #define DLOPEN(a) LoadLibraryA(a)
 #define DLSYM GetProcAddress
 #define DLCLOSE FreeLibrary
-#define DLERROR "error #" << GetLastError()
+#define DLERROR fmt::format("error #{}", GetLastError())
 #else
 #define DELIM ':'
 #define HTYPE void*
