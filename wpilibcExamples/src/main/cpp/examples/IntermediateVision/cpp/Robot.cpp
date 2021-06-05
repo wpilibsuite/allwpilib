@@ -18,7 +18,7 @@
  * processing.
  */
 class Robot : public frc::TimedRobot {
-#if defined(__linux__)
+#if defined(__linux__) || defined(_WIN32)
 
  private:
   static void VisionThread() {
