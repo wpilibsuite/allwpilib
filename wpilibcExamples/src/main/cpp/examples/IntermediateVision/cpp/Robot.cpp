@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
 #include <thread>
 
 #include <cameraserver/CameraServer.h>
@@ -9,7 +10,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <wpi/raw_ostream.h>
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
@@ -60,12 +60,12 @@ class Robot : public frc::TimedRobot {
   void RobotInit() override {
     // We need to run our vision program in a separate thread. If not, our robot
     // program will not run.
-#if defined(__linux__)
+#if defined(__linux__) || defined(_WIN32)
     std::thread visionThread(VisionThread);
     visionThread.detach();
 #else
-    wpi::errs() << "Vision only available on Linux.\n";
-    wpi::errs().flush();
+    std::fputs("Vision only available on Linux or Windows.\n", stderr);
+    std::fflush(stderr);
 #endif
   }
 };

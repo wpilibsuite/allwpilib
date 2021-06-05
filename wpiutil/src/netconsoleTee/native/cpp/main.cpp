@@ -2,10 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
+
+#include "fmt/format.h"
 #include "wpi/MathExtras.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/timestamp.h"
 #include "wpi/uv/Loop.h"
@@ -139,30 +141,32 @@ int main(int argc, char* argv[]) {
       std::optional<int> portValue;
       if (arg >= argc || argv[arg][0] == '-' ||
           !(portValue = wpi::parse_integer<int>(argv[arg], 10))) {
-        wpi::errs() << "-p must be followed by port number\n";
+        std::fputs("-p must be followed by port number\n", stderr);
         err = true;
       } else if (portValue) {
         port = portValue.value();
       }
     } else {
-      wpi::errs() << "unrecognized command line option " << argv[arg] << '\n';
+      fmt::print(stderr, "unrecognized command line option {}\n", argv[arg]);
       err = true;
     }
     ++arg;
   }
 
   if (err) {
-    wpi::errs()
-        << argv[0] << " [-ub] [-p PORT]\n"
-        << "  -u       send udp to localhost port 6666 instead of using tcp\n"
-        << "  -b       broadcast udp to port 6666 instead of using tcp\n"
-        << "  -p PORT  use port PORT instead of 6666 (udp) or 1740 (tcp)\n";
+    std::fputs(argv[0], stderr);
+    std::fputs(
+        " [-ub] [-p PORT]\n"
+        "  -u       send udp to localhost port 6666 instead of using tcp\n"
+        "  -b       broadcast udp to port 6666 instead of using tcp\n"
+        "  -p PORT  use port PORT instead of 6666 (udp) or 1740 (tcp)\n",
+        stderr);
     return EXIT_FAILURE;
   }
 
   auto loop = uv::Loop::Create();
   loop->error.connect(
-      [](uv::Error err) { wpi::errs() << "uv ERROR: " << err.str() << '\n'; });
+      [](uv::Error err) { fmt::print(stderr, "uv ERROR: {}\n", err.str()); });
 
   // create ttys
   auto stdinTty = uv::Tty::Create(loop, 0, true);

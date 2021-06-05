@@ -8,10 +8,12 @@
 #include <pty.h>
 #endif
 
+#include <cstdio>
+
+#include "fmt/format.h"
 #include "wpi/MathExtras.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/timestamp.h"
 #include "wpi/uv/Loop.h"
@@ -143,18 +145,20 @@ int main(int argc, char* argv[]) {
       useUdp = true;
       broadcastUdp = true;
     } else {
-      wpi::errs() << "unrecognized command line option " << argv[programArgc]
-                  << '\n';
+      fmt::print(stderr, "unrecognized command line option {}\n",
+                 argv[programArgc]);
       err = true;
     }
     ++programArgc;
   }
 
   if (err || (argc - programArgc) < 1) {
-    wpi::errs()
-        << argv[0] << " [-ub] program [arguments ...]\n"
-        << "  -u  send udp to localhost port 6666 instead of using tcp\n"
-        << "  -b  broadcast udp to port 6666 instead of using tcp\n";
+    std::fputs(argv[0], stderr);
+    std::fputs(
+        " [-ub] program [arguments ...]\n"
+        "  -u  send udp to localhost port 6666 instead of using tcp\n"
+        "  -b  broadcast udp to port 6666 instead of using tcp\n",
+        stderr);
     return EXIT_FAILURE;
   }
 
@@ -162,7 +166,7 @@ int main(int argc, char* argv[]) {
 
   auto loop = uv::Loop::Create();
   loop->error.connect(
-      [](uv::Error err) { wpi::errs() << "uv ERROR: " << err.str() << '\n'; });
+      [](uv::Error err) { fmt::print(stderr, "uv ERROR: {}\n", err.str()); });
 
   // create pipes to communicate with child
   auto stdinPipe = uv::Pipe::Create(loop);
@@ -250,7 +254,7 @@ int main(int argc, char* argv[]) {
 
   auto proc = uv::Process::SpawnArray(loop, argv[programArgc], options);
   if (!proc) {
-    wpi::errs() << "could not start subprocess\n";
+    std::fputs("could not start subprocess\n", stderr);
     return EXIT_FAILURE;
   }
   proc->exited.connect([](int64_t status, int) { std::exit(status); });

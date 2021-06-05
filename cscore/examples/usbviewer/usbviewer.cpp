@@ -6,12 +6,13 @@
 #include <thread>
 #include <vector>
 
+#include <fmt/format.h>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include <wpi/raw_ostream.h>
 #include <wpi/spinlock.h>
 #include <wpigui.h>
 
@@ -38,7 +39,7 @@ int main() {
       // get frame from camera
       uint64_t time = cvsink.GrabFrame(frame);
       if (time == 0) {
-        wpi::outs() << "error: " << cvsink.GetError() << '\n';
+        fmt::print("error: {}\n", cvsink.GetError());
         continue;
       }
 

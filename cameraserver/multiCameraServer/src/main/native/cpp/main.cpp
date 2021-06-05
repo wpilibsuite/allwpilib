@@ -157,8 +157,7 @@ bool ReadConfig() {
 }
 
 void StartCamera(const CameraConfig& config) {
-  wpi::outs() << "Starting camera '" << config.name << "' on " << config.path
-              << '\n';
+  fmt::print("Starting camera '{}' on {}\n", config.name, config.path);
   auto camera = frc::CameraServer::GetInstance()->StartAutomaticCapture(
       config.name, config.path);
 
