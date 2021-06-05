@@ -16,7 +16,6 @@
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "cameraserver/CameraServerShared.h"
 #include "ntcore_cpp.h"
@@ -229,12 +228,8 @@ static std::string PixelFormatToString(int pixelFormat) {
 }
 
 static std::string VideoModeToString(const cs::VideoMode& mode) {
-  std::string rv;
-  wpi::raw_string_ostream oss{rv};
-  oss << mode.width << "x" << mode.height;
-  oss << " " << PixelFormatToString(mode.pixelFormat) << " ";
-  oss << mode.fps << " fps";
-  return oss.str();
+  return fmt::format("{}x{} {} {} fps", mode.width, mode.height,
+                     PixelFormatToString(mode.pixelFormat), mode.fps);
 }
 
 static std::vector<std::string> GetSourceModeValues(int source) {
