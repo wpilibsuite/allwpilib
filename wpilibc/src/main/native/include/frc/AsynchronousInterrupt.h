@@ -19,8 +19,8 @@ namespace frc {
  * <p> By default, interrupts will occur on rising edge. Callbacks are disabled
  * by default, and Enable() must be called before they will occur.
  *
- * <p> Both rising and falling edge can be indiciated if both a rising and
- * falling happen between callbacks.
+ * <p> Both rising and falling edges can be indicated in one callback if both a
+ * rising and falling edge occurred since the previous callback.
  *
  * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
  */
@@ -31,7 +31,7 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * <p> The first bool in the callback is rising, the second is falling.
    */
   AsynchronousInterrupt(DigitalSource& source,
                         std::function<void(bool, bool)> callback);
