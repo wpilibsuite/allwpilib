@@ -134,6 +134,8 @@ TEST_F(DIOLoopTest, FakeCounter) {
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
+  Reset();
+
   int32_t param = 0;
 
   frc::AsynchronousInterrupt interrupt(m_input,
@@ -143,14 +145,18 @@ TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
   // If the voltage rises
   m_output.Set(false);
   m_output.Set(true);
-  interrupt.Disable();
 
   // Then the int32_t should be 12345
   frc::Wait(kDelayTime);
+
+  interrupt.Disable();
+
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
 TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
+  Reset();
+
   // Given a synchronous interrupt
   frc::SynchronousInterrupt interrupt(m_input);
 
@@ -164,6 +170,8 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
   frc::Timer timer;
   timer.Start();
   interrupt.WaitForInterrupt(kSynchronousInterruptTime + 1_s);
-  EXPECT_NEAR(kSynchronousInterruptTime.to<double>(), timer.Get().to<double>(),
+  auto time = timer.Get().to<double>();
+  if (thr.joinable()) thr.join();
+  EXPECT_NEAR(kSynchronousInterruptTime.to<double>(), time,
               kSynchronousInterruptTimeTolerance.to<double>());
 }
