@@ -6,9 +6,8 @@
 
 #include <type_traits>
 
-#include <wpi/NullDeleter.h>
-
 #include <hal/Interrupts.h>
+#include <wpi/NullDeleter.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"
