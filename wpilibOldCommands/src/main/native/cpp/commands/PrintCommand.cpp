@@ -5,7 +5,6 @@
 #include "frc/commands/PrintCommand.h"
 
 #include <fmt/format.h>
-#include <wpi/raw_ostream.h>
 
 using namespace frc;
 
@@ -15,5 +14,5 @@ PrintCommand::PrintCommand(std::string_view message)
 }
 
 void PrintCommand::Initialize() {
-  wpi::outs() << m_message << '\n';
+  fmt::print("{}\n", m_message);
 }
