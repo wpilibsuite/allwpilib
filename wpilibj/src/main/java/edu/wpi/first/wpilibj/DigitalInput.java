@@ -40,9 +40,6 @@ public class DigitalInput extends DigitalSource implements Sendable {
   public void close() {
     super.close();
     SendableRegistry.remove(this);
-    if (m_interrupt != 0) {
-      cancelInterrupts();
-    }
     DIOJNI.freeDIOPort(m_handle);
     m_handle = 0;
   }

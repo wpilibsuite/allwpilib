@@ -6,7 +6,7 @@
 
 #include <hal/Types.h>
 
-#include "frc/InterruptableSensorBase.h"
+#include "frc/AnalogTriggerType.h"
 
 namespace frc {
 
@@ -19,14 +19,14 @@ namespace frc {
  * constructed and freed when finished for the source. The source can either be
  * a digital input or analog trigger but not both.
  */
-class DigitalSource : public InterruptableSensorBase {
+class DigitalSource {
  public:
   DigitalSource() = default;
   DigitalSource(DigitalSource&&) = default;
   DigitalSource& operator=(DigitalSource&&) = default;
 
-  HAL_Handle GetPortHandleForRouting() const override = 0;
-  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override = 0;
+  virtual HAL_Handle GetPortHandleForRouting() const = 0;
+  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual bool IsAnalogTrigger() const = 0;
   virtual int GetChannel() const = 0;
 };

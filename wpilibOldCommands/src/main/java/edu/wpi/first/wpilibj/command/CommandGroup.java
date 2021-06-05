@@ -330,7 +330,7 @@ public class CommandGroup extends Command {
 
   /**
    * Returns whether or not this group is interruptible. A command group will be uninterruptible if
-   * {@link CommandGroup#setInterruptible(boolean) setInterruptable(false)} was called or if it is
+   * {@link CommandGroup#setInterruptible(boolean) setInterruptible(false)} was called or if it is
    * currently running an uninterruptible command or child.
    *
    * @return whether or not this {@link CommandGroup} is interruptible.

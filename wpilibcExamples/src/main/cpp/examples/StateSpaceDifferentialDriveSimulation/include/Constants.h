@@ -52,11 +52,11 @@ constexpr double kEncoderDistancePerPulse =
 // Toolsuite provides a convenient tool for obtaining these values for your
 // robot.
 constexpr auto ks = 0.22_V;
-constexpr auto kv = 1.98 * 1_V * 1_s / 1_m;
-constexpr auto ka = 0.2 * 1_V * 1_s * 1_s / 1_m;
+constexpr auto kv = 1.98 * 1_V / 1_mps;
+constexpr auto ka = 0.2 * 1_V / 1_mps_sq;
 
-constexpr auto kvAngular = 1.5 * 1_V * 1_s / 1_rad;
-constexpr auto kaAngular = 0.3 * 1_V * 1_s * 1_s / 1_rad;
+constexpr auto kvAngular = 1.5 * 1_V / 1_mps;
+constexpr auto kaAngular = 0.3 * 1_V / 1_mps_sq;
 
 extern const frc::LinearSystem<2, 2, 2> kDrivetrainPlant;
 

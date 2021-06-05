@@ -10,8 +10,9 @@
 #include <units/time.h>
 
 #include "TestBench.h"
+#include "frc/AsynchronousInterrupt.h"
 #include "frc/Counter.h"
-#include "frc/InterruptableSensorBase.h"
+#include "frc/SynchronousInterrupt.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
@@ -71,10 +72,10 @@ TEST_F(DIOLoopTest, DIOPWM) {
   m_output.EnablePWM(0.0);
   frc::Wait(0.5_s);
   m_output.UpdateDutyCycle(0.5);
-  m_input.RequestInterrupts();
-  m_input.SetUpSourceEdge(false, true);
-  frc::InterruptableSensorBase::WaitResult result =
-      m_input.WaitForInterrupt(3_s, true);
+  frc::SynchronousInterrupt interrupt{m_output};
+  interrupt.SetInterruptEdges(false, true);
+  frc::SynchronousInterrupt::WaitResult result =
+      interrupt.WaitForInterrupt(3_s, true);
 
   frc::Wait(0.5_s);
   bool firstCycle = m_input.Get();
@@ -96,7 +97,7 @@ TEST_F(DIOLoopTest, DIOPWM) {
   frc::Wait(0.5_s);
   bool secondAfterStop = m_input.Get();
 
-  EXPECT_EQ(frc::InterruptableSensorBase::WaitResult::kFallingEdge, result)
+  EXPECT_EQ(frc::SynchronousInterrupt::WaitResult::kFallingEdge, result)
       << "WaitForInterrupt was not falling.";
 
   EXPECT_FALSE(firstCycle) << "Input not low after first delay";
@@ -132,48 +133,46 @@ TEST_F(DIOLoopTest, FakeCounter) {
   EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
 }
 
-static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *reinterpret_cast<int32_t*>(param) = 12345;
-}
-
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
+  Reset();
+
   int32_t param = 0;
 
-  // Given an interrupt handler that sets an int32_t to 12345
-  m_input.RequestInterrupts(InterruptHandler, &param);
-  m_input.EnableInterrupts();
+  frc::AsynchronousInterrupt interrupt(m_input,
+                                       [&](auto a, auto b) { param = 12345; });
 
+  interrupt.Enable();
   // If the voltage rises
   m_output.Set(false);
   m_output.Set(true);
-  m_input.CancelInterrupts();
 
   // Then the int32_t should be 12345
   frc::Wait(kDelayTime);
+
+  interrupt.Disable();
+
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
-static void* InterruptTriggerer(void* data) {
-  auto& output = *static_cast<frc::DigitalOutput*>(data);
-  output.Set(false);
-  frc::Wait(kSynchronousInterruptTime);
-  output.Set(true);
-  return nullptr;
-}
-
 TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
-  // Given a synchronous interrupt
-  m_input.RequestInterrupts();
+  Reset();
 
-  // If we have another thread trigger the interrupt in a few seconds
-  pthread_t interruptTriggererLoop;
-  pthread_create(&interruptTriggererLoop, nullptr, InterruptTriggerer,
-                 &m_output);
+  // Given a synchronous interrupt
+  frc::SynchronousInterrupt interrupt(m_input);
+
+  std::thread thr([this]() {
+    m_output.Set(false);
+    frc::Wait(kSynchronousInterruptTime);
+    m_output.Set(true);
+  });
 
   // Then this thread should pause and resume after that number of seconds
   frc::Timer timer;
   timer.Start();
-  m_input.WaitForInterrupt(kSynchronousInterruptTime + 1_s);
-  EXPECT_NEAR_UNITS(kSynchronousInterruptTime, timer.Get(),
-                    kSynchronousInterruptTimeTolerance);
+  interrupt.WaitForInterrupt(kSynchronousInterruptTime + 1_s);
+  auto time = timer.Get().to<double>();
+  if (thr.joinable())
+    thr.join();
+  EXPECT_NEAR(kSynchronousInterruptTime.to<double>(), time,
+              kSynchronousInterruptTimeTolerance.to<double>());
 }

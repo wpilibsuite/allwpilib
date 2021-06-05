@@ -10,6 +10,7 @@
 #include "units/acceleration.h"
 #include "units/angular_acceleration.h"
 #include "units/angular_velocity.h"
+#include "units/length.h"
 #include "units/moment_of_inertia.h"
 #include "units/velocity.h"
 #include "units/voltage.h"
@@ -156,31 +157,66 @@ class LinearSystemId {
    * Inputs: [[left voltage], [right voltage]]
    * Outputs: [[left velocity], [right velocity]]
    *
-   * @param kVlinear The linear velocity gain, in volt seconds per distance.
-   * @param kAlinear The linear acceleration gain, in volt seconds^2 per
-   * distance.
-   * @param kVangular The angular velocity gain, in volt seconds per angle.
-   * @param kAangular The angular acceleration gain, in volt seconds^2 per
-   * angle.
+   * @param kVlinear  The linear velocity gain in volts per (meter per second).
+   * @param kAlinear  The linear acceleration gain in volts per (meter per
+   *                  second squared).
+   * @param kVangular The angular velocity gain in volts per (meter per second).
+   * @param kAangular The angular acceleration gain in volts per (meter per
+   *                  second squared).
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
-      decltype(1_V / 1_rad_per_s) kVangular,
-      decltype(1_V / 1_rad_per_s_sq) kAangular) {
-    double c = 0.5 / (kAlinear.to<double>() * kAangular.to<double>());
-    double A1 = c * (-kAlinear.to<double>() * kVangular.to<double>() -
-                     kVlinear.to<double>() * kAangular.to<double>());
-    double A2 = c * (kAlinear.to<double>() * kVangular.to<double>() -
-                     kVlinear.to<double>() * kAangular.to<double>());
-    double B1 = c * (kAlinear.to<double>() + kAangular.to<double>());
-    double B2 = c * (kAangular.to<double>() - kAlinear.to<double>());
+      decltype(1_V / 1_mps) kVangular, decltype(1_V / 1_mps_sq) kAangular) {
+    double A1 = -(kVlinear.to<double>() / kAlinear.to<double>() +
+                  kVangular.to<double>() / kAangular.to<double>());
+    double A2 = -(kVlinear.to<double>() / kAlinear.to<double>() -
+                  kVangular.to<double>() / kAangular.to<double>());
+    double B1 = 1.0 / kAlinear.to<double>() + 1.0 / kAangular.to<double>();
+    double B2 = 1.0 / kAlinear.to<double>() - 1.0 / kAangular.to<double>();
 
-    auto A = frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
-    auto B = frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
+    auto A = 0.5 * frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
+    auto B = 0.5 * frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
     auto C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
     auto D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
+  }
+
+  /**
+   * Constructs the state-space model for a 2 DOF drivetrain velocity system
+   * from system identification data.
+   *
+   * States: [[left velocity], [right velocity]]
+   * Inputs: [[left voltage], [right voltage]]
+   * Outputs: [[left velocity], [right velocity]]
+   *
+   * @param kVlinear   The linear velocity gain in volts per (meter per second).
+   * @param kAlinear   The linear acceleration gain in volts per (meter per
+   *                   second squared).
+   * @param kVangular  The angular velocity gain in volts per (radian per
+   *                   second).
+   * @param kAangular  The angular acceleration gain in volts per (radian per
+   *                   second squared).
+   * @param trackwidth The width of the drivetrain.
+   */
+  static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
+      decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
+      decltype(1_V / 1_rad_per_s) kVangular,
+      decltype(1_V / 1_rad_per_s_sq) kAangular, units::meter_t trackwidth) {
+    // We want to find a factor to include in Kv,angular that will convert
+    // `u = Kv,angular omega` to `u = Kv,angular v`.
+    //
+    // v = omega r
+    // omega = v/r
+    // omega = 1/r v
+    // omega = 1/(trackwidth/2) v
+    // omega = 2/trackwidth v
+    //
+    // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
+    // to V/m/s).
+    return IdentifyDrivetrainSystem(kVlinear, kAlinear,
+                                    kVangular * 2.0 / trackwidth * 1_rad,
+                                    kAangular * 2.0 / trackwidth * 1_rad);
   }
 
   /**
