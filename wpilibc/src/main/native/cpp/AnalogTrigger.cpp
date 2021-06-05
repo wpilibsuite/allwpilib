@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
 
