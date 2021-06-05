@@ -4,8 +4,6 @@
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
-#include <wpi/raw_ostream.h>
-
 #include "frc/Errors.h"
 #include "frc/shuffleboard/ComplexWidget.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
@@ -70,7 +68,7 @@ ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
 ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
   auto name = SendableRegistry::GetInstance().GetName(&sendable);
   if (name.empty()) {
-    wpi::outs() << "Sendable must have a name\n";
+    FRC_ReportError(err::Error, "{}", "Sendable must have a name");
   }
   return Add(name, sendable);
 }
@@ -285,7 +283,7 @@ void ShuffleboardContainer::DisableIfActuator() {
 void ShuffleboardContainer::CheckTitle(std::string_view title) {
   std::string titleStr{title};
   if (m_usedTitles.count(titleStr) > 0) {
-    wpi::errs() << "Title is already in use: " << title << "\n";
+    FRC_ReportError(err::Error, "Title is already in use: {}", title);
     return;
   }
   m_usedTitles.insert(titleStr);

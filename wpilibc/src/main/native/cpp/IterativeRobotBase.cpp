@@ -4,9 +4,9 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
@@ -23,33 +23,33 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::SimulationInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::DisabledInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::AutonomousInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::TeleopInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::TestInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -57,7 +57,7 @@ void IterativeRobotBase::RobotPeriodic() {
 void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -65,7 +65,7 @@ void IterativeRobotBase::SimulationPeriodic() {
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -73,7 +73,7 @@ void IterativeRobotBase::DisabledPeriodic() {
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -81,7 +81,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -89,7 +89,7 @@ void IterativeRobotBase::TeleopPeriodic() {
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
