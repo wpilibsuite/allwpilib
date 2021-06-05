@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
  * Class for handling asynchrounous interrupts.
  *
  * <p>By default, interrupts will occur on rising edge. Callbacks are disabled by default, and
- * Enable() must be called before they will occur.
+ * enable() must be called before they will occur.
  *
  * <p>Both rising and falling edges can be indicated in one callback if both a rising and falling
  * edge occurred since the previous callback.
