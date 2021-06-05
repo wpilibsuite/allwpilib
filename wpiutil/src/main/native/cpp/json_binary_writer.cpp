@@ -631,7 +631,7 @@ void json::binary_writer::write_ubjson(const json& j, const bool use_count,
                 o << static_cast<CharType>('S');
             }
             write_number_with_ubjson_prefix(j.m_value.string->size(), true);
-            o << j.m_value.string;
+            o << *j.m_value.string;
             break;
         }
 

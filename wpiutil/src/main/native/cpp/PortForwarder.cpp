@@ -4,10 +4,9 @@
 
 #include "wpi/PortForwarder.h"
 
+#include "fmt/format.h"
 #include "wpi/DenseMap.h"
 #include "wpi/EventLoopRunner.h"
-#include "wpi/SmallString.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/uv/GetAddrInfo.h"
 #include "wpi/uv/Tcp.h"
 #include "wpi/uv/Timer.h"
@@ -80,10 +79,6 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
             }
           });
 
-      // convert port to string
-      SmallString<16> remotePortStr;
-      raw_svector_ostream(remotePortStr) << remotePort;
-
       // resolve address
       uv::GetAddrInfo(
           loop,
@@ -125,7 +120,7 @@ void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
               CopyStream(*remotePtr, clientWeak);
             });
           },
-          host, remotePortStr);
+          host, fmt::to_string(remotePort));
 
       // time out for connection
       uv::Timer::SingleShot(loop, uv::Timer::Time{500},
