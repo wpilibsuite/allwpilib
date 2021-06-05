@@ -8,9 +8,9 @@
 
 using namespace frc2;
 
-PrintCommand::PrintCommand(const wpi::Twine& message)
-    : CommandHelper{[str = message.str()] { wpi::outs() << str << "\n"; }, {}} {
-}
+PrintCommand::PrintCommand(std::string_view message)
+    : CommandHelper{
+          [str = std::string(message)] { wpi::outs() << str << "\n"; }, {}} {}
 
 bool PrintCommand::RunsWhenDisabled() const {
   return true;

@@ -5,8 +5,8 @@
 #include "frc/AnalogAccelerometer.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
-#include "frc/Base.h"
 #include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -19,9 +19,9 @@ AnalogAccelerometer::AnalogAccelerometer(int channel)
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
-    : m_analogInput(channel, NullDeleter<AnalogInput>()) {
+    : m_analogInput(channel, wpi::NullDeleter<AnalogInput>()) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw FRC_MakeError(err::NullParameter, "{}", "channel");
   }
   InitAccelerometer();
 }
@@ -29,7 +29,7 @@ AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
 AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
     : m_analogInput(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw FRC_MakeError(err::NullParameter, "{}", "channel");
   }
   InitAccelerometer();
 }

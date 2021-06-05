@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.differentialdriveposeestimator;
 
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.math.StateSpaceUtil;
 import edu.wpi.first.math.util.Units;
 
 /** This dummy class represents a global measurement sensor, such as a computer vision solution. */

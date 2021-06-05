@@ -5,7 +5,6 @@
 #include "frc/InterruptableSensorBase.h"
 
 #include "frc/Errors.h"
-#include "frc/Utility.h"
 
 using namespace frc;
 
@@ -30,7 +29,7 @@ void InterruptableSensorBase::RequestInterrupts(
       &status);
   SetUpSourceEdge(true, false);
   HAL_AttachInterruptHandler(m_interrupt, handler, param, &status);
-  FRC_CheckErrorStatus(status, "AttachInterruptHandler");
+  FRC_CheckErrorStatus(status, "{}", "AttachInterruptHandler");
 }
 
 void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
@@ -60,7 +59,7 @@ void InterruptableSensorBase::RequestInterrupts(InterruptEventHandler handler) {
         (*self)(res);
       },
       m_interruptHandler.get(), &status);
-  FRC_CheckErrorStatus(status, "AttachInterruptHandler");
+  FRC_CheckErrorStatus(status, "{}", "AttachInterruptHandler");
 }
 
 void InterruptableSensorBase::RequestInterrupts() {
@@ -72,7 +71,7 @@ void InterruptableSensorBase::RequestInterrupts() {
       m_interrupt, GetPortHandleForRouting(),
       static_cast<HAL_AnalogTriggerType>(GetAnalogTriggerTypeForRouting()),
       &status);
-  FRC_CheckErrorStatus(status, "RequestInterrupts");
+  FRC_CheckErrorStatus(status, "{}", "RequestInterrupts");
   SetUpSourceEdge(true, false);
 }
 
@@ -86,13 +85,14 @@ void InterruptableSensorBase::CancelInterrupts() {
 }
 
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
-    double timeout, bool ignorePrevious) {
+    units::second_t timeout, bool ignorePrevious) {
   FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int result;
 
-  result = HAL_WaitForInterrupt(m_interrupt, timeout, ignorePrevious, &status);
-  FRC_CheckErrorStatus(status, "WaitForInterrupt");
+  result = HAL_WaitForInterrupt(m_interrupt, timeout.to<double>(),
+                                ignorePrevious, &status);
+  FRC_CheckErrorStatus(status, "{}", "WaitForInterrupt");
 
   // Rising edge result is the interrupt bit set in the byte 0xFF
   // Falling edge result is the interrupt bit set in the byte 0xFF00
@@ -107,43 +107,43 @@ void InterruptableSensorBase::EnableInterrupts() {
   FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_EnableInterrupts(m_interrupt, &status);
-  FRC_CheckErrorStatus(status, "EnableInterrupts");
+  FRC_CheckErrorStatus(status, "{}", "EnableInterrupts");
 }
 
 void InterruptableSensorBase::DisableInterrupts() {
   FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_DisableInterrupts(m_interrupt, &status);
-  FRC_CheckErrorStatus(status, "DisableInterrupts");
+  FRC_CheckErrorStatus(status, "{}", "DisableInterrupts");
 }
 
-double InterruptableSensorBase::ReadRisingTimestamp() {
+units::second_t InterruptableSensorBase::ReadRisingTimestamp() {
   FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
-  FRC_CheckErrorStatus(status, "ReadRisingTimestamp");
-  return timestamp * 1e-6;
+  FRC_CheckErrorStatus(status, "{}", "ReadRisingTimestamp");
+  return units::microsecond_t(timestamp);
 }
 
-double InterruptableSensorBase::ReadFallingTimestamp() {
+units::second_t InterruptableSensorBase::ReadFallingTimestamp() {
   FRC_Assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int64_t timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
-  FRC_CheckErrorStatus(status, "ReadFallingTimestamp");
-  return timestamp * 1e-6;
+  FRC_CheckErrorStatus(status, "{}", "ReadFallingTimestamp");
+  return units::microsecond_t(timestamp);
 }
 
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
                                               bool fallingEdge) {
   if (m_interrupt == HAL_kInvalidHandle) {
     throw FRC_MakeError(
-        err::NullParameter,
+        err::NullParameter, "{}",
         "You must call RequestInterrupts before SetUpSourceEdge");
   }
   if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_SetInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
-    FRC_CheckErrorStatus(status, "SetUpSourceEdge");
+    FRC_CheckErrorStatus(status, "{}", "SetUpSourceEdge");
   }
 }
 
@@ -152,5 +152,5 @@ void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
   // Expects the calling leaf class to allocate an interrupt index.
   int32_t status = 0;
   m_interrupt = HAL_InitializeInterrupts(watcher, &status);
-  FRC_CheckErrorStatus(status, "AllocateInterrupts");
+  FRC_CheckErrorStatus(status, "{}", "AllocateInterrupts");
 }

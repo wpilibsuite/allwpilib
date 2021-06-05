@@ -4,8 +4,8 @@
 
 #include "frc/motorcontrol/NidecBrushless.h"
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -17,7 +17,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   auto& registry = SendableRegistry::GetInstance();
   registry.AddChild(this, &m_dio);
   registry.AddChild(this, &m_pwm);
-  SetExpiration(0.0);
+  SetExpiration(0_s);
   SetSafetyEnabled(false);
 
   // the dio controls the output (in PWM mode)
@@ -64,8 +64,8 @@ void NidecBrushless::StopMotor() {
   m_pwm.SetDisabled();
 }
 
-void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "Nidec " << GetChannel();
+std::string NidecBrushless::GetDescription() const {
+  return fmt::format("Nidec {}", GetChannel());
 }
 
 int NidecBrushless::GetChannel() const {

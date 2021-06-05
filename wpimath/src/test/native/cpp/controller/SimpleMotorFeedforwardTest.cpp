@@ -1,0 +1,51 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+
+#include "Eigen/Core"
+#include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/controller/SimpleMotorFeedforward.h"
+#include "units/acceleration.h"
+#include "units/length.h"
+#include "units/time.h"
+
+namespace frc {
+
+TEST(SimpleMotorFeedforwardTest, Calculate) {
+  double Ks = 0.5;
+  double Kv = 3.0;
+  double Ka = 0.6;
+  auto dt = 0.02_s;
+
+  Eigen::Matrix<double, 1, 1> A;
+  A << -Kv / Ka;
+
+  Eigen::Matrix<double, 1, 1> B;
+  B << 1.0 / Ka;
+
+  frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
+  frc::SimpleMotorFeedforward<units::meter> simpleMotor{
+      units::volt_t{Ks}, units::volt_t{Kv} / 1_mps,
+      units::volt_t{Ka} / 1_mps_sq};
+
+  Eigen::Matrix<double, 1, 1> r;
+  r << 2;
+  Eigen::Matrix<double, 1, 1> nextR;
+  nextR << 3;
+
+  EXPECT_NEAR(37.524995834325161 + Ks,
+              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+  EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
+              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+
+  // These won't match exactly. It's just an approximation to make sure they're
+  // in the same ballpark.
+  EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
+              simpleMotor.Calculate(2_mps, 1_mps / dt).to<double>(), 2.0);
+}
+
+}  // namespace frc

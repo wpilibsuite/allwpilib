@@ -4,35 +4,19 @@
 
 #include "frc/Timer.h"  // NOLINT(build/include_order)
 
-#include "TestBench.h"
+#include <units/math.h>
+
 #include "gtest/gtest.h"
 
-using namespace frc;
+#define EXPECT_NEAR_UNITS(val1, val2, eps) \
+  EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-static const double kWaitTime = 0.5;
+TEST(TimerTest, Wait) {
+  auto initialTime = frc::Timer::GetFPGATimestamp();
 
-class TimerTest : public testing::Test {
- protected:
-  Timer* m_timer;
+  frc::Wait(500_ms);
 
-  void SetUp() override { m_timer = new Timer; }
+  auto finalTime = frc::Timer::GetFPGATimestamp();
 
-  void TearDown() override { delete m_timer; }
-
-  void Reset() { m_timer->Reset(); }
-};
-
-/**
- * Test if the Wait function works
- */
-TEST_F(TimerTest, Wait) {
-  Reset();
-
-  double initialTime = m_timer->GetFPGATimestamp();
-
-  Wait(kWaitTime);
-
-  double finalTime = m_timer->GetFPGATimestamp();
-
-  EXPECT_NEAR(kWaitTime, finalTime - initialTime, 0.001);
+  EXPECT_NEAR_UNITS(500_ms, finalTime - initialTime, 1_ms);
 }

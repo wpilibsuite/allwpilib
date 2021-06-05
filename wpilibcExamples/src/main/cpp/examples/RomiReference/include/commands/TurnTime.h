@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <frc2/Timer.h>
+#include <frc/Timer.h>
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 #include <units/time.h>
@@ -27,5 +27,5 @@ class TurnTime : public frc2::CommandHelper<frc2::CommandBase, TurnTime> {
   double m_speed;
   units::second_t m_duration;
   Drivetrain* m_drive;
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
 };

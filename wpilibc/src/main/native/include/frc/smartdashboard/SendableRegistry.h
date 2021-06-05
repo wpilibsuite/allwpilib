@@ -6,10 +6,10 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <wpi/STLExtras.h>
-#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -41,7 +41,7 @@ class SendableRegistry {
    * @param sendable object to add
    * @param name component name
    */
-  void Add(Sendable* sendable, const wpi::Twine& name);
+  void Add(Sendable* sendable, std::string_view name);
 
   /**
    * Adds an object to the registry.
@@ -51,7 +51,7 @@ class SendableRegistry {
    *                     the value
    * @param channel      The channel number the device is plugged into
    */
-  void Add(Sendable* sendable, const wpi::Twine& moduleType, int channel);
+  void Add(Sendable* sendable, std::string_view moduleType, int channel);
 
   /**
    * Adds an object to the registry.
@@ -62,7 +62,7 @@ class SendableRegistry {
    * @param moduleNumber The number of the particular module type
    * @param channel      The channel number the device is plugged into
    */
-  void Add(Sendable* sendable, const wpi::Twine& moduleType, int moduleNumber,
+  void Add(Sendable* sendable, std::string_view moduleType, int moduleNumber,
            int channel);
 
   /**
@@ -72,8 +72,8 @@ class SendableRegistry {
    * @param subsystem subsystem name
    * @param name component name
    */
-  void Add(Sendable* sendable, const wpi::Twine& subsystem,
-           const wpi::Twine& name);
+  void Add(Sendable* sendable, std::string_view subsystem,
+           std::string_view name);
 
   /**
    * Adds an object to the registry and LiveWindow.
@@ -81,7 +81,7 @@ class SendableRegistry {
    * @param sendable object to add
    * @param name component name
    */
-  void AddLW(Sendable* sendable, const wpi::Twine& name);
+  void AddLW(Sendable* sendable, std::string_view name);
 
   /**
    * Adds an object to the registry and LiveWindow.
@@ -91,7 +91,7 @@ class SendableRegistry {
    *                     the value
    * @param channel      The channel number the device is plugged into
    */
-  void AddLW(Sendable* sendable, const wpi::Twine& moduleType, int channel);
+  void AddLW(Sendable* sendable, std::string_view moduleType, int channel);
 
   /**
    * Adds an object to the registry and LiveWindow.
@@ -102,7 +102,7 @@ class SendableRegistry {
    * @param moduleNumber The number of the particular module type
    * @param channel      The channel number the device is plugged into
    */
-  void AddLW(Sendable* sendable, const wpi::Twine& moduleType, int moduleNumber,
+  void AddLW(Sendable* sendable, std::string_view moduleType, int moduleNumber,
              int channel);
 
   /**
@@ -112,8 +112,8 @@ class SendableRegistry {
    * @param subsystem subsystem name
    * @param name component name
    */
-  void AddLW(Sendable* sendable, const wpi::Twine& subsystem,
-             const wpi::Twine& name);
+  void AddLW(Sendable* sendable, std::string_view subsystem,
+             std::string_view name);
 
   /**
    * Adds a child object to an object.  Adds the child object to the registry
@@ -171,7 +171,7 @@ class SendableRegistry {
    * @param sendable object
    * @param name name
    */
-  void SetName(Sendable* sendable, const wpi::Twine& name);
+  void SetName(Sendable* sendable, std::string_view name);
 
   /**
    * Sets the name of an object with a channel number.
@@ -181,7 +181,7 @@ class SendableRegistry {
    *                   the value
    * @param channel    The channel number the device is plugged into
    */
-  void SetName(Sendable* sendable, const wpi::Twine& moduleType, int channel);
+  void SetName(Sendable* sendable, std::string_view moduleType, int channel);
 
   /**
    * Sets the name of an object with a module and channel number.
@@ -192,7 +192,7 @@ class SendableRegistry {
    * @param moduleNumber The number of the particular module type
    * @param channel      The channel number the device is plugged into
    */
-  void SetName(Sendable* sendable, const wpi::Twine& moduleType,
+  void SetName(Sendable* sendable, std::string_view moduleType,
                int moduleNumber, int channel);
 
   /**
@@ -202,8 +202,8 @@ class SendableRegistry {
    * @param subsystem subsystem name
    * @param name device name
    */
-  void SetName(Sendable* sendable, const wpi::Twine& subsystem,
-               const wpi::Twine& name);
+  void SetName(Sendable* sendable, std::string_view subsystem,
+               std::string_view name);
 
   /**
    * Gets the subsystem name of an object.
@@ -219,7 +219,7 @@ class SendableRegistry {
    * @param sendable object
    * @param subsystem subsystem name
    */
-  void SetSubsystem(Sendable* sendable, const wpi::Twine& subsystem);
+  void SetSubsystem(Sendable* sendable, std::string_view subsystem);
 
   /**
    * Gets a unique handle for setting/getting data with SetData() and GetData().

@@ -65,7 +65,7 @@ void ParallelCommandGroup::AddCommands(
   }
 
   if (isRunning) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }
@@ -77,7 +77,7 @@ void ParallelCommandGroup::AddCommands(
       m_runWhenDisabled &= command->RunsWhenDisabled();
       m_commands.emplace_back(std::move(command), false);
     } else {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                           "Multiple commands in a parallel group cannot "
                           "require the same subsystems");
     }

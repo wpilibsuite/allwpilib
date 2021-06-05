@@ -153,7 +153,7 @@ double PIDBase::GetSetpoint() const {
 
 double PIDBase::GetDeltaSetpoint() const {
   std::scoped_lock lock(m_thisMutex);
-  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
+  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get().to<double>();
 }
 
 double PIDBase::GetError() const {

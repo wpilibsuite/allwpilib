@@ -19,7 +19,7 @@
 #include <units/length.h>
 #include <units/mass.h>
 #include <units/velocity.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -92,7 +92,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.SetDistancePerPulse(2.0 * wpi::math::pi *
+    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi *
                                   kDrumRadius.to<double>() / 4096.0);
   }
 

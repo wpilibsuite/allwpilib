@@ -12,14 +12,14 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 class Robot : public frc::TimedRobot {
  public:
   static constexpr units::second_t kDt = 20_ms;
 
   Robot() {
-    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * wpi::math::pi * 1.5);
+    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * wpi::numbers::pi * 1.5);
   }
 
   void TeleopPeriodic() override {

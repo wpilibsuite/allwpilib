@@ -253,10 +253,11 @@ class ProfiledPIDController
   double Calculate(Distance_t measurement) {
     if (m_controller.IsContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
+      auto errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       auto goalMinDistance = frc::InputModulus<Distance_t>(
-          m_goal.position - measurement, m_minimumInput, m_maximumInput);
+          m_goal.position - measurement, -errorBound, errorBound);
       auto setpointMinDistance = frc::InputModulus<Distance_t>(
-          m_setpoint.position - measurement, m_minimumInput, m_maximumInput);
+          m_setpoint.position - measurement, -errorBound, errorBound);
 
       // Recompute the profile goal with the smallest error, thus giving the
       // shortest path. The goal may be outside the input range after this

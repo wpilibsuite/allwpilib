@@ -8,8 +8,8 @@
 
 using namespace frc;
 
-ScopedTracer::ScopedTracer(wpi::Twine name, wpi::raw_ostream& os)
-    : m_name(name.str()), m_os(os) {
+ScopedTracer::ScopedTracer(std::string_view name, wpi::raw_ostream& os)
+    : m_name(name), m_os(os) {
   m_tracer.ResetTimer();
 }
 

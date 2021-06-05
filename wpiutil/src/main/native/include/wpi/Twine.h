@@ -16,6 +16,7 @@
 #include <cassert>
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 #ifdef _WIN32
 #pragma warning(push)
@@ -104,6 +105,9 @@ namespace wpi {
       /// A pointer to a StringRef instance.
       StringRefKind,
 
+      /// A pointer to a std::string_view instance.
+      StringViewKind,
+
       /// A pointer to a SmallString instance.
       SmallStringKind,
 
@@ -141,6 +145,7 @@ namespace wpi {
       const char *cString;
       const std::string *stdString;
       const StringRef *stringRef;
+      const std::string_view *stringView;
       const SmallVectorImpl<char> *smallString;
       char character;
       unsigned int decUI;
@@ -282,6 +287,12 @@ namespace wpi {
       assert(isValid() && "Invalid twine!");
     }
 
+    /// Construct from a std::string_view.
+    /*implicit*/ Twine(const std::string_view &Str) : LHSKind(StringViewKind) {
+      LHS.stringView = &Str;
+      assert(isValid() && "Invalid twine!");
+    }
+
     /// Construct from a SmallString.
     /*implicit*/ Twine(const SmallVectorImpl<char> &Str)
         : LHSKind(SmallStringKind) {
@@ -355,6 +366,22 @@ namespace wpi {
       assert(isValid() && "Invalid twine!");
     }
 
+    /// Construct as the concatenation of a C string and a std::string_view.
+    /*implicit*/ Twine(const char *LHS, const std::string_view &RHS)
+        : LHSKind(CStringKind), RHSKind(StringViewKind) {
+      this->LHS.cString = LHS;
+      this->RHS.stringView = &RHS;
+      assert(isValid() && "Invalid twine!");
+    }
+
+    /// Construct as the concatenation of a std::string_view and a C string.
+    /*implicit*/ Twine(const std::string_view &LHS, const char *RHS)
+        : LHSKind(StringViewKind), RHSKind(CStringKind) {
+      this->LHS.stringView = &LHS;
+      this->RHS.cString = RHS;
+      assert(isValid() && "Invalid twine!");
+    }
+
     /// Since the intended use of twines is as temporary objects, assignments
     /// when concatenating might cause undefined behavior or stack corruptions
     Twine &operator=(const Twine &) = delete;
@@ -402,6 +429,7 @@ namespace wpi {
       case CStringKind:
       case StdStringKind:
       case StringRefKind:
+      case StringViewKind:
       case SmallStringKind:
       case CharKind:
         return true;
@@ -438,6 +466,7 @@ namespace wpi {
       case CStringKind:    return StringRef(LHS.cString);
       case StdStringKind:  return StringRef(*LHS.stdString);
       case StringRefKind:  return *LHS.stringRef;
+      case StringViewKind: return StringRef(*LHS.stringView);
       case SmallStringKind:
         return StringRef(LHS.smallString->data(), LHS.smallString->size());
       case CharKind:       return StringRef(&LHS.character, 1);

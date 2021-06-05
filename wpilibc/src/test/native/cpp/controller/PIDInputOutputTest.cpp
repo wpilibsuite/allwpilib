@@ -17,8 +17,10 @@ class PIDInputOutputTest : public testing::Test {
 TEST_F(PIDInputOutputTest, ContinuousInputTest) {
   controller->SetP(1);
   controller->EnableContinuousInput(-180, 180);
+  EXPECT_DOUBLE_EQ(controller->Calculate(-179, 179), -2);
 
-  EXPECT_LT(controller->Calculate(-179, 179), 0);
+  controller->EnableContinuousInput(0, 360);
+  EXPECT_DOUBLE_EQ(controller->Calculate(1, 359), -2);
 }
 
 TEST_F(PIDInputOutputTest, ProportionalGainOutputTest) {

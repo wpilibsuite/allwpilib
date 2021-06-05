@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
 
 namespace wpi::math {
 
@@ -24,8 +24,13 @@ enum class MathUsageId {
 class MathShared {
  public:
   virtual ~MathShared() = default;
-  virtual void ReportError(const wpi::Twine& error) = 0;
+  virtual void ReportErrorV(fmt::string_view format, fmt::format_args args) = 0;
   virtual void ReportUsage(MathUsageId id, int count) = 0;
+
+  template <typename S, typename... Args>
+  inline void ReportError(const S& format, Args&&... args) {
+    ReportErrorV(format, fmt::make_args_checked<Args...>(format, args...));
+  }
 };
 
 class MathSharedStore {
@@ -34,8 +39,13 @@ class MathSharedStore {
 
   static void SetMathShared(std::unique_ptr<MathShared> shared);
 
-  static void ReportError(const wpi::Twine& error) {
-    GetMathShared().ReportError(error);
+  static void ReportErrorV(fmt::string_view format, fmt::format_args args) {
+    GetMathShared().ReportErrorV(format, args);
+  }
+
+  template <typename S, typename... Args>
+  static inline void ReportError(const S& format, Args&&... args) {
+    ReportErrorV(format, fmt::make_args_checked<Args...>(format, args...));
   }
 
   static void ReportUsage(MathUsageId id, int count) {

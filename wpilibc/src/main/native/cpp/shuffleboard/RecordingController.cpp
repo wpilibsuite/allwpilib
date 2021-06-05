@@ -4,7 +4,7 @@
 
 #include "frc/shuffleboard/RecordingController.h"
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 using namespace frc::detail;
@@ -38,7 +38,8 @@ void RecordingController::AddEventMarker(
     wpi::StringRef name, wpi::StringRef description,
     ShuffleboardEventImportance importance) {
   if (name.empty()) {
-    DriverStation::ReportError("Shuffleboard event name was not specified");
+    FRC_ReportError(err::Error, "{}",
+                    "Shuffleboard event name was not specified");
     return;
   }
   m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(

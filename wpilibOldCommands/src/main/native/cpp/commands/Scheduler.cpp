@@ -65,7 +65,7 @@ void Scheduler::AddButton(ButtonScheduler* button) {
 
 void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
   if (!subsystem) {
-    throw FRC_MakeError(err::NullParameter, "subsystem");
+    throw FRC_MakeError(err::NullParameter, "{}", "subsystem");
   }
   m_impl->subsystems.insert(subsystem);
 }
@@ -108,7 +108,7 @@ void Scheduler::Run() {
     for (auto& addition : m_impl->additions) {
       // Check to make sure no adding during adding
       if (m_impl->adding) {
-        FRC_ReportError(warn::IncompatibleState,
+        FRC_ReportError(warn::IncompatibleState, "{}",
                         "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(addition);
@@ -121,7 +121,7 @@ void Scheduler::Run() {
   for (auto& subsystem : m_impl->subsystems) {
     if (subsystem->GetCurrentCommand() == nullptr) {
       if (m_impl->adding) {
-        FRC_ReportError(warn::IncompatibleState,
+        FRC_ReportError(warn::IncompatibleState, "{}",
                         "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(subsystem->GetDefaultCommand());
@@ -133,7 +133,7 @@ void Scheduler::Run() {
 
 void Scheduler::Remove(Command* command) {
   if (!command) {
-    throw FRC_MakeError(err::NullParameter, "command");
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
 
   m_impl->Remove(command);

@@ -155,9 +155,9 @@ class MecanumDrivePoseEstimator {
    *                                 timestamp with an epoch since FPGA startup
    *                                 (i.e. the epoch of this timestamp is the
    *                                 same epoch as
-   *                                 frc2::Timer::GetFPGATimestamp(). This means
+   *                                 frc::Timer::GetFPGATimestamp(). This means
    *                                 that you should use
-   *                                 frc2::Timer::GetFPGATimestamp() as your
+   *                                 frc::Timer::GetFPGATimestamp() as your
    *                                 time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to

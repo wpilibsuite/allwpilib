@@ -50,8 +50,8 @@ class Command {
   Command() = default;
   virtual ~Command();
 
-  Command(const Command&);
-  Command& operator=(const Command&);
+  Command(const Command&) = default;
+  Command& operator=(const Command& rhs);
   Command(Command&&) = default;
   Command& operator=(Command&&) = default;
 

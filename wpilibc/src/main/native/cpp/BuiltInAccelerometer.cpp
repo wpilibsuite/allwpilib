@@ -23,7 +23,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
 void BuiltInAccelerometer::SetRange(Range range) {
   if (range == kRange_16G) {
-    throw FRC_MakeError(err::ParameterOutOfRange,
+    throw FRC_MakeError(err::ParameterOutOfRange, "{}",
                         "16G range not supported (use k2G, k4G, or k8G)");
   }
 

@@ -7,7 +7,7 @@
 #include <frc/TimedRobot.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -35,7 +35,7 @@ class Robot : public frc::TimedRobot {
   void RobotInit() override {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
-    m_encoder.SetDistancePerPulse((wpi::math::pi * 6) / 360.0);
+    m_encoder.SetDistancePerPulse((wpi::numbers::pi * 6) / 360.0);
   }
 
  private:

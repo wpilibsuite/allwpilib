@@ -7,14 +7,13 @@
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
 
-#include "frc/Base.h"
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -37,21 +36,21 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel)
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
-    : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
+    : m_pingChannel(pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   if (!pingChannel) {
-    throw FRC_MakeError(err::NullParameter, "pingChannel");
+    throw FRC_MakeError(err::NullParameter, "{}", "pingChannel");
   }
   if (!echoChannel) {
-    throw FRC_MakeError(err::NullParameter, "echoChannel");
+    throw FRC_MakeError(err::NullParameter, "{}", "echoChannel");
   }
   Initialize();
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel)
-    : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
-      m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
+    : m_pingChannel(&pingChannel, wpi::NullDeleter<DigitalOutput>()),
+      m_echoChannel(&echoChannel, wpi::NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
   Initialize();
 }
@@ -83,7 +82,10 @@ Ultrasonic::~Ultrasonic() {
 }
 
 void Ultrasonic::Ping() {
-  wpi_assert(!m_automaticEnabled);
+  if (m_automaticEnabled) {
+    throw FRC_MakeError(err::IncompatibleMode, "{}",
+                        "cannot call Ping() in automatic mode");
+  }
 
   // Reset the counter to zero (invalid data now)
   m_counter.Reset();
@@ -135,19 +137,15 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
   }
 }
 
-double Ultrasonic::GetRangeInches() const {
+units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return m_simRange.Get();
+      return units::meter_t{m_simRange.Get()};
     }
-    return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
+    return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {
-    return 0;
+    return 0_m;
   }
-}
-
-double Ultrasonic::GetRangeMM() const {
-  return GetRangeInches() * 25.4;
 }
 
 bool Ultrasonic::IsEnabled() const {
@@ -161,7 +159,7 @@ void Ultrasonic::SetEnabled(bool enable) {
 void Ultrasonic::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetRangeInches(); }, nullptr);
+      "Value", [=] { return units::inch_t{GetRange()}.to<double>(); }, nullptr);
 }
 
 void Ultrasonic::Initialize() {
@@ -178,7 +176,7 @@ void Ultrasonic::Initialize() {
   // Link this instance on the list
   m_sensors.emplace_back(this);
 
-  m_counter.SetMaxPeriod(1.0);
+  m_counter.SetMaxPeriod(1_s);
   m_counter.SetSemiPeriodMode(true);
   m_counter.Reset();
   m_enabled = true;  // Make it available for round robin scheduling
@@ -202,7 +200,7 @@ void Ultrasonic::UltrasonicChecker() {
         sensor->m_pingChannel->Pulse(kPingTime);  // do the ping
       }
 
-      Wait(0.1);  // wait for ping to return
+      Wait(100_ms);  // wait for ping to return
     }
   }
 }

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/time.h>
+
 namespace frc {
 
 class Command;
@@ -17,14 +19,15 @@ class CommandGroupEntry {
   };
 
   CommandGroupEntry() = default;
-  CommandGroupEntry(Command* command, Sequence state, double timeout = -1.0);
+  CommandGroupEntry(Command* command, Sequence state,
+                    units::second_t timeout = -1_s);
 
   CommandGroupEntry(CommandGroupEntry&&) = default;
   CommandGroupEntry& operator=(CommandGroupEntry&&) = default;
 
   bool IsTimedOut() const;
 
-  double m_timeout = -1.0;
+  units::second_t m_timeout = -1_s;
   Command* m_command = nullptr;
   Sequence m_state = kSequence_InSequence;
 };

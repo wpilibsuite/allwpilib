@@ -5,10 +5,11 @@
 #pragma once
 
 #include <frc/commands/TimedCommand.h>
+#include <units/time.h>
 
 class ReplaceMeTimedCommand : public frc::TimedCommand {
  public:
-  explicit ReplaceMeTimedCommand(double timeout);
+  explicit ReplaceMeTimedCommand(units::second_t timeout);
   void Initialize() override;
   void Execute() override;
   void End() override;

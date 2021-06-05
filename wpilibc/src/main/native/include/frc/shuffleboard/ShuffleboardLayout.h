@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardContainer.h"
@@ -26,8 +26,8 @@ namespace frc {
 class ShuffleboardLayout : public ShuffleboardComponent<ShuffleboardLayout>,
                            public ShuffleboardContainer {
  public:
-  ShuffleboardLayout(ShuffleboardContainer& parent, const wpi::Twine& name,
-                     const wpi::Twine& type);
+  ShuffleboardLayout(ShuffleboardContainer& parent, std::string_view name,
+                     std::string_view type);
 
   void BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                  std::shared_ptr<nt::NetworkTable> metaTable) override;

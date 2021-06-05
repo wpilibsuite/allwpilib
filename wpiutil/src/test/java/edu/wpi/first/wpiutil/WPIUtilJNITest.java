@@ -10,6 +10,16 @@ import org.junit.jupiter.api.Test;
 
 public class WPIUtilJNITest {
   @Test
+  public void testEnableMockTime() {
+    assertDoesNotThrow(WPIUtilJNI::enableMockTime);
+  }
+
+  @Test
+  public void testSetMockTime() {
+    assertDoesNotThrow(() -> WPIUtilJNI.setMockTime(0L));
+  }
+
+  @Test
   public void testNow() {
     assertDoesNotThrow(WPIUtilJNI::now);
   }

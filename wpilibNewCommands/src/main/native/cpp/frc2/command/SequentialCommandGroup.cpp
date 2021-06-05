@@ -60,7 +60,7 @@ void SequentialCommandGroup::AddCommands(
   }
 
   if (m_currentCommandIndex != invalid_index) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "Commands cannot be added to a CommandGroup "
                         "while the group is running");
   }

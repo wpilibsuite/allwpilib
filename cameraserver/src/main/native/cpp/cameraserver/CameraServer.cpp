@@ -625,8 +625,8 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
       auto kind = it->second.GetKind();
       if (kind != cs::VideoSink::kCv) {
         auto csShared = GetCameraServerShared();
-        csShared->SetCameraServerError("expected OpenCV sink, but got " +
-                                       wpi::Twine(kind));
+        csShared->SetCameraServerError("expected OpenCV sink, but got {}",
+                                       kind);
         return cs::CvSink{};
       }
       return *static_cast<cs::CvSink*>(&it->second);
@@ -648,7 +648,7 @@ cs::CvSink CameraServer::GetVideo(const wpi::Twine& name) {
     auto it = m_impl->m_sources.find(nameStr);
     if (it == m_impl->m_sources.end()) {
       auto csShared = GetCameraServerShared();
-      csShared->SetCameraServerError("could not find camera " + nameStr);
+      csShared->SetCameraServerError("could not find camera {}", nameStr);
       return cs::CvSink{};
     }
     source = it->second;
@@ -711,7 +711,7 @@ cs::VideoSink CameraServer::GetServer(const wpi::Twine& name) {
   auto it = m_impl->m_sinks.find(nameStr);
   if (it == m_impl->m_sinks.end()) {
     auto csShared = GetCameraServerShared();
-    csShared->SetCameraServerError("could not find server " + nameStr);
+    csShared->SetCameraServerError("could not find server {}", nameStr);
     return cs::VideoSink{};
   }
   return it->second;

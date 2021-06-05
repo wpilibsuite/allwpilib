@@ -28,7 +28,7 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   RequireAll(*this, onTrue, onFalse);
 }
 
-ConditionalCommand::ConditionalCommand(const wpi::Twine& name, Command* onTrue,
+ConditionalCommand::ConditionalCommand(std::string_view name, Command* onTrue,
                                        Command* onFalse)
     : Command(name) {
   m_onTrue = onTrue;

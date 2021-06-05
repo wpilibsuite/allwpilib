@@ -14,6 +14,7 @@
 #include "wpi/SmallVector.h"
 #include "wpi/STLExtras.h"
 #include "wpi/Compiler.h"
+#include "wpi/span.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -24,6 +25,9 @@
 #include <optional>
 #include <type_traits>
 #include <vector>
+#if __cplusplus >= 202002L && __has_include(<span>)
+#include <span>
+#endif
 
 namespace wpi {
 
@@ -125,6 +129,24 @@ namespace wpi {
              typename std::enable_if<
                  std::is_convertible<U *const *, T const *>::value>::type* = 0)
       : Data(Vec.data()), Length(Vec.size()) {}
+
+#ifdef __cpp_lib_span
+    /// Construct an ArrayRef from std::span
+    /*implicit*/ ArrayRef(std::span<T> Span)
+        : Data(Span.data()), Length(Span.size()) {}
+
+    /// Construct an ArrayRef from std::span
+    /*implicit*/ ArrayRef(std::span<const T> Span)
+        : Data(Span.data()), Length(Span.size()) {}
+#endif
+
+    /// Construct an ArrayRef from wpi::span
+    /*implicit*/ ArrayRef(span<T> Span)
+        : Data(Span.data()), Length(Span.size()) {}
+
+    /// Construct an ArrayRef from wpi::span
+    /*implicit*/ ArrayRef(span<const T> Span)
+        : Data(Span.data()), Length(Span.size()) {}
 
     /// @}
     /// @name Simple Operations
@@ -268,6 +290,15 @@ namespace wpi {
       return std::vector<T>(Data, Data+Length);
     }
 
+#ifdef __cpp_lib_span
+    operator std::span<const T>() const {
+      return std::span<const T>(Data, Length);
+    }
+#endif
+
+    operator span<const T>() const {
+      return span<const T>(Data, Length);
+    }
     /// @}
   };
 
@@ -321,6 +352,14 @@ namespace wpi {
     /// Construct an MutableArrayRef from a C array.
     template <size_t N>
     /*implicit*/ constexpr MutableArrayRef(T (&Arr)[N]) : ArrayRef<T>(Arr) {}
+
+#ifdef __cpp_lib_span
+    /// Construct an ArrayRef from std::span
+    /*implicit*/ MutableArrayRef(std::span<T> Span) : ArrayRef<T>(Span) {}
+#endif
+
+    /// Construct an ArrayRef from wpi::span
+    /*implicit*/ MutableArrayRef(span<T> Span) : ArrayRef<T>(Span) {}
 
     T *data() const { return const_cast<T*>(ArrayRef<T>::data()); }
 
@@ -413,6 +452,16 @@ namespace wpi {
     T &operator[](size_t Index) const {
       assert(Index < this->size() && "Invalid index!");
       return data()[Index];
+    }
+
+#ifdef __cpp_lib_span
+    operator std::span<T>() const {
+      return std::span<T>(data(), this->size());
+    }
+#endif
+
+    operator span<T>() const {
+      return span<T>(data(), this->size());
     }
   };
 

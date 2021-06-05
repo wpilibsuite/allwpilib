@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <units/time.h>
 
 #include "frc/SolenoidBase.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -93,7 +94,7 @@ class Solenoid : public SolenoidBase,
    *
    * @see startPulse()
    */
-  void SetPulseDuration(double durationSeconds);
+  void SetPulseDuration(units::second_t duration);
 
   /**
    * Trigger the PCM to generate a pulse of the duration set in

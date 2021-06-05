@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
 
 namespace frc {
 
@@ -19,10 +19,11 @@ namespace frc {
  */
 class RuntimeError : public std::runtime_error {
  public:
-  RuntimeError(int32_t code, const wpi::Twine& message, const wpi::Twine& loc,
-               wpi::StringRef stack);
-  RuntimeError(int32_t code, const wpi::Twine& message, const char* fileName,
-               int lineNumber, const char* funcName, wpi::StringRef stack);
+  RuntimeError(int32_t code, std::string&& loc, std::string&& stack,
+               std::string&& message);
+  RuntimeError(int32_t code, const char* fileName, int lineNumber,
+               const char* funcName, std::string&& stack,
+               std::string&& message);
 
   int32_t code() const noexcept { return m_data->code; }
   const char* loc() const noexcept { return m_data->loc.c_str(); }
@@ -52,13 +53,33 @@ const char* GetErrorMessage(int32_t* code);
  * Generally the FRC_ReportError wrapper macro should be used instead.
  *
  * @param status error code
- * @param message error message details
  * @param fileName source file name
  * @param lineNumber source line number
  * @param funcName source function name
+ * @param format error message format
+ * @param args error message format args
  */
-void ReportError(int32_t status, const wpi::Twine& message,
-                 const char* fileName, int lineNumber, const char* funcName);
+void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
+                  const char* funcName, fmt::string_view format,
+                  fmt::format_args args);
+
+/**
+ * Reports an error to the driver station (using HAL_SendError).
+ * Generally the FRC_ReportError wrapper macro should be used instead.
+ *
+ * @param status error code
+ * @param fileName source file name
+ * @param lineNumber source line number
+ * @param funcName source function name
+ * @param format error message format
+ * @param args error message format args
+ */
+template <typename S, typename... Args>
+inline void ReportError(int32_t status, const char* fileName, int lineNumber,
+                        const char* funcName, const S& format, Args&&... args) {
+  ReportErrorV(status, fileName, lineNumber, funcName, format,
+               fmt::make_args_checked<Args...>(format, args...));
+}
 
 /**
  * Makes a runtime error exception object. This object should be thrown
@@ -72,9 +93,20 @@ void ReportError(int32_t status, const wpi::Twine& message,
  * @param funcName source function name
  * @return runtime error object
  */
-[[nodiscard]] RuntimeError MakeError(int32_t status, const wpi::Twine& message,
-                                     const char* fileName, int lineNumber,
-                                     const char* funcName);
+[[nodiscard]] RuntimeError MakeErrorV(int32_t status, const char* fileName,
+                                      int lineNumber, const char* funcName,
+                                      fmt::string_view format,
+                                      fmt::format_args args);
+
+template <typename S, typename... Args>
+[[nodiscard]] inline RuntimeError MakeError(int32_t status,
+                                            const char* fileName,
+                                            int lineNumber,
+                                            const char* funcName,
+                                            const S& format, Args&&... args) {
+  return MakeErrorV(status, fileName, lineNumber, funcName, format,
+                    fmt::make_args_checked<Args...>(format, args...));
+}
 
 namespace err {
 #define S(label, offset, message) inline constexpr int label = offset;
@@ -93,13 +125,14 @@ namespace warn {
  * Reports an error to the driver station (using HAL_SendError).
  *
  * @param status error code
- * @param message error message details
+ * @param format error message format
  */
-#define FRC_ReportError(status, message)                                     \
-  do {                                                                       \
-    if ((status) != 0) {                                                     \
-      ::frc::ReportError(status, message, __FILE__, __LINE__, __FUNCTION__); \
-    }                                                                        \
+#define FRC_ReportError(status, format, ...)                       \
+  do {                                                             \
+    if ((status) != 0) {                                           \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
+                         FMT_STRING(format), __VA_ARGS__);         \
+    }                                                              \
   } while (0)
 
 /**
@@ -107,33 +140,37 @@ namespace warn {
  * by the caller.
  *
  * @param status error code
- * @param message error message details
+ * @param format error message format
  * @return runtime error object
  */
-#define FRC_MakeError(status, message) \
-  ::frc::MakeError(status, message, __FILE__, __LINE__, __FUNCTION__)
+#define FRC_MakeError(status, format, ...)                   \
+  ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
+                   FMT_STRING(format), __VA_ARGS__)
 
 /**
  * Checks a status code and depending on its value, either throws a
  * RuntimeError exception, calls ReportError, or does nothing (if no error).
  *
  * @param status error code
- * @param message error message details
+ * @param format error message format
  */
-#define FRC_CheckErrorStatus(status, message) \
-  do {                                        \
-    if ((status) < 0) {                       \
-      throw FRC_MakeError(status, message);   \
-    } else if ((status) > 0) {                \
-      FRC_ReportError(status, message);       \
-    }                                         \
+#define FRC_CheckErrorStatus(status, format, ...)                      \
+  do {                                                                 \
+    if ((status) < 0) {                                                \
+      throw ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
+                             FMT_STRING(format), __VA_ARGS__);         \
+    } else if ((status) > 0) {                                         \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,     \
+                         FMT_STRING(format), __VA_ARGS__);             \
+    }                                                                  \
   } while (0)
 
-#define FRC_AssertMessage(condition, message)              \
-  do {                                                     \
-    if (!(condition)) {                                    \
-      throw FRC_MakeError(err::AssertionFailure, message); \
-    }                                                      \
+#define FRC_AssertMessage(condition, format, ...)                            \
+  do {                                                                       \
+    if (!(condition)) {                                                      \
+      throw ::frc::MakeError(err::AssertionFailure, __FILE__, __LINE__,      \
+                             __FUNCTION__, FMT_STRING(format), __VA_ARGS__); \
+    }                                                                        \
   } while (0)
 
-#define FRC_Assert(condition) FRC_AssertMessage(condition, #condition)
+#define FRC_Assert(condition) FRC_AssertMessage(condition, "{}", #condition)

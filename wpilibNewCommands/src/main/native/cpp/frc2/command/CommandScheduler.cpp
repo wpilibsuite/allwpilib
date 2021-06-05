@@ -111,7 +111,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;
@@ -359,12 +359,13 @@ void CommandScheduler::CancelAll() {
   Cancel(commands);
 }
 
-double CommandScheduler::TimeSinceScheduled(const Command* command) const {
+units::second_t CommandScheduler::TimeSinceScheduled(
+    const Command* command) const {
   auto find = m_impl->scheduledCommands.find(command);
   if (find != m_impl->scheduledCommands.end()) {
     return find->second.TimeSinceInitialized();
   } else {
-    return -1;
+    return -1_s;
   }
 }
 bool CommandScheduler::IsScheduled(

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/InstantCommand.h"
@@ -20,7 +20,7 @@ class PrintCommand : public CommandHelper<InstantCommand, PrintCommand> {
    *
    * @param message the message to print
    */
-  explicit PrintCommand(const wpi::Twine& message);
+  explicit PrintCommand(std::string_view message);
 
   PrintCommand(PrintCommand&& other) = default;
 

@@ -7,12 +7,12 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
 #include <networktables/NetworkTable.h>
 #include <wpi/StringMap.h>
-#include <wpi/Twine.h>
 
 namespace frc {
 
@@ -30,7 +30,7 @@ class MechanismObject2d {
   friend class Mechanism2d;
 
  protected:
-  explicit MechanismObject2d(const wpi::Twine& name);
+  explicit MechanismObject2d(std::string_view name);
 
   /**
    * Update all entries with new ones from a new table.

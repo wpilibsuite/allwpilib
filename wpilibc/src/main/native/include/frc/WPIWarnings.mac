@@ -21,3 +21,4 @@ S(SPIReadNoMISO, 13, "Cannot read from SPI port with no MISO input")
 S(SPIReadNoData, 14, "No data available to read from SPI")
 S(IncompatibleState, 15,
   "Incompatible State: The operation cannot be completed")
+S(Warning, 16, "Warning")

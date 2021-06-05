@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <hal/Interrupts.h>
+#include <units/time.h>
 
 #include "frc/AnalogTriggerType.h"
 
@@ -86,12 +87,12 @@ class InterruptableSensorBase {
    * waiting for an interrupt. This is not threadsafe, and can cause memory
    * corruption
    *
-   * @param timeout        Timeout in seconds
+   * @param timeout        Timeout
    * @param ignorePrevious If true, ignore interrupts that happened before
    *                       WaitForInterrupt was called.
    * @return What interrupts fired
    */
-  virtual WaitResult WaitForInterrupt(double timeout,
+  virtual WaitResult WaitForInterrupt(units::second_t timeout,
                                       bool ignorePrevious = true);
 
   /**
@@ -116,7 +117,7 @@ class InterruptableSensorBase {
    *
    * @return Timestamp in seconds since boot.
    */
-  virtual double ReadRisingTimestamp();
+  virtual units::second_t ReadRisingTimestamp();
 
   /**
    * Return the timestamp for the falling interrupt that occurred most recently.
@@ -127,7 +128,7 @@ class InterruptableSensorBase {
    *
    * @return Timestamp in seconds since boot.
    */
-  virtual double ReadFallingTimestamp();
+  virtual units::second_t ReadFallingTimestamp();
 
   /**
    * Set which edge to trigger interrupts on

@@ -18,7 +18,7 @@ using namespace frc;
 Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   SetClosedLoopControl(true);
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID + 1);
@@ -36,34 +36,34 @@ void Compressor::Stop() {
 bool Compressor::Enabled() const {
   int32_t status = 0;
   bool value = HAL_GetCompressor(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 bool Compressor::GetPressureSwitchValue() const {
   int32_t status = 0;
   bool value = HAL_GetCompressorPressureSwitch(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 double Compressor::GetCompressorCurrent() const {
   int32_t status = 0;
   double value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 void Compressor::SetClosedLoopControl(bool on) {
   int32_t status = 0;
   HAL_SetCompressorClosedLoopControl(m_compressorHandle, on, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 bool Compressor::GetClosedLoopControl() const {
   int32_t status = 0;
   bool value = HAL_GetCompressorClosedLoopControl(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
@@ -71,7 +71,7 @@ bool Compressor::GetCompressorCurrentTooHighFault() const {
   int32_t status = 0;
   bool value =
       HAL_GetCompressorCurrentTooHighFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
@@ -79,21 +79,21 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
   int32_t status = 0;
   bool value =
       HAL_GetCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 bool Compressor::GetCompressorShortedStickyFault() const {
   int32_t status = 0;
   bool value = HAL_GetCompressorShortedStickyFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 bool Compressor::GetCompressorShortedFault() const {
   int32_t status = 0;
   bool value = HAL_GetCompressorShortedFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
@@ -101,21 +101,21 @@ bool Compressor::GetCompressorNotConnectedStickyFault() const {
   int32_t status = 0;
   bool value =
       HAL_GetCompressorNotConnectedStickyFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 bool Compressor::GetCompressorNotConnectedFault() const {
   int32_t status = 0;
   bool value = HAL_GetCompressorNotConnectedFault(m_compressorHandle, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return value;
 }
 
 void Compressor::ClearAllPCMStickyFaults() {
   int32_t status = 0;
   HAL_ClearAllPCMStickyFaults(m_module, &status);
-  FRC_CheckErrorStatus(status, "Module " + wpi::Twine{m_module});
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 int Compressor::GetModule() const {

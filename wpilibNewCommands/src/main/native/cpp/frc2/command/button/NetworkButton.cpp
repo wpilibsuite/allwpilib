@@ -12,9 +12,9 @@ NetworkButton::NetworkButton(nt::NetworkTableEntry entry)
       }) {}
 
 NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                             const wpi::Twine& field)
+                             std::string_view field)
     : NetworkButton(table->GetEntry(field)) {}
 
-NetworkButton::NetworkButton(const wpi::Twine& table, const wpi::Twine& field)
+NetworkButton::NetworkButton(std::string_view table, std::string_view field)
     : NetworkButton(nt::NetworkTableInstance::GetDefault().GetTable(table),
                     field) {}
