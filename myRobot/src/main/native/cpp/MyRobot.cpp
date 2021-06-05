@@ -4,17 +4,7 @@
 
 #include <frc/TimedRobot.h>
 
-#include "frc/XboxController.h"
-#include "frc/PneumaticsControlModule.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/Solenoid.h"
-
 class MyRobot : public frc::TimedRobot {
-  frc::PneumaticsControlModule pcm;
-  frc::Solenoid solenoid{pcm, 1};
-  frc::DoubleSolenoid doubleSolenoid{pcm, 2, 3};
-  frc::XboxController joystick{0};
-
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -39,16 +29,7 @@ class MyRobot : public frc::TimedRobot {
   /**
    * This function is called periodically during operator control
    */
-  void TeleopPeriodic() override {
-    solenoid.Set(joystick.GetAButton());
-    if (joystick.GetBButton()) {
-      doubleSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
-    } else if (joystick.GetYButton()) {
-      doubleSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
-    } else {
-      doubleSolenoid.Set(frc::DoubleSolenoid::Value::kOff);
-    }
-  }
+  void TeleopPeriodic() override {}
 
   /**
    * This function is called periodically during test mode
