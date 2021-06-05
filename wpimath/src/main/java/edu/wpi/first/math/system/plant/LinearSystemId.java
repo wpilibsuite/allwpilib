@@ -179,6 +179,37 @@ public final class LinearSystemId {
 
   /**
    * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
+   * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(meter/sec) and
+   * volts/(meter/sec^2)) cases. This can be found using frc-characterization. The states of the
+   * system are [left velocity, right velocity]^T, inputs are [left voltage, right voltage]^T, and
+   * outputs are [left velocity, right velocity]^T.
+   *
+   * @param kVLinear The linear velocity gain, volts per (meter per second).
+   * @param kALinear The linear acceleration gain, volts per (meter per second squared).
+   * @param kVAngular The angular velocity gain, volts per (meter per second).
+   * @param kAAngular The angular acceleration gain, volts per (meter per second squared).
+   * @return A LinearSystem representing the given characterized constants.
+   * @see <a href="https://github.com/wpilibsuite/frc-characterization">
+   *     https://github.com/wpilibsuite/frc-characterization</a>
+   */
+  @SuppressWarnings("ParameterName")
+  public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
+      double kVLinear, double kALinear, double kVAngular, double kAAngular) {
+
+    final double A1 = 0.5 * -(kVLinear / kALinear + kVAngular / kAAngular);
+    final double A2 = 0.5 * -(kVLinear / kALinear - kVAngular / kAAngular);
+    final double B1 = 0.5 * (1.0 / kALinear + 1.0 / kAAngular);
+    final double B2 = 0.5 * (1.0 / kALinear - 1.0 / kAAngular);
+
+    return new LinearSystem<>(
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
+        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0));
+  }
+
+  /**
+   * Identify a standard differential drive drivetrain, given the drivetrain's kV and kA in both
    * linear (volts/(meter/sec) and volts/(meter/sec^2)) and angular (volts/(radian/sec) and
    * volts/(radian/sec^2)) cases. This can be found using frc-characterization. The states of the
    * system are [left velocity, right velocity]^T, inputs are [left voltage, right voltage]^T, and
@@ -188,24 +219,26 @@ public final class LinearSystemId {
    * @param kALinear The linear acceleration gain, volts per (meter per second squared).
    * @param kVAngular The angular velocity gain, volts per (radians per second).
    * @param kAAngular The angular acceleration gain, volts per (radians per second squared).
+   * @param trackwidth The width of the drivetrain in meters.
    * @return A LinearSystem representing the given characterized constants.
    * @see <a href="https://github.com/wpilibsuite/frc-characterization">
    *     https://github.com/wpilibsuite/frc-characterization</a>
    */
   @SuppressWarnings("ParameterName")
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
-      double kVLinear, double kALinear, double kVAngular, double kAAngular) {
-
-    final double c = 0.5 / (kALinear * kAAngular);
-    final double A1 = c * (-kALinear * kVAngular - kVLinear * kAAngular);
-    final double A2 = c * (kALinear * kVAngular - kVLinear * kAAngular);
-    final double B1 = c * (kALinear + kAAngular);
-    final double B2 = c * (kAAngular - kALinear);
-
-    return new LinearSystem<>(
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
-        Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0));
+      double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
+    // We want to find a factor to include in Kv,angular that will convert
+    // `u = Kv,angular omega` to `u = Kv,angular v`.
+    //
+    // v = omega r
+    // omega = v/r
+    // omega = 1/r v
+    // omega = 1/(trackwidth/2) v
+    // omega = 2/trackwidth v
+    //
+    // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
+    // to V/m/s).
+    return identifyDrivetrainSystem(
+        kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
   }
 }
