@@ -21,14 +21,16 @@ class SendableBuilder;
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public Sendable,
-                       public SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public Sendable, public SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 
-  DoubleSolenoid(PneumaticsBase& module, int forwardChannel, int reverseChannel);
-  DoubleSolenoid(PneumaticsBase* module, int forwardChannel, int reverseChannel);
-  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel, int reverseChannel);
+  DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
+                 int reverseChannel);
+  DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
+                 int reverseChannel);
+  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel,
+                 int reverseChannel);
 
   ~DoubleSolenoid() override;
 
@@ -75,8 +77,8 @@ class DoubleSolenoid : public Sendable,
   /**
    * Check if the forward solenoid is Disabled.
    *
-   * If a solenoid is shorted, it is added to the DisabledList and disabled until
-   * power cycle, or until faults are cleared.
+   * If a solenoid is shorted, it is added to the DisabledList and disabled
+   * until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.
@@ -86,8 +88,8 @@ class DoubleSolenoid : public Sendable,
   /**
    * Check if the reverse solenoid is Disabled.
    *
-   * If a solenoid is shorted, it is added to the DisabledList and disabled until
-   * power cycle, or until faults are cleared.
+   * If a solenoid is shorted, it is added to the DisabledList and disabled
+   * until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.

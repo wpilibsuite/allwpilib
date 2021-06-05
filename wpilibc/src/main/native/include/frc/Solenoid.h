@@ -21,14 +21,11 @@ class SendableBuilder;
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public Sendable,
-                 public SendableHelper<Solenoid> {
+class Solenoid : public Sendable, public SendableHelper<Solenoid> {
  public:
-
   Solenoid(PneumaticsBase& module, int channel);
   Solenoid(PneumaticsBase* module, int channel);
   Solenoid(std::shared_ptr<PneumaticsBase> module, int channel);
-
 
   ~Solenoid() override;
 

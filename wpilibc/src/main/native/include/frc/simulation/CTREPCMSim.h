@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "frc/simulation/CallbackStore.h"
 #include "frc/PneumaticsBase.h"
+#include "frc/simulation/CallbackStore.h"
 
 namespace frc {
 
@@ -42,9 +42,8 @@ class CTREPCMSim {
    * @param initialNotify should the callback be run with the initial state
    * @return the CallbackStore object associated with this callback
    */
-  [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterInitializedCallback(NotifyCallback callback,
-                                      bool initialNotify);
+  [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
+      NotifyCallback callback, bool initialNotify);
 
   /**
    * Check if a solenoid has been initialized on a specific channel.

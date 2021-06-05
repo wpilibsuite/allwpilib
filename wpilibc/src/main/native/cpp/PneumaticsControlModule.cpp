@@ -1,10 +1,14 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "frc/PneumaticsControlModule.h"
 
-#include "frc/SensorUtil.h"
+#include <hal/CTREPCM.h>
 #include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
-#include "hal/CTREPCM.h"
+#include "frc/SensorUtil.h"
 
 using namespace frc;
 
@@ -145,8 +149,8 @@ void PneumaticsControlModule::FireOneShot(int index) {
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::SetOneShotDuration(
-    int index, units::second_t duration) {
+void PneumaticsControlModule::SetOneShotDuration(int index,
+                                                 units::second_t duration) {
   int32_t status = 0;
   units::millisecond_t millis = duration;
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);

@@ -39,9 +39,7 @@ class CompressorSimModel : public glass::CompressorModel {
 
   void Update() override {}
 
-  bool Exists() override {
-    return HALSIM_GetCTREPCMInitialized(m_index);
-  }
+  bool Exists() override { return HALSIM_GetCTREPCMInitialized(m_index); }
 
   glass::DataSource* GetRunningData() override { return &m_running; }
   glass::DataSource* GetEnabledData() override { return &m_enabled; }
@@ -78,9 +76,7 @@ class SolenoidSimModel : public glass::SolenoidModel {
 
   void Update() override {}
 
-  bool Exists() override {
-    return HALSIM_GetCTREPCMInitialized(m_index);
-  }
+  bool Exists() override { return HALSIM_GetCTREPCMInitialized(m_index); }
 
   glass::DataSource* GetOutputData() override { return &m_output; }
 

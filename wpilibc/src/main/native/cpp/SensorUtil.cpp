@@ -47,7 +47,6 @@ bool SensorUtil::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
 }
 
-
 bool SensorUtil::CheckPDPChannel(int channel) {
   return HAL_CheckPDPChannel(channel);
 }
