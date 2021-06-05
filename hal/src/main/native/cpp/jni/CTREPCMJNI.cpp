@@ -49,8 +49,9 @@ Java_edu_wpi_first_hal_CTREPCMJNI_free
  * Method:    checkSolenoidChannel
  * Signature: (I)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_CTREPCMJNI_checkSolenoidChannel
-  (JNIEnv *, jclass, jint channel)
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_CTREPCMJNI_checkSolenoidChannel
+  (JNIEnv*, jclass, jint channel)
 {
   return HAL_CheckCTREPCMSolenoidChannel(channel);
 }

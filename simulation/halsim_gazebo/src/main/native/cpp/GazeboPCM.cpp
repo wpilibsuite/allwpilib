@@ -7,8 +7,8 @@
 #include <string>
 
 #include <hal/Value.h>
-#include <hal/simulation/NotifyListener.h>
 #include <hal/simulation/CTREPCMData.h>
+#include <hal/simulation/NotifyListener.h>
 
 #include "simulation/gz_msgs/msgs.h"
 
@@ -30,8 +30,7 @@ GazeboPCM::GazeboPCM(int index, int channel, HALSimGazebo* halsim) {
   m_channel = channel;
   m_halsim = halsim;
   m_pub = NULL;
-  HALSIM_RegisterCTREPCMInitializedCallback(index, init_callback,
-                                            this, true);
+  HALSIM_RegisterCTREPCMInitializedCallback(index, init_callback, this, true);
   HALSIM_RegisterCTREPCMSolenoidOutputCallback(index, channel, output_callback,
                                                this, true);
 }
