@@ -5,7 +5,6 @@
 #include "glass/other/Log.h"
 
 #include <imgui.h>
-#include <wpi/raw_ostream.h>
 
 using namespace glass;
 
@@ -23,8 +22,7 @@ void LogData::Append(std::string_view msg) {
   }
 
   size_t oldSize = m_buf.size();
-  wpi::raw_string_ostream os{m_buf};
-  os << msg;
+  m_buf.append(msg);
   for (size_t newSize = m_buf.size(); oldSize < newSize; ++oldSize) {
     if (m_buf[oldSize] == '\n') {
       m_lineOffsets.push_back(oldSize + 1);

@@ -5,8 +5,9 @@
 #include "glass/WindowManager.h"
 
 #include <algorithm>
+#include <cstdio>
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 #include <wpigui.h>
 
 using namespace glass;
@@ -37,7 +38,7 @@ Window* WindowManager::AddWindow(std::string_view id,
     return nullptr;
   }
   if (win->HasView()) {
-    wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
+    fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(MakeFunctionView(std::move(display)));
@@ -51,7 +52,7 @@ Window* WindowManager::AddWindow(std::string_view id,
     return nullptr;
   }
   if (win->HasView()) {
-    wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
+    fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
     return nullptr;
   }
   win->SetView(std::move(view));
@@ -65,7 +66,7 @@ Window* WindowManager::GetOrAddWindow(std::string_view id, bool duplicateOk) {
       [](const auto& elem, std::string_view s) { return elem->GetId() < s; });
   if (it != m_windows.end() && (*it)->GetId() == id) {
     if (!duplicateOk) {
-      wpi::errs() << "GUI: ignoring duplicate window '" << id << "'\n";
+      fmt::print(stderr, "GUI: ignoring duplicate window '{}'\n", id);
       return nullptr;
     }
     return it->get();

@@ -6,10 +6,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <memory>
 #include <string_view>
 #include <utility>
 
+#include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
@@ -27,7 +29,6 @@
 #include <wpi/fs.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -402,7 +403,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   std::error_code ec;
   wpi::raw_fd_istream f(jsonfile, ec);
   if (ec) {
-    wpi::errs() << "GUI: could not open field JSON file\n";
+    std::fputs("GUI: could not open field JSON file\n", stderr);
     return;
   }
 
@@ -411,12 +412,12 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   try {
     j = wpi::json::parse(f);
   } catch (const wpi::json::parse_error& e) {
-    wpi::errs() << "GUI: JSON: could not parse: " << e.what() << '\n';
+    fmt::print(stderr, "GUI: JSON: could not parse: {}\n", e.what());
   }
 
   // top level must be an object
   if (!j.is_object()) {
-    wpi::errs() << "GUI: JSON: does not contain a top object\n";
+    std::fputs("GUI: JSON: does not contain a top object\n", stderr);
     return;
   }
 
@@ -425,8 +426,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   try {
     image = j.at("field-image").get<std::string>();
   } catch (const wpi::json::exception& e) {
-    wpi::errs() << "GUI: JSON: could not read field-image: " << e.what()
-                << '\n';
+    fmt::print(stderr, "GUI: JSON: could not read field-image: {}\n", e.what());
     return;
   }
 
@@ -438,8 +438,8 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     bottom = j.at("field-corners").at("bottom-right").at(1).get<int>();
     right = j.at("field-corners").at("bottom-right").at(0).get<int>();
   } catch (const wpi::json::exception& e) {
-    wpi::errs() << "GUI: JSON: could not read field-corners: " << e.what()
-                << '\n';
+    fmt::print(stderr, "GUI: JSON: could not read field-corners: {}\n",
+               e.what());
     return;
   }
 
@@ -450,7 +450,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
     width = j.at("field-size").at(0).get<float>();
     height = j.at("field-size").at(1).get<float>();
   } catch (const wpi::json::exception& e) {
-    wpi::errs() << "GUI: JSON: could not read field-size: " << e.what() << '\n';
+    fmt::print(stderr, "GUI: JSON: could not read field-size: {}\n", e.what());
     return;
   }
 
@@ -459,7 +459,7 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
   try {
     unit = j.at("field-unit").get<std::string>();
   } catch (const wpi::json::exception& e) {
-    wpi::errs() << "GUI: JSON: could not read field-unit: " << e.what() << '\n';
+    fmt::print(stderr, "GUI: JSON: could not read field-unit: {}\n", e.what());
     return;
   }
 
@@ -488,10 +488,10 @@ void FieldInfo::LoadJson(std::string_view jsonfile) {
 }
 
 bool FieldInfo::LoadImageImpl(const char* fn) {
-  wpi::outs() << "GUI: loading field image '" << fn << "'\n";
+  fmt::print("GUI: loading field image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn);
   if (!texture) {
-    wpi::errs() << "GUI: could not read field image\n";
+    std::puts("GUI: could not read field image");
     return false;
   }
   m_texture = std::move(texture);
@@ -681,10 +681,10 @@ void ObjectInfo::LoadImage() {
 }
 
 bool ObjectInfo::LoadImageImpl(const char* fn) {
-  wpi::outs() << "GUI: loading object image '" << fn << "'\n";
+  fmt::print("GUI: loading object image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn);
   if (!texture) {
-    wpi::errs() << "GUI: could not read object image\n";
+    std::fputs("GUI: could not read object image\n", stderr);
     return false;
   }
   m_texture = std::move(texture);

@@ -13,7 +13,6 @@
 #include <ntcore_cpp.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <wpi/raw_ostream.h>
 
 #include "glass/Context.h"
 

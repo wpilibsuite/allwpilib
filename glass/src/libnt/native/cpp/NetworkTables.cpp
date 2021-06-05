@@ -48,19 +48,7 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
 }
 
 static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
-  std::string rv;
-  wpi::raw_string_ostream os{rv};
-  os << '[';
-  bool first = true;
-  for (auto v : in) {
-    if (!first) {
-      os << ',';
-    }
-    first = false;
-    os << fmt::format("{:.6f}", v);
-  }
-  os << ']';
-  return rv;
+  return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
 static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
@@ -255,8 +243,8 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(std::string_view in) {
     } else if (wpi::equals_lower(val, "false")) {
       out.emplace_back(0);
     } else {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
   }
@@ -286,8 +274,8 @@ static std::shared_ptr<nt::Value> StringToDoubleArray(std::string_view in) {
     if (auto num = wpi::parse_float<double>(wpi::trim(val))) {
       out.emplace_back(num.value());
     } else {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
   }
@@ -368,8 +356,8 @@ static std::shared_ptr<nt::Value> StringToStringArray(std::string_view in) {
       continue;
     }
     if (val.front() != '"' || val.back() != '"') {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
     out.emplace_back(UnescapeString(val, buf));

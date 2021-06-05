@@ -6,10 +6,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <memory>
 #include <string_view>
 #include <utility>
 
+#include <fmt/format.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Transform2d.h>
@@ -22,7 +24,6 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
-#include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -126,10 +127,10 @@ void BackgroundInfo::LoadImage() {
 }
 
 bool BackgroundInfo::LoadImageImpl(const char* fn) {
-  wpi::outs() << "GUI: loading background image '" << fn << "'\n";
+  fmt::print("GUI: loading background image '{}'\n", fn);
   auto texture = gui::Texture::CreateFromFile(fn);
   if (!texture) {
-    wpi::errs() << "GUI: could not read background image\n";
+    std::puts("GUI: could not read background image");
     return false;
   }
   m_texture = std::move(texture);
