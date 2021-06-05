@@ -15,7 +15,6 @@
 #include <wpi/UrlParser.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Request.h>
 
@@ -44,7 +43,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
     Log(200);
     m_isWsConnected = true;
-    wpi::errs() << "HALWebSim: websocket connected\n";
+    std::fputs("HALWebSim: websocket connected\n", stderr);
   });
 
   // parse incoming JSON, dispatch to parent
@@ -68,7 +67,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   m_websocket->closed.connect([this](uint16_t, auto) {
     // unset the global, allow another websocket to connect
     if (m_isWsConnected) {
-      wpi::errs() << "HALWebSim: websocket disconnected\n";
+      std::fputs("HALWebSim: websocket disconnected\n", stderr);
       m_isWsConnected = false;
 
       m_server->CloseWebsocket(shared_from_this());
@@ -95,8 +94,8 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
                                   }
 
                                   if (err) {
-                                    wpi::errs() << err.str() << "\n";
-                                    wpi::errs().flush();
+                                    fmt::print(stderr, "{}\n", err.str());
+                                    std::fflush(stderr);
                                   }
                                 });
   });
@@ -200,7 +199,6 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 
 void HALSimHttpConnection::Log(int code) {
   auto method = wpi::http_method_str(m_request.GetMethod());
-  wpi::errs() << method << " " << m_request.GetUrl() << " HTTP/"
-              << m_request.GetMajor() << "." << m_request.GetMinor() << " "
-              << code << "\n";
+  fmt::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
+             m_request.GetMajor(), m_request.GetMinor(), code);
 }

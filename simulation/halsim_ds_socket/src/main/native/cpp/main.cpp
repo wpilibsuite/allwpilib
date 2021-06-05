@@ -14,13 +14,14 @@
 #include <sys/types.h>
 
 #include <atomic>
+#include <cstdio>
 #include <cstring>
 #include <string_view>
 
 #include <DSCommPacket.h>
+#include <fmt/format.h>
 #include <hal/Extensions.h>
 #include <wpi/EventLoopRunner.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Tcp.h>
 #include <wpi/uv/Timer.h>
@@ -118,8 +119,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     udpLocal->Send(simAddr, wpi::ArrayRef<Buffer>{singleByte.get(), 1},
                    [](auto buf, Error err) {
                      if (err) {
-                       wpi::errs() << err.str() << "\n";
-                       wpi::errs().flush();
+                       fmt::print(stderr, "{}\n", err.str());
+                       std::fflush(stderr);
                      }
                    });
   });
@@ -146,8 +147,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
       GetBufferPool().Release(bufs);
       if (err) {
-        wpi::errs() << err.str() << "\n";
-        wpi::errs().flush();
+        fmt::print(stderr, "{}\n", err.str());
+        std::fflush(stderr);
       }
     });
     ds->SendUDPToHALSim();
@@ -177,12 +178,12 @@ __declspec(dllexport)
   static bool once = false;
 
   if (once) {
-    wpi::errs() << "Error: cannot invoke HALSIM_InitExtension twice.\n";
+    std::fputs("Error: cannot invoke HALSIM_InitExtension twice.\n", stderr);
     return -1;
   }
   once = true;
 
-  wpi::outs() << "DriverStationSocket Initializing.\n";
+  std::puts("DriverStationSocket Initializing.");
 
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
@@ -192,7 +193,7 @@ __declspec(dllexport)
 
   eventLoopRunner->ExecAsync(SetupEventLoop);
 
-  wpi::outs() << "DriverStationSocket Initialized!\n";
+  std::puts("DriverStationSocket Initialized!");
   return 0;
 }
 }  // extern "C"

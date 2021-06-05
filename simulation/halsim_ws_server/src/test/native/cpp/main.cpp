@@ -4,11 +4,11 @@
 
 #include <thread>
 
+#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <hal/simulation/DIOData.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/uv/Loop.h>
 
 #include "HALSimWSServer.h"
@@ -83,7 +83,7 @@ TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
       test_value = it.value();
     }
   } catch (wpi::json::exception& e) {
-    wpi::errs() << "Error with incoming message: " << e.what() << "\n";
+    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 
   // Compare results

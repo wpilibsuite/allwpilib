@@ -4,6 +4,7 @@
 
 #include "HALSimWeb.h"
 
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
@@ -24,7 +25,7 @@ HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::errs() << "HALSim WS Server libuv ERROR: " << err.str() << '\n';
+    fmt::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
   });
 
   m_server = uv::Tcp::Create(m_loop);
@@ -69,7 +70,7 @@ bool HALSimWeb::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::errs() << "Error decoding HALSIMWS_PORT (" << err.what() << ")\n";
+      fmt::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -97,8 +98,8 @@ void HALSimWeb::Start() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::outs() << "Listening at http://localhost:" << m_port << "\n";
-  wpi::outs() << "WebSocket URI: " << m_uri << "\n";
+  fmt::print("Listening at http://localhost:{}\n", m_port);
+  fmt::print("WebSocket URI: {}\n", m_uri);
 }
 
 bool HALSimWeb::RegisterWebsocket(
@@ -153,6 +154,6 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    wpi::errs() << "Error with incoming message: " << e.what() << "\n";
+    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }
