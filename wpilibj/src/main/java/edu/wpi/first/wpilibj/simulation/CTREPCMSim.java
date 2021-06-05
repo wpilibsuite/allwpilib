@@ -6,15 +6,17 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.CTREPCMDataJNI;
 import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.wpilibj.SensorUtil;
 import edu.wpi.first.wpilibj.PneumaticsBase;
+import edu.wpi.first.wpilibj.SensorUtil;
+
 
 /** Class to control a simulated Pneumatic Control Module (PCM). */
-public class PCMSim {
+@SuppressWarnings("AbbreviationAsWordInName")
+public class CTREPCMSim {
   private final int m_index;
 
   /** Constructs for the default PCM. */
-  public PCMSim() {
+  public CTREPCMSim() {
     m_index = SensorUtil.getDefaultSolenoidModule();
   }
 
@@ -23,16 +25,16 @@ public class PCMSim {
    *
    * @param module module number
    */
-  public PCMSim(int module) {
+  public CTREPCMSim(int module) {
     m_index = module;
   }
 
   /**
    * Constructs from a Compressor object.
    *
-   * @param compressor Compressor connected to PCM to simulate
+   * @param module PCM module to simulate
    */
-  public PCMSim(PneumaticsBase module) {
+  public CTREPCMSim(PneumaticsBase module) {
     m_index = module.getModuleNumber();
   }
 

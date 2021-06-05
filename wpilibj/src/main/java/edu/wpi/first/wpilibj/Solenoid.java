@@ -8,7 +8,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
 import java.util.Objects;
 
 /**
@@ -25,7 +24,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param moduleNumber The CAN ID of the PCM the solenoid is attached to.
+   * @param module The PCM the solenoid is attached to.
    * @param channel The channel on the PCM to control (0..7).
    */
   public Solenoid(PneumaticsBase module, final int channel) {
@@ -33,7 +32,7 @@ public class Solenoid implements Sendable, AutoCloseable {
 
     SensorUtil.checkSolenoidChannel(channel);
 
-    m_mask = (1 << channel);
+    m_mask = 1 << channel;
     m_channel = channel;
 
     HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, module.getModuleNumber() + 1);
@@ -90,7 +89,6 @@ public class Solenoid implements Sendable, AutoCloseable {
    * disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
-   * @see #clearAllPCMStickyFaults()
    */
   public boolean isBlackListed() {
     // TODO

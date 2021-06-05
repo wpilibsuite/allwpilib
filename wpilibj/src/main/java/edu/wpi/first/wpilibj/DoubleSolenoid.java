@@ -6,11 +6,10 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.util.UncleanStatusException;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-
 import java.util.Objects;
+
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -26,8 +25,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     kReverse
   }
 
-  private int m_forwardMask; // The mask for the forward channel.
-  private int m_reverseMask; // The mask for the reverse channel.
+  private final int m_forwardMask; // The mask for the forward channel.
+  private final int m_reverseMask; // The mask for the reverse channel.
   private final int m_mask; // The channel mask
   private PneumaticsBase m_module;
   private final int m_forwardChannel;
@@ -36,7 +35,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param moduleNumber The module number of the solenoid module to use.
+   * @param module The module of the solenoid module to use.
    * @param forwardChannel The forward channel on the module to control (0..7).
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
@@ -48,12 +47,14 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
 
-    m_forwardMask = (1 << forwardChannel);
-    m_reverseMask = (1 << reverseChannel);
+    m_forwardMask = 1 << forwardChannel;
+    m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
-    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel + 1, module.getModuleNumber() + 1);
-    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel + 1, module.getModuleNumber() + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid,
+      forwardChannel + 1, module.getModuleNumber() + 1);
+    HAL.report(tResourceType.kResourceType_Solenoid,
+      reverseChannel + 1, module.getModuleNumber() + 1);
     SendableRegistry.addLW(this, "DoubleSolenoid", module.getModuleNumber(), forwardChannel);
   }
 
@@ -148,7 +149,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * blacklist and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
-   * @see #clearAllPCMStickyFaults()
    */
   public boolean isFwdSolenoidBlackListed() {
     // TODO
@@ -162,7 +162,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * blacklist and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
-   * @see #clearAllPCMStickyFaults()
    */
   public boolean isRevSolenoidBlackListed() {
     // int blackList = getPCMSolenoidBlackList();
