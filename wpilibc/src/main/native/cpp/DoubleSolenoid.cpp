@@ -22,13 +22,13 @@ DoubleSolenoid::DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
                                int reverseChannel)
     : DoubleSolenoid{std::shared_ptr<PneumaticsBase>{
                          &module, wpi::NullDeleter<PneumaticsBase>()},
-                     m_forwardChannel, m_reverseChannel} {}
+                     forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
                                int reverseChannel)
     : DoubleSolenoid{std::shared_ptr<PneumaticsBase>{
                          module, wpi::NullDeleter<PneumaticsBase>()},
-                     m_forwardChannel, m_reverseChannel} {}
+                     forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
                                int forwardChannel, int reverseChannel)
