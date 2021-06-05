@@ -4,10 +4,12 @@
 
 #include <frc/SlewRateLimiter.h>
 #include <frc/TimedRobot.h>
+#include <frc/Timer.h>
 #include <frc/XboxController.h>
 #include <frc/controller/RamseteController.h>
+#include <frc/smartdashboard/Field2d.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc2/Timer.h>
 
 #include "Drivetrain.h"
 
@@ -17,13 +19,22 @@ class Robot : public frc::TimedRobot {
     // Start the timer.
     m_timer.Start();
 
+    // Send Field2d to SmartDashboard.
+    frc::SmartDashboard::PutData(&m_field);
+
     // Reset the drivetrain's odometry to the starting pose of the trajectory.
     m_drive.ResetOdometry(m_trajectory.InitialPose());
+
+    // Send our generated trajectory to Field2d.
+    m_field.GetObject("traj")->SetTrajectory(m_trajectory);
   }
 
   void AutonomousPeriodic() override {
     // Update odometry.
     m_drive.UpdateOdometry();
+
+    // Update robot position on Field2d.
+    m_field.SetRobotPose(m_drive.GetPose());
 
     if (m_timer.Get() < m_trajectory.TotalTime()) {
       // Get the desired pose from the trajectory.
@@ -78,7 +89,10 @@ class Robot : public frc::TimedRobot {
   frc::RamseteController m_ramseteController;
 
   // The timer to use during the autonomous period.
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
+
+  // Create Field2d for robot and trajectory visualizations.
+  frc::Field2d m_field;
 };
 
 #ifndef RUNNING_FRC_TESTS

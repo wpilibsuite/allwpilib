@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpiutil.math.MathUtil;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
@@ -270,10 +270,11 @@ public class ProfiledPIDController implements Sendable {
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
       // Get error which is smallest distance between goal and measurement
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       double goalMinDistance =
-          MathUtil.inputModulus(m_goal.position - measurement, m_minimumInput, m_maximumInput);
+          MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);
       double setpointMinDistance =
-          MathUtil.inputModulus(m_setpoint.position - measurement, m_minimumInput, m_maximumInput);
+          MathUtil.inputModulus(m_setpoint.position - measurement, -errorBound, errorBound);
 
       // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
       // may be outside the input range after this operation, but that's OK because the controller

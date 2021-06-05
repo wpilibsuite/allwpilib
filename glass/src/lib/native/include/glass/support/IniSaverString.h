@@ -53,4 +53,4 @@ class IniSaverString : public IniSaverBase {
 
 }  // namespace glass
 
-#include "IniSaverString.inl"
+#include "IniSaverString.inc"

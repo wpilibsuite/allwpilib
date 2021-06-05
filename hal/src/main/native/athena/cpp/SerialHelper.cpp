@@ -8,8 +8,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include <wpi/FileSystem.h>
 #include <wpi/StringRef.h>
+#include <wpi/fs.h>
 
 #include "hal/Errors.h"
 #include "visa/visa.h"
@@ -220,22 +220,20 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // The directories we need are not symbolic, so we can safely
     // disable symbolic links.
     std::error_code ec;
-    for (auto p = wpi::sys::fs::recursive_directory_iterator(
-             "/sys/devices/soc0", ec, false);
-         p != wpi::sys::fs::recursive_directory_iterator(); p.increment(ec)) {
+    for (auto& p : fs::recursive_directory_iterator("/sys/devices/soc0", ec)) {
       if (ec)
         break;
-      wpi::StringRef path{p->path()};
-      if (path.find("amba") == wpi::StringRef::npos)
+      std::string path = p.path().string();
+      if (path.find("amba") == std::string::npos)
         continue;
-      if (path.find("usb") == wpi::StringRef::npos)
+      if (path.find("usb") == std::string::npos)
         continue;
-      if (path.find(matchString) == wpi::StringRef::npos)
+      if (path.find(matchString) == std::string::npos)
         continue;
 
       wpi::SmallVector<wpi::StringRef, 16> pathSplitVec;
       // Split path into individual directories
-      path.split(pathSplitVec, '/', -1, false);
+      wpi::StringRef{path}.split(pathSplitVec, '/', -1, false);
 
       // Find each individual item index
       int findusb = -1;

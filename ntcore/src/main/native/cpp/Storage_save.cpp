@@ -6,10 +6,10 @@
 #include <string>
 
 #include <wpi/Base64.h>
-#include <wpi/FileSystem.h>
 #include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
+#include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 
 #include "Log.h"
@@ -209,7 +209,7 @@ const char* Storage::SavePersistent(const wpi::Twine& filename,
 
   // start by writing to temporary file
   std::error_code ec;
-  wpi::raw_fd_ostream os(tmp, ec, wpi::sys::fs::F_Text);
+  wpi::raw_fd_ostream os(tmp, ec, fs::F_Text);
   if (ec.value() != 0) {
     err = "could not open file";
     goto done;
@@ -266,7 +266,7 @@ const char* Storage::SaveEntries(const wpi::Twine& filename,
 
   // start by writing to temporary file
   std::error_code ec;
-  wpi::raw_fd_ostream os(tmp, ec, wpi::sys::fs::F_Text);
+  wpi::raw_fd_ostream os(tmp, ec, fs::F_Text);
   if (ec.value() != 0) {
     return "could not open file";
   }

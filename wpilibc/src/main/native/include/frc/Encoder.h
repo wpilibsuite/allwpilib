@@ -167,7 +167,7 @@ class Encoder : public CounterBase,
    *
    * @return Period in seconds of the most recent pulse.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Sets the maximum period for stopped detection.
@@ -188,7 +188,7 @@ class Encoder : public CounterBase,
   WPI_DEPRECATED(
       "Use SetMinRate() in favor of this method.  This takes unscaled periods "
       "and SetMinRate() scales using value from SetDistancePerPulse().")
-  void SetMaxPeriod(double maxPeriod) override;
+  void SetMaxPeriod(units::second_t maxPeriod) override;
 
   /**
    * Determine if the encoder is stopped.

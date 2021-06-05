@@ -7,11 +7,11 @@ package edu.wpi.first.wpilibj.drive;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import java.util.StringJoiner;
 
 /**
@@ -66,8 +66,33 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   private final SpeedController m_frontRightMotor;
   private final SpeedController m_rearRightMotor;
 
-  private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported;
+
+  @SuppressWarnings("MemberName")
+  public static class WheelSpeeds {
+    public double frontLeft;
+    public double frontRight;
+    public double rearLeft;
+    public double rearRight;
+
+    /** Constructs a WheelSpeeds with zeroes for all four speeds. */
+    public WheelSpeeds() {}
+
+    /**
+     * Constructs a WheelSpeeds.
+     *
+     * @param frontLeft The front left speed.
+     * @param frontRight The front right speed.
+     * @param rearLeft The rear left speed.
+     * @param rearRight The rear right speed.
+     */
+    public WheelSpeeds(double frontLeft, double frontRight, double rearLeft, double rearRight) {
+      this.frontLeft = frontLeft;
+      this.frontRight = frontRight;
+      this.rearLeft = rearLeft;
+      this.rearRight = rearRight;
+    }
+  }
 
   /**
    * Construct a MecanumDrive.
@@ -167,30 +192,15 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       m_reported = true;
     }
 
-    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
     ySpeed = applyDeadband(ySpeed, m_deadband);
-
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    // Compensate for gyro angle.
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
-    input.rotate(-gyroAngle);
+    var speeds = driveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
 
-    double[] wheelSpeeds = new double[4];
-    wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kFrontRight.value] = -input.x + input.y - zRotation;
-    wheelSpeeds[MotorType.kRearLeft.value] = -input.x + input.y + zRotation;
-    wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
-
-    normalize(wheelSpeeds);
-
-    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
-    m_frontRightMotor.set(
-        wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput * m_rightSideInvertMultiplier);
-    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
-    m_rearRightMotor.set(
-        wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput * m_rightSideInvertMultiplier);
+    m_frontLeftMotor.set(speeds.frontLeft * m_maxOutput);
+    m_frontRightMotor.set(speeds.frontRight * m_maxOutput);
+    m_rearLeftMotor.set(speeds.rearLeft * m_maxOutput);
+    m_rearRightMotor.set(speeds.rearRight * m_maxOutput);
 
     feed();
   }
@@ -214,28 +224,48 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     }
 
     driveCartesian(
-        magnitude * Math.sin(angle * (Math.PI / 180.0)),
         magnitude * Math.cos(angle * (Math.PI / 180.0)),
+        magnitude * Math.sin(angle * (Math.PI / 180.0)),
         zRotation,
         0.0);
   }
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by -1.
+   * Cartesian inverse kinematics for Mecanum platform.
    *
-   * @return true if the right side is inverted
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
+   * from its angle or rotation rate.
+   *
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *     positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
+   *     to implement field-oriented controls.
    */
-  public boolean isRightSideInverted() {
-    return m_rightSideInvertMultiplier == -1.0;
-  }
+  @SuppressWarnings("ParameterName")
+  public static WheelSpeeds driveCartesianIK(
+      double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
 
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be multiplied by -1.
-   *
-   * @param rightSideInverted true if right side power should be multiplied by -1
-   */
-  public void setRightSideInverted(boolean rightSideInverted) {
-    m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+    // Compensate for gyro angle.
+    Vector2d input = new Vector2d(ySpeed, xSpeed);
+    input.rotate(-gyroAngle);
+
+    double[] wheelSpeeds = new double[4];
+    wheelSpeeds[MotorType.kFrontLeft.value] = input.x + input.y + zRotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = input.x - input.y - zRotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = input.x - input.y + zRotation;
+    wheelSpeeds[MotorType.kRearRight.value] = input.x + input.y - zRotation;
+
+    normalize(wheelSpeeds);
+
+    return new WheelSpeeds(
+        wheelSpeeds[MotorType.kFrontLeft.value],
+        wheelSpeeds[MotorType.kFrontRight.value],
+        wheelSpeeds[MotorType.kRearLeft.value],
+        wheelSpeeds[MotorType.kRearRight.value]);
   }
 
   @Override
@@ -261,12 +291,12 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
         "Front Left Motor Speed", m_frontLeftMotor::get, m_frontLeftMotor::set);
     builder.addDoubleProperty(
         "Front Right Motor Speed",
-        () -> m_frontRightMotor.get() * m_rightSideInvertMultiplier,
-        value -> m_frontRightMotor.set(value * m_rightSideInvertMultiplier));
+        () -> m_frontRightMotor.get(),
+        value -> m_frontRightMotor.set(value));
     builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get, m_rearLeftMotor::set);
     builder.addDoubleProperty(
         "Rear Right Motor Speed",
-        () -> m_rearRightMotor.get() * m_rightSideInvertMultiplier,
-        value -> m_rearRightMotor.set(value * m_rightSideInvertMultiplier));
+        () -> m_rearRightMotor.get(),
+        value -> m_rearRightMotor.set(value));
   }
 }

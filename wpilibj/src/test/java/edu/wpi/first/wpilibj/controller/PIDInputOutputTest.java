@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +21,10 @@ class PIDInputOutputTest {
   void continuousInputTest() {
     m_controller.setP(1);
     m_controller.enableContinuousInput(-180, 180);
+    assertEquals(m_controller.calculate(-179, 179), -2, 1e-5);
 
-    assertTrue(m_controller.calculate(-179, 179) < 0.0);
+    m_controller.enableContinuousInput(0, 360);
+    assertEquals(m_controller.calculate(1, 359), -2, 1e-5);
   }
 
   @Test

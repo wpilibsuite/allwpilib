@@ -10,6 +10,9 @@
 #include <vector>
 
 #include <hal/SimDevice.h>
+#include <units/length.h>
+#include <units/time.h>
+#include <units/velocity.h>
 
 #include "frc/Counter.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -121,22 +124,13 @@ class Ultrasonic : public Sendable, public SendableHelper<Ultrasonic> {
   static void SetAutomaticMode(bool enabling);
 
   /**
-   * Get the range in inches from the ultrasonic sensor.
+   * Get the range from the ultrasonic sensor.
    *
-   * @return Range in inches of the target returned from the ultrasonic sensor.
-   *         If there is no valid value yet, i.e. at least one measurement
-   *         hasn't completed, then return 0.
+   * @return Range of the target returned from the ultrasonic sensor. If there
+   *         is no valid value yet, i.e. at least one measurement hasn't
+   *         completed, then return 0.
    */
-  double GetRangeInches() const;
-
-  /**
-   * Get the range in millimeters from the ultrasonic sensor.
-   *
-   * @return Range in millimeters of the target returned by the ultrasonic
-   *         sensor. If there is no valid value yet, i.e. at least one
-   *         measurement hasn't completed, then return 0.
-   */
-  double GetRangeMM() const;
+  units::meter_t GetRange() const;
 
   bool IsEnabled() const;
 
@@ -174,8 +168,8 @@ class Ultrasonic : public Sendable, public SendableHelper<Ultrasonic> {
   static constexpr int kPriority = 64;
 
   // Max time (ms) between readings.
-  static constexpr double kMaxUltrasonicTime = 0.1;
-  static constexpr double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
+  static constexpr auto kMaxUltrasonicTime = 0.1_s;
+  static constexpr auto kSpeedOfSound = 1130_fps;
 
   // Thread doing the round-robin automatic sensing
   static std::thread m_thread;

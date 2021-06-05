@@ -6,26 +6,22 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
 
 namespace frc {
 
 class ShuffleboardValue {
  public:
-  explicit ShuffleboardValue(const wpi::Twine& title) {
-    wpi::SmallVector<char, 16> storage;
-    m_title = title.toStringRef(storage);
-  }
+  explicit ShuffleboardValue(std::string_view title) : m_title(title) {}
 
   virtual ~ShuffleboardValue() = default;
 
   /**
    * Gets the title of this Shuffleboard value.
    */
-  wpi::StringRef GetTitle() const { return m_title; }
+  const std::string& GetTitle() const { return m_title; }
 
   /**
    * Builds the entries for this value.

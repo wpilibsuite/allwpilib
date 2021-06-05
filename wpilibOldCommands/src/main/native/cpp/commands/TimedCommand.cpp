@@ -6,16 +6,16 @@
 
 using namespace frc;
 
-TimedCommand::TimedCommand(const wpi::Twine& name, double timeout)
+TimedCommand::TimedCommand(std::string_view name, units::second_t timeout)
     : Command(name, timeout) {}
 
-TimedCommand::TimedCommand(double timeout) : Command(timeout) {}
+TimedCommand::TimedCommand(units::second_t timeout) : Command(timeout) {}
 
-TimedCommand::TimedCommand(const wpi::Twine& name, double timeout,
+TimedCommand::TimedCommand(std::string_view name, units::second_t timeout,
                            Subsystem& subsystem)
     : Command(name, timeout, subsystem) {}
 
-TimedCommand::TimedCommand(double timeout, Subsystem& subsystem)
+TimedCommand::TimedCommand(units::second_t timeout, Subsystem& subsystem)
     : Command(timeout, subsystem) {}
 
 bool TimedCommand::IsFinished() {

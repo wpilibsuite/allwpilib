@@ -23,6 +23,7 @@ includeOtherLibs {
   ^cameraserver/
   ^cscore
   ^drake/
+  ^fmt/
   ^hal/
   ^imgui
   ^implot

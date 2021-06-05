@@ -5,12 +5,12 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <units/length.h>
-#include <wpi/Twine.h>
 #include <wpi/mutex.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -76,7 +76,7 @@ class Field2d : public Sendable, public SendableHelper<Field2d> {
    *
    * @return Field object
    */
-  FieldObject2d* GetObject(const wpi::Twine& name);
+  FieldObject2d* GetObject(std::string_view name);
 
   /**
    * Get the robot object.

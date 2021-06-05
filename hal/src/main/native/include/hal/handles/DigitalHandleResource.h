@@ -22,7 +22,7 @@ namespace hal {
  * allows a limited number of handles that are allocated by index.
  * The enum value is separate, as 2 enum values are allowed per handle
  * Because they are allocated by index, each individual index holds its own
- * mutex, which reduces contention heavily.]
+ * mutex, which reduces contention heavily.
  *
  * @tparam THandle The Handle Type (Must be typedefed from HAL_Handle)
  * @tparam TStruct The struct type held by this resource
@@ -38,7 +38,8 @@ class DigitalHandleResource : public HandleBase {
   DigitalHandleResource(const DigitalHandleResource&) = delete;
   DigitalHandleResource& operator=(const DigitalHandleResource&) = delete;
 
-  THandle Allocate(int16_t index, HAL_HandleEnum enumValue, int32_t* status);
+  std::shared_ptr<TStruct> Allocate(int16_t index, HAL_HandleEnum enumValue,
+                                    THandle* handle, int32_t* status);
   int16_t GetIndex(THandle handle, HAL_HandleEnum enumValue) {
     return getHandleTypedIndex(handle, enumValue, m_version);
   }
@@ -52,21 +53,27 @@ class DigitalHandleResource : public HandleBase {
 };
 
 template <typename THandle, typename TStruct, int16_t size>
-THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
-    int16_t index, HAL_HandleEnum enumValue, int32_t* status) {
+std::shared_ptr<TStruct>
+DigitalHandleResource<THandle, TStruct, size>::Allocate(
+    int16_t index, HAL_HandleEnum enumValue, THandle* handle, int32_t* status) {
   // don't acquire the lock if we can fail early.
   if (index < 0 || index >= size) {
+    *handle = HAL_kInvalidHandle;
     *status = RESOURCE_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+    return nullptr;
   }
   std::scoped_lock lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
+    *handle = HAL_kInvalidHandle;
     *status = RESOURCE_IS_ALLOCATED;
-    return HAL_kInvalidHandle;
+    return m_structures[index];
   }
   m_structures[index] = std::make_shared<TStruct>();
-  return static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  *handle =
+      static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
+  *status = HAL_SUCCESS;
+  return m_structures[index];
 }
 
 template <typename THandle, typename TStruct, int16_t size>

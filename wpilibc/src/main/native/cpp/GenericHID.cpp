@@ -13,8 +13,7 @@ using namespace frc;
 
 GenericHID::GenericHID(int port) : m_ds(&DriverStation::GetInstance()) {
   if (port < 0 || port >= DriverStation::kJoystickPorts) {
-    throw FRC_MakeError(warn::BadJoystickIndex,
-                        "port " + wpi::Twine{port} + "out of range");
+    throw FRC_MakeError(warn::BadJoystickIndex, "port {} out of range", port);
   }
   m_port = port;
 }

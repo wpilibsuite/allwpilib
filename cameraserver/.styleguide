@@ -12,6 +12,7 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^fmt/
   ^hal/
   ^networktables/
   ^opencv2/

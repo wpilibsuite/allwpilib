@@ -5,7 +5,7 @@
 #include "commands/TurnDegrees.h"
 
 #include <units/math.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point
@@ -26,7 +26,7 @@ bool TurnDegrees::IsFinished() {
   // found here https://www.pololu.com/category/203/romi-chassis-kits, has a
   // wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm
   // or 5.551 inches. We then take into consideration the width of the tires.
-  static auto inchPerDegree = (5.551_in * wpi::math::pi) / 360_deg;
+  static auto inchPerDegree = (5.551_in * wpi::numbers::pi) / 360_deg;
 
   // Compare distance traveled from start to distance based on degree turn.
   return GetAverageTurningDistance() >= inchPerDegree * m_angle;

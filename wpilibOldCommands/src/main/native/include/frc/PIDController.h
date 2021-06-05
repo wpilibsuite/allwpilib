@@ -10,7 +10,6 @@
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
-#include "frc/Base.h"
 #include "frc/Controller.h"
 #include "frc/Notifier.h"
 #include "frc/PIDBase.h"

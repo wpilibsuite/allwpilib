@@ -21,12 +21,16 @@ extern "C" {
 /**
  * Creates a new instance of a digital port.
  *
- * @param portHandle the port handle to create from
- * @param input      true for input, false for output
- * @return           the created digital handle
+ * @param portHandle            the port handle to create from
+ * @param input                 true for input, false for output
+ * @param allocationLocation    the location where the allocation is occuring
+ * (can be null)
+ * @return                      the created digital handle
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, int32_t* status);
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status);
 
 /**
  * Checks if a DIO channel is valid.

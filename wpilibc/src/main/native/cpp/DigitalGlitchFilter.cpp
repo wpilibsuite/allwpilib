@@ -16,7 +16,6 @@
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/Utility.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -47,19 +46,6 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
   }
 }
 
-DigitalGlitchFilter::DigitalGlitchFilter(DigitalGlitchFilter&& rhs)
-    : SendableHelper(std::move(rhs)) {
-  std::swap(m_channelIndex, rhs.m_channelIndex);
-}
-
-DigitalGlitchFilter& DigitalGlitchFilter::operator=(DigitalGlitchFilter&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
-
-  std::swap(m_channelIndex, rhs.m_channelIndex);
-
-  return *this;
-}
-
 void DigitalGlitchFilter::Add(DigitalSource* input) {
   DoAdd(input, m_channelIndex + 1);
 }
@@ -71,19 +57,17 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requestedIndex) {
     // We don't support GlitchFilters on AnalogTriggers.
     if (input->IsAnalogTrigger()) {
       throw FRC_MakeError(
-          -1, "Analog Triggers not supported for DigitalGlitchFilters");
+          -1, "{}", "Analog Triggers not supported for DigitalGlitchFilters");
     }
     int32_t status = 0;
     HAL_SetFilterSelect(input->GetPortHandleForRouting(), requestedIndex,
                         &status);
-    FRC_CheckErrorStatus(status,
-                         "requested index " + wpi::Twine{requestedIndex});
+    FRC_CheckErrorStatus(status, "requested index {}", requestedIndex);
 
     // Validate that we set it correctly.
     int actualIndex =
         HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
-    FRC_CheckErrorStatus(status,
-                         "requested index " + wpi::Twine{requestedIndex});
+    FRC_CheckErrorStatus(status, "requested index {}", requestedIndex);
     FRC_Assert(actualIndex == requestedIndex);
   }
 }
@@ -115,7 +99,7 @@ void DigitalGlitchFilter::Remove(Counter* input) {
 void DigitalGlitchFilter::SetPeriodCycles(int fpgaCycles) {
   int32_t status = 0;
   HAL_SetFilterPeriod(m_channelIndex, fpgaCycles, &status);
-  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
+  FRC_CheckErrorStatus(status, "Channel {}", m_channelIndex);
 }
 
 void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
@@ -123,20 +107,20 @@ void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
   int fpgaCycles =
       nanoseconds * HAL_GetSystemClockTicksPerMicrosecond() / 4 / 1000;
   HAL_SetFilterPeriod(m_channelIndex, fpgaCycles, &status);
-  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
+  FRC_CheckErrorStatus(status, "Channel {}", m_channelIndex);
 }
 
 int DigitalGlitchFilter::GetPeriodCycles() {
   int32_t status = 0;
   int fpgaCycles = HAL_GetFilterPeriod(m_channelIndex, &status);
-  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
+  FRC_CheckErrorStatus(status, "Channel {}", m_channelIndex);
   return fpgaCycles;
 }
 
 uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
   int32_t status = 0;
   int fpgaCycles = HAL_GetFilterPeriod(m_channelIndex, &status);
-  FRC_CheckErrorStatus(status, "Channel " + wpi::Twine{m_channelIndex});
+  FRC_CheckErrorStatus(status, "Channel {}", m_channelIndex);
   return static_cast<uint64_t>(fpgaCycles) * 1000L /
          static_cast<uint64_t>(HAL_GetSystemClockTicksPerMicrosecond() / 4);
 }

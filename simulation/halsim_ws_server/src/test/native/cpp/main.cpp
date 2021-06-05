@@ -41,7 +41,7 @@ class WebServerIntegrationTest : public ::testing::Test {
   HALSimWSServer m_server;
 };
 
-TEST_F(WebServerIntegrationTest, DigitalOutput) {
+TEST_F(WebServerIntegrationTest, DISABLED_DigitalOutput) {
   // Create expected results
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;
@@ -92,7 +92,7 @@ TEST_F(WebServerIntegrationTest, DigitalOutput) {
   EXPECT_EQ(EXPECTED_VALUE, test_value);
 }
 
-TEST_F(WebServerIntegrationTest, DigitalInput) {
+TEST_F(WebServerIntegrationTest, DISABLED_DigitalInput) {
   // Create expected results
   const bool EXPECTED_VALUE = false;
   const int PIN = 0;

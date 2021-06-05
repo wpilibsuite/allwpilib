@@ -49,8 +49,8 @@ class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
 
   ~AnalogTrigger() override;
 
-  AnalogTrigger(AnalogTrigger&& rhs);
-  AnalogTrigger& operator=(AnalogTrigger&& rhs);
+  AnalogTrigger(AnalogTrigger&&) = default;
+  AnalogTrigger& operator=(AnalogTrigger&&) = default;
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -151,6 +151,8 @@ class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
+  int GetSourceChannel() const;
+
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
   DutyCycle* m_dutyCycle = nullptr;

@@ -10,8 +10,9 @@
 #include <string>
 #include <thread>
 
+#include <fmt/format.h>
 #include <hal/DriverStationTypes.h>
-#include <wpi/Twine.h>
+#include <units/time.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -39,28 +40,6 @@ class DriverStation {
    * @return Reference to the DS instance
    */
   static DriverStation& GetInstance();
-
-  /**
-   * Report an error to the DriverStation messages window.
-   *
-   * The error is also printed to the program console.
-   */
-  static void ReportError(const wpi::Twine& error);
-
-  /**
-   * Report a warning to the DriverStation messages window.
-   *
-   * The warning is also printed to the program console.
-   */
-  static void ReportWarning(const wpi::Twine& error);
-
-  /**
-   * Report an error to the DriverStation messages window.
-   *
-   * The error is also printed to the program console.
-   */
-  static void ReportError(bool isError, int code, const wpi::Twine& error,
-                          const wpi::Twine& location, const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 
@@ -356,11 +335,11 @@ class DriverStation {
    * This is a good way to delay processing until there is new driver station
    * data to act on.
    *
-   * @param timeout Timeout time in seconds
+   * @param timeout Timeout
    *
    * @return true if new data, otherwise false
    */
-  bool WaitForData(double timeout);
+  bool WaitForData(units::second_t timeout);
 
   /**
    * Return the approximate match time.
@@ -465,14 +444,28 @@ class DriverStation {
    *
    * Throttles the errors so that they don't overwhelm the DS.
    */
-  void ReportJoystickUnpluggedError(const wpi::Twine& message);
+  void ReportJoystickUnpluggedErrorV(fmt::string_view format,
+                                     fmt::format_args args);
+
+  template <typename S, typename... Args>
+  inline void ReportJoystickUnpluggedError(const S& format, Args&&... args) {
+    ReportJoystickUnpluggedErrorV(
+        format, fmt::make_args_checked<Args...>(format, args...));
+  }
 
   /**
    * Reports errors related to unplugged joysticks.
    *
    * Throttles the errors so that they don't overwhelm the DS.
    */
-  void ReportJoystickUnpluggedWarning(const wpi::Twine& message);
+  void ReportJoystickUnpluggedWarningV(fmt::string_view format,
+                                       fmt::format_args args);
+
+  template <typename S, typename... Args>
+  inline void ReportJoystickUnpluggedWarning(const S& format, Args&&... args) {
+    ReportJoystickUnpluggedWarningV(
+        format, fmt::make_args_checked<Args...>(format, args...));
+  }
 
   void Run();
 
@@ -502,7 +495,7 @@ class DriverStation {
   bool m_userInTeleop = false;
   bool m_userInTest = false;
 
-  double m_nextMessageTime = 0;
+  units::second_t m_nextMessageTime = 0_s;
 };
 
 }  // namespace frc

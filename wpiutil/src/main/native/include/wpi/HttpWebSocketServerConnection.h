@@ -86,6 +86,6 @@ class HttpWebSocketServerConnection
 
 }  // namespace wpi
 
-#include "HttpWebSocketServerConnection.inl"
+#include "HttpWebSocketServerConnection.inc"
 
 #endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_H_

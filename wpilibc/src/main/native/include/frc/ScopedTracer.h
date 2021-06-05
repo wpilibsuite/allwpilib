@@ -5,9 +5,7 @@
 #pragma once
 
 #include <string>
-
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/Tracer.h"
 
@@ -31,7 +29,7 @@ class ScopedTracer {
    * @param name The name of the epoch.
    * @param os A reference to the raw_ostream to print data to.
    */
-  ScopedTracer(wpi::Twine name, wpi::raw_ostream& os);
+  ScopedTracer(std::string_view name, wpi::raw_ostream& os);
   ~ScopedTracer();
 
   ScopedTracer(const ScopedTracer&) = delete;

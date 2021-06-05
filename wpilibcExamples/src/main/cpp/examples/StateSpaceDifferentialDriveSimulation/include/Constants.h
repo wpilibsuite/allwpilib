@@ -12,7 +12,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #pragma once
 
@@ -43,7 +43,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr auto kWheelDiameter = 6_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.to<double>() * wpi::math::pi) /
+    (kWheelDiameter.to<double>() * wpi::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

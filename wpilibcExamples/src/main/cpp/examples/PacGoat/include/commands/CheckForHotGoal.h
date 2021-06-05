@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/commands/Command.h>
+#include <units/time.h>
 
 /**
  * This command looks for the hot goal and waits until it's detected or timed
@@ -14,6 +15,6 @@
  */
 class CheckForHotGoal : public frc::Command {
  public:
-  explicit CheckForHotGoal(double time);
+  explicit CheckForHotGoal(units::second_t time);
   bool IsFinished() override;
 };

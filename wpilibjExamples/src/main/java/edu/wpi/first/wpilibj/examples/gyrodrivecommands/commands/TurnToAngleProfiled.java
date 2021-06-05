@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.gyrodrivecommands.commands;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.gyrodrivecommands.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 /** A command that will turn the robot to the specified angle using a motion profile. */

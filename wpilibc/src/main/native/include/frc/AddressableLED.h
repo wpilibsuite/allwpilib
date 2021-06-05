@@ -159,5 +159,6 @@ class AddressableLED {
  private:
   hal::Handle<HAL_DigitalHandle> m_pwmHandle;
   hal::Handle<HAL_AddressableLEDHandle> m_handle;
+  int m_port;
 };
 }  // namespace frc

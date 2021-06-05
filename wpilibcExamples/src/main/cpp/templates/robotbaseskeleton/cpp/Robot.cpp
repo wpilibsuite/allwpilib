@@ -21,7 +21,7 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  auto& lw = frc::LiveWindow::GetInstance();
+  auto& lw = *frc::LiveWindow::GetInstance();
 
   RobotInit();
 

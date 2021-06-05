@@ -4,8 +4,6 @@
 
 package edu.wpi.first.math;
 
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Num;
 import org.ejml.simple.SimpleMatrix;
 
 public final class Drake {

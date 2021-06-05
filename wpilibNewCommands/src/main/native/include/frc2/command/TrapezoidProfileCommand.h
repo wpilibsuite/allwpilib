@@ -7,10 +7,10 @@
 #include <functional>
 #include <initializer_list>
 
+#include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
 #include <wpi/ArrayRef.h>
 
-#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -76,7 +76,7 @@ class TrapezoidProfileCommand
   frc::TrapezoidProfile<Distance> m_profile;
   std::function<void(State)> m_output;
 
-  Timer m_timer;
+  frc::Timer m_timer;
 };
 
 }  // namespace frc2

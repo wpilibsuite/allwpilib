@@ -6,6 +6,7 @@
 
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/AnalogAccumulator.h"
 #include "hal/handles/HandlesInternal.h"
@@ -18,26 +19,30 @@ void InitializeAnalogInput() {}
 }  // namespace hal::init
 
 extern "C" {
-HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
-                                                    int32_t* status) {
+HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
+    HAL_PortHandle portHandle, const char* allocationLocation,
+    int32_t* status) {
   hal::init::CheckInit();
   int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+  if (channel == InvalidHandleIndex || channel >= kNumAnalogInputs) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
+                                     0, kNumAnalogInputs, channel);
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogInputHandle handle = analogInputHandles->Allocate(channel, status);
+  HAL_AnalogInputHandle handle;
+  auto analog_port = analogInputHandles->Allocate(channel, &handle, status);
 
   if (*status != 0) {
+    if (analog_port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "Analog Input", channel,
+                                           analog_port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Analog Input",
+                                       0, kNumAnalogInputs, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  // Initialize port structure
-  auto analog_port = analogInputHandles->Get(handle);
-  if (analog_port == nullptr) {  // would only error on thread issue
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   analog_port->channel = static_cast<uint8_t>(channel);
@@ -50,6 +55,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
   SimAnalogInData[channel].initialized = true;
   SimAnalogInData[channel].accumulatorInitialized = false;
   SimAnalogInData[channel].simDevice = 0;
+
+  analog_port->previousAllocation =
+      allocationLocation ? allocationLocation : "";
 
   return handle;
 }

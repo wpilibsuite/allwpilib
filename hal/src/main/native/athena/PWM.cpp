@@ -12,6 +12,7 @@
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -65,6 +66,7 @@ void InitializePWM() {}
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
@@ -75,7 +77,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumPWMChannels) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                     kNumPWMChannels, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -87,17 +91,20 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
+  HAL_DigitalHandle handle;
+
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
+                                              &handle, status);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                       kNumPWMChannels, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = origChannel;
@@ -112,6 +119,8 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   // Defaults to allow an always valid config.
   HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }

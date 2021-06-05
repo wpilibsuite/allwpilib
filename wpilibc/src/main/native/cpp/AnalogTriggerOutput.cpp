@@ -18,7 +18,7 @@ bool AnalogTriggerOutput::Get() const {
   bool result = HAL_GetAnalogTriggerOutput(
       m_trigger->m_trigger, static_cast<HAL_AnalogTriggerType>(m_outputType),
       &status);
-  FRC_CheckErrorStatus(status, "Get");
+  FRC_CheckErrorStatus(status, "{}", "Get");
   return result;
 }
 

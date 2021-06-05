@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_RelayJNI.h"
 #include "hal/Ports.h"
@@ -26,10 +28,10 @@ Java_edu_wpi_first_hal_RelayJNI_initializeRelayPort
   (JNIEnv* env, jclass, jint id, jboolean fwd)
 {
   int32_t status = 0;
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
   HAL_RelayHandle handle = HAL_InitializeRelayPort(
-      (HAL_PortHandle)id, static_cast<uint8_t>(fwd), &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumRelayChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+      (HAL_PortHandle)id, static_cast<uint8_t>(fwd), stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)handle;
 }
 

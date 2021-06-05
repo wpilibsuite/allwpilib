@@ -209,6 +209,14 @@
     "mainclass": "Main",
     "commandversion": 2
   },
+  {"name": "Mechanism2d",
+    "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
+    "tags": [],
+    "foldername": "mechanism2d",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
   {
     "name": "Motor Controller",
     "description": "Demonstrate controlling a single motor with a joystick",
@@ -744,7 +752,7 @@
       "Pose",
       "Swerve"
     ],
-    "foldername": "swervesdriveposeestimator",
+    "foldername": "swervedriveposeestimator",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

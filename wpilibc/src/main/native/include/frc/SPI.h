@@ -243,32 +243,6 @@ class SPI {
                            units::second_t timeout);
 
   /**
-   * Read data that has been transferred by the automatic SPI transfer engine.
-   *
-   * Transfers may be made a byte at a time, so it's necessary for the caller
-   * to handle cases where an entire transfer has not been completed.
-   *
-   * Each received data sequence consists of a timestamp followed by the
-   * received data bytes, one byte per word (in the least significant byte).
-   * The length of each received data sequence is the same as the combined
-   * size of the data and zeroSize set in SetAutoTransmitData().
-   *
-   * Blocks until numToRead words have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many words are available.
-   *
-   * @deprecated Use unit safe version instead.
-   *             ReadAutoReceivedData(uint32_t* buffer, int numToRead, <!--
-   * -->         units::second_t timeout)
-   *
-   * @param buffer buffer where read words are stored
-   * @param numToRead number of words to read
-   * @param timeout timeout in seconds (ms resolution)
-   * @return Number of words remaining to be read
-   */
-  WPI_DEPRECATED("Use ReadAutoReceivedData with unit-safety instead")
-  int ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout);
-
-  /**
    * Get the number of bytes dropped by the automatic SPI transfer engine due
    * to the receive buffer being full.
    *

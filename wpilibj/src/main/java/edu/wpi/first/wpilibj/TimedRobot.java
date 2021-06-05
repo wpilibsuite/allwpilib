@@ -137,11 +137,6 @@ public class TimedRobot extends IterativeRobotBase {
     NotifierJNI.stopNotifier(m_notifier);
   }
 
-  /** Get time period between calls to Periodic() functions. */
-  public double getPeriod() {
-    return m_period;
-  }
-
   /**
    * Add a callback to run at a specific period.
    *

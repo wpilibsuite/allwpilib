@@ -10,9 +10,10 @@
 #include <hal/AnalogGyro.h>
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
+#include <wpi/StackTrace.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -26,13 +27,13 @@ AnalogGyro::AnalogGyro(int channel)
 }
 
 AnalogGyro::AnalogGyro(AnalogInput* channel)
-    : AnalogGyro(
-          std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}
+    : AnalogGyro(std::shared_ptr<AnalogInput>(
+          channel, wpi::NullDeleter<AnalogInput>())) {}
 
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
     : m_analog(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw FRC_MakeError(err::NullParameter, "{}", "channel");
   }
   InitGyro();
   Calibrate();
@@ -47,13 +48,13 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
                        double offset)
     : m_analog(channel) {
   if (!channel) {
-    throw FRC_MakeError(err::NullParameter, "channel");
+    throw FRC_MakeError(err::NullParameter, "{}", "channel");
   }
   InitGyro();
   int32_t status = 0;
   HAL_SetAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
                               offset, center, &status);
-  FRC_CheckErrorStatus(status, "SetAnalogGyroParameters");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   Reset();
 }
 
@@ -64,28 +65,28 @@ AnalogGyro::~AnalogGyro() {
 double AnalogGyro::GetAngle() const {
   int32_t status = 0;
   double value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "GetAngle");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   return value;
 }
 
 double AnalogGyro::GetRate() const {
   int32_t status = 0;
   double value = HAL_GetAnalogGyroRate(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "GetRate");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   return value;
 }
 
 int AnalogGyro::GetCenter() const {
   int32_t status = 0;
   int value = HAL_GetAnalogGyroCenter(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "GetCenter");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   return value;
 }
 
 double AnalogGyro::GetOffset() const {
   int32_t status = 0;
   double value = HAL_GetAnalogGyroOffset(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "GetOffset");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   return value;
 }
 
@@ -93,35 +94,33 @@ void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
   int32_t status = 0;
   HAL_SetAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
                                            voltsPerDegreePerSecond, &status);
-  FRC_CheckErrorStatus(status, "SetSensitivity");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 }
 
 void AnalogGyro::SetDeadband(double volts) {
   int32_t status = 0;
   HAL_SetAnalogGyroDeadband(m_gyroHandle, volts, &status);
-  FRC_CheckErrorStatus(status, "SetDeadband");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 }
 
 void AnalogGyro::Reset() {
   int32_t status = 0;
   HAL_ResetAnalogGyro(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "Reset");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 }
 
 void AnalogGyro::InitGyro() {
   if (m_gyroHandle == HAL_kInvalidHandle) {
     int32_t status = 0;
-    m_gyroHandle = HAL_InitializeAnalogGyro(m_analog->m_port, &status);
-    if (status == PARAMETER_OUT_OF_RANGE) {
-      throw FRC_MakeError(err::ParameterOutOfRange,
-                          "channel must be accumulator channel");
-    }
-    FRC_CheckErrorStatus(status, "InitializeAnalogGyro");
+    std::string stackTrace = wpi::GetStackTrace(1);
+    m_gyroHandle =
+        HAL_InitializeAnalogGyro(m_analog->m_port, stackTrace.c_str(), &status);
+    FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
   }
 
   int32_t status = 0;
   HAL_SetupAnalogGyro(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "SetupAnalogGyro");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 
   HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel() + 1);
 
@@ -132,7 +131,7 @@ void AnalogGyro::InitGyro() {
 void AnalogGyro::Calibrate() {
   int32_t status = 0;
   HAL_CalibrateAnalogGyro(m_gyroHandle, &status);
-  FRC_CheckErrorStatus(status, "Calibrate");
+  FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
 }
 
 std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {

@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <memory>
 
+#include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -22,7 +23,6 @@
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc2/Timer.h"
 
 #pragma once
 
@@ -225,7 +225,7 @@ class SwerveControllerCommand
 
   std::function<frc::Rotation2d()> m_desiredRotation;
 
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   units::second_t m_prevTime;
   frc::Rotation2d m_finalRotation;
 };

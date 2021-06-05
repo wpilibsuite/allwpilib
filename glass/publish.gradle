@@ -61,6 +61,17 @@ addTaskToCopyAllOutputs(libntCppHeadersZip)
 addTaskToCopyAllOutputs(libntCppSourcesZip)
 
 model {
+    tasks {
+        // Create the run task.
+        $.components.glassApp.binaries.each { bin ->
+            if (bin.buildable && bin.name.toLowerCase().contains("debug")) {
+                Task run = project.tasks.create("run", Exec) {
+                    commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                }
+                run.dependsOn bin.tasks.install
+            }
+        }
+    }
     publishing {
         def glassAppTaskList = []
         $.components.each { component ->

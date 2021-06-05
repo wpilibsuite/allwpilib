@@ -83,7 +83,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    * @param value value to clip
    * @param deadband range around zero
    */
-  protected double applyDeadband(double value, double deadband) {
+  protected static double applyDeadband(double value, double deadband) {
     if (Math.abs(value) > deadband) {
       if (value > 0.0) {
         return (value - deadband) / (1.0 - deadband);
@@ -96,7 +96,7 @@ public abstract class RobotDriveBase extends MotorSafety {
   }
 
   /** Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0. */
-  protected void normalize(double[] wheelSpeeds) {
+  protected static void normalize(double[] wheelSpeeds) {
     double maxMagnitude = Math.abs(wheelSpeeds[0]);
     for (int i = 1; i < wheelSpeeds.length; i++) {
       double temp = Math.abs(wheelSpeeds[i]);

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/raw_ostream.h>
+#include <string>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -95,23 +95,15 @@ class SpeedController;
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
- *
- * <p>RobotDrive porting guide:
- * <br>TankDrive(double, double, bool) is equivalent to
- * RobotDrive's TankDrive(double, double, bool) if a deadband of 0 is used.
- * <br>ArcadeDrive(double, double, bool) is equivalent to
- * RobotDrive's ArcadeDrive(double, double, bool) if a deadband of 0 is used
- * and the the rotation input is inverted eg ArcadeDrive(y, -rotation, false)
- * <br>CurvatureDrive(double, double, bool) is similar in concept to
- * RobotDrive's Drive(double, double) with the addition of a quick turn
- * mode. However, it is not designed to give exactly the same response.
  */
 class DifferentialDrive : public RobotDriveBase,
                           public Sendable,
                           public SendableHelper<DifferentialDrive> {
  public:
-  static constexpr double kDefaultQuickStopThreshold = 0.2;
-  static constexpr double kDefaultQuickStopAlpha = 0.1;
+  struct WheelSpeeds {
+    double left = 0.0;
+    double right = 0.0;
+  };
 
   /**
    * Construct a DifferentialDrive.
@@ -148,14 +140,14 @@ class DifferentialDrive : public RobotDriveBase,
    * high speeds. Also handles the robot's quick turn functionality - "quick
    * turn" overrides constant-curvature turning for turn-in-place maneuvers.
    *
-   * @param xSpeed      The robot's speed along the X axis [-1.0..1.0]. Forward
-   *                    is positive.
-   * @param zRotation   The robot's rotation rate around the Z axis [-1.0..1.0].
-   *                    Clockwise is positive.
-   * @param isQuickTurn If set, overrides constant-curvature turning for
-   *                    turn-in-place maneuvers.
+   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
+   *                         Forward is positive.
+   * @param zRotation        The robot's rotation rate around the Z axis
+   *                         [-1.0..1.0]. Clockwise is positive.
+   * @param allowTurnInPlace If set, overrides constant-curvature turning for
+   *                         turn-in-place maneuvers.
    */
-  void CurvatureDrive(double xSpeed, double zRotation, bool isQuickTurn);
+  void CurvatureDrive(double xSpeed, double zRotation, bool allowTurnInPlace);
 
   /**
    * Tank drive method for differential drive platform.
@@ -169,65 +161,58 @@ class DifferentialDrive : public RobotDriveBase,
   void TankDrive(double leftSpeed, double rightSpeed, bool squareInputs = true);
 
   /**
-   * Sets the QuickStop speed threshold in curvature drive.
+   * Arcade drive inverse kinematics for differential drive platform.
    *
-   * QuickStop compensates for the robot's moment of inertia when stopping after
-   * a QuickTurn.
+   * Note: Some drivers may prefer inverted rotation controls. This can be done
+   * by negating the value passed for rotation.
    *
-   * While QuickTurn is enabled, the QuickStop accumulator takes on the rotation
-   * rate value outputted by the low-pass filter when the robot's speed along
-   * the X axis is below the threshold. When QuickTurn is disabled, the
-   * accumulator's value is applied against the computed angular power request
-   * to slow the robot's rotation.
-   *
-   * @param threshold X speed below which quick stop accumulator will receive
-   *                  rotation rate values [0..1.0].
+   * @param xSpeed       The speed at which the robot should drive along the X
+   *                     axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation    The rotation rate of the robot around the Z axis
+   *                     [-1.0..1.0]. Clockwise is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  void SetQuickStopThreshold(double threshold);
+  static WheelSpeeds ArcadeDriveIK(double xSpeed, double zRotation,
+                                   bool squareInputs = true);
 
   /**
-   * Sets the low-pass filter gain for QuickStop in curvature drive.
+   * Curvature drive inverse kinematics for differential drive platform.
    *
-   * The low-pass filter filters incoming rotation rate commands to smooth out
-   * high frequency changes.
+   * The rotation argument controls the curvature of the robot's path rather
+   * than its rate of heading change. This makes the robot more controllable at
+   * high speeds. Also handles the robot's quick turn functionality - "quick
+   * turn" overrides constant-curvature turning for turn-in-place maneuvers.
    *
-   * @param alpha Low-pass filter gain [0.0..2.0]. Smaller values result in
-   *              slower output changes. Values between 1.0 and 2.0 result in
-   *              output oscillation. Values below 0.0 and above 2.0 are
-   *              unstable.
+   * @param xSpeed           The robot's speed along the X axis [-1.0..1.0].
+   *                         Forward is positive.
+   * @param zRotation        The robot's rotation rate around the Z axis
+   *                         [-1.0..1.0]. Clockwise is positive.
+   * @param allowTurnInPlace If set, overrides constant-curvature turning for
+   *                         turn-in-place maneuvers.
    */
-  void SetQuickStopAlpha(double alpha);
+  static WheelSpeeds CurvatureDriveIK(double xSpeed, double zRotation,
+                                      bool allowTurnInPlace);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by
-   * -1.
+   * Tank drive inverse kinematics for differential drive platform.
    *
-   * @return true if the right side is inverted
+   * @param leftSpeed    The robot left side's speed along the X axis
+   *                     [-1.0..1.0]. Forward is positive.
+   * @param rightSpeed   The robot right side's speed along the X axis
+   *                     [-1.0..1.0]. Forward is positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  bool IsRightSideInverted() const;
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be
-   * multiplied by -1.
-   *
-   * @param rightSideInverted true if right side power should be multiplied by
-   * -1
-   */
-  void SetRightSideInverted(bool rightSideInverted);
+  static WheelSpeeds TankDriveIK(double leftSpeed, double rightSpeed,
+                                 bool squareInputs = true);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 
  private:
   SpeedController* m_leftMotor;
   SpeedController* m_rightMotor;
-
-  double m_quickStopThreshold = kDefaultQuickStopThreshold;
-  double m_quickStopAlpha = kDefaultQuickStopAlpha;
-  double m_quickStopAccumulator = 0.0;
-  double m_rightSideInvertMultiplier = -1.0;
 };
 
 #if defined(_MSC_VER)

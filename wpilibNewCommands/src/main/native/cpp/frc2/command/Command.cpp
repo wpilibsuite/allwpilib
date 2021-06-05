@@ -21,8 +21,6 @@ Command::~Command() {
   CommandScheduler::GetInstance().Cancel(this);
 }
 
-Command::Command(const Command& rhs) = default;
-
 Command& Command::operator=(const Command& rhs) {
   m_isGrouped = false;
   return *this;

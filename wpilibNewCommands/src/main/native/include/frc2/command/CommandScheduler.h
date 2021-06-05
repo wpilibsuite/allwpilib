@@ -180,11 +180,11 @@ class CommandScheduler final : public frc::Sendable,
                          Command, std::remove_reference_t<T>>>>
   void SetDefaultCommand(Subsystem* subsystem, T&& defaultCommand) {
     if (!defaultCommand.HasRequirement(subsystem)) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                           "Default commands must require their subsystem!");
     }
     if (defaultCommand.IsFinished()) {
-      throw FRC_MakeError(frc::err::CommandIllegalUse,
+      throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                           "Default commands should not end!");
     }
     SetDefaultCommandImpl(subsystem,
@@ -249,9 +249,9 @@ class CommandScheduler final : public frc::Sendable,
    * them.
    *
    * @param command the command to query
-   * @return the time since the command was scheduled, in seconds
+   * @return the time since the command was scheduled
    */
-  double TimeSinceScheduled(const Command* command) const;
+  units::second_t TimeSinceScheduled(const Command* command) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on

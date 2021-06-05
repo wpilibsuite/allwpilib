@@ -8,71 +8,74 @@
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
-#include <wpi/Path.h>
-#include <wpi/SmallString.h>
 #include <wpi/StackTrace.h>
+#include <wpi/fs.h>
 
 using namespace frc;
 
-RuntimeError::RuntimeError(int32_t code, const wpi::Twine& message,
-                           const wpi::Twine& loc, wpi::StringRef stack)
-    : runtime_error{message.str()}, m_data{std::make_shared<Data>()} {
+RuntimeError::RuntimeError(int32_t code, std::string&& loc, std::string&& stack,
+                           std::string&& message)
+    : runtime_error{std::move(message)}, m_data{std::make_shared<Data>()} {
   m_data->code = code;
-  m_data->loc = loc.str();
+  m_data->loc = std::move(loc);
   m_data->stack = stack;
 }
 
-RuntimeError::RuntimeError(int32_t code, const wpi::Twine& message,
-                           const char* fileName, int lineNumber,
-                           const char* funcName, wpi::StringRef stack)
-    : RuntimeError{code, message,
-                   funcName + wpi::Twine{" ["} +
-                       wpi::sys::path::filename(fileName) + ":" +
-                       wpi::Twine{lineNumber} + "]",
-                   stack} {}
+RuntimeError::RuntimeError(int32_t code, const char* fileName, int lineNumber,
+                           const char* funcName, std::string&& stack,
+                           std::string&& message)
+    : RuntimeError{
+          code,
+          fmt::format("{} [{}:{}]", funcName,
+                      fs::path{fileName}.filename().string(), lineNumber),
+          std::move(stack), std::move(message)} {}
 
 void RuntimeError::Report() const {
   HAL_SendError(m_data->code < 0, m_data->code, 0, what(), m_data->loc.c_str(),
                 m_data->stack.c_str(), 1);
 }
 
-const char* frc::GetErrorMessage(int32_t code) {
-  using namespace err;
-  using namespace warn;
-  switch (code) {
+const char* frc::GetErrorMessage(int32_t* code) {
+  switch (*code) {
 #define S(label, offset, message) \
-  case label:                     \
+  case err::label:                \
     return message;
 #include "frc/WPIErrors.mac"
+#undef S
+#define S(label, offset, message) \
+  case warn::label:               \
+    return message;
 #include "frc/WPIWarnings.mac"
 #undef S
     default:
-      return HAL_GetErrorMessage(code);
+      return HAL_GetLastError(code);
   }
 }
 
-void frc::ReportError(int32_t status, const wpi::Twine& message,
-                      const char* fileName, int lineNumber,
-                      const char* funcName) {
+void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
+                       const char* funcName, fmt::string_view format,
+                       fmt::format_args args) {
   if (status == 0) {
     return;
   }
-  const char* statusMessage = GetErrorMessage(status);
-  auto stack = wpi::GetStackTrace(2);
-  wpi::SmallString<128> buf;
-  HAL_SendError(status < 0, status, 0,
-                (statusMessage + wpi::Twine{": "} + message)
-                    .toNullTerminatedStringRef(buf)
-                    .data(),
-                funcName, stack.c_str(), 1);
+  fmt::memory_buffer out;
+  fmt::format_to(out, "{}: ", GetErrorMessage(&status));
+  fmt::vformat_to(out, format, args);
+  out.push_back('\0');
+  HAL_SendError(status < 0, status, 0, out.data(), funcName,
+                wpi::GetStackTrace(2).c_str(), 1);
 }
 
-RuntimeError frc::MakeError(int32_t status, const wpi::Twine& message,
-                            const char* fileName, int lineNumber,
-                            const char* funcName) {
-  const char* statusMessage = GetErrorMessage(status);
-  auto stack = wpi::GetStackTrace(2);
-  return RuntimeError{status,   statusMessage + wpi::Twine{": "} + message,
-                      fileName, lineNumber,
-                      funcName, stack};
+RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
+                             int lineNumber, const char* funcName,
+                             fmt::string_view format, fmt::format_args args) {
+  fmt::memory_buffer out;
+  fmt::format_to(out, "{}: ", GetErrorMessage(&status));
+  fmt::vformat_to(out, format, args);
+  return RuntimeError{status,
+                      fileName,
+                      lineNumber,
+                      funcName,
+                      wpi::GetStackTrace(2),
+                      fmt::to_string(out)};
 }

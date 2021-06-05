@@ -15,9 +15,9 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringRef.h"
+#include "wpi/fs.h"
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO
@@ -78,14 +78,14 @@ static int getFD(const Twine& Filename, std::error_code& EC) {
     return STDIN_FILENO;
   }
 
-  int FD;
-
-  EC = sys::fs::openFileForRead(Filename, FD);
+  fs::file_t F = fs::OpenFileForRead(Filename.str(), EC);
   if (EC) {
     return -1;
   }
-
-  EC = std::error_code();
+  int FD = fs::FileToFd(F, EC, fs::OF_None);
+  if (EC) {
+    return -1;
+  }
   return FD;
 }
 

@@ -20,6 +20,7 @@
 #include <iosfwd>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -94,6 +95,10 @@ namespace wpi {
     LLVM_ATTRIBUTE_ALWAYS_INLINE
     /*implicit*/ StringRef(const std::string &Str) noexcept
       : Data(Str.data()), Length(Str.length()) {}
+
+    /// Construct a string ref from an std::string_view.
+    /*implicit*/ constexpr StringRef(std::string_view Str)
+        : Data(Str.data()), Length(Str.size()) {}
 
     static StringRef withNullAsEmpty(const char *data) noexcept {
       return StringRef(data ? data : "");
@@ -233,6 +238,10 @@ namespace wpi {
 
     operator std::string() const {
       return str();
+    }
+
+    operator std::string_view() const {
+      return std::string_view(data(), size());
     }
 
     /// @}

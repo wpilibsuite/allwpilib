@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <frc/Timer.h>
 #include <units/time.h>
 
-#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -39,7 +39,7 @@ class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
   bool RunsWhenDisabled() const override;
 
  protected:
-  Timer m_timer;
+  frc::Timer m_timer;
 
  private:
   units::second_t m_duration;

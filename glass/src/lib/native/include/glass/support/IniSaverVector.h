@@ -28,4 +28,4 @@ class IniSaverVector : public std::vector<Info>, public IniSaverBase {
 
 }  // namespace glass
 
-#include "IniSaverVector.inl"
+#include "IniSaverVector.inc"

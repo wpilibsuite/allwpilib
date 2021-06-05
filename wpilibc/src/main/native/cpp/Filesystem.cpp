@@ -4,31 +4,26 @@
 
 #include "frc/Filesystem.h"
 
-#include <wpi/FileSystem.h>
-#include <wpi/Path.h>
+#include <wpi/fs.h>
 
 #include "frc/RobotBase.h"
 
-void frc::filesystem::GetLaunchDirectory(wpi::SmallVectorImpl<char>& result) {
-  wpi::sys::fs::current_path(result);
+std::string frc::filesystem::GetLaunchDirectory() {
+  return fs::current_path().string();
 }
 
-void frc::filesystem::GetOperatingDirectory(
-    wpi::SmallVectorImpl<char>& result) {
+std::string frc::filesystem::GetOperatingDirectory() {
   if constexpr (RobotBase::IsReal()) {
-    wpi::sys::path::native("/home/lvuser", result);
+    return "/home/lvuser";
   } else {
-    frc::filesystem::GetLaunchDirectory(result);
+    return frc::filesystem::GetLaunchDirectory();
   }
 }
 
-void frc::filesystem::GetDeployDirectory(wpi::SmallVectorImpl<char>& result) {
-  frc::filesystem::GetOperatingDirectory(result);
+std::string frc::filesystem::GetDeployDirectory() {
   if constexpr (RobotBase::IsReal()) {
-    wpi::sys::path::append(result, "deploy");
+    return "/home/lvuser/deploy";
   } else {
-    wpi::sys::path::append(result, "src");
-    wpi::sys::path::append(result, "main");
-    wpi::sys::path::append(result, "deploy");
+    return (fs::current_path() / "src" / "main" / "deploy").string();
   }
 }

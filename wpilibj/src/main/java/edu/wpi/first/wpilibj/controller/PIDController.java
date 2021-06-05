@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.controller;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpiutil.math.MathUtil;
 
 /** Implements a PID control loop. */
 @SuppressWarnings("PMD.TooManyFields")
@@ -203,8 +203,8 @@ public class PIDController implements Sendable, AutoCloseable {
   public boolean atSetpoint() {
     double positionError;
     if (m_continuous) {
-      positionError =
-          MathUtil.inputModulus(m_setpoint - m_measurement, m_minimumInput, m_maximumInput);
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
       positionError = m_setpoint - m_measurement;
     }
@@ -310,8 +310,8 @@ public class PIDController implements Sendable, AutoCloseable {
     m_prevError = m_positionError;
 
     if (m_continuous) {
-      m_positionError =
-          MathUtil.inputModulus(m_setpoint - measurement, m_minimumInput, m_maximumInput);
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
       m_positionError = m_setpoint - measurement;
     }

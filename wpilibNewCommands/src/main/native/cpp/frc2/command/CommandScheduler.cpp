@@ -70,19 +70,19 @@ CommandScheduler::CommandScheduler()
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
   frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto& scheduler = frc::LiveWindow::GetInstance();
-  scheduler.enabled = [this] {
-    Disable();
-    CancelAll();
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = [this] {
+    this->Disable();
+    this->CancelAll();
   };
-  scheduler.disabled = [this] { Enable(); };
+  scheduler->disabled = [this] { this->Enable(); };
 }
 
 CommandScheduler::~CommandScheduler() {
   frc::SendableRegistry::GetInstance().Remove(this);
-  auto& scheduler = frc::LiveWindow::GetInstance();
-  scheduler.enabled = nullptr;
-  scheduler.disabled = nullptr;
+  auto scheduler = frc::LiveWindow::GetInstance();
+  scheduler->enabled = nullptr;
+  scheduler->disabled = nullptr;
 
   std::unique_ptr<Impl>().swap(m_impl);
 }
@@ -111,7 +111,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse,
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;
@@ -359,12 +359,13 @@ void CommandScheduler::CancelAll() {
   Cancel(commands);
 }
 
-double CommandScheduler::TimeSinceScheduled(const Command* command) const {
+units::second_t CommandScheduler::TimeSinceScheduled(
+    const Command* command) const {
   auto find = m_impl->scheduledCommands.find(command);
   if (find != m_impl->scheduledCommands.end()) {
     return find->second.TimeSinceInitialized();
   } else {
-    return -1;
+    return -1_s;
   }
 }
 bool CommandScheduler::IsScheduled(

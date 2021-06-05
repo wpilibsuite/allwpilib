@@ -22,10 +22,9 @@
 #include <algorithm>
 #include <memory>
 
-#include <wpi/FileSystem.h>
 #include <wpi/MemAlloc.h>
-#include <wpi/Path.h>
 #include <wpi/SmallString.h>
+#include <wpi/fs.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
@@ -267,26 +266,20 @@ static bool IsVideoCaptureDevice(const char* cpath) {
 }
 
 static int GetDeviceNum(const char* cpath) {
-  wpi::StringRef path{cpath};
-  std::string pathBuf;
+  fs::path path{cpath};
 
   // it might be a symlink; if so, find the symlink target (e.g. /dev/videoN),
   // add that to the list and make it the keypath
-  if (wpi::sys::fs::is_symlink_file(cpath)) {
-    char* target = ::realpath(cpath, nullptr);
-    if (target) {
-      pathBuf = target;
-      path = pathBuf;
-      std::free(target);
-    }
+  if (fs::is_symlink(path)) {
+    path = fs::canonical(path);
   }
 
-  path = wpi::sys::path::filename(path);
-  if (!path.startswith("video")) {
+  auto fn = path.filename();
+  if (!wpi::StringRef{fn}.startswith("video")) {
     return -1;
   }
   int dev = -1;
-  if (path.substr(5).getAsInteger(10, dev)) {
+  if (wpi::StringRef{fn}.substr(5).getAsInteger(10, dev)) {
     return -1;
   }
   return dev;
@@ -1688,10 +1681,11 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
           path += ep->d_name;
           char* target = ::realpath(path.c_str(), nullptr);
           if (target) {
-            wpi::StringRef fname = wpi::sys::path::filename(target);
+            std::string fname = fs::path{target}.filename();
             unsigned int dev = 0;
-            if (fname.startswith("video") &&
-                !fname.substr(5).getAsInteger(10, dev) && dev < retval.size()) {
+            if (wpi::StringRef{fname}.startswith("video") &&
+                !wpi::StringRef{fname}.substr(5).getAsInteger(10, dev) &&
+                dev < retval.size()) {
               retval[dev].otherPaths.emplace_back(path.str());
             }
             std::free(target);

@@ -8,7 +8,7 @@
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -36,7 +36,7 @@ void Tracer::PrintEpochs() {
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
-    DriverStation::ReportWarning(buf);
+    FRC_ReportError(warn::Warning, "{}", buf.c_str());
   }
 }
 

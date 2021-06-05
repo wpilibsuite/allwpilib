@@ -15,7 +15,7 @@
 #include <wpi/priority_queue.h>
 
 #include "frc/IterativeRobotBase.h"
-#include "frc2/Timer.h"
+#include "frc/Timer.h"
 
 namespace frc {
 
@@ -30,7 +30,7 @@ namespace frc {
  */
 class TimedRobot : public IterativeRobotBase {
  public:
-  static constexpr units::second_t kDefaultPeriod = 20_ms;
+  static constexpr auto kDefaultPeriod = 20_ms;
 
   /**
    * Provide an alternate "main loop" via StartCompetition().
@@ -41,11 +41,6 @@ class TimedRobot : public IterativeRobotBase {
    * Ends the main loop in StartCompetition().
    */
   void EndCompetition() override;
-
-  /**
-   * Get the time period between calls to Periodic() functions.
-   */
-  units::second_t GetPeriod() const;
 
   /**
    * Constructor for TimedRobot.
@@ -104,12 +99,11 @@ class TimedRobot : public IterativeRobotBase {
              units::second_t period, units::second_t offset)
         : func{std::move(func)},
           period{period},
-          expirationTime{
-              startTime + offset +
-              units::math::floor((frc2::Timer::GetFPGATimestamp() - startTime) /
-                                 period) *
-                  period +
-              period} {}
+          expirationTime{startTime + offset +
+                         units::math::floor(
+                             (Timer::GetFPGATimestamp() - startTime) / period) *
+                             period +
+                         period} {}
 
     bool operator>(const Callback& rhs) const {
       return expirationTime > rhs.expirationTime;

@@ -4,11 +4,13 @@
 
 #include "frc2/command/WaitCommand.h"
 
+#include <fmt/format.h>
+
 using namespace frc2;
 
 WaitCommand::WaitCommand(units::second_t duration) : m_duration{duration} {
   auto durationStr = std::to_string(duration.to<double>());
-  SetName(wpi::Twine(GetName()) + ": " + wpi::Twine(durationStr) + " seconds");
+  SetName(fmt::format("{}: {} seconds", GetName(), durationStr));
 }
 
 void WaitCommand::Initialize() {

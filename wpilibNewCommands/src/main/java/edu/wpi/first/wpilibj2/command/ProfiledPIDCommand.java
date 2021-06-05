@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.State;
+import static edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;

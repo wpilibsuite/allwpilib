@@ -20,9 +20,9 @@
 #include <portable-file-dialogs.h>
 #include <units/angle.h>
 #include <units/length.h>
-#include <wpi/Path.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
+#include <wpi/fs.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -468,10 +468,7 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   }
 
   // the image filename is relative to the json file
-  wpi::SmallString<128> pathname;
-  jsonfile.toVector(pathname);
-  wpi::sys::path::remove_filename(pathname);
-  wpi::sys::path::append(pathname, image);
+  auto pathname = fs::path{jsonfile.str()}.replace_filename(image).string();
 
   // load field image
   if (!LoadImageImpl(pathname.c_str())) {
@@ -479,7 +476,7 @@ void FieldInfo::LoadJson(const wpi::Twine& jsonfile) {
   }
 
   // save to field info
-  *m_pFilename = pathname.str();
+  *m_pFilename = pathname;
   *m_pTop = top;
   *m_pLeft = left;
   *m_pBottom = bottom;

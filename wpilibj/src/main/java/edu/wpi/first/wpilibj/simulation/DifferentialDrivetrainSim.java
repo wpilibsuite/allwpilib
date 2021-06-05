@@ -4,21 +4,21 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.math.StateSpaceUtil;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.NumericalIntegration;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
-import edu.wpi.first.wpiutil.math.numbers.N7;
 
 /**
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set
@@ -101,9 +101,9 @@ public class DifferentialDrivetrainSim {
    *
    * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
    *     system can be created with {@link
-   *     edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
-   *     edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
    *     double, double)}.
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
@@ -416,8 +416,15 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
+    kSixInch(Units.inchesToMeters(6)),
+    kEightInch(Units.inchesToMeters(8)),
+    kTenInch(Units.inchesToMeters(10)),
+
+    @Deprecated
     SixInch(Units.inchesToMeters(6)),
+    @Deprecated
     EightInch(Units.inchesToMeters(8)),
+    @Deprecated
     TenInch(Units.inchesToMeters(10));
 
     @SuppressWarnings("MemberName")

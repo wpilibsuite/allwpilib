@@ -8,6 +8,7 @@
 #include <initializer_list>
 #include <memory>
 
+#include <frc/Timer.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/RamseteController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
@@ -18,7 +19,6 @@
 #include <units/voltage.h>
 #include <wpi/ArrayRef.h>
 
-#include "frc2/Timer.h"
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -185,7 +185,7 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
   std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
       m_outputVel;
 
-  Timer m_timer;
+  frc::Timer m_timer;
   units::second_t m_prevTime;
   frc::DifferentialDriveWheelSpeeds m_prevSpeeds;
   bool m_usePID;
