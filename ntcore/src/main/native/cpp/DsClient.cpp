@@ -161,12 +161,10 @@ void DsClient::Thread::Main() {
       oldip = ip;
 
       // Convert number into dotted quad
-      json.clear();
-      wpi::raw_svector_ostream os{json};
-      os << ((ip >> 24) & 0xff) << "." << ((ip >> 16) & 0xff) << "."
-         << ((ip >> 8) & 0xff) << "." << (ip & 0xff);
-      INFO("client: DS overriding server IP to {}", os.str());
-      m_dispatcher.SetServerOverride(json.c_str(), port);
+      auto newip = fmt::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
+                               (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
+      INFO("client: DS overriding server IP to {}", newip);
+      m_dispatcher.SetServerOverride(newip.c_str(), port);
     }
 
     // We disconnected from the DS, clear the server override

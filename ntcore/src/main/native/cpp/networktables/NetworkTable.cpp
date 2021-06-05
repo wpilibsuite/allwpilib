@@ -11,7 +11,6 @@
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
-#include <wpi/raw_ostream.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"

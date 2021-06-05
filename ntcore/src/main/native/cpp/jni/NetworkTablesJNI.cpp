@@ -6,10 +6,9 @@
 
 #include <cassert>
 
+#include <fmt/format.h>
 #include <wpi/ConvertUTF.h>
-#include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
@@ -1781,13 +1780,10 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadPersistent
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err = nt::LoadPersistent(inst, JStringRef{env, filename}.str(),
-                                       [&](size_t line, const char* msg) {
-                                         wpi::SmallString<128> warn;
-                                         wpi::raw_svector_ostream oss(warn);
-                                         oss << line << ": " << msg;
-                                         warns.emplace_back(oss.str());
-                                       });
+  const char* err = nt::LoadPersistent(
+      inst, JStringRef{env, filename}.str(), [&](size_t line, const char* msg) {
+        warns.emplace_back(fmt::format("{}: {}", line, msg));
+      });
   if (err) {
     persistentEx.Throw(env, err);
     return nullptr;
@@ -1837,14 +1833,11 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadEntries
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err = nt::LoadEntries(inst, JStringRef{env, filename}.str(),
-                                    JStringRef{env, prefix}.str(),
-                                    [&](size_t line, const char* msg) {
-                                      wpi::SmallString<128> warn;
-                                      wpi::raw_svector_ostream oss(warn);
-                                      oss << line << ": " << msg;
-                                      warns.emplace_back(oss.str());
-                                    });
+  const char* err = nt::LoadEntries(
+      inst, JStringRef{env, filename}.str(), JStringRef{env, prefix}.str(),
+      [&](size_t line, const char* msg) {
+        warns.emplace_back(fmt::format("{}: {}", line, msg));
+      });
   if (err) {
     persistentEx.Throw(env, err);
     return nullptr;
