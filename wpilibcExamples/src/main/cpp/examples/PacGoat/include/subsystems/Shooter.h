@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "PneumaticsModule.h"
 #include <frc/DigitalInput.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
+
+#include "PneumaticsModule.h"
 
 /**
  * The Shooter subsystem handles shooting. The mechanism for shooting is

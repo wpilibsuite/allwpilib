@@ -5,9 +5,9 @@
 #include "TestBench.h"
 #include "frc/AnalogInput.h"
 #include "frc/DigitalInput.h"
-#include "frc/PneumaticsControlModule.h"
 #include "frc/DigitalOutput.h"
 #include "frc/DoubleSolenoid.h"
+#include "frc/PneumaticsControlModule.h"
 #include "frc/Solenoid.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
@@ -111,8 +111,7 @@ TEST_F(PCMTest, Solenoid) {
  * with the DoubleSolenoid class.
  */
 TEST_F(PCMTest, DoubleSolenoid) {
-  frc::DoubleSolenoid solenoid{m_pneumaticsModule,
-                               TestBench::kSolenoidChannel1,
+  frc::DoubleSolenoid solenoid{m_pneumaticsModule, TestBench::kSolenoidChannel1,
                                TestBench::kSolenoidChannel2};
 
   solenoid.Set(frc::DoubleSolenoid::kOff);

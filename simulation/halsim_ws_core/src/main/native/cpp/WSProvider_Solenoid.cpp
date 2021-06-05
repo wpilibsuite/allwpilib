@@ -57,7 +57,8 @@ void HALSimWSProviderSolenoid::CancelCallbacks() {
 }
 
 void HALSimWSProviderSolenoid::DoCancelCallbacks() {
-  // HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
+  // HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex,
+  // m_solenoidIndex,
   //                                                 m_initCbKey);
   HALSIM_CancelCTREPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
                                              m_outputCbKey);

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <frc/PneumaticsControlModule.h>
 #include <frc/DoubleSolenoid.h>
+#include <frc/PneumaticsControlModule.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"

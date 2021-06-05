@@ -4,13 +4,13 @@
 
 #include "Robot.h"
 
-#include "PneumaticsModule.h"
-
 #include <iostream>
 
 #include <frc/commands/Scheduler.h>
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+
+#include "PneumaticsModule.h"
 
 DriveTrain Robot::drivetrain;
 Pivot Robot::pivot;

@@ -18,7 +18,7 @@ class MyRobot : public frc::TimedRobot {
   void RobotInit() override {
     // int32_t status = 0;
 
-    //solenoid = new frc::Solenoid{0};
+    // solenoid = new frc::Solenoid{0};
     // handle = HAL_InitializeCTREPCM(0, nullptr, &status);
     // std::printf("Status %d\n", status);
   }
