@@ -4,8 +4,8 @@
 
 #include "TestBench.h"
 #include "frc/AnalogInput.h"
-#include "frc/Compressor.h"
 #include "frc/DigitalInput.h"
+#include "frc/PneumaticsControlModule.h"
 #include "frc/DigitalOutput.h"
 #include "frc/DoubleSolenoid.h"
 #include "frc/Solenoid.h"
@@ -26,7 +26,7 @@ static const double kCompressorOffVoltage = 1.68;
 
 class PCMTest : public testing::Test {
  protected:
-  frc::Compressor m_compressor;
+  frc::PneumaticsControlModule m_pneumaticsModule;
 
   frc::DigitalOutput m_fakePressureSwitch{
       TestBench::kFakePressureSwitchChannel};
@@ -35,7 +35,7 @@ class PCMTest : public testing::Test {
   frc::DigitalInput m_fakeSolenoid2{TestBench::kFakeSolenoid2Channel};
 
   void Reset() {
-    m_compressor.Stop();
+    m_pneumaticsModule.SetClosedLoopControl(false);
     m_fakePressureSwitch.Set(false);
   }
 };
@@ -46,7 +46,7 @@ class PCMTest : public testing::Test {
 TEST_F(PCMTest, PressureSwitch) {
   Reset();
 
-  m_compressor.SetClosedLoopControl(true);
+  m_pneumaticsModule.SetClosedLoopControl(true);
 
   // Turn on the compressor
   m_fakePressureSwitch.Set(true);
@@ -66,8 +66,8 @@ TEST_F(PCMTest, PressureSwitch) {
  */
 TEST_F(PCMTest, Solenoid) {
   Reset();
-  frc::Solenoid solenoid1{TestBench::kSolenoidChannel1};
-  frc::Solenoid solenoid2{TestBench::kSolenoidChannel2};
+  frc::Solenoid solenoid1{m_pneumaticsModule, TestBench::kSolenoidChannel1};
+  frc::Solenoid solenoid2{m_pneumaticsModule, TestBench::kSolenoidChannel2};
 
   // Turn both solenoids off
   solenoid1.Set(false);
@@ -111,7 +111,8 @@ TEST_F(PCMTest, Solenoid) {
  * with the DoubleSolenoid class.
  */
 TEST_F(PCMTest, DoubleSolenoid) {
-  frc::DoubleSolenoid solenoid{TestBench::kSolenoidChannel1,
+  frc::DoubleSolenoid solenoid{m_pneumaticsModule,
+                               TestBench::kSolenoidChannel1,
                                TestBench::kSolenoidChannel2};
 
   solenoid.Set(frc::DoubleSolenoid::kOff);
@@ -138,8 +139,8 @@ TEST_F(PCMTest, DoubleSolenoid) {
 
 TEST_F(PCMTest, OneShot) {
   Reset();
-  frc::Solenoid solenoid1{TestBench::kSolenoidChannel1};
-  frc::Solenoid solenoid2{TestBench::kSolenoidChannel2};
+  frc::Solenoid solenoid1{m_pneumaticsModule, TestBench::kSolenoidChannel1};
+  frc::Solenoid solenoid2{m_pneumaticsModule, TestBench::kSolenoidChannel2};
 
   // Turn both solenoids off
   solenoid1.Set(false);

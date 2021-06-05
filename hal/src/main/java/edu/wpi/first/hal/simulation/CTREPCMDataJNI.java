@@ -15,8 +15,7 @@ public class CTREPCMDataJNI extends JNIWrapper {
 
   public static native boolean getInitialized(int index);
 
-  public static native void setInitialized(
-      int index, boolean initialized);
+  public static native void setInitialized(int index, boolean initialized);
 
   public static native int registerSolenoidOutputCallback(
       int index, int channel, NotifyCallback callback, boolean initialNotify);

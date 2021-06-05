@@ -156,3 +156,8 @@ void PneumaticsControlModule::SetOneShotDuration(int index,
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
+
+bool PneumaticsControlModule::CheckSolenoidChannel(int channel) const {
+  // TODO Fix me
+  return true;
+}

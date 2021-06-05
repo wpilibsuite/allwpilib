@@ -26,8 +26,8 @@ HALSimWSProviderPCM::~HALSimWSProviderPCM() {
 }
 
 void HALSimWSProviderPCM::RegisterCallbacks() {
-  m_initCbKey = REGISTER_CTREPCM(CompressorInitialized, "<init", bool, boolean);
-  m_onCbKey = REGISTER_CTREPCM(CompressorInitialized, ">on", bool, boolean);
+  m_initCbKey = REGISTER_CTREPCM(Initialized, "<init", bool, boolean);
+  m_onCbKey = REGISTER_CTREPCM(CompressorOn, ">on", bool, boolean);
   m_closedLoopCbKey =
       REGISTER_CTREPCM(ClosedLoopEnabled, "<closed_loop", bool, boolean);
   m_pressureSwitchCbKey =
@@ -41,7 +41,7 @@ void HALSimWSProviderPCM::CancelCallbacks() {
 }
 
 void HALSimWSProviderPCM::DoCancelCallbacks() {
-  HALSIM_CancelCTREPCMCompressorInitializedCallback(m_channel, m_initCbKey);
+  HALSIM_CancelCTREPCMInitializedCallback(m_channel, m_initCbKey);
   HALSIM_CancelCTREPCMCompressorOnCallback(m_channel, m_onCbKey);
   HALSIM_CancelCTREPCMClosedLoopEnabledCallback(m_channel, m_closedLoopCbKey);
   HALSIM_CancelCTREPCMPressureSwitchCallback(m_channel, m_pressureSwitchCbKey);

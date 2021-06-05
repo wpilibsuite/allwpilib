@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "PneumaticsModule.h"
 #include <frc/DigitalInput.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/Solenoid.h>
@@ -114,9 +115,9 @@ class Shooter : public frc::Subsystem {
 
  private:
   // Devices
-  frc::DoubleSolenoid m_piston1{3, 4};
-  frc::DoubleSolenoid m_piston2{5, 6};
-  frc::Solenoid m_latchPiston{1, 2};
+  frc::DoubleSolenoid m_piston1{pac::GetPneumatics(), 3, 4};
+  frc::DoubleSolenoid m_piston2{pac::GetPneumatics(), 5, 6};
+  frc::Solenoid m_latchPiston{pac::GetPneumatics(), 2};
   frc::DigitalInput m_piston1ReedSwitchFront{9};
   frc::DigitalInput m_piston1ReedSwitchBack{11};
   frc::DigitalInput m_hotGoalSensor{

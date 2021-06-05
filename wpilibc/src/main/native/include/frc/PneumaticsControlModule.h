@@ -53,6 +53,8 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void SetOneShotDuration(int index, units::second_t duration) override;
 
+  bool CheckSolenoidChannel(int channel) const override;
+
  private:
   int m_module;
   hal::Handle<HAL_CTREPCMHandle> m_handle;

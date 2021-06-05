@@ -9,7 +9,6 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.SensorUtil;
 
-
 /** Class to control a simulated Pneumatic Control Module (PCM). */
 @SuppressWarnings("AbbreviationAsWordInName")
 public class CTREPCMSim {
@@ -82,10 +81,8 @@ public class CTREPCMSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerInitializedCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid =
-        CTREPCMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
+  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelInitializedCallback);
   }
 

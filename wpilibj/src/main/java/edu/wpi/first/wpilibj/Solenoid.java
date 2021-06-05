@@ -83,8 +83,8 @@ public class Solenoid implements Sendable, AutoCloseable {
   }
 
   /**
-   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to the Disabled
-   * List and disabled until power cycle, or until faults are cleared.
+   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to the Disabled List
+   * and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
    */

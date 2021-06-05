@@ -48,7 +48,7 @@ HALSimWSProviderSolenoid::~HALSimWSProviderSolenoid() {
 }
 
 void HALSimWSProviderSolenoid::RegisterCallbacks() {
-  m_initCbKey = REGISTER_SOLENOID(Initialized, "<init", bool, boolean);
+  // m_initCbKey = REGISTER_SOLENOID(Initialized, "<init", bool, boolean);
   m_outputCbKey = REGISTER_SOLENOID(Output, "<output", bool, boolean);
 }
 
@@ -57,8 +57,8 @@ void HALSimWSProviderSolenoid::CancelCallbacks() {
 }
 
 void HALSimWSProviderSolenoid::DoCancelCallbacks() {
-  HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
-                                                  m_initCbKey);
+  // HALSIM_CancelCTREPCMSolenoidInitializedCallback(m_pcmIndex, m_solenoidIndex,
+  //                                                 m_initCbKey);
   HALSIM_CancelCTREPCMSolenoidOutputCallback(m_pcmIndex, m_solenoidIndex,
                                              m_outputCbKey);
 

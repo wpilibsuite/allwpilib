@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <frc/PneumaticsControlModule.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc2/command/SubsystemBase.h>
 
@@ -28,5 +29,6 @@ class HatchSubsystem : public frc2::SubsystemBase {
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
+  frc::PneumaticsControlModule m_pneumaticsModule;
   frc::DoubleSolenoid m_hatchSolenoid;
 };

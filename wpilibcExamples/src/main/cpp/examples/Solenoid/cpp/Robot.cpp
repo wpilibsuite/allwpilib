@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/PneumaticsControlModule.h>
 #include <frc/DoubleSolenoid.h>
 #include <frc/Joystick.h>
 #include <frc/Solenoid.h>
@@ -53,11 +54,13 @@ class Robot : public frc::TimedRobot {
  private:
   frc::Joystick m_stick{0};
 
+  frc::PneumaticsControlModule m_pneumaticsModule;
+
   // Solenoid corresponds to a single solenoid.
-  frc::Solenoid m_solenoid{0};
+  frc::Solenoid m_solenoid{m_pneumaticsModule, 0};
 
   // DoubleSolenoid corresponds to a double solenoid.
-  frc::DoubleSolenoid m_doubleSolenoid{1, 2};
+  frc::DoubleSolenoid m_doubleSolenoid{m_pneumaticsModule, 1, 2};
 
   static constexpr int kSolenoidButton = 1;
   static constexpr int kDoubleSolenoidForward = 2;

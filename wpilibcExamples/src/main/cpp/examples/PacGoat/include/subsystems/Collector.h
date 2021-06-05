@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "PneumaticsModule.h"
 #include <frc/DigitalInput.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
@@ -68,6 +69,6 @@ class Collector : public frc::Subsystem {
   // Subsystem devices
   frc::PWMSparkMax m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
-  frc::Solenoid m_piston{1};
+  frc::Solenoid m_piston{pac::GetPneumatics(), 1};
   frc::DigitalInput m_openDetector{6};
 };
