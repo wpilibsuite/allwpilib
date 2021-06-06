@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <array>
 #include <atomic>
 #include <memory>
