@@ -27,7 +27,7 @@ Solenoid::Solenoid(PneumaticsBase* module, int channel)
                channel} {}
 
 Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
-    : m_module{module} {
+    : m_module{std::move(module)} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }

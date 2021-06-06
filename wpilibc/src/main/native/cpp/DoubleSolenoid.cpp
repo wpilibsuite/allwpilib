@@ -32,7 +32,7 @@ DoubleSolenoid::DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
 
 DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
                                int forwardChannel, int reverseChannel)
-    : m_module{module} {
+    : m_module{std::move(module)} {
   if (!m_module->CheckSolenoidChannel(forwardChannel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
                         forwardChannel);
