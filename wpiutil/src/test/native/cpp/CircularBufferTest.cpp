@@ -25,7 +25,7 @@ TEST(CircularBufferTest, PushFrontTest) {
     queue.push_front(value);
   }
 
-  for (size_t i = 0; i < pushFrontOut.size(); i++) {
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
     EXPECT_EQ(pushFrontOut[i], queue[i]);
   }
 }
@@ -37,7 +37,31 @@ TEST(CircularBufferTest, PushBackTest) {
     queue.push_back(value);
   }
 
-  for (size_t i = 0; i < pushBackOut.size(); i++) {
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
+    EXPECT_EQ(pushBackOut[i], queue[i]);
+  }
+}
+
+TEST(CircularBufferTest, EmplaceFrontTest) {
+  wpi::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_front(value);
+  }
+
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
+    EXPECT_EQ(pushFrontOut[i], queue[i]);
+  }
+}
+
+TEST(CircularBufferTest, EmplaceBackTest) {
+  wpi::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_back(value);
+  }
+
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
     EXPECT_EQ(pushBackOut[i], queue[i]);
   }
 }
@@ -88,15 +112,13 @@ TEST(CircularBufferTest, PushPopTest) {
 TEST(CircularBufferTest, ResetTest) {
   wpi::circular_buffer<double> queue(5);
 
-  for (size_t i = 1; i < 6; i++) {
+  for (size_t i = 1; i < 6; ++i) {
     queue.push_back(i);
   }
 
   queue.reset();
 
-  for (size_t i = 0; i < 5; i++) {
-    EXPECT_EQ(0.0, queue[i]);
-  }
+  EXPECT_EQ(queue.size(), size_t{0});
 }
 
 TEST(CircularBufferTest, ResizeTest) {
@@ -203,4 +225,30 @@ TEST(CircularBufferTest, ResizeTest) {
   EXPECT_EQ(1.0, queue[1]);
   EXPECT_EQ(2.0, queue[2]);
   EXPECT_EQ(3.0, queue[3]);
+}
+
+TEST(CircularBufferTest, IteratorTest) {
+  wpi::circular_buffer<double> queue(3);
+
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.push_back(4.0);  // Overwrite 1 with 4
+
+  // The buffer now contains 2, 3 and 4
+  const std::array<double, 3> values = {2.0, 3.0, 4.0};
+
+  // iterator
+  int i = 0;
+  for (auto& elem : queue) {
+    EXPECT_EQ(values[i], elem);
+    ++i;
+  }
+
+  // const_iterator
+  i = 0;
+  for (const auto& elem : queue) {
+    EXPECT_EQ(values[i], elem);
+    ++i;
+  }
 }
