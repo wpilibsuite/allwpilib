@@ -4,6 +4,8 @@
 
 #include "ntcore_test.h"
 
+#include <cstring>
+
 #include <wpi/MemAlloc.h>
 
 #include "Value_internal.h"

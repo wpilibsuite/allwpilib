@@ -165,7 +165,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
   builder.SetUpdateTable([=]() {
     // Get the list of possible commands to cancel
     auto new_toCancel = cancelEntry.GetValue();
-    wpi::ArrayRef<double> toCancel;
+    wpi::span<const double> toCancel;
     if (new_toCancel) {
       toCancel = new_toCancel->GetDoubleArray();
     }

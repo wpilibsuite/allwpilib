@@ -14,7 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
@@ -23,6 +22,7 @@
 #include "wpi/deprecated.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/span.h"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {
@@ -137,7 +137,7 @@ class JStringRef {
       jsize size = env->GetStringLength(str);
       const jchar* chars = env->GetStringCritical(str, nullptr);
       if (chars) {
-        convertUTF16ToUTF8String(makeArrayRef(chars, size), m_str);
+        convertUTF16ToUTF8String(wpi::span<const jchar>(chars, size), m_str);
         env->ReleaseStringCritical(str, chars);
       }
     } else {
@@ -185,13 +185,13 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
 
-  operator ArrayRef<T>() const { return array(); }  // NOLINT
+  operator span<const T>() const { return array(); }  // NOLINT
 
-  ArrayRef<T> array() const {
+  span<const T> array() const {
     if (!this->m_elements) {
       return {};
     }
-    return ArrayRef<T>{this->m_elements, this->m_size};
+    return {this->m_elements, this->m_size};
   }
 
   JArrayRefBase(const JArrayRefBase&) = delete;
@@ -342,7 +342,7 @@ namespace detail {
 template <typename T,
           bool = (std::is_integral<T>::value && sizeof(jint) == sizeof(T))>
 struct ConvertIntArray {
-  static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
+  static jintArray ToJava(JNIEnv* env, span<const T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
     if (!jarr) {
       return nullptr;
@@ -363,7 +363,7 @@ struct ConvertIntArray {
 // Fast path (use SetIntArrayRegion)
 template <typename T>
 struct ConvertIntArray<T, true> {
-  static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
+  static jintArray ToJava(JNIEnv* env, span<const T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
     if (!jarr) {
       return nullptr;
@@ -376,9 +376,14 @@ struct ConvertIntArray<T, true> {
 
 }  // namespace detail
 
-// Convert an ArrayRef to a jintArray.
+// Convert an span to a jintArray.
 template <typename T>
-inline jintArray MakeJIntArray(JNIEnv* env, ArrayRef<T> arr) {
+inline jintArray MakeJIntArray(JNIEnv* env, span<const T> arr) {
+  return detail::ConvertIntArray<T>::ToJava(env, arr);
+}
+
+template <typename T>
+inline jintArray MakeJIntArray(JNIEnv* env, span<T> arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
@@ -408,7 +413,7 @@ inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
 }
 
 // Convert an array of integers into a jbooleanArray.
-inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
+inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const int> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
     return nullptr;
@@ -426,7 +431,7 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
 }
 
 // Convert an array of booleans into a jbooleanArray.
-inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
+inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const bool> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
     return nullptr;
@@ -445,14 +450,14 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
 
 // Other MakeJ*Array conversions.
 
-#define WPI_JNI_MAKEJARRAY(T, F)                                  \
-  inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \
-    T##Array jarr = env->New##F##Array(arr.size());               \
-    if (!jarr) {                                                  \
-      return nullptr;                                             \
-    }                                                             \
-    env->Set##F##ArrayRegion(jarr, 0, arr.size(), arr.data());    \
-    return jarr;                                                  \
+#define WPI_JNI_MAKEJARRAY(T, F)                                    \
+  inline T##Array MakeJ##F##Array(JNIEnv* env, span<const T> arr) { \
+    T##Array jarr = env->New##F##Array(arr.size());                 \
+    if (!jarr) {                                                    \
+      return nullptr;                                               \
+    }                                                               \
+    env->Set##F##ArrayRegion(jarr, 0, arr.size(), arr.data());      \
+    return jarr;                                                    \
   }
 
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
@@ -465,7 +470,7 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 #undef WPI_JNI_MAKEJARRAY
 
 // Convert an array of std::string into a jarray of jstring.
-inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
+inline jobjectArray MakeJStringArray(JNIEnv* env, span<const std::string> arr) {
   static JClass stringCls{env, "java/lang/String"};
   if (!stringCls) {
     return nullptr;

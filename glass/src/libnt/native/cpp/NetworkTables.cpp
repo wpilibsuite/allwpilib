@@ -17,17 +17,18 @@
 #include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallString.h>
+#include <wpi/SpanExtras.h>
 #include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
+#include <wpi/span.h>
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 
 using namespace glass;
 
-static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
+static std::string BooleanArrayToString(wpi::span<const int> in) {
   std::string rv;
   wpi::raw_string_ostream os{rv};
   os << '[';
@@ -47,11 +48,11 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
   return rv;
 }
 
-static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
+static std::string DoubleArrayToString(wpi::span<const double> in) {
   return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
-static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
+static std::string StringArrayToString(wpi::span<const std::string> in) {
   std::string rv;
   wpi::raw_string_ostream os{rv};
   os << '[';
@@ -186,7 +187,7 @@ void NetworkTablesModel::Update() {
 
     // get to leaf
     auto nodes = &m_root;
-    for (auto part : wpi::ArrayRef(parts.begin(), parts.end()).drop_back()) {
+    for (auto part : wpi::drop_back(wpi::span{parts.begin(), parts.end()})) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });

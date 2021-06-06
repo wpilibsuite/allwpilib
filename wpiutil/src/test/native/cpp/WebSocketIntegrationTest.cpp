@@ -87,7 +87,7 @@ TEST_F(WebSocketIntegrationTest, ServerSendBinary) {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn);
     server->connected.connect([&](std::string_view, WebSocket& ws) {
-      ws.SendBinary(uv::Buffer{"\x03\x04", 2}, [&](auto, uv::Error) {});
+      ws.SendBinary({uv::Buffer{"\x03\x04", 2}}, [&](auto, uv::Error) {});
       ws.Close();
     });
   });
@@ -100,7 +100,7 @@ TEST_F(WebSocketIntegrationTest, ServerSendBinary) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
     });
-    ws->binary.connect([&](ArrayRef<uint8_t> data, bool) {
+    ws->binary.connect([&](auto data, bool) {
       ++gotData;
       std::vector<uint8_t> recvData{data.begin(), data.end()};
       std::vector<uint8_t> expectData{0x03, 0x04};
@@ -136,7 +136,7 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
       }
     });
     ws->open.connect([&, s = ws.get()](std::string_view) {
-      s->SendText(uv::Buffer{"hello"}, [&](auto, uv::Error) {});
+      s->SendText({{"hello"}}, [&](auto, uv::Error) {});
       s->Close();
     });
   });

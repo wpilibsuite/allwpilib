@@ -10,8 +10,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
 #include <wpi/circular_buffer.h>
+#include <wpi/span.h>
 
 #include "units/time.h"
 #include "wpimath/MathShared.h"
@@ -77,11 +77,11 @@ class LinearFilter {
    * @param ffGains The "feed forward" or FIR gains.
    * @param fbGains The "feed back" or IIR gains.
    */
-  LinearFilter(wpi::ArrayRef<double> ffGains, wpi::ArrayRef<double> fbGains)
+  LinearFilter(wpi::span<const double> ffGains, wpi::span<const double> fbGains)
       : m_inputs(ffGains.size()),
         m_outputs(fbGains.size()),
-        m_inputGains(ffGains),
-        m_outputGains(fbGains) {
+        m_inputGains(ffGains.begin(), ffGains.end()),
+        m_outputGains(fbGains.begin(), fbGains.end()) {
     for (size_t i = 0; i < ffGains.size(); ++i) {
       m_inputs.emplace_front(0.0);
     }
@@ -103,8 +103,8 @@ class LinearFilter {
    */
   LinearFilter(std::initializer_list<double> ffGains,
                std::initializer_list<double> fbGains)
-      : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
-                     wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
+      : LinearFilter({ffGains.begin(), ffGains.end()},
+                     {fbGains.begin(), fbGains.end()}) {}
 
   // Static methods to create commonly used filters
   /**
@@ -124,7 +124,7 @@ class LinearFilter {
   static LinearFilter<T> SinglePoleIIR(double timeConstant,
                                        units::second_t period) {
     double gain = std::exp(-period.to<double>() / timeConstant);
-    return LinearFilter(1.0 - gain, -gain);
+    return LinearFilter({1.0 - gain}, {-gain});
   }
 
   /**

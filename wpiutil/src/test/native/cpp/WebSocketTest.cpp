@@ -48,7 +48,7 @@ std::vector<uint8_t> WebSocketTest::BuildHeader(uint8_t opcode, bool fin,
 
 std::vector<uint8_t> WebSocketTest::BuildMessage(uint8_t opcode, bool fin,
                                                  bool masking,
-                                                 ArrayRef<uint8_t> data) {
+                                                 span<const uint8_t> data) {
   auto finalData = BuildHeader(opcode, fin, masking, data.size());
   size_t headerSize = finalData.size();
   finalData.insert(finalData.end(), data.begin(), data.end());
@@ -68,7 +68,7 @@ std::vector<uint8_t> WebSocketTest::BuildMessage(uint8_t opcode, bool fin,
 
 // If the message is masked, changes the mask to match the mask set by
 // BuildHeader() by unmasking and remasking.
-void WebSocketTest::AdjustMasking(MutableArrayRef<uint8_t> message) {
+void WebSocketTest::AdjustMasking(span<uint8_t> message) {
   if (message.size() < 2) {
     return;
   }
@@ -91,7 +91,7 @@ void WebSocketTest::AdjustMasking(MutableArrayRef<uint8_t> message) {
   message[maskPos + 2] = testMask[2];
   message[maskPos + 3] = testMask[3];
   int n = 0;
-  for (auto& ch : message.slice(maskPos + 4)) {
+  for (auto& ch : message.subspan(maskPos + 4)) {
     ch ^= mask[n] ^ testMask[n];
     if (++n >= 4) {
       n = 0;

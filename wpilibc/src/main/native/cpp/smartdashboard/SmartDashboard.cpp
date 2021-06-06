@@ -170,52 +170,52 @@ std::string SmartDashboard::GetString(std::string_view keyName,
 }
 
 bool SmartDashboard::PutBooleanArray(std::string_view key,
-                                     wpi::ArrayRef<int> value) {
+                                     wpi::span<const int> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetBooleanArray(value);
 }
 
 bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
-                                            wpi::ArrayRef<int> defaultValue) {
+                                            wpi::span<const int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
 
 std::vector<int> SmartDashboard::GetBooleanArray(
-    std::string_view key, wpi::ArrayRef<int> defaultValue) {
+    std::string_view key, wpi::span<const int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetBooleanArray(
       defaultValue);
 }
 
 bool SmartDashboard::PutNumberArray(std::string_view key,
-                                    wpi::ArrayRef<double> value) {
+                                    wpi::span<const double> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetDoubleArray(value);
 }
 
-bool SmartDashboard::SetDefaultNumberArray(std::string_view key,
-                                           wpi::ArrayRef<double> defaultValue) {
+bool SmartDashboard::SetDefaultNumberArray(
+    std::string_view key, wpi::span<const double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDoubleArray(
       defaultValue);
 }
 
 std::vector<double> SmartDashboard::GetNumberArray(
-    std::string_view key, wpi::ArrayRef<double> defaultValue) {
+    std::string_view key, wpi::span<const double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetDoubleArray(
       defaultValue);
 }
 
 bool SmartDashboard::PutStringArray(std::string_view key,
-                                    wpi::ArrayRef<std::string> value) {
+                                    wpi::span<const std::string> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetStringArray(value);
 }
 
 bool SmartDashboard::SetDefaultStringArray(
-    std::string_view key, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view key, wpi::span<const std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultStringArray(
       defaultValue);
 }
 
 std::vector<std::string> SmartDashboard::GetStringArray(
-    std::string_view key, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view key, wpi::span<const std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetStringArray(
       defaultValue);
 }

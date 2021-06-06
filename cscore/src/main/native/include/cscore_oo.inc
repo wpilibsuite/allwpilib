@@ -302,7 +302,7 @@ inline HttpCamera::HttpCamera(std::string_view name, const std::string& url,
     : HttpCamera(name, std::string_view{url}, kind) {}
 
 inline HttpCamera::HttpCamera(std::string_view name,
-                              wpi::ArrayRef<std::string> urls,
+                              wpi::span<const std::string> urls,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
@@ -329,7 +329,7 @@ inline HttpCamera::HttpCameraKind HttpCamera::GetHttpCameraKind() const {
       static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
 }
 
-inline void HttpCamera::SetUrls(wpi::ArrayRef<std::string> urls) {
+inline void HttpCamera::SetUrls(wpi::span<const std::string> urls) {
   m_status = 0;
   ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
 }
@@ -351,7 +351,7 @@ inline std::vector<std::string> HttpCamera::GetUrls() const {
 }
 
 inline std::vector<std::string> AxisCamera::HostToUrl(
-    wpi::ArrayRef<std::string> hosts) {
+    wpi::span<const std::string> hosts) {
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
   for (const auto& host : hosts) {
@@ -381,7 +381,7 @@ inline AxisCamera::AxisCamera(std::string_view name, const std::string& host)
     : HttpCamera(name, HostToUrl(std::string_view{host}), kAxis) {}
 
 inline AxisCamera::AxisCamera(std::string_view name,
-                              wpi::ArrayRef<std::string> hosts)
+                              wpi::span<const std::string> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
 template <typename T>
@@ -452,7 +452,7 @@ inline VideoProperty ImageSource::CreateStringProperty(std::string_view name,
 }
 
 inline void ImageSource::SetEnumPropertyChoices(
-    const VideoProperty& property, wpi::ArrayRef<std::string> choices) {
+    const VideoProperty& property, wpi::span<const std::string> choices) {
   m_status = 0;
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
 }

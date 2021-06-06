@@ -35,7 +35,7 @@ void NTStringChooserModel::SetActive(std::string_view val) {
   nt::SetEntryValue(m_active, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetOptions(wpi::ArrayRef<std::string> val) {
+void NTStringChooserModel::SetOptions(wpi::span<const std::string> val) {
   nt::SetEntryValue(m_options, nt::Value::MakeStringArray(val));
 }
 
@@ -63,7 +63,8 @@ void NTStringChooserModel::Update() {
       if ((event.flags & NT_NOTIFY_DELETE) != 0) {
         m_optionsValue.clear();
       } else if (event.value && event.value->IsStringArray()) {
-        m_optionsValue = event.value->GetStringArray();
+        auto arr = event.value->GetStringArray();
+        m_optionsValue.assign(arr.begin(), arr.end());
       }
     }
   }

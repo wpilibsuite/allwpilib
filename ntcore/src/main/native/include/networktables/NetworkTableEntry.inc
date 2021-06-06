@@ -86,48 +86,48 @@ inline std::string NetworkTableEntry::GetRaw(
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
-    wpi::ArrayRef<int> defaultValue) const {
+    wpi::span<const int> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_BOOLEAN_ARRAY) {
-    return defaultValue;
+    return {defaultValue.begin(), defaultValue.end()};
   }
-  return value->GetBooleanArray();
+  auto arr = value->GetBooleanArray();
+  return {arr.begin(), arr.end()};
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
     std::initializer_list<int> defaultValue) const {
-  return GetBooleanArray(
-      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
+  return GetBooleanArray({defaultValue.begin(), defaultValue.end()});
 }
 
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
-    wpi::ArrayRef<double> defaultValue) const {
+    wpi::span<const double> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_DOUBLE_ARRAY) {
-    return defaultValue;
+    return {defaultValue.begin(), defaultValue.end()};
   }
-  return value->GetDoubleArray();
+  auto arr = value->GetDoubleArray();
+  return {arr.begin(), arr.end()};
 }
 
 inline std::vector<double> NetworkTableEntry::GetDoubleArray(
     std::initializer_list<double> defaultValue) const {
-  return GetDoubleArray(
-      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
+  return GetDoubleArray({defaultValue.begin(), defaultValue.end()});
 }
 
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
-    wpi::ArrayRef<std::string> defaultValue) const {
+    wpi::span<const std::string> defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_STRING_ARRAY) {
-    return defaultValue;
+    return {defaultValue.begin(), defaultValue.end()};
   }
-  return value->GetStringArray();
+  auto arr = value->GetStringArray();
+  return {arr.begin(), arr.end()};
 }
 
 inline std::vector<std::string> NetworkTableEntry::GetStringArray(
     std::initializer_list<std::string> defaultValue) const {
-  return GetStringArray(
-      wpi::makeArrayRef(defaultValue.begin(), defaultValue.end()));
+  return GetStringArray({defaultValue.begin(), defaultValue.end()});
 }
 
 inline bool NetworkTableEntry::SetDefaultValue(std::shared_ptr<Value> value) {
@@ -151,7 +151,7 @@ inline bool NetworkTableEntry::SetDefaultRaw(std::string_view defaultValue) {
 }
 
 inline bool NetworkTableEntry::SetDefaultBooleanArray(
-    wpi::ArrayRef<int> defaultValue) {
+    wpi::span<const int> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeBooleanArray(defaultValue));
 }
 
@@ -161,7 +161,7 @@ inline bool NetworkTableEntry::SetDefaultBooleanArray(
 }
 
 inline bool NetworkTableEntry::SetDefaultDoubleArray(
-    wpi::ArrayRef<double> defaultValue) {
+    wpi::span<const double> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDoubleArray(defaultValue));
 }
 
@@ -171,7 +171,7 @@ inline bool NetworkTableEntry::SetDefaultDoubleArray(
 }
 
 inline bool NetworkTableEntry::SetDefaultStringArray(
-    wpi::ArrayRef<std::string> defaultValue) {
+    wpi::span<const std::string> defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeStringArray(defaultValue));
 }
 
@@ -200,7 +200,7 @@ inline bool NetworkTableEntry::SetRaw(std::string_view value) {
   return SetEntryValue(m_handle, Value::MakeRaw(value));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::ArrayRef<bool> value) {
+inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const bool> value) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -209,7 +209,7 @@ inline bool NetworkTableEntry::SetBooleanArray(
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline bool NetworkTableEntry::SetBooleanArray(wpi::ArrayRef<int> value) {
+inline bool NetworkTableEntry::SetBooleanArray(wpi::span<const int> value) {
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -218,7 +218,7 @@ inline bool NetworkTableEntry::SetBooleanArray(
   return SetEntryValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline bool NetworkTableEntry::SetDoubleArray(wpi::ArrayRef<double> value) {
+inline bool NetworkTableEntry::SetDoubleArray(wpi::span<const double> value) {
   return SetEntryValue(m_handle, Value::MakeDoubleArray(value));
 }
 
@@ -228,7 +228,7 @@ inline bool NetworkTableEntry::SetDoubleArray(
 }
 
 inline bool NetworkTableEntry::SetStringArray(
-    wpi::ArrayRef<std::string> value) {
+    wpi::span<const std::string> value) {
   return SetEntryValue(m_handle, Value::MakeStringArray(value));
 }
 
@@ -257,7 +257,8 @@ inline void NetworkTableEntry::ForceSetRaw(std::string_view value) {
   SetEntryTypeValue(m_handle, Value::MakeRaw(value));
 }
 
-inline void NetworkTableEntry::ForceSetBooleanArray(wpi::ArrayRef<bool> value) {
+inline void NetworkTableEntry::ForceSetBooleanArray(
+    wpi::span<const bool> value) {
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -266,7 +267,8 @@ inline void NetworkTableEntry::ForceSetBooleanArray(
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
-inline void NetworkTableEntry::ForceSetBooleanArray(wpi::ArrayRef<int> value) {
+inline void NetworkTableEntry::ForceSetBooleanArray(
+    wpi::span<const int> value) {
   SetEntryTypeValue(m_handle, Value::MakeBooleanArray(value));
 }
 
@@ -276,7 +278,7 @@ inline void NetworkTableEntry::ForceSetBooleanArray(
 }
 
 inline void NetworkTableEntry::ForceSetDoubleArray(
-    wpi::ArrayRef<double> value) {
+    wpi::span<const double> value) {
   SetEntryTypeValue(m_handle, Value::MakeDoubleArray(value));
 }
 
@@ -286,7 +288,7 @@ inline void NetworkTableEntry::ForceSetDoubleArray(
 }
 
 inline void NetworkTableEntry::ForceSetStringArray(
-    wpi::ArrayRef<std::string> value) {
+    wpi::span<const std::string> value) {
   SetEntryTypeValue(m_handle, Value::MakeStringArray(value));
 }
 

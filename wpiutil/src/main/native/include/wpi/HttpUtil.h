@@ -13,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/NetworkStream.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
@@ -21,6 +20,7 @@
 #include "wpi/raw_istream.h"
 #include "wpi/raw_socket_istream.h"
 #include "wpi/raw_socket_ostream.h"
+#include "wpi/span.h"
 
 namespace wpi {
 
@@ -143,14 +143,12 @@ class HttpPath {
    * @return True if path equals match list
    */
   bool equals(std::initializer_list<std::string_view> match) const {
-    return equals(0, makeArrayRef(match.begin(), match.end()));
+    return equals(0, {match.begin(), match.end()});
   }
-  bool equals(ArrayRef<std::string_view> match) const {
+  bool equals(span<const std::string_view> match) const {
     return equals(0, match);
   }
-  bool equals(std::string_view match) const {
-    return equals(0, makeArrayRef(match));
-  }
+  bool equals(std::string_view match) const { return equals(0, {match}); }
 
   /**
    * Returns true if the elements of the path starting at the "start" element
@@ -162,16 +160,16 @@ class HttpPath {
    */
   bool equals(size_t start,
               std::initializer_list<std::string_view> match) const {
-    return equals(start, makeArrayRef(match.begin(), match.end()));
+    return equals(start, {match.begin(), match.end()});
   }
-  bool equals(size_t start, ArrayRef<std::string_view> match) const {
+  bool equals(size_t start, span<const std::string_view> match) const {
     if (m_pathEnds.size() != (start + match.size())) {
       return false;
     }
     return startswith(start, match);
   }
   bool equals(size_t start, std::string_view match) const {
-    return equals(start, makeArrayRef(match));
+    return equals(start, {match});
   }
 
   /**
@@ -182,13 +180,13 @@ class HttpPath {
    * @return True if path starts with match list
    */
   bool startswith(std::initializer_list<std::string_view> match) const {
-    return startswith(0, makeArrayRef(match.begin(), match.end()));
+    return startswith(0, {match.begin(), match.end()});
   }
-  bool startswith(ArrayRef<std::string_view> match) const {
+  bool startswith(span<const std::string_view> match) const {
     return startswith(0, match);
   }
   bool startswith(std::string_view match) const {
-    return startswith(0, makeArrayRef(match));
+    return startswith(0, {match});
   }
 
   /**
@@ -201,13 +199,13 @@ class HttpPath {
    */
   bool startswith(size_t start,
                   std::initializer_list<std::string_view> match) const {
-    return startswith(start, makeArrayRef(match.begin(), match.end()));
+    return startswith(start, {match.begin(), match.end()});
   }
 
-  bool startswith(size_t start, ArrayRef<std::string_view> match) const;
+  bool startswith(size_t start, span<const std::string_view> match) const;
 
   bool startswith(size_t start, std::string_view match) const {
-    return startswith(start, makeArrayRef(match));
+    return startswith(start, {match});
   }
 
   /**
@@ -240,45 +238,43 @@ class HttpPathRef {
   size_t size() const { return m_path ? m_path->size() - m_start : 0; }
 
   bool equals(std::initializer_list<std::string_view> match) const {
-    return equals(0, makeArrayRef(match.begin(), match.end()));
+    return equals(0, {match.begin(), match.end()});
   }
-  bool equals(ArrayRef<std::string_view> match) const {
+  bool equals(span<const std::string_view> match) const {
     return equals(0, match);
   }
-  bool equals(std::string_view match) const {
-    return equals(0, makeArrayRef(match));
-  }
+  bool equals(std::string_view match) const { return equals(0, {match}); }
 
   bool equals(size_t start,
               std::initializer_list<std::string_view> match) const {
-    return equals(start, makeArrayRef(match.begin(), match.end()));
+    return equals(start, {match.begin(), match.end()});
   }
-  bool equals(size_t start, ArrayRef<std::string_view> match) const {
+  bool equals(size_t start, span<const std::string_view> match) const {
     return m_path ? m_path->equals(m_start + start, match) : false;
   }
   bool equals(size_t start, std::string_view match) const {
-    return equals(start, makeArrayRef(match));
+    return equals(start, {match});
   }
 
   bool startswith(std::initializer_list<std::string_view> match) const {
-    return startswith(0, makeArrayRef(match.begin(), match.end()));
+    return startswith(0, {match.begin(), match.end()});
   }
-  bool startswith(ArrayRef<std::string_view> match) const {
+  bool startswith(span<const std::string_view> match) const {
     return startswith(0, match);
   }
   bool startswith(std::string_view match) const {
-    return startswith(0, makeArrayRef(match));
+    return startswith(0, {match});
   }
 
   bool startswith(size_t start,
                   std::initializer_list<std::string_view> match) const {
-    return startswith(start, makeArrayRef(match.begin(), match.end()));
+    return startswith(start, {match.begin(), match.end()});
   }
-  bool startswith(size_t start, ArrayRef<std::string_view> match) const {
+  bool startswith(size_t start, span<const std::string_view> match) const {
     return m_path ? m_path->startswith(m_start + start, match) : false;
   }
   bool startswith(size_t start, std::string_view match) const {
-    return startswith(start, makeArrayRef(match));
+    return startswith(start, {match});
   }
 
   std::string_view operator[](size_t n) const {

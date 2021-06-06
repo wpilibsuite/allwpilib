@@ -14,9 +14,9 @@
 #ifndef WPIUTIL_WPI_DENSEMAPINFO_H
 #define WPIUTIL_WPI_DENSEMAPINFO_H
 
-#include "wpi/ArrayRef.h"
 #include "wpi/Hashing.h"
 #include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/span.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -234,26 +234,26 @@ template <> struct DenseMapInfo<std::string_view> {
   }
 };
 
-// Provide DenseMapInfo for ArrayRefs.
-template <typename T> struct DenseMapInfo<ArrayRef<T>> {
-  static inline ArrayRef<T> getEmptyKey() {
-    return ArrayRef<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(0)),
-                       size_t(0));
+// Provide DenseMapInfo for spans.
+template <typename T> struct DenseMapInfo<span<T>> {
+  static inline span<T> getEmptyKey() {
+    return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(0)),
+                   size_t(0));
   }
 
-  static inline ArrayRef<T> getTombstoneKey() {
-    return ArrayRef<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(1)),
-                       size_t(0));
+  static inline span<T> getTombstoneKey() {
+    return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(1)),
+                   size_t(0));
   }
 
-  static unsigned getHashValue(ArrayRef<T> Val) {
+  static unsigned getHashValue(span<T> Val) {
     assert(Val.data() != getEmptyKey().data() && "Cannot hash the empty key!");
     assert(Val.data() != getTombstoneKey().data() &&
            "Cannot hash the tombstone key!");
     return (unsigned)(hash_value(Val));
   }
 
-  static bool isEqual(ArrayRef<T> LHS, ArrayRef<T> RHS) {
+  static bool isEqual(span<T> LHS, span<T> RHS) {
     if (RHS.data() == getEmptyKey().data())
       return LHS.data() == getEmptyKey().data();
     if (RHS.data() == getTombstoneKey().data())

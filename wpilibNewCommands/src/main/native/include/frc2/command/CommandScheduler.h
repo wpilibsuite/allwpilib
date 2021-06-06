@@ -13,8 +13,8 @@
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/span.h>
 
 namespace frc2 {
 class Command;
@@ -92,7 +92,7 @@ class CommandScheduler final : public frc::Sendable,
    * @param interruptible whether the commands should be interruptible
    * @param commands      the commands to schedule
    */
-  void Schedule(bool interruptible, wpi::ArrayRef<Command*> commands);
+  void Schedule(bool interruptible, wpi::span<Command* const> commands);
 
   /**
    * Schedules multiple commands for execution.  Does nothing if the command is
@@ -112,7 +112,7 @@ class CommandScheduler final : public frc::Sendable,
    *
    * @param commands the commands to schedule
    */
-  void Schedule(wpi::ArrayRef<Command*> commands);
+  void Schedule(wpi::span<Command* const> commands);
 
   /**
    * Schedules multiple commands for execution, with interruptible defaulted to
@@ -160,10 +160,10 @@ class CommandScheduler final : public frc::Sendable,
   void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
+  void RegisterSubsystem(wpi::span<Subsystem* const> subsystems);
 
   void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
-  void UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
+  void UnregisterSubsystem(wpi::span<Subsystem* const> subsystems);
 
   /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
@@ -223,7 +223,7 @@ class CommandScheduler final : public frc::Sendable,
    *
    * @param commands the commands to cancel
    */
-  void Cancel(wpi::ArrayRef<Command*> commands);
+  void Cancel(wpi::span<Command* const> commands);
 
   /**
    * Cancels commands. The scheduler will only call Command::End()
@@ -261,7 +261,7 @@ class CommandScheduler final : public frc::Sendable,
    * @param commands the command to query
    * @return whether the command is currently scheduled
    */
-  bool IsScheduled(wpi::ArrayRef<const Command*> commands) const;
+  bool IsScheduled(wpi::span<const Command* const> commands) const;
 
   /**
    * Whether the given commands are running.  Note that this only works on

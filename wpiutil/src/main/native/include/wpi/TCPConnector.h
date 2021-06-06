@@ -27,8 +27,8 @@
 #include <memory>
 #include <utility>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/NetworkStream.h"
+#include "wpi/span.h"
 
 namespace wpi {
 
@@ -40,7 +40,7 @@ class TCPConnector {
                                                 Logger& logger,
                                                 int timeout = 0);
   static std::unique_ptr<NetworkStream> connect_parallel(
-      ArrayRef<std::pair<const char*, int>> servers, Logger& logger,
+      span<const std::pair<const char*, int>> servers, Logger& logger,
       int timeout = 0);
 };
 

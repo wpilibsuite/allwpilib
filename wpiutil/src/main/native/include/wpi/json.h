@@ -60,8 +60,8 @@ SOFTWARE.
 #include <utility>
 #include <vector> // vector
 
-#include "wpi/ArrayRef.h"
 #include "wpi/StringMap.h"
+#include "wpi/span.h"
 
 namespace wpi
 {
@@ -1126,7 +1126,7 @@ struct external_constructor<value_t::array>
     }
 
     template<typename BasicJsonType, typename T>
-    static void construct(BasicJsonType& j, ArrayRef<T> arr)
+    static void construct(BasicJsonType& j, span<T> arr)
     {
         using std::begin;
         using std::end;
@@ -7014,7 +7014,7 @@ class json
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
-    static json parse(ArrayRef<uint8_t> arr,
+    static json parse(span<const uint8_t> arr,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
@@ -7027,7 +7027,7 @@ class json
 
     static bool accept(std::string_view s);
 
-    static bool accept(ArrayRef<uint8_t> arr);
+    static bool accept(span<const uint8_t> arr);
 
     static bool accept(raw_istream& i);
 
@@ -7205,8 +7205,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_cbor(const json& j);
-    static ArrayRef<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
-    static ArrayRef<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static span<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
+    static span<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_cbor(raw_ostream& os, const json& j);
 
     /*!
@@ -7290,8 +7290,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_msgpack(const json& j);
-    static ArrayRef<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
-    static ArrayRef<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static span<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
+    static span<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_msgpack(raw_ostream& os, const json& j);
 
     /*!
@@ -7377,10 +7377,10 @@ class json
     static std::vector<uint8_t> to_ubjson(const json& j,
                                           const bool use_size = false,
                                           const bool use_type = false);
-    static ArrayRef<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
-                                       const bool use_size = false, const bool use_type = false);
-    static ArrayRef<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
-                                       const bool use_size = false, const bool use_type = false);
+    static span<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
+                                   const bool use_size = false, const bool use_type = false);
+    static span<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+                                   const bool use_size = false, const bool use_type = false);
     static void to_ubjson(raw_ostream& os, const json& j,
                           const bool use_size = false, const bool use_type = false);
 
@@ -7483,7 +7483,7 @@ class json
     /*!
     @copydoc from_cbor(raw_istream&, const bool)
     */
-    static json from_cbor(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_cbor(span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in MessagePack format
@@ -7564,7 +7564,7 @@ class json
     /*!
     @copydoc from_msgpack(raw_istream, const bool)
     */
-    static json from_msgpack(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_msgpack(span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in UBJSON format
@@ -7622,7 +7622,7 @@ class json
     static json from_ubjson(raw_istream& is,
                                   const bool strict = true);
 
-    static json from_ubjson(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_ubjson(span<const uint8_t> arr, const bool strict = true);
 
     /// @}
 

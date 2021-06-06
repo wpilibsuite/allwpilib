@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -955,7 +955,7 @@ bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def);
  * @param values      array of values to pack
  * @return Raw packed bytes.
  */
-std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values);
+std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values);
 
 /**
  * Unpack RPC values as required for RPC version 1 definition messages.
@@ -965,7 +965,7 @@ std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values);
  * @return Array of values.
  */
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(
-    std::string_view packed, wpi::ArrayRef<NT_Type> types);
+    std::string_view packed, wpi::span<const NT_Type> types);
 
 /** @} */
 
@@ -1050,7 +1050,7 @@ void StartClient(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void StartClient(
     NT_Inst inst,
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Starts a client using commonly known robot addresses for the specified
@@ -1087,7 +1087,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void SetServer(
     NT_Inst inst,
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).

@@ -25,12 +25,12 @@ class SavePersistentImpl {
 
   explicit SavePersistentImpl(wpi::raw_ostream& os) : m_os(os) {}
 
-  void Save(wpi::ArrayRef<Entry> entries);
+  void Save(wpi::span<const Entry> entries);
 
  private:
   void WriteString(std::string_view str);
   void WriteHeader();
-  void WriteEntries(wpi::ArrayRef<Entry> entries);
+  void WriteEntries(wpi::span<const Entry> entries);
   void WriteEntry(std::string_view name, const Value& value);
   bool WriteType(NT_Type type);
   void WriteValue(const Value& value);
@@ -72,7 +72,7 @@ void SavePersistentImpl::WriteString(std::string_view str) {
   m_os << '"';
 }
 
-void SavePersistentImpl::Save(wpi::ArrayRef<Entry> entries) {
+void SavePersistentImpl::Save(wpi::span<const Entry> entries) {
   WriteHeader();
   WriteEntries(entries);
 }
@@ -81,7 +81,7 @@ void SavePersistentImpl::WriteHeader() {
   m_os << "[NetworkTables Storage 3.0]\n";
 }
 
-void SavePersistentImpl::WriteEntries(wpi::ArrayRef<Entry> entries) {
+void SavePersistentImpl::WriteEntries(wpi::span<const Entry> entries) {
   for (auto& i : entries) {
     if (!i.second) {
       continue;

@@ -62,7 +62,7 @@ std::vector<double> GetElementsFromTrajectory(
   return elements;
 }
 
-frc::Trajectory CreateTrajectoryFromElements(wpi::ArrayRef<double> elements) {
+frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
   // Make sure that the elements have the correct length.
   assert(elements.size() % 7 == 0);
 

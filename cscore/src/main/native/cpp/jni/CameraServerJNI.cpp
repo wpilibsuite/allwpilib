@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
+#include <wpi/span.h>
 
 #include "cscore_cpp.h"
 #include "cscore_cv.h"
@@ -294,7 +295,8 @@ static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
   // clang-format on
 }
 
-static jobjectArray MakeJObject(JNIEnv* env, wpi::ArrayRef<cs::RawEvent> arr) {
+static jobjectArray MakeJObject(JNIEnv* env,
+                                wpi::span<const cs::RawEvent> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), videoEventCls, nullptr);
   if (!jarr) {
     return nullptr;

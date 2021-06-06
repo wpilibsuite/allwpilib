@@ -12,7 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
 #include <wpi/Logger.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>

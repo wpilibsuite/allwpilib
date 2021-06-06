@@ -162,8 +162,9 @@ void NetworkConnection::ReadThreadMain() {
             }
             return msg;
           },
-          [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
-            m_outgoing.emplace(msgs);
+          [&](auto msgs) {
+            m_outgoing.emplace(std::vector<std::shared_ptr<Message>>(
+                msgs.begin(), msgs.end()));
           })) {
     set_state(kDead);
     m_active = false;

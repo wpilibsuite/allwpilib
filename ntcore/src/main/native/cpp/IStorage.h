@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -45,7 +45,7 @@ class IStorage {
       INetworkConnection& conn,
       std::vector<std::shared_ptr<Message>>* msgs) = 0;
   virtual void ApplyInitialAssignments(
-      INetworkConnection& conn, wpi::ArrayRef<std::shared_ptr<Message>> msgs,
+      INetworkConnection& conn, wpi::span<std::shared_ptr<Message>> msgs,
       bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) = 0;
 
   // Filename-based save/load functions.  Used both by periodic saves and

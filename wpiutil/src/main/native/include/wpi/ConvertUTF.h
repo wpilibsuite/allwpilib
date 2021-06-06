@@ -90,7 +90,7 @@
 #ifndef LLVM_SUPPORT_CONVERTUTF_H
 #define LLVM_SUPPORT_CONVERTUTF_H
 
-#include "wpi/ArrayRef.h"
+#include "wpi/span.h"
 
 #include <cstddef>
 #include <string>
@@ -101,6 +101,9 @@
 // their own version of the unicode libraries.
 
 namespace wpi {
+
+template <typename T>
+class SmallVectorImpl;
 
 /* ---------------------------------------------------------------------
     The following 4 definitions are compiler-specific.
@@ -228,14 +231,14 @@ static inline ConversionResult convertUTF8Sequence(const UTF8 **source,
  * Returns true if a blob of text starts with a UTF-16 big or little endian byte
  * order mark.
  */
-bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
+bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
 
 /**
  * Converts a UTF-16 string into a UTF-8 string.
  *
  * \returns true on success
  */
-bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
+bool convertUTF16ToUTF8String(span<const UTF16> SrcUTF16,
                               SmallVectorImpl<char> &DstUTF8);
 
 /**

@@ -32,7 +32,7 @@ class NTStringChooserModel : public StringChooserModel {
   void SetDefault(std::string_view val) override;
   void SetSelected(std::string_view val) override;
   void SetActive(std::string_view val) override;
-  void SetOptions(wpi::ArrayRef<std::string> val) override;
+  void SetOptions(wpi::span<const std::string> val) override;
 
   void Update() override;
   bool Exists() override;

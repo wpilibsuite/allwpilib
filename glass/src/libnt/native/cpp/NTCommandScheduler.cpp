@@ -41,11 +41,13 @@ void NTCommandSchedulerModel::Update() {
       }
     } else if (event.entry == m_commands) {
       if (event.value && event.value->IsStringArray()) {
-        m_commandsValue = event.value->GetStringArray();
+        auto arr = event.value->GetStringArray();
+        m_commandsValue.assign(arr.begin(), arr.end());
       }
     } else if (event.entry == m_ids) {
       if (event.value && event.value->IsDoubleArray()) {
-        m_idsValue = event.value->GetDoubleArray();
+        auto arr = event.value->GetDoubleArray();
+        m_idsValue.assign(arr.begin(), arr.end());
       }
     }
   }

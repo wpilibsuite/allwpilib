@@ -16,6 +16,7 @@
 
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "IDispatcher.h"
 #include "INetworkConnection.h"
@@ -77,11 +78,11 @@ class DispatcherBase : public IDispatcher {
   bool ClientHandshake(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs);
   bool ServerHandshake(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs);
 
   void ClientReconnect(unsigned int proto_rev = 0x0300);
 
@@ -136,7 +137,7 @@ class Dispatcher : public DispatcherBase {
 
   void SetServer(const char* server_name, unsigned int port);
   void SetServer(
-      wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
+      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
   void SetServerTeam(unsigned int team, unsigned int port);
 
   void SetServerOverride(const char* server_name, unsigned int port);

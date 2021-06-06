@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "wpi/ArrayRef.h"
+#include "wpi/span.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Pipe.h"
 #include "wpi/uv/Timer.h"
@@ -58,8 +58,8 @@ class WebSocketTest : public ::testing::Test {
                                           bool masking, uint64_t len);
   static std::vector<uint8_t> BuildMessage(uint8_t opcode, bool fin,
                                            bool masking,
-                                           ArrayRef<uint8_t> data);
-  static void AdjustMasking(MutableArrayRef<uint8_t> message);
+                                           span<const uint8_t> data);
+  static void AdjustMasking(span<uint8_t> message);
   static const uint8_t testMask[4];
 
   std::shared_ptr<uv::Loop> loop;

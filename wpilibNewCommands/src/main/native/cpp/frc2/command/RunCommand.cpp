@@ -13,7 +13,7 @@ RunCommand::RunCommand(std::function<void()> toRun,
 }
 
 RunCommand::RunCommand(std::function<void()> toRun,
-                       wpi::ArrayRef<Subsystem*> requirements)
+                       wpi::span<Subsystem* const> requirements)
     : m_toRun{std::move(toRun)} {
   AddRequirements(requirements);
 }

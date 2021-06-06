@@ -177,7 +177,7 @@ void SendableBuilderImpl::AddStringProperty(
 
 void SendableBuilderImpl::AddBooleanArrayProperty(
     std::string_view key, std::function<std::vector<int>()> getter,
-    std::function<void(wpi::ArrayRef<int>)> setter) {
+    std::function<void(wpi::span<const int>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -203,7 +203,7 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
 
 void SendableBuilderImpl::AddDoubleArrayProperty(
     std::string_view key, std::function<std::vector<double>()> getter,
-    std::function<void(wpi::ArrayRef<double>)> setter) {
+    std::function<void(wpi::span<const double>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -229,7 +229,7 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
 
 void SendableBuilderImpl::AddStringArrayProperty(
     std::string_view key, std::function<std::vector<std::string>()> getter,
-    std::function<void(wpi::ArrayRef<std::string>)> setter) {
+    std::function<void(wpi::span<const std::string>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -331,8 +331,8 @@ void SendableBuilderImpl::AddSmallStringProperty(
 
 void SendableBuilderImpl::AddSmallBooleanArrayProperty(
     std::string_view key,
-    std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
-    std::function<void(wpi::ArrayRef<int>)> setter) {
+    std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)> getter,
+    std::function<void(wpi::span<const int>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -359,9 +359,9 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
 
 void SendableBuilderImpl::AddSmallDoubleArrayProperty(
     std::string_view key,
-    std::function<wpi::ArrayRef<double>(wpi::SmallVectorImpl<double>& buf)>
+    std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
         getter,
-    std::function<void(wpi::ArrayRef<double>)> setter) {
+    std::function<void(wpi::span<const double>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,
@@ -389,9 +389,9 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
 void SendableBuilderImpl::AddSmallStringArrayProperty(
     std::string_view key,
     std::function<
-        wpi::ArrayRef<std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+        wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
         getter,
-    std::function<void(wpi::ArrayRef<std::string>)> setter) {
+    std::function<void(wpi::span<const std::string>)> setter) {
   m_properties.emplace_back(*m_table, key);
   if (getter) {
     m_properties.back().update = [=](nt::NetworkTableEntry entry,

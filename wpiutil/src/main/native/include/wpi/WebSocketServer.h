@@ -12,12 +12,12 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/HttpParser.h"
 #include "wpi/Signal.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/WebSocket.h"
+#include "wpi/span.h"
 
 namespace wpi {
 
@@ -53,7 +53,7 @@ class WebSocketServerHelper {
    *         is empty.
    */
   std::pair<bool, std::string_view> MatchProtocol(
-      ArrayRef<std::string_view> protocols);
+      span<const std::string_view> protocols);
 
   /**
    * Try to find a match to the list of sub-protocols provided by the client.
@@ -66,7 +66,7 @@ class WebSocketServerHelper {
    */
   std::pair<bool, std::string_view> MatchProtocol(
       std::initializer_list<std::string_view> protocols) {
-    return MatchProtocol(makeArrayRef(protocols.begin(), protocols.end()));
+    return MatchProtocol({protocols.begin(), protocols.end()});
   }
 
   /**
@@ -122,7 +122,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   /**
    * Private constructor.
    */
-  WebSocketServer(uv::Stream& stream, ArrayRef<std::string_view> protocols,
+  WebSocketServer(uv::Stream& stream, span<const std::string_view> protocols,
                   ServerOptions options, const private_init&);
 
   /**
@@ -135,7 +135,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocketServer> Create(
-      uv::Stream& stream, ArrayRef<std::string_view> protocols = {},
+      uv::Stream& stream, span<const std::string_view> protocols = {},
       const ServerOptions& options = {});
 
   /**
@@ -150,8 +150,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   static std::shared_ptr<WebSocketServer> Create(
       uv::Stream& stream, std::initializer_list<std::string_view> protocols,
       const ServerOptions& options = {}) {
-    return Create(stream, makeArrayRef(protocols.begin(), protocols.end()),
-                  options);
+    return Create(stream, {protocols.begin(), protocols.end()}, options);
   }
 
   /**

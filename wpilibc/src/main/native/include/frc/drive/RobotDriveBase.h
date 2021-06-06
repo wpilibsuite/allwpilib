@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
 
@@ -82,7 +82,7 @@ class RobotDriveBase : public MotorSafety {
    * Normalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  static void Normalize(wpi::MutableArrayRef<double> wheelSpeeds);
+  static void Normalize(wpi::span<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

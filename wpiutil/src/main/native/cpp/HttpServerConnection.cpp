@@ -7,6 +7,7 @@
 #include "fmt/format.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
+#include "wpi/SpanExtras.h"
 #include "wpi/StringExtras.h"
 #include "wpi/fmt/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
@@ -83,10 +84,9 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   os << "\r\n";  // header ends with a blank line
 }
 
-void HttpServerConnection::SendData(ArrayRef<uv::Buffer> bufs,
+void HttpServerConnection::SendData(span<const uv::Buffer> bufs,
                                     bool closeAfter) {
-  m_stream.Write(bufs, [closeAfter, stream = &m_stream](
-                           MutableArrayRef<uv::Buffer> bufs, uv::Error) {
+  m_stream.Write(bufs, [closeAfter, stream = &m_stream](auto bufs, uv::Error) {
     for (auto&& buf : bufs) {
       buf.Deallocate();
     }
@@ -126,9 +126,9 @@ void HttpServerConnection::SendStaticResponse(
   bufs.emplace_back(content);
 
   m_stream.Write(bufs, [closeAfter = !m_keepAlive, stream = &m_stream](
-                           MutableArrayRef<uv::Buffer> bufs, uv::Error) {
+                           auto bufs, uv::Error) {
     // don't deallocate the static content
-    for (auto&& buf : bufs.drop_back()) {
+    for (auto&& buf : wpi::drop_back(bufs)) {
       buf.Deallocate();
     }
     if (closeAfter) {

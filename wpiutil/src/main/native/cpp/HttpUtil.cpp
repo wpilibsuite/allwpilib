@@ -132,7 +132,7 @@ HttpPath::HttpPath(std::string_view path) {
 }
 
 bool HttpPath::startswith(size_t start,
-                          ArrayRef<std::string_view> match) const {
+                          span<const std::string_view> match) const {
   if (m_pathEnds.size() < (start + match.size())) {
     return false;
   }

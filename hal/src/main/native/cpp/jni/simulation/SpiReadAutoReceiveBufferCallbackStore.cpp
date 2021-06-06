@@ -59,7 +59,7 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
   }
 
   auto toCallbackArr = MakeJIntArray(
-      env, wpi::ArrayRef<uint32_t>{buffer, static_cast<size_t>(numToRead)});
+      env, wpi::span<const uint32_t>{buffer, static_cast<size_t>(numToRead)});
 
   jint ret = env->CallIntMethod(m_call, sim::GetBufferCallback(),
                                 MakeJString(env, name), toCallbackArr,

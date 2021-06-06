@@ -10,8 +10,8 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/STLExtras.h>
+#include <wpi/span.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -22,8 +22,8 @@ class FieldObjectModel : public Model {
  public:
   virtual const char* GetName() const = 0;
 
-  virtual wpi::ArrayRef<frc::Pose2d> GetPoses() = 0;
-  virtual void SetPoses(wpi::ArrayRef<frc::Pose2d> poses) = 0;
+  virtual wpi::span<const frc::Pose2d> GetPoses() = 0;
+  virtual void SetPoses(wpi::span<const frc::Pose2d> poses) = 0;
   virtual void SetPose(size_t i, frc::Pose2d pose) = 0;
   virtual void SetPosition(size_t i, frc::Translation2d pos) = 0;
   virtual void SetRotation(size_t i, frc::Rotation2d rot) = 0;

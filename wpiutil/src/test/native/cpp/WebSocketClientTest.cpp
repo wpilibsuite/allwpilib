@@ -205,7 +205,7 @@ TEST_F(WebSocketClientTest, ProtocolReqNotResp) {
 
   clientPipe->Connect(pipeName, [&] {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName,
-                                      std::string_view{"myProtocol"});
+                                      {{"myProtocol"}});
     ws->closed.connect([&](uint16_t code, std::string_view msg) {
       Finish();
       ++gotClosed;
@@ -254,7 +254,7 @@ TEST_P(WebSocketClientDataTest, SendBinary) {
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
     ws->open.connect([&](std::string_view) {
-      ws->SendBinary(uv::Buffer(data), [&](auto bufs, uv::Error) {
+      ws->SendBinary({{data}}, [&](auto bufs, uv::Error) {
         ++gotCallback;
         ws->Terminate();
         ASSERT_FALSE(bufs.empty());
@@ -275,7 +275,7 @@ TEST_P(WebSocketClientDataTest, ReceiveBinary) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->binary.connect([&](ArrayRef<uint8_t> inData, bool fin) {
+    ws->binary.connect([&](auto inData, bool fin) {
       ++gotCallback;
       ws->Terminate();
       ASSERT_TRUE(fin);
@@ -284,9 +284,7 @@ TEST_P(WebSocketClientDataTest, ReceiveBinary) {
     });
   };
   auto message = BuildMessage(0x02, true, false, data);
-  connected = [&] {
-    conn->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
-  };
+  connected = [&] { conn->Write({{message}}, [&](auto bufs, uv::Error) {}); };
 
   loop->Run();
 
@@ -311,9 +309,7 @@ TEST_P(WebSocketClientDataTest, ReceiveMasked) {
     });
   };
   auto message = BuildMessage(0x01, true, true, data);
-  connected = [&] {
-    conn->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
-  };
+  connected = [&] { conn->Write({{message}}, [&](auto bufs, uv::Error) {}); };
 
   loop->Run();
 

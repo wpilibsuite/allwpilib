@@ -10,8 +10,8 @@
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
+#include <wpi/span.h>
 
 namespace frc {
 
@@ -173,7 +173,7 @@ class SPI {
    * @param dataToSend data to send (maximum 16 bytes)
    * @param zeroSize number of zeros to send after the data
    */
-  void SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize);
+  void SetAutoTransmitData(wpi::span<const uint8_t> dataToSend, int zeroSize);
 
   /**
    * Start running the automatic SPI transfer engine at a periodic rate.

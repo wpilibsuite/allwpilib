@@ -17,9 +17,8 @@ using namespace wpi::uv;
 
 class CallbackUdpSendReq : public UdpSendReq {
  public:
-  CallbackUdpSendReq(
-      ArrayRef<Buffer> bufs,
-      std::function<void(MutableArrayRef<Buffer>, Error)> callback)
+  CallbackUdpSendReq(span<const Buffer> bufs,
+                     std::function<void(span<Buffer>, Error)> callback)
       : m_bufs{bufs.begin(), bufs.end()} {
     complete.connect([=](Error err) { callback(m_bufs, err); });
   }
@@ -121,7 +120,7 @@ void Udp::SetMulticastInterface(std::string_view interfaceAddr) {
   Invoke(&uv_udp_set_multicast_interface, GetRaw(), interfaceAddrBuf.c_str());
 }
 
-void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
+void Udp::Send(const sockaddr& addr, span<const Buffer> bufs,
                const std::shared_ptr<UdpSendReq>& req) {
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              &addr, [](uv_udp_send_t* r, int status) {
@@ -136,12 +135,13 @@ void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
   }
 }
 
-void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,
-               std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+void Udp::Send(const sockaddr& addr, span<const Buffer> bufs,
+               std::function<void(span<Buffer>, Error)> callback) {
   Send(addr, bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
 }
 
-void Udp::Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req) {
+void Udp::Send(span<const Buffer> bufs,
+               const std::shared_ptr<UdpSendReq>& req) {
   if (Invoke(&uv_udp_send, req->GetRaw(), GetRaw(), bufs.data(), bufs.size(),
              nullptr, [](uv_udp_send_t* r, int status) {
                auto& h = *static_cast<UdpSendReq*>(r->data);
@@ -155,8 +155,8 @@ void Udp::Send(ArrayRef<Buffer> bufs, const std::shared_ptr<UdpSendReq>& req) {
   }
 }
 
-void Udp::Send(ArrayRef<Buffer> bufs,
-               std::function<void(MutableArrayRef<Buffer>, Error)> callback) {
+void Udp::Send(span<const Buffer> bufs,
+               std::function<void(span<Buffer>, Error)> callback) {
   Send(bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
 }
 

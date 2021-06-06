@@ -139,7 +139,7 @@ std::shared_ptr<nt::Value> FromJavaBooleanArray(JNIEnv* env, jbooleanArray jarr,
   if (!ref) {
     return nullptr;
   }
-  wpi::ArrayRef<jboolean> elements{ref};
+  wpi::span<const jboolean> elements{ref};
   size_t len = elements.size();
   std::vector<int> arr;
   arr.reserve(len);
@@ -306,8 +306,9 @@ static jobject MakeJObject(JNIEnv* env, jobject inst,
       static_cast<jint>(answer.call), name.obj(), params.obj(), conn.obj());
 }
 
-static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::ArrayRef<nt::ConnectionNotification> arr) {
+static jobjectArray MakeJObject(
+    JNIEnv* env, jobject inst,
+    wpi::span<const nt::ConnectionNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), connectionNotificationCls, nullptr);
   if (!jarr) {
@@ -321,7 +322,7 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::ArrayRef<nt::EntryNotification> arr) {
+                                wpi::span<const nt::EntryNotification> arr) {
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), entryNotificationCls, nullptr);
   if (!jarr) {
@@ -335,7 +336,7 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::ArrayRef<nt::LogMessage> arr) {
+                                wpi::span<const nt::LogMessage> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), logMessageCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -348,7 +349,7 @@ static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
 }
 
 static jobjectArray MakeJObject(JNIEnv* env, jobject inst,
-                                wpi::ArrayRef<nt::RpcAnswer> arr) {
+                                wpi::span<const nt::RpcAnswer> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), rpcAnswerCls, nullptr);
   if (!jarr) {
     return nullptr;

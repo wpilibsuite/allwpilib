@@ -36,7 +36,7 @@ static void CopyStream(uv::Stream& in, std::weak_ptr<uv::Stream> outWeak) {
       in.Close();
       return;
     }
-    out->Write(buf2, [](auto bufs, uv::Error) {
+    out->Write({buf2}, [](auto bufs, uv::Error) {
       for (auto buf : bufs) {
         buf.Deallocate();
       }

@@ -12,9 +12,9 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
 #include <wpi/StringMap.h>
+#include <wpi/span.h>
 
 #include "frc/shuffleboard/BuiltInLayouts.h"
 #include "frc/shuffleboard/LayoutType.h"
@@ -228,19 +228,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(std::string_view title, wpi::ArrayRef<bool> defaultValue);
-
-  /**
-   * Adds a widget to this container to display the given data.
-   *
-   * @param title the title of the widget
-   * @param defaultValue  the default value of the widget
-   * @return a widget to display the sendable data
-   * @throws IllegalArgumentException if a widget already exists in this
-   *         container with the given title
-   * @see #addPersistent(String, Object) add(String title, Object defaultValue)
-   */
-  SimpleWidget& Add(std::string_view title, wpi::ArrayRef<double> defaultValue);
+  SimpleWidget& Add(std::string_view title, wpi::span<const bool> defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -253,7 +241,20 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
   SimpleWidget& Add(std::string_view title,
-                    wpi::ArrayRef<std::string> defaultValue);
+                    wpi::span<const double> defaultValue);
+
+  /**
+   * Adds a widget to this container to display the given data.
+   *
+   * @param title the title of the widget
+   * @param defaultValue  the default value of the widget
+   * @return a widget to display the sendable data
+   * @throws IllegalArgumentException if a widget already exists in this
+   *         container with the given title
+   * @see #addPersistent(String, Object) add(String title, Object defaultValue)
+   */
+  SimpleWidget& Add(std::string_view title,
+                    wpi::span<const std::string> defaultValue);
 
   /**
    * Adds a widget to this container. The widget will display the data provided
@@ -432,7 +433,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
   SimpleWidget& AddPersistent(std::string_view title,
-                              wpi::ArrayRef<bool> defaultValue);
+                              wpi::span<const bool> defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -447,7 +448,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
   SimpleWidget& AddPersistent(std::string_view title,
-                              wpi::ArrayRef<double> defaultValue);
+                              wpi::span<const double> defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -462,7 +463,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
   SimpleWidget& AddPersistent(std::string_view title,
-                              wpi::ArrayRef<std::string> defaultValue);
+                              wpi::span<const std::string> defaultValue);
 
   void EnableIfActuator() override;
 

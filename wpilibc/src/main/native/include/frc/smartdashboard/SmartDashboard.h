@@ -11,6 +11,7 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
+#include <wpi/span.h>
 
 #include "frc/smartdashboard/ListenerExecutor.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -243,7 +244,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    *       std::vector<bool> is special-cased in C++. 0 is false, any
    *       non-zero value is true.
    */
-  static bool PutBooleanArray(std::string_view key, wpi::ArrayRef<int> value);
+  static bool PutBooleanArray(std::string_view key, wpi::span<const int> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -253,7 +254,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultBooleanArray(std::string_view key,
-                                     wpi::ArrayRef<int> defaultValue);
+                                     wpi::span<const int> defaultValue);
 
   /**
    * Returns the boolean array the key maps to.
@@ -274,7 +275,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    *       non-zero value is true.
    */
   static std::vector<int> GetBooleanArray(std::string_view key,
-                                          wpi::ArrayRef<int> defaultValue);
+                                          wpi::span<const int> defaultValue);
 
   /**
    * Put a number array in the table.
@@ -283,7 +284,8 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @param value The value that will be assigned.
    * @return False if the table key already exists with a different type
    */
-  static bool PutNumberArray(std::string_view key, wpi::ArrayRef<double> value);
+  static bool PutNumberArray(std::string_view key,
+                             wpi::span<const double> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -293,7 +295,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultNumberArray(std::string_view key,
-                                    wpi::ArrayRef<double> defaultValue);
+                                    wpi::span<const double> defaultValue);
 
   /**
    * Returns the number array the key maps to.
@@ -309,8 +311,8 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @note This makes a copy of the array. If the overhead of this is a concern,
    *       use GetValue() instead.
    */
-  static std::vector<double> GetNumberArray(std::string_view key,
-                                            wpi::ArrayRef<double> defaultValue);
+  static std::vector<double> GetNumberArray(
+      std::string_view key, wpi::span<const double> defaultValue);
 
   /**
    * Put a string array in the table.
@@ -320,7 +322,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @return False if the table key already exists with a different type
    */
   static bool PutStringArray(std::string_view key,
-                             wpi::ArrayRef<std::string> value);
+                             wpi::span<const std::string> value);
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -330,7 +332,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @returns False if the table key exists with a different type
    */
   static bool SetDefaultStringArray(std::string_view key,
-                                    wpi::ArrayRef<std::string> defaultValue);
+                                    wpi::span<const std::string> defaultValue);
 
   /**
    * Returns the string array the key maps to.
@@ -347,7 +349,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    *       use GetValue() instead.
    */
   static std::vector<std::string> GetStringArray(
-      std::string_view key, wpi::ArrayRef<std::string> defaultValue);
+      std::string_view key, wpi::span<const std::string> defaultValue);
 
   /**
    * Put a raw value (byte array) in the table.

@@ -28,12 +28,12 @@ FieldObject2d& FieldObject2d::operator=(FieldObject2d&& rhs) {
 }
 
 void FieldObject2d::SetPose(const Pose2d& pose) {
-  SetPoses(wpi::makeArrayRef(pose));
+  SetPoses({pose});
 }
 
 void FieldObject2d::SetPose(units::meter_t x, units::meter_t y,
                             Rotation2d rotation) {
-  SetPoses(wpi::makeArrayRef(Pose2d{x, y, rotation}));
+  SetPoses({{x, y, rotation}});
 }
 
 Pose2d FieldObject2d::GetPose() const {
@@ -45,14 +45,14 @@ Pose2d FieldObject2d::GetPose() const {
   return m_poses[0];
 }
 
-void FieldObject2d::SetPoses(wpi::ArrayRef<Pose2d> poses) {
+void FieldObject2d::SetPoses(wpi::span<const Pose2d> poses) {
   std::scoped_lock lock(m_mutex);
   m_poses.assign(poses.begin(), poses.end());
   UpdateEntry();
 }
 
 void FieldObject2d::SetPoses(std::initializer_list<Pose2d> poses) {
-  SetPoses(wpi::makeArrayRef(poses.begin(), poses.end()));
+  SetPoses({poses.begin(), poses.end()});
 }
 
 void FieldObject2d::SetTrajectory(const Trajectory& trajectory) {
@@ -71,7 +71,7 @@ std::vector<Pose2d> FieldObject2d::GetPoses() const {
   return std::vector<Pose2d>(m_poses.begin(), m_poses.end());
 }
 
-wpi::ArrayRef<Pose2d> FieldObject2d::GetPoses(
+wpi::span<const Pose2d> FieldObject2d::GetPoses(
     wpi::SmallVectorImpl<Pose2d>& out) const {
   std::scoped_lock lock(m_mutex);
   UpdateFromEntry();

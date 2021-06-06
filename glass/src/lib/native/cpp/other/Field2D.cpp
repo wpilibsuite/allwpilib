@@ -90,7 +90,7 @@ class PopupState {
 
   SelectedTargetInfo* GetTarget() { return &m_target; }
   FieldObjectModel* GetInsertModel() { return m_insertModel; }
-  wpi::ArrayRef<frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
+  wpi::span<const frc::Pose2d> GetInsertPoses() const { return m_insertPoses; }
 
   void Display(Field2DModel* model, const FieldFrameData& ffd);
 
@@ -184,7 +184,7 @@ class ObjectInfo {
 
   DisplayOptions GetDisplayOptions() const;
   void DisplaySettings();
-  void DrawLine(ImDrawList* drawList, wpi::ArrayRef<ImVec2> points) const;
+  void DrawLine(ImDrawList* drawList, wpi::span<const ImVec2> points) const;
 
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
@@ -623,7 +623,7 @@ void ObjectInfo::DisplaySettings() {
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
-                          wpi::ArrayRef<ImVec2> points) const {
+                          wpi::span<const ImVec2> points) const {
   if (points.empty()) {
     return;
   }
@@ -1038,9 +1038,9 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
 
   m_drawSplit.Split(m_drawList, 2);
   m_drawSplit.SetCurrentChannel(m_drawList, 1);
-  wpi::ArrayRef<frc::Pose2d> poses = gPopupState.GetInsertModel() == &model
-                                         ? gPopupState.GetInsertPoses()
-                                         : model.GetPoses();
+  auto poses = gPopupState.GetInsertModel() == &model
+                   ? gPopupState.GetInsertPoses()
+                   : model.GetPoses();
   size_t i = 0;
   for (auto&& pose : poses) {
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
@@ -1113,7 +1113,8 @@ void PopupState::DisplayTarget(Field2DModel* model, const FieldFrameData& ffd) {
     m_target.objModel->SetPose(m_target.index, pose);
   }
   if (ImGui::Button("Delete Pose")) {
-    std::vector<frc::Pose2d> poses = m_target.objModel->GetPoses();
+    auto posesRef = m_target.objModel->GetPoses();
+    std::vector<frc::Pose2d> poses{posesRef.begin(), posesRef.end()};
     if (m_target.index < poses.size()) {
       poses.erase(poses.begin() + m_target.index);
       m_target.objModel->SetPoses(poses);
@@ -1150,7 +1151,8 @@ void PopupState::DisplayInsert(Field2DModel* model) {
       if (ImGui::Selectable(name.data(), selected)) {
         m_insertModel = &objModel;
         auto pose = m_insertPoses[m_insertIndex];
-        m_insertPoses = objModel.GetPoses();
+        auto posesRef = objModel.GetPoses();
+        m_insertPoses.assign(posesRef.begin(), posesRef.end());
         m_insertPoses.emplace_back(std::move(pose));
         m_insertName = name;
         m_insertIndex = m_insertPoses.size() - 1;

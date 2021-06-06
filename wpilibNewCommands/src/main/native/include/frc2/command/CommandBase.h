@@ -10,8 +10,8 @@
 
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
+#include <wpi/span.h>
 
 #include "frc2/command/Command.h"
 
@@ -35,7 +35,7 @@ class CommandBase : public Command,
    *
    * @param requirements the requirements to add
    */
-  void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
+  void AddRequirements(wpi::span<Subsystem* const> requirements);
 
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
 

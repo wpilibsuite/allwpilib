@@ -117,7 +117,7 @@ inline void NetworkTableInstance::StartClient(const char* server_name,
 }
 
 inline void NetworkTableInstance::StartClient(
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers) {
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
   ::nt::StartClient(m_handle, servers);
 }
 
@@ -136,7 +136,7 @@ inline void NetworkTableInstance::SetServer(const char* server_name,
 }
 
 inline void NetworkTableInstance::SetServer(
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers) {
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
   ::nt::SetServer(m_handle, servers);
 }
 

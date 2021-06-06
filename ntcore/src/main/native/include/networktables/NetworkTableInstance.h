@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -342,7 +342,7 @@ class NetworkTableInstance final {
    * @param servers   array of server name and port pairs
    */
   void StartClient(
-      wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
+      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
   /**
    * Starts a client using the specified servers and port.  The
@@ -351,7 +351,7 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over
    */
-  void StartClient(wpi::ArrayRef<std::string_view> servers,
+  void StartClient(wpi::span<const std::string_view> servers,
                    unsigned int port = kDefaultPort);
 
   /**
@@ -383,7 +383,7 @@ class NetworkTableInstance final {
    * @param servers   array of server name and port pairs
    */
   void SetServer(
-      wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers);
+      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
   /**
    * Sets server addresses and port for client (without restarting client).
@@ -392,7 +392,7 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over
    */
-  void SetServer(wpi::ArrayRef<std::string_view> servers,
+  void SetServer(wpi::span<const std::string_view> servers,
                  unsigned int port = kDefaultPort);
 
   /**

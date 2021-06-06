@@ -12,9 +12,9 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <units/length.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -66,7 +66,7 @@ class FieldObject2d {
    *
    * @param poses array of 2D poses
    */
-  void SetPoses(wpi::ArrayRef<Pose2d> poses);
+  void SetPoses(wpi::span<const Pose2d> poses);
 
   /**
    * Set multiple poses from an array of Pose objects.
@@ -97,9 +97,9 @@ class FieldObject2d {
    *
    * @param obj Object entry
    * @param out output SmallVector to hold 2D poses
-   * @return ArrayRef referring to output SmallVector
+   * @return span referring to output SmallVector
    */
-  wpi::ArrayRef<Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
+  wpi::span<const Pose2d> GetPoses(wpi::SmallVectorImpl<Pose2d>& out) const;
 
  private:
   void UpdateEntry(bool setDefault = false);

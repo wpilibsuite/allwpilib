@@ -12,7 +12,7 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "SourceImpl.h"
 
@@ -41,7 +41,8 @@ class ConfigurableSourceImpl : public SourceImpl {
   int CreateProperty(std::string_view name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value,
                      std::function<void(CS_Property property)> onChange);
-  void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,
+  void SetEnumPropertyChoices(int property,
+                              wpi::span<const std::string> choices,
                               CS_Status* status);
 
  private:
