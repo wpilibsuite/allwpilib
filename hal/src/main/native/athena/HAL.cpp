@@ -22,7 +22,6 @@
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "ctre/ctre.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
@@ -111,18 +110,6 @@ const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
-    case CTR_RxTimeout:
-      return CTR_RxTimeout_MESSAGE;
-    case CTR_TxTimeout:
-      return CTR_TxTimeout_MESSAGE;
-    case CTR_InvalidParamValue:
-      return CTR_InvalidParamValue_MESSAGE;
-    case CTR_UnexpectedArbId:
-      return CTR_UnexpectedArbId_MESSAGE;
-    case CTR_TxFailed:
-      return CTR_TxFailed_MESSAGE;
-    case CTR_SigNotUpdated:
-      return CTR_SigNotUpdated_MESSAGE;
     case NiFpga_Status_FifoTimeout:
       return NiFpga_Status_FifoTimeout_MESSAGE;
     case NiFpga_Status_TransferAborted:
