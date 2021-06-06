@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include <hal/Types.h>
 #include <units/time.h>
 
-#include "frc/SolenoidBase.h"
+#include "frc/PneumaticsBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -21,24 +23,11 @@ class SendableBuilder;
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public SolenoidBase,
-                 public Sendable,
-                 public SendableHelper<Solenoid> {
+class Solenoid : public Sendable, public SendableHelper<Solenoid> {
  public:
-  /**
-   * Constructor using the default PCM ID (0).
-   *
-   * @param channel The channel on the PCM to control (0..7).
-   */
-  explicit Solenoid(int channel);
-
-  /**
-   * Constructor.
-   *
-   * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
-   * @param channel      The channel on the PCM to control (0..7).
-   */
-  Solenoid(int moduleNumber, int channel);
+  Solenoid(PneumaticsBase& module, int channel);
+  Solenoid(PneumaticsBase* module, int channel);
+  Solenoid(std::shared_ptr<PneumaticsBase> module, int channel);
 
   ~Solenoid() override;
 
@@ -73,16 +62,16 @@ class Solenoid : public SolenoidBase,
   int GetChannel() const;
 
   /**
-   * Check if solenoid is blacklisted.
+   * Check if solenoid is Disabled.
    *
-   * If a solenoid is shorted, it is added to the blacklist and
+   * If a solenoid is shorted, it is added to the DisabledList and
    * disabled until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    *
    * @return If solenoid is disabled due to short.
    */
-  bool IsBlackListed() const;
+  bool IsDisabled() const;
 
   /**
    * Set the pulse duration in the PCM. This is used in conjunction with
@@ -107,8 +96,9 @@ class Solenoid : public SolenoidBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_SolenoidHandle> m_solenoidHandle;
-  int m_channel;  // The channel on the module to control
+  std::shared_ptr<PneumaticsBase> m_module;
+  int m_mask;
+  int m_channel;
 };
 
 }  // namespace frc

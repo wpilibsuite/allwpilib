@@ -19,14 +19,7 @@ class SensorUtil final {
    *
    * @return The number of the default solenoid module.
    */
-  static int GetDefaultSolenoidModule();
-
-  /**
-   * Check that the solenoid module number is valid. module numbers are 0-based
-   *
-   * @return Solenoid module is valid and present
-   */
-  static bool CheckSolenoidModule(int moduleNumber);
+  static int GetDefaultCTREPCMModule();
 
   /**
    * Check that the digital channel number is valid.
@@ -77,13 +70,6 @@ class SensorUtil final {
    * @return Analog channel is valid
    */
   static bool CheckAnalogOutputChannel(int channel);
-
-  /**
-   * Verify that the solenoid channel number is within limits.
-   *
-   * @return Solenoid channel is valid
-   */
-  static bool CheckSolenoidChannel(int channel);
 
   /**
    * Verify that the power distribution channel number is within limits.

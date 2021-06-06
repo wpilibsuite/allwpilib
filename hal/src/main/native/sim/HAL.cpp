@@ -73,7 +73,7 @@ void InitializeHAL() {
   InitializeDriverStationData();
   InitializeEncoderData();
   InitializeI2CData();
-  InitializePCMData();
+  InitializeCTREPCMData();
   InitializePDPData();
   InitializePWMData();
   InitializeRelayData();
@@ -90,7 +90,6 @@ void InitializeHAL() {
   InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
-  InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();
@@ -107,11 +106,11 @@ void InitializeHAL() {
   InitializePDP();
   InitializePorts();
   InitializePower();
+  InitializeCTREPCM();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
   InitializeSimDevice();
-  InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();
 }

@@ -7,9 +7,7 @@
 #include <utility>
 
 #include <hal/FRCUsageReporting.h>
-#include <hal/HALBase.h>
-#include <hal/Ports.h>
-#include <hal/Solenoid.h>
+#include <wpi/NullDeleter.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -18,49 +16,40 @@
 
 using namespace frc;
 
-Solenoid::Solenoid(int channel)
-    : Solenoid(SensorUtil::GetDefaultSolenoidModule(), channel) {}
+Solenoid::Solenoid(PneumaticsBase& module, int channel)
+    : Solenoid{std::shared_ptr<PneumaticsBase>{
+                   &module, wpi::NullDeleter<PneumaticsBase>()},
+               channel} {}
 
-Solenoid::Solenoid(int moduleNumber, int channel)
-    : SolenoidBase(moduleNumber), m_channel(channel) {
-  if (!SensorUtil::CheckSolenoidModule(m_moduleNumber)) {
-    throw FRC_MakeError(err::ModuleIndexOutOfRange, "Module {}",
-                        m_moduleNumber);
-  }
-  if (!SensorUtil::CheckSolenoidChannel(m_channel)) {
+Solenoid::Solenoid(PneumaticsBase* module, int channel)
+    : Solenoid{std::shared_ptr<PneumaticsBase>{
+                   module, wpi::NullDeleter<PneumaticsBase>()},
+               channel} {}
+
+Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
+    : m_module{std::move(module)} {
+  if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }
-
-  int32_t status = 0;
-  m_solenoidHandle = HAL_InitializeSolenoidPort(
-      HAL_GetPortWithModule(moduleNumber, channel), &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
-                       m_channel);
+  m_channel = channel;
+  m_mask = 1 << channel;
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
-             m_moduleNumber + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Solenoid", m_moduleNumber,
-                                        m_channel);
+             m_module->GetModuleNumber() + 1);
+  SendableRegistry::GetInstance().AddLW(this, "Solenoid",
+                                        m_module->GetModuleNumber(), m_channel);
 }
 
-Solenoid::~Solenoid() {
-  HAL_FreeSolenoidPort(m_solenoidHandle);
-}
+Solenoid::~Solenoid() {}
 
 void Solenoid::Set(bool on) {
-  int32_t status = 0;
-  HAL_SetSolenoid(m_solenoidHandle, on, &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
-                       m_channel);
+  int value = on ? (0xFFFF & m_mask) : 0;
+  m_module->SetSolenoids(m_mask, value);
 }
 
 bool Solenoid::Get() const {
-  int32_t status = 0;
-  bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
-                       m_channel);
-
-  return value;
+  int currentAll = m_module->GetSolenoids();
+  return (currentAll & m_mask) != 0;
 }
 
 void Solenoid::Toggle() {
@@ -71,24 +60,16 @@ int Solenoid::GetChannel() const {
   return m_channel;
 }
 
-bool Solenoid::IsBlackListed() const {
-  int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
-  return (value != 0);
+bool Solenoid::IsDisabled() const {
+  return (m_module->GetSolenoidDisabledList() & m_mask) != 0;
 }
 
 void Solenoid::SetPulseDuration(units::second_t duration) {
-  int32_t status = 0;
-  HAL_SetOneShotDuration(m_solenoidHandle,
-                         units::millisecond_t{duration}.to<int32_t>(), &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
-                       m_channel);
+  m_module->SetOneShotDuration(m_channel, duration);
 }
 
 void Solenoid::StartPulse() {
-  int32_t status = 0;
-  HAL_FireOneShot(m_solenoidHandle, &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_moduleNumber,
-                       m_channel);
+  m_module->FireOneShot(m_channel);
 }
 
 void Solenoid::InitSendable(SendableBuilder& builder) {

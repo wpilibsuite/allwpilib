@@ -6,16 +6,16 @@ package edu.wpi.first.hal.simulation;
 
 import edu.wpi.first.hal.JNIWrapper;
 
-public class PCMDataJNI extends JNIWrapper {
-  public static native int registerSolenoidInitializedCallback(
-      int index, int channel, NotifyCallback callback, boolean initialNotify);
+@SuppressWarnings("AbbreviationAsWordInName")
+public class CTREPCMDataJNI extends JNIWrapper {
+  public static native int registerInitializedCallback(
+      int index, NotifyCallback callback, boolean initialNotify);
 
-  public static native void cancelSolenoidInitializedCallback(int index, int channel, int uid);
+  public static native void cancelInitializedCallback(int index, int uid);
 
-  public static native boolean getSolenoidInitialized(int index, int channel);
+  public static native boolean getInitialized(int index);
 
-  public static native void setSolenoidInitialized(
-      int index, int channel, boolean solenoidInitialized);
+  public static native void setInitialized(int index, boolean initialized);
 
   public static native int registerSolenoidOutputCallback(
       int index, int channel, NotifyCallback callback, boolean initialNotify);
@@ -25,15 +25,6 @@ public class PCMDataJNI extends JNIWrapper {
   public static native boolean getSolenoidOutput(int index, int channel);
 
   public static native void setSolenoidOutput(int index, int channel, boolean solenoidOutput);
-
-  public static native int registerCompressorInitializedCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelCompressorInitializedCallback(int index, int uid);
-
-  public static native boolean getCompressorInitialized(int index);
-
-  public static native void setCompressorInitialized(int index, boolean compressorInitialized);
 
   public static native int registerCompressorOnCallback(
       int index, NotifyCallback callback, boolean initialNotify);

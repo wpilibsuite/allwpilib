@@ -34,7 +34,7 @@ public class PCMTest extends AbstractComsSetup {
   protected static final double kCompressorOnVoltage = 5.00;
   protected static final double kCompressorOffVoltage = 1.68;
 
-  private static Compressor compressor;
+  private static PneumaticsControlModule pcm;
 
   private static DigitalOutput fakePressureSwitch;
   private static AnalogInput fakeCompressor;
@@ -44,7 +44,7 @@ public class PCMTest extends AbstractComsSetup {
 
   @BeforeClass
   public static void setUpBeforeClass() {
-    compressor = new Compressor();
+    pcm = new PneumaticsControlModule();
 
     fakePressureSwitch = new DigitalOutput(11);
     fakeCompressor = new AnalogInput(1);
@@ -64,7 +64,7 @@ public class PCMTest extends AbstractComsSetup {
 
   @Before
   public void reset() {
-    compressor.stop();
+    pcm.setClosedLoopControl(false);
     fakePressureSwitch.set(false);
   }
 
@@ -73,7 +73,7 @@ public class PCMTest extends AbstractComsSetup {
   public void testPressureSwitch() throws Exception {
     final double range = 0.5;
     reset();
-    compressor.setClosedLoopControl(true);
+    pcm.setClosedLoopControl(true);
 
     // Turn on the compressor
     fakePressureSwitch.set(true);
@@ -99,8 +99,8 @@ public class PCMTest extends AbstractComsSetup {
   public void testSolenoid() throws Exception {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(0);
-    Solenoid solenoid2 = new Solenoid(1);
+    Solenoid solenoid1 = new Solenoid(pcm, 0);
+    Solenoid solenoid2 = new Solenoid(pcm, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);
@@ -147,7 +147,7 @@ public class PCMTest extends AbstractComsSetup {
    */
   @Test
   public void doubleSolenoid() {
-    DoubleSolenoid solenoid = new DoubleSolenoid(0, 1);
+    DoubleSolenoid solenoid = new DoubleSolenoid(pcm, 0, 1);
 
     solenoid.set(DoubleSolenoid.Value.kOff);
     Timer.delay(kSolenoidDelayTime);
@@ -177,8 +177,8 @@ public class PCMTest extends AbstractComsSetup {
   public void testOneShot() throws Exception {
     reset();
 
-    Solenoid solenoid1 = new Solenoid(0);
-    Solenoid solenoid2 = new Solenoid(1);
+    Solenoid solenoid1 = new Solenoid(pcm, 0);
+    Solenoid solenoid2 = new Solenoid(pcm, 1);
 
     solenoid1.set(false);
     solenoid2.set(false);
