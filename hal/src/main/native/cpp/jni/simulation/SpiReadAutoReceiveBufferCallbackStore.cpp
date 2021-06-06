@@ -6,6 +6,8 @@
 
 #include <jni.h>
 
+#include <cstdio>
+
 #include <wpi/jni_util.h>
 
 #include "SimulatorJNI.h"
@@ -47,13 +49,13 @@ int32_t SpiReadAutoReceiveBufferCallbackStore::performCallback(
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return -1;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
   }
 
   auto toCallbackArr = MakeJIntArray(

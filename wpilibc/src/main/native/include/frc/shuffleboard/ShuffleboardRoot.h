@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace frc {
 
@@ -25,7 +25,7 @@ class ShuffleboardRoot {
    * @param title the title of the tab
    * @return the tab with the given title
    */
-  virtual ShuffleboardTab& GetTab(wpi::StringRef title) = 0;
+  virtual ShuffleboardTab& GetTab(std::string_view title) = 0;
 
   /**
    * Updates all tabs.
@@ -57,7 +57,7 @@ class ShuffleboardRoot {
    *
    * @param title the title of the tab to select
    */
-  virtual void SelectTab(wpi::StringRef title) = 0;
+  virtual void SelectTab(std::string_view title) = 0;
 };
 
 }  // namespace frc

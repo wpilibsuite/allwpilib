@@ -13,15 +13,18 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
+#include <hal/DriverStationTypes.h>
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpigui.h>
 
 #include "HALDataSource.h"
@@ -104,7 +107,7 @@ class KeyboardJoystick : public SystemJoystick {
   void ClearKey(int key);
   virtual const char* GetKeyName(int key) const = 0;
 
-  void ReadIni(wpi::StringRef name, wpi::StringRef value);
+  void ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out_buf) const;
 
  protected:
@@ -210,14 +213,14 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource* GetEnabledData() override { return &m_enabled; }
   glass::DataSource* GetTestData() override { return &m_test; }
   glass::DataSource* GetAutonomousData() override { return &m_autonomous; }
-  wpi::StringRef GetGameSpecificMessage(
+  std::string_view GetGameSpecificMessage(
       wpi::SmallVectorImpl<char>& buf) override {
     HAL_MatchInfo info;
     HALSIM_GetMatchInfo(&info);
     buf.clear();
     buf.append(info.gameSpecificMessage,
                info.gameSpecificMessage + info.gameSpecificMessageSize);
-    return wpi::StringRef(buf.begin(), buf.size());
+    return std::string_view(buf.begin(), buf.size());
   }
 
   void SetFmsAttached(bool val) override {
@@ -299,17 +302,15 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   axisCount = halAxes.count;
   for (int i = 0; i < axisCount; ++i) {
     axes[i] = std::make_unique<glass::DataSource>(
-        "Joystick[" + wpi::Twine{index} + "] Axis[" + wpi::Twine{i} +
-        wpi::Twine{']'});
+        fmt::format("Joystick[{}] Axis[{}]", index, i));
   }
 
   HAL_JoystickButtons halButtons;
   HALSIM_GetJoystickButtons(index, &halButtons);
   buttonCount = halButtons.count;
   for (int i = 0; i < buttonCount; ++i) {
-    buttons[i] =
-        new glass::DataSource("Joystick[" + wpi::Twine{index} + "] Button[" +
-                              wpi::Twine{i + 1} + wpi::Twine{']'});
+    buttons[i] = new glass::DataSource(
+        fmt::format("Joystick[{}] Button[{}]", index, i + 1));
     buttons[i]->SetDigital(true);
   }
   for (int i = buttonCount; i < 32; ++i) {
@@ -321,8 +322,7 @@ JoystickModel::JoystickModel(int index) : m_index{index} {
   povCount = halPOVs.count;
   for (int i = 0; i < povCount; ++i) {
     povs[i] = std::make_unique<glass::DataSource>(
-        "Joystick[" + wpi::Twine{index} + "] POV[" + wpi::Twine{i} +
-        wpi::Twine{']'});
+        fmt::format("Joystick[{}] POV [{}]", index, i));
   }
 
   m_callback =
@@ -360,10 +360,7 @@ void JoystickModel::CallbackFunc(const char*, void* param, const HAL_Value*) {
 // read/write joystick mapping to ini file
 static void* JoystickReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
                               const char* name) {
-  int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) {
-    return nullptr;
-  }
+  int num = wpi::parse_integer<int>(name, 10).value_or(-1);
   if (num < 0 || num >= HAL_kMaxJoysticks) {
     return nullptr;
   }
@@ -371,21 +368,18 @@ static void* JoystickReadOpen(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 }
 
 static void JoystickReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
-                             void* entry, const char* lineStr) {
+                             void* entry, const char* line) {
   RobotJoystick* joy = static_cast<RobotJoystick*>(entry);
   // format: guid=guid or useGamepad=0/1
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
+  auto [name, value] = wpi::split(line, '=');
+  name = wpi::trim(name);
+  value = wpi::trim(value);
   if (name == "guid") {
     joy->guid = value;
   } else if (name == "useGamepad") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      joy->useGamepad = num.value();
     }
-    joy->useGamepad = num;
   } else {
     joy->name.ReadIni(name, value);
   }
@@ -417,10 +411,7 @@ static void JoystickWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
 static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
                                       ImGuiSettingsHandler* handler,
                                       const char* name) {
-  int num;
-  if (wpi::StringRef{name}.getAsInteger(10, num)) {
-    return nullptr;
-  }
+  int num = wpi::parse_integer<int>(name, 10).value_or(-1);
   if (num < 0 || num >= static_cast<int>(gKeyboardJoysticks.size())) {
     return nullptr;
   }
@@ -431,12 +422,11 @@ static void* KeyboardJoystickReadOpen(ImGuiContext* ctx,
 
 static void KeyboardJoystickReadLine(ImGuiContext* ctx,
                                      ImGuiSettingsHandler* handler, void* entry,
-                                     const char* lineStr) {
+                                     const char* line) {
   auto joy = static_cast<KeyboardJoystick*>(entry);
   // format: guid=guid or useGamepad=0/1
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  joy->ReadIni(name.trim(), value.trim());
+  auto [name, value] = wpi::split(line, '=');
+  joy->ReadIni(wpi::trim(name), wpi::trim(value));
 }
 
 static void KeyboardJoystickWriteAll(ImGuiContext* ctx,
@@ -453,7 +443,7 @@ static void KeyboardJoystickWriteAll(ImGuiContext* ctx,
 static void* DriverStationReadOpen(ImGuiContext* ctx,
                                    ImGuiSettingsHandler* handler,
                                    const char* name) {
-  if (name == wpi::StringRef{"Main"}) {
+  if (name == std::string_view{"Main"}) {
     return &gDisableDS;
   }
   return nullptr;
@@ -461,35 +451,26 @@ static void* DriverStationReadOpen(ImGuiContext* ctx,
 
 static void DriverStationReadLine(ImGuiContext* ctx,
                                   ImGuiSettingsHandler* handler, void* entry,
-                                  const char* lineStr) {
-  wpi::StringRef line{lineStr};
-  auto [name, value] = line.split('=');
-  name = name.trim();
-  value = value.trim();
+                                  const char* line) {
+  auto [name, value] = wpi::split(line, '=');
+  name = wpi::trim(name);
+  value = wpi::trim(value);
   if (name == "disable") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      gDisableDS = num.value();
     }
-    gDisableDS = num;
   } else if (name == "zeroDisconnectedJoysticks") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      gZeroDisconnectedJoysticks = num.value();
     }
-    gZeroDisconnectedJoysticks = num;
   } else if (name == "enableDisableKeys") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      gUseEnableDisableHotkeys = num.value();
     }
-    gUseEnableDisableHotkeys = num;
   } else if (name == "estopKey") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      gUseEstopHotkey = num.value();
     }
-    gUseEstopHotkey = num;
   }
 }
 
@@ -914,92 +895,76 @@ void KeyboardJoystick::ClearKey(int key) {
   }
 }
 
-void KeyboardJoystick::ReadIni(wpi::StringRef name, wpi::StringRef value) {
-  if (name.startswith("axis")) {
-    name = name.drop_front(4);
+void KeyboardJoystick::ReadIni(std::string_view name, std::string_view value) {
+  if (wpi::starts_with(name, "axis")) {
+    name.remove_prefix(4);
     if (name == "Count") {
-      int v;
-      if (value.getAsInteger(10, v)) {
-        return;
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_data.axes.count = (std::min)(v.value(), HAL_kMaxJoystickAxes);
       }
-      m_data.axes.count = (std::min)(v, HAL_kMaxJoystickAxes);
       return;
     }
 
-    unsigned int index;
-    if (name.consumeInteger(10, index)) {
-      return;
-    }
+    auto index = wpi::consume_integer<unsigned int>(&name, 10).value_or(
+        HAL_kMaxJoystickAxes);
     if (index >= HAL_kMaxJoystickAxes) {
       return;
     }
     if (name == "incKey") {
-      int v;
-      if (value.getAsInteger(10, v)) {
-        return;
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_axisConfig[index].incKey = v.value();
       }
-      m_axisConfig[index].incKey = v;
     } else if (name == "decKey") {
-      int v;
-      if (value.getAsInteger(10, v)) {
-        return;
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_axisConfig[index].decKey = v.value();
       }
-      m_axisConfig[index].decKey = v;
     } else if (name == "keyRate") {
-      std::sscanf(value.data(), "%f", &m_axisConfig[index].keyRate);
-    } else if (name == "decayRate") {
-      std::sscanf(value.data(), "%f", &m_axisConfig[index].decayRate);
-    } else if (name == "maxAbsValue") {
-      std::sscanf(value.data(), "%f", &m_axisConfig[index].maxAbsValue);
-    }
-  } else if (name.startswith("button")) {
-    name = name.drop_front(6);
-    if (name == "Count") {
-      int v;
-      if (value.getAsInteger(10, v)) {
-        return;
+      if (auto v = wpi::parse_float<float>(value)) {
+        m_axisConfig[index].keyRate = v.value();
       }
-      m_data.buttons.count = (std::min)(v, kMaxButtonCount);
+    } else if (name == "decayRate") {
+      if (auto v = wpi::parse_float<float>(value)) {
+        m_axisConfig[index].decayRate = v.value();
+      }
+    } else if (name == "maxAbsValue") {
+      if (auto v = wpi::parse_float<float>(value)) {
+        m_axisConfig[index].maxAbsValue = v.value();
+      }
+    }
+  } else if (wpi::starts_with(name, "button")) {
+    name.remove_prefix(6);
+    if (name == "Count") {
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_data.buttons.count = (std::min)(v.value(), kMaxButtonCount);
+      }
       return;
     }
 
-    unsigned int index;
-    if (name.getAsInteger(10, index)) {
-      return;
-    }
+    auto index =
+        wpi::parse_integer<unsigned int>(name, 10).value_or(kMaxButtonCount);
     if (index >= kMaxButtonCount) {
       return;
     }
-    int v;
-    if (value.getAsInteger(10, v)) {
-      return;
-    }
+    int v = wpi::parse_integer<int>(value, 10).value_or(-1);
     if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
       return;
     }
     m_buttonKey[index] = v;
-  } else if (name.startswith("pov")) {
-    name = name.drop_front(3);
+  } else if (wpi::starts_with(name, "pov")) {
+    name.remove_prefix(3);
     if (name == "Count") {
-      int v;
-      if (value.getAsInteger(10, v)) {
-        return;
+      if (auto v = wpi::parse_integer<int>(value, 10)) {
+        m_data.povs.count = (std::min)(v.value(), HAL_kMaxJoystickPOVs);
       }
-      m_data.povs.count = (std::min)(v, HAL_kMaxJoystickPOVs);
       return;
     }
 
-    unsigned int index;
-    if (name.consumeInteger(10, index)) {
-      return;
-    }
+    auto index = wpi::consume_integer<unsigned int>(&name, 10).value_or(
+        HAL_kMaxJoystickPOVs);
     if (index >= HAL_kMaxJoystickPOVs) {
       return;
     }
-    int v;
-    if (value.getAsInteger(10, v)) {
-      return;
-    }
+    int v = wpi::parse_integer<int>(value, 10).value_or(-1);
     if (v < 0 || v >= IM_ARRAYSIZE(ImGuiIO::KeysDown)) {
       return;
     }
@@ -1409,8 +1374,9 @@ static void DisplayJoysticks() {
         }
         joy.sys = payload_sys;
         joy.guid.clear();
-        wpi::StringRef name{payload_sys->GetName()};
-        joy.useGamepad = name.startswith("Xbox") || name.contains("pad");
+        std::string_view name{payload_sys->GetName()};
+        joy.useGamepad =
+            wpi::starts_with(name, "Xbox") || wpi::contains(name, "pad");
       }
       ImGui::EndDragDropTarget();
     }

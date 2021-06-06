@@ -6,12 +6,12 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <frc/geometry/Translation2d.h>
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Mechanism2D.h"
@@ -23,8 +23,8 @@ class NTMechanism2DModel : public Mechanism2DModel {
   static constexpr const char* kType = "Mechanism2d";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTMechanism2DModel(wpi::StringRef path);
-  NTMechanism2DModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTMechanism2DModel(std::string_view path);
+  NTMechanism2DModel(NT_Inst inst, std::string_view path);
   ~NTMechanism2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }

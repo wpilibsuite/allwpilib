@@ -9,12 +9,11 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
 #include <wpi/Logger.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -37,7 +36,7 @@ class SourceImpl : public PropertyContainer {
   friend class Frame;
 
  public:
-  SourceImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  SourceImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry);
   ~SourceImpl() override;
   SourceImpl(const SourceImpl& oth) = delete;
@@ -45,10 +44,10 @@ class SourceImpl : public PropertyContainer {
 
   virtual void Start() = 0;
 
-  wpi::StringRef GetName() const { return m_name; }
+  std::string_view GetName() const { return m_name; }
 
-  void SetDescription(const wpi::Twine& description);
-  wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
+  void SetDescription(std::string_view description);
+  std::string_view GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void SetConnectionStrategy(CS_ConnectionStrategy strategy) {
     m_strategy = static_cast<int>(strategy);
@@ -128,7 +127,7 @@ class SourceImpl : public PropertyContainer {
   virtual bool SetResolution(int width, int height, CS_Status* status);
   virtual bool SetFPS(int fps, CS_Status* status);
 
-  bool SetConfigJson(wpi::StringRef config, CS_Status* status);
+  bool SetConfigJson(std::string_view config, CS_Status* status);
   virtual bool SetConfigJson(const wpi::json& config, CS_Status* status);
   std::string GetConfigJson(CS_Status* status);
   virtual wpi::json GetConfigJsonObject(CS_Status* status);
@@ -141,12 +140,12 @@ class SourceImpl : public PropertyContainer {
  protected:
   void NotifyPropertyCreated(int propIndex, PropertyImpl& prop) override;
   void UpdatePropertyValue(int property, bool setString, int value,
-                           const wpi::Twine& valueStr) override;
+                           std::string_view valueStr) override;
 
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
-                wpi::StringRef data, Frame::Time time);
+                std::string_view data, Frame::Time time);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
-  void PutError(const wpi::Twine& msg, Frame::Time time);
+  void PutError(std::string_view msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;

@@ -10,10 +10,8 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
@@ -143,7 +141,7 @@ class NetworkTableEntry final {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::string GetString(wpi::StringRef defaultValue) const;
+  std::string GetString(std::string_view defaultValue) const;
 
   /**
    * Gets the entry's value as a raw. If the entry does not exist or is of
@@ -152,7 +150,7 @@ class NetworkTableEntry final {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::string GetRaw(wpi::StringRef defaultValue) const;
+  std::string GetRaw(std::string_view defaultValue) const;
 
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
@@ -268,7 +266,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultString(const wpi::Twine& defaultValue);
+  bool SetDefaultString(std::string_view defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -276,7 +274,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultRaw(wpi::StringRef defaultValue);
+  bool SetDefaultRaw(std::string_view defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -356,7 +354,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetString(const wpi::Twine& value);
+  bool SetString(std::string_view value);
 
   /**
    * Sets the entry's value.
@@ -364,7 +362,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetRaw(wpi::StringRef value);
+  bool SetRaw(std::string_view value);
 
   /**
    * Sets the entry's value.
@@ -460,7 +458,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetString(const wpi::Twine& value);
+  void ForceSetString(std::string_view value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -468,7 +466,7 @@ class NetworkTableEntry final {
    *
    * @param value the value to set
    */
-  void ForceSetRaw(wpi::StringRef value);
+  void ForceSetRaw(std::string_view value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is
@@ -596,7 +594,7 @@ class NetworkTableEntry final {
    * @param params      parameter
    * @return RPC call object.
    */
-  RpcCall CallRpc(wpi::StringRef params);
+  RpcCall CallRpc(std::string_view params);
 
   /**
    * Add a listener for changes to this entry.

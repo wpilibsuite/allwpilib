@@ -34,6 +34,7 @@ SOFTWARE.
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
+#include "fmt/format.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
@@ -75,9 +76,9 @@ class json::binary_writer
                       const bool use_type, const bool add_prefix = true);
 
   private:
-    void write_cbor_string(StringRef str);
+    void write_cbor_string(std::string_view str);
 
-    void write_msgpack_string(StringRef str);
+    void write_msgpack_string(std::string_view str);
 
     /*
     @brief write a number to output input
@@ -630,7 +631,7 @@ void json::binary_writer::write_ubjson(const json& j, const bool use_count,
                 o << static_cast<CharType>('S');
             }
             write_number_with_ubjson_prefix(j.m_value.string->size(), true);
-            o << j.m_value.string;
+            o << *j.m_value.string;
             break;
         }
 
@@ -731,7 +732,7 @@ void json::binary_writer::write_ubjson(const json& j, const bool use_count,
     }
 }
 
-void json::binary_writer::write_cbor_string(StringRef str)
+void json::binary_writer::write_cbor_string(std::string_view str)
 {
     // step 1: write control byte and the string length
     const auto N = str.size();
@@ -766,7 +767,7 @@ void json::binary_writer::write_cbor_string(StringRef str)
     o << str;
 }
 
-void json::binary_writer::write_msgpack_string(StringRef str)
+void json::binary_writer::write_msgpack_string(std::string_view str)
 {
     // step 1: write control byte and the string length
     const auto N = str.size();
@@ -862,7 +863,7 @@ void json::binary_writer::write_number_with_ubjson_prefix(const NumberType n,
     }
     else
     {
-        JSON_THROW(out_of_range::create(407, "number overflow serializing " + Twine(n)));
+        JSON_THROW(out_of_range::create(407, fmt::format("number overflow serializing {}", n)));
     }
 }
 
@@ -915,7 +916,7 @@ void json::binary_writer::write_number_with_ubjson_prefix(const NumberType n,
     // LCOV_EXCL_START
     else
     {
-        JSON_THROW(out_of_range::create(407, "number overflow serializing " + Twine(n)));
+        JSON_THROW(out_of_range::create(407, fmt::format("number overflow serializing {}", n)));
     }
     // LCOV_EXCL_STOP
 }

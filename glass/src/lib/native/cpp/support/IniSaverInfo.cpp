@@ -8,15 +8,13 @@
 #include <cstring>
 
 #include <imgui_internal.h>
-#include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-void NameInfo::SetName(const wpi::Twine& name) {
-  wpi::SmallString<64> nameBuf;
-  auto nameStr = name.toStringRef(nameBuf);
-  size_t len = (std::min)(nameStr.size(), sizeof(m_name) - 1);
-  std::memcpy(m_name, nameStr.data(), len);
+void NameInfo::SetName(std::string_view name) {
+  size_t len = (std::min)(name.size(), sizeof(m_name) - 1);
+  std::memcpy(m_name, name.data(), len);
   m_name[len] = '\0';
 }
 
@@ -74,7 +72,7 @@ void NameInfo::GetLabel(char* buf, size_t size, const char* defaultName,
   }
 }
 
-bool NameInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+bool NameInfo::ReadIni(std::string_view name, std::string_view value) {
   if (name != "name") {
     return false;
   }
@@ -140,15 +138,13 @@ bool NameInfo::InputTextName(const char* label_id, ImGuiInputTextFlags flags) {
   return ImGui::InputText(label_id, m_name, sizeof(m_name), flags);
 }
 
-bool OpenInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+bool OpenInfo::ReadIni(std::string_view name, std::string_view value) {
   if (name != "open") {
     return false;
   }
-  int num;
-  if (value.getAsInteger(10, num)) {
-    return true;
+  if (auto num = wpi::parse_integer<int>(value, 10)) {
+    m_open = num.value();
   }
-  m_open = num;
   return true;
 }
 
@@ -156,7 +152,7 @@ void OpenInfo::WriteIni(ImGuiTextBuffer* out) {
   out->appendf("open=%d\n", m_open ? 1 : 0);
 }
 
-bool NameOpenInfo::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+bool NameOpenInfo::ReadIni(std::string_view name, std::string_view value) {
   if (NameInfo::ReadIni(name, value)) {
     return true;
   }

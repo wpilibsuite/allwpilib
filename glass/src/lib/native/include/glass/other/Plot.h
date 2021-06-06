@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "glass/WindowManager.h"
 #include "glass/support/IniSaverBase.h"
 
@@ -11,7 +13,7 @@ namespace glass {
 
 class PlotProvider : private WindowManager {
  public:
-  explicit PlotProvider(const wpi::Twine& iniName);
+  explicit PlotProvider(std::string_view iniName);
   ~PlotProvider() override;
 
   void GlobalInit() override;
@@ -35,7 +37,7 @@ class PlotProvider : private WindowManager {
 
   class IniSaver : public IniSaverBase {
    public:
-    explicit IniSaver(const wpi::Twine& typeName, PlotProvider* provider,
+    explicit IniSaver(std::string_view typeName, PlotProvider* provider,
                       bool forSeries);
 
     void* IniReadOpen(const char* name) override;

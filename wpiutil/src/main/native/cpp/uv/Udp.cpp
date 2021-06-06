@@ -47,7 +47,7 @@ std::shared_ptr<Udp> Udp::Create(Loop& loop, unsigned int flags) {
   return h;
 }
 
-void Udp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
+void Udp::Bind(std::string_view ip, unsigned int port, unsigned int flags) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -57,7 +57,7 @@ void Udp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
   }
 }
 
-void Udp::Bind6(const Twine& ip, unsigned int port, unsigned int flags) {
+void Udp::Bind6(std::string_view ip, unsigned int port, unsigned int flags) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -67,7 +67,7 @@ void Udp::Bind6(const Twine& ip, unsigned int port, unsigned int flags) {
   }
 }
 
-void Udp::Connect(const Twine& ip, unsigned int port) {
+void Udp::Connect(std::string_view ip, unsigned int port) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -77,7 +77,7 @@ void Udp::Connect(const Twine& ip, unsigned int port) {
   }
 }
 
-void Udp::Connect6(const Twine& ip, unsigned int port) {
+void Udp::Connect6(std::string_view ip, unsigned int port) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -107,20 +107,18 @@ sockaddr_storage Udp::GetSock() {
   return name;
 }
 
-void Udp::SetMembership(const Twine& multicastAddr, const Twine& interfaceAddr,
+void Udp::SetMembership(std::string_view multicastAddr,
+                        std::string_view interfaceAddr,
                         uv_membership membership) {
-  SmallString<128> multicastAddrBuf;
-  SmallString<128> interfaceAddrBuf;
-  Invoke(&uv_udp_set_membership, GetRaw(),
-         multicastAddr.toNullTerminatedStringRef(multicastAddrBuf).data(),
-         interfaceAddr.toNullTerminatedStringRef(interfaceAddrBuf).data(),
-         membership);
+  SmallString<128> multicastAddrBuf{multicastAddr};
+  SmallString<128> interfaceAddrBuf{interfaceAddr};
+  Invoke(&uv_udp_set_membership, GetRaw(), multicastAddrBuf.c_str(),
+         interfaceAddrBuf.c_str(), membership);
 }
 
-void Udp::SetMulticastInterface(const Twine& interfaceAddr) {
-  SmallString<128> interfaceAddrBuf;
-  Invoke(&uv_udp_set_multicast_interface, GetRaw(),
-         interfaceAddr.toNullTerminatedStringRef(interfaceAddrBuf).data());
+void Udp::SetMulticastInterface(std::string_view interfaceAddr) {
+  SmallString<128> interfaceAddrBuf{interfaceAddr};
+  Invoke(&uv_udp_set_multicast_interface, GetRaw(), interfaceAddrBuf.c_str());
 }
 
 void Udp::Send(const sockaddr& addr, ArrayRef<Buffer> bufs,

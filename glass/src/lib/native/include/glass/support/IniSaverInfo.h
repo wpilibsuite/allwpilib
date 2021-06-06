@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <imgui.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 namespace glass {
 
@@ -15,7 +15,7 @@ class NameInfo {
   NameInfo() { m_name[0] = '\0'; }
 
   bool HasName() const { return m_name[0] != '\0'; }
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
   const char* GetName() const { return m_name; }
   void GetName(char* buf, size_t size, const char* defaultName) const;
   void GetName(char* buf, size_t size, const char* defaultName,
@@ -28,7 +28,7 @@ class NameInfo {
   void GetLabel(char* buf, size_t size, const char* defaultName, int index,
                 int index2) const;
 
-  bool ReadIni(wpi::StringRef name, wpi::StringRef value);
+  bool ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out);
   void PushEditNameId(int index);
   void PushEditNameId(const char* name);
@@ -47,7 +47,7 @@ class OpenInfo {
 
   bool IsOpen() const { return m_open; }
   void SetOpen(bool open) { m_open = open; }
-  bool ReadIni(wpi::StringRef name, wpi::StringRef value);
+  bool ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out);
 
  private:
@@ -56,7 +56,7 @@ class OpenInfo {
 
 class NameOpenInfo : public NameInfo, public OpenInfo {
  public:
-  bool ReadIni(wpi::StringRef name, wpi::StringRef value);
+  bool ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out);
 };
 

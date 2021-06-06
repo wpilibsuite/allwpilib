@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "wpi/StringExtras.h"
+#include "wpi/fmt/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/uv/Buffer.h"
 #include "wpi/uv/Stream.h"
@@ -13,23 +15,23 @@
 using namespace wpi;
 
 WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
-  req.header.connect([this](StringRef name, StringRef value) {
-    if (name.equals_lower("host")) {
+  req.header.connect([this](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "host")) {
       m_gotHost = true;
-    } else if (name.equals_lower("upgrade")) {
-      if (value.equals_lower("websocket")) {
+    } else if (equals_lower(name, "upgrade")) {
+      if (equals_lower(value, "websocket")) {
         m_websocket = true;
       }
-    } else if (name.equals_lower("sec-websocket-key")) {
+    } else if (equals_lower(name, "sec-websocket-key")) {
       m_key = value;
-    } else if (name.equals_lower("sec-websocket-version")) {
+    } else if (equals_lower(name, "sec-websocket-version")) {
       m_version = value;
-    } else if (name.equals_lower("sec-websocket-protocol")) {
+    } else if (equals_lower(name, "sec-websocket-protocol")) {
       // Protocols are comma delimited, repeated headers add to list
-      SmallVector<StringRef, 2> protocols;
-      value.split(protocols, ",", -1, false);
+      SmallVector<std::string_view, 2> protocols;
+      split(value, protocols, ",", -1, false);
       for (auto protocol : protocols) {
-        protocol = protocol.trim();
+        protocol = trim(protocol);
         if (!protocol.empty()) {
           m_protocols.emplace_back(protocol);
         }
@@ -43,31 +45,31 @@ WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
   });
 }
 
-std::pair<bool, StringRef> WebSocketServerHelper::MatchProtocol(
-    ArrayRef<StringRef> protocols) {
+std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
+    ArrayRef<std::string_view> protocols) {
   if (protocols.empty() && m_protocols.empty()) {
-    return std::make_pair(true, StringRef{});
+    return {true, {}};
   }
   for (auto protocol : protocols) {
     for (auto&& clientProto : m_protocols) {
       if (protocol == clientProto) {
-        return std::make_pair(true, protocol);
+        return {true, protocol};
       }
     }
   }
-  return std::make_pair(false, StringRef{});
+  return {false, {}};
 }
 
 WebSocketServer::WebSocketServer(uv::Stream& stream,
-                                 ArrayRef<StringRef> protocols,
+                                 ArrayRef<std::string_view> protocols,
                                  ServerOptions options, const private_init&)
     : m_stream{stream},
       m_helper{m_req},
       m_protocols{protocols.begin(), protocols.end()},
       m_options{std::move(options)} {
   // Header handling
-  m_req.header.connect([this](StringRef name, StringRef value) {
-    if (name.equals_lower("host")) {
+  m_req.header.connect([this](std::string_view name, std::string_view value) {
+    if (equals_lower(name, "host")) {
       if (m_options.checkHost) {
         if (!m_options.checkHost(value)) {
           Abort(401, "Unrecognized Host");
@@ -75,7 +77,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
       }
     }
   });
-  m_req.url.connect([this](StringRef name) {
+  m_req.url.connect([this](std::string_view name) {
     if (m_options.checkUrl) {
       if (!m_options.checkUrl(name)) {
         Abort(404, "Not Found");
@@ -96,8 +98,9 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     }
 
     // Negotiate sub-protocol
-    SmallVector<StringRef, 2> protocols{m_protocols.begin(), m_protocols.end()};
-    StringRef protocol = m_helper.MatchProtocol(protocols).second;
+    SmallVector<std::string_view, 2> protocols{m_protocols.begin(),
+                                               m_protocols.end()};
+    std::string_view protocol = m_helper.MatchProtocol(protocols).second;
 
     // Disconnect our header reader
     m_dataConn.disconnect();
@@ -110,10 +113,11 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
     auto ws = m_helper.Accept(m_stream, protocol);
 
     // Connect the websocket open event to our connected event.
-    ws->open.connect_extended([self, s = ws.get()](auto conn, StringRef) {
-      self->connected(self->m_req.GetUrl(), *s);
-      conn.disconnect();  // one-shot
-    });
+    ws->open.connect_extended(
+        [self, s = ws.get()](auto conn, std::string_view) {
+          self->connected(self->m_req.GetUrl(), *s);
+          conn.disconnect();  // one-shot
+        });
   });
 
   // Set up stream
@@ -123,7 +127,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
         if (m_aborted) {
           return;
         }
-        m_req.Execute(StringRef{buf.base, size});
+        m_req.Execute(std::string_view{buf.base, size});
         if (m_req.HasError()) {
           Abort(400, "Bad Request");
         }
@@ -134,7 +138,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
 }
 
 std::shared_ptr<WebSocketServer> WebSocketServer::Create(
-    uv::Stream& stream, ArrayRef<StringRef> protocols,
+    uv::Stream& stream, ArrayRef<std::string_view> protocols,
     const ServerOptions& options) {
   auto server = std::make_shared<WebSocketServer>(stream, protocols, options,
                                                   private_init{});
@@ -142,7 +146,7 @@ std::shared_ptr<WebSocketServer> WebSocketServer::Create(
   return server;
 }
 
-void WebSocketServer::Abort(uint16_t code, StringRef reason) {
+void WebSocketServer::Abort(uint16_t code, std::string_view reason) {
   if (m_aborted) {
     return;
   }
@@ -153,7 +157,7 @@ void WebSocketServer::Abort(uint16_t code, StringRef reason) {
   raw_uv_ostream os{bufs, 1024};
 
   // Handle unsupported version
-  os << "HTTP/1.1 " << code << ' ' << reason << "\r\n";
+  fmt::print(os, "HTTP/1.1 {} {}\r\n", code, reason);
   if (code == 426) {
     os << "Upgrade: WebSocket\r\n";
   }

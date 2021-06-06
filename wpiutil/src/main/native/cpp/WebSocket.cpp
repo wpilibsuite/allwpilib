@@ -6,10 +6,12 @@
 
 #include <random>
 
+#include "fmt/format.h"
 #include "wpi/Base64.h"
 #include "wpi/HttpParser.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
 #include "wpi/raw_uv_ostream.h"
 #include "wpi/sha1.h"
 #include "wpi/uv/Stream.h"
@@ -47,7 +49,7 @@ class WebSocket::ClientHandshakeData {
       v = static_cast<char>(dist(gen));
     }
     raw_svector_ostream os(key);
-    Base64Encode(os, StringRef{nonce, 16});
+    Base64Encode(os, {nonce, 16});
   }
   ~ClientHandshakeData() {
     if (auto t = timer.lock()) {
@@ -67,7 +69,8 @@ class WebSocket::ClientHandshakeData {
   std::weak_ptr<uv::Timer> timer;
 };
 
-static StringRef AcceptHash(StringRef key, SmallVectorImpl<char>& buf) {
+static std::string_view AcceptHash(std::string_view key,
+                                   SmallVectorImpl<char>& buf) {
   SHA1 hash;
   hash.Update(key);
   hash.Update("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
@@ -80,7 +83,7 @@ WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
   // Connect closed and error signals to ourselves
   m_stream.closed.connect([this]() { SetClosed(1006, "handle closed"); });
   m_stream.error.connect([this](uv::Error err) {
-    Terminate(1006, "stream error: " + Twine(err.name()));
+    Terminate(1006, fmt::format("stream error: {}", err.name()));
   });
 
   // Start reading
@@ -95,8 +98,8 @@ WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
 WebSocket::~WebSocket() = default;
 
 std::shared_ptr<WebSocket> WebSocket::CreateClient(
-    uv::Stream& stream, const Twine& uri, const Twine& host,
-    ArrayRef<StringRef> protocols, const ClientOptions& options) {
+    uv::Stream& stream, std::string_view uri, std::string_view host,
+    ArrayRef<std::string_view> protocols, const ClientOptions& options) {
   auto ws = std::make_shared<WebSocket>(stream, false, private_init{});
   stream.SetData(ws);
   ws->StartClient(uri, host, protocols, options);
@@ -104,23 +107,23 @@ std::shared_ptr<WebSocket> WebSocket::CreateClient(
 }
 
 std::shared_ptr<WebSocket> WebSocket::CreateServer(uv::Stream& stream,
-                                                   StringRef key,
-                                                   StringRef version,
-                                                   StringRef protocol) {
+                                                   std::string_view key,
+                                                   std::string_view version,
+                                                   std::string_view protocol) {
   auto ws = std::make_shared<WebSocket>(stream, true, private_init{});
   stream.SetData(ws);
   ws->StartServer(key, version, protocol);
   return ws;
 }
 
-void WebSocket::Close(uint16_t code, const Twine& reason) {
+void WebSocket::Close(uint16_t code, std::string_view reason) {
   SendClose(code, reason);
   if (m_state != FAILED && m_state != CLOSED) {
     m_state = CLOSING;
   }
 }
 
-void WebSocket::Fail(uint16_t code, const Twine& reason) {
+void WebSocket::Fail(uint16_t code, std::string_view reason) {
   if (m_state == FAILED || m_state == CLOSED) {
     return;
   }
@@ -129,7 +132,7 @@ void WebSocket::Fail(uint16_t code, const Twine& reason) {
   Shutdown();
 }
 
-void WebSocket::Terminate(uint16_t code, const Twine& reason) {
+void WebSocket::Terminate(uint16_t code, std::string_view reason) {
   if (m_state == FAILED || m_state == CLOSED) {
     return;
   }
@@ -137,8 +140,8 @@ void WebSocket::Terminate(uint16_t code, const Twine& reason) {
   Shutdown();
 }
 
-void WebSocket::StartClient(const Twine& uri, const Twine& host,
-                            ArrayRef<StringRef> protocols,
+void WebSocket::StartClient(std::string_view uri, std::string_view host,
+                            ArrayRef<std::string_view> protocols,
                             const ClientOptions& options) {
   // Create client handshake data
   m_clientHandshake = std::make_unique<ClientHandshakeData>();
@@ -187,42 +190,42 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
   });
 
   // Set up client response handling
-  m_clientHandshake->parser.status.connect([this](StringRef status) {
+  m_clientHandshake->parser.status.connect([this](std::string_view status) {
     unsigned int code = m_clientHandshake->parser.GetStatusCode();
     if (code != 101) {
       Terminate(code, status);
     }
   });
   m_clientHandshake->parser.header.connect(
-      [this](StringRef name, StringRef value) {
-        value = value.trim();
-        if (name.equals_lower("upgrade")) {
-          if (!value.equals_lower("websocket")) {
+      [this](std::string_view name, std::string_view value) {
+        value = trim(value);
+        if (equals_lower(name, "upgrade")) {
+          if (!equals_lower(value, "websocket")) {
             return Terminate(1002, "invalid upgrade response value");
           }
           m_clientHandshake->hasUpgrade = true;
-        } else if (name.equals_lower("connection")) {
-          if (!value.equals_lower("upgrade")) {
+        } else if (equals_lower(name, "connection")) {
+          if (!equals_lower(value, "upgrade")) {
             return Terminate(1002, "invalid connection response value");
           }
           m_clientHandshake->hasConnection = true;
-        } else if (name.equals_lower("sec-websocket-accept")) {
+        } else if (equals_lower(name, "sec-websocket-accept")) {
           // Check against expected response
           SmallString<64> acceptBuf;
-          if (!value.equals(AcceptHash(m_clientHandshake->key, acceptBuf))) {
+          if (!equals(value, AcceptHash(m_clientHandshake->key, acceptBuf))) {
             return Terminate(1002, "invalid accept key");
           }
           m_clientHandshake->hasAccept = true;
-        } else if (name.equals_lower("sec-websocket-extensions")) {
+        } else if (equals_lower(name, "sec-websocket-extensions")) {
           // No extensions are supported
           if (!value.empty()) {
             return Terminate(1010, "unsupported extension");
           }
-        } else if (name.equals_lower("sec-websocket-protocol")) {
+        } else if (equals_lower(name, "sec-websocket-protocol")) {
           // Make sure it was one of the provided protocols
           bool match = false;
           for (auto&& protocol : m_clientHandshake->protocols) {
-            if (value.equals_lower(protocol)) {
+            if (equals_lower(value, protocol)) {
               match = true;
               break;
             }
@@ -257,8 +260,8 @@ void WebSocket::StartClient(const Twine& uri, const Twine& host,
   }
 }
 
-void WebSocket::StartServer(StringRef key, StringRef version,
-                            StringRef protocol) {
+void WebSocket::StartServer(std::string_view key, std::string_view version,
+                            std::string_view protocol) {
   m_protocol = protocol;
 
   // Build server response
@@ -308,14 +311,14 @@ void WebSocket::StartServer(StringRef key, StringRef version,
   });
 }
 
-void WebSocket::SendClose(uint16_t code, const Twine& reason) {
+void WebSocket::SendClose(uint16_t code, std::string_view reason) {
   SmallVector<uv::Buffer, 4> bufs;
   if (code != 1005) {
     raw_uv_ostream os{bufs, 4096};
     const uint8_t codeMsb[] = {static_cast<uint8_t>((code >> 8) & 0xff),
                                static_cast<uint8_t>(code & 0xff)};
     os << ArrayRef<uint8_t>(codeMsb);
-    reason.print(os);
+    os << reason;
   }
   Send(kFlagFin | kOpClose, bufs, [](auto bufs, uv::Error) {
     for (auto&& buf : bufs) {
@@ -324,13 +327,12 @@ void WebSocket::SendClose(uint16_t code, const Twine& reason) {
   });
 }
 
-void WebSocket::SetClosed(uint16_t code, const Twine& reason, bool failed) {
+void WebSocket::SetClosed(uint16_t code, std::string_view reason, bool failed) {
   if (m_state == FAILED || m_state == CLOSED) {
     return;
   }
   m_state = failed ? FAILED : CLOSED;
-  SmallString<64> reasonBuf;
-  closed(code, reason.toStringRef(reasonBuf));
+  closed(code, reason);
 }
 
 void WebSocket::Shutdown() {
@@ -343,7 +345,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     return;
   }
 
-  StringRef data{buf.base, size};
+  std::string_view data{buf.base, size};
 
   // Handle connecting state (mainly on client)
   if (m_state == CONNECTING) {
@@ -372,8 +374,8 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
       // Need at least two bytes to determine header length
       if (m_header.size() < 2u) {
         size_t toCopy = (std::min)(2u - m_header.size(), data.size());
-        m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-        data = data.drop_front(toCopy);
+        m_header.append(data.data(), data.data() + toCopy);
+        data.remove_prefix(toCopy);
         if (m_header.size() < 2u) {
           return;  // need more data
         }
@@ -410,8 +412,8 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
       // Need to complete header to calculate message size
       if (m_header.size() < m_headerSize) {
         size_t toCopy = (std::min)(m_headerSize - m_header.size(), data.size());
-        m_header.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-        data = data.drop_front(toCopy);
+        m_header.append(data.data(), data.data() + toCopy);
+        data.remove_prefix(toCopy);
         if (m_header.size() < m_headerSize) {
           return;  // need more data
         }
@@ -446,8 +448,8 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
     if (m_frameSize != UINT64_MAX) {
       size_t need = m_frameStart + m_frameSize - m_payload.size();
       size_t toCopy = (std::min)(need, data.size());
-      m_payload.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-      data = data.drop_front(toCopy);
+      m_payload.append(data.data(), data.data() + toCopy);
+      data.remove_prefix(toCopy);
       need -= toCopy;
       if (need == 0) {
         // We have a complete frame
@@ -474,8 +476,9 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             switch (m_fragmentOpcode) {
               case kOpText:
                 if (!m_combineFragments || fin) {
-                  text(StringRef{reinterpret_cast<char*>(m_payload.data()),
-                                 m_payload.size()},
+                  text(std::string_view{reinterpret_cast<char*>(
+                                            m_payload.data()),
+                                        m_payload.size()},
                        fin);
                 }
                 break;
@@ -497,8 +500,8 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               return Fail(1002, "incomplete fragment");
             }
             if (!m_combineFragments || fin) {
-              text(StringRef{reinterpret_cast<char*>(m_payload.data()),
-                             m_payload.size()},
+              text(std::string_view{reinterpret_cast<char*>(m_payload.data()),
+                                    m_payload.size()},
                    fin);
             }
             if (!fin) {
@@ -518,7 +521,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             break;
           case kOpClose: {
             uint16_t code;
-            StringRef reason;
+            std::string_view reason;
             if (!fin) {
               code = 1002;
               reason = "cannot fragment control frames";
@@ -527,9 +530,9 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             } else {
               code = (static_cast<uint16_t>(m_payload[0]) << 8) |
                      static_cast<uint16_t>(m_payload[1]);
-              reason = StringRef{reinterpret_cast<char*>(m_payload.data()),
-                                 m_payload.size()}
-                           .drop_front(2);
+              reason = drop_front(
+                  {reinterpret_cast<char*>(m_payload.data()), m_payload.size()},
+                  2);
             }
             // Echo the close if we didn't previously send it
             if (m_state != CLOSING) {

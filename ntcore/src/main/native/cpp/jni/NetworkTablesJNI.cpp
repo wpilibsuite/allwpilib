@@ -6,10 +6,9 @@
 
 #include <cassert>
 
+#include <fmt/format.h>
 #include <wpi/ConvertUTF.h>
-#include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
@@ -113,7 +112,7 @@ inline std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv* env, jbyteArray jarr,
   if (!ref) {
     return nullptr;
   }
-  return nt::Value::MakeRaw(ref, time);
+  return nt::Value::MakeRaw(ref.str(), time);
 }
 
 inline std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv* env, jobject jbb,
@@ -170,7 +169,7 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv* env, jobjectArray jarr,
     if (!elem) {
       return nullptr;
     }
-    arr.push_back(JStringRef{env, elem}.str());
+    arr.emplace_back(JStringRef{env, elem}.str());
   }
   return nt::Value::MakeStringArray(std::move(arr), time);
 }
@@ -1251,7 +1250,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createPolledRpc
     nullPointerEx.Throw(env, "def cannot be null");
     return;
   }
-  nt::CreatePolledRpc(entry, JByteArrayRef{env, def}, poller);
+  nt::CreatePolledRpc(entry, JByteArrayRef{env, def}.str(), poller);
 }
 
 /*
@@ -1326,7 +1325,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_postRpcResponse
     nullPointerEx.Throw(env, "result cannot be null");
     return false;
   }
-  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result});
+  return nt::PostRpcResponse(entry, call, JByteArrayRef{env, result}.str());
 }
 
 /*
@@ -1342,7 +1341,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_callRpc
     nullPointerEx.Throw(env, "params cannot be null");
     return 0;
   }
-  return nt::CallRpc(entry, JByteArrayRef{env, params});
+  return nt::CallRpc(entry, JByteArrayRef{env, params}.str());
 }
 
 /*
@@ -1549,7 +1548,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
   }
 
   std::vector<std::string> names;
-  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
   names.reserve(len);
   servers.reserve(len);
   for (int i = 0; i < len; ++i) {
@@ -1561,7 +1560,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_startClient__I_3Ljava_lang_Str
     }
     names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(
-        std::make_pair(wpi::StringRef(names.back()), portInts[i]));
+        std::make_pair(std::string_view{names.back()}, portInts[i]));
   }
   env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::StartClient(inst, servers);
@@ -1636,7 +1635,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
   }
 
   std::vector<std::string> names;
-  std::vector<std::pair<wpi::StringRef, unsigned int>> servers;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
   names.reserve(len);
   servers.reserve(len);
   for (int i = 0; i < len; ++i) {
@@ -1648,7 +1647,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_Strin
     }
     names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(
-        std::make_pair(wpi::StringRef(names.back()), portInts[i]));
+        std::make_pair(std::string_view{names.back()}, portInts[i]));
   }
   env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
   nt::SetServer(inst, servers);
@@ -1781,13 +1780,10 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadPersistent
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err = nt::LoadPersistent(inst, JStringRef{env, filename}.str(),
-                                       [&](size_t line, const char* msg) {
-                                         wpi::SmallString<128> warn;
-                                         wpi::raw_svector_ostream oss(warn);
-                                         oss << line << ": " << msg;
-                                         warns.emplace_back(oss.str());
-                                       });
+  const char* err = nt::LoadPersistent(
+      inst, JStringRef{env, filename}.str(), [&](size_t line, const char* msg) {
+        warns.emplace_back(fmt::format("{}: {}", line, msg));
+      });
   if (err) {
     persistentEx.Throw(env, err);
     return nullptr;
@@ -1837,14 +1833,11 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_loadEntries
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err = nt::LoadEntries(inst, JStringRef{env, filename}.str(),
-                                    JStringRef{env, prefix}.str(),
-                                    [&](size_t line, const char* msg) {
-                                      wpi::SmallString<128> warn;
-                                      wpi::raw_svector_ostream oss(warn);
-                                      oss << line << ": " << msg;
-                                      warns.emplace_back(oss.str());
-                                    });
+  const char* err = nt::LoadEntries(
+      inst, JStringRef{env, filename}.str(), JStringRef{env, prefix}.str(),
+      [&](size_t line, const char* msg) {
+        warns.emplace_back(fmt::format("{}: {}", line, msg));
+      });
   if (err) {
     persistentEx.Throw(env, err);
     return nullptr;

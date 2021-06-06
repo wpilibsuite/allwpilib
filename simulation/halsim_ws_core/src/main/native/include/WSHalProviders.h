@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <hal/simulation/NotifyListener.h>
 #include <wpi/json.h>
@@ -41,8 +42,8 @@ class HALSimWSHalProvider : public HALSimWSBaseProvider {
 // provider generates per-channel diffs
 class HALSimWSHalChanProvider : public HALSimWSHalProvider {
  public:
-  explicit HALSimWSHalChanProvider(int32_t channel, const std::string& key,
-                                   const std::string& type);
+  explicit HALSimWSHalChanProvider(int32_t channel, std::string_view key,
+                                   std::string_view type);
 
   int32_t GetChannel() { return m_channel; }
 
@@ -51,15 +52,14 @@ class HALSimWSHalChanProvider : public HALSimWSHalProvider {
 };
 
 using WSRegisterFunc = std::function<void(
-    const std::string&, std::shared_ptr<HALSimWSBaseProvider>)>;
+    std::string_view, std::shared_ptr<HALSimWSBaseProvider>)>;
 
 template <typename T>
-void CreateProviders(const std::string& prefix, int32_t numChannels,
+void CreateProviders(std::string_view prefix, int32_t numChannels,
                      WSRegisterFunc webRegisterFunc);
 
 template <typename T>
-void CreateSingleProvider(const std::string& key,
-                          WSRegisterFunc webRegisterFunc);
+void CreateSingleProvider(std::string_view key, WSRegisterFunc webRegisterFunc);
 
 }  // namespace wpilibws
 

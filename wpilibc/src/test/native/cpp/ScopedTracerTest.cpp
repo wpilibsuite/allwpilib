@@ -2,18 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string_view>
+
 #include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
 
 #include "frc/ScopedTracer.h"
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
-wpi::SmallString<128> buf;
-wpi::raw_svector_ostream os(buf);
-
 TEST(ScopedTracerTest, Timing) {
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream os(buf);
+
   frc::sim::PauseTiming();
   {
     frc::ScopedTracer tracer("timing_test", os);
@@ -21,6 +23,6 @@ TEST(ScopedTracerTest, Timing) {
   }
   frc::sim::ResumeTiming();
 
-  wpi::StringRef out = os.str();
-  EXPECT_TRUE(out.startswith("	timing_test: 1.5"));
+  std::string_view out = os.str();
+  EXPECT_TRUE(wpi::starts_with(out, "	timing_test: 1.5"));
 }

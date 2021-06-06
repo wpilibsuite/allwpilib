@@ -3,10 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
 #include <string>
+#include <string_view>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/hardware/Gyro.h"
@@ -17,8 +18,8 @@ class NTGyroModel : public GyroModel {
  public:
   static constexpr const char* kType = "Gyro";
 
-  explicit NTGyroModel(wpi::StringRef path);
-  NTGyroModel(NT_Inst instance, wpi::StringRef path);
+  explicit NTGyroModel(std::string_view path);
+  NTGyroModel(NT_Inst instance, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }

@@ -9,11 +9,11 @@
 
 #include <cstring>
 #include <initializer_list>
+#include <string_view>
 #include <utility>
 
 #include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 
 namespace wpi::uv {
 
@@ -30,7 +30,7 @@ class Buffer : public uv_buf_t {
     base = oth.base;
     len = oth.len;
   }
-  /*implicit*/ Buffer(StringRef str)  // NOLINT
+  /*implicit*/ Buffer(std::string_view str)  // NOLINT
       : Buffer{str.data(), str.size()} {}
   /*implicit*/ Buffer(ArrayRef<uint8_t> arr)  // NOLINT
       : Buffer{reinterpret_cast<const char*>(arr.data()), arr.size()} {}
@@ -51,7 +51,7 @@ class Buffer : public uv_buf_t {
 
   static Buffer Allocate(size_t size) { return Buffer{new char[size], size}; }
 
-  static Buffer Dup(StringRef in) {
+  static Buffer Dup(std::string_view in) {
     Buffer buf = Allocate(in.size());
     std::memcpy(buf.base, in.data(), in.size());
     return buf;

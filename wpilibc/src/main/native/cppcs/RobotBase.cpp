@@ -30,12 +30,12 @@ using namespace frc;
 
 int frc::RunHALInitialization() {
   if (!HAL_Initialize(500, 0)) {
-    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
+    std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
-  wpi::outs() << "\n********** Robot program starting **********\n";
+  std::puts("\n********** Robot program starting **********");
   return 0;
 }
 
@@ -124,8 +124,8 @@ static void SetupCameraServerShared() {
 #endif
 
   if (!cameraServerLib) {
-    wpi::outs() << "Camera Server Library Not Found\n";
-    wpi::outs().flush();
+    std::puts("Camera Server Library Not Found");
+    std::fflush(stdout);
     return;
   }
   auto symbol = dlsym(cameraServerLib, "CameraServer_SetCameraServerShared");
@@ -133,15 +133,15 @@ static void SetupCameraServerShared() {
     auto setCameraServerShared = (SetCameraServerSharedFP)symbol;
     setCameraServerShared(new WPILibCameraServerShared{});
   } else {
-    wpi::outs() << "Camera Server Shared Symbol Missing\n";
-    wpi::outs().flush();
+    std::puts("Camera Server Shared Symbol Missing");
+    std::fflush(stdout);
   }
 #else
   CameraServer_SetCameraServerShared(new WPILibCameraServerShared{});
 #endif
 #else
-  wpi::outs() << "Not loading CameraServerShared\n";
-  wpi::outs().flush();
+  std::puts("Not loading CameraServerShared");
+  std::fflush(stdout);
 #endif
 }
 

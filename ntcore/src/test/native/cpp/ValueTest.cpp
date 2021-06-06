@@ -2,10 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string_view>
+
 #include "TestPrinters.h"
 #include "Value_internal.h"
 #include "gtest/gtest.h"
 #include "networktables/NetworkTableValue.h"
+
+using namespace std::string_view_literals;
 
 namespace nt {
 
@@ -66,7 +70,7 @@ TEST_F(ValueTest, String) {
   NT_InitValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ(wpi::StringRef("hello"), cv.data.v_string.str);
+  ASSERT_EQ("hello"sv, cv.data.v_string.str);
   ASSERT_EQ(5u, cv.data.v_string.len);
 
   v = Value::MakeString("goodbye");
@@ -74,7 +78,7 @@ TEST_F(ValueTest, String) {
   ASSERT_EQ("goodbye", v->GetString());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
-  ASSERT_EQ(wpi::StringRef("goodbye"), cv.data.v_string.str);
+  ASSERT_EQ("goodbye"sv, cv.data.v_string.str);
   ASSERT_EQ(7u, cv.data.v_string.len);
 
   NT_DisposeValue(&cv);
@@ -88,7 +92,7 @@ TEST_F(ValueTest, Raw) {
   NT_InitValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_RAW, cv.type);
-  ASSERT_EQ(wpi::StringRef("hello"), cv.data.v_string.str);
+  ASSERT_EQ("hello"sv, cv.data.v_string.str);
   ASSERT_EQ(5u, cv.data.v_string.len);
 
   v = Value::MakeRaw("goodbye");
@@ -96,7 +100,7 @@ TEST_F(ValueTest, Raw) {
   ASSERT_EQ("goodbye", v->GetRaw());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_RAW, cv.type);
-  ASSERT_EQ(wpi::StringRef("goodbye"), cv.data.v_string.str);
+  ASSERT_EQ("goodbye"sv, cv.data.v_string.str);
   ASSERT_EQ(7u, cv.data.v_string.len);
 
   NT_DisposeValue(&cv);
@@ -190,17 +194,17 @@ TEST_F(ValueTest, StringArray) {
   auto v = Value::MakeStringArray(std::move(vec));
   ASSERT_EQ(NT_STRING_ARRAY, v->type());
   ASSERT_EQ(3u, v->GetStringArray().size());
-  ASSERT_EQ(wpi::StringRef("hello"), v->GetStringArray()[0]);
-  ASSERT_EQ(wpi::StringRef("goodbye"), v->GetStringArray()[1]);
-  ASSERT_EQ(wpi::StringRef("string"), v->GetStringArray()[2]);
+  ASSERT_EQ("hello"sv, v->GetStringArray()[0]);
+  ASSERT_EQ("goodbye"sv, v->GetStringArray()[1]);
+  ASSERT_EQ("string"sv, v->GetStringArray()[2]);
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ(wpi::StringRef("hello"), cv.data.arr_string.arr[0].str);
-  ASSERT_EQ(wpi::StringRef("goodbye"), cv.data.arr_string.arr[1].str);
-  ASSERT_EQ(wpi::StringRef("string"), cv.data.arr_string.arr[2].str);
+  ASSERT_EQ("hello"sv, cv.data.arr_string.arr[0].str);
+  ASSERT_EQ("goodbye"sv, cv.data.arr_string.arr[1].str);
+  ASSERT_EQ("string"sv, cv.data.arr_string.arr[2].str);
 
   // assign with same size
   vec.clear();
@@ -210,15 +214,15 @@ TEST_F(ValueTest, StringArray) {
   v = Value::MakeStringArray(vec);
   ASSERT_EQ(NT_STRING_ARRAY, v->type());
   ASSERT_EQ(3u, v->GetStringArray().size());
-  ASSERT_EQ(wpi::StringRef("s1"), v->GetStringArray()[0]);
-  ASSERT_EQ(wpi::StringRef("str2"), v->GetStringArray()[1]);
-  ASSERT_EQ(wpi::StringRef("string3"), v->GetStringArray()[2]);
+  ASSERT_EQ("s1"sv, v->GetStringArray()[0]);
+  ASSERT_EQ("str2"sv, v->GetStringArray()[1]);
+  ASSERT_EQ("string3"sv, v->GetStringArray()[2]);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
-  ASSERT_EQ(wpi::StringRef("s1"), cv.data.arr_string.arr[0].str);
-  ASSERT_EQ(wpi::StringRef("str2"), cv.data.arr_string.arr[1].str);
-  ASSERT_EQ(wpi::StringRef("string3"), cv.data.arr_string.arr[2].str);
+  ASSERT_EQ("s1"sv, cv.data.arr_string.arr[0].str);
+  ASSERT_EQ("str2"sv, cv.data.arr_string.arr[1].str);
+  ASSERT_EQ("string3"sv, cv.data.arr_string.arr[2].str);
 
   // assign with different size
   vec.clear();
@@ -227,13 +231,13 @@ TEST_F(ValueTest, StringArray) {
   v = Value::MakeStringArray(std::move(vec));
   ASSERT_EQ(NT_STRING_ARRAY, v->type());
   ASSERT_EQ(2u, v->GetStringArray().size());
-  ASSERT_EQ(wpi::StringRef("short"), v->GetStringArray()[0]);
-  ASSERT_EQ(wpi::StringRef("er"), v->GetStringArray()[1]);
+  ASSERT_EQ("short"sv, v->GetStringArray()[0]);
+  ASSERT_EQ("er"sv, v->GetStringArray()[1]);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_string.size);
-  ASSERT_EQ(wpi::StringRef("short"), cv.data.arr_string.arr[0].str);
-  ASSERT_EQ(wpi::StringRef("er"), cv.data.arr_string.arr[1].str);
+  ASSERT_EQ("short"sv, cv.data.arr_string.arr[0].str);
+  ASSERT_EQ("er"sv, cv.data.arr_string.arr[1].str);
 
   NT_DisposeValue(&cv);
 }

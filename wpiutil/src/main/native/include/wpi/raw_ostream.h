@@ -16,7 +16,6 @@
 
 #include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -33,11 +32,6 @@ enum CreationDisposition : unsigned;
 } // end namespace fs
 
 namespace wpi {
-
-class format_object_base;
-class FormattedString;
-class FormattedNumber;
-class FormattedBytes;
 
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
@@ -180,21 +174,6 @@ public:
     return *this;
   }
 
-  raw_ostream &operator<<(StringRef Str) {
-    // Inline fast path, particularly for strings with a known length.
-    size_t Size = Str.size();
-
-    // Make sure we can use the fast path.
-    if (Size > (size_t)(OutBufEnd - OutBufCur))
-      return write(Str.data(), Size);
-
-    if (Size) {
-      memcpy(OutBufCur, Str.data(), Size);
-      OutBufCur += Size;
-    }
-    return *this;
-  }
-
   raw_ostream &operator<<(std::string_view Str) {
     // Inline fast path, particularly for strings with a known length.
     size_t Size = Str.size();
@@ -214,7 +193,7 @@ public:
     // Inline fast path, particularly for constant strings where a sufficiently
     // smart compiler will simplify strlen.
 
-    return this->operator<<(StringRef(Str));
+    return this->operator<<(std::string_view(Str));
   }
 
   raw_ostream &operator<<(const std::string &Str) {
@@ -235,46 +214,15 @@ public:
     return write(Arr.data(), Arr.size());
   }
 
-  raw_ostream &operator<<(unsigned long N);
-  raw_ostream &operator<<(long N);
-  raw_ostream &operator<<(unsigned long long N);
-  raw_ostream &operator<<(long long N);
-  raw_ostream &operator<<(const void *P);
-
-  raw_ostream &operator<<(unsigned int N) {
-    return this->operator<<(static_cast<unsigned long>(N));
-  }
-
-  raw_ostream &operator<<(int N) {
-    return this->operator<<(static_cast<long>(N));
-  }
-
-  raw_ostream &operator<<(double N);
-
-  /// Output \p N in hexadecimal, without any prefix or padding.
-  raw_ostream &write_hex(unsigned long long N);
-
   /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
   /// satisfy wpi::isPrint into an escape sequence.
-  raw_ostream &write_escaped(StringRef Str, bool UseHexEscapes = false);
+  raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
 
   raw_ostream &write(unsigned char C);
   raw_ostream &write(const char *Ptr, size_t Size);
   raw_ostream &write(const uint8_t *Ptr, size_t Size) {
     return write(reinterpret_cast<const char *>(Ptr), Size);
   }
-
-  // Formatted output, see the format() function in Support/Format.h.
-  raw_ostream &operator<<(const format_object_base &Fmt);
-
-  // Formatted output, see the leftJustify() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedString &);
-
-  // Formatted output, see the formatHex() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedNumber &);
-
-  // Formatted output, see the format_bytes() function in Support/Format.h.
-  raw_ostream &operator<<(const FormattedBytes &);
 
   /// indent - Insert 'NumSpaces' spaces.
   raw_ostream &indent(unsigned NumSpaces);
@@ -443,14 +391,14 @@ public:
   /// As a special case, if Filename is "-", then the stream will use
   /// STDOUT_FILENO instead of opening a file. This will not close the stdout
   /// descriptor.
-  raw_fd_ostream(StringRef Filename, std::error_code &EC);
-  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+  raw_fd_ostream(std::string_view Filename, std::error_code &EC);
+  raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                  fs::CreationDisposition Disp);
-  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+  raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                  fs::FileAccess Access);
-  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+  raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                  fs::OpenFlags Flags);
-  raw_fd_ostream(StringRef Filename, std::error_code &EC,
+  raw_fd_ostream(std::string_view Filename, std::error_code &EC,
                  fs::CreationDisposition Disp, fs::FileAccess Access,
                  fs::OpenFlags Flags);
 
@@ -559,8 +507,8 @@ public:
 
   void flush() = delete;
 
-  /// Return a StringRef for the vector contents.
-  StringRef str() { return StringRef(OS.data(), OS.size()); }
+  /// Return a std::string_view for the vector contents.
+  std::string_view str() { return std::string_view(OS.data(), OS.size()); }
 };
 
 /// A raw_ostream that writes to a vector.  This is a
@@ -592,8 +540,8 @@ public:
 
   void flush() = delete;
 
-  /// Return a StringRef for the vector contents.
-  StringRef str() { return StringRef(OS.data(), OS.size()); }
+  /// Return a std::string_view for the vector contents.
+  std::string_view str() { return std::string_view(OS.data(), OS.size()); }
 };
 
 /// A raw_ostream that writes to an SmallVector or SmallString.  This is a
@@ -658,7 +606,7 @@ public:
 
   void flush() = delete;
 
-  /// Return a StringRef for the vector contents.
+  /// Return a ArrayRef for the vector contents.
   ArrayRef<uint8_t> array() { return ArrayRef<uint8_t>(OS.data(), OS.size()); }
 };
 

@@ -11,14 +11,15 @@
 #include <cstring>
 #include <initializer_list>
 #include <memory>
+#include <string_view>
 #include <vector>
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
 #include <wpi/ArrayRef.h>
-#include <wpi/Format.h>
 #include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpi/raw_ostream.h>
 
 #include "glass/Context.h"
@@ -47,19 +48,7 @@ static std::string BooleanArrayToString(wpi::ArrayRef<int> in) {
 }
 
 static std::string DoubleArrayToString(wpi::ArrayRef<double> in) {
-  std::string rv;
-  wpi::raw_string_ostream os{rv};
-  os << '[';
-  bool first = true;
-  for (auto v : in) {
-    if (!first) {
-      os << ',';
-    }
-    first = false;
-    os << wpi::format("%.6f", v);
-  }
-  os << ']';
-  return rv;
+  return fmt::format("[{:.6f}]", fmt::join(in, ","));
 }
 
 static std::string StringArrayToString(wpi::ArrayRef<std::string> in) {
@@ -107,14 +96,14 @@ void NetworkTablesModel::Entry::UpdateValue() {
   switch (value->type()) {
     case NT_BOOLEAN:
       if (!source) {
-        source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
       }
       source->SetValue(value->GetBoolean() ? 1 : 0);
       source->SetDigital(true);
       break;
     case NT_DOUBLE:
       if (!source) {
-        source = std::make_unique<DataSource>(wpi::Twine{"NT:"} + name);
+        source = std::make_unique<DataSource>(fmt::format("NT:{}", name));
       }
       source->SetValue(value->GetDouble());
       source->SetDigital(false);
@@ -185,10 +174,10 @@ void NetworkTablesModel::Update() {
 
   // rebuild tree
   m_root.clear();
-  wpi::SmallVector<wpi::StringRef, 16> parts;
+  wpi::SmallVector<std::string_view, 16> parts;
   for (auto& entry : m_sortedEntries) {
     parts.clear();
-    wpi::StringRef{entry->name}.split(parts, '/', -1, false);
+    wpi::split(entry->name, parts, '/', -1, false);
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -206,8 +195,8 @@ void NetworkTablesModel::Update() {
         // path is from the beginning of the string to the end of the current
         // part; this works because part is a reference to the internals of
         // entry->name
-        nodes->back().path.assign(entry->name.data(),
-                                  part.end() - entry->name.data());
+        nodes->back().path.assign(
+            entry->name.data(), part.data() + part.size() - entry->name.data());
         it = nodes->end() - 1;
       }
       nodes = &it->children;
@@ -229,33 +218,33 @@ bool NetworkTablesModel::Exists() {
   return nt::IsConnected(m_inst);
 }
 
-static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
-  in = in.trim();
+static std::shared_ptr<nt::Value> StringToBooleanArray(std::string_view in) {
+  in = wpi::trim(in);
   if (in.empty()) {
     return nt::NetworkTableValue::MakeBooleanArray(
         std::initializer_list<bool>{});
   }
   if (in.front() == '[') {
-    in = in.drop_front();
+    in.remove_prefix(1);
   }
   if (in.back() == ']') {
-    in = in.drop_back();
+    in.remove_suffix(1);
   }
-  in = in.trim();
+  in = wpi::trim(in);
 
-  wpi::SmallVector<wpi::StringRef, 16> inSplit;
+  wpi::SmallVector<std::string_view, 16> inSplit;
   wpi::SmallVector<int, 16> out;
 
-  in.split(inSplit, ',', -1, false);
+  wpi::split(in, inSplit, ',', -1, false);
   for (auto val : inSplit) {
-    val = val.trim();
-    if (val.equals_lower("true")) {
+    val = wpi::trim(val);
+    if (wpi::equals_lower(val, "true")) {
       out.emplace_back(1);
-    } else if (val.equals_lower("false")) {
+    } else if (wpi::equals_lower(val, "false")) {
       out.emplace_back(0);
     } else {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
   }
@@ -263,33 +252,30 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(wpi::StringRef in) {
   return nt::NetworkTableValue::MakeBooleanArray(out);
 }
 
-static std::shared_ptr<nt::Value> StringToDoubleArray(wpi::StringRef in) {
-  in = in.trim();
+static std::shared_ptr<nt::Value> StringToDoubleArray(std::string_view in) {
+  in = wpi::trim(in);
   if (in.empty()) {
     return nt::NetworkTableValue::MakeDoubleArray(
         std::initializer_list<double>{});
   }
   if (in.front() == '[') {
-    in = in.drop_front();
+    in.remove_prefix(1);
   }
   if (in.back() == ']') {
-    in = in.drop_back();
+    in.remove_suffix(1);
   }
-  in = in.trim();
+  in = wpi::trim(in);
 
-  wpi::SmallVector<wpi::StringRef, 16> inSplit;
+  wpi::SmallVector<std::string_view, 16> inSplit;
   wpi::SmallVector<double, 16> out;
 
-  in.split(inSplit, ',', -1, false);
+  wpi::split(in, inSplit, ',', -1, false);
   for (auto val : inSplit) {
-    val = val.trim();
-    wpi::SmallString<32> valStr = val;
-    double d;
-    if (std::sscanf(valStr.c_str(), "%lf", &d) == 1) {
-      out.emplace_back(d);
+    if (auto num = wpi::parse_float<double>(wpi::trim(val))) {
+      out.emplace_back(num.value());
     } else {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
   }
@@ -307,8 +293,8 @@ static int fromxdigit(char ch) {
   }
 }
 
-static wpi::StringRef UnescapeString(wpi::StringRef source,
-                                     wpi::SmallVectorImpl<char>& buf) {
+static std::string_view UnescapeString(std::string_view source,
+                                       wpi::SmallVectorImpl<char>& buf) {
   assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
   buf.clear();
   buf.reserve(source.size() - 2);
@@ -342,36 +328,36 @@ static wpi::StringRef UnescapeString(wpi::StringRef source,
         break;
     }
   }
-  return wpi::StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
-static std::shared_ptr<nt::Value> StringToStringArray(wpi::StringRef in) {
-  in = in.trim();
+static std::shared_ptr<nt::Value> StringToStringArray(std::string_view in) {
+  in = wpi::trim(in);
   if (in.empty()) {
     return nt::NetworkTableValue::MakeStringArray(
         std::initializer_list<std::string>{});
   }
   if (in.front() == '[') {
-    in = in.drop_front();
+    in.remove_prefix(1);
   }
   if (in.back() == ']') {
-    in = in.drop_back();
+    in.remove_suffix(1);
   }
-  in = in.trim();
+  in = wpi::trim(in);
 
-  wpi::SmallVector<wpi::StringRef, 16> inSplit;
+  wpi::SmallVector<std::string_view, 16> inSplit;
   std::vector<std::string> out;
   wpi::SmallString<32> buf;
 
-  in.split(inSplit, ',', -1, false);
+  wpi::split(in, inSplit, ',', -1, false);
   for (auto val : inSplit) {
-    val = val.trim();
+    val = wpi::trim(val);
     if (val.empty()) {
       continue;
     }
     if (val.front() != '"' || val.back() != '"') {
-      wpi::errs() << "GUI: NetworkTables: Could not understand value '" << val
-                  << "'\n";
+      fmt::print(stderr,
+                 "GUI: NetworkTables: Could not understand value '{}'\n", val);
       return nullptr;
     }
     out.emplace_back(UnescapeString(val, buf));
@@ -421,7 +407,7 @@ static void EmitEntryValueReadonly(NetworkTablesModel::Entry& entry) {
 
 static constexpr size_t kTextBufferSize = 4096;
 
-static char* GetTextBuffer(wpi::StringRef in) {
+static char* GetTextBuffer(std::string_view in) {
   static char textBuffer[kTextBufferSize];
   size_t len = (std::min)(in.size(), kTextBufferSize - 1);
   std::memcpy(textBuffer, in.data(), len);
@@ -524,7 +510,7 @@ static void EmitParentContextMenu(const std::string& path,
       if (path == "/") {
         fullNewPath = path + nameBuffer;
       } else {
-        fullNewPath = (path + wpi::Twine('/') + nameBuffer).str();
+        fullNewPath = fmt::format("{}/{}", path, nameBuffer);
       }
 
       ImGui::Text("Adding: %s", fullNewPath.c_str());

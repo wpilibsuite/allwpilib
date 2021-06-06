@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstring>
 
+#include <fmt/format.h>
 #include <wpi/jni_util.h>
 
 #include "HALUtil.h"
@@ -227,13 +228,11 @@ Java_edu_wpi_first_hal_HAL_getJoystickAxes
 
   jsize javaSize = env->GetArrayLength(axesArray);
   if (axes.count > javaSize) {
-    wpi::SmallString<128> errStr;
-    wpi::raw_svector_ostream oss{errStr};
-    oss << "Native array size larger then passed in java array size "
-        << "Native Size: " << static_cast<int>(axes.count)
-        << " Java Size: " << static_cast<int>(javaSize);
-
-    ThrowIllegalArgumentException(env, errStr.str());
+    ThrowIllegalArgumentException(
+        env,
+        fmt::format("Native array size larger then passed in java array "
+                    "size\nNative Size: {} Java Size: {}",
+                    static_cast<int>(axes.count), static_cast<int>(javaSize)));
     return 0;
   }
 
@@ -256,13 +255,11 @@ Java_edu_wpi_first_hal_HAL_getJoystickPOVs
 
   jsize javaSize = env->GetArrayLength(povsArray);
   if (povs.count > javaSize) {
-    wpi::SmallString<128> errStr;
-    wpi::raw_svector_ostream oss{errStr};
-    oss << "Native array size larger then passed in java array size "
-        << "Native Size: " << static_cast<int>(povs.count)
-        << " Java Size: " << static_cast<int>(javaSize);
-
-    ThrowIllegalArgumentException(env, errStr.str());
+    ThrowIllegalArgumentException(
+        env,
+        fmt::format("Native array size larger then passed in java array "
+                    "size\nNative Size: {} Java Size: {}",
+                    static_cast<int>(povs.count), static_cast<int>(javaSize)));
     return 0;
   }
 

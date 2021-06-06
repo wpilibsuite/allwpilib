@@ -26,6 +26,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 
 #include "wpi/NetworkStream.h"
 
@@ -50,7 +51,7 @@ class TCPStream : public NetworkStream {
                  int timeout = 0) override;
   void close() final;
 
-  StringRef getPeerIP() const override;
+  std::string_view getPeerIP() const override;
   int getPeerPort() const override;
   void setNoDelay() override;
   bool setBlocking(bool enabled) override;

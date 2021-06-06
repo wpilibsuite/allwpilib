@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "networktables/NetworkTableEntry.h"
@@ -67,21 +68,21 @@ inline double NetworkTableEntry::GetDouble(double defaultValue) const {
 }
 
 inline std::string NetworkTableEntry::GetString(
-    wpi::StringRef defaultValue) const {
+    std::string_view defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_STRING) {
-    return defaultValue;
+    return std::string{defaultValue};
   }
-  return value->GetString();
+  return std::string{value->GetString()};
 }
 
 inline std::string NetworkTableEntry::GetRaw(
-    wpi::StringRef defaultValue) const {
+    std::string_view defaultValue) const {
   auto value = GetEntryValue(m_handle);
   if (!value || value->type() != NT_RAW) {
-    return defaultValue;
+    return std::string{defaultValue};
   }
-  return value->GetRaw();
+  return std::string{value->GetRaw()};
 }
 
 inline std::vector<int> NetworkTableEntry::GetBooleanArray(
@@ -141,12 +142,11 @@ inline bool NetworkTableEntry::SetDefaultDouble(double defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDouble(defaultValue));
 }
 
-inline bool NetworkTableEntry::SetDefaultString(
-    const wpi::Twine& defaultValue) {
+inline bool NetworkTableEntry::SetDefaultString(std::string_view defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeString(defaultValue));
 }
 
-inline bool NetworkTableEntry::SetDefaultRaw(wpi::StringRef defaultValue) {
+inline bool NetworkTableEntry::SetDefaultRaw(std::string_view defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeRaw(defaultValue));
 }
 
@@ -192,11 +192,11 @@ inline bool NetworkTableEntry::SetDouble(double value) {
   return SetEntryValue(m_handle, Value::MakeDouble(value));
 }
 
-inline bool NetworkTableEntry::SetString(const wpi::Twine& value) {
+inline bool NetworkTableEntry::SetString(std::string_view value) {
   return SetEntryValue(m_handle, Value::MakeString(value));
 }
 
-inline bool NetworkTableEntry::SetRaw(wpi::StringRef value) {
+inline bool NetworkTableEntry::SetRaw(std::string_view value) {
   return SetEntryValue(m_handle, Value::MakeRaw(value));
 }
 
@@ -249,11 +249,11 @@ inline void NetworkTableEntry::ForceSetDouble(double value) {
   SetEntryTypeValue(m_handle, Value::MakeDouble(value));
 }
 
-inline void NetworkTableEntry::ForceSetString(const wpi::Twine& value) {
+inline void NetworkTableEntry::ForceSetString(std::string_view value) {
   SetEntryTypeValue(m_handle, Value::MakeString(value));
 }
 
-inline void NetworkTableEntry::ForceSetRaw(wpi::StringRef value) {
+inline void NetworkTableEntry::ForceSetRaw(std::string_view value) {
   SetEntryTypeValue(m_handle, Value::MakeRaw(value));
 }
 
@@ -321,10 +321,10 @@ inline void NetworkTableEntry::Delete() {
 
 inline void NetworkTableEntry::CreateRpc(
     std::function<void(const RpcAnswer& answer)> callback) {
-  ::nt::CreateRpc(m_handle, wpi::StringRef("\0", 1), callback);
+  ::nt::CreateRpc(m_handle, std::string_view("\0", 1), callback);
 }
 
-inline RpcCall NetworkTableEntry::CallRpc(wpi::StringRef params) {
+inline RpcCall NetworkTableEntry::CallRpc(std::string_view params) {
   return RpcCall{m_handle, ::nt::CallRpc(m_handle, params)};
 }
 

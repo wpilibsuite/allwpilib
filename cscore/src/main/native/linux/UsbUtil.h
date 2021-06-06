@@ -5,15 +5,11 @@
 #ifndef CSCORE_USBUTIL_H_
 #define CSCORE_USBUTIL_H_
 
-#include <stdint.h>
-
-#include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
+#include <string>
 
 namespace cs {
 
-wpi::StringRef GetUsbNameFromId(int vendor, int product,
-                                wpi::SmallVectorImpl<char>& buf);
+std::string GetUsbNameFromId(int vendor, int product);
 
 int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
                  const char* name, const char* file, int line, bool quiet);

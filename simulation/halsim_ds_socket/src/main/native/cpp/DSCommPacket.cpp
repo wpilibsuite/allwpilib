@@ -13,7 +13,6 @@
 #include <hal/simulation/DriverStationData.h>
 #include <hal/simulation/MockHooks.h>
 #include <wpi/ArrayRef.h>
-#include <wpi/Format.h>
 
 using namespace halsim;
 

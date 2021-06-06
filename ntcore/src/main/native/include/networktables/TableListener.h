@@ -7,8 +7,7 @@
 
 #include <functional>
 #include <memory>
-
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace nt {
 
@@ -25,9 +24,9 @@ class NetworkTable;
  *
  * @ingroup ntcore_cpp_api
  */
-typedef std::function<void(NetworkTable* parent, wpi::StringRef name,
-                           std::shared_ptr<NetworkTable> table)>
-    TableListener;
+using TableListener =
+    std::function<void(NetworkTable* parent, std::string_view name,
+                       std::shared_ptr<NetworkTable> table)>;
 
 }  // namespace nt
 

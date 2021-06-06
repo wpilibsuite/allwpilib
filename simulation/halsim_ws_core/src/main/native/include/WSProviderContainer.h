@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <string_view>
 
 #include <wpi/StringMap.h>
 
@@ -25,12 +26,13 @@ class ProviderContainer {
   ProviderContainer(const ProviderContainer&) = delete;
   ProviderContainer& operator=(const ProviderContainer&) = delete;
 
-  void Add(wpi::StringRef key, std::shared_ptr<HALSimWSBaseProvider> provider) {
+  void Add(std::string_view key,
+           std::shared_ptr<HALSimWSBaseProvider> provider) {
     std::unique_lock lock(m_mutex);
     m_providers[key] = provider;
   }
 
-  void Delete(wpi::StringRef key) {
+  void Delete(std::string_view key) {
     std::unique_lock lock(m_mutex);
     m_providers.erase(key);
   }
@@ -42,7 +44,7 @@ class ProviderContainer {
     }
   }
 
-  ProviderPtr Get(wpi::StringRef key) {
+  ProviderPtr Get(std::string_view key) {
     std::shared_lock lock(m_mutex);
     auto fiter = m_providers.find(key);
     return fiter != m_providers.end() ? fiter->second : ProviderPtr();

@@ -13,7 +13,7 @@
 
 using namespace cs;
 
-ConfigurableSourceImpl::ConfigurableSourceImpl(const wpi::Twine& name,
+ConfigurableSourceImpl::ConfigurableSourceImpl(std::string_view name,
                                                wpi::Logger& logger,
                                                Notifier& notifier,
                                                Telemetry& telemetry,
@@ -50,11 +50,11 @@ void ConfigurableSourceImpl::NumSinksEnabledChanged() {
   // ignore
 }
 
-void ConfigurableSourceImpl::NotifyError(const wpi::Twine& msg) {
+void ConfigurableSourceImpl::NotifyError(std::string_view msg) {
   PutError(msg, wpi::Now());
 }
 
-int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
+int ConfigurableSourceImpl::CreateProperty(std::string_view name,
                                            CS_PropertyKind kind, int minimum,
                                            int maximum, int step,
                                            int defaultValue, int value) {
@@ -75,12 +75,12 @@ int ConfigurableSourceImpl::CreateProperty(const wpi::Twine& name,
         value = prop.value;
       });
   m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, name, ndx,
-                                  kind, value, wpi::Twine{});
+                                  kind, value, {});
   return ndx;
 }
 
 int ConfigurableSourceImpl::CreateProperty(
-    const wpi::Twine& name, CS_PropertyKind kind, int minimum, int maximum,
+    std::string_view name, CS_PropertyKind kind, int minimum, int maximum,
     int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange) {
   // TODO
@@ -102,5 +102,5 @@ void ConfigurableSourceImpl::SetEnumPropertyChoices(
   prop->enumChoices = choices;
   m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
                                   prop->name, property, CS_PROP_ENUM,
-                                  prop->value, wpi::Twine{});
+                                  prop->value, {});
 }

@@ -121,7 +121,7 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSafeState([=]() { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
-      [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
+      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         switch (Get()) {
           case kForward:
             return "Forward";
@@ -131,7 +131,7 @@ void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
             return "Off";
         }
       },
-      [=](wpi::StringRef value) {
+      [=](std::string_view value) {
         Value lvalue = kOff;
         if (value == "Forward") {
           lvalue = kForward;

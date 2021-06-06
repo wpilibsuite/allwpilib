@@ -4,14 +4,14 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <imgui.h>
 #include <wpi/ArrayRef.h>
 #include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -31,10 +31,10 @@ class FieldObjectModel : public Model {
 
 class Field2DModel : public Model {
  public:
-  virtual FieldObjectModel* AddFieldObject(const wpi::Twine& name) = 0;
-  virtual void RemoveFieldObject(const wpi::Twine& name) = 0;
+  virtual FieldObjectModel* AddFieldObject(std::string_view name) = 0;
+  virtual void RemoveFieldObject(std::string_view name) = 0;
   virtual void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
+      wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
           func) = 0;
 };
 

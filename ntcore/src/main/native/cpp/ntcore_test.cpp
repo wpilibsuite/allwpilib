@@ -12,7 +12,7 @@ extern "C" {
 struct NT_String* NT_GetStringForTesting(const char* string, int* struct_size) {
   struct NT_String* str =
       static_cast<NT_String*>(wpi::safe_calloc(1, sizeof(NT_String)));
-  nt::ConvertToC(wpi::StringRef(string), str);
+  nt::ConvertToC(string, str);
   *struct_size = sizeof(NT_String);
   return str;
 }
@@ -24,7 +24,7 @@ struct NT_EntryInfo* NT_GetEntryInfoForTesting(const char* name,
                                                int* struct_size) {
   struct NT_EntryInfo* entry_info =
       static_cast<NT_EntryInfo*>(wpi::safe_calloc(1, sizeof(NT_EntryInfo)));
-  nt::ConvertToC(wpi::StringRef(name), &entry_info->name);
+  nt::ConvertToC(name, &entry_info->name);
   entry_info->type = type;
   entry_info->flags = flags;
   entry_info->last_change = last_change;
@@ -42,8 +42,8 @@ struct NT_ConnectionInfo* NT_GetConnectionInfoForTesting(
     uint64_t last_update, unsigned int protocol_version, int* struct_size) {
   struct NT_ConnectionInfo* conn_info = static_cast<NT_ConnectionInfo*>(
       wpi::safe_calloc(1, sizeof(NT_ConnectionInfo)));
-  nt::ConvertToC(wpi::StringRef(remote_id), &conn_info->remote_id);
-  nt::ConvertToC(wpi::StringRef(remote_ip), &conn_info->remote_ip);
+  nt::ConvertToC(remote_id, &conn_info->remote_id);
+  nt::ConvertToC(remote_ip, &conn_info->remote_ip);
   conn_info->remote_port = remote_port;
   conn_info->last_update = last_update;
   conn_info->protocol_version = protocol_version;
@@ -86,7 +86,7 @@ struct NT_Value* NT_GetValueStringForTesting(uint64_t last_change,
       static_cast<NT_Value*>(wpi::safe_calloc(1, sizeof(NT_Value)));
   value->type = NT_STRING;
   value->last_change = last_change;
-  nt::ConvertToC(wpi::StringRef(str), &value->data.v_string);
+  nt::ConvertToC(str, &value->data.v_string);
   *struct_size = sizeof(NT_Value);
   return value;
 }
@@ -97,7 +97,7 @@ struct NT_Value* NT_GetValueRawForTesting(uint64_t last_change, const char* raw,
       static_cast<NT_Value*>(wpi::safe_calloc(1, sizeof(NT_Value)));
   value->type = NT_RAW;
   value->last_change = last_change;
-  nt::ConvertToC(wpi::StringRef(raw, raw_len), &value->data.v_string);
+  nt::ConvertToC(std::string_view(raw, raw_len), &value->data.v_string);
   *struct_size = sizeof(NT_Value);
   return value;
 }
@@ -164,7 +164,7 @@ static void CopyNtValue(const struct NT_Value* copy_from,
 
 static void CopyNtString(const struct NT_String* copy_from,
                          struct NT_String* copy_to) {
-  nt::ConvertToC(wpi::StringRef(copy_from->str, copy_from->len), copy_to);
+  nt::ConvertToC({copy_from->str, copy_from->len}, copy_to);
 }
 
 struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
@@ -172,7 +172,7 @@ struct NT_RpcParamDef* NT_GetRpcParamDefForTesting(const char* name,
                                                    int* struct_size) {
   struct NT_RpcParamDef* def =
       static_cast<NT_RpcParamDef*>(wpi::safe_calloc(1, sizeof(NT_RpcParamDef)));
-  nt::ConvertToC(wpi::StringRef(name), &def->name);
+  nt::ConvertToC(name, &def->name);
   CopyNtValue(val, &def->def_value);
   *struct_size = sizeof(NT_RpcParamDef);
   return def;
@@ -189,7 +189,7 @@ struct NT_RpcResultDef* NT_GetRpcResultsDefForTesting(const char* name,
                                                       int* struct_size) {
   struct NT_RpcResultDef* def = static_cast<NT_RpcResultDef*>(
       wpi::safe_calloc(1, sizeof(NT_RpcResultDef)));
-  nt::ConvertToC(wpi::StringRef(name), &def->name);
+  nt::ConvertToC(name, &def->name);
   def->type = type;
   *struct_size = sizeof(NT_RpcResultDef);
   return def;
@@ -207,7 +207,7 @@ struct NT_RpcDefinition* NT_GetRpcDefinitionForTesting(
   struct NT_RpcDefinition* def = static_cast<NT_RpcDefinition*>(
       wpi::safe_calloc(1, sizeof(NT_RpcDefinition)));
   def->version = version;
-  nt::ConvertToC(wpi::StringRef(name), &def->name);
+  nt::ConvertToC(name, &def->name);
   def->num_params = num_params;
   def->params = static_cast<NT_RpcParamDef*>(
       wpi::safe_malloc(num_params * sizeof(NT_RpcParamDef)));
@@ -234,8 +234,8 @@ struct NT_RpcAnswer* NT_GetRpcAnswerForTesting(
       static_cast<NT_RpcAnswer*>(wpi::safe_calloc(1, sizeof(NT_RpcAnswer)));
   info->entry = rpc_id;
   info->call = call_uid;
-  nt::ConvertToC(wpi::StringRef(name), &info->name);
-  nt::ConvertToC(wpi::StringRef(params, params_len), &info->params);
+  nt::ConvertToC(name, &info->name);
+  nt::ConvertToC({params, params_len}, &info->params);
   *struct_size = sizeof(NT_RpcAnswer);
   return info;
 }

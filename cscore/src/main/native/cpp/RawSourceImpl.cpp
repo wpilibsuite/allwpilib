@@ -14,7 +14,7 @@
 
 using namespace cs;
 
-RawSourceImpl::RawSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+RawSourceImpl::RawSourceImpl(std::string_view name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              const VideoMode& mode)
     : ConfigurableSourceImpl{name, logger, notifier, telemetry, mode} {}
@@ -47,7 +47,7 @@ void RawSourceImpl::PutFrame(const CS_RawFrame& image) {
 }
 
 namespace cs {
-CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
+CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
                           CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSource(CS_SOURCE_RAW, std::make_shared<RawSourceImpl>(

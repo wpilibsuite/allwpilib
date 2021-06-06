@@ -6,6 +6,8 @@
 
 #include <jni.h>
 
+#include <cstdio>
+
 #include <wpi/jni_util.h>
 
 #include "SimulatorJNI.h"
@@ -45,13 +47,13 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
   }
 
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),

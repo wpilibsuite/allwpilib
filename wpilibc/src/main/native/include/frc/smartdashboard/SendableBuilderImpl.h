@@ -100,7 +100,7 @@ class SendableBuilderImpl : public SendableBuilder {
 
   void AddStringProperty(std::string_view key,
                          std::function<std::string()> getter,
-                         std::function<void(wpi::StringRef)> setter) override;
+                         std::function<void(std::string_view)> setter) override;
 
   void AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,
@@ -115,7 +115,7 @@ class SendableBuilderImpl : public SendableBuilder {
       std::function<void(wpi::ArrayRef<std::string>)> setter) override;
 
   void AddRawProperty(std::string_view key, std::function<std::string()> getter,
-                      std::function<void(wpi::StringRef)> setter) override;
+                      std::function<void(std::string_view)> setter) override;
 
   void AddValueProperty(
       std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
@@ -123,8 +123,8 @@ class SendableBuilderImpl : public SendableBuilder {
 
   void AddSmallStringProperty(
       std::string_view key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) override;
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) override;
 
   void AddSmallBooleanArrayProperty(
       std::string_view key,
@@ -146,8 +146,8 @@ class SendableBuilderImpl : public SendableBuilder {
 
   void AddSmallRawProperty(
       std::string_view key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) override;
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) override;
 
  private:
   struct Property {

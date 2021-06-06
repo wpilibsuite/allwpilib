@@ -8,7 +8,7 @@
 
 #include "wpi/Demangle.h"
 #include "wpi/SmallString.h"
-#include "wpi/StringRef.h"
+#include "wpi/StringExtras.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
@@ -24,19 +24,18 @@ std::string GetStackTrace(int offset) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
       // extract just function name from "pathToExe(functionName+offset)"
-      StringRef sym{mangledSymbols[i]};
-      sym = sym.split('(').second;
-      StringRef offset;
-      std::tie(sym, offset) = sym.split('+');
-      StringRef addr;
-      std::tie(offset, addr) = offset.split(')');
+      std::string_view sym = split(mangledSymbols[i], '(').second;
+      std::string_view offset;
+      std::tie(sym, offset) = split(sym, '+');
+      std::string_view addr;
+      std::tie(offset, addr) = split(offset, ')');
       trace << "\tat " << Demangle(sym) << " + " << offset << addr << "\n";
     }
   }
 
   std::free(mangledSymbols);
 
-  return trace.str();
+  return std::string{trace.str()};
 }
 
 }  // namespace wpi

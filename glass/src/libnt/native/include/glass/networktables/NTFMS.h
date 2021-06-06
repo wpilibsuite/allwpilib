@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
@@ -18,8 +19,8 @@ class NTFMSModel : public FMSModel {
   static constexpr const char* kType = "FMSInfo";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTFMSModel(wpi::StringRef path);
-  NTFMSModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTFMSModel(std::string_view path);
+  NTFMSModel(NT_Inst inst, std::string_view path);
 
   DataSource* GetFmsAttachedData() override { return &m_fmsAttached; }
   DataSource* GetDsAttachedData() override { return &m_dsAttached; }
@@ -32,7 +33,7 @@ class NTFMSModel : public FMSModel {
   DataSource* GetEnabledData() override { return &m_enabled; }
   DataSource* GetTestData() override { return &m_test; }
   DataSource* GetAutonomousData() override { return &m_autonomous; }
-  wpi::StringRef GetGameSpecificMessage(
+  std::string_view GetGameSpecificMessage(
       wpi::SmallVectorImpl<char>& buf) override;
 
   // NT is read-only (it's continually set by robot code)

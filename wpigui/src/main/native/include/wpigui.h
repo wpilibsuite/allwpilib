@@ -6,13 +6,9 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 
 #include <imgui.h>
-
-#if __has_include(<wpi/StringRef.h>)
-#include <wpi/StringRef.h>
-#define WPIGUI_HAS_STRINGREF
-#endif
 
 extern "C" struct GLFWwindow;
 
@@ -98,11 +94,10 @@ GLFWwindow* GetSystemWindow();
  */
 bool AddIcon(const unsigned char* data, int len);
 
-#ifdef WPIGUI_HAS_STRINGREF
-inline bool AddIcon(wpi::StringRef data) {
-  return AddIcon(data.bytes_begin(), data.size());
+inline bool AddIcon(std::string_view data) {
+  return AddIcon(reinterpret_cast<const unsigned char*>(data.data()),
+                 data.size());
 }
-#endif
 
 /**
  * Adds a font to the GUI.  The passed function is called during

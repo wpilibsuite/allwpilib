@@ -31,7 +31,7 @@ ShuffleboardInstance::ShuffleboardInstance(nt::NetworkTableInstance ntInstance)
 
 ShuffleboardInstance::~ShuffleboardInstance() = default;
 
-frc::ShuffleboardTab& ShuffleboardInstance::GetTab(wpi::StringRef title) {
+frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
     m_impl->tabs.try_emplace(title, ShuffleboardTab(*this, title));
     m_impl->tabsChanged = true;
@@ -77,6 +77,6 @@ void ShuffleboardInstance::SelectTab(int index) {
   m_impl->rootMetaTable->GetEntry("Selected").ForceSetDouble(index);
 }
 
-void ShuffleboardInstance::SelectTab(wpi::StringRef title) {
+void ShuffleboardInstance::SelectTab(std::string_view title) {
   m_impl->rootMetaTable->GetEntry("Selected").ForceSetString(title);
 }

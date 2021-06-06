@@ -8,6 +8,7 @@
 #include <linux/videodev2.h>
 
 #include <memory>
+#include <string_view>
 
 #include <wpi/mutex.h>
 
@@ -19,19 +20,19 @@ namespace cs {
 class UsbCameraProperty : public PropertyImpl {
  public:
   UsbCameraProperty() = default;
-  explicit UsbCameraProperty(const wpi::Twine& name_) : PropertyImpl{name_} {}
+  explicit UsbCameraProperty(std::string_view name_) : PropertyImpl{name_} {}
 
   // Software property constructor
-  UsbCameraProperty(const wpi::Twine& name_, unsigned id_,
-                    CS_PropertyKind kind_, int minimum_, int maximum_,
-                    int step_, int defaultValue_, int value_)
+  UsbCameraProperty(std::string_view name_, unsigned id_, CS_PropertyKind kind_,
+                    int minimum_, int maximum_, int step_, int defaultValue_,
+                    int value_)
       : PropertyImpl(name_, kind_, minimum_, maximum_, step_, defaultValue_,
                      value_),
         device{false},
         id{id_} {}
 
   // Normalized property constructor
-  UsbCameraProperty(const wpi::Twine& name_, int rawIndex_,
+  UsbCameraProperty(std::string_view name_, int rawIndex_,
                     const UsbCameraProperty& rawProp, int defaultValue_,
                     int value_)
       : PropertyImpl(name_, rawProp.propKind, 1, defaultValue_, value_),
@@ -55,7 +56,7 @@ class UsbCameraProperty : public PropertyImpl {
   bool DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd) const;
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
-                 const wpi::Twine& newValueStr) const;
+                 std::string_view newValueStr) const;
 
   // If this is a device (rather than software) property
   bool device{true};

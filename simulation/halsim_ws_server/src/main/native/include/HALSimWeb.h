@@ -11,7 +11,6 @@
 #include <WSBaseProvider.h>
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/StringRef.h>
 #include <wpi/uv/Async.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
@@ -42,9 +41,9 @@ class HALSimWeb : public std::enable_shared_from_this<HALSimWeb> {
   // network -> sim
   void OnNetValueChanged(const wpi::json& msg);
 
-  wpi::StringRef GetWebrootSys() const { return m_webroot_sys; }
-  wpi::StringRef GetWebrootUser() const { return m_webroot_user; }
-  wpi::StringRef GetServerUri() const { return m_uri; }
+  const std::string& GetWebrootSys() const { return m_webroot_sys; }
+  const std::string& GetWebrootUser() const { return m_webroot_user; }
+  const std::string& GetServerUri() const { return m_uri; }
   int GetServerPort() const { return m_port; }
   wpi::uv::Loop& GetLoop() { return m_loop; }
 

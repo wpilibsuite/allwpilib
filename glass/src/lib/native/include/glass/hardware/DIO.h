@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 
@@ -57,6 +58,6 @@ class DIOsModel : public Model {
 
 void DisplayDIO(DIOModel* model, int index, bool outputsEnabled);
 void DisplayDIOs(DIOsModel* model, bool outputsEnabled,
-                 wpi::StringRef noneMsg = "No Digital I/O");
+                 std::string_view noneMsg = "No Digital I/O");
 
 }  // namespace glass

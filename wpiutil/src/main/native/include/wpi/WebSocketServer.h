@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include "wpi/ArrayRef.h"
@@ -16,7 +17,6 @@
 #include "wpi/Signal.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 #include "wpi/WebSocket.h"
 
 namespace wpi {
@@ -52,7 +52,8 @@ class WebSocketServerHelper {
    *         Second item is the matched protocol if a match was made, otherwise
    *         is empty.
    */
-  std::pair<bool, StringRef> MatchProtocol(ArrayRef<StringRef> protocols);
+  std::pair<bool, std::string_view> MatchProtocol(
+      ArrayRef<std::string_view> protocols);
 
   /**
    * Try to find a match to the list of sub-protocols provided by the client.
@@ -63,8 +64,8 @@ class WebSocketServerHelper {
    *         Second item is the matched protocol if a match was made, otherwise
    *         is empty.
    */
-  std::pair<bool, StringRef> MatchProtocol(
-      std::initializer_list<StringRef> protocols) {
+  std::pair<bool, std::string_view> MatchProtocol(
+      std::initializer_list<std::string_view> protocols) {
     return MatchProtocol(makeArrayRef(protocols.begin(), protocols.end()));
   }
 
@@ -75,7 +76,7 @@ class WebSocketServerHelper {
    * @param protocol The subprotocol to send to the client
    */
   std::shared_ptr<WebSocket> Accept(uv::Stream& stream,
-                                    StringRef protocol = StringRef{}) {
+                                    std::string_view protocol = {}) {
     return WebSocket::CreateServer(stream, m_key, m_version, protocol);
   }
 
@@ -109,19 +110,19 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
      * Checker for URL.  Return true if URL should be accepted.  By default all
      * URLs are accepted.
      */
-    std::function<bool(StringRef)> checkUrl;
+    std::function<bool(std::string_view)> checkUrl;
 
     /**
      * Checker for Host header.  Return true if Host should be accepted.  By
      * default all hosts are accepted.
      */
-    std::function<bool(StringRef)> checkHost;
+    std::function<bool(std::string_view)> checkHost;
   };
 
   /**
    * Private constructor.
    */
-  WebSocketServer(uv::Stream& stream, ArrayRef<StringRef> protocols,
+  WebSocketServer(uv::Stream& stream, ArrayRef<std::string_view> protocols,
                   ServerOptions options, const private_init&);
 
   /**
@@ -134,8 +135,8 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocketServer> Create(
-      uv::Stream& stream, ArrayRef<StringRef> protocols = ArrayRef<StringRef>{},
-      const ServerOptions& options = ServerOptions{});
+      uv::Stream& stream, ArrayRef<std::string_view> protocols = {},
+      const ServerOptions& options = {});
 
   /**
    * Starts a dedicated WebSocket server on the provided connection.  The
@@ -147,8 +148,8 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
    * @param options Handshake options
    */
   static std::shared_ptr<WebSocketServer> Create(
-      uv::Stream& stream, std::initializer_list<StringRef> protocols,
-      const ServerOptions& options = ServerOptions{}) {
+      uv::Stream& stream, std::initializer_list<std::string_view> protocols,
+      const ServerOptions& options = {}) {
     return Create(stream, makeArrayRef(protocols.begin(), protocols.end()),
                   options);
   }
@@ -156,7 +157,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   /**
    * Connected event.  First parameter is the URL, second is the websocket.
    */
-  sig::Signal<StringRef, WebSocket&> connected;
+  sig::Signal<std::string_view, WebSocket&> connected;
 
  private:
   uv::Stream& m_stream;
@@ -169,7 +170,7 @@ class WebSocketServer : public std::enable_shared_from_this<WebSocketServer> {
   sig::ScopedConnection m_errorConn;
   sig::ScopedConnection m_endConn;
 
-  void Abort(uint16_t code, StringRef reason);
+  void Abort(uint16_t code, std::string_view reason);
 };
 
 }  // namespace wpi

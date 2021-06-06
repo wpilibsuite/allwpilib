@@ -16,10 +16,10 @@
 
 using namespace cs;
 
-Frame::Frame(SourceImpl& source, const wpi::Twine& error, Time time)
+Frame::Frame(SourceImpl& source, std::string_view error, Time time)
     : m_impl{source.AllocFrameImpl().release()} {
   m_impl->refcount = 1;
-  m_impl->error = error.str();
+  m_impl->error = error;
   m_impl->time = time;
 }
 
@@ -522,10 +522,8 @@ Image* Frame::GetImageImpl(int width, int height,
   }
 
   WPI_DEBUG4(Instance::GetInstance().logger,
-             "converting image from " << cur->width << "x" << cur->height
-                                      << " type " << cur->pixelFormat << " to "
-                                      << width << "x" << height << " type "
-                                      << pixelFormat);
+             "converting image from {}x{} type {} to {}x{} type {}", cur->width,
+             cur->height, cur->pixelFormat, width, height, pixelFormat);
 
   // If the source image is a JPEG, we need to decode it before we can do
   // anything else with it.  Note that if the destination format is JPEG, we

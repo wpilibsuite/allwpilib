@@ -4,8 +4,11 @@
 
 #include "wpi/HttpServerConnection.h"
 
+#include "fmt/format.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
+#include "wpi/fmt/raw_ostream.h"
 #include "wpi/raw_uv_ostream.h"
 
 using namespace wpi;
@@ -21,16 +24,18 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
 
   // look for Accept-Encoding headers to determine if gzip is acceptable
   m_request.messageBegin.connect([this] { m_acceptGzip = false; });
-  m_request.header.connect([this](StringRef name, StringRef value) {
-    if (name.equals_lower("accept-encoding") && value.contains("gzip")) {
-      m_acceptGzip = true;
-    }
-  });
+  m_request.header.connect(
+      [this](std::string_view name, std::string_view value) {
+        if (wpi::equals_lower(name, "accept-encoding") &&
+            wpi::contains(value, "gzip")) {
+          m_acceptGzip = true;
+        }
+      });
 
   // pass incoming data to HTTP parser
   m_dataConn =
       stream->data.connect_connection([this](uv::Buffer& buf, size_t size) {
-        m_request.Execute(StringRef{buf.base, size});
+        m_request.Execute({buf.base, size});
         if (m_request.HasError()) {
           // could not parse; just close the connection
           m_stream.Close();
@@ -54,12 +59,12 @@ void HttpServerConnection::BuildCommonHeaders(raw_ostream& os) {
 }
 
 void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
-                                       const Twine& codeText,
-                                       const Twine& contentType,
+                                       std::string_view codeText,
+                                       std::string_view contentType,
                                        uint64_t contentLength,
-                                       const Twine& extra) {
-  os << "HTTP/" << m_request.GetMajor() << '.' << m_request.GetMinor() << ' '
-     << code << ' ' << codeText << "\r\n";
+                                       std::string_view extra) {
+  fmt::print(os, "HTTP/{}.{} {} {}\r\n", m_request.GetMajor(),
+             m_request.GetMinor(), code, codeText);
   if (contentLength == 0) {
     m_keepAlive = false;
   }
@@ -69,13 +74,11 @@ void HttpServerConnection::BuildHeader(raw_ostream& os, int code,
   BuildCommonHeaders(os);
   os << "Content-Type: " << contentType << "\r\n";
   if (contentLength != 0) {
-    os << "Content-Length: " << contentLength << "\r\n";
+    fmt::print(os, "Content-Length: {}\r\n", contentLength);
   }
   os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
-  SmallString<128> extraBuf;
-  StringRef extraStr = extra.toStringRef(extraBuf);
-  if (!extraStr.empty()) {
-    os << extraStr;
+  if (!extra.empty()) {
+    os << extra;
   }
   os << "\r\n";  // header ends with a blank line
 }
@@ -93,10 +96,10 @@ void HttpServerConnection::SendData(ArrayRef<uv::Buffer> bufs,
   });
 }
 
-void HttpServerConnection::SendResponse(int code, const Twine& codeText,
-                                        const Twine& contentType,
-                                        StringRef content,
-                                        const Twine& extraHeader) {
+void HttpServerConnection::SendResponse(int code, std::string_view codeText,
+                                        std::string_view contentType,
+                                        std::string_view content,
+                                        std::string_view extraHeader) {
   SmallVector<uv::Buffer, 4> toSend;
   raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(), extraHeader);
@@ -105,13 +108,12 @@ void HttpServerConnection::SendResponse(int code, const Twine& codeText,
   SendData(os.bufs(), !m_keepAlive);
 }
 
-void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
-                                              const Twine& contentType,
-                                              StringRef content, bool gzipped,
-                                              const Twine& extraHeader) {
+void HttpServerConnection::SendStaticResponse(
+    int code, std::string_view codeText, std::string_view contentType,
+    std::string_view content, bool gzipped, std::string_view extraHeader) {
   // TODO: handle remote side not accepting gzip (very rare)
 
-  StringRef contentEncodingHeader;
+  std::string_view contentEncodingHeader;
   if (gzipped /* && m_acceptGzip*/) {
     contentEncodingHeader = "Content-Encoding: gzip\r\n";
   }
@@ -119,7 +121,7 @@ void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
   SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(),
-              extraHeader + contentEncodingHeader);
+              fmt::format("{}{}", extraHeader, contentEncodingHeader));
   // can send content without copying
   bufs.emplace_back(content);
 
@@ -135,8 +137,8 @@ void HttpServerConnection::SendStaticResponse(int code, const Twine& codeText,
   });
 }
 
-void HttpServerConnection::SendError(int code, const Twine& message) {
-  StringRef codeText, extra, baseMessage;
+void HttpServerConnection::SendError(int code, std::string_view message) {
+  std::string_view codeText, extra, baseMessage;
   switch (code) {
     case 401:
       codeText = "Unauthorized";
@@ -169,8 +171,8 @@ void HttpServerConnection::SendError(int code, const Twine& message) {
       baseMessage = "501: Not Implemented!";
       break;
   }
-  SmallString<256> content = baseMessage;
+  SmallString<256> content{baseMessage};
   content += "\r\n";
-  message.toVector(content);
-  SendResponse(code, codeText, "text/plain", content, extra);
+  content += message;
+  SendResponse(code, codeText, "text/plain", content.str(), extra);
 }

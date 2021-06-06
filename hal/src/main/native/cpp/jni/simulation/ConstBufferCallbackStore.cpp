@@ -6,6 +6,8 @@
 
 #include <jni.h>
 
+#include <cstdio>
+
 #include <wpi/jni_util.h>
 
 #include "SimulatorJNI.h"
@@ -47,18 +49,18 @@ void ConstBufferCallbackStore::performCallback(const char* name,
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
   }
 
-  auto toCallbackArr =
-      MakeJByteArray(env, wpi::StringRef{reinterpret_cast<const char*>(buffer),
-                                         static_cast<size_t>(length)});
+  auto toCallbackArr = MakeJByteArray(
+      env, std::string_view{reinterpret_cast<const char*>(buffer),
+                            static_cast<size_t>(length)});
 
   env->CallVoidMethod(m_call, sim::GetConstBufferCallback(),
                       MakeJString(env, name), toCallbackArr,

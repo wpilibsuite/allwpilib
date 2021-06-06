@@ -26,7 +26,7 @@ void RecordingController::StopRecording() {
   m_recordingControlEntry.SetBoolean(false);
 }
 
-void RecordingController::SetRecordingFileNameFormat(wpi::StringRef format) {
+void RecordingController::SetRecordingFileNameFormat(std::string_view format) {
   m_recordingFileNameFormatEntry.SetString(format);
 }
 
@@ -35,7 +35,7 @@ void RecordingController::ClearRecordingFileNameFormat() {
 }
 
 void RecordingController::AddEventMarker(
-    wpi::StringRef name, wpi::StringRef description,
+    std::string_view name, std::string_view description,
     ShuffleboardEventImportance importance) {
   if (name.empty()) {
     FRC_ReportError(err::Error, "{}",
@@ -43,5 +43,6 @@ void RecordingController::AddEventMarker(
     return;
   }
   m_eventsTable->GetSubTable(name)->GetEntry("Info").SetStringArray(
-      {description, ShuffleboardEventImportanceName(importance)});
+      {std::string{description},
+       std::string{ShuffleboardEventImportanceName(importance)}});
 }

@@ -15,11 +15,8 @@
 #ifndef WPIUTIL_WPI_VERSIONTUPLE_H
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
-#include "wpi/StringRef.h"
-#include "wpi/raw_ostream.h"
 #include <optional>
 #include <string>
-#include <tuple>
 
 namespace wpi {
 
@@ -137,18 +134,7 @@ public:
   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
     return !(X < Y);
   }
-
-  /// Retrieve a string representation of the version number.
-  std::string getAsString() const;
-
-  /// Try to parse the given string as a version number.
-  /// \returns \c true if the string does not match the regular expression
-  ///   [0-9]+(\.[0-9]+){0,3}
-  bool tryParse(StringRef string);
 };
-
-/// Print a version number.
-raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
 
 } // end namespace wpi
 #endif // WPIUTIL_WPI_VERSIONTUPLE_H

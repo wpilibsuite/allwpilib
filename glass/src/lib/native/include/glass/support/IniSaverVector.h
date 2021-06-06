@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <string_view>
 #include <vector>
 
 #include <imgui.h>
-#include <wpi/Twine.h>
 
 #include "glass/support/IniSaverBase.h"
 
@@ -16,7 +16,7 @@ namespace glass {
 template <typename Info>
 class IniSaverVector : public std::vector<Info>, public IniSaverBase {
  public:
-  explicit IniSaverVector(const wpi::Twine& typeName,
+  explicit IniSaverVector(std::string_view typeName,
                           IniSaverBackend* backend = nullptr)
       : IniSaverBase(typeName, backend) {}
 

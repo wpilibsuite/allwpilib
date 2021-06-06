@@ -6,12 +6,15 @@
 
 #include <uv.h>
 
+#include <string_view>
+
+#include <fmt/format.h>
 #include <wpi/MimeTypes.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 #include <wpi/UrlParser.h>
 #include <wpi/fs.h>
 #include <wpi/raw_istream.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Request.h>
 
@@ -19,7 +22,7 @@ namespace uv = wpi::uv;
 
 using namespace wpilibws;
 
-bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
+bool HALSimHttpConnection::IsValidWsUpgrade(std::string_view protocol) {
   if (m_request.GetUrl() != m_server->GetServerUri()) {
     MySendError(404, "invalid websocket address");
     return false;
@@ -29,7 +32,7 @@ bool HALSimHttpConnection::IsValidWsUpgrade(wpi::StringRef protocol) {
 }
 
 void HALSimHttpConnection::ProcessWsUpgrade() {
-  m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
+  m_websocket->open.connect_extended([this](auto conn, auto) {
     conn.disconnect();  // one-shot
 
     if (!m_server->RegisterWebsocket(shared_from_this())) {
@@ -40,11 +43,11 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
     Log(200);
     m_isWsConnected = true;
-    wpi::errs() << "HALWebSim: websocket connected\n";
+    std::fputs("HALWebSim: websocket connected\n", stderr);
   });
 
   // parse incoming JSON, dispatch to parent
-  m_websocket->text.connect([this](wpi::StringRef msg, bool) {
+  m_websocket->text.connect([this](auto msg, bool) {
     if (!m_isWsConnected) {
       return;
     }
@@ -61,10 +64,10 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
     m_server->OnNetValueChanged(j);
   });
 
-  m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
+  m_websocket->closed.connect([this](uint16_t, auto) {
     // unset the global, allow another websocket to connect
     if (m_isWsConnected) {
-      wpi::errs() << "HALWebSim: websocket disconnected\n";
+      std::fputs("HALWebSim: websocket disconnected\n", stderr);
       m_isWsConnected = false;
 
       m_server->CloseWebsocket(shared_from_this());
@@ -91,30 +94,28 @@ void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
                                   }
 
                                   if (err) {
-                                    wpi::errs() << err.str() << "\n";
-                                    wpi::errs().flush();
+                                    fmt::print(stderr, "{}\n", err.str());
+                                    std::fflush(stderr);
                                   }
                                 });
   });
 }
 
-void HALSimHttpConnection::SendFileResponse(int code,
-                                            const wpi::Twine& codeText,
-                                            const wpi::Twine& contentType,
-                                            const wpi::Twine& filename,
-                                            const wpi::Twine& extraHeader) {
-  std::string fn = filename.str();
+void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
+                                            std::string_view contentType,
+                                            std::string_view filename,
+                                            std::string_view extraHeader) {
   std::error_code ec;
 
   // get file size
-  auto size = fs::file_size(fn, ec);
+  auto size = fs::file_size(filename, ec);
   if (ec) {
     MySendError(404, "error getting file size");
     return;
   }
 
   // open file
-  wpi::raw_fd_istream is{fn, ec, true};
+  wpi::raw_fd_istream is{filename, ec, true};
   if (ec) {
     MySendError(404, "error opening file");
     return;
@@ -157,23 +158,23 @@ void HALSimHttpConnection::ProcessRequest() {
     return;
   }
 
-  wpi::StringRef path;
+  std::string_view path;
   if (url.HasPath()) {
     path = url.GetPath();
   }
 
-  if (m_request.GetMethod() == wpi::HTTP_GET && path.startswith("/") &&
-      !path.contains("..") && !path.contains("//")) {
+  if (m_request.GetMethod() == wpi::HTTP_GET && wpi::starts_with(path, '/') &&
+      !wpi::contains(path, "..") && !wpi::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
-    if (path.startswith("/user/")) {
-      nativePath = fs::path{std::string{m_server->GetWebrootSys()}} /
-                   fs::path{std::string{path.drop_front(6)},
-                            fs::path::format::generic_format};
+    if (wpi::starts_with(path, "/user/")) {
+      nativePath =
+          fs::path{m_server->GetWebrootSys()} /
+          fs::path{wpi::drop_front(path, 6), fs::path::format::generic_format};
     } else {
-      nativePath = fs::path{std::string{m_server->GetWebrootSys()}} /
-                   fs::path{std::string{path.drop_front(1)},
-                            fs::path::format::generic_format};
+      nativePath =
+          fs::path{m_server->GetWebrootSys()} /
+          fs::path{wpi::drop_front(path, 1), fs::path::format::generic_format};
     }
 
     if (fs::is_directory(nativePath)) {
@@ -181,7 +182,7 @@ void HALSimHttpConnection::ProcessRequest() {
     }
 
     if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
-      MySendError(404, "Resource '" + path + "' not found");
+      MySendError(404, fmt::format("Resource '{}' not found", path));
     } else {
       auto contentType = wpi::MimeTypeFromPath(nativePath.string());
       SendFileResponse(200, "OK", contentType, nativePath.string());
@@ -191,14 +192,13 @@ void HALSimHttpConnection::ProcessRequest() {
   }
 }
 
-void HALSimHttpConnection::MySendError(int code, const wpi::Twine& message) {
+void HALSimHttpConnection::MySendError(int code, std::string_view message) {
   Log(code);
   SendError(code, message);
 }
 
 void HALSimHttpConnection::Log(int code) {
   auto method = wpi::http_method_str(m_request.GetMethod());
-  wpi::errs() << method << " " << m_request.GetUrl() << " HTTP/"
-              << m_request.GetMajor() << "." << m_request.GetMinor() << " "
-              << code << "\n";
+  fmt::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
+             m_request.GetMajor(), m_request.GetMinor(), code);
 }

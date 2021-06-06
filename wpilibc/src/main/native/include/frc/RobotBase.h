@@ -11,7 +11,6 @@
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/Errors.h"
 

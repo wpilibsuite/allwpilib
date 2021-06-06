@@ -7,8 +7,9 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <string_view>
 
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 
 #include "hal/Errors.h"
@@ -53,7 +54,7 @@ std::string SerialHelper::GetVISASerialPortName(HAL_SerialPort port,
     return "";
     // Error
   } else {
-    return m_visaResource[visaIndex].str();
+    return std::string{m_visaResource[visaIndex].str()};
   }
 }
 
@@ -80,7 +81,7 @@ std::string SerialHelper::GetOSSerialPortName(HAL_SerialPort port,
     return "";
     // Error
   } else {
-    return m_osResource[osIndex].str();
+    return std::string{m_osResource[osIndex].str()};
   }
 }
 
@@ -136,8 +137,8 @@ void SerialHelper::SortHubPathVector() {
   std::sort(m_sortedHubPath.begin(), m_sortedHubPath.end(),
             [](const wpi::SmallVectorImpl<char>& lhs,
                const wpi::SmallVectorImpl<char>& rhs) -> int {
-              wpi::StringRef lhsRef(lhs.begin(), lhs.size());
-              wpi::StringRef rhsRef(rhs.begin(), rhs.size());
+              std::string_view lhsRef(lhs.begin(), lhs.size());
+              std::string_view rhsRef(rhs.begin(), rhs.size());
               return lhsRef.compare(rhsRef);
             });
 }
@@ -147,9 +148,9 @@ void SerialHelper::CoiteratedSort(
   wpi::SmallVector<wpi::SmallString<16>, 4> sortedVec;
   for (auto& str : m_sortedHubPath) {
     for (size_t i = 0; i < m_unsortedHubPath.size(); i++) {
-      if (wpi::StringRef{m_unsortedHubPath[i].begin(),
-                         m_unsortedHubPath[i].size()}
-              .equals(wpi::StringRef{str.begin(), str.size()})) {
+      if (wpi::equals(std::string_view{m_unsortedHubPath[i].begin(),
+                                       m_unsortedHubPath[i].size()},
+                      std::string_view{str.begin(), str.size()})) {
         sortedVec.push_back(vec[i]);
         break;
       }
@@ -206,14 +207,14 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     *status = 0;
 
     // split until (/dev/
-    wpi::StringRef devNameRef = wpi::StringRef{osName}.split("(/dev/").second;
+    std::string_view devNameRef = wpi::split(osName, "(/dev/").second;
     // String not found, continue
-    if (devNameRef.equals(""))
+    if (wpi::equals(devNameRef, ""))
       continue;
 
     // Split at )
-    wpi::StringRef matchString = devNameRef.split(')').first;
-    if (matchString.equals(devNameRef))
+    std::string_view matchString = wpi::split(devNameRef, ')').first;
+    if (wpi::equals(matchString, devNameRef))
       continue;
 
     // Search directories to get a list of system accessors
@@ -223,7 +224,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     for (auto& p : fs::recursive_directory_iterator("/sys/devices/soc0", ec)) {
       if (ec)
         break;
-      std::string path = p.path().string();
+      std::string path = p.path();
       if (path.find("amba") == std::string::npos)
         continue;
       if (path.find("usb") == std::string::npos)
@@ -231,22 +232,22 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
       if (path.find(matchString) == std::string::npos)
         continue;
 
-      wpi::SmallVector<wpi::StringRef, 16> pathSplitVec;
+      wpi::SmallVector<std::string_view, 16> pathSplitVec;
       // Split path into individual directories
-      wpi::StringRef{path}.split(pathSplitVec, '/', -1, false);
+      wpi::split(path, pathSplitVec, '/', -1, false);
 
       // Find each individual item index
       int findusb = -1;
       int findtty = -1;
       int findregex = -1;
       for (size_t i = 0; i < pathSplitVec.size(); i++) {
-        if (findusb == -1 && pathSplitVec[i].equals("usb1")) {
+        if (findusb == -1 && wpi::equals(pathSplitVec[i], "usb1")) {
           findusb = i;
         }
-        if (findtty == -1 && pathSplitVec[i].equals("tty")) {
+        if (findtty == -1 && wpi::equals(pathSplitVec[i], "tty")) {
           findtty = i;
         }
-        if (findregex == -1 && pathSplitVec[i].equals(matchString)) {
+        if (findregex == -1 && wpi::equals(pathSplitVec[i], matchString)) {
           findregex = i;
         }
       }
@@ -263,10 +264,10 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
       // Add our devices to our list
       m_unsortedHubPath.emplace_back(
-          wpi::StringRef{pathSplitVec[hubIndex - 2]});
+          std::string_view{pathSplitVec[hubIndex - 2]});
       m_visaResource.emplace_back(desc);
       m_osResource.emplace_back(
-          wpi::StringRef{osName}.split("(").second.split(")").first);
+          wpi::split(wpi::split(osName, "(").second, ")").first);
       break;
     }
   }
@@ -291,8 +292,9 @@ int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   if (portString.empty()) {
     for (size_t i = 0; i < 2; i++) {
       // Remove all used ports
-      auto idx = std::find(m_sortedHubPath.begin(), m_sortedHubPath.end(),
-                           m_usbNames[i]);
+      auto idx = std::find_if(
+          m_sortedHubPath.begin(), m_sortedHubPath.end(),
+          [&](const auto& s) { return wpi::equals(s, m_usbNames[i]); });
       if (idx != m_sortedHubPath.end()) {
         // found
         m_sortedHubPath.erase(idx);
@@ -327,7 +329,7 @@ int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   int retIndex = -1;
 
   for (size_t i = 0; i < m_sortedHubPath.size(); i++) {
-    if (m_sortedHubPath[i].equals(portString)) {
+    if (wpi::equals(m_sortedHubPath[i], portString)) {
       retIndex = i;
       break;
     }

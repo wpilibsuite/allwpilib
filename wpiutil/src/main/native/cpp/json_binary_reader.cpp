@@ -36,6 +36,7 @@ SOFTWARE.
 
 #include <cmath>  // ldexp
 
+#include "fmt/format.h"
 #include "wpi/raw_istream.h"
 
 namespace wpi {
@@ -711,7 +712,7 @@ json json::binary_reader::parse_cbor_internal(const bool get_char)
 
         default: // anything else (0xFF is handled inside the other types)
         {
-            JSON_THROW(parse_error::create(112, chars_read, "error reading CBOR; last byte: 0x" + Twine::utohexstr(current)));
+            JSON_THROW(parse_error::create(112, chars_read, fmt::format("error reading CBOR; last byte: {:#02x}", current)));
         }
     }
 }
@@ -1034,7 +1035,7 @@ json json::binary_reader::parse_msgpack_internal()
         default: // anything else
         {
             JSON_THROW(parse_error::create(112, chars_read,
-                                           "error reading MessagePack; last byte: 0x" + Twine::utohexstr(current)));
+                fmt::format("error reading MessagePack; last byte: {:#02x}", current)));
         }
     }
 }
@@ -1106,7 +1107,8 @@ std::string json::binary_reader::get_cbor_string()
 
         default:
         {
-            JSON_THROW(parse_error::create(113, chars_read, "expected a CBOR string; last byte: 0x" + Twine::utohexstr(current)));
+            JSON_THROW(parse_error::create(113, chars_read,
+                fmt::format("expected a CBOR string; last byte: {:#02x}", current)));
         }
     }
 }
@@ -1172,7 +1174,7 @@ std::string json::binary_reader::get_msgpack_string()
         default:
         {
             JSON_THROW(parse_error::create(113, chars_read,
-                                           "expected a MessagePack string; last byte: 0x" + Twine::utohexstr(current)));
+                fmt::format("expected a MessagePack string; last byte: {:#02x}", current)));
         }
     }
 }
@@ -1200,7 +1202,7 @@ std::string json::binary_reader::get_ubjson_string(const bool get_char)
             return get_string(get_number<int64_t>());
         default:
             JSON_THROW(parse_error::create(113, chars_read,
-                                           "expected a UBJSON string; last byte: 0x" + Twine::utohexstr(current)));
+                fmt::format("expected a UBJSON string; last byte: {:#02x}", current)));
     }
 }
 
@@ -1220,7 +1222,7 @@ std::pair<std::size_t, int> json::binary_reader::get_ubjson_size_type()
         if (current != '#')
         {
             JSON_THROW(parse_error::create(112, chars_read,
-                                           "expected '#' after UBJSON type information; last byte: 0x" + Twine::utohexstr(current)));
+                fmt::format("expected '#' after UBJSON type information; last byte: {:#02x}", current)));
         }
         sz = parse_ubjson_internal();
     }
@@ -1269,7 +1271,7 @@ json json::binary_reader::get_ubjson_value(const int prefix)
             if (JSON_UNLIKELY(current > 127))
             {
                 JSON_THROW(parse_error::create(113, chars_read,
-                                               "byte after 'C' must be in range 0x00..0x7F; last byte: 0x" + Twine::utohexstr(current)));
+                    fmt::format("byte after 'C' must be in range 0x00..0x7F; last byte: {:#02x}", current)));
             }
             return std::string(1, static_cast<char>(current));
         }
@@ -1285,7 +1287,7 @@ json json::binary_reader::get_ubjson_value(const int prefix)
 
         default: // anything else
             JSON_THROW(parse_error::create(112, chars_read,
-                                           "error reading UBJSON; last byte: 0x" + Twine::utohexstr(current)));
+                fmt::format("error reading UBJSON; last byte: {:#02x}", current)));
     }
 }
 
@@ -1299,7 +1301,7 @@ json json::binary_reader::get_ubjson_array()
         if (JSON_UNLIKELY(size_and_type.first > result.max_size()))
         {
             JSON_THROW(out_of_range::create(408,
-                                            "excessive array size: " + Twine(size_and_type.first)));
+                fmt::format("excessive array size: {}", size_and_type.first)));
         }
 
         if (size_and_type.second != 0)
@@ -1344,7 +1346,7 @@ json json::binary_reader::get_ubjson_object()
         if (JSON_UNLIKELY(size_and_type.first > result.max_size()))
         {
             JSON_THROW(out_of_range::create(408,
-                                            "excessive object size: " + Twine(size_and_type.first)));
+                fmt::format("excessive object size: {}", size_and_type.first)));
         }
 
         if (size_and_type.second != 0)

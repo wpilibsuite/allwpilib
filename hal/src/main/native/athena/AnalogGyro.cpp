@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "AnalogInternal.h"
 #include "HALInitializer.h"
@@ -193,8 +193,8 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   if (*status != 0) {
     return;
   }
-  wpi::outs() << "Calibrating analog gyro for " << kCalibrationSampleTime
-              << " seconds." << '\n';
+  fmt::print("Calibrating analog gyro for {} seconds.\n",
+             kCalibrationSampleTime);
   Wait(kCalibrationSampleTime);
 
   int64_t value;

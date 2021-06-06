@@ -153,7 +153,7 @@ void nt::ConvertToC(const Value& in, NT_Value* out) {
   out->type = in.type();
 }
 
-void nt::ConvertToC(wpi::StringRef in, NT_String* out) {
+void nt::ConvertToC(std::string_view in, NT_String* out) {
   out->len = in.size();
   out->str = static_cast<char*>(wpi::safe_malloc(in.size() + 1));
   std::memcpy(out->str, in.data(), in.size());
@@ -184,7 +184,7 @@ std::shared_ptr<Value> nt::ConvertFromC(const NT_Value& value) {
       std::vector<std::string> v;
       v.reserve(value.data.arr_string.size);
       for (size_t i = 0; i < value.data.arr_string.size; ++i) {
-        v.push_back(ConvertFromC(value.data.arr_string.arr[i]));
+        v.emplace_back(ConvertFromC(value.data.arr_string.arr[i]));
       }
       return Value::MakeStringArray(std::move(v));
     }

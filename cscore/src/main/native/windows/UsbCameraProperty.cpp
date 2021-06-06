@@ -4,14 +4,16 @@
 
 #include "UsbCameraProperty.h"
 
+#include <fmt/format.h>
+
 #include "ComPtr.h"
 
 using namespace cs;
 
-UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_,
+UsbCameraProperty::UsbCameraProperty(std::string_view name_,
                                      tagVideoProcAmpProperty tag, bool autoProp,
                                      IAMVideoProcAmp* pProcAmp, bool* isValid)
-    : PropertyImpl{autoProp ? name_ + "_auto" : name_} {
+    : PropertyImpl{autoProp ? fmt::format("{}_auto", name_) : name_} {
   this->tagVideoProc = tag;
   this->isControlProperty = false;
   this->isAutoProp = autoProp;
@@ -71,11 +73,11 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
   return false;
 }
 
-UsbCameraProperty::UsbCameraProperty(const wpi::Twine& name_,
+UsbCameraProperty::UsbCameraProperty(std::string_view name_,
                                      tagCameraControlProperty tag,
                                      bool autoProp, IAMCameraControl* pProcAmp,
                                      bool* isValid)
-    : PropertyImpl{autoProp ? name_ + "_auto" : name_} {
+    : PropertyImpl{autoProp ? fmt::format("{}_auto", name_) : name_} {
   this->tagCameraControl = tag;
   this->isControlProperty = true;
   this->isAutoProp = autoProp;

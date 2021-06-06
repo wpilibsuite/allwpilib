@@ -2,9 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
+
 #include <cameraserver/CameraServer.h>
 #include <frc/TimedRobot.h>
-#include <wpi/raw_ostream.h>
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
@@ -15,11 +16,11 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
-#if defined(__linux__)
+#if defined(__linux__) || defined(_WIN32)
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
 #else
-    wpi::errs() << "Vision only available on Linux.\n";
-    wpi::errs().flush();
+    std::fputs("Vision only available on Linux or Windows.\n", stderr);
+    std::fflush(stderr);
 #endif
   }
 };

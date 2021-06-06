@@ -6,10 +6,12 @@
 
 #include "frc/smartdashboard/SendableRegistry.h"
 
+using namespace frc;
+
 MockActuatorSendable::MockActuatorSendable(std::string_view name) {
-  frc::SendableRegistry::GetInstance().Add(this, name);
+  SendableRegistry::GetInstance().Add(this, name);
 }
 
-void MockActuatorSendable::InitSendable(frc::SendableBuilder& builder) {
+void MockActuatorSendable::InitSendable(SendableBuilder& builder) {
   builder.SetActuator(true);
 }

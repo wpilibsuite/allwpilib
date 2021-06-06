@@ -144,7 +144,7 @@ class SerialPort {
    * Use Write({data, len}) to get a buffer that is shorter than the length of
    * the string.
    *
-   * @param buffer StringRef to the buffer to read the bytes from.
+   * @param buffer the buffer to read the bytes from.
    * @return The number of bytes actually written into the port.
    */
   int Write(std::string_view buffer);

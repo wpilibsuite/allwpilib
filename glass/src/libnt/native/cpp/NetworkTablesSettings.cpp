@@ -4,14 +4,15 @@
 
 #include "glass/networktables/NetworkTablesSettings.h"
 
+#include <optional>
+#include <string_view>
 #include <utility>
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <ntcore_cpp.h>
 #include <wpi/SmallVector.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/StringExtras.h>
 
 #include "glass/Context.h"
 
@@ -55,14 +56,15 @@ void NetworkTablesSettings::Thread::Main() {
     } while (mode != m_mode || dsClient != m_dsClient);
 
     if (m_mode == 1) {
-      wpi::StringRef serverTeam{m_serverTeam};
-      unsigned int team;
-      if (!serverTeam.contains('.') && !serverTeam.getAsInteger(10, team)) {
-        nt::StartClientTeam(m_inst, team, NT_DEFAULT_PORT);
+      std::string_view serverTeam{m_serverTeam};
+      std::optional<unsigned int> team;
+      if (!wpi::contains(serverTeam, '.') &&
+          (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
+        nt::StartClientTeam(m_inst, team.value(), NT_DEFAULT_PORT);
       } else {
-        wpi::SmallVector<wpi::StringRef, 4> serverNames;
-        wpi::SmallVector<std::pair<wpi::StringRef, unsigned int>, 4> servers;
-        serverTeam.split(serverNames, ',', -1, false);
+        wpi::SmallVector<std::string_view, 4> serverNames;
+        wpi::SmallVector<std::pair<std::string_view, unsigned int>, 4> servers;
+        wpi::split(serverTeam, serverNames, ',', -1, false);
         for (auto&& serverName : serverNames) {
           servers.emplace_back(serverName, NT_DEFAULT_PORT);
         }

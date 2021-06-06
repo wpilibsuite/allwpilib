@@ -6,7 +6,7 @@
 
 using namespace frc;
 
-ShuffleboardTab::ShuffleboardTab(ShuffleboardRoot& root, wpi::StringRef title)
+ShuffleboardTab::ShuffleboardTab(ShuffleboardRoot& root, std::string_view title)
     : ShuffleboardValue(title), ShuffleboardContainer(title), m_root(root) {}
 
 ShuffleboardRoot& ShuffleboardTab::GetRoot() {

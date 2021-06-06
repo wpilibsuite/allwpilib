@@ -192,7 +192,7 @@ bool Watchdog::IsExpired() const {
   return m_isExpired;
 }
 
-void Watchdog::AddEpoch(wpi::StringRef epochName) {
+void Watchdog::AddEpoch(std::string_view epochName) {
   m_tracer.AddEpoch(epochName);
 }
 

@@ -11,6 +11,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -76,7 +77,7 @@ class NetworkConnection : public INetworkConnection {
   void set_state(State state) final;
 
   std::string remote_id() const;
-  void set_remote_id(wpi::StringRef remote_id);
+  void set_remote_id(std::string_view remote_id);
 
   uint64_t last_update() const { return m_last_update; }
 

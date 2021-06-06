@@ -5,15 +5,15 @@
 #pragma once
 
 #include <functional>
+#include <string_view>
 
 #include <hal/Value.h>
-#include <wpi/StringRef.h>
 
 namespace frc::sim {
 
-using NotifyCallback = std::function<void(wpi::StringRef, const HAL_Value*)>;
+using NotifyCallback = std::function<void(std::string_view, const HAL_Value*)>;
 using ConstBufferCallback = std::function<void(
-    wpi::StringRef, const unsigned char* buffer, unsigned int count)>;
+    std::string_view, const unsigned char* buffer, unsigned int count)>;
 using CancelCallbackFunc = void (*)(int32_t index, int32_t uid);
 using CancelCallbackNoIndexFunc = void (*)(int32_t uid);
 using CancelCallbackChannelFunc = void (*)(int32_t index, int32_t channel,

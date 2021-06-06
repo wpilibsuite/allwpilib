@@ -7,10 +7,10 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <wpi/ArrayRef.h>
-#include <wpi/Twine.h>
 
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -50,10 +50,10 @@ class IStorage {
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
-  virtual const char* SavePersistent(const wpi::Twine& filename,
+  virtual const char* SavePersistent(std::string_view filename,
                                      bool periodic) const = 0;
   virtual const char* LoadPersistent(
-      const wpi::Twine& filename,
+      std::string_view filename,
       std::function<void(size_t line, const char* msg)> warn) = 0;
 };
 

@@ -10,14 +10,14 @@
 
 using namespace cs;
 
-RawSinkImpl::RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+RawSinkImpl::RawSinkImpl(std::string_view name, wpi::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry)
     : SinkImpl{name, logger, notifier, telemetry} {
   m_active = true;
   // m_thread = std::thread(&RawSinkImpl::ThreadMain, this);
 }
 
-RawSinkImpl::RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger,
+RawSinkImpl::RawSinkImpl(std::string_view name, wpi::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry,
                          std::function<void(uint64_t time)> processFrame)
     : SinkImpl{name, logger, notifier, telemetry} {}
@@ -127,7 +127,7 @@ void RawSinkImpl::ThreadMain() {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
-    SDEBUG4("waiting for frame");
+    SDEBUG4("{}", "waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) {
       break;
@@ -143,14 +143,14 @@ void RawSinkImpl::ThreadMain() {
 }
 
 namespace cs {
-CS_Sink CreateRawSink(const wpi::Twine& name, CS_Status* status) {
+CS_Sink CreateRawSink(std::string_view name, CS_Status* status) {
   auto& inst = Instance::GetInstance();
   return inst.CreateSink(CS_SINK_RAW,
                          std::make_shared<RawSinkImpl>(
                              name, inst.logger, inst.notifier, inst.telemetry));
 }
 
-CS_Sink CreateRawSinkCallback(const wpi::Twine& name,
+CS_Sink CreateRawSinkCallback(std::string_view name,
                               std::function<void(uint64_t time)> processFrame,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();

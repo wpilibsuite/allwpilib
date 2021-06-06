@@ -5,9 +5,9 @@
 #include <memory>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
-#include <wpi/SmallString.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -21,13 +21,13 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 namespace ov {
-wpi::StringRef GetResource_ov_16_png();
-wpi::StringRef GetResource_ov_32_png();
-wpi::StringRef GetResource_ov_48_png();
-wpi::StringRef GetResource_ov_64_png();
-wpi::StringRef GetResource_ov_128_png();
-wpi::StringRef GetResource_ov_256_png();
-wpi::StringRef GetResource_ov_512_png();
+std::string_view GetResource_ov_16_png();
+std::string_view GetResource_ov_32_png();
+std::string_view GetResource_ov_48_png();
+std::string_view GetResource_ov_64_png();
+std::string_view GetResource_ov_128_png();
+std::string_view GetResource_ov_256_png();
+std::string_view GetResource_ov_512_png();
 }  // namespace ov
 
 static std::unique_ptr<glass::NetworkTablesModel> gModel;
@@ -49,18 +49,14 @@ static void NtInitialize() {
     for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
       if ((nt::GetNetworkMode(inst) & NT_NET_MODE_SERVER) != 0) {
         // for server mode, just print number of clients connected
-        wpi::SmallString<64> title;
-        glfwSetWindowTitle(win, ("OutlineViewer - " +
-                                 wpi::Twine{nt::GetConnections(inst).size()} +
-                                 " Clients Connected")
-                                    .toNullTerminatedStringRef(title)
-                                    .data());
+        glfwSetWindowTitle(win,
+                           fmt::format("OutlineViewer - {} Clients Connected",
+                                       nt::GetConnections(inst).size())
+                               .c_str());
       } else if (event.connected) {
-        wpi::SmallString<64> title;
-        title = "OutlineViewer - Connected (";
-        title += event.conn.remote_ip;
-        title += ')';
-        glfwSetWindowTitle(win, title.c_str());
+        glfwSetWindowTitle(win, fmt::format("OutlineViewer - Connected ({})",
+                                            event.conn.remote_ip)
+                                    .c_str());
       } else {
         glfwSetWindowTitle(win, "OutlineViewer - DISCONNECTED");
       }
@@ -81,9 +77,8 @@ static void NtInitialize() {
       } else if (msg.level >= NT_LOG_WARNING) {
         level = "WARNING: ";
       }
-      gLog.Append(wpi::Twine{level} + msg.message + wpi::Twine{" ("} +
-                  msg.filename + wpi::Twine{':'} + wpi::Twine{msg.line} +
-                  wpi::Twine{")\n"});
+      gLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
+                              msg.filename, msg.line));
     }
   });
 

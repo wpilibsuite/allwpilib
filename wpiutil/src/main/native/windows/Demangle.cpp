@@ -15,16 +15,15 @@
 
 namespace wpi {
 
-std::string Demangle(const Twine& mangledSymbol) {
+std::string Demangle(std::string_view mangledSymbol) {
   static wpi::mutex m;
   std::scoped_lock lock(m);
-  SmallString<128> buf;
+  SmallString<128> buf{mangledSymbol};
   char buffer[256];
-  DWORD sz =
-      UnDecorateSymbolName(mangledSymbol.toNullTerminatedStringRef(buf).data(),
-                           buffer, sizeof(buffer), UNDNAME_COMPLETE);
+  DWORD sz = UnDecorateSymbolName(buf.c_str(), buffer, sizeof(buffer),
+                                  UNDNAME_COMPLETE);
   if (sz == 0)
-    return mangledSymbol.str();
+    return std::string{mangledSymbol};
   return std::string(buffer, sz);
 }
 

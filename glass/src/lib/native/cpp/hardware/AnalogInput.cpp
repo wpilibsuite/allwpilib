@@ -48,7 +48,7 @@ void glass::DisplayAnalogInput(AnalogInputModel* model, int index) {
 }
 
 void glass::DisplayAnalogInputs(AnalogInputsModel* model,
-                                wpi::StringRef noneMsg) {
+                                std::string_view noneMsg) {
   ImGui::Text("(Use Ctrl+Click to edit value)");
   bool hasAny = false;
   bool first = true;
@@ -65,6 +65,6 @@ void glass::DisplayAnalogInputs(AnalogInputsModel* model,
     hasAny = true;
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }

@@ -5,8 +5,8 @@
 #include <cctype>
 #include <string>
 
+#include <fmt/format.h>
 #include <wpi/Base64.h>
-#include <wpi/Format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/fs.h>
@@ -21,17 +21,17 @@ namespace {
 
 class SavePersistentImpl {
  public:
-  typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
+  using Entry = std::pair<std::string, std::shared_ptr<Value>>;
 
   explicit SavePersistentImpl(wpi::raw_ostream& os) : m_os(os) {}
 
   void Save(wpi::ArrayRef<Entry> entries);
 
  private:
-  void WriteString(wpi::StringRef str);
+  void WriteString(std::string_view str);
   void WriteHeader();
   void WriteEntries(wpi::ArrayRef<Entry> entries);
-  void WriteEntry(wpi::StringRef name, const Value& value);
+  void WriteEntry(std::string_view name, const Value& value);
   bool WriteType(NT_Type type);
   void WriteValue(const Value& value);
 
@@ -41,7 +41,7 @@ class SavePersistentImpl {
 }  // namespace
 
 /* Escapes and writes a string, including start and end double quotes */
-void SavePersistentImpl::WriteString(wpi::StringRef str) {
+void SavePersistentImpl::WriteString(std::string_view str) {
   m_os << '"';
   for (auto c : str) {
     switch (c) {
@@ -90,7 +90,7 @@ void SavePersistentImpl::WriteEntries(wpi::ArrayRef<Entry> entries) {
   }
 }
 
-void SavePersistentImpl::WriteEntry(wpi::StringRef name, const Value& value) {
+void SavePersistentImpl::WriteEntry(std::string_view name, const Value& value) {
   if (!WriteType(value.type())) {
     return;  // type
   }
@@ -135,7 +135,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       m_os << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      m_os << wpi::format("%g", value.GetDouble());
+      m_os << fmt::format("{:g}", value.GetDouble());
       break;
     case NT_STRING:
       WriteString(value.GetString());
@@ -162,7 +162,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
           m_os << ',';
         }
         first = false;
-        m_os << wpi::format("%g", elem);
+        m_os << fmt::format("{:g}", elem);
       }
       break;
     }
@@ -190,14 +190,11 @@ void Storage::SavePersistent(wpi::raw_ostream& os, bool periodic) const {
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SavePersistent(const wpi::Twine& filename,
+const char* Storage::SavePersistent(std::string_view filename,
                                     bool periodic) const {
-  wpi::SmallString<128> fn;
-  filename.toVector(fn);
-  wpi::SmallString<128> tmp = fn;
-  tmp += ".tmp";
-  wpi::SmallString<128> bak = fn;
-  bak += ".bak";
+  std::string fn{filename};
+  auto tmp = fmt::format("{}.tmp", filename);
+  auto bak = fmt::format("{}.bak", filename);
 
   // Get entries before creating file
   std::vector<SavePersistentImpl::Entry> entries;
@@ -214,7 +211,7 @@ const char* Storage::SavePersistent(const wpi::Twine& filename,
     err = "could not open file";
     goto done;
   }
-  DEBUG0("saving persistent file '" << filename << "'");
+  DEBUG0("saving persistent file '{}'", filename);
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {
@@ -240,8 +237,7 @@ done:
   return err;
 }
 
-void Storage::SaveEntries(wpi::raw_ostream& os,
-                          const wpi::Twine& prefix) const {
+void Storage::SaveEntries(wpi::raw_ostream& os, std::string_view prefix) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetEntries(prefix, &entries)) {
     return;
@@ -249,14 +245,11 @@ void Storage::SaveEntries(wpi::raw_ostream& os,
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SaveEntries(const wpi::Twine& filename,
-                                 const wpi::Twine& prefix) const {
-  wpi::SmallString<128> fn;
-  filename.toVector(fn);
-  wpi::SmallString<128> tmp = fn;
-  tmp += ".tmp";
-  wpi::SmallString<128> bak = fn;
-  bak += ".bak";
+const char* Storage::SaveEntries(std::string_view filename,
+                                 std::string_view prefix) const {
+  std::string fn{filename};
+  auto tmp = fmt::format("{}.tmp", filename);
+  auto bak = fmt::format("{}.bak", filename);
 
   // Get entries before creating file
   std::vector<SavePersistentImpl::Entry> entries;
@@ -270,7 +263,7 @@ const char* Storage::SaveEntries(const wpi::Twine& filename,
   if (ec.value() != 0) {
     return "could not open file";
   }
-  DEBUG0("saving file '" << filename << "'");
+  DEBUG0("saving file '{}'", filename);
   SavePersistentImpl(os).Save(entries);
   os.close();
   if (os.has_error()) {

@@ -4,25 +4,28 @@
 
 #include "glass/networktables/NTPIDController.h"
 
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
+
 using namespace glass;
 
-NTPIDControllerModel::NTPIDControllerModel(wpi::StringRef path)
+NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
     : NTPIDControllerModel(nt::GetDefaultInstance(), path) {}
 
 NTPIDControllerModel::NTPIDControllerModel(NT_Inst instance,
-                                           wpi::StringRef path)
+                                           std::string_view path)
     : m_nt(instance),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_controllable(m_nt.GetEntry(path + "/.controllable")),
-      m_p(m_nt.GetEntry(path + "/p")),
-      m_i(m_nt.GetEntry(path + "/i")),
-      m_d(m_nt.GetEntry(path + "/d")),
-      m_setpoint(m_nt.GetEntry(path + "/setpoint")),
-      m_pData("NTPIDCtrlP:" + path),
-      m_iData("NTPIDCtrlI:" + path),
-      m_dData("NTPIDCtrlD:" + path),
-      m_setpointData("NTPIDCtrlStpt:" + path),
-      m_nameValue(path.rsplit('/').second) {
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
+      m_p(m_nt.GetEntry(fmt::format("{}/p", path))),
+      m_i(m_nt.GetEntry(fmt::format("{}/i", path))),
+      m_d(m_nt.GetEntry(fmt::format("{}/d", path))),
+      m_setpoint(m_nt.GetEntry(fmt::format("{}/setpoint", path))),
+      m_pData(fmt::format("NTPIDCtrlP:{}", path)),
+      m_iData(fmt::format("NTPIDCtrlI:{}", path)),
+      m_dData(fmt::format("NTPIDCtrlD:{}", path)),
+      m_setpointData(fmt::format("NTPIDCtrlStpt:{}", path)),
+      m_nameValue(wpi::rsplit(path, '/').second) {
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_p);
