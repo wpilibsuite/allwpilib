@@ -286,13 +286,13 @@ CS_Property GetSourceProperty(CS_Source source, std::string_view name,
   return Handle{source, property, Handle::kProperty};
 }
 
-wpi::ArrayRef<CS_Property> EnumerateSourceProperties(
+wpi::span<CS_Property> EnumerateSourceProperties(
     CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return 0;
+    return {};
   }
   wpi::SmallVector<int, 32> properties_buf;
   for (auto property :
@@ -398,14 +398,14 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
-wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                            wpi::SmallVectorImpl<CS_Sink>& vec,
-                                            CS_Status* status) {
+wpi::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
+                                        wpi::SmallVectorImpl<CS_Sink>& vec,
+                                        CS_Status* status) {
   auto& inst = Instance::GetInstance();
   auto data = inst.GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return wpi::ArrayRef<CS_Sink>{};
+    return {};
   }
   return inst.EnumerateSourceSinks(source, vec);
 }
@@ -583,12 +583,12 @@ CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
   return Handle{sink, property, Handle::kSinkProperty};
 }
 
-wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
+wpi::span<CS_Property> EnumerateSinkProperties(
     CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status) {
   auto data = Instance::GetInstance().GetSink(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return 0;
+    return {};
   }
   wpi::SmallVector<int, 32> properties_buf;
   for (auto property :
@@ -861,13 +861,13 @@ void Shutdown() {
 // Utility Functions
 //
 
-wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
+wpi::span<CS_Source> EnumerateSourceHandles(
     wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
   return Instance::GetInstance().EnumerateSourceHandles(vec);
 }
 
-wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
-                                            CS_Status* status) {
+wpi::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+                                        CS_Status* status) {
   return Instance::GetInstance().EnumerateSinkHandles(vec);
 }
 

@@ -792,7 +792,7 @@ bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def) {
   return true;
 }
 
-std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values) {
+std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values) {
   WireEncoder enc(0x0300);
   for (auto& value : values) {
     enc.WriteValue(*value);
@@ -801,7 +801,7 @@ std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values) {
 }
 
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(
-    std::string_view packed, wpi::ArrayRef<NT_Type> types) {
+    std::string_view packed, wpi::span<const NT_Type> types) {
   wpi::raw_mem_istream is(packed.data(), packed.size());
   wpi::Logger logger;
   WireDecoder dec(is, 0x0300, logger);
@@ -900,7 +900,7 @@ void StartClient(NT_Inst inst, const char* server_name, unsigned int port) {
 
 void StartClient(
     NT_Inst inst,
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers) {
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return;
@@ -940,7 +940,7 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
 
 void SetServer(
     NT_Inst inst,
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers) {
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) {
     return;

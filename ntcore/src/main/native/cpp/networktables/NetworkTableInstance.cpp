@@ -23,8 +23,8 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
   }
 }
 
-void NetworkTableInstance::StartClient(wpi::ArrayRef<std::string_view> servers,
-                                       unsigned int port) {
+void NetworkTableInstance::StartClient(
+    wpi::span<const std::string_view> servers, unsigned int port) {
   wpi::SmallVector<std::pair<std::string_view, unsigned int>, 8> server_ports;
   for (const auto& server : servers) {
     server_ports.emplace_back(std::make_pair(server, port));
@@ -32,7 +32,7 @@ void NetworkTableInstance::StartClient(wpi::ArrayRef<std::string_view> servers,
   StartClient(server_ports);
 }
 
-void NetworkTableInstance::SetServer(wpi::ArrayRef<std::string_view> servers,
+void NetworkTableInstance::SetServer(wpi::span<const std::string_view> servers,
                                      unsigned int port) {
   wpi::SmallVector<std::pair<std::string_view, unsigned int>, 8> server_ports;
   for (const auto& server : servers) {

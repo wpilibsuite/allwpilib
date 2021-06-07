@@ -15,8 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
-
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 

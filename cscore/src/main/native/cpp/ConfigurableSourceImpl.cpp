@@ -88,7 +88,7 @@ int ConfigurableSourceImpl::CreateProperty(
 }
 
 void ConfigurableSourceImpl::SetEnumPropertyChoices(
-    int property, wpi::ArrayRef<std::string> choices, CS_Status* status) {
+    int property, wpi::span<const std::string> choices, CS_Status* status) {
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
@@ -99,7 +99,7 @@ void ConfigurableSourceImpl::SetEnumPropertyChoices(
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
-  prop->enumChoices = choices;
+  prop->enumChoices.assign(choices.begin(), choices.end());
   m_notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
                                   prop->name, property, CS_PROP_ENUM,
                                   prop->value, {});

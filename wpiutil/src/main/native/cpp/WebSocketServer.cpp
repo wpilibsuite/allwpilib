@@ -46,7 +46,7 @@ WebSocketServerHelper::WebSocketServerHelper(HttpParser& req) {
 }
 
 std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
-    ArrayRef<std::string_view> protocols) {
+    span<const std::string_view> protocols) {
   if (protocols.empty() && m_protocols.empty()) {
     return {true, {}};
   }
@@ -61,7 +61,7 @@ std::pair<bool, std::string_view> WebSocketServerHelper::MatchProtocol(
 }
 
 WebSocketServer::WebSocketServer(uv::Stream& stream,
-                                 ArrayRef<std::string_view> protocols,
+                                 span<const std::string_view> protocols,
                                  ServerOptions options, const private_init&)
     : m_stream{stream},
       m_helper{m_req},
@@ -138,7 +138,7 @@ WebSocketServer::WebSocketServer(uv::Stream& stream,
 }
 
 std::shared_ptr<WebSocketServer> WebSocketServer::Create(
-    uv::Stream& stream, ArrayRef<std::string_view> protocols,
+    uv::Stream& stream, span<const std::string_view> protocols,
     const ServerOptions& options) {
   auto server = std::make_shared<WebSocketServer>(stream, protocols, options,
                                                   private_init{});

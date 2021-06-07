@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/ArrayRef.h>
 
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"

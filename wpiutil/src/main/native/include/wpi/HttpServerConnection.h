@@ -8,8 +8,8 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/HttpParser.h"
+#include "wpi/span.h"
 #include "wpi/uv/Stream.h"
 
 namespace wpi {
@@ -78,7 +78,7 @@ class HttpServerConnection {
    *             is desired, call m_stream.Write() directly instead.
    * @param closeAfter close the connection after the write completes
    */
-  void SendData(ArrayRef<uv::Buffer> bufs, bool closeAfter = false);
+  void SendData(span<const uv::Buffer> bufs, bool closeAfter = false);
 
   /**
    * Send HTTP response, along with other header information like mimetype.

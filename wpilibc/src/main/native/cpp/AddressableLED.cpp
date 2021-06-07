@@ -51,7 +51,7 @@ void AddressableLED::SetLength(int length) {
 static_assert(sizeof(AddressableLED::LEDData) == sizeof(HAL_AddressableLEDData),
               "LED Structs MUST be the same size");
 
-void AddressableLED::SetData(wpi::ArrayRef<LEDData> ledData) {
+void AddressableLED::SetData(wpi::span<const LEDData> ledData) {
   int32_t status = 0;
   HAL_WriteAddressableLEDData(m_handle, ledData.begin(), ledData.size(),
                               &status);

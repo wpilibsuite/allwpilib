@@ -410,7 +410,7 @@ void Storage::GetInitialAssignments(
 }
 
 void Storage::ApplyInitialAssignments(
-    INetworkConnection& conn, wpi::ArrayRef<std::shared_ptr<Message>> msgs,
+    INetworkConnection& conn, wpi::span<std::shared_ptr<Message>> msgs,
     bool /*new_server*/, std::vector<std::shared_ptr<Message>>* out_msgs) {
   std::unique_lock lock(m_mutex);
   if (m_server) {

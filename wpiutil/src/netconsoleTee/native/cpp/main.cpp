@@ -48,7 +48,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
                               static_cast<uint8_t>(ts & 0xff),
                               static_cast<uint8_t>((tcpSeq >> 8) & 0xff),
                               static_cast<uint8_t>(tcpSeq & 0xff)};
-    out << wpi::ArrayRef<uint8_t>(header);
+    out << wpi::span<const uint8_t>(header);
   }
   out << rem << toCopy;
 
@@ -114,7 +114,7 @@ static void CopyStream(uv::Stream& in, std::shared_ptr<uv::Stream> out) {
   in.data.connect([out](uv::Buffer& buf, size_t len) {
     uv::Buffer buf2 = buf.Dup();
     buf2.len = len;
-    out->Write(buf2, [](auto bufs, uv::Error) {
+    out->Write({buf2}, [](auto bufs, uv::Error) {
       for (auto buf : bufs) {
         buf.Deallocate();
       }

@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/span.h>
+
 #include "cscore_cpp.h"
 
 namespace cs {
@@ -514,7 +516,7 @@ class HttpCamera : public VideoCamera {
    * @param urls Array of Camera URLs
    * @param kind Camera kind (e.g. kAxis)
    */
-  HttpCamera(std::string_view name, wpi::ArrayRef<std::string> urls,
+  HttpCamera(std::string_view name, wpi::span<const std::string> urls,
              HttpCameraKind kind = kUnknown);
 
   /**
@@ -539,7 +541,7 @@ class HttpCamera : public VideoCamera {
   /**
    * Change the URLs used to connect to the camera.
    */
-  void SetUrls(wpi::ArrayRef<std::string> urls);
+  void SetUrls(wpi::span<const std::string> urls);
 
   /**
    * Change the URLs used to connect to the camera.
@@ -558,7 +560,7 @@ class HttpCamera : public VideoCamera {
  */
 class AxisCamera : public HttpCamera {
   static std::string HostToUrl(std::string_view host);
-  static std::vector<std::string> HostToUrl(wpi::ArrayRef<std::string> hosts);
+  static std::vector<std::string> HostToUrl(wpi::span<const std::string> hosts);
   template <typename T>
   static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
 
@@ -597,7 +599,7 @@ class AxisCamera : public HttpCamera {
    * @param hosts Array of Camera host IPs/DNS names
    * @param kind Camera kind (e.g. kAxis)
    */
-  AxisCamera(std::string_view name, wpi::ArrayRef<std::string> hosts);
+  AxisCamera(std::string_view name, wpi::span<const std::string> hosts);
 
   /**
    * Create a source for an Axis IP camera.
@@ -698,7 +700,7 @@ class ImageSource : public VideoSource {
    * @param choices Choices
    */
   void SetEnumPropertyChoices(const VideoProperty& property,
-                              wpi::ArrayRef<std::string> choices);
+                              wpi::span<const std::string> choices);
 
   /**
    * Configure enum property choices.

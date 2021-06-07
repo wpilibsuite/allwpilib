@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/ConvertUTF.h"
+#include "wpi/SmallVector.h"
 #include <string>
 #include <vector>
 
@@ -28,13 +29,13 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
   return true;
 }
 
-bool hasUTF16ByteOrderMark(ArrayRef<char> S) {
+bool hasUTF16ByteOrderMark(span<const char> S) {
   return (S.size() >= 2 &&
           ((S[0] == '\xff' && S[1] == '\xfe') ||
            (S[0] == '\xfe' && S[1] == '\xff')));
 }
 
-bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
+bool convertUTF16ToUTF8String(span<const UTF16> SrcUTF16,
                               SmallVectorImpl<char> &DstUTF8) {
   assert(DstUTF8.empty());
 

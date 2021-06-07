@@ -12,9 +12,9 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
+#include "wpi/span.h"
 #include "wpi/uv/Handle.h"
 
 namespace wpi::uv {
@@ -232,12 +232,12 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param options Process options
    */
   static std::shared_ptr<Process> SpawnArray(Loop& loop, std::string_view file,
-                                             ArrayRef<Option> options);
+                                             span<const Option> options);
 
   static std::shared_ptr<Process> SpawnArray(
       Loop& loop, std::string_view file,
       std::initializer_list<Option> options) {
-    return SpawnArray(loop, file, makeArrayRef(options.begin(), options.end()));
+    return SpawnArray(loop, file, {options.begin(), options.end()});
   }
 
   template <typename... Args>
@@ -261,7 +261,7 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    */
   static std::shared_ptr<Process> SpawnArray(const std::shared_ptr<Loop>& loop,
                                              std::string_view file,
-                                             ArrayRef<Option> options) {
+                                             span<const Option> options) {
     return SpawnArray(*loop, file, options);
   }
 

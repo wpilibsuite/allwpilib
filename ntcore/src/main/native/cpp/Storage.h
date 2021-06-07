@@ -21,6 +21,7 @@
 #include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "IStorage.h"
 #include "Message.h"
@@ -67,7 +68,7 @@ class Storage : public IStorage {
       INetworkConnection& conn,
       std::vector<std::shared_ptr<Message>>* msgs) override;
   void ApplyInitialAssignments(
-      INetworkConnection& conn, wpi::ArrayRef<std::shared_ptr<Message>> msgs,
+      INetworkConnection& conn, wpi::span<std::shared_ptr<Message>> msgs,
       bool new_server,
       std::vector<std::shared_ptr<Message>>* out_msgs) override;
 

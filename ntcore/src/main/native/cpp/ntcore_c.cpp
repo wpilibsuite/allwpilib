@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <cstring>
 #include <string_view>
 
 #include <wpi/MemAlloc.h>
@@ -550,8 +551,7 @@ char* NT_PackRpcValues(const NT_Value** values, size_t values_len,
 
 NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
                               const NT_Type* types, size_t types_len) {
-  auto values_v = nt::UnpackRpcValues({packed, packed_len},
-                                      wpi::ArrayRef<NT_Type>(types, types_len));
+  auto values_v = nt::UnpackRpcValues({packed, packed_len}, {types, types_len});
   if (values_v.size() == 0) {
     return nullptr;
   }
@@ -972,24 +972,22 @@ NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, uint64_t time,
                                 const NT_Bool* arr, size_t size,
                                 NT_Bool force) {
   if (force != 0) {
-    nt::SetEntryTypeValue(
-        entry, Value::MakeBooleanArray(wpi::makeArrayRef(arr, size), time));
+    nt::SetEntryTypeValue(entry,
+                          Value::MakeBooleanArray(wpi::span(arr, size), time));
     return 1;
   } else {
     return nt::SetEntryValue(
-        entry, Value::MakeBooleanArray(wpi::makeArrayRef(arr, size), time));
+        entry, Value::MakeBooleanArray(wpi::span(arr, size), time));
   }
 }
 
 NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, uint64_t time, const double* arr,
                                size_t size, NT_Bool force) {
   if (force != 0) {
-    nt::SetEntryTypeValue(
-        entry, Value::MakeDoubleArray(wpi::makeArrayRef(arr, size), time));
+    nt::SetEntryTypeValue(entry, Value::MakeDoubleArray({arr, size}, time));
     return 1;
   } else {
-    return nt::SetEntryValue(
-        entry, Value::MakeDoubleArray(wpi::makeArrayRef(arr, size), time));
+    return nt::SetEntryValue(entry, Value::MakeDoubleArray({arr, size}, time));
   }
 }
 
@@ -1138,16 +1136,15 @@ NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, uint64_t time,
                                        const NT_Bool* default_value,
                                        size_t default_size) {
   return nt::SetDefaultEntryValue(
-      entry, Value::MakeBooleanArray(
-                 wpi::makeArrayRef(default_value, default_size), time));
+      entry,
+      Value::MakeBooleanArray(wpi::span(default_value, default_size), time));
 }
 
 NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, uint64_t time,
                                       const double* default_value,
                                       size_t default_size) {
   return nt::SetDefaultEntryValue(
-      entry, Value::MakeDoubleArray(
-                 wpi::makeArrayRef(default_value, default_size), time));
+      entry, Value::MakeDoubleArray({default_value, default_size}, time));
 }
 
 NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,

@@ -12,8 +12,8 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallVector.h>
+#include <wpi/span.h>
 
 #include "cscore_c.h"
 
@@ -203,7 +203,7 @@ CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
 CS_Source CreateHttpCamera(std::string_view name, std::string_view url,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateHttpCamera(std::string_view name,
-                           wpi::ArrayRef<std::string> urls,
+                           wpi::span<const std::string> urls,
                            CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(std::string_view name, const VideoMode& mode,
                          CS_Status* status);
@@ -230,7 +230,7 @@ bool IsSourceConnected(CS_Source source, CS_Status* status);
 bool IsSourceEnabled(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, std::string_view name,
                               CS_Status* status);
-wpi::ArrayRef<CS_Property> EnumerateSourceProperties(
+wpi::span<CS_Property> EnumerateSourceProperties(
     CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status);
 VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status);
@@ -249,9 +249,9 @@ std::string GetSourceConfigJson(CS_Source source, CS_Status* status);
 wpi::json GetSourceConfigJsonObject(CS_Source source, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
-wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(CS_Source source,
-                                            wpi::SmallVectorImpl<CS_Sink>& vec,
-                                            CS_Status* status);
+wpi::span<CS_Sink> EnumerateSourceSinks(CS_Source source,
+                                        wpi::SmallVectorImpl<CS_Sink>& vec,
+                                        CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 /** @} */
@@ -285,7 +285,7 @@ UsbCameraInfo GetUsbCameraInfo(CS_Source source, CS_Status* status);
  * @{
  */
 CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status);
-void SetHttpCameraUrls(CS_Source source, wpi::ArrayRef<std::string> urls,
+void SetHttpCameraUrls(CS_Source source, wpi::span<const std::string> urls,
                        CS_Status* status);
 std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 /** @} */
@@ -304,7 +304,7 @@ CS_Property CreateSourceProperty(CS_Source source, std::string_view name,
                                  int step, int defaultValue, int value,
                                  CS_Status* status);
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                  wpi::ArrayRef<std::string> choices,
+                                  wpi::span<const std::string> choices,
                                   CS_Status* status);
 /** @} */
 
@@ -335,7 +335,7 @@ std::string_view GetSinkDescription(CS_Sink sink,
                                     CS_Status* status);
 CS_Property GetSinkProperty(CS_Sink sink, std::string_view name,
                             CS_Status* status);
-wpi::ArrayRef<CS_Property> EnumerateSinkProperties(
+wpi::span<CS_Property> EnumerateSinkProperties(
     CS_Sink sink, wpi::SmallVectorImpl<CS_Property>& vec, CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, std::string_view name,
@@ -430,10 +430,10 @@ void Shutdown();
  */
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
-wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
+wpi::span<CS_Source> EnumerateSourceHandles(
     wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status);
-wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
-                                            CS_Status* status);
+wpi::span<CS_Sink> EnumerateSinkHandles(wpi::SmallVectorImpl<CS_Sink>& vec,
+                                        CS_Status* status);
 
 std::string GetHostname();
 

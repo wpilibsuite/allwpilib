@@ -161,7 +161,7 @@ void CommandScheduler::Schedule(Command* command) {
 }
 
 void CommandScheduler::Schedule(bool interruptible,
-                                wpi::ArrayRef<Command*> commands) {
+                                wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(interruptible, command);
   }
@@ -174,7 +174,7 @@ void CommandScheduler::Schedule(bool interruptible,
   }
 }
 
-void CommandScheduler::Schedule(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(true, command);
   }
@@ -284,7 +284,8 @@ void CommandScheduler::RegisterSubsystem(
   }
 }
 
-void CommandScheduler::RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
+void CommandScheduler::RegisterSubsystem(
+    wpi::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     RegisterSubsystem(subsystem);
   }
@@ -298,7 +299,7 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 void CommandScheduler::UnregisterSubsystem(
-    wpi::ArrayRef<Subsystem*> subsystems) {
+    wpi::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
@@ -340,7 +341,7 @@ void CommandScheduler::Cancel(Command* command) {
   }
 }
 
-void CommandScheduler::Cancel(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -370,7 +371,7 @@ units::second_t CommandScheduler::TimeSinceScheduled(
   }
 }
 bool CommandScheduler::IsScheduled(
-    wpi::ArrayRef<const Command*> commands) const {
+    wpi::span<const Command* const> commands) const {
   for (auto command : commands) {
     if (!IsScheduled(command)) {
       return false;
@@ -444,8 +445,7 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
           m_impl->scheduledCommands.end()) {
         Cancel(command);
       }
-      nt::NetworkTableEntry(cancelEntry)
-          .SetDoubleArray(wpi::ArrayRef<double>{});
+      nt::NetworkTableEntry(cancelEntry).SetDoubleArray({});
     }
 
     wpi::SmallVector<std::string, 8> names;

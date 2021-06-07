@@ -14,8 +14,8 @@
 #include <system_error>
 #include <vector>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
+#include "wpi/span.h"
 
 namespace wpi {
 
@@ -133,9 +133,9 @@ class raw_mem_istream : public raw_istream {
   // not const as we don't want to allow temporaries
   explicit raw_mem_istream(std::string& str)
       : raw_mem_istream(str.data(), str.size()) {}
-  explicit raw_mem_istream(ArrayRef<char> mem)
+  explicit raw_mem_istream(span<const char> mem)
       : raw_mem_istream(mem.data(), mem.size()) {}
-  explicit raw_mem_istream(ArrayRef<uint8_t> mem)
+  explicit raw_mem_istream(span<const uint8_t> mem)
       : raw_mem_istream(reinterpret_cast<const char*>(mem.data()), mem.size()) {
   }
   explicit raw_mem_istream(const char* str)

@@ -668,7 +668,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
 {
   int32_t numElems = 0;
   const double* elems = HALSIM_GetSimValueEnumDoubleValues(handle, &numElems);
-  return MakeJDoubleArray(env, wpi::makeArrayRef(elems, numElems));
+  return MakeJDoubleArray(env, wpi::span(elems, numElems));
 }
 
 /*

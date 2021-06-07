@@ -6,8 +6,13 @@
 
 using namespace frc2;
 
-ProxyScheduleCommand::ProxyScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
+ProxyScheduleCommand::ProxyScheduleCommand(
+    wpi::span<Command* const> toSchedule) {
   SetInsert(m_toSchedule, toSchedule);
+}
+
+ProxyScheduleCommand::ProxyScheduleCommand(Command* toSchedule) {
+  SetInsert(m_toSchedule, {&toSchedule, 1});
 }
 
 void ProxyScheduleCommand::Initialize() {

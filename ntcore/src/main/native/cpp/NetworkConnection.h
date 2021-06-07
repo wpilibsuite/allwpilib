@@ -19,6 +19,7 @@
 #include <wpi/ConcurrentQueue.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "INetworkConnection.h"
 #include "Message.h"
@@ -38,7 +39,7 @@ class NetworkConnection : public INetworkConnection {
   typedef std::function<bool(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
   using ProcessIncomingFunc =
       std::function<void(std::shared_ptr<Message>, NetworkConnection*)>;

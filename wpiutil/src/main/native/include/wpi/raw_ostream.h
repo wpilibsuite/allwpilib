@@ -14,8 +14,8 @@
 #ifndef WPIUTIL_WPI_RAW_OSTREAM_H
 #define WPIUTIL_WPI_RAW_OSTREAM_H
 
-#include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
+#include "wpi/span.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -159,7 +159,7 @@ public:
     return *this;
   }
 
-  raw_ostream &operator<<(ArrayRef<uint8_t> Arr) {
+  raw_ostream &operator<<(span<const uint8_t> Arr) {
     // Inline fast path, particularly for arrays with a known length.
     size_t Size = Arr.size();
 
@@ -573,8 +573,9 @@ public:
 
   void flush() = delete;
 
-  /// Return an ArrayRef for the vector contents.
-  ArrayRef<uint8_t> array() { return ArrayRef<uint8_t>(OS.data(), OS.size()); }
+  /// Return an span for the vector contents.
+  span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
 };
 
 /// A raw_ostream that writes to a vector.  This is a
@@ -606,8 +607,9 @@ public:
 
   void flush() = delete;
 
-  /// Return a ArrayRef for the vector contents.
-  ArrayRef<uint8_t> array() { return ArrayRef<uint8_t>(OS.data(), OS.size()); }
+  /// Return a span for the vector contents.
+  span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
 };
 
 

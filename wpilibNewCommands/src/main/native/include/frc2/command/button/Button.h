@@ -8,7 +8,7 @@
 #include <initializer_list>
 #include <utility>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "Trigger.h"
 
@@ -79,7 +79,7 @@ class Button : public Trigger {
    * @param requirements the required subsystems.
    */
   Button WhenPressed(std::function<void()> toRun,
-                     wpi::ArrayRef<Subsystem*> requirements = {});
+                     wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to be started repeatedly while the button is pressed, and
@@ -125,7 +125,7 @@ class Button : public Trigger {
    * @param requirements the required subsystems.
    */
   Button WhileHeld(std::function<void()> toRun,
-                   wpi::ArrayRef<Subsystem*> requirements = {});
+                   wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to be started when the button is pressed, and canceled
@@ -199,7 +199,7 @@ class Button : public Trigger {
    * @param requirements the required subsystems.
    */
   Button WhenReleased(std::function<void()> toRun,
-                      wpi::ArrayRef<Subsystem*> requirements = {});
+                      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Binds a command to start when the button is pressed, and be canceled when

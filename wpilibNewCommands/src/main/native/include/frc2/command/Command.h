@@ -10,9 +10,9 @@
 #include <string>
 
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -140,7 +140,7 @@ class Command {
    */
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
+      wpi::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -162,7 +162,7 @@ class Command {
    */
   SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
+      wpi::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

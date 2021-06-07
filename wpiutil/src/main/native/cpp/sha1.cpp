@@ -217,7 +217,7 @@ SHA1::SHA1() {
 }
 
 void SHA1::Update(std::string_view s) {
-  raw_mem_istream is(makeArrayRef(s.data(), s.size()));
+  raw_mem_istream is(span<const char>(s.data(), s.size()));
   Update(is);
 }
 

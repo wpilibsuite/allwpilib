@@ -19,7 +19,7 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/voltage.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
@@ -167,7 +167,7 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -205,7 +205,7 @@ class SwerveControllerCommand
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 

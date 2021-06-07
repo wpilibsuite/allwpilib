@@ -18,7 +18,7 @@ void CommandBase::AddRequirements(
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(wpi::ArrayRef<Subsystem*> requirements) {
+void CommandBase::AddRequirements(wpi::span<Subsystem* const> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 

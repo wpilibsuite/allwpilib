@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <algorithm>
 #include <string_view>
 
 #include "TestPrinters.h"
@@ -10,6 +11,16 @@
 #include "networktables/NetworkTableValue.h"
 
 using namespace std::string_view_literals;
+
+namespace wpi {
+template <typename T>
+inline bool operator==(span<T> lhs, span<T> rhs) {
+  if (lhs.size() != rhs.size()) {
+    return false;
+  }
+  return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
+}  // namespace wpi
 
 namespace nt {
 
@@ -110,7 +121,7 @@ TEST_F(ValueTest, BooleanArray) {
   std::vector<int> vec{1, 0, 1};
   auto v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<int>(vec), v->GetBooleanArray());
+  ASSERT_EQ(wpi::span<const int>(vec), v->GetBooleanArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(*v, &cv);
@@ -124,7 +135,7 @@ TEST_F(ValueTest, BooleanArray) {
   vec = {0, 1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<int>(vec), v->GetBooleanArray());
+  ASSERT_EQ(wpi::span<const int>(vec), v->GetBooleanArray());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_boolean.size);
@@ -136,7 +147,7 @@ TEST_F(ValueTest, BooleanArray) {
   vec = {1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<int>(vec), v->GetBooleanArray());
+  ASSERT_EQ(wpi::span<const int>(vec), v->GetBooleanArray());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_boolean.size);
@@ -150,7 +161,7 @@ TEST_F(ValueTest, DoubleArray) {
   std::vector<double> vec{0.5, 0.25, 0.5};
   auto v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<double>(vec), v->GetDoubleArray());
+  ASSERT_EQ(wpi::span<const double>(vec), v->GetDoubleArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(*v, &cv);
@@ -164,7 +175,7 @@ TEST_F(ValueTest, DoubleArray) {
   vec = {0.25, 0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<double>(vec), v->GetDoubleArray());
+  ASSERT_EQ(wpi::span<const double>(vec), v->GetDoubleArray());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_double.size);
@@ -176,7 +187,7 @@ TEST_F(ValueTest, DoubleArray) {
   vec = {0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
-  ASSERT_EQ(wpi::ArrayRef<double>(vec), v->GetDoubleArray());
+  ASSERT_EQ(wpi::span<const double>(vec), v->GetDoubleArray());
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_double.size);

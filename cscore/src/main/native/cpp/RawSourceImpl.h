@@ -12,8 +12,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
-
 #include "ConfigurableSourceImpl.h"
 #include "SourceImpl.h"
 #include "cscore_raw.h"

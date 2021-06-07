@@ -288,47 +288,47 @@ bool NetworkTable::GetBoolean(std::string_view key, bool defaultValue) const {
 }
 
 bool NetworkTable::PutBooleanArray(std::string_view key,
-                                   wpi::ArrayRef<int> value) {
+                                   wpi::span<const int> value) {
   return GetEntry(key).SetBooleanArray(value);
 }
 
 bool NetworkTable::SetDefaultBooleanArray(std::string_view key,
-                                          wpi::ArrayRef<int> defaultValue) {
+                                          wpi::span<const int> defaultValue) {
   return GetEntry(key).SetDefaultBooleanArray(defaultValue);
 }
 
 std::vector<int> NetworkTable::GetBooleanArray(
-    std::string_view key, wpi::ArrayRef<int> defaultValue) const {
+    std::string_view key, wpi::span<const int> defaultValue) const {
   return GetEntry(key).GetBooleanArray(defaultValue);
 }
 
 bool NetworkTable::PutNumberArray(std::string_view key,
-                                  wpi::ArrayRef<double> value) {
+                                  wpi::span<const double> value) {
   return GetEntry(key).SetDoubleArray(value);
 }
 
 bool NetworkTable::SetDefaultNumberArray(std::string_view key,
-                                         wpi::ArrayRef<double> defaultValue) {
+                                         wpi::span<const double> defaultValue) {
   return GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> NetworkTable::GetNumberArray(
-    std::string_view key, wpi::ArrayRef<double> defaultValue) const {
+    std::string_view key, wpi::span<const double> defaultValue) const {
   return GetEntry(key).GetDoubleArray(defaultValue);
 }
 
 bool NetworkTable::PutStringArray(std::string_view key,
-                                  wpi::ArrayRef<std::string> value) {
+                                  wpi::span<const std::string> value) {
   return GetEntry(key).SetStringArray(value);
 }
 
 bool NetworkTable::SetDefaultStringArray(
-    std::string_view key, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view key, wpi::span<const std::string> defaultValue) {
   return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> NetworkTable::GetStringArray(
-    std::string_view key, wpi::ArrayRef<std::string> defaultValue) const {
+    std::string_view key, wpi::span<const std::string> defaultValue) const {
   return GetEntry(key).GetStringArray(defaultValue);
 }
 

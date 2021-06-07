@@ -10,11 +10,11 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/HttpServerConnection.h"
 #include "wpi/SmallVector.h"
 #include "wpi/WebSocket.h"
 #include "wpi/WebSocketServer.h"
+#include "wpi/span.h"
 #include "wpi/uv/Stream.h"
 
 namespace wpi {
@@ -36,7 +36,7 @@ class HttpWebSocketServerConnection
    * @param protocols Acceptable subprotocols
    */
   HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
-                                ArrayRef<std::string_view> protocols);
+                                span<const std::string_view> protocols);
 
   /**
    * Constructor.
@@ -47,8 +47,8 @@ class HttpWebSocketServerConnection
   HttpWebSocketServerConnection(
       std::shared_ptr<uv::Stream> stream,
       std::initializer_list<std::string_view> protocols)
-      : HttpWebSocketServerConnection(
-            stream, makeArrayRef(protocols.begin(), protocols.end())) {}
+      : HttpWebSocketServerConnection(stream,
+                                      {protocols.begin(), protocols.end()}) {}
 
  protected:
   /**

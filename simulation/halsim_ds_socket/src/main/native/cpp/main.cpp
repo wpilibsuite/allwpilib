@@ -116,13 +116,12 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   struct sockaddr_in simAddr;
   NameToAddr("127.0.0.1", 1135, &simAddr);
   simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
-    udpLocal->Send(simAddr, wpi::ArrayRef<Buffer>{singleByte.get(), 1},
-                   [](auto buf, Error err) {
-                     if (err) {
-                       fmt::print(stderr, "{}\n", err.str());
-                       std::fflush(stderr);
-                     }
-                   });
+    udpLocal->Send(simAddr, {singleByte.get(), 1}, [](auto buf, Error err) {
+      if (err) {
+        fmt::print(stderr, "{}\n", err.str());
+        std::fflush(stderr);
+      }
+    });
   });
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
 
@@ -131,8 +130,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
                                                const sockaddr& recSock,
                                                unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP(
-        wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
+    ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
 
     struct sockaddr_in outAddr;
     std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));

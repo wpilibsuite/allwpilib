@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
 #include <wpi/TCPAcceptor.h>
 #include <wpi/TCPConnector.h>
@@ -37,7 +38,7 @@ void Dispatcher::SetServer(const char* server_name, unsigned int port) {
 }
 
 void Dispatcher::SetServer(
-    wpi::ArrayRef<std::pair<std::string_view, unsigned int>> servers) {
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers) {
   wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
   for (const auto& server : servers) {
     servers_copy.emplace_back(std::string{wpi::trim(server.first)},
@@ -512,7 +513,7 @@ void DispatcherBase::ClientThreadMain() {
 
 bool DispatcherBase::ClientHandshake(
     NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
-    std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
+    std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs) {
   // get identity
   std::string self_id;
   {
@@ -522,10 +523,11 @@ bool DispatcherBase::ClientHandshake(
 
   // send client hello
   DEBUG0("{}", "client: sending hello");
-  send_msgs(Message::ClientHello(self_id));
+  auto msg = Message::ClientHello(self_id);
+  send_msgs(wpi::span(&msg, 1));
 
   // wait for response
-  auto msg = get_msg();
+  msg = get_msg();
   if (!msg) {
     // disconnected, retry
     DEBUG0("{}", "client: server disconnected before first response");
@@ -604,7 +606,7 @@ bool DispatcherBase::ClientHandshake(
 
 bool DispatcherBase::ServerHandshake(
     NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
-    std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
+    std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs) {
   // Wait for the client to send us a hello.
   auto msg = get_msg();
   if (!msg) {
@@ -620,7 +622,8 @@ bool DispatcherBase::ServerHandshake(
   unsigned int proto_rev = msg->id();
   if (proto_rev > 0x0300) {
     DEBUG0("{}", "server: client requested proto > 0x0300");
-    send_msgs(Message::ProtoUnsup());
+    auto toSend = Message::ProtoUnsup();
+    send_msgs(wpi::span(&toSend, 1));
     return false;
   }
 

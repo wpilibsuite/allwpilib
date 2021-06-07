@@ -12,7 +12,7 @@ class HttpWebSocketServerConnectionTest
     : public HttpWebSocketServerConnection<HttpWebSocketServerConnectionTest> {
  public:
   HttpWebSocketServerConnectionTest(std::shared_ptr<uv::Stream> stream,
-                                    ArrayRef<std::string_view> protocols)
+                                    span<const std::string_view> protocols)
       : HttpWebSocketServerConnection{stream, protocols} {}
 
   void ProcessRequest() override { ++gotRequest; }

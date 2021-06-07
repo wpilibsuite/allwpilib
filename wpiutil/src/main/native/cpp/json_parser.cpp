@@ -1921,11 +1921,11 @@ json json::parse(std::string_view s,
                         const parser_callback_t cb,
                         const bool allow_exceptions)
 {
-    raw_mem_istream is(makeArrayRef(s.data(), s.size()));
+    raw_mem_istream is(span<const char>(s.data(), s.size()));
     return parse(is, cb, allow_exceptions);
 }
 
-json json::parse(ArrayRef<uint8_t> arr,
+json json::parse(span<const uint8_t> arr,
                         const parser_callback_t cb,
                         const bool allow_exceptions)
 {
@@ -1944,11 +1944,11 @@ json json::parse(raw_istream& i,
 
 bool json::accept(std::string_view s)
 {
-    raw_mem_istream is(makeArrayRef(s.data(), s.size()));
+    raw_mem_istream is(span<const char>(s.data(), s.size()));
     return parser(is).accept(true);
 }
 
-bool json::accept(ArrayRef<uint8_t> arr)
+bool json::accept(span<const uint8_t> arr)
 {
     raw_mem_istream is(arr);
     return parser(is).accept(true);

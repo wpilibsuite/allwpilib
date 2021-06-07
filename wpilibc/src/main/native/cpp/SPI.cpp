@@ -260,7 +260,8 @@ void SPI::FreeAuto() {
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
-void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize) {
+void SPI::SetAutoTransmitData(wpi::span<const uint8_t> dataToSend,
+                              int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),
                              zeroSize, &status);

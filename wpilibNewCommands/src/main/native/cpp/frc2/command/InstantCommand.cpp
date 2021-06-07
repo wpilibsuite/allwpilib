@@ -13,7 +13,7 @@ InstantCommand::InstantCommand(std::function<void()> toRun,
 }
 
 InstantCommand::InstantCommand(std::function<void()> toRun,
-                               wpi::ArrayRef<Subsystem*> requirements)
+                               wpi::span<Subsystem* const> requirements)
     : m_toRun{std::move(toRun)} {
   AddRequirements(requirements);
 }

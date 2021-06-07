@@ -27,7 +27,7 @@ int PropertyContainer::GetPropertyIndex(std::string_view name) const {
   return ndx;
 }
 
-wpi::ArrayRef<int> PropertyContainer::EnumerateProperties(
+wpi::span<int> PropertyContainer::EnumerateProperties(
     wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};

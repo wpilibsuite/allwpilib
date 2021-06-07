@@ -9,7 +9,7 @@
 
 #include <frc/Timer.h>
 #include <frc/trajectory/TrapezoidProfile.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -54,7 +54,7 @@ class TrapezoidProfileCommand
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
-                          wpi::ArrayRef<Subsystem*> requirements = {})
+                          wpi::span<Subsystem* const> requirements = {})
       : m_profile(profile), m_output(output) {
     this->AddRequirements(requirements);
   }

@@ -6,7 +6,7 @@
 
 using namespace frc2;
 
-bool CommandGroupBase::RequireUngrouped(Command& command) {
+bool CommandGroupBase::RequireUngrouped(const Command& command) {
   if (command.IsGrouped()) {
     throw FRC_MakeError(
         frc::err::CommandIllegalUse, "{}",
@@ -15,8 +15,12 @@ bool CommandGroupBase::RequireUngrouped(Command& command) {
   return true;
 }
 
+bool CommandGroupBase::RequireUngrouped(const Command* command) {
+  return RequireUngrouped(*command);
+}
+
 bool CommandGroupBase::RequireUngrouped(
-    wpi::ArrayRef<std::unique_ptr<Command>> commands) {
+    wpi::span<const std::unique_ptr<Command>> commands) {
   bool allUngrouped = true;
   for (auto&& command : commands) {
     allUngrouped &= !command.get()->IsGrouped();
@@ -30,7 +34,7 @@ bool CommandGroupBase::RequireUngrouped(
 }
 
 bool CommandGroupBase::RequireUngrouped(
-    std::initializer_list<Command*> commands) {
+    std::initializer_list<const Command*> commands) {
   bool allUngrouped = true;
   for (auto&& command : commands) {
     allUngrouped &= !command->IsGrouped();

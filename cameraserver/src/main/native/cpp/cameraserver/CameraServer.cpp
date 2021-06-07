@@ -529,7 +529,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(const std::string& host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(wpi::ArrayRef<std::string> hosts) {
+cs::AxisCamera CameraServer::AddAxisCamera(wpi::span<const std::string> hosts) {
   return AddAxisCamera("Axis Camera", hosts);
 }
 
@@ -561,7 +561,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(std::string_view name,
-                                           wpi::ArrayRef<std::string> hosts) {
+                                           wpi::span<const std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
   auto csShared = GetCameraServerShared();
