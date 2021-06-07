@@ -8,10 +8,10 @@
 
 #include "TestBench.h"
 #include "frc/Encoder.h"
-#include "frc/LinearFilter.h"
 #include "frc/Notifier.h"
 #include "frc/Timer.h"
 #include "frc/controller/PIDController.h"
+#include "frc/filter/LinearFilter.h"
 #include "frc/motorcontrol/Jaguar.h"
 #include "frc/motorcontrol/Talon.h"
 #include "frc/motorcontrol/Victor.h"

@@ -4,7 +4,7 @@
 
 #include <wpi/timestamp.h>
 
-#include "frc/SlewRateLimiter.h"
+#include "frc/filter/SlewRateLimiter.h"
 #include "gtest/gtest.h"
 #include "units/length.h"
 #include "units/time.h"

@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/AnalogInput.h>
-#include <frc/MedianFilter.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/filter/MedianFilter.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
