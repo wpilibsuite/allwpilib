@@ -41,6 +41,14 @@
 
 using namespace cs;
 
+namespace {
+// Find the length of an array.
+template <class T, size_t N>
+constexpr inline size_t array_lengthof(T (&)[N]) {
+  return N;
+}
+}  // namespace
+
 static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
 static constexpr char const* kPropWbValue = "white_balance_temperature";
 static constexpr char const* kPropExAuto = "exposure_auto";
@@ -124,7 +132,7 @@ int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
   // LifeCam exposure setting quirk
   if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
-    int nelems = wpi::array_lengthof(quirkLifeCamHd3000);
+    int nelems = array_lengthof(quirkLifeCamHd3000);
     for (int i = 0; i < nelems; ++i) {
       if (rawValue < quirkLifeCamHd3000[i]) {
         return 100.0 * i / nelems;
@@ -141,7 +149,7 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
   // LifeCam exposure setting quirk
   if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
-    int nelems = wpi::array_lengthof(quirkLifeCamHd3000);
+    int nelems = array_lengthof(quirkLifeCamHd3000);
     int ndx = nelems * percentValue / 100.0;
     if (ndx < 0) {
       ndx = 0;

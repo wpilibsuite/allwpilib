@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/STLExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
