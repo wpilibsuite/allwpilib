@@ -16,7 +16,6 @@
 #endif
 
 #include "wpi/raw_ostream.h"
-#include "wpi/STLExtras.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
@@ -64,6 +63,14 @@
 #endif
 
 using namespace wpi;
+
+namespace {
+// Find the length of an array.
+template <class T, std::size_t N>
+constexpr inline size_t array_lengthof(T (&)[N]) {
+  return N;
+}
+}  // namespace
 
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer

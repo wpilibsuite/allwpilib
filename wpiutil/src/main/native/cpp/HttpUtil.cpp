@@ -8,7 +8,6 @@
 
 #include "fmt/format.h"
 #include "wpi/Base64.h"
-#include "wpi/STLExtras.h"
 #include "wpi/StringExtras.h"
 #include "wpi/TCPConnector.h"
 #include "wpi/raw_ostream.h"
