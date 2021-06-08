@@ -6,6 +6,8 @@
 #include "edu_wpi_first_hal_DMAJNI.h"
 #include "hal/DMA.h"
 #include "hal/handles/HandlesInternal.h"
+#include <algorithm>
+#include <cstring>
 
 using namespace hal;
 

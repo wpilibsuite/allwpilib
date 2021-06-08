@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.dma;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DMA;
 import edu.wpi.first.wpilibj.DMASample;
@@ -11,7 +12,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Units;
 
 /** This is a sample program showing how to to use DMA to read a sensor. */
 public class Robot extends TimedRobot {

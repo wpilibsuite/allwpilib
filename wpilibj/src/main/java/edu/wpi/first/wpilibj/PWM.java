@@ -36,8 +36,7 @@ public class PWM implements Sendable, AutoCloseable {
 
   private final int m_channel;
 
-  // Package private to use from AddressableLED
-  int m_handle;
+  private int m_handle;
 
   /**
    * Allocate a PWM given a channel.
@@ -241,6 +240,15 @@ public class PWM implements Sendable, AutoCloseable {
 
   public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
+  }
+
+  /**
+   * Get the underlying handle.
+   *
+   * @return Underlying PWM handle
+   */
+  public int getHandle() {
+    return m_handle;
   }
 
   @Override

@@ -563,7 +563,7 @@ int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
     hal::SetLastError(status,
                       "Digital Source unabled to be mapped properly. Likely "
                       "invalid handle passed.");
-    return;
+    return 0;
   }
 
   tDMA::tExternalTriggers newTrigger;

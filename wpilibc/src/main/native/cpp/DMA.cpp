@@ -10,6 +10,7 @@
 #include <frc/DutyCycle.h>
 #include <frc/Encoder.h>
 #include <frc/PWM.h>
+#include <frc/motorcontrol/PWMMotorController.h>
 
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
@@ -114,6 +115,15 @@ int DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
                                     source->GetAnalogTriggerTypeForRouting()),
                                 rising, falling, &status);
   FRC_CheckErrorStatus(status, "{}", "SetExternalTrigger");
+  return idx;
+}
+
+int DMA::SetPwmEdgeTrigger(PWMMotorController* source, bool rising, bool falling) {
+  int32_t status = 0;
+  int32_t idx = HAL_SetDMAExternalTrigger(
+      dmaHandle, source->GetPwm()->m_handle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow,
+      rising, falling, &status);
+  FRC_CheckErrorStatus(status, "{}", "SetPWmEdgeTrigger");
   return idx;
 }
 

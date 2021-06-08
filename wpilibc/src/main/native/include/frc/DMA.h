@@ -15,6 +15,7 @@ class DutyCycle;
 class AnalogInput;
 class DMASample;
 class PWM;
+class PWMMotorController;
 
 class DMA {
   friend class DMASample;
@@ -46,6 +47,7 @@ class DMA {
 
   int SetExternalTrigger(DigitalSource* source, bool rising, bool falling);
   int SetPwmEdgeTrigger(PWM* pwm, bool rising, bool falling);
+  int SetPwmEdgeTrigger(PWMMotorController* pwm, bool rising, bool falling);
 
   void ClearSensors();
   void ClearExternalTriggers();

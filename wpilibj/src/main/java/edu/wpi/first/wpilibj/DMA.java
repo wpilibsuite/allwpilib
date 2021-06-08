@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.DMAJNI;
+import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 
 public class DMA implements AutoCloseable {
   final int m_dmaHandle;
@@ -83,8 +84,12 @@ public class DMA implements AutoCloseable {
         falling);
   }
 
+  public int setPwmEdgeTrigger(PWMMotorController pwm, boolean rising, boolean falling) {
+    return DMAJNI.setExternalTrigger(m_dmaHandle, pwm.getPwmHandle(), 0, rising, falling);
+  }
+
   public int setPwmEdgeTrigger(PWM pwm, boolean rising, boolean falling) {
-    return DMAJNI.setExternalTrigger(m_dmaHandle, pwm.m_handle, 0, rising, falling);
+    return DMAJNI.setExternalTrigger(m_dmaHandle, pwm.getHandle(), 0, rising, falling);
   }
 
   public void clearSensors() {

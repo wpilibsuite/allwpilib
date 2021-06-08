@@ -7,10 +7,12 @@ package edu.wpi.first.wpilibj;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
+import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
+import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
-import edu.wpi.first.wpilibj.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +30,7 @@ public class DMATest extends AbstractComsSetup {
 
   private AnalogCrossConnectFixture m_analogIO;
   private DigitalOutput m_manualTrigger;
-  private PWMSpeedController m_pwm;
+  private PWMMotorController m_pwm;
   private DMA m_dma;
   private DMASample m_dmaSample;
 

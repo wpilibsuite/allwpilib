@@ -51,6 +51,7 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
+  private final EncodingType m_encodingType;
 
   int m_encoder; // the HAL encoder object
 

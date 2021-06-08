@@ -5,16 +5,17 @@
 #include <frc/AnalogInput.h>
 #include <frc/AnalogOutput.h>
 #include <frc/DigitalOutput.h>
-#include <frc/Jaguar.h>
+#include <frc/motorcontrol/Jaguar.h>
 
 #include "TestBench.h"
 #include "frc/DMA.h"
 #include "frc/DMASample.h"
+#include <frc/Timer.h>
 #include "gtest/gtest.h"
 
 using namespace frc;
 
-static const double kDelayTime = 0.1;
+static constexpr auto kDelayTime = 100_ms;
 
 class DMATest : public testing::Test {
  protected:
@@ -22,7 +23,7 @@ class DMATest : public testing::Test {
   AnalogInput* m_analogInput;
   AnalogOutput* m_analogOutput;
   DigitalOutput* m_manualTrigger;
-  PWMSpeedController* m_pwm;
+  PWMMotorController* m_pwm;
 
   void SetUp() override {
     m_analogOutput = new AnalogOutput(TestBench::kAnalogOutputChannel);
@@ -97,7 +98,7 @@ TEST_F(DMATest, AnalogIndividualTriggers) {
     int32_t status = 0;
 
     m_analogOutput->SetVoltage(i);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
     m_manualTrigger->Set(false);
     auto timedOut = sample.Update(m_dma, 1_ms, &remaining, &status);
     m_manualTrigger->Set(true);
@@ -115,9 +116,9 @@ TEST_F(DMATest, AnalogMultipleTriggers) {
   for (double i = 0; i < 5; i += 0.5) {
     values.push_back(i);
     m_analogOutput->SetVoltage(i);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
     m_manualTrigger->Set(false);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
     m_manualTrigger->Set(true);
   }
 
@@ -137,7 +138,7 @@ TEST_F(DMATest, AnalogMultipleTriggers) {
 TEST_F(DMATest, TimedTriggers) {
   m_dma->SetTimedTrigger(10_ms);
   m_dma->Start(1024);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   m_dma->SetPause(true);
 
   frc::DMASample sample;
@@ -155,7 +156,7 @@ TEST_F(DMATest, PWMTimedTriggers) {
   m_dma->ClearExternalTriggers();
   m_dma->SetPwmEdgeTrigger(m_pwm, true, false);
   m_dma->Start(1024);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   m_dma->SetPause(true);
 
   frc::DMASample sample;
