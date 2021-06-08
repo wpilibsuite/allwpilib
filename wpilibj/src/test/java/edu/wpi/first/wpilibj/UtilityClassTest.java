@@ -19,7 +19,14 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-public class UtilityClassTest<T> {
+// Declaring this class abstract prevents UtilityClassTest from running on itself and throwing the
+// following exception:
+//
+// org.junit.jupiter.api.extension.ParameterResolutionException: No ParameterResolver registered
+// for parameter [java.lang.Class<T> arg0] in constructor [protected
+// edu.wpi.first.wpilibj.UtilityClassTest(java.lang.Class<T>)].
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
+public abstract class UtilityClassTest<T> {
   private final Class<T> m_clazz;
 
   protected UtilityClassTest(Class<T> clazz) {
