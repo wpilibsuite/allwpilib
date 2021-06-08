@@ -98,7 +98,6 @@ public final class Units {
   }
 
   /**
-<<<<<<< HEAD:wpimath/src/main/java/edu/wpi/first/wpilibj/util/Units.java
    * Converts given milliseconds to seconds.
    *
    * @param milliseconds The milliseconds to convert to seconds.
@@ -116,7 +115,9 @@ public final class Units {
    */
   public static double secondsToMilliseconds(double seconds) {
     return seconds * kMillisecondsPerSecond;
-=======
+  }
+
+  /**
    * Converts kilograms into lbs (pound-mass).
    *
    * @param kilograms The kilograms to convert to lbs (pound-mass).
@@ -134,6 +135,5 @@ public final class Units {
    */
   public static double lbsToKilograms(double lbs) {
     return lbs * kKilogramsPerLb;
->>>>>>> main:wpimath/src/main/java/edu/wpi/first/math/util/Units.java
   }
 }
