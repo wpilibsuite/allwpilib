@@ -28,12 +28,11 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
       false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   HAL_PortHandle portHandle;
   HAL_DigitalHandle digitalIoHandle;
 
   // Use out of range index
-  status = 0;
   portHandle = 8000;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(portHandle, true, nullptr, &status);

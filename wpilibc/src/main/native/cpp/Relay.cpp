@@ -125,7 +125,7 @@ void Relay::Set(Relay::Value value) {
 
 Relay::Value Relay::Get() const {
   Relay::Value value = kOff;
-  int32_t status;
+  int32_t status = 0;
 
   if (m_direction == kForwardOnly) {
     if (HAL_GetRelay(m_forwardHandle, &status)) {

@@ -28,12 +28,11 @@ TEST(SolenoidSimTests, TestPCMInitialization) {
       false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   int32_t module;
   HAL_CTREPCMHandle pcmHandle;
 
   // Use out of range index
-  status = 0;
   module = 8000;
   gTestSolenoidCallbackName = "Unset";
   pcmHandle = HAL_InitializeCTREPCM(module, nullptr, &status);
