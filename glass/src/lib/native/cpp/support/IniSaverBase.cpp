@@ -54,9 +54,8 @@ static ImGuiSaver* GetSaverInstance() {
   return inst;
 }
 
-IniSaverBase::IniSaverBase(const wpi::Twine& typeName, IniSaverBackend* backend)
-    : m_typeName(typeName.str()),
-      m_backend{backend ? backend : GetSaverInstance()} {}
+IniSaverBase::IniSaverBase(std::string_view typeName, IniSaverBackend* backend)
+    : m_typeName(typeName), m_backend{backend ? backend : GetSaverInstance()} {}
 
 IniSaverBase::~IniSaverBase() {
   m_backend->Unregister(this);

@@ -4,12 +4,14 @@
 
 #include "hal/Extensions.h"
 
+#include <cstdio>
+#include <string_view>
 #include <vector>
 
-#include <wpi/Path.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fs.h>
 #include <wpi/spinlock.h>
 
 #if defined(WIN32) || defined(_WIN32)
@@ -24,7 +26,7 @@
 #define DLOPEN(a) LoadLibraryA(a)
 #define DLSYM GetProcAddress
 #define DLCLOSE FreeLibrary
-#define DLERROR "error #" << GetLastError()
+#define DLERROR fmt::format("error #{}", GetLastError())
 #else
 #define DELIM ':'
 #define HTYPE void*
@@ -53,30 +55,26 @@ extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {
   int rc = 1;  // It is expected and reasonable not to find an extra simulation
-  wpi::outs() << "HAL Extensions: Attempting to load: "
-              << wpi::sys::path::stem(library) << "\n";
-  wpi::outs().flush();
+  fmt::print("HAL Extensions: Attempting to load: {}\n",
+             fs::path{library}.stem().string());
+  std::fflush(stdout);
   HTYPE handle = DLOPEN(library);
 #if !defined(WIN32) && !defined(_WIN32)
   if (!handle) {
-    wpi::SmallString<128> libraryName("lib");
-    libraryName += library;
 #if defined(__APPLE__)
-    libraryName += ".dylib";
+    auto libraryName = fmt::format("lib{}.dylib", library);
 #else
-    libraryName += ".so";
+    auto libraryName = fmt::format("lib{}.so", library);
 #endif
-    wpi::outs() << "HAL Extensions: Load failed: " << DLERROR
-                << "\nTrying modified name: "
-                << wpi::sys::path::stem(libraryName) << "\n";
-    wpi::outs().flush();
+    fmt::print("HAL Extensions: Load failed: {}\nTrying modified name: {}\n",
+               DLERROR, fs::path{libraryName}.stem().string());
+    std::fflush(stdout);
     handle = DLOPEN(libraryName.c_str());
   }
 #endif
   if (!handle) {
-    wpi::outs() << "HAL Extensions: Failed to load library: " << DLERROR
-                << '\n';
-    wpi::outs().flush();
+    fmt::print("HAL Extensions: Failed to load library: {}\n", DLERROR);
+    std::fflush(stdout);
     return rc;
   }
 
@@ -88,32 +86,30 @@ int HAL_LoadOneExtension(const char* library) {
   }
 
   if (rc != 0) {
-    wpi::outs() << "HAL Extensions: Failed to load extension\n";
-    wpi::outs().flush();
+    std::puts("HAL Extensions: Failed to load extension");
+    std::fflush(stdout);
     DLCLOSE(handle);
   } else {
-    wpi::outs() << "HAL Extensions: Successfully loaded extension\n";
-    wpi::outs().flush();
+    std::puts("HAL Extensions: Successfully loaded extension");
+    std::fflush(stdout);
   }
   return rc;
 }
 
 int HAL_LoadExtensions(void) {
   int rc = 1;
-  wpi::SmallVector<wpi::StringRef, 2> libraries;
+  wpi::SmallVector<std::string_view, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) {
     if (GetShowNotFoundMessage()) {
-      wpi::outs() << "HAL Extensions: No extensions found\n";
-      wpi::outs().flush();
+      std::puts("HAL Extensions: No extensions found");
+      std::fflush(stdout);
     }
     return rc;
   }
-  wpi::StringRef env{e};
-  env.split(libraries, DELIM, -1, false);
-  for (auto& libref : libraries) {
-    wpi::SmallString<128> library(libref);
-    rc = HAL_LoadOneExtension(library.c_str());
+  wpi::split(e, libraries, DELIM, -1, false);
+  for (auto& library : libraries) {
+    rc = HAL_LoadOneExtension(std::string(library).c_str());
     if (rc < 0) {
       break;
     }

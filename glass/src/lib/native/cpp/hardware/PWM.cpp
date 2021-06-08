@@ -41,7 +41,7 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
 }
 
 void glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
-                        wpi::StringRef noneMsg) {
+                        std::string_view noneMsg) {
   bool hasAny = false;
   bool first = true;
   model->ForEachPWM([&](PWMModel& pwm, int i) {
@@ -58,6 +58,6 @@ void glass::DisplayPWMs(PWMsModel* model, bool outputsEnabled,
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }

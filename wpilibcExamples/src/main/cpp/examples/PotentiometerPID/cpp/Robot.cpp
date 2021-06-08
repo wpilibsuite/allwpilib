@@ -6,9 +6,9 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
@@ -62,7 +62,7 @@ class Robot : public frc::TimedRobot {
 
   frc::AnalogInput m_potentiometer{kPotChannel};
   frc::Joystick m_joystick{kJoystickChannel};
-  frc::PWMVictorSPX m_elevatorMotor{kMotorChannel};
+  frc::PWMSparkMax m_elevatorMotor{kMotorChannel};
 
   frc2::PIDController m_pidController{kP, kI, kD};
 };

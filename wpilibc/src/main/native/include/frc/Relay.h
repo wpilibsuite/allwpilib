@@ -5,11 +5,10 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include <hal/Types.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/MotorSafety.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
@@ -92,7 +91,7 @@ class Relay : public MotorSafety,
   // MotorSafety interface
   void StopMotor() override;
 
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

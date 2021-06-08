@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends DigitalSource implements Sendable, AutoCloseable {
+public class DigitalOutput extends DigitalSource implements Sendable {
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 

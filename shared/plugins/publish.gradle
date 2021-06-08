@@ -43,18 +43,7 @@ addTaskToCopyAllOutputs(cppHeadersZip)
 
 model {
     publishing {
-        def pluginTaskList = createComponentZipTasks($.components, [pluginName], zipBaseName, Zip, project, { task, value ->
-            value.each { binary ->
-                if (binary.buildable) {
-                    if (binary instanceof SharedLibraryBinarySpec) {
-                        task.dependsOn binary.buildTask
-                        task.from(binary.sharedLibraryFile) {
-                            into nativeUtils.getPlatformPath(binary) + '/shared'
-                        }
-                    }
-                }
-            }
-        })
+        def pluginTaskList = createComponentZipTasks($.components, [pluginName], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

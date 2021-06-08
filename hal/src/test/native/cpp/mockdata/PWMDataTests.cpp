@@ -35,16 +35,18 @@ TEST(PWMSimTests, TestPwmInitialization) {
   status = 0;
   portHandle = 8000;
   gTestPwmCallbackName = "Unset";
-  pwmHandle = HAL_InitializePWMPort(portHandle, &status);
+  pwmHandle = HAL_InitializePWMPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pwmHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
+  EXPECT_EQ(RESOURCE_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
 
   // Successful setup
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPwmCallbackName = "Unset";
-  pwmHandle = HAL_InitializePWMPort(portHandle, &status);
+  pwmHandle = HAL_InitializePWMPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pwmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
@@ -53,8 +55,10 @@ TEST(PWMSimTests, TestPwmInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPwmCallbackName = "Unset";
-  pwmHandle = HAL_InitializePWMPort(portHandle, &status);
+  pwmHandle = HAL_InitializePWMPort(portHandle, nullptr, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pwmHandle);
+  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  HAL_GetLastError(&status);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
 
@@ -67,7 +71,7 @@ TEST(PWMSimTests, TestPwmInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPwmCallbackName = "Unset";
-  pwmHandle = HAL_InitializePWMPort(portHandle, &status);
+  pwmHandle = HAL_InitializePWMPort(portHandle, nullptr, &status);
   EXPECT_TRUE(HAL_kInvalidHandle != pwmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());

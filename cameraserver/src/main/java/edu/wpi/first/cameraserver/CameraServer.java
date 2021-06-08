@@ -4,20 +4,20 @@
 
 package edu.wpi.first.cameraserver;
 
-import edu.wpi.cscore.AxisCamera;
-import edu.wpi.cscore.CameraServerJNI;
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
-import edu.wpi.cscore.MjpegServer;
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.cscore.VideoEvent;
-import edu.wpi.cscore.VideoException;
-import edu.wpi.cscore.VideoListener;
-import edu.wpi.cscore.VideoMode;
-import edu.wpi.cscore.VideoMode.PixelFormat;
-import edu.wpi.cscore.VideoProperty;
-import edu.wpi.cscore.VideoSink;
-import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.cscore.AxisCamera;
+import edu.wpi.first.cscore.CameraServerJNI;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoEvent;
+import edu.wpi.first.cscore.VideoException;
+import edu.wpi.first.cscore.VideoListener;
+import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cscore.VideoProperty;
+import edu.wpi.first.cscore.VideoSink;
+import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;

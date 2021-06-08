@@ -4,12 +4,11 @@
 
 #pragma once
 
+#include <string_view>
 #include <utility>
 
 #include <imgui.h>
 #include <wpi/StringMap.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "glass/support/IniSaverBase.h"
 
@@ -18,28 +17,28 @@ namespace glass {
 template <typename Info>
 class IniSaverString : public IniSaverBase {
  public:
-  explicit IniSaverString(const wpi::Twine& typeName,
+  explicit IniSaverString(std::string_view typeName,
                           IniSaverBackend* backend = nullptr)
       : IniSaverBase(typeName, backend) {}
 
   // pass through useful functions to map
-  Info& operator[](wpi::StringRef key) { return m_map[key]; }
+  Info& operator[](std::string_view key) { return m_map[key]; }
 
   template <typename... ArgsTy>
-  auto try_emplace(wpi::StringRef key, ArgsTy&&... args) {
+  auto try_emplace(std::string_view key, ArgsTy&&... args) {
     return m_map.try_emplace(key, std::forward<ArgsTy>(args)...);
   }
 
   void erase(typename wpi::StringMap<Info>::iterator it) { m_map.erase(it); }
-  auto erase(wpi::StringRef key) { return m_map.erase(key); }
+  auto erase(std::string_view key) { return m_map.erase(key); }
 
   auto begin() { return m_map.begin(); }
   auto end() { return m_map.end(); }
-  auto find(wpi::StringRef key) { return m_map.find(key); }
+  auto find(std::string_view key) { return m_map.find(key); }
 
   auto begin() const { return m_map.begin(); }
   auto end() const { return m_map.end(); }
-  auto find(wpi::StringRef key) const { return m_map.find(key); }
+  auto find(std::string_view key) const { return m_map.find(key); }
 
   bool empty() const { return m_map.empty(); }
 
@@ -53,4 +52,4 @@ class IniSaverString : public IniSaverBase {
 
 }  // namespace glass
 
-#include "IniSaverString.inl"
+#include "IniSaverString.inc"

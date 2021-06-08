@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drive train
@@ -23,12 +23,15 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 @SuppressWarnings("MemberName")
 public class HolonomicDriveController {
   private Pose2d m_poseError = new Pose2d();
+  private Rotation2d m_rotationError = new Rotation2d();
   private Pose2d m_poseTolerance = new Pose2d();
   private boolean m_enabled = true;
 
   private final PIDController m_xController;
   private final PIDController m_yController;
   private final ProfiledPIDController m_thetaController;
+
+  private boolean m_firstRun = true;
 
   /**
    * Constructs a holonomic drive controller.
@@ -52,7 +55,7 @@ public class HolonomicDriveController {
    */
   public boolean atReference() {
     final var eTranslate = m_poseError.getTranslation();
-    final var eRotate = m_poseError.getRotation();
+    final var eRotate = m_rotationError;
     final var tolTranslate = m_poseTolerance.getTranslation();
     final var tolRotate = m_poseTolerance.getRotation();
     return Math.abs(eTranslate.getX()) < tolTranslate.getX()
@@ -81,6 +84,13 @@ public class HolonomicDriveController {
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
+    // If this is the first run, then we need to reset the theta controller to the current pose's
+    // heading.
+    if (m_firstRun) {
+      m_thetaController.reset(currentPose.getRotation().getRadians());
+      m_firstRun = false;
+    }
+
     // Calculate feedforward velocities (field-relative).
     double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
     double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
@@ -88,6 +98,7 @@ public class HolonomicDriveController {
         m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
 
     m_poseError = poseRef.relativeTo(currentPose);
+    m_rotationError = angleRef.minus(currentPose.getRotation());
 
     if (!m_enabled) {
       return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());

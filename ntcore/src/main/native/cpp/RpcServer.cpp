@@ -27,7 +27,7 @@ void RpcServer::RemoveRpc(unsigned int rpc_uid) {
 }
 
 void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
-                           StringRef name, StringRef params,
+                           std::string_view name, std::string_view params,
                            const ConnectionInfo& conn,
                            SendResponseFunc send_response,
                            unsigned int rpc_uid) {
@@ -37,11 +37,12 @@ void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
 }
 
 bool RpcServer::PostRpcResponse(unsigned int local_id, unsigned int call_uid,
-                                wpi::StringRef result) {
+                                std::string_view result) {
   auto thr = GetThread();
   auto i = thr->m_response_map.find(impl::RpcIdPair{local_id, call_uid});
   if (i == thr->m_response_map.end()) {
-    WARNING("posting RPC response to nonexistent call (or duplicate response)");
+    WARNING("{}",
+            "posting RPC response to nonexistent call (or duplicate response)");
     return false;
   }
   (i->getSecond())(result);

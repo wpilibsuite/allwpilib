@@ -4,10 +4,9 @@
 
 #include "wpi/PortForwarder.h"
 
+#include "fmt/format.h"
 #include "wpi/DenseMap.h"
 #include "wpi/EventLoopRunner.h"
-#include "wpi/SmallString.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/uv/GetAddrInfo.h"
 #include "wpi/uv/Tcp.h"
 #include "wpi/uv/Timer.h"
@@ -37,7 +36,7 @@ static void CopyStream(uv::Stream& in, std::weak_ptr<uv::Stream> outWeak) {
       in.Close();
       return;
     }
-    out->Write(buf2, [](auto bufs, uv::Error) {
+    out->Write({buf2}, [](auto bufs, uv::Error) {
       for (auto buf : bufs) {
         buf.Deallocate();
       }
@@ -45,7 +44,7 @@ static void CopyStream(uv::Stream& in, std::weak_ptr<uv::Stream> outWeak) {
   });
 }
 
-void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
+void PortForwarder::Add(unsigned int port, std::string_view remoteHost,
                         unsigned int remotePort) {
   m_impl->runner.ExecSync([&](uv::Loop& loop) {
     auto server = uv::Tcp::Create(loop);
@@ -55,7 +54,7 @@ void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
 
     // when we get a connection, accept it
     server->connection.connect([serverPtr = server.get(),
-                                host = remoteHost.str(), remotePort] {
+                                host = std::string{remoteHost}, remotePort] {
       auto& loop = serverPtr->GetLoopRef();
       auto client = serverPtr->Accept();
       if (!client) {
@@ -79,10 +78,6 @@ void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
               client->Close();
             }
           });
-
-      // convert port to string
-      SmallString<16> remotePortStr;
-      raw_svector_ostream(remotePortStr) << remotePort;
 
       // resolve address
       uv::GetAddrInfo(
@@ -125,7 +120,7 @@ void PortForwarder::Add(unsigned int port, const Twine& remoteHost,
               CopyStream(*remotePtr, clientWeak);
             });
           },
-          host, remotePortStr);
+          host, fmt::to_string(remotePort));
 
       // time out for connection
       uv::Timer::SingleShot(loop, uv::Timer::Time{500},

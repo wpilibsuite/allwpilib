@@ -7,14 +7,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
+#include <wpi/span.h>
 
 namespace frc {
 
@@ -28,7 +28,7 @@ class SendableBuilder {
    *
    * @param type    data type
    */
-  virtual void SetSmartDashboardType(const wpi::Twine& type) = 0;
+  virtual void SetSmartDashboardType(std::string_view type) = 0;
 
   /**
    * Set a flag indicating if this sendable should be treated as an actuator.
@@ -63,7 +63,7 @@ class SendableBuilder {
    * @param key   property name
    * @return Network table entry
    */
-  virtual nt::NetworkTableEntry GetEntry(const wpi::Twine& key) = 0;
+  virtual nt::NetworkTableEntry GetEntry(std::string_view key) = 0;
 
   /**
    * Add a boolean property.
@@ -72,7 +72,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddBooleanProperty(const wpi::Twine& key,
+  virtual void AddBooleanProperty(std::string_view key,
                                   std::function<bool()> getter,
                                   std::function<void(bool)> setter) = 0;
 
@@ -83,7 +83,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddDoubleProperty(const wpi::Twine& key,
+  virtual void AddDoubleProperty(std::string_view key,
                                  std::function<double()> getter,
                                  std::function<void(double)> setter) = 0;
 
@@ -95,8 +95,8 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddStringProperty(
-      const wpi::Twine& key, std::function<std::string()> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::string_view key, std::function<std::string()> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a boolean array property.
@@ -106,8 +106,8 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddBooleanArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<int>()> getter,
-      std::function<void(wpi::ArrayRef<int>)> setter) = 0;
+      std::string_view key, std::function<std::vector<int>()> getter,
+      std::function<void(wpi::span<const int>)> setter) = 0;
 
   /**
    * Add a double array property.
@@ -117,8 +117,8 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddDoubleArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<double>()> getter,
-      std::function<void(wpi::ArrayRef<double>)> setter) = 0;
+      std::string_view key, std::function<std::vector<double>()> getter,
+      std::function<void(wpi::span<const double>)> setter) = 0;
 
   /**
    * Add a string array property.
@@ -128,8 +128,8 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddStringArrayProperty(
-      const wpi::Twine& key, std::function<std::vector<std::string>()> getter,
-      std::function<void(wpi::ArrayRef<std::string>)> setter) = 0;
+      std::string_view key, std::function<std::vector<std::string>()> getter,
+      std::function<void(wpi::span<const std::string>)> setter) = 0;
 
   /**
    * Add a raw property.
@@ -138,9 +138,9 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddRawProperty(const wpi::Twine& key,
+  virtual void AddRawProperty(std::string_view key,
                               std::function<std::string()> getter,
-                              std::function<void(wpi::StringRef)> setter) = 0;
+                              std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a NetworkTableValue property.
@@ -150,7 +150,7 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddValueProperty(
-      const wpi::Twine& key, std::function<std::shared_ptr<nt::Value>()> getter,
+      std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
       std::function<void(std::shared_ptr<nt::Value>)> setter) = 0;
 
   /**
@@ -161,9 +161,9 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallStringProperty(
-      const wpi::Twine& key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::string_view key,
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a boolean array property (SmallVector form).
@@ -173,9 +173,10 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallBooleanArrayProperty(
-      const wpi::Twine& key,
-      std::function<wpi::ArrayRef<int>(wpi::SmallVectorImpl<int>& buf)> getter,
-      std::function<void(wpi::ArrayRef<int>)> setter) = 0;
+      std::string_view key,
+      std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)>
+          getter,
+      std::function<void(wpi::span<const int>)> setter) = 0;
 
   /**
    * Add a double array property (SmallVector form).
@@ -185,10 +186,10 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallDoubleArrayProperty(
-      const wpi::Twine& key,
-      std::function<wpi::ArrayRef<double>(wpi::SmallVectorImpl<double>& buf)>
+      std::string_view key,
+      std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
           getter,
-      std::function<void(wpi::ArrayRef<double>)> setter) = 0;
+      std::function<void(wpi::span<const double>)> setter) = 0;
 
   /**
    * Add a string array property (SmallVector form).
@@ -198,11 +199,11 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallStringArrayProperty(
-      const wpi::Twine& key,
+      std::string_view key,
       std::function<
-          wpi::ArrayRef<std::string>(wpi::SmallVectorImpl<std::string>& buf)>
+          wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
           getter,
-      std::function<void(wpi::ArrayRef<std::string>)> setter) = 0;
+      std::function<void(wpi::span<const std::string>)> setter) = 0;
 
   /**
    * Add a raw property (SmallVector form).
@@ -212,9 +213,9 @@ class SendableBuilder {
    * @param setter  setter function (sets new value)
    */
   virtual void AddSmallRawProperty(
-      const wpi::Twine& key,
-      std::function<wpi::StringRef(wpi::SmallVectorImpl<char>& buf)> getter,
-      std::function<void(wpi::StringRef)> setter) = 0;
+      std::string_view key,
+      std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Get the network table.

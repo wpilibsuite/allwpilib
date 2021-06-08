@@ -6,25 +6,26 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for ball detection, a
  * piston for opening and closing the claw, and a reed switch to check if the piston is open.
  */
-public class Collector extends Subsystem implements AutoCloseable {
+public class Collector extends Subsystem {
   // Constants for some useful speeds
   public static final double kForward = 1;
   public static final double kStop = 0;
   public static final double kReverse = -1;
 
   // Subsystem devices
-  private final SpeedController m_rollerMotor = new Victor(6);
+  private final MotorController m_rollerMotor = new Victor(6);
   private final DigitalInput m_ballDetector = new DigitalInput(10);
   private final DigitalInput m_openDetector = new DigitalInput(6);
-  private final Solenoid m_piston = new Solenoid(1, 1);
+  private final Solenoid m_piston = new Solenoid(Robot.pneumaticsModule, 1);
 
   /** Create a new collector subsystem. */
   public Collector() {

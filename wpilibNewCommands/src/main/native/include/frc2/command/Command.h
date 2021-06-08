@@ -9,11 +9,10 @@
 #include <memory>
 #include <string>
 
-#include <frc/ErrorBase.h>
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
 
@@ -46,13 +45,13 @@ class ProxyScheduleCommand;
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public frc::ErrorBase {
+class Command {
  public:
   Command() = default;
-  ~Command() override;
+  virtual ~Command();
 
-  Command(const Command&);
-  Command& operator=(const Command&);
+  Command(const Command&) = default;
+  Command& operator=(const Command& rhs);
   Command(Command&&) = default;
   Command& operator=(Command&&) = default;
 
@@ -141,7 +140,7 @@ class Command : public frc::ErrorBase {
    */
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
+      wpi::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command with a runnable to run after the command finishes.
@@ -163,7 +162,7 @@ class Command : public frc::ErrorBase {
    */
   SequentialCommandGroup AndThen(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) &&;
+      wpi::span<Subsystem* const> requirements = {}) &&;
 
   /**
    * Decorates this command to run perpetually, ignoring its ordinary end

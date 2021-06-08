@@ -8,9 +8,9 @@ using namespace wpi::uv;
 
 Handle::~Handle() noexcept {
   if (!m_closed && m_uv_handle->type != UV_UNKNOWN_HANDLE) {
-    uv_close(m_uv_handle, [](uv_handle_t* uv_handle) { delete uv_handle; });
+    uv_close(m_uv_handle, [](uv_handle_t* uv_handle) { std::free(uv_handle); });
   } else {
-    delete m_uv_handle;
+    std::free(m_uv_handle);
   }
 }
 

@@ -6,17 +6,17 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/velocity.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * Represents a differential drive style drivetrain.
@@ -28,9 +28,9 @@ class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    m_leftEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
+    m_leftEncoder.SetDistancePerPulse(2 * wpi::numbers::pi * kWheelRadius /
                                       kEncoderResolution);
-    m_rightEncoder.SetDistancePerPulse(2 * wpi::math::pi * kWheelRadius /
+    m_rightEncoder.SetDistancePerPulse(2 * wpi::numbers::pi * kWheelRadius /
                                        kEncoderResolution);
 
     m_leftEncoder.Reset();
@@ -40,7 +40,7 @@ class Drivetrain {
   static constexpr units::meters_per_second_t kMaxSpeed =
       3.0_mps;  // 3 meters per second
   static constexpr units::radians_per_second_t kMaxAngularSpeed{
-      wpi::math::pi};  // 1/2 rotation per second
+      wpi::numbers::pi};  // 1/2 rotation per second
 
   void SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds);
   void Drive(units::meters_per_second_t xSpeed,
@@ -52,13 +52,13 @@ class Drivetrain {
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
-  frc::PWMVictorSPX m_leftLeader{1};
-  frc::PWMVictorSPX m_leftFollower{2};
-  frc::PWMVictorSPX m_rightLeader{3};
-  frc::PWMVictorSPX m_rightFollower{4};
+  frc::PWMSparkMax m_leftLeader{1};
+  frc::PWMSparkMax m_leftFollower{2};
+  frc::PWMSparkMax m_rightLeader{3};
+  frc::PWMSparkMax m_rightFollower{4};
 
-  frc::SpeedControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
-  frc::SpeedControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
+  frc::MotorControllerGroup m_leftGroup{m_leftLeader, m_leftFollower};
+  frc::MotorControllerGroup m_rightGroup{m_rightLeader, m_rightFollower};
 
   frc::Encoder m_leftEncoder{0, 1};
   frc::Encoder m_rightEncoder{2, 3};

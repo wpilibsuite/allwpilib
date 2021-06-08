@@ -65,22 +65,21 @@ class Notifier : public wpi::CallbackManager<Notifier, impl::NotifierThread> {
   unsigned int AddPolled(unsigned int pollerUid, int eventMask);
 
   // Notification events
-  void NotifySource(const wpi::Twine& name, CS_Source source,
-                    CS_EventKind kind);
+  void NotifySource(std::string_view name, CS_Source source, CS_EventKind kind);
   void NotifySource(const SourceImpl& source, CS_EventKind kind);
   void NotifySourceVideoMode(const SourceImpl& source, const VideoMode& mode);
   void NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                            const wpi::Twine& propertyName, int property,
+                            std::string_view propertyName, int property,
                             CS_PropertyKind propertyKind, int value,
-                            const wpi::Twine& valueStr);
-  void NotifySink(const wpi::Twine& name, CS_Sink sink, CS_EventKind kind);
+                            std::string_view valueStr);
+  void NotifySink(std::string_view name, CS_Sink sink, CS_EventKind kind);
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
-  void NotifySinkSourceChanged(const wpi::Twine& name, CS_Sink sink,
+  void NotifySinkSourceChanged(std::string_view name, CS_Sink sink,
                                CS_Source source);
   void NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
-                          const wpi::Twine& propertyName, int property,
+                          std::string_view propertyName, int property,
                           CS_PropertyKind propertyKind, int value,
-                          const wpi::Twine& valueStr);
+                          std::string_view valueStr);
   void NotifyNetworkInterfacesChanged();
   void NotifyTelemetryUpdated();
   void NotifyUsbCamerasChanged();

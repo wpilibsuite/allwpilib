@@ -8,6 +8,8 @@
 
 #include <utility>
 
+#include <wpi/MathExtras.h>
+
 #include "frc/RobotController.h"
 #include "frc/system/NumericalIntegration.h"
 

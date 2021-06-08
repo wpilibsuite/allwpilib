@@ -6,12 +6,12 @@
 
 #include <initializer_list>
 #include <string>
+#include <string_view>
 
 #include <frc/smartdashboard/Sendable.h>
 #include <frc/smartdashboard/SendableHelper.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
-#include <wpi/Twine.h>
+#include <wpi/span.h>
 
 #include "frc2/command/Command.h"
 
@@ -35,7 +35,7 @@ class CommandBase : public Command,
    *
    * @param requirements the requirements to add
    */
-  void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
+  void AddRequirements(wpi::span<Subsystem* const> requirements);
 
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
 
@@ -46,7 +46,7 @@ class CommandBase : public Command,
    *
    * @param name name
    */
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
 
   /**
    * Gets the name of this Command.
@@ -67,7 +67,7 @@ class CommandBase : public Command,
    *
    * @param subsystem subsystem name
    */
-  void SetSubsystem(const wpi::Twine& subsystem);
+  void SetSubsystem(std::string_view subsystem);
 
   void InitSendable(frc::SendableBuilder& builder) override;
 

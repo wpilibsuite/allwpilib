@@ -4,12 +4,11 @@
 
 #include "HALSimWeb.h"
 
-#include <wpi/FileSystem.h>
-#include <wpi/Path.h>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/Twine.h>
 #include <wpi/UrlParser.h>
 #include <wpi/WebSocketServer.h>
+#include <wpi/fs.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Loop.h>
 #include <wpi/uv/Tcp.h>
@@ -26,7 +25,7 @@ HALSimWeb::HALSimWeb(wpi::uv::Loop& loop, ProviderContainer& providers,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::errs() << "HALSim WS Server libuv ERROR: " << err.str() << '\n';
+    fmt::print(stderr, "HALSim WS Server libuv ERROR: {}\n", err.str());
   });
 
   m_server = uv::Tcp::Create(m_loop);
@@ -42,31 +41,22 @@ bool HALSimWeb::Initialize() {
   }
 
   // determine where to get static content from
-  // wpi::SmallVector<char, 64> tmp;
-  wpi::SmallString<64> tmp;
-
+  fs::path path;
   const char* webroot_sys = std::getenv("HALSIMWS_SYSROOT");
   if (webroot_sys != nullptr) {
-    wpi::StringRef tstr(webroot_sys);
-    tmp.append(tstr);
+    path = webroot_sys;
   } else {
-    wpi::sys::fs::current_path(tmp);
-    wpi::sys::path::append(tmp, "sim");
+    path = fs::current_path() / "sim";
   }
-  wpi::sys::fs::make_absolute(tmp);
-  m_webroot_sys = wpi::Twine(tmp).str();
+  m_webroot_sys = fs::absolute(path).string();
 
-  tmp.clear();
   const char* webroot_user = std::getenv("HALSIMWS_USERROOT");
   if (webroot_user != nullptr) {
-    wpi::StringRef tstr(webroot_user);
-    tmp.append(tstr);
+    path = webroot_sys;
   } else {
-    wpi::sys::fs::current_path(tmp);
-    wpi::sys::path::append(tmp, "sim", "user");
+    path = fs::current_path() / "sim" / "user";
   }
-  wpi::sys::fs::make_absolute(tmp);
-  m_webroot_user = wpi::Twine(tmp).str();
+  m_webroot_user = fs::absolute(path).string();
 
   const char* uri = std::getenv("HALSIMWS_URI");
   if (uri != nullptr) {
@@ -80,7 +70,7 @@ bool HALSimWeb::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::errs() << "Error decoding HALSIMWS_PORT (" << err.what() << ")\n";
+      fmt::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -108,8 +98,8 @@ void HALSimWeb::Start() {
 
   // start listening for incoming connections
   m_server->Listen();
-  wpi::outs() << "Listening at http://localhost:" << m_port << "\n";
-  wpi::outs() << "WebSocket URI: " << m_uri << "\n";
+  fmt::print("Listening at http://localhost:{}\n", m_port);
+  fmt::print("WebSocket URI: {}\n", m_uri);
 }
 
 bool HALSimWeb::RegisterWebsocket(
@@ -164,6 +154,6 @@ void HALSimWeb::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    wpi::errs() << "Error with incoming message: " << e.what() << "\n";
+    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }

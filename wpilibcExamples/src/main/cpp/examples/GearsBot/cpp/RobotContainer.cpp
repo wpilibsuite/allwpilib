@@ -42,8 +42,8 @@ void RobotContainer::ConfigureButtonBindings() {
   frc2::JoystickButton m_l1{&m_joy, 11};
   frc2::JoystickButton m_r1{&m_joy, 12};
 
-  m_dUp.WhenPressed(SetElevatorSetpoint(0.2, &m_elevator));
-  m_dDown.WhenPressed(SetElevatorSetpoint(-0.2, &m_elevator));
+  m_dUp.WhenPressed(SetElevatorSetpoint(0.25, &m_elevator));
+  m_dDown.WhenPressed(SetElevatorSetpoint(0.0, &m_elevator));
   m_dRight.WhenPressed(CloseClaw(&m_claw));
   m_dLeft.WhenPressed(OpenClaw(&m_claw));
 

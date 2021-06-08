@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardWidget.h"
 #include "frc/smartdashboard/SendableBuilder.h"
@@ -24,7 +24,7 @@ class ShuffleboardContainer;
  */
 class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {
  public:
-  ComplexWidget(ShuffleboardContainer& parent, const wpi::Twine& title,
+  ComplexWidget(ShuffleboardContainer& parent, std::string_view title,
                 Sendable& sendable);
 
   void EnableIfActuator() override;

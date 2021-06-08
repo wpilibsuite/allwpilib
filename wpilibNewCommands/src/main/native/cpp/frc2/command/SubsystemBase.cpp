@@ -51,7 +51,7 @@ std::string SubsystemBase::GetName() const {
   return frc::SendableRegistry::GetInstance().GetName(this);
 }
 
-void SubsystemBase::SetName(const wpi::Twine& name) {
+void SubsystemBase::SetName(std::string_view name) {
   frc::SendableRegistry::GetInstance().SetName(this, name);
 }
 
@@ -59,7 +59,7 @@ std::string SubsystemBase::GetSubsystem() const {
   return frc::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
-void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
+void SubsystemBase::SetSubsystem(std::string_view name) {
   frc::SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 

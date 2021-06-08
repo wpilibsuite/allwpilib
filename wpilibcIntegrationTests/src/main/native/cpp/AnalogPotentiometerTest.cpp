@@ -10,38 +10,25 @@
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
+static constexpr double kScale = 270.0;
+static constexpr double kAngle = 180.0;
 
-static const double kScale = 270.0;
-static const double kAngle = 180.0;
+TEST(AnalogPotentiometerTest, TestInitialSettings) {
+  frc::AnalogOutput m_fakePot{TestBench::kAnalogOutputChannel};
+  frc::AnalogPotentiometer m_pot{TestBench::kFakeAnalogOutputChannel, kScale};
 
-class AnalogPotentiometerTest : public testing::Test {
- protected:
-  AnalogOutput* m_fakePot;
-  AnalogPotentiometer* m_pot;
-
-  void SetUp() override {
-    m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);
-    m_pot =
-        new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel, kScale);
-  }
-
-  void TearDown() override {
-    delete m_fakePot;
-    delete m_pot;
-  }
-};
-
-TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
-  m_fakePot->SetVoltage(0.0);
-  Wait(0.1);
-  EXPECT_NEAR(0.0, m_pot->Get(), 5.0)
+  m_fakePot.SetVoltage(0.0);
+  frc::Wait(100_ms);
+  EXPECT_NEAR(0.0, m_pot.Get(), 5.0)
       << "The potentiometer did not initialize to 0.";
 }
 
-TEST_F(AnalogPotentiometerTest, TestRangeValues) {
-  m_fakePot->SetVoltage(kAngle / kScale * RobotController::GetVoltage5V());
-  Wait(0.1);
-  EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
+TEST(AnalogPotentiometerTest, TestRangeValues) {
+  frc::AnalogOutput m_fakePot{TestBench::kAnalogOutputChannel};
+  frc::AnalogPotentiometer m_pot{TestBench::kFakeAnalogOutputChannel, kScale};
+
+  m_fakePot.SetVoltage(kAngle / kScale * frc::RobotController::GetVoltage5V());
+  frc::Wait(100_ms);
+  EXPECT_NEAR(kAngle, m_pot.Get(), 2.0)
       << "The potentiometer did not measure the correct angle.";
 }

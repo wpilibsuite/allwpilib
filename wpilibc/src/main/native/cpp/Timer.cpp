@@ -4,16 +4,27 @@
 
 #include "frc/Timer.h"
 
-#include <units/time.h>
+#include <chrono>
+#include <thread>
+
+#include "frc/DriverStation.h"
+#include "frc/RobotController.h"
 
 namespace frc {
 
-void Wait(double seconds) {
-  frc2::Wait(units::second_t(seconds));
+void Wait(units::second_t seconds) {
+  std::this_thread::sleep_for(
+      std::chrono::duration<double>(seconds.to<double>()));
 }
 
-double GetTime() {
-  return frc2::GetTime().to<double>();
+units::second_t GetTime() {
+  using std::chrono::duration;
+  using std::chrono::duration_cast;
+  using std::chrono::system_clock;
+
+  return units::second_t(
+      duration_cast<duration<double>>(system_clock::now().time_since_epoch())
+          .count());
 }
 
 }  // namespace frc
@@ -24,30 +35,57 @@ Timer::Timer() {
   Reset();
 }
 
-double Timer::Get() const {
-  return m_timer.Get().to<double>();
+units::second_t Timer::Get() const {
+  if (m_running) {
+    return (GetFPGATimestamp() - m_startTime) + m_accumulatedTime;
+  } else {
+    return m_accumulatedTime;
+  }
 }
 
 void Timer::Reset() {
-  m_timer.Reset();
+  m_accumulatedTime = 0_s;
+  m_startTime = GetFPGATimestamp();
 }
 
 void Timer::Start() {
-  m_timer.Start();
+  if (!m_running) {
+    m_startTime = GetFPGATimestamp();
+    m_running = true;
+  }
 }
 
 void Timer::Stop() {
-  m_timer.Stop();
+  if (m_running) {
+    m_accumulatedTime = Get();
+    m_running = false;
+  }
 }
 
-bool Timer::HasPeriodPassed(double period) {
-  return m_timer.HasPeriodPassed(units::second_t(period));
+bool Timer::HasElapsed(units::second_t period) const {
+  return Get() > period;
 }
 
-double Timer::GetFPGATimestamp() {
-  return frc2::Timer::GetFPGATimestamp().to<double>();
+bool Timer::HasPeriodPassed(units::second_t period) {
+  return AdvanceIfElapsed(period);
 }
 
-double Timer::GetMatchTime() {
-  return frc2::Timer::GetMatchTime().to<double>();
+bool Timer::AdvanceIfElapsed(units::second_t period) {
+  if (Get() > period) {
+    // Advance the start time by the period.
+    m_startTime += period;
+    // Don't set it to the current time... we want to avoid drift.
+    return true;
+  } else {
+    return false;
+  }
+}
+
+units::second_t Timer::GetFPGATimestamp() {
+  // FPGA returns the timestamp in microseconds
+  return units::second_t(frc::RobotController::GetFPGATime() * 1.0e-6);
+}
+
+units::second_t Timer::GetMatchTime() {
+  return units::second_t(frc::DriverStation::GetInstance().GetMatchTime());
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 
@@ -15,6 +16,16 @@ using namespace frc::sim;
 
 SimDeviceSim::SimDeviceSim(const char* name)
     : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
+
+SimDeviceSim::SimDeviceSim(const char* name, int index) {
+  m_handle =
+      HALSIM_GetSimDeviceHandle(fmt::format("{}[{}]", name, index).c_str());
+}
+
+SimDeviceSim::SimDeviceSim(const char* name, int index, int channel) {
+  m_handle = HALSIM_GetSimDeviceHandle(
+      fmt::format("{}[{},{}]", name, index, channel).c_str());
+}
 
 hal::SimValue SimDeviceSim::GetValue(const char* name) const {
   return HALSIM_GetSimValueHandle(m_handle, name);

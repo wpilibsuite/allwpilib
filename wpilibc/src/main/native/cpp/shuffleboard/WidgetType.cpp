@@ -6,6 +6,6 @@
 
 using namespace frc;
 
-wpi::StringRef WidgetType::GetWidgetName() const {
+std::string_view WidgetType::GetWidgetName() const {
   return m_widgetName;
 }

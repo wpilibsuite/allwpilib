@@ -34,39 +34,51 @@ SOFTWARE.
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
+#include "fmt/format.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
 namespace detail {
 
-exception::exception(int id_, const Twine& what_arg)
-    : id(id_), m(what_arg.str()) {}
+exception::exception(int id_, std::string_view what_arg)
+    : id(id_), m(std::string{what_arg}) {}
 
-parse_error parse_error::create(int id_, std::size_t byte_, const Twine& what_arg)
+parse_error parse_error::create(int id_, std::size_t byte_, std::string_view what_arg)
 {
-    return parse_error(id_, byte_, "[json.exception.parse_error." + Twine(id_) + "] parse error" +
-                    (byte_ != 0 ? (" at " + Twine(byte_)) : Twine("")) +
-                    ": " + what_arg);
+    if (byte_ != 0)
+        return parse_error(id_, byte_, fmt::format("[json.exception.parse_error.{}] parse error at {}: {}", id_, byte_, what_arg));
+    else
+        return parse_error(id_, byte_, fmt::format("[json.exception.parse_error.{}] parse error: {}", id_, what_arg));
 }
 
-invalid_iterator invalid_iterator::create(int id_, const Twine& what_arg)
+invalid_iterator invalid_iterator::create(int id_, std::string_view what_arg)
 {
-    return invalid_iterator(id_, "[json.exception.invalid_iterator." + Twine(id_) + "] " + what_arg);
+    return invalid_iterator(id_, fmt::format("[json.exception.invalid_iterator.{}] {}", id_, what_arg));
 }
 
-type_error type_error::create(int id_, const Twine& what_arg)
+invalid_iterator invalid_iterator::create(int id_, std::string_view what_arg, std::string_view type_info)
 {
-    return type_error(id_, "[json.exception.type_error." + Twine(id_) + "] " + what_arg);
+    return invalid_iterator(id_, fmt::format("[json.exception.invalid_iterator.{}] {} {}", id_, what_arg, type_info));
 }
 
-out_of_range out_of_range::create(int id_, const Twine& what_arg)
+type_error type_error::create(int id_, std::string_view what_arg)
 {
-    return out_of_range(id_, "[json.exception.out_of_range." + Twine(id_) + "] " + what_arg);
+    return type_error(id_, fmt::format("[json.exception.type_error.{}] {}", id_, what_arg));
 }
 
-other_error other_error::create(int id_, const Twine& what_arg)
+type_error type_error::create(int id_, std::string_view what_arg, std::string_view type_info)
 {
-    return other_error(id_, "[json.exception.other_error." + Twine(id_) + "] " + what_arg);
+    return type_error(id_, fmt::format("[json.exception.type_error.{}] {} {}", id_, what_arg, type_info));
+}
+
+out_of_range out_of_range::create(int id_, std::string_view what_arg)
+{
+    return out_of_range(id_, fmt::format("[json.exception.out_of_range.{}] {}", id_, what_arg));
+}
+
+other_error other_error::create(int id_, std::string_view what_arg)
+{
+    return other_error(id_, fmt::format("[json.exception.other_error.{}] {}", id_, what_arg));
 }
 
 }  // namespace detail
@@ -353,12 +365,12 @@ json::reference json::at(size_type idx)
         JSON_CATCH (std::out_of_range&)
         {
             // create better exception explanation
-            JSON_THROW(out_of_range::create(401, "array index " + Twine(idx) + " is out of range"));
+            JSON_THROW(out_of_range::create(401, fmt::format("array index {} is out of range", idx)));
         }
     }
     else
     {
-        JSON_THROW(type_error::create(304, "cannot use at() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(304, "cannot use at() with", type_name()));
     }
 }
 
@@ -374,16 +386,16 @@ json::const_reference json::at(size_type idx) const
         JSON_CATCH (std::out_of_range&)
         {
             // create better exception explanation
-            JSON_THROW(out_of_range::create(401, "array index " + Twine(idx) + " is out of range"));
+            JSON_THROW(out_of_range::create(401, fmt::format("array index {} is out of range", idx)));
         }
     }
     else
     {
-        JSON_THROW(type_error::create(304, "cannot use at() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(304, "cannot use at() with", type_name()));
     }
 }
 
-json::reference json::at(StringRef key)
+json::reference json::at(std::string_view key)
 {
     // at only works for objects
     if (JSON_LIKELY(is_object()))
@@ -392,17 +404,17 @@ json::reference json::at(StringRef key)
         if (it == m_value.object->end())
         {
             // create better exception explanation
-            JSON_THROW(out_of_range::create(403, "key '" + Twine(key) + "' not found"));
+            JSON_THROW(out_of_range::create(403, fmt::format("key '{}' not found", key)));
         }
         return it->second;
     }
     else
     {
-        JSON_THROW(type_error::create(304, "cannot use at() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(304, "cannot use at() with", type_name()));
     }
 }
 
-json::const_reference json::at(StringRef key) const
+json::const_reference json::at(std::string_view key) const
 {
     // at only works for objects
     if (JSON_LIKELY(is_object()))
@@ -411,13 +423,13 @@ json::const_reference json::at(StringRef key) const
         if (it == m_value.object->end())
         {
             // create better exception explanation
-            JSON_THROW(out_of_range::create(403, "key '" + Twine(key) + "' not found"));
+            JSON_THROW(out_of_range::create(403, fmt::format("key '{}' not found", key)));
         }
         return it->second;
     }
     else
     {
-        JSON_THROW(type_error::create(304, "cannot use at() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(304, "cannot use at() with", type_name()));
     }
 }
 
@@ -445,7 +457,7 @@ json::reference json::operator[](size_type idx)
         return m_value.array->operator[](idx);
     }
 
-    JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+    JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
 }
 
 json::const_reference json::operator[](size_type idx) const
@@ -456,10 +468,10 @@ json::const_reference json::operator[](size_type idx) const
         return m_value.array->operator[](idx);
     }
 
-    JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+    JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
 }
 
-json::reference json::operator[](StringRef key)
+json::reference json::operator[](std::string_view key)
 {
     // implicitly convert null value to an empty object
     if (is_null())
@@ -475,10 +487,10 @@ json::reference json::operator[](StringRef key)
         return m_value.object->operator[](key);
     }
 
-    JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+    JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
 }
 
-json::const_reference json::operator[](StringRef key) const
+json::const_reference json::operator[](std::string_view key) const
 {
     // const operator[] only works for objects
     if (JSON_LIKELY(is_object()))
@@ -487,10 +499,10 @@ json::const_reference json::operator[](StringRef key) const
         return m_value.object->find(key)->second;
     }
 
-    JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+    JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
 }
 
-json::size_type json::erase(StringRef key)
+json::size_type json::erase(std::string_view key)
 {
     // this erase only works for objects
     if (JSON_LIKELY(is_object()))
@@ -498,7 +510,7 @@ json::size_type json::erase(StringRef key)
         return m_value.object->erase(key);
     }
 
-    JSON_THROW(type_error::create(307, "cannot use erase() with " + Twine(type_name())));
+    JSON_THROW(type_error::create(307, "cannot use erase() with", type_name()));
 }
 
 void json::erase(const size_type idx)
@@ -508,18 +520,18 @@ void json::erase(const size_type idx)
     {
         if (JSON_UNLIKELY(idx >= size()))
         {
-            JSON_THROW(out_of_range::create(401, "array index " + Twine(idx) + " is out of range"));
+            JSON_THROW(out_of_range::create(401, fmt::format("array index {} is out of range", idx)));
         }
 
         m_value.array->erase(m_value.array->begin() + static_cast<difference_type>(idx));
     }
     else
     {
-        JSON_THROW(type_error::create(307, "cannot use erase() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(307, "cannot use erase() with", type_name()));
     }
 }
 
-json::iterator json::find(StringRef key)
+json::iterator json::find(std::string_view key)
 {
     auto result = end();
 
@@ -531,7 +543,7 @@ json::iterator json::find(StringRef key)
     return result;
 }
 
-json::const_iterator json::find(StringRef key) const
+json::const_iterator json::find(std::string_view key) const
 {
     auto result = cend();
 
@@ -543,7 +555,7 @@ json::const_iterator json::find(StringRef key) const
     return result;
 }
 
-json::size_type json::count(StringRef key) const
+json::size_type json::count(std::string_view key) const
 {
     // return 0 for all nonobject types
     return is_object() ? m_value.object->count(key) : 0;
@@ -689,7 +701,7 @@ void json::push_back(json&& val)
     // push_back only works for null objects or arrays
     if (JSON_UNLIKELY(not(is_null() or is_array())))
     {
-        JSON_THROW(type_error::create(308, "cannot use push_back() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(308, "cannot use push_back() with", type_name()));
     }
 
     // transform null object into an array
@@ -711,7 +723,7 @@ void json::push_back(const json& val)
     // push_back only works for null objects or arrays
     if (JSON_UNLIKELY(not(is_null() or is_array())))
     {
-        JSON_THROW(type_error::create(308, "cannot use push_back() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(308, "cannot use push_back() with", type_name()));
     }
 
     // transform null object into an array
@@ -731,7 +743,7 @@ void json::push_back(initializer_list_t init)
     if (is_object() and init.size() == 2 and (*init.begin())->is_string())
     {
         std::string key = init.begin()->moved_or_copied();
-        push_back(std::pair<StringRef, json>(key, (init.begin() + 1)->moved_or_copied()));
+        push_back(std::pair<std::string_view, json>(key, (init.begin() + 1)->moved_or_copied()));
     }
     else
     {
@@ -756,7 +768,7 @@ json::iterator json::insert(const_iterator pos, const json& val)
         return result;
     }
 
-    JSON_THROW(type_error::create(309, "cannot use insert() with " + Twine(type_name())));
+    JSON_THROW(type_error::create(309, "cannot use insert() with", type_name()));
 }
 
 json::iterator json::insert(const_iterator pos, size_type cnt, const json& val)
@@ -776,7 +788,7 @@ json::iterator json::insert(const_iterator pos, size_type cnt, const json& val)
         return result;
     }
 
-    JSON_THROW(type_error::create(309, "cannot use insert() with " + Twine(type_name())));
+    JSON_THROW(type_error::create(309, "cannot use insert() with", type_name()));
 }
 
 json::iterator json::insert(const_iterator pos, const_iterator first, const_iterator last)
@@ -784,7 +796,7 @@ json::iterator json::insert(const_iterator pos, const_iterator first, const_iter
     // insert only works for arrays
     if (JSON_UNLIKELY(not is_array()))
     {
-        JSON_THROW(type_error::create(309, "cannot use insert() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(309, "cannot use insert() with", type_name()));
     }
 
     // check if iterator pos fits to this JSON value
@@ -818,7 +830,7 @@ json::iterator json::insert(const_iterator pos, initializer_list_t ilist)
     // insert only works for arrays
     if (JSON_UNLIKELY(not is_array()))
     {
-        JSON_THROW(type_error::create(309, "cannot use insert() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(309, "cannot use insert() with", type_name()));
     }
 
     // check if iterator pos fits to this JSON value
@@ -838,7 +850,7 @@ void json::insert(const_iterator first, const_iterator last)
     // insert only works for objects
     if (JSON_UNLIKELY(not is_object()))
     {
-        JSON_THROW(type_error::create(309, "cannot use insert() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(309, "cannot use insert() with", type_name()));
     }
 
     // check if range iterators belong to the same JSON object
@@ -871,11 +883,11 @@ void json::update(const_reference j)
 
     if (JSON_UNLIKELY(not is_object()))
     {
-        JSON_THROW(type_error::create(312, "cannot use update() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(312, "cannot use update() with", type_name()));
     }
     if (JSON_UNLIKELY(not j.is_object()))
     {
-        JSON_THROW(type_error::create(312, "cannot use update() with " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(312, "cannot use update() with", j.type_name()));
     }
 
     for (auto it = j.cbegin(); it != j.cend(); ++it)
@@ -896,7 +908,7 @@ void json::update(const_iterator first, const_iterator last)
 
     if (JSON_UNLIKELY(not is_object()))
     {
-        JSON_THROW(type_error::create(312, "cannot use update() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(312, "cannot use update() with", type_name()));
     }
 
     // check if range iterators belong to the same JSON object
@@ -1156,7 +1168,7 @@ json json::patch(const json& json_patch) const
                         if (JSON_UNLIKELY(static_cast<size_type>(idx) > parent.size()))
                         {
                             // avoid undefined behavior
-                            JSON_THROW(out_of_range::create(401, "array index " + Twine(idx) + " is out of range"));
+                            JSON_THROW(out_of_range::create(401, fmt::format("array index {} is out of range", idx)));
                         }
                         else
                         {
@@ -1194,7 +1206,7 @@ json json::patch(const json& json_patch) const
             }
             else
             {
-                JSON_THROW(out_of_range::create(403, "key '" + Twine(last_path) + "' not found"));
+                JSON_THROW(out_of_range::create(403, fmt::format("key '{}' not found", last_path)));
             }
         }
         else if (parent.is_array())
@@ -1227,13 +1239,13 @@ json json::patch(const json& json_patch) const
             // check if desired value is present
             if (JSON_UNLIKELY(it == val.m_value.object->end()))
             {
-                JSON_THROW(parse_error::create(105, 0, Twine(error_msg) + " must have member '" + Twine(member) + "'"));
+                JSON_THROW(parse_error::create(105, 0, fmt::format("{} must have member '{}'", error_msg, member)));
             }
 
             // check if result is of type string
             if (JSON_UNLIKELY(string_type and not it->second.is_string()))
             {
-                JSON_THROW(parse_error::create(105, 0, Twine(error_msg) + " must have string member '" + Twine(member) + "'"));
+                JSON_THROW(parse_error::create(105, 0, fmt::format("{} must have string member '{}'", error_msg, member)));
             }
 
             // no error: return value
@@ -1321,7 +1333,7 @@ json json::patch(const json& json_patch) const
                 // throw an exception if test fails
                 if (JSON_UNLIKELY(not success))
                 {
-                    JSON_THROW(other_error::create(501, "unsuccessful: " + Twine(val.dump())));
+                    JSON_THROW(other_error::create(501, fmt::format("unsuccessful: {}", val.dump())));
                 }
 
                 break;
@@ -1331,7 +1343,7 @@ json json::patch(const json& json_patch) const
             {
                 // op must be "add", "remove", "replace", "move", "copy", or
                 // "test"
-                JSON_THROW(parse_error::create(105, 0, "operation value '" + Twine(op) + "' is invalid"));
+                JSON_THROW(parse_error::create(105, 0, fmt::format("operation value '{}' is invalid", op)));
             }
         }
     }
@@ -1413,7 +1425,7 @@ json json::diff(const json& source, const json& target,
                 for (auto it = source.cbegin(); it != source.cend(); ++it)
                 {
                     // escape the key name to be used in a JSON patch
-                    const auto key = json_pointer::escape(it.key());
+                    const auto key = json_pointer::escape(std::string{it.key()});
 
                     if (target.find(it.key()) != target.end())
                     {
@@ -1437,7 +1449,7 @@ json json::diff(const json& source, const json& target,
                     if (source.find(it.key()) == source.end())
                     {
                         // found a key that is not in this -> add it
-                        const auto key = json_pointer::escape(it.key());
+                        const auto key = json_pointer::escape(std::string{it.key()});
                         result.push_back(
                         {
                             {"op", "add"}, {"path", path + "/" + key},

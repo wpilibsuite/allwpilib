@@ -6,8 +6,8 @@
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/DigitalInput.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/commands/PIDSubsystem.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control
@@ -67,5 +67,5 @@ class Pivot : public frc::PIDSubsystem {
   frc::AnalogPotentiometer m_pot{1};
 
   // Motor to move the pivot
-  frc::PWMVictorSPX m_motor{5};
+  frc::PWMSparkMax m_motor{5};
 };

@@ -14,7 +14,7 @@ void Shuffleboard::Update() {
   GetInstance().Update();
 }
 
-ShuffleboardTab& Shuffleboard::GetTab(wpi::StringRef title) {
+ShuffleboardTab& Shuffleboard::GetTab(std::string_view title) {
   return GetInstance().GetTab(title);
 }
 
@@ -22,7 +22,7 @@ void Shuffleboard::SelectTab(int index) {
   GetInstance().SelectTab(index);
 }
 
-void Shuffleboard::SelectTab(wpi::StringRef title) {
+void Shuffleboard::SelectTab(std::string_view title) {
   GetInstance().SelectTab(title);
 }
 
@@ -44,7 +44,7 @@ void Shuffleboard::StopRecording() {
   GetRecordingController().StopRecording();
 }
 
-void Shuffleboard::SetRecordingFileNameFormat(wpi::StringRef format) {
+void Shuffleboard::SetRecordingFileNameFormat(std::string_view format) {
   GetRecordingController().SetRecordingFileNameFormat(format);
 }
 
@@ -52,13 +52,13 @@ void Shuffleboard::ClearRecordingFileNameFormat() {
   GetRecordingController().ClearRecordingFileNameFormat();
 }
 
-void Shuffleboard::AddEventMarker(wpi::StringRef name,
-                                  wpi::StringRef description,
+void Shuffleboard::AddEventMarker(std::string_view name,
+                                  std::string_view description,
                                   ShuffleboardEventImportance importance) {
   GetRecordingController().AddEventMarker(name, description, importance);
 }
 
-void Shuffleboard::AddEventMarker(wpi::StringRef name,
+void Shuffleboard::AddEventMarker(std::string_view name,
                                   ShuffleboardEventImportance importance) {
   AddEventMarker(name, "", importance);
 }

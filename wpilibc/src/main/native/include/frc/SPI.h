@@ -10,10 +10,8 @@
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/deprecated.h>
-
-#include "frc/ErrorBase.h"
+#include <wpi/span.h>
 
 namespace frc {
 
@@ -26,7 +24,7 @@ class DigitalSource;
  * It probably should not be used directly.
  *
  */
-class SPI : public ErrorBase {
+class SPI {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
 
@@ -37,7 +35,7 @@ class SPI : public ErrorBase {
    */
   explicit SPI(Port port);
 
-  ~SPI() override;
+  ~SPI();
 
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
@@ -175,7 +173,7 @@ class SPI : public ErrorBase {
    * @param dataToSend data to send (maximum 16 bytes)
    * @param zeroSize number of zeros to send after the data
    */
-  void SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize);
+  void SetAutoTransmitData(wpi::span<const uint8_t> dataToSend, int zeroSize);
 
   /**
    * Start running the automatic SPI transfer engine at a periodic rate.
@@ -243,32 +241,6 @@ class SPI : public ErrorBase {
    */
   int ReadAutoReceivedData(uint32_t* buffer, int numToRead,
                            units::second_t timeout);
-
-  /**
-   * Read data that has been transferred by the automatic SPI transfer engine.
-   *
-   * Transfers may be made a byte at a time, so it's necessary for the caller
-   * to handle cases where an entire transfer has not been completed.
-   *
-   * Each received data sequence consists of a timestamp followed by the
-   * received data bytes, one byte per word (in the least significant byte).
-   * The length of each received data sequence is the same as the combined
-   * size of the data and zeroSize set in SetAutoTransmitData().
-   *
-   * Blocks until numToRead words have been read or timeout expires.
-   * May be called with numToRead=0 to retrieve how many words are available.
-   *
-   * @deprecated Use unit safe version instead.
-   *             ReadAutoReceivedData(uint32_t* buffer, int numToRead, <!--
-   * -->         units::second_t timeout)
-   *
-   * @param buffer buffer where read words are stored
-   * @param numToRead number of words to read
-   * @param timeout timeout in seconds (ms resolution)
-   * @return Number of words remaining to be read
-   */
-  WPI_DEPRECATED("Use ReadAutoReceivedData with unit-safety instead")
-  int ReadAutoReceivedData(uint32_t* buffer, int numToRead, double timeout);
 
   /**
    * Get the number of bytes dropped by the automatic SPI transfer engine due

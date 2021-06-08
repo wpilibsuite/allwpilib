@@ -5,7 +5,7 @@
 #include "subsystems/SwerveModule.h"
 
 #include <frc/geometry/Rotation2d.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "Constants.h"
 
@@ -27,15 +27,15 @@ SwerveModule::SwerveModule(int driveMotorChannel, int turningMotorChannel,
       ModuleConstants::kDriveEncoderDistancePerPulse);
 
   // Set the distance (in this case, angle) per pulse for the turning encoder.
-  // This is the the angle through an entire rotation (2 * wpi::math::pi)
+  // This is the the angle through an entire rotation (2 * wpi::numbers::pi)
   // divided by the encoder resolution.
   m_turningEncoder.SetDistancePerPulse(
       ModuleConstants::kTurningEncoderDistancePerPulse);
 
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
-  m_turningPIDController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
-                                               units::radian_t(wpi::math::pi));
+  m_turningPIDController.EnableContinuousInput(
+      units::radian_t(-wpi::numbers::pi), units::radian_t(wpi::numbers::pi));
 }
 
 frc::SwerveModuleState SwerveModule::GetState() {

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 
@@ -13,8 +14,8 @@ namespace frc {
 
 template <typename Derived>
 ShuffleboardComponent<Derived>::ShuffleboardComponent(
-    ShuffleboardContainer& parent, const wpi::Twine& title,
-    const wpi::Twine& type)
+    ShuffleboardContainer& parent, std::string_view title,
+    std::string_view type)
     : ShuffleboardValue(title),
       ShuffleboardComponentBase(parent, title, type) {}
 

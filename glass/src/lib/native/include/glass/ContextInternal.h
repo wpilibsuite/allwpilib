@@ -26,7 +26,7 @@ class DataSourceName {
   DataSourceName() = default;
   explicit DataSourceName(DataSource* source) : source{source} {}
 
-  bool ReadIni(wpi::StringRef name_, wpi::StringRef value) {
+  bool ReadIni(std::string_view name_, std::string_view value) {
     return name->ReadIni(name_, value);
   }
   void WriteIni(ImGuiTextBuffer* out) { name->WriteIni(out); }

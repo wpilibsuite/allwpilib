@@ -4,7 +4,7 @@
 
 #include "subsystems/Drivetrain.h"
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "Constants.h"
 
@@ -16,9 +16,9 @@ using namespace DriveConstants;
 // to use DIO pins 4/5 and 6/7 for the left and right
 Drivetrain::Drivetrain() {
   m_leftEncoder.SetDistancePerPulse(
-      wpi::math::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
+      wpi::numbers::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
   m_rightEncoder.SetDistancePerPulse(
-      wpi::math::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
+      wpi::numbers::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
   ResetEncoders();
 }
 

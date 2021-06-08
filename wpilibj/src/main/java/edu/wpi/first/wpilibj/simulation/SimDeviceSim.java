@@ -13,7 +13,6 @@ import edu.wpi.first.hal.SimValue;
 import edu.wpi.first.hal.simulation.SimDeviceCallback;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.hal.simulation.SimValueCallback;
-import edu.wpi.first.hal.simulation.SimValueCallback2;
 
 /** Class to control the simulation side of a SimDevice. */
 public class SimDeviceSim {
@@ -26,6 +25,27 @@ public class SimDeviceSim {
    */
   public SimDeviceSim(String name) {
     m_handle = SimDeviceDataJNI.getSimDeviceHandle(name);
+  }
+
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   * @param index device index number to append to name
+   */
+  public SimDeviceSim(String name, int index) {
+    this(name + "[" + index + "]");
+  }
+
+  /**
+   * Constructs a SimDeviceSim.
+   *
+   * @param name name of the SimDevice
+   * @param index device index number to append to name
+   * @param channel device channel number to append to name
+   */
+  public SimDeviceSim(String name, int index, int channel) {
+    this(name + "[" + index + "," + channel + "]");
   }
 
   /**
@@ -171,22 +191,6 @@ public class SimDeviceSim {
   }
 
   /**
-   * Register a callback to be run every time a value is changed on this device.
-   *
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial state
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
-   */
-  public CallbackStore registerValueChangedCallback2(
-      SimValue value, SimValueCallback2 callback, boolean initialNotify) {
-    int uid =
-        SimDeviceDataJNI.registerSimValueChangedCallback2(
-            value.getNativeHandle(), callback, initialNotify);
-    return new CallbackStore(uid, SimDeviceDataJNI::cancelSimValueChangedCallback);
-  }
-
-  /**
    * Register a callback for SimDouble.reset() and similar functions. The callback is called with
    * the old value.
    *
@@ -195,7 +199,7 @@ public class SimDeviceSim {
    * @param initialNotify ignored (present for consistency)
    */
   public CallbackStore registerValueResetCallback(
-      SimValue value, SimValueCallback2 callback, boolean initialNotify) {
+      SimValue value, SimValueCallback callback, boolean initialNotify) {
     int uid =
         SimDeviceDataJNI.registerSimValueResetCallback(
             value.getNativeHandle(), callback, initialNotify);

@@ -2,6 +2,8 @@ cppHeaderFileInclude {
   \.h$
   \.inc$
   \.inl$
+  math$
+  numbers$
 }
 
 cppSrcFileInclude {
@@ -46,7 +48,6 @@ generatedFileExclude {
   src/main/native/include/wpi/SmallSet\.h$
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
-  src/main/native/include/wpi/StringExtras\.h$
   src/main/native/include/wpi/StringMap\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$
@@ -58,6 +59,11 @@ generatedFileExclude {
   src/main/native/include/wpi/iterator_range\.h$
   src/main/native/include/wpi/raw_os_ostream\.h$
   src/main/native/include/wpi/raw_ostream\.h$
+  src/main/native/include/wpi/span\.h$
+  src/main/native/include/wpi/fs\.h$
+  src/main/native/cpp/fs\.cpp$
+  src/main/native/include/wpi/ghc/
+  src/test/native/cpp/span/
   src/main/native/include/wpi/type_traits\.h$
   src/main/native/cpp/json
   src/main/native/include/wpi/json
@@ -65,6 +71,7 @@ generatedFileExclude {
   src/main/native/include/uv\.h$
   src/main/native/include/uv/
   src/main/native/libuv/
+  src/main/native/fmtlib/
   src/main/native/resources/
   src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker

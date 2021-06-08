@@ -8,7 +8,7 @@
 #include <thread>
 #include <utility>
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
 
 namespace frc {
 class CameraServerShared {
@@ -17,10 +17,31 @@ class CameraServerShared {
   virtual void ReportUsbCamera(int id) = 0;
   virtual void ReportAxisCamera(int id) = 0;
   virtual void ReportVideoServer(int id) = 0;
-  virtual void SetCameraServerError(const wpi::Twine& error) = 0;
-  virtual void SetVisionRunnerError(const wpi::Twine& error) = 0;
-  virtual void ReportDriverStationError(const wpi::Twine& error) = 0;
+  virtual void SetCameraServerErrorV(fmt::string_view format,
+                                     fmt::format_args args) = 0;
+  virtual void SetVisionRunnerErrorV(fmt::string_view format,
+                                     fmt::format_args args) = 0;
+  virtual void ReportDriverStationErrorV(fmt::string_view format,
+                                         fmt::format_args args) = 0;
   virtual std::pair<std::thread::id, bool> GetRobotMainThreadId() const = 0;
+
+  template <typename S, typename... Args>
+  inline void SetCameraServerError(const S& format, Args&&... args) {
+    SetCameraServerErrorV(format,
+                          fmt::make_args_checked<Args...>(format, args...));
+  }
+
+  template <typename S, typename... Args>
+  inline void SetVisionRunnerError(const S& format, Args&&... args) {
+    SetVisionRunnerErrorV(format,
+                          fmt::make_args_checked<Args...>(format, args...));
+  }
+
+  template <typename S, typename... Args>
+  inline void ReportDriverStationError(const S& format, Args&&... args) {
+    ReportDriverStationErrorV(format,
+                              fmt::make_args_checked<Args...>(format, args...));
+  }
 };
 
 CameraServerShared* GetCameraServerShared();

@@ -6,7 +6,6 @@
 
 #include <hal/Types.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -18,8 +17,7 @@ class SendableBuilder;
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel : public ErrorBase,
-                               public Sendable,
+class PowerDistributionPanel : public Sendable,
                                public SendableHelper<PowerDistributionPanel> {
  public:
   PowerDistributionPanel();

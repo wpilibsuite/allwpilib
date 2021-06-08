@@ -6,7 +6,15 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
 namespace hal {
 void ReleaseFPGAInterrupt(int32_t interruptNumber);
-
+void SetLastError(int32_t* status, std::string_view value);
+void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
+                                 int32_t minimum, int32_t maximum,
+                                 int32_t channel);
+void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
+                                     int32_t channel,
+                                     std::string_view previousAllocation);
 }  // namespace hal

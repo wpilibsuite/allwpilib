@@ -5,8 +5,7 @@
 #pragma once
 
 #include <memory>
-
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/PIDController.h"
 #include "frc/PIDOutput.h"
@@ -34,7 +33,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
    * @param i    the integral value
    * @param d    the derivative value
    */
-  PIDSubsystem(const wpi::Twine& name, double p, double i, double d);
+  PIDSubsystem(std::string_view name, double p, double i, double d);
 
   /**
    * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
@@ -45,7 +44,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
    * @param d    the derivative value
    * @param f    the feedforward value
    */
-  PIDSubsystem(const wpi::Twine& name, double p, double i, double d, double f);
+  PIDSubsystem(std::string_view name, double p, double i, double d, double f);
 
   /**
    * Instantiates a PIDSubsystem that will use the given P, I, D, and F values.
@@ -60,7 +59,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
    * @param f      the feedfoward value
    * @param period the time (in seconds) between calculations
    */
-  PIDSubsystem(const wpi::Twine& name, double p, double i, double d, double f,
+  PIDSubsystem(std::string_view name, double p, double i, double d, double f,
                double period);
 
   /**

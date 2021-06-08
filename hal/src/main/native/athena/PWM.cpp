@@ -4,14 +4,15 @@
 
 #include "hal/PWM.h"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <thread>
-
-#include <wpi/raw_ostream.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
@@ -65,6 +66,7 @@ void InitializePWM() {}
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
+                                        const char* allocationLocation,
                                         int32_t* status) {
   hal::init::CheckInit();
   initializeDigital(status);
@@ -75,7 +77,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex || channel >= kNumPWMChannels) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                     kNumPWMChannels, channel);
     return HAL_kInvalidHandle;
   }
 
@@ -87,17 +91,20 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
+  HAL_DigitalHandle handle;
+
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM,
+                                              &handle, status);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
+                                       kNumPWMChannels, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = origChannel;
@@ -112,6 +119,8 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   // Defaults to allow an always valid config.
   HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
@@ -129,8 +138,8 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "PWM handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("PWM handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();
@@ -277,13 +286,13 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
   if (speed == 0.0) {
     rawValue = GetCenterPwm(dPort);
   } else if (speed > 0.0) {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
-        static_cast<double>(GetMinPositivePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
+                    static_cast<double>(GetMinPositivePwm(dPort)));
   } else {
-    rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
-        static_cast<double>(GetMaxNegativePwm(dPort)) + 0.5);
+    rawValue =
+        std::lround(speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
+                    static_cast<double>(GetMaxNegativePwm(dPort)));
   }
 
   if (!((rawValue >= GetMinNegativePwm(dPort)) &&

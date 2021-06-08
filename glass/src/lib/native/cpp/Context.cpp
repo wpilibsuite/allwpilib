@@ -11,7 +11,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 #include <wpigui.h>
 
@@ -23,64 +23,47 @@ Context* glass::gContext;
 
 static bool ConvertInt(Storage::Value* value) {
   value->type = Storage::Value::kInt;
-  if (value->stringVal.empty()) {
-    return false;
-  } else {
-    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->intVal)) {
-      return false;
-    }
+  if (auto val = wpi::parse_integer<int>(value->stringVal, 10)) {
+    value->intVal = val.value();
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool ConvertInt64(Storage::Value* value) {
   value->type = Storage::Value::kInt64;
-  if (value->stringVal.empty()) {
-    return false;
-  } else {
-    if (wpi::StringRef{value->stringVal}.getAsInteger(10, value->int64Val)) {
-      return false;
-    }
+  if (auto val = wpi::parse_integer<int64_t>(value->stringVal, 10)) {
+    value->int64Val = val.value();
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool ConvertBool(Storage::Value* value) {
   value->type = Storage::Value::kBool;
-  if (value->stringVal.empty()) {
-    return false;
-  } else {
-    int val;
-    if (wpi::StringRef{value->stringVal}.getAsInteger(10, val)) {
-      return false;
-    }
-    value->boolVal = (val != 0);
+  if (auto val = wpi::parse_integer<int>(value->stringVal, 10)) {
+    value->intVal = (val.value() != 0);
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool ConvertFloat(Storage::Value* value) {
   value->type = Storage::Value::kFloat;
-  if (value->stringVal.empty()) {
-    return false;
-  } else {
-    if (std::sscanf(value->stringVal.c_str(), "%f", &value->floatVal) != 1) {
-      return false;
-    }
+  if (auto val = wpi::parse_float<float>(value->stringVal)) {
+    value->floatVal = val.value();
+    return true;
   }
-  return true;
+  return false;
 }
 
 static bool ConvertDouble(Storage::Value* value) {
   value->type = Storage::Value::kDouble;
-  if (value->stringVal.empty()) {
-    return false;
-  } else {
-    if (std::sscanf(value->stringVal.c_str(), "%lf", &value->doubleVal) != 1) {
-      return false;
-    }
+  if (auto val = wpi::parse_float<double>(value->stringVal)) {
+    value->doubleVal = val.value();
+    return true;
   }
-  return true;
+  return false;
 }
 
 static void* GlassStorageReadOpen(ImGuiContext*, ImGuiSettingsHandler* handler,
@@ -96,7 +79,7 @@ static void* GlassStorageReadOpen(ImGuiContext*, ImGuiSettingsHandler* handler,
 static void GlassStorageReadLine(ImGuiContext*, ImGuiSettingsHandler*,
                                  void* entry, const char* line) {
   auto storage = static_cast<Storage*>(entry);
-  auto [key, val] = wpi::StringRef{line}.split('=');
+  auto [key, val] = wpi::split(line, '=');
   auto& keys = storage->GetKeys();
   auto& values = storage->GetValues();
   auto it = std::find(keys.begin(), keys.end(), key);
@@ -144,7 +127,8 @@ static void GlassStorageWriteAll(ImGuiContext*, ImGuiSettingsHandler* handler,
   for (auto&& entryIt : sorted) {
     auto& entry = *entryIt;
     out_buf->append("[GlassStorage][");
-    out_buf->append(entry.first().begin(), entry.first().end());
+    out_buf->append(entry.first().data(),
+                    entry.first().data() + entry.first().size());
     out_buf->append("]\n");
     auto& keys = entry.second->GetKeys();
     auto& values = entry.second->GetValues();
@@ -233,7 +217,7 @@ uint64_t glass::GetZeroTime() {
   return gContext->zeroTime;
 }
 
-Storage::Value& Storage::GetValue(wpi::StringRef key) {
+Storage::Value& Storage::GetValue(std::string_view key) {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
   if (it == m_keys.end()) {
     m_keys.emplace_back(key);
@@ -244,49 +228,49 @@ Storage::Value& Storage::GetValue(wpi::StringRef key) {
   }
 }
 
-#define DEFUN(CapsName, LowerName, CType)                                    \
-  CType Storage::Get##CapsName(wpi::StringRef key, CType defaultVal) const { \
-    auto it = std::find(m_keys.begin(), m_keys.end(), key);                  \
-    if (it == m_keys.end())                                                  \
-      return defaultVal;                                                     \
-    Value& value = *m_values[it - m_keys.begin()];                           \
-    if (value.type != Value::k##CapsName) {                                  \
-      if (!Convert##CapsName(&value))                                        \
-        value.LowerName##Val = defaultVal;                                   \
-    }                                                                        \
-    return value.LowerName##Val;                                             \
-  }                                                                          \
-                                                                             \
-  void Storage::Set##CapsName(wpi::StringRef key, CType val) {               \
-    auto it = std::find(m_keys.begin(), m_keys.end(), key);                  \
-    if (it == m_keys.end()) {                                                \
-      m_keys.emplace_back(key);                                              \
-      m_values.emplace_back(std::make_unique<Value>());                      \
-      m_values.back()->type = Value::k##CapsName;                            \
-      m_values.back()->LowerName##Val = val;                                 \
-    } else {                                                                 \
-      Value& value = *m_values[it - m_keys.begin()];                         \
-      value.type = Value::k##CapsName;                                       \
-      value.LowerName##Val = val;                                            \
-    }                                                                        \
-  }                                                                          \
-                                                                             \
-  CType* Storage::Get##CapsName##Ref(wpi::StringRef key, CType defaultVal) { \
-    auto it = std::find(m_keys.begin(), m_keys.end(), key);                  \
-    if (it == m_keys.end()) {                                                \
-      m_keys.emplace_back(key);                                              \
-      m_values.emplace_back(std::make_unique<Value>());                      \
-      m_values.back()->type = Value::k##CapsName;                            \
-      m_values.back()->LowerName##Val = defaultVal;                          \
-      return &m_values.back()->LowerName##Val;                               \
-    } else {                                                                 \
-      Value& value = *m_values[it - m_keys.begin()];                         \
-      if (value.type != Value::k##CapsName) {                                \
-        if (!Convert##CapsName(&value))                                      \
-          value.LowerName##Val = defaultVal;                                 \
-      }                                                                      \
-      return &value.LowerName##Val;                                          \
-    }                                                                        \
+#define DEFUN(CapsName, LowerName, CType)                                      \
+  CType Storage::Get##CapsName(std::string_view key, CType defaultVal) const { \
+    auto it = std::find(m_keys.begin(), m_keys.end(), key);                    \
+    if (it == m_keys.end())                                                    \
+      return defaultVal;                                                       \
+    Value& value = *m_values[it - m_keys.begin()];                             \
+    if (value.type != Value::k##CapsName) {                                    \
+      if (!Convert##CapsName(&value))                                          \
+        value.LowerName##Val = defaultVal;                                     \
+    }                                                                          \
+    return value.LowerName##Val;                                               \
+  }                                                                            \
+                                                                               \
+  void Storage::Set##CapsName(std::string_view key, CType val) {               \
+    auto it = std::find(m_keys.begin(), m_keys.end(), key);                    \
+    if (it == m_keys.end()) {                                                  \
+      m_keys.emplace_back(key);                                                \
+      m_values.emplace_back(std::make_unique<Value>());                        \
+      m_values.back()->type = Value::k##CapsName;                              \
+      m_values.back()->LowerName##Val = val;                                   \
+    } else {                                                                   \
+      Value& value = *m_values[it - m_keys.begin()];                           \
+      value.type = Value::k##CapsName;                                         \
+      value.LowerName##Val = val;                                              \
+    }                                                                          \
+  }                                                                            \
+                                                                               \
+  CType* Storage::Get##CapsName##Ref(std::string_view key, CType defaultVal) { \
+    auto it = std::find(m_keys.begin(), m_keys.end(), key);                    \
+    if (it == m_keys.end()) {                                                  \
+      m_keys.emplace_back(key);                                                \
+      m_values.emplace_back(std::make_unique<Value>());                        \
+      m_values.back()->type = Value::k##CapsName;                              \
+      m_values.back()->LowerName##Val = defaultVal;                            \
+      return &m_values.back()->LowerName##Val;                                 \
+    } else {                                                                   \
+      Value& value = *m_values[it - m_keys.begin()];                           \
+      if (value.type != Value::k##CapsName) {                                  \
+        if (!Convert##CapsName(&value))                                        \
+          value.LowerName##Val = defaultVal;                                   \
+      }                                                                        \
+      return &value.LowerName##Val;                                            \
+    }                                                                          \
   }
 
 DEFUN(Int, int, int)
@@ -295,18 +279,18 @@ DEFUN(Bool, bool, bool)
 DEFUN(Float, float, float)
 DEFUN(Double, double, double)
 
-std::string Storage::GetString(wpi::StringRef key,
-                               const std::string& defaultVal) const {
+std::string Storage::GetString(std::string_view key,
+                               std::string_view defaultVal) const {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
   if (it == m_keys.end()) {
-    return defaultVal;
+    return std::string{defaultVal};
   }
   Value& value = *m_values[it - m_keys.begin()];
   value.type = Value::kString;
   return value.stringVal;
 }
 
-void Storage::SetString(wpi::StringRef key, const wpi::Twine& val) {
+void Storage::SetString(std::string_view key, std::string_view val) {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
   if (it == m_keys.end()) {
     m_keys.emplace_back(key);
@@ -315,12 +299,12 @@ void Storage::SetString(wpi::StringRef key, const wpi::Twine& val) {
   } else {
     Value& value = *m_values[it - m_keys.begin()];
     value.type = Value::kString;
-    value.stringVal = val.str();
+    value.stringVal = val;
   }
 }
 
-std::string* Storage::GetStringRef(wpi::StringRef key,
-                                   wpi::StringRef defaultVal) {
+std::string* Storage::GetStringRef(std::string_view key,
+                                   std::string_view defaultVal) {
   auto it = std::find(m_keys.begin(), m_keys.end(), key);
   if (it == m_keys.end()) {
     m_keys.emplace_back(key);
@@ -342,7 +326,7 @@ Storage& glass::GetStorage() {
   return *storage;
 }
 
-Storage& glass::GetStorage(wpi::StringRef id) {
+Storage& glass::GetStorage(std::string_view id) {
   auto& storage = gContext->storage[id];
   if (!storage) {
     storage = std::make_unique<Storage>();
@@ -350,10 +334,10 @@ Storage& glass::GetStorage(wpi::StringRef id) {
   return *storage;
 }
 
-static void PushIDStack(wpi::StringRef label_id) {
+static void PushIDStack(std::string_view label_id) {
   gContext->idStack.emplace_back(gContext->curId.size());
 
-  auto [label, id] = wpi::StringRef{label_id}.split("###");
+  auto [label, id] = wpi::split(label_id, "###");
   // if no ###id, use label as id
   if (id.empty()) {
     id = label;
@@ -392,7 +376,7 @@ void glass::EndChild() {
 
 bool glass::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags) {
   wpi::SmallString<64> openKey;
-  auto [name, id] = wpi::StringRef{label}.split("###");
+  auto [name, id] = wpi::split(label, "###");
   // if no ###id, use name as id
   if (id.empty()) {
     id = name;
@@ -400,7 +384,7 @@ bool glass::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags) {
   openKey = id;
   openKey += "###open";
 
-  bool* open = GetStorage().GetBoolRef(openKey);
+  bool* open = GetStorage().GetBoolRef(openKey.str());
   *open = ImGui::CollapsingHeader(
       label, flags | (*open ? ImGuiTreeNodeFlags_DefaultOpen : 0));
   return *open;
@@ -428,7 +412,7 @@ void glass::PushID(const char* str_id) {
 }
 
 void glass::PushID(const char* str_id_begin, const char* str_id_end) {
-  PushIDStack(wpi::StringRef(str_id_begin, str_id_end - str_id_begin));
+  PushIDStack(std::string_view(str_id_begin, str_id_end - str_id_begin));
   ImGui::PushID(str_id_begin, str_id_end);
 }
 

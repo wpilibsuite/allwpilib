@@ -4,10 +4,10 @@
 
 #include <frc/AnalogInput.h>
 #include <frc/MedianFilter.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and
@@ -55,8 +55,8 @@ class Robot : public frc::TimedRobot {
 
   frc::AnalogInput m_ultrasonic{kUltrasonicPort};
 
-  frc::PWMVictorSPX m_left{kLeftMotorPort};
-  frc::PWMVictorSPX m_right{kRightMotorPort};
+  frc::PWMSparkMax m_left{kLeftMotorPort};
+  frc::PWMSparkMax m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc2::PIDController m_pidController{kP, kI, kD};

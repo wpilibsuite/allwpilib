@@ -16,9 +16,12 @@ CommandState::CommandState(bool interruptible)
 void CommandState::StartTiming() {
   m_startTime = frc::Timer::GetFPGATimestamp();
 }
+
 void CommandState::StartRunning() {
-  m_startTime = -1;
+  m_startTime = -1_s;
 }
-double CommandState::TimeSinceInitialized() const {
-  return m_startTime != -1 ? frc::Timer::GetFPGATimestamp() - m_startTime : -1;
+
+units::second_t CommandState::TimeSinceInitialized() const {
+  return m_startTime != -1_s ? frc::Timer::GetFPGATimestamp() - m_startTime
+                             : -1_s;
 }

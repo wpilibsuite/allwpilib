@@ -19,6 +19,9 @@
 #include <string>
 #include <thread>
 
+#include <fmt/format.h>
+
+#include "HALInternal.h"
 #include "hal/cpp/SerialHelper.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
@@ -70,16 +73,11 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
 HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
                                                     const char* portName,
                                                     int32_t* status) {
-  auto handle = serialPortHandles->Allocate(static_cast<int16_t>(port), status);
+  HAL_SerialPortHandle handle;
+  auto serialPort =
+      serialPortHandles->Allocate(static_cast<int16_t>(port), &handle, status);
 
   if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
-
-  auto serialPort = serialPortHandles->Get(handle);
-
-  if (serialPort == nullptr) {
-    *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
 
@@ -188,6 +186,7 @@ void HAL_SetSerialBaudRate(HAL_SerialPortHandle handle, int32_t baud,
     BAUDCASE(4000000)
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, fmt::format("Invalid BaudRate: {}", baud));
       return;
   }
   int err = cfsetospeed(&port->tty, static_cast<speed_t>(port->baudRate));
@@ -230,6 +229,7 @@ void HAL_SetSerialDataBits(HAL_SerialPortHandle handle, int32_t bits,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, fmt::format("Invalid data bits: {}", bits));
       return;
   }
 
@@ -277,6 +277,7 @@ void HAL_SetSerialParity(HAL_SerialPortHandle handle, int32_t parity,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, fmt::format("Invalid parity bits: {}", parity));
       return;
   }
 
@@ -304,6 +305,7 @@ void HAL_SetSerialStopBits(HAL_SerialPortHandle handle, int32_t stopBits,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, fmt::format("Invalid stop bits: {}", stopBits));
       return;
   }
 
@@ -339,6 +341,7 @@ void HAL_SetSerialFlowControl(HAL_SerialPortHandle handle, int32_t flow,
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, fmt::format("Invalid fc bits: {}", flow));
       return;
   }
 

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <wpi/Logger.h>
+#include <wpi/StringExtras.h>
 
 #include "EntryNotifier.h"
 #include "TestPrinters.h"
@@ -245,7 +246,7 @@ TEST_F(EntryNotifierTest, PollPrefixBasic) {
   int g4count = 0;
   for (const auto& result : results) {
     SCOPED_TRACE(::testing::PrintToString(result));
-    EXPECT_TRUE(StringRef(result.name).startswith("/foo"));
+    EXPECT_TRUE(wpi::starts_with(result.name, "/foo"));
     EXPECT_THAT(result.value, ValueEq(Value::MakeDouble(1)));
     EXPECT_EQ(Handle{result.entry}.GetType(), Handle::kEntry);
     EXPECT_EQ(Handle{result.entry}.GetInst(), 1);

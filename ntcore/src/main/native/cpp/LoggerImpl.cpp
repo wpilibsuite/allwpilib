@@ -4,35 +4,29 @@
 
 #include "LoggerImpl.h"
 
-#include <wpi/Path.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
+#include <wpi/fs.h>
 
 using namespace nt;
 
 static void DefaultLogger(unsigned int level, const char* file,
                           unsigned int line, const char* msg) {
-  wpi::SmallString<128> buf;
-  wpi::raw_svector_ostream oss(buf);
   if (level == 20) {
-    oss << "NT: " << msg << '\n';
-    wpi::errs() << oss.str();
+    fmt::print(stderr, "NT: {}\n", msg);
     return;
   }
 
-  wpi::StringRef levelmsg;
+  std::string_view levelmsg;
   if (level >= 50) {
-    levelmsg = "CRITICAL: ";
+    levelmsg = "CRITICAL";
   } else if (level >= 40) {
-    levelmsg = "ERROR: ";
+    levelmsg = "ERROR";
   } else if (level >= 30) {
-    levelmsg = "WARNING: ";
+    levelmsg = "WARNING";
   } else {
     return;
   }
-  oss << "NT: " << levelmsg << msg << " (" << file << ':' << line << ")\n";
-  wpi::errs() << oss.str();
+  fmt::print(stderr, "NT: {}: {} ({}:{})\n", levelmsg, msg, file, line);
 }
 
 LoggerImpl::LoggerImpl(int inst) : m_inst(inst) {}
@@ -70,13 +64,12 @@ unsigned int LoggerImpl::GetMinLevel() {
 
 void LoggerImpl::Log(unsigned int level, const char* file, unsigned int line,
                      const char* msg) {
-  // this is safe because it's null terminated and always the end
-  const char* filename = wpi::sys::path::filename(file).data();
+  auto filename = fs::path{file}.filename();
   {
     auto thr = GetThread();
     if (!thr || thr->m_listeners.empty()) {
-      DefaultLogger(level, filename, line, msg);
+      DefaultLogger(level, filename.string().c_str(), line, msg);
     }
   }
-  Send(UINT_MAX, 0, level, filename, line, msg);
+  Send(UINT_MAX, 0, level, filename.string().c_str(), line, msg);
 }

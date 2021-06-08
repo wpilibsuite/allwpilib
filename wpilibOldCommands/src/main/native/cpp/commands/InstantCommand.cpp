@@ -8,11 +8,11 @@
 
 using namespace frc;
 
-InstantCommand::InstantCommand(const wpi::Twine& name) : Command(name) {}
+InstantCommand::InstantCommand(std::string_view name) : Command(name) {}
 
 InstantCommand::InstantCommand(Subsystem& subsystem) : Command(subsystem) {}
 
-InstantCommand::InstantCommand(const wpi::Twine& name, Subsystem& subsystem)
+InstantCommand::InstantCommand(std::string_view name, Subsystem& subsystem)
     : Command(name, subsystem) {}
 
 InstantCommand::InstantCommand(std::function<void()> func)
@@ -23,13 +23,13 @@ InstantCommand::InstantCommand(Subsystem& subsystem, std::function<void()> func)
   m_func = func;
 }
 
-InstantCommand::InstantCommand(const wpi::Twine& name,
+InstantCommand::InstantCommand(std::string_view name,
                                std::function<void()> func)
     : InstantCommand(name) {
   m_func = func;
 }
 
-InstantCommand::InstantCommand(const wpi::Twine& name, Subsystem& subsystem,
+InstantCommand::InstantCommand(std::string_view name, Subsystem& subsystem,
                                std::function<void()> func)
     : InstantCommand(name, subsystem) {
   m_func = func;

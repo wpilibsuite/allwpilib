@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <memory>
 
+#include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -20,11 +21,10 @@
 #include <units/length.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc2/Timer.h"
 
 #pragma once
 
@@ -204,7 +204,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -257,7 +257,7 @@ class MecanumControllerCommand
       std::function<void(units::volt_t, units::volt_t, units::volt_t,
                          units::volt_t)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -373,7 +373,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new MecanumControllerCommand that when executed will follow
@@ -413,7 +413,7 @@ class MecanumControllerCommand
                          units::meters_per_second_t,
                          units::meters_per_second_t)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 
@@ -444,7 +444,7 @@ class MecanumControllerCommand
       m_outputVolts;
 
   bool m_usePID;
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   frc::MecanumDriveWheelSpeeds m_prevSpeeds;
   units::second_t m_prevTime;
 };

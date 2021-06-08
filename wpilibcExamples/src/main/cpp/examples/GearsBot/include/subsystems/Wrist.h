@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/AnalogPotentiometer.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/PIDSubsystem.h>
 
 /**
@@ -40,7 +40,7 @@ class Wrist : public frc2::PIDSubsystem {
   void Periodic() override;
 
  private:
-  frc::PWMVictorSPX m_motor{6};
+  frc::PWMSparkMax m_motor{6};
   double m_setpoint = 0;
 
 // Conversion value of potentiometer varies between the real world and

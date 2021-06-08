@@ -13,6 +13,7 @@
 #include "Eigen/QR"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "edu_wpi_first_math_WPIMathJNI.h"
+#include "frc/trajectory/TrajectoryUtil.h"
 #include "unsupported/Eigen/MatrixFunctions"
 
 using namespace wpi::java;
@@ -41,6 +42,46 @@ bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
   }
 
   return true;
+}
+
+std::vector<double> GetElementsFromTrajectory(
+    const frc::Trajectory& trajectory) {
+  std::vector<double> elements;
+  elements.reserve(trajectory.States().size() * 7);
+
+  for (auto&& state : trajectory.States()) {
+    elements.push_back(state.t.to<double>());
+    elements.push_back(state.velocity.to<double>());
+    elements.push_back(state.acceleration.to<double>());
+    elements.push_back(state.pose.X().to<double>());
+    elements.push_back(state.pose.Y().to<double>());
+    elements.push_back(state.pose.Rotation().Radians().to<double>());
+    elements.push_back(state.curvature.to<double>());
+  }
+
+  return elements;
+}
+
+frc::Trajectory CreateTrajectoryFromElements(wpi::span<const double> elements) {
+  // Make sure that the elements have the correct length.
+  assert(elements.size() % 7 == 0);
+
+  // Create a vector of states from the elements.
+  std::vector<frc::Trajectory::State> states;
+  states.reserve(elements.size() / 7);
+
+  for (size_t i = 0; i < elements.size(); i += 7) {
+    states.emplace_back(frc::Trajectory::State{
+        units::second_t{elements[i]},
+        units::meters_per_second_t{elements[i + 1]},
+        units::meters_per_second_squared_t{elements[i + 2]},
+        frc::Pose2d{units::meter_t{elements[i + 3]},
+                    units::meter_t{elements[i + 4]},
+                    units::radian_t{elements[i + 5]}},
+        units::curvature_t{elements[i + 6]}});
+  }
+
+  return frc::Trajectory(states);
 }
 
 extern "C" {
@@ -161,6 +202,101 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
 
   return isStabilizable;
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    fromPathweaverJson
+ * Signature: (Ljava/lang/String;)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_fromPathweaverJson
+  (JNIEnv* env, jclass, jstring path)
+{
+  try {
+    auto trajectory =
+        frc::TrajectoryUtil::FromPathweaverJson(JStringRef{env, path}.c_str());
+    std::vector<double> elements = GetElementsFromTrajectory(trajectory);
+    return MakeJDoubleArray(env, elements);
+  } catch (std::exception& e) {
+    jclass cls = env->FindClass("java/lang/IOException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+    return nullptr;
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    toPathweaverJson
+ * Signature: ([DLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_toPathweaverJson
+  (JNIEnv* env, jclass, jdoubleArray elements, jstring path)
+{
+  try {
+    auto trajectory =
+        CreateTrajectoryFromElements(JDoubleArrayRef{env, elements});
+    frc::TrajectoryUtil::ToPathweaverJson(trajectory,
+                                          JStringRef{env, path}.c_str());
+  } catch (std::exception& e) {
+    jclass cls = env->FindClass("java/lang/IOException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    deserializeTrajectory
+ * Signature: (Ljava/lang/String;)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_deserializeTrajectory
+  (JNIEnv* env, jclass, jstring json)
+{
+  try {
+    auto trajectory = frc::TrajectoryUtil::DeserializeTrajectory(
+        JStringRef{env, json}.c_str());
+    std::vector<double> elements = GetElementsFromTrajectory(trajectory);
+    return MakeJDoubleArray(env, elements);
+  } catch (std::exception& e) {
+    jclass cls = env->FindClass(
+        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "TrajectorySerializationException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+    return nullptr;
+  }
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    serializeTrajectory
+ * Signature: ([D)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
+  (JNIEnv* env, jclass, jdoubleArray elements)
+{
+  try {
+    auto trajectory =
+        CreateTrajectoryFromElements(JDoubleArrayRef{env, elements});
+    return MakeJString(env,
+                       frc::TrajectoryUtil::SerializeTrajectory(trajectory));
+  } catch (std::exception& e) {
+    jclass cls = env->FindClass(
+        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "TrajectorySerializationException");
+    if (cls) {
+      env->ThrowNew(cls, e.what());
+    }
+    return nullptr;
+  }
 }
 
 }  // extern "C"

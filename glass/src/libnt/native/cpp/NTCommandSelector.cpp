@@ -4,18 +4,21 @@
 
 #include "glass/networktables/NTCommandSelector.h"
 
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
+
 using namespace glass;
 
-NTCommandSelectorModel::NTCommandSelectorModel(wpi::StringRef path)
+NTCommandSelectorModel::NTCommandSelectorModel(std::string_view path)
     : NTCommandSelectorModel(nt::GetDefaultInstance(), path) {}
 
 NTCommandSelectorModel::NTCommandSelectorModel(NT_Inst instance,
-                                               wpi::StringRef path)
+                                               std::string_view path)
     : m_nt(instance),
-      m_running(m_nt.GetEntry(path + "/running")),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_runningData("NTCmd:" + path),
-      m_nameValue(path.rsplit('/').second) {
+      m_running(m_nt.GetEntry(fmt::format("{}/running", path))),
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_runningData(fmt::format("NTCmd:{}", path)),
+      m_nameValue(wpi::rsplit(path, '/').second) {
   m_runningData.SetDigital(true);
   m_nt.AddListener(m_running);
   m_nt.AddListener(m_name);

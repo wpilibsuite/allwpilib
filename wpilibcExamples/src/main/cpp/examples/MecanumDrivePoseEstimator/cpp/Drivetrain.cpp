@@ -4,7 +4,7 @@
 
 #include "Drivetrain.h"
 
-#include <frc2/Timer.h>
+#include <frc/Timer.h>
 
 #include "ExampleGlobalMeasurementSensor.h"
 
@@ -17,7 +17,7 @@ frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   std::function<void(units::meters_per_second_t, const frc::Encoder&,
-                     frc2::PIDController&, frc::PWMVictorSPX&)>
+                     frc2::PIDController&, frc::PWMSparkMax&)>
       calcAndSetSpeeds =
           [&m_feedforward = m_feedforward](units::meters_per_second_t speed,
                                            const auto& encoder,
@@ -58,5 +58,5 @@ void Drivetrain::UpdateOdometry() {
   m_poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
           m_poseEstimator.GetEstimatedPosition()),
-      frc2::Timer::GetFPGATimestamp() - 0.3_s);
+      frc::Timer::GetFPGATimestamp() - 0.3_s);
 }

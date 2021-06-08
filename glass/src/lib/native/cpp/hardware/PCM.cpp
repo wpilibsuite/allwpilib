@@ -83,7 +83,7 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
 }
 
 void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                                 wpi::StringRef noneMsg) {
+                                 std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPCM([&](PCMModel& pcm, int i) {
     PushID(i);
@@ -93,7 +93,7 @@ void glass::DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }
 

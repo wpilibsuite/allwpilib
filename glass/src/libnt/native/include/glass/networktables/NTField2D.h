@@ -6,10 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Field2D.h"
@@ -21,8 +22,8 @@ class NTField2DModel : public Field2DModel {
   static constexpr const char* kType = "Field2d";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTField2DModel(wpi::StringRef path);
-  NTField2DModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTField2DModel(std::string_view path);
+  NTField2DModel(NT_Inst inst, std::string_view path);
   ~NTField2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -32,8 +33,10 @@ class NTField2DModel : public Field2DModel {
   bool Exists() override;
   bool IsReadOnly() override;
 
-  void ForEachFieldObjectGroup(
-      wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>
+  FieldObjectModel* AddFieldObject(std::string_view name) override;
+  void RemoveFieldObject(std::string_view name) override;
+  void ForEachFieldObject(
+      wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
           func) override;
 
  private:
@@ -42,8 +45,11 @@ class NTField2DModel : public Field2DModel {
   NT_Entry m_name;
   std::string m_nameValue;
 
-  class GroupModel;
-  std::vector<std::unique_ptr<GroupModel>> m_groups;
+  class ObjectModel;
+  using Objects = std::vector<std::unique_ptr<ObjectModel>>;
+  Objects m_objects;
+
+  std::pair<Objects::iterator, bool> Find(std::string_view fullName);
 };
 
 }  // namespace glass

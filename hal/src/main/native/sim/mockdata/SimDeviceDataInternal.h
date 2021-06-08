@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/StringExtras.h>
 #include <wpi/StringMap.h>
 #include <wpi/UidVector.h>
 #include <wpi/spinlock.h>
@@ -118,7 +119,7 @@ class SimPrefixCallbackRegistry {
   void Invoke(const char* name, U&&... u) const {
     if (m_callbacks) {
       for (auto&& cb : *m_callbacks) {
-        if (wpi::StringRef{name}.startswith(cb.prefix)) {
+        if (wpi::starts_with(name, cb.prefix)) {
           cb.callback(name, cb.param, std::forward<U>(u)...);
         }
       }

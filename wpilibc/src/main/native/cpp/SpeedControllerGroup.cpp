@@ -60,10 +60,6 @@ void SpeedControllerGroup::StopMotor() {
   }
 }
 
-void SpeedControllerGroup::PIDWrite(double output) {
-  Set(output);
-}
-
 void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
   builder.SetActuator(true);

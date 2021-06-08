@@ -9,6 +9,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Errors.h"
 #include "frc/MathUtil.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -18,6 +19,15 @@ using namespace frc2;
 PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
+  if (period <= 0_s) {
+    FRC_ReportError(
+        frc::err::Error,
+        "Controller period must be a non-zero positive number, got {}!",
+        period.to<double>());
+    m_period = 20_ms;
+    FRC_ReportError(frc::warn::Warning, "{}",
+                    "Controller period defaulted to 20ms.");
+  }
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
@@ -69,8 +79,9 @@ double PIDController::GetSetpoint() const {
 bool PIDController::AtSetpoint() const {
   double positionError;
   if (m_continuous) {
-    positionError = frc::InputModulus(m_setpoint - m_measurement,
-                                      m_minimumInput, m_maximumInput);
+    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+    positionError =
+        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     positionError = m_setpoint - m_measurement;
   }
@@ -121,8 +132,9 @@ double PIDController::Calculate(double measurement) {
   m_prevError = m_positionError;
 
   if (m_continuous) {
-    m_positionError = frc::InputModulus(m_setpoint - measurement,
-                                        m_minimumInput, m_maximumInput);
+    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+    m_positionError =
+        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
     m_positionError = m_setpoint - measurement;
   }

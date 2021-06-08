@@ -7,9 +7,11 @@
 #include <glass/other/DeviceTree.h>
 #include <stdint.h>
 
+#include <fmt/format.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/DenseMap.h>
+#include <wpi/StringExtras.h>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
@@ -21,7 +23,7 @@ class SimValueSource : public glass::DataSource {
  public:
   explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
                           const char* name)
-      : DataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
+      : DataSource(fmt::format("{}-{}", device, name)),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
   ~SimValueSource() override {
@@ -61,6 +63,7 @@ class SimDevicesModel : public glass::Model {
 }  // namespace
 
 static SimDevicesModel* gSimDevicesModel;
+static bool gSimDevicesShowPrefix = false;
 
 void SimDevicesModel::Update() {
   HALSIM_EnumerateSimDevices(
@@ -136,10 +139,14 @@ static void DisplaySimValue(const char* name, void* data,
 
 static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
-  // only show "Foo" portion of "Accel:Foo"
-  auto [type, id] = wpi::StringRef{name}.split(':');
-  if (id.empty()) {
-    id = type;
+  std::string_view id{name};
+  if (!gSimDevicesShowPrefix) {
+    // only show "Foo" portion of "Accel:Foo"
+    std::string_view type;
+    std::tie(type, id) = wpi::split(id, ':');
+    if (id.empty()) {
+      id = type;
+    }
   }
   if (glass::BeginDevice(id.data())) {
     HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
@@ -154,8 +161,14 @@ void SimDeviceGui::Initialize() {
       [](glass::Window* win, glass::Model* model) {
         win->SetDefaultPos(1025, 20);
         win->SetDefaultSize(250, 695);
-        return glass::MakeFunctionView(
-            [=] { static_cast<glass::DeviceTreeModel*>(model)->Display(); });
+        win->DisableRenamePopup();
+        return glass::MakeFunctionView([=] {
+          if (ImGui::BeginPopupContextItem()) {
+            ImGui::Checkbox("Show prefix", &gSimDevicesShowPrefix);
+            ImGui::EndPopup();
+          }
+          static_cast<glass::DeviceTreeModel*>(model)->Display();
+        });
       });
   HALSimGui::halProvider.ShowDefault("Other Devices");
 

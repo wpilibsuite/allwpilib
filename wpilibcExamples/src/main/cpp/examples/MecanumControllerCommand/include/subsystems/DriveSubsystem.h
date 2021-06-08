@@ -6,13 +6,13 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/interfaces/Gyro.h>
 #include <frc/kinematics/MecanumDriveOdometry.h>
 #include <frc/kinematics/MecanumDriveWheelSpeeds.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
@@ -82,9 +82,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::MecanumDriveWheelSpeeds getCurrentWheelSpeeds();
 
   /**
-   * Sets the drive SpeedControllers to a desired voltage.
+   * Sets the drive MotorControllers to a desired voltage.
    */
-  void SetSpeedControllersVolts(units::volt_t frontLeftPower,
+  void SetMotorControllersVolts(units::volt_t frontLeftPower,
                                 units::volt_t rearLeftPower,
                                 units::volt_t frontRightPower,
                                 units::volt_t rearRightPower);
@@ -135,10 +135,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMVictorSPX m_frontLeft;
-  frc::PWMVictorSPX m_rearLeft;
-  frc::PWMVictorSPX m_frontRight;
-  frc::PWMVictorSPX m_rearRight;
+  frc::PWMSparkMax m_frontLeft;
+  frc::PWMSparkMax m_rearLeft;
+  frc::PWMSparkMax m_frontRight;
+  frc::PWMSparkMax m_rearRight;
 
   // The robot's drive
   frc::MecanumDrive m_drive{m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};

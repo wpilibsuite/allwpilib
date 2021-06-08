@@ -6,9 +6,9 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
@@ -44,8 +44,8 @@ class Robot : public frc::TimedRobot {
   static constexpr int kGyroPort = 0;
   static constexpr int kJoystickPort = 0;
 
-  frc::PWMVictorSPX m_left{kLeftMotorPort};
-  frc::PWMVictorSPX m_right{kRightMotorPort};
+  frc::PWMSparkMax m_left{kLeftMotorPort};
+  frc::PWMSparkMax m_right{kRightMotorPort};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::AnalogGyro m_gyro{kGyroPort};

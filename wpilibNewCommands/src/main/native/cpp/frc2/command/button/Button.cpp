@@ -20,7 +20,7 @@ Button Button::WhenPressed(std::function<void()> toRun,
 }
 
 Button Button::WhenPressed(std::function<void()> toRun,
-                           wpi::ArrayRef<Subsystem*> requirements) {
+                           wpi::span<Subsystem* const> requirements) {
   WhenActive(std::move(toRun), requirements);
   return *this;
 }
@@ -37,7 +37,7 @@ Button Button::WhileHeld(std::function<void()> toRun,
 }
 
 Button Button::WhileHeld(std::function<void()> toRun,
-                         wpi::ArrayRef<Subsystem*> requirements) {
+                         wpi::span<Subsystem* const> requirements) {
   WhileActiveContinous(std::move(toRun), requirements);
   return *this;
 }
@@ -59,7 +59,7 @@ Button Button::WhenReleased(std::function<void()> toRun,
 }
 
 Button Button::WhenReleased(std::function<void()> toRun,
-                            wpi::ArrayRef<Subsystem*> requirements) {
+                            wpi::span<Subsystem* const> requirements) {
   WhenInactive(std::move(toRun), requirements);
   return *this;
 }

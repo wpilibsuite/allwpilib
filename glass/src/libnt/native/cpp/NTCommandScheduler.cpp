@@ -4,21 +4,22 @@
 
 #include "glass/networktables/NTCommandScheduler.h"
 
-#include <iostream>
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-NTCommandSchedulerModel::NTCommandSchedulerModel(wpi::StringRef path)
+NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
     : NTCommandSchedulerModel(nt::GetDefaultInstance(), path) {}
 
 NTCommandSchedulerModel::NTCommandSchedulerModel(NT_Inst instance,
-                                                 wpi::StringRef path)
+                                                 std::string_view path)
     : m_nt(instance),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_commands(m_nt.GetEntry(path + "/Names")),
-      m_ids(m_nt.GetEntry(path + "/Ids")),
-      m_cancel(m_nt.GetEntry(path + "/Cancel")),
-      m_nameValue(path.rsplit('/').second) {
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_commands(m_nt.GetEntry(fmt::format("{}/Names", path))),
+      m_ids(m_nt.GetEntry(fmt::format("{}/Ids", path))),
+      m_cancel(m_nt.GetEntry(fmt::format("{}/Cancel", path))),
+      m_nameValue(wpi::rsplit(path, '/').second) {
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_commands);
   m_nt.AddListener(m_ids);
@@ -40,11 +41,13 @@ void NTCommandSchedulerModel::Update() {
       }
     } else if (event.entry == m_commands) {
       if (event.value && event.value->IsStringArray()) {
-        m_commandsValue = event.value->GetStringArray();
+        auto arr = event.value->GetStringArray();
+        m_commandsValue.assign(arr.begin(), arr.end());
       }
     } else if (event.entry == m_ids) {
       if (event.value && event.value->IsDoubleArray()) {
-        m_idsValue = event.value->GetDoubleArray();
+        auto arr = event.value->GetDoubleArray();
+        m_idsValue.assign(arr.begin(), arr.end());
       }
     }
   }

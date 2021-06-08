@@ -6,11 +6,10 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <imgui.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "glass/View.h"
 
@@ -23,9 +22,9 @@ namespace glass {
 class Window {
  public:
   Window() = default;
-  explicit Window(wpi::StringRef id) : m_id{id}, m_defaultName{id} {}
+  explicit Window(std::string_view id) : m_id{id}, m_defaultName{id} {}
 
-  wpi::StringRef GetId() const { return m_id; }
+  std::string_view GetId() const { return m_id; }
 
   enum Visibility { kHide = 0, kShow, kDisabled };
 
@@ -43,8 +42,8 @@ class Window {
 
   void SetFlags(ImGuiWindowFlags flags) { m_flags = flags; }
 
-  void SetName(const wpi::Twine& name) { m_name = name.str(); }
-  void SetDefaultName(const wpi::Twine& name) { m_defaultName = name.str(); }
+  void SetName(std::string_view name) { m_name = name; }
+  void SetDefaultName(std::string_view name) { m_defaultName = name; }
 
   /**
    * Normally windows provide a right-click popup menu on the title bar to

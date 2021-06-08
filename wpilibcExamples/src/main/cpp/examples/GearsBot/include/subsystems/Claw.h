@@ -5,7 +5,7 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/PWMVictorSPX.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
 /**
@@ -50,6 +50,6 @@ class Claw : public frc2::SubsystemBase {
   void Periodic() override;
 
  private:
-  frc::PWMVictorSPX m_motor{7};
+  frc::PWMSparkMax m_motor{7};
   frc::DigitalInput m_contact{5};
 };

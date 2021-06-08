@@ -6,7 +6,7 @@
 
 #include <frc/Joystick.h>
 #include <units/length.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "commands/DriveWithJoystick.h"
 
@@ -19,14 +19,10 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   // Configure the DifferentialDrive to reflect the fact that all our
   // motors are wired backwards and our drivers sensitivity preferences.
   m_robotDrive.SetSafetyEnabled(false);
-  m_robotDrive.SetExpiration(0.1);
+  m_robotDrive.SetExpiration(100_ms);
   m_robotDrive.SetMaxOutput(1.0);
   m_leftCIMs.SetInverted(true);
   m_rightCIMs.SetInverted(true);
-
-  // Configure encoders
-  m_rightEncoder.SetPIDSourceType(frc::PIDSourceType::kDisplacement);
-  m_leftEncoder.SetPIDSourceType(frc::PIDSourceType::kDisplacement);
 
 #ifndef SIMULATION
   // Converts to feet
@@ -35,9 +31,9 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
   m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                     wpi::math::pi / 360.0);
+                                     wpi::numbers::pi / 360.0);
   m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
-                                    wpi::math::pi / 360.0);
+                                    wpi::numbers::pi / 360.0);
 #endif
 
   AddChild("Right Encoder", m_rightEncoder);

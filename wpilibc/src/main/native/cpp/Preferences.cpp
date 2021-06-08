@@ -8,14 +8,11 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringRef.h>
-
-#include "frc/WPIErrors.h"
 
 using namespace frc;
 
 // The Preferences table name
-static wpi::StringRef kTableName{"Preferences"};
+static constexpr std::string_view kTableName{"Preferences"};
 
 Preferences* Preferences::GetInstance() {
   static Preferences instance;
@@ -26,102 +23,126 @@ std::vector<std::string> Preferences::GetKeys() {
   return m_table->GetKeys();
 }
 
-std::string Preferences::GetString(wpi::StringRef key,
-                                   wpi::StringRef defaultValue) {
+std::string Preferences::GetString(std::string_view key,
+                                   std::string_view defaultValue) {
   return m_table->GetString(key, defaultValue);
 }
 
-int Preferences::GetInt(wpi::StringRef key, int defaultValue) {
+int Preferences::GetInt(std::string_view key, int defaultValue) {
   return static_cast<int>(m_table->GetNumber(key, defaultValue));
 }
 
-double Preferences::GetDouble(wpi::StringRef key, double defaultValue) {
+double Preferences::GetDouble(std::string_view key, double defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
-float Preferences::GetFloat(wpi::StringRef key, float defaultValue) {
+float Preferences::GetFloat(std::string_view key, float defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
-bool Preferences::GetBoolean(wpi::StringRef key, bool defaultValue) {
+bool Preferences::GetBoolean(std::string_view key, bool defaultValue) {
   return m_table->GetBoolean(key, defaultValue);
 }
 
-int64_t Preferences::GetLong(wpi::StringRef key, int64_t defaultValue) {
+int64_t Preferences::GetLong(std::string_view key, int64_t defaultValue) {
   return static_cast<int64_t>(m_table->GetNumber(key, defaultValue));
 }
 
-void Preferences::PutString(wpi::StringRef key, wpi::StringRef value) {
+void Preferences::SetString(std::string_view key, std::string_view value) {
   auto entry = m_table->GetEntry(key);
   entry.SetString(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitString(wpi::StringRef key, wpi::StringRef value) {
+void Preferences::PutString(std::string_view key, std::string_view value) {
+  SetString(key, value);
+}
+
+void Preferences::InitString(std::string_view key, std::string_view value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultString(value);
 }
 
-void Preferences::PutInt(wpi::StringRef key, int value) {
+void Preferences::SetInt(std::string_view key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitInt(wpi::StringRef key, int value) {
+void Preferences::PutInt(std::string_view key, int value) {
+  SetInt(key, value);
+}
+
+void Preferences::InitInt(std::string_view key, int value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutDouble(wpi::StringRef key, double value) {
+void Preferences::SetDouble(std::string_view key, double value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitDouble(wpi::StringRef key, double value) {
+void Preferences::PutDouble(std::string_view key, double value) {
+  SetDouble(key, value);
+}
+
+void Preferences::InitDouble(std::string_view key, double value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutFloat(wpi::StringRef key, float value) {
+void Preferences::SetFloat(std::string_view key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitFloat(wpi::StringRef key, float value) {
+void Preferences::PutFloat(std::string_view key, float value) {
+  SetFloat(key, value);
+}
+
+void Preferences::InitFloat(std::string_view key, float value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
-void Preferences::PutBoolean(wpi::StringRef key, bool value) {
+void Preferences::SetBoolean(std::string_view key, bool value) {
   auto entry = m_table->GetEntry(key);
   entry.SetBoolean(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitBoolean(wpi::StringRef key, bool value) {
+void Preferences::PutBoolean(std::string_view key, bool value) {
+  SetBoolean(key, value);
+}
+
+void Preferences::InitBoolean(std::string_view key, bool value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultBoolean(value);
 }
 
-void Preferences::PutLong(wpi::StringRef key, int64_t value) {
+void Preferences::SetLong(std::string_view key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
 }
 
-void Preferences::InitLong(wpi::StringRef key, int64_t value) {
+void Preferences::PutLong(std::string_view key, int64_t value) {
+  SetLong(key, value);
+}
+
+void Preferences::InitLong(std::string_view key, int64_t value) {
   auto entry = m_table->GetEntry(key);
   entry.SetDefaultDouble(value);
 }
 
-bool Preferences::ContainsKey(wpi::StringRef key) {
+bool Preferences::ContainsKey(std::string_view key) {
   return m_table->ContainsKey(key);
 }
 
-void Preferences::Remove(wpi::StringRef key) {
+void Preferences::Remove(std::string_view key) {
   m_table->Delete(key);
 }
 
@@ -137,7 +158,7 @@ Preferences::Preferences()
     : m_table(nt::NetworkTableInstance::GetDefault().GetTable(kTableName)) {
   m_table->GetEntry(".type").SetString("RobotPreferences");
   m_listener = m_table->AddEntryListener(
-      [=](nt::NetworkTable* table, wpi::StringRef name,
+      [=](nt::NetworkTable* table, std::string_view name,
           nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
           int flags) { entry.SetPersistent(); },
       NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);

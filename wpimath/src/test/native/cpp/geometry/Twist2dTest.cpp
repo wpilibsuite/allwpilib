@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/geometry/Pose2d.h"
 #include "gtest/gtest.h"
@@ -23,8 +23,8 @@ TEST(Twist2dTest, Straight) {
 }
 
 TEST(Twist2dTest, QuarterCircle) {
-  const Twist2d quarterCircle{5.0_m / 2.0 * wpi::math::pi, 0_m,
-                              units::radian_t(wpi::math::pi / 2.0)};
+  const Twist2d quarterCircle{5.0_m / 2.0 * wpi::numbers::pi, 0_m,
+                              units::radian_t(wpi::numbers::pi / 2.0)};
   const auto quarterCirclePose = Pose2d().Exp(quarterCircle);
 
   EXPECT_NEAR(quarterCirclePose.X().to<double>(), 5.0, kEpsilon);
@@ -60,7 +60,7 @@ TEST(Twist2dTest, Pose2dLog) {
 
   const auto twist = start.Log(end);
 
-  EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::math::pi, kEpsilon);
+  EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::numbers::pi, kEpsilon);
   EXPECT_NEAR(twist.dy.to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.to<double>(), wpi::math::pi / 2.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.to<double>(), wpi::numbers::pi / 2.0, kEpsilon);
 }

@@ -10,8 +10,25 @@ package edu.wpi.first.wpilibj;
  * just provides a channel, then a digital input will be constructed and freed when finished for the
  * source. The source can either be a digital input or analog trigger but not both.
  */
-public abstract class DigitalSource extends InterruptableSensorBase {
+public abstract class DigitalSource implements AutoCloseable {
   public abstract boolean isAnalogTrigger();
 
   public abstract int getChannel();
+
+  /**
+   * If this is an analog trigger.
+   *
+   * @return true if this is an analog trigger.
+   */
+  public abstract int getAnalogTriggerTypeForRouting();
+
+  /**
+   * The channel routing number.
+   *
+   * @return channel routing number
+   */
+  public abstract int getPortHandleForRouting();
+
+  @Override
+  public void close() {}
 }

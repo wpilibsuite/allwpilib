@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/Errors.h>
+
 #include "CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/ConditionalCommand.h"
@@ -71,11 +73,9 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
 
 TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
   TestSubsystem requirement1;
-  ErrorConfirmer confirmer("require");
 
   MockCommand command1;
 
-  requirement1.SetDefaultCommand(std::move(command1));
-
-  EXPECT_TRUE(requirement1.GetDefaultCommand() == nullptr);
+  ASSERT_THROW(requirement1.SetDefaultCommand(std::move(command1)),
+               frc::RuntimeError);
 }

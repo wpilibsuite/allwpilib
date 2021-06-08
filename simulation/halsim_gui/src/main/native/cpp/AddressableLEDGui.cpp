@@ -9,7 +9,6 @@
 #include <hal/Ports.h>
 #include <hal/simulation/AddressableLEDData.h>
 #include <imgui.h>
-#include <wpi/StringRef.h>
 
 #include "HALSimGui.h"
 
@@ -27,7 +26,7 @@ class AddressableLEDModel : public glass::LEDDisplayModel {
 
   bool IsRunning() override { return HALSIM_GetAddressableLEDRunning(m_index); }
 
-  wpi::ArrayRef<Data> GetData(wpi::SmallVectorImpl<Data>&) override {
+  wpi::span<const Data> GetData(wpi::SmallVectorImpl<Data>&) override {
     size_t length = HALSIM_GetAddressableLEDData(m_index, m_data);
     return {reinterpret_cast<Data*>(m_data), length};
   }

@@ -5,11 +5,11 @@
 #include <frc/Encoder.h>
 #include <frc/GenericHID.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/ElevatorSim.h>
 #include <frc/simulation/EncoderSim.h>
@@ -17,7 +17,7 @@
 #include <frc/system/plant/LinearSystemId.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -40,7 +40,7 @@ class Robot : public frc::TimedRobot {
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::math::pi * kElevatorDrumRadius.to<double>() / 4096.0;
+      2.0 * wpi::numbers::pi * kElevatorDrumRadius.to<double>() / 4096.0;
 
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
   frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
@@ -48,7 +48,7 @@ class Robot : public frc::TimedRobot {
   // Standard classes for controlling our elevator
   frc2::PIDController m_controller{kElevatorKp, 0, 0};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
-  frc::PWMVictorSPX m_motor{kMotorPort};
+  frc::PWMSparkMax m_motor{kMotorPort};
   frc::Joystick m_joystick{kJoystickPort};
 
   // Simulation classes help us simulate what's going on, including gravity.

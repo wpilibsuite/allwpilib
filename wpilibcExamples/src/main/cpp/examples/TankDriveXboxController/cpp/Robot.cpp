@@ -3,18 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/GenericHID.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class.
  * Runs the motors with tank steering and an Xbox controller.
  */
 class Robot : public frc::TimedRobot {
-  frc::PWMVictorSPX m_leftMotor{0};
-  frc::PWMVictorSPX m_rightMotor{1};
+  frc::PWMSparkMax m_leftMotor{0};
+  frc::PWMSparkMax m_rightMotor{1};
   frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
   frc::XboxController m_driverController{0};
 

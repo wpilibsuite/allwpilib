@@ -5,15 +5,13 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include <wpi/ArrayRef.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
 
 namespace frc {
-
-class SpeedController;
 
 /**
  * Common base class for drive platforms.
@@ -68,7 +66,7 @@ class RobotDriveBase : public MotorSafety {
   void FeedWatchdog();
 
   void StopMotor() override = 0;
-  void GetDescription(wpi::raw_ostream& desc) const override = 0;
+  std::string GetDescription() const override = 0;
 
  protected:
   /**
@@ -78,13 +76,13 @@ class RobotDriveBase : public MotorSafety {
    * @param value    value to clip
    * @param deadband range around zero
    */
-  double ApplyDeadband(double number, double deadband);
+  static double ApplyDeadband(double number, double deadband);
 
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  void Normalize(wpi::MutableArrayRef<double> wheelSpeeds);
+  static void Normalize(wpi::span<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

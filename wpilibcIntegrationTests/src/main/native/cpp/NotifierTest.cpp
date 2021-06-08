@@ -4,13 +4,11 @@
 
 #include "frc/Notifier.h"  // NOLINT(build/include_order)
 
-#include <wpi/raw_ostream.h>
+#include <fmt/core.h>
 
 #include "TestBench.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
-
-using namespace frc;
 
 unsigned notifierCounter;
 
@@ -22,21 +20,20 @@ void notifierHandler(void*) {
  * Test if the Wait function works
  */
 TEST(NotifierTest, DISABLED_TestTimerNotifications) {
-  wpi::outs() << "NotifierTest...\n";
+  fmt::print("NotifierTest...\n");
   notifierCounter = 0;
-  wpi::outs() << "notifier(notifierHandler, nullptr)...\n";
-  Notifier notifier(notifierHandler, nullptr);
-  wpi::outs() << "Start Periodic...\n";
-  notifier.StartPeriodic(1.0);
+  fmt::print("notifier(notifierHandler, nullptr)...\n");
+  frc::Notifier notifier(notifierHandler, nullptr);
+  fmt::print("Start Periodic...\n");
+  notifier.StartPeriodic(1_s);
 
-  wpi::outs() << "Wait...\n";
-  Wait(10.5);
-  wpi::outs() << "...Wait\n";
+  fmt::print("Wait...\n");
+  frc::Wait(10.5_s);
+  fmt::print("...Wait\n");
 
   EXPECT_EQ(10u, notifierCounter)
       << "Received " << notifierCounter << " notifications in 10.5 seconds";
-  wpi::outs() << "Received " << notifierCounter
-              << " notifications in 10.5 seconds";
+  fmt::print("Received {} notifications in 10.5 seconds", notifierCounter);
 
-  wpi::outs() << "...NotifierTest\n";
+  fmt::print("...NotifierTest\n");
 }

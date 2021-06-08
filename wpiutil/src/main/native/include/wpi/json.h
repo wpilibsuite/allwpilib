@@ -54,15 +54,14 @@ SOFTWARE.
 #include <memory> // allocator, shared_ptr, make_shared, addressof
 #include <stdexcept> // runtime_error
 #include <string> // string, char_traits, stoi, to_string
+#include <string_view>
 #include <tuple> // tuple, get, make_tuple
 #include <type_traits>
 #include <utility>
 #include <vector> // vector
 
-#include "wpi/ArrayRef.h"
 #include "wpi/StringMap.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
+#include "wpi/span.h"
 
 namespace wpi
 {
@@ -239,7 +238,7 @@ template<class RealType, class CompatibleObjectType>
 struct is_compatible_object_type_impl<true, RealType, CompatibleObjectType>
 {
     static constexpr auto value =
-        std::is_constructible<StringRef, typename CompatibleObjectType::key_type>::value and
+        std::is_constructible<std::string_view, typename CompatibleObjectType::key_type>::value and
         std::is_constructible<typename RealType::mapped_type, typename CompatibleObjectType::mapped_type>::value;
 };
 
@@ -269,7 +268,7 @@ struct is_compatible_array_type
         std::conjunction<std::negation<std::is_same<void, CompatibleArrayType>>,
         std::negation<is_compatible_object_type<
         BasicJsonType, CompatibleArrayType>>,
-        std::negation<std::is_constructible<StringRef,
+        std::negation<std::is_constructible<std::string_view,
         CompatibleArrayType>>,
         std::negation<is_json_nested_type<BasicJsonType, CompatibleArrayType>>,
         has_value_type<CompatibleArrayType>,
@@ -423,7 +422,7 @@ class exception : public std::exception
     const int id;
 
   protected:
-    exception(int id_, const Twine& what_arg);
+    exception(int id_, std::string_view what_arg);
 
   private:
     /// an exception object as storage for error messages
@@ -484,7 +483,7 @@ class parse_error : public exception
     @param[in] what_arg  the explanatory string
     @return parse_error object
     */
-    static parse_error create(int id_, std::size_t byte_, const Twine& what_arg);
+    static parse_error create(int id_, std::size_t byte_, std::string_view what_arg);
 
     /*!
     @brief byte index of the parse error
@@ -498,7 +497,7 @@ class parse_error : public exception
     const std::size_t byte;
 
   private:
-    parse_error(int id_, std::size_t byte_, const Twine& what_arg)
+    parse_error(int id_, std::size_t byte_, std::string_view what_arg)
         : exception(id_, what_arg), byte(byte_) {}
 };
 
@@ -542,10 +541,11 @@ caught.,invalid_iterator}
 class invalid_iterator : public exception
 {
   public:
-    static invalid_iterator create(int id_, const Twine& what_arg);
+    static invalid_iterator create(int id_, std::string_view what_arg);
+    static invalid_iterator create(int id_, std::string_view what_arg, std::string_view type_info);
 
   private:
-    invalid_iterator(int id_, const Twine& what_arg)
+    invalid_iterator(int id_, std::string_view what_arg)
         : exception(id_, what_arg) {}
 };
 
@@ -590,10 +590,11 @@ caught.,type_error}
 class type_error : public exception
 {
   public:
-    static type_error create(int id_, const Twine& what_arg);
+    static type_error create(int id_, std::string_view what_arg);
+    static type_error create(int id_, std::string_view what_arg, std::string_view type_info);
 
   private:
-    type_error(int id_, const Twine& what_arg) : exception(id_, what_arg) {}
+    type_error(int id_, std::string_view what_arg) : exception(id_, what_arg) {}
 };
 
 /*!
@@ -631,10 +632,10 @@ caught.,out_of_range}
 class out_of_range : public exception
 {
   public:
-    static out_of_range create(int id_, const Twine& what_arg);
+    static out_of_range create(int id_, std::string_view what_arg);
 
   private:
-    out_of_range(int id_, const Twine& what_arg) : exception(id_, what_arg) {}
+    out_of_range(int id_, std::string_view what_arg) : exception(id_, what_arg) {}
 };
 
 /*!
@@ -664,10 +665,10 @@ caught.,other_error}
 class other_error : public exception
 {
   public:
-    static other_error create(int id_, const Twine& what_arg);
+    static other_error create(int id_, std::string_view what_arg);
 
   private:
-    other_error(int id_, const Twine& what_arg) : exception(id_, what_arg) {}
+    other_error(int id_, std::string_view what_arg) : exception(id_, what_arg) {}
 };
 
 ///////////////////////////
@@ -760,7 +761,7 @@ void get_arithmetic_value(const BasicJsonType& j, ArithmeticType& val)
         }
 
         default:
-            JSON_THROW(type_error::create(302, "type must be number, but is " + Twine(j.type_name())));
+            JSON_THROW(type_error::create(302, "type must be number, but is", j.type_name()));
     }
 }
 
@@ -769,7 +770,7 @@ void from_json(const BasicJsonType& j, bool& b)
 {
     if (JSON_UNLIKELY(not j.is_boolean()))
     {
-        JSON_THROW(type_error::create(302, "type must be boolean, but is " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be boolean, but is", j.type_name()));
     }
     b = *j.template get_ptr<const bool*>();
 }
@@ -779,7 +780,7 @@ void from_json(const BasicJsonType& j, std::string& s)
 {
     if (JSON_UNLIKELY(not j.is_string()))
     {
-        JSON_THROW(type_error::create(302, "type must be string, but is " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be string, but is", j.type_name()));
     }
     s = *j.template get_ptr<const std::string*>();
 }
@@ -816,7 +817,7 @@ void from_json(const BasicJsonType& j, typename BasicJsonType::array_t& arr)
 {
     if (JSON_UNLIKELY(not j.is_array()))
     {
-        JSON_THROW(type_error::create(302, "type must be array, but is " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be array, but is", j.type_name()));
     }
     arr = *j.template get_ptr<const typename BasicJsonType::array_t*>();
 }
@@ -875,8 +876,7 @@ void from_json(const BasicJsonType& j, CompatibleArrayType& arr)
 {
     if (JSON_UNLIKELY(not j.is_array()))
     {
-        JSON_THROW(type_error::create(302, "type must be array, but is " +
-                                      Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be array, but is", j.type_name()));
     }
 
     from_json_array_impl(j, arr, priority_tag<2> {});
@@ -888,7 +888,7 @@ void from_json(const BasicJsonType& j, typename BasicJsonType::object_t& obj)
 {
     if (!j.is_object())
     {
-        JSON_THROW(type_error::create(302, "type must be object, but is " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be object, but is", j.type_name()));
     }
 
     auto inner_object = j.template get_ptr<const typename BasicJsonType::object_t*>();
@@ -904,7 +904,7 @@ void from_json(const BasicJsonType& j, CompatibleObjectType& obj)
 {
     if (JSON_UNLIKELY(not j.is_object()))
     {
-        JSON_THROW(type_error::create(302, "type must be object, but is " + Twine(j.type_name())));
+        JSON_THROW(type_error::create(302, "type must be object, but is", j.type_name()));
     }
 
     auto inner_object = j.template get_ptr<const typename BasicJsonType::object_t*>();
@@ -965,7 +965,7 @@ void from_json(const BasicJsonType& j, ArithmeticType& val)
         }
 
         default:
-            JSON_THROW(type_error::create(302, "type must be number, but is " + Twine(j.type_name())));
+            JSON_THROW(type_error::create(302, "type must be number, but is", j.type_name()));
     }
 }
 
@@ -1053,7 +1053,7 @@ template<>
 struct external_constructor<value_t::string>
 {
     template<typename BasicJsonType>
-    static void construct(BasicJsonType& j, StringRef s)
+    static void construct(BasicJsonType& j, std::string_view s)
     {
         j.m_type = value_t::string;
         j.m_value = s;
@@ -1126,7 +1126,7 @@ struct external_constructor<value_t::array>
     }
 
     template<typename BasicJsonType, typename T>
-    static void construct(BasicJsonType& j, ArrayRef<T> arr)
+    static void construct(BasicJsonType& j, span<T> arr)
     {
         using std::begin;
         using std::end;
@@ -1206,7 +1206,7 @@ void to_json(BasicJsonType& j, T b) noexcept
 }
 
 template<typename BasicJsonType, typename CompatibleString,
-         enable_if_t<std::is_constructible<StringRef, CompatibleString>::value, int> = 0>
+         enable_if_t<std::is_constructible<std::string_view, CompatibleString>::value, int> = 0>
 void to_json(BasicJsonType& j, const CompatibleString& s)
 {
     external_constructor<value_t::string>::construct(j, s);
@@ -1283,7 +1283,7 @@ void to_json(BasicJsonType& j, typename BasicJsonType::object_t&& obj)
 }
 
 template<typename BasicJsonType, typename T, std::size_t N,
-         enable_if_t<not std::is_constructible<StringRef, T (&)[N]>::value, int> = 0>
+         enable_if_t<not std::is_constructible<std::string_view, T (&)[N]>::value, int> = 0>
 void to_json(BasicJsonType& j, T (&arr)[N])
 {
     external_constructor<value_t::array>::construct(j, arr);
@@ -2044,7 +2044,7 @@ class iter_impl
     @brief  return the key of an object iterator
     @pre The iterator is initialized; i.e. `m_object != nullptr`.
     */
-    StringRef key() const
+    std::string_view key() const
     {
         assert(m_object != nullptr);
 
@@ -2348,7 +2348,7 @@ class json_pointer
 
     @since version 2.0.0
     */
-    explicit json_pointer(const Twine& s = {})
+    explicit json_pointer(std::string_view s = {})
         : reference_tokens(split(s))
     {}
 
@@ -2382,7 +2382,7 @@ class json_pointer
 
     @throw out_of_range.404 if string @a s could not be converted to an integer
     */
-    static int array_index(const Twine& s);
+    static int array_index(std::string_view s);
 
   private:
     /*!
@@ -2490,7 +2490,7 @@ class json_pointer
     @throw parse_error.107  if the pointer is not empty or begins with '/'
     @throw parse_error.108  if character '~' is not followed by '0' or '1'
     */
-    static std::vector<std::string> split(const Twine& reference_string);
+    static std::vector<std::string> split(std::string_view reference_string);
 
     /*!
     @brief replace all occurrences of a substring by another string
@@ -2521,7 +2521,7 @@ class json_pointer
 
     @note Empty objects or arrays are flattened to `null`.
     */
-    static void flatten(const Twine& reference_string,
+    static void flatten(std::string_view reference_string,
                         const json& value,
                         json& result);
 
@@ -2970,7 +2970,7 @@ class json
         json_value(value_t t);
 
         /// constructor for strings
-        json_value(StringRef value)
+        json_value(std::string_view value)
         {
             string = create<std::string>(value);
         }
@@ -3576,8 +3576,7 @@ class json
             }
 
             default:
-                JSON_THROW(invalid_iterator::create(206, "cannot construct with iterators from " +
-                                                    Twine(first.m_object->type_name())));
+                JSON_THROW(invalid_iterator::create(206, "cannot construct with iterators from", first.m_object->type_name()));
         }
 
         assert_invariant();
@@ -4162,7 +4161,7 @@ class json
             return m_value.boolean;
         }
 
-        JSON_THROW(type_error::create(302, "type must be boolean, but is " + Twine(type_name())));
+        JSON_THROW(type_error::create(302, "type must be boolean, but is", type_name()));
     }
 
     /// get a pointer to the value (object)
@@ -4271,7 +4270,7 @@ class json
             return *ptr;
         }
 
-        JSON_THROW(type_error::create(303, "incompatible ReferenceType for get_ref, actual type is " + Twine(obj.type_name())));
+        JSON_THROW(type_error::create(303, "incompatible ReferenceType for get_ref, actual type is", obj.type_name()));
     }
 
   public:
@@ -4716,7 +4715,7 @@ class json
     written using `at()`. It also demonstrates the different exceptions that
     can be thrown.,at__object_t_key_type}
     */
-    reference at(StringRef key);
+    reference at(std::string_view key);
 
     /*!
     @brief access specified object element with bounds checking
@@ -4748,7 +4747,7 @@ class json
     `at()`. It also demonstrates the different exceptions that can be thrown.,
     at__object_t_key_type_const}
     */
-    const_reference at(StringRef key) const;
+    const_reference at(std::string_view key) const;
 
     /*!
     @brief access specified array element
@@ -4825,7 +4824,7 @@ class json
 
     @since version 1.0.0
     */
-    reference operator[](StringRef key);
+    reference operator[](std::string_view key);
 
     /*!
     @brief read-only access specified object element
@@ -4857,7 +4856,7 @@ class json
 
     @since version 1.0.0
     */
-    const_reference operator[](StringRef key) const;
+    const_reference operator[](std::string_view key) const;
 
     /*!
     @brief access specified object element
@@ -4903,7 +4902,7 @@ class json
             return m_value.object->operator[](key);
         }
 
-        JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+        JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
     }
 
     /*!
@@ -4946,7 +4945,7 @@ class json
             return m_value.object->find(key)->second;
         }
 
-        JSON_THROW(type_error::create(305, "cannot use operator[] with " + Twine(type_name())));
+        JSON_THROW(type_error::create(305, "cannot use operator[] with", type_name()));
     }
 
     /*!
@@ -4999,7 +4998,7 @@ class json
     */
     template<class ValueType, typename std::enable_if<
                  std::is_convertible<json_t, ValueType>::value, int>::type = 0>
-    ValueType value(StringRef key, const ValueType& default_value) const
+    ValueType value(std::string_view key, const ValueType& default_value) const
     {
         // at only works for objects
         if (JSON_LIKELY(is_object()))
@@ -5014,14 +5013,14 @@ class json
             return default_value;
         }
 
-        JSON_THROW(type_error::create(306, "cannot use value() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(306, "cannot use value() with", type_name()));
     }
 
     /*!
     @brief overload for a default value of type const char*
     @copydoc json::value(const typename object_t::key_type&, ValueType) const
     */
-    std::string value(StringRef key, const char* default_value) const
+    std::string value(std::string_view key, const char* default_value) const
     {
         return value(key, std::string(default_value));
     }
@@ -5085,7 +5084,7 @@ class json
             }
         }
 
-        JSON_THROW(type_error::create(306, "cannot use value() with " + Twine(type_name())));
+        JSON_THROW(type_error::create(306, "cannot use value() with", type_name()));
     }
 
     /*!
@@ -5220,7 +5219,7 @@ class json
 
     @sa @ref erase(IteratorType, IteratorType) -- removes the elements in
     the given range
-    @sa @ref erase(StringRef) -- removes the element
+    @sa @ref erase(std::string_view) -- removes the element
     from an object at the given key
     @sa @ref erase(const size_type) -- removes the element from an array at
     the given index
@@ -5278,7 +5277,7 @@ class json
             }
 
             default:
-                JSON_THROW(type_error::create(307, "cannot use erase() with " + Twine(type_name())));
+                JSON_THROW(type_error::create(307, "cannot use erase() with", type_name()));
         }
     }
 
@@ -5377,7 +5376,7 @@ class json
             }
 
             default:
-                JSON_THROW(type_error::create(307, "cannot use erase() with " + Twine(type_name())));
+                JSON_THROW(type_error::create(307, "cannot use erase() with", type_name()));
         }
 
         return result;
@@ -5412,7 +5411,7 @@ class json
 
     @since version 1.0.0
     */
-    size_type erase(StringRef key);
+    size_type erase(std::string_view key);
 
     /*!
     @brief remove element from a JSON array given an index
@@ -5472,13 +5471,13 @@ class json
 
     @since version 1.0.0
     */
-    iterator find(StringRef key);
+    iterator find(std::string_view key);
 
     /*!
     @brief find an element in a JSON object
     @copydoc find(KeyT&&)
     */
-    const_iterator find(StringRef key) const;
+    const_iterator find(std::string_view key) const;
 
     /*!
     @brief returns the number of occurrences of a key in a JSON object
@@ -5501,7 +5500,7 @@ class json
 
     @since version 1.0.0
     */
-    size_type count(StringRef key) const;
+    size_type count(std::string_view key) const;
 
     /// @}
 
@@ -6113,7 +6112,7 @@ class json
         // push_back only works for null objects or objects
         if (JSON_UNLIKELY(not(is_null() or is_object())))
         {
-            JSON_THROW(type_error::create(308, "cannot use push_back() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(308, "cannot use push_back() with", type_name()));
         }
 
         // transform null object into an object
@@ -6203,7 +6202,7 @@ class json
         // emplace_back only works for null objects or arrays
         if (JSON_UNLIKELY(not(is_null() or is_array())))
         {
-            JSON_THROW(type_error::create(311, "cannot use emplace_back() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(311, "cannot use emplace_back() with", type_name()));
         }
 
         // transform null object into an array
@@ -6246,12 +6245,12 @@ class json
     @since version 2.0.8
     */
     template<class... Args>
-    std::pair<iterator, bool> emplace(StringRef key, Args&& ... args)
+    std::pair<iterator, bool> emplace(std::string_view key, Args&& ... args)
     {
         // emplace only works for null objects or arrays
         if (JSON_UNLIKELY(not(is_null() or is_object())))
         {
-            JSON_THROW(type_error::create(311, "cannot use emplace() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(311, "cannot use emplace() with", type_name()));
         }
 
         // transform null object into an object
@@ -6521,7 +6520,7 @@ class json
         }
         else
         {
-            JSON_THROW(type_error::create(310, "cannot use swap() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(310, "cannot use swap() with", type_name()));
         }
     }
 
@@ -6554,7 +6553,7 @@ class json
         }
         else
         {
-            JSON_THROW(type_error::create(310, "cannot use swap() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(310, "cannot use swap() with", type_name()));
         }
     }
 
@@ -6587,7 +6586,7 @@ class json
         }
         else
         {
-            JSON_THROW(type_error::create(310, "cannot use swap() with " + Twine(type_name())));
+            JSON_THROW(type_error::create(310, "cannot use swap() with", type_name()));
         }
     }
 
@@ -7011,11 +7010,11 @@ class json
 
     @since version 2.0.3 (contiguous containers)
     */
-    static json parse(StringRef s,
+    static json parse(std::string_view s,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
-    static json parse(ArrayRef<uint8_t> arr,
+    static json parse(span<const uint8_t> arr,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
@@ -7026,9 +7025,9 @@ class json
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true);
 
-    static bool accept(StringRef s);
+    static bool accept(std::string_view s);
 
-    static bool accept(ArrayRef<uint8_t> arr);
+    static bool accept(span<const uint8_t> arr);
 
     static bool accept(raw_istream& i);
 
@@ -7206,8 +7205,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_cbor(const json& j);
-    static ArrayRef<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
-    static ArrayRef<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static span<uint8_t> to_cbor(const json& j, std::vector<uint8_t>& buf);
+    static span<uint8_t> to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_cbor(raw_ostream& os, const json& j);
 
     /*!
@@ -7291,8 +7290,8 @@ class json
     @since version 2.0.9
     */
     static std::vector<uint8_t> to_msgpack(const json& j);
-    static ArrayRef<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
-    static ArrayRef<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
+    static span<uint8_t> to_msgpack(const json& j, std::vector<uint8_t>& buf);
+    static span<uint8_t> to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf);
     static void to_msgpack(raw_ostream& os, const json& j);
 
     /*!
@@ -7378,10 +7377,10 @@ class json
     static std::vector<uint8_t> to_ubjson(const json& j,
                                           const bool use_size = false,
                                           const bool use_type = false);
-    static ArrayRef<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
-                                       const bool use_size = false, const bool use_type = false);
-    static ArrayRef<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
-                                       const bool use_size = false, const bool use_type = false);
+    static span<uint8_t> to_ubjson(const json& j, std::vector<uint8_t>& buf,
+                                   const bool use_size = false, const bool use_type = false);
+    static span<uint8_t> to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+                                   const bool use_size = false, const bool use_type = false);
     static void to_ubjson(raw_ostream& os, const json& j,
                           const bool use_size = false, const bool use_type = false);
 
@@ -7484,7 +7483,7 @@ class json
     /*!
     @copydoc from_cbor(raw_istream&, const bool)
     */
-    static json from_cbor(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_cbor(span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in MessagePack format
@@ -7565,7 +7564,7 @@ class json
     /*!
     @copydoc from_msgpack(raw_istream, const bool)
     */
-    static json from_msgpack(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_msgpack(span<const uint8_t> arr, const bool strict = true);
 
     /*!
     @brief create a JSON value from an input in UBJSON format
@@ -7623,7 +7622,7 @@ class json
     static json from_ubjson(raw_istream& is,
                                   const bool strict = true);
 
-    static json from_ubjson(ArrayRef<uint8_t> arr, const bool strict = true);
+    static json from_ubjson(span<const uint8_t> arr, const bool strict = true);
 
     /// @}
 
@@ -8074,7 +8073,7 @@ if no parse error occurred.
 */
 inline wpi::json operator "" _json(const char* s, std::size_t n)
 {
-    return wpi::json::parse(wpi::StringRef(s, n));
+    return wpi::json::parse(std::string_view(s, n));
 }
 
 /*!
@@ -8092,7 +8091,7 @@ object if no parse error occurred.
 */
 inline wpi::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
 {
-    return wpi::json::json_pointer(wpi::StringRef(s, n));
+    return wpi::json::json_pointer(std::string_view(s, n));
 }
 
 #ifndef WPI_JSON_IMPLEMENTATION

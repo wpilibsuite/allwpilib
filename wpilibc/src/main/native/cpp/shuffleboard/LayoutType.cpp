@@ -6,6 +6,6 @@
 
 using namespace frc;
 
-wpi::StringRef LayoutType::GetLayoutName() const {
+std::string_view LayoutType::GetLayoutName() const {
   return m_layoutName;
 }

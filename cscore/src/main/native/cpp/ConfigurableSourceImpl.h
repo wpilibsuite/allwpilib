@@ -9,10 +9,10 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
-#include <wpi/Twine.h>
+#include <wpi/span.h>
 
 #include "SourceImpl.h"
 
@@ -20,7 +20,7 @@ namespace cs {
 
 class ConfigurableSourceImpl : public SourceImpl {
  protected:
-  ConfigurableSourceImpl(const wpi::Twine& name, wpi::Logger& logger,
+  ConfigurableSourceImpl(std::string_view name, wpi::Logger& logger,
                          Notifier& notifier, Telemetry& telemetry,
                          const VideoMode& mode);
 
@@ -35,13 +35,14 @@ class ConfigurableSourceImpl : public SourceImpl {
   void NumSinksEnabledChanged() override;
 
   // OpenCV-specific functions
-  void NotifyError(const wpi::Twine& msg);
-  int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
+  void NotifyError(std::string_view msg);
+  int CreateProperty(std::string_view name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
-  int CreateProperty(const wpi::Twine& name, CS_PropertyKind kind, int minimum,
+  int CreateProperty(std::string_view name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value,
                      std::function<void(CS_Property property)> onChange);
-  void SetEnumPropertyChoices(int property, wpi::ArrayRef<std::string> choices,
+  void SetEnumPropertyChoices(int property,
+                              wpi::span<const std::string> choices,
                               CS_Status* status);
 
  private:

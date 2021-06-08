@@ -6,9 +6,7 @@
 
 #include <cassert>
 
-#include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_CANAPIJNI.h"

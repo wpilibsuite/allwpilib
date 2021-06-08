@@ -59,6 +59,7 @@ option(WITH_EXTERNAL_HAL "Use a separately built HAL" OFF)
 set(EXTERNAL_HAL_FILE "" CACHE FILEPATH "Location to look for an external HAL CMake File")
 
 # Options for using a package manager (vcpkg) for certain dependencies.
+option(USE_VCPKG_FMTLIB "Use vcpkg fmtlib" OFF)
 option(USE_VCPKG_LIBUV "Use vcpkg libuv" OFF)
 option(USE_VCPKG_EIGEN "Use vcpkg eigen" OFF)
 
@@ -187,6 +188,7 @@ if (WITH_GUI)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
+    add_subdirectory(outlineviewer)
 endif()
 
 if (WITH_CSCORE)

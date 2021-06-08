@@ -4,19 +4,20 @@
 
 #include "glass/networktables/NTDigitalInput.h"
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-NTDigitalInputModel::NTDigitalInputModel(wpi::StringRef path)
+NTDigitalInputModel::NTDigitalInputModel(std::string_view path)
     : NTDigitalInputModel{nt::GetDefaultInstance(), path} {}
 
-NTDigitalInputModel::NTDigitalInputModel(NT_Inst inst, wpi::StringRef path)
+NTDigitalInputModel::NTDigitalInputModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_value{m_nt.GetEntry(path + "/Value")},
-      m_name{m_nt.GetEntry(path + "/.name")},
-      m_valueData{"NT_DIn:" + path},
-      m_nameValue{path.rsplit('/').second} {
+      m_value{m_nt.GetEntry(fmt::format("{}/Value", path))},
+      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))},
+      m_valueData{fmt::format("NT_DIn:{}", path)},
+      m_nameValue{wpi::rsplit(path, '/').second} {
   m_nt.AddListener(m_value);
   m_nt.AddListener(m_name);
 

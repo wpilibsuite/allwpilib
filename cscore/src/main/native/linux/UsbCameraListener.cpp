@@ -5,6 +5,7 @@
 #include "UsbCameraListener.h"
 
 #include <wpi/EventLoopRunner.h>
+#include <wpi/StringExtras.h>
 #include <wpi/uv/FsEvent.h>
 #include <wpi/uv/Timer.h>
 
@@ -38,7 +39,7 @@ void UsbCameraListener::Start() {
 
       auto devEvents = wpi::uv::FsEvent::Create(loop);
       devEvents->fsEvent.connect([refreshTimer](const char* fn, int flags) {
-        if (wpi::StringRef(fn).startswith("video")) {
+        if (wpi::starts_with(fn, "video")) {
           refreshTimer->Start(wpi::uv::Timer::Time(200));
         }
       });

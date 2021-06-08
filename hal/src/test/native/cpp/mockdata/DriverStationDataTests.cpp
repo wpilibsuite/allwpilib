@@ -6,7 +6,6 @@
 
 #include "gtest/gtest.h"
 #include "hal/HAL.h"
-#include "hal/Solenoid.h"
 #include "hal/simulation/DriverStationData.h"
 
 namespace hal {

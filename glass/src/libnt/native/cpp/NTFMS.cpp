@@ -6,27 +6,29 @@
 
 #include <stdint.h>
 
-#include <wpi/Twine.h>
+#include <fmt/format.h>
+#include <wpi/SmallVector.h>
 #include <wpi/timestamp.h>
 
 using namespace glass;
 
-NTFMSModel::NTFMSModel(wpi::StringRef path)
+NTFMSModel::NTFMSModel(std::string_view path)
     : NTFMSModel{nt::GetDefaultInstance(), path} {}
 
-NTFMSModel::NTFMSModel(NT_Inst inst, wpi::StringRef path)
+NTFMSModel::NTFMSModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_gameSpecificMessage{m_nt.GetEntry(path + "/GameSpecificMessage")},
-      m_alliance{m_nt.GetEntry(path + "/IsRedAlliance")},
-      m_station{m_nt.GetEntry(path + "/StationNumber")},
-      m_controlWord{m_nt.GetEntry(path + "/FMSControlData")},
-      m_fmsAttached{"NT_FMS:FMSAttached:" + path},
-      m_dsAttached{"NT_FMS:DSAttached:" + path},
-      m_allianceStationId{"NT_FMS:AllianceStationID:" + path},
-      m_estop{"NT_FMS:EStop:" + path},
-      m_enabled{"NT_FMS:RobotEnabled:" + path},
-      m_test{"NT_FMS:TestMode:" + path},
-      m_autonomous{"NT_FMS:AutonomousMode:" + path} {
+      m_gameSpecificMessage{
+          m_nt.GetEntry(fmt::format("{}/GameSpecificMessage", path))},
+      m_alliance{m_nt.GetEntry(fmt::format("{}/IsRedAlliance", path))},
+      m_station{m_nt.GetEntry(fmt::format("{}/StationNumber", path))},
+      m_controlWord{m_nt.GetEntry(fmt::format("{}/FMSControlData", path))},
+      m_fmsAttached{fmt::format("NT_FMS:FMSAttached:{}", path)},
+      m_dsAttached{fmt::format("NT_FMS:DSAttached:{}", path)},
+      m_allianceStationId{fmt::format("NT_FMS:AllianceStationID:{}", path)},
+      m_estop{fmt::format("NT_FMS:EStop:{}", path)},
+      m_enabled{fmt::format("NT_FMS:RobotEnabled:{}", path)},
+      m_test{fmt::format("NT_FMS:TestMode:{}", path)},
+      m_autonomous{fmt::format("NT_FMS:AutonomousMode:{}", path)} {
   m_nt.AddListener(m_alliance);
   m_nt.AddListener(m_station);
   m_nt.AddListener(m_controlWord);
@@ -39,7 +41,7 @@ NTFMSModel::NTFMSModel(NT_Inst inst, wpi::StringRef path)
   m_autonomous.SetDigital(true);
 }
 
-wpi::StringRef NTFMSModel::GetGameSpecificMessage(
+std::string_view NTFMSModel::GetGameSpecificMessage(
     wpi::SmallVectorImpl<char>& buf) {
   buf.clear();
   auto value = nt::GetEntryValue(m_gameSpecificMessage);
@@ -47,7 +49,7 @@ wpi::StringRef NTFMSModel::GetGameSpecificMessage(
     auto str = value->GetString();
     buf.append(str.begin(), str.end());
   }
-  return wpi::StringRef{buf.data(), buf.size()};
+  return std::string_view{buf.data(), buf.size()};
 }
 
 void NTFMSModel::Update() {

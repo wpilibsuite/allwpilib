@@ -12,7 +12,7 @@
   },
   {
     "name": "Tank Drive",
-    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with tank steering",
+    "description": "Demonstrate the use of the DifferentialDrive class doing teleop driving with tank steering",
     "tags": [
       "Actuators",
       "Joystick",
@@ -37,7 +37,7 @@
   },
   {
     "name": "Mecanum Drive",
-    "description": "Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum steering",
+    "description": "Demonstrate the use of the MecanumDrive class doing teleop driving with Mecanum steering",
     "tags": [
       "Actuators",
       "Joystick",
@@ -205,6 +205,14 @@
       "Joystick"
     ],
     "foldername": "hidrumble",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {"name": "Mechanism2d",
+    "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
+    "tags": [],
+    "foldername": "mechanism2d",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
@@ -755,7 +763,7 @@
       "Pose",
       "Swerve"
     ],
-    "foldername": "swervesdriveposeestimator",
+    "foldername": "swervedriveposeestimator",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2

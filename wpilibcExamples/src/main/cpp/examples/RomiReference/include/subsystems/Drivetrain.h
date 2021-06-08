@@ -6,8 +6,8 @@
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/Encoder.h>
-#include <frc/Spark.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/Spark.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
 

@@ -4,10 +4,10 @@
 
 #include "hal/HAL.h"
 
+#include <cstdio>
 #include <vector>
 
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/spinlock.h>
 
 #ifdef _WIN32
@@ -73,7 +73,7 @@ void InitializeHAL() {
   InitializeDriverStationData();
   InitializeEncoderData();
   InitializeI2CData();
-  InitializePCMData();
+  InitializeCTREPCMData();
   InitializePDPData();
   InitializePWMData();
   InitializeRelayData();
@@ -90,7 +90,6 @@ void InitializeHAL() {
   InitializeAnalogOutput();
   InitializeAnalogTrigger();
   InitializeCAN();
-  InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();
@@ -107,11 +106,11 @@ void InitializeHAL() {
   InitializePDP();
   InitializePorts();
   InitializePower();
+  InitializeCTREPCM();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
   InitializeSimDevice();
-  InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();
 }
@@ -250,6 +249,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
     case HAL_LED_CHANNEL_ERROR:
       return HAL_LED_CHANNEL_ERROR_MESSAGE;
+    case HAL_USE_LAST_ERROR:
+      return HAL_USE_LAST_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
@@ -350,7 +351,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   }
 #endif  // _WIN32
 
-  wpi::outs().SetUnbuffered();
+#ifndef _WIN32
+  setlinebuf(stdin);
+  setlinebuf(stdout);
+#endif
+
   if (HAL_LoadExtensions() < 0) {
     return false;
   }

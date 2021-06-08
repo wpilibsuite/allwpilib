@@ -3,16 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/livewindow/LiveWindow.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
-    m_robotDrive.SetExpiration(0.1);
+    m_robotDrive.SetExpiration(100_ms);
     m_timer.Start();
   }
 
@@ -23,7 +23,7 @@ class Robot : public frc::TimedRobot {
 
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
-    if (m_timer.Get() < 2.0) {
+    if (m_timer.Get() < 2_s) {
       // Drive forwards half speed
       m_robotDrive.ArcadeDrive(0.5, 0.0);
     } else {
@@ -45,8 +45,8 @@ class Robot : public frc::TimedRobot {
 
  private:
   // Robot drive system
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
+  frc::PWMSparkMax m_left{0};
+  frc::PWMSparkMax m_right{1};
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::Joystick m_stick{0};

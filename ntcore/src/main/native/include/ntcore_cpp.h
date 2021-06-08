@@ -11,14 +11,12 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
-#include <wpi/deprecated.h>
+#include <wpi/span.h>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -32,10 +30,6 @@ namespace nt {
  *
  * @{
  */
-
-using wpi::ArrayRef;
-using wpi::StringRef;
-using wpi::Twine;
 
 /** NetworkTables Entry Information */
 struct EntryInfo {
@@ -103,7 +97,7 @@ struct ConnectionInfo {
 /** NetworkTables RPC Version 1 Definition Parameter */
 struct RpcParamDef {
   RpcParamDef() = default;
-  RpcParamDef(StringRef name_, std::shared_ptr<Value> def_value_)
+  RpcParamDef(std::string_view name_, std::shared_ptr<Value> def_value_)
       : name(name_), def_value(std::move(def_value_)) {}
 
   std::string name;
@@ -113,7 +107,8 @@ struct RpcParamDef {
 /** NetworkTables RPC Version 1 Definition Result */
 struct RpcResultDef {
   RpcResultDef() = default;
-  RpcResultDef(StringRef name_, NT_Type type_) : name(name_), type(type_) {}
+  RpcResultDef(std::string_view name_, NT_Type type_)
+      : name(name_), type(type_) {}
 
   std::string name;
   NT_Type type;
@@ -131,8 +126,8 @@ struct RpcDefinition {
 class RpcAnswer {
  public:
   RpcAnswer() = default;
-  RpcAnswer(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
-            StringRef params_, ConnectionInfo conn_)
+  RpcAnswer(NT_Entry entry_, NT_RpcCall call_, std::string_view name_,
+            std::string_view params_, ConnectionInfo conn_)
       : entry(entry_),
         call(call_),
         name(name_),
@@ -165,7 +160,7 @@ class RpcAnswer {
    * @param result  result raw data that will be provided to remote caller
    * @return True if posting the response is valid, otherwise false
    */
-  bool PostResponse(StringRef result) const;
+  bool PostResponse(std::string_view result) const;
 
   friend void swap(RpcAnswer& first, RpcAnswer& second) {
     using std::swap;
@@ -182,7 +177,7 @@ class EntryNotification {
  public:
   EntryNotification() = default;
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
-                    StringRef name_, std::shared_ptr<Value> value_,
+                    std::string_view name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
       : listener(listener_),
         entry(entry_),
@@ -249,7 +244,7 @@ class LogMessage {
  public:
   LogMessage() = default;
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
-             unsigned int line_, StringRef message_)
+             unsigned int line_, std::string_view message_)
       : logger(logger_),
         level(level_),
         filename(filename_),
@@ -331,7 +326,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle);
  * @param name      entry name (UTF-8 string)
  * @return entry handle
  */
-NT_Entry GetEntry(NT_Inst inst, const Twine& name);
+NT_Entry GetEntry(NT_Inst inst, std::string_view name);
 
 /**
  * Get Entry Handles.
@@ -347,7 +342,7 @@ NT_Entry GetEntry(NT_Inst inst, const Twine& name);
  *                      as a "don't care"
  * @return Array of entry handles.
  */
-std::vector<NT_Entry> GetEntries(NT_Inst inst, const Twine& prefix,
+std::vector<NT_Entry> GetEntries(NT_Inst inst, std::string_view prefix,
                                  unsigned int types);
 
 /**
@@ -382,36 +377,10 @@ uint64_t GetEntryLastChange(NT_Entry entry);
  * Returns copy of current entry value.
  * Note that one of the type options is "unassigned".
  *
- * @param name      entry name (UTF-8 string)
- * @return entry value
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-std::shared_ptr<Value> GetEntryValue(StringRef name);
-
-/**
- * Get Entry Value.
- *
- * Returns copy of current entry value.
- * Note that one of the type options is "unassigned".
- *
  * @param entry     entry handle
  * @return entry value
  */
 std::shared_ptr<Value> GetEntryValue(NT_Entry entry);
-
-/**
- * Set Default Entry Value
- *
- * Returns copy of current entry value if it exists.
- * Otherwise, sets passed in value, and returns set value.
- * Note that one of the type options is "unassigned".
- *
- * @param name      entry name (UTF-8 string)
- * @param value     value to be set if name does not exist
- * @return False on error (value not set), True on success
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value);
 
 /**
  * Set Default Entry Value
@@ -425,19 +394,6 @@ bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value);
  * @return False on error (value not set), True on success
  */
 bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
-
-/**
- * Set Entry Value.
- *
- * Sets new entry value.  If type of new value differs from the type of the
- * currently stored entry, returns error and does not update value.
- *
- * @param name      entry name (UTF-8 string)
- * @param value     new entry value
- * @return False on error (type mismatch), True on success
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
 
 /**
  * Set Entry Value.
@@ -461,35 +417,10 @@ bool SetEntryValue(NT_Entry entry, std::shared_ptr<Value> value);
  * This is NOT the preferred method to update a value; generally
  * SetEntryValue() should be used instead, with appropriate error handling.
  *
- * @param name      entry name (UTF-8 string)
- * @param value     new entry value
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
-
-/**
- * Set Entry Type and Value.
- *
- * Sets new entry value.  If type of new value differs from the type of the
- * currently stored entry, the currently stored entry type is overridden
- * (generally this will generate an Entry Assignment message).
- *
- * This is NOT the preferred method to update a value; generally
- * SetEntryValue() should be used instead, with appropriate error handling.
- *
  * @param entry     entry handle
  * @param value     new entry value
  */
 void SetEntryTypeValue(NT_Entry entry, std::shared_ptr<Value> value);
-
-/**
- * Set Entry Flags.
- *
- * @param name      entry name (UTF-8 string)
- * @param flags     flags value (bitmask of NT_EntryFlags)
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-void SetEntryFlags(StringRef name, unsigned int flags);
 
 /**
  * Set Entry Flags.
@@ -502,35 +433,10 @@ void SetEntryFlags(NT_Entry entry, unsigned int flags);
 /**
  * Get Entry Flags.
  *
- * @param name      entry name (UTF-8 string)
- * @return Flags value (bitmask of NT_EntryFlags)
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-unsigned int GetEntryFlags(StringRef name);
-
-/**
- * Get Entry Flags.
- *
  * @param entry     entry handle
  * @return Flags value (bitmask of NT_EntryFlags)
  */
 unsigned int GetEntryFlags(NT_Entry entry);
-
-/**
- * Delete Entry.
- *
- * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
- * so this may not have an effect if any other node in the network is not
- * version 3.0 or newer.
- *
- * Note: GetConnections() can be used to determine the protocol version
- * of direct remote connection(s), but this is not sufficient to determine
- * if all nodes in the network are version 3.0 or newer.
- *
- * @param name      entry name (UTF-8 string)
- */
-WPI_DEPRECATED("use NT_Entry function instead")
-void DeleteEntry(StringRef name);
 
 /**
  * Delete Entry.
@@ -557,12 +463,6 @@ void DeleteEntry(NT_Entry entry);
  * Note: GetConnections() can be used to determine the protocol version
  * of direct remote connection(s), but this is not sufficient to determine
  * if all nodes in the network are version 3.0 or newer.
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void DeleteAllEntries();
-
-/**
- * @copydoc DeleteAllEntries()
  *
  * @param inst      instance handle
  */
@@ -576,21 +476,14 @@ void DeleteAllEntries(NT_Inst inst);
  * filtered by string prefix and entry type to only return a subset of all
  * entries.
  *
+ * @param inst    instance handle
  * @param prefix        entry name required prefix; only entries whose name
  *                      starts with this string are returned
  * @param types         bitmask of NT_Type values; 0 is treated specially
  *                      as a "don't care"
  * @return Array of entry information.
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
-
-/**
- * @copydoc GetEntryInfo(StringRef, unsigned int)
- *
- * @param inst    instance handle
- */
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const Twine& prefix,
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, std::string_view prefix,
                                     unsigned int types);
 
 /**
@@ -622,30 +515,21 @@ EntryInfo GetEntryInfo(NT_Entry entry);
  * @param flags           update flags; for example, NT_NOTIFY_NEW if the key
  *                        did not previously exist
  */
-typedef std::function<void(NT_EntryListener entry_listener, StringRef name,
-                           std::shared_ptr<Value> value, unsigned int flags)>
-    EntryListenerCallback;
+using EntryListenerCallback =
+    std::function<void(NT_EntryListener entry_listener, std::string_view name,
+                       std::shared_ptr<Value> value, unsigned int flags)>;
 
 /**
  * Add a listener for all entries starting with a certain prefix.
  *
+ * @param inst              instance handle
  * @param prefix            UTF-8 string prefix
  * @param callback          listener to add
  * @param flags             NotifyKind bitmask
  * @return Listener handle
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-NT_EntryListener AddEntryListener(StringRef prefix,
-                                  EntryListenerCallback callback,
-                                  unsigned int flags);
-
-/**
- * @copydoc AddEntryListener(StringRef, EntryListenerCallback, unsigned int)
- *
- * @param inst              instance handle
- */
 NT_EntryListener AddEntryListener(
-    NT_Inst inst, const Twine& prefix,
+    NT_Inst inst, std::string_view prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags);
 
@@ -693,7 +577,7 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
  * @return Listener handle
  */
 NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        const Twine& prefix,
+                                        std::string_view prefix,
                                         unsigned int flags);
 
 /**
@@ -787,18 +671,10 @@ using ConnectionListenerCallback =
 /**
  * Add a connection listener.
  *
+ * @param inst              instance handle
  * @param callback          listener to add
  * @param immediate_notify  notify listener of all existing connections
  * @return Listener handle
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-NT_ConnectionListener AddConnectionListener(ConnectionListenerCallback callback,
-                                            bool immediate_notify);
-
-/**
- * @copydoc AddConnectionListener(ConnectionListenerCallback, bool)
- *
- * @param inst              instance handle
  */
 NT_ConnectionListener AddConnectionListener(
     NT_Inst inst,
@@ -910,7 +786,7 @@ bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout);
  * @param callback  callback function; note the callback function must call
  *                  PostRpcResponse() to provide a response to the call
  */
-void CreateRpc(NT_Entry entry, StringRef def,
+void CreateRpc(NT_Entry entry, std::string_view def,
                std::function<void(const RpcAnswer& answer)> callback);
 
 /**
@@ -943,7 +819,8 @@ void DestroyRpcCallPoller(NT_RpcCallPoller poller);
  * @param def       RPC definition
  * @param poller    poller handle
  */
-void CreatePolledRpc(NT_Entry entry, StringRef def, NT_RpcCallPoller poller);
+void CreatePolledRpc(NT_Entry entry, std::string_view def,
+                     NT_RpcCallPoller poller);
 
 /**
  * Get the next incoming RPC call.  This blocks until the next incoming RPC
@@ -1006,7 +883,7 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout);
  * @param result      result raw data that will be provided to remote caller
  * @return            true if the response was posted, otherwise false
  */
-bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result);
+bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, std::string_view result);
 
 /**
  * Call a RPC function.  May be used on either the client or server.
@@ -1019,7 +896,7 @@ bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result);
  * @return RPC call handle (for use with GetRpcResult() or
  *         CancelRpcResult()).
  */
-NT_RpcCall CallRpc(NT_Entry entry, StringRef params);
+NT_RpcCall CallRpc(NT_Entry entry, std::string_view params);
 
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
@@ -1070,7 +947,7 @@ std::string PackRpcDefinition(const RpcDefinition& def);
  * @param def         RPC version 1 definition (output)
  * @return True if successfully unpacked, false otherwise.
  */
-bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def);
+bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def);
 
 /**
  * Pack RPC values as required for RPC version 1 definition messages.
@@ -1078,7 +955,7 @@ bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def);
  * @param values      array of values to pack
  * @return Raw packed bytes.
  */
-std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values);
+std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values);
 
 /**
  * Unpack RPC values as required for RPC version 1 definition messages.
@@ -1087,8 +964,8 @@ std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values);
  * @param types       array of data types (as provided in the RPC definition)
  * @return Array of values.
  */
-std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
-                                                    ArrayRef<NT_Type> types);
+std::vector<std::shared_ptr<Value>> UnpackRpcValues(
+    std::string_view packed, wpi::span<const NT_Type> types);
 
 /** @} */
 
@@ -1102,25 +979,10 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
  * This is the name used during the initial connection handshake, and is
  * visible through ConnectionInfo on the remote node.
  *
+ * @param inst      instance handle
  * @param name      identity to advertise
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-void SetNetworkIdentity(StringRef name);
-
-/**
- * @copydoc SetNetworkIdentity(StringRef)
- *
- * @param inst      instance handle
- */
-void SetNetworkIdentity(NT_Inst inst, const Twine& name);
-
-/**
- * Get the current network mode.
- *
- * @return Bitmask of NT_NetworkMode.
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-unsigned int GetNetworkMode();
+void SetNetworkIdentity(NT_Inst inst, std::string_view name);
 
 /**
  * Get the current network mode.
@@ -1146,32 +1008,18 @@ void StopLocal(NT_Inst inst);
 /**
  * Starts a server using the specified filename, listening address, and port.
  *
+ * @param inst              instance handle
  * @param persist_filename  the name of the persist file to use (UTF-8 string,
  *                          null terminated)
  * @param listen_address    the address to listen on, or null to listen on any
  *                          address. (UTF-8 string, null terminated)
  * @param port              port to communicate over.
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StartServer(StringRef persist_filename, const char* listen_address,
-                 unsigned int port);
-
-/**
- * @copydoc StartServer(StringRef, const char*, unsigned int)
- *
- * @param inst              instance handle
- */
-void StartServer(NT_Inst inst, const Twine& persist_filename,
+void StartServer(NT_Inst inst, std::string_view persist_filename,
                  const char* listen_address, unsigned int port);
 
 /**
  * Stops the server if it is running.
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StopServer();
-
-/**
- * @copydoc StopServer()
  *
  * @param inst  instance handle
  */
@@ -1179,49 +1027,30 @@ void StopServer(NT_Inst inst);
 
 /**
  * Starts a client.  Use SetServer to set the server name and port.
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StartClient();
-
-/**
- * Starts a client using the specified server and port
- *
- * @param server_name server name (UTF-8 string, null terminated)
- * @param port        port to communicate over
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StartClient(const char* server_name, unsigned int port);
-
-/**
- * Starts a client using the specified (server, port) combinations.  The
- * client will attempt to connect to each server in round robin fashion.
- *
- * @param servers   array of server name and port pairs
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
-
-/**
- * @copydoc StartClient()
  *
  * @param inst  instance handle
  */
 void StartClient(NT_Inst inst);
 
 /**
- * @copydoc StartClient(const char*, unsigned int)
+ * Starts a client using the specified server and port
  *
  * @param inst        instance handle
+ * @param server_name server name (UTF-8 string, null terminated)
+ * @param port        port to communicate over
  */
 void StartClient(NT_Inst inst, const char* server_name, unsigned int port);
 
 /**
- * @copydoc StartClient(ArrayRef<std::pair<StringRef, unsigned int>>)
+ * Starts a client using the specified (server, port) combinations.  The
+ * client will attempt to connect to each server in round robin fashion.
  *
  * @param inst      instance handle
+ * @param servers   array of server name and port pairs
  */
-void StartClient(NT_Inst inst,
-                 ArrayRef<std::pair<StringRef, unsigned int>> servers);
+void StartClient(
+    NT_Inst inst,
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Starts a client using commonly known robot addresses for the specified
@@ -1235,12 +1064,7 @@ void StartClientTeam(NT_Inst inst, unsigned int team, unsigned int port);
 
 /**
  * Stops the client if it is running.
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StopClient();
-
-/**
- * @copydoc StopClient()
+ *
  * @param inst  instance handle
  */
 void StopClient(NT_Inst inst);
@@ -1248,35 +1072,22 @@ void StopClient(NT_Inst inst);
 /**
  * Sets server address and port for client (without restarting client).
  *
+ * @param inst        instance handle
  * @param server_name server name (UTF-8 string, null terminated)
  * @param port        port to communicate over
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-void SetServer(const char* server_name, unsigned int port);
+void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
 
 /**
  * Sets server addresses for client (without restarting client).
  * The client will attempt to connect to each server in round robin fashion.
  *
+ * @param inst      instance handle
  * @param servers   array of server name and port pairs
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
-
-/**
- * @copydoc SetServer(const char*, unsigned int)
- *
- * @param inst        instance handle
- */
-void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
-
-/**
- * @copydoc SetServer(ArrayRef<std::pair<StringRef, unsigned int>>)
- *
- * @param inst      instance handle
- */
-void SetServer(NT_Inst inst,
-               ArrayRef<std::pair<StringRef, unsigned int>> servers);
+void SetServer(
+    NT_Inst inst,
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).
@@ -1293,45 +1104,24 @@ void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
  * This connects to the Driver Station running on localhost to obtain the
  * server IP address.
  *
- * @param port server port to use in combination with IP from DS
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StartDSClient(unsigned int port);
-
-/**
- * @copydoc StartDSClient(unsigned int)
  * @param inst  instance handle
+ * @param port server port to use in combination with IP from DS
  */
 void StartDSClient(NT_Inst inst, unsigned int port);
 
-/** Stops requesting server address from Driver Station. */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StopDSClient();
-
 /**
- * @copydoc StopDSClient()
+ * Stops requesting server address from Driver Station.
  *
  * @param inst  instance handle
  */
 void StopDSClient(NT_Inst inst);
 
-/** Stops the RPC server if it is running. */
-WPI_DEPRECATED("use NT_Inst function instead")
-void StopRpcServer();
-
 /**
  * Set the periodic update rate.
  * Sets how frequently updates are sent to other nodes over the network.
  *
- * @param interval  update interval in seconds (range 0.01 to 1.0)
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void SetUpdateRate(double interval);
-
-/**
- * @copydoc SetUpdateRate(double)
- *
  * @param inst      instance handle
+ * @param interval  update interval in seconds (range 0.01 to 1.0)
  */
 void SetUpdateRate(NT_Inst inst, double interval);
 
@@ -1345,12 +1135,6 @@ void SetUpdateRate(NT_Inst inst, double interval);
  * Note: flushes are rate limited to avoid excessive network traffic.  If
  * the time between calls is too short, the flush will occur after the minimum
  * time elapses (rather than immediately).
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void Flush();
-
-/**
- * @copydoc Flush()
  *
  * @param inst      instance handle
  */
@@ -1360,15 +1144,8 @@ void Flush(NT_Inst inst);
  * Get information on the currently established network connections.
  * If operating as a client, this will return either zero or one values.
  *
- * @return      array of connection information
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-std::vector<ConnectionInfo> GetConnections();
-
-/**
- * @copydoc GetConnections()
- *
  * @param inst  instance handle
+ * @return      array of connection information
  */
 std::vector<ConnectionInfo> GetConnections(NT_Inst inst);
 
@@ -1392,39 +1169,24 @@ bool IsConnected(NT_Inst inst);
  * but this function provides a way to save persistent values in the same
  * format to a file on either a client or a server.
  *
+ * @param inst      instance handle
  * @param filename  filename
  * @return error string, or nullptr if successful
  */
-WPI_DEPRECATED("use NT_Inst function instead")
-const char* SavePersistent(StringRef filename);
-
-/**
- * @copydoc SavePersistent(StringRef)
- * @param inst      instance handle
- */
-const char* SavePersistent(NT_Inst inst, const Twine& filename);
+const char* SavePersistent(NT_Inst inst, std::string_view filename);
 
 /**
  * Load persistent values from a file.  The server automatically does this
  * at startup, but this function provides a way to restore persistent values
  * in the same format from a file at any time on either a client or a server.
  *
+ * @param inst      instance handle
  * @param filename  filename
  * @param warn      callback function for warnings
  * @return error string, or nullptr if successful
  */
-WPI_DEPRECATED("use NT_Inst function instead")
 const char* LoadPersistent(
-    StringRef filename, std::function<void(size_t line, const char* msg)> warn);
-
-/**
- * @copydoc LoadPersistent(StringRef, std::function<void(size_t, const
- * char*)>)
- *
- * @param inst      instance handle
- */
-const char* LoadPersistent(
-    NT_Inst inst, const Twine& filename,
+    NT_Inst inst, std::string_view filename,
     std::function<void(size_t line, const char* msg)> warn);
 
 /**
@@ -1436,8 +1198,8 @@ const char* LoadPersistent(
  * @param prefix    save only keys starting with this prefix
  * @return error string, or nullptr if successful
  */
-const char* SaveEntries(NT_Inst inst, const Twine& filename,
-                        const Twine& prefix);
+const char* SaveEntries(NT_Inst inst, std::string_view filename,
+                        std::string_view prefix);
 
 /**
  * Load table values from a file.  The file format used is identical to
@@ -1449,8 +1211,8 @@ const char* SaveEntries(NT_Inst inst, const Twine& filename,
  * @param warn      callback function for warnings
  * @return error string, or nullptr if successful
  */
-const char* LoadEntries(NT_Inst inst, const Twine& filename,
-                        const Twine& prefix,
+const char* LoadEntries(NT_Inst inst, std::string_view filename,
+                        std::string_view prefix,
                         std::function<void(size_t line, const char* msg)> warn);
 
 /** @} */
@@ -1475,30 +1237,6 @@ uint64_t Now();
  * @defgroup ntcore_logger_func Logger Functions
  * @{
  */
-
-/**
- * Log function.
- *
- * @param level   log level of the message (see NT_LogLevel)
- * @param file    origin source filename
- * @param line    origin source line number
- * @param msg     message
- */
-using LogFunc =
-    std::function<void(unsigned int, const char*, unsigned int, const char*)>;
-
-/**
- * Set logger callback function.  By default, log messages are sent to stderr;
- * this function changes the log level and sends log messages to the provided
- * callback function instead.  The callback function will only be called for
- * log messages with level greater than or equal to min_level; messages lower
- * than this level will be silently ignored.
- *
- * @param func        log callback function
- * @param min_level   minimum log level
- */
-WPI_DEPRECATED("use NT_Inst function instead")
-void SetLogger(LogFunc func, unsigned int min_level);
 
 /**
  * Add logger callback function.  By default, log messages are sent to stderr;
@@ -1601,7 +1339,7 @@ bool WaitForLoggerQueue(NT_Inst inst, double timeout);
 /** @} */
 /** @} */
 
-inline bool RpcAnswer::PostResponse(StringRef result) const {
+inline bool RpcAnswer::PostResponse(std::string_view result) const {
   auto ret = PostRpcResponse(entry, call, result);
   call = 0;
   return ret;

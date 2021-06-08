@@ -5,10 +5,10 @@
 #pragma once
 
 #include <chrono>
+#include <string_view>
 
 #include <hal/cpp/fpga_clock.h>
 #include <wpi/StringMap.h>
-#include <wpi/StringRef.h>
 
 namespace wpi {
 class raw_ostream;
@@ -48,7 +48,7 @@ class Tracer {
    *
    * @param epochName The name to associate with the epoch.
    */
-  void AddEpoch(wpi::StringRef epochName);
+  void AddEpoch(std::string_view epochName);
 
   /**
    * Prints list of epochs added so far and their times to the DriverStation.

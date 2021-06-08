@@ -4,6 +4,8 @@
 
 #include "EntryNotifier.h"
 
+#include <wpi/StringExtras.h>
+
 #include "Log.h"
 
 using namespace nt;
@@ -49,8 +51,7 @@ bool impl::EntryNotifierThread::Matches(const EntryListenerData& listener,
   if (listener.entry != 0 && data.entry != listener.entry) {
     return false;
   }
-  if (listener.entry == 0 &&
-      !wpi::StringRef(data.name).startswith(listener.prefix)) {
+  if (listener.entry == 0 && !wpi::starts_with(data.name, listener.prefix)) {
     return false;
   }
 
@@ -59,7 +60,7 @@ bool impl::EntryNotifierThread::Matches(const EntryListenerData& listener,
 
 unsigned int EntryNotifier::Add(
     std::function<void(const EntryNotification& event)> callback,
-    StringRef prefix, unsigned int flags) {
+    std::string_view prefix, unsigned int flags) {
   if ((flags & NT_NOTIFY_LOCAL) != 0) {
     m_local_notifiers = true;
   }
@@ -76,7 +77,7 @@ unsigned int EntryNotifier::Add(
 }
 
 unsigned int EntryNotifier::AddPolled(unsigned int poller_uid,
-                                      wpi::StringRef prefix,
+                                      std::string_view prefix,
                                       unsigned int flags) {
   if ((flags & NT_NOTIFY_LOCAL) != 0) {
     m_local_notifiers = true;
@@ -93,7 +94,7 @@ unsigned int EntryNotifier::AddPolled(unsigned int poller_uid,
   return DoAdd(poller_uid, Handle(m_inst, local_id, Handle::kEntry), flags);
 }
 
-void EntryNotifier::NotifyEntry(unsigned int local_id, StringRef name,
+void EntryNotifier::NotifyEntry(unsigned int local_id, std::string_view name,
                                 std::shared_ptr<Value> value,
                                 unsigned int flags,
                                 unsigned int only_listener) {
@@ -102,8 +103,7 @@ void EntryNotifier::NotifyEntry(unsigned int local_id, StringRef name,
   if ((flags & NT_NOTIFY_LOCAL) != 0 && !m_local_notifiers) {
     return;
   }
-  DEBUG0("notifying '" << name << "' (local=" << local_id
-                       << "), flags=" << flags);
+  DEBUG0("notifying '{}' (local={}), flags={}", name, local_id, flags);
   Send(only_listener, 0, Handle(m_inst, local_id, Handle::kEntry).handle(),
        name, value, flags);
 }

@@ -10,7 +10,7 @@
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
@@ -44,7 +44,7 @@ void SmartDashboard::init() {
   Singleton::GetInstance();
 }
 
-bool SmartDashboard::ContainsKey(wpi::StringRef key) {
+bool SmartDashboard::ContainsKey(std::string_view key) {
   return Singleton::GetInstance().table->ContainsKey(key);
 }
 
@@ -52,42 +52,41 @@ std::vector<std::string> SmartDashboard::GetKeys(int types) {
   return Singleton::GetInstance().table->GetKeys(types);
 }
 
-void SmartDashboard::SetPersistent(wpi::StringRef key) {
+void SmartDashboard::SetPersistent(std::string_view key) {
   Singleton::GetInstance().table->GetEntry(key).SetPersistent();
 }
 
-void SmartDashboard::ClearPersistent(wpi::StringRef key) {
+void SmartDashboard::ClearPersistent(std::string_view key) {
   Singleton::GetInstance().table->GetEntry(key).ClearPersistent();
 }
 
-bool SmartDashboard::IsPersistent(wpi::StringRef key) {
+bool SmartDashboard::IsPersistent(std::string_view key) {
   return Singleton::GetInstance().table->GetEntry(key).IsPersistent();
 }
 
-void SmartDashboard::SetFlags(wpi::StringRef key, unsigned int flags) {
+void SmartDashboard::SetFlags(std::string_view key, unsigned int flags) {
   Singleton::GetInstance().table->GetEntry(key).SetFlags(flags);
 }
 
-void SmartDashboard::ClearFlags(wpi::StringRef key, unsigned int flags) {
+void SmartDashboard::ClearFlags(std::string_view key, unsigned int flags) {
   Singleton::GetInstance().table->GetEntry(key).ClearFlags(flags);
 }
 
-unsigned int SmartDashboard::GetFlags(wpi::StringRef key) {
+unsigned int SmartDashboard::GetFlags(std::string_view key) {
   return Singleton::GetInstance().table->GetEntry(key).GetFlags();
 }
 
-void SmartDashboard::Delete(wpi::StringRef key) {
+void SmartDashboard::Delete(std::string_view key) {
   Singleton::GetInstance().table->Delete(key);
 }
 
-nt::NetworkTableEntry SmartDashboard::GetEntry(wpi::StringRef key) {
+nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   return Singleton::GetInstance().table->GetEntry(key);
 }
 
-void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
-  if (data == nullptr) {
-    wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
-    return;
+void SmartDashboard::PutData(std::string_view key, Sendable* data) {
+  if (!data) {
+    throw FRC_MakeError(err::NullParameter, "{}", "value");
   }
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
@@ -103,9 +102,8 @@ void SmartDashboard::PutData(wpi::StringRef key, Sendable* data) {
 }
 
 void SmartDashboard::PutData(Sendable* value) {
-  if (value == nullptr) {
-    wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
-    return;
+  if (!value) {
+    throw FRC_MakeError(err::NullParameter, "{}", "value");
   }
   auto name = SendableRegistry::GetInstance().GetName(value);
   if (!name.empty()) {
@@ -113,139 +111,142 @@ void SmartDashboard::PutData(Sendable* value) {
   }
 }
 
-Sendable* SmartDashboard::GetData(wpi::StringRef key) {
+Sendable* SmartDashboard::GetData(std::string_view key) {
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto it = inst.tablesToData.find(key);
   if (it == inst.tablesToData.end()) {
-    wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
-    return nullptr;
+    throw FRC_MakeError(err::SmartDashboardMissingKey, "{}", key);
   }
   return SendableRegistry::GetInstance().GetSendable(it->getValue());
 }
 
-bool SmartDashboard::PutBoolean(wpi::StringRef keyName, bool value) {
+bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetBoolean(value);
 }
 
-bool SmartDashboard::SetDefaultBoolean(wpi::StringRef key, bool defaultValue) {
+bool SmartDashboard::SetDefaultBoolean(std::string_view key,
+                                       bool defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultBoolean(
       defaultValue);
 }
 
-bool SmartDashboard::GetBoolean(wpi::StringRef keyName, bool defaultValue) {
+bool SmartDashboard::GetBoolean(std::string_view keyName, bool defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetBoolean(
       defaultValue);
 }
 
-bool SmartDashboard::PutNumber(wpi::StringRef keyName, double value) {
+bool SmartDashboard::PutNumber(std::string_view keyName, double value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetDouble(value);
 }
 
-bool SmartDashboard::SetDefaultNumber(wpi::StringRef key, double defaultValue) {
+bool SmartDashboard::SetDefaultNumber(std::string_view key,
+                                      double defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDouble(
       defaultValue);
 }
 
-double SmartDashboard::GetNumber(wpi::StringRef keyName, double defaultValue) {
+double SmartDashboard::GetNumber(std::string_view keyName,
+                                 double defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetDouble(
       defaultValue);
 }
 
-bool SmartDashboard::PutString(wpi::StringRef keyName, wpi::StringRef value) {
+bool SmartDashboard::PutString(std::string_view keyName,
+                               std::string_view value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetString(value);
 }
 
-bool SmartDashboard::SetDefaultString(wpi::StringRef key,
-                                      wpi::StringRef defaultValue) {
+bool SmartDashboard::SetDefaultString(std::string_view key,
+                                      std::string_view defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultString(
       defaultValue);
 }
 
-std::string SmartDashboard::GetString(wpi::StringRef keyName,
-                                      wpi::StringRef defaultValue) {
+std::string SmartDashboard::GetString(std::string_view keyName,
+                                      std::string_view defaultValue) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetString(
       defaultValue);
 }
 
-bool SmartDashboard::PutBooleanArray(wpi::StringRef key,
-                                     wpi::ArrayRef<int> value) {
+bool SmartDashboard::PutBooleanArray(std::string_view key,
+                                     wpi::span<const int> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetBooleanArray(value);
 }
 
-bool SmartDashboard::SetDefaultBooleanArray(wpi::StringRef key,
-                                            wpi::ArrayRef<int> defaultValue) {
+bool SmartDashboard::SetDefaultBooleanArray(std::string_view key,
+                                            wpi::span<const int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultBooleanArray(
       defaultValue);
 }
 
 std::vector<int> SmartDashboard::GetBooleanArray(
-    wpi::StringRef key, wpi::ArrayRef<int> defaultValue) {
+    std::string_view key, wpi::span<const int> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetBooleanArray(
       defaultValue);
 }
 
-bool SmartDashboard::PutNumberArray(wpi::StringRef key,
-                                    wpi::ArrayRef<double> value) {
+bool SmartDashboard::PutNumberArray(std::string_view key,
+                                    wpi::span<const double> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetDoubleArray(value);
 }
 
-bool SmartDashboard::SetDefaultNumberArray(wpi::StringRef key,
-                                           wpi::ArrayRef<double> defaultValue) {
+bool SmartDashboard::SetDefaultNumberArray(
+    std::string_view key, wpi::span<const double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultDoubleArray(
       defaultValue);
 }
 
 std::vector<double> SmartDashboard::GetNumberArray(
-    wpi::StringRef key, wpi::ArrayRef<double> defaultValue) {
+    std::string_view key, wpi::span<const double> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetDoubleArray(
       defaultValue);
 }
 
-bool SmartDashboard::PutStringArray(wpi::StringRef key,
-                                    wpi::ArrayRef<std::string> value) {
+bool SmartDashboard::PutStringArray(std::string_view key,
+                                    wpi::span<const std::string> value) {
   return Singleton::GetInstance().table->GetEntry(key).SetStringArray(value);
 }
 
 bool SmartDashboard::SetDefaultStringArray(
-    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view key, wpi::span<const std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultStringArray(
       defaultValue);
 }
 
 std::vector<std::string> SmartDashboard::GetStringArray(
-    wpi::StringRef key, wpi::ArrayRef<std::string> defaultValue) {
+    std::string_view key, wpi::span<const std::string> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetStringArray(
       defaultValue);
 }
 
-bool SmartDashboard::PutRaw(wpi::StringRef key, wpi::StringRef value) {
+bool SmartDashboard::PutRaw(std::string_view key, std::string_view value) {
   return Singleton::GetInstance().table->GetEntry(key).SetRaw(value);
 }
 
-bool SmartDashboard::SetDefaultRaw(wpi::StringRef key,
-                                   wpi::StringRef defaultValue) {
+bool SmartDashboard::SetDefaultRaw(std::string_view key,
+                                   std::string_view defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultRaw(
       defaultValue);
 }
 
-std::string SmartDashboard::GetRaw(wpi::StringRef key,
-                                   wpi::StringRef defaultValue) {
+std::string SmartDashboard::GetRaw(std::string_view key,
+                                   std::string_view defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetRaw(defaultValue);
 }
 
-bool SmartDashboard::PutValue(wpi::StringRef keyName,
+bool SmartDashboard::PutValue(std::string_view keyName,
                               std::shared_ptr<nt::Value> value) {
   return Singleton::GetInstance().table->GetEntry(keyName).SetValue(value);
 }
 
-bool SmartDashboard::SetDefaultValue(wpi::StringRef key,
+bool SmartDashboard::SetDefaultValue(std::string_view key,
                                      std::shared_ptr<nt::Value> defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).SetDefaultValue(
       defaultValue);
 }
 
-std::shared_ptr<nt::Value> SmartDashboard::GetValue(wpi::StringRef keyName) {
+std::shared_ptr<nt::Value> SmartDashboard::GetValue(std::string_view keyName) {
   return Singleton::GetInstance().table->GetEntry(keyName).GetValue();
 }
 

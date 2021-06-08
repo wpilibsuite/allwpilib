@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable {
+public class Encoder implements CounterBase, Sendable, AutoCloseable {
   public enum IndexingType {
     kResetWhileHigh(0),
     kResetWhileLow(1),
@@ -51,8 +51,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
-  private PIDSourceType m_pidSource;
-  private final EncodingType m_encodingType;
 
   int m_encoder; // the HAL encoder object
 
@@ -73,8 +71,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
             m_bSource.getAnalogTriggerTypeForRouting(),
             reverseDirection,
             type.value);
-
-    m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
@@ -482,39 +478,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public int getSamplesToAverage() {
     return EncoderJNI.getEncoderSamplesToAverage(m_encoder);
-  }
-
-  /**
-   * Set which parameter of the encoder you are using as a process control variable. The encoder
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current value of the selected source parameter.
-   */
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
   }
 
   /**

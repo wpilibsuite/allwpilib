@@ -43,7 +43,7 @@ TEST(UvGetAddrInfo, BothNull) {
   });
 
   GetAddrInfo(
-      loop, [](const addrinfo&) { FAIL(); }, Twine::createNull());
+      loop, [](const addrinfo&) { FAIL(); }, "");
   loop->Run();
   ASSERT_EQ(fail_cb_called, 1);
 }

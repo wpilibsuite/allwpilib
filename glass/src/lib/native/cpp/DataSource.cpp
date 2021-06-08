@@ -4,13 +4,15 @@
 
 #include "glass/DataSource.h"
 
+#include <fmt/format.h>
+
 #include "glass/ContextInternal.h"
 
 using namespace glass;
 
 wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
-DataSource::DataSource(const wpi::Twine& id) : m_id{id.str()} {
+DataSource::DataSource(std::string_view id) : m_id{id} {
   auto it = gContext->sources.try_emplace(m_id, this);
   auto& srcName = it.first->getValue();
   m_name = srcName.name.get();
@@ -20,12 +22,11 @@ DataSource::DataSource(const wpi::Twine& id) : m_id{id.str()} {
   sourceCreated(m_id.c_str(), this);
 }
 
-DataSource::DataSource(const wpi::Twine& id, int index)
-    : DataSource{id + wpi::Twine('[') + wpi::Twine(index) + wpi::Twine(']')} {}
+DataSource::DataSource(std::string_view id, int index)
+    : DataSource{fmt::format("{}[{}]", id, index)} {}
 
-DataSource::DataSource(const wpi::Twine& id, int index, int index2)
-    : DataSource{id + wpi::Twine('[') + wpi::Twine(index) + wpi::Twine(',') +
-                 wpi::Twine(index2) + wpi::Twine(']')} {}
+DataSource::DataSource(std::string_view id, int index, int index2)
+    : DataSource{fmt::format("{}[{},{}]", id, index, index2)} {}
 
 DataSource::~DataSource() {
   if (!gContext) {
@@ -41,7 +42,7 @@ DataSource::~DataSource() {
   }
 }
 
-void DataSource::SetName(const wpi::Twine& name) {
+void DataSource::SetName(std::string_view name) {
   m_name->SetName(name);
 }
 
@@ -146,7 +147,7 @@ void DataSource::EmitDrag(ImGuiDragDropFlags flags) const {
   }
 }
 
-DataSource* DataSource::Find(wpi::StringRef id) {
+DataSource* DataSource::Find(std::string_view id) {
   auto it = gContext->sources.find(id);
   if (it == gContext->sources.end()) {
     return nullptr;

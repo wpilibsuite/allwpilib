@@ -6,9 +6,9 @@
 
 #include <typeinfo>
 
+#include "frc/Errors.h"
 #include "frc/RobotState.h"
 #include "frc/Timer.h"
-#include "frc/WPIErrors.h"
 #include "frc/commands/CommandGroup.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
@@ -19,51 +19,53 @@ using namespace frc;
 
 int Command::m_commandCounter = 0;
 
-Command::Command() : Command("", -1.0) {}
+Command::Command() : Command("", -1_s) {}
 
-Command::Command(const wpi::Twine& name) : Command(name, -1.0) {}
+Command::Command(std::string_view name) : Command(name, -1_s) {}
 
-Command::Command(double timeout) : Command("", timeout) {}
+Command::Command(units::second_t timeout) : Command("", timeout) {}
 
-Command::Command(Subsystem& subsystem) : Command("", -1.0) {
+Command::Command(Subsystem& subsystem) : Command("", -1_s) {
   Requires(&subsystem);
 }
 
-Command::Command(const wpi::Twine& name, double timeout) {
+Command::Command(std::string_view name, units::second_t timeout) {
   // We use -1.0 to indicate no timeout.
-  if (timeout < 0.0 && timeout != -1.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+  if (timeout < 0_s && timeout != -1_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_timeout = timeout;
 
   // If name contains an empty string
-  if (name.isTriviallyEmpty() ||
-      (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
+  if (name.empty()) {
     SendableRegistry::GetInstance().Add(
-        this, "Command_" + wpi::Twine(typeid(*this).name()));
+        this, fmt::format("Command_{}", typeid(*this).name()));
   } else {
     SendableRegistry::GetInstance().Add(this, name);
   }
 }
 
-Command::Command(const wpi::Twine& name, Subsystem& subsystem)
-    : Command(name, -1.0) {
+Command::Command(std::string_view name, Subsystem& subsystem)
+    : Command(name, -1_s) {
   Requires(&subsystem);
 }
 
-Command::Command(double timeout, Subsystem& subsystem) : Command("", timeout) {
+Command::Command(units::second_t timeout, Subsystem& subsystem)
+    : Command("", timeout) {
   Requires(&subsystem);
 }
 
-Command::Command(const wpi::Twine& name, double timeout, Subsystem& subsystem)
+Command::Command(std::string_view name, units::second_t timeout,
+                 Subsystem& subsystem)
     : Command(name, timeout) {
   Requires(&subsystem);
 }
 
-double Command::TimeSinceInitialized() const {
-  if (m_startTime < 0.0) {
-    return 0.0;
+units::second_t Command::TimeSinceInitialized() const {
+  if (m_startTime < 0_s) {
+    return 0_s;
   } else {
     return Timer::GetFPGATimestamp() - m_startTime;
   }
@@ -77,15 +79,15 @@ void Command::Requires(Subsystem* subsystem) {
   if (subsystem != nullptr) {
     m_requirements.insert(subsystem);
   } else {
-    wpi_setWPIErrorWithContext(NullParameter, "subsystem");
+    throw FRC_MakeError(err::NullParameter, "{}", "subsystem");
   }
 }
 
 void Command::Start() {
   LockChanges();
   if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(
-        CommandIllegalUse,
+    throw FRC_MakeError(
+        err::CommandIllegalUse, "{}",
         "Can not start a command that is part of a command group");
   }
 
@@ -115,8 +117,8 @@ bool Command::Run() {
 
 void Command::Cancel() {
   if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(
-        CommandIllegalUse,
+    throw FRC_MakeError(
+        err::CommandIllegalUse, "{}",
         "Can not cancel a command that is part of a command group");
   }
 
@@ -171,35 +173,35 @@ int Command::GetID() const {
   return m_commandID;
 }
 
-void Command::SetTimeout(double timeout) {
-  if (timeout < 0.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
+void Command::SetTimeout(units::second_t timeout) {
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   } else {
     m_timeout = timeout;
   }
 }
 
 bool Command::IsTimedOut() const {
-  return m_timeout != -1 && TimeSinceInitialized() >= m_timeout;
+  return m_timeout != -1_s && TimeSinceInitialized() >= m_timeout;
 }
 
-bool Command::AssertUnlocked(const std::string& message) {
+bool Command::AssertUnlocked(std::string_view message) {
   if (m_locked) {
-    std::string buf =
-        message + " after being started or being added to a command group";
-    wpi_setWPIErrorWithContext(CommandIllegalUse, buf);
-    return false;
+    throw FRC_MakeError(
+        err::CommandIllegalUse,
+        "{} after being started or being added to a command group", message);
   }
   return true;
 }
 
 void Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "parent");
+    throw FRC_MakeError(err::NullParameter, "{}", "parent");
   } else if (m_parent != nullptr) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "Can not give command to a command group after "
-                               "already being put in a command group");
+    throw FRC_MakeError(err::CommandIllegalUse, "{}",
+                        "Can not give command to a command group after "
+                        "already being put in a command group");
   } else {
     LockChanges();
     m_parent = parent;
@@ -266,7 +268,7 @@ void Command::Removed() {
 
 void Command::StartRunning() {
   m_running = true;
-  m_startTime = -1;
+  m_startTime = -1_s;
   m_completed = false;
 }
 
@@ -278,7 +280,7 @@ std::string Command::GetName() const {
   return SendableRegistry::GetInstance().GetName(this);
 }
 
-void Command::SetName(const wpi::Twine& name) {
+void Command::SetName(std::string_view name) {
   SendableRegistry::GetInstance().SetName(this, name);
 }
 
@@ -286,7 +288,7 @@ std::string Command::GetSubsystem() const {
   return SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
-void Command::SetSubsystem(const wpi::Twine& name) {
+void Command::SetSubsystem(std::string_view name) {
   SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 

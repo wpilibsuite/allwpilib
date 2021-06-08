@@ -24,7 +24,7 @@ class StorageTest {
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::IdMap& idmap() { return storage.m_idmap; }
 
-  Storage::Entry* GetEntry(StringRef name) {
+  Storage::Entry* GetEntry(std::string_view name) {
     auto i = storage.m_entries.find(name);
     return i == storage.m_entries.end() ? &tmp_entry : i->getValue();
   }

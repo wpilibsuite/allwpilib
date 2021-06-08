@@ -27,7 +27,7 @@ double Pivot::ReturnPIDInput() {
 }
 
 void Pivot::UsePIDOutput(double output) {
-  m_motor.PIDWrite(output);
+  m_motor.Set(output);
 }
 
 bool Pivot::IsAtUpperLimit() {

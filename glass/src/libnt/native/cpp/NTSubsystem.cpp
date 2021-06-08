@@ -4,16 +4,18 @@
 
 #include "glass/networktables/NTSubsystem.h"
 
+#include <fmt/format.h>
+
 using namespace glass;
 
-NTSubsystemModel::NTSubsystemModel(wpi::StringRef path)
+NTSubsystemModel::NTSubsystemModel(std::string_view path)
     : NTSubsystemModel(nt::GetDefaultInstance(), path) {}
 
-NTSubsystemModel::NTSubsystemModel(NT_Inst instance, wpi::StringRef path)
+NTSubsystemModel::NTSubsystemModel(NT_Inst instance, std::string_view path)
     : m_nt(instance),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_defaultCommand(m_nt.GetEntry(path + "/.default")),
-      m_currentCommand(m_nt.GetEntry(path + "/.command")) {
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_defaultCommand(m_nt.GetEntry(fmt::format("{}/.default", path))),
+      m_currentCommand(m_nt.GetEntry(fmt::format("{}/.command", path))) {
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_defaultCommand);
   m_nt.AddListener(m_currentCommand);

@@ -27,7 +27,6 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @return Name
    */
-  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }
@@ -37,7 +36,6 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @param name name
    */
-  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
@@ -47,7 +45,6 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @return Subsystem name
    */
-  @Override
   public String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
@@ -57,7 +54,6 @@ public abstract class SubsystemBase implements Subsystem, Sendable {
    *
    * @param subsystem subsystem name
    */
-  @Override
   public void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }

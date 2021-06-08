@@ -125,7 +125,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
   /**
    * Adds a command immediately to the {@link Scheduler}. This should only be called in the {@link
    * Scheduler#run()} loop. Any command with conflicting requirements will be removed, unless it is
-   * uninterruptable. Giving <code>null</code> does nothing.
+   * uninterruptible. Giving <code>null</code> does nothing.
    *
    * @param command the {@link Command} to add
    */
@@ -144,7 +144,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
     // Only add if not already in
     if (!m_commandTable.containsKey(command)) {
       // Check that the requirements can be had
-      Enumeration requirements = command.getRequirements();
+      Enumeration<?> requirements = command.getRequirements();
       while (requirements.hasMoreElements()) {
         Subsystem lock = (Subsystem) requirements.nextElement();
         if (lock.getCurrentCommand() != null && !lock.getCurrentCommand().isInterruptible()) {
@@ -210,7 +210,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
     }
 
     // Call every subsystem's periodic method
-    Enumeration subsystems = m_subsystems.getElements();
+    Enumeration<?> subsystems = m_subsystems.getElements();
     while (subsystems.hasMoreElements()) {
       ((Subsystem) subsystems.nextElement()).periodic();
     }
@@ -233,7 +233,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
     m_additions.removeAllElements();
 
     // Add in the defaults
-    Enumeration locks = m_subsystems.getElements();
+    Enumeration<?> locks = m_subsystems.getElements();
     while (locks.hasMoreElements()) {
       Subsystem lock = (Subsystem) locks.nextElement();
       if (lock.getCurrentCommand() == null) {
@@ -276,7 +276,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
     }
     element.remove();
 
-    Enumeration requirements = command.getRequirements();
+    Enumeration<?> requirements = command.getRequirements();
     while (requirements.hasMoreElements()) {
       ((Subsystem) requirements.nextElement()).setCurrentCommand(null);
     }

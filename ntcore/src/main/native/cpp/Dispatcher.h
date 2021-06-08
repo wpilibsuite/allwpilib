@@ -9,14 +9,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "IDispatcher.h"
 #include "INetworkConnection.h"
@@ -45,12 +45,12 @@ class DispatcherBase : public IDispatcher {
 
   unsigned int GetNetworkMode() const;
   void StartLocal();
-  void StartServer(const Twine& persist_filename,
+  void StartServer(std::string_view persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();
   void Stop();
   void SetUpdateRate(double interval);
-  void SetIdentity(const Twine& name);
+  void SetIdentity(std::string_view name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
   bool IsConnected() const;
@@ -78,11 +78,11 @@ class DispatcherBase : public IDispatcher {
   bool ClientHandshake(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs);
   bool ServerHandshake(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs);
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs);
 
   void ClientReconnect(unsigned int proto_rev = 0x0300);
 
@@ -132,11 +132,12 @@ class Dispatcher : public DispatcherBase {
              wpi::Logger& logger)
       : DispatcherBase(storage, notifier, logger) {}
 
-  void StartServer(const Twine& persist_filename, const char* listen_address,
-                   unsigned int port);
+  void StartServer(std::string_view persist_filename,
+                   const char* listen_address, unsigned int port);
 
   void SetServer(const char* server_name, unsigned int port);
-  void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+  void SetServer(
+      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
   void SetServerTeam(unsigned int team, unsigned int port);
 
   void SetServerOverride(const char* server_name, unsigned int port);

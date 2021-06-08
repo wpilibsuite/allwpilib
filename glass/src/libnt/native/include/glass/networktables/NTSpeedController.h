@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/hardware/SpeedController.h"
@@ -18,8 +18,8 @@ class NTSpeedControllerModel : public SpeedControllerModel {
  public:
   static constexpr const char* kType = "Speed Controller";
 
-  explicit NTSpeedControllerModel(wpi::StringRef path);
-  NTSpeedControllerModel(NT_Inst instance, wpi::StringRef path);
+  explicit NTSpeedControllerModel(std::string_view path);
+  NTSpeedControllerModel(NT_Inst instance, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   const char* GetSimDevice() const override { return nullptr; }

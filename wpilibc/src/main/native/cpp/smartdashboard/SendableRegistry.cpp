@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <fmt/format.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
 #include <wpi/UidVector.h>
@@ -26,16 +27,12 @@ struct SendableRegistry::Impl {
     bool liveWindow = false;
     wpi::SmallVector<std::shared_ptr<void>, 2> data;
 
-    void SetName(const wpi::Twine& moduleType, int channel) {
-      name =
-          (moduleType + wpi::Twine('[') + wpi::Twine(channel) + wpi::Twine(']'))
-              .str();
+    void SetName(std::string_view moduleType, int channel) {
+      name = fmt::format("{}[{}]", moduleType, channel);
     }
 
-    void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel) {
-      name = (moduleType + wpi::Twine('[') + wpi::Twine(moduleNumber) +
-              wpi::Twine(',') + wpi::Twine(channel) + wpi::Twine(']'))
-                 .str();
+    void SetName(std::string_view moduleType, int moduleNumber, int channel) {
+      name = fmt::format("{}[{},{}]", moduleType, moduleNumber, channel);
     }
   };
 
@@ -66,14 +63,14 @@ SendableRegistry& SendableRegistry::GetInstance() {
   return instance;
 }
 
-void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& name) {
+void SendableRegistry::Add(Sendable* sendable, std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
-  comp.name = name.str();
+  comp.name = name;
 }
 
-void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::Add(Sendable* sendable, std::string_view moduleType,
                            int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
@@ -81,7 +78,7 @@ void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& moduleType,
   comp.SetName(moduleType, channel);
 }
 
-void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::Add(Sendable* sendable, std::string_view moduleType,
                            int moduleNumber, int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
@@ -89,24 +86,24 @@ void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& moduleType,
   comp.SetName(moduleType, moduleNumber, channel);
 }
 
-void SendableRegistry::Add(Sendable* sendable, const wpi::Twine& subsystem,
-                           const wpi::Twine& name) {
+void SendableRegistry::Add(Sendable* sendable, std::string_view subsystem,
+                           std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
-  comp.name = name.str();
-  comp.subsystem = subsystem.str();
+  comp.name = name;
+  comp.subsystem = subsystem;
 }
 
-void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& name) {
+void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.liveWindow = true;
-  comp.name = name.str();
+  comp.name = name;
 }
 
-void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
                              int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
@@ -115,7 +112,7 @@ void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& moduleType,
   comp.SetName(moduleType, channel);
 }
 
-void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
                              int moduleNumber, int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
@@ -124,14 +121,14 @@ void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& moduleType,
   comp.SetName(moduleType, moduleNumber, channel);
 }
 
-void SendableRegistry::AddLW(Sendable* sendable, const wpi::Twine& subsystem,
-                             const wpi::Twine& name) {
+void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
+                             std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.liveWindow = true;
-  comp.name = name.str();
-  comp.subsystem = subsystem.str();
+  comp.name = name;
+  comp.subsystem = subsystem;
 }
 
 void SendableRegistry::AddChild(Sendable* parent, Sendable* child) {
@@ -204,17 +201,17 @@ std::string SendableRegistry::GetName(const Sendable* sendable) const {
   return m_impl->components[it->getSecond() - 1]->name;
 }
 
-void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& name) {
+void SendableRegistry::SetName(Sendable* sendable, std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
   if (it == m_impl->componentMap.end() ||
       !m_impl->components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->name = name.str();
+  m_impl->components[it->getSecond() - 1]->name = name;
 }
 
-void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::SetName(Sendable* sendable, std::string_view moduleType,
                                int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
@@ -225,7 +222,7 @@ void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& moduleType,
   m_impl->components[it->getSecond() - 1]->SetName(moduleType, channel);
 }
 
-void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& moduleType,
+void SendableRegistry::SetName(Sendable* sendable, std::string_view moduleType,
                                int moduleNumber, int channel) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
@@ -237,8 +234,8 @@ void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& moduleType,
                                                    channel);
 }
 
-void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& subsystem,
-                               const wpi::Twine& name) {
+void SendableRegistry::SetName(Sendable* sendable, std::string_view subsystem,
+                               std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
   if (it == m_impl->componentMap.end() ||
@@ -246,8 +243,8 @@ void SendableRegistry::SetName(Sendable* sendable, const wpi::Twine& subsystem,
     return;
   }
   auto& comp = *m_impl->components[it->getSecond() - 1];
-  comp.name = name.str();
-  comp.subsystem = subsystem.str();
+  comp.name = name;
+  comp.subsystem = subsystem;
 }
 
 std::string SendableRegistry::GetSubsystem(const Sendable* sendable) const {
@@ -261,14 +258,14 @@ std::string SendableRegistry::GetSubsystem(const Sendable* sendable) const {
 }
 
 void SendableRegistry::SetSubsystem(Sendable* sendable,
-                                    const wpi::Twine& subsystem) {
+                                    std::string_view subsystem) {
   std::scoped_lock lock(m_impl->mutex);
   auto it = m_impl->componentMap.find(sendable);
   if (it == m_impl->componentMap.end() ||
       !m_impl->components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->subsystem = subsystem.str();
+  m_impl->components[it->getSecond() - 1]->subsystem = subsystem;
 }
 
 int SendableRegistry::GetDataHandle() {
@@ -352,7 +349,7 @@ Sendable* SendableRegistry::GetSendable(UID uid) {
 }
 
 void SendableRegistry::Publish(UID sendableUid,
-                               std::shared_ptr<NetworkTable> table) {
+                               std::shared_ptr<nt::NetworkTable> table) {
   std::scoped_lock lock(m_impl->mutex);
   if (sendableUid == 0 || (sendableUid - 1) >= m_impl->components.size() ||
       !m_impl->components[sendableUid - 1]) {

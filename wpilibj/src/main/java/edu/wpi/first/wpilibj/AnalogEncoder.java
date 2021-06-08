@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -23,6 +24,15 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   protected SimDouble m_simPosition;
 
   /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  public AnalogEncoder(int channel) {
+    this(new AnalogInput(channel));
+  }
+
+  /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.
    *
    * @param analogInput the analog input to attach to
@@ -39,7 +49,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_simDevice = SimDevice.create("AnalogEncoder", m_analogInput.getChannel());
 
     if (m_simDevice != null) {
-      m_simPosition = m_simDevice.createDouble("Position", false, 0.0);
+      m_simPosition = m_simDevice.createDouble("Position", Direction.kInput, 0.0);
     }
 
     // Limits need to be 25% from each end

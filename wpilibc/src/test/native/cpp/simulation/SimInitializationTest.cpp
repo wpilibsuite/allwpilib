@@ -12,12 +12,12 @@
 #include "frc/simulation/AnalogOutputSim.h"
 #include "frc/simulation/AnalogTriggerSim.h"
 #include "frc/simulation/BuiltInAccelerometerSim.h"
+#include "frc/simulation/CTREPCMSim.h"
 #include "frc/simulation/DIOSim.h"
 #include "frc/simulation/DigitalPWMSim.h"
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/DutyCycleSim.h"
 #include "frc/simulation/EncoderSim.h"
-#include "frc/simulation/PCMSim.h"
 #include "frc/simulation/PDPSim.h"
 #include "frc/simulation/PWMSim.h"
 #include "frc/simulation/RelaySim.h"
@@ -40,7 +40,7 @@ TEST(SimInitializationTests, TestAllInitialize) {
   (void)dssim;
   EncoderSim esim = EncoderSim::CreateForIndex(0);
   (void)esim;
-  PCMSim pcmsim{0};
+  CTREPCMSim pcmsim{0};
   PDPSim pdpsim{0};
   PWMSim pwmsim{0};
   RelaySim rsim{0};

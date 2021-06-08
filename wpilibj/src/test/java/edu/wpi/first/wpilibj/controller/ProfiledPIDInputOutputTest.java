@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +65,22 @@ class ProfiledPIDInputOutputTest {
 
     // Error must be less than half the input range at all times
     assertTrue(Math.abs(m_controller.getSetpoint().position - kMeasurement) < Math.PI);
+  }
+
+  @Test
+  void continuousInputTest4() {
+    m_controller.setP(1);
+    m_controller.enableContinuousInput(0, 2.0 * Math.PI);
+
+    final double kSetpoint = 2.78;
+    final double kMeasurement = 3.12;
+    final double kGoal = 2.71;
+
+    m_controller.reset(kSetpoint);
+    assertTrue(m_controller.calculate(kMeasurement, kGoal) < 0.0);
+
+    // Error must be less than half the input range at all times
+    assertTrue(Math.abs(m_controller.getSetpoint().position - kMeasurement) < Math.PI / 2.0);
   }
 
   @Test

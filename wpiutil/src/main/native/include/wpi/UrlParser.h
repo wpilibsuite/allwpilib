@@ -5,7 +5,8 @@
 #ifndef WPIUTIL_WPI_URLPARSER_H_
 #define WPIUTIL_WPI_URLPARSER_H_
 
-#include "wpi/StringRef.h"
+#include <string_view>
+
 #include "wpi/http_parser.h"
 
 namespace wpi {
@@ -21,7 +22,7 @@ class UrlParser {
    * @param in input
    * @param isConnect
    */
-  UrlParser(StringRef in, bool isConnect) {
+  UrlParser(std::string_view in, bool isConnect) {
     m_data = in;
     http_parser_url_init(&m_url);
     m_error = http_parser_parse_url(in.data(), in.size(), isConnect, &m_url);
@@ -50,41 +51,41 @@ class UrlParser {
     return (m_url.field_set & (1 << UF_USERINFO)) != 0;
   }
 
-  StringRef GetSchema() const {
+  std::string_view GetSchema() const {
     return m_data.substr(m_url.field_data[UF_SCHEMA].off,
                          m_url.field_data[UF_SCHEMA].len);
   }
 
-  StringRef GetHost() const {
+  std::string_view GetHost() const {
     return m_data.substr(m_url.field_data[UF_HOST].off,
                          m_url.field_data[UF_HOST].len);
   }
 
   unsigned int GetPort() const { return m_url.port; }
 
-  StringRef GetPath() const {
+  std::string_view GetPath() const {
     return m_data.substr(m_url.field_data[UF_PATH].off,
                          m_url.field_data[UF_PATH].len);
   }
 
-  StringRef GetQuery() const {
+  std::string_view GetQuery() const {
     return m_data.substr(m_url.field_data[UF_QUERY].off,
                          m_url.field_data[UF_QUERY].len);
   }
 
-  StringRef GetFragment() const {
+  std::string_view GetFragment() const {
     return m_data.substr(m_url.field_data[UF_FRAGMENT].off,
                          m_url.field_data[UF_FRAGMENT].len);
   }
 
-  StringRef GetUserInfo() const {
+  std::string_view GetUserInfo() const {
     return m_data.substr(m_url.field_data[UF_USERINFO].off,
                          m_url.field_data[UF_USERINFO].len);
   }
 
  private:
   bool m_error;
-  StringRef m_data;
+  std::string_view m_data;
   http_parser_url m_url;
 };
 

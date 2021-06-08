@@ -13,7 +13,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/mutex.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 #include "frc/buttons/ButtonScheduler.h"
 #include "frc/commands/Command.h"
 #include "frc/commands/Subsystem.h"
@@ -64,9 +64,8 @@ void Scheduler::AddButton(ButtonScheduler* button) {
 }
 
 void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
-  if (subsystem == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "subsystem");
-    return;
+  if (!subsystem) {
+    throw FRC_MakeError(err::NullParameter, "{}", "subsystem");
   }
   m_impl->subsystems.insert(subsystem);
 }
@@ -109,8 +108,8 @@ void Scheduler::Run() {
     for (auto& addition : m_impl->additions) {
       // Check to make sure no adding during adding
       if (m_impl->adding) {
-        wpi_setWPIErrorWithContext(IncompatibleState,
-                                   "Can not start command from cancel method");
+        FRC_ReportError(warn::IncompatibleState, "{}",
+                        "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(addition);
       }
@@ -122,8 +121,8 @@ void Scheduler::Run() {
   for (auto& subsystem : m_impl->subsystems) {
     if (subsystem->GetCurrentCommand() == nullptr) {
       if (m_impl->adding) {
-        wpi_setWPIErrorWithContext(IncompatibleState,
-                                   "Can not start command from cancel method");
+        FRC_ReportError(warn::IncompatibleState, "{}",
+                        "Can not start command from cancel method");
       } else {
         m_impl->ProcessCommandAddition(subsystem->GetDefaultCommand());
       }
@@ -133,9 +132,8 @@ void Scheduler::Run() {
 }
 
 void Scheduler::Remove(Command* command) {
-  if (command == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "command");
-    return;
+  if (!command) {
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
 
   m_impl->Remove(command);
@@ -167,7 +165,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
   builder.SetUpdateTable([=]() {
     // Get the list of possible commands to cancel
     auto new_toCancel = cancelEntry.GetValue();
-    wpi::ArrayRef<double> toCancel;
+    wpi::span<const double> toCancel;
     if (new_toCancel) {
       toCancel = new_toCancel->GetDoubleArray();
     }

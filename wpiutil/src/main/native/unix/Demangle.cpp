@@ -12,14 +12,12 @@
 
 namespace wpi {
 
-std::string Demangle(const Twine& mangledSymbol) {
-  SmallString<128> buf;
+std::string Demangle(std::string_view mangledSymbol) {
+  SmallString<128> buf{mangledSymbol};
   size_t length;
   int32_t status;
 
-  char* symbol =
-      abi::__cxa_demangle(mangledSymbol.toNullTerminatedStringRef(buf).data(),
-                          nullptr, &length, &status);
+  char* symbol = abi::__cxa_demangle(buf.c_str(), nullptr, &length, &status);
   if (status == 0) {
     std::string rv{symbol};
     std::free(symbol);
@@ -27,7 +25,7 @@ std::string Demangle(const Twine& mangledSymbol) {
   }
 
   // If everything else failed, just return the mangled symbol
-  return mangledSymbol.str();
+  return std::string{mangledSymbol};
 }
 
 }  // namespace wpi

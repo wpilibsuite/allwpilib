@@ -11,9 +11,10 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
+#include <wpi/StackTrace.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -21,24 +22,16 @@ using namespace frc;
 
 AnalogOutput::AnalogOutput(int channel) {
   if (!SensorUtil::CheckAnalogOutputChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "analog output " + wpi::Twine(channel));
-    m_channel = std::numeric_limits<int>::max();
-    m_port = HAL_kInvalidHandle;
-    return;
+    throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", channel);
   }
 
   m_channel = channel;
 
   HAL_PortHandle port = HAL_GetPort(m_channel);
   int32_t status = 0;
-  m_port = HAL_InitializeAnalogOutputPort(port, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumAnalogOutputs(), channel);
-    m_channel = std::numeric_limits<int>::max();
-    m_port = HAL_kInvalidHandle;
-    return;
-  }
+  std::string stackTrace = wpi::GetStackTrace(1);
+  m_port = HAL_InitializeAnalogOutputPort(port, stackTrace.c_str(), &status);
+  FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
   SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
@@ -51,16 +44,13 @@ AnalogOutput::~AnalogOutput() {
 void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
-
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 double AnalogOutput::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetAnalogOutput(m_port, &status);
-
-  wpi_setHALError(status);
-
+  FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   return voltage;
 }
 

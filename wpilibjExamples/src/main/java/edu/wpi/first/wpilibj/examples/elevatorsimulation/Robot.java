@@ -4,19 +4,19 @@
 
 package edu.wpi.first.wpilibj.examples.elevatorsimulation;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 
 /** This is a sample program to demonstrate the use of elevator simulation with existing code. */
 public class Robot extends TimedRobot {
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   // Standard classes for controlling our elevator
   private final PIDController m_controller = new PIDController(kElevatorKp, 0, 0);
   private final Encoder m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-  private final PWMVictorSPX m_motor = new PWMVictorSPX(kMotorPort);
+  private final PWMSparkMax m_motor = new PWMSparkMax(kMotorPort);
   private final Joystick m_joystick = new Joystick(kJoystickPort);
 
   // Simulation classes help us simulate what's going on, including gravity.

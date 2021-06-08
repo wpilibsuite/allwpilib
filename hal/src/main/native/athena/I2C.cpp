@@ -12,6 +12,8 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
+
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "hal/DIO.h"
@@ -56,7 +58,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
     }
     int handle = open("/dev/i2c-2", O_RDWR);
     if (handle < 0) {
-      std::printf("Failed to open onboard i2c bus: %s\n", std::strerror(errno));
+      fmt::print("Failed to open onboard i2c bus: {}\n", std::strerror(errno));
       return;
     }
     i2COnBoardHandle = handle;
@@ -67,11 +69,11 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
       return;
     }
     if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
-             HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(24), false, nullptr, status)) == HAL_kInvalidHandle) {
       return;
     }
     if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
-             HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
+             HAL_GetPort(25), false, nullptr, status)) == HAL_kInvalidHandle) {
       HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
       return;
     }
@@ -79,7 +81,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
         digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
     int handle = open("/dev/i2c-1", O_RDWR);
     if (handle < 0) {
-      std::printf("Failed to open MXP i2c bus: %s\n", std::strerror(errno));
+      fmt::print("Failed to open MXP i2c bus: {}\n", std::strerror(errno));
       return;
     }
     i2CMXPHandle = handle;

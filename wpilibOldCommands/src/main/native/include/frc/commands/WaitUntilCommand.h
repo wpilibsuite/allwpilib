@@ -4,7 +4,9 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string_view>
+
+#include <units/time.h>
 
 #include "frc/commands/Command.h"
 
@@ -20,9 +22,9 @@ class WaitUntilCommand : public Command {
    *
    * @see CommandGroup
    */
-  explicit WaitUntilCommand(double time);
+  explicit WaitUntilCommand(units::second_t time);
 
-  WaitUntilCommand(const wpi::Twine& name, double time);
+  WaitUntilCommand(std::string_view name, units::second_t time);
 
   ~WaitUntilCommand() override = default;
 
@@ -36,7 +38,7 @@ class WaitUntilCommand : public Command {
   bool IsFinished() override;
 
  private:
-  double m_time;
+  units::second_t m_time;
 };
 
 }  // namespace frc

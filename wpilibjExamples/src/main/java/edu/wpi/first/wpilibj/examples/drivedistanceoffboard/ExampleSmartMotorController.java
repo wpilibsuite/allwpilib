@@ -4,19 +4,21 @@
 
 package edu.wpi.first.wpilibj.examples.drivedistanceoffboard;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 /**
  * A simplified stub class that simulates the API of a common "smart" motor controller.
  *
  * <p>Has no actual functionality.
  */
-public class ExampleSmartMotorController implements SpeedController {
+public class ExampleSmartMotorController implements MotorController {
   public enum PIDMode {
     kPosition,
     kVelocity,
     kMovementWitchcraft
   }
+
+  double m_value;
 
   /**
    * Creates a new ExampleSmartMotorController.
@@ -73,11 +75,13 @@ public class ExampleSmartMotorController implements SpeedController {
   public void resetEncoder() {}
 
   @Override
-  public void set(double speed) {}
+  public void set(double speed) {
+    m_value = speed;
+  }
 
   @Override
   public double get() {
-    return 0;
+    return m_value;
   }
 
   @Override
@@ -93,7 +97,4 @@ public class ExampleSmartMotorController implements SpeedController {
 
   @Override
   public void stopMotor() {}
-
-  @Override
-  public void pidWrite(double output) {}
 }

@@ -9,7 +9,6 @@
 #include <hal/Types.h>
 
 #include "frc/AnalogTriggerOutput.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -19,9 +18,7 @@ class AnalogInput;
 class DutyCycle;
 class SendableBuilder;
 
-class AnalogTrigger : public ErrorBase,
-                      public Sendable,
-                      public SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
@@ -52,8 +49,8 @@ class AnalogTrigger : public ErrorBase,
 
   ~AnalogTrigger() override;
 
-  AnalogTrigger(AnalogTrigger&& rhs);
-  AnalogTrigger& operator=(AnalogTrigger&& rhs);
+  AnalogTrigger(AnalogTrigger&&) = default;
+  AnalogTrigger& operator=(AnalogTrigger&&) = default;
 
   /**
    * Set the upper and lower limits of the analog trigger.
@@ -154,6 +151,8 @@ class AnalogTrigger : public ErrorBase,
   void InitSendable(SendableBuilder& builder) override;
 
  private:
+  int GetSourceChannel() const;
+
   hal::Handle<HAL_AnalogTriggerHandle> m_trigger;
   AnalogInput* m_analogInput = nullptr;
   DutyCycle* m_dutyCycle = nullptr;

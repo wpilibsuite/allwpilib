@@ -4,7 +4,7 @@
 
 #include <units/math.h>
 #include <units/time.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
@@ -15,7 +15,8 @@
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
 static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * wpi::math::pi / 180.0};
+static constexpr units::radian_t kAngularTolerance{2.0 * wpi::numbers::pi /
+                                                   180.0};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
   frc::HolonomicDriveController controller{
@@ -46,4 +47,18 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(frc::AngleModulus(robotPose.Rotation().Radians()), 0_rad,
                     kAngularTolerance);
+}
+
+TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
+  frc::HolonomicDriveController controller{
+      frc2::PIDController{1, 0, 0}, frc2::PIDController{1, 0, 0},
+      frc::ProfiledPIDController<units::radian>{
+          1, 0, 0,
+          frc::TrapezoidProfile<units::radian>::Constraints{
+              4_rad_per_s, 2_rad_per_s / 1_s}}};
+
+  frc::ChassisSpeeds speeds = controller.Calculate(
+      frc::Pose2d(0_m, 0_m, 1.57_rad), frc::Pose2d(), 0_mps, 1.57_rad);
+
+  EXPECT_EQ(0, speeds.omega.to<double>());
 }

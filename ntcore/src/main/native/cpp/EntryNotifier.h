@@ -8,6 +8,7 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <wpi/CallbackManager.h>
 
@@ -29,13 +30,13 @@ struct EntryListenerData
   EntryListenerData() = default;
   EntryListenerData(
       std::function<void(const EntryNotification& event)> callback_,
-      StringRef prefix_, unsigned int flags_)
+      std::string_view prefix_, unsigned int flags_)
       : CallbackListenerData(callback_), prefix(prefix_), flags(flags_) {}
   EntryListenerData(
       std::function<void(const EntryNotification& event)> callback_,
       NT_Entry entry_, unsigned int flags_)
       : CallbackListenerData(callback_), entry(entry_), flags(flags_) {}
-  EntryListenerData(unsigned int poller_uid_, StringRef prefix_,
+  EntryListenerData(unsigned int poller_uid_, std::string_view prefix_,
                     unsigned int flags_)
       : CallbackListenerData(poller_uid_), prefix(prefix_), flags(flags_) {}
   EntryListenerData(unsigned int poller_uid_, NT_Entry entry_,
@@ -85,15 +86,15 @@ class EntryNotifier
   bool local_notifiers() const override;
 
   unsigned int Add(std::function<void(const EntryNotification& event)> callback,
-                   wpi::StringRef prefix, unsigned int flags) override;
+                   std::string_view prefix, unsigned int flags) override;
   unsigned int Add(std::function<void(const EntryNotification& event)> callback,
                    unsigned int local_id, unsigned int flags) override;
-  unsigned int AddPolled(unsigned int poller_uid, wpi::StringRef prefix,
+  unsigned int AddPolled(unsigned int poller_uid, std::string_view prefix,
                          unsigned int flags) override;
   unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                          unsigned int flags) override;
 
-  void NotifyEntry(unsigned int local_id, StringRef name,
+  void NotifyEntry(unsigned int local_id, std::string_view name,
                    std::shared_ptr<Value> value, unsigned int flags,
                    unsigned int only_listener = UINT_MAX) override;
 

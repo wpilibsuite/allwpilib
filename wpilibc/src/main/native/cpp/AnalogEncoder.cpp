@@ -4,23 +4,27 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <wpi/NullDeleter.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/Counter.h"
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
+AnalogEncoder::AnalogEncoder(int channel)
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
+
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
-    : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
-    : m_analogInput{analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
@@ -69,7 +73,8 @@ units::turn_t AnalogEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  FRC_ReportError(
+      warn::Warning, "{}",
       "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
       "value");
   return m_lastPosition;

@@ -4,24 +4,26 @@
 
 #include "glass/networktables/NTDifferentialDrive.h"
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <wpi/MathExtras.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-NTDifferentialDriveModel::NTDifferentialDriveModel(wpi::StringRef path)
+NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
     : NTDifferentialDriveModel(nt::GetDefaultInstance(), path) {}
 
 NTDifferentialDriveModel::NTDifferentialDriveModel(NT_Inst instance,
-                                                   wpi::StringRef path)
+                                                   std::string_view path)
     : m_nt(instance),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_controllable(m_nt.GetEntry(path + "/.controllable")),
-      m_lPercent(m_nt.GetEntry(path + "/Left Motor Speed")),
-      m_rPercent(m_nt.GetEntry(path + "/Right Motor Speed")),
-      m_nameValue(path.rsplit('/').second),
-      m_lPercentData("NTDiffDriveL:" + path),
-      m_rPercentData("NTDiffDriveR:" + path) {
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
+      m_lPercent(m_nt.GetEntry(fmt::format("{}/Left Motor Speed", path))),
+      m_rPercent(m_nt.GetEntry(fmt::format("{}/Right Motor Speed", path))),
+      m_nameValue(wpi::rsplit(path, '/').second),
+      m_lPercentData(fmt::format("NTDiffDriveL:{}", path)),
+      m_rPercentData(fmt::format("NTDiffDriveR:{}", path)) {
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_controllable);
   m_nt.AddListener(m_lPercent);

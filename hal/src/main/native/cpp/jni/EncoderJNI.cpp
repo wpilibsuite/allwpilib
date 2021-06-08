@@ -267,10 +267,6 @@ Java_edu_wpi_first_hal_EncoderJNI_setEncoderSamplesToAverage
 {
   int32_t status = 0;
   HAL_SetEncoderSamplesToAverage((HAL_EncoderHandle)id, value, &status);
-  if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, value, 1, 127);
-    return;
-  }
   CheckStatus(env, status);
 }
 

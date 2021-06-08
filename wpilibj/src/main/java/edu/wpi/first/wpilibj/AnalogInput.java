@@ -25,13 +25,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
+public class AnalogInput implements Sendable, AutoCloseable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Construct an analog channel.
@@ -320,26 +319,6 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
    */
   public static double getGlobalSampleRate() {
     return AnalogJNI.getAnalogSampleRate();
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the average voltage for use with PIDController.
-   *
-   * @return the average voltage
-   */
-  @Override
-  public double pidGet() {
-    return getAverageVoltage();
   }
 
   /**

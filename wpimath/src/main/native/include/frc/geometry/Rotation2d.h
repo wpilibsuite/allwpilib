@@ -60,18 +60,6 @@ class Rotation2d {
   Rotation2d operator+(const Rotation2d& other) const;
 
   /**
-   * Adds a rotation to the current rotation.
-   *
-   * This is similar to the + operator except that it mutates the current
-   * object.
-   *
-   * @param other The rotation to add.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Rotation2d& operator+=(const Rotation2d& other);
-
-  /**
    * Subtracts the new rotation from the current rotation and returns the new
    * rotation.
    *
@@ -83,18 +71,6 @@ class Rotation2d {
    * @return The difference between the two rotations.
    */
   Rotation2d operator-(const Rotation2d& other) const;
-
-  /**
-   * Subtracts the new rotation from the current rotation.
-   *
-   * This is similar to the - operator except that it mutates the current
-   * object.
-   *
-   * @param other The rotation to subtract.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Rotation2d& operator-=(const Rotation2d& other);
 
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
@@ -131,10 +107,11 @@ class Rotation2d {
   /**
    * Adds the new rotation to the current rotation using a rotation matrix.
    *
+   * <pre>
    * [cos_new]   [other.cos, -other.sin][cos]
    * [sin_new] = [other.sin,  other.cos][sin]
-   *
-   * value_new = std::atan2(cos_new, sin_new)
+   * value_new = std::atan2(sin_new, cos_new)
+   * </pre>
    *
    * @param other The rotation to rotate by.
    *

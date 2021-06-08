@@ -18,7 +18,7 @@ void CommandBase::AddRequirements(
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
-void CommandBase::AddRequirements(wpi::ArrayRef<Subsystem*> requirements) {
+void CommandBase::AddRequirements(wpi::span<Subsystem* const> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
@@ -30,7 +30,7 @@ wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }
 
-void CommandBase::SetName(const wpi::Twine& name) {
+void CommandBase::SetName(std::string_view name) {
   frc::SendableRegistry::GetInstance().SetName(this, name);
 }
 
@@ -42,7 +42,7 @@ std::string CommandBase::GetSubsystem() const {
   return frc::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
-void CommandBase::SetSubsystem(const wpi::Twine& subsystem) {
+void CommandBase::SetSubsystem(std::string_view subsystem) {
   frc::SendableRegistry::GetInstance().SetSubsystem(this, subsystem);
 }
 

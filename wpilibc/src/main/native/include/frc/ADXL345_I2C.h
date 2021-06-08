@@ -6,7 +6,6 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -23,8 +22,7 @@ class SendableBuilder;
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public ErrorBase,
-                    public Accelerometer,
+class ADXL345_I2C : public Accelerometer,
                     public Sendable,
                     public SendableHelper<ADXL345_I2C> {
  public:

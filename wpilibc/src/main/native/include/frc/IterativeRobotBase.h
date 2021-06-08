@@ -161,6 +161,11 @@ class IterativeRobotBase : public RobotBase {
   void SetNetworkTablesFlushEnabled(bool enabled);
 
   /**
+   * Gets time period between calls to Periodic() functions.
+   */
+  units::second_t GetPeriod() const;
+
+  /**
    * Constructor for IterativeRobotBase.
    *
    * @param period Period in seconds.
@@ -186,12 +191,11 @@ class IterativeRobotBase : public RobotBase {
 
   void LoopFunc();
 
-  units::second_t m_period;
-
  private:
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
 
   Mode m_lastMode = Mode::kNone;
+  units::second_t m_period;
   Watchdog m_watchdog;
   bool m_ntFlushEnabled = false;
 

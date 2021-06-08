@@ -98,11 +98,14 @@ class HolonomicDriveController {
 
  private:
   Pose2d m_poseError;
+  Rotation2d m_rotationError;
   Pose2d m_poseTolerance;
   bool m_enabled = true;
 
   frc2::PIDController m_xController;
   frc2::PIDController m_yController;
   ProfiledPIDController<units::radian> m_thetaController;
+
+  bool m_firstRun = true;
 };
 }  // namespace frc

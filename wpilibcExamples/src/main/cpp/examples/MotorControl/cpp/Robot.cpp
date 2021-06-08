@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -20,7 +20,7 @@ class Robot : public frc::TimedRobot {
 
  private:
   frc::Joystick m_stick{0};
-  frc::PWMVictorSPX m_motor{0};
+  frc::PWMSparkMax m_motor{0};
 };
 
 #ifndef RUNNING_FRC_TESTS

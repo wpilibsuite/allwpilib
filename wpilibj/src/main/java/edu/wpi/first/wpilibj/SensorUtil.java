@@ -11,7 +11,6 @@ import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.RelayJNI;
-import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
@@ -48,22 +47,6 @@ public final class SensorUtil {
 
   /** Number of PCM Modules. */
   public static final int kPCMModules = PortsJNI.getNumPCMModules();
-
-  /**
-   * Verify that the solenoid module is correct.
-   *
-   * @param moduleNumber The solenoid module module number to check.
-   */
-  public static void checkSolenoidModule(final int moduleNumber) {
-    if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
-          .append(kPCMModules)
-          .append(", Requested: ")
-          .append(moduleNumber);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
@@ -151,22 +134,6 @@ public final class SensorUtil {
   }
 
   /**
-   * Verify that the solenoid channel number is within limits. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkSolenoidChannel(final int channel) {
-    if (!SolenoidJNI.checkSolenoidChannel(channel)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
-          .append(kSolenoidChannels)
-          .append(", Requested: ")
-          .append(channel);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
-
-  /**
    * Verify that the power distribution channel number is within limits. Channel numbers are
    * 0-based.
    *
@@ -204,7 +171,8 @@ public final class SensorUtil {
    *
    * @return The number of the default solenoid module.
    */
-  public static int getDefaultSolenoidModule() {
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static int getDefaultCTREPCMModule() {
     return 0;
   }
 

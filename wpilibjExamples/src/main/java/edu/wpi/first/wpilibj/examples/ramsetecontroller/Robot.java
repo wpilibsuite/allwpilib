@@ -4,19 +4,21 @@
 
 package edu.wpi.first.wpilibj.examples.ramsetecontroller;
 
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.List;
 
 public class Robot extends TimedRobot {
@@ -36,6 +38,9 @@ public class Robot extends TimedRobot {
   // The timer to use during the autonomous period.
   private Timer m_timer;
 
+  // Create Field2d for robot and trajectory visualizations.
+  private Field2d m_field;
+
   @Override
   public void robotInit() {
     // Create the trajectory to follow in autonomous. It is best to initialize
@@ -46,6 +51,13 @@ public class Robot extends TimedRobot {
             List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
             new Pose2d(3, 0, Rotation2d.fromDegrees(0)),
             new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
+
+    // Create and push Field2d to SmartDashboard.
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
+
+    // Push the trajectory to Field2d.
+    m_field.getObject("traj").setTrajectory(m_trajectory);
   }
 
   @Override
@@ -62,6 +74,9 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // Update odometry.
     m_drive.updateOdometry();
+
+    // Update robot position on Field2d.
+    m_field.setRobotPose(m_drive.getPose());
 
     if (m_timer.get() < m_trajectory.getTotalTimeSeconds()) {
       // Get the desired pose from the trajectory.

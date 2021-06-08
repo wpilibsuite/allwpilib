@@ -5,7 +5,6 @@
 #include "glass/other/Log.h"
 
 #include <imgui.h>
-#include <wpi/raw_ostream.h>
 
 using namespace glass;
 
@@ -17,19 +16,22 @@ void LogData::Clear() {
   m_lineOffsets.push_back(0);
 }
 
-void LogData::Append(const wpi::Twine& msg) {
+void LogData::Append(std::string_view msg) {
   if (m_lineOffsets.size() >= m_maxLines) {
     Clear();
   }
 
   size_t oldSize = m_buf.size();
-  wpi::raw_vector_ostream os{m_buf};
-  msg.print(os);
+  m_buf.append(msg);
   for (size_t newSize = m_buf.size(); oldSize < newSize; ++oldSize) {
     if (m_buf[oldSize] == '\n') {
       m_lineOffsets.push_back(oldSize + 1);
     }
   }
+}
+
+const std::string& LogData::GetBuffer() {
+  return m_buf;
 }
 
 void glass::DisplayLog(LogData* data, bool autoScroll) {
@@ -64,6 +66,11 @@ void LogView::Display() {
     ImGui::Checkbox("Auto-scroll", &m_autoScroll);
     if (ImGui::Selectable("Clear")) {
       m_data->Clear();
+    }
+    const auto& buf = m_data->GetBuffer();
+    if (ImGui::Selectable("Copy to Clipboard", false,
+                          buf.empty() ? ImGuiSelectableFlags_Disabled : 0)) {
+      ImGui::SetClipboardText(buf.c_str());
     }
     ImGui::EndPopup();
   }

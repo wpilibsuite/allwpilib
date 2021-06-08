@@ -17,7 +17,7 @@ void Provider<Functions>::GlobalInit() {
 }
 
 template <typename Functions>
-void Provider<Functions>::ShowDefault(wpi::StringRef name) {
+void Provider<Functions>::ShowDefault(std::string_view name) {
   auto win = GetWindow(name);
   if (win) {
     return;
@@ -30,7 +30,7 @@ void Provider<Functions>::ShowDefault(wpi::StringRef name) {
 }
 
 template <typename Functions>
-void Provider<Functions>::Register(wpi::StringRef name, ExistsFunc exists,
+void Provider<Functions>::Register(std::string_view name, ExistsFunc exists,
                                    CreateModelFunc createModel,
                                    CreateViewFunc createView) {
   RegisterModel(name, std::move(exists), std::move(createModel));
@@ -38,7 +38,8 @@ void Provider<Functions>::Register(wpi::StringRef name, ExistsFunc exists,
 }
 
 template <typename Functions>
-void Provider<Functions>::RegisterModel(wpi::StringRef name, ExistsFunc exists,
+void Provider<Functions>::RegisterModel(std::string_view name,
+                                        ExistsFunc exists,
                                         CreateModelFunc createModel) {
   auto it = FindModelEntry(name);
   // ignore if exists
@@ -51,8 +52,8 @@ void Provider<Functions>::RegisterModel(wpi::StringRef name, ExistsFunc exists,
 }
 
 template <typename Functions>
-void Provider<Functions>::RegisterView(wpi::StringRef name,
-                                       wpi::StringRef modelName,
+void Provider<Functions>::RegisterView(std::string_view name,
+                                       std::string_view modelName,
                                        ViewExistsFunc exists,
                                        CreateViewFunc createView) {
   // find model; if model doesn't exist, ignore
@@ -84,18 +85,18 @@ void Provider<Functions>::Update() {
 
 template <typename Functions>
 typename Provider<Functions>::ModelEntries::iterator
-Provider<Functions>::FindModelEntry(wpi::StringRef name) {
+Provider<Functions>::FindModelEntry(std::string_view name) {
   return std::lower_bound(
       m_modelEntries.begin(), m_modelEntries.end(), name,
-      [](const auto& elem, wpi::StringRef s) { return elem->name < s; });
+      [](const auto& elem, std::string_view s) { return elem->name < s; });
 }
 
 template <typename Functions>
 typename Provider<Functions>::ViewEntries::iterator
-Provider<Functions>::FindViewEntry(wpi::StringRef name) {
+Provider<Functions>::FindViewEntry(std::string_view name) {
   return std::lower_bound(
       m_viewEntries.begin(), m_viewEntries.end(), name,
-      [](const auto& elem, wpi::StringRef s) { return elem->name < s; });
+      [](const auto& elem, std::string_view s) { return elem->name < s; });
 }
 
 }  // namespace glass

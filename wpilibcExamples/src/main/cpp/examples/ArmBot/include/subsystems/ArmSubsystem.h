@@ -5,8 +5,8 @@
 #pragma once
 
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/controller/ArmFeedforward.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/angle.h>
 
@@ -24,7 +24,7 @@ class ArmSubsystem : public frc2::ProfiledPIDSubsystem<units::radians> {
   units::radian_t GetMeasurement() override;
 
  private:
-  frc::PWMVictorSPX m_motor;
+  frc::PWMSparkMax m_motor;
   frc::Encoder m_encoder;
   frc::ArmFeedforward m_feedforward;
 };

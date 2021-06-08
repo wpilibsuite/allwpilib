@@ -4,14 +4,13 @@
 
 #include "frc/PowerDistributionPanel.h"
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/Ports.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
+#include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/WPIErrors.h"
 #include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableRegistry.h"
 
@@ -25,10 +24,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   m_handle = HAL_InitializePDP(module, &status);
-  if (status != 0) {
-    wpi_setHALErrorWithRange(status, 0, HAL_GetNumPDPModules(), module);
-    return;
-  }
+  FRC_CheckErrorStatus(status, "Module {}", module);
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
   SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel", module);
@@ -36,25 +32,15 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
 
 double PowerDistributionPanel::GetVoltage() const {
   int32_t status = 0;
-
   double voltage = HAL_GetPDPVoltage(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
-
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return voltage;
 }
 
 double PowerDistributionPanel::GetTemperature() const {
   int32_t status = 0;
-
   double temperature = HAL_GetPDPTemperature(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
-
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return temperature;
 }
 
@@ -62,75 +48,48 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
   int32_t status = 0;
 
   if (!SensorUtil::CheckPDPChannel(channel)) {
-    wpi::SmallString<32> str;
-    wpi::raw_svector_ostream buf(str);
-    buf << "PDP Channel " << channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    FRC_ReportError(err::ChannelIndexOutOfRange, "Module {} Channel {}",
+                    m_module, channel);
+    return 0;
   }
 
   double current = HAL_GetPDPChannelCurrent(m_handle, channel, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
+  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_module, channel);
 
   return current;
 }
 
 double PowerDistributionPanel::GetTotalCurrent() const {
   int32_t status = 0;
-
   double current = HAL_GetPDPTotalCurrent(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
-
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return current;
 }
 
 double PowerDistributionPanel::GetTotalPower() const {
   int32_t status = 0;
-
   double power = HAL_GetPDPTotalPower(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
-
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return power;
 }
 
 double PowerDistributionPanel::GetTotalEnergy() const {
   int32_t status = 0;
-
   double energy = HAL_GetPDPTotalEnergy(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
-
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
   return energy;
 }
 
 void PowerDistributionPanel::ResetTotalEnergy() {
   int32_t status = 0;
-
   HAL_ResetPDPTotalEnergy(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 void PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
-
   HAL_ClearPDPStickyFaults(m_handle, &status);
-
-  if (status) {
-    wpi_setWPIErrorWithContext(Timeout, "");
-  }
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 int PowerDistributionPanel::GetModule() const {
@@ -141,7 +100,7 @@ void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty(
-        "Chan" + wpi::Twine(i), [=]() { return GetCurrent(i); }, nullptr);
+        fmt::format("Chan{}", i), [=]() { return GetCurrent(i); }, nullptr);
   }
   builder.AddDoubleProperty(
       "Voltage", [=]() { return GetVoltage(); }, nullptr);

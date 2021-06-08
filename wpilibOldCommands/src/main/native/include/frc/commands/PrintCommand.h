@@ -5,8 +5,7 @@
 #pragma once
 
 #include <string>
-
-#include <wpi/Twine.h>
+#include <string_view>
 
 #include "frc/commands/InstantCommand.h"
 
@@ -14,7 +13,7 @@ namespace frc {
 
 class PrintCommand : public InstantCommand {
  public:
-  explicit PrintCommand(const wpi::Twine& message);
+  explicit PrintCommand(std::string_view message);
   ~PrintCommand() override = default;
 
   PrintCommand(PrintCommand&&) = default;

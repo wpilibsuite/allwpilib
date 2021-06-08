@@ -101,10 +101,11 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     dio.getOutput().enablePWM(0.0);
     Timer.delay(0.5);
     dio.getOutput().updateDutyCycle(0.5);
-    dio.getInput().requestInterrupts();
-    dio.getInput().setUpSourceEdge(false, true);
-    // TODO: Add return value from WaitForInterrupt
-    dio.getInput().waitForInterrupt(3.0, true);
+    try (var interruptHandler = new SynchronousInterrupt(dio.getInput())) {
+      interruptHandler.setInterruptEdges(false, true);
+      // TODO: Add return value from WaitForInterrupt
+      interruptHandler.waitForInterrupt(3.0, true);
+    }
     Timer.delay(0.5);
     final boolean firstCycle = dio.getInput().get();
     Timer.delay(0.5);
@@ -140,10 +141,10 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveSource()
    */
   @Override
-  InterruptableSensorBase giveInterruptableSensorBase() {
+  DigitalSource giveSource() {
     return dio.getInput();
   }
 
@@ -151,10 +152,10 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeSource()
    */
   @Override
-  void freeInterruptableSensorBase() {
+  void freeSource() {
     // Handled in the fixture
   }
 

@@ -7,6 +7,7 @@
 
 #include <climits>
 #include <memory>
+#include <string_view>
 
 #include "ntcore_cpp.h"
 
@@ -22,16 +23,17 @@ class IEntryNotifier {
 
   virtual unsigned int Add(
       std::function<void(const EntryNotification& event)> callback,
-      wpi::StringRef prefix, unsigned int flags) = 0;
+      std::string_view prefix, unsigned int flags) = 0;
   virtual unsigned int Add(
       std::function<void(const EntryNotification& event)> callback,
       unsigned int local_id, unsigned int flags) = 0;
-  virtual unsigned int AddPolled(unsigned int poller_uid, wpi::StringRef prefix,
+  virtual unsigned int AddPolled(unsigned int poller_uid,
+                                 std::string_view prefix,
                                  unsigned int flags) = 0;
   virtual unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) = 0;
 
-  virtual void NotifyEntry(unsigned int local_id, StringRef name,
+  virtual void NotifyEntry(unsigned int local_id, std::string_view name,
                            std::shared_ptr<Value> value, unsigned int flags,
                            unsigned int only_listener = UINT_MAX) = 0;
 };

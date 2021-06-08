@@ -6,7 +6,6 @@
 
 #include <hal/SimDevice.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
 #include "frc/smartdashboard/Sendable.h"
@@ -21,8 +20,7 @@ class SendableBuilder;
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public ErrorBase,
-                public Accelerometer,
+class ADXL362 : public Accelerometer,
                 public Sendable,
                 public SendableHelper<ADXL362> {
  public:

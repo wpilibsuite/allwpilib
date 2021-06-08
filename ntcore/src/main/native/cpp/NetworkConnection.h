@@ -11,6 +11,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,6 +19,7 @@
 #include <wpi/ConcurrentQueue.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/span.h>
 
 #include "INetworkConnection.h"
 #include "Message.h"
@@ -37,7 +39,7 @@ class NetworkConnection : public INetworkConnection {
   typedef std::function<bool(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
   using ProcessIncomingFunc =
       std::function<void(std::shared_ptr<Message>, NetworkConnection*)>;
@@ -76,7 +78,7 @@ class NetworkConnection : public INetworkConnection {
   void set_state(State state) final;
 
   std::string remote_id() const;
-  void set_remote_id(StringRef remote_id);
+  void set_remote_id(std::string_view remote_id);
 
   uint64_t last_update() const { return m_last_update; }
 

@@ -6,8 +6,8 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
-#include <wpi/Twine.h>
 #include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/SendableRegistry.h"
@@ -61,7 +61,7 @@ class SendableHelper {
    * @param name name
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(const wpi::Twine& name) {
+  void SetName(std::string_view name) {
     SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this), name);
   }
 
@@ -74,7 +74,7 @@ class SendableHelper {
    * @param name device name
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(const wpi::Twine& subsystem, const wpi::Twine& name) {
+  void SetName(std::string_view subsystem, std::string_view name) {
     SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
                                             subsystem, name);
   }
@@ -100,7 +100,7 @@ class SendableHelper {
    * @param subsystem subsystem name
    */
   WPI_DEPRECATED("use SendableRegistry::SetSubsystem()")
-  void SetSubsystem(const wpi::Twine& subsystem) {
+  void SetSubsystem(std::string_view subsystem) {
     SendableRegistry::GetInstance().SetSubsystem(static_cast<Derived*>(this),
                                                  subsystem);
   }
@@ -142,7 +142,7 @@ class SendableHelper {
    * @param channel    The channel number the device is plugged into
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(const wpi::Twine& moduleType, int channel) {
+  void SetName(std::string_view moduleType, int channel) {
     SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
                                             moduleType, channel);
   }
@@ -159,7 +159,7 @@ class SendableHelper {
    * PWM)
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(const wpi::Twine& moduleType, int moduleNumber, int channel) {
+  void SetName(std::string_view moduleType, int moduleNumber, int channel) {
     SendableRegistry::GetInstance().SetName(static_cast<Derived*>(this),
                                             moduleType, moduleNumber, channel);
   }

@@ -12,9 +12,8 @@
 #include <cstring>
 #include <string>
 
-#include <wpi/SmallString.h>
+#include <fmt/format.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
 
 #include "edu_wpi_first_hal_HALUtil.h"
 #include "hal/CAN.h"
@@ -74,7 +73,7 @@ static const JExceptionInit exceptions[] = {
 
 namespace hal {
 
-void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
+void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
                                  int32_t status) {
   static jmethodID func =
       env->GetMethodID(uncleanStatusExCls, "<init>", "(ILjava/lang/String;)V");
@@ -85,43 +84,38 @@ void ThrowUncleanStatusException(JNIEnv* env, wpi::StringRef msg,
   env->Throw(static_cast<jthrowable>(exception));
 }
 
-void ThrowAllocationException(JNIEnv* env, int32_t minRange, int32_t maxRange,
-                              int32_t requestedValue, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message
-      << ", Minimum Value: " << minRange << ", Maximum Value: " << maxRange
-      << ", Requested Value: " << requestedValue;
-  env->ThrowNew(allocationExCls, buf.c_str());
-  allocationExCls.Throw(env, buf.c_str());
+void ThrowAllocationException(JNIEnv* env, const char* lastError,
+                              int32_t status) {
+  allocationExCls.Throw(env,
+                        fmt::format("Code: {}\n{}", status, lastError).c_str());
 }
 
 void ThrowHalHandleException(JNIEnv* env, int32_t status) {
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message;
-  halHandleExCls.Throw(env, buf.c_str());
+  const char* message = HAL_GetLastError(&status);
+  halHandleExCls.Throw(env,
+                       fmt::format(" Code: {}. {}", status, message).c_str());
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   if (status == 0) {
     return;
   }
+  const char* message = HAL_GetLastError(&status);
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetErrorMessage(status);
   if (doThrow && status < 0) {
-    wpi::SmallString<1024> buf;
-    wpi::raw_svector_ostream oss(buf);
-    oss << " Code: " << status << ". " << message;
-    ThrowUncleanStatusException(env, buf.c_str(), status);
+    ThrowUncleanStatusException(
+        env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first");
-    HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
+    // Make a copy of message for safety, calling back into the HAL might
+    // invalidate the string.
+    std::string lastMessage{message};
+    HAL_SendError(1, status, 0, lastMessage.c_str(), func.c_str(),
+                  stack.c_str(), 1);
   }
 }
 
@@ -130,18 +124,18 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
   if (status == 0) {
     return;
   }
+  const char* lastError = HAL_GetLastError(&status);
   if (status == NO_AVAILABLE_RESOURCES || status == RESOURCE_IS_ALLOCATED ||
       status == RESOURCE_OUT_OF_RANGE) {
-    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
+    ThrowAllocationException(env, lastError, status);
+    return;
   }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
+    return;
   }
-  const char* message = HAL_GetErrorMessage(status);
-  wpi::SmallString<1024> buf;
-  wpi::raw_svector_ostream oss(buf);
-  oss << " Code: " << status << ". " << message;
-  ThrowUncleanStatusException(env, buf.c_str(), status);
+  ThrowUncleanStatusException(
+      env, fmt::format(" Code: {}. {}", status, lastError).c_str(), status);
 }
 
 void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
@@ -178,10 +172,8 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
     }
     case HAL_ERR_CANSessionMux_NotAllowed:
     case kRIOStatusFeatureNotSupported: {
-      wpi::SmallString<100> buf;
-      wpi::raw_svector_ostream oss(buf);
-      oss << "MessageID = " << message_id;
-      canMessageNotAllowedExCls.Throw(env, buf.c_str());
+      canMessageNotAllowedExCls.Throw(
+          env, fmt::format("MessageID = {}", message_id).c_str());
       break;
     }
     case HAL_ERR_CANSessionMux_NotInitialized:
@@ -197,16 +189,14 @@ void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
       break;
     }
     default: {
-      wpi::SmallString<100> buf;
-      wpi::raw_svector_ostream oss(buf);
-      oss << "Fatal status code detected: " << status;
-      uncleanStatusExCls.Throw(env, buf.c_str());
+      uncleanStatusExCls.Throw(
+          env, fmt::format("Fatal status code detected: {}", status).c_str());
       break;
     }
   }
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg) {
+void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
   illegalArgExCls.Throw(env, msg);
 }
 
@@ -263,9 +253,9 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
   env->CallVoidMethod(
       matchStatus, func, MakeJString(env, matchInfo.eventName),
-      MakeJString(env, wpi::StringRef{reinterpret_cast<const char*>(
-                                          matchInfo.gameSpecificMessage),
-                                      matchInfo.gameSpecificMessageSize}),
+      MakeJString(env,
+                  {reinterpret_cast<const char*>(matchInfo.gameSpecificMessage),
+                   matchInfo.gameSpecificMessageSize}),
       static_cast<jint>(matchInfo.matchNumber),
       static_cast<jint>(matchInfo.replayNumber),
       static_cast<jint>(matchInfo.matchType));

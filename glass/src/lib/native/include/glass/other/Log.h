@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
 #include <vector>
-
-#include <wpi/Twine.h>
 
 #include "glass/View.h"
 
@@ -19,11 +19,12 @@ class LogData {
   explicit LogData(size_t maxLines = 10000);
 
   void Clear();
-  void Append(const wpi::Twine& msg);
+  void Append(std::string_view msg);
+  const std::string& GetBuffer();
 
  private:
   size_t m_maxLines;
-  std::vector<char> m_buf;
+  std::string m_buf;
   std::vector<size_t> m_lineOffsets{0};
 };
 

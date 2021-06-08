@@ -5,7 +5,6 @@
 #pragma once
 
 #include <frc/AnalogInput.h>
-#include <frc/Compressor.h>
 #include <frc/commands/Subsystem.h>
 
 /**
@@ -41,10 +40,6 @@ class Pneumatics : public frc::Subsystem {
 
  private:
   frc::AnalogInput m_pressureSensor{3};
-
-#ifndef SIMULATION
-  frc::Compressor m_compressor{1};  // TODO: (1, 14, 1, 8);
-#endif
 
   static constexpr double kMaxPressure = 2.55;
 };

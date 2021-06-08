@@ -4,7 +4,7 @@
 
 #include <hal/HAL.h>
 #include <units/math.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/AnalogEncoder.h"
 #include "frc/AnalogInput.h"
@@ -22,6 +22,6 @@ TEST(AnalogEncoderSimTest, TestBasic) {
   encoderSim.SetPosition(180_deg);
   EXPECT_NEAR(encoder.Get().to<double>(), 0.5, 1E-8);
   EXPECT_NEAR(encoderSim.GetTurns().to<double>(), 0.5, 1E-8);
-  EXPECT_NEAR(encoderSim.GetPosition().Radians().to<double>(), wpi::math::pi,
+  EXPECT_NEAR(encoderSim.GetPosition().Radians().to<double>(), wpi::numbers::pi,
               1E-8);
 }

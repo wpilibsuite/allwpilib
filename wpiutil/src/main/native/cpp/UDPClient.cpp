@@ -16,14 +16,15 @@
 #endif
 
 #include "wpi/Logger.h"
+#include "wpi/SmallString.h"
 #include "wpi/SocketError.h"
 
 using namespace wpi;
 
 UDPClient::UDPClient(Logger& logger) : UDPClient("", logger) {}
 
-UDPClient::UDPClient(const Twine& address, Logger& logger)
-    : m_lsd(0), m_port(0), m_address(address.str()), m_logger(logger) {}
+UDPClient::UDPClient(std::string_view address, Logger& logger)
+    : m_lsd(0), m_port(0), m_address(address), m_logger(logger) {}
 
 UDPClient::UDPClient(UDPClient&& other)
     : m_lsd(other.m_lsd),
@@ -72,7 +73,7 @@ int UDPClient::start(int port) {
   m_lsd = socket(AF_INET, SOCK_DGRAM, 0);
 
   if (m_lsd < 0) {
-    WPI_ERROR(m_logger, "could not create socket");
+    WPI_ERROR(m_logger, "{}", "could not create socket");
     return -1;
   }
 
@@ -88,7 +89,7 @@ int UDPClient::start(int port) {
     int res = inet_pton(PF_INET, m_address.c_str(), &(addr.sin_addr));
 #endif
     if (res != 1) {
-      WPI_ERROR(m_logger, "could not resolve " << m_address << " address");
+      WPI_ERROR(m_logger, "could not resolve {} address", m_address);
       return -1;
     }
   } else {
@@ -110,7 +111,7 @@ int UDPClient::start(int port) {
 
   int result = bind(m_lsd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
   if (result != 0) {
-    WPI_ERROR(m_logger, "bind() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "bind() failed: {}", SocketStrerror());
     return result;
   }
   m_port = port;
@@ -132,25 +133,25 @@ void UDPClient::shutdown() {
   }
 }
 
-int UDPClient::send(ArrayRef<uint8_t> data, const Twine& server, int port) {
+int UDPClient::send(span<const uint8_t> data, std::string_view server,
+                    int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  SmallVector<char, 128> addr_store;
-  StringRef remoteAddr = server.toNullTerminatedStringRef(addr_store);
+  SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "server must be passed");
+    WPI_ERROR(m_logger, "{}", "server must be passed");
     return -1;
   }
 
 #ifdef _WIN32
-  int res = InetPton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+  int res = InetPton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #else
-  int res = inet_pton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+  int res = inet_pton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #endif
   if (res != 1) {
-    WPI_ERROR(m_logger, "could not resolve " << server << " address");
+    WPI_ERROR(m_logger, "could not resolve {} address", server);
     return -1;
   }
   addr.sin_port = htons(port);
@@ -162,25 +163,24 @@ int UDPClient::send(ArrayRef<uint8_t> data, const Twine& server, int port) {
   return result;
 }
 
-int UDPClient::send(StringRef data, const Twine& server, int port) {
+int UDPClient::send(std::string_view data, std::string_view server, int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
-  SmallVector<char, 128> addr_store;
-  StringRef remoteAddr = server.toNullTerminatedStringRef(addr_store);
+  SmallString<128> remoteAddr{server};
   if (remoteAddr.empty()) {
-    WPI_ERROR(m_logger, "server must be passed");
+    WPI_ERROR(m_logger, "{}", "server must be passed");
     return -1;
   }
 
 #ifdef _WIN32
-  int res = InetPton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+  int res = InetPton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #else
-  int res = inet_pton(AF_INET, remoteAddr.data(), &(addr.sin_addr));
+  int res = inet_pton(AF_INET, remoteAddr.c_str(), &(addr.sin_addr));
 #endif
   if (res != 1) {
-    WPI_ERROR(m_logger, "could not resolve " << server << " address");
+    WPI_ERROR(m_logger, "could not resolve {} address", server);
     return -1;
   }
   addr.sin_port = htons(port);
@@ -242,7 +242,7 @@ int UDPClient::set_timeout(double timeout) {
   int ret = setsockopt(m_lsd, SOL_SOCKET, SO_RCVTIMEO,
                        reinterpret_cast<char*>(&tv), sizeof(tv));
   if (ret < 0) {
-    WPI_ERROR(m_logger, "set timeout failed");
+    WPI_ERROR(m_logger, "{}", "set timeout failed");
   }
   return ret;
 }

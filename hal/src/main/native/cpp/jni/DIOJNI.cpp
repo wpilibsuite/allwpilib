@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_DIOJNI.h"
 #include "hal/DIO.h"
@@ -27,10 +29,10 @@ Java_edu_wpi_first_hal_DIOJNI_initializeDIOPort
   (JNIEnv* env, jclass, jint id, jboolean input)
 {
   int32_t status = 0;
-  auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id,
-                                   static_cast<uint8_t>(input), &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumDigitalChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto dio = HAL_InitializeDIOPort(
+      (HAL_PortHandle)id, static_cast<uint8_t>(input), stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)dio;
 }
 

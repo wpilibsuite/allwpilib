@@ -7,13 +7,13 @@
 #include <hal/DriverStation.h>
 
 #include "frc/DriverStation.h"
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
 GenericHID::GenericHID(int port) : m_ds(&DriverStation::GetInstance()) {
-  if (port >= DriverStation::kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+  if (port < 0 || port >= DriverStation::kJoystickPorts) {
+    throw FRC_MakeError(warn::BadJoystickIndex, "port {} out of range", port);
   }
   m_port = port;
 }

@@ -204,7 +204,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_PortsJNI_getNumPCMModules
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumPCMModules();
+  jint value = HAL_GetNumCTREPCMModules();
   return value;
 }
 

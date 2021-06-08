@@ -5,6 +5,7 @@
 #include "DigitalInternal.h"
 
 #include <atomic>
+#include <cmath>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
@@ -108,10 +109,10 @@ void initializeDigital(int32_t* status) {
   double loopTime = pwmSystem->readLoopTiming(status) /
                     (kSystemClockTicksPerMicrosecond * 1e3);
 
-  pwmSystem->writeConfig_Period(
-      static_cast<uint16_t>(kDefaultPwmPeriod / loopTime + 0.5), status);
-  uint16_t minHigh = static_cast<uint16_t>(
-      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + 0.5);
+  pwmSystem->writeConfig_Period(std::lround(kDefaultPwmPeriod / loopTime),
+                                status);
+  uint16_t minHigh = std::lround(
+      (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
   for (uint8_t pwmIndex = 0; pwmIndex < kNumPWMChannels; pwmIndex++) {

@@ -19,8 +19,8 @@ class NTStringChooserModel : public StringChooserModel {
   static constexpr const char* kType = "String Chooser";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTStringChooserModel(wpi::StringRef path);
-  NTStringChooserModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTStringChooserModel(std::string_view path);
+  NTStringChooserModel(NT_Inst inst, std::string_view path);
 
   const std::string& GetDefault() override { return m_defaultValue; }
   const std::string& GetSelected() override { return m_selectedValue; }
@@ -29,10 +29,10 @@ class NTStringChooserModel : public StringChooserModel {
     return m_optionsValue;
   }
 
-  void SetDefault(wpi::StringRef val) override;
-  void SetSelected(wpi::StringRef val) override;
-  void SetActive(wpi::StringRef val) override;
-  void SetOptions(wpi::ArrayRef<std::string> val) override;
+  void SetDefault(std::string_view val) override;
+  void SetSelected(std::string_view val) override;
+  void SetActive(std::string_view val) override;
+  void SetOptions(wpi::span<const std::string> val) override;
 
   void Update() override;
   bool Exists() override;

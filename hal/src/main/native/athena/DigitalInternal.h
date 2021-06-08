@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include <wpi/mutex.h>
 
@@ -70,6 +71,7 @@ struct DigitalPort {
   int32_t centerPwm = 0;
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
+  std::string previousAllocation;
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,

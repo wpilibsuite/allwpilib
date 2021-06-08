@@ -10,8 +10,8 @@
 
 namespace wpi::uv {
 
-std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
-                                             ArrayRef<Option> options) {
+std::shared_ptr<Process> Process::SpawnArray(Loop& loop, std::string_view file,
+                                             span<const Option> options) {
   // convert Option array to libuv structure
   uv_process_options_t coptions;
 
@@ -20,8 +20,8 @@ std::shared_ptr<Process> Process::SpawnArray(Loop& loop, const Twine& file,
     h.exited(status, signal);
   };
 
-  SmallString<128> fileBuf;
-  coptions.file = file.toNullTerminatedStringRef(fileBuf).data();
+  SmallString<128> fileBuf{file};
+  coptions.file = fileBuf.c_str();
   coptions.cwd = nullptr;
   coptions.flags = 0;
   coptions.uid = 0;

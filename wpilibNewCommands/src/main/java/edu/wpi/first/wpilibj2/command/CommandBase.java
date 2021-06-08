@@ -45,7 +45,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
-  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
@@ -56,7 +55,7 @@ public abstract class CommandBase implements Sendable, Command {
    * @param name name
    * @return the decorated Command
    */
-  public Command withName(String name) {
+  public CommandBase withName(String name) {
     this.setName(name);
     return this;
   }
@@ -66,7 +65,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @return Subsystem name
    */
-  @Override
   public String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
@@ -76,7 +74,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param subsystem subsystem name
    */
-  @Override
   public void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }

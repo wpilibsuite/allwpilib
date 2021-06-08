@@ -48,8 +48,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Put Some buttons on the SmartDashboard
     SmartDashboard.putData("Elevator Bottom", new SetElevatorSetpoint(0, m_elevator));
-    SmartDashboard.putData("Elevator Platform", new SetElevatorSetpoint(0.2, m_elevator));
-    SmartDashboard.putData("Elevator Top", new SetElevatorSetpoint(0.3, m_elevator));
+    SmartDashboard.putData("Elevator Top", new SetElevatorSetpoint(0.25, m_elevator));
 
     SmartDashboard.putData("Wrist Horizontal", new SetWristSetpoint(0, m_wrist));
     SmartDashboard.putData("Raise Wrist", new SetWristSetpoint(-45, m_wrist));
@@ -93,8 +92,8 @@ public class RobotContainer {
     final JoystickButton r1 = new JoystickButton(m_joystick, 12);
 
     // Connect the buttons to commands
-    dpadUp.whenPressed(new SetElevatorSetpoint(0.2, m_elevator));
-    dpadDown.whenPressed(new SetElevatorSetpoint(-0.2, m_elevator));
+    dpadUp.whenPressed(new SetElevatorSetpoint(0.25, m_elevator));
+    dpadDown.whenPressed(new SetElevatorSetpoint(0.0, m_elevator));
     dpadRight.whenPressed(new CloseClaw(m_claw));
     dpadLeft.whenPressed(new OpenClaw(m_claw));
 

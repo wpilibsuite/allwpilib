@@ -5,17 +5,17 @@
 #include <memory>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
-#include <wpi/SmallString.h>
 #include <wpigui.h>
 
-#include "NetworkTablesSettings.h"
 #include "glass/Context.h"
 #include "glass/Model.h"
 #include "glass/View.h"
 #include "glass/networktables/NetworkTables.h"
 #include "glass/networktables/NetworkTablesProvider.h"
+#include "glass/networktables/NetworkTablesSettings.h"
 #include "glass/other/Log.h"
 #include "glass/other/Plot.h"
 
@@ -24,20 +24,20 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 namespace glass {
-wpi::StringRef GetResource_glass_16_png();
-wpi::StringRef GetResource_glass_32_png();
-wpi::StringRef GetResource_glass_48_png();
-wpi::StringRef GetResource_glass_64_png();
-wpi::StringRef GetResource_glass_128_png();
-wpi::StringRef GetResource_glass_256_png();
-wpi::StringRef GetResource_glass_512_png();
+std::string_view GetResource_glass_16_png();
+std::string_view GetResource_glass_32_png();
+std::string_view GetResource_glass_48_png();
+std::string_view GetResource_glass_64_png();
+std::string_view GetResource_glass_128_png();
+std::string_view GetResource_glass_256_png();
+std::string_view GetResource_glass_512_png();
 }  // namespace glass
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 static std::unique_ptr<glass::NetworkTablesProvider> gNtProvider;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<NetworkTablesSettings> gNetworkTablesSettings;
+static std::unique_ptr<glass::NetworkTablesSettings> gNetworkTablesSettings;
 static glass::LogData gNetworkTablesLog;
 static glass::Window* gNetworkTablesWindow;
 static glass::Window* gNetworkTablesSettingsWindow;
@@ -56,11 +56,9 @@ static void NtInitialize() {
     bool timedOut;
     for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
       if (event.connected) {
-        wpi::SmallString<64> title;
-        title = "Glass - Connected (";
-        title += event.conn.remote_ip;
-        title += ')';
-        glfwSetWindowTitle(win, title.c_str());
+        glfwSetWindowTitle(
+            win, fmt::format("Glass - Connected ({})", event.conn.remote_ip)
+                     .c_str());
       } else {
         glfwSetWindowTitle(win, "Glass - DISCONNECTED");
       }
@@ -81,9 +79,8 @@ static void NtInitialize() {
       } else if (msg.level >= NT_LOG_WARNING) {
         level = "WARNING: ";
       }
-      gNetworkTablesLog.Append(
-          wpi::Twine{level} + msg.message + wpi::Twine{" ("} + msg.filename +
-          wpi::Twine{':'} + wpi::Twine{msg.line} + wpi::Twine{")\n"});
+      gNetworkTablesLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
+                                           msg.filename, msg.line));
     }
   });
 
@@ -111,7 +108,7 @@ static void NtInitialize() {
   }
 
   // NetworkTables settings window
-  gNetworkTablesSettings = std::make_unique<NetworkTablesSettings>();
+  gNetworkTablesSettings = std::make_unique<glass::NetworkTablesSettings>();
   gui::AddEarlyExecute([] { gNetworkTablesSettings->Update(); });
 
   gNetworkTablesSettingsWindow = gNtProvider->AddWindow(

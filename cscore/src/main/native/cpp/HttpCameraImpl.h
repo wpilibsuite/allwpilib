@@ -10,15 +10,16 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
 #include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
+#include <wpi/span.h>
 
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
@@ -27,7 +28,7 @@ namespace cs {
 
 class HttpCameraImpl : public SourceImpl {
  public:
-  HttpCameraImpl(const wpi::Twine& name, CS_HttpCameraKind kind,
+  HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
                  wpi::Logger& logger, Notifier& notifier, Telemetry& telemetry);
   ~HttpCameraImpl() override;
 
@@ -35,7 +36,7 @@ class HttpCameraImpl : public SourceImpl {
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, const wpi::Twine& value,
+  void SetStringProperty(int property, std::string_view value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -54,20 +55,20 @@ class HttpCameraImpl : public SourceImpl {
   void NumSinksEnabledChanged() override;
 
   CS_HttpCameraKind GetKind() const;
-  bool SetUrls(wpi::ArrayRef<std::string> urls, CS_Status* status);
+  bool SetUrls(wpi::span<const std::string> urls, CS_Status* status);
   std::vector<std::string> GetUrls() const;
 
   // Property data
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    explicit PropertyData(const wpi::Twine& name_) : PropertyImpl{name_} {}
-    PropertyData(const wpi::Twine& name_, const wpi::Twine& httpParam_,
+    explicit PropertyData(std::string_view name_) : PropertyImpl{name_} {}
+    PropertyData(std::string_view name_, std::string_view httpParam_,
                  bool viaSettings_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : PropertyImpl(name_, kind_, step_, defaultValue_, value_),
           viaSettings(viaSettings_),
-          httpParam(httpParam_.str()) {
+          httpParam(httpParam_) {
       hasMinimum = true;
       minimum = minimum_;
       hasMaximum = true;
@@ -81,16 +82,16 @@ class HttpCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      const wpi::Twine& name) const override;
+      std::string_view name) const override;
 
   bool CacheProperties(CS_Status* status) const override;
 
-  void CreateProperty(const wpi::Twine& name, const wpi::Twine& httpParam,
+  void CreateProperty(std::string_view name, std::string_view httpParam,
                       bool viaSettings, CS_PropertyKind kind, int minimum,
                       int maximum, int step, int defaultValue, int value) const;
 
   template <typename T>
-  void CreateEnumProperty(const wpi::Twine& name, const wpi::Twine& httpParam,
+  void CreateEnumProperty(std::string_view name, std::string_view httpParam,
                           bool viaSettings, int defaultValue, int value,
                           std::initializer_list<T> choices) const;
 
@@ -101,7 +102,7 @@ class HttpCameraImpl : public SourceImpl {
   // Functions used by StreamThreadMain()
   wpi::HttpConnection* DeviceStreamConnect(
       wpi::SmallVectorImpl<char>& boundary);
-  void DeviceStream(wpi::raw_istream& is, wpi::StringRef boundary);
+  void DeviceStream(wpi::raw_istream& is, std::string_view boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 
   // The camera settings thread
@@ -146,12 +147,12 @@ class HttpCameraImpl : public SourceImpl {
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  AxisCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
-                 Notifier& notifier, Telemetry& telemetry)
+  AxisCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+                 Telemetry& telemetry)
       : HttpCameraImpl{name, CS_HTTP_AXIS, logger, notifier, telemetry} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, const wpi::Twine& value,
+  void SetStringProperty(int property, std::string_view value,
                          CS_Status* status) override;
 #endif
  protected:

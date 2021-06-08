@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-MockActuatorSendable::MockActuatorSendable(wpi::StringRef name) {
+MockActuatorSendable::MockActuatorSendable(std::string_view name) {
   SendableRegistry::GetInstance().Add(this, name);
 }
 

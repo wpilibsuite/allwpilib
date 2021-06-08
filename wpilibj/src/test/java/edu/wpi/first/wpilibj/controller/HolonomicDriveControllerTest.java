@@ -7,15 +7,15 @@ package edu.wpi.first.wpilibj.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Twist2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -71,5 +71,20 @@ class HolonomicDriveControllerTest {
                 0.0,
                 MathUtil.angleModulus(finalRobotPose.getRotation().getRadians()),
                 kAngularTolerance));
+  }
+
+  @Test
+  void testDoesNotRotateUnnecessarily() {
+    var controller =
+        new HolonomicDriveController(
+            new PIDController(1, 0, 0),
+            new PIDController(1, 0, 0),
+            new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(4, 2)));
+
+    ChassisSpeeds speeds =
+        controller.calculate(
+            new Pose2d(0, 0, new Rotation2d(1.57)), new Pose2d(), 0, new Rotation2d(1.57));
+
+    assertEquals(0.0, speeds.omegaRadiansPerSecond);
   }
 }

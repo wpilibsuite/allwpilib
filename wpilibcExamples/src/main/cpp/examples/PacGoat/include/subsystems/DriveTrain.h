@@ -6,10 +6,10 @@
 
 #include <frc/AnalogGyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMVictorSPX.h>
-#include <frc/SpeedControllerGroup.h>
 #include <frc/commands/Subsystem.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 namespace frc {
 class Joystick;
@@ -60,13 +60,13 @@ class DriveTrain : public frc::Subsystem {
 
  private:
   // Subsystem devices
-  frc::PWMVictorSPX m_frontLeftCIM{1};
-  frc::PWMVictorSPX m_rearLeftCIM{2};
-  frc::SpeedControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
+  frc::PWMSparkMax m_frontLeftCIM{1};
+  frc::PWMSparkMax m_rearLeftCIM{2};
+  frc::MotorControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
 
-  frc::PWMVictorSPX m_frontRightCIM{3};
-  frc::PWMVictorSPX m_rearRightCIM{4};
-  frc::SpeedControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
+  frc::PWMSparkMax m_frontRightCIM{3};
+  frc::PWMSparkMax m_rearRightCIM{4};
+  frc::MotorControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
 
   frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};
 

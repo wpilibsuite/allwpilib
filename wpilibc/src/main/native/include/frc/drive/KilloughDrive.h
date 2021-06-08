@@ -5,8 +5,7 @@
 #pragma once
 
 #include <memory>
-
-#include <wpi/raw_ostream.h>
+#include <string>
 
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/drive/Vector2d.h"
@@ -14,6 +13,17 @@
 #include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 class SpeedController;
 
@@ -50,6 +60,12 @@ class KilloughDrive : public RobotDriveBase,
   static constexpr double kDefaultLeftMotorAngle = 60.0;
   static constexpr double kDefaultRightMotorAngle = 120.0;
   static constexpr double kDefaultBackMotorAngle = 270.0;
+
+  struct WheelSpeeds {
+    double left = 0.0;
+    double right = 0.0;
+    double back = 0.0;
+  };
 
   /**
    * Construct a Killough drive with the given motors and default motor angles.
@@ -123,8 +139,26 @@ class KilloughDrive : public RobotDriveBase,
    */
   void DrivePolar(double magnitude, double angle, double zRotation);
 
+  /**
+   * Cartesian inverse kinematics for Killough platform.
+   *
+   * Angles are measured clockwise from the positive X axis. The robot's speed
+   * is independent from its angle or rotation rate.
+   *
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+   *                  positive.
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+   *                  Clockwise is positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around
+   *                  the Z axis. Use this to implement field-oriented controls.
+   */
+  WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed, double zRotation,
+                               double gyroAngle = 0.0);
+
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   void InitSendable(SendableBuilder& builder) override;
 
@@ -139,5 +173,13 @@ class KilloughDrive : public RobotDriveBase,
 
   bool reported = false;
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 }  // namespace frc

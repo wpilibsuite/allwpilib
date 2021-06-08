@@ -7,10 +7,10 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/time.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -31,8 +31,7 @@ class DMASample;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public ErrorBase,
-                public CounterBase,
+class Counter : public CounterBase,
                 public Sendable,
                 public SendableHelper<Counter> {
   friend class DMA;
@@ -370,7 +369,7 @@ class Counter : public ErrorBase,
    *
    * @returns The period between the last two pulses in units of seconds.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Set the maximum period where the device is still considered "moving".
@@ -382,7 +381,7 @@ class Counter : public ErrorBase,
    * @param maxPeriod The maximum period where the counted device is considered
    *                  moving in seconds.
    */
-  void SetMaxPeriod(double maxPeriod) final;
+  void SetMaxPeriod(units::second_t maxPeriod) final;
 
   /**
    * Select whether you want to continue updating the event timer output when

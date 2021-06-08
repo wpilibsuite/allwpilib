@@ -245,27 +245,27 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kEncoder("Encoder"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.SpeedController SpeedController}. The speed controller
-   * will be controllable from the dashboard when test mode is enabled, but will otherwise be
-   * view-only. <br>
+   * Displays a {@link edu.wpi.first.wpilibj.motorcontrol.MotorController MotorController}. The
+   * speed controller will be controllable from the dashboard when test mode is enabled, but will
+   * otherwise be view-only. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PWMSpeedController}
-   *   <li>{@link edu.wpi.first.wpilibj.DMC60}
-   *   <li>{@link edu.wpi.first.wpilibj.Jaguar}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMSparkMax}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonFX}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMTalonSRX}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMVenom}
-   *   <li>{@link edu.wpi.first.wpilibj.PWMVictorSPX}
-   *   <li>{@link edu.wpi.first.wpilibj.SD540}
-   *   <li>{@link edu.wpi.first.wpilibj.Spark}
-   *   <li>{@link edu.wpi.first.wpilibj.Talon}
-   *   <li>{@link edu.wpi.first.wpilibj.Victor}
-   *   <li>{@link edu.wpi.first.wpilibj.VictorSP}
-   *   <li>{@link edu.wpi.first.wpilibj.SpeedControllerGroup}
-   *   <li>Any custom subclass of {@code SpeedController}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMMotorController}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.DMC60}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Jaguar}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVenom}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.SD540}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Spark}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Talon}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.Victor}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.VictorSP}
+   *   <li>{@link edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}
+   *   <li>Any custom subclass of {@code MotorController}
    * </ul>
    *
    * <br>
@@ -277,7 +277,7 @@ public enum BuiltInWidgets implements WidgetType {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  kSpeedController("Speed Controller"),
+  kMotorController("Motor Controller"),
   /**
    * Displays a command with a toggle button. Pressing the button will start the command, and the
    * button will automatically release when the command completes. <br>
@@ -453,7 +453,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
+   *   <li>{@link edu.wpi.first.cscore.VideoSource} (as long as it is streaming on an MJPEG server)
    * </ul>
    *
    * <br>

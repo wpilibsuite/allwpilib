@@ -8,7 +8,7 @@
 
 #include <hal/Types.h>
 
-#include "frc/GyroBase.h"
+#include "frc/interfaces/Gyro.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 
@@ -29,7 +29,9 @@ class AnalogInput;
  *
  * This class is for gyro sensors that connect to an analog input.
  */
-class AnalogGyro : public GyroBase {
+class AnalogGyro : public Gyro,
+                   public Sendable,
+                   public SendableHelper<AnalogGyro> {
  public:
   static constexpr int kOversampleBits = 10;
   static constexpr int kAverageBits = 0;
@@ -189,6 +191,8 @@ class AnalogGyro : public GyroBase {
    * @return AnalogInput
    */
   std::shared_ptr<AnalogInput> GetAnalogInput() const;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   std::shared_ptr<AnalogInput> m_analog;

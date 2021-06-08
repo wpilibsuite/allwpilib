@@ -5,11 +5,12 @@
 #include <glass/Context.h>
 #include <glass/other/Plot.h>
 
+#include <cstdio>
+#include <string_view>
+
 #include <hal/Extensions.h>
 #include <hal/Main.h>
 #include <imgui.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
 #include <wpigui.h>
 
 #include "AccelerometerSimGui.h"
@@ -21,7 +22,6 @@
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
 #include "HALSimGui.h"
-#include "Mechanism2D.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
 #include "PDPSimGui.h"
@@ -42,7 +42,7 @@ extern "C" {
 __declspec(dllexport)
 #endif
     int HALSIM_InitExtension(void) {
-  wpi::outs() << "Simulator GUI Initializing.\n";
+  std::puts("Simulator GUI Initializing.");
 
   gui::CreateContext();
   glass::CreateContext();
@@ -60,7 +60,6 @@ __declspec(dllexport)
   gui::AddInit(AnalogInputSimGui::Initialize);
   gui::AddInit(AnalogOutputSimGui::Initialize);
   gui::AddInit(DIOSimGui::Initialize);
-  gui::AddInit(Mechanism2D::Initialize);
   gui::AddInit(NetworkTablesSimGui::Initialize);
   gui::AddInit(PCMSimGui::Initialize);
   gui::AddInit(PDPSimGui::Initialize);
@@ -104,7 +103,7 @@ __declspec(dllexport)
   }
   HAL_RegisterExtensionListener(
       nullptr, [](void*, const char* name, void* data) {
-        if (wpi::StringRef{name} == "ds_socket") {
+        if (std::string_view{name} == "ds_socket") {
           DriverStationGui::SetDSSocketExtension(data);
         }
       });
@@ -116,7 +115,7 @@ __declspec(dllexport)
         gui::DestroyContext();
       },
       [](void*) { gui::Exit(); });
-  wpi::outs() << "Simulator GUI Initialized!\n";
+  std::puts("Simulator GUI Initialized!");
 
   return 0;
 }

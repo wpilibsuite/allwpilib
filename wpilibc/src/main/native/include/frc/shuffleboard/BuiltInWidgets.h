@@ -200,10 +200,10 @@ enum class BuiltInWidgets {
    */
   kEncoder,
   /**
-   * Displays a SpeedController.
+   * Displays a MotorController.
    * The speed controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
-   * <li>PWMSpeedController</li>
+   * <li>PWMMotorController</li>
    * <li>DMC60</li>
    * <li>Jaguar</li>
    * <li>PWMTalonSRX</li>
@@ -213,7 +213,7 @@ enum class BuiltInWidgets {
    * <li>Talon</li>
    * <li>Victor</li>
    * <li>VictorSP</li>
-   * <li>SpeedControllerGroup</li>
+   * <li>MotorControllerGroup</li>
    * <li>Any custom subclass of {@code SpeedContorller}</li>
    * </ul>
    * <br>Custom properties:
@@ -223,7 +223,7 @@ enum class BuiltInWidgets {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  kSpeedController,
+  kMotorController,
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command

@@ -37,7 +37,7 @@ SOFTWARE.
 #include "unit-json.h"
 using wpi::json;
 
-#include "wpi/Format.h"
+#include "fmt/format.h"
 #include "wpi/StringExtras.h"
 #include "wpi/raw_ostream.h"
 
@@ -919,11 +919,7 @@ static std::string codepoint_to_unicode(std::size_t cp)
     // reverse solidus, followed by the lowercase letter u, followed
     // by four hexadecimal digits that encode the character's code
     // point
-    std::string s;
-    wpi::raw_string_ostream ss(s);
-    ss << "\\u" << wpi::format_hex_no_prefix(cp, 4);
-    ss.flush();
-    return s;
+    return fmt::format("\\u{:04x}", cp);
 }
 
 // correct sequences

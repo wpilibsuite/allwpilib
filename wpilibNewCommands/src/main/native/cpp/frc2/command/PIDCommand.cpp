@@ -24,7 +24,7 @@ PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        std::function<double()> setpointSource,
                        std::function<void(double)> useOutput,
-                       wpi::ArrayRef<Subsystem*> requirements)
+                       wpi::span<Subsystem* const> requirements)
     : m_controller{std::move(controller)},
       m_measurement{std::move(measurementSource)},
       m_setpoint{std::move(setpointSource)},
@@ -43,7 +43,7 @@ PIDCommand::PIDCommand(PIDController controller,
 PIDCommand::PIDCommand(PIDController controller,
                        std::function<double()> measurementSource,
                        double setpoint, std::function<void(double)> useOutput,
-                       wpi::ArrayRef<Subsystem*> requirements)
+                       wpi::span<Subsystem* const> requirements)
     : PIDCommand(
           controller, measurementSource, [setpoint] { return setpoint; },
           useOutput, requirements) {}

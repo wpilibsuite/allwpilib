@@ -5,9 +5,9 @@
 #include <frc/AnalogPotentiometer.h>
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
-#include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/shuffleboard/ShuffleboardLayout.h>
 #include <frc/shuffleboard/ShuffleboardTab.h>
@@ -61,9 +61,9 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::PWMVictorSPX m_left{0};
-  frc::PWMVictorSPX m_right{1};
-  frc::PWMVictorSPX m_elevatorMotor{2};
+  frc::PWMSparkMax m_left{0};
+  frc::PWMSparkMax m_right{1};
+  frc::PWMSparkMax m_elevatorMotor{2};
 
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <wpi/ArrayRef.h>
-#include <wpi/STLExtras.h>
+#include <wpi/function_ref.h>
+#include <wpi/span.h>
 
 #include "glass/Model.h"
 
@@ -27,7 +27,7 @@ class LEDDisplayModel : public glass::Model {
 
   virtual bool IsRunning() = 0;
 
-  virtual wpi::ArrayRef<Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
+  virtual wpi::span<const Data> GetData(wpi::SmallVectorImpl<Data>& buf) = 0;
 };
 
 class LEDDisplaysModel : public glass::Model {

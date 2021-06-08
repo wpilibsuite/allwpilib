@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include <cassert>
+#include <algorithm>
 #include <cmath>
 #include <initializer_list>
+#include <stdexcept>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
 #include <wpi/circular_buffer.h>
+#include <wpi/span.h>
 
 #include "units/time.h"
 #include "wpimath/MathShared.h"
@@ -76,11 +77,18 @@ class LinearFilter {
    * @param ffGains The "feed forward" or FIR gains.
    * @param fbGains The "feed back" or IIR gains.
    */
-  LinearFilter(wpi::ArrayRef<double> ffGains, wpi::ArrayRef<double> fbGains)
+  LinearFilter(wpi::span<const double> ffGains, wpi::span<const double> fbGains)
       : m_inputs(ffGains.size()),
         m_outputs(fbGains.size()),
-        m_inputGains(ffGains),
-        m_outputGains(fbGains) {
+        m_inputGains(ffGains.begin(), ffGains.end()),
+        m_outputGains(fbGains.begin(), fbGains.end()) {
+    for (size_t i = 0; i < ffGains.size(); ++i) {
+      m_inputs.emplace_front(0.0);
+    }
+    for (size_t i = 0; i < fbGains.size(); ++i) {
+      m_outputs.emplace_front(0.0);
+    }
+
     static int instances = 0;
     instances++;
     wpi::math::MathSharedStore::ReportUsage(
@@ -95,14 +103,17 @@ class LinearFilter {
    */
   LinearFilter(std::initializer_list<double> ffGains,
                std::initializer_list<double> fbGains)
-      : LinearFilter(wpi::makeArrayRef(ffGains.begin(), ffGains.end()),
-                     wpi::makeArrayRef(fbGains.begin(), fbGains.end())) {}
+      : LinearFilter({ffGains.begin(), ffGains.end()},
+                     {fbGains.begin(), fbGains.end()}) {}
 
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>
    *   y[n] = (1 - gain) * x[n] + gain * y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
+   *
+   * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
+   * above which the input starts to attenuate.
    *
    * This filter is stable for time constants greater than zero.
    *
@@ -113,13 +124,16 @@ class LinearFilter {
   static LinearFilter<T> SinglePoleIIR(double timeConstant,
                                        units::second_t period) {
     double gain = std::exp(-period.to<double>() / timeConstant);
-    return LinearFilter(1.0 - gain, -gain);
+    return LinearFilter({1.0 - gain}, {-gain});
   }
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
    *   y[n] = gain * x[n] + (-gain) * x[n-1] + gain * y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
+   *
+   * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
+   * below which the input starts to attenuate.
    *
    * This filter is stable for time constants greater than zero.
    *
@@ -142,7 +156,9 @@ class LinearFilter {
    *             slower
    */
   static LinearFilter<T> MovingAverage(int taps) {
-    assert(taps > 0);
+    if (taps <= 0) {
+      throw std::runtime_error("Number of taps must be greater than zero.");
+    }
 
     std::vector<double> gains(taps, 1.0 / taps);
     return LinearFilter(gains, {});
@@ -152,8 +168,8 @@ class LinearFilter {
    * Reset the filter state.
    */
   void Reset() {
-    m_inputs.reset();
-    m_outputs.reset();
+    std::fill(m_inputs.begin(), m_inputs.end(), T{0.0});
+    std::fill(m_outputs.begin(), m_outputs.end(), T{0.0});
   }
 
   /**
@@ -164,21 +180,25 @@ class LinearFilter {
    * @return The filtered value at this step
    */
   T Calculate(T input) {
-    T retVal = T(0.0);
+    T retVal{0.0};
 
     // Rotate the inputs
-    m_inputs.push_front(input);
+    if (m_inputGains.size() > 0) {
+      m_inputs.push_front(input);
+    }
 
     // Calculate the new value
-    for (size_t i = 0; i < m_inputGains.size(); i++) {
+    for (size_t i = 0; i < m_inputGains.size(); ++i) {
       retVal += m_inputs[i] * m_inputGains[i];
     }
-    for (size_t i = 0; i < m_outputGains.size(); i++) {
+    for (size_t i = 0; i < m_outputGains.size(); ++i) {
       retVal -= m_outputs[i] * m_outputGains[i];
     }
 
     // Rotate the outputs
-    m_outputs.push_front(retVal);
+    if (m_outputGains.size() > 0) {
+      m_outputs.push_front(retVal);
+    }
 
     return retVal;
   }

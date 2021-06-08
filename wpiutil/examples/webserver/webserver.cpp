@@ -4,10 +4,10 @@
 
 #include <cstdio>
 
+#include "fmt/format.h"
 #include "wpi/EventLoopRunner.h"
 #include "wpi/HttpServerConnection.h"
 #include "wpi/UrlParser.h"
-#include "wpi/raw_ostream.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/Tcp.h"
 
@@ -23,7 +23,7 @@ class MyHttpServerConnection : public wpi::HttpServerConnection {
 };
 
 void MyHttpServerConnection::ProcessRequest() {
-  wpi::errs() << "HTTP request: '" << m_request.GetUrl() << "'\n";
+  fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
   wpi::UrlParser url{m_request.GetUrl(),
                      m_request.GetMethod() == wpi::HTTP_CONNECT};
   if (!url.IsValid()) {
@@ -32,27 +32,25 @@ void MyHttpServerConnection::ProcessRequest() {
     return;
   }
 
-  wpi::StringRef path;
+  std::string_view path;
   if (url.HasPath()) {
     path = url.GetPath();
   }
-  wpi::errs() << "path: \"" << path << "\"\n";
+  fmt::print(stderr, "path: \"{}\"\n", path);
 
-  wpi::StringRef query;
+  std::string_view query;
   if (url.HasQuery()) {
     query = url.GetQuery();
   }
-  wpi::errs() << "query: \"" << query << "\"\n";
+  fmt::print(stderr, "query: \"{}\"\n", query);
 
   const bool isGET = m_request.GetMethod() == wpi::HTTP_GET;
-  if (isGET && path.equals("/")) {
+  if (isGET && path == "/") {
     // build HTML root page
-    wpi::SmallString<256> buf;
-    wpi::raw_svector_ostream os{buf};
-    os << "<html><head><title>WebServer Example</title></head>";
-    os << "<body><p>This is an example root page from the webserver.";
-    os << "</body></html>";
-    SendResponse(200, "OK", "text/html", os.str());
+    SendResponse(200, "OK", "text/html",
+                 "<html><head><title>WebServer Example</title></head>"
+                 "<body><p>This is an example root page from the webserver."
+                 "</body></html>");
   } else {
     SendError(404, "Resource not found");
   }
@@ -73,7 +71,7 @@ int main() {
       if (!tcp) {
         return;
       }
-      wpi::errs() << "Got a connection\n";
+      std::fputs("Got a connection\n", stderr);
       auto conn = std::make_shared<MyHttpServerConnection>(tcp);
       tcp->SetData(conn);
     });
@@ -81,7 +79,7 @@ int main() {
     // start listening for incoming connections
     tcp->Listen();
 
-    wpi::errs() << "Listening on port 8080\n";
+    std::fputs("Listening on port 8080\n", stderr);
   });
 
   // wait for a keypress to terminate
