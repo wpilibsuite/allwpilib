@@ -136,7 +136,6 @@ TEST_F(DMATest, TimedTriggers) {
   ASSERT_EQ(DMASample::DMAReadStatus::kOk, timedOut);
   ASSERT_EQ(0, status);
   ASSERT_GT(remaining, 5);
-  ASSERT_EQ(DMASample::DMAReadStatus::kTimeout, timedOut);
 }
 
 TEST_F(DMATest, PWMTimedTriggers) {
@@ -154,5 +153,4 @@ TEST_F(DMATest, PWMTimedTriggers) {
   ASSERT_EQ(DMASample::DMAReadStatus::kOk, timedOut);
   ASSERT_EQ(0, status);
   ASSERT_GT(remaining, 5);
-  ASSERT_EQ(DMASample::DMAReadStatus::kTimeout, timedOut);
 }
