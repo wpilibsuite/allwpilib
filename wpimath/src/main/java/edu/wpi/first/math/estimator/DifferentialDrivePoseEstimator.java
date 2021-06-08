@@ -216,9 +216,14 @@ public class DifferentialDrivePoseEstimator {
    * @param gyroAngle The angle reported by the gyroscope.
    */
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
-    m_previousAngle = poseMeters.getRotation();
+    // Reset state estimate and error covariance
+    m_observer.reset();
+    m_latencyCompensator.reset();
+
     m_observer.setXhat(fillStateVector(poseMeters, 0.0, 0.0));
+
     m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
+    m_previousAngle = poseMeters.getRotation();
   }
 
   /**
