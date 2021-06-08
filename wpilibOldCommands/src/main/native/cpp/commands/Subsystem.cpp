@@ -4,17 +4,18 @@
 
 #include "frc/commands/Subsystem.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc/Errors.h"
 #include "frc/commands/Command.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 Subsystem::Subsystem(std::string_view name) {
-  SendableRegistry::GetInstance().AddLW(this, name, name);
+  wpi::SendableRegistry::GetInstance().AddLW(this, name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 
@@ -43,7 +44,7 @@ Command* Subsystem::GetDefaultCommand() {
 std::string Subsystem::GetDefaultCommandName() {
   Command* defaultCommand = GetDefaultCommand();
   if (defaultCommand) {
-    return SendableRegistry::GetInstance().GetName(defaultCommand);
+    return wpi::SendableRegistry::GetInstance().GetName(defaultCommand);
   } else {
     return {};
   }
@@ -61,7 +62,7 @@ Command* Subsystem::GetCurrentCommand() const {
 std::string Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
   if (currentCommand) {
-    return SendableRegistry::GetInstance().GetName(currentCommand);
+    return wpi::SendableRegistry::GetInstance().GetName(currentCommand);
   } else {
     return {};
   }
@@ -72,19 +73,19 @@ void Subsystem::Periodic() {}
 void Subsystem::InitDefaultCommand() {}
 
 std::string Subsystem::GetName() const {
-  return SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetInstance().GetName(this);
 }
 
 void Subsystem::SetName(std::string_view name) {
-  SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::GetInstance().SetName(this, name);
 }
 
 std::string Subsystem::GetSubsystem() const {
-  return SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
 void Subsystem::SetSubsystem(std::string_view name) {
-  SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 
 void Subsystem::AddChild(std::string_view name,
@@ -92,25 +93,25 @@ void Subsystem::AddChild(std::string_view name,
   AddChild(name, *child);
 }
 
-void Subsystem::AddChild(std::string_view name, Sendable* child) {
+void Subsystem::AddChild(std::string_view name, wpi::Sendable* child) {
   AddChild(name, *child);
 }
 
-void Subsystem::AddChild(std::string_view name, Sendable& child) {
-  auto& registry = SendableRegistry::GetInstance();
+void Subsystem::AddChild(std::string_view name, wpi::Sendable& child) {
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddLW(&child, registry.GetSubsystem(this), name);
 }
 
-void Subsystem::AddChild(std::shared_ptr<Sendable> child) {
+void Subsystem::AddChild(std::shared_ptr<wpi::Sendable> child) {
   AddChild(*child);
 }
 
-void Subsystem::AddChild(Sendable* child) {
+void Subsystem::AddChild(wpi::Sendable* child) {
   AddChild(*child);
 }
 
-void Subsystem::AddChild(Sendable& child) {
-  auto& registry = SendableRegistry::GetInstance();
+void Subsystem::AddChild(wpi::Sendable& child) {
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.SetSubsystem(&child, registry.GetSubsystem(this));
   registry.EnableLiveWindow(&child);
 }
@@ -121,7 +122,7 @@ void Subsystem::ConfirmCommand() {
   }
 }
 
-void Subsystem::InitSendable(SendableBuilder& builder) {
+void Subsystem::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
 
   builder.AddBooleanProperty(

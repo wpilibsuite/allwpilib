@@ -7,18 +7,18 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTriggerOutput.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class AnalogInput;
 class DutyCycle;
-class SendableBuilder;
 
-class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public wpi::Sendable,
+                      public wpi::SendableHelper<AnalogTrigger> {
   friend class AnalogTriggerOutput;
 
  public:
@@ -148,7 +148,7 @@ class AnalogTrigger : public Sendable, public SendableHelper<AnalogTrigger> {
   std::shared_ptr<AnalogTriggerOutput> CreateOutput(
       AnalogTriggerType type) const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int GetSourceChannel() const;

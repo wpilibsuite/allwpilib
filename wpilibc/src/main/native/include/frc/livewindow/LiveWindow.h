@@ -7,9 +7,11 @@
 #include <functional>
 #include <memory>
 
-namespace frc {
-
+namespace wpi {
 class Sendable;
+}  // namespace wpi
+
+namespace frc {
 
 /**
  * The LiveWindow class is the public interface for putting sensors and
@@ -36,14 +38,14 @@ class LiveWindow {
    *
    * @param sendable component
    */
-  void EnableTelemetry(Sendable* component);
+  void EnableTelemetry(wpi::Sendable* component);
 
   /**
    * Disable telemetry for a single component.
    *
    * @param sendable component
    */
-  void DisableTelemetry(Sendable* component);
+  void DisableTelemetry(wpi::Sendable* component);
 
   /**
    * Disable ALL telemetry.

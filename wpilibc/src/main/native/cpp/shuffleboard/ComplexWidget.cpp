@@ -4,36 +4,41 @@
 
 #include "frc/shuffleboard/ComplexWidget.h"
 
-#include "frc/smartdashboard/Sendable.h"
+#include <wpi/sendable/Sendable.h>
+
+#include "frc/smartdashboard/SendableBuilderImpl.h"
 
 using namespace frc;
 
 ComplexWidget::ComplexWidget(ShuffleboardContainer& parent,
-                             std::string_view title, Sendable& sendable)
+                             std::string_view title, wpi::Sendable& sendable)
     : ShuffleboardValue(title),
       ShuffleboardWidget(parent, title),
       m_sendable(sendable) {}
 
+ComplexWidget::~ComplexWidget() = default;
+
 void ComplexWidget::EnableIfActuator() {
-  if (m_builder.IsActuator()) {
-    m_builder.StartLiveWindowMode();
+  if (m_builder && static_cast<SendableBuilderImpl&>(*m_builder).IsActuator()) {
+    static_cast<SendableBuilderImpl&>(*m_builder).StartLiveWindowMode();
   }
 }
 
 void ComplexWidget::DisableIfActuator() {
-  if (m_builder.IsActuator()) {
-    m_builder.StopLiveWindowMode();
+  if (m_builder && static_cast<SendableBuilderImpl&>(*m_builder).IsActuator()) {
+    static_cast<SendableBuilderImpl&>(*m_builder).StopLiveWindowMode();
   }
 }
 
 void ComplexWidget::BuildInto(std::shared_ptr<nt::NetworkTable> parentTable,
                               std::shared_ptr<nt::NetworkTable> metaTable) {
   BuildMetadata(metaTable);
-  if (!m_builderInit) {
-    m_builder.SetTable(parentTable->GetSubTable(GetTitle()));
-    m_sendable.InitSendable(m_builder);
-    m_builder.StartListeners();
-    m_builderInit = true;
+  if (!m_builder) {
+    m_builder = std::make_unique<SendableBuilderImpl>();
+    static_cast<SendableBuilderImpl&>(*m_builder)
+        .SetTable(parentTable->GetSubTable(GetTitle()));
+    m_sendable.InitSendable(static_cast<SendableBuilderImpl&>(*m_builder));
+    static_cast<SendableBuilderImpl&>(*m_builder).StartListeners();
   }
-  m_builder.UpdateTable();
+  m_builder->Update();
 }

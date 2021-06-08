@@ -18,8 +18,8 @@ using CS_Handle = int;        // NOLINT
 using CS_Source = CS_Handle;  // NOLINT
 #endif
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
@@ -29,14 +29,15 @@ namespace detail {
 constexpr const char* kProtocol = "camera_server://";
 std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
     CS_Source source);
-void AddToSendableRegistry(Sendable* sendable, std::string name);
+void AddToSendableRegistry(wpi::Sendable* sendable, std::string name);
 }  // namespace detail
 
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
  */
-class SendableCameraWrapper : public Sendable,
-                              public SendableHelper<SendableCameraWrapper> {
+class SendableCameraWrapper
+    : public wpi::Sendable,
+      public wpi::SendableHelper<SendableCameraWrapper> {
  private:
   struct private_init {};
 
@@ -60,7 +61,7 @@ class SendableCameraWrapper : public Sendable,
   static SendableCameraWrapper& Wrap(const cs::VideoSource& source);
   static SendableCameraWrapper& Wrap(CS_Source source);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   std::string m_uri;

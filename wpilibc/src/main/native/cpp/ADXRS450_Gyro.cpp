@@ -5,11 +5,11 @@
 #include "frc/ADXRS450_Gyro.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -58,7 +58,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {
@@ -136,7 +136,7 @@ int ADXRS450_Gyro::GetPort() const {
   return m_port;
 }
 
-void ADXRS450_Gyro::InitSendable(SendableBuilder& builder) {
+void ADXRS450_Gyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
       "Value", [=] { return GetAngle(); }, nullptr);

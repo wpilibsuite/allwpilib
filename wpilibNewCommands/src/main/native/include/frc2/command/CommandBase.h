@@ -8,9 +8,9 @@
 #include <string>
 #include <string_view>
 
-#include <frc/smartdashboard/Sendable.h>
-#include <frc/smartdashboard/SendableHelper.h>
 #include <wpi/SmallSet.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Command.h"
@@ -20,8 +20,8 @@ namespace frc2 {
  * A Sendable base class for Commands.
  */
 class CommandBase : public Command,
-                    public frc::Sendable,
-                    public frc::SendableHelper<CommandBase> {
+                    public wpi::Sendable,
+                    public wpi::SendableHelper<CommandBase> {
  public:
   /**
    * Adds the specified requirements to the command.
@@ -69,7 +69,7 @@ class CommandBase : public Command,
    */
   void SetSubsystem(std::string_view subsystem);
 
-  void InitSendable(frc::SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   CommandBase();

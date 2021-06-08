@@ -92,7 +92,7 @@ class Servo : public PWM {
    */
   double GetMinAngle() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   double GetServoAngleRange() const;

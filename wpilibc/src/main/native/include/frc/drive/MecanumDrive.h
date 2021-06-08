@@ -7,9 +7,10 @@
 #include <memory>
 #include <string>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -72,8 +73,8 @@ class SpeedController;
  * deadband of 0 is used.
  */
 class MecanumDrive : public RobotDriveBase,
-                     public Sendable,
-                     public SendableHelper<MecanumDrive> {
+                     public wpi::Sendable,
+                     public wpi::SendableHelper<MecanumDrive> {
  public:
   struct WheelSpeeds {
     double frontLeft = 0.0;
@@ -150,7 +151,7 @@ class MecanumDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   SpeedController* m_frontLeftMotor;

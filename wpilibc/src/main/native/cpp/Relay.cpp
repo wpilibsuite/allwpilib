@@ -12,11 +12,11 @@
 #include <hal/Ports.h>
 #include <hal/Relay.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -56,7 +56,7 @@ Relay::Relay(int channel, Relay::Direction direction)
     FRC_CheckErrorStatus(status, "Channel {}", m_channel);
   }
 
-  SendableRegistry::GetInstance().AddLW(this, "Relay", m_channel);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Relay", m_channel);
 }
 
 Relay::~Relay() {
@@ -172,7 +172,7 @@ std::string Relay::GetDescription() const {
   return fmt::format("Relay {}", GetChannel());
 }
 
-void Relay::InitSendable(SendableBuilder& builder) {
+void Relay::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Relay");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Set(kOff); });

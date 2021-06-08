@@ -8,11 +8,11 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -36,8 +36,8 @@ Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_module->GetModuleNumber() + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Solenoid",
-                                        m_module->GetModuleNumber(), m_channel);
+  wpi::SendableRegistry::GetInstance().AddLW(
+      this, "Solenoid", m_module->GetModuleNumber(), m_channel);
 }
 
 Solenoid::~Solenoid() {}
@@ -72,7 +72,7 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::InitSendable(SendableBuilder& builder) {
+void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Solenoid");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Set(false); });

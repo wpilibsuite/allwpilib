@@ -9,10 +9,10 @@
 #include <array>
 
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -26,8 +26,8 @@ class Counter;
  * filter. The filter lets the user configure the time that an input must remain
  * high or low before it is classified as high or low.
  */
-class DigitalGlitchFilter : public Sendable,
-                            public SendableHelper<DigitalGlitchFilter> {
+class DigitalGlitchFilter : public wpi::Sendable,
+                            public wpi::SendableHelper<DigitalGlitchFilter> {
  public:
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;
@@ -114,7 +114,7 @@ class DigitalGlitchFilter : public Sendable,
    */
   uint64_t GetPeriodNanoSeconds();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Sets the filter for the input to be the requested index. A value of 0

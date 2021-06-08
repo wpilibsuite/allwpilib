@@ -4,8 +4,8 @@
 
 #include "frc/smartdashboard/Field2d.h"
 
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -13,7 +13,7 @@ Field2d::Field2d() {
   m_objects.emplace_back(
       std::make_unique<FieldObject2d>("Robot", FieldObject2d::private_init{}));
   m_objects[0]->SetPose(Pose2d{});
-  SendableRegistry::GetInstance().Add(this, "Field");
+  wpi::SendableRegistry::GetInstance().Add(this, "Field");
 }
 
 Field2d::Field2d(Field2d&& rhs) : SendableHelper(std::move(rhs)) {
@@ -67,7 +67,7 @@ FieldObject2d* Field2d::GetRobotObject() {
   return m_objects[0].get();
 }
 
-void Field2d::InitSendable(SendableBuilder& builder) {
+void Field2d::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Field2d");
   m_table = builder.GetTable();
 

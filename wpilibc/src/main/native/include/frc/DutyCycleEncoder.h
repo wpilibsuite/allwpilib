@@ -9,11 +9,11 @@
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
 #include <units/angle.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 class DutyCycle;
@@ -24,8 +24,8 @@ class DigitalSource;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public Sendable,
-                         public SendableHelper<DutyCycleEncoder> {
+class DutyCycleEncoder : public wpi::Sendable,
+                         public wpi::SendableHelper<DutyCycleEncoder> {
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
@@ -163,7 +163,7 @@ class DutyCycleEncoder : public Sendable,
    */
   int GetSourceChannel() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   void Init();

@@ -11,12 +11,12 @@
 #include <hal/Constants.h>
 #include <hal/DIO.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Counter.h"
 #include "frc/Encoder.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -35,8 +35,8 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalGlitchFilter,
              m_channelIndex + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
-                                        m_channelIndex);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "DigitalGlitchFilter",
+                                             m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
@@ -125,4 +125,4 @@ uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
          static_cast<uint64_t>(HAL_GetSystemClockTicksPerMicrosecond() / 4);
 }
 
-void DigitalGlitchFilter::InitSendable(SendableBuilder&) {}
+void DigitalGlitchFilter::InitSendable(wpi::SendableBuilder&) {}

@@ -5,15 +5,13 @@
 #pragma once
 
 #include <hal/SimDevice.h>
+#include <networktables/NTSendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -23,8 +21,8 @@ class SendableBuilder;
  * 0x1D (7-bit address).
  */
 class ADXL345_I2C : public Accelerometer,
-                    public Sendable,
-                    public SendableHelper<ADXL345_I2C> {
+                    public nt::NTSendable,
+                    public wpi::SendableHelper<ADXL345_I2C> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
@@ -70,7 +68,7 @@ class ADXL345_I2C : public Accelerometer,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  protected:
   I2C m_i2c;

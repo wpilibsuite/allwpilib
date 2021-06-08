@@ -4,8 +4,6 @@
 
 #include "frc/smartdashboard/MechanismRoot2d.h"
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 #include "frc/util/Color8Bit.h"
 
 using namespace frc;

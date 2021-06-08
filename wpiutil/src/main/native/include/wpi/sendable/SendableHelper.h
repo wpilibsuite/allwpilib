@@ -8,11 +8,10 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/deprecated.h>
+#include "wpi/deprecated.h"
+#include "wpi/sendable/SendableRegistry.h"
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
-namespace frc {
+namespace wpi {
 
 /**
  * A helper class for use with objects that add themselves to SendableRegistry.
@@ -173,4 +172,4 @@ class SendableHelper {
   }
 };
 
-}  // namespace frc
+}  // namespace wpi

@@ -4,16 +4,25 @@
 
 #pragma once
 
-#include <string_view>
-
 #include <wpi/sendable/Sendable.h>
 
+namespace nt {
+
+class NTSendableBuilder;
+
 /**
- * A mock sendable that marks itself as an actuator.
+ * Interface for NetworkTable Sendable objects.
  */
-class MockActuatorSendable : public wpi::Sendable {
+class NTSendable : public wpi::Sendable {
  public:
-  explicit MockActuatorSendable(std::string_view name);
+  /**
+   * Initializes this Sendable object.
+   *
+   * @param builder sendable builder
+   */
+  virtual void InitSendable(NTSendableBuilder& builder) = 0;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 };
+
+}  // namespace nt

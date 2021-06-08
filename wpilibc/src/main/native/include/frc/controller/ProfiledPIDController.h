@@ -10,12 +10,12 @@
 #include <limits>
 
 #include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableHelper.h"
 #include "frc/trajectory/TrapezoidProfile.h"
 
 namespace frc {
@@ -29,8 +29,8 @@ void ReportProfiledPIDController();
  */
 template <class Distance>
 class ProfiledPIDController
-    : public Sendable,
-      public SendableHelper<ProfiledPIDController<Distance>> {
+    : public wpi::Sendable,
+      public wpi::SendableHelper<ProfiledPIDController<Distance>> {
  public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =
@@ -340,7 +340,7 @@ class ProfiledPIDController
     Reset(measuredPosition, Velocity_t(0));
   }
 
-  void InitSendable(frc::SendableBuilder& builder) override {
+  void InitSendable(wpi::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("ProfiledPIDController");
     builder.AddDoubleProperty(
         "p", [this] { return GetP(); }, [this](double value) { SetP(value); });

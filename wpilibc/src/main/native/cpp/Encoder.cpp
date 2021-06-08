@@ -9,11 +9,11 @@
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/DigitalInput.h"
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -22,7 +22,7 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddChild(this, m_aSource.get());
   registry.AddChild(this, m_bSource.get());
 }
@@ -181,7 +181,7 @@ int Encoder::GetSamplesToAverage() const {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
+  wpi::SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
@@ -207,7 +207,7 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::InitSendable(SendableBuilder& builder) {
+void Encoder::InitSendable(wpi::SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   FRC_CheckErrorStatus(status, "{}", "GetEncodingType");
@@ -240,8 +240,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
-  SendableRegistry::GetInstance().AddLW(this, "Encoder",
-                                        m_aSource->GetChannel());
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Encoder",
+                                             m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {
