@@ -14,7 +14,7 @@
 namespace frc::sim {
 
 /**
- * Class to control a simulated RoboRIO.
+ * A utility class to control a simulated RoboRIO.
  */
 class RoboRioSim {
  public:

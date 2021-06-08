@@ -20,7 +20,7 @@ class QuinticHermiteSplineTest {
   private static final double kMaxDy = 0.00127;
   private static final double kMaxDtheta = 0.0872;
 
-  @SuppressWarnings({"ParameterName", "PMD.UnusedLocalVariable"})
+  @SuppressWarnings("ParameterName")
   private void run(Pose2d a, Pose2d b) {
     // Start the timer.
     // var start = System.nanoTime();

@@ -19,8 +19,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class UtilityClassTest<T> {
+public class UtilityClassTest<T> {
   private final Class<T> m_clazz;
 
   protected UtilityClassTest(Class<T> clazz) {

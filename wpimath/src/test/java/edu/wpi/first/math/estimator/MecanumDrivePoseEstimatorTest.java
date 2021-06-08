@@ -20,11 +20,7 @@ import org.junit.jupiter.api.Test;
 
 public class MecanumDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ExcessiveMethodLength"
-  })
+  @SuppressWarnings("LocalVariableName")
   public void testAccuracy() {
     var kinematics =
         new MecanumDriveKinematics(

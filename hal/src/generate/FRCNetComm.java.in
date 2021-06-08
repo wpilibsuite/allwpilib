@@ -12,7 +12,7 @@ public class FRCNetComm {
   /**
    * Resource type from UsageReporting.
    */
-  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
+  @SuppressWarnings("TypeName")
   public static final class tResourceType {
     private tResourceType() {
     }
@@ -23,7 +23,7 @@ ${usage_reporting_types}
   /**
    * Instances from UsageReporting.
    */
-  @SuppressWarnings({"TypeName", "PMD.ConstantsInInterface"})
+  @SuppressWarnings("TypeName")
   public static final class tInstances {
     private tInstances() {
     }

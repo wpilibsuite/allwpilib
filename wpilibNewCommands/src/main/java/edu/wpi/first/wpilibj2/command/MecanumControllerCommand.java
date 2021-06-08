@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * <p>The robot angle controller does not follow the angle given by the trajectory but rather goes
  * to the angle given in the final state of the trajectory.
  */
-@SuppressWarnings({"PMD.TooManyFields", "MemberName"})
+@SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -85,7 +85,7 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -177,7 +177,7 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -235,7 +235,7 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -307,7 +307,7 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

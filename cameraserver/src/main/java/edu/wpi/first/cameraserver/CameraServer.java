@@ -90,7 +90,7 @@ public final class CameraServer {
     return "mjpg:http://" + address + ":" + port + "/?action=stream";
   }
 
-  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings("MissingJavadocMethod")
   private synchronized String[] getSinkStreamValues(int sink) {
     // Ignore all but MjpegServer
     if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
@@ -120,7 +120,7 @@ public final class CameraServer {
     return values.toArray(new String[0]);
   }
 
-  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  @SuppressWarnings("MissingJavadocMethod")
   private synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -155,11 +155,7 @@ public final class CameraServer {
     return values;
   }
 
-  @SuppressWarnings({
-    "MissingJavadocMethod",
-    "PMD.AvoidUsingHardCodedIP",
-    "PMD.CyclomaticComplexity"
-  })
+  @SuppressWarnings("MissingJavadocMethod")
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
@@ -247,7 +243,7 @@ public final class CameraServer {
     return modeStrings;
   }
 
-  @SuppressWarnings({"MissingJavadocMethod", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings("MissingJavadocMethod")
   private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
@@ -304,12 +300,7 @@ public final class CameraServer {
     }
   }
 
-  @SuppressWarnings({
-    "MissingJavadocMethod",
-    "PMD.UnusedLocalVariable",
-    "PMD.ExcessiveMethodLength",
-    "PMD.NPathComplexity"
-  })
+  @SuppressWarnings("MissingJavadocMethod")
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
     m_sources = new HashMap<>();

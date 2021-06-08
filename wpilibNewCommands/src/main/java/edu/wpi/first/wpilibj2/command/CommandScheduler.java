@@ -34,7 +34,6 @@ import java.util.function.Consumer;
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  */
-@SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields"})
 public final class CommandScheduler implements Sendable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
@@ -157,7 +156,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param interruptible whether this command can be interrupted
    * @param command the command to schedule
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   private void schedule(boolean interruptible, Command command) {
     if (m_inRunLoop) {
       m_toSchedule.put(command, interruptible);
@@ -239,7 +237,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * <p>Any subsystems not being used as requirements have their default methods started.
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
     if (m_disabled) {
       return;

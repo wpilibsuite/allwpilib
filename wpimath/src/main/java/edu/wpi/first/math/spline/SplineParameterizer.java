@@ -96,7 +96,6 @@ public final class SplineParameterizer {
    * @throws MalformedSplineException When the spline is malformed (e.g. has close adjacent points
    *     with approximately opposing headings)
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static List<PoseWithCurvature> parameterize(Spline spline, double t0, double t1) {
     var splinePoints = new ArrayList<PoseWithCurvature>();
 

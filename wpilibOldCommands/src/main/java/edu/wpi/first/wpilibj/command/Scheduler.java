@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -46,8 +47,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
   }
 
   /** A hashtable of active {@link Command Commands} to their {@link LinkedListElement}. */
-  @SuppressWarnings("PMD.LooseCoupling")
-  private final Hashtable<Command, LinkedListElement> m_commandTable = new Hashtable<>();
+  private final Map<Command, LinkedListElement> m_commandTable = new Hashtable<>();
   /** The {@link Set} of all {@link Subsystem Subsystems}. */
   private final Set m_subsystems = new Set();
   /** The first {@link Command} in the list. */
@@ -59,13 +59,12 @@ public final class Scheduler implements Sendable, AutoCloseable {
   /** Whether or not we are currently disabled. */
   private boolean m_disabled;
   /** A list of all {@link Command Commands} which need to be added. */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   private final Vector<Command> m_additions = new Vector<>();
   /**
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
    */
-  @SuppressWarnings("PMD.LooseCoupling")
   private Vector<ButtonScheduler> m_buttons;
 
   private boolean m_runningCommandsChanged;
@@ -129,7 +128,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
    *
    * @param command the {@link Command} to add
    */
-  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings("MethodName")
   private void _add(Command command) {
     if (command == null) {
       return;
@@ -194,7 +193,6 @@ public final class Scheduler implements Sendable, AutoCloseable {
    *   <li>Add Defaults
    * </ol>
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
     m_runningCommandsChanged = false;
 

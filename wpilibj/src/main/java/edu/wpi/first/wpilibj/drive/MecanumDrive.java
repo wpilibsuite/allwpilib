@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import static java.util.Objects.requireNonNull;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -12,7 +14,6 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import java.util.StringJoiner;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -104,7 +105,11 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       SpeedController rearLeftMotor,
       SpeedController frontRightMotor,
       SpeedController rearRightMotor) {
-    verify(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
+    requireNonNull(frontLeftMotor, "Front-left motor cannot be null");
+    requireNonNull(rearLeftMotor, "Rear-left motor cannot be null");
+    requireNonNull(frontRightMotor, "Front-right motor cannot be null");
+    requireNonNull(rearRightMotor, "Rear-right motor cannot be null");
+
     m_frontLeftMotor = frontLeftMotor;
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
@@ -120,39 +125,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   @Override
   public void close() {
     SendableRegistry.remove(this);
-  }
-
-  /**
-   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are. The
-   * exception's error message will specify all null motors, e.g. {@code
-   * NullPointerException("frontLeftMotor, rearRightMotor")}, to give as much information as
-   * possible to the programmer.
-   *
-   * @throws NullPointerException if any of the given motors are null
-   */
-  @SuppressWarnings({"PMD.AvoidThrowingNullPointerException", "PMD.CyclomaticComplexity"})
-  private void verify(
-      SpeedController frontLeft,
-      SpeedController rearLeft,
-      SpeedController frontRight,
-      SpeedController rearRightMotor) {
-    if (frontLeft != null && rearLeft != null && frontRight != null && rearRightMotor != null) {
-      return;
-    }
-    StringJoiner joiner = new StringJoiner(", ");
-    if (frontLeft == null) {
-      joiner.add("frontLeftMotor");
-    }
-    if (rearLeft == null) {
-      joiner.add("rearLeftMotor");
-    }
-    if (frontRight == null) {
-      joiner.add("frontRightMotor");
-    }
-    if (rearRightMotor == null) {
-      joiner.add("rearRightMotor");
-    }
-    throw new NullPointerException(joiner.toString());
   }
 
   /**

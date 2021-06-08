@@ -161,7 +161,7 @@ public final class NetworkTableInstance implements AutoCloseable {
   public NetworkTable getTable(String key) {
     // prepend leading / if not present
     String theKey;
-    if (key.isEmpty() || key.equals("/")) {
+    if (key.isEmpty() || "/".equals(key)) {
       theKey = "";
     } else if (key.charAt(0) == NetworkTable.PATH_SEPARATOR) {
       theKey = key;
@@ -202,13 +202,13 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   private final ReentrantLock m_entryListenerLock = new ReentrantLock();
   private final Map<Integer, EntryConsumer<EntryNotification>> m_entryListeners = new HashMap<>();
-  private Thread m_entryListenerThread;
   private int m_entryListenerPoller;
   private boolean m_entryListenerWaitQueue;
   private final Condition m_entryListenerWaitQueueCond = m_entryListenerLock.newCondition();
 
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startEntryListenerThread() {
-    m_entryListenerThread =
+    var entryListenerThread =
         new Thread(
             () -> {
               boolean wasInterrupted = false;
@@ -264,8 +264,8 @@ public final class NetworkTableInstance implements AutoCloseable {
               }
             },
             "NTEntryListener");
-    m_entryListenerThread.setDaemon(true);
-    m_entryListenerThread.start();
+    entryListenerThread.setDaemon(true);
+    entryListenerThread.start();
   }
 
   /**
@@ -369,14 +369,14 @@ public final class NetworkTableInstance implements AutoCloseable {
   private final ReentrantLock m_connectionListenerLock = new ReentrantLock();
   private final Map<Integer, Consumer<ConnectionNotification>> m_connectionListeners =
       new HashMap<>();
-  private Thread m_connectionListenerThread;
   private int m_connectionListenerPoller;
   private boolean m_connectionListenerWaitQueue;
   private final Condition m_connectionListenerWaitQueueCond =
       m_connectionListenerLock.newCondition();
 
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startConnectionListenerThread() {
-    m_connectionListenerThread =
+    var connectionListenerThread =
         new Thread(
             () -> {
               boolean wasInterrupted = false;
@@ -432,8 +432,8 @@ public final class NetworkTableInstance implements AutoCloseable {
               }
             },
             "NTConnectionListener");
-    m_connectionListenerThread.setDaemon(true);
-    m_connectionListenerThread.start();
+    connectionListenerThread.setDaemon(true);
+    connectionListenerThread.start();
   }
 
   /**
@@ -519,13 +519,13 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   private final ReentrantLock m_rpcCallLock = new ReentrantLock();
   private final Map<Integer, EntryConsumer<RpcAnswer>> m_rpcCalls = new HashMap<>();
-  private Thread m_rpcCallThread;
   private int m_rpcCallPoller;
   private boolean m_rpcCallWaitQueue;
   private final Condition m_rpcCallWaitQueueCond = m_rpcCallLock.newCondition();
 
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startRpcCallThread() {
-    m_rpcCallThread =
+    var rpcCallThread =
         new Thread(
             () -> {
               boolean wasInterrupted = false;
@@ -581,8 +581,8 @@ public final class NetworkTableInstance implements AutoCloseable {
               }
             },
             "NTRpcCall");
-    m_rpcCallThread.setDaemon(true);
-    m_rpcCallThread.start();
+    rpcCallThread.setDaemon(true);
+    rpcCallThread.start();
   }
 
   private static final byte[] rev0def = new byte[] {0};
@@ -999,13 +999,13 @@ public final class NetworkTableInstance implements AutoCloseable {
 
   private final ReentrantLock m_loggerLock = new ReentrantLock();
   private final Map<Integer, Consumer<LogMessage>> m_loggers = new HashMap<>();
-  private Thread m_loggerThread;
   private int m_loggerPoller;
   private boolean m_loggerWaitQueue;
   private final Condition m_loggerWaitQueueCond = m_loggerLock.newCondition();
 
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private void startLogThread() {
-    m_loggerThread =
+    var loggerThread =
         new Thread(
             () -> {
               boolean wasInterrupted = false;
@@ -1049,8 +1049,8 @@ public final class NetworkTableInstance implements AutoCloseable {
               }
             },
             "NTLogger");
-    m_loggerThread.setDaemon(true);
-    m_loggerThread.start();
+    loggerThread.setDaemon(true);
+    loggerThread.start();
   }
 
   /**
@@ -1149,5 +1149,5 @@ public final class NetworkTableInstance implements AutoCloseable {
   }
 
   private boolean m_owned;
-  private int m_handle;
+  private final int m_handle;
 }

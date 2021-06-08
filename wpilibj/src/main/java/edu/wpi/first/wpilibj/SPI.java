@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 /** Represents a SPI bus port. */
-@SuppressWarnings("PMD.CyclomaticComplexity")
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0),
@@ -258,7 +257,7 @@ public class SPI implements AutoCloseable {
    * @param dataReceived Buffer to receive data from the device.
    * @param size The length of the transaction, in bytes
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
+  @SuppressWarnings("ByteBufferBackingArray")
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -425,7 +424,6 @@ public class SPI implements AutoCloseable {
 
   private static final int kAccumulateDepth = 2048;
 
-  @SuppressWarnings("PMD.TooManyFields")
   private static class Accumulator implements AutoCloseable {
     Accumulator(
         int port,
@@ -482,7 +480,6 @@ public class SPI implements AutoCloseable {
     final boolean m_bigEndian; // is response big endian?
     final int m_port;
 
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     void update() {
       synchronized (m_mutex) {
         boolean done = false;

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import static java.util.Objects.requireNonNull;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -12,7 +14,6 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import java.util.StringJoiner;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -121,7 +122,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * so before passing it in.
    */
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
-    verify(leftMotor, rightMotor);
+    requireNonNull(leftMotor, "Left motor cannot be null");
+    requireNonNull(rightMotor, "Right motor cannot be null");
+
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     SendableRegistry.addChild(this, m_leftMotor);
@@ -133,29 +136,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   @Override
   public void close() {
     SendableRegistry.remove(this);
-  }
-
-  /**
-   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are. The
-   * exception's error message will specify all null motors, e.g. {@code
-   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to the
-   * programmer.
-   *
-   * @throws NullPointerException if any of the given motors are null
-   */
-  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
-  private void verify(SpeedController leftMotor, SpeedController rightMotor) {
-    if (leftMotor != null && rightMotor != null) {
-      return;
-    }
-    StringJoiner joiner = new StringJoiner(", ");
-    if (leftMotor == null) {
-      joiner.add("leftMotor");
-    }
-    if (rightMotor == null) {
-      joiner.add("rightMotor");
-    }
-    throw new NullPointerException(joiner.toString());
   }
 
   /**
@@ -212,7 +192,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers.
    */
-  @SuppressWarnings({"ParameterName", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings("ParameterName")
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
       HAL.report(

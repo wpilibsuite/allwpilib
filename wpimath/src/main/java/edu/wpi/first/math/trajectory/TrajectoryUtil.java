@@ -23,7 +23,6 @@ public final class TrajectoryUtil {
    * @param elements A double[] containing the raw elements of the trajectory.
    * @return A trajectory created from the elements.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private static Trajectory createTrajectoryFromElements(double[] elements) {
     // Make sure that the elements have the correct length.
     if (elements.length % 7 != 0) {

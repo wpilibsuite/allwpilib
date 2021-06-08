@@ -18,13 +18,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
-@SuppressWarnings({
-  "PMD.CyclomaticComplexity",
-  "PMD.ExcessiveClassLength",
-  "PMD.ExcessivePublicCount",
-  "PMD.GodClass",
-  "PMD.TooManyFields"
-})
 public class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
@@ -162,7 +155,6 @@ public class DriverStation {
       controlWord.forceSetDouble(0);
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
     private void sendMatchData(DriverStation driverStation) {
       AllianceStationID allianceID = HAL.getAllianceStation();
       boolean isRedAlliance = false;
@@ -268,8 +260,7 @@ public class DriverStation {
   private final MatchDataSender m_matchDataSender;
 
   // Internal Driver Station thread
-  @SuppressWarnings("PMD.SingularField")
-  private final Thread m_thread;
+  private Thread m_thread;
 
   private volatile boolean m_threadKeepAlive = true;
 
@@ -308,7 +299,6 @@ public class DriverStation {
    * <p>The single DriverStation instance is created statically with the instance static member
    * variable.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private DriverStation() {
     HAL.initialize(500, 0);
     m_waitForDataCount = 0;
@@ -340,6 +330,14 @@ public class DriverStation {
   /** Kill the thread. */
   public void release() {
     m_threadKeepAlive = false;
+    if (m_thread != null) {
+      try {
+        m_thread.join();
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }
+      m_thread = null;
+    }
   }
 
   /**

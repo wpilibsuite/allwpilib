@@ -30,13 +30,13 @@ import java.util.Vector;
  */
 public class CommandGroup extends Command {
   /** The commands in this group (stored in entries). */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
    */
   /** The active children in this group (stored in entries). */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   final Vector<Entry> m_children = new Vector<>();
   /** The current command, -1 signifies that none have been run. */
   private int m_currentCommandIndex = -1;
@@ -205,7 +205,7 @@ public class CommandGroup extends Command {
   }
 
   @Override
-  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+  @SuppressWarnings("MethodName")
   void _execute() {
     Entry entry = null;
     Command cmd = null;

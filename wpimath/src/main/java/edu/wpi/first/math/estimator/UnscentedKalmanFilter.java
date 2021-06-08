@@ -26,7 +26,7 @@ import org.ejml.simple.SimpleMatrix;
  * an estimate of the true covariance (as opposed to a linearized version of it). This means that
  * the UKF works with nonlinear systems.
  */
-@SuppressWarnings({"MemberName", "ClassTypeParameterName", "PMD.TooManyFields"})
+@SuppressWarnings({"MemberName", "ClassTypeParameterName"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
 
@@ -108,7 +108,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param addFuncX A function that adds two state vectors.
    * @param nominalDtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
+  @SuppressWarnings("ParameterName")
   public UnscentedKalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -144,7 +144,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     reset();
   }
 
-  @SuppressWarnings({"ParameterName", "LocalVariableName", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   static <S extends Num, C extends Num> Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
       Nat<S> s,
       Nat<C> dim,

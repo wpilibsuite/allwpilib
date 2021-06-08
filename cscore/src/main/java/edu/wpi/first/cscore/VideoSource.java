@@ -179,7 +179,6 @@ public class VideoSource implements AutoCloseable {
   }
 
   /** Enumerate all properties of this source. */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSourceProperties(m_handle);
     VideoProperty[] rv = new VideoProperty[handles.length];
@@ -323,7 +322,6 @@ public class VideoSource implements AutoCloseable {
    *
    * @return Vector of sinks.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSourceSinks(m_handle);
     VideoSink[] rv = new VideoSink[handles.length];
@@ -338,7 +336,6 @@ public class VideoSource implements AutoCloseable {
    *
    * @return Vector of sources.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static VideoSource[] enumerateSources() {
     int[] handles = CameraServerJNI.enumerateSources();
     VideoSource[] rv = new VideoSource[handles.length];

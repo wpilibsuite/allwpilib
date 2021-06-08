@@ -171,7 +171,6 @@ public class VecBuilder<N extends Num> extends MatBuilder<N, N1> {
    * @param n9 the ninth element.
    * @param n10 the tenth element.
    */
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   public static Vector<N10> fill(
       double n1,
       double n2,

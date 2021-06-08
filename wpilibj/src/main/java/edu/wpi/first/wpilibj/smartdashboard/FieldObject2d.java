@@ -153,7 +153,6 @@ public class FieldObject2d {
     }
   }
 
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private synchronized void updateFromEntry() {
     if (m_entry == null) {
       return;

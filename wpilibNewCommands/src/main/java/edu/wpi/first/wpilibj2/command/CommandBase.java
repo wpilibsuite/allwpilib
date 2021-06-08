@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** A {@link Sendable} base class for {@link Command}s. */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandBase implements Sendable, Command {
 
   protected Set<Subsystem> m_requirements = new HashSet<>();
