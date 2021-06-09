@@ -9,8 +9,19 @@
 
 #ifdef __cplusplus
 #include "cscore_oo.h"
-#endif
-
+/**
+ * Raw Frame
+ */
+struct CS_RawFrame {
+  char* data;
+  int dataLength;
+  int pixelFormat;
+  int width;
+  int height;
+  int totalData;
+};
+extern "C" {
+#else
 /**
  * Raw Frame
  */
@@ -22,9 +33,6 @@ typedef struct CS_RawFrame {
   int height;
   int totalData;
 } CS_RawFrame;
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 /**

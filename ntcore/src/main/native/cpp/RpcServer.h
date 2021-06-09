@@ -19,7 +19,7 @@ namespace nt {
 
 namespace impl {
 
-typedef std::pair<unsigned int, unsigned int> RpcIdPair;
+using RpcIdPair = std::pair<unsigned int, unsigned int>;
 
 struct RpcNotifierData : public RpcAnswer {
   RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, std::string_view name_,

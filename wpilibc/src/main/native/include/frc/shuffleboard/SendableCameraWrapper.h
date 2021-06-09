@@ -14,8 +14,8 @@
 namespace cs {
 class VideoSource;
 }  // namespace cs
-typedef int CS_Handle;
-typedef CS_Handle CS_Source;
+using CS_Handle = int;        // NOLINT
+using CS_Source = CS_Handle;  // NOLINT
 #endif
 
 #include "frc/smartdashboard/Sendable.h"

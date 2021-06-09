@@ -2154,7 +2154,7 @@ struct LogMessage {
   std::string m_msg;
 };
 
-typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
+using LoggerJNI = JSingletonCallbackManager<LogMessage>;
 
 }  // namespace
 

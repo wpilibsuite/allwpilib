@@ -21,7 +21,7 @@ namespace {
 
 class LoadPersistentImpl {
  public:
-  typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
+  using Entry = std::pair<std::string, std::shared_ptr<Value>>;
   using WarnFunc = std::function<void(size_t, const char*)>;
 
   LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)

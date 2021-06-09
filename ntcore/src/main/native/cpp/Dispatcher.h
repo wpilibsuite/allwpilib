@@ -37,7 +37,7 @@ class DispatcherBase : public IDispatcher {
   friend class DispatcherTest;
 
  public:
-  typedef std::function<std::unique_ptr<wpi::NetworkStream>()> Connector;
+  using Connector = std::function<std::unique_ptr<wpi::NetworkStream>()>;
 
   DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
                  wpi::Logger& logger);
