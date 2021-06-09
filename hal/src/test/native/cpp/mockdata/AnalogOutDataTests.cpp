@@ -28,12 +28,11 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
       false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   HAL_PortHandle portHandle;
   HAL_DigitalHandle analogOutHandle;
 
   // Use out of range index
-  status = 0;
   portHandle = 8000;
   gTestAnalogOutCallbackName = "Unset";
   analogOutHandle =

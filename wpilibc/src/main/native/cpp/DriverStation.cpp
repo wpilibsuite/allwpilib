@@ -514,7 +514,7 @@ bool DriverStation::WaitForData(units::second_t timeout) {
 }
 
 double DriverStation::GetMatchTime() const {
-  int32_t status;
+  int32_t status = 0;
   return HAL_GetMatchTime(&status);
 }
 
