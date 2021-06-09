@@ -135,7 +135,7 @@ public class ShuffleboardTabTest {
   }
 
   /** Stub for Java 9 {@code Map.of()}. */
-  @SuppressWarnings({"unchecked", "PMD"})
+  @SuppressWarnings("unchecked")
   private static <K, V> Map<K, V> mapOf(Object... entries) {
     Map<K, V> map = new HashMap<>();
     for (int i = 0; i < entries.length; i += 2) {

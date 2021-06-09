@@ -208,7 +208,6 @@ public abstract class IterativeRobotBase extends RobotBase {
     return m_period;
   }
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
     m_watchdog.reset();
 

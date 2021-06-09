@@ -13,8 +13,9 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 
 /** Basic setup for all {@link Command tests}." */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandTestBase {
+  protected CommandTestBase() {}
+
   @BeforeEach
   void commandSetup() {
     CommandScheduler.getInstance().cancelAll();

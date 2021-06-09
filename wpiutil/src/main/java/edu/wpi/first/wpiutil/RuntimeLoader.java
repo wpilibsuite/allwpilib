@@ -107,13 +107,7 @@ public final class RuntimeLoader<T> {
   }
 
   /** Load a native library by directly hashing the file. */
-  @SuppressWarnings({
-    "PMD.NPathComplexity",
-    "PMD.PreserveStackTrace",
-    "PMD.EmptyWhileStmt",
-    "PMD.AvoidThrowingRawExceptionTypes",
-    "PMD.CyclomaticComplexity"
-  })
+  @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.EmptyWhileStmt"})
   public void loadLibraryHashed() throws IOException {
     try {
       // First, try loading path

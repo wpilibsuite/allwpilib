@@ -56,11 +56,7 @@ public final class CombinedRuntimeLoader {
    * @return List of all libraries that were extracted
    * @throws IOException Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UnnecessaryCastRule",
-    "unchecked"
-  })
+  @SuppressWarnings({"PMD.UnnecessaryCastRule", "unchecked"})
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
     TypeReference<HashMap<String, Object>> typeRef =

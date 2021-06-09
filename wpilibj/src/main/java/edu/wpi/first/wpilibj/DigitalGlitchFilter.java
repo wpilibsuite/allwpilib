@@ -163,7 +163,6 @@ public class DigitalGlitchFilter implements Sendable, AutoCloseable {
   }
 
   @Override
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public void initSendable(SendableBuilder builder) {}
 
   private int m_channelIndex = -1;

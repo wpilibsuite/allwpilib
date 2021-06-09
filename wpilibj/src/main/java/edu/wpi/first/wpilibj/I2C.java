@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
-@SuppressWarnings("PMD.GodClass")
 public class I2C implements AutoCloseable {
   public enum Port {
     kOnboard(0),
@@ -99,7 +98,7 @@ public class I2C implements AutoCloseable {
    * @param receiveSize Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
+  @SuppressWarnings("ByteBufferBackingArray")
   public synchronized boolean transaction(
       ByteBuffer dataToSend, int sendSize, ByteBuffer dataReceived, int receiveSize) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {

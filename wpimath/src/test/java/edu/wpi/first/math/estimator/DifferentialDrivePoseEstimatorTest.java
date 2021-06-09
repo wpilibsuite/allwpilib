@@ -22,11 +22,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 public class DifferentialDrivePoseEstimatorTest {
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.ExcessiveMethodLength",
-    "PMD.AvoidInstantiatingObjectsInLoops"
-  })
+  @SuppressWarnings("LocalVariableName")
   @Test
   public void testAccuracy() {
     var estimator =

@@ -277,10 +277,7 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
-    "PMD.CyclomaticComplexity", "PMD.NPathComplexity"
-  })
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 

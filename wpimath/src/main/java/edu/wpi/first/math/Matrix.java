@@ -23,7 +23,6 @@ import org.ejml.simple.SimpleMatrix;
  * @param <R> The number of rows in this matrix.
  * @param <C> The number of columns in this matrix.
  */
-@SuppressWarnings("PMD.ExcessivePublicCount")
 public class Matrix<R extends Num, C extends Num> {
   protected final SimpleMatrix m_storage;
 
@@ -531,7 +530,6 @@ public class Matrix<R extends Num, C extends Num> {
    * @throws RuntimeException if the matrix could not be decomposed(ie. is not positive
    *     semidefinite).
    */
-  @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
   public Matrix<R, C> lltDecompose(boolean lowerTriangular) {
     SimpleMatrix temp = m_storage.copy();
 

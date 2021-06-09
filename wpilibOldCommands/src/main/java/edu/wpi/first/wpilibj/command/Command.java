@@ -36,7 +36,6 @@ import java.util.Enumeration;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-@SuppressWarnings("PMD.GodClass")
 public abstract class Command implements Sendable, AutoCloseable {
   /** The time since this command was initialized. */
   private double m_startTime = -1;

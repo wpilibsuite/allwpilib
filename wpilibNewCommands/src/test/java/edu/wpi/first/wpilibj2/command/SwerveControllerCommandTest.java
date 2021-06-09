@@ -82,7 +82,6 @@ class SwerveControllerCommandTest {
 
   @Test
   @ResourceLock("timing")
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
     final var subsystem = new Subsystem() {};
 

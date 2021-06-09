@@ -54,12 +54,6 @@ public final class TrajectoryParameterizer {
    *     from a -&gt; b -&gt; ... -&gt; z as defined in the waypoints.
    * @return The trajectory.
    */
-  @SuppressWarnings({
-    "PMD.ExcessiveMethodLength",
-    "PMD.CyclomaticComplexity",
-    "PMD.NPathComplexity",
-    "PMD.AvoidInstantiatingObjectsInLoops"
-  })
   public static Trajectory timeParameterizeTrajectory(
       List<PoseWithCurvature> points,
       List<TrajectoryConstraint> constraints,

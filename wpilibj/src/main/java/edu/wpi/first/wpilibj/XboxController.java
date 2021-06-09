@@ -28,7 +28,7 @@ public class XboxController extends GenericHID {
     kBack(7),
     kStart(8);
 
-    @SuppressWarnings({"MemberName", "PMD.SingularField"})
+    @SuppressWarnings("MemberName")
     public final int value;
 
     Button(int value) {
@@ -45,7 +45,7 @@ public class XboxController extends GenericHID {
     kLeftTrigger(2),
     kRightTrigger(3);
 
-    @SuppressWarnings({"MemberName", "PMD.SingularField"})
+    @SuppressWarnings("MemberName")
     public final int value;
 
     Axis(int value) {

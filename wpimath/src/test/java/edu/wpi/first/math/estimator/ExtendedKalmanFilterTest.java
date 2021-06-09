@@ -98,11 +98,7 @@ public class ExtendedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ExcessiveMethodLength"
-  })
+  @SuppressWarnings("LocalVariableName")
   @Test
   public void testConvergence() {
     double dtSeconds = 0.00505;

@@ -83,7 +83,7 @@ public class SwerveDriveKinematics {
    *     attainable max velocity. Use the {@link #normalizeWheelSpeeds(SwerveModuleState[], double)
    *     normalizeWheelSpeeds} function to rectify this issue.
    */
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
     if (!centerOfRotationMeters.equals(m_prevCoR)) {

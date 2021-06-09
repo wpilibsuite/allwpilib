@@ -128,7 +128,6 @@ public class LiveWindow {
    * <p>Actuators are handled through callbacks on their value changing from the SmartDashboard
    * widgets.
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public static synchronized void updateValues() {
     // Only do this if either LiveWindow mode or telemetry is enabled.
     if (!liveWindowEnabled && !telemetryEnabled) {

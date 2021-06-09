@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /** Implements a PID control loop. */
-@SuppressWarnings("PMD.TooManyFields")
 public class PIDController implements Sendable, AutoCloseable {
   private static int instances;
 

@@ -26,14 +26,11 @@ public class SpeedControllerGroup implements MotorController, Sendable, AutoClos
    *
    * @param speedControllers The SpeedControllers to add
    */
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   public SpeedControllerGroup(
       SpeedController speedController, SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
-    for (int i = 0; i < speedControllers.length; i++) {
-      m_speedControllers[i + 1] = speedControllers[i];
-    }
+    System.arraycopy(speedControllers, 0, m_speedControllers, 1, speedControllers.length);
     init();
   }
 

@@ -60,7 +60,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param globalMeasurementCorrect The function take calls correct() on the observer.
    * @param timestampSeconds The timestamp of the measurement.
    */
-  @SuppressWarnings({"ParameterName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("ParameterName")
   public <R extends Num> void applyPastGlobalMeasurement(
       Nat<R> rows,
       KalmanTypeFilter<S, I, O> observer,

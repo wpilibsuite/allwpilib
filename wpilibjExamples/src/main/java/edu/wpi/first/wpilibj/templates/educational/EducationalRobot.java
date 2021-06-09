@@ -29,7 +29,6 @@ public class EducationalRobot extends RobotBase {
 
   private volatile boolean m_exit;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   @Override
   public void startCompetition() {
     robotInit();

@@ -15,7 +15,6 @@ public final class RuntimeDetector {
   private static String fileExtension;
   private static String filePath;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   private static synchronized void computePlatform() {
     if (fileExtension != null && filePath != null && filePrefix != null) {
       return;

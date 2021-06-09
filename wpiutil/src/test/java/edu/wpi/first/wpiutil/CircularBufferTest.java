@@ -105,7 +105,6 @@ class CircularBufferTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.ExcessiveMethodLength")
   void resizeTest() {
     CircularBuffer queue = new CircularBuffer(5);
 

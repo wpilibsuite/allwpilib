@@ -27,7 +27,6 @@ class LoggerTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   void addMessageTest() {
     List<LogMessage> msgs = new ArrayList<>();
     m_clientInst.addLogger(msgs::add, LogMessage.kInfo, 100);

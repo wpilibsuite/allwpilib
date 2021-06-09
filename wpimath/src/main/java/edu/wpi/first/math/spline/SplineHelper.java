@@ -48,7 +48,6 @@ public final class SplineHelper {
    * @param waypoints The waypoints
    * @return List of splines.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static QuinticHermiteSpline[] getQuinticSplinesFromWaypoints(List<Pose2d> waypoints) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[waypoints.size() - 1];
     for (int i = 0; i < waypoints.size() - 1; ++i) {
@@ -79,11 +78,7 @@ public final class SplineHelper {
    * @return A vector of cubic hermite splines that interpolate through the provided waypoints and
    *     control vectors.
    */
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.ExcessiveMethodLength",
-    "PMD.AvoidInstantiatingObjectsInLoops"
-  })
+  @SuppressWarnings("LocalVariableName")
   public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
       Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
 
@@ -208,7 +203,7 @@ public final class SplineHelper {
    * @param controlVectors The control vectors.
    * @return A vector of quintic hermite splines that interpolate through the provided waypoints.
    */
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public static QuinticHermiteSpline[] getQuinticSplinesFromControlVectors(
       Spline.ControlVector[] controlVectors) {
     QuinticHermiteSpline[] splines = new QuinticHermiteSpline[controlVectors.length - 1];
