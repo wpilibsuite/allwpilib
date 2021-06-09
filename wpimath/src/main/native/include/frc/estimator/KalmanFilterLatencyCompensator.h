@@ -34,6 +34,19 @@ class KalmanFilterLatencyCompensator {
           localMeasurements(localY) {}
   };
 
+  /**
+   * Clears the observer snapshot buffer.
+   */
+  void Reset() { m_pastObserverSnapshots.clear(); }
+
+  /**
+   * Add past observer states to the observer snapshots list.
+   *
+   * @param observer  The observer.
+   * @param u         The input at the timestamp.
+   * @param localY    The local output at the timestamp
+   * @param timestamp The timesnap of the state.
+   */
   void AddObserverState(const KalmanFilterType& observer,
                         Eigen::Matrix<double, Inputs, 1> u,
                         Eigen::Matrix<double, Outputs, 1> localY,
@@ -48,8 +61,19 @@ class KalmanFilterLatencyCompensator {
     }
   }
 
+  /**
+   * Add past global measurements (such as from vision)to the estimator.
+   *
+   * @param observer                 The observer to apply the past global
+   *                                 measurement.
+   * @param nominalDt                The nominal timestep.
+   * @param y                        The measurement.
+   * @param globalMeasurementCorrect The function take calls correct() on the
+   *                                 observer.
+   * @param timestamp                The timestamp of the measurement.
+   */
   template <int Rows>
-  void ApplyPastMeasurement(
+  void ApplyPastGlobalMeasurement(
       KalmanFilterType* observer, units::second_t nominalDt,
       Eigen::Matrix<double, Rows, 1> y,
       std::function<void(const Eigen::Matrix<double, Inputs, 1>& u,

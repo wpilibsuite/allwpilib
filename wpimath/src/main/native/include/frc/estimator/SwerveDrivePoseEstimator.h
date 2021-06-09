@@ -125,10 +125,12 @@ class SwerveDrivePoseEstimator {
    * @param gyroAngle The angle reported by the gyroscope.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
-    // Set observer state.
+    // Reset state estimate and error covariance
+    m_observer.Reset();
+    m_latencyCompensator.Reset();
+
     m_observer.SetXhat(PoseTo3dVector(pose));
 
-    // Calculate offsets.
     m_gyroOffset = pose.Rotation() - gyroAngle;
     m_previousAngle = pose.Rotation();
   }
@@ -184,7 +186,7 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    m_latencyCompensator.ApplyPastMeasurement<3>(
+    m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
         &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
         m_visionCorrect, timestamp);
   }
