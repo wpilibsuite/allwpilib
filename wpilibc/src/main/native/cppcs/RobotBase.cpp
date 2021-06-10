@@ -24,7 +24,7 @@
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
-typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
+using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
 using namespace frc;
 

@@ -9,6 +9,8 @@
 #error "Cannot include both cscore_cv.h and cscore_raw_cv.h in the same file"
 #endif
 
+#include <opencv2/core/mat.hpp>
+
 #include "cscore_raw.h"
 
 namespace cs {

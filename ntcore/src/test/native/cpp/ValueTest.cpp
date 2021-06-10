@@ -26,7 +26,7 @@ namespace nt {
 
 class ValueTest : public ::testing::Test {};
 
-typedef ValueTest ValueDeathTest;
+using ValueDeathTest = ValueTest;
 
 TEST_F(ValueTest, ConstructEmpty) {
   Value v;

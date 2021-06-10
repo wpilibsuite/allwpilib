@@ -76,10 +76,12 @@ static void alarmCallback() {
 
   // process all notifiers
   notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
-    if (notifier->triggerTime == UINT64_MAX)
+    if (notifier->triggerTime == UINT64_MAX) {
       return;
-    if (currentTime == 0)
+    }
+    if (currentTime == 0) {
       currentTime = HAL_GetFPGATime(&status);
+    }
     std::unique_lock lock(notifier->mutex);
     if (notifier->triggerTime < currentTime) {
       notifier->triggerTime = UINT64_MAX;

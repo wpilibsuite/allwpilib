@@ -243,8 +243,9 @@ void gui::DeleteTexture(ImTextureID texture) {
   if (!gPlatformValid) {
     return;
   }
-  if (texture)
+  if (texture) {
     static_cast<ID3D11ShaderResourceView*>(texture)->Release();
+  }
 }
 
 }  // namespace wpi

@@ -486,7 +486,7 @@ inline bool operator!=(const Value& lhs, const Value& rhs) {
  * NetworkTable Value alias for similarity with Java.
  * @ingroup ntcore_cpp_api
  */
-typedef Value NetworkTableValue;
+using NetworkTableValue = Value;
 
 }  // namespace nt
 

@@ -60,7 +60,7 @@ struct SynchronousWaitData {
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
                              HAL_HandleEnum::Interrupt>* interruptHandles;
 
-typedef HAL_Handle SynchronousWaitDataHandle;
+using SynchronousWaitDataHandle = HAL_Handle;
 static UnlimitedHandleResource<SynchronousWaitDataHandle, SynchronousWaitData,
                                HAL_HandleEnum::Vendor>*
     synchronousInterruptHandles;

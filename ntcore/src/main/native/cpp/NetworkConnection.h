@@ -36,11 +36,10 @@ class IConnectionNotifier;
 
 class NetworkConnection : public INetworkConnection {
  public:
-  typedef std::function<bool(
+  using HandshakeFunc = std::function<bool(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
-      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs)>
-      HandshakeFunc;
+      std::function<void(wpi::span<std::shared_ptr<Message>>)> send_msgs)>;
   using ProcessIncomingFunc =
       std::function<void(std::shared_ptr<Message>, NetworkConnection*)>;
   using Outgoing = std::vector<std::shared_ptr<Message>>;
