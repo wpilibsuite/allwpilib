@@ -372,18 +372,10 @@ HAL_Bool HAL_IsNewControlData(void) {
   return true;
 }
 
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
 void HAL_WaitForDSData(void) {
   HAL_WaitForDSDataTimeout(0);
 }
 
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed. Returns true on new data, false on timeout.
- */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();
