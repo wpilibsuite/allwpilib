@@ -5,7 +5,6 @@
 #pragma once
 
 #include <cstddef>
-#include <stdexcept>
 #include <vector>
 
 namespace wpi {

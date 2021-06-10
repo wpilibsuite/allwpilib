@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <memory>
+#include <initializer_list>
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
