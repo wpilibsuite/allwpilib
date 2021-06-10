@@ -18,9 +18,6 @@ using namespace frc;
 
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
-/**
- * Initialize the PDP.
- */
 PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   m_handle = HAL_InitializePDP(module, &status);

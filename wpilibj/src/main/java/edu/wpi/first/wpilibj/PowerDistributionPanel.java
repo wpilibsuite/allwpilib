@@ -19,7 +19,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
   private final int m_module;
 
   /**
-   * Constructor.
+   * Constructs a PowerDistributionPanel.
    *
    * @param module The CAN ID of the PDP
    */
@@ -32,7 +32,11 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
-  /** Constructor. Uses the default CAN ID (0). */
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * <p>Uses the default CAN ID (0).
+   */
   public PowerDistributionPanel() {
     this(0);
   }
