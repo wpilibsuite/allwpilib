@@ -23,7 +23,10 @@ jobs:
         with:
           python-version: 3.8
       - name: Install clang-format
-        run: sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list" && sudo apt-get update -q && sudo apt-get install -y clang-format-12
+        run: |
+          sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list"
+          sudo apt-get update -q
+          sudo apt-get install -y clang-format-12
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Run
@@ -46,7 +49,10 @@ jobs:
         with:
           python-version: 3.8
       - name: Install clang-tidy
-        run: sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list" && sudo apt-get update -q && sudo apt-get install -y clang-tidy-12 clang-format-12
+        run: |
+          sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list"
+          sudo apt-get update -q
+          sudo apt-get install -y clang-tidy-12 clang-format-12
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json
