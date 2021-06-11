@@ -10,6 +10,7 @@ jobs:
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-latest
+    container: wpilib/roborio-cross-ubuntu:2021-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
@@ -22,7 +23,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install clang-format
-        run: sudo apt-get update -q && sudo apt-get install -y clang-format-12
+        run: sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list" && sudo apt-get update -q && sudo apt-get install -y clang-format-12
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Run
@@ -45,11 +46,7 @@ jobs:
         with:
           python-version: 3.8
       - name: Install clang-tidy
-        run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 12
-          sudo apt-get install -y clang-tidy-12
+        run: sudo sh -c "echo 'deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -cs)-proposed restricted main multiverse universe' >> /etc/apt/sources.list.d/proposed-repositories.list" && sudo apt-get update -q && sudo apt-get install -y clang-tidy-12 clang-format-12
       - name: Install wpiformat
         run: pip3 install wpiformat
       - name: Create compile_commands.json
