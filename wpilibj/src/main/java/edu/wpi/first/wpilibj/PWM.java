@@ -117,6 +117,8 @@ public class PWM implements Sendable, AutoCloseable {
    * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
    * particular type of controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
+   *
+   * @return The bounds on the PWM pulse widths.
    */
   public PWMConfigDataResult getRawBounds() {
     return PWMJNI.getPWMConfigRaw(m_handle);

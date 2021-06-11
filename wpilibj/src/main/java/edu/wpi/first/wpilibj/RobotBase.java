@@ -357,14 +357,23 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  /** Suppress the "Robots should not quit" message. */
+  /**
+   * Suppress the "Robots should not quit" message.
+   *
+   * @param value True if exit warning should be suppressed.
+   */
   public static void suppressExitWarning(boolean value) {
     m_runMutex.lock();
     m_suppressExitWarning = value;
     m_runMutex.unlock();
   }
 
-  /** Starting point for the applications. */
+  /**
+   * Starting point for the applications.
+   *
+   * @param <T> Robot subclass.
+   * @param robotSupplier Function that returns an instance of the robot subclass.
+   */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");

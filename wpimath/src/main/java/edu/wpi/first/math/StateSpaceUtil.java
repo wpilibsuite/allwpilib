@@ -157,6 +157,7 @@ public final class StateSpaceUtil {
    * radians.
    *
    * @param pose A pose to convert to a vector.
+   * @return The given pose in as a 4x1 vector of x, y, cos(theta), and sin(theta).
    */
   public static Matrix<N4, N1> poseTo4dVector(Pose2d pose) {
     return VecBuilder.fill(

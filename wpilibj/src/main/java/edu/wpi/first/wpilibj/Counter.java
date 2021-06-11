@@ -53,7 +53,11 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   private int m_index; // /< The index of this counter.
   private double m_distancePerPulse; // distance of travel for each tick
 
-  /** Create an instance of a counter with the given mode. */
+  /**
+   * Create an instance of a counter with the given mode.
+   *
+   * @param mode The counter mode.
+   */
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order

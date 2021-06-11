@@ -40,7 +40,11 @@ public class JNIWrapper {
     }
   }
 
-  /** Force load the library. */
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if the library load failed
+   */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;

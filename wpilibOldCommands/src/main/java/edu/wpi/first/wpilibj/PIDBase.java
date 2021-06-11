@@ -307,6 +307,8 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * setpoint for the output. If a position PID controller is being used, the F term should be set
    * to 1 over the maximum speed for the output measured in setpoint units per this controller's
    * update period (see the default period in this class's constructor).
+   *
+   * @return The feedforward value.
    */
   protected double calculateFeedForward() {
     if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {

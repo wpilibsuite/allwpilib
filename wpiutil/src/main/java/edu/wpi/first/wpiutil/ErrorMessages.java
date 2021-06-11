@@ -17,9 +17,11 @@ public final class ErrorMessages {
    * Requires that a parameter of a method not be null; prints an error message with helpful
    * debugging instructions if the parameter is null.
    *
+   * @param <T> Type of object.
    * @param obj The parameter that must not be null.
    * @param paramName The name of the parameter.
    * @param methodName The name of the method.
+   * @return The object parameter confirmed not to be null.
    */
   public static <T> T requireNonNullParam(T obj, String paramName, String methodName) {
     return requireNonNull(

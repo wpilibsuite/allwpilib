@@ -38,12 +38,17 @@ public class Vector2d {
    * Returns dot product of this vector with argument.
    *
    * @param vec Vector with which to perform dot product.
+   * @return Dot product of this vector with argument.
    */
   public double dot(Vector2d vec) {
     return x * vec.x + y * vec.y;
   }
 
-  /** Returns magnitude of vector. */
+  /**
+   * Returns magnitude of vector.
+   *
+   * @return Magnitude of vector.
+   */
   public double magnitude() {
     return Math.sqrt(x * x + y * y);
   }
@@ -52,6 +57,7 @@ public class Vector2d {
    * Returns scalar projection of this vector onto argument.
    *
    * @param vec Vector onto which to project this vector.
+   * @return scalar projection of this vector onto argument.
    */
   public double scalarProject(Vector2d vec) {
     return dot(vec) / vec.magnitude();

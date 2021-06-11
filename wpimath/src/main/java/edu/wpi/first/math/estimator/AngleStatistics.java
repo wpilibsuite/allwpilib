@@ -20,9 +20,11 @@ public final class AngleStatistics {
    * Subtracts a and b while normalizing the resulting value in the selected row as if it were an
    * angle.
    *
+   * @param <S> Number of rows in vector.
    * @param a A vector to subtract from.
    * @param b A vector to subtract with.
    * @param angleStateIdx The row containing angles to be normalized.
+   * @return Difference of two vectors with angle at the given index normalized.
    */
   public static <S extends Num> Matrix<S, N1> angleResidual(
       Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
@@ -36,7 +38,9 @@ public final class AngleStatistics {
    * Returns a function that subtracts two vectors while normalizing the resulting value in the
    * selected row as if it were an angle.
    *
+   * @param <S> Number of rows in vector.
    * @param angleStateIdx The row containing angles to be normalized.
+   * @return Function returning difference of two vectors with angle at the given index normalized.
    */
   public static <S extends Num>
       BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>> angleResidual(int angleStateIdx) {
@@ -46,9 +50,11 @@ public final class AngleStatistics {
   /**
    * Adds a and b while normalizing the resulting value in the selected row as an angle.
    *
+   * @param <S> Number of rows in vector.
    * @param a A vector to add with.
    * @param b A vector to add with.
    * @param angleStateIdx The row containing angles to be normalized.
+   * @return Sum of two vectors with angle at the given index normalized.
    */
   public static <S extends Num> Matrix<S, N1> angleAdd(
       Matrix<S, N1> a, Matrix<S, N1> b, int angleStateIdx) {
@@ -62,7 +68,9 @@ public final class AngleStatistics {
    * Returns a function that adds two vectors while normalizing the resulting value in the selected
    * row as an angle.
    *
+   * @param <S> Number of rows in vector.
    * @param angleStateIdx The row containing angles to be normalized.
+   * @return Function returning of two vectors with angle at the given index normalized.
    */
   public static <S extends Num> BiFunction<Matrix<S, N1>, Matrix<S, N1>, Matrix<S, N1>> angleAdd(
       int angleStateIdx) {
@@ -73,9 +81,11 @@ public final class AngleStatistics {
    * Computes the mean of sigmas with the weights Wm while computing a special angle mean for a
    * select row.
    *
+   * @param <S> Number of rows in sigma point matrix.
    * @param sigmas Sigma points.
    * @param Wm Weights for the mean.
    * @param angleStateIdx The row containing the angles.
+   * @return Mean of sigma points.
    */
   @SuppressWarnings("checkstyle:ParameterName")
   public static <S extends Num> Matrix<S, N1> angleMean(
@@ -101,7 +111,9 @@ public final class AngleStatistics {
    * Returns a function that computes the mean of sigmas with the weights Wm while computing a
    * special angle mean for a select row.
    *
+   * @param <S> Number of rows in sigma point matrix.
    * @param angleStateIdx The row containing the angles.
+   * @return Function returning mean of sigma points.
    */
   @SuppressWarnings("LambdaParameterName")
   public static <S extends Num> BiFunction<Matrix<S, ?>, Matrix<?, N1>, Matrix<S, N1>> angleMean(

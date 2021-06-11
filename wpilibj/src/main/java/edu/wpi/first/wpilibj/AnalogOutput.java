@@ -39,7 +39,11 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     m_channel = 0;
   }
 
-  /** Get the channel of this AnalogOutput. */
+  /**
+   * Get the channel of this AnalogOutput.
+   *
+   * @return The channel of this AnalogOutput.
+   */
   public int getChannel() {
     return m_channel;
   }

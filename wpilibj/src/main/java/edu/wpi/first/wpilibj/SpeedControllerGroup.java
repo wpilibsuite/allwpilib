@@ -24,6 +24,7 @@ public class SpeedControllerGroup implements MotorController, Sendable, AutoClos
   /**
    * Create a new SpeedControllerGroup with the provided SpeedControllers.
    *
+   * @param speedController The first SpeedController to add.
    * @param speedControllers The SpeedControllers to add
    */
   public SpeedControllerGroup(

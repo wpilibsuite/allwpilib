@@ -36,10 +36,13 @@ public final class Discretization {
    * taylor series to several terms and still be substantially cheaper than taking the big
    * exponential.
    *
+   * @param <States> Number of states.
+   * @param <Inputs> Number of inputs.
    * @param states Nat representing the states of the system.
    * @param contA Continuous system matrix.
    * @param contB Continuous input matrix.
    * @param dtseconds Discretization timestep.
+   * @return Pair containing discretized A and B matrices.
    */
   public static <States extends Num, Inputs extends Num>
       Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeABTaylor(

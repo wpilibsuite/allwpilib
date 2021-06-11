@@ -192,12 +192,20 @@ public abstract class GenericHID {
     return m_ds.getStickAxisCount(m_port);
   }
 
-  /** For the current HID, return the number of POVs. */
+  /**
+   * For the current HID, return the number of POVs.
+   *
+   * @return the number of POVs for the current HID
+   */
   public int getPOVCount() {
     return m_ds.getStickPOVCount(m_port);
   }
 
-  /** For the current HID, return the number of buttons. */
+  /**
+   * For the current HID, return the number of buttons.
+   *
+   * @return the number of buttons for the current HID
+   */
   public int getButtonCount() {
     return m_ds.getStickButtonCount(m_port);
   }
@@ -232,6 +240,7 @@ public abstract class GenericHID {
   /**
    * Get the axis type of a joystick axis.
    *
+   * @param axis The axis to read, starting at 0.
    * @return the axis type of a joystick axis.
    */
   public int getAxisType(int axis) {

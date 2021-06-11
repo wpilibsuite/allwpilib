@@ -66,6 +66,7 @@ public class DCMotor {
    *
    * @param speedRadiansPerSec The speed of the rotor.
    * @param voltageInputVolts The input voltage.
+   * @return The estimated current.
    */
   public double getCurrent(double speedRadiansPerSec, double voltageInputVolts) {
     return -1.0 / KvRadPerSecPerVolt / rOhms * speedRadiansPerSec + 1.0 / rOhms * voltageInputVolts;
@@ -75,6 +76,7 @@ public class DCMotor {
    * Return a gearbox of CIM motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of CIM motors.
    */
   public static DCMotor getCIM(int numMotors) {
     return new DCMotor(
@@ -85,6 +87,7 @@ public class DCMotor {
    * Return a gearbox of 775Pro motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of 775Pro motors.
    */
   public static DCMotor getVex775Pro(int numMotors) {
     return new DCMotor(
@@ -95,6 +98,7 @@ public class DCMotor {
    * Return a gearbox of NEO motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO motors.
    */
   public static DCMotor getNEO(int numMotors) {
     return new DCMotor(
@@ -105,6 +109,7 @@ public class DCMotor {
    * Return a gearbox of MiniCIM motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of MiniCIM motors.
    */
   public static DCMotor getMiniCIM(int numMotors) {
     return new DCMotor(
@@ -115,6 +120,7 @@ public class DCMotor {
    * Return a gearbox of Bag motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Bag motors.
    */
   public static DCMotor getBag(int numMotors) {
     return new DCMotor(
@@ -125,6 +131,7 @@ public class DCMotor {
    * Return a gearbox of Andymark RS775-125 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Andymark RS775-125 motors.
    */
   public static DCMotor getAndymarkRs775_125(int numMotors) {
     return new DCMotor(
@@ -135,6 +142,7 @@ public class DCMotor {
    * Return a gearbox of Banebots RS775 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Banebots RS775 motors.
    */
   public static DCMotor getBanebotsRs775(int numMotors) {
     return new DCMotor(
@@ -145,6 +153,7 @@ public class DCMotor {
    * Return a gearbox of Andymark 9015 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Andymark 9015 motors.
    */
   public static DCMotor getAndymark9015(int numMotors) {
     return new DCMotor(
@@ -155,6 +164,7 @@ public class DCMotor {
    * Return a gearbox of Banebots RS 550 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Banebots RS 550 motors.
    */
   public static DCMotor getBanebotsRs550(int numMotors) {
     return new DCMotor(
@@ -162,9 +172,10 @@ public class DCMotor {
   }
 
   /**
-   * Return a gearbox of Neo 550 motors.
+   * Return a gearbox of NEO 550 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO 550 motors.
    */
   public static DCMotor getNeo550(int numMotors) {
     return new DCMotor(
@@ -175,6 +186,7 @@ public class DCMotor {
    * Return a gearbox of Falcon 500 motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 motors.
    */
   public static DCMotor getFalcon500(int numMotors) {
     return new DCMotor(
@@ -185,6 +197,7 @@ public class DCMotor {
    * Return a gearbox of Romi/TI_RSLK MAX motors.
    *
    * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Romi/TI_RSLK MAX motors.
    */
   public static DCMotor getRomiBuiltIn(int numMotors) {
     // From https://www.pololu.com/product/1520/specs

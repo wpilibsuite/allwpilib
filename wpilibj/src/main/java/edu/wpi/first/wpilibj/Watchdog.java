@@ -81,7 +81,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     return Double.hashCode(m_expirationTime);
   }
 
-  /** Returns the time in seconds since the watchdog was last fed. */
+  /**
+   * Returns the time in seconds since the watchdog was last fed.
+   *
+   * @return The time in seconds since the watchdog was last fed.
+   */
   public double getTime() {
     return Timer.getFPGATimestamp() - m_startTime;
   }
@@ -109,7 +113,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /** Returns the watchdog's timeout in seconds. */
+  /**
+   * Returns the watchdog's timeout in seconds.
+   *
+   * @return The watchdog's timeout in seconds.
+   */
   public double getTimeout() {
     m_queueMutex.lock();
     try {
@@ -119,7 +127,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     }
   }
 
-  /** Returns true if the watchdog timer has expired. */
+  /**
+   * Returns true if the watchdog timer has expired.
+   *
+   * @return True if the watchdog timer has expired.
+   */
   public boolean isExpired() {
     m_queueMutex.lock();
     try {

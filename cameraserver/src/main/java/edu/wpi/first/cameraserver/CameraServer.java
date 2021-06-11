@@ -43,7 +43,11 @@ public final class CameraServer {
   private static final String kPublishName = "/CameraPublisher";
   private static CameraServer server;
 
-  /** Get the CameraServer instance. */
+  /**
+   * Get the CameraServer instance.
+   *
+   * @return CameraServer instance
+   */
   public static synchronized CameraServer getInstance() {
     if (server == null) {
       server = new CameraServer();
@@ -522,6 +526,8 @@ public final class CameraServer {
    * <p>The first time this overload is called, it calls {@link #startAutomaticCapture(int)} with
    * device 0, creating a camera named "USB Camera 0". Subsequent calls increment the device number
    * (e.g. 1, 2, etc).
+   *
+   * @return The USB camera capturing images.
    */
   public UsbCamera startAutomaticCapture() {
     UsbCamera camera = startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
@@ -536,6 +542,7 @@ public final class CameraServer {
    * {dev}".
    *
    * @param dev The device number of the camera interface
+   * @return The USB camera capturing images.
    */
   public UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
@@ -549,6 +556,7 @@ public final class CameraServer {
    *
    * @param name The name to give the camera
    * @param dev The device number of the camera interface
+   * @return The USB camera capturing images.
    */
   public UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
@@ -562,6 +570,7 @@ public final class CameraServer {
    *
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
+   * @return The USB camera capturing images.
    */
   public UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
@@ -574,6 +583,7 @@ public final class CameraServer {
    * Start automatically capturing images to send to the dashboard from an existing camera.
    *
    * @param camera Camera
+   * @return The MJPEG server serving images from the given camera.
    */
   public MjpegServer startAutomaticCapture(VideoSource camera) {
     addCamera(camera);
@@ -588,6 +598,7 @@ public final class CameraServer {
    * <p>This overload calls {@link #addAxisCamera(String, String)} with name "Axis Camera".
    *
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @return The Axis camera capturing images.
    */
   public AxisCamera addAxisCamera(String host) {
     return addAxisCamera("Axis Camera", host);
@@ -599,6 +610,7 @@ public final class CameraServer {
    * <p>This overload calls {@link #addAxisCamera(String, String[])} with name "Axis Camera".
    *
    * @param hosts Array of Camera host IPs/DNS names
+   * @return The Axis camera capturing images.
    */
   public AxisCamera addAxisCamera(String[] hosts) {
     return addAxisCamera("Axis Camera", hosts);
@@ -609,6 +621,7 @@ public final class CameraServer {
    *
    * @param name The name to give the camera
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   * @return The Axis camera capturing images.
    */
   public AxisCamera addAxisCamera(String name, String host) {
     AxisCamera camera = new AxisCamera(name, host);
@@ -623,6 +636,7 @@ public final class CameraServer {
    *
    * @param name The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
+   * @return The Axis camera capturing images.
    */
   public AxisCamera addAxisCamera(String name, String[] hosts) {
     AxisCamera camera = new AxisCamera(name, hosts);
@@ -636,6 +650,9 @@ public final class CameraServer {
    * Adds a virtual camera for switching between two streams. Unlike the other addCamera methods,
    * this returns a VideoSink rather than a VideoSource. Calling setSource() on the returned object
    * can be used to switch the actual source of the stream.
+   *
+   * @param name The name to give the camera
+   * @return The MJPEG server serving images from the given camera.
    */
   public MjpegServer addSwitchedCamera(String name) {
     // create a dummy CvSource
@@ -654,6 +671,8 @@ public final class CameraServer {
    *
    * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
    * or addServer().
+   *
+   * @return OpenCV sink for the primary camera feed
    */
   public CvSink getVideo() {
     VideoSource source;
@@ -674,6 +693,7 @@ public final class CameraServer {
    * image processing on the roboRIO.
    *
    * @param camera Camera (e.g. as returned by startAutomaticCapture).
+   * @return OpenCV sink for the specified camera
    */
   public CvSink getVideo(VideoSource camera) {
     String name = "opencv_" + camera.getName();
@@ -700,6 +720,7 @@ public final class CameraServer {
    * image processing on the roboRIO.
    *
    * @param name Camera name
+   * @return OpenCV sink for the specified camera
    */
   public CvSink getVideo(String name) {
     VideoSource source;
@@ -719,6 +740,7 @@ public final class CameraServer {
    * @param name Name to give the stream
    * @param width Width of the image being sent
    * @param height Height of the image being sent
+   * @return OpenCV source for the MJPEG stream
    */
   public CvSource putVideo(String name, int width, int height) {
     CvSource source = new CvSource(name, VideoMode.PixelFormat.kMJPEG, width, height, 30);
@@ -730,6 +752,7 @@ public final class CameraServer {
    * Adds a MJPEG server at the next available port.
    *
    * @param name Server name
+   * @return The MJPEG server
    */
   public MjpegServer addServer(String name) {
     int port;
@@ -744,6 +767,8 @@ public final class CameraServer {
    * Adds a MJPEG server.
    *
    * @param name Server name
+   * @param port Server port
+   * @return The MJPEG server
    */
   public MjpegServer addServer(String name, int port) {
     MjpegServer server = new MjpegServer(name, port);
@@ -778,6 +803,8 @@ public final class CameraServer {
    *
    * <p>This is only valid to call after a camera feed has been added with startAutomaticCapture()
    * or addServer().
+   *
+   * @return The server for the primary camera feed
    */
   public VideoSink getServer() {
     synchronized (this) {
@@ -792,6 +819,7 @@ public final class CameraServer {
    * Gets a server by name.
    *
    * @param name Server name
+   * @return The server
    */
   public VideoSink getServer(String name) {
     synchronized (this) {

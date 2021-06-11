@@ -26,7 +26,11 @@ import edu.wpi.first.wpilibj.PWM;
  * </ul>
  */
 public class PWMSparkMax extends PWMMotorController {
-  /** Common initialization code called by all constructors. */
+  /**
+   * Common initialization code called by all constructors.
+   *
+   * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
+   */
   public PWMSparkMax(final int channel) {
     super("PWMSparkMax", channel);
 

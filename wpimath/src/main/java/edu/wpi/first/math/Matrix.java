@@ -323,6 +323,7 @@ public class Matrix<R extends Num, C extends Num> {
    * <p>The matrix equation could also be written as x = A<sup>-1</sup>b. Where the pseudo inverse
    * is used if A is not square.
    *
+   * @param <C2> Columns in b.
    * @param b The right-hand side of the equation to solve.
    * @return The solution to the linear system.
    */
@@ -477,6 +478,8 @@ public class Matrix<R extends Num, C extends Num> {
   /**
    * Extracts a matrix of a given size and start position with new underlying storage.
    *
+   * @param <R2> Number of rows to extract.
+   * @param <C2> Number of columns to extract.
    * @param height The number of rows of the extracted matrix.
    * @param width The number of columns of the extracted matrix.
    * @param startingRow The starting row of the extracted matrix.
@@ -496,6 +499,8 @@ public class Matrix<R extends Num, C extends Num> {
   /**
    * Assign a matrix of a given size and start position.
    *
+   * @param <R2> Rows in block assignment.
+   * @param <C2> Columns in block assignment.
    * @param startingRow The row to start at.
    * @param startingCol The column to start at.
    * @param other The matrix to assign the block to.
@@ -510,6 +515,8 @@ public class Matrix<R extends Num, C extends Num> {
    * Extracts a submatrix from the supplied matrix and inserts it in a submatrix in "this". The
    * shape of "this" is used to determine the size of the matrix extracted.
    *
+   * @param <R2> Number of rows to extract.
+   * @param <C2> Number of columns to extract.
    * @param startingRow The starting row in the supplied matrix to extract the submatrix.
    * @param startingCol The starting column in the supplied matrix to extract the submatrix.
    * @param other The matrix to extract the submatrix from.
@@ -603,6 +610,8 @@ public class Matrix<R extends Num, C extends Num> {
    * Reassigns dimensions of a {@link Matrix} to allow for operations with other matrices that have
    * wildcard dimensions.
    *
+   * @param <R1> Row dimension to assign.
+   * @param <C1> Column dimension to assign.
    * @param mat The {@link Matrix} to remove the dimensions from.
    * @return The matrix with reassigned dimensions.
    */

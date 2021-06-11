@@ -155,7 +155,11 @@ public class ProfiledPIDController implements Sendable {
     m_goal = new TrapezoidProfile.State(goal, 0);
   }
 
-  /** Gets the goal for the ProfiledPIDController. */
+  /**
+   * Gets the goal for the ProfiledPIDController.
+   *
+   * @return The goal.
+   */
   public TrapezoidProfile.State getGoal() {
     return m_goal;
   }
@@ -164,6 +168,8 @@ public class ProfiledPIDController implements Sendable {
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
+   *
+   * @return True if the error is within the tolerance of the error.
    */
   public boolean atGoal() {
     return atSetpoint() && m_goal.equals(m_setpoint);
@@ -191,6 +197,8 @@ public class ProfiledPIDController implements Sendable {
    * Returns true if the error is within the tolerance of the error.
    *
    * <p>This will return false until at least one input value has been computed.
+   *
+   * @return True if the error is within the tolerance of the error.
    */
   public boolean atSetpoint() {
     return m_controller.atSetpoint();
@@ -257,7 +265,11 @@ public class ProfiledPIDController implements Sendable {
     return m_controller.getPositionError();
   }
 
-  /** Returns the change in error per second. */
+  /**
+   * Returns the change in error per second.
+   *
+   * @return The change in error per second.
+   */
   public double getVelocityError() {
     return m_controller.getVelocityError();
   }
@@ -266,6 +278,7 @@ public class ProfiledPIDController implements Sendable {
    * Returns the next output of the PID controller.
    *
    * @param measurement The current measurement of the process variable.
+   * @return The controller's next output.
    */
   public double calculate(double measurement) {
     if (m_controller.isContinuousInputEnabled()) {
@@ -294,6 +307,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
+   * @return The controller's next output.
    */
   public double calculate(double measurement, TrapezoidProfile.State goal) {
     setGoal(goal);
@@ -305,6 +319,7 @@ public class ProfiledPIDController implements Sendable {
    *
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
+   * @return The controller's next output.
    */
   public double calculate(double measurement, double goal) {
     setGoal(goal);
@@ -317,6 +332,7 @@ public class ProfiledPIDController implements Sendable {
    * @param measurement The current measurement of the process variable.
    * @param goal The new goal of the controller.
    * @param constraints Velocity and acceleration constraints for goal.
+   * @return The controller's next output.
    */
   public double calculate(
       double measurement, TrapezoidProfile.State goal, TrapezoidProfile.Constraints constraints) {

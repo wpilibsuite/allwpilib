@@ -329,6 +329,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
    * of this function).
    *
+   * @param <R> Number of measurements in y.
+   * @param rows Number of rows in y.
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
@@ -357,6 +359,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
    * of this function).
    *
+   * @param <R> Number of measurements in y.
+   * @param rows Number of rows in y.
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.

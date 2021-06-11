@@ -343,6 +343,7 @@ public class DriverStation {
   /**
    * Report error to Driver Station. Optionally appends Stack trace to error message.
    *
+   * @param error The error to report.
    * @param printTrace If true, append stack trace to error string
    */
   public static void reportError(String error, boolean printTrace) {
@@ -352,6 +353,7 @@ public class DriverStation {
   /**
    * Report error to Driver Station. Appends provided stack trace to error message.
    *
+   * @param error The error to report.
    * @param stackTrace The stack trace to append
    */
   public static void reportError(String error, StackTraceElement[] stackTrace) {
@@ -361,19 +363,21 @@ public class DriverStation {
   /**
    * Report warning to Driver Station. Optionally appends Stack trace to warning message.
    *
+   * @param warning The warning to report.
    * @param printTrace If true, append stack trace to warning string
    */
-  public static void reportWarning(String error, boolean printTrace) {
-    reportErrorImpl(false, 1, error, printTrace);
+  public static void reportWarning(String warning, boolean printTrace) {
+    reportErrorImpl(false, 1, warning, printTrace);
   }
 
   /**
    * Report warning to Driver Station. Appends provided stack trace to warning message.
    *
+   * @param warning The warning to report.
    * @param stackTrace The stack trace to append
    */
-  public static void reportWarning(String error, StackTraceElement[] stackTrace) {
-    reportErrorImpl(false, 1, error, stackTrace);
+  public static void reportWarning(String warning, StackTraceElement[] stackTrace) {
+    reportErrorImpl(false, 1, warning, stackTrace);
   }
 
   private static void reportErrorImpl(boolean isError, int code, String error, boolean printTrace) {
@@ -565,6 +569,8 @@ public class DriverStation {
   /**
    * Get the state of a POV on the joystick.
    *
+   * @param stick The joystick to read.
+   * @param pov The POV to read.
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public int getStickPOV(int stick, int pov) {

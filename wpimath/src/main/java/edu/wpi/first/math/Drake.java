@@ -36,6 +36,8 @@ public final class Drake {
   /**
    * Solves the discrete alegebraic Riccati equation.
    *
+   * @param <States> Number of states.
+   * @param <Inputs> Number of inputs.
    * @param A System matrix.
    * @param B Input matrix.
    * @param Q State cost matrix.
@@ -88,6 +90,8 @@ public final class Drake {
   /**
    * Solves the discrete alegebraic Riccati equation.
    *
+   * @param <States> Number of states.
+   * @param <Inputs> Number of inputs.
    * @param A System matrix.
    * @param B Input matrix.
    * @param Q State cost matrix.
