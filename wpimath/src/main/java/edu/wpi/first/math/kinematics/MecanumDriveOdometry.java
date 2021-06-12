@@ -9,7 +9,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
