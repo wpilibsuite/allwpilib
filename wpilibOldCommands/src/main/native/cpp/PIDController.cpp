@@ -78,6 +78,6 @@ void PIDController::Reset() {
 void PIDController::InitSendable(SendableBuilder& builder) {
   PIDBase::InitSendable(builder);
   builder.AddBooleanProperty(
-      "enabled", [=]() { return IsEnabled(); },
+      "enabled", [=] { return IsEnabled(); },
       [=](bool value) { SetEnabled(value); });
 }

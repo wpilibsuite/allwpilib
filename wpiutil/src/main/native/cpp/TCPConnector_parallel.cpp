@@ -82,7 +82,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     ++num_workers;
 
     // start the worker
-    std::thread([=]() {
+    std::thread([=] {
       if (!result->done) {
         // add to global state
         {

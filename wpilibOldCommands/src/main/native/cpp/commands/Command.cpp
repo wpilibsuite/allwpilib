@@ -295,10 +295,10 @@ void Command::SetSubsystem(std::string_view name) {
 void Command::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(
-      ".name", [=]() { return SendableRegistry::GetInstance().GetName(this); },
+      ".name", [=] { return SendableRegistry::GetInstance().GetName(this); },
       nullptr);
   builder.AddBooleanProperty(
-      "running", [=]() { return IsRunning(); },
+      "running", [=] { return IsRunning(); },
       [=](bool value) {
         if (value) {
           if (!IsRunning()) {
@@ -311,5 +311,5 @@ void Command::InitSendable(SendableBuilder& builder) {
         }
       });
   builder.AddBooleanProperty(
-      ".isParented", [=]() { return IsParented(); }, nullptr);
+      ".isParented", [=] { return IsParented(); }, nullptr);
 }

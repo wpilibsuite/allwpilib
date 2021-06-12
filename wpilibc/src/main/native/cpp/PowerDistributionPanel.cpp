@@ -97,10 +97,10 @@ void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty(
-        fmt::format("Chan{}", i), [=]() { return GetCurrent(i); }, nullptr);
+        fmt::format("Chan{}", i), [=] { return GetCurrent(i); }, nullptr);
   }
   builder.AddDoubleProperty(
-      "Voltage", [=]() { return GetVoltage(); }, nullptr);
+      "Voltage", [=] { return GetVoltage(); }, nullptr);
   builder.AddDoubleProperty(
-      "TotalCurrent", [=]() { return GetTotalCurrent(); }, nullptr);
+      "TotalCurrent", [=] { return GetTotalCurrent(); }, nullptr);
 }

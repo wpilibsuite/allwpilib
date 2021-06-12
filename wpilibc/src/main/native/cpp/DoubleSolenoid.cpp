@@ -118,7 +118,7 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { Set(kOff); });
+  builder.SetSafeState([=] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
       [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {

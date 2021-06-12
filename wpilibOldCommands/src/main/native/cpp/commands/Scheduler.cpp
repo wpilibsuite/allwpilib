@@ -162,7 +162,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
   auto namesEntry = builder.GetEntry("Names");
   auto idsEntry = builder.GetEntry("Ids");
   auto cancelEntry = builder.GetEntry("Cancel");
-  builder.SetUpdateTable([=]() {
+  builder.SetUpdateTable([=] {
     // Get the list of possible commands to cancel
     auto new_toCancel = cancelEntry.GetValue();
     wpi::span<const double> toCancel;

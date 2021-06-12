@@ -125,12 +125,12 @@ void Subsystem::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
 
   builder.AddBooleanProperty(
-      ".hasDefault", [=]() { return m_defaultCommand != nullptr; }, nullptr);
+      ".hasDefault", [=] { return m_defaultCommand != nullptr; }, nullptr);
   builder.AddStringProperty(
-      ".default", [=]() { return GetDefaultCommandName(); }, nullptr);
+      ".default", [=] { return GetDefaultCommandName(); }, nullptr);
 
   builder.AddBooleanProperty(
-      ".hasCommand", [=]() { return m_currentCommand != nullptr; }, nullptr);
+      ".hasCommand", [=] { return m_currentCommand != nullptr; }, nullptr);
   builder.AddStringProperty(
-      ".command", [=]() { return GetCurrentCommandName(); }, nullptr);
+      ".command", [=] { return GetCurrentCommandName(); }, nullptr);
 }
