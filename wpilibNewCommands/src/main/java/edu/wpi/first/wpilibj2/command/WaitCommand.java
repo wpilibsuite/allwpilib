@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /**
  * A command that does nothing but takes a specified amount of time to finish. Useful for

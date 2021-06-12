@@ -7,8 +7,9 @@ package edu.wpi.first.wpilibj.livewindow;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
@@ -30,6 +31,10 @@ public class LiveWindow {
 
   private static Runnable enabledListener;
   private static Runnable disabledListener;
+
+  static {
+    SendableRegistry.setLiveWindowBuilderFactory(() -> new SendableBuilderImpl());
+  }
 
   private static Component getOrAdd(Sendable sendable) {
     Component data = (Component) SendableRegistry.getData(sendable, dataHandle);
@@ -84,7 +89,7 @@ public class LiveWindow {
         SendableRegistry.foreachLiveWindow(
             dataHandle,
             cbdata -> {
-              cbdata.builder.stopLiveWindowMode();
+              ((SendableBuilderImpl) cbdata.builder).stopLiveWindowMode();
             });
         if (disabledListener != null) {
           disabledListener.run();
@@ -173,7 +178,7 @@ public class LiveWindow {
               table = ssTable.getSubTable(cbdata.name);
             }
             table.getEntry(".name").setString(cbdata.name);
-            cbdata.builder.setTable(table);
+            ((SendableBuilderImpl) cbdata.builder).setTable(table);
             cbdata.sendable.initSendable(cbdata.builder);
             ssTable.getEntry(".type").setString("LW Subsystem");
 
@@ -181,9 +186,9 @@ public class LiveWindow {
           }
 
           if (startLiveWindow) {
-            cbdata.builder.startLiveWindowMode();
+            ((SendableBuilderImpl) cbdata.builder).startLiveWindowMode();
           }
-          cbdata.builder.updateTable();
+          cbdata.builder.update();
         });
 
     startLiveWindow = false;
