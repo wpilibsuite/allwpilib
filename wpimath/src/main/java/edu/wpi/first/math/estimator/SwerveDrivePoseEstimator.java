@@ -16,7 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.util.function.BiConsumer;
 
 /**

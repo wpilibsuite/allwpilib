@@ -6,7 +6,7 @@ package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.wpiutil.CircularBuffer;
+import edu.wpi.first.util.CircularBuffer;
 import java.util.Arrays;
 
 /**

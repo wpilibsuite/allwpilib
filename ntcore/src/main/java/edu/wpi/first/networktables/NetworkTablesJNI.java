@@ -4,7 +4,7 @@
 
 package edu.wpi.first.networktables;
 
-import edu.wpi.first.wpiutil.RuntimeLoader;
+import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;

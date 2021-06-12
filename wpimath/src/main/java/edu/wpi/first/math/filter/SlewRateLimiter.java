@@ -5,7 +5,7 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,

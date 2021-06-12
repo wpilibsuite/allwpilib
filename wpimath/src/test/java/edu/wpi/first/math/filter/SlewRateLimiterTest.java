@@ -7,7 +7,7 @@ package edu.wpi.first.math.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import org.junit.jupiter.api.Test;
 
 public class SlewRateLimiterTest {
