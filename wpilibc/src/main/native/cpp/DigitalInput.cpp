@@ -70,5 +70,5 @@ int DigitalInput::GetChannel() const {
 void DigitalInput::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
   builder.AddBooleanProperty(
-      "Value", [=]() { return Get(); }, nullptr);
+      "Value", [=] { return Get(); }, nullptr);
 }

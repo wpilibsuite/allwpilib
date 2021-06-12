@@ -49,7 +49,7 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
   builder.GetEntry(kInstance).SetDouble(m_instance);
   builder.AddStringArrayProperty(
       kOptions,
-      [=]() {
+      [=] {
         std::vector<std::string> keys;
         for (const auto& choice : m_choices) {
           keys.emplace_back(choice.first());

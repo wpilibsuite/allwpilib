@@ -29,8 +29,7 @@ class raw_uv_ostream : public raw_ostream {
    *                  performed using Buffer::Allocate().
    */
   raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs, size_t allocSize)
-      : m_bufs(bufs),
-        m_alloc([=]() { return uv::Buffer::Allocate(allocSize); }) {
+      : m_bufs(bufs), m_alloc([=] { return uv::Buffer::Allocate(allocSize); }) {
     SetUnbuffered();
   }
 

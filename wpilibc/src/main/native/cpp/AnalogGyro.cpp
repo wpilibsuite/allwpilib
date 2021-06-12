@@ -141,5 +141,5 @@ std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
 void AnalogGyro::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetAngle(); }, nullptr);
+      "Value", [=] { return GetAngle(); }, nullptr);
 }

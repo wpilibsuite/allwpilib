@@ -230,17 +230,17 @@ void PIDBase::PIDWrite(double output) {
 
 void PIDBase::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
-  builder.SetSafeState([=]() { Reset(); });
+  builder.SetSafeState([=] { Reset(); });
   builder.AddDoubleProperty(
-      "p", [=]() { return GetP(); }, [=](double value) { SetP(value); });
+      "p", [=] { return GetP(); }, [=](double value) { SetP(value); });
   builder.AddDoubleProperty(
-      "i", [=]() { return GetI(); }, [=](double value) { SetI(value); });
+      "i", [=] { return GetI(); }, [=](double value) { SetI(value); });
   builder.AddDoubleProperty(
-      "d", [=]() { return GetD(); }, [=](double value) { SetD(value); });
+      "d", [=] { return GetD(); }, [=](double value) { SetD(value); });
   builder.AddDoubleProperty(
-      "f", [=]() { return GetF(); }, [=](double value) { SetF(value); });
+      "f", [=] { return GetF(); }, [=](double value) { SetF(value); });
   builder.AddDoubleProperty(
-      "setpoint", [=]() { return GetSetpoint(); },
+      "setpoint", [=] { return GetSetpoint(); },
       [=](double value) { SetSetpoint(value); });
 }
 

@@ -218,11 +218,11 @@ void Encoder::InitSendable(SendableBuilder& builder) {
   }
 
   builder.AddDoubleProperty(
-      "Speed", [=]() { return GetRate(); }, nullptr);
+      "Speed", [=] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
-      "Distance", [=]() { return GetDistance(); }, nullptr);
+      "Distance", [=] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(
-      "Distance per Tick", [=]() { return GetDistancePerPulse(); }, nullptr);
+      "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr);
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {

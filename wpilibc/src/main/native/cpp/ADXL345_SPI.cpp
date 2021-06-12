@@ -120,7 +120,7 @@ void ADXL345_SPI::InitSendable(SendableBuilder& builder) {
   auto x = builder.GetEntry("X").GetHandle();
   auto y = builder.GetEntry("Y").GetHandle();
   auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=]() {
+  builder.SetUpdateTable([=] {
     auto data = GetAccelerations();
     nt::NetworkTableEntry(x).SetDouble(data.XAxis);
     nt::NetworkTableEntry(y).SetDouble(data.YAxis);
