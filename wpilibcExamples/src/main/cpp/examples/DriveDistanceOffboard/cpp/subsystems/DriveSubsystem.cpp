@@ -12,6 +12,16 @@ DriveSubsystem::DriveSubsystem()
       m_rightLeader{kRightMotor1Port},
       m_rightFollower{kRightMotor2Port},
       m_feedforward{ks, kv, ka} {
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_rightLeader.SetInverted(true);
+
+  // You might need to not do this depending on the specific motor controller
+  // that you are using -- contact the respective vendor's documentation for
+  // more details.
+  m_rightFollower.SetInverted(true);
+
   m_leftFollower.Follow(m_leftLeader);
   m_rightFollower.Follow(m_rightLeader);
 
