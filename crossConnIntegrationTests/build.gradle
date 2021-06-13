@@ -1,9 +1,15 @@
 import org.gradle.language.base.internal.ProjectLayout
+import jaci.gradle.toolchains.*
+import jaci.gradle.nativedeps.*
+import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'jaci.gradle.EmbeddedTools'
 
 apply from: '../shared/config.gradle'
 
@@ -23,7 +29,6 @@ model {
     components {
         crossConnIntegrationTests(NativeExecutableSpec) {
             targetBuildTypes 'debug'
-            baseName = 'FRCUserProgram'
             nativeUtils.useRequiredLibrary(it, 'googletest_static')
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
@@ -65,30 +70,49 @@ model {
     }
 }
 
-def testOutputFolder = file("${project(':').buildDir}/crossConnIntegrationTestFiles")
-
-model {
-    tasks {
-        copyWpilibCTestLibrariesToOutput(Copy) {
-            def task = it
-            $.binaries.each {
-                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.buildable) {
-                    def installTask = it.tasks.install
-                    task.dependsOn installTask
-                    task.from(installTask.executableFile) {
-                        into '/cpp'
-                    }
-                    installTask.libs.each {
-                        task.from(it) {
-                            into '/libs'
-                        }
-                    }
+deploy {
+    targets {
+        target('roborio') {
+            directory = '/home/admin'
+            maxChannels = 4
+            locations {
+                ssh {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
                 }
             }
-            destinationDir testOutputFolder
         }
-        if (!project.hasProperty('skiponlyathena')) {
-            build.dependsOn copyWpilibCTestLibrariesToOutput
+    }
+    artifacts {
+        all {
+            targets << 'roborio'
+            predeploy << { ctx ->
+                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+            }
+            postdeploy << { ctx ->
+                ctx.execute("sync")
+                ctx.execute("ldconfig")
+            }
         }
+
+        nativeArtifact('crossConnIntegrationTests') {
+            component = 'crossConnIntegrationTests'
+            targetPlatform = nativeUtils.wpi.platforms.roborio
+            libraryDirectory = '/usr/local/frc/third-party/lib'
+            buildType = 'debug'
+            postdeploy << { ctx ->
+                ctx.execute('chmod +x crossConnIntegrationTests')
+            }
+        }
+    }
+}
+
+tasks.register('deployTests') {
+    try {
+        dependsOn tasks.named('deployCrossConnIntegrationTestsLibrariesRoborio')
+        dependsOn tasks.named('deployCrossConnIntegrationTestsRoborio')
+    } catch (ignored) {
     }
 }
