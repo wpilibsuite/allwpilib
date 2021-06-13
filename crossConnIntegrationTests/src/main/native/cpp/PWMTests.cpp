@@ -10,9 +10,9 @@
 #include <wpi/priority_mutex.h>
 
 #include "CrossConnects.h"
-#include "HAL/HAL.h"
 #include "LifetimeWrappers.h"
 #include "gtest/gtest.h"
+#include "hal/HAL.h"
 
 using namespace hlt;
 
