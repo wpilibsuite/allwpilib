@@ -26,10 +26,13 @@ namespace cs {
 class VideoSource;
 }  // namespace cs
 
+namespace wpi {
+class Sendable;
+}  // namespace wpi
+
 namespace frc {
 
 class ComplexWidget;
-class Sendable;
 class ShuffleboardLayout;
 class SimpleWidget;
 
@@ -111,7 +114,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this
    * container with the given title
    */
-  ComplexWidget& Add(std::string_view title, Sendable& sendable);
+  ComplexWidget& Add(std::string_view title, wpi::Sendable& sendable);
 
   /**
    * Adds a widget to this container to display the given video stream.
@@ -133,7 +136,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * container with the given title, or if the sendable's name has not been
    * specified
    */
-  ComplexWidget& Add(Sendable& sendable);
+  ComplexWidget& Add(wpi::Sendable& sendable);
 
   /**
    * Adds a widget to this container to display the given video stream.

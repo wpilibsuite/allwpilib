@@ -4,14 +4,14 @@
 
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/DigitalSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
-class SendableBuilder;
 
 /**
  * Class to read a digital input.
@@ -23,8 +23,8 @@ class SendableBuilder;
  * implemented anywhere else.
  */
 class DigitalInput : public DigitalSource,
-                     public Sendable,
-                     public SendableHelper<DigitalInput> {
+                     public wpi::Sendable,
+                     public wpi::SendableHelper<DigitalInput> {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -75,7 +75,7 @@ class DigitalInput : public DigitalSource,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

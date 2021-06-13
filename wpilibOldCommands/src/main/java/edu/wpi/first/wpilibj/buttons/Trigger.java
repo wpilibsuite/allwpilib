@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.buttons;
 
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * This class provides an easy way to link commands to inputs.

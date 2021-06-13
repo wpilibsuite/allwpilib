@@ -9,10 +9,10 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/numbers>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/SpeedController.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -43,7 +43,7 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                 std::sin(rightMotorAngle * (wpi::numbers::pi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (wpi::numbers::pi / 180.0)),
                std::sin(backMotorAngle * (wpi::numbers::pi / 180.0))};
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddChild(this, m_leftMotor);
   registry.AddChild(this, m_rightMotor);
   registry.AddChild(this, m_backMotor);
@@ -118,7 +118,7 @@ std::string KilloughDrive::GetDescription() const {
   return "KilloughDrive";
 }
 
-void KilloughDrive::InitSendable(SendableBuilder& builder) {
+void KilloughDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("KilloughDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });

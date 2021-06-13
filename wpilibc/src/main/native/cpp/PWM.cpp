@@ -11,11 +11,11 @@
 #include <hal/PWM.h>
 #include <hal/Ports.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -40,7 +40,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel + 1);
   if (registerSendable) {
-    SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
+    wpi::SendableRegistry::GetInstance().AddLW(this, "PWM", channel);
   }
 }
 
@@ -163,7 +163,7 @@ int PWM::GetChannel() const {
   return m_channel;
 }
 
-void PWM::InitSendable(SendableBuilder& builder) {
+void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PWM");
   builder.SetActuator(true);
   builder.SetSafeState([=] { SetDisabled(); });

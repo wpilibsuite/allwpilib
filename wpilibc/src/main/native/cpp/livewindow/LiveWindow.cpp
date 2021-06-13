@@ -8,10 +8,10 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableBuilderImpl.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -25,7 +25,7 @@ struct LiveWindow::Impl {
 
   wpi::mutex mutex;
 
-  SendableRegistry& registry;
+  wpi::SendableRegistry& registry;
   int dataHandle;
 
   std::shared_ptr<nt::NetworkTable> liveWindowTable;
@@ -36,20 +36,22 @@ struct LiveWindow::Impl {
   bool liveWindowEnabled = false;
   bool telemetryEnabled = true;
 
-  std::shared_ptr<Component> GetOrAdd(Sendable* sendable);
+  std::shared_ptr<Component> GetOrAdd(wpi::Sendable* sendable);
 };
 
 LiveWindow::Impl::Impl()
-    : registry(SendableRegistry::GetInstance()),
+    : registry(wpi::SendableRegistry::GetInstance()),
       dataHandle(registry.GetDataHandle()),
       liveWindowTable(
           nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow")) {
+  registry.SetLiveWindowBuilderFactory(
+      [] { return std::make_unique<SendableBuilderImpl>(); });
   statusTable = liveWindowTable->GetSubTable(".status");
   enabledEntry = statusTable->GetEntry("LW Enabled");
 }
 
 std::shared_ptr<LiveWindow::Impl::Component> LiveWindow::Impl::GetOrAdd(
-    Sendable* sendable) {
+    wpi::Sendable* sendable) {
   auto data = std::static_pointer_cast<Component>(
       registry.GetData(sendable, dataHandle));
   if (!data) {
@@ -64,14 +66,14 @@ LiveWindow* LiveWindow::GetInstance() {
   return &instance;
 }
 
-void LiveWindow::EnableTelemetry(Sendable* sendable) {
+void LiveWindow::EnableTelemetry(wpi::Sendable* sendable) {
   std::scoped_lock lock(m_impl->mutex);
   // Re-enable global setting in case DisableAllTelemetry() was called.
   m_impl->telemetryEnabled = true;
   m_impl->GetOrAdd(sendable)->telemetryEnabled = true;
 }
 
-void LiveWindow::DisableTelemetry(Sendable* sendable) {
+void LiveWindow::DisableTelemetry(wpi::Sendable* sendable) {
   std::scoped_lock lock(m_impl->mutex);
   m_impl->GetOrAdd(sendable)->telemetryEnabled = false;
 }
@@ -108,7 +110,7 @@ void LiveWindow::SetEnabled(bool enabled) {
     }
   } else {
     m_impl->registry.ForeachLiveWindow(m_impl->dataHandle, [&](auto& cbdata) {
-      cbdata.builder.StopLiveWindowMode();
+      static_cast<SendableBuilderImpl&>(cbdata.builder).StopLiveWindowMode();
     });
     if (this->disabled) {
       this->disabled();
@@ -160,7 +162,7 @@ void LiveWindow::UpdateValuesUnsafe() {
         table = ssTable->GetSubTable(cbdata.name);
       }
       table->GetEntry(".name").SetString(cbdata.name);
-      cbdata.builder.SetTable(table);
+      static_cast<SendableBuilderImpl&>(cbdata.builder).SetTable(table);
       cbdata.sendable->InitSendable(cbdata.builder);
       ssTable->GetEntry(".type").SetString("LW Subsystem");
 
@@ -168,9 +170,9 @@ void LiveWindow::UpdateValuesUnsafe() {
     }
 
     if (m_impl->startLiveWindow) {
-      cbdata.builder.StartLiveWindowMode();
+      static_cast<SendableBuilderImpl&>(cbdata.builder).StartLiveWindowMode();
     }
-    cbdata.builder.UpdateTable();
+    cbdata.builder.Update();
   });
 
   m_impl->startLiveWindow = false;

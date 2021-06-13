@@ -7,10 +7,11 @@
 #include <memory>
 #include <string>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/drive/RobotDriveBase.h"
 #include "frc/drive/Vector2d.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -54,8 +55,8 @@ class SpeedController;
  * clockwise rotation around the Z axis is positive.
  */
 class KilloughDrive : public RobotDriveBase,
-                      public Sendable,
-                      public SendableHelper<KilloughDrive> {
+                      public wpi::Sendable,
+                      public wpi::SendableHelper<KilloughDrive> {
  public:
   static constexpr double kDefaultLeftMotorAngle = 60.0;
   static constexpr double kDefaultRightMotorAngle = 120.0;
@@ -160,7 +161,7 @@ class KilloughDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   SpeedController* m_leftMotor;

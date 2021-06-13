@@ -29,8 +29,6 @@ class ShuffleboardComponent : public ShuffleboardComponentBase {
   ShuffleboardComponent(ShuffleboardContainer& parent, std::string_view title,
                         std::string_view type = "");
 
-  ~ShuffleboardComponent() override = default;
-
   /**
    * Sets custom properties for this component. Property names are
    * case-sensitive and whitespace-insensitive (capitalization and spaces do not

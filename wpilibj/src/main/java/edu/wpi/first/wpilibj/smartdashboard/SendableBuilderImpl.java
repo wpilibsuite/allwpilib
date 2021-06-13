@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -17,7 +18,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class SendableBuilderImpl implements SendableBuilder {
+public class SendableBuilderImpl implements NTSendableBuilder {
   private static class Property {
     Property(NetworkTable table, String key) {
       m_entry = table.getEntry(key);
@@ -80,7 +81,8 @@ public class SendableBuilderImpl implements SendableBuilder {
    *
    * @return True if it has a table, false if not.
    */
-  public boolean hasTable() {
+  @Override
+  public boolean isPublished() {
     return m_table != null;
   }
 
@@ -94,7 +96,8 @@ public class SendableBuilderImpl implements SendableBuilder {
   }
 
   /** Update the network table values by calling the getters for all properties. */
-  public void updateTable() {
+  @Override
+  public void update() {
     for (Property property : m_properties) {
       if (property.m_update != null) {
         property.m_update.accept(property.m_entry);
@@ -148,6 +151,7 @@ public class SendableBuilderImpl implements SendableBuilder {
   }
 
   /** Clear properties. */
+  @Override
   public void clearProperties() {
     stopListeners();
     m_properties.clear();

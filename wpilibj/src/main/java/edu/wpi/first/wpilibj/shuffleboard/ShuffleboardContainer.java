@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.cscore.VideoSource;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.Sendable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BooleanSupplier;

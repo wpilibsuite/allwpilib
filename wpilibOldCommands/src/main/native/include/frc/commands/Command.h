@@ -10,10 +10,10 @@
 
 #include <units/time.h>
 #include <wpi/SmallPtrSet.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/commands/Subsystem.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -43,7 +43,7 @@ class CommandGroup;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public Sendable, public SendableHelper<Command> {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   friend class CommandGroup;
   friend class Scheduler;
 
@@ -482,7 +482,7 @@ class Command : public Sendable, public SendableHelper<Command> {
   static int m_commandCounter;
 
  public:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

@@ -6,10 +6,10 @@
 
 #include <hal/Accelerometer.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -18,7 +18,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
              "Built-in accelerometer");
-  SendableRegistry::GetInstance().AddLW(this, "BuiltInAccel");
+  wpi::SendableRegistry::GetInstance().AddLW(this, "BuiltInAccel");
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {
@@ -44,7 +44,7 @@ double BuiltInAccelerometer::GetZ() {
   return HAL_GetAccelerometerZ();
 }
 
-void BuiltInAccelerometer::InitSendable(SendableBuilder& builder) {
+void BuiltInAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   builder.AddDoubleProperty(
       "X", [=] { return GetX(); }, nullptr);

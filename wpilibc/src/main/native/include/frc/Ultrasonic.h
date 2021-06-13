@@ -13,10 +13,10 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/Counter.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -35,7 +35,8 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public Sendable, public SendableHelper<Ultrasonic> {
+class Ultrasonic : public wpi::Sendable,
+                   public wpi::SendableHelper<Ultrasonic> {
  public:
   /**
    * Create an instance of the Ultrasonic Sensor.
@@ -136,7 +137,7 @@ class Ultrasonic : public Sendable, public SendableHelper<Ultrasonic> {
 
   void SetEnabled(bool enable);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**

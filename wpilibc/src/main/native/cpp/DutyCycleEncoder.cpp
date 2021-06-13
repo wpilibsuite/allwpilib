@@ -5,13 +5,13 @@
 #include "frc/DutyCycleEncoder.h"
 
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -72,8 +72,8 @@ void DutyCycleEncoder::Init() {
         m_analogTrigger->CreateOutput(AnalogTriggerType::kFallingPulse));
   }
 
-  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                        m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
+                                             m_dutyCycle->GetSourceChannel());
 }
 
 units::turn_t DutyCycleEncoder::Get() const {
@@ -148,7 +148,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
+void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Distance", [this] { return this->GetDistance(); }, nullptr);

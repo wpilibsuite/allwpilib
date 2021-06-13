@@ -7,10 +7,10 @@
 #include <hal/DutyCycle.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/DigitalSource.h"
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -49,7 +49,7 @@ void DutyCycle::InitDutyCycle() {
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   int index = GetFPGAIndex();
   HAL_Report(HALUsageReporting::kResourceType_DutyCycle, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", index);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Duty Cycle", index);
 }
 
 int DutyCycle::GetFPGAIndex() const {
@@ -91,7 +91,7 @@ int DutyCycle::GetSourceChannel() const {
   return m_source->GetChannel();
 }
 
-void DutyCycle::InitSendable(SendableBuilder& builder) {
+void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Duty Cycle");
   builder.AddDoubleProperty(
       "Frequency", [this] { return this->GetFrequency(); }, nullptr);

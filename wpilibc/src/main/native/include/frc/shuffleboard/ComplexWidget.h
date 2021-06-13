@@ -10,12 +10,14 @@
 #include <networktables/NetworkTable.h>
 
 #include "frc/shuffleboard/ShuffleboardWidget.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableBuilderImpl.h"
+
+namespace wpi {
+class Sendable;
+class SendableBuilder;
+}  // namespace wpi
 
 namespace frc {
 
-class Sendable;
 class ShuffleboardContainer;
 
 /**
@@ -25,7 +27,9 @@ class ShuffleboardContainer;
 class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {
  public:
   ComplexWidget(ShuffleboardContainer& parent, std::string_view title,
-                Sendable& sendable);
+                wpi::Sendable& sendable);
+
+  ~ComplexWidget() override;
 
   void EnableIfActuator() override;
 
@@ -35,9 +39,8 @@ class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {
                  std::shared_ptr<nt::NetworkTable> metaTable) override;
 
  private:
-  Sendable& m_sendable;
-  SendableBuilderImpl m_builder;
-  bool m_builderInit = false;
+  wpi::Sendable& m_sendable;
+  std::unique_ptr<wpi::SendableBuilder> m_builder;
 };
 
 }  // namespace frc

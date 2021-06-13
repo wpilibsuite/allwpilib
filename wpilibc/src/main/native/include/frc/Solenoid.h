@@ -8,14 +8,12 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
@@ -23,7 +21,7 @@ class SendableBuilder;
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public Sendable, public SendableHelper<Solenoid> {
+class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
   Solenoid(PneumaticsBase& module, int channel);
   Solenoid(PneumaticsBase* module, int channel);
@@ -93,7 +91,7 @@ class Solenoid : public Sendable, public SendableHelper<Solenoid> {
    */
   void StartPulse();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

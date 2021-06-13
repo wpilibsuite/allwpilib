@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Arrays;
 
 /** Allows multiple {@link MotorController} objects to be linked together. */

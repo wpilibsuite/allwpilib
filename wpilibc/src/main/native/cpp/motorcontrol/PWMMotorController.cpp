@@ -5,8 +5,8 @@
 #include "frc/motorcontrol/PWMMotorController.h"
 
 #include <fmt/format.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -44,10 +44,10 @@ int PWMMotorController::GetChannel() const {
 
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
-  SendableRegistry::GetInstance().AddLW(this, name, channel);
+  wpi::SendableRegistry::GetInstance().AddLW(this, name, channel);
 }
 
-void PWMMotorController::InitSendable(SendableBuilder& builder) {
+void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Disable(); });

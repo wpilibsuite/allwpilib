@@ -10,16 +10,18 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableEntry.h>
-#include <networktables/NetworkTableValue.h>
-#include <wpi/SmallVector.h>
-#include <wpi/span.h>
+#include "wpi/SmallVector.h"
+#include "wpi/span.h"
 
-namespace frc {
+namespace wpi {
 
 class SendableBuilder {
  public:
+  /**
+   * The backend kinds used for the sendable builder.
+   */
+  enum BackendKind { kUnknown, kNetworkTables };
+
   virtual ~SendableBuilder() = default;
 
   /**
@@ -45,25 +47,6 @@ class SendableBuilder {
    * @param func    function
    */
   virtual void SetSafeState(std::function<void()> func) = 0;
-
-  /**
-   * Set the function that should be called to update the network table
-   * for things other than properties.  Note this function is not passed
-   * the network table object; instead it should use the entry handles
-   * returned by GetEntry().
-   *
-   * @param func    function
-   */
-  virtual void SetUpdateTable(std::function<void()> func) = 0;
-
-  /**
-   * Add a property without getters or setters.  This can be used to get
-   * entry handles for the function called by SetUpdateTable().
-   *
-   * @param key   property name
-   * @return Network table entry
-   */
-  virtual nt::NetworkTableEntry GetEntry(std::string_view key) = 0;
 
   /**
    * Add a boolean property.
@@ -143,17 +126,6 @@ class SendableBuilder {
                               std::function<void(std::string_view)> setter) = 0;
 
   /**
-   * Add a NetworkTableValue property.
-   *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
-   */
-  virtual void AddValueProperty(
-      std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
-      std::function<void(std::shared_ptr<nt::Value>)> setter) = 0;
-
-  /**
    * Add a string property (SmallString form).
    *
    * @param key     property name
@@ -218,10 +190,28 @@ class SendableBuilder {
       std::function<void(std::string_view)> setter) = 0;
 
   /**
-   * Get the network table.
-   * @return The network table
+   * Gets the kind of backend being used.
+   *
+   * @return Backend kind
    */
-  virtual std::shared_ptr<nt::NetworkTable> GetTable() = 0;
+  virtual BackendKind GetBackendKind() const = 0;
+
+  /**
+   * Return whether this sendable has been published.
+   *
+   * @return True if it has been published, false if not.
+   */
+  virtual bool IsPublished() const = 0;
+
+  /**
+   * Update the published values by calling the getters for all properties.
+   */
+  virtual void Update() = 0;
+
+  /**
+   * Clear properties.
+   */
+  virtual void ClearProperties() = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

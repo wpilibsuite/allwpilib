@@ -7,11 +7,11 @@
 #include <stdint.h>
 
 #include <hal/SimDevice.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
 #include "frc/interfaces/Gyro.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -29,8 +29,8 @@ namespace frc {
  * Only one instance of an ADXRS Gyro is supported.
  */
 class ADXRS450_Gyro : public Gyro,
-                      public Sendable,
-                      public SendableHelper<ADXRS450_Gyro> {
+                      public wpi::Sendable,
+                      public wpi::SendableHelper<ADXRS450_Gyro> {
  public:
   /**
    * Gyro constructor on onboard CS0.
@@ -100,7 +100,7 @@ class ADXRS450_Gyro : public Gyro,
    */
   int GetPort() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   SPI m_spi;

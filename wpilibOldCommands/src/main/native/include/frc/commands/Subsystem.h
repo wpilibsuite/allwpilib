@@ -8,14 +8,14 @@
 #include <string>
 #include <string_view>
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
 class Command;
 
-class Subsystem : public Sendable, public SendableHelper<Subsystem> {
+class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
   friend class Scheduler;
 
  public:
@@ -127,7 +127,7 @@ class Subsystem : public Sendable, public SendableHelper<Subsystem> {
    * @param name name to give child
    * @param child sendable
    */
-  void AddChild(std::string_view name, std::shared_ptr<Sendable> child);
+  void AddChild(std::string_view name, std::shared_ptr<wpi::Sendable> child);
 
   /**
    * Associate a Sendable with this Subsystem.
@@ -136,7 +136,7 @@ class Subsystem : public Sendable, public SendableHelper<Subsystem> {
    * @param name name to give child
    * @param child sendable
    */
-  void AddChild(std::string_view name, Sendable* child);
+  void AddChild(std::string_view name, wpi::Sendable* child);
 
   /**
    * Associate a Sendable with this Subsystem.
@@ -145,28 +145,28 @@ class Subsystem : public Sendable, public SendableHelper<Subsystem> {
    * @param name name to give child
    * @param child sendable
    */
-  void AddChild(std::string_view name, Sendable& child);
+  void AddChild(std::string_view name, wpi::Sendable& child);
 
   /**
    * Associate a {@link Sendable} with this Subsystem.
    *
    * @param child sendable
    */
-  void AddChild(std::shared_ptr<Sendable> child);
+  void AddChild(std::shared_ptr<wpi::Sendable> child);
 
   /**
    * Associate a {@link Sendable} with this Subsystem.
    *
    * @param child sendable
    */
-  void AddChild(Sendable* child);
+  void AddChild(wpi::Sendable* child);
 
   /**
    * Associate a {@link Sendable} with this Subsystem.
    *
    * @param child sendable
    */
-  void AddChild(Sendable& child);
+  void AddChild(wpi::Sendable& child);
 
  private:
   /**
@@ -185,7 +185,7 @@ class Subsystem : public Sendable, public SendableHelper<Subsystem> {
   bool m_initializedDefaultCommand = false;
 
  public:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

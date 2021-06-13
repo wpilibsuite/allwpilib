@@ -14,7 +14,6 @@
 #include "frc/shuffleboard/ShuffleboardInstance.h"
 #include "frc/shuffleboard/ShuffleboardTab.h"
 #include "frc/shuffleboard/ShuffleboardWidget.h"
-#include "frc/smartdashboard/Sendable.h"
 #include "gtest/gtest.h"
 
 using namespace frc;

@@ -4,14 +4,14 @@
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
 std::atomic_int SendableChooserBase::s_instances{0};
 
 SendableChooserBase::SendableChooserBase() : m_instance{s_instances++} {
-  SendableRegistry::GetInstance().Add(this, "SendableChooser", m_instance);
+  wpi::SendableRegistry::GetInstance().Add(this, "SendableChooser", m_instance);
 }
 
 SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)

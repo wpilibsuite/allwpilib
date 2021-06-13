@@ -8,16 +8,16 @@
 #include <string_view>
 #include <vector>
 
+#include <networktables/NTSendable.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <units/length.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/smartdashboard/FieldObject2d.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -39,7 +39,7 @@ namespace frc {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public Sendable, public SendableHelper<Field2d> {
+class Field2d : public nt::NTSendable, public wpi::SendableHelper<Field2d> {
  public:
   using Entry = size_t;
 
@@ -85,7 +85,7 @@ class Field2d : public Sendable, public SendableHelper<Field2d> {
    */
   FieldObject2d* GetRobotObject();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   std::shared_ptr<nt::NetworkTable> m_table;

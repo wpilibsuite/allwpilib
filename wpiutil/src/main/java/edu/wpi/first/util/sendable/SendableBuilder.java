@@ -2,11 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package edu.wpi.first.util.sendable;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -14,12 +11,11 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public interface SendableBuilder {
-  /**
-   * Get the network table.
-   *
-   * @return The network table
-   */
-  NetworkTable getTable();
+  /** The backend kinds used for the sendable builder. */
+  enum BackendKind {
+    kUnknown,
+    kNetworkTables
+  }
 
   /**
    * Set the string representation of the named data type that will be used by the smart dashboard
@@ -44,24 +40,6 @@ public interface SendableBuilder {
    * @param func function
    */
   void setSafeState(Runnable func);
-
-  /**
-   * Set the function that should be called to update the network table for things other than
-   * properties. Note this function is not passed the network table object; instead it should use
-   * the entry handles returned by getEntry().
-   *
-   * @param func function
-   */
-  void setUpdateTable(Runnable func);
-
-  /**
-   * Add a property without getters or setters. This can be used to get entry handles for the
-   * function called by setUpdateTable().
-   *
-   * @param key property name
-   * @return Network table entry
-   */
-  NetworkTableEntry getEntry(String key);
 
   /**
    * Represents an operation that accepts a single boolean-valued argument and returns no result.
@@ -144,12 +122,22 @@ public interface SendableBuilder {
   void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
-   * Add a NetworkTableValue property.
+   * Gets the kind of backend being used.
    *
-   * @param key property name
-   * @param getter getter function (returns current value)
-   * @param setter setter function (sets new value)
+   * @return Backend kind
    */
-  void addValueProperty(
-      String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter);
+  BackendKind getBackendKind();
+
+  /**
+   * Return whether this sendable has been published.
+   *
+   * @return True if it has been published, false if not.
+   */
+  boolean isPublished();
+
+  /** Update the published values by calling the getters for all properties. */
+  void update();
+
+  /** Clear properties. */
+  void clearProperties();
 }
