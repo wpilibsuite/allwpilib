@@ -98,8 +98,8 @@ void TestTiming(int squelch, std::pair<int, int> param) {
           interruptData.fallingStamps.push_back(ts);
         }
 
-        if (interruptData.risingStamps.size() == 4 &&
-            interruptData.fallingStamps.size() == 4) {
+        if (interruptData.risingStamps.size() >= 4 &&
+            interruptData.fallingStamps.size() >= 4) {
           interruptData.cond.notify_all();
           runThread = false;
           break;
