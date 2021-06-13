@@ -5,12 +5,12 @@
 #include <frc/AnalogInput.h>
 #include <frc/AnalogOutput.h>
 #include <frc/DigitalOutput.h>
+#include <frc/Timer.h>
 #include <frc/motorcontrol/Jaguar.h>
 
 #include "TestBench.h"
 #include "frc/DMA.h"
 #include "frc/DMASample.h"
-#include <frc/Timer.h>
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -26,7 +26,6 @@ class DMATest : public testing::Test {
   DMA m_dma;
 
   void SetUp() override {
-
     m_dma.AddAnalogInput(&m_analogInput);
     m_dma.SetExternalTrigger(&m_manualTrigger, false, true);
     m_manualTrigger.Set(true);
