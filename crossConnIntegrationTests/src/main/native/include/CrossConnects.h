@@ -1,10 +1,15 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #include <array>
+#include <utility>
 
 namespace hlt {
 
-constexpr static std::array<std::pair<int, int>, 22> DIOCrossConnects {
+constexpr static std::array<std::pair<int, int>, 22> DIOCrossConnects{
     std::pair{20, 25},
     std::pair{19, 24},
     std::pair{17, 13},
@@ -32,9 +37,9 @@ constexpr static std::array<std::pair<int, int>, 22> DIOCrossConnects {
 };
 
 // PWM on left, DIO on right
-constexpr static std::array<std::pair<int, int>, 2> PWMCrossConnects {
+constexpr static std::array<std::pair<int, int>, 2> PWMCrossConnects{
     std::pair{0, 18},
     std::pair{16, 25},
 };
 
-}
+}  // namespace hlt

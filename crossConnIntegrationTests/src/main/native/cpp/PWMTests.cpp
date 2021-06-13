@@ -1,16 +1,18 @@
-#include "CrossConnects.h"
-#include "LifetimeWrappers.h"
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/SmallVector.h"
-
-#include "gtest/gtest.h"
-
-#include "HAL/HAL.h"
-#include <thread>
 #include <atomic>
+#include <thread>
 
-#include <wpi/priority_mutex.h>
+#include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
+#include <wpi/priority_mutex.h>
+
+#include "CrossConnects.h"
+#include "HAL/HAL.h"
+#include "LifetimeWrappers.h"
+#include "gtest/gtest.h"
 
 using namespace hlt;
 
