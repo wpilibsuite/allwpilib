@@ -7,17 +7,16 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -37,8 +36,8 @@ class DMASample;
  * to be zeroed before use.
  */
 class Encoder : public CounterBase,
-                public Sendable,
-                public SendableHelper<Encoder> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<Encoder> {
   friend class DMA;
   friend class DMASample;
 
@@ -340,7 +339,7 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**

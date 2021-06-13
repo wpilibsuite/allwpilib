@@ -7,15 +7,16 @@
 #include <functional>
 #include <vector>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/motorcontrol/MotorController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class MotorControllerGroup : public Sendable,
+class MotorControllerGroup : public wpi::Sendable,
                              public MotorController,
-                             public SendableHelper<MotorControllerGroup> {
+                             public wpi::SendableHelper<MotorControllerGroup> {
  public:
   template <class... MotorControllers>
   explicit MotorControllerGroup(MotorController& motorController,
@@ -33,7 +34,7 @@ class MotorControllerGroup : public Sendable,
   void Disable() override;
   void StopMotor() override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

@@ -20,7 +20,7 @@ std::shared_ptr<nt::NetworkTable> SendableBuilderImpl::GetTable() {
   return m_table;
 }
 
-bool SendableBuilderImpl::HasTable() const {
+bool SendableBuilderImpl::IsPublished() const {
   return m_table != nullptr;
 }
 
@@ -28,7 +28,7 @@ bool SendableBuilderImpl::IsActuator() const {
   return m_actuator;
 }
 
-void SendableBuilderImpl::UpdateTable() {
+void SendableBuilderImpl::Update() {
   uint64_t time = nt::Now();
   for (auto& property : m_properties) {
     if (property.update) {

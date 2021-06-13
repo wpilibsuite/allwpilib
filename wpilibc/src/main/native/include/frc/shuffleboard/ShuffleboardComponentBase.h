@@ -26,8 +26,6 @@ class ShuffleboardComponentBase : public virtual ShuffleboardValue {
   ShuffleboardComponentBase(ShuffleboardContainer& parent,
                             std::string_view title, std::string_view type = "");
 
-  ~ShuffleboardComponentBase() override = default;
-
   void SetType(std::string_view type);
 
   void BuildMetadata(std::shared_ptr<nt::NetworkTable> metaTable);

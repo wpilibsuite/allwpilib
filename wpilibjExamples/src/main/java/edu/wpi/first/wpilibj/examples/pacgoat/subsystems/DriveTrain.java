@@ -46,6 +46,7 @@ public class DriveTrain extends Subsystem {
     // Configure the DifferentialDrive to reflect the fact that all motors
     // are wired backwards (right is inverted in DifferentialDrive).
     m_leftCIMs.setInverted(true);
+    m_rightCIMs.setInverted(true);
     m_drive = new DifferentialDrive(m_leftCIMs, m_rightCIMs);
     m_drive.setSafetyEnabled(true);
     m_drive.setExpiration(0.1);

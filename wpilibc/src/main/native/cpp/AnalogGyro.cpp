@@ -12,18 +12,18 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogGyro::AnalogGyro(int channel)
     : AnalogGyro(std::make_shared<AnalogInput>(channel)) {
-  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
+  wpi::SendableRegistry::GetInstance().AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(AnalogInput* channel)
@@ -41,7 +41,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
 
 AnalogGyro::AnalogGyro(int channel, int center, double offset)
     : AnalogGyro(std::make_shared<AnalogInput>(channel), center, offset) {
-  SendableRegistry::GetInstance().AddChild(this, m_analog.get());
+  wpi::SendableRegistry::GetInstance().AddChild(this, m_analog.get());
 }
 
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
@@ -124,8 +124,8 @@ void AnalogGyro::InitGyro() {
 
   HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel() + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "AnalogGyro",
-                                        m_analog->GetChannel());
+  wpi::SendableRegistry::GetInstance().AddLW(this, "AnalogGyro",
+                                             m_analog->GetChannel());
 }
 
 void AnalogGyro::Calibrate() {
@@ -138,7 +138,7 @@ std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
   return m_analog;
 }
 
-void AnalogGyro::InitSendable(SendableBuilder& builder) {
+void AnalogGyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
       "Value", [=] { return GetAngle(); }, nullptr);

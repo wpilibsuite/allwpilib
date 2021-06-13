@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * This class defines a {@link Command} which interacts heavily with a PID loop.

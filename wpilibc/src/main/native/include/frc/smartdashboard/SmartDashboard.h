@@ -11,15 +11,16 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
 #include "frc/smartdashboard/ListenerExecutor.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
+class SmartDashboard : public wpi::Sendable,
+                       public wpi::SendableHelper<SmartDashboard> {
  public:
   static void init();
 
@@ -115,7 +116,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @param keyName the key
    * @param value   the value
    */
-  static void PutData(std::string_view key, Sendable* data);
+  static void PutData(std::string_view key, wpi::Sendable* data);
 
   /**
    * Maps the specified key (where the key is the name of the Sendable)
@@ -129,7 +130,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    *
    * @param value the value
    */
-  static void PutData(Sendable* value);
+  static void PutData(wpi::Sendable* value);
 
   /**
    * Returns the value at the specified key.
@@ -137,7 +138,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
    * @param keyName the key
    * @return the value
    */
-  static Sendable* GetData(std::string_view keyName);
+  static wpi::Sendable* GetData(std::string_view keyName);
 
   /**
    * Maps the specified key to the specified value in this table.

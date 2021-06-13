@@ -10,13 +10,13 @@
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
 #include <frc/livewindow/LiveWindow.h>
-#include <frc/smartdashboard/SendableBuilder.h>
-#include <frc/smartdashboard/SendableRegistry.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -70,7 +70,7 @@ CommandScheduler::CommandScheduler()
       }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
-  frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = [this] {
     this->Disable();
@@ -80,7 +80,7 @@ CommandScheduler::CommandScheduler()
 }
 
 CommandScheduler::~CommandScheduler() {
-  frc::SendableRegistry::GetInstance().Remove(this);
+  wpi::SendableRegistry::GetInstance().Remove(this);
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = nullptr;
   scheduler->disabled = nullptr;
@@ -428,7 +428,7 @@ void CommandScheduler::OnCommandFinish(Action action) {
   m_impl->finishActions.emplace_back(std::move(action));
 }
 
-void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
+void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
   auto namesEntry = builder.GetEntry("Names");
   auto idsEntry = builder.GetEntry("Ids");

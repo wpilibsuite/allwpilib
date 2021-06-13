@@ -8,11 +8,11 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/MathUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc2;
 
@@ -31,7 +31,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
-  frc::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
+  wpi::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 void PIDController::SetPID(double Kp, double Ki, double Kd) {
@@ -161,7 +161,7 @@ void PIDController::Reset() {
   m_totalError = 0;
 }
 
-void PIDController::InitSendable(frc::SendableBuilder& builder) {
+void PIDController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.AddDoubleProperty(
       "p", [this] { return GetP(); }, [this](double value) { SetP(value); });

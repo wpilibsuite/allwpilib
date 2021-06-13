@@ -4,12 +4,13 @@
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc/Errors.h"
 #include "frc/shuffleboard/ComplexWidget.h"
 #include "frc/shuffleboard/ShuffleboardComponent.h"
 #include "frc/shuffleboard/ShuffleboardLayout.h"
 #include "frc/shuffleboard/SimpleWidget.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -57,7 +58,7 @@ ShuffleboardLayout& ShuffleboardContainer::GetLayout(std::string_view title) {
 }
 
 ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
-                                          Sendable& sendable) {
+                                          wpi::Sendable& sendable) {
   CheckTitle(title);
   auto widget = std::make_unique<ComplexWidget>(*this, title, sendable);
   auto ptr = widget.get();
@@ -65,8 +66,8 @@ ComplexWidget& ShuffleboardContainer::Add(std::string_view title,
   return *ptr;
 }
 
-ComplexWidget& ShuffleboardContainer::Add(Sendable& sendable) {
-  auto name = SendableRegistry::GetInstance().GetName(&sendable);
+ComplexWidget& ShuffleboardContainer::Add(wpi::Sendable& sendable) {
+  auto name = wpi::SendableRegistry::GetInstance().GetName(&sendable);
   if (name.empty()) {
     FRC_ReportError(err::Error, "{}", "Sendable must have a name");
   }

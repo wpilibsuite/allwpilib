@@ -6,16 +6,16 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  SendableRegistry::GetInstance().AddChild(this, m_analogInput.get());
+  wpi::SendableRegistry::GetInstance().AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
@@ -46,7 +46,7 @@ void AnalogAccelerometer::SetZero(double zero) {
   m_zeroGVoltage = zero;
 }
 
-void AnalogAccelerometer::InitSendable(SendableBuilder& builder) {
+void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Accelerometer");
   builder.AddDoubleProperty(
       "Value", [=] { return GetAcceleration(); }, nullptr);
@@ -56,6 +56,6 @@ void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
              m_analogInput->GetChannel() + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "Accelerometer",
-                                        m_analogInput->GetChannel());
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Accelerometer",
+                                             m_analogInput->GetChannel());
 }

@@ -9,11 +9,11 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/numbers>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/SpeedController.h"
 #include "frc/drive/Vector2d.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -33,7 +33,7 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
       m_rearLeftMotor(&rearLeftMotor),
       m_frontRightMotor(&frontRightMotor),
       m_rearRightMotor(&rearRightMotor) {
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddChild(this, m_frontLeftMotor);
   registry.AddChild(this, m_rearLeftMotor);
   registry.AddChild(this, m_frontRightMotor);
@@ -113,7 +113,7 @@ std::string MecanumDrive::GetDescription() const {
   return "MecanumDrive";
 }
 
-void MecanumDrive::InitSendable(SendableBuilder& builder) {
+void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });

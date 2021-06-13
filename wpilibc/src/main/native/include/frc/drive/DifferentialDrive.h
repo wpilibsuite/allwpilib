@@ -6,9 +6,10 @@
 
 #include <string>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -97,8 +98,8 @@ class SpeedController;
  * with SetDeadband().
  */
 class DifferentialDrive : public RobotDriveBase,
-                          public Sendable,
-                          public SendableHelper<DifferentialDrive> {
+                          public wpi::Sendable,
+                          public wpi::SendableHelper<DifferentialDrive> {
  public:
   struct WheelSpeeds {
     double left = 0.0;
@@ -208,7 +209,7 @@ class DifferentialDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   SpeedController* m_leftMotor;

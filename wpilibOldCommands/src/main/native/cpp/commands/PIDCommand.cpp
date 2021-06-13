@@ -4,7 +4,7 @@
 
 #include "frc/commands/PIDCommand.h"
 
-#include "frc/smartdashboard/SendableBuilder.h"
+#include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc;
 
@@ -112,7 +112,7 @@ double PIDCommand::GetPosition() {
   return ReturnPIDInput();
 }
 
-void PIDCommand::InitSendable(SendableBuilder& builder) {
+void PIDCommand::InitSendable(wpi::SendableBuilder& builder) {
   m_controller->InitSendable(builder);
   Command::InitSendable(builder);
   builder.SetSmartDashboardType("PIDCommand");

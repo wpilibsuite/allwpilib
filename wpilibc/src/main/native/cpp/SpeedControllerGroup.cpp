@@ -4,8 +4,8 @@
 
 #include "frc/SpeedControllerGroup.h"
 
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -20,11 +20,12 @@ SpeedControllerGroup::SpeedControllerGroup(
 
 void SpeedControllerGroup::Initialize() {
   for (auto& speedController : m_speedControllers) {
-    SendableRegistry::GetInstance().AddChild(this, &speedController.get());
+    wpi::SendableRegistry::GetInstance().AddChild(this, &speedController.get());
   }
   static int instances = 0;
   ++instances;
-  SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup", instances);
+  wpi::SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup",
+                                           instances);
 }
 
 void SpeedControllerGroup::Set(double speed) {
@@ -60,7 +61,7 @@ void SpeedControllerGroup::StopMotor() {
   }
 }
 
-void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
+void SpeedControllerGroup::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });

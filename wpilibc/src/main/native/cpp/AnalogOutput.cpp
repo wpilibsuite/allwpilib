@@ -12,11 +12,11 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -34,7 +34,7 @@ AnalogOutput::AnalogOutput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "AnalogOutput", m_channel);
 }
 
 AnalogOutput::~AnalogOutput() {
@@ -58,7 +58,7 @@ int AnalogOutput::GetChannel() const {
   return m_channel;
 }
 
-void AnalogOutput::InitSendable(SendableBuilder& builder) {
+void AnalogOutput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Output");
   builder.AddDoubleProperty(
       "Value", [=] { return GetVoltage(); },

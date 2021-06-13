@@ -2,11 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.smartdashboard;
+package edu.wpi.first.util.sendable;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Sendable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * The SendableRegistry class is the public interface for registering sensors and actuators for use
@@ -28,7 +26,7 @@ public class SendableRegistry {
     }
 
     WeakReference<Sendable> m_sendable;
-    SendableBuilderImpl m_builder = new SendableBuilderImpl();
+    SendableBuilder m_builder;
     String m_name;
     String m_subsystem = "Ungrouped";
     WeakReference<Sendable> m_parent;
@@ -44,6 +42,7 @@ public class SendableRegistry {
     }
   }
 
+  private static Supplier<SendableBuilder> liveWindowFactory;
   private static final Map<Object, Component> components = new WeakHashMap<>();
   private static int nextDataHandle;
 
@@ -62,6 +61,15 @@ public class SendableRegistry {
 
   private SendableRegistry() {
     throw new UnsupportedOperationException("This is a utility class!");
+  }
+
+  /**
+   * Sets the factory for LiveWindow builders.
+   *
+   * @param factory factory function
+   */
+  public static synchronized void setLiveWindowBuilderFactory(Supplier<SendableBuilder> factory) {
+    liveWindowFactory = factory;
   }
 
   /**
@@ -122,6 +130,9 @@ public class SendableRegistry {
    */
   public static synchronized void addLW(Sendable sendable, String name) {
     Component comp = getOrAdd(sendable);
+    if (liveWindowFactory != null) {
+      comp.m_builder = liveWindowFactory.get();
+    }
     comp.m_liveWindow = true;
     comp.m_name = name;
   }
@@ -135,6 +146,9 @@ public class SendableRegistry {
    */
   public static synchronized void addLW(Sendable sendable, String moduleType, int channel) {
     Component comp = getOrAdd(sendable);
+    if (liveWindowFactory != null) {
+      comp.m_builder = liveWindowFactory.get();
+    }
     comp.m_liveWindow = true;
     comp.setName(moduleType, channel);
   }
@@ -150,6 +164,9 @@ public class SendableRegistry {
   public static synchronized void addLW(
       Sendable sendable, String moduleType, int moduleNumber, int channel) {
     Component comp = getOrAdd(sendable);
+    if (liveWindowFactory != null) {
+      comp.m_builder = liveWindowFactory.get();
+    }
     comp.m_liveWindow = true;
     comp.setName(moduleType, moduleNumber, channel);
   }
@@ -163,6 +180,9 @@ public class SendableRegistry {
    */
   public static synchronized void addLW(Sendable sendable, String subsystem, String name) {
     Component comp = getOrAdd(sendable);
+    if (liveWindowFactory != null) {
+      comp.m_builder = liveWindowFactory.get();
+    }
     comp.m_liveWindow = true;
     comp.m_name = name;
     comp.m_subsystem = subsystem;
@@ -377,18 +397,19 @@ public class SendableRegistry {
   }
 
   /**
-   * Publishes an object in the registry to a network table.
+   * Publishes an object in the registry to a builder.
    *
    * @param sendable object
-   * @param table network table
+   * @param builder sendable builder
    */
-  public static synchronized void publish(Sendable sendable, NetworkTable table) {
+  public static synchronized void publish(Sendable sendable, SendableBuilder builder) {
     Component comp = getOrAdd(sendable);
-    comp.m_builder.clearProperties();
-    comp.m_builder.setTable(table);
+    if (comp.m_builder != null) {
+      comp.m_builder.clearProperties();
+    }
+    comp.m_builder = builder; // clear any current builder
     sendable.initSendable(comp.m_builder);
-    comp.m_builder.updateTable();
-    comp.m_builder.startListeners();
+    comp.m_builder.update();
   }
 
   /**
@@ -398,8 +419,8 @@ public class SendableRegistry {
    */
   public static synchronized void update(Sendable sendable) {
     Component comp = components.get(sendable);
-    if (comp != null) {
-      comp.m_builder.updateTable();
+    if (comp != null && comp.m_builder != null) {
+      comp.m_builder.update();
     }
   }
 
@@ -427,7 +448,7 @@ public class SendableRegistry {
 
     /** Sendable builder for the sendable. */
     @SuppressWarnings("MemberName")
-    public SendableBuilderImpl builder;
+    public SendableBuilder builder;
   }
 
   // As foreachLiveWindow is single threaded, cache the components it
@@ -448,7 +469,7 @@ public class SendableRegistry {
     foreachComponents.clear();
     foreachComponents.addAll(components.values());
     for (Component comp : foreachComponents) {
-      if (comp.m_sendable == null) {
+      if (comp.m_builder == null || comp.m_sendable == null) {
         continue;
       }
       cbdata.sendable = comp.m_sendable.get();
@@ -473,12 +494,11 @@ public class SendableRegistry {
           if (cause != null) {
             throwable = cause;
           }
-          DriverStation.reportError(
+          System.out.println(
               "Unhandled exception calling LiveWindow for "
                   + comp.m_name
                   + ": "
-                  + throwable.toString(),
-              false);
+                  + throwable.toString());
           comp.m_liveWindow = false;
         }
         if (cbdata.data != null) {

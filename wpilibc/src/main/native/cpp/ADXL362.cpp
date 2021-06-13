@@ -5,10 +5,10 @@
 #include "frc/ADXL362.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -72,7 +72,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL362, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL362", port);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "ADXL362", port);
 }
 
 void ADXL362::SetRange(Range range) {
@@ -178,7 +178,7 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
   return data;
 }
 
-void ADXL362::InitSendable(SendableBuilder& builder) {
+void ADXL362::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   auto x = builder.GetEntry("X").GetHandle();
   auto y = builder.GetEntry("Y").GetHandle();

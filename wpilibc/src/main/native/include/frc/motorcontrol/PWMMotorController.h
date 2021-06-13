@@ -7,11 +7,12 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/motorcontrol/MotorController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 class DMA;
@@ -21,8 +22,8 @@ class DMA;
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public Sendable,
-                           public SendableHelper<PWMMotorController> {
+                           public wpi::Sendable,
+                           public wpi::SendableHelper<PWMMotorController> {
  public:
   friend class DMA;
 
@@ -70,7 +71,7 @@ class PWMMotorController : public MotorController,
    */
   PWMMotorController(std::string_view name, int channel);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
   PWM m_pwm;
 

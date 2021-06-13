@@ -4,13 +4,13 @@
 
 #include "frc2/command/CommandBase.h"
 
-#include <frc/smartdashboard/SendableBuilder.h>
-#include <frc/smartdashboard/SendableRegistry.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc2;
 
 CommandBase::CommandBase() {
-  frc::SendableRegistry::GetInstance().Add(this, GetTypeName(*this));
+  wpi::SendableRegistry::GetInstance().Add(this, GetTypeName(*this));
 }
 
 void CommandBase::AddRequirements(
@@ -31,22 +31,22 @@ wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
 }
 
 void CommandBase::SetName(std::string_view name) {
-  frc::SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::GetInstance().SetName(this, name);
 }
 
 std::string CommandBase::GetName() const {
-  return frc::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetInstance().GetName(this);
 }
 
 std::string CommandBase::GetSubsystem() const {
-  return frc::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
 void CommandBase::SetSubsystem(std::string_view subsystem) {
-  frc::SendableRegistry::GetInstance().SetSubsystem(this, subsystem);
+  wpi::SendableRegistry::GetInstance().SetSubsystem(this, subsystem);
 }
 
-void CommandBase::InitSendable(frc::SendableBuilder& builder) {
+void CommandBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(
       ".name", [this] { return GetName(); }, nullptr);

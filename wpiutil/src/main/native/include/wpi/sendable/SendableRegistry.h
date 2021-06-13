@@ -4,17 +4,17 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 
-#include <networktables/NetworkTable.h>
-#include <wpi/function_ref.h>
+#include "wpi/function_ref.h"
 
-namespace frc {
+namespace wpi {
 
 class Sendable;
-class SendableBuilderImpl;
+class SendableBuilder;
 
 /**
  * The SendableRegistry class is the public interface for registering sensors
@@ -34,6 +34,14 @@ class SendableRegistry {
    * regardless of how many times GetInstance is called.
    */
   static SendableRegistry& GetInstance();
+
+  /**
+   * Sets the factory for LiveWindow builders.
+   *
+   * @param factory factory function
+   */
+  void SetLiveWindowBuilderFactory(
+      std::function<std::unique_ptr<SendableBuilder>()> factory);
 
   /**
    * Adds an object to the registry.
@@ -280,15 +288,15 @@ class SendableRegistry {
   Sendable* GetSendable(UID uid);
 
   /**
-   * Publishes an object in the registry to a network table.
+   * Publishes an object in the registry.
    *
    * @param sendableUid sendable unique id
-   * @param table network table
+   * @param builder publisher backend
    */
-  void Publish(UID sendableUid, std::shared_ptr<nt::NetworkTable> table);
+  void Publish(UID sendableUid, std::unique_ptr<SendableBuilder> builder);
 
   /**
-   * Updates network table information from an object.
+   * Updates published information from an object.
    *
    * @param sendableUid sendable unique id
    */
@@ -299,8 +307,8 @@ class SendableRegistry {
    */
   struct CallbackData {
     CallbackData(Sendable* sendable_, std::string_view name_,
-                 std::string_view subsystem_, Sendable* parent_,
-                 std::shared_ptr<void>& data_, SendableBuilderImpl& builder_)
+                 std::string_view subsystem_, wpi::Sendable* parent_,
+                 std::shared_ptr<void>& data_, SendableBuilder& builder_)
         : sendable(sendable_),
           name(name_),
           subsystem(subsystem_),
@@ -313,7 +321,7 @@ class SendableRegistry {
     std::string_view subsystem;
     Sendable* parent;
     std::shared_ptr<void>& data;
-    SendableBuilderImpl& builder;
+    SendableBuilder& builder;
   };
 
   /**
@@ -335,4 +343,4 @@ class SendableRegistry {
   std::unique_ptr<Impl> m_impl;
 };
 
-}  // namespace frc
+}  // namespace wpi

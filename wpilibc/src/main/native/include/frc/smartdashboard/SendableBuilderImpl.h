@@ -11,17 +11,16 @@
 #include <utility>
 #include <vector>
 
+#include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
 #include <wpi/SmallVector.h>
 #include <wpi/span.h>
 
-#include "frc/smartdashboard/SendableBuilder.h"
-
 namespace frc {
 
-class SendableBuilderImpl : public SendableBuilder {
+class SendableBuilderImpl : public nt::NTSendableBuilder {
  public:
   SendableBuilderImpl() = default;
   ~SendableBuilderImpl() override = default;
@@ -46,7 +45,7 @@ class SendableBuilderImpl : public SendableBuilder {
    * Return whether this sendable has an associated table.
    * @return True if it has a table, false if not.
    */
-  bool HasTable() const;
+  bool IsPublished() const override;
 
   /**
    * Return whether this sendable should be treated as an actuator.
@@ -57,7 +56,7 @@ class SendableBuilderImpl : public SendableBuilder {
   /**
    * Update the network table values by calling the getters for all properties.
    */
-  void UpdateTable();
+  void Update() override;
 
   /**
    * Hook setters for all properties.
@@ -84,7 +83,7 @@ class SendableBuilderImpl : public SendableBuilder {
   /**
    * Clear properties.
    */
-  void ClearProperties();
+  void ClearProperties() override;
 
   void SetSmartDashboardType(std::string_view type) override;
   void SetActuator(bool value) override;

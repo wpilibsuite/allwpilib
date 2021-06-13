@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.cscore.VideoSource;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Map;
 import java.util.WeakHashMap;
 

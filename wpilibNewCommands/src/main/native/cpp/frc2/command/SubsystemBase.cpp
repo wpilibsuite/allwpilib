@@ -4,8 +4,8 @@
 
 #include "frc2/command/SubsystemBase.h"
 
-#include <frc/smartdashboard/SendableBuilder.h>
-#include <frc/smartdashboard/SendableRegistry.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -13,11 +13,11 @@
 using namespace frc2;
 
 SubsystemBase::SubsystemBase() {
-  frc::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
+  wpi::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
+void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(
       ".hasDefault", [this] { return GetDefaultCommand() != nullptr; },
@@ -48,22 +48,22 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
 }
 
 std::string SubsystemBase::GetName() const {
-  return frc::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetInstance().GetName(this);
 }
 
 void SubsystemBase::SetName(std::string_view name) {
-  frc::SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::GetInstance().SetName(this, name);
 }
 
 std::string SubsystemBase::GetSubsystem() const {
-  return frc::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
 void SubsystemBase::SetSubsystem(std::string_view name) {
-  frc::SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 
-void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
-  auto& registry = frc::SendableRegistry::GetInstance();
+void SubsystemBase::AddChild(std::string name, wpi::Sendable* child) {
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddLW(child, GetSubsystem(), name);
 }

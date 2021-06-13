@@ -10,6 +10,11 @@
 #include <wpi/numbers>
 
 DriveTrain::DriveTrain() {
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_right.SetInverted(true);
+
 // Encoders may measure differently in the real world and in
 // simulation. In this example the robot moves 0.042 barleycorns
 // per tick in the real world, but the simulated encoders

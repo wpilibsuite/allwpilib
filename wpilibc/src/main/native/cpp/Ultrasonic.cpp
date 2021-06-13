@@ -8,14 +8,14 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalOutput.h"
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -30,7 +30,7 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel)
       m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {
   Initialize();
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddChild(this, m_pingChannel.get());
   registry.AddChild(this, m_echoChannel.get());
 }
@@ -156,7 +156,7 @@ void Ultrasonic::SetEnabled(bool enable) {
   m_enabled = enable;
 }
 
-void Ultrasonic::InitSendable(SendableBuilder& builder) {
+void Ultrasonic::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Ultrasonic");
   builder.AddDoubleProperty(
       "Value", [=] { return units::inch_t{GetRange()}.to<double>(); }, nullptr);
@@ -185,8 +185,8 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  SendableRegistry::GetInstance().AddLW(this, "Ultrasonic",
-                                        m_echoChannel->GetChannel());
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Ultrasonic",
+                                             m_echoChannel->GetChannel());
 }
 
 void Ultrasonic::UltrasonicChecker() {

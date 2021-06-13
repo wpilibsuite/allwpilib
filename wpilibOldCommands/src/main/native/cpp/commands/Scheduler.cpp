@@ -10,16 +10,16 @@
 #include <vector>
 
 #include <hal/FRCUsageReporting.h>
+#include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/buttons/ButtonScheduler.h"
 #include "frc/commands/Command.h"
 #include "frc/commands/Subsystem.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -157,7 +157,7 @@ void Scheduler::SetEnabled(bool enabled) {
   m_impl->enabled = enabled;
 }
 
-void Scheduler::InitSendable(SendableBuilder& builder) {
+void Scheduler::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
   auto namesEntry = builder.GetEntry("Names");
   auto idsEntry = builder.GetEntry("Ids");
@@ -186,7 +186,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
     if (m_impl->runningCommandsChanged) {
       m_impl->commandsBuf.resize(0);
       m_impl->idsBuf.resize(0);
-      auto& registry = SendableRegistry::GetInstance();
+      auto& registry = wpi::SendableRegistry::GetInstance();
       for (const auto& command : m_impl->commands) {
         m_impl->commandsBuf.emplace_back(registry.GetName(command));
         m_impl->idsBuf.emplace_back(command->GetID());
@@ -200,7 +200,7 @@ void Scheduler::InitSendable(SendableBuilder& builder) {
 Scheduler::Scheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
-  SendableRegistry::GetInstance().AddLW(this, "Scheduler");
+  wpi::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = [this] {
     this->SetEnabled(false);
@@ -210,7 +210,7 @@ Scheduler::Scheduler() : m_impl(new Impl) {
 }
 
 Scheduler::~Scheduler() {
-  SendableRegistry::GetInstance().Remove(this);
+  wpi::SendableRegistry::GetInstance().Remove(this);
   auto scheduler = frc::LiveWindow::GetInstance();
   scheduler->enabled = nullptr;
   scheduler->disabled = nullptr;

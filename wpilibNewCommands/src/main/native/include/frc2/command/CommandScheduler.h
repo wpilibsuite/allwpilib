@@ -10,10 +10,10 @@
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
-#include <frc/smartdashboard/Sendable.h>
-#include <frc/smartdashboard/SendableHelper.h>
+#include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
 namespace frc2 {
@@ -27,8 +27,8 @@ class Subsystem;
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
  */
-class CommandScheduler final : public frc::Sendable,
-                               public frc::SendableHelper<CommandScheduler> {
+class CommandScheduler final : public nt::NTSendable,
+                               public wpi::SendableHelper<CommandScheduler> {
  public:
   /**
    * Returns the Scheduler instance.
@@ -332,7 +332,7 @@ class CommandScheduler final : public frc::Sendable,
    */
   void OnCommandFinish(Action action);
 
-  void InitSendable(frc::SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   // Constructor; private as this is a singleton

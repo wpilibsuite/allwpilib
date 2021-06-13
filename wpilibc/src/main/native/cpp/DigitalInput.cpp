@@ -12,11 +12,11 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -33,7 +33,7 @@ DigitalInput::DigitalInput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalInput", channel);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "DigitalInput", channel);
 }
 
 DigitalInput::~DigitalInput() {
@@ -67,7 +67,7 @@ int DigitalInput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalInput::InitSendable(SendableBuilder& builder) {
+void DigitalInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Input");
   builder.AddBooleanProperty(
       "Value", [=] { return Get(); }, nullptr);

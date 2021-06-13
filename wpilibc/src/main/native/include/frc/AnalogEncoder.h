@@ -9,11 +9,11 @@
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
 #include <units/angle.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 class AnalogInput;
@@ -21,7 +21,8 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public Sendable, public SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::Sendable,
+                      public wpi::SendableHelper<AnalogEncoder> {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -116,7 +117,7 @@ class AnalogEncoder : public Sendable, public SendableHelper<AnalogEncoder> {
    */
   int GetChannel() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   void Init();

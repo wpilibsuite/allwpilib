@@ -8,17 +8,16 @@
 #include <limits>
 
 #include <units/time.h>
-
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc2 {
 
 /**
  * Implements a PID control loop.
  */
-class PIDController : public frc::Sendable,
-                      public frc::SendableHelper<PIDController> {
+class PIDController : public wpi::Sendable,
+                      public wpi::SendableHelper<PIDController> {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -193,7 +192,7 @@ class PIDController : public frc::Sendable,
    */
   void Reset();
 
-  void InitSendable(frc::SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   // Factor for "proportional" control

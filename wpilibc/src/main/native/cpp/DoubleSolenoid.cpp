@@ -10,11 +10,11 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -53,7 +53,7 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
              m_module->GetModuleNumber() + 1);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
              m_module->GetModuleNumber() + 1);
-  SendableRegistry::GetInstance().AddLW(
+  wpi::SendableRegistry::GetInstance().AddLW(
       this, "DoubleSolenoid", m_module->GetModuleNumber(), m_forwardChannel);
 }
 
@@ -115,7 +115,7 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
+void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Double Solenoid");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Set(kOff); });

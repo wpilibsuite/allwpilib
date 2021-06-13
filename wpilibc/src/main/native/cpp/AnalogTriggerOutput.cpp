@@ -38,7 +38,7 @@ int AnalogTriggerOutput::GetChannel() const {
   return m_trigger->GetIndex();
 }
 
-void AnalogTriggerOutput::InitSendable(SendableBuilder&) {}
+void AnalogTriggerOutput::InitSendable(wpi::SendableBuilder&) {}
 
 AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)

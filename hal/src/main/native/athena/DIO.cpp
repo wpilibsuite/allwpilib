@@ -272,6 +272,29 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
   }
   {
     std::scoped_lock lock(digitalDIOMutex);
+
+    tDIO::tOutputEnable currentOutputEnable =
+        digitalSystem->readOutputEnable(status);
+
+    HAL_Bool isInput = false;
+
+    if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+      isInput =
+          ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
+           1) != 0;
+    } else if (port->channel < kNumDigitalHeaders) {
+      isInput = ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
+    } else {
+      isInput = ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) &
+                 1) != 0;
+    }
+
+    if (isInput) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Cannot set output of an input channel");
+      return;
+    }
+
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {

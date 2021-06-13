@@ -6,24 +6,23 @@
 
 #include <string>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/DigitalOutput.h"
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/motorcontrol/MotorController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Nidec Brushless Motor.
  */
 class NidecBrushless : public MotorController,
                        public MotorSafety,
-                       public Sendable,
-                       public SendableHelper<NidecBrushless> {
+                       public wpi::Sendable,
+                       public wpi::SendableHelper<NidecBrushless> {
  public:
   /**
    * Constructor.
@@ -86,7 +85,7 @@ class NidecBrushless : public MotorController,
   int GetChannel() const;
 
   // Sendable interface
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

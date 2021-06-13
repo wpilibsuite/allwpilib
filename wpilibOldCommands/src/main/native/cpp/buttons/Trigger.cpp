@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/sendable/SendableBuilder.h>
+
 #include "frc/buttons/Button.h"
 #include "frc/buttons/CancelButtonScheduler.h"
 #include "frc/buttons/HeldButtonScheduler.h"
 #include "frc/buttons/PressedButtonScheduler.h"
 #include "frc/buttons/ReleasedButtonScheduler.h"
 #include "frc/buttons/ToggleButtonScheduler.h"
-#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -62,7 +63,7 @@ void Trigger::ToggleWhenActive(Command* command) {
   tbs->Start();
 }
 
-void Trigger::InitSendable(SendableBuilder& builder) {
+void Trigger::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Button");
   builder.SetSafeState([=] { m_sendablePressed = false; });
   builder.AddBooleanProperty(
