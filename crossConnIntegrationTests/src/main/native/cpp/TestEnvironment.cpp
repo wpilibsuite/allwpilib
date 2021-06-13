@@ -8,8 +8,6 @@
 #include <fmt/core.h>
 #include <hal/HAL.h>
 
-#include "frc/DriverStation.h"
-#include "frc/livewindow/LiveWindow.h"
 #include "gtest/gtest.h"
 #include "mockds/MockDS.h"
 
@@ -40,12 +38,18 @@ class TestEnvironment : public testing::Environment {
     // station returns that the robot is enabled, to ensure that tests will be
     // able to run on the hardware.
     HAL_ObserveUserProgramStarting();
-    frc::LiveWindow::GetInstance()->SetEnabled(false);
 
     fmt::print("Started coms\n");
 
     int enableCounter = 0;
-    while (!frc::DriverStation::GetInstance().IsEnabled()) {
+
+    auto checkEnabled = []() {
+      HAL_ControlWord controlWord;
+      std::memset(&controlWord, 0, sizeof(controlWord));
+      HAL_GetControlWord(&controlWord);
+      return controlWord.enabled && controlWord.dsAttached;
+    };
+    while (!checkEnabled()) {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
         // Force exit
