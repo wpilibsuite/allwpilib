@@ -15,6 +15,11 @@ using namespace DriveConstants;
 // The Romi has onboard encoders that are hardcoded
 // to use DIO pins 4/5 and 6/7 for the left and right
 Drivetrain::Drivetrain() {
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_rightMotor.SetInverted(true);
+
   m_leftEncoder.SetDistancePerPulse(
       wpi::numbers::pi * kWheelDiameter.to<double>() / kCountsPerRevolution);
   m_rightEncoder.SetDistancePerPulse(
