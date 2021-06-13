@@ -113,7 +113,11 @@ public class VideoSource implements AutoCloseable {
     return m_handle;
   }
 
-  /** Get the kind of the source. */
+  /**
+   * Get the kind of the source.
+   *
+   * @return The kind of the source.
+   */
   public Kind getKind() {
     return getKindFromInt(CameraServerJNI.getSourceKind(m_handle));
   }
@@ -121,12 +125,18 @@ public class VideoSource implements AutoCloseable {
   /**
    * Get the name of the source. The name is an arbitrary identifier provided when the source is
    * created, and should be unique.
+   *
+   * @return The name of the source.
    */
   public String getName() {
     return CameraServerJNI.getSourceName(m_handle);
   }
 
-  /** Get the source description. This is source-kind specific. */
+  /**
+   * Get the source description. This is source-kind specific.
+   *
+   * @return The source description.
+   */
   public String getDescription() {
     return CameraServerJNI.getSourceDescription(m_handle);
   }
@@ -153,7 +163,11 @@ public class VideoSource implements AutoCloseable {
     CameraServerJNI.setSourceConnectionStrategy(m_handle, strategy.getValue());
   }
 
-  /** Returns if the source currently connected to whatever is providing the images. */
+  /**
+   * Returns true if the source currently connected to whatever is providing the images.
+   *
+   * @return True if the source currently connected to whatever is providing the images.
+   */
   public boolean isConnected() {
     return CameraServerJNI.isSourceConnected(m_handle);
   }
@@ -178,8 +192,11 @@ public class VideoSource implements AutoCloseable {
     return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));
   }
 
-  /** Enumerate all properties of this source. */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  /**
+   * Enumerate all properties of this source.
+   *
+   * @return Array of video properties.
+   */
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSourceProperties(m_handle);
     VideoProperty[] rv = new VideoProperty[handles.length];
@@ -189,7 +206,11 @@ public class VideoSource implements AutoCloseable {
     return rv;
   }
 
-  /** Get the current video mode. */
+  /**
+   * Get the current video mode.
+   *
+   * @return The current video mode.
+   */
   public VideoMode getVideoMode() {
     return CameraServerJNI.getSourceVideoMode(m_handle);
   }
@@ -198,6 +219,7 @@ public class VideoSource implements AutoCloseable {
    * Set the video mode.
    *
    * @param mode Video mode
+   * @return True if set successfully.
    */
   public boolean setVideoMode(VideoMode mode) {
     return CameraServerJNI.setSourceVideoMode(
@@ -313,7 +335,11 @@ public class VideoSource implements AutoCloseable {
         m_handle, CameraServerJNI.TelemetryKind.kSourceBytesReceived);
   }
 
-  /** Enumerate all known video modes for this source. */
+  /**
+   * Enumerate all known video modes for this source.
+   *
+   * @return Vector of video modes.
+   */
   public VideoMode[] enumerateVideoModes() {
     return CameraServerJNI.enumerateSourceVideoModes(m_handle);
   }
@@ -323,7 +349,6 @@ public class VideoSource implements AutoCloseable {
    *
    * @return Vector of sinks.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSourceSinks(m_handle);
     VideoSink[] rv = new VideoSink[handles.length];
@@ -338,7 +363,6 @@ public class VideoSource implements AutoCloseable {
    *
    * @return Vector of sources.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static VideoSource[] enumerateSources() {
     int[] handles = CameraServerJNI.enumerateSources();
     VideoSource[] rv = new VideoSource[handles.length];

@@ -22,7 +22,6 @@ import java.util.Set;
  * <p>When a value is put into the SmartDashboard here, it pops up on the SmartDashboard on the
  * laptop. Users can put values into and get values from the SmartDashboard.
  */
-@SuppressWarnings("PMD.GodClass")
 public final class SmartDashboard {
   /** The {@link NetworkTable} used by {@link SmartDashboard}. */
   private static final NetworkTable table =

@@ -422,8 +422,7 @@ class SmartDashboard : public Sendable, public SendableHelper<SmartDashboard> {
 
   /**
    * Posts a task from a listener to the ListenerExecutor, so that it can be run
-   * synchronously from the main loop on the next call to {@link
-   * SmartDashboard#updateValues()}.
+   * synchronously from the main loop on the next call to updateValues().
    *
    * @param task The task to run synchronously from the main thread.
    */

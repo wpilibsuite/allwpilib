@@ -7562,7 +7562,7 @@ class json
                                    const bool strict = true);
 
     /*!
-    @copydoc from_msgpack(raw_istream, const bool)
+    @copydoc from_msgpack(raw_istream&, const bool)
     */
     static json from_msgpack(span<const uint8_t> arr, const bool strict = true);
 

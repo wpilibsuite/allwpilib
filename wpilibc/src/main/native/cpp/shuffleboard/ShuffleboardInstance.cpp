@@ -15,7 +15,7 @@
 using namespace frc::detail;
 
 struct ShuffleboardInstance::Impl {
-  wpi::StringMap<ShuffleboardTab> tabs;
+  wpi::StringMap<std::unique_ptr<ShuffleboardTab>> tabs;
 
   bool tabsChanged = false;
   std::shared_ptr<nt::NetworkTable> rootTable;
@@ -33,23 +33,24 @@ ShuffleboardInstance::~ShuffleboardInstance() = default;
 
 frc::ShuffleboardTab& ShuffleboardInstance::GetTab(std::string_view title) {
   if (m_impl->tabs.find(title) == m_impl->tabs.end()) {
-    m_impl->tabs.try_emplace(title, ShuffleboardTab(*this, title));
+    m_impl->tabs.try_emplace(title,
+                             std::make_unique<ShuffleboardTab>(*this, title));
     m_impl->tabsChanged = true;
   }
-  return m_impl->tabs.find(title)->second;
+  return *m_impl->tabs.find(title)->second;
 }
 
 void ShuffleboardInstance::Update() {
   if (m_impl->tabsChanged) {
     wpi::SmallVector<std::string, 16> tabTitles;
     for (auto& entry : m_impl->tabs) {
-      tabTitles.emplace_back(entry.second.GetTitle());
+      tabTitles.emplace_back(entry.second->GetTitle());
     }
     m_impl->rootMetaTable->GetEntry("Tabs").ForceSetStringArray(tabTitles);
     m_impl->tabsChanged = false;
   }
   for (auto& entry : m_impl->tabs) {
-    auto& tab = entry.second;
+    auto& tab = *entry.second;
     tab.BuildInto(m_impl->rootTable,
                   m_impl->rootMetaTable->GetSubTable(tab.GetTitle()));
   }
@@ -57,7 +58,7 @@ void ShuffleboardInstance::Update() {
 
 void ShuffleboardInstance::EnableActuatorWidgets() {
   for (auto& entry : m_impl->tabs) {
-    auto& tab = entry.second;
+    auto& tab = *entry.second;
     for (auto& component : tab.GetComponents()) {
       component->EnableIfActuator();
     }
@@ -66,7 +67,7 @@ void ShuffleboardInstance::EnableActuatorWidgets() {
 
 void ShuffleboardInstance::DisableActuatorWidgets() {
   for (auto& entry : m_impl->tabs) {
-    auto& tab = entry.second;
+    auto& tab = *entry.second;
     for (auto& component : tab.GetComponents()) {
       component->DisableIfActuator();
     }

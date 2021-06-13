@@ -166,6 +166,7 @@ public class TrapezoidProfile {
    * the profile was at time t = 0.
    *
    * @param t The time since the beginning of the profile.
+   * @return The position and velocity of the profile at time t.
    */
   public State calculate(double t) {
     State result = new State(m_initial.position, m_initial.velocity);
@@ -195,6 +196,7 @@ public class TrapezoidProfile {
    * Returns the time left until a target distance in the profile is reached.
    *
    * @param target The target distance.
+   * @return The time left until a target distance in the profile is reached.
    */
   public double timeLeftUntil(double target) {
     double position = m_initial.position * m_direction;
@@ -263,7 +265,11 @@ public class TrapezoidProfile {
     return accelTime + fullSpeedTime + deccelTime;
   }
 
-  /** Returns the total time the profile takes to reach the goal. */
+  /**
+   * Returns the total time the profile takes to reach the goal.
+   *
+   * @return The total time the profile takes to reach the goal.
+   */
   public double totalTime() {
     return m_endDeccel;
   }
@@ -275,6 +281,7 @@ public class TrapezoidProfile {
    * profile's total time.
    *
    * @param t The time since the beginning of the profile.
+   * @return True if the profile has reached the goal.
    */
   public boolean isFinished(double t) {
     return t >= totalTime();

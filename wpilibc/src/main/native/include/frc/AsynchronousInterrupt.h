@@ -12,6 +12,8 @@
 #include <thread>
 #include <utility>
 
+#include <units/time.h>
+
 namespace frc {
 /**
  * Class for handling asynchronous interrupts.

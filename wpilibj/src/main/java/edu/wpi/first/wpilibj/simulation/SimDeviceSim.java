@@ -177,6 +177,7 @@ public class SimDeviceSim {
   /**
    * Register a callback to be run every time a value is changed on this device.
    *
+   * @param value simulated value
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
@@ -197,6 +198,8 @@ public class SimDeviceSim {
    * @param value simulated value
    * @param callback callback
    * @param initialNotify ignored (present for consistency)
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerValueResetCallback(
       SimValue value, SimValueCallback callback, boolean initialNotify) {
@@ -219,6 +222,7 @@ public class SimDeviceSim {
   /**
    * Register a callback to be run every time a new {@link edu.wpi.first.hal.SimDevice} is created.
    *
+   * @param prefix the prefix to filter sim devices
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
@@ -234,7 +238,9 @@ public class SimDeviceSim {
    * Register a callback to be run every time a {@link edu.wpi.first.hal.SimDevice} is
    * freed/destroyed.
    *
+   * @param prefix the prefix to filter sim devices
    * @param callback the callback
+   * @param initialNotify should the callback be run with the initial state
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */

@@ -30,7 +30,6 @@ import java.util.function.Supplier;
  * functionality of a "smart" motor controller) may use the secondary constructor that omits the PID
  * and feedforward functionality, returning only the raw wheel speeds from the RAMSETE controller.
  */
-@SuppressWarnings("PMD.TooManyFields")
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -68,7 +67,6 @@ public class RamseteCommand extends CommandBase {
    *     the robot drive.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

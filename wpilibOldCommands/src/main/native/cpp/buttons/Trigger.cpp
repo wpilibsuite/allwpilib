@@ -64,8 +64,8 @@ void Trigger::ToggleWhenActive(Command* command) {
 
 void Trigger::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Button");
-  builder.SetSafeState([=]() { m_sendablePressed = false; });
+  builder.SetSafeState([=] { m_sendablePressed = false; });
   builder.AddBooleanProperty(
-      "pressed", [=]() { return Grab(); },
+      "pressed", [=] { return Grab(); },
       [=](bool value) { m_sendablePressed = value; });
 }

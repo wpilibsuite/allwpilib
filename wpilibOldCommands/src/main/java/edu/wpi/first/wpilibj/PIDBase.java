@@ -27,7 +27,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @deprecated All APIs which use this have been deprecated.
  */
 @Deprecated(since = "2020", forRemoval = true)
-@SuppressWarnings("PMD.TooManyFields")
 public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable {
   public static final double kDefaultPeriod = 0.05;
   private static int instances;
@@ -80,9 +79,6 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
 
   private double m_setpoint;
   private double m_prevSetpoint;
-
-  @SuppressWarnings("PMD.UnusedPrivateField")
-  private double m_error;
 
   private double m_result;
 
@@ -199,7 +195,7 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * Read the input, calculate the output accordingly, and write to the output. This should only be
    * called by the PIDTask and is created during initialization.
    */
-  @SuppressWarnings({"LocalVariableName", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
+  @SuppressWarnings("LocalVariableName")
   protected void calculate() {
     if (m_pidInput == null || m_pidOutput == null) {
       return;
@@ -291,7 +287,6 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
       m_thisMutex.lock();
       try {
         m_prevError = error;
-        m_error = error;
         m_totalError = totalError;
         m_result = result;
       } finally {
@@ -312,6 +307,8 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * setpoint for the output. If a position PID controller is being used, the F term should be set
    * to 1 over the maximum speed for the output measured in setpoint units per this controller's
    * update period (see the default period in this class's constructor).
+   *
+   * @return The feedforward value.
    */
   protected double calculateFeedForward() {
     if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {

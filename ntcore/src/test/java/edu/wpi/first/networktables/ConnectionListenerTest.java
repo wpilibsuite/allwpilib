@@ -41,7 +41,6 @@ class ConnectionListenerTest {
   }
 
   /** Connect to the server. */
-  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   private void connect() {
     m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
     m_clientInst.startClient("127.0.0.1", 10000);
@@ -109,7 +108,6 @@ class ConnectionListenerTest {
 
   @ParameterizedTest
   @DisabledOnOs(OS.WINDOWS)
-  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   @ValueSource(strings = {"127.0.0.1", "127.0.0.1 ", " 127.0.0.1 "})
   void testThreaded(String address) {
     m_serverInst.startServer("connectionlistenertest.ini", address, 10000);

@@ -19,7 +19,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
   private final int m_module;
 
   /**
-   * Constructor.
+   * Constructs a PowerDistributionPanel.
    *
    * @param module The CAN ID of the PDP
    */
@@ -32,7 +32,11 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "PowerDistributionPanel", module);
   }
 
-  /** Constructor. Uses the default CAN ID (0). */
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * <p>Uses the default CAN ID (0).
+   */
   public PowerDistributionPanel() {
     this(0);
   }
@@ -63,6 +67,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
   /**
    * Query the current of a single channel of the PDP.
    *
+   * @param channel The PDP channel to query.
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
@@ -110,7 +115,11 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
     PDPJNI.clearPDPStickyFaults(m_handle);
   }
 
-  /** Gets module number (CAN ID). */
+  /**
+   * Gets module number (CAN ID).
+   *
+   * @return The module number (CAN ID).
+   */
   public int getModule() {
     return m_module;
   }

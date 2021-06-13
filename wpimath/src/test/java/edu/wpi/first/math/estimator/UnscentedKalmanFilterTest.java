@@ -103,11 +103,7 @@ public class UnscentedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ExcessiveMethodLength"
-  })
+  @SuppressWarnings("LocalVariableName")
   @Test
   public void testConvergence() {
     double dtSeconds = 0.00505;
@@ -293,7 +289,7 @@ public class UnscentedKalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "ParameterName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);

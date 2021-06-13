@@ -203,12 +203,15 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_ntFlushEnabled = enabled;
   }
 
-  /** Gets time period between calls to Periodic() functions. */
+  /**
+   * Gets time period between calls to Periodic() functions.
+   *
+   * @return The time period between calls to Periodic() functions.
+   */
   public double getPeriod() {
     return m_period;
   }
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   protected void loopFunc() {
     m_watchdog.reset();
 

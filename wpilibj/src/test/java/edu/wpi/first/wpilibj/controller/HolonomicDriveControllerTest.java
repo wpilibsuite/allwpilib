@@ -25,7 +25,6 @@ class HolonomicDriveControllerTest {
   private static final double kAngularTolerance = Math.toRadians(2);
 
   @Test
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
     HolonomicDriveController controller =
         new HolonomicDriveController(

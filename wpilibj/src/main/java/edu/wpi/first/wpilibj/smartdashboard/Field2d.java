@@ -69,6 +69,7 @@ public class Field2d implements Sendable {
   /**
    * Get or create a field object.
    *
+   * @param name The field object's name.
    * @return Field object
    */
   public synchronized FieldObject2d getObject(String name) {

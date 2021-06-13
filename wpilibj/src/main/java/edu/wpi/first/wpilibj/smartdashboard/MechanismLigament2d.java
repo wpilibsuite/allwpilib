@@ -24,7 +24,15 @@ public class MechanismLigament2d extends MechanismObject2d {
   private double m_weight;
   private NetworkTableEntry m_weightEntry;
 
-  /** Create a new ligament. */
+  /**
+   * Create a new ligament.
+   *
+   * @param name The ligament name.
+   * @param length The ligament length.
+   * @param angle The ligament angle.
+   * @param lineWidth The ligament's line width.
+   * @param color The ligament's color.
+   */
   public MechanismLigament2d(
       String name, double length, double angle, double lineWidth, Color8Bit color) {
     super(name);
@@ -34,7 +42,13 @@ public class MechanismLigament2d extends MechanismObject2d {
     setLineWeight(lineWidth);
   }
 
-  /** Create a new ligament with the default color (dark blue) and thickness (6). */
+  /**
+   * Create a new ligament with the default color (dark blue) and thickness (6).
+   *
+   * @param name The ligament's name.
+   * @param length The ligament's length.
+   * @param angle The ligament's angle relative to its parent.
+   */
   public MechanismLigament2d(String name, double length, double angle) {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
   }

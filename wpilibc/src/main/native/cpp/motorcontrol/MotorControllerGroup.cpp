@@ -63,7 +63,7 @@ void MotorControllerGroup::StopMotor() {
 void MotorControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { StopMotor(); });
+  builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Value", [=]() { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }

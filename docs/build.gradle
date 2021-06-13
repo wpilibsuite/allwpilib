@@ -68,10 +68,6 @@ doxygen {
     recursive true
     quiet true
     warnings false
-    warn_if_doc_error false
-    warn_no_paramdoc false
-    warn_format false
-    warn_logfile false
     warn_if_undocumented false
     generate_latex false
     use_mathjax true

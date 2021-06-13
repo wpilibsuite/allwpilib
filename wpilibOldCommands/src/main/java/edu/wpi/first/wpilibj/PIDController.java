@@ -137,7 +137,11 @@ public class PIDController extends PIDBase implements Controller {
     }
   }
 
-  /** Set the enabled state of the PIDController. */
+  /**
+   * Set the enabled state of the PIDController.
+   *
+   * @param enable True to enable the PIDController.
+   */
   public void setEnabled(boolean enable) {
     if (enable) {
       enable();
@@ -146,7 +150,11 @@ public class PIDController extends PIDBase implements Controller {
     }
   }
 
-  /** Return true if PIDController is enabled. */
+  /**
+   * Return true if PIDController is enabled.
+   *
+   * @return True if PIDController is enabled.
+   */
   public boolean isEnabled() {
     m_thisMutex.lock();
     try {

@@ -56,6 +56,7 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
    *
    * @param desiredState The desired state.
    * @param currentAngle The current module angle.
+   * @return Optimized swerve module state.
    */
   public static SwerveModuleState optimize(
       SwerveModuleState desiredState, Rotation2d currentAngle) {

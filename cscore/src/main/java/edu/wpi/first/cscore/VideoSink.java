@@ -83,7 +83,11 @@ public class VideoSink implements AutoCloseable {
     return m_handle;
   }
 
-  /** Get the kind of the sink. */
+  /**
+   * Get the kind of the sink.
+   *
+   * @return The kind of the sink.
+   */
   public Kind getKind() {
     return getKindFromInt(CameraServerJNI.getSinkKind(m_handle));
   }
@@ -91,12 +95,18 @@ public class VideoSink implements AutoCloseable {
   /**
    * Get the name of the sink. The name is an arbitrary identifier provided when the sink is
    * created, and should be unique.
+   *
+   * @return The name of the sink.
    */
   public String getName() {
     return CameraServerJNI.getSinkName(m_handle);
   }
 
-  /** Get the sink description. This is sink-kind specific. */
+  /**
+   * Get the sink description. This is sink-kind specific.
+   *
+   * @return The sink description.
+   */
   public String getDescription() {
     return CameraServerJNI.getSinkDescription(m_handle);
   }
@@ -111,8 +121,11 @@ public class VideoSink implements AutoCloseable {
     return new VideoProperty(CameraServerJNI.getSinkProperty(m_handle, name));
   }
 
-  /** Enumerate all properties of this sink. */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+  /**
+   * Enumerate all properties of this sink.
+   *
+   * @return List of properties.
+   */
   public VideoProperty[] enumerateProperties() {
     int[] handles = CameraServerJNI.enumerateSinkProperties(m_handle);
     VideoProperty[] rv = new VideoProperty[handles.length];
@@ -195,7 +208,6 @@ public class VideoSink implements AutoCloseable {
    *
    * @return Vector of sinks.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSinks();
     VideoSink[] rv = new VideoSink[handles.length];

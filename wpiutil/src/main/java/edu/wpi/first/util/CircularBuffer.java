@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.util;
 
 /** This is a simple circular buffer so we don't need to "bucket brigade" copy old values. */
 public class CircularBuffer {
@@ -61,6 +61,8 @@ public class CircularBuffer {
   /**
    * Push new value onto front of the buffer. The value at the back is overwritten if the buffer is
    * full.
+   *
+   * @param value The value to push.
    */
   public void addFirst(double value) {
     if (m_data.length == 0) {
@@ -79,6 +81,8 @@ public class CircularBuffer {
   /**
    * Push new value onto back of the buffer. The value at the front is overwritten if the buffer is
    * full.
+   *
+   * @param value The value to push.
    */
   public void addLast(double value) {
     if (m_data.length == 0) {
@@ -112,7 +116,11 @@ public class CircularBuffer {
     return temp;
   }
 
-  /** Pop value at back of buffer. */
+  /**
+   * Pop value at back of buffer.
+   *
+   * @return value at back of buffer
+   */
   public double removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
@@ -127,6 +135,8 @@ public class CircularBuffer {
    * Resizes internal buffer to given size.
    *
    * <p>A new buffer is allocated because arrays are not resizable.
+   *
+   * @param size New buffer size.
    */
   void resize(int size) {
     double[] newBuffer = new double[size];
@@ -150,18 +160,27 @@ public class CircularBuffer {
   /**
    * Get the element at the provided index relative to the start of the buffer.
    *
+   * @param index Index into the buffer.
    * @return Element at index starting from front of buffer.
    */
   public double get(int index) {
     return m_data[(m_front + index) % m_data.length];
   }
 
-  /** Increment an index modulo the length of the m_data buffer. */
+  /**
+   * Increment an index modulo the length of the m_data buffer.
+   *
+   * @param index Index into the buffer.
+   */
   private int moduloInc(int index) {
     return (index + 1) % m_data.length;
   }
 
-  /** Decrement an index modulo the length of the m_data buffer. */
+  /**
+   * Decrement an index modulo the length of the m_data buffer.
+   *
+   * @param index Index into the buffer.
+   */
   private int moduloDec(int index) {
     if (index == 0) {
       return m_data.length - 1;

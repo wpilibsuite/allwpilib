@@ -37,7 +37,7 @@ void GazeboAnalogIn::Listen() {
 void GazeboAnalogIn::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   /* This value is going to be divided by the 5V rail in the HAL, so
      we multiply by that value to make the change neutral */
-  int32_t status;
+  int32_t status = 0;
   HALSIM_SetAnalogInVoltage(m_index,
                             msg->data() * HAL_GetUserVoltage5V(&status));
 }

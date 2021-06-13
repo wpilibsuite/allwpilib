@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +15,6 @@ public final class RuntimeDetector {
   private static String fileExtension;
   private static String filePath;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   private static synchronized void computePlatform() {
     if (fileExtension != null && filePath != null && filePrefix != null) {
       return;
@@ -61,50 +60,77 @@ public final class RuntimeDetector {
     }
   }
 
-  /** Get the file prefix for the current system. */
+  /**
+   * Get the file prefix for the current system.
+   *
+   * @return The file prefix.
+   */
   public static synchronized String getFilePrefix() {
     computePlatform();
 
     return filePrefix;
   }
 
-  /** Get the file extension for the current system. */
+  /**
+   * Get the file extension for the current system.
+   *
+   * @return The file extension.
+   */
   public static synchronized String getFileExtension() {
     computePlatform();
 
     return fileExtension;
   }
 
-  /** Get the platform path for the current system. */
+  /**
+   * Get the platform path for the current system.
+   *
+   * @return The platform path.
+   */
   public static synchronized String getPlatformPath() {
     computePlatform();
 
     return filePath;
   }
 
-  /** Get the path to the requested resource. */
+  /**
+   * Get the path to the requested resource.
+   *
+   * @param libName Library name.
+   * @return The path to the requested resource.
+   */
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 
     return filePath + filePrefix + libName + fileExtension;
   }
 
-  /** Get the path to the hash to the requested resource. */
+  /**
+   * Get the path to the hash to the requested resource.
+   *
+   * @param libName Library name.
+   * @return The path to the hash to the requested resource.
+   */
   public static synchronized String getHashLibraryResource(String libName) {
     computePlatform();
 
     return filePath + libName + ".hash";
   }
 
+  /**
+   * Check if hardware platform is Athena.
+   *
+   * @return True if hardware platform is Athena.
+   */
   public static boolean isAthena() {
     File runRobotFile = new File("/usr/local/frc/bin/frcRunRobot.sh");
     return runRobotFile.exists();
   }
 
   /**
-   * check if os is raspbian.
+   * Check if OS is Raspbian.
    *
-   * @return if os is raspbian
+   * @return True if OS is Raspbian.
    */
   public static boolean isRaspbian() {
     try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {

@@ -59,7 +59,7 @@ class TestEnvironment : public testing::Environment {
     }
   }
 
-  ~TestEnvironment() { m_mockDS.Stop(); }
+  ~TestEnvironment() override { m_mockDS.Stop(); }
 };
 
 testing::Environment* const environment =

@@ -28,6 +28,7 @@ public class RawSink extends ImageSink {
    * Wait for the next frame and get the image. Times out (returning 0) after 0.225 seconds. The
    * provided image will have three 8-bit channels stored in BGR order.
    *
+   * @param frame The frame object in which to store the image.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */
@@ -39,6 +40,8 @@ public class RawSink extends ImageSink {
    * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
    * provided image will have three 8-bit channels stored in BGR order.
    *
+   * @param frame The frame object in which to store the image.
+   * @param timeout The frame timeout in seconds.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */
@@ -50,6 +53,7 @@ public class RawSink extends ImageSink {
    * Wait for the next frame and get the image. May block forever. The provided image will have
    * three 8-bit channels stored in BGR order.
    *
+   * @param frame The frame object in which to store the image.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
    *     is in the same time base as wpi::Now(), and is in 1 us increments.
    */

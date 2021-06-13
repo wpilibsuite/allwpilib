@@ -18,16 +18,14 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
   /**
    * Create a new MotorControllerGroup with the provided MotorControllers.
    *
+   * @param motorController The first MotorController to add
    * @param motorControllers The MotorControllers to add
    */
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   public MotorControllerGroup(
       MotorController motorController, MotorController... motorControllers) {
     m_motorControllers = new MotorController[motorControllers.length + 1];
     m_motorControllers[0] = motorController;
-    for (int i = 0; i < motorControllers.length; i++) {
-      m_motorControllers[i + 1] = motorControllers[i];
-    }
+    System.arraycopy(motorControllers, 0, m_motorControllers, 1, motorControllers.length);
     init();
   }
 

@@ -227,6 +227,8 @@ public class AnalogInput implements Sendable, AutoCloseable {
    * <p>This center value is based on the output of the oversampled and averaged source the
    * accumulator channel. Because of this, any non-zero oversample bits will affect the size of the
    * value for this field.
+   *
+   * @param center The accumulator's center value.
    */
   public void setAccumulatorCenter(int center) {
     AnalogJNI.setAccumulatorCenter(m_port, center);

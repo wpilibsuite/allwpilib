@@ -27,12 +27,11 @@ TEST(RelaySimTests, TestRelayInitialization) {
       INDEX_TO_TEST, &TestRelayInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   HAL_PortHandle portHandle;
   HAL_DigitalHandle pdpHandle;
 
   // Use out of range index
-  status = 0;
   portHandle = 8000;
   gTestRelayCallbackName = "Unset";
   pdpHandle = HAL_InitializeRelayPort(portHandle, true, nullptr, &status);

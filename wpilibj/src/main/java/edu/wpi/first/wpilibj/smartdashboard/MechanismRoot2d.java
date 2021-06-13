@@ -42,6 +42,7 @@ public final class MechanismRoot2d {
   /**
    * Append a Mechanism object that is based on this one.
    *
+   * @param <T> The object type.
    * @param object the object to add.
    * @return the object given as a parameter, useful for variable assignments and call chaining.
    * @throws UnsupportedOperationException if the object's name is already used - object names must

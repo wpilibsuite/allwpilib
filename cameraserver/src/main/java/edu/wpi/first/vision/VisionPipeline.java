@@ -17,6 +17,8 @@ public interface VisionPipeline {
   /**
    * Processes the image input and sets the result objects. Implementations should make these
    * objects accessible.
+   *
+   * @param image The image to process.
    */
   void process(Mat image);
 }

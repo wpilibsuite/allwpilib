@@ -14,7 +14,7 @@
 
 namespace frc2 {
 /**
- * A {@link Button} that uses a {@link NetworkTable} boolean field.
+ * A Button that uses a NetworkTable boolean field.
  */
 class NetworkButton : public Button {
  public:

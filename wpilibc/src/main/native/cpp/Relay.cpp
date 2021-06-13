@@ -125,7 +125,7 @@ void Relay::Set(Relay::Value value) {
 
 Relay::Value Relay::Get() const {
   Relay::Value value = kOff;
-  int32_t status;
+  int32_t status = 0;
 
   if (m_direction == kForwardOnly) {
     if (HAL_GetRelay(m_forwardHandle, &status)) {
@@ -175,7 +175,7 @@ std::string Relay::GetDescription() const {
 void Relay::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Relay");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { Set(kOff); });
+  builder.SetSafeState([=] { Set(kOff); });
   builder.AddSmallStringProperty(
       "Value",
       [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {

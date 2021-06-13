@@ -12,6 +12,8 @@ public abstract class ImageSource extends VideoSource {
   /**
    * Signal sinks that an error has occurred. This should be called instead of NotifyFrame when an
    * error occurs.
+   *
+   * @param msg Error message.
    */
   public void notifyError(String msg) {
     CameraServerJNI.notifySourceError(m_handle, msg);

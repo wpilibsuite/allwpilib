@@ -158,8 +158,9 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   auto curTime = std::chrono::steady_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prevMsg[i] == details)
+    if (prevMsg[i] == details) {
       break;
+    }
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
@@ -372,18 +373,10 @@ HAL_Bool HAL_IsNewControlData(void) {
   return true;
 }
 
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
 void HAL_WaitForDSData(void) {
   HAL_WaitForDSDataTimeout(0);
 }
 
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed. Returns true on new data, false on timeout.
- */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();

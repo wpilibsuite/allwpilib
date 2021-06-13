@@ -20,7 +20,18 @@ class SendableBuilder;
 class PowerDistributionPanel : public Sendable,
                                public SendableHelper<PowerDistributionPanel> {
  public:
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * Uses the default CAN ID (0).
+   */
   PowerDistributionPanel();
+
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * @param module The CAN ID of the PDP
+   */
   explicit PowerDistributionPanel(int module);
 
   PowerDistributionPanel(PowerDistributionPanel&&) = default;

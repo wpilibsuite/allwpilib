@@ -46,5 +46,5 @@ double AnalogPotentiometer::Get() const {
 void AnalogPotentiometer::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
-      "Value", [=]() { return Get(); }, nullptr);
+      "Value", [=] { return Get(); }, nullptr);
 }

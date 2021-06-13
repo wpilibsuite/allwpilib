@@ -216,7 +216,6 @@ public final class SimpleMatrixUtils {
    * @throws RuntimeException if the matrix could not be decomposed (ie. is not positive
    *     semidefinite).
    */
-  @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
   public static SimpleMatrix lltDecompose(SimpleMatrix src, boolean lowerTriangular) {
     SimpleMatrix temp = src.copy();
 

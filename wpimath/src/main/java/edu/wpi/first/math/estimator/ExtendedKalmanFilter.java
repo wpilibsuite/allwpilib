@@ -101,7 +101,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param addFuncX A function that adds two state vectors.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
+  @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
       Nat<States> states,
       Nat<Inputs> inputs,

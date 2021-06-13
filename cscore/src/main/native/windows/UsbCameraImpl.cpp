@@ -533,8 +533,9 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   auto result = m_messagePump->SendWindowMessage<CS_Status>(
       WaitForStartupMessage, nullptr, nullptr);
   *status = result;
-  if (*status != CS_OK)
+  if (*status != CS_OK) {
     return false;
+  }
   if (!m_properties_cached) {
     *status = CS_SOURCE_IS_DISCONNECTED;
     return false;
@@ -883,10 +884,12 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 }
 
 bool UsbCameraImpl::DeviceStreamOn() {
-  if (m_streaming)
+  if (m_streaming) {
     return false;
-  if (!m_deviceValid)
+  }
+  if (!m_deviceValid) {
     return false;
+  }
   m_streaming = true;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);

@@ -46,7 +46,6 @@ public class VideoEvent {
    * @param kind The numerical representation of kind
    * @return The kind
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
       case 0x0001:
@@ -92,7 +91,6 @@ public class VideoEvent {
     }
   }
 
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   VideoEvent(
       int kind,
       int source,

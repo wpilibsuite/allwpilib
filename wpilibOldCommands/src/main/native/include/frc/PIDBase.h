@@ -10,11 +10,11 @@
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
-#include "frc/LinearFilter.h"
 #include "frc/PIDInterface.h"
 #include "frc/PIDOutput.h"
 #include "frc/PIDSource.h"
 #include "frc/Timer.h"
+#include "frc/filter/LinearFilter.h"
 #include "frc/smartdashboard/Sendable.h"
 #include "frc/smartdashboard/SendableHelper.h"
 

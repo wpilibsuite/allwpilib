@@ -18,9 +18,6 @@ using namespace frc;
 
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
-/**
- * Initialize the PDP.
- */
 PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   m_handle = HAL_InitializePDP(module, &status);
@@ -100,10 +97,10 @@ void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty(
-        fmt::format("Chan{}", i), [=]() { return GetCurrent(i); }, nullptr);
+        fmt::format("Chan{}", i), [=] { return GetCurrent(i); }, nullptr);
   }
   builder.AddDoubleProperty(
-      "Voltage", [=]() { return GetVoltage(); }, nullptr);
+      "Voltage", [=] { return GetVoltage(); }, nullptr);
   builder.AddDoubleProperty(
-      "TotalCurrent", [=]() { return GetTotalCurrent(); }, nullptr);
+      "TotalCurrent", [=] { return GetTotalCurrent(); }, nullptr);
 }

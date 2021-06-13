@@ -198,9 +198,9 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Left Motor Speed", [=]() { return m_leftMotor->Get(); },
+      "Left Motor Speed", [=] { return m_leftMotor->Get(); },
       [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Right Motor Speed", [=]() { return m_rightMotor->Get(); },
+      "Right Motor Speed", [=] { return m_rightMotor->Get(); },
       [=](double value) { m_rightMotor->Set(value); });
 }

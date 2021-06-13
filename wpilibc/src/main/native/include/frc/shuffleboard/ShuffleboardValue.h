@@ -18,6 +18,9 @@ class ShuffleboardValue {
 
   virtual ~ShuffleboardValue() = default;
 
+  ShuffleboardValue(const ShuffleboardValue&) = delete;
+  ShuffleboardValue& operator=(const ShuffleboardValue&) = delete;
+
   /**
    * Gets the title of this Shuffleboard value.
    */

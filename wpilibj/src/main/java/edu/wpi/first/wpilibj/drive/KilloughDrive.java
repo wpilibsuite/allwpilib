@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import static java.util.Objects.requireNonNull;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -12,7 +14,6 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import java.util.StringJoiner;
 
 /**
  * A class for driving Killough drive platforms.
@@ -122,7 +123,10 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
       double leftMotorAngle,
       double rightMotorAngle,
       double backMotorAngle) {
-    verify(leftMotor, rightMotor, backMotor);
+    requireNonNull(leftMotor, "Left motor cannot be null");
+    requireNonNull(rightMotor, "Right motor cannot be null");
+    requireNonNull(backMotor, "Back motor cannot be null");
+
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
@@ -148,33 +152,6 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   @Override
   public void close() {
     SendableRegistry.remove(this);
-  }
-
-  /**
-   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are. The
-   * exception's error message will specify all null motors, e.g. {@code
-   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to the
-   * programmer.
-   *
-   * @throws NullPointerException if any of the given motors are null
-   */
-  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
-  private void verify(
-      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
-    if (leftMotor != null && rightMotor != null && backMotor != null) {
-      return;
-    }
-    StringJoiner joiner = new StringJoiner(", ");
-    if (leftMotor == null) {
-      joiner.add("leftMotor");
-    }
-    if (rightMotor == null) {
-      joiner.add("rightMotor");
-    }
-    if (backMotor == null) {
-      joiner.add("backMotor");
-    }
-    throw new NullPointerException(joiner.toString());
   }
 
   /**
@@ -263,6 +240,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    *     positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
+   * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
   public WheelSpeeds driveCartesianIK(

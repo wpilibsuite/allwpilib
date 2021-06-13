@@ -27,12 +27,20 @@ public class MjpegServer extends VideoSink {
     this(name, "", port);
   }
 
-  /** Get the listen address of the server. */
+  /**
+   * Get the listen address of the server.
+   *
+   * @return The listen address.
+   */
   public String getListenAddress() {
     return CameraServerJNI.getMjpegServerListenAddress(m_handle);
   }
 
-  /** Get the port number of the server. */
+  /**
+   * Get the port number of the server.
+   *
+   * @return The port number.
+   */
   public int getPort() {
     return CameraServerJNI.getMjpegServerPort(m_handle);
   }

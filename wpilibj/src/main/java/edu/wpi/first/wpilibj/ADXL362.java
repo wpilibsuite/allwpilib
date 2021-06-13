@@ -21,7 +21,6 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-@SuppressWarnings("PMD.UnusedPrivateField")
 public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
@@ -37,7 +36,10 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   private static final byte kFilterCtl_ODR_100Hz = 0x03;
 
   private static final byte kPowerCtl_UltraLowNoise = 0x20;
+
+  @SuppressWarnings("PMD.UnusedPrivateField")
   private static final byte kPowerCtl_AutoSleep = 0x04;
+
   private static final byte kPowerCtl_Measure = 0x02;
 
   public enum Axes {

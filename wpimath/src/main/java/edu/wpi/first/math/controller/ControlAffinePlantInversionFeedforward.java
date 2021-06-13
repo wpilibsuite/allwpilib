@@ -73,7 +73,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
 
-    reset(m_r);
+    reset();
   }
 
   /**
@@ -102,7 +102,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
 
-    reset(m_r);
+    reset();
   }
 
   /**

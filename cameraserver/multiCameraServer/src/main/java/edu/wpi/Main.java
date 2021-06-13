@@ -94,7 +94,6 @@ public final class Main {
   }
 
   /** Read configuration file. */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static boolean readConfig() {
     // parse file
     JsonElement top;

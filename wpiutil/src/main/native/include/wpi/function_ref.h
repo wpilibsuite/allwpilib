@@ -37,19 +37,20 @@ class function_ref<Ret(Params...)> {
 
   template <typename Callable>
   static Ret callback_fn(intptr_t callable, Params... params) {
-    return (*reinterpret_cast<Callable*>(callable))(
-        std::forward<Params>(params)...);
+    return (*reinterpret_cast<Callable*>(callable))(std::forward<Params>(
+        params)...);
   }
 
  public:
   function_ref() = default;
-  function_ref(std::nullptr_t) {}
+  /*implicit*/ function_ref(std::nullptr_t) {}  // NOLINT
 
   template <typename Callable>
-  function_ref(Callable&& callable,
-               typename std::enable_if<
-                   !std::is_same<typename std::remove_reference<Callable>::type,
-                                 function_ref>::value>::type* = nullptr)
+  /*implicit*/ function_ref(  // NOLINT
+      Callable&& callable,
+      typename std::enable_if<
+          !std::is_same<typename std::remove_reference<Callable>::type,
+                        function_ref>::value>::type* = nullptr)
       : callback(callback_fn<typename std::remove_reference<Callable>::type>),
         callable(reinterpret_cast<intptr_t>(&callable)) {}
 

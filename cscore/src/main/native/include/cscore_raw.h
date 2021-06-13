@@ -14,7 +14,7 @@
 /**
  * Raw Frame
  */
-typedef struct CS_RawFrame {
+typedef struct CS_RawFrame {  // NOLINT
   char* data;
   int dataLength;
   int pixelFormat;

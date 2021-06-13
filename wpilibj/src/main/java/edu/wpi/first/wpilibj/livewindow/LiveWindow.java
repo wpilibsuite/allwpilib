@@ -57,12 +57,17 @@ public class LiveWindow {
   }
 
   /**
-   * Set the enabled state of LiveWindow. If it's being enabled, turn off the scheduler and remove
-   * all the commands from the queue and enable all the components registered for LiveWindow. If
-   * it's being disabled, stop all the registered components and reenable the scheduler. TODO: add
-   * code to disable PID loops when enabling LiveWindow. The commands should reenable the PID loops
-   * themselves when they get rescheduled. This prevents arms from starting to move around, etc.
-   * after a period of adjusting them in LiveWindow mode.
+   * Set the enabled state of LiveWindow.
+   *
+   * <p>If it's being enabled, turn off the scheduler and remove all the commands from the queue and
+   * enable all the components registered for LiveWindow. If it's being disabled, stop all the
+   * registered components and reenable the scheduler.
+   *
+   * <p>TODO: add code to disable PID loops when enabling LiveWindow. The commands should reenable
+   * the PID loops themselves when they get rescheduled. This prevents arms from starting to move
+   * around, etc. after a period of adjusting them in LiveWindow mode.
+   *
+   * @param enabled True to enable LiveWindow.
    */
   public static synchronized void setEnabled(boolean enabled) {
     if (liveWindowEnabled != enabled) {
@@ -128,7 +133,6 @@ public class LiveWindow {
    * <p>Actuators are handled through callbacks on their value changing from the SmartDashboard
    * widgets.
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public static synchronized void updateValues() {
     // Only do this if either LiveWindow mode or telemetry is enabled.
     if (!liveWindowEnabled && !telemetryEnabled) {

@@ -57,8 +57,7 @@ class ControlAffinePlantInversionFeedforward {
         f, Eigen::Matrix<double, States, 1>::Zero(),
         Eigen::Matrix<double, Inputs, 1>::Zero());
 
-    m_r.setZero();
-    Reset(m_r);
+    Reset();
   }
 
   /**
@@ -80,8 +79,7 @@ class ControlAffinePlantInversionFeedforward {
               const Eigen::Matrix<double, Inputs, 1>& u)
         -> Eigen::Matrix<double, States, 1> { return f(x); };
 
-    m_r.setZero();
-    Reset(m_r);
+    Reset();
   }
 
   ControlAffinePlantInversionFeedforward(

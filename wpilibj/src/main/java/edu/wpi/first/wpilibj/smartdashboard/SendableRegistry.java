@@ -441,11 +441,7 @@ public class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings({
-    "PMD.CyclomaticComplexity",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.AvoidCatchingThrowable"
-  })
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();

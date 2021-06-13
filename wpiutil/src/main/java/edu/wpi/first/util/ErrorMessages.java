@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.util;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,9 +17,11 @@ public final class ErrorMessages {
    * Requires that a parameter of a method not be null; prints an error message with helpful
    * debugging instructions if the parameter is null.
    *
+   * @param <T> Type of object.
    * @param obj The parameter that must not be null.
    * @param paramName The name of the parameter.
    * @param methodName The name of the method.
+   * @return The object parameter confirmed not to be null.
    */
   public static <T> T requireNonNullParam(T obj, String paramName, String methodName) {
     return requireNonNull(

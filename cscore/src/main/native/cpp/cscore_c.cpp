@@ -352,11 +352,11 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
 }
 
 void CS_SetListenerOnStart(void (*onStart)(void* data), void* data) {
-  cs::SetListenerOnStart([=]() { onStart(data); });
+  cs::SetListenerOnStart([=] { onStart(data); });
 }
 
 void CS_SetListenerOnExit(void (*onExit)(void* data), void* data) {
-  cs::SetListenerOnExit([=]() { onExit(data); });
+  cs::SetListenerOnExit([=] { onExit(data); });
 }
 
 CS_Listener CS_AddListener(void* data,

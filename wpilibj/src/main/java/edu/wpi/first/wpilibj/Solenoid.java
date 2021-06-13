@@ -77,7 +77,11 @@ public class Solenoid implements Sendable, AutoCloseable {
     set(!get());
   }
 
-  /** Get the channel this solenoid is connected to. */
+  /**
+   * Get the channel this solenoid is connected to.
+   *
+   * @return The channel this solenoid is connected to.
+   */
   public int getChannel() {
     return m_channel;
   }

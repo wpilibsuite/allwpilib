@@ -22,7 +22,7 @@ void TestSpiInitializationCallback(const char* name, void* param,
 TEST(SpiSimTests, TestSpiInitialization) {
   const int INDEX_TO_TEST = 2;
 
-  int32_t status;
+  int32_t status = 0;
   HAL_SPIPort port;
 
   int callbackParam = 0;
@@ -30,7 +30,6 @@ TEST(SpiSimTests, TestSpiInitialization) {
       INDEX_TO_TEST, &TestSpiInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  status = 0;
   port = HAL_SPI_kOnboardCS2;
   gTestSpiCallbackName = "Unset";
   HAL_InitializeSPI(port, &status);

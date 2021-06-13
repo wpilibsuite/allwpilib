@@ -35,7 +35,13 @@ public class SynchronousInterrupt implements AutoCloseable {
       this.value = value;
     }
 
-    /** Create a wait result. */
+    /**
+     * Create a wait result.
+     *
+     * @param rising True if a rising edge occured.
+     * @param falling True if a falling edge occured.
+     * @return A wait result.
+     */
     public static WaitResult getValue(boolean rising, boolean falling) {
       if (rising && falling) {
         return kBoth;

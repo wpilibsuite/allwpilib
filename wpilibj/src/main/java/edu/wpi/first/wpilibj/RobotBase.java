@@ -277,10 +277,7 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
-    "PMD.CyclomaticComplexity", "PMD.NPathComplexity"
-  })
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
@@ -360,14 +357,23 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  /** Suppress the "Robots should not quit" message. */
+  /**
+   * Suppress the "Robots should not quit" message.
+   *
+   * @param value True if exit warning should be suppressed.
+   */
   public static void suppressExitWarning(boolean value) {
     m_runMutex.lock();
     m_suppressExitWarning = value;
     m_runMutex.unlock();
   }
 
-  /** Starting point for the applications. */
+  /**
+   * Starting point for the applications.
+   *
+   * @param <T> Robot subclass.
+   * @param robotSupplier Function that returns an instance of the robot subclass.
+   */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");

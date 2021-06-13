@@ -37,7 +37,7 @@ class Message {
     kExecuteRpc = 0x20,
     kRpcResponse = 0x21
   };
-  typedef std::function<NT_Type(unsigned int id)> GetEntryTypeFunc;
+  using GetEntryTypeFunc = std::function<NT_Type(unsigned int id)>;
 
   Message() = default;
   Message(MsgType type, const private_init&) : m_type(type) {}

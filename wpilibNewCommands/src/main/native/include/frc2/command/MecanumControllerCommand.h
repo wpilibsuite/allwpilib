@@ -30,9 +30,9 @@
 
 namespace frc2 {
 /**
- * A command that uses two PID controllers ({@link PIDController}) and a
- * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
- * {@link Trajectory} with a mecanum drive.
+ * A command that uses two PID controllers (PIDController) and a profiled PID
+ * controller (ProfiledPIDController) to follow a trajectory (Trajectory) with a
+ * mecanum drive.
  *
  * <p>The command handles trajectory-following,
  * Velocity PID calculations, and feedforwards internally. This

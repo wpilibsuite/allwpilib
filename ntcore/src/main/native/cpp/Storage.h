@@ -197,7 +197,7 @@ class Storage : public IStorage {
     unsigned int rpc_call_uid{0};
   };
 
-  typedef wpi::StringMap<Entry*> EntriesMap;
+  using EntriesMap = wpi::StringMap<Entry*>;
   using IdMap = std::vector<Entry*>;
   using LocalMap = std::vector<std::unique_ptr<Entry>>;
   using RpcIdPair = std::pair<unsigned int, unsigned int>;

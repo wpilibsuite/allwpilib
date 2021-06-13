@@ -163,7 +163,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    *
    * @param value The state to set the relay.
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
       case kOff:

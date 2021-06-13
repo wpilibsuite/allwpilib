@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.util;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,7 +38,11 @@ public final class WPIUtilJNI {
     }
   }
 
-  /** Force load the library. */
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if the library failed to load
+   */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;

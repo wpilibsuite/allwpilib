@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpiutil;
+package edu.wpi.first.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,11 +56,7 @@ public final class CombinedRuntimeLoader {
    * @return List of all libraries that were extracted
    * @throws IOException Thrown if resource not found or file could not be extracted
    */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UnnecessaryCastRule",
-    "unchecked"
-  })
+  @SuppressWarnings({"PMD.UnnecessaryCastRule", "unchecked"})
   public static <T> List<String> extractLibraries(Class<T> clazz, String resourceName)
       throws IOException {
     TypeReference<HashMap<String, Object>> typeRef =
