@@ -1,0 +1,102 @@
+import org.gradle.language.base.internal.ProjectLayout
+
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
+
+apply from: '../shared/config.gradle'
+
+ext {
+    sharedCvConfigs = [crossConnIntegrationTests: []]
+    staticCvConfigs = [:]
+    useJava = false
+    useCpp = true
+    staticGtestConfigs = [crossConnIntegrationTests: []]
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+apply from: "${rootDir}/shared/googletest.gradle"
+
+model {
+    components {
+        crossConnIntegrationTests(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            baseName = 'FRCUserProgram'
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
+            binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    binary.sources {
+                        athenaCpp(CppSourceSet) {
+                            source {
+                                srcDirs = ['src/main/native/cpp']
+                                includes = ['**/*.cpp']
+                            }
+                            exportedHeaders {
+                                srcDirs = ['src/main/native/include']
+                                includes = ['**/*.h']
+                            }
+                        }
+                    }
+                    binary.tasks.withType(CppCompile) {
+                        cppCompiler.args "-Wno-missing-field-initializers"
+                        cppCompiler.args "-Wno-unused-variable"
+                        cppCompiler.args "-Wno-error=deprecated-declarations"
+                    }
+                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscore', linkage: 'shared'
+                    lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                    lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                    project(':hal').addHalDependency(binary, 'shared')
+                    project(':hal').addHalJniDependency(binary)
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    }
+                } else {
+                    binary.sources {
+                        simCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/dt'
+                                includes = ['**/*.cpp']
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def testOutputFolder = file("${project(':').buildDir}/crossConnIntegrationTestFiles")
+
+model {
+    tasks {
+        copyWpilibCTestLibrariesToOutput(Copy) {
+            def task = it
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio && it.buildable) {
+                    def installTask = it.tasks.install
+                    task.dependsOn installTask
+                    task.from(installTask.executableFile) {
+                        into '/cpp'
+                    }
+                    installTask.libs.each {
+                        task.from(it) {
+                            into '/libs'
+                        }
+                    }
+                }
+            }
+            destinationDir testOutputFolder
+        }
+        if (!project.hasProperty('skiponlyathena')) {
+            build.dependsOn copyWpilibCTestLibrariesToOutput
+        }
+    }
+}
