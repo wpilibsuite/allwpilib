@@ -5,6 +5,7 @@
 #include <atomic>
 #include <thread>
 
+#include <hal/HAL.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/priority_mutex.h>
@@ -12,7 +13,6 @@
 #include "CrossConnects.h"
 #include "LifetimeWrappers.h"
 #include "gtest/gtest.h"
-#include "hal/HAL.h"
 
 using namespace hlt;
 
