@@ -120,8 +120,9 @@ void TestTiming(int squelch, std::pair<int, int> param) {
       auto timeout = interruptData.cond.wait_for(lock, std::chrono::seconds(2));
       if (timeout == std::cv_status::timeout) {
         runThread = false;
-        if (interruptThread.joinable())
+        if (interruptThread.joinable()) {
           interruptThread.join();
+        }
         ASSERT_TRUE(false);  // Exit test as failure on timeout
       }
     }
@@ -132,10 +133,10 @@ void TestTiming(int squelch, std::pair<int, int> param) {
     ASSERT_EQ(interruptData.risingStamps.size(),
               interruptData.fallingStamps.size());
 
-    ASSERT_GT(interruptData.risingStamps.size(), (size_t)0);
+    ASSERT_GT(interruptData.risingStamps.size(), 0u);
 
-    ASSERT_EQ(interruptData.risingStamps.size() % 2, (size_t)0);
-    ASSERT_EQ(interruptData.fallingStamps.size() % 2, (size_t)0);
+    ASSERT_EQ(interruptData.risingStamps.size() % 2, 0u);
+    ASSERT_EQ(interruptData.fallingStamps.size() % 2, 0u);
 
     for (size_t j = 0; j < interruptData.risingStamps.size(); j++) {
       uint64_t width =
@@ -149,8 +150,9 @@ void TestTiming(int squelch, std::pair<int, int> param) {
       ASSERT_NEAR(period, checkPeriod, 10);
     }
     runThread = false;
-    if (interruptThread.joinable())
+    if (interruptThread.joinable()) {
       interruptThread.join();
+    }
   }
 }
 
