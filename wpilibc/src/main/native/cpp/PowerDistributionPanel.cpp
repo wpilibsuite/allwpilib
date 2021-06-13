@@ -8,11 +8,11 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/PDP.h>
 #include <hal/Ports.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -24,7 +24,8 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   FRC_CheckErrorStatus(status, "Module {}", module);
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
-  SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel", module);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "PowerDistributionPanel",
+                                             module);
 }
 
 double PowerDistributionPanel::GetVoltage() const {
@@ -93,7 +94,7 @@ int PowerDistributionPanel::GetModule() const {
   return m_module;
 }
 
-void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
+void PowerDistributionPanel::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
   for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
     builder.AddDoubleProperty(

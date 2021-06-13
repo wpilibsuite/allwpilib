@@ -6,15 +6,14 @@
 
 #include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_dio(dioChannel), m_pwm(pwmChannel) {
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   registry.AddChild(this, &m_dio);
   registry.AddChild(this, &m_pwm);
   SetExpiration(0_s);
@@ -72,7 +71,7 @@ int NidecBrushless::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-void NidecBrushless::InitSendable(SendableBuilder& builder) {
+void NidecBrushless::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });

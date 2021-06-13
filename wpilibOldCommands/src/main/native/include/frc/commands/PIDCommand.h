@@ -64,7 +64,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   std::shared_ptr<PIDController> m_controller;
 
  public:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

@@ -8,10 +8,10 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/PIDOutput.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -41,7 +41,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SendableRegistry::GetInstance().Add(this, "PIDController", instances);
+  wpi::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
 }
 
 double PIDBase::Get() const {
@@ -228,7 +228,7 @@ void PIDBase::PIDWrite(double output) {
   SetSetpoint(output);
 }
 
-void PIDBase::InitSendable(SendableBuilder& builder) {
+void PIDBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.SetSafeState([=] { Reset(); });
   builder.AddDoubleProperty(

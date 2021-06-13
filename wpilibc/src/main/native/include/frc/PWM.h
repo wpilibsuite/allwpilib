@@ -7,13 +7,11 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 class AddressableLED;
-class SendableBuilder;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -32,7 +30,7 @@ class SendableBuilder;
  *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public Sendable, public SendableHelper<PWM> {
+class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
   /**
@@ -224,7 +222,7 @@ class PWM : public Sendable, public SendableHelper<PWM> {
   int GetChannel() const;
 
  protected:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

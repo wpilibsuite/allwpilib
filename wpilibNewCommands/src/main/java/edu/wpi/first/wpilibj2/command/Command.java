@@ -72,7 +72,7 @@ public interface Command {
    * @return the command with the timeout added
    */
   default ParallelRaceGroup withTimeout(double seconds) {
-    return new ParallelRaceGroup(this, new WaitCommand(seconds));
+    return raceWith(new WaitCommand(seconds));
   }
 
   /**
@@ -91,7 +91,7 @@ public interface Command {
    * @return the command with the interrupt condition added
    */
   default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
-    return new ParallelRaceGroup(this, new WaitUntilCommand(condition));
+    return raceWith(new WaitUntilCommand(condition));
   }
 
   /**
@@ -108,7 +108,23 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup beforeStarting(Runnable toRun, Subsystem... requirements) {
-    return new SequentialCommandGroup(new InstantCommand(toRun, requirements), this);
+    return beforeStarting(new InstantCommand(toRun, requirements));
+  }
+
+  /**
+   * Decorates this command with another command to run before this command starts.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @param before the command to run before this one
+   * @return the decorated command
+   */
+  default SequentialCommandGroup beforeStarting(Command before) {
+    return new SequentialCommandGroup(before, this);
   }
 
   /**
@@ -125,7 +141,7 @@ public interface Command {
    * @return the decorated command
    */
   default SequentialCommandGroup andThen(Runnable toRun, Subsystem... requirements) {
-    return new SequentialCommandGroup(this, new InstantCommand(toRun, requirements));
+    return andThen(new InstantCommand(toRun, requirements));
   }
 
   /**
@@ -266,10 +282,7 @@ public interface Command {
   }
 
   /**
-   * Whether the command requires a given subsystem. Named "hasRequirement" rather than "requires"
-   * to avoid confusion with {@link
-   * edu.wpi.first.wpilibj.command.Command#requires(edu.wpi.first.wpilibj.command.Subsystem)} - this
-   * may be able to be changed in a few years.
+   * Whether the command requires a given subsystem.
    *
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required

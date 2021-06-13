@@ -7,13 +7,11 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -29,7 +27,8 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public Sendable, public SendableHelper<AnalogInput> {
+class AnalogInput : public wpi::Sendable,
+                    public wpi::SendableHelper<AnalogInput> {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;
@@ -282,7 +281,7 @@ class AnalogInput : public Sendable, public SendableHelper<AnalogInput> {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

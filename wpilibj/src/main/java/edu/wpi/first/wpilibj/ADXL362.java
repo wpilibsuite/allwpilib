@@ -9,10 +9,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -21,7 +22,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
+public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -258,7 +259,7 @@ public class ADXL362 implements Accelerometer, Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
     NetworkTableEntry entryX = builder.getEntry("X");
     NetworkTableEntry entryY = builder.getEntry("Y");

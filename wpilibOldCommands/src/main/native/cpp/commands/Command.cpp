@@ -6,14 +6,15 @@
 
 #include <typeinfo>
 
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc/Errors.h"
 #include "frc/RobotState.h"
 #include "frc/Timer.h"
 #include "frc/commands/CommandGroup.h"
 #include "frc/commands/Scheduler.h"
 #include "frc/livewindow/LiveWindow.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -40,10 +41,10 @@ Command::Command(std::string_view name, units::second_t timeout) {
 
   // If name contains an empty string
   if (name.empty()) {
-    SendableRegistry::GetInstance().Add(
+    wpi::SendableRegistry::GetInstance().Add(
         this, fmt::format("Command_{}", typeid(*this).name()));
   } else {
-    SendableRegistry::GetInstance().Add(this, name);
+    wpi::SendableRegistry::GetInstance().Add(this, name);
   }
 }
 
@@ -277,25 +278,26 @@ void Command::StartTiming() {
 }
 
 std::string Command::GetName() const {
-  return SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetInstance().GetName(this);
 }
 
 void Command::SetName(std::string_view name) {
-  SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::GetInstance().SetName(this, name);
 }
 
 std::string Command::GetSubsystem() const {
-  return SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
 }
 
 void Command::SetSubsystem(std::string_view name) {
-  SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
 }
 
-void Command::InitSendable(SendableBuilder& builder) {
+void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(
-      ".name", [=] { return SendableRegistry::GetInstance().GetName(this); },
+      ".name",
+      [=] { return wpi::SendableRegistry::GetInstance().GetName(this); },
       nullptr);
   builder.AddBooleanProperty(
       "running", [=] { return IsRunning(); },

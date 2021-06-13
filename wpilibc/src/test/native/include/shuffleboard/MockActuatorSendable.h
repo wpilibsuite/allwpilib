@@ -6,15 +6,14 @@
 
 #include <string_view>
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBuilder.h"
+#include <wpi/sendable/Sendable.h>
 
 /**
  * A mock sendable that marks itself as an actuator.
  */
-class MockActuatorSendable : public frc::Sendable {
+class MockActuatorSendable : public wpi::Sendable {
  public:
   explicit MockActuatorSendable(std::string_view name);
 
-  void InitSendable(frc::SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };

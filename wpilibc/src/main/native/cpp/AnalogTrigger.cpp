@@ -9,18 +9,18 @@
 #include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
+  wpi::SendableRegistry::GetInstance().AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
@@ -31,7 +31,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::AnalogTrigger(DutyCycle* input) {
@@ -42,7 +42,7 @@ AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -113,7 +113,7 @@ std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
       wpi::NullDeleter<AnalogTriggerOutput>());
 }
 
-void AnalogTrigger::InitSendable(SendableBuilder& builder) {
+void AnalogTrigger::InitSendable(wpi::SendableBuilder& builder) {
   if (m_ownsAnalog) {
     m_analogInput->InitSendable(builder);
   }

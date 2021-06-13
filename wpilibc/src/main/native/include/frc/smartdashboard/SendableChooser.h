@@ -10,7 +10,6 @@
 #include <wpi/StringMap.h>
 #include <wpi/deprecated.h>
 
-#include "frc/smartdashboard/SendableBuilder.h"
 #include "frc/smartdashboard/SendableChooserBase.h"
 
 namespace frc {
@@ -112,7 +111,7 @@ class SendableChooser : public SendableChooserBase {
    */
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 };
 
 }  // namespace frc

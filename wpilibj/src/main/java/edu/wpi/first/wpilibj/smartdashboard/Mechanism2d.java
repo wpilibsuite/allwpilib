@@ -4,8 +4,9 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map.Entry;
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-public final class Mechanism2d implements Sendable {
+public final class Mechanism2d implements NTSendable {
   private static final String kBackgroundColor = "backgroundColor";
   private NetworkTable m_table;
   private final Map<String, MechanismRoot2d> m_roots;
@@ -89,7 +90,7 @@ public final class Mechanism2d implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Mechanism2d");
     m_table = builder.getTable();
     m_table.getEntry("dims").setDoubleArray(m_dims);

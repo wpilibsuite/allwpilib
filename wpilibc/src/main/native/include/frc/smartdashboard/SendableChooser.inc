@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include <networktables/NTSendableBuilder.h>
+
 #include "frc/smartdashboard/SendableChooser.h"
 
 namespace frc {
@@ -44,7 +46,7 @@ auto SendableChooser<T>::GetSelected()
 }
 
 template <class T>
-void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
+void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
   builder.GetEntry(kInstance).SetDouble(m_instance);
   builder.AddStringArrayProperty(

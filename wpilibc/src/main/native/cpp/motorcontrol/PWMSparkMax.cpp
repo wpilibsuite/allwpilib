@@ -6,8 +6,6 @@
 
 #include <hal/FRCUsageReporting.h>
 
-#include "frc/smartdashboard/SendableRegistry.h"
-
 using namespace frc;
 
 PWMSparkMax::PWMSparkMax(int channel)

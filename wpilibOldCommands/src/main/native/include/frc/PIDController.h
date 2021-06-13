@@ -126,7 +126,7 @@ class PIDController : public PIDBase, public Controller {
    */
   void Reset() override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   std::unique_ptr<Notifier> m_controlLoop;

@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/DigitalSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -44,8 +45,8 @@ class AnalogTrigger;
  * may help with this, but rotational speeds of the sensor will then be limited.
  */
 class AnalogTriggerOutput : public DigitalSource,
-                            public Sendable,
-                            public SendableHelper<AnalogTriggerOutput> {
+                            public wpi::Sendable,
+                            public wpi::SendableHelper<AnalogTriggerOutput> {
   friend class AnalogTrigger;
 
  public:
@@ -77,7 +78,7 @@ class AnalogTriggerOutput : public DigitalSource,
    */
   int GetChannel() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   /**

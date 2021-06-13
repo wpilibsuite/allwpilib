@@ -127,7 +127,7 @@ public class PIDTest extends AbstractComsSetup {
         reference,
         m_controller.getPositionError(),
         0);
-    m_builder.updateTable();
+    m_builder.update();
     assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
     assertEquals(k_d, m_table.getEntry("Kd").getDouble(9999999), 0);

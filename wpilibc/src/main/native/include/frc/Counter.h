@@ -8,16 +8,15 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -32,8 +31,8 @@ class DMASample;
  * to be zeroed before use.
  */
 class Counter : public CounterBase,
-                public Sendable,
-                public SendableHelper<Counter> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<Counter> {
   friend class DMA;
   friend class DMASample;
 
@@ -421,7 +420,7 @@ class Counter : public CounterBase,
    */
   bool GetDirection() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   // Makes the counter count up.

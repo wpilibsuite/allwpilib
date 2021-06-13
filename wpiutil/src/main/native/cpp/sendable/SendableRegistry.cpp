@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "wpi/sendable/SendableRegistry.h"
 
 #include <memory>
 
-#include <fmt/format.h>
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
-#include <wpi/UidVector.h>
-#include <wpi/mutex.h>
+#include "fmt/format.h"
+#include "wpi/DenseMap.h"
+#include "wpi/SmallVector.h"
+#include "wpi/UidVector.h"
+#include "wpi/mutex.h"
+#include "wpi/sendable/Sendable.h"
+#include "wpi/sendable/SendableBuilder.h"
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBuilderImpl.h"
-
-using namespace frc;
+using namespace wpi;
 
 struct SendableRegistry::Impl {
   struct Component {
     Sendable* sendable = nullptr;
-    SendableBuilderImpl builder;
+    std::unique_ptr<SendableBuilder> builder;
     std::string name;
     std::string subsystem = "Ungrouped";
     Sendable* parent = nullptr;
@@ -38,6 +37,7 @@ struct SendableRegistry::Impl {
 
   wpi::recursive_mutex mutex;
 
+  std::function<std::unique_ptr<SendableBuilder>()> liveWindowFactory;
   wpi::UidVector<std::unique_ptr<Component>, 32> components;
   wpi::DenseMap<void*, UID> componentMap;
   int nextDataHandle = 0;
@@ -61,6 +61,11 @@ SendableRegistry::Impl::Component& SendableRegistry::Impl::GetOrAdd(
 SendableRegistry& SendableRegistry::GetInstance() {
   static SendableRegistry instance;
   return instance;
+}
+
+void SendableRegistry::SetLiveWindowBuilderFactory(
+    std::function<std::unique_ptr<SendableBuilder>()> factory) {
+  m_impl->liveWindowFactory = std::move(factory);
 }
 
 void SendableRegistry::Add(Sendable* sendable, std::string_view name) {
@@ -99,6 +104,9 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
+  if (m_impl->liveWindowFactory) {
+    comp.builder = m_impl->liveWindowFactory();
+  }
   comp.liveWindow = true;
   comp.name = name;
 }
@@ -108,6 +116,9 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
+  if (m_impl->liveWindowFactory) {
+    comp.builder = m_impl->liveWindowFactory();
+  }
   comp.liveWindow = true;
   comp.SetName(moduleType, channel);
 }
@@ -117,6 +128,9 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
+  if (m_impl->liveWindowFactory) {
+    comp.builder = m_impl->liveWindowFactory();
+  }
   comp.liveWindow = true;
   comp.SetName(moduleType, moduleNumber, channel);
 }
@@ -126,6 +140,9 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
   std::scoped_lock lock(m_impl->mutex);
   auto& comp = m_impl->GetOrAdd(sendable);
   comp.sendable = sendable;
+  if (m_impl->liveWindowFactory) {
+    comp.builder = m_impl->liveWindowFactory();
+  }
   comp.liveWindow = true;
   comp.name = name;
   comp.subsystem = subsystem;
@@ -173,10 +190,10 @@ void SendableRegistry::Move(Sendable* to, Sendable* from) {
   m_impl->componentMap[to] = compUid;
   auto& comp = *m_impl->components[compUid - 1];
   comp.sendable = to;
-  if (comp.builder.HasTable()) {
+  if (comp.builder && comp.builder->IsPublished()) {
     // rebuild builder, as lambda captures can point to "from"
-    comp.builder.ClearProperties();
-    to->InitSendable(comp.builder);
+    comp.builder->ClearProperties();
+    to->InitSendable(*comp.builder);
   }
   // update any parent pointers
   for (auto&& comp : m_impl->components) {
@@ -349,18 +366,16 @@ Sendable* SendableRegistry::GetSendable(UID uid) {
 }
 
 void SendableRegistry::Publish(UID sendableUid,
-                               std::shared_ptr<nt::NetworkTable> table) {
+                               std::unique_ptr<SendableBuilder> builder) {
   std::scoped_lock lock(m_impl->mutex);
   if (sendableUid == 0 || (sendableUid - 1) >= m_impl->components.size() ||
       !m_impl->components[sendableUid - 1]) {
     return;
   }
   auto& comp = *m_impl->components[sendableUid - 1];
-  comp.builder = SendableBuilderImpl{};  // clear any current builder
-  comp.builder.SetTable(table);
-  comp.sendable->InitSendable(comp.builder);
-  comp.builder.UpdateTable();
-  comp.builder.StartListeners();
+  comp.builder = std::move(builder);  // clear any current builder
+  comp.sendable->InitSendable(*comp.builder);
+  comp.builder->Update();
 }
 
 void SendableRegistry::Update(UID sendableUid) {
@@ -372,7 +387,9 @@ void SendableRegistry::Update(UID sendableUid) {
       !m_impl->components[sendableUid - 1]) {
     return;
   }
-  m_impl->components[sendableUid - 1]->builder.UpdateTable();
+  if (m_impl->components[sendableUid - 1]->builder) {
+    m_impl->components[sendableUid - 1]->builder->Update();
+  }
 }
 
 void SendableRegistry::ForeachLiveWindow(
@@ -385,13 +402,13 @@ void SendableRegistry::ForeachLiveWindow(
     components.emplace_back(comp.get());
   }
   for (auto comp : components) {
-    if (comp && comp->sendable && comp->liveWindow) {
+    if (comp && comp->builder && comp->sendable && comp->liveWindow) {
       if (static_cast<size_t>(dataHandle) >= comp->data.size()) {
         comp->data.resize(dataHandle + 1);
       }
       CallbackData cbdata{comp->sendable,         comp->name,
                           comp->subsystem,        comp->parent,
-                          comp->data[dataHandle], comp->builder};
+                          comp->data[dataHandle], *comp->builder};
       callback(cbdata);
     }
   }

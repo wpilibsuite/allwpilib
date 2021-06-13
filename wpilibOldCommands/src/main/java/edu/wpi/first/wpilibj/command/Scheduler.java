@@ -7,12 +7,12 @@ package edu.wpi.first.wpilibj.command;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Vector;
  *
  * @see Command
  */
-public final class Scheduler implements Sendable, AutoCloseable {
+public final class Scheduler implements NTSendable, AutoCloseable {
   /** The Singleton Instance. */
   private static Scheduler instance;
 
@@ -301,7 +301,7 @@ public final class Scheduler implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
     final NetworkTableEntry namesEntry = builder.getEntry("Names");
     final NetworkTableEntry idsEntry = builder.getEntry("Ids");

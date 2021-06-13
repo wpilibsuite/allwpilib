@@ -13,6 +13,11 @@ DriveSubsystem::DriveSubsystem()
       m_right2{kRightMotor2Port},
       m_leftEncoder{kLeftEncoderPorts[0], kLeftEncoderPorts[1]},
       m_rightEncoder{kRightEncoderPorts[0], kRightEncoderPorts[1]} {
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_rightMotors.SetInverted(true);
+
   // Set the distance per pulse for the encoders
   m_leftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace frc {
+namespace wpi {
 
 class SendableBuilder;
 
@@ -23,4 +23,4 @@ class Sendable {
   virtual void InitSendable(SendableBuilder& builder) = 0;
 };
 
-}  // namespace frc
+}  // namespace wpi

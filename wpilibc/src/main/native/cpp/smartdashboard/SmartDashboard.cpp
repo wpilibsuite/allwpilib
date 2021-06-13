@@ -9,9 +9,10 @@
 #include <networktables/NetworkTableInstance.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "frc/smartdashboard/SendableBuilderImpl.h"
 
 using namespace frc;
 
@@ -21,7 +22,7 @@ class Singleton {
   static Singleton& GetInstance();
 
   std::shared_ptr<nt::NetworkTable> table;
-  wpi::StringMap<SendableRegistry::UID> tablesToData;
+  wpi::StringMap<wpi::SendableRegistry::UID> tablesToData;
   wpi::mutex tablesToDataMutex;
 
  private:
@@ -84,41 +85,45 @@ nt::NetworkTableEntry SmartDashboard::GetEntry(std::string_view key) {
   return Singleton::GetInstance().table->GetEntry(key);
 }
 
-void SmartDashboard::PutData(std::string_view key, Sendable* data) {
+void SmartDashboard::PutData(std::string_view key, wpi::Sendable* data) {
   if (!data) {
     throw FRC_MakeError(err::NullParameter, "{}", "value");
   }
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto& uid = inst.tablesToData[key];
-  auto& registry = SendableRegistry::GetInstance();
-  Sendable* sddata = registry.GetSendable(uid);
+  auto& registry = wpi::SendableRegistry::GetInstance();
+  wpi::Sendable* sddata = registry.GetSendable(uid);
   if (sddata != data) {
     uid = registry.GetUniqueId(data);
     auto dataTable = inst.table->GetSubTable(key);
-    registry.Publish(uid, dataTable);
+    auto builder = std::make_unique<SendableBuilderImpl>();
+    auto builderPtr = builder.get();
+    builderPtr->SetTable(dataTable);
+    registry.Publish(uid, std::move(builder));
+    builderPtr->StartListeners();
     dataTable->GetEntry(".name").SetString(key);
   }
 }
 
-void SmartDashboard::PutData(Sendable* value) {
+void SmartDashboard::PutData(wpi::Sendable* value) {
   if (!value) {
     throw FRC_MakeError(err::NullParameter, "{}", "value");
   }
-  auto name = SendableRegistry::GetInstance().GetName(value);
+  auto name = wpi::SendableRegistry::GetInstance().GetName(value);
   if (!name.empty()) {
     PutData(name, value);
   }
 }
 
-Sendable* SmartDashboard::GetData(std::string_view key) {
+wpi::Sendable* SmartDashboard::GetData(std::string_view key) {
   auto& inst = Singleton::GetInstance();
   std::scoped_lock lock(inst.tablesToDataMutex);
   auto it = inst.tablesToData.find(key);
   if (it == inst.tablesToData.end()) {
     throw FRC_MakeError(err::SmartDashboardMissingKey, "{}", key);
   }
-  return SendableRegistry::GetInstance().GetSendable(it->getValue());
+  return wpi::SendableRegistry::GetInstance().GetSendable(it->getValue());
 }
 
 bool SmartDashboard::PutBoolean(std::string_view keyName, bool value) {
@@ -257,7 +262,7 @@ void SmartDashboard::PostListenerTask(std::function<void()> task) {
 }
 
 void SmartDashboard::UpdateValues() {
-  auto& registry = SendableRegistry::GetInstance();
+  auto& registry = wpi::SendableRegistry::GetInstance();
   auto& inst = Singleton::GetInstance();
   listenerExecutor.RunListenerTasks();
   std::scoped_lock lock(inst.tablesToDataMutex);

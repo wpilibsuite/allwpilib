@@ -11,11 +11,11 @@
 #include <hal/HALBase.h>
 #include <hal/Ports.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -33,7 +33,7 @@ DigitalOutput::DigitalOutput(int channel) {
   FRC_CheckErrorStatus(status, "Channel {}", channel);
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel + 1);
-  SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
+  wpi::SendableRegistry::GetInstance().AddLW(this, "DigitalOutput", channel);
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -140,7 +140,7 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::InitSendable(SendableBuilder& builder) {
+void DigitalOutput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Digital Output");
   builder.AddBooleanProperty(
       "Value", [=] { return Get(); }, [=](bool value) { Set(value); });

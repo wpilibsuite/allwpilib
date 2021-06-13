@@ -7,14 +7,12 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -23,7 +21,8 @@ class SendableBuilder;
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public Sendable, public SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::Sendable,
+                       public wpi::SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 
@@ -98,7 +97,7 @@ class DoubleSolenoid : public Sendable, public SendableHelper<DoubleSolenoid> {
    */
   bool IsRevSolenoidDisabled() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_forwardChannel;  // The forward channel on the module to control.
