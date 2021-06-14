@@ -15,6 +15,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/span.h>
+
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
 
@@ -86,11 +88,12 @@ class SequentialCommandGroup
 
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,
-      wpi::ArrayRef<Subsystem*> requirements = {}) &&
+      wpi::span<Subsystem* const> requirements = {}) &&
       override;
 
-  SequentialCommandGroup AndThen(std::function<void()> toRun,
-                                 wpi::ArrayRef<Subsystem*> requirements = {}) &&
+  SequentialCommandGroup AndThen(
+      std::function<void()> toRun,
+      wpi::span<Subsystem* const> requirements = {}) &&
       override;
 
  private:
