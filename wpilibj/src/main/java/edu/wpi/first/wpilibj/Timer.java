@@ -26,7 +26,7 @@ public class Timer {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    return DriverStation.getInstance().getMatchTime();
+    return DriverStation.getMatchTime();
   }
 
   /**

@@ -20,12 +20,11 @@ SpeedControllerGroup::SpeedControllerGroup(
 
 void SpeedControllerGroup::Initialize() {
   for (auto& speedController : m_speedControllers) {
-    wpi::SendableRegistry::GetInstance().AddChild(this, &speedController.get());
+    wpi::SendableRegistry::AddChild(this, &speedController.get());
   }
   static int instances = 0;
   ++instances;
-  wpi::SendableRegistry::GetInstance().Add(this, "SpeedControllerGroup",
-                                           instances);
+  wpi::SendableRegistry::Add(this, "SpeedControllerGroup", instances);
 }
 
 void SpeedControllerGroup::Set(double speed) {

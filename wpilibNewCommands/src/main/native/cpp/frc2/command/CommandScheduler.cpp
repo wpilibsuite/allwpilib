@@ -70,20 +70,18 @@ CommandScheduler::CommandScheduler()
       }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this] {
+  wpi::SendableRegistry::AddLW(this, "Scheduler");
+  frc::LiveWindow::SetEnabledCallback([this] {
     this->Disable();
     this->CancelAll();
-  };
-  scheduler->disabled = [this] { this->Enable(); };
+  });
+  frc::LiveWindow::SetDisabledCallback([this] { this->Enable(); });
 }
 
 CommandScheduler::~CommandScheduler() {
-  wpi::SendableRegistry::GetInstance().Remove(this);
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = nullptr;
-  scheduler->disabled = nullptr;
+  wpi::SendableRegistry::Remove(this);
+  frc::LiveWindow::SetEnabledCallback(nullptr);
+  frc::LiveWindow::SetDisabledCallback(nullptr);
 
   std::unique_ptr<Impl>().swap(m_impl);
 }

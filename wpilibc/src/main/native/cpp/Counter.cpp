@@ -27,7 +27,7 @@ Counter::Counter(Mode mode) {
   SetMaxPeriod(0.5_s);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index + 1, mode + 1);
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Counter", m_index);
+  wpi::SendableRegistry::AddLW(this, "Counter", m_index);
 }
 
 Counter::Counter(int channel) : Counter(kTwoPulse) {
@@ -97,7 +97,7 @@ Counter::~Counter() {
 
 void Counter::SetUpSource(int channel) {
   SetUpSource(std::make_shared<DigitalInput>(channel));
-  wpi::SendableRegistry::GetInstance().AddChild(this, m_upSource.get());
+  wpi::SendableRegistry::AddChild(this, m_upSource.get());
 }
 
 void Counter::SetUpSource(AnalogTrigger* analogTrigger,
@@ -152,7 +152,7 @@ void Counter::ClearUpSource() {
 
 void Counter::SetDownSource(int channel) {
   SetDownSource(std::make_shared<DigitalInput>(channel));
-  wpi::SendableRegistry::GetInstance().AddChild(this, m_downSource.get());
+  wpi::SendableRegistry::AddChild(this, m_downSource.get());
 }
 
 void Counter::SetDownSource(AnalogTrigger* analogTrigger,

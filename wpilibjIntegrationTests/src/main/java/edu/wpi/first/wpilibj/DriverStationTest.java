@@ -26,7 +26,7 @@ public class DriverStationTest extends AbstractComsSetup {
 
     // Wait for data 50 times
     for (int i = 0; i < 50; i++) {
-      DriverStation.getInstance().waitForData();
+      DriverStation.waitForData();
     }
     long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;

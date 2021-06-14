@@ -43,7 +43,7 @@ public class EncoderTest extends AbstractComsSetup {
    */
   @Parameters
   public static Collection<Integer[]> generateData() {
-    return TestBench.getInstance().getEncoderDIOCrossConnectCollection();
+    return TestBench.getEncoderDIOCrossConnectCollection();
   }
 
   /**

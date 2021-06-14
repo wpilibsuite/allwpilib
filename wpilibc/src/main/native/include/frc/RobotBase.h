@@ -215,15 +215,11 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase();
+  virtual ~RobotBase() = default;
 
  protected:
-  // m_ds isn't moved in these because DriverStation is a singleton; every
-  // instance of RobotBase has a reference to the same object.
-  RobotBase(RobotBase&&) noexcept;
-  RobotBase& operator=(RobotBase&&) noexcept;
-
-  DriverStation& m_ds;
+  RobotBase(RobotBase&&) = default;
+  RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
 };

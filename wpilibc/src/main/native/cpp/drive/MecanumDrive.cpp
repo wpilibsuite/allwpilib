@@ -33,14 +33,13 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
       m_rearLeftMotor(&rearLeftMotor),
       m_frontRightMotor(&frontRightMotor),
       m_rearRightMotor(&rearRightMotor) {
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.AddChild(this, m_frontLeftMotor);
-  registry.AddChild(this, m_rearLeftMotor);
-  registry.AddChild(this, m_frontRightMotor);
-  registry.AddChild(this, m_rearRightMotor);
+  wpi::SendableRegistry::AddChild(this, m_frontLeftMotor);
+  wpi::SendableRegistry::AddChild(this, m_rearLeftMotor);
+  wpi::SendableRegistry::AddChild(this, m_frontRightMotor);
+  wpi::SendableRegistry::AddChild(this, m_rearRightMotor);
   static int instances = 0;
   ++instances;
-  registry.AddLW(this, "MecanumDrive", instances);
+  wpi::SendableRegistry::AddLW(this, "MecanumDrive", instances);
 }
 
 void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,

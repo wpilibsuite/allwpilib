@@ -60,7 +60,7 @@ public class PDPTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(new Object[][] {{TestBench.getInstance().getTalonPair(), 0.0}});
+    return Arrays.asList(new Object[][] {{TestBench.getTalonPair(), 0.0}});
   }
 
   @After

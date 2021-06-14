@@ -151,42 +151,42 @@ static void SetupMathShared() {
 }
 
 bool RobotBase::IsEnabled() const {
-  return m_ds.IsEnabled();
+  return DriverStation::IsEnabled();
 }
 
 bool RobotBase::IsDisabled() const {
-  return m_ds.IsDisabled();
+  return DriverStation::IsDisabled();
 }
 
 bool RobotBase::IsAutonomous() const {
-  return m_ds.IsAutonomous();
+  return DriverStation::IsAutonomous();
 }
 
 bool RobotBase::IsAutonomousEnabled() const {
-  return m_ds.IsAutonomousEnabled();
+  return DriverStation::IsAutonomousEnabled();
 }
 
 bool RobotBase::IsOperatorControl() const {
-  return m_ds.IsOperatorControl();
+  return DriverStation::IsOperatorControl();
 }
 
 bool RobotBase::IsOperatorControlEnabled() const {
-  return m_ds.IsOperatorControlEnabled();
+  return DriverStation::IsOperatorControlEnabled();
 }
 
 bool RobotBase::IsTest() const {
-  return m_ds.IsTest();
+  return DriverStation::IsTest();
 }
 
 bool RobotBase::IsNewDataAvailable() const {
-  return m_ds.IsNewControlData();
+  return DriverStation::IsNewControlData();
 }
 
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }
 
-RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+RobotBase::RobotBase() {
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();
@@ -219,14 +219,5 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 
-  LiveWindow::GetInstance()->SetEnabled(false);
-}
-
-RobotBase::RobotBase(RobotBase&&) noexcept
-    : m_ds(DriverStation::GetInstance()) {}
-
-RobotBase::~RobotBase() = default;
-
-RobotBase& RobotBase::operator=(RobotBase&&) noexcept {
-  return *this;
+  LiveWindow::SetEnabled(false);
 }

@@ -41,10 +41,10 @@ Command::Command(std::string_view name, units::second_t timeout) {
 
   // If name contains an empty string
   if (name.empty()) {
-    wpi::SendableRegistry::GetInstance().Add(
-        this, fmt::format("Command_{}", typeid(*this).name()));
+    wpi::SendableRegistry::Add(this,
+                               fmt::format("Command_{}", typeid(*this).name()));
   } else {
-    wpi::SendableRegistry::GetInstance().Add(this, name);
+    wpi::SendableRegistry::Add(this, name);
   }
 }
 
@@ -278,27 +278,25 @@ void Command::StartTiming() {
 }
 
 std::string Command::GetName() const {
-  return wpi::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetName(this);
 }
 
 void Command::SetName(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::SetName(this, name);
 }
 
 std::string Command::GetSubsystem() const {
-  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetSubsystem(this);
 }
 
 void Command::SetSubsystem(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::SetSubsystem(this, name);
 }
 
 void Command::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Command");
   builder.AddStringProperty(
-      ".name",
-      [=] { return wpi::SendableRegistry::GetInstance().GetName(this); },
-      nullptr);
+      ".name", [=] { return wpi::SendableRegistry::GetName(this); }, nullptr);
   builder.AddBooleanProperty(
       "running", [=] { return IsRunning(); },
       [=](bool value) {

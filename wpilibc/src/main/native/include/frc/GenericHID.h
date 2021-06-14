@@ -192,7 +192,6 @@ class GenericHID {
   void SetRumble(RumbleType type, double value);
 
  private:
-  DriverStation* m_ds;
   int m_port;
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;

@@ -37,7 +37,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_SPI);
 
-  wpi::SendableRegistry::GetInstance().AddLW(this, "ADXL345_SPI", port);
+  wpi::SendableRegistry::AddLW(this, "ADXL345_SPI", port);
 }
 
 void ADXL345_SPI::SetRange(Range range) {

@@ -16,38 +16,40 @@
 
 using namespace wpi;
 
-struct SendableRegistry::Impl {
-  struct Component {
-    Sendable* sendable = nullptr;
-    std::unique_ptr<SendableBuilder> builder;
-    std::string name;
-    std::string subsystem = "Ungrouped";
-    Sendable* parent = nullptr;
-    bool liveWindow = false;
-    wpi::SmallVector<std::shared_ptr<void>, 2> data;
+namespace {
+struct Component {
+  Sendable* sendable = nullptr;
+  std::unique_ptr<SendableBuilder> builder;
+  std::string name;
+  std::string subsystem = "Ungrouped";
+  Sendable* parent = nullptr;
+  bool liveWindow = false;
+  wpi::SmallVector<std::shared_ptr<void>, 2> data;
 
-    void SetName(std::string_view moduleType, int channel) {
-      name = fmt::format("{}[{}]", moduleType, channel);
-    }
+  void SetName(std::string_view moduleType, int channel) {
+    name = fmt::format("{}[{}]", moduleType, channel);
+  }
 
-    void SetName(std::string_view moduleType, int moduleNumber, int channel) {
-      name = fmt::format("{}[{},{}]", moduleType, moduleNumber, channel);
-    }
-  };
+  void SetName(std::string_view moduleType, int moduleNumber, int channel) {
+    name = fmt::format("{}[{},{}]", moduleType, moduleNumber, channel);
+  }
+};
 
+struct SendableRegistryInst {
   wpi::recursive_mutex mutex;
 
   std::function<std::unique_ptr<SendableBuilder>()> liveWindowFactory;
   wpi::UidVector<std::unique_ptr<Component>, 32> components;
-  wpi::DenseMap<void*, UID> componentMap;
+  wpi::DenseMap<void*, SendableRegistry::UID> componentMap;
   int nextDataHandle = 0;
 
-  Component& GetOrAdd(void* sendable, UID* uid = nullptr);
+  Component& GetOrAdd(void* sendable, SendableRegistry::UID* uid = nullptr);
 };
+}  // namespace
 
-SendableRegistry::Impl::Component& SendableRegistry::Impl::GetOrAdd(
-    void* sendable, UID* uid) {
-  UID& compUid = componentMap[sendable];
+Component& SendableRegistryInst::GetOrAdd(void* sendable,
+                                          SendableRegistry::UID* uid) {
+  SendableRegistry::UID& compUid = componentMap[sendable];
   if (compUid == 0) {
     compUid = components.emplace_back(std::make_unique<Component>()) + 1;
   }
@@ -58,54 +60,59 @@ SendableRegistry::Impl::Component& SendableRegistry::Impl::GetOrAdd(
   return *components[compUid - 1];
 }
 
-SendableRegistry& SendableRegistry::GetInstance() {
-  static SendableRegistry instance;
+static SendableRegistryInst& GetInstance() {
+  static SendableRegistryInst instance;
   return instance;
 }
 
 void SendableRegistry::SetLiveWindowBuilderFactory(
     std::function<std::unique_ptr<SendableBuilder>()> factory) {
-  m_impl->liveWindowFactory = std::move(factory);
+  GetInstance().liveWindowFactory = std::move(factory);
 }
 
 void SendableRegistry::Add(Sendable* sendable, std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.name = name;
 }
 
 void SendableRegistry::Add(Sendable* sendable, std::string_view moduleType,
                            int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.SetName(moduleType, channel);
 }
 
 void SendableRegistry::Add(Sendable* sendable, std::string_view moduleType,
                            int moduleNumber, int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.SetName(moduleType, moduleNumber, channel);
 }
 
 void SendableRegistry::Add(Sendable* sendable, std::string_view subsystem,
                            std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
   comp.name = name;
   comp.subsystem = subsystem;
 }
 
 void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
-  if (m_impl->liveWindowFactory) {
-    comp.builder = m_impl->liveWindowFactory();
+  if (inst.liveWindowFactory) {
+    comp.builder = inst.liveWindowFactory();
   }
   comp.liveWindow = true;
   comp.name = name;
@@ -113,11 +120,12 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view name) {
 
 void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
                              int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
-  if (m_impl->liveWindowFactory) {
-    comp.builder = m_impl->liveWindowFactory();
+  if (inst.liveWindowFactory) {
+    comp.builder = inst.liveWindowFactory();
   }
   comp.liveWindow = true;
   comp.SetName(moduleType, channel);
@@ -125,11 +133,12 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
 
 void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
                              int moduleNumber, int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
-  if (m_impl->liveWindowFactory) {
-    comp.builder = m_impl->liveWindowFactory();
+  if (inst.liveWindowFactory) {
+    comp.builder = inst.liveWindowFactory();
   }
   comp.liveWindow = true;
   comp.SetName(moduleType, moduleNumber, channel);
@@ -137,11 +146,12 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view moduleType,
 
 void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
                              std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(sendable);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(sendable);
   comp.sendable = sendable;
-  if (m_impl->liveWindowFactory) {
-    comp.builder = m_impl->liveWindowFactory();
+  if (inst.liveWindowFactory) {
+    comp.builder = inst.liveWindowFactory();
   }
   comp.liveWindow = true;
   comp.name = name;
@@ -149,28 +159,31 @@ void SendableRegistry::AddLW(Sendable* sendable, std::string_view subsystem,
 }
 
 void SendableRegistry::AddChild(Sendable* parent, Sendable* child) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(child);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(child);
   comp.parent = parent;
 }
 
 void SendableRegistry::AddChild(Sendable* parent, void* child) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto& comp = m_impl->GetOrAdd(child);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto& comp = inst.GetOrAdd(child);
   comp.parent = parent;
 }
 
 bool SendableRegistry::Remove(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end()) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end()) {
     return false;
   }
   UID compUid = it->getSecond();
-  m_impl->components.erase(compUid - 1);
-  m_impl->componentMap.erase(it);
+  inst.components.erase(compUid - 1);
+  inst.componentMap.erase(it);
   // update any parent pointers
-  for (auto&& comp : m_impl->components) {
+  for (auto&& comp : inst.components) {
     if (comp->parent == sendable) {
       comp->parent = nullptr;
     }
@@ -179,16 +192,16 @@ bool SendableRegistry::Remove(Sendable* sendable) {
 }
 
 void SendableRegistry::Move(Sendable* to, Sendable* from) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(from);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(from);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
   UID compUid = it->getSecond();
-  m_impl->componentMap.erase(it);
-  m_impl->componentMap[to] = compUid;
-  auto& comp = *m_impl->components[compUid - 1];
+  inst.componentMap.erase(it);
+  inst.componentMap[to] = compUid;
+  auto& comp = *inst.components[compUid - 1];
   comp.sendable = to;
   if (comp.builder && comp.builder->IsPublished()) {
     // rebuild builder, as lambda captures can point to "from"
@@ -196,110 +209,112 @@ void SendableRegistry::Move(Sendable* to, Sendable* from) {
     to->InitSendable(*comp.builder);
   }
   // update any parent pointers
-  for (auto&& comp : m_impl->components) {
+  for (auto&& comp : inst.components) {
     if (comp->parent == from) {
       comp->parent = to;
     }
   }
 }
 
-bool SendableRegistry::Contains(const Sendable* sendable) const {
-  std::scoped_lock lock(m_impl->mutex);
-  return m_impl->componentMap.count(sendable) != 0;
+bool SendableRegistry::Contains(const Sendable* sendable) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  return inst.componentMap.count(sendable) != 0;
 }
 
-std::string SendableRegistry::GetName(const Sendable* sendable) const {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+std::string SendableRegistry::GetName(const Sendable* sendable) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return {};
   }
-  return m_impl->components[it->getSecond() - 1]->name;
+  return inst.components[it->getSecond() - 1]->name;
 }
 
 void SendableRegistry::SetName(Sendable* sendable, std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->name = name;
+  inst.components[it->getSecond() - 1]->name = name;
 }
 
 void SendableRegistry::SetName(Sendable* sendable, std::string_view moduleType,
                                int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->SetName(moduleType, channel);
+  inst.components[it->getSecond() - 1]->SetName(moduleType, channel);
 }
 
 void SendableRegistry::SetName(Sendable* sendable, std::string_view moduleType,
                                int moduleNumber, int channel) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->SetName(moduleType, moduleNumber,
-                                                   channel);
+  inst.components[it->getSecond() - 1]->SetName(moduleType, moduleNumber,
+                                                channel);
 }
 
 void SendableRegistry::SetName(Sendable* sendable, std::string_view subsystem,
                                std::string_view name) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  auto& comp = *m_impl->components[it->getSecond() - 1];
+  auto& comp = *inst.components[it->getSecond() - 1];
   comp.name = name;
   comp.subsystem = subsystem;
 }
 
-std::string SendableRegistry::GetSubsystem(const Sendable* sendable) const {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+std::string SendableRegistry::GetSubsystem(const Sendable* sendable) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return {};
   }
-  return m_impl->components[it->getSecond() - 1]->subsystem;
+  return inst.components[it->getSecond() - 1]->subsystem;
 }
 
 void SendableRegistry::SetSubsystem(Sendable* sendable,
                                     std::string_view subsystem) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->subsystem = subsystem;
+  inst.components[it->getSecond() - 1]->subsystem = subsystem;
 }
 
 int SendableRegistry::GetDataHandle() {
-  std::scoped_lock lock(m_impl->mutex);
-  return m_impl->nextDataHandle++;
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  return inst.nextDataHandle++;
 }
 
 std::shared_ptr<void> SendableRegistry::SetData(Sendable* sendable, int handle,
                                                 std::shared_ptr<void> data) {
+  auto& inst = GetInstance();
   assert(handle >= 0);
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return nullptr;
   }
-  auto& comp = *m_impl->components[it->getSecond() - 1];
+  auto& comp = *inst.components[it->getSecond() - 1];
   std::shared_ptr<void> rv;
   if (static_cast<size_t>(handle) < comp.data.size()) {
     rv = std::move(comp.data[handle]);
@@ -312,14 +327,14 @@ std::shared_ptr<void> SendableRegistry::SetData(Sendable* sendable, int handle,
 
 std::shared_ptr<void> SendableRegistry::GetData(Sendable* sendable,
                                                 int handle) {
+  auto& inst = GetInstance();
   assert(handle >= 0);
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return nullptr;
   }
-  auto& comp = *m_impl->components[it->getSecond() - 1];
+  auto& comp = *inst.components[it->getSecond() - 1];
   if (static_cast<size_t>(handle) >= comp.data.size()) {
     return nullptr;
   }
@@ -327,78 +342,82 @@ std::shared_ptr<void> SendableRegistry::GetData(Sendable* sendable,
 }
 
 void SendableRegistry::EnableLiveWindow(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->liveWindow = true;
+  inst.components[it->getSecond() - 1]->liveWindow = true;
 }
 
 void SendableRegistry::DisableLiveWindow(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
-  auto it = m_impl->componentMap.find(sendable);
-  if (it == m_impl->componentMap.end() ||
-      !m_impl->components[it->getSecond() - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  auto it = inst.componentMap.find(sendable);
+  if (it == inst.componentMap.end() || !inst.components[it->getSecond() - 1]) {
     return;
   }
-  m_impl->components[it->getSecond() - 1]->liveWindow = false;
+  inst.components[it->getSecond() - 1]->liveWindow = false;
 }
 
 SendableRegistry::UID SendableRegistry::GetUniqueId(Sendable* sendable) {
-  std::scoped_lock lock(m_impl->mutex);
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
   UID uid;
-  auto& comp = m_impl->GetOrAdd(sendable, &uid);
+  auto& comp = inst.GetOrAdd(sendable, &uid);
   comp.sendable = sendable;
   return uid;
 }
 
 Sendable* SendableRegistry::GetSendable(UID uid) {
+  auto& inst = GetInstance();
   if (uid == 0) {
     return nullptr;
   }
-  std::scoped_lock lock(m_impl->mutex);
-  if ((uid - 1) >= m_impl->components.size() || !m_impl->components[uid - 1]) {
+  std::scoped_lock lock(inst.mutex);
+  if ((uid - 1) >= inst.components.size() || !inst.components[uid - 1]) {
     return nullptr;
   }
-  return m_impl->components[uid - 1]->sendable;
+  return inst.components[uid - 1]->sendable;
 }
 
 void SendableRegistry::Publish(UID sendableUid,
                                std::unique_ptr<SendableBuilder> builder) {
-  std::scoped_lock lock(m_impl->mutex);
-  if (sendableUid == 0 || (sendableUid - 1) >= m_impl->components.size() ||
-      !m_impl->components[sendableUid - 1]) {
+  auto& inst = GetInstance();
+  std::scoped_lock lock(inst.mutex);
+  if (sendableUid == 0 || (sendableUid - 1) >= inst.components.size() ||
+      !inst.components[sendableUid - 1]) {
     return;
   }
-  auto& comp = *m_impl->components[sendableUid - 1];
+  auto& comp = *inst.components[sendableUid - 1];
   comp.builder = std::move(builder);  // clear any current builder
   comp.sendable->InitSendable(*comp.builder);
   comp.builder->Update();
 }
 
 void SendableRegistry::Update(UID sendableUid) {
+  auto& inst = GetInstance();
   if (sendableUid == 0) {
     return;
   }
-  std::scoped_lock lock(m_impl->mutex);
-  if ((sendableUid - 1) >= m_impl->components.size() ||
-      !m_impl->components[sendableUid - 1]) {
+  std::scoped_lock lock(inst.mutex);
+  if ((sendableUid - 1) >= inst.components.size() ||
+      !inst.components[sendableUid - 1]) {
     return;
   }
-  if (m_impl->components[sendableUid - 1]->builder) {
-    m_impl->components[sendableUid - 1]->builder->Update();
+  if (inst.components[sendableUid - 1]->builder) {
+    inst.components[sendableUid - 1]->builder->Update();
   }
 }
 
 void SendableRegistry::ForeachLiveWindow(
-    int dataHandle,
-    wpi::function_ref<void(CallbackData& data)> callback) const {
+    int dataHandle, wpi::function_ref<void(CallbackData& data)> callback) {
+  auto& inst = GetInstance();
   assert(dataHandle >= 0);
-  std::scoped_lock lock(m_impl->mutex);
-  wpi::SmallVector<Impl::Component*, 128> components;
-  for (auto&& comp : m_impl->components) {
+  std::scoped_lock lock(inst.mutex);
+  wpi::SmallVector<Component*, 128> components;
+  for (auto&& comp : inst.components) {
     components.emplace_back(comp.get());
   }
   for (auto comp : components) {
@@ -413,5 +432,3 @@ void SendableRegistry::ForeachLiveWindow(
     }
   }
 }
-
-SendableRegistry::SendableRegistry() : m_impl(new Impl) {}

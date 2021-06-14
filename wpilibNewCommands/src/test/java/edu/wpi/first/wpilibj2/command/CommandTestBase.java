@@ -31,8 +31,8 @@ public abstract class CommandTestBase {
 
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
-    DriverStation.getInstance().isNewControlData();
-    while (DriverStation.getInstance().isEnabled() != enabled) {
+    DriverStation.isNewControlData();
+    while (DriverStation.isEnabled() != enabled) {
       try {
         Thread.sleep(1);
       } catch (InterruptedException exception) {

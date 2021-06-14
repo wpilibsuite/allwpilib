@@ -8,7 +8,7 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 MockActuatorSendable::MockActuatorSendable(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().Add(this, name);
+  wpi::SendableRegistry::Add(this, name);
 }
 
 void MockActuatorSendable::InitSendable(wpi::SendableBuilder& builder) {
