@@ -76,7 +76,7 @@ void SequentialCommandGroup::AddCommands(
 }
 
 SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
-    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
+    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
   // store all the commands
   std::vector<std::unique_ptr<Command>> tmp;
   tmp.emplace_back(
@@ -97,7 +97,7 @@ SequentialCommandGroup SequentialCommandGroup::BeforeStarting(
 }
 
 SequentialCommandGroup SequentialCommandGroup::AndThen(
-    std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) && {
+    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) && {
   std::vector<std::unique_ptr<Command>> tmp;
   tmp.emplace_back(
       std::make_unique<InstantCommand>(std::move(toRun), requirements));
