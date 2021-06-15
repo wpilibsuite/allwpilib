@@ -254,7 +254,7 @@ int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoderHandle,
  *
  * @param encoderHandle       the encoder handle
  * @param digitalSourceHandle the index source handle (either a
- * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
+ * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the analog trigger type if the source is an analog
  * trigger
  * @param type                the index triggering type

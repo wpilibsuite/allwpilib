@@ -298,6 +298,22 @@ Java_edu_wpi_first_hal_AnalogJNI_getAnalogVoltsToValue
 
 /*
  * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    getAnalogValueToVolts
+ * Signature: (II)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogValueToVolts
+  (JNIEnv* env, jclass, jint id, jint rawValue)
+{
+  int32_t status = 0;
+  jdouble returnValue =
+      HAL_GetAnalogValueToVolts((HAL_AnalogInputHandle)id, rawValue, &status);
+  CheckStatus(env, status);
+  return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
  * Method:    getAnalogVoltage
  * Signature: (I)D
  */

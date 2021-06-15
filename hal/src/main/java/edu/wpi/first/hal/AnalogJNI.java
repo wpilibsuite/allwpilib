@@ -58,6 +58,8 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native int getAnalogVoltsToValue(int analogPortHandle, double voltage);
 
+  public static native double getAnalogValueToVolts(int analogPortHandle, int value);
+
   public static native double getAnalogVoltage(int analogPortHandle);
 
   public static native double getAnalogAverageVoltage(int analogPortHandle);
