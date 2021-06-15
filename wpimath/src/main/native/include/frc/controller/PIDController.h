@@ -7,9 +7,10 @@
 #include <functional>
 #include <limits>
 
-#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
+
+#include "units/time.h"
 
 namespace frc2 {
 
