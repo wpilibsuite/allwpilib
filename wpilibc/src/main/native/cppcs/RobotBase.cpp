@@ -109,6 +109,13 @@ class WPILibMathShared : public wpi::math::MathShared {
         HAL_Report(HALUsageReporting::kResourceType_Odometry,
                    HALUsageReporting::kOdometry_MecanumDrive);
         break;
+      case wpi::math::MathUsageId::kController_PIDController2:
+        HAL_Report(HALUsageReporting::kResourceType_PIDController2, count);
+        break;
+      case wpi::math::MathUsageId::kController_ProfiledPIDController:
+        HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
+                   count);
+        break;
     }
   }
 };
