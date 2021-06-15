@@ -4,10 +4,9 @@
 
 #include "frc/controller/ProfiledPIDController.h"
 
-#include <hal/FRCUsageReporting.h>
-
 void frc::detail::ReportProfiledPIDController() {
   static int instances = 0;
   ++instances;
-  HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController, instances);
+  wpi::math::MathSharedStore::ReportUsage(
+      wpi::math::MathUsageId::kController_ProfiledPIDController, instances);
 }
