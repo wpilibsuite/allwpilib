@@ -19,12 +19,12 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   if (period <= 0_s) {
-    wpi::math::MathSharedStore::ReportErrorV(
+    wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
-        fmt::make_format_args(period.to<double>()));
+        period.to<double>());
     m_period = 20_ms;
-    wpi::math::MathSharedStore::ReportErrorV(
-        "{}", fmt::make_format_args("Controller period defaulted to 20ms."));
+    wpi::math::MathSharedStore::ReportWarning(
+        "{}", "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;
