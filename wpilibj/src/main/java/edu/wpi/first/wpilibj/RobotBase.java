@@ -302,9 +302,9 @@ public abstract class RobotBase implements AutoCloseable {
           elements);
       DriverStation.reportWarning(
         "The robot program quit unexpectedly."
-            + " This is usually due to a code error."
-            + " The above stacktrace can help determine where the error occurred."
-            + " See https://wpilib.org/stacktrace for more information.", false);
+            + " This is usually due to a code error.\n"
+            + "  The above stacktrace can help determine where the error occurred.\n"
+            + "  See https://wpilib.org/stacktrace for more information.\n", false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
@@ -353,9 +353,9 @@ public abstract class RobotBase implements AutoCloseable {
         // startCompetition never returns unless exception occurs....
         DriverStation.reportWarning(
             "The robot program quit unexpectedly."
-                + " This is usually due to a code error."
-                + " The above stacktrace can help determine where the error occurred."
-                + " See https://wpilib.org/stacktrace for more information.", false);
+                + " This is usually due to a code error.\n"
+                + "  The above stacktrace can help determine where the error occurred.\n"
+                + "  See https://wpilib.org/stacktrace for more information.\n", false);
         if (errorOnExit) {
           DriverStation.reportError(
               "The startCompetition() method (or methods called by it) should have "
