@@ -78,8 +78,8 @@ class WPILibMathShared : public wpi::math::MathShared {
   }
 
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
-    frc::ReportWarningV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
-                        args);
+    frc::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
+                      args);
   }
 
   void ReportUsage(wpi::math::MathUsageId id, int count) override {
