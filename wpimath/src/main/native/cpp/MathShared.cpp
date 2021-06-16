@@ -12,6 +12,8 @@ namespace {
 class DefaultMathShared : public MathShared {
  public:
   void ReportErrorV(fmt::string_view format, fmt::format_args args) override {}
+  void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
+  }
   void ReportUsage(MathUsageId id, int count) override {}
 };
 }  // namespace
