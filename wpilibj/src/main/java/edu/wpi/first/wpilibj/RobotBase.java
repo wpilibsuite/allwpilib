@@ -368,7 +368,7 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  /** Suppress the "Robots should not quit" message. */
+  /** Suppress the "The robot program quit unexpectedly." message. */
   public static void suppressExitWarning(boolean value) {
     m_runMutex.lock();
     m_suppressExitWarning = value;
