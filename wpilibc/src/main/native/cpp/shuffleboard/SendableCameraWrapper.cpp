@@ -21,7 +21,7 @@ std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
 }
 
 void AddToSendableRegistry(wpi::Sendable* sendable, std::string name) {
-  wpi::SendableRegistry::GetInstance().Add(sendable, name);
+  wpi::SendableRegistry::Add(sendable, name);
 }
 }  // namespace detail
 

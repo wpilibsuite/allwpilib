@@ -6,12 +6,10 @@
 
 #include <stdint.h>
 
-#include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <networktables/NetworkTable.h>
 #include <wpi/deprecated.h>
 
 namespace frc {
@@ -36,7 +34,9 @@ class Preferences {
    * Get the one and only {@link Preferences} object.
    *
    * @return pointer to the {@link Preferences}
+   * @deprecated Use the static methods
    */
+  WPI_DEPRECATED("Use static methods")
   static Preferences* GetInstance();
 
   /**
@@ -44,7 +44,7 @@ class Preferences {
    *
    * @return a vector of the keys
    */
-  std::vector<std::string> GetKeys();
+  static std::vector<std::string> GetKeys();
 
   /**
    * Returns the string at the given key.  If this table does not have a value
@@ -54,8 +54,8 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  std::string GetString(std::string_view key,
-                        std::string_view defaultValue = "");
+  static std::string GetString(std::string_view key,
+                               std::string_view defaultValue = "");
 
   /**
    * Returns the int at the given key.  If this table does not have a value for
@@ -65,7 +65,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int GetInt(std::string_view key, int defaultValue = 0);
+  static int GetInt(std::string_view key, int defaultValue = 0);
 
   /**
    * Returns the double at the given key.  If this table does not have a value
@@ -75,7 +75,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  double GetDouble(std::string_view key, double defaultValue = 0.0);
+  static double GetDouble(std::string_view key, double defaultValue = 0.0);
 
   /**
    * Returns the float at the given key.  If this table does not have a value
@@ -85,7 +85,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  float GetFloat(std::string_view key, float defaultValue = 0.0);
+  static float GetFloat(std::string_view key, float defaultValue = 0.0);
 
   /**
    * Returns the boolean at the given key.  If this table does not have a value
@@ -95,7 +95,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  bool GetBoolean(std::string_view key, bool defaultValue = false);
+  static bool GetBoolean(std::string_view key, bool defaultValue = false);
 
   /**
    * Returns the long (int64_t) at the given key.  If this table does not have a
@@ -106,7 +106,7 @@ class Preferences {
    * @param defaultValue the value to return if none exists in the table
    * @return either the value in the table, or the defaultValue
    */
-  int64_t GetLong(std::string_view key, int64_t defaultValue = 0);
+  static int64_t GetLong(std::string_view key, int64_t defaultValue = 0);
 
   /**
    * Puts the given string into the preferences table.
@@ -117,7 +117,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetString(std::string_view key, std::string_view value);
+  static void SetString(std::string_view key, std::string_view value);
 
   /**
    * Puts the given string into the preferences table.
@@ -129,13 +129,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetString instead.")
-  void PutString(std::string_view key, std::string_view value);
+  static void PutString(std::string_view key, std::string_view value);
 
   /**
    * Puts the given string into the preferences table if it doesn't
    * already exist.
    */
-  void InitString(std::string_view key, std::string_view value);
+  static void InitString(std::string_view key, std::string_view value);
 
   /**
    * Puts the given int into the preferences table.
@@ -145,7 +145,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetInt(std::string_view key, int value);
+  static void SetInt(std::string_view key, int value);
 
   /**
    * Puts the given int into the preferences table.
@@ -156,13 +156,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetInt instead.")
-  void PutInt(std::string_view key, int value);
+  static void PutInt(std::string_view key, int value);
 
   /**
    * Puts the given int into the preferences table if it doesn't
    * already exist.
    */
-  void InitInt(std::string_view key, int value);
+  static void InitInt(std::string_view key, int value);
 
   /**
    * Puts the given double into the preferences table.
@@ -172,7 +172,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetDouble(std::string_view key, double value);
+  static void SetDouble(std::string_view key, double value);
 
   /**
    * Puts the given double into the preferences table.
@@ -183,13 +183,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetDouble instead.")
-  void PutDouble(std::string_view key, double value);
+  static void PutDouble(std::string_view key, double value);
 
   /**
    * Puts the given double into the preferences table if it doesn't
    * already exist.
    */
-  void InitDouble(std::string_view key, double value);
+  static void InitDouble(std::string_view key, double value);
 
   /**
    * Puts the given float into the preferences table.
@@ -199,7 +199,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetFloat(std::string_view key, float value);
+  static void SetFloat(std::string_view key, float value);
 
   /**
    * Puts the given float into the preferences table.
@@ -210,13 +210,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetFloat instead.")
-  void PutFloat(std::string_view key, float value);
+  static void PutFloat(std::string_view key, float value);
 
   /**
    * Puts the given float into the preferences table if it doesn't
    * already exist.
    */
-  void InitFloat(std::string_view key, float value);
+  static void InitFloat(std::string_view key, float value);
 
   /**
    * Puts the given boolean into the preferences table.
@@ -226,7 +226,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetBoolean(std::string_view key, bool value);
+  static void SetBoolean(std::string_view key, bool value);
 
   /**
    * Puts the given boolean into the preferences table.
@@ -237,13 +237,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetBoolean instead.")
-  void PutBoolean(std::string_view key, bool value);
+  static void PutBoolean(std::string_view key, bool value);
 
   /**
    * Puts the given boolean into the preferences table if it doesn't
    * already exist.
    */
-  void InitBoolean(std::string_view key, bool value);
+  static void InitBoolean(std::string_view key, bool value);
 
   /**
    * Puts the given long (int64_t) into the preferences table.
@@ -253,7 +253,7 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  void SetLong(std::string_view key, int64_t value);
+  static void SetLong(std::string_view key, int64_t value);
 
   /**
    * Puts the given long (int64_t) into the preferences table.
@@ -264,13 +264,13 @@ class Preferences {
    * @param value the value
    */
   WPI_DEPRECATED("Use SetLong instead.")
-  void PutLong(std::string_view key, int64_t value);
+  static void PutLong(std::string_view key, int64_t value);
 
   /**
    * Puts the given long into the preferences table if it doesn't
    * already exist.
    */
-  void InitLong(std::string_view key, int64_t value);
+  static void InitLong(std::string_view key, int64_t value);
 
   /**
    * Returns whether or not there is a key with the given name.
@@ -278,29 +278,22 @@ class Preferences {
    * @param key the key
    * @return if there is a value at the given key
    */
-  bool ContainsKey(std::string_view key);
+  static bool ContainsKey(std::string_view key);
 
   /**
    * Remove a preference.
    *
    * @param key the key
    */
-  void Remove(std::string_view key);
+  static void Remove(std::string_view key);
 
   /**
    * Remove all preferences.
    */
-  void RemoveAll();
-
- protected:
-  Preferences();
-
-  Preferences(Preferences&&) = default;
-  Preferences& operator=(Preferences&&) = default;
+  static void RemoveAll();
 
  private:
-  std::shared_ptr<nt::NetworkTable> m_table;
-  NT_EntryListener m_listener;
+  Preferences() = default;
 };
 
 }  // namespace frc

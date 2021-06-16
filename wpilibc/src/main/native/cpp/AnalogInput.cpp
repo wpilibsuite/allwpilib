@@ -34,7 +34,7 @@ AnalogInput::AnalogInput(int channel) {
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel + 1);
 
-  wpi::SendableRegistry::GetInstance().AddLW(this, "AnalogInput", channel);
+  wpi::SendableRegistry::AddLW(this, "AnalogInput", channel);
 }
 
 AnalogInput::~AnalogInput() {

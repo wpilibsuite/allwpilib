@@ -15,7 +15,7 @@
 using namespace frc;
 
 Subsystem::Subsystem(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().AddLW(this, name, name);
+  wpi::SendableRegistry::AddLW(this, name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
 
@@ -44,7 +44,7 @@ Command* Subsystem::GetDefaultCommand() {
 std::string Subsystem::GetDefaultCommandName() {
   Command* defaultCommand = GetDefaultCommand();
   if (defaultCommand) {
-    return wpi::SendableRegistry::GetInstance().GetName(defaultCommand);
+    return wpi::SendableRegistry::GetName(defaultCommand);
   } else {
     return {};
   }
@@ -62,7 +62,7 @@ Command* Subsystem::GetCurrentCommand() const {
 std::string Subsystem::GetCurrentCommandName() const {
   Command* currentCommand = GetCurrentCommand();
   if (currentCommand) {
-    return wpi::SendableRegistry::GetInstance().GetName(currentCommand);
+    return wpi::SendableRegistry::GetName(currentCommand);
   } else {
     return {};
   }
@@ -73,19 +73,19 @@ void Subsystem::Periodic() {}
 void Subsystem::InitDefaultCommand() {}
 
 std::string Subsystem::GetName() const {
-  return wpi::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetName(this);
 }
 
 void Subsystem::SetName(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::SetName(this, name);
 }
 
 std::string Subsystem::GetSubsystem() const {
-  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetSubsystem(this);
 }
 
 void Subsystem::SetSubsystem(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::SetSubsystem(this, name);
 }
 
 void Subsystem::AddChild(std::string_view name,
@@ -98,8 +98,8 @@ void Subsystem::AddChild(std::string_view name, wpi::Sendable* child) {
 }
 
 void Subsystem::AddChild(std::string_view name, wpi::Sendable& child) {
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.AddLW(&child, registry.GetSubsystem(this), name);
+  wpi::SendableRegistry::AddLW(&child,
+                               wpi::SendableRegistry::GetSubsystem(this), name);
 }
 
 void Subsystem::AddChild(std::shared_ptr<wpi::Sendable> child) {
@@ -111,9 +111,9 @@ void Subsystem::AddChild(wpi::Sendable* child) {
 }
 
 void Subsystem::AddChild(wpi::Sendable& child) {
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.SetSubsystem(&child, registry.GetSubsystem(this));
-  registry.EnableLiveWindow(&child);
+  wpi::SendableRegistry::SetSubsystem(
+      &child, wpi::SendableRegistry::GetSubsystem(this));
+  wpi::SendableRegistry::EnableLiveWindow(&child);
 }
 
 void Subsystem::ConfirmCommand() {

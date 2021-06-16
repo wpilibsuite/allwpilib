@@ -22,7 +22,7 @@ TEST(DriverStationTest, WaitForData) {
 
   // 20ms waiting intervals * 50 = 1s
   for (int i = 0; i < 50; i++) {
-    frc::DriverStation::GetInstance().WaitForData();
+    frc::DriverStation::WaitForData();
   }
 
   units::microsecond_t finalTime(frc::RobotController::GetFPGATime());

@@ -72,9 +72,9 @@ public class PIDTest extends AbstractComsSetup {
       data.addAll(
           Arrays.asList(
               new Object[][] {
-                {kp, ki, kd, TestBench.getInstance().getTalonPair()},
-                {kp, ki, kd, TestBench.getInstance().getVictorPair()},
-                {kp, ki, kd, TestBench.getInstance().getJaguarPair()}
+                {kp, ki, kd, TestBench.getTalonPair()},
+                {kp, ki, kd, TestBench.getVictorPair()},
+                {kp, ki, kd, TestBench.getJaguarPair()}
               }));
     }
     return data;

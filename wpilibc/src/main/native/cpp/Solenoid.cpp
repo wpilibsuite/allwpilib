@@ -36,8 +36,8 @@ Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_module->GetModuleNumber() + 1);
-  wpi::SendableRegistry::GetInstance().AddLW(
-      this, "Solenoid", m_module->GetModuleNumber(), m_channel);
+  wpi::SendableRegistry::AddLW(this, "Solenoid", m_module->GetModuleNumber(),
+                               m_channel);
 }
 
 Solenoid::~Solenoid() {}

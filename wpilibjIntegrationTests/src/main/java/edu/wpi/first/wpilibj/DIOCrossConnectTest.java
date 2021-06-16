@@ -58,7 +58,7 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     // port}.
     // These data are hard-coded into the class, but they could be
     // generated or loaded in any way you like.
-    return TestBench.getInstance().getDIOCrossConnectCollection();
+    return TestBench.getDIOCrossConnectCollection();
   }
 
   @AfterClass

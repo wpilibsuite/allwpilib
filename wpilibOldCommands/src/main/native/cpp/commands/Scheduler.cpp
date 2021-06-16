@@ -186,9 +186,9 @@ void Scheduler::InitSendable(nt::NTSendableBuilder& builder) {
     if (m_impl->runningCommandsChanged) {
       m_impl->commandsBuf.resize(0);
       m_impl->idsBuf.resize(0);
-      auto& registry = wpi::SendableRegistry::GetInstance();
       for (const auto& command : m_impl->commands) {
-        m_impl->commandsBuf.emplace_back(registry.GetName(command));
+        m_impl->commandsBuf.emplace_back(
+            wpi::SendableRegistry::GetName(command));
         m_impl->idsBuf.emplace_back(command->GetID());
       }
       nt::NetworkTableEntry(namesEntry).SetStringArray(m_impl->commandsBuf);
@@ -200,20 +200,18 @@ void Scheduler::InitSendable(nt::NTSendableBuilder& builder) {
 Scheduler::Scheduler() : m_impl(new Impl) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this] {
+  wpi::SendableRegistry::AddLW(this, "Scheduler");
+  frc::LiveWindow::SetEnabledCallback([this] {
     this->SetEnabled(false);
     this->RemoveAll();
-  };
-  scheduler->disabled = [this] { this->SetEnabled(true); };
+  });
+  frc::LiveWindow::SetDisabledCallback([this] { this->SetEnabled(true); });
 }
 
 Scheduler::~Scheduler() {
-  wpi::SendableRegistry::GetInstance().Remove(this);
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = nullptr;
-  scheduler->disabled = nullptr;
+  wpi::SendableRegistry::Remove(this);
+  frc::LiveWindow::SetEnabledCallback(nullptr);
+  frc::LiveWindow::SetDisabledCallback(nullptr);
 }
 
 void Scheduler::Impl::Remove(Command* command) {

@@ -53,8 +53,9 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
              m_module->GetModuleNumber() + 1);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel + 1,
              m_module->GetModuleNumber() + 1);
-  wpi::SendableRegistry::GetInstance().AddLW(
-      this, "DoubleSolenoid", m_module->GetModuleNumber(), m_forwardChannel);
+
+  wpi::SendableRegistry::AddLW(this, "DoubleSolenoid",
+                               m_module->GetModuleNumber(), m_forwardChannel);
 }
 
 DoubleSolenoid::~DoubleSolenoid() {}

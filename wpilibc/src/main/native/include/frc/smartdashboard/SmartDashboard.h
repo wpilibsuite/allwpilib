@@ -11,17 +11,18 @@
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
-#include "frc/smartdashboard/ListenerExecutor.h"
+namespace wpi {
+class Sendable;
+}  // namespace wpi
 
 namespace frc {
 
-class SmartDashboard : public wpi::Sendable,
-                       public wpi::SendableHelper<SmartDashboard> {
+class SmartDashboard {
  public:
+  SmartDashboard() = delete;
+
   static void init();
 
   /**
@@ -433,11 +434,6 @@ class SmartDashboard : public wpi::Sendable,
    * Puts all sendable data to the dashboard.
    */
   static void UpdateValues();
-
- private:
-  ~SmartDashboard() override = default;
-
-  static detail::ListenerExecutor listenerExecutor;
 };
 
 }  // namespace frc

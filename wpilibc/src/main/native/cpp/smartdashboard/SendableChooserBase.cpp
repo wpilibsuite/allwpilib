@@ -11,7 +11,7 @@ using namespace frc;
 std::atomic_int SendableChooserBase::s_instances{0};
 
 SendableChooserBase::SendableChooserBase() : m_instance{s_instances++} {
-  wpi::SendableRegistry::GetInstance().Add(this, "SendableChooser", m_instance);
+  wpi::SendableRegistry::Add(this, "SendableChooser", m_instance);
 }
 
 SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)
