@@ -6,12 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <ntcore_cpp.h>
 #include <wpi/DenseMap.h>
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 #include "glass/View.h"
@@ -47,7 +46,7 @@ class NetworkTablesModel : public Model {
   };
 
   struct TreeNode {
-    explicit TreeNode(wpi::StringRef name) : name{name} {}
+    explicit TreeNode(std::string_view name) : name{name} {}
 
     /** Short name (e.g. of just this node) */
     std::string name;

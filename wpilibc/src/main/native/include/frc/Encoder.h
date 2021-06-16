@@ -7,17 +7,16 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -37,8 +36,8 @@ class DMASample;
  * to be zeroed before use.
  */
 class Encoder : public CounterBase,
-                public Sendable,
-                public SendableHelper<Encoder> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<Encoder> {
   friend class DMA;
   friend class DMASample;
 
@@ -167,7 +166,7 @@ class Encoder : public CounterBase,
    *
    * @return Period in seconds of the most recent pulse.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Sets the maximum period for stopped detection.
@@ -188,7 +187,7 @@ class Encoder : public CounterBase,
   WPI_DEPRECATED(
       "Use SetMinRate() in favor of this method.  This takes unscaled periods "
       "and SetMinRate() scales using value from SetDistancePerPulse().")
-  void SetMaxPeriod(double maxPeriod) override;
+  void SetMaxPeriod(units::second_t maxPeriod) override;
 
   /**
    * Determine if the encoder is stopped.
@@ -340,7 +339,7 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**

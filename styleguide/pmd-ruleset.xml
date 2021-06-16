@@ -14,11 +14,14 @@
     <exclude name="AccessorMethodGeneration" />
     <exclude name="AvoidPrintStackTrace" />
     <exclude name="AvoidReassigningParameters" />
+    <exclude name="AvoidUsingHardCodedIP" />
+    <exclude name="ConstantsInInterface" />
     <exclude name="JUnitAssertionsShouldIncludeMessage" />
     <exclude name="JUnitTestContainsTooManyAsserts" />
     <exclude name="JUnit4TestShouldUseAfterAnnotation" />
     <exclude name="JUnit4TestShouldUseBeforeAnnotation" />
     <exclude name="JUnit4TestShouldUseTestAnnotation" />
+    <exclude name="LooseCoupling" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SwitchStmtsShouldHaveDefault" />
@@ -33,12 +36,22 @@
   </rule>
 
   <rule ref="category/java/design.xml">
+    <exclude name="AvoidThrowingRawExceptionTypes" />
+    <exclude name="CyclomaticComplexity" />
     <exclude name="DataClass" />
+    <exclude name="ExcessiveClassLength" />
+    <exclude name="ExcessiveImports" />
+    <exclude name="ExcessiveMethodLength" />
+    <exclude name="ExcessiveParameterList" />
+    <exclude name="ExcessivePublicCount" />
+    <exclude name="GodClass" />
     <exclude name="LawOfDemeter" />
     <exclude name="LoosePackageCoupling" />
+    <exclude name="NPathComplexity" />
     <exclude name="NcssConstructorCount" />
     <exclude name="NcssCount" />
     <exclude name="NcssMethodCount" />
+    <exclude name="TooManyFields" />
     <exclude name="TooManyMethods" />
   </rule>
 
@@ -65,6 +78,7 @@
 
   <rule ref="category/java/performance.xml">
     <exclude name="AvoidUsingShortType" />
+    <exclude name="AvoidInstantiatingObjectsInLoops" />
   </rule>
 
   <rule name="UnnecessaryCastRule" language="java"

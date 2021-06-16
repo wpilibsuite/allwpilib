@@ -86,11 +86,17 @@ public class ParallelCommandGroup extends CommandGroupBase {
 
   @Override
   public boolean isFinished() {
-    return !m_commands.values().contains(true);
+    return !m_commands.containsValue(true);
   }
 
   @Override
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
+  }
+
+  @Override
+  public ParallelCommandGroup alongWith(Command... parallel) {
+    addCommands(parallel);
+    return this;
   }
 }

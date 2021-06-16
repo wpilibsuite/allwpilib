@@ -5,10 +5,10 @@
 #ifndef CSCORE_IMAGE_H_
 #define CSCORE_IMAGE_H_
 
+#include <string_view>
 #include <vector>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/StringRef.h>
 
 #include "cscore_cpp.h"
 #include "default_init_allocator.h"
@@ -34,8 +34,8 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator wpi::StringRef() const { return str(); }  // NOLINT
-  wpi::StringRef str() const { return wpi::StringRef(data(), size()); }
+  operator std::string_view() const { return str(); }  // NOLINT
+  std::string_view str() const { return {data(), size()}; }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
     return reinterpret_cast<const char*>(m_data.data());

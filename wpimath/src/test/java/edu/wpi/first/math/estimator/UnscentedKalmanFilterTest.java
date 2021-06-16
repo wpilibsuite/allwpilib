@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.math.Discretization;
-import edu.wpi.first.math.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N4;
@@ -103,11 +103,7 @@ public class UnscentedKalmanFilterTest {
         });
   }
 
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ExcessiveMethodLength"
-  })
+  @SuppressWarnings("LocalVariableName")
   @Test
   public void testConvergence() {
     double dtSeconds = 0.00505;
@@ -293,7 +289,7 @@ public class UnscentedKalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "ParameterName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);

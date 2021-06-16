@@ -49,9 +49,9 @@ class VisionRunnerBase {
   void RunOnce();
 
   /**
-   * A convenience method that calls {@link #runOnce()} in an infinite loop.
-   * This must be run in a dedicated thread, and cannot be used in the main
-   * robot thread because it will freeze the robot program.
+   * A convenience method that calls runOnce() in an infinite loop. This must be
+   * run in a dedicated thread, and cannot be used in the main robot thread
+   * because it will freeze the robot program.
    *
    * <strong>Do not call this method directly from the main thread.</strong>
    */

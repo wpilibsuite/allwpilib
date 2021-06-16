@@ -4,20 +4,12 @@
 
 #pragma once
 
-#include <array>
-#include <atomic>
-#include <memory>
 #include <string>
-#include <thread>
 
-#include <hal/DriverStationTypes.h>
-#include <wpi/Twine.h>
-#include <wpi/condition_variable.h>
-#include <wpi/mutex.h>
+#include <units/time.h>
+#include <wpi/deprecated.h>
 
 namespace frc {
-
-class MatchDataSender;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -28,39 +20,14 @@ class DriverStation {
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
-  ~DriverStation();
-
-  DriverStation(const DriverStation&) = delete;
-  DriverStation& operator=(const DriverStation&) = delete;
-
   /**
    * Return a reference to the singleton DriverStation.
    *
    * @return Reference to the DS instance
+   * @deprecated Use the static methods
    */
+  WPI_DEPRECATED("Use static methods")
   static DriverStation& GetInstance();
-
-  /**
-   * Report an error to the DriverStation messages window.
-   *
-   * The error is also printed to the program console.
-   */
-  static void ReportError(const wpi::Twine& error);
-
-  /**
-   * Report a warning to the DriverStation messages window.
-   *
-   * The warning is also printed to the program console.
-   */
-  static void ReportWarning(const wpi::Twine& error);
-
-  /**
-   * Report an error to the DriverStation messages window.
-   *
-   * The error is also printed to the program console.
-   */
-  static void ReportError(bool isError, int code, const wpi::Twine& error,
-                          const wpi::Twine& location, const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 
@@ -71,7 +38,7 @@ class DriverStation {
    * @param button The button index, beginning at 1.
    * @return The state of the joystick button.
    */
-  bool GetStickButton(int stick, int button);
+  static bool GetStickButton(int stick, int button);
 
   /**
    * Whether one joystick button was pressed since the last check. Button
@@ -81,7 +48,7 @@ class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was pressed since the last check.
    */
-  bool GetStickButtonPressed(int stick, int button);
+  static bool GetStickButtonPressed(int stick, int button);
 
   /**
    * Whether one joystick button was released since the last check. Button
@@ -91,7 +58,7 @@ class DriverStation {
    * @param button The button index, beginning at 1.
    * @return Whether the joystick button was released since the last check.
    */
-  bool GetStickButtonReleased(int stick, int button);
+  static bool GetStickButtonReleased(int stick, int button);
 
   /**
    * Get the value of the axis on a joystick.
@@ -103,14 +70,14 @@ class DriverStation {
    * @param axis  The analog axis value to read from the joystick.
    * @return The value of the axis on the joystick.
    */
-  double GetStickAxis(int stick, int axis);
+  static double GetStickAxis(int stick, int axis);
 
   /**
    * Get the state of a POV on the joystick.
    *
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  int GetStickPOV(int stick, int pov);
+  static int GetStickPOV(int stick, int pov);
 
   /**
    * The state of the buttons on the joystick.
@@ -118,7 +85,7 @@ class DriverStation {
    * @param stick The joystick to read.
    * @return The state of the buttons on the joystick.
    */
-  int GetStickButtons(int stick) const;
+  static int GetStickButtons(int stick);
 
   /**
    * Returns the number of axes on a given joystick port.
@@ -126,7 +93,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return The number of axes on the indicated joystick
    */
-  int GetStickAxisCount(int stick) const;
+  static int GetStickAxisCount(int stick);
 
   /**
    * Returns the number of POVs on a given joystick port.
@@ -134,7 +101,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return The number of POVs on the indicated joystick
    */
-  int GetStickPOVCount(int stick) const;
+  static int GetStickPOVCount(int stick);
 
   /**
    * Returns the number of buttons on a given joystick port.
@@ -142,7 +109,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return The number of buttons on the indicated joystick
    */
-  int GetStickButtonCount(int stick) const;
+  static int GetStickButtonCount(int stick);
 
   /**
    * Returns a boolean indicating if the controller is an xbox controller.
@@ -150,7 +117,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return A boolean that is true if the controller is an xbox controller.
    */
-  bool GetJoystickIsXbox(int stick) const;
+  static bool GetJoystickIsXbox(int stick);
 
   /**
    * Returns the type of joystick at a given port.
@@ -158,7 +125,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return The HID type of joystick at the given port
    */
-  int GetJoystickType(int stick) const;
+  static int GetJoystickType(int stick);
 
   /**
    * Returns the name of the joystick at the given port.
@@ -166,7 +133,7 @@ class DriverStation {
    * @param stick The joystick port number
    * @return The name of the joystick at the given port
    */
-  std::string GetJoystickName(int stick) const;
+  static std::string GetJoystickName(int stick);
 
   /**
    * Returns the types of Axes on a given joystick port.
@@ -174,7 +141,7 @@ class DriverStation {
    * @param stick The joystick port number and the target axis
    * @return What type of axis the axis is reporting to be
    */
-  int GetJoystickAxisType(int stick, int axis) const;
+  static int GetJoystickAxisType(int stick, int axis);
 
   /**
    * Returns if a joystick is connected to the Driver Station.
@@ -185,35 +152,35 @@ class DriverStation {
    * @param stick The joystick port number
    * @return true if a joystick is connected
    */
-  bool IsJoystickConnected(int stick) const;
+  static bool IsJoystickConnected(int stick);
 
   /**
    * Check if the DS has enabled the robot.
    *
    * @return True if the robot is enabled and the DS is connected
    */
-  bool IsEnabled() const;
+  static bool IsEnabled();
 
   /**
    * Check if the robot is disabled.
    *
    * @return True if the robot is explicitly disabled or the DS is not connected
    */
-  bool IsDisabled() const;
+  static bool IsDisabled();
 
   /**
    * Check if the robot is e-stopped.
    *
    * @return True if the robot is e-stopped
    */
-  bool IsEStopped() const;
+  static bool IsEStopped();
 
   /**
    * Check if the DS is commanding autonomous mode.
    *
    * @return True if the robot is being commanded to be in autonomous mode
    */
-  bool IsAutonomous() const;
+  static bool IsAutonomous();
 
   /**
    * Check if the DS is commanding autonomous mode and if it has enabled the
@@ -222,14 +189,14 @@ class DriverStation {
    * @return True if the robot is being commanded to be in autonomous mode and
    * enabled.
    */
-  bool IsAutonomousEnabled() const;
+  static bool IsAutonomousEnabled();
 
   /**
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
    */
-  bool IsOperatorControl() const;
+  static bool IsOperatorControl();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -237,21 +204,21 @@ class DriverStation {
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  bool IsOperatorControlEnabled() const;
+  static bool IsOperatorControlEnabled();
 
   /**
    * Check if the DS is commanding test mode.
    *
    * @return True if the robot is being commanded to be in test mode
    */
-  bool IsTest() const;
+  static bool IsTest();
 
   /**
    * Check if the DS is attached.
    *
    * @return True if the DS is connected to the robot
    */
-  bool IsDSAttached() const;
+  static bool IsDSAttached();
 
   /**
    * Has a new control packet from the driver station arrived since the last
@@ -262,7 +229,7 @@ class DriverStation {
    *
    * @return True if the control data has been updated since the last call.
    */
-  bool IsNewControlData() const;
+  static bool IsNewControlData();
 
   /**
    * Is the driver station attached to a Field Management System?
@@ -270,21 +237,21 @@ class DriverStation {
    * @return True if the robot is competing on a field being controlled by a
    *         Field Management System
    */
-  bool IsFMSAttached() const;
+  static bool IsFMSAttached();
 
   /**
    * Returns the game specific message provided by the FMS.
    *
    * @return A string containing the game specific message.
    */
-  std::string GetGameSpecificMessage() const;
+  static std::string GetGameSpecificMessage();
 
   /**
    * Returns the name of the competition event provided by the FMS.
    *
    * @return A string containing the event name
    */
-  std::string GetEventName() const;
+  static std::string GetEventName();
 
   /**
    * Returns the type of match being played provided by the FMS.
@@ -292,14 +259,14 @@ class DriverStation {
    * @return The match type enum (kNone, kPractice, kQualification,
    *         kElimination)
    */
-  MatchType GetMatchType() const;
+  static MatchType GetMatchType();
 
   /**
    * Returns the match number provided by the FMS.
    *
    * @return The number of the match
    */
-  int GetMatchNumber() const;
+  static int GetMatchNumber();
 
   /**
    * Returns the number of times the current match has been replayed from the
@@ -307,7 +274,7 @@ class DriverStation {
    *
    * @return The number of replays
    */
-  int GetReplayNumber() const;
+  static int GetReplayNumber();
 
   /**
    * Return the alliance that the driver station says it is on.
@@ -316,7 +283,7 @@ class DriverStation {
    *
    * @return The Alliance enum (kRed, kBlue or kInvalid)
    */
-  Alliance GetAlliance() const;
+  static Alliance GetAlliance();
 
   /**
    * Return the driver station location on the field.
@@ -325,7 +292,7 @@ class DriverStation {
    *
    * @return The location of the driver station (1-3, 0 for invalid)
    */
-  int GetLocation() const;
+  static int GetLocation();
 
   /**
    * Wait until a new packet comes from the driver station.
@@ -338,7 +305,7 @@ class DriverStation {
    * Checks if new control data has arrived since the last waitForData call
    * on the current thread. If new data has not arrived, returns immediately.
    */
-  void WaitForData();
+  static void WaitForData();
 
   /**
    * Wait until a new packet comes from the driver station, or wait for a
@@ -356,11 +323,11 @@ class DriverStation {
    * This is a good way to delay processing until there is new driver station
    * data to act on.
    *
-   * @param timeout Timeout time in seconds
+   * @param timeout Timeout
    *
    * @return true if new data, otherwise false
    */
-  bool WaitForData(double timeout);
+  static bool WaitForData(units::second_t timeout);
 
   /**
    * Return the approximate match time.
@@ -377,14 +344,14 @@ class DriverStation {
    *
    * @return Time remaining in current match period (auto or teleop)
    */
-  double GetMatchTime() const;
+  static double GetMatchTime();
 
   /**
    * Read the battery voltage.
    *
    * @return The battery voltage in Volts.
    */
-  double GetBatteryVoltage() const;
+  static double GetBatteryVoltage();
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be
@@ -393,7 +360,7 @@ class DriverStation {
    * @param entering If true, starting disabled code; if false, leaving disabled
    *                 code.
    */
-  void InDisabled(bool entering) { m_userInDisabled = entering; }
+  static void InDisabled(bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be
@@ -402,7 +369,7 @@ class DriverStation {
    * @param entering If true, starting autonomous code; if false, leaving
    *                 autonomous code.
    */
-  void InAutonomous(bool entering) { m_userInAutonomous = entering; }
+  static void InAutonomous(bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be
@@ -411,7 +378,7 @@ class DriverStation {
    * @param entering If true, starting teleop code; if false, leaving teleop
    *                 code.
    */
-  void InOperatorControl(bool entering) { m_userInTeleop = entering; }
+  static void InOperatorControl(bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be
@@ -419,12 +386,12 @@ class DriverStation {
    *
    * @param entering If true, starting test code; if false, leaving test code.
    */
-  void InTest(bool entering) { m_userInTest = entering; }
+  static void InTest(bool entering);
 
   /**
    * Forces WaitForData() to return immediately.
    */
-  void WakeupWaitForData();
+  static void WakeupWaitForData();
 
   /**
    * Allows the user to specify whether they want joystick connection warnings
@@ -433,7 +400,7 @@ class DriverStation {
    *
    * @param silence Whether warning messages should be silenced.
    */
-  void SilenceJoystickConnectionWarning(bool silence);
+  static void SilenceJoystickConnectionWarning(bool silence);
 
   /**
    * Returns whether joystick connection warnings are silenced. This will
@@ -441,68 +408,10 @@ class DriverStation {
    *
    * @return Whether joystick connection warnings are silenced.
    */
-  bool IsJoystickConnectionWarningSilenced() const;
-
- protected:
-  /**
-   * Copy data from the DS task for the user.
-   *
-   * If no new data exists, it will just be returned, otherwise
-   * the data will be copied from the DS polling loop.
-   */
-  void GetData();
+  static bool IsJoystickConnectionWarningSilenced();
 
  private:
-  /**
-   * DriverStation constructor.
-   *
-   * This is only called once the first time GetInstance() is called
-   */
-  DriverStation();
-
-  /**
-   * Reports errors related to unplugged joysticks.
-   *
-   * Throttles the errors so that they don't overwhelm the DS.
-   */
-  void ReportJoystickUnpluggedError(const wpi::Twine& message);
-
-  /**
-   * Reports errors related to unplugged joysticks.
-   *
-   * Throttles the errors so that they don't overwhelm the DS.
-   */
-  void ReportJoystickUnpluggedWarning(const wpi::Twine& message);
-
-  void Run();
-
-  void SendMatchData();
-
-  std::unique_ptr<MatchDataSender> m_matchDataSender;
-
-  // Joystick button rising/falling edge flags
-  wpi::mutex m_buttonEdgeMutex;
-  std::array<HAL_JoystickButtons, kJoystickPorts> m_previousButtonStates;
-  std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
-  std::array<uint32_t, kJoystickPorts> m_joystickButtonsReleased;
-
-  // Internal Driver Station thread
-  std::thread m_dsThread;
-  std::atomic<bool> m_isRunning{false};
-
-  mutable wpi::mutex m_waitForDataMutex;
-  wpi::condition_variable m_waitForDataCond;
-  int m_waitForDataCounter;
-
-  bool m_silenceJoystickWarning = false;
-
-  // Robot state status variables
-  bool m_userInDisabled = false;
-  bool m_userInAutonomous = false;
-  bool m_userInTeleop = false;
-  bool m_userInTest = false;
-
-  double m_nextMessageTime = 0;
+  DriverStation() = default;
 };
 
 }  // namespace frc

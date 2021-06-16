@@ -27,12 +27,11 @@ TEST(PWMSimTests, TestPwmInitialization) {
       INDEX_TO_TEST, &TestPwmInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   HAL_PortHandle portHandle;
   HAL_DigitalHandle pwmHandle;
 
   // Use out of range index
-  status = 0;
   portHandle = 8000;
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(portHandle, nullptr, &status);

@@ -52,7 +52,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public void testStateSpaceEnabled() {
 
     m_loop.reset(VecBuilder.fill(0, 0));
@@ -82,7 +82,7 @@ public class LinearSystemLoopTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public void testFlywheelEnabled() {
 
     LinearSystem<N1, N1, N1> plant =

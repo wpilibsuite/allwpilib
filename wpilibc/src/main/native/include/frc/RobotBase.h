@@ -11,9 +11,7 @@
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/Base.h"
 #include "frc/Errors.h"
 
 namespace frc {
@@ -100,13 +98,6 @@ int StartRobot() {
 
   return 0;
 }
-
-#define START_ROBOT_CLASS(_ClassName_)                                 \
-  WPI_DEPRECATED("Call frc::StartRobot<" #_ClassName_                  \
-                 ">() in your own main() instead of using the "        \
-                 "START_ROBOT_CLASS(" #_ClassName_ ") macro.")         \
-  int StartRobotClassImpl() { return frc::StartRobot<_ClassName_>(); } \
-  int main() { return StartRobotClassImpl(); }
 
 /**
  * Implement a Robot Program framework.
@@ -224,15 +215,11 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase();
+  virtual ~RobotBase() = default;
 
  protected:
-  // m_ds isn't moved in these because DriverStation is a singleton; every
-  // instance of RobotBase has a reference to the same object.
-  RobotBase(RobotBase&&) noexcept;
-  RobotBase& operator=(RobotBase&&) noexcept;
-
-  DriverStation& m_ds;
+  RobotBase(RobotBase&&) = default;
+  RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
 };

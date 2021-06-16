@@ -4,36 +4,38 @@
 
 #include "glass/networktables/NTStringChooser.h"
 
+#include <fmt/format.h>
+
 using namespace glass;
 
-NTStringChooserModel::NTStringChooserModel(wpi::StringRef path)
+NTStringChooserModel::NTStringChooserModel(std::string_view path)
     : NTStringChooserModel{nt::GetDefaultInstance(), path} {}
 
-NTStringChooserModel::NTStringChooserModel(NT_Inst inst, wpi::StringRef path)
+NTStringChooserModel::NTStringChooserModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_default{m_nt.GetEntry(path + "/default")},
-      m_selected{m_nt.GetEntry(path + "/selected")},
-      m_active{m_nt.GetEntry(path + "/active")},
-      m_options{m_nt.GetEntry(path + "/options")} {
+      m_default{m_nt.GetEntry(fmt::format("{}/default", path))},
+      m_selected{m_nt.GetEntry(fmt::format("{}/selected", path))},
+      m_active{m_nt.GetEntry(fmt::format("{}/active", path))},
+      m_options{m_nt.GetEntry(fmt::format("{}/options", path))} {
   m_nt.AddListener(m_default);
   m_nt.AddListener(m_selected);
   m_nt.AddListener(m_active);
   m_nt.AddListener(m_options);
 }
 
-void NTStringChooserModel::SetDefault(wpi::StringRef val) {
+void NTStringChooserModel::SetDefault(std::string_view val) {
   nt::SetEntryValue(m_default, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetSelected(wpi::StringRef val) {
+void NTStringChooserModel::SetSelected(std::string_view val) {
   nt::SetEntryValue(m_selected, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetActive(wpi::StringRef val) {
+void NTStringChooserModel::SetActive(std::string_view val) {
   nt::SetEntryValue(m_active, nt::Value::MakeString(val));
 }
 
-void NTStringChooserModel::SetOptions(wpi::ArrayRef<std::string> val) {
+void NTStringChooserModel::SetOptions(wpi::span<const std::string> val) {
   nt::SetEntryValue(m_options, nt::Value::MakeStringArray(val));
 }
 
@@ -61,7 +63,8 @@ void NTStringChooserModel::Update() {
       if ((event.flags & NT_NOTIFY_DELETE) != 0) {
         m_optionsValue.clear();
       } else if (event.value && event.value->IsStringArray()) {
-        m_optionsValue = event.value->GetStringArray();
+        auto arr = event.value->GetStringArray();
+        m_optionsValue.assign(arr.begin(), arr.end());
       }
     }
   }

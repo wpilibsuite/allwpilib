@@ -4,10 +4,11 @@
 
 #include <exception>
 
+#include <fmt/format.h>
 #include <opencv2/core/core.hpp>
 #include <wpi/SmallString.h>
 #include <wpi/jni_util.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/span.h>
 
 #include "cscore_cpp.h"
 #include "cscore_cv.h"
@@ -197,7 +198,8 @@ static void ReportError(JNIEnv* env, CS_Status status) {
   if (status == CS_OK) {
     return;
   }
-  wpi::SmallString<64> msg;
+  std::string_view msg;
+  std::string msgBuf;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
       msg = "property write failed";
@@ -230,8 +232,8 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       msg = "telemetry not enabled";
       break;
     default: {
-      wpi::raw_svector_ostream oss{msg};
-      oss << "unknown error code=" << status;
+      msgBuf = fmt::format("unknown error code={}", status);
+      msg = msgBuf;
       break;
     }
   }
@@ -293,7 +295,8 @@ static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
   // clang-format on
 }
 
-static jobjectArray MakeJObject(JNIEnv* env, wpi::ArrayRef<cs::RawEvent> arr) {
+static jobjectArray MakeJObject(JNIEnv* env,
+                                wpi::span<const cs::RawEvent> arr) {
   jobjectArray jarr = env->NewObjectArray(arr.size(), videoEventCls, nullptr);
   if (!jarr) {
     return nullptr;
@@ -577,7 +580,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_createHttpCameraMulti
       // TODO
       return 0;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   auto val =
@@ -1172,7 +1175,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setHttpCameraUrls
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetHttpCameraUrls(source, vec, &status);
@@ -1353,7 +1356,7 @@ Java_edu_wpi_first_cscore_CameraServerJNI_setSourceEnumPropertyChoices
       // TODO
       return;
     }
-    vec.push_back(JStringRef{env, elem}.str());
+    vec.emplace_back(JStringRef{env, elem}.str());
   }
   CS_Status status = 0;
   cs::SetSourceEnumPropertyChoices(source, property, vec, &status);
@@ -2151,7 +2154,7 @@ struct LogMessage {
   std::string m_msg;
 };
 
-typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
+using LoggerJNI = JSingletonCallbackManager<LogMessage>;
 
 }  // namespace
 

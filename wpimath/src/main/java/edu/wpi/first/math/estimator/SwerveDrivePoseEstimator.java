@@ -4,19 +4,19 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.math.Discretization;
-import edu.wpi.first.math.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import java.util.function.BiConsumer;
 
 /**
@@ -181,9 +181,14 @@ public class SwerveDrivePoseEstimator {
    * @param gyroAngle The angle reported by the gyroscope.
    */
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
-    m_previousAngle = poseMeters.getRotation();
+    // Reset state estimate and error covariance
+    m_observer.reset();
+    m_latencyCompensator.reset();
+
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
+
     m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
+    m_previousAngle = poseMeters.getRotation();
   }
 
   /**

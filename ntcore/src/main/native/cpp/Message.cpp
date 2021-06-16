@@ -106,7 +106,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       } else {
         type = get_entry_type(msg->m_id);
       }
-      WPI_DEBUG4(decoder.logger(), "update message data type: " << type);
+      WPI_DEBUG4(decoder.logger(), "update message data type: {}", type);
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) {
         return nullptr;
@@ -171,7 +171,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (!decoder.Read(&params, size)) {
         return nullptr;
       }
-      msg->m_str = wpi::StringRef(params, size);
+      msg->m_str.assign(params, size);
       break;
     }
     case kRpcResponse: {
@@ -193,32 +193,32 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       if (!decoder.Read(&results, size)) {
         return nullptr;
       }
-      msg->m_str = wpi::StringRef(results, size);
+      msg->m_str.assign(results, size);
       break;
     }
     default:
       decoder.set_error("unrecognized message type");
-      WPI_INFO(decoder.logger(), "unrecognized message type: " << msg_type);
+      WPI_INFO(decoder.logger(), "unrecognized message type: {}", msg_type);
       return nullptr;
   }
   return msg;
 }
 
-std::shared_ptr<Message> Message::ClientHello(wpi::StringRef self_id) {
+std::shared_ptr<Message> Message::ClientHello(std::string_view self_id) {
   auto msg = std::make_shared<Message>(kClientHello, private_init());
   msg->m_str = self_id;
   return msg;
 }
 
 std::shared_ptr<Message> Message::ServerHello(unsigned int flags,
-                                              wpi::StringRef self_id) {
+                                              std::string_view self_id) {
   auto msg = std::make_shared<Message>(kServerHello, private_init());
   msg->m_str = self_id;
   msg->m_flags = flags;
   return msg;
 }
 
-std::shared_ptr<Message> Message::EntryAssign(wpi::StringRef name,
+std::shared_ptr<Message> Message::EntryAssign(std::string_view name,
                                               unsigned int id,
                                               unsigned int seq_num,
                                               std::shared_ptr<Value> value,
@@ -257,7 +257,7 @@ std::shared_ptr<Message> Message::EntryDelete(unsigned int id) {
 }
 
 std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
-                                             wpi::StringRef params) {
+                                             std::string_view params) {
   auto msg = std::make_shared<Message>(kExecuteRpc, private_init());
   msg->m_str = params;
   msg->m_id = id;
@@ -266,7 +266,7 @@ std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
 }
 
 std::shared_ptr<Message> Message::RpcResponse(unsigned int id, unsigned int uid,
-                                              wpi::StringRef result) {
+                                              std::string_view result) {
   auto msg = std::make_shared<Message>(kRpcResponse, private_init());
   msg->m_str = result;
   msg->m_id = id;

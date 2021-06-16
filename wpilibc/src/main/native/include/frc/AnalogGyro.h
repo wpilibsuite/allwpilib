@@ -7,10 +7,10 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/interfaces/Gyro.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -30,8 +30,8 @@ class AnalogInput;
  * This class is for gyro sensors that connect to an analog input.
  */
 class AnalogGyro : public Gyro,
-                   public Sendable,
-                   public SendableHelper<AnalogGyro> {
+                   public wpi::Sendable,
+                   public wpi::SendableHelper<AnalogGyro> {
  public:
   static constexpr int kOversampleBits = 10;
   static constexpr int kAverageBits = 0;
@@ -192,7 +192,7 @@ class AnalogGyro : public Gyro,
    */
   std::shared_ptr<AnalogInput> GetAnalogInput() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   std::shared_ptr<AnalogInput> m_analog;

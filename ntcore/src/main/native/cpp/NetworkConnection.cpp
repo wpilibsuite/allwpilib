@@ -64,7 +64,7 @@ void NetworkConnection::Start() {
 }
 
 void NetworkConnection::Stop() {
-  DEBUG2("NetworkConnection stopping (" << this << ")");
+  DEBUG2("NetworkConnection stopping ({})", fmt::ptr(this));
   set_state(kDead);
   m_active = false;
   // closing the stream so the read thread terminates
@@ -103,7 +103,7 @@ void NetworkConnection::Stop() {
 }
 
 ConnectionInfo NetworkConnection::info() const {
-  return ConnectionInfo{remote_id(), m_stream->getPeerIP(),
+  return ConnectionInfo{remote_id(), std::string{m_stream->getPeerIP()},
                         static_cast<unsigned int>(m_stream->getPeerPort()),
                         m_last_update, m_proto_rev};
 }
@@ -142,7 +142,7 @@ std::string NetworkConnection::remote_id() const {
   return m_remote_id;
 }
 
-void NetworkConnection::set_remote_id(wpi::StringRef remote_id) {
+void NetworkConnection::set_remote_id(std::string_view remote_id) {
   std::scoped_lock lock(m_remote_id_mutex);
   m_remote_id = remote_id;
 }
@@ -158,12 +158,13 @@ void NetworkConnection::ReadThreadMain() {
             decoder.set_proto_rev(m_proto_rev);
             auto msg = Message::Read(decoder, m_get_entry_type);
             if (!msg && decoder.error()) {
-              DEBUG0("error reading in handshake: " << decoder.error());
+              DEBUG0("error reading in handshake: {}", decoder.error());
             }
             return msg;
           },
-          [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
-            m_outgoing.emplace(msgs);
+          [&](auto msgs) {
+            m_outgoing.emplace(std::vector<std::shared_ptr<Message>>(
+                msgs.begin(), msgs.end()));
           })) {
     set_state(kDead);
     m_active = false;
@@ -180,7 +181,7 @@ void NetworkConnection::ReadThreadMain() {
     auto msg = Message::Read(decoder, m_get_entry_type);
     if (!msg) {
       if (decoder.error()) {
-        INFO("read error: " << decoder.error());
+        INFO("read error: {}", decoder.error());
       }
       // terminate connection on bad message
       if (m_stream) {
@@ -188,13 +189,12 @@ void NetworkConnection::ReadThreadMain() {
       }
       break;
     }
-    DEBUG3("received type=" << msg->type() << " with str=" << msg->str()
-                            << " id=" << msg->id()
-                            << " seq_num=" << msg->seq_num_uid());
+    DEBUG3("received type={} with str={} id={} seq_num={}", msg->type(),
+           msg->str(), msg->id(), msg->seq_num_uid());
     m_last_update = Now();
     m_process_incoming(std::move(msg), this);
   }
-  DEBUG2("read thread died (" << this << ")");
+  DEBUG2("read thread died ({})", fmt::ptr(this));
   set_state(kDead);
   m_active = false;
   m_outgoing.push(Outgoing());  // also kill write thread
@@ -213,18 +213,17 @@ void NetworkConnection::WriteThreadMain() {
 
   while (m_active) {
     auto msgs = m_outgoing.pop();
-    DEBUG4("write thread woke up");
+    DEBUG4("{}", "write thread woke up");
     if (msgs.empty()) {
       continue;
     }
     encoder.set_proto_rev(m_proto_rev);
     encoder.Reset();
-    DEBUG3("sending " << msgs.size() << " messages");
+    DEBUG3("sending {} messages", msgs.size());
     for (auto& msg : msgs) {
       if (msg) {
-        DEBUG3("sending type=" << msg->type() << " with str=" << msg->str()
-                               << " id=" << msg->id()
-                               << " seq_num=" << msg->seq_num_uid());
+        DEBUG3("sending type={} with str={} id={} seq_num={}", msg->type(),
+               msg->str(), msg->id(), msg->seq_num_uid());
         msg->Write(encoder);
       }
     }
@@ -238,9 +237,9 @@ void NetworkConnection::WriteThreadMain() {
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) {
       break;
     }
-    DEBUG4("sent " << encoder.size() << " bytes");
+    DEBUG4("sent {} bytes", encoder.size());
   }
-  DEBUG2("write thread died (" << this << ")");
+  DEBUG2("write thread died ({})", fmt::ptr(this));
   set_state(kDead);
   m_active = false;
   if (m_stream) {

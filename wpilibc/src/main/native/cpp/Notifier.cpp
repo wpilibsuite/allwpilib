@@ -6,25 +6,24 @@
 
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/Notifier.h>
 #include <hal/Threads.h>
-#include <wpi/SmallString.h>
 
 #include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/Utility.h"
 
 using namespace frc;
 
 Notifier::Notifier(std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+    throw FRC_MakeError(err::NullParameter, "{}", "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
 
   m_thread = std::thread([=] {
     for (;;) {
@@ -61,12 +60,12 @@ Notifier::Notifier(std::function<void()> handler) {
 
 Notifier::Notifier(int priority, std::function<void()> handler) {
   if (!handler) {
-    throw FRC_MakeError(err::NullParameter, "handler");
+    throw FRC_MakeError(err::NullParameter, "{}", "handler");
   }
   m_handler = handler;
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  FRC_CheckErrorStatus(status, "InitializeNotifier");
+  FRC_CheckErrorStatus(status, "{}", "InitializeNotifier");
 
   m_thread = std::thread([=] {
     int32_t status = 0;
@@ -107,7 +106,7 @@ Notifier::~Notifier() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  FRC_ReportError(status, "StopNotifier");
+  FRC_ReportError(status, "{}", "StopNotifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -139,11 +138,12 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
   return *this;
 }
 
-void Notifier::SetName(const wpi::Twine& name) {
-  wpi::SmallString<64> nameBuf;
+void Notifier::SetName(std::string_view name) {
+  fmt::memory_buffer buf;
+  fmt::format_to(buf, "{}", name);
+  buf.push_back('\0');  // null terminate
   int32_t status = 0;
-  HAL_SetNotifierName(m_notifier,
-                      name.toNullTerminatedStringRef(nameBuf).data(), &status);
+  HAL_SetNotifierName(m_notifier, buf.data(), &status);
 }
 
 void Notifier::SetHandler(std::function<void()> handler) {
@@ -151,26 +151,18 @@ void Notifier::SetHandler(std::function<void()> handler) {
   m_handler = handler;
 }
 
-void Notifier::StartSingle(double delay) {
-  StartSingle(units::second_t(delay));
-}
-
 void Notifier::StartSingle(units::second_t delay) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = false;
-  m_period = delay.to<double>();
+  m_period = delay;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
-}
-
-void Notifier::StartPeriodic(double period) {
-  StartPeriodic(units::second_t(period));
 }
 
 void Notifier::StartPeriodic(units::second_t period) {
   std::scoped_lock lock(m_processMutex);
   m_periodic = true;
-  m_period = period.to<double>();
+  m_period = period;
   m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
@@ -180,7 +172,7 @@ void Notifier::Stop() {
   m_periodic = false;
   int32_t status = 0;
   HAL_CancelNotifierAlarm(m_notifier, &status);
-  FRC_CheckErrorStatus(status, "CancelNotifierAlarm");
+  FRC_CheckErrorStatus(status, "{}", "CancelNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm(uint64_t triggerTime) {
@@ -191,7 +183,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
     return;
   }
   HAL_UpdateNotifierAlarm(notifier, triggerTime, &status);
-  FRC_CheckErrorStatus(status, "UpdateNotifierAlarm");
+  FRC_CheckErrorStatus(status, "{}", "UpdateNotifierAlarm");
 }
 
 void Notifier::UpdateAlarm() {

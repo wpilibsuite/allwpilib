@@ -4,15 +4,15 @@
 
 #include "frc/commands/PrintCommand.h"
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 using namespace frc;
 
-PrintCommand::PrintCommand(const wpi::Twine& message)
-    : InstantCommand("Print \"" + message + wpi::Twine('"')) {
-  m_message = message.str();
+PrintCommand::PrintCommand(std::string_view message)
+    : InstantCommand(fmt::format("Print \"{}\"", message)) {
+  m_message = message;
 }
 
 void PrintCommand::Initialize() {
-  wpi::outs() << m_message << '\n';
+  fmt::print("{}\n", m_message);
 }

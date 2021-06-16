@@ -4,20 +4,18 @@
 
 #include "frc/motorcontrol/NidecBrushless.h"
 
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
-#include <wpi/raw_ostream.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_dio(dioChannel), m_pwm(pwmChannel) {
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, &m_dio);
-  registry.AddChild(this, &m_pwm);
-  SetExpiration(0.0);
+  wpi::SendableRegistry::AddChild(this, &m_dio);
+  wpi::SendableRegistry::AddChild(this, &m_pwm);
+  SetExpiration(0_s);
   SetSafetyEnabled(false);
 
   // the dio controls the output (in PWM mode)
@@ -25,7 +23,7 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.EnablePWM(0.5);
 
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel + 1);
-  registry.AddLW(this, "Nidec Brushless", pwmChannel);
+  wpi::SendableRegistry::AddLW(this, "Nidec Brushless", pwmChannel);
 }
 
 void NidecBrushless::Set(double speed) {
@@ -64,18 +62,18 @@ void NidecBrushless::StopMotor() {
   m_pwm.SetDisabled();
 }
 
-void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "Nidec " << GetChannel();
+std::string NidecBrushless::GetDescription() const {
+  return fmt::format("Nidec {}", GetChannel());
 }
 
 int NidecBrushless::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-void NidecBrushless::InitSendable(SendableBuilder& builder) {
+void NidecBrushless::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Nidec Brushless");
   builder.SetActuator(true);
-  builder.SetSafeState([=]() { StopMotor(); });
+  builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Value", [=]() { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }

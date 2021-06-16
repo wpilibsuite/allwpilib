@@ -15,6 +15,7 @@ public final class MathUtil {
    * @param value Value to clamp.
    * @param low The lower boundary to which to clamp value.
    * @param high The higher boundary to which to clamp value.
+   * @return The clamped value.
    */
   public static int clamp(int value, int low, int high) {
     return Math.max(low, Math.min(value, high));
@@ -26,6 +27,7 @@ public final class MathUtil {
    * @param value Value to clamp.
    * @param low The lower boundary to which to clamp value.
    * @param high The higher boundary to which to clamp value.
+   * @return The clamped value.
    */
   public static double clamp(double value, double low, double high) {
     return Math.max(low, Math.min(value, high));
@@ -37,6 +39,7 @@ public final class MathUtil {
    * @param input Input value to wrap.
    * @param minimumInput The minimum value expected from the input.
    * @param maximumInput The maximum value expected from the input.
+   * @return The wrapped value.
    */
   public static double inputModulus(double input, double minimumInput, double maximumInput) {
     double modulus = maximumInput - minimumInput;
@@ -56,6 +59,7 @@ public final class MathUtil {
    * Wraps an angle to the range -pi to pi radians.
    *
    * @param angleRadians Angle to wrap in radians.
+   * @return The wrapped angle.
    */
   public static double angleModulus(double angleRadians) {
     return inputModulus(angleRadians, -Math.PI, Math.PI);

@@ -10,9 +10,10 @@ import static java.util.Objects.requireNonNull;
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -49,11 +50,15 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   protected DigitalSource m_downSource; // /< What makes the counter count down.
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  private int m_counter; // /< The FPGA counter object.
+  int m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
   private double m_distancePerPulse; // distance of travel for each tick
 
-  /** Create an instance of a counter with the given mode. */
+  /**
+   * Create an instance of a counter with the given mode.
+   *
+   * @param mode The counter mode.
+   */
   public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order

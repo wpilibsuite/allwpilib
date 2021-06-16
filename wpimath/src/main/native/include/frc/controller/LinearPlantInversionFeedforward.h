@@ -51,9 +51,7 @@ class LinearPlantInversionFeedforward {
       const Eigen::Matrix<double, States, Inputs>& B, units::second_t dt)
       : m_dt(dt) {
     DiscretizeAB<States, Inputs>(A, B, dt, &m_A, &m_B);
-
-    m_r.setZero();
-    Reset(m_r);
+    Reset();
   }
 
   /**

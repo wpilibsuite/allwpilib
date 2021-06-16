@@ -18,6 +18,8 @@ using namespace hal;
 namespace {
 struct Encoder {
   HAL_Handle nativeHandle;
+  HAL_FPGAEncoderHandle fpgaHandle;
+  HAL_CounterHandle counterHandle;
   HAL_EncoderEncodingType encodingType;
   double distancePerPulse;
   uint8_t index;
@@ -45,6 +47,21 @@ void InitializeEncoder() {
   encoderHandles = &eH;
 }
 }  // namespace hal::init
+
+namespace hal {
+bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
+                          HAL_FPGAEncoderHandle* fpgaHandle,
+                          HAL_CounterHandle* counterHandle) {
+  auto encoder = encoderHandles->Get(handle);
+  if (!handle) {
+    return false;
+  }
+
+  *fpgaHandle = encoder->fpgaHandle;
+  *counterHandle = encoder->counterHandle;
+  return true;
+}
+}  // namespace hal
 
 extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(
@@ -86,6 +103,13 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   encoder->nativeHandle = nativeHandle;
   encoder->encodingType = encodingType;
   encoder->distancePerPulse = 1.0;
+  if (encodingType == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+    encoder->fpgaHandle = nativeHandle;
+    encoder->counterHandle = HAL_kInvalidHandle;
+  } else {
+    encoder->fpgaHandle = HAL_kInvalidHandle;
+    encoder->counterHandle = nativeHandle;
+  }
   return handle;
 }
 

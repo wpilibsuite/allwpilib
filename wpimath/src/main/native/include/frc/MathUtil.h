@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "units/angle.h"
 
@@ -38,8 +38,9 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
  * @param angle Angle to wrap.
  */
 constexpr units::radian_t AngleModulus(units::radian_t angle) {
-  return InputModulus<units::radian_t>(angle, units::radian_t{-wpi::math::pi},
-                                       units::radian_t{wpi::math::pi});
+  return InputModulus<units::radian_t>(angle,
+                                       units::radian_t{-wpi::numbers::pi},
+                                       units::radian_t{wpi::numbers::pi});
 }
 
 }  // namespace frc

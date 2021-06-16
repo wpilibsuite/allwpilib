@@ -35,17 +35,29 @@ public class UsbCamera extends VideoCamera {
     return CameraServerJNI.enumerateUsbCameras();
   }
 
-  /** Change the path to the device. */
+  /**
+   * Change the path to the device.
+   *
+   * @param path New device path.
+   */
   void setPath(String path) {
     CameraServerJNI.setUsbCameraPath(m_handle, path);
   }
 
-  /** Get the path to the device. */
+  /**
+   * Get the path to the device.
+   *
+   * @return The device path.
+   */
   public String getPath() {
     return CameraServerJNI.getUsbCameraPath(m_handle);
   }
 
-  /** Get the full camera information for the device. */
+  /**
+   * Get the full camera information for the device.
+   *
+   * @return The camera information.
+   */
   public UsbCameraInfo getInfo() {
     return CameraServerJNI.getUsbCameraInfo(m_handle);
   }

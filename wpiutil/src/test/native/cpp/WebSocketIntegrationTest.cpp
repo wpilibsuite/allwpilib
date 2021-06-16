@@ -19,7 +19,7 @@ TEST_F(WebSocketIntegrationTest, Open) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn);
-    server->connected.connect([&](StringRef url, WebSocket&) {
+    server->connected.connect([&](std::string_view url, WebSocket&) {
       ++gotServerOpen;
       ASSERT_EQ(url, "/test");
     });
@@ -27,13 +27,13 @@ TEST_F(WebSocketIntegrationTest, Open) {
 
   clientPipe->Connect(pipeName, [&] {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       Finish();
       if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
     });
-    ws->open.connect([&, s = ws.get()](StringRef) {
+    ws->open.connect([&, s = ws.get()](std::string_view) {
       ++gotClientOpen;
       s->Close();
     });
@@ -52,7 +52,7 @@ TEST_F(WebSocketIntegrationTest, Protocol) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn, {"proto1", "proto2"});
-    server->connected.connect([&](StringRef, WebSocket& ws) {
+    server->connected.connect([&](std::string_view, WebSocket& ws) {
       ++gotServerOpen;
       ASSERT_EQ(ws.GetProtocol(), "proto1");
     });
@@ -61,13 +61,13 @@ TEST_F(WebSocketIntegrationTest, Protocol) {
   clientPipe->Connect(pipeName, [&] {
     auto ws =
         WebSocket::CreateClient(*clientPipe, "/test", pipeName, {"proto1"});
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       Finish();
       if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
     });
-    ws->open.connect([&, s = ws.get()](StringRef protocol) {
+    ws->open.connect([&, s = ws.get()](std::string_view protocol) {
       ++gotClientOpen;
       s->Close();
       ASSERT_EQ(protocol, "proto1");
@@ -86,21 +86,21 @@ TEST_F(WebSocketIntegrationTest, ServerSendBinary) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn);
-    server->connected.connect([&](StringRef, WebSocket& ws) {
-      ws.SendBinary(uv::Buffer{"\x03\x04", 2}, [&](auto, uv::Error) {});
+    server->connected.connect([&](std::string_view, WebSocket& ws) {
+      ws.SendBinary({uv::Buffer{"\x03\x04", 2}}, [&](auto, uv::Error) {});
       ws.Close();
     });
   });
 
   clientPipe->Connect(pipeName, [&] {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       Finish();
       if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
     });
-    ws->binary.connect([&](ArrayRef<uint8_t> data, bool) {
+    ws->binary.connect([&](auto data, bool) {
       ++gotData;
       std::vector<uint8_t> recvData{data.begin(), data.end()};
       std::vector<uint8_t> expectData{0x03, 0x04};
@@ -119,8 +119,8 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
   serverPipe->Listen([&]() {
     auto conn = serverPipe->Accept();
     auto server = WebSocketServer::Create(*conn);
-    server->connected.connect([&](StringRef, WebSocket& ws) {
-      ws.text.connect([&](StringRef data, bool) {
+    server->connected.connect([&](std::string_view, WebSocket& ws) {
+      ws.text.connect([&](std::string_view data, bool) {
         ++gotData;
         ASSERT_EQ(data, "hello");
       });
@@ -129,14 +129,14 @@ TEST_F(WebSocketIntegrationTest, ClientSendText) {
 
   clientPipe->Connect(pipeName, [&] {
     auto ws = WebSocket::CreateClient(*clientPipe, "/test", pipeName);
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       Finish();
       if (code != 1005 && code != 1006) {
         FAIL() << "Code: " << code << " Reason: " << reason;
       }
     });
-    ws->open.connect([&, s = ws.get()](StringRef) {
-      s->SendText(uv::Buffer{"hello"}, [&](auto, uv::Error) {});
+    ws->open.connect([&, s = ws.get()](std::string_view) {
+      s->SendText({{"hello"}}, [&](auto, uv::Error) {});
       s->Close();
     });
   });

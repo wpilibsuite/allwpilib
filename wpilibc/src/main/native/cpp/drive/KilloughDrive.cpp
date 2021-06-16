@@ -8,11 +8,11 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/math>
+#include <wpi/numbers>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/SpeedController.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -37,19 +37,18 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
     : m_leftMotor(&leftMotor),
       m_rightMotor(&rightMotor),
       m_backMotor(&backMotor) {
-  m_leftVec = {std::cos(leftMotorAngle * (wpi::math::pi / 180.0)),
-               std::sin(leftMotorAngle * (wpi::math::pi / 180.0))};
-  m_rightVec = {std::cos(rightMotorAngle * (wpi::math::pi / 180.0)),
-                std::sin(rightMotorAngle * (wpi::math::pi / 180.0))};
-  m_backVec = {std::cos(backMotorAngle * (wpi::math::pi / 180.0)),
-               std::sin(backMotorAngle * (wpi::math::pi / 180.0))};
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, m_leftMotor);
-  registry.AddChild(this, m_rightMotor);
-  registry.AddChild(this, m_backMotor);
+  m_leftVec = {std::cos(leftMotorAngle * (wpi::numbers::pi / 180.0)),
+               std::sin(leftMotorAngle * (wpi::numbers::pi / 180.0))};
+  m_rightVec = {std::cos(rightMotorAngle * (wpi::numbers::pi / 180.0)),
+                std::sin(rightMotorAngle * (wpi::numbers::pi / 180.0))};
+  m_backVec = {std::cos(backMotorAngle * (wpi::numbers::pi / 180.0)),
+               std::sin(backMotorAngle * (wpi::numbers::pi / 180.0))};
+  wpi::SendableRegistry::AddChild(this, m_leftMotor);
+  wpi::SendableRegistry::AddChild(this, m_rightMotor);
+  wpi::SendableRegistry::AddChild(this, m_backMotor);
   static int instances = 0;
   ++instances;
-  registry.AddLW(this, "KilloughDrive", instances);
+  wpi::SendableRegistry::AddLW(this, "KilloughDrive", instances);
 }
 
 void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
@@ -60,26 +59,15 @@ void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
     reported = true;
   }
 
-  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
   ySpeed = ApplyDeadband(ySpeed, m_deadband);
-
-  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
   xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  // Compensate for gyro angle.
-  Vector2d input{ySpeed, xSpeed};
-  input.Rotate(-gyroAngle);
+  auto [left, right, back] =
+      DriveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
 
-  double wheelSpeeds[3];
-  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
-  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
-  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
-
-  Normalize(wheelSpeeds);
-
-  m_leftMotor->Set(wheelSpeeds[kLeft] * m_maxOutput);
-  m_rightMotor->Set(wheelSpeeds[kRight] * m_maxOutput);
-  m_backMotor->Set(wheelSpeeds[kBack] * m_maxOutput);
+  m_leftMotor->Set(left * m_maxOutput);
+  m_rightMotor->Set(right * m_maxOutput);
+  m_backMotor->Set(back * m_maxOutput);
 
   Feed();
 }
@@ -92,9 +80,30 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  DriveCartesian(magnitude * std::sin(angle * (wpi::math::pi / 180.0)),
-                 magnitude * std::cos(angle * (wpi::math::pi / 180.0)),
+  DriveCartesian(magnitude * std::sin(angle * (wpi::numbers::pi / 180.0)),
+                 magnitude * std::cos(angle * (wpi::numbers::pi / 180.0)),
                  zRotation, 0.0);
+}
+
+KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesianIK(double ySpeed,
+                                                           double xSpeed,
+                                                           double zRotation,
+                                                           double gyroAngle) {
+  ySpeed = std::clamp(ySpeed, -1.0, 1.0);
+  xSpeed = std::clamp(xSpeed, -1.0, 1.0);
+
+  // Compensate for gyro angle.
+  Vector2d input{ySpeed, xSpeed};
+  input.Rotate(-gyroAngle);
+
+  double wheelSpeeds[3];
+  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
+  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
+  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
+
+  Normalize(wheelSpeeds);
+
+  return {wheelSpeeds[kLeft], wheelSpeeds[kRight], wheelSpeeds[kBack]};
 }
 
 void KilloughDrive::StopMotor() {
@@ -104,21 +113,21 @@ void KilloughDrive::StopMotor() {
   Feed();
 }
 
-void KilloughDrive::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "KilloughDrive";
+std::string KilloughDrive::GetDescription() const {
+  return "KilloughDrive";
 }
 
-void KilloughDrive::InitSendable(SendableBuilder& builder) {
+void KilloughDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("KilloughDrive");
   builder.SetActuator(true);
   builder.SetSafeState([=] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Left Motor Speed", [=]() { return m_leftMotor->Get(); },
+      "Left Motor Speed", [=] { return m_leftMotor->Get(); },
       [=](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Right Motor Speed", [=]() { return m_rightMotor->Get(); },
+      "Right Motor Speed", [=] { return m_rightMotor->Get(); },
       [=](double value) { m_rightMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Back Motor Speed", [=]() { return m_backMotor->Get(); },
+      "Back Motor Speed", [=] { return m_backMotor->Get(); },
       [=](double value) { m_backMotor->Set(value); });
 }

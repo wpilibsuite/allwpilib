@@ -6,11 +6,10 @@
 #define WPIUTIL_WPI_HTTPSERVERCONNECTION_H_
 
 #include <memory>
+#include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/HttpParser.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
+#include "wpi/span.h"
 #include "wpi/uv/Stream.h"
 
 namespace wpi {
@@ -64,9 +63,9 @@ class HttpServerConnection {
    *                      be set to false.
    * @param extra Extra HTTP headers to send, including final "\r\n"
    */
-  virtual void BuildHeader(raw_ostream& os, int code, const Twine& codeText,
-                           const Twine& contentType, uint64_t contentLength,
-                           const Twine& extra = Twine{});
+  virtual void BuildHeader(raw_ostream& os, int code, std::string_view codeText,
+                           std::string_view contentType, uint64_t contentLength,
+                           std::string_view extra = {});
 
   /**
    * Send data to client.
@@ -79,7 +78,7 @@ class HttpServerConnection {
    *             is desired, call m_stream.Write() directly instead.
    * @param closeAfter close the connection after the write completes
    */
-  void SendData(ArrayRef<uv::Buffer> bufs, bool closeAfter = false);
+  void SendData(span<const uv::Buffer> bufs, bool closeAfter = false);
 
   /**
    * Send HTTP response, along with other header information like mimetype.
@@ -91,9 +90,10 @@ class HttpServerConnection {
    * @param content Response message content
    * @param extraHeader Extra HTTP headers to send, including final "\r\n"
    */
-  virtual void SendResponse(int code, const Twine& codeText,
-                            const Twine& contentType, StringRef content,
-                            const Twine& extraHeader = Twine{});
+  virtual void SendResponse(int code, std::string_view codeText,
+                            std::string_view contentType,
+                            std::string_view content,
+                            std::string_view extraHeader = {});
 
   /**
    * Send HTTP response from static data, along with other header information
@@ -109,10 +109,10 @@ class HttpServerConnection {
    * @param gzipped True if content is gzip compressed
    * @param extraHeader Extra HTTP headers to send, including final "\r\n"
    */
-  virtual void SendStaticResponse(int code, const Twine& codeText,
-                                  const Twine& contentType, StringRef content,
-                                  bool gzipped,
-                                  const Twine& extraHeader = Twine{});
+  virtual void SendStaticResponse(int code, std::string_view codeText,
+                                  std::string_view contentType,
+                                  std::string_view content, bool gzipped,
+                                  std::string_view extraHeader = {});
 
   /**
    * Send error header and message.
@@ -123,7 +123,7 @@ class HttpServerConnection {
    * @param code HTTP error code (e.g. 404)
    * @param message Additional message text
    */
-  virtual void SendError(int code, const Twine& message = Twine{});
+  virtual void SendError(int code, std::string_view message = {});
 
   /** The HTTP request. */
   HttpParser m_request{HttpParser::kRequest};

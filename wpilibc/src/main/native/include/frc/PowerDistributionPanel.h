@@ -5,22 +5,31 @@
 #pragma once
 
 #include <hal/Types.h>
-
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel : public Sendable,
-                               public SendableHelper<PowerDistributionPanel> {
+class PowerDistributionPanel
+    : public wpi::Sendable,
+      public wpi::SendableHelper<PowerDistributionPanel> {
  public:
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * Uses the default CAN ID (0).
+   */
   PowerDistributionPanel();
+
+  /**
+   * Constructs a PowerDistributionPanel.
+   *
+   * @param module The CAN ID of the PDP
+   */
   explicit PowerDistributionPanel(int module);
 
   PowerDistributionPanel(PowerDistributionPanel&&) = default;
@@ -85,7 +94,7 @@ class PowerDistributionPanel : public Sendable,
    */
   int GetModule() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   hal::Handle<HAL_PDPHandle> m_handle;

@@ -33,8 +33,6 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/Twine.h>
-
 #include "frc/spline/Spline.h"
 #include "units/angle.h"
 #include "units/curvature.h"

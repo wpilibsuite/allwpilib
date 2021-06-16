@@ -6,13 +6,12 @@
 
 #include <memory>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read in an
@@ -20,8 +19,8 @@ class SendableBuilder;
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public Sendable,
-                            public SendableHelper<AnalogPotentiometer> {
+class AnalogPotentiometer : public wpi::Sendable,
+                            public wpi::SendableHelper<AnalogPotentiometer> {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.
@@ -103,7 +102,7 @@ class AnalogPotentiometer : public Sendable,
    */
   double Get() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<AnalogInput> m_analog_input;

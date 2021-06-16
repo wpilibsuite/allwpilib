@@ -4,11 +4,11 @@
 
 #include "frc/Tracer.h"
 
-#include <wpi/Format.h>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -25,7 +25,7 @@ void Tracer::ClearEpochs() {
   m_epochs.clear();
 }
 
-void Tracer::AddEpoch(wpi::StringRef epochName) {
+void Tracer::AddEpoch(std::string_view epochName) {
   auto currentTime = hal::fpga_clock::now();
   m_epochs[epochName] = currentTime - m_startTime;
   m_startTime = currentTime;
@@ -36,7 +36,7 @@ void Tracer::PrintEpochs() {
   wpi::raw_svector_ostream os(buf);
   PrintEpochs(os);
   if (!buf.empty()) {
-    DriverStation::ReportWarning(buf);
+    FRC_ReportError(warn::Warning, "{}", buf.c_str());
   }
 }
 
@@ -48,11 +48,9 @@ void Tracer::PrintEpochs(wpi::raw_ostream& os) {
   if (now - m_lastEpochsPrintTime > kMinPrintPeriod) {
     m_lastEpochsPrintTime = now;
     for (const auto& epoch : m_epochs) {
-      os << '\t' << epoch.getKey() << ": "
-         << wpi::format(
-                "%.6f",
-                duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6)
-         << "s\n";
+      os << fmt::format(
+          "\t{}: {:.6f}s\n", epoch.getKey(),
+          duration_cast<microseconds>(epoch.getValue()).count() / 1.0e6);
     }
   }
 }

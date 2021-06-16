@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
 #include <iostream>
 #include <thread>
 
+#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
-#include <wpi/Format.h>
-#include <wpi/raw_ostream.h>
 
 extern "C" int HALSIM_InitExtension(void);
 
@@ -25,9 +25,9 @@ int main() {
   while (cycleCount < 1000) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     cycleCount++;
-    std::cout << "Count: " << cycleCount << std::endl;
+    fmt::print("Count: {}\n", cycleCount);
   }
 
-  std::cout << "DONE" << std::endl;
+  std::puts("DONE");
   HAL_ExitMain();
 }

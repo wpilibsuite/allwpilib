@@ -4,8 +4,10 @@
 
 #include "HALSimWS.h"
 
+#include <cstdio>
+
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/uv/util.h>
 
 #include "HALSimWSClientConnection.h"
@@ -22,7 +24,7 @@ HALSimWS::HALSimWS(wpi::uv::Loop& loop, ProviderContainer& providers,
       m_providers(providers),
       m_simDevicesProvider(simDevicesProvider) {
   m_loop.error.connect([](uv::Error err) {
-    wpi::errs() << "HALSim WS Client libuv Error: " << err.str() << "\n";
+    fmt::print(stderr, "HALSim WS Client libuv Error: {}\n", err.str());
   });
 
   m_tcp_client = uv::Tcp::Create(m_loop);
@@ -50,7 +52,7 @@ bool HALSimWS::Initialize() {
     try {
       m_port = std::stoi(port);
     } catch (const std::invalid_argument& err) {
-      wpi::errs() << "Error decoding HALSIMWS_PORT (" << err.what() << ")\n";
+      fmt::print(stderr, "Error decoding HALSIMWS_PORT ({})\n", err.what());
       return false;
     }
   } else {
@@ -83,13 +85,12 @@ void HALSimWS::Start() {
         m_connect_timer->Start(uv::Timer::Time(kTcpConnectAttemptTimeout));
       });
 
-  m_tcp_client->closed.connect(
-      []() { wpi::outs() << "TCP connection closed\n"; });
+  m_tcp_client->closed.connect([]() { std::puts("TCP connection closed"); });
 
   // Set up the connection timer
-  wpi::outs() << "HALSimWS Initialized\n";
-  wpi::outs() << "Will attempt to connect to ws://" << m_host << ":" << m_port
-              << m_uri << "\n";
+  std::puts("HALSimWS Initialized");
+  fmt::print("Will attempt to connect to ws://{}:{}{}\n", m_host, m_port,
+             m_uri);
 
   // Set up the timer to attempt connection
   m_connect_timer->timeout.connect([this] { AttemptConnect(); });
@@ -102,7 +103,7 @@ void HALSimWS::Start() {
 void HALSimWS::AttemptConnect() {
   m_connect_attempts++;
 
-  wpi::outs() << "Connection Attempt " << m_connect_attempts << "\n";
+  fmt::print("Connection Attempt {}\n", m_connect_attempts);
 
   struct sockaddr_in dest;
   uv::NameToAddr(m_host, m_port, &dest);
@@ -167,6 +168,6 @@ void HALSimWS::OnNetValueChanged(const wpi::json& msg) {
       provider->OnNetValueChanged(msg.at("data"));
     }
   } catch (wpi::json::exception& e) {
-    wpi::errs() << "Error with incoming message: " << e.what() << "\n";
+    fmt::print(stderr, "Error with incoming message: {}\n", e.what());
   }
 }

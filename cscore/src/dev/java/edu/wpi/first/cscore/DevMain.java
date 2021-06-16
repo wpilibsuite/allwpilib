@@ -4,7 +4,7 @@
 
 package edu.wpi.first.cscore;
 
-import edu.wpi.first.wpiutil.RuntimeDetector;
+import edu.wpi.first.util.RuntimeDetector;
 
 public final class DevMain {
   /** Main method. */

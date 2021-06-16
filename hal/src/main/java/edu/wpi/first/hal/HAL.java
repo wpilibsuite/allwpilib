@@ -136,17 +136,18 @@ public final class HAL extends JNIWrapper {
   }
 
   /**
-   * Report the usage of a resource of interest. <br>
+   * Report the usage of a resource of interest.
    *
    * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
    * char*)</code>
    *
-   * @param resource one of the values in the tResourceType above (max value 51). <br>
-   * @param instanceNumber an index that identifies the resource instance. <br>
+   * @param resource one of the values in the tResourceType above (max value 51).
+   * @param instanceNumber an index that identifies the resource instance.
    * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit. <br>
+   *     Set to 0 to omit.
    * @param feature a string to be included describing features in use on a specific resource.
    *     Setting the same resource more than once allows you to change the feature string.
+   * @return TODO
    */
   public static native int report(int resource, int instanceNumber, int context, String feature);
 

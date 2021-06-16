@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <hal/Types.h>
+#include <memory>
 
-#include "frc/SolenoidBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
+#include "frc/PneumaticsBase.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
@@ -21,30 +21,17 @@ class SendableBuilder;
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase,
-                       public Sendable,
-                       public SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::Sendable,
+                       public wpi::SendableHelper<DoubleSolenoid> {
  public:
   enum Value { kOff, kForward, kReverse };
 
-  /**
-   * Constructor.
-   *
-   * Uses the default PCM ID of 0.
-   *
-   * @param forwardChannel The forward channel number on the PCM (0..7).
-   * @param reverseChannel The reverse channel number on the PCM (0..7).
-   */
-  explicit DoubleSolenoid(int forwardChannel, int reverseChannel);
-
-  /**
-   * Constructor.
-   *
-   * @param moduleNumber   The CAN ID of the PCM.
-   * @param forwardChannel The forward channel on the PCM to control (0..7).
-   * @param reverseChannel The reverse channel on the PCM to control (0..7).
-   */
-  DoubleSolenoid(int moduleNumber, int forwardChannel, int reverseChannel);
+  DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
+                 int reverseChannel);
+  DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
+                 int reverseChannel);
+  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel,
+                 int reverseChannel);
 
   ~DoubleSolenoid() override;
 
@@ -89,36 +76,36 @@ class DoubleSolenoid : public SolenoidBase,
   int GetRevChannel() const;
 
   /**
-   * Check if the forward solenoid is blacklisted.
+   * Check if the forward solenoid is Disabled.
    *
-   * If a solenoid is shorted, it is added to the blacklist and disabled until
-   * power cycle, or until faults are cleared.
+   * If a solenoid is shorted, it is added to the DisabledList and disabled
+   * until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.
    */
-  bool IsFwdSolenoidBlackListed() const;
+  bool IsFwdSolenoidDisabled() const;
 
   /**
-   * Check if the reverse solenoid is blacklisted.
+   * Check if the reverse solenoid is Disabled.
    *
-   * If a solenoid is shorted, it is added to the blacklist and disabled until
-   * power cycle, or until faults are cleared.
+   * If a solenoid is shorted, it is added to the DisabledList and disabled
+   * until power cycle, or until faults are cleared.
    *
    * @see ClearAllPCMStickyFaults()
    * @return If solenoid is disabled due to short.
    */
-  bool IsRevSolenoidBlackListed() const;
+  bool IsRevSolenoidDisabled() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_forwardChannel;  // The forward channel on the module to control.
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
-  hal::Handle<HAL_SolenoidHandle> m_forwardHandle;
-  hal::Handle<HAL_SolenoidHandle> m_reverseHandle;
+  int m_mask;
+  std::shared_ptr<PneumaticsBase> m_module;
 };
 
 }  // namespace frc

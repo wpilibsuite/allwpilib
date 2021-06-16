@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/function_ref.h>
 
 #include "glass/Model.h"
 
@@ -49,7 +50,7 @@ class PCMsModel : public Model {
 
 bool DisplayPCMSolenoids(PCMModel* model, int index, bool outputsEnabled);
 void DisplayPCMsSolenoids(PCMsModel* model, bool outputsEnabled,
-                          wpi::StringRef noneMsg = "No solenoids");
+                          std::string_view noneMsg = "No solenoids");
 
 void DisplayCompressorDevice(PCMModel* model, int index, bool outputsEnabled);
 void DisplayCompressorDevice(CompressorModel* model, int index,

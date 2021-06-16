@@ -28,12 +28,11 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
       false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
   HAL_PortHandle portHandle;
   HAL_DigitalHandle analogInHandle;
 
   // Use out of range index
-  status = 0;
   portHandle = 8000;
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(portHandle, nullptr, &status);

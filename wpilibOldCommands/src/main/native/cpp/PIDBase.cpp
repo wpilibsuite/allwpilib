@@ -8,10 +8,10 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/PIDOutput.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -41,7 +41,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
-  SendableRegistry::GetInstance().Add(this, "PIDController", instances);
+  wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
 
 double PIDBase::Get() const {
@@ -153,7 +153,7 @@ double PIDBase::GetSetpoint() const {
 
 double PIDBase::GetDeltaSetpoint() const {
   std::scoped_lock lock(m_thisMutex);
-  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
+  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get().to<double>();
 }
 
 double PIDBase::GetError() const {
@@ -228,19 +228,19 @@ void PIDBase::PIDWrite(double output) {
   SetSetpoint(output);
 }
 
-void PIDBase::InitSendable(SendableBuilder& builder) {
+void PIDBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
-  builder.SetSafeState([=]() { Reset(); });
+  builder.SetSafeState([=] { Reset(); });
   builder.AddDoubleProperty(
-      "p", [=]() { return GetP(); }, [=](double value) { SetP(value); });
+      "p", [=] { return GetP(); }, [=](double value) { SetP(value); });
   builder.AddDoubleProperty(
-      "i", [=]() { return GetI(); }, [=](double value) { SetI(value); });
+      "i", [=] { return GetI(); }, [=](double value) { SetI(value); });
   builder.AddDoubleProperty(
-      "d", [=]() { return GetD(); }, [=](double value) { SetD(value); });
+      "d", [=] { return GetD(); }, [=](double value) { SetD(value); });
   builder.AddDoubleProperty(
-      "f", [=]() { return GetF(); }, [=](double value) { SetF(value); });
+      "f", [=] { return GetF(); }, [=](double value) { SetF(value); });
   builder.AddDoubleProperty(
-      "setpoint", [=]() { return GetSetpoint(); },
+      "setpoint", [=] { return GetSetpoint(); },
       [=](double value) { SetSetpoint(value); });
 }
 

@@ -4,10 +4,10 @@
 
 #include "hal/PWM.h"
 
+#include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <thread>
-
-#include <wpi/raw_ostream.h>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
@@ -138,8 +138,8 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "PWM handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("PWM handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();

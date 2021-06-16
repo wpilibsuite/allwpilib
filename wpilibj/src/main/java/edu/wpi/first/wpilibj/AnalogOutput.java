@@ -7,8 +7,9 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /** Analog output class. */
 public class AnalogOutput implements Sendable, AutoCloseable {
@@ -39,7 +40,11 @@ public class AnalogOutput implements Sendable, AutoCloseable {
     m_channel = 0;
   }
 
-  /** Get the channel of this AnalogOutput. */
+  /**
+   * Get the channel of this AnalogOutput.
+   *
+   * @return The channel of this AnalogOutput.
+   */
   public int getChannel() {
     return m_channel;
   }

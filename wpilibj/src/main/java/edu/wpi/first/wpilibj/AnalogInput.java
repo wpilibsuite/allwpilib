@@ -10,8 +10,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Analog channel class.
@@ -227,6 +228,8 @@ public class AnalogInput implements Sendable, AutoCloseable {
    * <p>This center value is based on the output of the oversampled and averaged source the
    * accumulator channel. Because of this, any non-zero oversample bits will affect the size of the
    * value for this field.
+   *
+   * @param center The accumulator's center value.
    */
   public void setAccumulatorCenter(int center) {
     AnalogJNI.setAccumulatorCenter(m_port, center);

@@ -4,10 +4,12 @@
 
 #include <cstdio>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/StringRef.h>
+#include <wpi/StringExtras.h>
+#include <wpi/fmt/raw_ostream.h>
 #include <wpi/json.h>
 #include <wpi/raw_istream.h>
 #include <wpi/raw_ostream.h>
@@ -105,7 +107,7 @@ bool ReadConfig() {
   try {
     j = wpi::json::parse(is);
   } catch (const wpi::json::parse_error& e) {
-    ParseError() << "byte " << e.byte << ": " << e.what() << '\n';
+    fmt::print(ParseError(), "byte {}: {}\n", e.byte, e.what());
     return false;
   }
 
@@ -127,10 +129,9 @@ bool ReadConfig() {
   if (j.count("ntmode") != 0) {
     try {
       auto str = j.at("ntmode").get<std::string>();
-      wpi::StringRef s(str);
-      if (s.equals_lower("client")) {
+      if (wpi::equals_lower(str, "client")) {
         server = false;
-      } else if (s.equals_lower("server")) {
+      } else if (wpi::equals_lower(str, "server")) {
         server = true;
       } else {
         ParseError() << "could not understand ntmode value '" << str << "'\n";
@@ -156,10 +157,9 @@ bool ReadConfig() {
 }
 
 void StartCamera(const CameraConfig& config) {
-  wpi::outs() << "Starting camera '" << config.name << "' on " << config.path
-              << '\n';
-  auto camera = frc::CameraServer::GetInstance()->StartAutomaticCapture(
-      config.name, config.path);
+  fmt::print("Starting camera '{}' on {}\n", config.name, config.path);
+  auto camera =
+      frc::CameraServer::StartAutomaticCapture(config.name, config.path);
 
   camera.SetConfigJson(config.config);
 }
@@ -178,10 +178,10 @@ int main(int argc, char* argv[]) {
   // start NetworkTables
   auto ntinst = nt::NetworkTableInstance::GetDefault();
   if (server) {
-    wpi::outs() << "Setting up NetworkTables server\n";
+    std::puts("Setting up NetworkTables server");
     ntinst.StartServer();
   } else {
-    wpi::outs() << "Setting up NetworkTables client for team " << team << '\n';
+    fmt::print("Setting up NetworkTables client for team {}\n", team);
     ntinst.StartClientTeam(team);
   }
 

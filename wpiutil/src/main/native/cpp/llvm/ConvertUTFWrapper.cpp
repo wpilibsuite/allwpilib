@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/ConvertUTF.h"
+#include "wpi/SmallVector.h"
 #include <string>
 #include <vector>
 
@@ -28,13 +29,13 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
   return true;
 }
 
-bool hasUTF16ByteOrderMark(ArrayRef<char> S) {
+bool hasUTF16ByteOrderMark(span<const char> S) {
   return (S.size() >= 2 &&
           ((S[0] == '\xff' && S[1] == '\xfe') ||
            (S[0] == '\xfe' && S[1] == '\xff')));
 }
 
-bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
+bool convertUTF16ToUTF8String(span<const UTF16> SrcUTF16,
                               SmallVectorImpl<char> &DstUTF8) {
   assert(DstUTF8.empty());
 
@@ -80,7 +81,7 @@ bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
   return true;
 }
 
-bool convertUTF8ToUTF16String(StringRef SrcUTF8,
+bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
                               SmallVectorImpl<UTF16> &DstUTF16) {
   assert(DstUTF16.empty());
 
@@ -91,8 +92,8 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
     return true;
   }
 
-  const UTF8 *Src = reinterpret_cast<const UTF8 *>(SrcUTF8.begin());
-  const UTF8 *SrcEnd = reinterpret_cast<const UTF8 *>(SrcUTF8.end());
+  const UTF8 *Src = reinterpret_cast<const UTF8 *>(SrcUTF8.data());
+  const UTF8 *SrcEnd = reinterpret_cast<const UTF8 *>(SrcUTF8.data() + SrcUTF8.size());
 
   // Allocate the same number of UTF-16 code units as UTF-8 code units. Encoding
   // as UTF-16 should always require the same amount or less code units than the

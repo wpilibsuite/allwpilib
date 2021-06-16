@@ -6,11 +6,13 @@
 
 #include <glass/WindowManager.h>
 
+#include <string_view>
+
 namespace halsimgui {
 
 class DSManager : public glass::WindowManager {
  public:
-  explicit DSManager(const wpi::Twine& iniName) : WindowManager{iniName} {}
+  explicit DSManager(std::string_view iniName) : WindowManager{iniName} {}
 
   void DisplayMenu() override;
 };

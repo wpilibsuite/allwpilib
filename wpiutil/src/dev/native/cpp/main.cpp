@@ -4,11 +4,10 @@
 
 #include <iostream>
 
-#include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
+#include "wpi/SmallString.h"
 #include "wpi/hostname.h"
 
 int main() {
-  wpi::StringRef v1("Hello");
-  std::cout << v1.lower() << std::endl;
+  wpi::SmallString<128> v1("Hello");
+  std::cout << v1.str() << std::endl;
 }

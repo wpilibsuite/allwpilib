@@ -7,7 +7,7 @@
 #include <functional>
 #include <initializer_list>
 
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "frc2/command/CommandBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -38,7 +38,7 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    * @param requirements the subsystems required by this command
    */
   explicit InstantCommand(std::function<void()> toRun,
-                          wpi::ArrayRef<Subsystem*> requirements = {});
+                          wpi::span<Subsystem* const> requirements = {});
 
   InstantCommand(InstantCommand&& other) = default;
 

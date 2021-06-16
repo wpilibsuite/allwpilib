@@ -66,6 +66,7 @@ enum class HAL_HandleEnum {
   DutyCycle = 21,
   DMA = 22,
   AddressableLED = 23,
+  CTREPCM = 24,
 };
 
 /**

@@ -8,8 +8,9 @@
 
 namespace wpilibws {
 
-HALSimWSBaseProvider::HALSimWSBaseProvider(std::string key, std::string type)
-    : m_key(std::move(key)), m_type(std::move(type)) {}
+HALSimWSBaseProvider::HALSimWSBaseProvider(std::string_view key,
+                                           std::string_view type)
+    : m_key(key), m_type(type) {}
 
 void HALSimWSBaseProvider::OnNetValueChanged(const wpi::json& json) {
   // empty

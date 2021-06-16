@@ -19,25 +19,20 @@
 extern "C" {
 #endif
 
-typedef void (*HAL_InterruptHandlerFunction)(uint32_t interruptAssertedMask,
-                                             void* param);
-
 /**
  * Initializes an interrupt.
  *
  * @param watcher true for synchronous interrupts, false for asynchronous
  * @return        the created interrupt handle
  */
-HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher, int32_t* status);
+HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status);
 
 /**
  * Frees an interrupt.
  *
  * @param interruptHandle the interrupt handle
- * @return                the param passed to the interrupt, or nullptr if one
- * wasn't passed.
  */
-void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
+void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle);
 
 /**
  * In synchronous mode, waits for the defined interrupt to occur.
@@ -51,25 +46,6 @@ void* HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status);
-
-/**
- * Enables interrupts to occur on this input.
- *
- * Interrupts are disabled when the RequestInterrupt call is made. This gives
- * time to do the setup of the other options before starting to field
- * interrupts.
- *
- * @param interruptHandle the interrupt handle
- */
-void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
-
-/**
- * Disables interrupts without without deallocating structures.
- *
- * @param interruptHandle the interrupt handle
- */
-void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
-                           int32_t* status);
 
 /**
  * Returns the timestamp for the rising interrupt that occurred most recently.
@@ -102,41 +78,13 @@ int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
  *
  * @param interruptHandle     the interrupt handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
+ * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the trigger type if the source is an AnalogTrigger
  */
 void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
                            HAL_Handle digitalSourceHandle,
                            HAL_AnalogTriggerType analogTriggerType,
                            int32_t* status);
-
-/**
- * Attaches an asynchronous interrupt handler to the interrupt.
- *
- * This interrupt gets called directly on the FPGA interrupt thread, so will
- * block other interrupts while running.
- *
- * @param interruptHandle the interrupt handle
- * @param handler         the handler function for the interrupt to call
- * @param param           a parameter to be passed to the handler
- */
-void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
-                                HAL_InterruptHandlerFunction handler,
-                                void* param, int32_t* status);
-
-/**
- * Attaches an asynchronous interrupt handler to the interrupt.
- *
- * This interrupt gets called on a thread specific to the interrupt, so will not
- * block other interrupts.
- *
- * @param interruptHandle the interrupt handle
- * @param handler         the handler function for the interrupt to call
- * @param param           a parameter to be passed to the handler
- */
-void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interruptHandle,
-                                        HAL_InterruptHandlerFunction handler,
-                                        void* param, int32_t* status);
 
 /**
  * Sets the edges to trigger the interrupt on.

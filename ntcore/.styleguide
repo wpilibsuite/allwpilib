@@ -27,6 +27,7 @@ includeGuardRoots {
 }
 
 includeOtherLibs {
+  ^fmt/
   ^support/
   ^wpi/
 }

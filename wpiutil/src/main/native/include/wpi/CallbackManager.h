@@ -49,7 +49,7 @@ template <typename Derived, typename TUserInfo,
           typename TNotifierData = TUserInfo>
 class CallbackThread : public wpi::SafeThread {
  public:
-  typedef TUserInfo UserInfo;
+  using UserInfo = TUserInfo;
   using NotifierData = TNotifierData;
   using ListenerData = TListenerData;
 

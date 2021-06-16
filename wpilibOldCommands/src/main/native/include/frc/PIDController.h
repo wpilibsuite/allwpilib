@@ -10,7 +10,6 @@
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
-#include "frc/Base.h"
 #include "frc/Controller.h"
 #include "frc/Notifier.h"
 #include "frc/PIDBase.h"
@@ -127,7 +126,7 @@ class PIDController : public PIDBase, public Controller {
    */
   void Reset() override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   std::unique_ptr<Notifier> m_controlLoop;

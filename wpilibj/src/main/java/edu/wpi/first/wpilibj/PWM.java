@@ -8,8 +8,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.PWMConfigDataResult;
 import edu.wpi.first.hal.PWMJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -36,8 +37,7 @@ public class PWM implements Sendable, AutoCloseable {
 
   private final int m_channel;
 
-  // Package private to use from AddressableLED
-  int m_handle;
+  private int m_handle;
 
   /**
    * Allocate a PWM given a channel.
@@ -117,6 +117,8 @@ public class PWM implements Sendable, AutoCloseable {
    * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
    * particular type of controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
+   *
+   * @return The bounds on the PWM pulse widths.
    */
   public PWMConfigDataResult getRawBounds() {
     return PWMJNI.getPWMConfigRaw(m_handle);
@@ -241,6 +243,15 @@ public class PWM implements Sendable, AutoCloseable {
 
   public void setZeroLatch() {
     PWMJNI.latchPWMZero(m_handle);
+  }
+
+  /**
+   * Get the underlying handle.
+   *
+   * @return Underlying PWM handle
+   */
+  public int getHandle() {
+    return m_handle;
   }
 
   @Override

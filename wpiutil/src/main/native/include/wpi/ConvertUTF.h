@@ -90,17 +90,20 @@
 #ifndef LLVM_SUPPORT_CONVERTUTF_H
 #define LLVM_SUPPORT_CONVERTUTF_H
 
-#include "wpi/ArrayRef.h"
-#include "wpi/StringRef.h"
+#include "wpi/span.h"
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 #include <system_error>
 
 // Wrap everything in namespace wpi so that programs can link with wpiutil and
 // their own version of the unicode libraries.
 
 namespace wpi {
+
+template <typename T>
+class SmallVectorImpl;
 
 /* ---------------------------------------------------------------------
     The following 4 definitions are compiler-specific.
@@ -228,14 +231,14 @@ static inline ConversionResult convertUTF8Sequence(const UTF8 **source,
  * Returns true if a blob of text starts with a UTF-16 big or little endian byte
  * order mark.
  */
-bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
+bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
 
 /**
  * Converts a UTF-16 string into a UTF-8 string.
  *
  * \returns true on success
  */
-bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
+bool convertUTF16ToUTF8String(span<const UTF16> SrcUTF16,
                               SmallVectorImpl<char> &DstUTF8);
 
 /**
@@ -243,15 +246,15 @@ bool convertUTF16ToUTF8String(ArrayRef<UTF16> SrcUTF16,
  *
  * \returns true on success
  */
-bool convertUTF8ToUTF16String(StringRef SrcUTF8,
+bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
                               SmallVectorImpl<UTF16> &DstUTF16);
 
 #if defined(_WIN32)
 namespace sys {
 namespace windows {
-std::error_code UTF8ToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
+std::error_code UTF8ToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
 /// Convert to UTF16 from the current code page used in the system
-std::error_code CurCPToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
+std::error_code CurCPToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
 std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
                             SmallVectorImpl<char> &utf8);
 /// Convert from UTF16 to the current code page used in the system

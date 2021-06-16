@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-#include "frc/smartdashboard/SendableBuilder.h"
+#include <networktables/NTSendableBuilder.h>
 
 using namespace frc;
 
@@ -19,7 +19,8 @@ Mechanism2d::Mechanism2d(double width, double height,
   SetBackgroundColor(backgroundColor);
 }
 
-MechanismRoot2d* Mechanism2d::GetRoot(wpi::StringRef name, double x, double y) {
+MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
+                                      double y) {
   auto& obj = m_roots[name];
   if (obj) {
     return obj.get();
@@ -40,7 +41,7 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
   }
 }
 
-void Mechanism2d::InitSendable(SendableBuilder& builder) {
+void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Mechanism2d");
   m_table = builder.GetTable();
 

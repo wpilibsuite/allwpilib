@@ -22,6 +22,11 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
     m_pastObserverSnapshots = new ArrayList<>();
   }
 
+  /** Clears the observer snapshot buffer. */
+  public void reset() {
+    m_pastObserverSnapshots.clear();
+  }
+
   /**
    * Add past observer states to the observer snapshots list.
    *
@@ -51,18 +56,18 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
    * @param rows The rows in the global measurement vector.
    * @param observer The observer to apply the past global measurement.
    * @param nominalDtSeconds The nominal timestep.
-   * @param globalMeasurement The measurement.
+   * @param y The measurement.
    * @param globalMeasurementCorrect The function take calls correct() on the observer.
-   * @param globalMeasurementTimestampSeconds The timestamp of the measurement.
+   * @param timestampSeconds The timestamp of the measurement.
    */
-  @SuppressWarnings({"ParameterName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("ParameterName")
   public <R extends Num> void applyPastGlobalMeasurement(
       Nat<R> rows,
       KalmanTypeFilter<S, I, O> observer,
       double nominalDtSeconds,
-      Matrix<R, N1> globalMeasurement,
+      Matrix<R, N1> y,
       BiConsumer<Matrix<I, N1>, Matrix<R, N1>> globalMeasurementCorrect,
-      double globalMeasurementTimestampSeconds) {
+      double timestampSeconds) {
     if (m_pastObserverSnapshots.isEmpty()) {
       // State map was empty, which means that we got a past measurement right at startup. The only
       // thing we can really do is ignore the measurement.
@@ -77,7 +82,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
 
     while (low != high) {
       int mid = (low + high) / 2;
-      if (m_pastObserverSnapshots.get(mid).getKey() < globalMeasurementTimestampSeconds) {
+      if (m_pastObserverSnapshots.get(mid).getKey() < timestampSeconds) {
         // This index and everything under it are less than the requested timestamp. Therefore, we
         // can discard them.
         low = mid + 1;
@@ -91,7 +96,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
     // We are simply assigning this index to a new variable to avoid confusion
     // with variable names.
     int index = low;
-    double timestamp = globalMeasurementTimestampSeconds;
+    double timestamp = timestampSeconds;
     int indexOfClosestEntry =
         Math.abs(timestamp - m_pastObserverSnapshots.get(index - 1).getKey())
                 <= Math.abs(
@@ -124,7 +129,7 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
         // timestep for which we called predict.
         // This makes the assumption that the dt is small enough that the difference between the
         // measurement time and the time that the inputs were captured at is very small.
-        globalMeasurementCorrect.accept(snapshot.inputs, globalMeasurement);
+        globalMeasurementCorrect.accept(snapshot.inputs, y);
       }
       lastTimestamp = key;
 

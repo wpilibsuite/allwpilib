@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <networktables/NTSendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
@@ -15,7 +15,7 @@ class ButtonScheduler;
 class Command;
 class Subsystem;
 
-class Scheduler : public Sendable, public SendableHelper<Scheduler> {
+class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
  public:
   /**
    * Returns the Scheduler, creating it if one does not exist.
@@ -78,7 +78,7 @@ class Scheduler : public Sendable, public SendableHelper<Scheduler> {
 
   void SetEnabled(bool enabled);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   Scheduler();

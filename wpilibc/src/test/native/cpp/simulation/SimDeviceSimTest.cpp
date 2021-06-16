@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string_view>
+
 #include <hal/SimDevice.h>
-#include <wpi/StringRef.h>
 
 #include "frc/simulation/SimDeviceSim.h"
 #include "gtest/gtest.h"
@@ -27,7 +28,7 @@ TEST(SimDeviceSimTests, TestEnumerateDevices) {
   bool foundit = false;
   SimDeviceSim::EnumerateDevices(
       "te", [&](const char* name, HAL_SimDeviceHandle handle) {
-        if (wpi::StringRef(name) == "test") {
+        if (std::string_view(name) == "test") {
           foundit = true;
         }
       });

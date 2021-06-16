@@ -8,7 +8,11 @@ import edu.wpi.first.networktables.NetworkTable;
 
 interface ShuffleboardValue {
 
-  /** Gets the title of this Shuffleboard value. */
+  /**
+   * Gets the title of this Shuffleboard value.
+   *
+   * @return The title of this Shuffleboard value.
+   */
   String getTitle();
 
   /**

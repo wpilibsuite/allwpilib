@@ -9,19 +9,20 @@
 
 #include <queue>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
+#include "wpi/StringExtras.h"
 #include "wpi/deprecated.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/span.h"
 
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {
@@ -30,7 +31,7 @@ namespace wpi::java {
 // in the stack trace not starting with excludeFuncPrefix (useful for e.g.
 // finding the first user call to a series of library functions).
 std::string GetJavaStackTrace(JNIEnv* env, std::string* func = nullptr,
-                              StringRef excludeFuncPrefix = StringRef());
+                              std::string_view excludeFuncPrefix = {});
 
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
@@ -136,7 +137,7 @@ class JStringRef {
       jsize size = env->GetStringLength(str);
       const jchar* chars = env->GetStringCritical(str, nullptr);
       if (chars) {
-        convertUTF16ToUTF8String(makeArrayRef(chars, size), m_str);
+        convertUTF16ToUTF8String(wpi::span<const jchar>(chars, size), m_str);
         env->ReleaseStringCritical(str, chars);
       }
     } else {
@@ -148,8 +149,8 @@ class JStringRef {
     m_str.pop_back();
   }
 
-  operator StringRef() const { return m_str; }  // NOLINT
-  StringRef str() const { return m_str; }
+  operator std::string_view() const { return m_str.str(); }  // NOLINT
+  std::string_view str() const { return m_str.str(); }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
 
@@ -163,18 +164,18 @@ namespace detail {
 template <typename C, typename T>
 class JArrayRefInner {};
 
-// Specialization of JArrayRefBase to provide StringRef conversion.
+// Specialization of JArrayRefBase to provide std::string_view conversion.
 template <typename C>
 class JArrayRefInner<C, jbyte> {
  public:
-  operator StringRef() const { return str(); }
+  operator std::string_view() const { return str(); }
 
-  StringRef str() const {
+  std::string_view str() const {
     auto arr = static_cast<const C*>(this)->array();
     if (arr.empty()) {
       return {};
     }
-    return StringRef{reinterpret_cast<const char*>(arr.data()), arr.size()};
+    return {reinterpret_cast<const char*>(arr.data()), arr.size()};
   }
 };
 
@@ -184,13 +185,13 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
   explicit operator bool() const { return this->m_elements != nullptr; }
 
-  operator ArrayRef<T>() const { return array(); }  // NOLINT
+  operator span<const T>() const { return array(); }  // NOLINT
 
-  ArrayRef<T> array() const {
+  span<const T> array() const {
     if (!this->m_elements) {
       return {};
     }
-    return ArrayRef<T>{this->m_elements, this->m_size};
+    return {this->m_elements, this->m_size};
   }
 
   JArrayRefBase(const JArrayRefBase&) = delete;
@@ -326,7 +327,7 @@ WPI_JNI_JARRAYREF(jdouble, Double)
 //
 
 // Convert a UTF8 string into a jstring.
-inline jstring MakeJString(JNIEnv* env, StringRef str) {
+inline jstring MakeJString(JNIEnv* env, std::string_view str) {
   SmallVector<UTF16, 128> chars;
   convertUTF8ToUTF16String(str, chars);
   return env->NewString(chars.begin(), chars.size());
@@ -341,7 +342,7 @@ namespace detail {
 template <typename T,
           bool = (std::is_integral<T>::value && sizeof(jint) == sizeof(T))>
 struct ConvertIntArray {
-  static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
+  static jintArray ToJava(JNIEnv* env, span<const T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
     if (!jarr) {
       return nullptr;
@@ -362,7 +363,7 @@ struct ConvertIntArray {
 // Fast path (use SetIntArrayRegion)
 template <typename T>
 struct ConvertIntArray<T, true> {
-  static jintArray ToJava(JNIEnv* env, ArrayRef<T> arr) {
+  static jintArray ToJava(JNIEnv* env, span<const T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
     if (!jarr) {
       return nullptr;
@@ -375,9 +376,14 @@ struct ConvertIntArray<T, true> {
 
 }  // namespace detail
 
-// Convert an ArrayRef to a jintArray.
+// Convert an span to a jintArray.
 template <typename T>
-inline jintArray MakeJIntArray(JNIEnv* env, ArrayRef<T> arr) {
+inline jintArray MakeJIntArray(JNIEnv* env, span<const T> arr) {
+  return detail::ConvertIntArray<T>::ToJava(env, arr);
+}
+
+template <typename T>
+inline jintArray MakeJIntArray(JNIEnv* env, span<T> arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
@@ -395,8 +401,8 @@ inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
-// Convert a StringRef into a jbyteArray.
-inline jbyteArray MakeJByteArray(JNIEnv* env, StringRef str) {
+// Convert a std::string_view into a jbyteArray.
+inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
   jbyteArray jarr = env->NewByteArray(str.size());
   if (!jarr) {
     return nullptr;
@@ -407,7 +413,7 @@ inline jbyteArray MakeJByteArray(JNIEnv* env, StringRef str) {
 }
 
 // Convert an array of integers into a jbooleanArray.
-inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
+inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const int> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
     return nullptr;
@@ -425,7 +431,7 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<int> arr) {
 }
 
 // Convert an array of booleans into a jbooleanArray.
-inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
+inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const bool> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
     return nullptr;
@@ -444,14 +450,14 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, ArrayRef<bool> arr) {
 
 // Other MakeJ*Array conversions.
 
-#define WPI_JNI_MAKEJARRAY(T, F)                                  \
-  inline T##Array MakeJ##F##Array(JNIEnv* env, ArrayRef<T> arr) { \
-    T##Array jarr = env->New##F##Array(arr.size());               \
-    if (!jarr) {                                                  \
-      return nullptr;                                             \
-    }                                                             \
-    env->Set##F##ArrayRegion(jarr, 0, arr.size(), arr.data());    \
-    return jarr;                                                  \
+#define WPI_JNI_MAKEJARRAY(T, F)                                    \
+  inline T##Array MakeJ##F##Array(JNIEnv* env, span<const T> arr) { \
+    T##Array jarr = env->New##F##Array(arr.size());                 \
+    if (!jarr) {                                                    \
+      return nullptr;                                               \
+    }                                                               \
+    env->Set##F##ArrayRegion(jarr, 0, arr.size(), arr.data());      \
+    return jarr;                                                    \
   }
 
 WPI_JNI_MAKEJARRAY(jboolean, Boolean)
@@ -464,7 +470,7 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 #undef WPI_JNI_MAKEJARRAY
 
 // Convert an array of std::string into a jarray of jstring.
-inline jobjectArray MakeJStringArray(JNIEnv* env, ArrayRef<std::string> arr) {
+inline jobjectArray MakeJStringArray(JNIEnv* env, span<const std::string> arr) {
   static JClass stringCls{env, "java/lang/String"};
   if (!stringCls) {
     return nullptr;
@@ -593,7 +599,7 @@ class JSingletonCallbackManager : public JCallbackManager<T> {
   }
 };
 
-inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
+inline std::string GetJavaStackTrace(JNIEnv* env, std::string_view skipPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
   if (!throwableCls) {
@@ -657,7 +663,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
     // add a line to res
     JStringRef elem(env, stackElementString);
     if (!foundFirst) {
-      if (elem.str().startswith(skipPrefix)) {
+      if (wpi::starts_with(elem, skipPrefix)) {
         continue;
       }
       foundFirst = true;
@@ -669,7 +675,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, StringRef skipPrefix) {
 }
 
 inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
-                                     StringRef excludeFuncPrefix) {
+                                     std::string_view excludeFuncPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
   if (!throwableCls) {
@@ -740,7 +746,7 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
       if (i == 1) {
         *func = elem.str();
       } else if (i > 1 && !haveLoc && !excludeFuncPrefix.empty() &&
-                 !elem.str().startswith(excludeFuncPrefix)) {
+                 !wpi::starts_with(elem, excludeFuncPrefix)) {
         *func = elem.str();
         haveLoc = true;
       }
@@ -769,7 +775,9 @@ class JException : public JClass {
     env->Throw(static_cast<jthrowable>(exception));
   }
 
-  void Throw(JNIEnv* env, StringRef msg) { Throw(env, MakeJString(env, msg)); }
+  void Throw(JNIEnv* env, std::string_view msg) {
+    Throw(env, MakeJString(env, msg));
+  }
 
   explicit operator bool() const { return m_constructor; }
 

@@ -4,15 +4,16 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import static java.util.Objects.requireNonNull;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import java.util.StringJoiner;
 
 /**
  * A class for driving Killough drive platforms.
@@ -57,6 +58,29 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   private boolean m_reported;
 
+  @SuppressWarnings("MemberName")
+  public static class WheelSpeeds {
+    public double left;
+    public double right;
+    public double back;
+
+    /** Constructs a WheelSpeeds with zeroes for left, right, and back speeds. */
+    public WheelSpeeds() {}
+
+    /**
+     * Constructs a WheelSpeeds.
+     *
+     * @param left The left speed.
+     * @param right The right speed.
+     * @param back The back speed.
+     */
+    public WheelSpeeds(double left, double right, double back) {
+      this.left = left;
+      this.right = right;
+      this.back = back;
+    }
+  }
+
   /**
    * Construct a Killough drive with the given motors and default motor angles.
    *
@@ -99,7 +123,10 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
       double leftMotorAngle,
       double rightMotorAngle,
       double backMotorAngle) {
-    verify(leftMotor, rightMotor, backMotor);
+    requireNonNull(leftMotor, "Left motor cannot be null");
+    requireNonNull(rightMotor, "Right motor cannot be null");
+    requireNonNull(backMotor, "Back motor cannot be null");
+
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
@@ -125,33 +152,6 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   @Override
   public void close() {
     SendableRegistry.remove(this);
-  }
-
-  /**
-   * Verifies that all motors are nonnull, throwing a NullPointerException if any of them are. The
-   * exception's error message will specify all null motors, e.g. {@code
-   * NullPointerException("leftMotor, rightMotor")}, to give as much information as possible to the
-   * programmer.
-   *
-   * @throws NullPointerException if any of the given motors are null
-   */
-  @SuppressWarnings("PMD.AvoidThrowingNullPointerException")
-  private void verify(
-      SpeedController leftMotor, SpeedController rightMotor, SpeedController backMotor) {
-    if (leftMotor != null && rightMotor != null && backMotor != null) {
-      return;
-    }
-    StringJoiner joiner = new StringJoiner(", ");
-    if (leftMotor == null) {
-      joiner.add("leftMotor");
-    }
-    if (rightMotor == null) {
-      joiner.add("rightMotor");
-    }
-    if (backMotor == null) {
-      joiner.add("backMotor");
-    }
-    throw new NullPointerException(joiner.toString());
   }
 
   /**
@@ -191,26 +191,14 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
       m_reported = true;
     }
 
-    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
     ySpeed = applyDeadband(ySpeed, m_deadband);
-
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    // Compensate for gyro angle.
-    Vector2d input = new Vector2d(ySpeed, xSpeed);
-    input.rotate(-gyroAngle);
+    var speeds = driveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
 
-    double[] wheelSpeeds = new double[3];
-    wheelSpeeds[MotorType.kLeft.value] = input.scalarProject(m_leftVec) + zRotation;
-    wheelSpeeds[MotorType.kRight.value] = input.scalarProject(m_rightVec) + zRotation;
-    wheelSpeeds[MotorType.kBack.value] = input.scalarProject(m_backVec) + zRotation;
-
-    normalize(wheelSpeeds);
-
-    m_leftMotor.set(wheelSpeeds[MotorType.kLeft.value] * m_maxOutput);
-    m_rightMotor.set(wheelSpeeds[MotorType.kRight.value] * m_maxOutput);
-    m_backMotor.set(wheelSpeeds[MotorType.kBack.value] * m_maxOutput);
+    m_leftMotor.set(speeds.left * m_maxOutput);
+    m_rightMotor.set(speeds.right * m_maxOutput);
+    m_backMotor.set(speeds.back * m_maxOutput);
 
     feed();
   }
@@ -238,6 +226,43 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
         magnitude * Math.cos(angle * (Math.PI / 180.0)),
         zRotation,
         0.0);
+  }
+
+  /**
+   * Cartesian inverse kinematics for Killough platform.
+   *
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
+   * from its angle or rotation rate.
+   *
+   * @param ySpeed The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *     positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
+   *     to implement field-oriented controls.
+   * @return Wheel speeds.
+   */
+  @SuppressWarnings("ParameterName")
+  public WheelSpeeds driveCartesianIK(
+      double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
+    ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+
+    // Compensate for gyro angle.
+    Vector2d input = new Vector2d(ySpeed, xSpeed);
+    input.rotate(-gyroAngle);
+
+    double[] wheelSpeeds = new double[3];
+    wheelSpeeds[MotorType.kLeft.value] = input.scalarProject(m_leftVec) + zRotation;
+    wheelSpeeds[MotorType.kRight.value] = input.scalarProject(m_rightVec) + zRotation;
+    wheelSpeeds[MotorType.kBack.value] = input.scalarProject(m_backVec) + zRotation;
+
+    normalize(wheelSpeeds);
+
+    return new WheelSpeeds(
+        wheelSpeeds[MotorType.kLeft.value],
+        wheelSpeeds[MotorType.kRight.value],
+        wheelSpeeds[MotorType.kBack.value]);
   }
 
   @Override

@@ -96,7 +96,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
     int res = inet_pton(PF_INET, server, &(address.sin_addr));
 #endif
     if (res != 1) {
-      WPI_ERROR(logger, "could not resolve " << server << " address");
+      WPI_ERROR(logger, "could not resolve {} address", server);
       return nullptr;
     }
   }
@@ -105,13 +105,13 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if (sd < 0) {
-      WPI_ERROR(logger, "could not create socket");
+      WPI_ERROR(logger, "{}", "could not create socket");
       return nullptr;
     }
     if (::connect(sd, reinterpret_cast<struct sockaddr*>(&address),
                   sizeof(address)) != 0) {
-      WPI_ERROR(logger, "connect() to " << server << " port " << port
-                                        << " failed: " << SocketStrerror());
+      WPI_ERROR(logger, "connect() to {} port {} failed: {}", server, port,
+                SocketStrerror());
 #ifdef _WIN32
       closesocket(sd);
 #else
@@ -127,7 +127,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   socklen_t len;
   int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
   if (sd < 0) {
-    WPI_ERROR(logger, "could not create socket");
+    WPI_ERROR(logger, "{}", "could not create socket");
     return nullptr;
   }
 
@@ -135,19 +135,19 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
 #ifdef _WIN32
   u_long mode = 1;
   if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
-    WPI_WARNING(logger,
-                "could not set socket to non-blocking: " << SocketStrerror());
+    WPI_WARNING(logger, "could not set socket to non-blocking: {}",
+                SocketStrerror());
 #else
   int arg;
   arg = fcntl(sd, F_GETFL, nullptr);
   if (arg < 0) {
-    WPI_WARNING(logger,
-                "could not set socket to non-blocking: " << SocketStrerror());
+    WPI_WARNING(logger, "could not set socket to non-blocking: {}",
+                SocketStrerror());
   } else {
     arg |= O_NONBLOCK;
     if (fcntl(sd, F_SETFL, arg) < 0) {
-      WPI_WARNING(logger,
-                  "could not set socket to non-blocking: " << SocketStrerror());
+      WPI_WARNING(logger, "could not set socket to non-blocking: {}",
+                  SocketStrerror());
     }
   }
 #endif
@@ -170,21 +170,18 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
         getsockopt(sd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&valopt),
                    &len);
         if (valopt) {
-          WPI_ERROR(logger, "select() to " << server << " port " << port
-                                           << " error " << valopt << " - "
-                                           << SocketStrerror(valopt));
+          WPI_ERROR(logger, "select() to {} port {} error {} - {}", server,
+                    port, valopt, SocketStrerror(valopt));
         } else {
           // connection established
           result = 0;
         }
       } else {
-        WPI_INFO(logger,
-                 "connect() to " << server << " port " << port << " timed out");
+        WPI_INFO(logger, "connect() to {} port {} timed out", server, port);
       }
     } else {
-      WPI_ERROR(logger, "connect() to " << server << " port " << port
-                                        << " error " << SocketErrno() << " - "
-                                        << SocketStrerror());
+      WPI_ERROR(logger, "connect() to {} port {} error {} - {}", server, port,
+                SocketErrno(), SocketStrerror());
     }
   }
 
@@ -192,18 +189,18 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
 #ifdef _WIN32
   mode = 0;
   if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
-    WPI_WARNING(logger,
-                "could not set socket to blocking: " << SocketStrerror());
+    WPI_WARNING(logger, "could not set socket to blocking: {}",
+                SocketStrerror());
 #else
   arg = fcntl(sd, F_GETFL, nullptr);
   if (arg < 0) {
-    WPI_WARNING(logger,
-                "could not set socket to blocking: " << SocketStrerror());
+    WPI_WARNING(logger, "could not set socket to blocking: {}",
+                SocketStrerror());
   } else {
     arg &= (~O_NONBLOCK);
     if (fcntl(sd, F_SETFL, arg) < 0) {
-      WPI_WARNING(logger,
-                  "could not set socket to blocking: " << SocketStrerror());
+      WPI_WARNING(logger, "could not set socket to blocking: {}",
+                  SocketStrerror());
     }
   }
 #endif

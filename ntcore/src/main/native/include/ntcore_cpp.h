@@ -11,13 +11,12 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
-#include <wpi/ArrayRef.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
+#include <wpi/span.h>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -98,7 +97,7 @@ struct ConnectionInfo {
 /** NetworkTables RPC Version 1 Definition Parameter */
 struct RpcParamDef {
   RpcParamDef() = default;
-  RpcParamDef(wpi::StringRef name_, std::shared_ptr<Value> def_value_)
+  RpcParamDef(std::string_view name_, std::shared_ptr<Value> def_value_)
       : name(name_), def_value(std::move(def_value_)) {}
 
   std::string name;
@@ -108,7 +107,7 @@ struct RpcParamDef {
 /** NetworkTables RPC Version 1 Definition Result */
 struct RpcResultDef {
   RpcResultDef() = default;
-  RpcResultDef(wpi::StringRef name_, NT_Type type_)
+  RpcResultDef(std::string_view name_, NT_Type type_)
       : name(name_), type(type_) {}
 
   std::string name;
@@ -127,8 +126,8 @@ struct RpcDefinition {
 class RpcAnswer {
  public:
   RpcAnswer() = default;
-  RpcAnswer(NT_Entry entry_, NT_RpcCall call_, wpi::StringRef name_,
-            wpi::StringRef params_, ConnectionInfo conn_)
+  RpcAnswer(NT_Entry entry_, NT_RpcCall call_, std::string_view name_,
+            std::string_view params_, ConnectionInfo conn_)
       : entry(entry_),
         call(call_),
         name(name_),
@@ -161,7 +160,7 @@ class RpcAnswer {
    * @param result  result raw data that will be provided to remote caller
    * @return True if posting the response is valid, otherwise false
    */
-  bool PostResponse(wpi::StringRef result) const;
+  bool PostResponse(std::string_view result) const;
 
   friend void swap(RpcAnswer& first, RpcAnswer& second) {
     using std::swap;
@@ -178,7 +177,7 @@ class EntryNotification {
  public:
   EntryNotification() = default;
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
-                    wpi::StringRef name_, std::shared_ptr<Value> value_,
+                    std::string_view name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
       : listener(listener_),
         entry(entry_),
@@ -245,7 +244,7 @@ class LogMessage {
  public:
   LogMessage() = default;
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
-             unsigned int line_, wpi::StringRef message_)
+             unsigned int line_, std::string_view message_)
       : logger(logger_),
         level(level_),
         filename(filename_),
@@ -327,7 +326,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle);
  * @param name      entry name (UTF-8 string)
  * @return entry handle
  */
-NT_Entry GetEntry(NT_Inst inst, const wpi::Twine& name);
+NT_Entry GetEntry(NT_Inst inst, std::string_view name);
 
 /**
  * Get Entry Handles.
@@ -343,7 +342,7 @@ NT_Entry GetEntry(NT_Inst inst, const wpi::Twine& name);
  *                      as a "don't care"
  * @return Array of entry handles.
  */
-std::vector<NT_Entry> GetEntries(NT_Inst inst, const wpi::Twine& prefix,
+std::vector<NT_Entry> GetEntries(NT_Inst inst, std::string_view prefix,
                                  unsigned int types);
 
 /**
@@ -484,7 +483,7 @@ void DeleteAllEntries(NT_Inst inst);
  *                      as a "don't care"
  * @return Array of entry information.
  */
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const wpi::Twine& prefix,
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, std::string_view prefix,
                                     unsigned int types);
 
 /**
@@ -516,9 +515,9 @@ EntryInfo GetEntryInfo(NT_Entry entry);
  * @param flags           update flags; for example, NT_NOTIFY_NEW if the key
  *                        did not previously exist
  */
-typedef std::function<void(NT_EntryListener entry_listener, wpi::StringRef name,
-                           std::shared_ptr<Value> value, unsigned int flags)>
-    EntryListenerCallback;
+using EntryListenerCallback =
+    std::function<void(NT_EntryListener entry_listener, std::string_view name,
+                       std::shared_ptr<Value> value, unsigned int flags)>;
 
 /**
  * Add a listener for all entries starting with a certain prefix.
@@ -530,7 +529,7 @@ typedef std::function<void(NT_EntryListener entry_listener, wpi::StringRef name,
  * @return Listener handle
  */
 NT_EntryListener AddEntryListener(
-    NT_Inst inst, const wpi::Twine& prefix,
+    NT_Inst inst, std::string_view prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags);
 
@@ -578,7 +577,7 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
  * @return Listener handle
  */
 NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        const wpi::Twine& prefix,
+                                        std::string_view prefix,
                                         unsigned int flags);
 
 /**
@@ -787,7 +786,7 @@ bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout);
  * @param callback  callback function; note the callback function must call
  *                  PostRpcResponse() to provide a response to the call
  */
-void CreateRpc(NT_Entry entry, wpi::StringRef def,
+void CreateRpc(NT_Entry entry, std::string_view def,
                std::function<void(const RpcAnswer& answer)> callback);
 
 /**
@@ -820,7 +819,7 @@ void DestroyRpcCallPoller(NT_RpcCallPoller poller);
  * @param def       RPC definition
  * @param poller    poller handle
  */
-void CreatePolledRpc(NT_Entry entry, wpi::StringRef def,
+void CreatePolledRpc(NT_Entry entry, std::string_view def,
                      NT_RpcCallPoller poller);
 
 /**
@@ -884,7 +883,7 @@ bool WaitForRpcCallQueue(NT_Inst inst, double timeout);
  * @param result      result raw data that will be provided to remote caller
  * @return            true if the response was posted, otherwise false
  */
-bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, wpi::StringRef result);
+bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, std::string_view result);
 
 /**
  * Call a RPC function.  May be used on either the client or server.
@@ -897,7 +896,7 @@ bool PostRpcResponse(NT_Entry entry, NT_RpcCall call, wpi::StringRef result);
  * @return RPC call handle (for use with GetRpcResult() or
  *         CancelRpcResult()).
  */
-NT_RpcCall CallRpc(NT_Entry entry, wpi::StringRef params);
+NT_RpcCall CallRpc(NT_Entry entry, std::string_view params);
 
 /**
  * Get the result (return value) of a RPC call.  This function blocks until
@@ -948,7 +947,7 @@ std::string PackRpcDefinition(const RpcDefinition& def);
  * @param def         RPC version 1 definition (output)
  * @return True if successfully unpacked, false otherwise.
  */
-bool UnpackRpcDefinition(wpi::StringRef packed, RpcDefinition* def);
+bool UnpackRpcDefinition(std::string_view packed, RpcDefinition* def);
 
 /**
  * Pack RPC values as required for RPC version 1 definition messages.
@@ -956,7 +955,7 @@ bool UnpackRpcDefinition(wpi::StringRef packed, RpcDefinition* def);
  * @param values      array of values to pack
  * @return Raw packed bytes.
  */
-std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values);
+std::string PackRpcValues(wpi::span<const std::shared_ptr<Value>> values);
 
 /**
  * Unpack RPC values as required for RPC version 1 definition messages.
@@ -966,7 +965,7 @@ std::string PackRpcValues(wpi::ArrayRef<std::shared_ptr<Value>> values);
  * @return Array of values.
  */
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(
-    wpi::StringRef packed, wpi::ArrayRef<NT_Type> types);
+    std::string_view packed, wpi::span<const NT_Type> types);
 
 /** @} */
 
@@ -983,7 +982,7 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(
  * @param inst      instance handle
  * @param name      identity to advertise
  */
-void SetNetworkIdentity(NT_Inst inst, const wpi::Twine& name);
+void SetNetworkIdentity(NT_Inst inst, std::string_view name);
 
 /**
  * Get the current network mode.
@@ -1016,7 +1015,7 @@ void StopLocal(NT_Inst inst);
  *                          address. (UTF-8 string, null terminated)
  * @param port              port to communicate over.
  */
-void StartServer(NT_Inst inst, const wpi::Twine& persist_filename,
+void StartServer(NT_Inst inst, std::string_view persist_filename,
                  const char* listen_address, unsigned int port);
 
 /**
@@ -1051,7 +1050,7 @@ void StartClient(NT_Inst inst, const char* server_name, unsigned int port);
  */
 void StartClient(
     NT_Inst inst,
-    wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers);
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Starts a client using commonly known robot addresses for the specified
@@ -1086,8 +1085,9 @@ void SetServer(NT_Inst inst, const char* server_name, unsigned int port);
  * @param inst      instance handle
  * @param servers   array of server name and port pairs
  */
-void SetServer(NT_Inst inst,
-               wpi::ArrayRef<std::pair<wpi::StringRef, unsigned int>> servers);
+void SetServer(
+    NT_Inst inst,
+    wpi::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Sets server addresses and port for client (without restarting client).
@@ -1173,7 +1173,7 @@ bool IsConnected(NT_Inst inst);
  * @param filename  filename
  * @return error string, or nullptr if successful
  */
-const char* SavePersistent(NT_Inst inst, const wpi::Twine& filename);
+const char* SavePersistent(NT_Inst inst, std::string_view filename);
 
 /**
  * Load persistent values from a file.  The server automatically does this
@@ -1186,7 +1186,7 @@ const char* SavePersistent(NT_Inst inst, const wpi::Twine& filename);
  * @return error string, or nullptr if successful
  */
 const char* LoadPersistent(
-    NT_Inst inst, const wpi::Twine& filename,
+    NT_Inst inst, std::string_view filename,
     std::function<void(size_t line, const char* msg)> warn);
 
 /**
@@ -1198,8 +1198,8 @@ const char* LoadPersistent(
  * @param prefix    save only keys starting with this prefix
  * @return error string, or nullptr if successful
  */
-const char* SaveEntries(NT_Inst inst, const wpi::Twine& filename,
-                        const wpi::Twine& prefix);
+const char* SaveEntries(NT_Inst inst, std::string_view filename,
+                        std::string_view prefix);
 
 /**
  * Load table values from a file.  The file format used is identical to
@@ -1211,8 +1211,8 @@ const char* SaveEntries(NT_Inst inst, const wpi::Twine& filename,
  * @param warn      callback function for warnings
  * @return error string, or nullptr if successful
  */
-const char* LoadEntries(NT_Inst inst, const wpi::Twine& filename,
-                        const wpi::Twine& prefix,
+const char* LoadEntries(NT_Inst inst, std::string_view filename,
+                        std::string_view prefix,
                         std::function<void(size_t line, const char* msg)> warn);
 
 /** @} */
@@ -1339,7 +1339,7 @@ bool WaitForLoggerQueue(NT_Inst inst, double timeout);
 /** @} */
 /** @} */
 
-inline bool RpcAnswer::PostResponse(wpi::StringRef result) const {
+inline bool RpcAnswer::PostResponse(std::string_view result) const {
   auto ret = PostRpcResponse(entry, call, result);
   call = 0;
   return ret;

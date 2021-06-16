@@ -6,11 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/networktables/NetworkTablesHelper.h"
 #include "glass/other/Field2D.h"
@@ -22,8 +22,8 @@ class NTField2DModel : public Field2DModel {
   static constexpr const char* kType = "Field2d";
 
   // path is to the table containing ".type", excluding the trailing /
-  explicit NTField2DModel(wpi::StringRef path);
-  NTField2DModel(NT_Inst inst, wpi::StringRef path);
+  explicit NTField2DModel(std::string_view path);
+  NTField2DModel(NT_Inst inst, std::string_view path);
   ~NTField2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
@@ -33,10 +33,10 @@ class NTField2DModel : public Field2DModel {
   bool Exists() override;
   bool IsReadOnly() override;
 
-  FieldObjectModel* AddFieldObject(const wpi::Twine& name) override;
-  void RemoveFieldObject(const wpi::Twine& name) override;
+  FieldObjectModel* AddFieldObject(std::string_view name) override;
+  void RemoveFieldObject(std::string_view name) override;
   void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
+      wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
           func) override;
 
  private:
@@ -49,7 +49,7 @@ class NTField2DModel : public Field2DModel {
   using Objects = std::vector<std::unique_ptr<ObjectModel>>;
   Objects m_objects;
 
-  std::pair<Objects::iterator, bool> Find(wpi::StringRef fullName);
+  std::pair<Objects::iterator, bool> Find(std::string_view fullName);
 };
 
 }  // namespace glass

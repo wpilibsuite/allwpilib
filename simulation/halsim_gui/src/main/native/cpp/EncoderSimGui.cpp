@@ -9,8 +9,10 @@
 
 #include <limits>
 #include <memory>
+#include <string_view>
 #include <vector>
 
+#include <fmt/format.h>
 #include <hal/Ports.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/SimDeviceData.h>
@@ -24,14 +26,14 @@ namespace {
 
 class EncoderSimModel : public glass::EncoderModel {
  public:
-  EncoderSimModel(const wpi::Twine& id, int32_t index, int channelA,
+  EncoderSimModel(std::string_view id, int32_t index, int channelA,
                   int channelB)
-      : m_distancePerPulse(id + " Dist/Count"),
-        m_count(id + " Count"),
-        m_period(id + " Period"),
-        m_direction(id + " Direction"),
-        m_distance(id + " Distance"),
-        m_rate(id + " Rate"),
+      : m_distancePerPulse(fmt::format("{} Dist/Count", id)),
+        m_count(fmt::format("{} Count", id)),
+        m_period(fmt::format("{} Period", id)),
+        m_direction(fmt::format("{} Direction", id)),
+        m_distance(fmt::format("{} Distance", id)),
+        m_rate(fmt::format("{} Rate", id)),
         m_index{index},
         m_channelA{channelA},
         m_channelB{channelB},
@@ -48,8 +50,7 @@ class EncoderSimModel : public glass::EncoderModel {
   }
 
   EncoderSimModel(int32_t index, int channelA, int channelB)
-      : EncoderSimModel("Encoder[" + wpi::Twine(channelA) + wpi::Twine(',') +
-                            wpi::Twine(channelB) + wpi::Twine(']'),
+      : EncoderSimModel(fmt::format("Encoder[{},{}]", channelA, channelB),
                         index, channelA, channelB) {}
 
   explicit EncoderSimModel(int32_t index)

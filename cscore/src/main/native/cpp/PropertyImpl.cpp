@@ -6,18 +6,18 @@
 
 using namespace cs;
 
-PropertyImpl::PropertyImpl(const wpi::Twine& name_) : name{name_.str()} {}
-PropertyImpl::PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_,
+PropertyImpl::PropertyImpl(std::string_view name_) : name{name_} {}
+PropertyImpl::PropertyImpl(std::string_view name_, CS_PropertyKind kind_,
                            int step_, int defaultValue_, int value_)
-    : name{name_.str()},
+    : name{name_},
       propKind{kind_},
       step{step_},
       defaultValue{defaultValue_},
       value{value_} {}
-PropertyImpl::PropertyImpl(const wpi::Twine& name_, CS_PropertyKind kind_,
+PropertyImpl::PropertyImpl(std::string_view name_, CS_PropertyKind kind_,
                            int minimum_, int maximum_, int step_,
                            int defaultValue_, int value_)
-    : name{name_.str()},
+    : name{name_},
       propKind{kind_},
       hasMinimum{true},
       hasMaximum{true},
@@ -43,11 +43,10 @@ void PropertyImpl::SetValue(int v) {
   }
 }
 
-void PropertyImpl::SetValue(const wpi::Twine& v) {
+void PropertyImpl::SetValue(std::string_view v) {
   bool valueChanged = false;
-  std::string vStr = v.str();
-  if (valueStr != vStr) {
-    valueStr = vStr;
+  if (valueStr != v) {
+    valueStr = v;
     valueChanged = true;
   }
   bool wasValueSet = valueSet;

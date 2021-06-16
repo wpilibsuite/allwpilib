@@ -6,6 +6,7 @@
 #define NTCORE_IRPCSERVER_H_
 
 #include <memory>
+#include <string_view>
 
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -14,7 +15,7 @@ namespace nt {
 
 class IRpcServer {
  public:
-  typedef std::function<void(wpi::StringRef result)> SendResponseFunc;
+  using SendResponseFunc = std::function<void(std::string_view result)>;
 
   IRpcServer() = default;
   IRpcServer(const IRpcServer&) = delete;
@@ -24,7 +25,7 @@ class IRpcServer {
   virtual void RemoveRpc(unsigned int rpc_uid) = 0;
 
   virtual void ProcessRpc(unsigned int local_id, unsigned int call_uid,
-                          wpi::StringRef name, wpi::StringRef params,
+                          std::string_view name, std::string_view params,
                           const ConnectionInfo& conn,
                           SendResponseFunc send_response,
                           unsigned int rpc_uid) = 0;

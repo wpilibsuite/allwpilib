@@ -104,7 +104,7 @@ void glass::DisplayDIO(DIOModel* model, int index, bool outputsEnabled) {
 }
 
 void glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
-                        wpi::StringRef noneMsg) {
+                        std::string_view noneMsg) {
   bool hasAny = false;
 
   ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
@@ -116,6 +116,6 @@ void glass::DisplayDIOs(DIOsModel* model, bool outputsEnabled,
   });
   ImGui::PopItemWidth();
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }

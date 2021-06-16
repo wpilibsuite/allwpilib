@@ -15,7 +15,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDriveKinematicsConstraintTest {
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   @Test
   void testDifferentialDriveKinematicsConstraint() {
     double maxVelocity = Units.feetToMeters(12.0); // 12 feet per second

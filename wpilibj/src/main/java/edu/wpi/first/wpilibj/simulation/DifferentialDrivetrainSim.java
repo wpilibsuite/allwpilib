@@ -6,10 +6,10 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N7;
@@ -187,12 +187,18 @@ public class DifferentialDrivetrainSim {
    * Returns the direction the robot is pointing.
    *
    * <p>Note that this angle is counterclockwise-positive, while most gyros are clockwise positive.
+   *
+   * @return The direction the robot is pointing.
    */
   public Rotation2d getHeading() {
     return new Rotation2d(getOutput(State.kHeading));
   }
 
-  /** Returns the current pose. */
+  /**
+   * Returns the current pose.
+   *
+   * @return The current pose.
+   */
   public Pose2d getPose() {
     return new Pose2d(getOutput(State.kX), getOutput(State.kY), getHeading());
   }
@@ -447,6 +453,7 @@ public class DifferentialDrivetrainSim {
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
+   * @return A sim for the standard FRC kitbot.
    */
   public static DifferentialDrivetrainSim createKitbotSim(
       KitbotMotor motor,
@@ -475,6 +482,7 @@ public class DifferentialDrivetrainSim {
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
+   * @return A sim for the standard FRC kitbot.
    */
   @SuppressWarnings("ParameterName")
   public static DifferentialDrivetrainSim createKitbotSim(

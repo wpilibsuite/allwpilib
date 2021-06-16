@@ -8,11 +8,10 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 #include <wpigui.h>
 
 #include "glass/Model.h"
@@ -52,7 +51,7 @@ class Provider : public WindowManager {
    *
    * @param iniName Group name to use in ini file
    */
-  explicit Provider(const wpi::Twine& iniName) : WindowManager{iniName} {}
+  explicit Provider(std::string_view iniName) : WindowManager{iniName} {}
 
   Provider(const Provider&) = delete;
   Provider& operator=(const Provider&) = delete;
@@ -69,7 +68,7 @@ class Provider : public WindowManager {
    *
    * @param name View name
    */
-  void ShowDefault(wpi::StringRef name);
+  void ShowDefault(std::string_view name);
 
   /**
    * Register a model and view combination.  Equivalent to calling both
@@ -80,7 +79,7 @@ class Provider : public WindowManager {
    * @param createModel Functor for creating model
    * @param createView Functor for creating view
    */
-  void Register(wpi::StringRef name, ExistsFunc exists,
+  void Register(std::string_view name, ExistsFunc exists,
                 CreateModelFunc createModel, CreateViewFunc createView);
 
   /**
@@ -90,7 +89,7 @@ class Provider : public WindowManager {
    * @param exists Functor, returns true if model can be created
    * @param createModel Functor for creating model
    */
-  void RegisterModel(wpi::StringRef name, ExistsFunc exists,
+  void RegisterModel(std::string_view name, ExistsFunc exists,
                      CreateModelFunc createModel);
 
   /**
@@ -101,14 +100,14 @@ class Provider : public WindowManager {
    * @param exists Functor, returns true if view can be created
    * @param createView Functor for creating view
    */
-  void RegisterView(wpi::StringRef name, wpi::StringRef modelName,
+  void RegisterView(std::string_view name, std::string_view modelName,
                     ViewExistsFunc exists, CreateViewFunc createView);
 
  protected:
   virtual void Update();
 
   struct ModelEntry {
-    ModelEntry(wpi::StringRef name, ExistsFunc exists,
+    ModelEntry(std::string_view name, ExistsFunc exists,
                CreateModelFunc createModel)
         : name{name},
           exists{std::move(exists)},
@@ -122,7 +121,7 @@ class Provider : public WindowManager {
   };
 
   struct ViewEntry {
-    ViewEntry(wpi::StringRef name, ModelEntry* modelEntry,
+    ViewEntry(std::string_view name, ModelEntry* modelEntry,
               ViewExistsFunc exists, CreateViewFunc createView)
         : name{name},
           modelEntry{modelEntry},
@@ -143,16 +142,16 @@ class Provider : public WindowManager {
   using ViewEntries = std::vector<std::unique_ptr<ViewEntry>>;
   ViewEntries m_viewEntries;
 
-  typename ModelEntries::iterator FindModelEntry(wpi::StringRef name);
-  typename ViewEntries::iterator FindViewEntry(wpi::StringRef name);
+  typename ModelEntries::iterator FindModelEntry(std::string_view name);
+  typename ViewEntries::iterator FindViewEntry(std::string_view name);
 
   virtual std::unique_ptr<ModelEntry> MakeModelEntry(
-      wpi::StringRef name, ExistsFunc exists, CreateModelFunc createModel) {
+      std::string_view name, ExistsFunc exists, CreateModelFunc createModel) {
     return std::make_unique<ModelEntry>(name, std::move(exists),
                                         std::move(createModel));
   }
 
-  virtual std::unique_ptr<ViewEntry> MakeViewEntry(wpi::StringRef name,
+  virtual std::unique_ptr<ViewEntry> MakeViewEntry(std::string_view name,
                                                    ModelEntry* modelEntry,
                                                    ViewExistsFunc exists,
                                                    CreateViewFunc createView) {

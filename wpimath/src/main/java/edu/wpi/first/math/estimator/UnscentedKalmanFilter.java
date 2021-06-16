@@ -4,12 +4,12 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.math.Discretization;
-import edu.wpi.first.math.math.StateSpaceUtil;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
@@ -26,7 +26,7 @@ import org.ejml.simple.SimpleMatrix;
  * an estimate of the true covariance (as opposed to a linearized version of it). This means that
  * the UKF works with nonlinear systems.
  */
-@SuppressWarnings({"MemberName", "ClassTypeParameterName", "PMD.TooManyFields"})
+@SuppressWarnings({"MemberName", "ClassTypeParameterName"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
 
@@ -108,7 +108,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param addFuncX A function that adds two state vectors.
    * @param nominalDtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
+  @SuppressWarnings("ParameterName")
   public UnscentedKalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -144,7 +144,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     reset();
   }
 
-  @SuppressWarnings({"ParameterName", "LocalVariableName", "PMD.CyclomaticComplexity"})
+  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   static <S extends Num, C extends Num> Pair<Matrix<C, N1>, Matrix<C, C>> unscentedTransform(
       Nat<S> s,
       Nat<C> dim,
@@ -329,6 +329,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
    * of this function).
    *
+   * @param <R> Number of measurements in y.
+   * @param rows Number of rows in y.
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
@@ -357,6 +359,8 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * The h(x, u) passed to the constructor is used if one is not provided (the two-argument version
    * of this function).
    *
+   * @param <R> Number of measurements in y.
+   * @param rows Number of rows in y.
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.

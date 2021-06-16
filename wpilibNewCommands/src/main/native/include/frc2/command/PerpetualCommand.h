@@ -65,6 +65,8 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
 
   void End(bool interrupted) override;
 
+  PerpetualCommand Perpetually() && override;
+
  private:
   std::unique_ptr<Command> m_command;
 };

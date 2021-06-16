@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/function_ref.h>
 
 #include "glass/Model.h"
 
@@ -31,6 +32,6 @@ class PWMsModel : public Model {
 
 void DisplayPWM(PWMModel* model, int index, bool outputsEnabled);
 void DisplayPWMs(PWMsModel* model, bool outputsEnabled,
-                 wpi::StringRef noneMsg = "No PWM outputs");
+                 std::string_view noneMsg = "No PWM outputs");
 
 }  // namespace glass

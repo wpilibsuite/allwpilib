@@ -22,7 +22,7 @@ void TestI2CInitializationCallback(const char* name, void* param,
 TEST(I2CSimTests, TestI2CInitialization) {
   const int INDEX_TO_TEST = 1;
 
-  int32_t status;
+  int32_t status = 0;
   HAL_I2CPort port;
 
   int callbackParam = 0;
@@ -30,7 +30,6 @@ TEST(I2CSimTests, TestI2CInitialization) {
       INDEX_TO_TEST, &TestI2CInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  status = 0;
   port = HAL_I2C_kMXP;
   gTestI2CCallbackName = "Unset";
   HAL_InitializeI2C(port, &status);

@@ -7,13 +7,13 @@
 #include <memory>
 #include <string>
 
+#include <networktables/NTSendable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/smartdashboard/MechanismRoot2d.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 #include "frc/util/Color8Bit.h"
 
 namespace frc {
@@ -36,7 +36,8 @@ namespace frc {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
+class Mechanism2d : public nt::NTSendable,
+                    public wpi::SendableHelper<Mechanism2d> {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
@@ -59,7 +60,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    * @param y the root y coordinate
    * @return a new root object, or the existing one with the given name.
    */
-  MechanismRoot2d* GetRoot(wpi::StringRef name, double x, double y);
+  MechanismRoot2d* GetRoot(std::string_view name, double x, double y);
 
   /**
    * Set the Mechanism2d background color.
@@ -68,7 +69,7 @@ class Mechanism2d : public Sendable, public SendableHelper<Mechanism2d> {
    */
   void SetBackgroundColor(const Color8Bit& color);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   double m_width;

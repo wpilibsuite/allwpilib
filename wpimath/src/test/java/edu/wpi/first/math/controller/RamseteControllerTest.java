@@ -21,7 +21,6 @@ class RamseteControllerTest {
   private static final double kAngularTolerance = Math.toRadians(2);
 
   @Test
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   void testReachesReference() {
     final var controller = new RamseteController(2.0, 0.7);
     var robotPose = new Pose2d(2.7, 23.0, Rotation2d.fromDegrees(0.0));

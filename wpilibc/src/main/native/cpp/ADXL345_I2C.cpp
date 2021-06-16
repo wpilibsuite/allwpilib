@@ -5,9 +5,8 @@
 #include "frc/ADXL345_I2C.h"
 
 #include <hal/FRCUsageReporting.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -30,7 +29,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_I2C, 0);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL345_I2C", port);
+  wpi::SendableRegistry::AddLW(this, "ADXL345_I2C", port);
 }
 
 void ADXL345_I2C::SetRange(Range range) {
@@ -84,12 +83,12 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   return data;
 }
 
-void ADXL345_I2C::InitSendable(SendableBuilder& builder) {
+void ADXL345_I2C::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   auto x = builder.GetEntry("X").GetHandle();
   auto y = builder.GetEntry("Y").GetHandle();
   auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=]() {
+  builder.SetUpdateTable([=] {
     auto data = GetAccelerations();
     nt::NetworkTableEntry(x).SetDouble(data.XAxis);
     nt::NetworkTableEntry(y).SetDouble(data.YAxis);

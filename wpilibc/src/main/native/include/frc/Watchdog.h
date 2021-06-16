@@ -5,11 +5,10 @@
 #pragma once
 
 #include <functional>
+#include <string_view>
 #include <utility>
 
 #include <units/time.h>
-#include <wpi/StringRef.h>
-#include <wpi/deprecated.h>
 
 #include "frc/Tracer.h"
 
@@ -29,29 +28,11 @@ class Watchdog {
   /**
    * Watchdog constructor.
    *
-   * @deprecated use unit-safe version instead.
-   * Watchdog(units::second_t timeout, std::function<void()> callback)
-   *
-   * @param timeout  The watchdog's timeout in seconds with microsecond
-   *                 resolution.
-   * @param callback This function is called when the timeout expires.
-   */
-  WPI_DEPRECATED("Use unit-safe version instead")
-  Watchdog(double timeout, std::function<void()> callback);
-
-  /**
-   * Watchdog constructor.
-   *
    * @param timeout  The watchdog's timeout in seconds with microsecond
    *                 resolution.
    * @param callback This function is called when the timeout expires.
    */
   Watchdog(units::second_t timeout, std::function<void()> callback);
-
-  template <typename Callable, typename Arg, typename... Args>
-  WPI_DEPRECATED("Use unit-safe version instead")
-  Watchdog(double timeout, Callable&& f, Arg&& arg, Args&&... args)
-      : Watchdog(units::second_t{timeout}, arg, args...) {}
 
   template <typename Callable, typename Arg, typename... Args>
   Watchdog(units::second_t timeout, Callable&& f, Arg&& arg, Args&&... args)
@@ -65,21 +46,9 @@ class Watchdog {
   Watchdog& operator=(Watchdog&& rhs);
 
   /**
-   * Returns the time in seconds since the watchdog was last fed.
+   * Returns the time since the watchdog was last fed.
    */
-  double GetTime() const;
-
-  /**
-   * Sets the watchdog's timeout.
-   *
-   * @deprecated use the unit safe version instead.
-   * SetTimeout(units::second_t timeout)
-   *
-   * @param timeout The watchdog's timeout in seconds with microsecond
-   *                resolution.
-   */
-  WPI_DEPRECATED("Use unit-safe version instead")
-  void SetTimeout(double timeout);
+  units::second_t GetTime() const;
 
   /**
    * Sets the watchdog's timeout.
@@ -90,9 +59,9 @@ class Watchdog {
   void SetTimeout(units::second_t timeout);
 
   /**
-   * Returns the watchdog's timeout in seconds.
+   * Returns the watchdog's timeout.
    */
-  double GetTimeout() const;
+  units::second_t GetTimeout() const;
 
   /**
    * Returns true if the watchdog timer has expired.
@@ -107,7 +76,7 @@ class Watchdog {
    *
    * @param epochName The name to associate with the epoch.
    */
-  void AddEpoch(wpi::StringRef epochName);
+  void AddEpoch(std::string_view epochName);
 
   /**
    * Prints list of epochs added so far and their times.
@@ -143,7 +112,7 @@ class Watchdog {
 
  private:
   // Used for timeout print rate-limiting
-  static constexpr units::second_t kMinPrintPeriod = 1_s;
+  static constexpr auto kMinPrintPeriod = 1_s;
 
   units::second_t m_startTime = 0_s;
   units::second_t m_timeout;

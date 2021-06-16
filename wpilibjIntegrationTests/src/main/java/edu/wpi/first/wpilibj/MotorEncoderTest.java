@@ -9,8 +9,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -58,9 +58,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(
         new MotorEncoderFixture<?>[][] {
-          {TestBench.getInstance().getTalonPair()},
-          {TestBench.getInstance().getVictorPair()},
-          {TestBench.getInstance().getJaguarPair()}
+          {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
         });
   }
 

@@ -38,6 +38,7 @@ public class CvSink extends ImageSink {
    * Wait for the next frame and get the image. Times out (returning 0) after 0.225 seconds. The
    * provided image will have three 3-bit channels stored in BGR order.
    *
+   * @param image Where to store the image.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message)
    */
   public long grabFrame(Mat image) {
@@ -48,6 +49,8 @@ public class CvSink extends ImageSink {
    * Wait for the next frame and get the image. Times out (returning 0) after timeout seconds. The
    * provided image will have three 3-bit channels stored in BGR order.
    *
+   * @param image Where to store the image.
+   * @param timeout Retrieval timeout in seconds.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
    *     is in 1 us increments.
    */
@@ -59,6 +62,7 @@ public class CvSink extends ImageSink {
    * Wait for the next frame and get the image. May block forever. The provided image will have
    * three 3-bit channels stored in BGR order.
    *
+   * @param image Where to store the image.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
    *     is in 1 us increments.
    */

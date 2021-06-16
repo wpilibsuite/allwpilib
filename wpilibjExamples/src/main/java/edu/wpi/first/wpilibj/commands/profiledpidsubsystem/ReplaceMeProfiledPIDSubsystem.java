@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj.commands.profiledpidsubsystem;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDSubsystem;
 
 public class ReplaceMeProfiledPIDSubsystem extends ProfiledPIDSubsystem {

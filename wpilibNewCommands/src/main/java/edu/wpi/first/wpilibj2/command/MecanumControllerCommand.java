@@ -6,6 +6,9 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,9 +18,6 @@ import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.controller.HolonomicDriveController;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * <p>The robot angle controller does not follow the angle given by the trajectory but rather goes
  * to the angle given in the final state of the trajectory.
  */
-@SuppressWarnings({"PMD.TooManyFields", "MemberName"})
+@SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -85,7 +85,7 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -177,7 +177,7 @@ public class MecanumControllerCommand extends CommandBase {
    *     voltages.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -235,7 +235,7 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -307,7 +307,7 @@ public class MecanumControllerCommand extends CommandBase {
    * @param outputWheelSpeeds A MecanumDriveWheelSpeeds object containing the output wheel speeds.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings({"PMD.ExcessiveParameterList", "ParameterName"})
+  @SuppressWarnings("ParameterName")
   public MecanumControllerCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,

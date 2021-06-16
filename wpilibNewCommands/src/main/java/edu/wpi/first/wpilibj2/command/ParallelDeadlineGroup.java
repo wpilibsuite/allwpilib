@@ -117,4 +117,10 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
   public boolean runsWhenDisabled() {
     return m_runWhenDisabled;
   }
+
+  @Override
+  public ParallelDeadlineGroup deadlineWith(Command... parallel) {
+    addCommands(parallel);
+    return this;
+  }
 }

@@ -26,8 +26,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <wpi/MemAlloc.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
 #include "COMCreators.h"
@@ -69,17 +68,17 @@ using namespace cs;
 
 namespace cs {
 
-UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
-                             const wpi::Twine& path)
-    : SourceImpl{name, logger, notifier, telemetry}, m_path{path.str()} {
+                             std::string_view path)
+    : SourceImpl{name, logger, notifier, telemetry}, m_path{path} {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
   m_widePath = utf8_conv.from_bytes(m_path.c_str());
   m_deviceId = -1;
   StartMessagePump();
 }
 
-UsbCameraImpl::UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger,
+UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              int deviceId)
     : SourceImpl{name, logger, notifier, telemetry}, m_deviceId(deviceId) {
@@ -99,11 +98,11 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
           SetCameraMessage, msg.kind, &msg);
   *status = result;
 }
-void UsbCameraImpl::SetStringProperty(int property, const wpi::Twine& value,
+void UsbCameraImpl::SetStringProperty(int property, std::string_view value,
                                       CS_Status* status) {
   Message msg{Message::kCmdSetPropertyStr};
   msg.data[0] = property;
-  msg.dataStr = value.str();
+  msg.dataStr = value;
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
           SetCameraMessage, msg.kind, &msg);
@@ -197,9 +196,9 @@ void UsbCameraImpl::NumSinksEnabledChanged() {
       SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
 }
 
-void UsbCameraImpl::SetPath(const wpi::Twine& path, CS_Status* status) {
+void UsbCameraImpl::SetPath(std::string_view path, CS_Status* status) {
   Message msg{Message::kCmdSetPath};
-  msg.dataStr = path.str();
+  msg.dataStr = path;
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
           SetCameraMessage, msg.kind, &msg);
@@ -257,7 +256,7 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 
 void UsbCameraImpl::DeviceDisconnect() {
   if (m_connectVerbose)
-    SINFO("Disconnected from " << m_path);
+    SINFO("Disconnected from {}", m_path);
   m_sourceReader.Reset();
   m_mediaSource.Reset();
   if (m_imageCallback) {
@@ -268,8 +267,8 @@ void UsbCameraImpl::DeviceDisconnect() {
   SetConnected(false);
 }
 
-static bool IsPercentageProperty(wpi::StringRef name) {
-  if (name.startswith("raw_"))
+static bool IsPercentageProperty(std::string_view name) {
+  if (wpi::starts_with(name, "raw_"))
     name = name.substr(4);
   return name == "Brightness" || name == "Contrast" || name == "Saturation" ||
          name == "Hue" || name == "Sharpness" || name == "Gain" ||
@@ -341,8 +340,7 @@ void UsbCameraImpl::ProcessFrame(IMFSample* videoSample,
     case cs::VideoMode::PixelFormat::kMJPEG: {
       // Special case
       PutFrame(VideoMode::kMJPEG, mode.width, mode.height,
-               wpi::StringRef(reinterpret_cast<char*>(ptr), length),
-               wpi::Now());
+               {reinterpret_cast<char*>(ptr), length}, wpi::Now());
       doFinalSet = false;
       break;
     }
@@ -477,9 +475,9 @@ bool UsbCameraImpl::DeviceConnect() {
     return true;
 
   if (m_connectVerbose)
-    SINFO("Connecting to USB camera on " << m_path);
+    SINFO("Connecting to USB camera on {}", m_path);
 
-  SDEBUG3("opening device");
+  SDEBUG3("{}", "opening device");
 
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
@@ -506,13 +504,13 @@ bool UsbCameraImpl::DeviceConnect() {
   }
 
   if (!m_properties_cached) {
-    SDEBUG3("caching properties");
+    SDEBUG3("{}", "caching properties");
     DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
   } else {
-    SDEBUG3("restoring video mode");
+    SDEBUG3("{}", "restoring video mode");
     DeviceSetMode();
   }
 
@@ -526,7 +524,7 @@ bool UsbCameraImpl::DeviceConnect() {
 }
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
-    const wpi::Twine& name) const {
+    std::string_view name) const {
   return nullptr;
 }
 
@@ -535,8 +533,9 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   auto result = m_messagePump->SendWindowMessage<CS_Status>(
       WaitForStartupMessage, nullptr, nullptr);
   *status = result;
-  if (*status != CS_OK)
+  if (*status != CS_OK) {
     return false;
+  }
   if (!m_properties_cached) {
     *status = CS_SOURCE_IS_DISCONNECTED;
     return false;
@@ -545,7 +544,7 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 template <typename TagProperty, typename IAM>
-void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
+void UsbCameraImpl::DeviceAddProperty(std::string_view name_, TagProperty tag,
                                       IAM* pProcAmp) {
   // First see if properties exist
   bool isValid = false;
@@ -556,11 +555,11 @@ void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_, TagProperty tag,
   }
 }
 
-template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+template void UsbCameraImpl::DeviceAddProperty(std::string_view name_,
                                                tagVideoProcAmpProperty tag,
                                                IAMVideoProcAmp* pProcAmp);
 
-template void UsbCameraImpl::DeviceAddProperty(const wpi::Twine& name_,
+template void UsbCameraImpl::DeviceAddProperty(std::string_view name_,
                                                tagCameraControlProperty tag,
                                                IAMCameraControl* pProcAmp);
 
@@ -669,7 +668,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   } else {
     // Read current raw value and set percentage from it
     if (!rawProp->DeviceGet(lock, pProcAmp))
-      SWARNING("failed to get property " << rawProp->name);
+      SWARNING("failed to get property {}", rawProp->name);
 
     if (perProp) {
       perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
@@ -680,7 +679,7 @@ void UsbCameraImpl::DeviceCacheProperty(
   // Set value on device if user-configured
   if (rawProp->valueSet) {
     if (!rawProp->DeviceSet(lock, pProcAmp))
-      SWARNING("failed to set property " << rawProp->name);
+      SWARNING("failed to set property {}", rawProp->name);
   }
 
   // Update pointers since we released the lock
@@ -764,7 +763,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   bool setString = (msg.kind == Message::kCmdSetPropertyStr);
   int property = msg.data[0];
   int value = msg.data[1];
-  wpi::StringRef valueStr = msg.dataStr;
+  std::string_view valueStr = msg.dataStr;
 
   // Look up
   auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
@@ -885,10 +884,12 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
 }
 
 bool UsbCameraImpl::DeviceStreamOn() {
-  if (m_streaming)
+  if (m_streaming) {
     return false;
-  if (!m_deviceValid)
+  }
+  if (!m_deviceValid) {
     return false;
+  }
   m_streaming = true;
   m_sourceReader->ReadSample(MF_SOURCE_READER_FIRST_VIDEO_STREAM, 0, NULL, NULL,
                              NULL, NULL);
@@ -1022,23 +1023,21 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   m_notifier.NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-static void ParseVidAndPid(wpi::StringRef path, int* pid, int* vid) {
-  auto vidIndex = path.find_lower("vid_");
-  auto pidIndex = path.find_lower("pid_");
+static void ParseVidAndPid(std::string_view path, int* pid, int* vid) {
+  auto vidIndex = wpi::find_lower(path, "vid_");
+  auto pidIndex = wpi::find_lower(path, "pid_");
 
-  if (vidIndex != wpi::StringRef::npos) {
-    auto vidSlice = path.slice(vidIndex + 4, vidIndex + 8);
-    uint16_t val = 0;
-    if (!vidSlice.getAsInteger(16, val)) {
-      *vid = val;
+  if (vidIndex != std::string_view::npos) {
+    auto vidSlice = wpi::slice(path, vidIndex + 4, vidIndex + 8);
+    if (auto v = wpi::parse_integer<uint16_t>(vidSlice, 16)) {
+      *vid = v.value();
     }
   }
 
-  if (pidIndex != wpi::StringRef::npos) {
-    auto pidSlice = path.slice(pidIndex + 4, pidIndex + 8);
-    uint16_t val = 0;
-    if (!pidSlice.getAsInteger(16, val)) {
-      *pid = val;
+  if (pidIndex != std::string_view::npos) {
+    auto pidSlice = wpi::slice(path, pidIndex + 4, pidIndex + 8);
+    if (auto v = wpi::parse_integer<uint16_t>(pidSlice, 16)) {
+      *pid = v.value();
     }
   }
 }
@@ -1112,7 +1111,7 @@ done:
   return retval;
 }
 
-CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
+CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
   // First check if device exists
   auto devices = cs::EnumerateUsbCameras(status);
@@ -1125,7 +1124,7 @@ CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
-CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
+CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
                               CS_Status* status) {
   auto& inst = Instance::GetInstance();
   auto source = std::make_shared<UsbCameraImpl>(
@@ -1133,7 +1132,7 @@ CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
   return inst.CreateSource(CS_SOURCE_USB, source);
 }
 
-void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+void SetUsbCameraPath(CS_Source source, std::string_view path,
                       CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data || data->kind != CS_SOURCE_USB) {

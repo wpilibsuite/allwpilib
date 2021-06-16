@@ -4,9 +4,9 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
-import edu.wpi.first.math.math.Discretization;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import org.ejml.simple.SimpleMatrix;
@@ -64,7 +64,7 @@ public class LinearPlantInversionFeedforward<
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_uff = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
-    reset(m_r);
+    reset();
   }
 
   /**

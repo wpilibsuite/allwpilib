@@ -4,13 +4,11 @@
 
 #include "frc/IterativeRobotBase.h"
 
+#include <fmt/format.h>
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -25,33 +23,33 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::SimulationInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::DisabledInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::AutonomousInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::TeleopInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::TestInit() {
-  wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
 }
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -59,7 +57,7 @@ void IterativeRobotBase::RobotPeriodic() {
 void IterativeRobotBase::SimulationPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -67,7 +65,7 @@ void IterativeRobotBase::SimulationPeriodic() {
 void IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -75,7 +73,7 @@ void IterativeRobotBase::DisabledPeriodic() {
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -83,7 +81,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
 void IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -91,7 +89,7 @@ void IterativeRobotBase::TeleopPeriodic() {
 void IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    wpi::outs() << "Default " << __FUNCTION__ << "() method... Override me!\n";
+    fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -112,7 +110,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call DisabledInit() if we are now just entering disabled mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kDisabled) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
@@ -126,7 +124,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call AutonomousInit() if we are now just entering autonomous mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kAutonomous) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
@@ -140,7 +138,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call TeleopInit() if we are now just entering teleop mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTeleop) {
-      LiveWindow::GetInstance()->SetEnabled(false);
+      LiveWindow::SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
@@ -154,7 +152,7 @@ void IterativeRobotBase::LoopFunc() {
     // Call TestInit() if we are now just entering test mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTest) {
-      LiveWindow::GetInstance()->SetEnabled(true);
+      LiveWindow::SetEnabled(true);
       Shuffleboard::EnableActuatorWidgets();
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
@@ -171,7 +169,7 @@ void IterativeRobotBase::LoopFunc() {
 
   SmartDashboard::UpdateValues();
   m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
-  LiveWindow::GetInstance()->UpdateValues();
+  LiveWindow::UpdateValues();
   m_watchdog.AddEpoch("LiveWindow::UpdateValues()");
   Shuffleboard::Update();
   m_watchdog.AddEpoch("Shuffleboard::Update()");
@@ -197,11 +195,6 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  wpi::SmallString<128> str;
-  wpi::raw_svector_ostream buf(str);
-
-  buf << "Loop time of " << wpi::format("%.6f", m_period.to<double>())
-      << "s overrun\n";
-
-  DriverStation::ReportWarning(str);
+  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun",
+                  m_period.to<double>());
 }

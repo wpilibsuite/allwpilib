@@ -6,10 +6,9 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/StringRef.h>
 
 #include "glass/Model.h"
 
@@ -24,7 +23,7 @@ class DriveModel : public Model {
     DataSource* percent;
     std::function<void(double)> setter;
 
-    WheelInfo(wpi::StringRef name, DataSource* percent,
+    WheelInfo(std::string_view name, DataSource* percent,
               std::function<void(double)> setter)
         : name(name), percent(percent), setter(std::move(setter)) {}
   };

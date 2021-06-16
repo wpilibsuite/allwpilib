@@ -6,131 +6,125 @@
 
 #include <utility>
 
+#include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/DutyCycle.h"
 #include "frc/Errors.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
-  SendableRegistry::GetInstance().AddChild(this, m_analogInput);
+  wpi::SendableRegistry::AddChild(this, m_analogInput);
 }
 
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &status);
-  FRC_CheckErrorStatus(status, "InitializeAnalogTrigger");
+  FRC_CheckErrorStatus(status, "Channel {}", input->GetChannel());
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::AnalogTrigger(DutyCycle* input) {
   m_dutyCycle = input;
   int32_t status = 0;
   m_trigger = HAL_InitializeAnalogTriggerDutyCycle(input->m_handle, &status);
-  FRC_CheckErrorStatus(status, "InitializeAnalogTriggerDutyCycle");
+  FRC_CheckErrorStatus(status, "Channel {}", m_dutyCycle->GetSourceChannel());
   int index = GetIndex();
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, index + 1);
-  SendableRegistry::GetInstance().AddLW(this, "AnalogTrigger", index);
+  wpi::SendableRegistry::AddLW(this, "AnalogTrigger", index);
 }
 
 AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   HAL_CleanAnalogTrigger(m_trigger, &status);
-  FRC_ReportError(status, "CleanAnalogTrigger");
+  FRC_ReportError(status, "Channel {}", GetSourceChannel());
 
   if (m_ownsAnalog) {
     delete m_analogInput;
   }
 }
 
-AnalogTrigger::AnalogTrigger(AnalogTrigger&& rhs)
-    : SendableHelper(std::move(rhs)), m_trigger(std::move(rhs.m_trigger)) {
-  std::swap(m_analogInput, rhs.m_analogInput);
-  std::swap(m_dutyCycle, rhs.m_dutyCycle);
-  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
-}
-
-AnalogTrigger& AnalogTrigger::operator=(AnalogTrigger&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
-
-  m_trigger = std::move(rhs.m_trigger);
-  std::swap(m_analogInput, rhs.m_analogInput);
-  std::swap(m_dutyCycle, rhs.m_dutyCycle);
-  std::swap(m_ownsAnalog, rhs.m_ownsAnalog);
-
-  return *this;
-}
-
 void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsVoltage");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetLimitsDutyCycle(double lower, double upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsDutyCycle(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsDutyCycle");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
-  FRC_CheckErrorStatus(status, "SetLimitsRaw");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetAveraged(bool useAveragedValue) {
   int32_t status = 0;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
-  FRC_CheckErrorStatus(status, "SetAveraged");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
   int32_t status = 0;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
-  FRC_CheckErrorStatus(status, "SetFiltered");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 int AnalogTrigger::GetIndex() const {
   int32_t status = 0;
   auto ret = HAL_GetAnalogTriggerFPGAIndex(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetIndex");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return ret;
 }
 
 bool AnalogTrigger::GetInWindow() {
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerInWindow(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetInWindow");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return result;
 }
 
 bool AnalogTrigger::GetTriggerState() {
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerTriggerState(m_trigger, &status);
-  FRC_CheckErrorStatus(status, "GetTriggerState");
+  FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
   return result;
 }
 
 std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
   return std::shared_ptr<AnalogTriggerOutput>(
-      new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
+      new AnalogTriggerOutput(*this, type),
+      wpi::NullDeleter<AnalogTriggerOutput>());
 }
 
-void AnalogTrigger::InitSendable(SendableBuilder& builder) {
+void AnalogTrigger::InitSendable(wpi::SendableBuilder& builder) {
   if (m_ownsAnalog) {
     m_analogInput->InitSendable(builder);
+  }
+}
+
+int AnalogTrigger::GetSourceChannel() const {
+  if (m_analogInput) {
+    return m_analogInput->GetChannel();
+  } else if (m_dutyCycle) {
+    return m_dutyCycle->GetSourceChannel();
+  } else {
+    return -1;
   }
 }

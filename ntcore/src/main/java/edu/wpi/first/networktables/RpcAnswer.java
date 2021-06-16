@@ -36,6 +36,7 @@ public final class RpcAnswer {
    * @param params Call raw parameters
    * @param conn Connection info
    */
+  @SuppressWarnings("PMD.ArrayIsStoredDirectly")
   public RpcAnswer(
       NetworkTableInstance inst,
       int entry,

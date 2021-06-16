@@ -7,14 +7,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableValue.h>
-#include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
 #include <wpi/StringMap.h>
-#include <wpi/Twine.h>
+#include <wpi/span.h>
 
 #include "frc/shuffleboard/BuiltInLayouts.h"
 #include "frc/shuffleboard/LayoutType.h"
@@ -26,10 +26,13 @@ namespace cs {
 class VideoSource;
 }  // namespace cs
 
+namespace wpi {
+class Sendable;
+}  // namespace wpi
+
 namespace frc {
 
 class ComplexWidget;
-class Sendable;
 class ShuffleboardLayout;
 class SimpleWidget;
 
@@ -38,7 +41,7 @@ class SimpleWidget;
  */
 class ShuffleboardContainer : public virtual ShuffleboardValue {
  public:
-  explicit ShuffleboardContainer(const wpi::Twine& title);
+  explicit ShuffleboardContainer(std::string_view title);
 
   ShuffleboardContainer(ShuffleboardContainer&& rhs) = default;
 
@@ -58,7 +61,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param layoutType the type of the layout, eg "List" or "Grid"
    * @return the layout
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& title, BuiltInLayouts type);
+  ShuffleboardLayout& GetLayout(std::string_view title, BuiltInLayouts type);
 
   /**
    * Gets the layout with the given type and title, creating it if it does not
@@ -68,8 +71,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param layoutType the type of the layout, eg "List" or "Grid"
    * @return the layout
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& title,
-                                const LayoutType& type);
+  ShuffleboardLayout& GetLayout(std::string_view title, const LayoutType& type);
 
   /**
    * Gets the layout with the given type and title, creating it if it does not
@@ -84,8 +86,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return the layout
    * @see #GetLayout(String, LayoutType)
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& title,
-                                const wpi::Twine& type);
+  ShuffleboardLayout& GetLayout(std::string_view title, std::string_view type);
 
   /**
    * Gets the already-defined layout in this container with the given title.
@@ -102,7 +103,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return the layout with the given title
    * @throws if no layout has yet been defined with the given title
    */
-  ShuffleboardLayout& GetLayout(const wpi::Twine& title);
+  ShuffleboardLayout& GetLayout(std::string_view title);
 
   /**
    * Adds a widget to this container to display the given sendable.
@@ -113,7 +114,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this
    * container with the given title
    */
-  ComplexWidget& Add(const wpi::Twine& title, Sendable& sendable);
+  ComplexWidget& Add(std::string_view title, wpi::Sendable& sendable);
 
   /**
    * Adds a widget to this container to display the given video stream.
@@ -124,7 +125,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @throws IllegalArgumentException if a widget already exists in this
    * container with the given title
    */
-  ComplexWidget& Add(const wpi::Twine& title, const cs::VideoSource& video);
+  ComplexWidget& Add(std::string_view title, const cs::VideoSource& video);
 
   /**
    * Adds a widget to this container to display the given sendable.
@@ -135,7 +136,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * container with the given title, or if the sendable's name has not been
    * specified
    */
-  ComplexWidget& Add(Sendable& sendable);
+  ComplexWidget& Add(wpi::Sendable& sendable);
 
   /**
    * Adds a widget to this container to display the given video stream.
@@ -157,7 +158,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title,
+  SimpleWidget& Add(std::string_view title,
                     std::shared_ptr<nt::Value> defaultValue);
 
   /**
@@ -170,7 +171,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, bool defaultValue);
+  SimpleWidget& Add(std::string_view title, bool defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -182,7 +183,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, double defaultValue);
+  SimpleWidget& Add(std::string_view title, double defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -194,7 +195,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, int defaultValue);
+  SimpleWidget& Add(std::string_view title, int defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -206,7 +207,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, const wpi::Twine& defaultValue);
+  SimpleWidget& Add(std::string_view title, std::string_view defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -218,7 +219,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, const char* defaultValue);
+  SimpleWidget& Add(std::string_view title, const char* defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -230,7 +231,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title, wpi::ArrayRef<bool> defaultValue);
+  SimpleWidget& Add(std::string_view title, wpi::span<const bool> defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -242,8 +243,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title,
-                    wpi::ArrayRef<double> defaultValue);
+  SimpleWidget& Add(std::string_view title,
+                    wpi::span<const double> defaultValue);
 
   /**
    * Adds a widget to this container to display the given data.
@@ -255,8 +256,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *         container with the given title
    * @see #addPersistent(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& Add(const wpi::Twine& title,
-                    wpi::ArrayRef<std::string> defaultValue);
+  SimpleWidget& Add(std::string_view title,
+                    wpi::span<const std::string> defaultValue);
 
   /**
    * Adds a widget to this container. The widget will display the data provided
@@ -269,7 +270,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display data
    */
   SuppliedValueWidget<std::string>& AddString(
-      const wpi::Twine& title, std::function<std::string()> supplier);
+      std::string_view title, std::function<std::string()> supplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided
@@ -281,7 +282,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param valueSupplier the supplier for values
    * @return a widget to display data
    */
-  SuppliedValueWidget<double>& AddNumber(const wpi::Twine& title,
+  SuppliedValueWidget<double>& AddNumber(std::string_view title,
                                          std::function<double()> supplier);
 
   /**
@@ -294,7 +295,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param valueSupplier the supplier for values
    * @return a widget to display data
    */
-  SuppliedValueWidget<bool>& AddBoolean(const wpi::Twine& title,
+  SuppliedValueWidget<bool>& AddBoolean(std::string_view title,
                                         std::function<bool()> supplier);
 
   /**
@@ -308,7 +309,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display data
    */
   SuppliedValueWidget<std::vector<std::string>>& AddStringArray(
-      const wpi::Twine& title,
+      std::string_view title,
       std::function<std::vector<std::string>()> supplier);
 
   /**
@@ -322,7 +323,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display data
    */
   SuppliedValueWidget<std::vector<double>>& AddNumberArray(
-      const wpi::Twine& title, std::function<std::vector<double>()> supplier);
+      std::string_view title, std::function<std::vector<double>()> supplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided
@@ -335,7 +336,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display data
    */
   SuppliedValueWidget<std::vector<int>>& AddBooleanArray(
-      const wpi::Twine& title, std::function<std::vector<int>()> supplier);
+      std::string_view title, std::function<std::vector<int>()> supplier);
 
   /**
    * Adds a widget to this container. The widget will display the data provided
@@ -347,8 +348,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @param valueSupplier the supplier for values
    * @return a widget to display data
    */
-  SuppliedValueWidget<wpi::StringRef>& AddRaw(
-      const wpi::Twine& title, std::function<wpi::StringRef()> supplier);
+  SuppliedValueWidget<std::string_view>& AddRaw(
+      std::string_view title, std::function<std::string_view()> supplier);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -362,7 +363,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title,
+  SimpleWidget& AddPersistent(std::string_view title,
                               std::shared_ptr<nt::Value> defaultValue);
 
   /**
@@ -377,7 +378,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title, bool defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title, bool defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -391,7 +392,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title, double defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title, double defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -405,7 +406,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title, int defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title, int defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -419,8 +420,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title,
-                              const wpi::Twine& defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title,
+                              std::string_view defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -434,8 +435,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title,
-                              wpi::ArrayRef<bool> defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title,
+                              wpi::span<const bool> defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -449,8 +450,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title,
-                              wpi::ArrayRef<double> defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title,
+                              wpi::span<const double> defaultValue);
 
   /**
    * Adds a widget to this container to display a simple piece of data.
@@ -464,8 +465,8 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    * @return a widget to display the sendable data
    * @see #add(String, Object) add(String title, Object defaultValue)
    */
-  SimpleWidget& AddPersistent(const wpi::Twine& title,
-                              wpi::ArrayRef<std::string> defaultValue);
+  SimpleWidget& AddPersistent(std::string_view title,
+                              wpi::span<const std::string> defaultValue);
 
   void EnableIfActuator() override;
 
@@ -484,7 +485,7 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
    *
    * @return True if title isn't in use; false otherwise.
    */
-  void CheckTitle(const wpi::Twine& title);
+  void CheckTitle(std::string_view title);
 
   friend class SimpleWidget;
 };
@@ -505,7 +506,7 @@ inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
 }
 
 inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
-    const wpi::Twine& title, const cs::VideoSource& video) {
+    std::string_view title, const cs::VideoSource& video) {
   return Add(title, frc::SendableCameraWrapper::Wrap(video));
 }
 #endif

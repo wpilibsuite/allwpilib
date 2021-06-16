@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include <memory>
 
+#include <frc/Timer.h>
 #include <frc/controller/HolonomicDriveController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/controller/ProfiledPIDController.h>
@@ -18,20 +19,19 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/voltage.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "CommandBase.h"
 #include "CommandHelper.h"
-#include "frc2/Timer.h"
 
 #pragma once
 
 namespace frc2 {
 
 /**
- * A command that uses two PID controllers ({@link PIDController}) and a
- * ProfiledPIDController ({@link ProfiledPIDController}) to follow a trajectory
- * {@link Trajectory} with a swerve drive.
+ * A command that uses two PID controllers (PIDController) and a profiled PID
+ * controller (ProfiledPIDController) to follow a trajectory (Trajectory) with a
+ * swerve drive.
  *
  * <p>The command handles trajectory-following, Velocity PID calculations, and
  * feedforwards internally. This is intended to be a more-or-less "complete
@@ -167,7 +167,7 @@ class SwerveControllerCommand
       std::function<frc::Rotation2d()> desiredRotation,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   /**
    * Constructs a new SwerveControllerCommand that when executed will follow the
@@ -205,7 +205,7 @@ class SwerveControllerCommand
       frc::ProfiledPIDController<units::radians> thetaController,
       std::function<void(std::array<frc::SwerveModuleState, NumModules>)>
           output,
-      wpi::ArrayRef<Subsystem*> requirements = {});
+      wpi::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 
@@ -225,7 +225,7 @@ class SwerveControllerCommand
 
   std::function<frc::Rotation2d()> m_desiredRotation;
 
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
   units::second_t m_prevTime;
   frc::Rotation2d m_finalRotation;
 };

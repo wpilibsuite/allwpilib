@@ -20,11 +20,7 @@ import org.junit.jupiter.api.Test;
 
 public class SwerveDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings({
-    "LocalVariableName",
-    "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ExcessiveMethodLength"
-  })
+  @SuppressWarnings("LocalVariableName")
   public void testAccuracy() {
     var kinematics =
         new SwerveDriveKinematics(

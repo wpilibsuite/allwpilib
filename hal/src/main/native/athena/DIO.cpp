@@ -5,9 +5,8 @@
 #include "hal/DIO.h"
 
 #include <cmath>
+#include <cstdio>
 #include <thread>
-
-#include <wpi/raw_ostream.h>
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
@@ -143,8 +142,8 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   while (port.use_count() != 1) {
     auto current = hal::fpga_clock::now();
     if (start + std::chrono::seconds(1) < current) {
-      wpi::outs() << "DIO handle free timeout\n";
-      wpi::outs().flush();
+      std::puts("DIO handle free timeout");
+      std::fflush(stdout);
       break;
     }
     std::this_thread::yield();
@@ -273,6 +272,29 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
   }
   {
     std::scoped_lock lock(digitalDIOMutex);
+
+    tDIO::tOutputEnable currentOutputEnable =
+        digitalSystem->readOutputEnable(status);
+
+    HAL_Bool isInput = false;
+
+    if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+      isInput =
+          ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
+           1) != 0;
+    } else if (port->channel < kNumDigitalHeaders) {
+      isInput = ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
+    } else {
+      isInput = ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) &
+                 1) != 0;
+    }
+
+    if (isInput) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(status, "Cannot set output of an input channel");
+      return;
+    }
+
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {

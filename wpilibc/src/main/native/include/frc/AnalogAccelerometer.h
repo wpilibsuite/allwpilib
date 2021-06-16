@@ -6,13 +6,12 @@
 
 #include <memory>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Handle operation of an analog accelerometer.
@@ -21,8 +20,8 @@ class SendableBuilder;
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public Sendable,
-                            public SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::Sendable,
+                            public wpi::SendableHelper<AnalogAccelerometer> {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -93,7 +92,7 @@ class AnalogAccelerometer : public Sendable,
    */
   void SetZero(double zero);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**

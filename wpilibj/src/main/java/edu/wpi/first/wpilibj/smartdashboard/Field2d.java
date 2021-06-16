@@ -6,8 +6,10 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ import java.util.List;
  * using the getObject() function. Other objects can also have multiple poses (which will show the
  * object at multiple locations).
  */
-public class Field2d implements Sendable {
+public class Field2d implements NTSendable {
   /** Constructor. */
   public Field2d() {
     FieldObject2d obj = new FieldObject2d("Robot");
@@ -69,6 +71,7 @@ public class Field2d implements Sendable {
   /**
    * Get or create a field object.
    *
+   * @param name The field object's name.
    * @return Field object
    */
   public synchronized FieldObject2d getObject(String name) {
@@ -97,7 +100,7 @@ public class Field2d implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Field2d");
     m_table = builder.getTable();
 

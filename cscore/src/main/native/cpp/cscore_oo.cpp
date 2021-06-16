@@ -4,6 +4,7 @@
 
 #include "cscore_oo.h"
 
+#include <fmt/format.h>
 #include <wpi/json.h>
 
 using namespace cs;
@@ -81,4 +82,8 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
     sinks.emplace_back(VideoSink{handle});
   }
   return sinks;
+}
+
+std::string AxisCamera::HostToUrl(std::string_view host) {
+  return fmt::format("http://{}/mjpg/video.mjpg", host);
 }

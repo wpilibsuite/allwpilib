@@ -11,15 +11,14 @@
 
 using namespace cs;
 
-int PropertyContainer::GetPropertyIndex(const wpi::Twine& name) const {
+int PropertyContainer::GetPropertyIndex(std::string_view name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
   if (!m_properties_cached) {
     CacheProperties(&status);
   }
   std::scoped_lock lock(m_mutex);
-  wpi::SmallVector<char, 64> nameBuf;
-  int& ndx = m_properties[name.toStringRef(nameBuf)];
+  int& ndx = m_properties[name];
   if (ndx == 0) {
     // create a new index
     ndx = m_propertyData.size() + 1;
@@ -28,7 +27,7 @@ int PropertyContainer::GetPropertyIndex(const wpi::Twine& name) const {
   return ndx;
 }
 
-wpi::ArrayRef<int> PropertyContainer::EnumerateProperties(
+wpi::span<int> PropertyContainer::EnumerateProperties(
     wpi::SmallVectorImpl<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
@@ -55,7 +54,7 @@ CS_PropertyKind PropertyContainer::GetPropertyKind(int property) const {
   return prop->propKind;
 }
 
-wpi::StringRef PropertyContainer::GetPropertyName(
+std::string_view PropertyContainer::GetPropertyName(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
@@ -108,7 +107,7 @@ void PropertyContainer::SetProperty(int property, int value,
     return;
   }
 
-  UpdatePropertyValue(property, false, value, wpi::Twine{});
+  UpdatePropertyValue(property, false, value, {});
 }
 
 int PropertyContainer::GetPropertyMin(int property, CS_Status* status) const {
@@ -164,7 +163,7 @@ int PropertyContainer::GetPropertyDefault(int property,
   return prop->defaultValue;
 }
 
-wpi::StringRef PropertyContainer::GetStringProperty(
+std::string_view PropertyContainer::GetStringProperty(
     int property, wpi::SmallVectorImpl<char>& buf, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) {
     return {};
@@ -181,10 +180,10 @@ wpi::StringRef PropertyContainer::GetStringProperty(
   }
   buf.clear();
   buf.append(prop->valueStr.begin(), prop->valueStr.end());
-  return wpi::StringRef(buf.data(), buf.size());
+  return {buf.data(), buf.size()};
 }
 
-void PropertyContainer::SetStringProperty(int property, const wpi::Twine& value,
+void PropertyContainer::SetStringProperty(int property, std::string_view value,
                                           CS_Status* status) {
   std::scoped_lock lock(m_mutex);
   auto prop = GetProperty(property);
@@ -225,7 +224,7 @@ std::vector<std::string> PropertyContainer::GetEnumPropertyChoices(
 }
 
 std::unique_ptr<PropertyImpl> PropertyContainer::CreateEmptyProperty(
-    const wpi::Twine& name) const {
+    std::string_view name) const {
   return std::make_unique<PropertyImpl>(name);
 }
 
@@ -237,16 +236,15 @@ bool PropertyContainer::CacheProperties(CS_Status* status) const {
 
 bool PropertyContainer::SetPropertiesJson(const wpi::json& config,
                                           wpi::Logger& logger,
-                                          wpi::StringRef logName,
+                                          std::string_view logName,
                                           CS_Status* status) {
   for (auto&& prop : config) {
     std::string name;
     try {
       name = prop.at("name").get<std::string>();
     } catch (const wpi::json::exception& e) {
-      WPI_WARNING(logger,
-                  logName << ": SetConfigJson: could not read property name: "
-                          << e.what());
+      WPI_WARNING(logger, "{}: SetConfigJson: could not read property name: {}",
+                  logName, e.what());
       continue;
     }
     int n = GetPropertyIndex(name);
@@ -254,24 +252,24 @@ bool PropertyContainer::SetPropertiesJson(const wpi::json& config,
       auto& v = prop.at("value");
       if (v.is_string()) {
         std::string val = v.get<std::string>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to '" << val << '\'');
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to '{}'",
+                 logName, name, val);
         SetStringProperty(n, val, status);
       } else if (v.is_boolean()) {
         bool val = v.get<bool>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to " << val);
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
+                 logName, name, val);
         SetProperty(n, val, status);
       } else {
         int val = v.get<int>();
-        WPI_INFO(logger, logName << ": SetConfigJson: setting property '"
-                                 << name << "' to " << val);
+        WPI_INFO(logger, "{}: SetConfigJson: setting property '{}' to {}",
+                 logName, name, val);
         SetProperty(n, val, status);
       }
     } catch (const wpi::json::exception& e) {
       WPI_WARNING(logger,
-                  logName << ": SetConfigJson: could not read property value: "
-                          << e.what());
+                  "{}: SetConfigJson: could not read property value: {}",
+                  logName, e.what());
       continue;
     }
   }

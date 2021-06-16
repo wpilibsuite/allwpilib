@@ -72,7 +72,6 @@ public class KalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public void testSwerveKFStationary() {
 
     var random = new Random();
@@ -121,7 +120,6 @@ public class KalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public void testSwerveKFMovingWithoutAccelerating() {
 
     var random = new Random();
@@ -178,7 +176,7 @@ public class KalmanFilterTest {
   }
 
   @Test
-  @SuppressWarnings({"LocalVariableName", "PMD.AvoidInstantiatingObjectsInLoops"})
+  @SuppressWarnings("LocalVariableName")
   public void testSwerveKFMovingOverTrajectory() {
 
     var random = new Random();

@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,8 +15,6 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.OIConstants;
@@ -31,7 +31,6 @@ import java.util.List;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();

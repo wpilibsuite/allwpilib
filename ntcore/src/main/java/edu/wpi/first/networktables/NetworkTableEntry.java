@@ -853,6 +853,6 @@ public final class NetworkTableEntry {
     return m_handle;
   }
 
-  private NetworkTableInstance m_inst;
-  private int m_handle;
+  private final NetworkTableInstance m_inst;
+  private final int m_handle;
 }

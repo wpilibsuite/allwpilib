@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/math>
+#include <wpi/numbers>
 
 #include "frc/simulation/SingleJointedArmSim.h"
 #include "gtest/gtest.h"
@@ -18,5 +18,5 @@ TEST(SingleJointedArmTest, Disabled) {
   }
 
   // The arm should swing down.
-  EXPECT_NEAR(sim.GetAngle().to<double>(), -wpi::math::pi / 2, 0.01);
+  EXPECT_NEAR(sim.GetAngle().to<double>(), -wpi::numbers::pi / 2, 0.01);
 }

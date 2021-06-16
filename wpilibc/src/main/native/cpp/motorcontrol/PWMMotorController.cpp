@@ -4,9 +4,9 @@
 
 #include "frc/motorcontrol/PWMMotorController.h"
 
-#include <wpi/raw_ostream.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
+#include <fmt/format.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -34,20 +34,20 @@ void PWMMotorController::StopMotor() {
   Disable();
 }
 
-void PWMMotorController::GetDescription(wpi::raw_ostream& desc) const {
-  desc << "PWM " << GetChannel();
+std::string PWMMotorController::GetDescription() const {
+  return fmt::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
-PWMMotorController::PWMMotorController(const wpi::Twine& name, int channel)
+PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
-  SendableRegistry::GetInstance().AddLW(this, name, channel);
+  wpi::SendableRegistry::AddLW(this, name, channel);
 }
 
-void PWMMotorController::InitSendable(SendableBuilder& builder) {
+void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);
   builder.SetSafeState([=] { Disable(); });

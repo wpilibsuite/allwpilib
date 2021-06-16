@@ -4,7 +4,7 @@
 
 package edu.wpi.first.cscore;
 
-import edu.wpi.first.wpiutil.RuntimeLoader;
+import edu.wpi.first.util.RuntimeLoader;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.opencv.core.Core;
@@ -42,7 +42,11 @@ public class CameraServerCvJNI {
     }
   }
 
-  /** Force load the library. */
+  /**
+   * Force load the library.
+   *
+   * @throws IOException if library load failed
+   */
   public static synchronized void forceLoad() throws IOException {
     if (libraryLoaded) {
       return;

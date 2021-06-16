@@ -75,7 +75,7 @@ TEST_F(WatchdogTest, SetTimeout) {
   frc::sim::StepTiming(0.2_s);
   watchdog.SetTimeout(0.2_s);
 
-  EXPECT_EQ(0.2, watchdog.GetTimeout());
+  EXPECT_EQ(0.2_s, watchdog.GetTimeout());
   EXPECT_EQ(0u, watchdogCounter) << "Watchdog triggered early";
 
   frc::sim::StepTiming(0.3_s);

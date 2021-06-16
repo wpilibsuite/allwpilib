@@ -4,28 +4,29 @@
 
 #pragma once
 
-#include <wpi/Twine.h>
+#include <string>
+#include <string_view>
+
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/motorcontrol/MotorController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
-
-namespace wpi {
-class raw_ostream;
-}  // namespace wpi
 
 namespace frc {
+class DMA;
 
 /**
  * Common base class for all PWM Motor Controllers.
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public Sendable,
-                           public SendableHelper<PWMMotorController> {
+                           public wpi::Sendable,
+                           public wpi::SendableHelper<PWMMotorController> {
  public:
+  friend class DMA;
+
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
@@ -56,7 +57,7 @@ class PWMMotorController : public MotorController,
 
   // MotorSafety interface
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
   int GetChannel() const;
 
@@ -68,14 +69,16 @@ class PWMMotorController : public MotorController,
    * @param channel The PWM channel that the controller is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
-  PWMMotorController(const wpi::Twine& name, int channel);
+  PWMMotorController(std::string_view name, int channel);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
   PWM m_pwm;
 
  private:
   bool m_isInverted = false;
+
+  PWM* GetPwm() { return &m_pwm; }
 };
 
 }  // namespace frc

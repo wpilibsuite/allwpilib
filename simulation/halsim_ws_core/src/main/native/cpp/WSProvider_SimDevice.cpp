@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include <fmt/format.h>
 #include <hal/Ports.h>
+#include <wpi/StringExtras.h>
 
 namespace wpilibws {
 
@@ -140,7 +142,7 @@ void HALSimWSProviderSimDevice::OnValueCreated(const char* name,
         break;
     }
   }
-  std::string key = (wpi::Twine(prefix) + name).str();
+  std::string key = fmt::format("{}{}", prefix, name);
   auto data = std::make_unique<SimDeviceValueData>();
   data->device = this;
   data->handle = handle;
@@ -258,15 +260,15 @@ HALSimWSProviderSimDevices::~HALSimWSProviderSimDevices() {
 void HALSimWSProviderSimDevices::DeviceCreatedCallback(
     const char* name, HAL_SimDeviceHandle handle) {
   // Map "Accel:Foo" -> type=Accel, device=Foo
-  auto [type, id] = wpi::StringRef{name}.split(':');
+  auto [type, id] = wpi::split(name, ':');
   std::shared_ptr<HALSimWSProviderSimDevice> dev;
   if (id.empty()) {
-    auto key = ("SimDevice/" + type).str();
+    auto key = fmt::format("SimDevice/{}", type);
     dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, "SimDevice",
                                                       type);
     m_providers.Add(key, dev);
   } else {
-    auto key = (type + "/" + id).str();
+    auto key = fmt::format("{}/{}", type, id);
     dev = std::make_shared<HALSimWSProviderSimDevice>(handle, key, type, id);
     m_providers.Add(key, dev);
   }

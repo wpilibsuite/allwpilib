@@ -19,11 +19,11 @@ namespace nt {
 
 namespace impl {
 
-typedef std::pair<unsigned int, unsigned int> RpcIdPair;
+using RpcIdPair = std::pair<unsigned int, unsigned int>;
 
 struct RpcNotifierData : public RpcAnswer {
-  RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, wpi::StringRef name_,
-                  wpi::StringRef params_, const ConnectionInfo& conn_,
+  RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, std::string_view name_,
+                  std::string_view params_, const ConnectionInfo& conn_,
                   IRpcServer::SendResponseFunc send_response_)
       : RpcAnswer{entry_, call_, name_, params_, conn_},
         send_response{std::move(send_response_)} {}
@@ -55,7 +55,7 @@ class RpcServerThread
 
   void DoCallback(std::function<void(const RpcAnswer& call)> callback,
                   const RpcNotifierData& data) {
-    DEBUG4("rpc calling " << data.name);
+    DEBUG4("rpc calling {}", data.name);
     unsigned int local_id = Handle{data.entry}.GetIndex();
     unsigned int call_uid = Handle{data.call}.GetIndex();
     RpcIdPair lookup_uid{local_id, call_uid};
@@ -94,12 +94,12 @@ class RpcServer
   void RemoveRpc(unsigned int rpc_uid) override;
 
   void ProcessRpc(unsigned int local_id, unsigned int call_uid,
-                  wpi::StringRef name, wpi::StringRef params,
+                  std::string_view name, std::string_view params,
                   const ConnectionInfo& conn, SendResponseFunc send_response,
                   unsigned int rpc_uid) override;
 
   bool PostRpcResponse(unsigned int local_id, unsigned int call_uid,
-                       wpi::StringRef result);
+                       std::string_view result);
 
  private:
   int m_inst;

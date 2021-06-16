@@ -44,7 +44,7 @@
 
 using namespace wpi;
 
-TCPAcceptor::TCPAcceptor(int port, const char* address, Logger& logger)
+TCPAcceptor::TCPAcceptor(int port, std::string_view address, Logger& logger)
     : m_lsd(0),
       m_port(port),
       m_address(address),
@@ -79,7 +79,7 @@ int TCPAcceptor::start() {
 
   m_lsd = socket(PF_INET, SOCK_STREAM, 0);
   if (m_lsd < 0) {
-    WPI_ERROR(m_logger, "could not create socket");
+    WPI_ERROR(m_logger, "{}", "could not create socket");
     return -1;
   }
   struct sockaddr_in address;
@@ -95,7 +95,7 @@ int TCPAcceptor::start() {
     int res = inet_pton(PF_INET, m_address.c_str(), &(address.sin_addr));
 #endif
     if (res != 1) {
-      WPI_ERROR(m_logger, "could not resolve " << m_address << " address");
+      WPI_ERROR(m_logger, "could not resolve {} address", m_address);
       return -1;
     }
   } else {
@@ -116,15 +116,15 @@ int TCPAcceptor::start() {
   int result = bind(m_lsd, reinterpret_cast<struct sockaddr*>(&address),
                     sizeof(address));
   if (result != 0) {
-    WPI_ERROR(m_logger,
-              "bind() to port " << m_port << " failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "bind() to port {} failed: {}", m_port,
+              SocketStrerror());
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    WPI_ERROR(m_logger,
-              "listen() on port " << m_port << " failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "listen() on port {} failed: {}", m_port,
+              SocketStrerror());
     return result;
   }
   m_listening = true;
@@ -193,8 +193,8 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   int sd = ::accept(m_lsd, reinterpret_cast<struct sockaddr*>(&address), &len);
   if (sd < 0) {
     if (!m_shutdown) {
-      WPI_ERROR(m_logger, "accept() on port "
-                              << m_port << " failed: " << SocketStrerror());
+      WPI_ERROR(m_logger, "accept() on port {} failed: {}", m_port,
+                SocketStrerror());
     }
     return nullptr;
   }

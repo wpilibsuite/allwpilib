@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <memory>
+#include <initializer_list>
 
 #include <hal/AddressableLEDTypes.h>
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "util/Color.h"
 #include "util/Color8Bit.h"
@@ -107,7 +107,7 @@ class AddressableLED {
    *
    * @param ledData the buffer to write
    */
-  void SetData(wpi::ArrayRef<LEDData> ledData);
+  void SetData(wpi::span<const LEDData> ledData);
 
   /**
    * Sets the led output data.
@@ -159,5 +159,6 @@ class AddressableLED {
  private:
   hal::Handle<HAL_DigitalHandle> m_pwmHandle;
   hal::Handle<HAL_AddressableLEDHandle> m_handle;
+  int m_port;
 };
 }  // namespace frc

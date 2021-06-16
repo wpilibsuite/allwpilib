@@ -27,10 +27,9 @@ TEST(PdpSimTests, TestPdpInitialization) {
       INDEX_TO_TEST, &TestPdpInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
-  int32_t status;
+  int32_t status = 0;
 
   // Use out of range index
-  status = 0;
   gTestPdpCallbackName = "Unset";
   HAL_InitializePDP(INDEX_TO_TEST, &status);
   EXPECT_EQ(0, status);

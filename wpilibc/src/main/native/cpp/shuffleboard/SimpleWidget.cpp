@@ -11,7 +11,7 @@
 using namespace frc;
 
 SimpleWidget::SimpleWidget(ShuffleboardContainer& parent,
-                           const wpi::Twine& title)
+                           std::string_view title)
     : ShuffleboardValue(title), ShuffleboardWidget(parent, title), m_entry() {}
 
 nt::NetworkTableEntry SimpleWidget::GetEntry() {

@@ -18,19 +18,19 @@ class MockEntryNotifier : public IEntryNotifier {
   MOCK_METHOD3(
       Add,
       unsigned int(std::function<void(const EntryNotification& event)> callback,
-                   wpi::StringRef prefix, unsigned int flags));
+                   std::string_view prefix, unsigned int flags));
   MOCK_METHOD3(
       Add,
       unsigned int(std::function<void(const EntryNotification& event)> callback,
                    unsigned int local_id, unsigned int flags));
   MOCK_METHOD3(AddPolled,
-               unsigned int(unsigned int poller_uid, wpi::StringRef prefix,
+               unsigned int(unsigned int poller_uid, std::string_view prefix,
                             unsigned int flags));
   MOCK_METHOD3(AddPolled,
                unsigned int(unsigned int poller_uid, unsigned int local_id,
                             unsigned int flags));
   MOCK_METHOD5(NotifyEntry,
-               void(unsigned int local_id, wpi::StringRef name,
+               void(unsigned int local_id, std::string_view name,
                     std::shared_ptr<Value> value, unsigned int flags,
                     unsigned int only_listener));
 };

@@ -26,7 +26,15 @@ public class MatchInfoData {
   @SuppressWarnings("MemberName")
   public int matchType;
 
-  /** Called from JNI to set the structure data. */
+  /**
+   * Called from JNI to set the structure data.
+   *
+   * @param eventName Event name.
+   * @param gameSpecificMessage Game-specific message.
+   * @param matchNumber Match number.
+   * @param replayNumber Replay number.
+   * @param matchType Match type.
+   */
   @SuppressWarnings("MissingJavadocMethod")
   public void setData(
       String eventName,

@@ -9,7 +9,11 @@ public final class MathSharedStore {
 
   private MathSharedStore() {}
 
-  /** get the MathShared object. */
+  /**
+   * Get the MathShared object.
+   *
+   * @return The MathShared object.
+   */
   public static synchronized MathShared getMathShared() {
     if (mathShared == null) {
       mathShared =
@@ -24,7 +28,11 @@ public final class MathSharedStore {
     return mathShared;
   }
 
-  /** set the MathShared object. */
+  /**
+   * Set the MathShared object.
+   *
+   * @param shared The MathShared object.
+   */
   public static synchronized void setMathShared(MathShared shared) {
     mathShared = shared;
   }
@@ -33,6 +41,7 @@ public final class MathSharedStore {
    * Report an error.
    *
    * @param error the error to set
+   * @param stackTrace array of stacktrace elements
    */
   public static void reportError(String error, StackTraceElement[] stackTrace) {
     getMathShared().reportError(error, stackTrace);

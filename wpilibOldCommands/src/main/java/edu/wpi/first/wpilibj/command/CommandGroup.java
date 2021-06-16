@@ -30,13 +30,13 @@ import java.util.Vector;
  */
 public class CommandGroup extends Command {
   /** The commands in this group (stored in entries). */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
    */
   /** The active children in this group (stored in entries). */
-  @SuppressWarnings({"PMD.LooseCoupling", "PMD.UseArrayListInsteadOfVector"})
+  @SuppressWarnings("PMD.UseArrayListInsteadOfVector")
   final Vector<Entry> m_children = new Vector<>();
   /** The current command, -1 signifies that none have been run. */
   private int m_currentCommandIndex = -1;
@@ -205,7 +205,7 @@ public class CommandGroup extends Command {
   }
 
   @Override
-  @SuppressWarnings({"MethodName", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+  @SuppressWarnings("MethodName")
   void _execute() {
     Entry entry = null;
     Command cmd = null;
@@ -330,7 +330,7 @@ public class CommandGroup extends Command {
 
   /**
    * Returns whether or not this group is interruptible. A command group will be uninterruptible if
-   * {@link CommandGroup#setInterruptible(boolean) setInterruptable(false)} was called or if it is
+   * {@link CommandGroup#setInterruptible(boolean) setInterruptible(false)} was called or if it is
    * currently running an uninterruptible command or child.
    *
    * @return whether or not this {@link CommandGroup} is interruptible.

@@ -6,7 +6,7 @@
 
 #include "Robot.h"
 
-CheckForHotGoal::CheckForHotGoal(double time) {
+CheckForHotGoal::CheckForHotGoal(units::second_t time) {
   SetTimeout(time);
 }
 

@@ -9,19 +9,16 @@
 
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/Base.h"
-#include "frc/LinearFilter.h"
 #include "frc/PIDInterface.h"
 #include "frc/PIDOutput.h"
 #include "frc/PIDSource.h"
 #include "frc/Timer.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include "frc/filter/LinearFilter.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * Class implements a PID Control Loop.
@@ -37,8 +34,8 @@ class SendableBuilder;
  */
 class PIDBase : public PIDInterface,
                 public PIDOutput,
-                public Sendable,
-                public SendableHelper<PIDBase> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<PIDBase> {
  public:
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -302,7 +299,7 @@ class PIDBase : public PIDInterface,
    */
   void PIDWrite(double output) override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   // Is the pid controller enabled

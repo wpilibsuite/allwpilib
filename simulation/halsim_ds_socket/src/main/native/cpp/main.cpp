@@ -14,13 +14,14 @@
 #include <sys/types.h>
 
 #include <atomic>
+#include <cstdio>
 #include <cstring>
+#include <string_view>
 
 #include <DSCommPacket.h>
+#include <fmt/format.h>
 #include <hal/Extensions.h>
 #include <wpi/EventLoopRunner.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/raw_uv_ostream.h>
 #include <wpi/uv/Tcp.h>
 #include <wpi/uv/Timer.h>
@@ -50,13 +51,13 @@ static SimpleBufferPool<4>& GetBufferPool() {
 }
 
 static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
-  wpi::StringRef data{buf.base, size};
+  std::string_view data{buf.base, size};
   while (!data.empty()) {
     if (store.m_frameSize == (std::numeric_limits<size_t>::max)()) {
       if (store.m_frame.size() < 2u) {
         size_t toCopy = (std::min)(2u - store.m_frame.size(), data.size());
-        store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-        data = data.drop_front(toCopy);
+        store.m_frame.append(data.data(), data.data() + toCopy);
+        data.remove_prefix(toCopy);
         if (store.m_frame.size() < 2u) {
           return;  // need more data
         }
@@ -67,8 +68,8 @@ static void HandleTcpDataStream(Buffer& buf, size_t size, DataStore& store) {
     if (store.m_frameSize != (std::numeric_limits<size_t>::max)()) {
       size_t need = store.m_frameSize - (store.m_frame.size() - 2);
       size_t toCopy = (std::min)(need, data.size());
-      store.m_frame.append(data.bytes_begin(), data.bytes_begin() + toCopy);
-      data = data.drop_front(toCopy);
+      store.m_frame.append(data.data(), data.data() + toCopy);
+      data.remove_prefix(toCopy);
       need -= toCopy;
       if (need == 0) {
         auto ds = store.dsPacket;
@@ -115,13 +116,12 @@ static void SetupUdp(wpi::uv::Loop& loop) {
   struct sockaddr_in simAddr;
   NameToAddr("127.0.0.1", 1135, &simAddr);
   simLoopTimer->timeout.connect([udpLocal = udp.get(), simAddr] {
-    udpLocal->Send(simAddr, wpi::ArrayRef<Buffer>{singleByte.get(), 1},
-                   [](auto buf, Error err) {
-                     if (err) {
-                       wpi::errs() << err.str() << "\n";
-                       wpi::errs().flush();
-                     }
-                   });
+    udpLocal->Send(simAddr, {singleByte.get(), 1}, [](auto buf, Error err) {
+      if (err) {
+        fmt::print(stderr, "{}\n", err.str());
+        std::fflush(stderr);
+      }
+    });
   });
   simLoopTimer->Start(Timer::Time{100}, Timer::Time{100});
 
@@ -130,8 +130,7 @@ static void SetupUdp(wpi::uv::Loop& loop) {
                                                const sockaddr& recSock,
                                                unsigned int port) {
     auto ds = udpLocal->GetLoop()->GetData<halsim::DSCommPacket>();
-    ds->DecodeUDP(
-        wpi::ArrayRef<uint8_t>{reinterpret_cast<uint8_t*>(buf.base), len});
+    ds->DecodeUDP({reinterpret_cast<uint8_t*>(buf.base), len});
 
     struct sockaddr_in outAddr;
     std::memcpy(&outAddr, &recSock, sizeof(sockaddr_in));
@@ -146,8 +145,8 @@ static void SetupUdp(wpi::uv::Loop& loop) {
     udpLocal->Send(outAddr, sendBufs, [](auto bufs, Error err) {
       GetBufferPool().Release(bufs);
       if (err) {
-        wpi::errs() << err.str() << "\n";
-        wpi::errs().flush();
+        fmt::print(stderr, "{}\n", err.str());
+        std::fflush(stderr);
       }
     });
     ds->SendUDPToHALSim();
@@ -177,12 +176,12 @@ __declspec(dllexport)
   static bool once = false;
 
   if (once) {
-    wpi::errs() << "Error: cannot invoke HALSIM_InitExtension twice.\n";
+    std::fputs("Error: cannot invoke HALSIM_InitExtension twice.\n", stderr);
     return -1;
   }
   once = true;
 
-  wpi::outs() << "DriverStationSocket Initializing.\n";
+  std::puts("DriverStationSocket Initializing.");
 
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
@@ -192,7 +191,7 @@ __declspec(dllexport)
 
   eventLoopRunner->ExecAsync(SetupEventLoop);
 
-  wpi::outs() << "DriverStationSocket Initialized!\n";
+  std::puts("DriverStationSocket Initialized!");
   return 0;
 }
 }  // extern "C"

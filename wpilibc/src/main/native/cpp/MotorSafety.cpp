@@ -8,8 +8,6 @@
 #include <utility>
 
 #include <wpi/SmallPtrSet.h>
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
 
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
@@ -49,12 +47,12 @@ void MotorSafety::Feed() {
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
 
-void MotorSafety::SetExpiration(double expirationTime) {
+void MotorSafety::SetExpiration(units::second_t expirationTime) {
   std::scoped_lock lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
-double MotorSafety::GetExpiration() const {
+units::second_t MotorSafety::GetExpiration() const {
   std::scoped_lock lock(m_thisMutex);
   return m_expiration;
 }
@@ -76,7 +74,7 @@ bool MotorSafety::IsSafetyEnabled() const {
 
 void MotorSafety::Check() {
   bool enabled;
-  double stopTime;
+  units::second_t stopTime;
 
   {
     std::scoped_lock lock(m_thisMutex);
@@ -84,17 +82,13 @@ void MotorSafety::Check() {
     stopTime = m_stopTime;
   }
 
-  DriverStation& ds = DriverStation::GetInstance();
-  if (!enabled || ds.IsDisabled() || ds.IsTest()) {
+  if (!enabled || DriverStation::IsDisabled() || DriverStation::IsTest()) {
     return;
   }
 
   if (stopTime < Timer::GetFPGATimestamp()) {
-    wpi::SmallString<128> buf;
-    wpi::raw_svector_ostream desc(buf);
-    GetDescription(desc);
-    desc << "... Output not updated often enough.";
-    FRC_ReportError(err::Timeout, desc.str());
+    FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
+                    GetDescription());
     StopMotor();
   }
 }

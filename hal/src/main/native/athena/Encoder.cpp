@@ -4,6 +4,8 @@
 
 #include "hal/Encoder.h"
 
+#include <fmt/format.h>
+
 #include "EncoderInternal.h"
 #include "FPGAEncoder.h"
 #include "HALInitializer.h"
@@ -47,9 +49,8 @@ Encoder::Encoder(HAL_Handle digitalSourceHandleA,
     }
     default:
       *status = PARAMETER_OUT_OF_RANGE;
-      hal::SetLastError(status, "Encoding type " +
-                                    wpi::Twine(static_cast<int>(encodingType)) +
-                                    " invalid.");
+      hal::SetLastError(status, fmt::format("Encoding type {} invalid.",
+                                            static_cast<int>(encodingType)));
       return;
   }
 }
@@ -185,10 +186,9 @@ void Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
 void Encoder::SetSamplesToAverage(int32_t samplesToAverage, int32_t* status) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
-    hal::SetLastError(
-        status,
-        "Samples to average must be between 1 and 127 inclusive. Requested " +
-            wpi::Twine(samplesToAverage));
+    hal::SetLastError(status, fmt::format("Samples to average must be between "
+                                          "1 and 127 inclusive. Requested {}",
+                                          samplesToAverage));
     return;
   }
   if (m_counter) {
@@ -254,7 +254,7 @@ bool GetEncoderBaseHandle(HAL_EncoderHandle handle,
                           HAL_FPGAEncoderHandle* fpgaHandle,
                           HAL_CounterHandle* counterHandle) {
   auto encoder = encoderHandles->Get(handle);
-  if (!handle) {
+  if (!encoder) {
     return false;
   }
 

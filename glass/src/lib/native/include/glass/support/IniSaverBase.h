@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <imgui.h>
-#include <wpi/Twine.h>
 
 namespace glass {
 
@@ -22,7 +22,7 @@ class IniSaverBackend {
 
 class IniSaverBase {
  public:
-  explicit IniSaverBase(const wpi::Twine& typeName,
+  explicit IniSaverBase(std::string_view typeName,
                         IniSaverBackend* backend = nullptr);
   virtual ~IniSaverBase();
 

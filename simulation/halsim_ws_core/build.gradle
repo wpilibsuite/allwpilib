@@ -23,6 +23,7 @@ if (!project.hasProperty('onlylinuxathena')) {
     apply from: "${rootDir}/shared/googletest.gradle"
 
     apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/plugins/publish.gradle"
 
     model {
         components {

@@ -9,10 +9,10 @@
 
 #include <atomic>
 #include <functional>
+#include <string_view>
 #include <thread>
 
 #include <opencv2/core/core.hpp>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 
 #include "Frame.h"
@@ -24,9 +24,9 @@ class SourceImpl;
 
 class CvSinkImpl : public SinkImpl {
  public:
-  CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry);
-  CvSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  CvSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
              Telemetry& telemetry,
              std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;

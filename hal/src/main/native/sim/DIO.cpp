@@ -174,6 +174,11 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
       value = 1;
     }
   }
+  if (SimDIOData[port->channel].isInput) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Cannot set output of an input channel");
+    return;
+  }
   SimDIOData[port->channel].value = value;
 }
 

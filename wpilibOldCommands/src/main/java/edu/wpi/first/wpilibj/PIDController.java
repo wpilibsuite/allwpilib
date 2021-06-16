@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * Class implements a PID Control Loop.
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  *
- * @deprecated Use {@link edu.wpi.first.wpilibj.controller.PIDController} instead.
+ * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} instead.
  */
 @Deprecated(since = "2020", forRemoval = true)
 public class PIDController extends PIDBase implements Controller {
@@ -137,7 +137,11 @@ public class PIDController extends PIDBase implements Controller {
     }
   }
 
-  /** Set the enabled state of the PIDController. */
+  /**
+   * Set the enabled state of the PIDController.
+   *
+   * @param enable True to enable the PIDController.
+   */
   public void setEnabled(boolean enable) {
     if (enable) {
       enable();
@@ -146,7 +150,11 @@ public class PIDController extends PIDBase implements Controller {
     }
   }
 
-  /** Return true if PIDController is enabled. */
+  /**
+   * Return true if PIDController is enabled.
+   *
+   * @return True if PIDController is enabled.
+   */
   public boolean isEnabled() {
     m_thisMutex.lock();
     try {

@@ -79,7 +79,7 @@ void glass::DisplayPDP(PDPModel* model, int index) {
   }
 }
 
-void glass::DisplayPDPs(PDPsModel* model, wpi::StringRef noneMsg) {
+void glass::DisplayPDPs(PDPsModel* model, std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPDP([&](PDPModel& pdp, int i) {
     hasAny = true;
@@ -88,6 +88,6 @@ void glass::DisplayPDPs(PDPsModel* model, wpi::StringRef noneMsg) {
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }

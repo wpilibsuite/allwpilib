@@ -4,12 +4,12 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
-import edu.wpi.first.math.math.Discretization;
-import edu.wpi.first.math.math.StateSpaceUtil;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
@@ -101,7 +101,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
    * @param addFuncX A function that adds two state vectors.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "PMD.ExcessiveParameterList"})
+  @SuppressWarnings("ParameterName")
   public ExtendedKalmanFilter(
       Nat<States> states,
       Nat<Inputs> inputs,

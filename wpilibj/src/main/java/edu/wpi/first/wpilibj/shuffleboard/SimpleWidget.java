@@ -15,7 +15,11 @@ public final class SimpleWidget extends ShuffleboardWidget<SimpleWidget> {
     super(parent, title);
   }
 
-  /** Gets the NetworkTable entry that contains the data for this widget. */
+  /**
+   * Gets the NetworkTable entry that contains the data for this widget.
+   *
+   * @return The NetworkTable entry that contains the data for this widget.
+   */
   public NetworkTableEntry getEntry() {
     if (m_entry == null) {
       forceGenerate();

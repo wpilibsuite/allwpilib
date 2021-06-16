@@ -7,8 +7,8 @@
 using namespace frc;
 
 ShuffleboardLayout::ShuffleboardLayout(ShuffleboardContainer& parent,
-                                       const wpi::Twine& title,
-                                       const wpi::Twine& type)
+                                       std::string_view title,
+                                       std::string_view type)
     : ShuffleboardValue(title),
       ShuffleboardComponent(parent, title, type),
       ShuffleboardContainer(title) {

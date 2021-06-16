@@ -7,16 +7,16 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <units/time.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/CounterBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -31,8 +31,8 @@ class DMASample;
  * to be zeroed before use.
  */
 class Counter : public CounterBase,
-                public Sendable,
-                public SendableHelper<Counter> {
+                public wpi::Sendable,
+                public wpi::SendableHelper<Counter> {
   friend class DMA;
   friend class DMASample;
 
@@ -368,7 +368,7 @@ class Counter : public CounterBase,
    *
    * @returns The period between the last two pulses in units of seconds.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Set the maximum period where the device is still considered "moving".
@@ -380,7 +380,7 @@ class Counter : public CounterBase,
    * @param maxPeriod The maximum period where the counted device is considered
    *                  moving in seconds.
    */
-  void SetMaxPeriod(double maxPeriod) final;
+  void SetMaxPeriod(units::second_t maxPeriod) final;
 
   /**
    * Select whether you want to continue updating the event timer output when
@@ -420,7 +420,7 @@ class Counter : public CounterBase,
    */
   bool GetDirection() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  protected:
   // Makes the counter count up.

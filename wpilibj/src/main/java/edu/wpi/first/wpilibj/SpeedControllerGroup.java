@@ -4,9 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.Arrays;
 
 /**
@@ -24,16 +25,14 @@ public class SpeedControllerGroup implements MotorController, Sendable, AutoClos
   /**
    * Create a new SpeedControllerGroup with the provided SpeedControllers.
    *
+   * @param speedController The first SpeedController to add.
    * @param speedControllers The SpeedControllers to add
    */
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   public SpeedControllerGroup(
       SpeedController speedController, SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
-    for (int i = 0; i < speedControllers.length; i++) {
-      m_speedControllers[i + 1] = speedControllers[i];
-    }
+    System.arraycopy(speedControllers, 0, m_speedControllers, 1, speedControllers.length);
     init();
   }
 

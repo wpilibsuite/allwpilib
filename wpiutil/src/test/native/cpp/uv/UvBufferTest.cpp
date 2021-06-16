@@ -26,7 +26,7 @@ TEST(UvSimpleBufferPool, ReleaseReuse) {
   auto buf1copy = buf1;
   auto origSize = buf1.len;
   buf1.len = 8;
-  pool.Release(buf1);
+  pool.Release({&buf1, 1});
   ASSERT_EQ(buf1.base, nullptr);
   auto buf2 = pool.Allocate();
   ASSERT_EQ(buf1copy.base, buf2.base);
@@ -36,7 +36,7 @@ TEST(UvSimpleBufferPool, ReleaseReuse) {
 TEST(UvSimpleBufferPool, ClearRemaining) {
   SimpleBufferPool<4> pool;
   auto buf1 = pool.Allocate();
-  pool.Release(buf1);
+  pool.Release({&buf1, 1});
   ASSERT_EQ(pool.Remaining(), 1u);
   pool.Clear();
   ASSERT_EQ(pool.Remaining(), 0u);

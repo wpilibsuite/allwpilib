@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace frc {
 
@@ -14,7 +14,7 @@ namespace frc {
 
 enum ShuffleboardEventImportance { kTrivial, kLow, kNormal, kHigh, kCritical };
 
-inline wpi::StringRef ShuffleboardEventImportanceName(
+inline std::string_view ShuffleboardEventImportanceName(
     ShuffleboardEventImportance importance) {
   switch (importance) {
     case kTrivial:

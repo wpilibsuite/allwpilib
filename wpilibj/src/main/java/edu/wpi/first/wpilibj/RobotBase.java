@@ -116,14 +116,18 @@ public abstract class RobotBase implements AutoCloseable {
               case kOdometry_MecanumDrive:
                 HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
                 break;
+              case kController_PIDController2:
+                HAL.report(tResourceType.kResourceType_PIDController2, count);
+                break;
+              case kController_ProfiledPIDController:
+                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
+                break;
               default:
                 break;
             }
           }
         });
   }
-
-  protected final DriverStation m_ds;
 
   /**
    * Constructor for a generic robot program. User code should be placed in the constructor that
@@ -144,7 +148,6 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer();
     }
-    m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
@@ -182,7 +185,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently disabled by the field controls.
    */
   public boolean isDisabled() {
-    return m_ds.isDisabled();
+    return DriverStation.isDisabled();
   }
 
   /**
@@ -191,7 +194,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently enabled by the field controls.
    */
   public boolean isEnabled() {
-    return m_ds.isEnabled();
+    return DriverStation.isEnabled();
   }
 
   /**
@@ -200,7 +203,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating Autonomously.
    */
   public boolean isAutonomous() {
-    return m_ds.isAutonomous();
+    return DriverStation.isAutonomous();
   }
 
   /**
@@ -210,7 +213,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating autonomously while enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_ds.isAutonomousEnabled();
+    return DriverStation.isAutonomousEnabled();
   }
 
   /**
@@ -219,7 +222,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Test mode.
    */
   public boolean isTest() {
-    return m_ds.isTest();
+    return DriverStation.isTest();
   }
 
   /**
@@ -229,7 +232,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode.
    */
   public boolean isOperatorControl() {
-    return m_ds.isOperatorControl();
+    return DriverStation.isOperatorControl();
   }
 
   /**
@@ -239,7 +242,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
   public boolean isOperatorControlEnabled() {
-    return m_ds.isOperatorControlEnabled();
+    return DriverStation.isOperatorControlEnabled();
   }
 
   /**
@@ -248,7 +251,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return Has new data arrived over the network since the last time this function was called?
    */
   public boolean isNewDataAvailable() {
-    return m_ds.isNewControlData();
+    return DriverStation.isNewControlData();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -277,10 +280,7 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
-    "PMD.CyclomaticComplexity", "PMD.NPathComplexity"
-  })
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
@@ -370,14 +370,23 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  /** Suppress the "The robot program quit unexpectedly." message. */
+  /**
+   * Suppress the "The robot program quit unexpectedly." message.
+   *
+   * @param value True if exit warning should be suppressed.
+   */
   public static void suppressExitWarning(boolean value) {
     m_runMutex.lock();
     m_suppressExitWarning = value;
     m_runMutex.unlock();
   }
 
-  /** Starting point for the applications. */
+  /**
+   * Starting point for the applications.
+   *
+   * @param <T> Robot subclass.
+   * @param robotSupplier Function that returns an instance of the robot subclass.
+   */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");

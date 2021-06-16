@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /** Common base class for all PWM Motor Controllers. */
 public abstract class PWMMotorController extends MotorSafety
@@ -84,6 +84,15 @@ public abstract class PWMMotorController extends MotorSafety
   @Override
   public String getDescription() {
     return "PWM " + getChannel();
+  }
+
+  /**
+   * Gets the backing PWM handle.
+   *
+   * @return The pwm handle.
+   */
+  public int getPwmHandle() {
+    return m_pwm.getHandle();
   }
 
   /**

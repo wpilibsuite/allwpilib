@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <cstdio>
 #include <memory>
 
 #include <hal/Extensions.h>
-#include <wpi/raw_ostream.h>
 
 #include "HALSimWSClient.h"
 
@@ -19,7 +19,7 @@ __declspec(dllexport)
 #endif
 
     int HALSIM_InitExtension(void) {
-  wpi::outs() << "HALSim WS Client Extension Initializing\n";
+  std::puts("HALSim WS Client Extension Initializing");
 
   HAL_OnShutdown(nullptr, [](void*) { gClient.reset(); });
 
@@ -28,7 +28,7 @@ __declspec(dllexport)
     return -1;
   }
 
-  wpi::outs() << "HALSim WS Client Extension Initialized\n";
+  std::puts("HALSim WS Client Extension Initialized");
   return 0;
 }
 

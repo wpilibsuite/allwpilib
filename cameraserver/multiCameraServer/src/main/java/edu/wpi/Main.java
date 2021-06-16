@@ -94,7 +94,6 @@ public final class Main {
   }
 
   /** Read configuration file. */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static boolean readConfig() {
     // parse file
     JsonElement top;
@@ -151,7 +150,7 @@ public final class Main {
   /** Start running the camera. */
   public static void startCamera(CameraConfig config) {
     System.out.println("Starting camera '" + config.name + "' on " + config.path);
-    VideoSource camera = CameraServer.getInstance().startAutomaticCapture(config.name, config.path);
+    VideoSource camera = CameraServer.startAutomaticCapture(config.name, config.path);
 
     Gson gson = new GsonBuilder().create();
 

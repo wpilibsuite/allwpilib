@@ -7,17 +7,18 @@
 #include <algorithm>
 #include <vector>
 
+#include <fmt/format.h>
 #include <ntcore_cpp.h>
 #include <wpi/Endian.h>
 #include <wpi/MathExtras.h>
-#include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
 class NTField2DModel::ObjectModel : public FieldObjectModel {
  public:
-  ObjectModel(wpi::StringRef name, NT_Entry entry)
+  ObjectModel(std::string_view name, NT_Entry entry)
       : m_name{name}, m_entry{entry} {}
 
   const char* GetName() const override { return m_name.c_str(); }
@@ -33,8 +34,8 @@ class NTField2DModel::ObjectModel : public FieldObjectModel {
   bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
   bool IsReadOnly() override { return false; }
 
-  wpi::ArrayRef<frc::Pose2d> GetPoses() override { return m_poses; }
-  void SetPoses(wpi::ArrayRef<frc::Pose2d> poses) override;
+  wpi::span<const frc::Pose2d> GetPoses() override { return m_poses; }
+  void SetPoses(wpi::span<const frc::Pose2d> poses) override;
   void SetPose(size_t i, frc::Pose2d pose) override;
   void SetPosition(size_t i, frc::Translation2d pos) override;
   void SetRotation(size_t i, frc::Rotation2d rot) override;
@@ -63,7 +64,7 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
     }
   } else if (value.IsRaw()) {
     // treat it simply as an array of doubles
-    wpi::StringRef data = value.GetRaw();
+    std::string_view data = value.GetRaw();
 
     // must be triples of doubles
     auto size = data.size();
@@ -71,7 +72,7 @@ void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
       return;
     }
     m_poses.resize(size / (3 * 8));
-    const char* p = data.begin();
+    const char* p = data.data();
     for (size_t i = 0; i < size / (3 * 8); ++i) {
       double x = wpi::BitsToDouble(
           wpi::support::endian::readNext<uint64_t, wpi::support::big,
@@ -115,13 +116,13 @@ void NTField2DModel::ObjectModel::UpdateNT() {
           p, wpi::DoubleToBits(pose.Rotation().Degrees().to<double>()));
       p += 8;
     }
-    nt::SetEntryTypeValue(
-        m_entry, nt::Value::MakeRaw(wpi::StringRef{arr.data(), arr.size()}));
+    nt::SetEntryTypeValue(m_entry,
+                          nt::Value::MakeRaw({arr.data(), arr.size()}));
   }
 }
 
-void NTField2DModel::ObjectModel::SetPoses(wpi::ArrayRef<frc::Pose2d> poses) {
-  m_poses = poses;
+void NTField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
+  m_poses.assign(poses.begin(), poses.end());
   UpdateNT();
 }
 
@@ -147,13 +148,13 @@ void NTField2DModel::ObjectModel::SetRotation(size_t i, frc::Rotation2d rot) {
   }
 }
 
-NTField2DModel::NTField2DModel(wpi::StringRef path)
+NTField2DModel::NTField2DModel(std::string_view path)
     : NTField2DModel{nt::GetDefaultInstance(), path} {}
 
-NTField2DModel::NTField2DModel(NT_Inst inst, wpi::StringRef path)
+NTField2DModel::NTField2DModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_path{(path + "/").str()},
-      m_name{m_nt.GetEntry(path + "/.name")} {
+      m_path{fmt::format("{}/", path)},
+      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))} {
   m_nt.AddListener(m_path, NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
 }
@@ -182,8 +183,9 @@ void NTField2DModel::Update() {
     }
 
     // handle create/delete
-    if (wpi::StringRef{event.name}.startswith(m_path)) {
-      auto name = wpi::StringRef{event.name}.drop_front(m_path.size());
+    std::string_view name = event.name;
+    if (wpi::starts_with(name, m_path)) {
+      name.remove_prefix(m_path.size());
       if (name.empty() || name[0] == '.') {
         continue;
       }
@@ -216,9 +218,8 @@ bool NTField2DModel::IsReadOnly() {
   return false;
 }
 
-FieldObjectModel* NTField2DModel::AddFieldObject(const wpi::Twine& name) {
-  wpi::SmallString<128> fullNameBuf;
-  wpi::StringRef fullName = (m_path + name).toStringRef(fullNameBuf);
+FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
+  auto fullName = fmt::format("{}{}", m_path, name);
   auto [it, match] = Find(fullName);
   if (!match) {
     it = m_objects.emplace(
@@ -227,9 +228,8 @@ FieldObjectModel* NTField2DModel::AddFieldObject(const wpi::Twine& name) {
   return it->get();
 }
 
-void NTField2DModel::RemoveFieldObject(const wpi::Twine& name) {
-  wpi::SmallString<128> fullNameBuf;
-  auto [it, match] = Find((m_path + name).toStringRef(fullNameBuf));
+void NTField2DModel::RemoveFieldObject(std::string_view name) {
+  auto [it, match] = Find(fmt::format("{}{}", m_path, name));
   if (match) {
     nt::DeleteEntry((*it)->GetEntry());
     m_objects.erase(it);
@@ -237,19 +237,19 @@ void NTField2DModel::RemoveFieldObject(const wpi::Twine& name) {
 }
 
 void NTField2DModel::ForEachFieldObject(
-    wpi::function_ref<void(FieldObjectModel& model, wpi::StringRef name)>
+    wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
         func) {
   for (auto&& obj : m_objects) {
     if (obj->Exists()) {
-      func(*obj, wpi::StringRef{obj->GetName()}.drop_front(m_path.size()));
+      func(*obj, wpi::drop_front(obj->GetName(), m_path.size()));
     }
   }
 }
 
 std::pair<NTField2DModel::Objects::iterator, bool> NTField2DModel::Find(
-    wpi::StringRef fullName) {
+    std::string_view fullName) {
   auto it = std::lower_bound(
       m_objects.begin(), m_objects.end(), fullName,
-      [](const auto& e, wpi::StringRef name) { return e->GetName() < name; });
+      [](const auto& e, std::string_view name) { return e->GetName() < name; });
   return {it, it != m_objects.end() && (*it)->GetName() == fullName};
 }

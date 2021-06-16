@@ -5,16 +5,16 @@
 #include "frc/ADXRS450_Gyro.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/DriverStation.h"
+#include "frc/Errors.h"
 #include "frc/Timer.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
-static constexpr auto kSamplePeriod = 0.0005_s;
-static constexpr double kCalibrationSampleTime = 5.0;
+static constexpr auto kSamplePeriod = 0.5_ms;
+static constexpr auto kCalibrationSampleTime = 5_s;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
 // static constexpr int kRateRegister = 0x00;
@@ -46,7 +46,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
   if (!m_simDevice) {
     // Validate the part ID
     if ((ReadRegister(kPIDRegister) & 0xff00) != 0x5200) {
-      DriverStation::ReportError("could not find ADXRS450 gyro");
+      FRC_ReportError(err::Error, "{}", "could not find ADXRS450 gyro");
       return;
     }
 
@@ -58,7 +58,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXRS450_Gyro", port);
+  wpi::SendableRegistry::AddLW(this, "ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {
@@ -121,7 +121,7 @@ void ADXRS450_Gyro::Reset() {
 }
 
 void ADXRS450_Gyro::Calibrate() {
-  Wait(0.1);
+  Wait(100_ms);
 
   m_spi.SetAccumulatorIntegratedCenter(0);
   m_spi.ResetAccumulator();
@@ -136,8 +136,8 @@ int ADXRS450_Gyro::GetPort() const {
   return m_port;
 }
 
-void ADXRS450_Gyro::InitSendable(SendableBuilder& builder) {
+void ADXRS450_Gyro::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Gyro");
   builder.AddDoubleProperty(
-      "Value", [=]() { return GetAngle(); }, nullptr);
+      "Value", [=] { return GetAngle(); }, nullptr);
 }

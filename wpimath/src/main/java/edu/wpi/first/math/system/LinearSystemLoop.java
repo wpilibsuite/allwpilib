@@ -6,10 +6,10 @@ package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
+import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
 import edu.wpi.first.math.controller.LinearQuadraticRegulator;
 import edu.wpi.first.math.estimator.KalmanFilter;
-import edu.wpi.first.math.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import java.util.function.Function;
 import org.ejml.MatrixDimensionException;
@@ -302,7 +302,11 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
     return m_clampFunction;
   }
 
-  /** Set the clamping function used to clamp inputs. */
+  /**
+   * Set the clamping function used to clamp inputs.
+   *
+   * @param clampFunction The clamping function.
+   */
   public void setClampFunction(Function<Matrix<Inputs, N1>, Matrix<Inputs, N1>> clampFunction) {
     this.m_clampFunction = clampFunction;
   }

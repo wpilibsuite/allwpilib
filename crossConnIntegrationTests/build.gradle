@@ -1,0 +1,118 @@
+import org.gradle.language.base.internal.ProjectLayout
+import jaci.gradle.toolchains.*
+import jaci.gradle.nativedeps.*
+import org.gradle.internal.os.OperatingSystem
+
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: ExtraTasks
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'jaci.gradle.EmbeddedTools'
+
+apply from: '../shared/config.gradle'
+
+ext {
+    sharedCvConfigs = [crossConnIntegrationTests: []]
+    staticCvConfigs = [:]
+    useJava = false
+    useCpp = true
+    staticGtestConfigs = [crossConnIntegrationTests: []]
+}
+
+apply from: "${rootDir}/shared/opencv.gradle"
+
+apply from: "${rootDir}/shared/googletest.gradle"
+
+model {
+    components {
+        crossConnIntegrationTests(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            nativeUtils.useRequiredLibrary(it, 'googletest_static')
+            binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    binary.sources {
+                        athenaCpp(CppSourceSet) {
+                            source {
+                                srcDirs = ['src/main/native/cpp']
+                                includes = ['**/*.cpp']
+                            }
+                            exportedHeaders {
+                                srcDirs = ['src/main/native/include']
+                                includes = ['**/*.h']
+                            }
+                        }
+                    }
+                    binary.tasks.withType(CppCompile) {
+                        cppCompiler.args "-Wno-missing-field-initializers"
+                        cppCompiler.args "-Wno-unused-variable"
+                        cppCompiler.args "-Wno-error=deprecated-declarations"
+                    }
+                    project(':hal').addHalDependency(binary, 'shared')
+                    project(':hal').addHalJniDependency(binary)
+                    lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    }
+                } else {
+                    binary.sources {
+                        simCpp(CppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/dt'
+                                includes = ['**/*.cpp']
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+deploy {
+    targets {
+        target('roborio') {
+            directory = '/home/admin'
+            maxChannels = 4
+            locations {
+                ssh {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
+                }
+            }
+        }
+    }
+    artifacts {
+        all {
+            targets << 'roborio'
+            predeploy << { ctx ->
+                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+            }
+            postdeploy << { ctx ->
+                ctx.execute("sync")
+                ctx.execute("ldconfig")
+            }
+        }
+
+        nativeArtifact('crossConnIntegrationTests') {
+            component = 'crossConnIntegrationTests'
+            targetPlatform = nativeUtils.wpi.platforms.roborio
+            libraryDirectory = '/usr/local/frc/third-party/lib'
+            buildType = 'debug'
+            postdeploy << { ctx ->
+                ctx.execute('chmod +x crossConnIntegrationTests')
+            }
+        }
+    }
+}
+
+tasks.register('deployTests') {
+    try {
+        dependsOn tasks.named('deployCrossConnIntegrationTestsLibrariesRoborio')
+        dependsOn tasks.named('deployCrossConnIntegrationTestsRoborio')
+    } catch (ignored) {
+    }
+}

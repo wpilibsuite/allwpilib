@@ -5,6 +5,7 @@
 #include "DsClient.h"
 
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpi/TCPConnector.h>
 #include <wpi/raw_ostream.h>
 #include <wpi/raw_socket_istream.h>
@@ -80,7 +81,7 @@ void DsClient::Thread::Main() {
       continue;
     }
 
-    DEBUG3("connected to DS");
+    DEBUG3("{}", "connected to DS");
     wpi::raw_socket_istream is(*m_stream);
 
     while (m_active && !is.has_error()) {
@@ -122,24 +123,27 @@ void DsClient::Thread::Main() {
         m_stream = nullptr;
         break;
       }
-      DEBUG3("json=" << json);
+      DEBUG3("json={}", json);
 
       // Look for "robotIP":12345, and get 12345 portion
       size_t pos = json.find("\"robotIP\"");
-      if (pos == wpi::StringRef::npos) {
+      if (pos == std::string_view::npos) {
         continue;  // could not find?
       }
       pos += 9;
       pos = json.find(':', pos);
-      if (pos == wpi::StringRef::npos) {
+      if (pos == std::string_view::npos) {
         continue;  // could not find?
       }
       size_t endpos = json.find_first_not_of("0123456789", pos + 1);
-      DEBUG3("found robotIP=" << json.slice(pos + 1, endpos));
+      DEBUG3("found robotIP={}", wpi::slice(json, pos + 1, endpos));
 
       // Parse into number
       unsigned int ip = 0;
-      if (json.slice(pos + 1, endpos).getAsInteger(10, ip)) {
+      if (auto v = wpi::parse_integer<unsigned int>(
+              wpi::slice(json, pos + 1, endpos), 10)) {
+        ip = v.value();
+      } else {
         continue;  // error
       }
 
@@ -157,12 +161,10 @@ void DsClient::Thread::Main() {
       oldip = ip;
 
       // Convert number into dotted quad
-      json.clear();
-      wpi::raw_svector_ostream os{json};
-      os << ((ip >> 24) & 0xff) << "." << ((ip >> 16) & 0xff) << "."
-         << ((ip >> 8) & 0xff) << "." << (ip & 0xff);
-      INFO("client: DS overriding server IP to " << os.str());
-      m_dispatcher.SetServerOverride(json.c_str(), port);
+      auto newip = fmt::format("{}.{}.{}.{}", (ip >> 24) & 0xff,
+                               (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
+      INFO("client: DS overriding server IP to {}", newip);
+      m_dispatcher.SetServerOverride(newip.c_str(), port);
     }
 
     // We disconnected from the DS, clear the server override

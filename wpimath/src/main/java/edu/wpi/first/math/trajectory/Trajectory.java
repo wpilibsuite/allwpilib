@@ -152,7 +152,6 @@ public class Trajectory {
    * @param transform The transform to transform the trajectory by.
    * @return The transformed trajectory.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Trajectory transformBy(Transform2d transform) {
     var firstState = m_states.get(0);
     var firstPose = firstState.poseMeters;
@@ -214,7 +213,6 @@ public class Trajectory {
    * @param other The trajectory to concatenate.
    * @return The concatenated trajectory.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public Trajectory concatenate(Trajectory other) {
     // If this is a default constructed trajectory with no states, then we can
     // simply return the rhs trajectory.

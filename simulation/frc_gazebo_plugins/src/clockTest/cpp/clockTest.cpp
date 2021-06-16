@@ -22,7 +22,7 @@ void cb(gazebo::msgs::ConstFloat64Ptr& msg) {
   latest_time = msg->data();
 }
 
-TEST(ClockTests, test_clock) {
+TEST(ClockTests, TestClock) {
   gazebo::physics::WorldPtr world;
 
   ASSERT_TRUE(library);

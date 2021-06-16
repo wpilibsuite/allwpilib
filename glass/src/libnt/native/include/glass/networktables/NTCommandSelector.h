@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <ntcore_cpp.h>
-#include <wpi/StringRef.h>
 
 #include "glass/DataSource.h"
 #include "glass/networktables/NetworkTablesHelper.h"
@@ -18,8 +18,8 @@ class NTCommandSelectorModel : public CommandSelectorModel {
  public:
   static constexpr const char* kType = "Command";
 
-  explicit NTCommandSelectorModel(wpi::StringRef path);
-  NTCommandSelectorModel(NT_Inst instance, wpi::StringRef path);
+  explicit NTCommandSelectorModel(std::string_view path);
+  NTCommandSelectorModel(NT_Inst instance, std::string_view path);
 
   const char* GetName() const override { return m_nameValue.c_str(); }
   DataSource* GetRunningData() override { return &m_runningData; }

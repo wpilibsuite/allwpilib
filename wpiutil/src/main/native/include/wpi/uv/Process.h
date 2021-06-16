@@ -10,11 +10,11 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/Signal.h"
 #include "wpi/SmallVector.h"
-#include "wpi/Twine.h"
+#include "wpi/span.h"
 #include "wpi/uv/Handle.h"
 
 namespace wpi::uv {
@@ -35,9 +35,9 @@ class Process final : public HandleImpl<Process, uv_process_t> {
   ~Process() noexcept override = default;
 
   /**
-   * Structure for Spawn() option temporaries.  This is a reference type
-   * similar to StringRef, so if this value is stored outside of a temporary,
-   * be careful about overwriting what it points to.
+   * Structure for Spawn() option temporaries.  This is a reference type, so if
+   * this value is stored outside of a temporary, be careful about overwriting
+   * what it points to.
    */
   struct Option {
     enum Type {
@@ -65,18 +65,13 @@ class Process final : public HandleImpl<Process, uv_process_t> {
       m_data.str = arg.data();
     }
 
-    /*implicit*/ Option(StringRef arg)  // NOLINT
+    /*implicit*/ Option(std::string_view arg)  // NOLINT
         : m_strData(arg) {
       m_data.str = m_strData.c_str();
     }
 
     /*implicit*/ Option(const SmallVectorImpl<char>& arg)  // NOLINT
         : m_strData(arg.data(), arg.size()) {
-      m_data.str = m_strData.c_str();
-    }
-
-    /*implicit*/ Option(const Twine& arg)  // NOLINT
-        : m_strData(arg.str()) {
       m_data.str = m_strData.c_str();
     }
 
@@ -105,9 +100,9 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * environment is used.
    * @param env environment variable
    */
-  static Option Env(const Twine& env) {
+  static Option Env(std::string_view env) {
     Option o(Option::kEnv);
-    o.m_strData = env.str();
+    o.m_strData = env;
     o.m_data.str = o.m_strData.c_str();
     return o;
   }
@@ -116,9 +111,9 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * Set the current working directory for the subprocess.
    * @param cwd current working directory
    */
-  static Option Cwd(const Twine& cwd) {
+  static Option Cwd(std::string_view cwd) {
     Option o(Option::kCwd);
-    o.m_strData = cwd.str();
+    o.m_strData = cwd;
     o.m_data.str = o.m_strData.c_str();
     return o;
   }
@@ -236,16 +231,17 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param file Path pointing to the program to be executed
    * @param options Process options
    */
-  static std::shared_ptr<Process> SpawnArray(Loop& loop, const Twine& file,
-                                             ArrayRef<Option> options);
+  static std::shared_ptr<Process> SpawnArray(Loop& loop, std::string_view file,
+                                             span<const Option> options);
 
   static std::shared_ptr<Process> SpawnArray(
-      Loop& loop, const Twine& file, std::initializer_list<Option> options) {
-    return SpawnArray(loop, file, makeArrayRef(options.begin(), options.end()));
+      Loop& loop, std::string_view file,
+      std::initializer_list<Option> options) {
+    return SpawnArray(loop, file, {options.begin(), options.end()});
   }
 
   template <typename... Args>
-  static std::shared_ptr<Process> Spawn(Loop& loop, const Twine& file,
+  static std::shared_ptr<Process> Spawn(Loop& loop, std::string_view file,
                                         const Args&... options) {
     return SpawnArray(loop, file, {options...});
   }
@@ -264,20 +260,20 @@ class Process final : public HandleImpl<Process, uv_process_t> {
    * @param options Process options
    */
   static std::shared_ptr<Process> SpawnArray(const std::shared_ptr<Loop>& loop,
-                                             const Twine& file,
-                                             ArrayRef<Option> options) {
+                                             std::string_view file,
+                                             span<const Option> options) {
     return SpawnArray(*loop, file, options);
   }
 
   static std::shared_ptr<Process> SpawnArray(
-      const std::shared_ptr<Loop>& loop, const Twine& file,
+      const std::shared_ptr<Loop>& loop, std::string_view file,
       std::initializer_list<Option> options) {
     return SpawnArray(*loop, file, options);
   }
 
   template <typename... Args>
   static std::shared_ptr<Process> Spawn(const std::shared_ptr<Loop>& loop,
-                                        const Twine& file,
+                                        std::string_view file,
                                         const Args&... options) {
     return SpawnArray(*loop, file, {options...});
   }

@@ -138,7 +138,6 @@ public final class TrajectoryGenerator {
    * @param config The configuration for the trajectory.
    * @return The generated trajectory.
    */
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   public static Trajectory generateTrajectory(
       ControlVectorList controlVectors, TrajectoryConfig config) {
     final var flip = new Transform2d(new Translation2d(), Rotation2d.fromDegrees(180.0));

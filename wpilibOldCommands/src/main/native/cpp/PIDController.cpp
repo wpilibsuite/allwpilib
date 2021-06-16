@@ -4,9 +4,10 @@
 
 #include "frc/PIDController.h"
 
+#include <wpi/sendable/SendableBuilder.h>
+
 #include "frc/Notifier.h"
 #include "frc/PIDOutput.h"
-#include "frc/smartdashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -75,9 +76,9 @@ void PIDController::Reset() {
   PIDBase::Reset();
 }
 
-void PIDController::InitSendable(SendableBuilder& builder) {
+void PIDController::InitSendable(wpi::SendableBuilder& builder) {
   PIDBase::InitSendable(builder);
   builder.AddBooleanProperty(
-      "enabled", [=]() { return IsEnabled(); },
+      "enabled", [=] { return IsEnabled(); },
       [=](bool value) { SetEnabled(value); });
 }

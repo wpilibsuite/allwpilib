@@ -4,14 +4,13 @@
 
 #include "shuffleboard/MockActuatorSendable.h"
 
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-using namespace frc;
-
-MockActuatorSendable::MockActuatorSendable(wpi::StringRef name) {
-  SendableRegistry::GetInstance().Add(this, name);
+MockActuatorSendable::MockActuatorSendable(std::string_view name) {
+  wpi::SendableRegistry::Add(this, name);
 }
 
-void MockActuatorSendable::InitSendable(SendableBuilder& builder) {
+void MockActuatorSendable::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetActuator(true);
 }

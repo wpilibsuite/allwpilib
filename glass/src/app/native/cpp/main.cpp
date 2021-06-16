@@ -5,9 +5,9 @@
 #include <memory>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 #include <imgui.h>
 #include <ntcore_cpp.h>
-#include <wpi/SmallString.h>
 #include <wpigui.h>
 
 #include "glass/Context.h"
@@ -24,13 +24,13 @@ namespace gui = wpi::gui;
 const char* GetWPILibVersion();
 
 namespace glass {
-wpi::StringRef GetResource_glass_16_png();
-wpi::StringRef GetResource_glass_32_png();
-wpi::StringRef GetResource_glass_48_png();
-wpi::StringRef GetResource_glass_64_png();
-wpi::StringRef GetResource_glass_128_png();
-wpi::StringRef GetResource_glass_256_png();
-wpi::StringRef GetResource_glass_512_png();
+std::string_view GetResource_glass_16_png();
+std::string_view GetResource_glass_32_png();
+std::string_view GetResource_glass_48_png();
+std::string_view GetResource_glass_64_png();
+std::string_view GetResource_glass_128_png();
+std::string_view GetResource_glass_256_png();
+std::string_view GetResource_glass_512_png();
 }  // namespace glass
 
 static std::unique_ptr<glass::PlotProvider> gPlotProvider;
@@ -56,11 +56,9 @@ static void NtInitialize() {
     bool timedOut;
     for (auto&& event : nt::PollConnectionListener(poller, 0, &timedOut)) {
       if (event.connected) {
-        wpi::SmallString<64> title;
-        title = "Glass - Connected (";
-        title += event.conn.remote_ip;
-        title += ')';
-        glfwSetWindowTitle(win, title.c_str());
+        glfwSetWindowTitle(
+            win, fmt::format("Glass - Connected ({})", event.conn.remote_ip)
+                     .c_str());
       } else {
         glfwSetWindowTitle(win, "Glass - DISCONNECTED");
       }
@@ -81,9 +79,8 @@ static void NtInitialize() {
       } else if (msg.level >= NT_LOG_WARNING) {
         level = "WARNING: ";
       }
-      gNetworkTablesLog.Append(
-          wpi::Twine{level} + msg.message + wpi::Twine{" ("} + msg.filename +
-          wpi::Twine{':'} + wpi::Twine{msg.line} + wpi::Twine{")\n"});
+      gNetworkTablesLog.Append(fmt::format("{}{} ({}:{})\n", level, msg.message,
+                                           msg.filename, msg.line));
     }
   });
 

@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include <atomic>
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <thread>
@@ -16,13 +17,12 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <FRC_NetworkCommunication/UsageReporting.h>
+#include <fmt/format.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
 #include "HALInternal.h"
-#include "ctre/ctre.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"
@@ -40,6 +40,7 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
+  InitializeCTREPCM();
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();
@@ -50,7 +51,6 @@ void InitializeHAL() {
   InitializeAnalogTrigger();
   InitializeCAN();
   InitializeCANAPI();
-  InitializeCompressor();
   InitializeConstants();
   InitializeCounter();
   InitializeDigitalInternal();
@@ -64,14 +64,12 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
-  InitializePCMInternal();
   InitializePDP();
   InitializePorts();
   InitializePower();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
-  InitializeSolenoid();
   InitializeSPI();
   InitializeThreads();
 }
@@ -113,18 +111,6 @@ const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
-    case CTR_RxTimeout:
-      return CTR_RxTimeout_MESSAGE;
-    case CTR_TxTimeout:
-      return CTR_TxTimeout_MESSAGE;
-    case CTR_InvalidParamValue:
-      return CTR_InvalidParamValue_MESSAGE;
-    case CTR_UnexpectedArbId:
-      return CTR_UnexpectedArbId_MESSAGE;
-    case CTR_TxFailed:
-      return CTR_TxFailed_MESSAGE;
-    case CTR_SigNotUpdated:
-      return CTR_SigNotUpdated_MESSAGE;
     case NiFpga_Status_FifoTimeout:
       return NiFpga_Status_FifoTimeout_MESSAGE;
     case NiFpga_Status_TransferAborted:
@@ -233,6 +219,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_CAN_BUFFER_OVERRUN_MESSAGE;
     case HAL_LED_CHANNEL_ERROR:
       return HAL_LED_CHANNEL_ERROR_MESSAGE;
+    case HAL_INVALID_DMA_STATE:
+      return HAL_INVALID_DMA_STATE_MESSAGE;
+    case HAL_INVALID_DMA_ADDITION:
+      return HAL_INVALID_DMA_ADDITION_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
     default:
@@ -345,18 +335,19 @@ static bool killExistingProgram(int timeout, int mode) {
     // see if the pid is around, but we don't want to mess with init id=1, or
     // ourselves
     if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
-      wpi::outs() << "Killing previously running FRC program...\n";
+      std::puts("Killing previously running FRC program...");
       kill(pid, SIGTERM);  // try to kill it
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
       if (kill(pid, 0) == 0) {
         // still not successful
-        wpi::outs() << "FRC pid " << pid << " did not die within " << timeout
-                    << "ms. Force killing with kill -9\n";
+        fmt::print(
+            "FRC pid {} did not die within {} ms. Force killing with kill -9\n",
+            pid, timeout);
         // Force kill -9
         auto forceKill = kill(pid, SIGKILL);
         if (forceKill != 0) {
           auto errorMsg = std::strerror(forceKill);
-          wpi::outs() << "Kill -9 error: " << errorMsg << "\n";
+          fmt::print("Kill -9 error: {}\n", errorMsg);
         }
         // Give a bit of time for the kill to take place
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -393,7 +384,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   setlinebuf(stdin);
   setlinebuf(stdout);
-  wpi::outs().SetUnbuffered();
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
@@ -427,11 +417,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
     int32_t status = 0;
     uint64_t rv = HAL_GetFPGATime(&status);
     if (status != 0) {
-      wpi::errs()
-          << "Call to HAL_GetFPGATime failed in wpi::Now() with status "
-          << status
-          << ". Initialization might have failed. Time will not be correct\n";
-      wpi::errs().flush();
+      fmt::print(stderr,
+                 "Call to HAL_GetFPGATime failed in wpi::Now() with status {}. "
+                 "Initialization might have failed. Time will not be correct\n",
+                 status);
+      std::fflush(stderr);
       return 0u;
     }
     return rv;

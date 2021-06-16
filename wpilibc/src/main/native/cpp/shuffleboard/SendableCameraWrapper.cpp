@@ -9,9 +9,8 @@
 #include <string>
 
 #include <wpi/DenseMap.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 namespace frc {
 namespace detail {
@@ -21,12 +20,12 @@ std::shared_ptr<SendableCameraWrapper>& GetSendableCameraWrapper(
   return wrappers[static_cast<int>(source)];
 }
 
-void AddToSendableRegistry(frc::Sendable* sendable, std::string name) {
-  SendableRegistry::GetInstance().Add(sendable, name);
+void AddToSendableRegistry(wpi::Sendable* sendable, std::string name) {
+  wpi::SendableRegistry::Add(sendable, name);
 }
 }  // namespace detail
 
-void SendableCameraWrapper::InitSendable(SendableBuilder& builder) {
+void SendableCameraWrapper::InitSendable(wpi::SendableBuilder& builder) {
   builder.AddStringProperty(
       ".ShuffleboardURI", [this] { return m_uri; }, nullptr);
 }

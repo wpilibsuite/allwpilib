@@ -4,19 +4,22 @@
 
 #include "glass/networktables/NTSpeedController.h"
 
+#include <fmt/format.h>
+#include <wpi/StringExtras.h>
+
 using namespace glass;
 
-NTSpeedControllerModel::NTSpeedControllerModel(wpi::StringRef path)
+NTSpeedControllerModel::NTSpeedControllerModel(std::string_view path)
     : NTSpeedControllerModel(nt::GetDefaultInstance(), path) {}
 
 NTSpeedControllerModel::NTSpeedControllerModel(NT_Inst instance,
-                                               wpi::StringRef path)
+                                               std::string_view path)
     : m_nt(instance),
-      m_value(m_nt.GetEntry(path + "/Value")),
-      m_name(m_nt.GetEntry(path + "/.name")),
-      m_controllable(m_nt.GetEntry(path + "/.controllable")),
-      m_valueData("NT_SpdCtrl:" + path),
-      m_nameValue(path.rsplit('/').second) {
+      m_value(m_nt.GetEntry(fmt::format("{}/Value", path))),
+      m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
+      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable"))),
+      m_valueData(fmt::format("NT_SpdCtrl:{}", path)),
+      m_nameValue(wpi::rsplit(path, '/').second) {
   m_nt.AddListener(m_value);
   m_nt.AddListener(m_name);
   m_nt.AddListener(m_controllable);

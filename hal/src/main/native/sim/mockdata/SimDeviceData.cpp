@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include <wpi/StringExtras.h>
+
 #include "SimDeviceDataInternal.h"
 
 using namespace hal;
@@ -71,7 +73,7 @@ void SimDeviceData::SetDeviceEnabled(const char* prefix, bool enabled) {
 bool SimDeviceData::IsDeviceEnabled(const char* name) {
   std::scoped_lock lock(m_mutex);
   for (const auto& elem : m_prefixEnabled) {
-    if (wpi::StringRef{name}.startswith(elem.first)) {
+    if (wpi::starts_with(name, elem.first)) {
       return elem.second;
     }
   }
@@ -83,7 +85,7 @@ HAL_SimDeviceHandle SimDeviceData::CreateDevice(const char* name) {
 
   // don't create if disabled
   for (const auto& elem : m_prefixEnabled) {
-    if (wpi::StringRef{name}.startswith(elem.first)) {
+    if (wpi::starts_with(name, elem.first)) {
       if (elem.second) {
         break;  // enabled
       }
@@ -272,7 +274,7 @@ int32_t SimDeviceData::RegisterDeviceCreatedCallback(
   // initial notifications
   if (initialNotify) {
     for (auto&& device : m_devices) {
-      if (wpi::StringRef{device->name}.startswith(prefix)) {
+      if (wpi::starts_with(device->name, prefix)) {
         callback(device->name.c_str(), param, device->handle);
       }
     }
@@ -332,7 +334,7 @@ void SimDeviceData::EnumerateDevices(const char* prefix, void* param,
                                      HALSIM_SimDeviceCallback callback) {
   std::scoped_lock lock(m_mutex);
   for (auto&& device : m_devices) {
-    if (wpi::StringRef{device->name}.startswith(prefix)) {
+    if (wpi::starts_with(device->name, prefix)) {
       callback(device->name.c_str(), param, device->handle);
     }
   }

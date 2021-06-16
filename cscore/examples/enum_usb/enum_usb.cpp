@@ -2,83 +2,77 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <cstdio>
+
+#include <fmt/format.h>
 
 #include "cscore.h"
 
 int main() {
   CS_Status status = 0;
-  wpi::SmallString<64> buf;
 
   for (const auto& caminfo : cs::EnumerateUsbCameras(&status)) {
-    wpi::outs() << caminfo.dev << ": " << caminfo.path << " (" << caminfo.name
-                << ")\n";
+    fmt::print("{}: {} ({})\n", caminfo.dev, caminfo.path, caminfo.name);
     if (!caminfo.otherPaths.empty()) {
-      wpi::outs() << "Other device paths:\n";
+      std::puts("Other device paths:");
       for (auto&& path : caminfo.otherPaths) {
-        wpi::outs() << "  " << path << '\n';
+        fmt::print("  {}\n", path);
       }
     }
 
     cs::UsbCamera camera{"usbcam", caminfo.dev};
 
-    wpi::outs() << "Properties:\n";
+    std::puts("Properties:");
     for (const auto& prop : camera.EnumerateProperties()) {
-      wpi::outs() << "  " << prop.GetName();
+      fmt::print("  {}", prop.GetName());
       switch (prop.GetKind()) {
         case cs::VideoProperty::kBoolean:
-          wpi::outs() << " (bool): "
-                      << "value=" << prop.Get()
-                      << " default=" << prop.GetDefault();
+          fmt::print(" (bool): value={} default={}", prop.Get(),
+                     prop.GetDefault());
           break;
         case cs::VideoProperty::kInteger:
-          wpi::outs() << " (int): "
-                      << "value=" << prop.Get() << " min=" << prop.GetMin()
-                      << " max=" << prop.GetMax() << " step=" << prop.GetStep()
-                      << " default=" << prop.GetDefault();
+          fmt::print(" (int): value={} min={} max={} step={} default={}",
+                     prop.Get(), prop.GetMin(), prop.GetMax(), prop.GetStep(),
+                     prop.GetDefault());
           break;
         case cs::VideoProperty::kString:
-          wpi::outs() << " (string): " << prop.GetString(buf);
+          fmt::print(" (string): {}", prop.GetString());
           break;
         case cs::VideoProperty::kEnum: {
-          wpi::outs() << " (enum): "
-                      << "value=" << prop.Get();
+          fmt::print(" (enum): value={}", prop.Get());
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
-            if (choices[i].empty()) {
-              continue;
+            if (!choices[i].empty()) {
+              fmt::print("\n    {}: {}", i, choices[i]);
             }
-            wpi::outs() << "\n    " << i << ": " << choices[i];
           }
           break;
         }
         default:
           break;
       }
-      wpi::outs() << '\n';
+      std::fputc('\n', stdout);
     }
 
-    wpi::outs() << "Video Modes:\n";
+    std::puts("Video Modes:");
     for (const auto& mode : camera.EnumerateVideoModes()) {
-      wpi::outs() << "  PixelFormat:";
+      const char* pixelFormat;
       switch (mode.pixelFormat) {
         case cs::VideoMode::kMJPEG:
-          wpi::outs() << "MJPEG";
+          pixelFormat = "MJPEG";
           break;
         case cs::VideoMode::kYUYV:
-          wpi::outs() << "YUYV";
+          pixelFormat = "YUYV";
           break;
         case cs::VideoMode::kRGB565:
-          wpi::outs() << "RGB565";
+          pixelFormat = "RGB565";
           break;
         default:
-          wpi::outs() << "Unknown";
+          pixelFormat = "Unknown";
           break;
       }
-      wpi::outs() << " Width:" << mode.width;
-      wpi::outs() << " Height:" << mode.height;
-      wpi::outs() << " FPS:" << mode.fps << '\n';
+      fmt::print("  PixelFormat:{} Width:{} Height:{} FPS:{}\n", pixelFormat,
+                 mode.width, mode.height, mode.fps);
     }
   }
 }

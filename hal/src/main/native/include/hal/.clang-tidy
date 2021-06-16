@@ -72,4 +72,4 @@ Checks:
 FormatStyle: file
 CheckOptions:
   - key: bugprone-dangling-handle
-    value: 'wpi::StringRef;wpi::Twine'
+    value: 'std::string_view'

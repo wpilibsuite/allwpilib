@@ -31,6 +31,7 @@ repoRootNameOverride {
 }
 
 includeOtherLibs {
+  ^fmt/
   ^opencv2/
   ^support/
   ^tcpsockets/

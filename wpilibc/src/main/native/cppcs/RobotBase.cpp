@@ -11,6 +11,7 @@
 #include <cstdio>
 
 #include <cameraserver/CameraServerShared.h>
+#include <fmt/format.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
 #include <networktables/NetworkTableInstance.h>
@@ -20,22 +21,21 @@
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
 #include "frc/RobotState.h"
-#include "frc/Utility.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
-typedef void (*SetCameraServerSharedFP)(frc::CameraServerShared* shared);
+using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
 using namespace frc;
 
 int frc::RunHALInitialization() {
   if (!HAL_Initialize(500, 0)) {
-    wpi::errs() << "FATAL ERROR: HAL could not be initialized\n";
+    std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
-  wpi::outs() << "\n********** Robot program starting **********\n";
+  std::puts("\n********** Robot program starting **********");
   return 0;
 }
 
@@ -53,14 +53,18 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
   void ReportVideoServer(int id) override {
     HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
   }
-  void SetCameraServerError(const wpi::Twine& error) override {
-    FRC_ReportError(err::CameraServerError, error);
+  void SetCameraServerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {
+    ReportErrorV(err::CameraServerError, __FILE__, __LINE__, __FUNCTION__,
+                 format, args);
   }
-  void SetVisionRunnerError(const wpi::Twine& error) override {
-    FRC_ReportError(-1, error);
+  void SetVisionRunnerErrorV(fmt::string_view format,
+                             fmt::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
-  void ReportDriverStationError(const wpi::Twine& error) override {
-    DriverStation::ReportError(error);
+  void ReportDriverStationErrorV(fmt::string_view format,
+                                 fmt::format_args args) override {
+    ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format, args);
   }
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
     return std::make_pair(RobotBase::GetThreadId(), true);
@@ -68,8 +72,14 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
 };
 class WPILibMathShared : public wpi::math::MathShared {
  public:
-  void ReportError(const wpi::Twine& error) override {
-    DriverStation::ReportError(error);
+  void ReportErrorV(fmt::string_view format, fmt::format_args args) override {
+    frc::ReportErrorV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
+                      args);
+  }
+
+  void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
+    frc::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
+                      args);
   }
 
   void ReportUsage(wpi::math::MathUsageId id, int count) override {
@@ -104,6 +114,13 @@ class WPILibMathShared : public wpi::math::MathShared {
         HAL_Report(HALUsageReporting::kResourceType_Odometry,
                    HALUsageReporting::kOdometry_MecanumDrive);
         break;
+      case wpi::math::MathUsageId::kController_PIDController2:
+        HAL_Report(HALUsageReporting::kResourceType_PIDController2, count);
+        break;
+      case wpi::math::MathUsageId::kController_ProfiledPIDController:
+        HAL_Report(HALUsageReporting::kResourceType_ProfiledPIDController,
+                   count);
+        break;
     }
   }
 };
@@ -119,8 +136,8 @@ static void SetupCameraServerShared() {
 #endif
 
   if (!cameraServerLib) {
-    wpi::outs() << "Camera Server Library Not Found\n";
-    wpi::outs().flush();
+    std::puts("Camera Server Library Not Found");
+    std::fflush(stdout);
     return;
   }
   auto symbol = dlsym(cameraServerLib, "CameraServer_SetCameraServerShared");
@@ -128,15 +145,15 @@ static void SetupCameraServerShared() {
     auto setCameraServerShared = (SetCameraServerSharedFP)symbol;
     setCameraServerShared(new WPILibCameraServerShared{});
   } else {
-    wpi::outs() << "Camera Server Shared Symbol Missing\n";
-    wpi::outs().flush();
+    std::puts("Camera Server Shared Symbol Missing");
+    std::fflush(stdout);
   }
 #else
   CameraServer_SetCameraServerShared(new WPILibCameraServerShared{});
 #endif
 #else
-  wpi::outs() << "Not loading CameraServerShared\n";
-  wpi::outs().flush();
+  std::puts("Not loading CameraServerShared");
+  std::fflush(stdout);
 #endif
 }
 
@@ -146,42 +163,42 @@ static void SetupMathShared() {
 }
 
 bool RobotBase::IsEnabled() const {
-  return m_ds.IsEnabled();
+  return DriverStation::IsEnabled();
 }
 
 bool RobotBase::IsDisabled() const {
-  return m_ds.IsDisabled();
+  return DriverStation::IsDisabled();
 }
 
 bool RobotBase::IsAutonomous() const {
-  return m_ds.IsAutonomous();
+  return DriverStation::IsAutonomous();
 }
 
 bool RobotBase::IsAutonomousEnabled() const {
-  return m_ds.IsAutonomousEnabled();
+  return DriverStation::IsAutonomousEnabled();
 }
 
 bool RobotBase::IsOperatorControl() const {
-  return m_ds.IsOperatorControl();
+  return DriverStation::IsOperatorControl();
 }
 
 bool RobotBase::IsOperatorControlEnabled() const {
-  return m_ds.IsOperatorControlEnabled();
+  return DriverStation::IsOperatorControlEnabled();
 }
 
 bool RobotBase::IsTest() const {
-  return m_ds.IsTest();
+  return DriverStation::IsTest();
 }
 
 bool RobotBase::IsNewDataAvailable() const {
-  return m_ds.IsNewControlData();
+  return DriverStation::IsNewControlData();
 }
 
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }
 
-RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+RobotBase::RobotBase() {
   m_threadId = std::this_thread::get_id();
 
   SetupCameraServerShared();
@@ -214,14 +231,5 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 
-  LiveWindow::GetInstance()->SetEnabled(false);
-}
-
-RobotBase::RobotBase(RobotBase&&) noexcept
-    : m_ds(DriverStation::GetInstance()) {}
-
-RobotBase::~RobotBase() = default;
-
-RobotBase& RobotBase::operator=(RobotBase&&) noexcept {
-  return *this;
+  LiveWindow::SetEnabled(false);
 }

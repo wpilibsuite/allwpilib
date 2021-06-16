@@ -12,7 +12,10 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
+
+#include <fmt/format.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
@@ -23,6 +26,7 @@
 #include <wpi/Signal.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
 #include "glass/Context.h"
@@ -42,7 +46,7 @@ struct PlotSeriesRef {
 
 class PlotSeries {
  public:
-  explicit PlotSeries(wpi::StringRef id);
+  explicit PlotSeries(std::string_view id);
   explicit PlotSeries(DataSource* source, int yAxis = 0);
 
   const std::string& GetId() const { return m_id; }
@@ -52,7 +56,7 @@ class PlotSeries {
   void SetSource(DataSource* source);
   DataSource* GetSource() const { return m_source; }
 
-  bool ReadIni(wpi::StringRef name, wpi::StringRef value);
+  bool ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out);
 
   enum Action { kNone, kMoveUp, kMoveDown, kDelete };
@@ -102,7 +106,7 @@ class Plot {
  public:
   Plot();
 
-  bool ReadIni(wpi::StringRef name, wpi::StringRef value);
+  bool ReadIni(std::string_view name, std::string_view value);
   void WriteIni(ImGuiTextBuffer* out);
 
   void DragDropTarget(PlotView& view, size_t i, bool inPlot);
@@ -164,7 +168,7 @@ class PlotView : public View {
 
 }  // namespace
 
-PlotSeries::PlotSeries(wpi::StringRef id) : m_id(id) {
+PlotSeries::PlotSeries(std::string_view id) : m_id(id) {
   if (DataSource* source = DataSource::Find(id)) {
     SetSource(source);
     return;
@@ -241,55 +245,45 @@ void PlotSeries::AppendValue(double value, uint64_t timeUs) {
   }
 }
 
-bool PlotSeries::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+bool PlotSeries::ReadIni(std::string_view name, std::string_view value) {
   if (name == "name") {
     m_name = value;
     return true;
   }
   if (name == "yAxis") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_yAxis = num.value();
     }
-    m_yAxis = num;
     return true;
   } else if (name == "color") {
-    unsigned int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<unsigned int>(value, 10)) {
+      m_color = ImColor(num.value());
     }
-    m_color = ImColor(num);
     return true;
   } else if (name == "marker") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_marker = num.value();
     }
-    m_marker = num;
     return true;
   } else if (name == "weight") {
-    std::sscanf(value.data(), "%f", &m_weight);
+    if (auto num = wpi::parse_float<float>(value)) {
+      m_weight = num.value();
+    }
     return true;
   } else if (name == "digital") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_digital = num.value();
     }
-    m_digital = num;
     return true;
   } else if (name == "digitalBitHeight") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_digitalBitHeight = num.value();
     }
-    m_digitalBitHeight = num;
     return true;
   } else if (name == "digitalBitGap") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_digitalBitGap = num.value();
     }
-    m_digitalBitGap = num;
     return true;
   }
   return false;
@@ -478,121 +472,93 @@ Plot::Plot() {
   }
 }
 
-bool Plot::ReadIni(wpi::StringRef name, wpi::StringRef value) {
+bool Plot::ReadIni(std::string_view name, std::string_view value) {
   if (name == "name") {
     m_name = value;
     return true;
   } else if (name == "visible") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_visible = num.value() != 0;
     }
-    m_visible = num != 0;
     return true;
   } else if (name == "showPause") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_showPause = num.value() != 0;
     }
-    m_showPause = num != 0;
     return true;
   } else if (name == "lockPrevX") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_lockPrevX = num.value() != 0;
     }
-    m_lockPrevX = num != 0;
     return true;
   } else if (name == "legend") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
-    }
-    if (num == 0) {
-      m_plotFlags |= ImPlotFlags_NoLegend;
-    } else {
-      m_plotFlags &= ~ImPlotFlags_NoLegend;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      if (num.value() == 0) {
+        m_plotFlags |= ImPlotFlags_NoLegend;
+      } else {
+        m_plotFlags &= ~ImPlotFlags_NoLegend;
+      }
     }
     return true;
   } else if (name == "yaxis2") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
-    }
-    if (num == 0) {
-      m_plotFlags &= ~ImPlotFlags_YAxis2;
-    } else {
-      m_plotFlags |= ImPlotFlags_YAxis2;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      if (num.value() == 0) {
+        m_plotFlags &= ~ImPlotFlags_YAxis2;
+      } else {
+        m_plotFlags |= ImPlotFlags_YAxis2;
+      }
     }
     return true;
   } else if (name == "yaxis3") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
-    }
-    if (num == 0) {
-      m_plotFlags &= ~ImPlotFlags_YAxis3;
-    } else {
-      m_plotFlags |= ImPlotFlags_YAxis3;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      if (num.value() == 0) {
+        m_plotFlags &= ~ImPlotFlags_YAxis3;
+      } else {
+        m_plotFlags |= ImPlotFlags_YAxis3;
+      }
     }
     return true;
   } else if (name == "viewTime") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_viewTime = num.value() / 1000.0;
     }
-    m_viewTime = num / 1000.0;
     return true;
   } else if (name == "autoHeight") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_autoHeight = num.value() != 0;
     }
-    m_autoHeight = num != 0;
     return true;
   } else if (name == "height") {
-    int num;
-    if (value.getAsInteger(10, num)) {
-      return true;
+    if (auto num = wpi::parse_integer<int>(value, 10)) {
+      m_height = num.value();
     }
-    m_height = num;
     return true;
-  } else if (name.startswith("y")) {
-    auto [yAxisStr, yName] = name.split('_');
-    int yAxis;
-    if (yAxisStr.substr(1).getAsInteger(10, yAxis)) {
-      return false;
-    }
+  } else if (wpi::starts_with(name, 'y')) {
+    auto [yAxisStr, yName] = wpi::split(name, '_');
+    int yAxis =
+        wpi::parse_integer<int>(wpi::drop_front(yAxisStr), 10).value_or(-1);
     if (yAxis < 0 || yAxis > 3) {
       return false;
     }
     if (yName == "min") {
-      int num;
-      if (value.getAsInteger(10, num)) {
-        return true;
+      if (auto num = wpi::parse_integer<int>(value, 10)) {
+        m_axisRange[yAxis].min = num.value() / 1000.0;
       }
-      m_axisRange[yAxis].min = num / 1000.0;
       return true;
     } else if (yName == "max") {
-      int num;
-      if (value.getAsInteger(10, num)) {
-        return true;
+      if (auto num = wpi::parse_integer<int>(value, 10)) {
+        m_axisRange[yAxis].max = num.value() / 1000.0;
       }
-      m_axisRange[yAxis].max = num / 1000.0;
       return true;
     } else if (yName == "lockMin") {
-      int num;
-      if (value.getAsInteger(10, num)) {
-        return true;
+      if (auto num = wpi::parse_integer<int>(value, 10)) {
+        m_axisRange[yAxis].lockMin = num.value() != 0;
       }
-      m_axisRange[yAxis].lockMin = num != 0;
       return true;
     } else if (yName == "lockMax") {
-      int num;
-      if (value.getAsInteger(10, num)) {
-        return true;
+      if (auto num = wpi::parse_integer<int>(value, 10)) {
+        m_axisRange[yAxis].lockMax = num.value() != 0;
       }
-      m_axisRange[yAxis].lockMax = num != 0;
       return true;
     } else if (yName == "label") {
       m_axisLabel[yAxis] = value;
@@ -960,10 +926,10 @@ void PlotView::MovePlotSeries(PlotView* fromView, size_t fromPlotIndex,
   }
 }
 
-PlotProvider::PlotProvider(const wpi::Twine& iniName)
-    : WindowManager{iniName + "Window"},
+PlotProvider::PlotProvider(std::string_view iniName)
+    : WindowManager{fmt::format("{}Window", iniName)},
       m_plotSaver{iniName, this, false},
-      m_seriesSaver{iniName + "Series", this, true} {}
+      m_seriesSaver{fmt::format("{}Series", iniName), this, true} {}
 
 PlotProvider::~PlotProvider() = default;
 
@@ -1021,21 +987,23 @@ void PlotProvider::DisplayWindows() {
   WindowManager::DisplayWindows();
 }
 
-PlotProvider::IniSaver::IniSaver(const wpi::Twine& typeName,
+PlotProvider::IniSaver::IniSaver(std::string_view typeName,
                                  PlotProvider* provider, bool forSeries)
     : IniSaverBase{typeName}, m_provider{provider}, m_forSeries{forSeries} {}
 
 void* PlotProvider::IniSaver::IniReadOpen(const char* name) {
-  auto [viewId, plotNumStr] = wpi::StringRef{name}.split('#');
-  wpi::StringRef seriesId;
+  auto [viewId, plotNumStr] = wpi::split(name, '#');
+  std::string_view seriesId;
   if (m_forSeries) {
-    std::tie(plotNumStr, seriesId) = plotNumStr.split('#');
+    std::tie(plotNumStr, seriesId) = wpi::split(plotNumStr, '#');
     if (seriesId.empty()) {
       return nullptr;
     }
   }
   unsigned int plotNum;
-  if (plotNumStr.getAsInteger(10, plotNum)) {
+  if (auto plotNumOpt = wpi::parse_integer<unsigned int>(plotNumStr, 10)) {
+    plotNum = plotNumOpt.value();
+  } else {
     return nullptr;
   }
 
@@ -1071,10 +1039,10 @@ void* PlotProvider::IniSaver::IniReadOpen(const char* name) {
       .get();
 }
 
-void PlotProvider::IniSaver::IniReadLine(void* entry, const char* lineStr) {
-  auto [name, value] = wpi::StringRef{lineStr}.split('=');
-  name = name.trim();
-  value = value.trim();
+void PlotProvider::IniSaver::IniReadLine(void* entry, const char* line) {
+  auto [name, value] = wpi::split(line, '=');
+  name = wpi::trim(name);
+  value = wpi::trim(value);
   if (m_forSeries) {
     static_cast<PlotSeries*>(entry)->ReadIni(name, value);
   } else {

@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <thread>
 
+#include <fmt/format.h>
 #include <wpi/timestamp.h>
 
 #include "MockHooksInternal.h"
@@ -83,7 +84,7 @@ void HALSIM_WaitForProgramStart(void) {
   int count = 0;
   while (!programStarted) {
     count++;
-    std::printf("Waiting for program start signal: %d\n", count);
+    fmt::print("Waiting for program start signal: {}\n", count);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
