@@ -77,6 +77,11 @@ class WPILibMathShared : public wpi::math::MathShared {
                       args);
   }
 
+  void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
+    frc::ReportWarningV(err::Error, __FILE__, __LINE__, __FUNCTION__, format,
+                        args);
+  }
+
   void ReportUsage(wpi::math::MathUsageId id, int count) override {
     switch (id) {
       case wpi::math::MathUsageId::kKinematics_DifferentialDrive:
