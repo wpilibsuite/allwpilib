@@ -9,7 +9,6 @@
 #include <functional>
 #include <limits>
 
-#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -17,6 +16,7 @@
 #include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/trajectory/TrapezoidProfile.h"
+#include "units/time.h"
 
 namespace frc {
 namespace detail {

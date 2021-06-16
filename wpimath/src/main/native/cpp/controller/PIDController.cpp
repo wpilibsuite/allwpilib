@@ -7,12 +7,11 @@
 #include <algorithm>
 #include <cmath>
 
-#include <hal/FRCUsageReporting.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/Errors.h"
 #include "frc/MathUtil.h"
+#include "wpimath/MathShared.h"
 
 using namespace frc2;
 
@@ -20,17 +19,18 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
                              units::second_t period)
     : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
   if (period <= 0_s) {
-    FRC_ReportError(
-        frc::err::Error,
+    wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
         period.to<double>());
     m_period = 20_ms;
-    FRC_ReportError(frc::warn::Warning, "{}",
-                    "Controller period defaulted to 20ms.");
+    wpi::math::MathSharedStore::ReportWarning(
+        "{}", "Controller period defaulted to 20ms.");
   }
   static int instances = 0;
   instances++;
-  HAL_Report(HALUsageReporting::kResourceType_PIDController2, instances);
+
+  wpi::math::MathSharedStore::ReportUsage(
+      wpi::math::MathUsageId::kController_PIDController2, instances);
   wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
 

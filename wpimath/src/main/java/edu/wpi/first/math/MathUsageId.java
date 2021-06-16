@@ -12,5 +12,7 @@ public enum MathUsageId {
   kFilter_Linear,
   kOdometry_DifferentialDrive,
   kOdometry_SwerveDrive,
-  kOdometry_MecanumDrive
+  kOdometry_MecanumDrive,
+  kController_PIDController2,
+  kController_ProfiledPIDController,
 }
