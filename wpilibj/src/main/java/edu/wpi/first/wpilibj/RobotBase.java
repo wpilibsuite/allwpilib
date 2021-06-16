@@ -353,7 +353,7 @@ public abstract class RobotBase implements AutoCloseable {
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
         DriverStation.reportWarning(
-            "The robot program quit unexpectedly.\n"
+            "The robot program quit unexpectedly."
                 + " This is usually due to a code error.\n"
                 + "  The above stacktrace can help determine where the error occurred.\n"
                 + "  See https://wpilib.org/stacktrace for more information.",
