@@ -129,8 +129,6 @@ public abstract class RobotBase implements AutoCloseable {
         });
   }
 
-  protected final DriverStation m_ds;
-
   /**
    * Constructor for a generic robot program. User code should be placed in the constructor that
    * runs before the Autonomous or Operator Control period starts. The constructor will run to
@@ -150,7 +148,6 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer();
     }
-    m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
@@ -188,7 +185,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently disabled by the field controls.
    */
   public boolean isDisabled() {
-    return m_ds.isDisabled();
+    return DriverStation.isDisabled();
   }
 
   /**
@@ -197,7 +194,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently enabled by the field controls.
    */
   public boolean isEnabled() {
-    return m_ds.isEnabled();
+    return DriverStation.isEnabled();
   }
 
   /**
@@ -206,7 +203,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating Autonomously.
    */
   public boolean isAutonomous() {
-    return m_ds.isAutonomous();
+    return DriverStation.isAutonomous();
   }
 
   /**
@@ -216,7 +213,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating autonomously while enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_ds.isAutonomousEnabled();
+    return DriverStation.isAutonomousEnabled();
   }
 
   /**
@@ -225,7 +222,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Test mode.
    */
   public boolean isTest() {
-    return m_ds.isTest();
+    return DriverStation.isTest();
   }
 
   /**
@@ -235,7 +232,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode.
    */
   public boolean isOperatorControl() {
-    return m_ds.isOperatorControl();
+    return DriverStation.isOperatorControl();
   }
 
   /**
@@ -245,7 +242,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
   public boolean isOperatorControlEnabled() {
-    return m_ds.isOperatorControlEnabled();
+    return DriverStation.isOperatorControlEnabled();
   }
 
   /**
@@ -254,7 +251,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return Has new data arrived over the network since the last time this function was called?
    */
   public boolean isNewDataAvailable() {
-    return m_ds.isNewControlData();
+    return DriverStation.isNewControlData();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */

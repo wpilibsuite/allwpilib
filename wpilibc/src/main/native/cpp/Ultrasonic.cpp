@@ -30,9 +30,8 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel)
       m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {
   Initialize();
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.AddChild(this, m_pingChannel.get());
-  registry.AddChild(this, m_echoChannel.get());
+  wpi::SendableRegistry::AddChild(this, m_pingChannel.get());
+  wpi::SendableRegistry::AddChild(this, m_echoChannel.get());
 }
 
 Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel)
@@ -185,8 +184,7 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Ultrasonic",
-                                             m_echoChannel->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "Ultrasonic", m_echoChannel->GetChannel());
 }
 
 void Ultrasonic::UltrasonicChecker() {

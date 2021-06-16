@@ -15,7 +15,7 @@ using namespace frc;
 
 AnalogAccelerometer::AnalogAccelerometer(int channel)
     : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
-  wpi::SendableRegistry::GetInstance().AddChild(this, m_analogInput.get());
+  wpi::SendableRegistry::AddChild(this, m_analogInput.get());
 }
 
 AnalogAccelerometer::AnalogAccelerometer(AnalogInput* channel)
@@ -56,6 +56,6 @@ void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
              m_analogInput->GetChannel() + 1);
 
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Accelerometer",
-                                             m_analogInput->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "Accelerometer",
+                               m_analogInput->GetChannel());
 }

@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
   CounterTest.class,
   DigitalGlitchFilterTest.class,
   DIOCrossConnectTest.class,
+  DMATest.class,
   DriverStationTest.class,
   EncoderTest.class,
   GyroTest.class,

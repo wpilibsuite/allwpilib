@@ -9,6 +9,7 @@ public final class Units {
   private static final double kInchesPerFoot = 12.0;
   private static final double kMetersPerInch = 0.0254;
   private static final double kSecondsPerMinute = 60;
+  private static final double kMillisecondsPerSecond = 1000;
   private static final double kKilogramsPerLb = 0.453592;
 
   /** Utility class, so constructor is private. */
@@ -94,6 +95,26 @@ public final class Units {
    */
   public static double radiansPerSecondToRotationsPerMinute(double radiansPerSecond) {
     return radiansPerSecond * (kSecondsPerMinute / 2) / Math.PI;
+  }
+
+  /**
+   * Converts given milliseconds to seconds.
+   *
+   * @param milliseconds The milliseconds to convert to seconds.
+   * @return Seconds converted from milliseconds.
+   */
+  public static double millisecondsToSeconds(double milliseconds) {
+    return milliseconds / kMillisecondsPerSecond;
+  }
+
+  /**
+   * Converts given seconds to milliseconds.
+   *
+   * @param seconds The seconds to convert to milliseconds.
+   * @return Milliseconds converted from seconds.
+   */
+  public static double secondsToMilliseconds(double seconds) {
+    return seconds * kMillisecondsPerSecond;
   }
 
   /**

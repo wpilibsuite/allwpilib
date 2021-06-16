@@ -62,7 +62,7 @@ void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
+ * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the analog trigger type if the source is an analog
  * trigger
  */
@@ -96,7 +96,7 @@ void HAL_ClearCounterUpSource(HAL_CounterHandle counterHandle, int32_t* status);
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle of a HAL_DigitalHandle)
+ * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the analog trigger type if the source is an analog
  * trigger
  */

@@ -22,9 +22,8 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.AddChild(this, m_aSource.get());
-  registry.AddChild(this, m_bSource.get());
+  wpi::SendableRegistry::AddChild(this, m_aSource.get());
+  wpi::SendableRegistry::AddChild(this, m_bSource.get());
 }
 
 Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
@@ -181,7 +180,7 @@ int Encoder::GetSamplesToAverage() const {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  wpi::SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
+  wpi::SendableRegistry::AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
@@ -240,8 +239,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
-  wpi::SendableRegistry::GetInstance().AddLW(this, "Encoder",
-                                             m_aSource->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "Encoder", m_aSource->GetChannel());
 }
 
 double Encoder::DecodingScaleFactor() const {

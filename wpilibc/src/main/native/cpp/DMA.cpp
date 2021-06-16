@@ -4,6 +4,14 @@
 
 #include "frc/DMA.h"
 
+#include <frc/AnalogInput.h>
+#include <frc/Counter.h>
+#include <frc/DigitalSource.h>
+#include <frc/DutyCycle.h>
+#include <frc/Encoder.h>
+#include <frc/PWM.h>
+#include <frc/motorcontrol/PWMMotorController.h>
+
 #include <hal/DMA.h>
 #include <hal/HALBase.h>
 
@@ -32,10 +40,16 @@ void DMA::SetPause(bool pause) {
   FRC_CheckErrorStatus(status, "{}", "SetPause");
 }
 
-void DMA::SetRate(int cycles) {
+void DMA::SetTimedTrigger(units::second_t seconds) {
   int32_t status = 0;
-  HAL_SetDMARate(dmaHandle, cycles, &status);
-  FRC_CheckErrorStatus(status, "{}", "SetRate");
+  HAL_SetDMATimedTrigger(dmaHandle, seconds.to<double>(), &status);
+  FRC_CheckErrorStatus(status, "{}", "SetTimedTrigger");
+}
+
+void DMA::SetTimedTriggerCycles(int cycles) {
+  int32_t status = 0;
+  HAL_SetDMATimedTriggerCycles(dmaHandle, cycles, &status);
+  FRC_CheckErrorStatus(status, "{}", "SetTimedTriggerCycles");
 }
 
 void DMA::AddEncoder(const Encoder* encoder) {
@@ -93,23 +107,56 @@ void DMA::AddAnalogAccumulator(const AnalogInput* analogInput) {
   FRC_CheckErrorStatus(status, "{}", "AddAnalogAccumulator");
 }
 
-void DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
+int DMA::SetExternalTrigger(DigitalSource* source, bool rising, bool falling) {
   int32_t status = 0;
-  HAL_SetDMAExternalTrigger(dmaHandle, source->GetPortHandleForRouting(),
-                            static_cast<HAL_AnalogTriggerType>(
-                                source->GetAnalogTriggerTypeForRouting()),
-                            rising, falling, &status);
+  int32_t idx =
+      HAL_SetDMAExternalTrigger(dmaHandle, source->GetPortHandleForRouting(),
+                                static_cast<HAL_AnalogTriggerType>(
+                                    source->GetAnalogTriggerTypeForRouting()),
+                                rising, falling, &status);
   FRC_CheckErrorStatus(status, "{}", "SetExternalTrigger");
+  return idx;
 }
 
-void DMA::StartDMA(int queueDepth) {
+int DMA::SetPwmEdgeTrigger(PWMMotorController* source, bool rising,
+                           bool falling) {
+  int32_t status = 0;
+  int32_t idx = HAL_SetDMAExternalTrigger(
+      dmaHandle, source->GetPwm()->m_handle,
+      HAL_AnalogTriggerType::HAL_Trigger_kInWindow, rising, falling, &status);
+  FRC_CheckErrorStatus(status, "{}", "SetPWmEdgeTrigger");
+  return idx;
+}
+
+int DMA::SetPwmEdgeTrigger(PWM* source, bool rising, bool falling) {
+  int32_t status = 0;
+  int32_t idx = HAL_SetDMAExternalTrigger(
+      dmaHandle, source->m_handle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow,
+      rising, falling, &status);
+  FRC_CheckErrorStatus(status, "{}", "SetPWmEdgeTrigger");
+  return idx;
+}
+
+void DMA::ClearSensors() {
+  int32_t status = 0;
+  HAL_ClearDMASensors(dmaHandle, &status);
+  FRC_CheckErrorStatus(status, "{}", "ClearSensors");
+}
+
+void DMA::ClearExternalTriggers() {
+  int32_t status = 0;
+  HAL_ClearDMAExternalTriggers(dmaHandle, &status);
+  FRC_CheckErrorStatus(status, "{}", "ClearExternalTriggers");
+}
+
+void DMA::Start(int queueDepth) {
   int32_t status = 0;
   HAL_StartDMA(dmaHandle, queueDepth, &status);
-  FRC_CheckErrorStatus(status, "{}", "StartDMA");
+  FRC_CheckErrorStatus(status, "{}", "Start");
 }
 
-void DMA::StopDMA() {
+void DMA::Stop() {
   int32_t status = 0;
   HAL_StopDMA(dmaHandle, &status);
-  FRC_CheckErrorStatus(status, "{}", "StopDMA");
+  FRC_CheckErrorStatus(status, "{}", "Stop");
 }

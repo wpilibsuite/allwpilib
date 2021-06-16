@@ -13,7 +13,7 @@
 using namespace frc2;
 
 SubsystemBase::SubsystemBase() {
-  wpi::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
+  wpi::SendableRegistry::AddLW(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
@@ -48,22 +48,21 @@ void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
 }
 
 std::string SubsystemBase::GetName() const {
-  return wpi::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetName(this);
 }
 
 void SubsystemBase::SetName(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetName(this, name);
+  wpi::SendableRegistry::SetName(this, name);
 }
 
 std::string SubsystemBase::GetSubsystem() const {
-  return wpi::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetSubsystem(this);
 }
 
 void SubsystemBase::SetSubsystem(std::string_view name) {
-  wpi::SendableRegistry::GetInstance().SetSubsystem(this, name);
+  wpi::SendableRegistry::SetSubsystem(this, name);
 }
 
 void SubsystemBase::AddChild(std::string name, wpi::Sendable* child) {
-  auto& registry = wpi::SendableRegistry::GetInstance();
-  registry.AddLW(child, GetSubsystem(), name);
+  wpi::SendableRegistry::AddLW(child, GetSubsystem(), name);
 }

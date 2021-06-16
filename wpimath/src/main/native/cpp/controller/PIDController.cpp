@@ -31,7 +31,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
 
   wpi::math::MathSharedStore::ReportUsage(
       wpi::math::MathUsageId::kController_PIDController2, instances);
-  wpi::SendableRegistry::GetInstance().Add(this, "PIDController", instances);
+  wpi::SendableRegistry::Add(this, "PIDController", instances);
 }
 
 void PIDController::SetPID(double Kp, double Ki, double Kd) {

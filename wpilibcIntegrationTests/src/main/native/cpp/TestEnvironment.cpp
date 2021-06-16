@@ -40,12 +40,12 @@ class TestEnvironment : public testing::Environment {
     // station returns that the robot is enabled, to ensure that tests will be
     // able to run on the hardware.
     HAL_ObserveUserProgramStarting();
-    frc::LiveWindow::GetInstance()->SetEnabled(false);
+    frc::LiveWindow::SetEnabled(false);
 
     fmt::print("Started coms\n");
 
     int enableCounter = 0;
-    while (!frc::DriverStation::GetInstance().IsEnabled()) {
+    while (!frc::DriverStation::IsEnabled()) {
       if (enableCounter > 50) {
         // Robot did not enable properly after 5 seconds.
         // Force exit

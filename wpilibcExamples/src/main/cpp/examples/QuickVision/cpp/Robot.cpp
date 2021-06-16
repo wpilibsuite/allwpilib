@@ -17,7 +17,7 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
 #if defined(__linux__) || defined(_WIN32)
-    frc::CameraServer::GetInstance()->StartAutomaticCapture();
+    frc::CameraServer::StartAutomaticCapture();
 #else
     std::fputs("Vision only available on Linux or Windows.\n", stderr);
     std::fflush(stderr);

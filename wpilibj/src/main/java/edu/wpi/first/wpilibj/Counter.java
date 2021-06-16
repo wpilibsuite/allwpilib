@@ -50,7 +50,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   protected DigitalSource m_downSource; // /< What makes the counter count down.
   private boolean m_allocatedUpSource;
   private boolean m_allocatedDownSource;
-  private int m_counter; // /< The FPGA counter object.
+  int m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
   private double m_distancePerPulse; // distance of travel for each tick
 

@@ -58,9 +58,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(
         new MotorEncoderFixture<?>[][] {
-          {TestBench.getInstance().getTalonPair()},
-          {TestBench.getInstance().getVictorPair()},
-          {TestBench.getInstance().getJaguarPair()}
+          {TestBench.getTalonPair()}, {TestBench.getVictorPair()}, {TestBench.getJaguarPair()}
         });
   }
 

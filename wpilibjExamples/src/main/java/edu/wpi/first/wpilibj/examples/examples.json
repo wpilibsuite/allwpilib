@@ -492,6 +492,17 @@
     "commandversion": 2
   },
   {
+    "name": "DMA",
+    "description": "Demonstrates the use of the DMA class",
+    "tags": [
+      "Advanced Java"
+    ],
+    "foldername": "dma",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "ArmBot",
     "description": "An example command-based robot demonstrating the use of a ProfiledPIDSubsystem to control an arm.",
     "tags": [

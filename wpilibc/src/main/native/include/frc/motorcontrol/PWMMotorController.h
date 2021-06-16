@@ -15,6 +15,7 @@
 #include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
+class DMA;
 
 /**
  * Common base class for all PWM Motor Controllers.
@@ -24,6 +25,8 @@ class PWMMotorController : public MotorController,
                            public wpi::Sendable,
                            public wpi::SendableHelper<PWMMotorController> {
  public:
+  friend class DMA;
+
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
 
@@ -74,6 +77,8 @@ class PWMMotorController : public MotorController,
 
  private:
   bool m_isInverted = false;
+
+  PWM* GetPwm() { return &m_pwm; }
 };
 
 }  // namespace frc

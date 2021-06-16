@@ -6,7 +6,6 @@
 #include <frc/TimedRobot.h>
 #include <frc/Timer.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/livewindow/LiveWindow.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 
 class Robot : public frc::TimedRobot {
@@ -50,7 +49,6 @@ class Robot : public frc::TimedRobot {
   frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
   frc::Joystick m_stick{0};
-  frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
   frc::Timer m_timer;
 };
 

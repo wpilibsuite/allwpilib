@@ -24,7 +24,7 @@ Servo::Servo(int channel) : PWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
-  wpi::SendableRegistry::GetInstance().SetName(this, "Servo", channel);
+  wpi::SendableRegistry::SetName(this, "Servo", channel);
 }
 
 void Servo::Set(double value) {

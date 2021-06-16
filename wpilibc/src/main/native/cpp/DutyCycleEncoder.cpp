@@ -72,8 +72,8 @@ void DutyCycleEncoder::Init() {
         m_analogTrigger->CreateOutput(AnalogTriggerType::kFallingPulse));
   }
 
-  wpi::SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                             m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
+                               m_dutyCycle->GetSourceChannel());
 }
 
 units::turn_t DutyCycleEncoder::Get() const {

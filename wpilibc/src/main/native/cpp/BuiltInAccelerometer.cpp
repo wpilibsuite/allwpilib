@@ -18,7 +18,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
              "Built-in accelerometer");
-  wpi::SendableRegistry::GetInstance().AddLW(this, "BuiltInAccel");
+  wpi::SendableRegistry::AddLW(this, "BuiltInAccel");
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {

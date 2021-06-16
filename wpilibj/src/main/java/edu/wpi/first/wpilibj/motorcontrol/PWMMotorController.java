@@ -87,6 +87,15 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   /**
+   * Gets the backing PWM handle.
+   *
+   * @return The pwm handle.
+   */
+  public int getPwmHandle() {
+    return m_pwm.getHandle();
+  }
+
+  /**
    * Gets the PWM channel number.
    *
    * @return The channel number.

@@ -158,8 +158,8 @@ bool ReadConfig() {
 
 void StartCamera(const CameraConfig& config) {
   fmt::print("Starting camera '{}' on {}\n", config.name, config.path);
-  auto camera = frc::CameraServer::GetInstance()->StartAutomaticCapture(
-      config.name, config.path);
+  auto camera =
+      frc::CameraServer::StartAutomaticCapture(config.name, config.path);
 
   camera.SetConfigJson(config.config);
 }
