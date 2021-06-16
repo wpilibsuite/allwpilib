@@ -16,8 +16,12 @@ Pose2d::Pose2d(Translation2d translation, Rotation2d rotation)
 Pose2d::Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
     : m_translation(x, y), m_rotation(rotation) {}
 
-Pose2d Pose2d::operator+(const Transform2d& other) const {
+Pose2d Pose2d::operator*(const Transform2d& other) const {
   return TransformBy(other);
+}
+
+Pose2d Pose2d::operator+(const Transform2d& other) const {
+  return operator*(other);
 }
 
 Transform2d Pose2d::operator-(const Pose2d& other) const {

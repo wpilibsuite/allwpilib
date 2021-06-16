@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 #include "Transform2d.h"
 #include "Translation2d.h"
 #include "Twist2d.h"
@@ -54,8 +56,24 @@ class Pose2d {
    * @param other The transform to transform the pose by.
    *
    * @return The transformed pose.
+   * @deprecated use {@link #operator*} instead
    */
+  WPI_DEPRECATED("Use the * operator instead")
   Pose2d operator+(const Transform2d& other) const;
+
+  /**
+   * Transforms the pose by the given transformation and returns the new
+   * transformed pose.
+   *
+   * [x_new]    [cos, -sin, 0][transform.x]
+   * [y_new] += [sin,  cos, 0][transform.y]
+   * [t_new]    [0,    0,   1][transform.t]
+   *
+   * @param other The transform to transform the pose by.
+   *
+   * @return The transformed pose.
+   */
+  Pose2d operator*(const Transform2d& other) const;
 
   /**
    * Returns the Transform2d that maps the one pose to another.
