@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
@@ -37,6 +38,9 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
         " This is usually due to a code error.\n"
         "  The above stacktrace can help determine where the error occurred.\n"
         "  See https://wpilib.org/stacktrace for more information.\n");
+    throw;
+  } catch (const std::exception& e) {
+    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
     throw;
   }
 }
