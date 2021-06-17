@@ -69,14 +69,14 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
   m_drive.ArcadeDrive(fwd, rot);
 }
 
-void DriveSubsystem::FollowState(frc::Trajectory::State targetState) {
-  // calculate via Ramsete the speed vector needed to reach the target state
+void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
+  // Calculate via Ramsete the speed vector needed to reach the target state
   frc::ChassisSpeeds speedVector =
-      m_ramseteController.Calculate(m_odometry.GetPoseMeters(), targetState);
-  // convert the vector to the separate velocities of each side of the
+      m_ramseteController.Calculate(m_odometry.GetPose(), targetState);
+  // Convert the vector to the separate velocities of each side of the
   // drivetrain
   frc::DifferentialDriveWheelSpeeds wheelSpeeds =
-      DriveConstants.kDriveKinematics.ToWheelSpeeds(speedVector);
+      kDriveKinematics.ToWheelSpeeds(speedVector);
 
   // PID and Feedforward control
   // This can be replaced by calls to smart motor controller closed-loop control
@@ -102,12 +102,12 @@ void DriveSubsystem::FollowState(frc::Trajectory::State targetState) {
                                             m_rightEncoder.getRate(),
                                             wheelSpeeds.rightMetersPerSecond);
 
-  // apply the voltages
+  // Apply the voltages
   m_leftMotors.SetVoltage(leftOutput);
   m_rightMotors.SetVoltage(rightOutput);
   m_drive.Feed();
 
-  // track previous speeds and time
+  // Track previous speeds and time
   m_previousSpeeds = wheelSpeeds;
   m_previousTime = targetState.t;
 }

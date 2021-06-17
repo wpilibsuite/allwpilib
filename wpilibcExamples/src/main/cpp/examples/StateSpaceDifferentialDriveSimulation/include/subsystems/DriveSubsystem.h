@@ -58,7 +58,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param targetState the target state struct.
    */
-  void FollowState(frc::Trajectory::State targetState);
+  void FollowState(const frc::Trajectory::State& targetState);
 
   /**
    * Resets the drive encoders to currently read a position of 0.
@@ -167,11 +167,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
 
   frc::RamseteController m_ramseteController;
-  frc::SimpleMotorFeedforward m_feedforward{
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
   frc::PIDController m_leftController{DriveConstants::kPDriveVel, 0, 0};
 
   // track previous target velocities for acceleration calculation
   frc::DifferentialDriveWheelSpeeds m_previousSpeeds;
-  units::seconds_t m_previousTime = -1_s;
+  units::second_t m_previousTime = -1_s;
 };

@@ -88,7 +88,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final PIDController m_rightController =
       new PIDController(DriveConstants.kPDriveVel, 0, 0);
 
-  // track previous target velocities for acceleration calculation
+  // Track previous target velocities for acceleration calculation
   private DifferentialDriveWheelSpeeds m_previousSpeeds;
   private double m_previousTime = -1;
 
@@ -231,10 +231,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param targetState the target state struct.
    */
   private void followState(Trajectory.State targetState) {
-    // calculate via Ramsete the speed vector needed to reach the target state
+    // Calculate via Ramsete the speed vector needed to reach the target state
     ChassisSpeeds speedVector =
         m_ramseteController.calculate(m_odometry.getPoseMeters(), targetState);
-    // convert the vector to the separate velocities of each side of the drivetrain
+    // Convert the vector to the separate velocities of each side of the drivetrain
     DifferentialDriveWheelSpeeds wheelSpeeds =
         DriveConstants.kDriveKinematics.toWheelSpeeds(speedVector);
 
@@ -247,15 +247,13 @@ public class DriveSubsystem extends SubsystemBase {
         m_feedforward.calculate(
             wheelSpeeds.leftMetersPerSecond,
             (wheelSpeeds.leftMetersPerSecond - m_previousSpeeds.leftMetersPerSecond)
-                    / targetState.timeSeconds
-                - m_previousTime);
+                    / (targetState.timeSeconds - m_previousTime));
 
     double rightFeedforward =
         m_feedforward.calculate(
             wheelSpeeds.rightMetersPerSecond,
             (wheelSpeeds.rightMetersPerSecond - m_previousSpeeds.rightMetersPerSecond)
-                    / targetState.timeSeconds
-                - m_previousTime);
+                    / (targetState.timeSeconds- m_previousTime));
 
     double leftOutput =
         leftFeedforward
@@ -266,12 +264,12 @@ public class DriveSubsystem extends SubsystemBase {
             + m_rightController.calculate(
                 m_rightEncoder.getRate(), wheelSpeeds.rightMetersPerSecond);
 
-    // apply the voltages
+    // Apply the voltages
     m_leftMotors.setVoltage(leftOutput);
     m_rightMotors.setVoltage(rightOutput);
     m_drive.feed();
 
-    // track previous speeds and time
+    // Track previous speeds and time
     m_previousSpeeds = wheelSpeeds;
     m_previousTime = targetState.timeSeconds;
   }

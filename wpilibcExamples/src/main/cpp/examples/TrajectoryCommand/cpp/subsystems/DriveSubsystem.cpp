@@ -45,11 +45,11 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
   m_drive.ArcadeDrive(fwd, rot);
 }
 
-void DriveSubsystem::FollowState(frc::Trajectory::State targetState) {
-  // calculate via Ramsete the speed vector needed to reach the target state
+void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
+  // Calculate via Ramsete the speed vector needed to reach the target state
   frc::ChassisSpeeds speedVector =
-      m_ramseteController.Calculate(m_odometry.GetPoseMeters(), targetState);
-  // convert the vector to the separate velocities of each side of the
+      m_ramseteController.Calculate(m_odometry.GetPose(), targetState);
+  // Convert the vector to the separate velocities of each side of the
   // drivetrain
   frc::DifferentialDriveWheelSpeeds wheelSpeeds =
       DriveConstants.kDriveKinematics.ToWheelSpeeds(speedVector);
@@ -60,15 +60,13 @@ void DriveSubsystem::FollowState(frc::Trajectory::State targetState) {
   // mySmartMotorController.setSetpoint(leftMetersPerSecond,
   // ControlType.Velocity);
 
-  auto leftFeedforward = m_feedforward.calculate(
+  auto leftFeedforward = m_feedforward.Calculate(
       wheelSpeeds.left,
-      (wheelSpeeds.left - m_previousSpeeds.left) / targetState.t -
-          m_previousTime);
+      (wheelSpeeds.left - m_previousSpeeds.left) / (targetState.t - m_previousTime));
 
-  auto rightFeedforward = m_feedforward.calculate(
+  auto rightFeedforward = m_feedforward.Calculate(
       wheelSpeeds.right,
-      (wheelSpeeds.right - m_previousSpeeds.right) / targetState.t -
-          m_previousTime);
+      (wheelSpeeds.right - m_previousSpeeds.right) / (targetState.t - m_previousTime));
 
   auto leftOutput =
       leftFeedforward + units::volt_t{m_leftController.Calculate(
@@ -126,7 +124,7 @@ frc2::Command* DriveSubsystem::BuildTrajectoryGroup(
       ResetOdometry(trajectory.InitialPose()); }),
   frc2::TrajectoryCommand(
     trajectory,
-    [this](frc::Trajectory::State targetState) {
+    [this](const frc::Trajectory::State& targetState) {
       FollowState(targetState)},
     {&this}
   ),

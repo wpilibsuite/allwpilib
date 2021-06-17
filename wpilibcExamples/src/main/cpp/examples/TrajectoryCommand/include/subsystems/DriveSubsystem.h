@@ -45,7 +45,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param targetState the target state struct.
    */
-  void FollowState(frc::Trajectory::State targetState);
+  void FollowState(const frc::Trajectory::State& targetState);
 
   /**
    * Resets the drive encoders to currently read a position of 0.

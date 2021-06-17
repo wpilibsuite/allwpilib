@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
@@ -19,7 +21,6 @@ public class TrajectoryCommand extends CommandBase {
   private final Trajectory m_trajectory;
   private final Consumer<Trajectory.State> m_output;
   private final Timer m_timer = new Timer();
-  private double m_prevTime;
 
   /**
    * Create a new TrajectoryCommand.
@@ -31,32 +32,21 @@ public class TrajectoryCommand extends CommandBase {
    */
   public TrajectoryCommand(
       Trajectory trajectory, Consumer<Trajectory.State> output, Subsystem... requirements) {
-    m_trajectory = trajectory;
-    m_output = output;
+    m_trajectory = requireNonNullParam(trajectory, "trajectory", "TrajectoryCommand");
+    m_output = requireNonNullParam(output, "output", "TrajectoryCommand");
 
     addRequirements(requirements);
   }
 
   @Override
   public void initialize() {
-    m_prevTime = -1;
     m_timer.reset();
     m_timer.start();
   }
 
   @Override
   public void execute() {
-    double curTime = m_timer.get();
-
-    if (m_prevTime < 0) {
-      m_output.accept(new Trajectory.State());
-      m_prevTime = curTime;
-      return;
-    }
-
-    m_output.accept(m_trajectory.sample(curTime));
-
-    m_prevTime = curTime;
+    m_output.accept(m_trajectory.sample(m_timer.get()));
   }
 
   @Override

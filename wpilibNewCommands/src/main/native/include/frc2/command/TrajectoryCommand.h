@@ -35,7 +35,7 @@ class TrajectoryCommand : public CommandHelper<CommandBase, TrajectoryCommand> {
    */
   TrajectoryCommand(frc::Trajectory trajectory,
                     std::function<void(const frc::Trajectory::State&)> output,
-                    std::initializer_list<Subsystem*> requirements);
+                    std::initializer_list<Subsystem* const> requirements);
 
   /**
    * Create a new TrajectoryCommand.
@@ -47,7 +47,7 @@ class TrajectoryCommand : public CommandHelper<CommandBase, TrajectoryCommand> {
    */
   TrajectoryCommand(frc::Trajectory trajectory,
                     std::function<void(const frc::Trajectory::State&)> output,
-                    wpi::span<Subsystem*> requirements = {});
+                    wpi::span<Subsystem* const> requirements = {});
 
   void Initialize() override;
 
@@ -61,6 +61,5 @@ class TrajectoryCommand : public CommandHelper<CommandBase, TrajectoryCommand> {
   frc::Trajectory m_trajectory;
   std::function<void(const frc::Trajectory::State&)> m_output;
   frc::Timer m_timer;
-  units::second_t m_prevTime;
 };
 }  // namespace frc2
