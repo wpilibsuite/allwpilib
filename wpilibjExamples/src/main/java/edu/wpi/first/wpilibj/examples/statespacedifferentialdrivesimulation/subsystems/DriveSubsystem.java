@@ -247,13 +247,13 @@ public class DriveSubsystem extends SubsystemBase {
         m_feedforward.calculate(
             wheelSpeeds.leftMetersPerSecond,
             (wheelSpeeds.leftMetersPerSecond - m_previousSpeeds.leftMetersPerSecond)
-                    / (targetState.timeSeconds - m_previousTime));
+                / (targetState.timeSeconds - m_previousTime));
 
     double rightFeedforward =
         m_feedforward.calculate(
             wheelSpeeds.rightMetersPerSecond,
             (wheelSpeeds.rightMetersPerSecond - m_previousSpeeds.rightMetersPerSecond)
-                    / (targetState.timeSeconds- m_previousTime));
+                / (targetState.timeSeconds - m_previousTime));
 
     double leftOutput =
         leftFeedforward

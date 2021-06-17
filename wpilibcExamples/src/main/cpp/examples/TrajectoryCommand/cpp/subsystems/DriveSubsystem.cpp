@@ -61,12 +61,12 @@ void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
   // ControlType.Velocity);
 
   auto leftFeedforward = m_feedforward.Calculate(
-      wheelSpeeds.left,
-      (wheelSpeeds.left - m_previousSpeeds.left) / (targetState.t - m_previousTime));
+      wheelSpeeds.left, (wheelSpeeds.left - m_previousSpeeds.left) /
+                            (targetState.t - m_previousTime));
 
   auto rightFeedforward = m_feedforward.Calculate(
-      wheelSpeeds.right,
-      (wheelSpeeds.right - m_previousSpeeds.right) / (targetState.t - m_previousTime));
+      wheelSpeeds.right, (wheelSpeeds.right - m_previousSpeeds.right) /
+                             (targetState.t - m_previousTime));
 
   auto leftOutput =
       leftFeedforward + units::volt_t{m_leftController.Calculate(
