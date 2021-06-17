@@ -170,6 +170,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::SimpleMotorFeedforward<units::meters> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
   frc::PIDController m_leftController{DriveConstants::kPDriveVel, 0, 0};
+  frc::PIDController m_rightController{DriveConstants::kPDriveVel, 0, 0};
 
   // track previous target velocities for acceleration calculation
   frc::DifferentialDriveWheelSpeeds m_previousSpeeds;

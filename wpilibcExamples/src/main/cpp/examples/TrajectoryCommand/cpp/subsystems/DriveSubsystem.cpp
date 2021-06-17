@@ -52,7 +52,7 @@ void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
   // Convert the vector to the separate velocities of each side of the
   // drivetrain
   frc::DifferentialDriveWheelSpeeds wheelSpeeds =
-      DriveConstants.kDriveKinematics.ToWheelSpeeds(speedVector);
+      kDriveKinematics.ToWheelSpeeds(speedVector);
 
   // PID and Feedforward control
   // This can be replaced by calls to smart motor controller closed-loop control
@@ -68,20 +68,21 @@ void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
       wheelSpeeds.right, (wheelSpeeds.right - m_previousSpeeds.right) /
                              (targetState.t - m_previousTime));
 
-  auto leftOutput =
-      leftFeedforward + units::volt_t{m_leftController.Calculate(
-                            m_leftEncoder.GetRate(), wheelSpeeds.left)};
+  auto leftOutput = leftFeedforward + units::volt_t{m_leftController.Calculate(
+                                          m_leftEncoder.GetRate(),
+                                          wheelSpeeds.left.to<double>())};
 
   auto rightOutput =
-      rightFeedforward + units::volt_t{m_rightController.Calculate(
-                             m_rightEncoder.GetRate(), wheelSpeeds.right)};
+      rightFeedforward +
+      units::volt_t{m_rightController.Calculate(
+          m_rightEncoder.GetRate(), wheelSpeeds.right.to<double>())};
 
-  // apply the voltages
+  // Apply the voltages
   m_leftMotors.SetVoltage(leftOutput);
   m_rightMotors.SetVoltage(rightOutput);
   m_drive.Feed();
 
-  // track previous speeds and time
+  // Track previous speeds and time
   m_previousSpeeds = wheelSpeeds;
   m_previousTime = targetState.t;
 }
@@ -118,17 +119,14 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 
 frc2::Command* DriveSubsystem::BuildTrajectoryGroup(
     frc::Trajectory trajectory) {
-  return frc2::SequentialCommandGroup {
-  frc2::InstantCommand(
-          [this, trajectory] {
-      ResetOdometry(trajectory.InitialPose()); }),
-  frc2::TrajectoryCommand(
-    trajectory,
-    [this](const frc::Trajectory::State& targetState) {
-      FollowState(targetState)},
-    {&this}
-  ),
-  frc2::InstantCommand([this] {
-      m_drive.StopMotor(); }));
-  };
+  return frc2::SequentialCommandGroup{
+      frc2::InstantCommand(
+          [this, trajectory] { ResetOdometry(trajectory.InitialPose()); }),
+      frc2::TrajectoryCommand(
+          trajectory,
+          [this](const frc::Trajectory::State& targetState) {
+            FollowState(targetState);
+          },
+          {this}),
+      frc2::InstantCommand([this] { m_drive.StopMotor(); })};
 }

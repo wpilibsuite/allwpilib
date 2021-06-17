@@ -84,23 +84,22 @@ void DriveSubsystem::FollowState(const frc::Trajectory::State& targetState) {
   // mySmartMotorController.setSetpoint(leftMetersPerSecond,
   // ControlType.Velocity);
 
-  auto leftFeedforward = m_feedforward.calculate(
-      wheelSpeeds.left,
-      (wheelSpeeds.left - m_previousSpeeds.left) / targetState.t -
-          m_previousTime);
+  auto leftFeedforward = m_feedforward.Calculate(
+      wheelSpeeds.left, (wheelSpeeds.left - m_previousSpeeds.left) /
+                            (targetState.t - m_previousTime));
 
-  auto rightFeedforward = m_feedforward.calculate(
-      wheelSpeeds.right,
-      (wheelSpeeds.right - m_previousSpeeds.right) / targetState.t -
-          m_previousTime);
+  auto rightFeedforward = m_feedforward.Calculate(
+      wheelSpeeds.right, (wheelSpeeds.right - m_previousSpeeds.right) /
+                             (targetState.t - m_previousTime));
 
-  auto leftOutput =
-      leftFeedforward + units::volt_t{m_leftController.Calculate(
-                            m_leftEncoder.GetRate(), wheelSpeeds.left)};
+  auto leftOutput = leftFeedforward + units::volt_t{m_leftController.Calculate(
+                                          m_leftEncoder.GetRate(),
+                                          wheelSpeeds.left.to<double>())};
 
-  auto rightOutput = rightFeedforward + m_rightController.calculate(
-                                            m_rightEncoder.getRate(),
-                                            wheelSpeeds.rightMetersPerSecond);
+  auto rightOutput =
+      rightFeedforward +
+      units::volt_t{m_rightController.Calculate(
+          m_rightEncoder.GetRate(), wheelSpeeds.right.to<double>())};
 
   // Apply the voltages
   m_leftMotors.SetVoltage(leftOutput);
@@ -141,17 +140,14 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 
 frc2::Command* DriveSubsystem::BuildTrajectoryGroup(
     frc::Trajectory trajectory) {
-  return frc2::SequentialCommandGroup {
-  frc2::InstantCommand(
-          [this, trajectory] {
-      ResetOdometry(trajectory.InitialPose()); }),
-  frc2::TrajectoryCommand(
-    trajectory,
-    [this](frc::Trajectory::State targetState) {
-      FollowState(targetState)},
-    {&this}
-  ),
-  frc2::InstantCommand([this] {
-      m_drive.StopMotor(); }));
-  };
+  return frc2::SequentialCommandGroup{
+      frc2::InstantCommand(
+          [this, trajectory] { ResetOdometry(trajectory.InitialPose()); }),
+      frc2::TrajectoryCommand(
+          trajectory,
+          [this](const frc::Trajectory::State& targetState) {
+            FollowState(targetState);
+          },
+          {&this}),
+      frc2::InstantCommand([this] { m_drive.StopMotor(); })};
 }

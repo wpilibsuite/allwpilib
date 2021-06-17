@@ -32,7 +32,7 @@ RobotContainer::RobotContainer() {
 }
 
 void RobotContainer::ZeroAllOutputs() {
-  m_drive.TankDriveVolts(0_V, 0_V);
+  m_drive.ArcadeDrive(0, 0);
 }
 
 const DriveSubsystem& RobotContainer::GetRobotDrive() const {
