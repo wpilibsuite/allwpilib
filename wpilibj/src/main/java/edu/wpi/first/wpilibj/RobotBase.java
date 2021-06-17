@@ -300,7 +300,7 @@ public abstract class RobotBase implements AutoCloseable {
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
           elements);
-      DriverStation.reportWarning(
+      DriverStation.reportError(
           "The robot program quit unexpectedly."
               + " This is usually due to a code error.\n"
               + "  The above stacktrace can help determine where the error occurred.\n"
