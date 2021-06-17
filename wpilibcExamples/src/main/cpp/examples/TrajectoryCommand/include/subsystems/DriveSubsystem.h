@@ -14,14 +14,8 @@
 #include <frc/kinematics/DifferentialDriveOdometry.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/simulation/ADXRS450_GyroSim.h>
-#include <frc/simulation/DifferentialDrivetrainSim.h>
-#include <frc/simulation/EncoderSim.h>
-#include <frc/smartdashboard/Field2d.h>
-#include <frc/trajectory/Trajectory.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/SubsystemBase.h>
-#include <units/time.h>
 #include <units/voltage.h>
 
 #include "Constants.h"
@@ -35,14 +29,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void Periodic() override;
 
-  /**
-   * Will be called periodically during simulation.
-   */
-  void SimulationPeriodic() override;
-
   // Subsystem methods go here.
-
-  units::ampere_t GetCurrentDraw() const;
 
   /**
    * Drives the robot using arcade controls.
@@ -95,6 +82,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double GetTurnRate();
 
   /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  frc::Pose2d GetPose();
+
+  /**
    * Resets the odometry to the specified pose.
    *
    * @param pose The pose to which to set the odometry.
@@ -102,9 +96,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ResetOdometry(frc::Pose2d pose);
 
   /**
-   * Build a command group for the given trajectory.
-   *
-   * <p>The group consists of:
+   * Build a command group for the given trajectory, which includes:
    *
    * <p>- resetting the odometry to the trajectory's initial pose
    *
@@ -122,10 +114,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  frc::PWMSparkMax m_left1{DriveConstants::kLeftMotor1Port};
-  frc::PWMSparkMax m_left2{DriveConstants::kLeftMotor2Port};
-  frc::PWMSparkMax m_right1{DriveConstants::kRightMotor1Port};
-  frc::PWMSparkMax m_right2{DriveConstants::kRightMotor2Port};
+  frc::PWMSparkMax m_left1;
+  frc::PWMSparkMax m_left2;
+  frc::PWMSparkMax m_right1;
+  frc::PWMSparkMax m_right2;
 
   // The motors on the left side of the drive
   frc::MotorControllerGroup m_leftMotors{m_left1, m_left2};
@@ -137,41 +129,30 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
 
   // The left-side drive encoder
-  frc::Encoder m_leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                             DriveConstants::kLeftEncoderPorts[1]};
+  frc::Encoder m_leftEncoder;
 
   // The right-side drive encoder
-  frc::Encoder m_rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                              DriveConstants::kRightEncoderPorts[1]};
+  frc::Encoder m_rightEncoder;
 
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;
 
-  // These classes help simulate our drivetrain.
-  frc::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
-      DriveConstants::kDrivetrainPlant,
-      DriveConstants::kTrackwidth,
-      DriveConstants::kDrivetrainGearbox,
-      DriveConstants::kDrivetrainGearing,
-      DriveConstants::kWheelDiameter / 2,
-      {0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005}};
+  // the RAMSETE controller
+  frc::RamseteController m_ramseteController;
 
-  frc::sim::EncoderSim m_leftEncoderSim{m_leftEncoder};
-  frc::sim::EncoderSim m_rightEncoderSim{m_rightEncoder};
-  frc::sim::ADXRS450_GyroSim m_gyroSim{m_gyro};
+  // the PID controllers for each side
+  frc::PIDController m_leftController;
+  frc::PIDController m_rightController;
 
-  // The Field2d class shows the field in the sim GUI.
-  frc::Field2d m_fieldSim;
+  // the feedforward
+  // if the two sides of the drivetrain are different,
+  // a separate feedforward object can be used for each side
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward;
 
   // Odometry class for tracking robot pose
-  frc::DifferentialDriveOdometry m_odometry{m_gyro.GetRotation2d()};
+  frc::DifferentialDriveOdometry m_odometry;
 
-  frc::RamseteController m_ramseteController;
-  frc::SimpleMotorFeedforward m_feedforward{
-      DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
-  frc::PIDController m_leftController{DriveConstants::kPDriveVel, 0, 0};
-
-  // track previous target velocities for acceleration calculation
+  // track previous target velocity for acceleration calculations
   frc::DifferentialDriveWheelSpeeds m_previousSpeeds;
-  units::seconds_t m_previousTime = -1_s;
+  units::second_t m_previousTime;
 };
