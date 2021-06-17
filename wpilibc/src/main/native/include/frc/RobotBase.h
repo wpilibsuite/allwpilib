@@ -16,8 +16,6 @@
 
 namespace frc {
 
-class DriverStation;
-
 int RunHALInitialization();
 
 namespace impl {
@@ -33,6 +31,12 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
     theRobot.StartCompetition();
   } catch (const frc::RuntimeError& e) {
     e.Report();
+    FRC_ReportError(
+        err::Error, "{}",
+        "The robot program quit unexpectedly."
+        " This is usually due to a code error.\n"
+        "  The above stacktrace can help determine where the error occurred.\n"
+        "  See https://wpilib.org/stacktrace for more information.\n");
     throw;
   }
 }
