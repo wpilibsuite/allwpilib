@@ -13,8 +13,8 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc2/command/InstantCommand.h>
-#include <frc2/command/TrajectoryCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/TrajectoryCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "Constants.h"
