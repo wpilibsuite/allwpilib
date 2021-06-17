@@ -39,6 +39,7 @@ namespace frc2 {
  *
  * @see RamseteController
  * @see Trajectory
+ * @deprecated Use TrajectoryCommand.
  */
 class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
  public:
@@ -68,7 +69,9 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * outputs (in volts) for the robot drive.
    * @param requirements    The subsystems to require.
+   * @deprecated Use TrajectoryCommand.
    */
+  WPI_DEPRECATED("Use TrajectoryCommand.")
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
@@ -105,7 +108,9 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * outputs (in volts) for the robot drive.
    * @param requirements    The subsystems to require.
+   * @deprecated Use TrajectoryCommand.
    */
+  WPI_DEPRECATED("Use TrajectoryCommand.")
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::SimpleMotorFeedforward<units::meters> feedforward,
@@ -131,7 +136,9 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * wheel speeds.
    * @param requirements    The subsystems to require.
+   * @deprecated Use TrajectoryCommand.
    */
+  WPI_DEPRECATED("Use TrajectoryCommand.")
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::DifferentialDriveKinematics kinematics,
@@ -155,7 +162,9 @@ class RamseteCommand : public CommandHelper<CommandBase, RamseteCommand> {
    * @param output          A function that consumes the computed left and right
    * wheel speeds.
    * @param requirements    The subsystems to require.
+   * @deprecated Use TrajectoryCommand.
    */
+  WPI_DEPRECATED("Use TrajectoryCommand.")
   RamseteCommand(frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
                  frc::RamseteController controller,
                  frc::DifferentialDriveKinematics kinematics,

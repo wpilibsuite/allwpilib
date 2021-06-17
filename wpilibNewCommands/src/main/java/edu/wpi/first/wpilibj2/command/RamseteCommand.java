@@ -29,7 +29,11 @@ import java.util.function.Supplier;
  * <p>Advanced teams seeking more flexibility (for example, those who wish to use the onboard PID
  * functionality of a "smart" motor controller) may use the secondary constructor that omits the PID
  * and feedforward functionality, returning only the raw wheel speeds from the RAMSETE controller.
+ *
+ * @deprecated Use {@link TrajectoryCommand} and handle Ramsete/PID/Feedforward control in the
+ *     subsystem.
  */
+@Deprecated(since = "2022", forRemoval = true)
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
