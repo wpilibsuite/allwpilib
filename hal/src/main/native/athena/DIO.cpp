@@ -281,12 +281,12 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
       isInput =
           ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
-           1) != 0;
+           1) == 0;
     } else if (port->channel < kNumDigitalHeaders) {
-      isInput = ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
+      isInput = ((currentOutputEnable.Headers >> port->channel) & 1) == 0;
     } else {
       isInput = ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) &
-                 1) != 0;
+                 1) == 0;
     }
 
     if (isInput) {
@@ -398,11 +398,11 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
 
   if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
     return ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
-            1) != 0;
+            1) == 0;
   } else if (port->channel < kNumDigitalHeaders) {
-    return ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
+    return ((currentOutputEnable.Headers >> port->channel) & 1) == 0;
   } else {
-    return ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) & 1) !=
+    return ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) & 1) ==
            0;
   }
 }
