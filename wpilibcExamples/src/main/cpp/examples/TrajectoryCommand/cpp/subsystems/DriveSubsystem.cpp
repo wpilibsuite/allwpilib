@@ -119,7 +119,7 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 
 frc2::Command* DriveSubsystem::BuildTrajectoryGroup(
     frc::Trajectory trajectory) {
-  return frc2::SequentialCommandGroup{
+  return new frc2::SequentialCommandGroup(
       frc2::InstantCommand(
           [this, trajectory] { ResetOdometry(trajectory.InitialPose()); }),
       frc2::TrajectoryCommand(
@@ -128,5 +128,5 @@ frc2::Command* DriveSubsystem::BuildTrajectoryGroup(
             FollowState(targetState);
           },
           {this}),
-      frc2::InstantCommand([this] { m_drive.StopMotor(); })};
+      frc2::InstantCommand([this] { m_drive.StopMotor(); }));
 }
