@@ -422,16 +422,16 @@
     "commandversion": 2
   },
   {
-    "name": "RamseteCommand",
-    "description": "An example command-based robot demonstrating the use of a RamseteCommand to follow a pregenerated trajectory.",
+    "name": "TrajectoryCommand",
+    "description": "An example command-based robot demonstrating the use of a TrajectoryCommand to follow a pregenerated trajectory.",
     "tags": [
-      "RamseteCommand",
+      "TrajectoryCommand",
       "PID",
       "Ramsete",
       "Trajectory",
       "Path following"
     ],
-    "foldername": "ramsetecommand",
+    "foldername": "trajectorycommand",
     "gradlebase": "java",
     "mainclass": "Main",
     "commandversion": 2
