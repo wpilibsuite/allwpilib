@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
@@ -15,8 +16,6 @@
 #include "frc/Errors.h"
 
 namespace frc {
-
-class DriverStation;
 
 int RunHALInitialization();
 
@@ -33,6 +32,15 @@ void RunRobot(wpi::mutex& m, Robot** robot) {
     theRobot.StartCompetition();
   } catch (const frc::RuntimeError& e) {
     e.Report();
+    FRC_ReportError(
+        err::Error, "{}",
+        "The robot program quit unexpectedly."
+        " This is usually due to a code error.\n"
+        "  The above stacktrace can help determine where the error occurred.\n"
+        "  See https://wpilib.org/stacktrace for more information.\n");
+    throw;
+  } catch (const std::exception& e) {
+    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
     throw;
   }
 }
