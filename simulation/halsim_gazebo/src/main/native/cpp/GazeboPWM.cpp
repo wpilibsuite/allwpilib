@@ -4,8 +4,7 @@
 
 #include "GazeboPWM.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Value.h>
 #include <hal/simulation/NotifyListener.h>
 #include <hal/simulation/PWMData.h>
@@ -35,7 +34,7 @@ GazeboPWM::GazeboPWM(int port, HALSimGazebo* halsim) {
 void GazeboPWM::Publish(double value) {
   if (!m_pub) {
     m_pub = m_halsim->node.Advertise<gazebo::msgs::Float64>(
-        "~/simulator/pwm/" + std::to_string(m_port));
+        fmt::format("~/simulator/pwm/{}", m_port));
     m_pub->WaitForConnection(gazebo::common::Time(1, 0));
   }
   gazebo::msgs::Float64 msg;

@@ -4,8 +4,7 @@
 
 #include "GazeboPCM.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Value.h>
 #include <hal/simulation/CTREPCMData.h>
 #include <hal/simulation/NotifyListener.h>
@@ -38,8 +37,7 @@ GazeboPCM::GazeboPCM(int index, int channel, HALSimGazebo* halsim) {
 void GazeboPCM::Publish(bool value) {
   if (!m_pub) {
     m_pub = m_halsim->node.Advertise<gazebo::msgs::Bool>(
-        "~/simulator/pneumatic/" + std::to_string(m_index + 1) + "/" +
-        std::to_string(m_channel));
+        fmt::format("~/simulator/pneumatic/{}/{}", m_index + 1, m_channel));
     m_pub->WaitForConnection(gazebo::common::Time(1, 0));
   }
   gazebo::msgs::Bool msg;

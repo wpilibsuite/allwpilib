@@ -4,8 +4,7 @@
 
 #include "GazeboEncoder.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Value.h>
 #include <hal/simulation/EncoderData.h>
 #include <hal/simulation/NotifyListener.h>
@@ -51,8 +50,8 @@ GazeboEncoder::GazeboEncoder(int index, HALSimGazebo* halsim) {
 void GazeboEncoder::Control(const char* command) {
   if (!m_pub) {
     m_pub = m_halsim->node.Advertise<gazebo::msgs::String>(
-        "~/simulator/encoder/dio/" +
-        std::to_string(HALSIM_GetEncoderDigitalChannelA(m_index)) + "/control");
+        fmt::format("~/simulator/encoder/dio/{}/control",
+                    HALSIM_GetEncoderDigitalChannelA(m_index)));
     m_pub->WaitForConnection(gazebo::common::Time(1, 0));
   }
   gazebo::msgs::String msg;
@@ -64,9 +63,8 @@ void GazeboEncoder::Control(const char* command) {
 void GazeboEncoder::Listen() {
   if (!m_sub)
     m_sub = m_halsim->node.Subscribe<gazebo::msgs::Float64>(
-        "~/simulator/encoder/dio/" +
-            std::to_string(HALSIM_GetEncoderDigitalChannelA(m_index)) +
-            "/position",
+        fmt::format("~/simulator/encoder/dio/{}/position",
+                    HALSIM_GetEncoderDigitalChannelA(m_index)),
         &GazeboEncoder::Callback, this);
 }
 

@@ -47,6 +47,7 @@ model {
             linker.args gazebo_linker_args
             cppCompiler.args gazebo_cppflags
             lib project: ":simulation:gz_msgs", library: "gz_msgs", linkage: "static"
+            lib project: ":wpiutil", library: "wpiutil", linkage: "static"
         }
     }
 }

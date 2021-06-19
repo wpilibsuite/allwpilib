@@ -15,6 +15,7 @@ repoRootNameOverride {
 includeOtherLibs {
   ^cameraserver/
   ^cscore
+  ^fmt/
   ^frc/
   ^hal/
   ^imgui

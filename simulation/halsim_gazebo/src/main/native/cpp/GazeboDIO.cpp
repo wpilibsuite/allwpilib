@@ -4,8 +4,7 @@
 
 #include "GazeboDIO.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Value.h>
 #include <hal/simulation/DIOData.h>
 #include <hal/simulation/NotifyListener.h>
@@ -29,8 +28,7 @@ GazeboDIO::GazeboDIO(int index, HALSimGazebo* halsim) {
 void GazeboDIO::Listen() {
   if (!m_sub)
     m_sub = m_halsim->node.Subscribe<gazebo::msgs::Bool>(
-        "~/simulator/dio/" + std::to_string(m_index), &GazeboDIO::Callback,
-        this);
+        fmt::format("~/simulator/dio/{}", m_index), &GazeboDIO::Callback, this);
 }
 
 void GazeboDIO::Callback(const gazebo::msgs::ConstBoolPtr& msg) {
