@@ -70,8 +70,9 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
       int32_t remaining = 0;
       HAL_DMASample testSample;
       HAL_ReadDMA(dmaHandle, &testSample, 0.01, &remaining, &status);
-      if (remaining == 0)
+      if (remaining == 0) {
         break;
+      }
     }
 
     HAL_SetPWMSpeed(pwmHandle, (testWidth - 1000) / 1000.0, &status);
