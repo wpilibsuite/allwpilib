@@ -5,8 +5,8 @@
 #include <atomic>
 #include <thread>
 
-#include <hal/HAL.h>
 #include <hal/DMA.h>
+#include <hal/HAL.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/priority_mutex.h>
@@ -56,12 +56,13 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
   HAL_AddDMADigitalSource(dmaHandle, dioHandle, &status);
   ASSERT_EQ(0, status);
 
-  HAL_SetDMAExternalTrigger(dmaHandle, dioHandle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, true, true, &status);
+  HAL_SetDMAExternalTrigger(dmaHandle, dioHandle,
+                            HAL_AnalogTriggerType::HAL_Trigger_kInWindow, true,
+                            true, &status);
   ASSERT_EQ(0, status);
 
   // Loop to test 5 speeds
   for (unsigned int testWidth = 1000; testWidth < 2100; testWidth += 250) {
-
     HAL_StartDMA(dmaHandle, 1024, &status);
     ASSERT_EQ(0, status);
 
@@ -69,18 +70,20 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
       int32_t remaining = 0;
       HAL_DMASample testSample;
       HAL_ReadDMA(dmaHandle, &testSample, 0.01, &remaining, &status);
-      if (remaining == 0) break;
+      if (remaining == 0)
+        break;
     }
 
     HAL_SetPWMSpeed(pwmHandle, (testWidth - 1000) / 1000.0, &status);
 
-    constexpr int sampleCount = 15;
-    HAL_DMASample dmaSamples[sampleCount];
+    constexpr const int kSampleCount = 15;
+    HAL_DMASample dmaSamples[kSampleCount];
     int readCount = 0;
-    while (readCount < sampleCount) {
+    while (readCount < kSampleCount) {
       status = 0;
       int32_t remaining = 0;
-      HAL_DMAReadStatus readStatus = HAL_ReadDMA(dmaHandle, &dmaSamples[readCount], 1.0, &remaining, &status);
+      HAL_DMAReadStatus readStatus = HAL_ReadDMA(
+          dmaHandle, &dmaSamples[readCount], 1.0, &remaining, &status);
       ASSERT_EQ(0, status);
       ASSERT_EQ(HAL_DMAReadStatus::HAL_DMA_OK, readStatus);
       readCount++;
@@ -93,9 +96,11 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
     int startIndex = 4;
     while (startIndex < 6) {
       status = 0;
-      auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[startIndex], dioHandle, &status);
+      auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[startIndex],
+                                                 dioHandle, &status);
       ASSERT_EQ(0, status);
-      if (value) break;
+      if (value)
+        break;
       startIndex++;
     }
     ASSERT_LT(startIndex, 6);
@@ -104,7 +109,8 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
     bool previous = false;
     int iterationCount = 0;
     for (int i = startIndex; i < startIndex + 8; i++) {
-      auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[i], dioHandle, &status);
+      auto value =
+          HAL_GetDMASampleDigitalSource(&dmaSamples[i], dioHandle, &status);
       ASSERT_EQ(0, status);
       ASSERT_NE(previous, value);
       previous = !previous;
@@ -114,8 +120,9 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
     iterationCount = 0;
 
     // Check width between samples
-    for (int i = startIndex; i < startIndex + 8; i+=2) {
-      auto width = HAL_GetDMASampleTime(&dmaSamples[i + 1], &status) - HAL_GetDMASampleTime(&dmaSamples[i], &status);
+    for (int i = startIndex; i < startIndex + 8; i += 2) {
+      auto width = HAL_GetDMASampleTime(&dmaSamples[i + 1], &status) -
+                   HAL_GetDMASampleTime(&dmaSamples[i], &status);
       ASSERT_NEAR(testWidth, width, 10);
       iterationCount++;
     }
@@ -123,8 +130,9 @@ void TestTimingDMA(int squelch, std::pair<int, int> param) {
     iterationCount = 0;
 
     // Check period between samples
-    for (int i = startIndex; i < startIndex + 6; i+=2) {
-      auto period = HAL_GetDMASampleTime(&dmaSamples[i + 2], &status) - HAL_GetDMASampleTime(&dmaSamples[i], &status);
+    for (int i = startIndex; i < startIndex + 6; i += 2) {
+      auto period = HAL_GetDMASampleTime(&dmaSamples[i + 2], &status) -
+                    HAL_GetDMASampleTime(&dmaSamples[i], &status);
       ASSERT_NEAR(checkPeriod, period, 10);
       iterationCount++;
     }

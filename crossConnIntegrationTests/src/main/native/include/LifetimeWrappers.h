@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <hal/HAL.h>
 #include <hal/DMA.h>
+#include <hal/HAL.h>
 
 namespace hlt {
 
@@ -30,9 +30,7 @@ struct InterruptHandle {
 
 struct DMAHandle {
  public:
-  explicit DMAHandle(int32_t* status) {
-    handle = HAL_InitializeDMA(status);
-  }
+  explicit DMAHandle(int32_t* status) { handle = HAL_InitializeDMA(status); }
   DMAHandle(const DMAHandle&) = delete;
   DMAHandle operator=(const DMAHandle&) = delete;
 
