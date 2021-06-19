@@ -90,6 +90,25 @@ struct PWMHandle {
   HAL_DigitalHandle handle = 0;
 };
 
+struct RelayHandle {
+ public:
+  RelayHandle(int32_t port, HAL_Bool fwd, int32_t* status) {
+    handle = HAL_InitializeRelayPort(HAL_GetPort(port), fwd, nullptr, status);
+  }
+  RelayHandle(const RelayHandle&) = delete;
+  RelayHandle operator=(const RelayHandle&) = delete;
+
+  RelayHandle(RelayHandle&&) = default;
+  RelayHandle& operator=(RelayHandle&&) = default;
+
+  ~RelayHandle() { HAL_FreeRelayPort(handle); }
+
+  operator HAL_RelayHandle() const { return handle; }
+
+ private:
+  HAL_RelayHandle handle = 0;
+};
+
 #define ASSERT_LAST_ERROR_STATUS(status, x)                          \
   do {                                                               \
     ASSERT_EQ(status, HAL_USE_LAST_ERROR);                           \

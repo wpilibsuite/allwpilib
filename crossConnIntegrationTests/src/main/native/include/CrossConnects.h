@@ -42,4 +42,17 @@ constexpr static std::array<std::pair<int, int>, 2> PWMCrossConnects{
     std::pair{16, 25},
 };
 
+// FWD only, relay on left
+constexpr static std::array<std::pair<int, int>, 2> RelayAnalogCrossConnects{
+    std::pair{2, 0}, std::pair{3, 1}};
+
+struct RelayCross {
+  int Relay;
+  int FwdDio;
+  int RevDio;
+};
+
+constexpr static std::array<RelayCross, 1> RelayCrossConnects{
+    RelayCross{0, 23, 22}};
+
 }  // namespace hlt
