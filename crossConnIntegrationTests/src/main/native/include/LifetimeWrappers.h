@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <hal/DMA.h>
 #include <hal/HAL.h>
 
 namespace hlt {
@@ -25,6 +26,23 @@ struct InterruptHandle {
 
  private:
   HAL_InterruptHandle handle = 0;
+};
+
+struct DMAHandle {
+ public:
+  explicit DMAHandle(int32_t* status) { handle = HAL_InitializeDMA(status); }
+  DMAHandle(const DMAHandle&) = delete;
+  DMAHandle operator=(const DMAHandle&) = delete;
+
+  DMAHandle(DMAHandle&&) = default;
+  DMAHandle& operator=(DMAHandle&&) = default;
+
+  ~DMAHandle() { HAL_FreeDMA(handle); }
+
+  operator HAL_DMAHandle() const { return handle; }
+
+ private:
+  HAL_DMAHandle handle = 0;
 };
 
 struct DIOHandle {
