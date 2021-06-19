@@ -55,4 +55,8 @@ struct RelayCross {
 constexpr static std::array<RelayCross, 1> RelayCrossConnects{
     RelayCross{0, 23, 22}};
 
+// input on left
+constexpr static std::array<std::pair<int, int>, 2> AnalogCrossConnects{
+    std::pair{2, 0}, std::pair{4, 1}};
+
 }  // namespace hlt

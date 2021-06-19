@@ -45,6 +45,66 @@ struct DMAHandle {
   HAL_DMAHandle handle = 0;
 };
 
+struct AnalogInputHandle {
+ public:
+  AnalogInputHandle(int32_t port, int32_t* status) {
+    handle = HAL_InitializeAnalogInputPort(HAL_GetPort(port), nullptr, status);
+  }
+  AnalogInputHandle(const AnalogInputHandle&) = delete;
+  AnalogInputHandle operator=(const AnalogInputHandle&) = delete;
+
+  AnalogInputHandle(AnalogInputHandle&&) = default;
+  AnalogInputHandle& operator=(AnalogInputHandle&&) = default;
+
+  ~AnalogInputHandle() { HAL_FreeAnalogInputPort(handle); }
+
+  operator HAL_AnalogInputHandle() const { return handle; }
+
+ private:
+  HAL_AnalogInputHandle handle = 0;
+};
+
+struct AnalogOutputHandle {
+ public:
+  AnalogOutputHandle(int32_t port, int32_t* status) {
+    handle = HAL_InitializeAnalogOutputPort(HAL_GetPort(port), nullptr, status);
+  }
+  AnalogOutputHandle(const AnalogOutputHandle&) = delete;
+  AnalogOutputHandle operator=(const AnalogOutputHandle&) = delete;
+
+  AnalogOutputHandle(AnalogOutputHandle&&) = default;
+  AnalogOutputHandle& operator=(AnalogOutputHandle&&) = default;
+
+  ~AnalogOutputHandle() { HAL_FreeAnalogOutputPort(handle); }
+
+  operator HAL_AnalogOutputHandle() const { return handle; }
+
+ private:
+  HAL_AnalogOutputHandle handle = 0;
+};
+
+struct AnalogTriggerHandle {
+ public:
+  explicit AnalogTriggerHandle(HAL_AnalogInputHandle port, int32_t* status) {
+    handle = HAL_InitializeAnalogTrigger(port, status);
+  }
+  AnalogTriggerHandle(const AnalogTriggerHandle&) = delete;
+  AnalogTriggerHandle operator=(const AnalogTriggerHandle&) = delete;
+
+  AnalogTriggerHandle(AnalogTriggerHandle&&) = default;
+  AnalogTriggerHandle& operator=(AnalogTriggerHandle&&) = default;
+
+  ~AnalogTriggerHandle() {
+    int32_t status = 0;
+    HAL_CleanAnalogTrigger(handle, &status);
+  }
+
+  operator HAL_AnalogTriggerHandle() const { return handle; }
+
+ private:
+  HAL_AnalogTriggerHandle handle = 0;
+};
+
 struct DIOHandle {
  public:
   DIOHandle() {}
