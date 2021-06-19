@@ -6,6 +6,7 @@
 #include <thread>
 
 #include <hal/HAL.h>
+#include <hal/DMA.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/priority_mutex.h>
@@ -17,6 +18,119 @@
 using namespace hlt;
 
 class PWMTest : public ::testing::TestWithParam<std::pair<int, int>> {};
+
+void TestTimingDMA(int squelch, std::pair<int, int> param) {
+  // Initialize DMA
+  int32_t status = 0;
+  DMAHandle dmaHandle(&status);
+  ASSERT_NE(dmaHandle, HAL_kInvalidHandle);
+  ASSERT_EQ(0, status);
+
+  status = 0;
+  PWMHandle pwmHandle(param.first, &status);
+  ASSERT_NE(pwmHandle, HAL_kInvalidHandle);
+  ASSERT_EQ(0, status);
+
+  // Ensure our PWM is disabled, and set up properly
+  HAL_SetPWMRaw(pwmHandle, 0, &status);
+  HAL_SetPWMConfig(pwmHandle, 2.0, 1.0, 1.0, 0, 0, &status);
+  HAL_SetPWMPeriodScale(pwmHandle, squelch, &status);
+
+  unsigned int checkPeriod = 0;
+  switch (squelch) {
+    case (0):
+      checkPeriod = 5050;
+      break;
+    case (1):
+      checkPeriod = 10100;
+      break;
+    case (3):
+      checkPeriod = 20200;
+      break;
+  }
+
+  status = 0;
+  DIOHandle dioHandle(param.second, true, &status);
+  ASSERT_NE(dioHandle, HAL_kInvalidHandle);
+
+  HAL_AddDMADigitalSource(dmaHandle, dioHandle, &status);
+  ASSERT_EQ(0, status);
+
+  HAL_SetDMAExternalTrigger(dmaHandle, dioHandle, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, true, true, &status);
+  ASSERT_EQ(0, status);
+
+  // Loop to test 5 speeds
+  for (unsigned int testWidth = 1000; testWidth < 2100; testWidth += 250) {
+
+    HAL_StartDMA(dmaHandle, 1024, &status);
+    ASSERT_EQ(0, status);
+
+    while (true) {
+      int32_t remaining = 0;
+      HAL_DMASample testSample;
+      HAL_ReadDMA(dmaHandle, &testSample, 0.01, &remaining, &status);
+      if (remaining == 0) break;
+    }
+
+    HAL_SetPWMSpeed(pwmHandle, (testWidth - 1000) / 1000.0, &status);
+
+    constexpr int sampleCount = 15;
+    HAL_DMASample dmaSamples[sampleCount];
+    int readCount = 0;
+    while (readCount < sampleCount) {
+      status = 0;
+      int32_t remaining = 0;
+      HAL_DMAReadStatus readStatus = HAL_ReadDMA(dmaHandle, &dmaSamples[readCount], 1.0, &remaining, &status);
+      ASSERT_EQ(0, status);
+      ASSERT_EQ(HAL_DMAReadStatus::HAL_DMA_OK, readStatus);
+      readCount++;
+    }
+
+    HAL_SetPWMSpeed(pwmHandle, 0, &status);
+    HAL_StopDMA(dmaHandle, &status);
+
+    // Find first rising edge
+    int startIndex = 4;
+    while (startIndex < 6) {
+      status = 0;
+      auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[startIndex], dioHandle, &status);
+      ASSERT_EQ(0, status);
+      if (value) break;
+      startIndex++;
+    }
+    ASSERT_LT(startIndex, 6);
+
+    // Check that samples alternate
+    bool previous = false;
+    int iterationCount = 0;
+    for (int i = startIndex; i < startIndex + 8; i++) {
+      auto value = HAL_GetDMASampleDigitalSource(&dmaSamples[i], dioHandle, &status);
+      ASSERT_EQ(0, status);
+      ASSERT_NE(previous, value);
+      previous = !previous;
+      iterationCount++;
+    }
+    ASSERT_EQ(iterationCount, 8);
+    iterationCount = 0;
+
+    // Check width between samples
+    for (int i = startIndex; i < startIndex + 8; i+=2) {
+      auto width = HAL_GetDMASampleTime(&dmaSamples[i + 1], &status) - HAL_GetDMASampleTime(&dmaSamples[i], &status);
+      ASSERT_NEAR(testWidth, width, 10);
+      iterationCount++;
+    }
+    ASSERT_EQ(iterationCount, 4);
+    iterationCount = 0;
+
+    // Check period between samples
+    for (int i = startIndex; i < startIndex + 6; i+=2) {
+      auto period = HAL_GetDMASampleTime(&dmaSamples[i + 2], &status) - HAL_GetDMASampleTime(&dmaSamples[i], &status);
+      ASSERT_NEAR(checkPeriod, period, 10);
+      iterationCount++;
+    }
+    ASSERT_EQ(iterationCount, 3);
+  }
+}
 
 struct InterruptCheckData {
   wpi::SmallVector<uint64_t, 8> risingStamps;
@@ -169,6 +283,21 @@ TEST_P(PWMTest, TestTiming2x) {
 TEST_P(PWMTest, TestTiming1x) {
   auto param = GetParam();
   TestTiming(0, param);
+}
+
+TEST_P(PWMTest, TestTimingDMA4x) {
+  auto param = GetParam();
+  TestTimingDMA(3, param);
+}
+
+TEST_P(PWMTest, TestTimingDMA2x) {
+  auto param = GetParam();
+  TestTimingDMA(1, param);
+}
+
+TEST_P(PWMTest, TestTimingDMA1x) {
+  auto param = GetParam();
+  TestTimingDMA(0, param);
 }
 
 TEST(PWMTest, TestAllocateAll) {

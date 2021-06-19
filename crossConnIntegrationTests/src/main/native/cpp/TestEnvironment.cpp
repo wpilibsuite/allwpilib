@@ -61,6 +61,7 @@ class TestEnvironment : public testing::Environment {
 
       fmt::print("Waiting for enable: {}\n", enableCounter++);
     }
+    std::this_thread::sleep_for(500ms);
   }
 
   ~TestEnvironment() override { m_mockDS.Stop(); }
