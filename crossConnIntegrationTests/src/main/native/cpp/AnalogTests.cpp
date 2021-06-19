@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
 #include <wpi/SmallVector.h>
@@ -11,29 +15,29 @@ using namespace hlt;
 class AnalogCrossTest : public ::testing::TestWithParam<std::pair<int, int>> {};
 
 TEST_P(AnalogCrossTest, TestAnalogCross) {
-    auto param = GetParam();
+  auto param = GetParam();
 
-    int32_t status = 0;
-    AnalogInputHandle input{param.first, &status};
+  int32_t status = 0;
+  AnalogInputHandle input{param.first, &status};
+  ASSERT_EQ(0, status);
+  AnalogOutputHandle output{param.second, &status};
+  ASSERT_EQ(0, status);
+
+  for (double i = 0; i < 5; i += 0.1) {
+    HAL_SetAnalogOutput(output, i, &status);
     ASSERT_EQ(0, status);
-    AnalogOutputHandle output{param.second, &status};
+    usleep(1000);
+    ASSERT_NEAR(i, HAL_GetAnalogVoltage(input, &status), 0.01);
     ASSERT_EQ(0, status);
+  }
 
-    for (double i = 0; i < 5; i += 0.1) {
-        HAL_SetAnalogOutput(output, i, &status);
-        ASSERT_EQ(0, status);
-        usleep(1000);
-        ASSERT_NEAR(i, HAL_GetAnalogVoltage(input, &status), 0.01);
-        ASSERT_EQ(0, status);
-    }
-
-    for (double i = 5; i > 0; i -= 0.1) {
-        HAL_SetAnalogOutput(output, i, &status);
-        ASSERT_EQ(0, status);
-        usleep(1000);
-        ASSERT_NEAR(i, HAL_GetAnalogVoltage(input, &status), 0.01);
-        ASSERT_EQ(0, status);
-    }
+  for (double i = 5; i > 0; i -= 0.1) {
+    HAL_SetAnalogOutput(output, i, &status);
+    ASSERT_EQ(0, status);
+    usleep(1000);
+    ASSERT_NEAR(i, HAL_GetAnalogVoltage(input, &status), 0.01);
+    ASSERT_EQ(0, status);
+  }
 }
 
 TEST(AnalogInputTest, TestAllocateAll) {
