@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hal/DMA.h>
+#include <hal/DutyCycle.h>
 #include <hal/HAL.h>
 
 namespace hlt {
@@ -103,6 +104,26 @@ struct AnalogTriggerHandle {
 
  private:
   HAL_AnalogTriggerHandle handle = 0;
+};
+
+struct DutyCycleHandle {
+ public:
+  DutyCycleHandle(HAL_DigitalHandle port, int32_t* status) {
+    handle = HAL_InitializeDutyCycle(
+        port, HAL_AnalogTriggerType::HAL_Trigger_kInWindow, status);
+  }
+  DutyCycleHandle(const DutyCycleHandle&) = delete;
+  DutyCycleHandle operator=(const DutyCycleHandle&) = delete;
+
+  DutyCycleHandle(DutyCycleHandle&&) = default;
+  DutyCycleHandle& operator=(DutyCycleHandle&&) = default;
+
+  ~DutyCycleHandle() { HAL_FreeDutyCycle(handle); }
+
+  operator HAL_DutyCycleHandle() const { return handle; }
+
+ private:
+  HAL_DutyCycleHandle handle = 0;
 };
 
 struct DIOHandle {
