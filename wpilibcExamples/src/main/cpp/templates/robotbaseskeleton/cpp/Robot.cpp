@@ -21,8 +21,6 @@ void Robot::Teleop() {}
 void Robot::Test() {}
 
 void Robot::StartCompetition() {
-  auto& lw = *frc::LiveWindow::GetInstance();
-
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
@@ -44,7 +42,7 @@ void Robot::StartCompetition() {
         frc::DriverStation::WaitForData();
       }
     } else if (IsTest()) {
-      lw.SetEnabled(true);
+      frc::LiveWindow::SetEnabled(true);
       frc::Shuffleboard::EnableActuatorWidgets();
       frc::DriverStation::InTest(true);
       Test();
@@ -52,7 +50,7 @@ void Robot::StartCompetition() {
       while (IsTest() && IsEnabled()) {
         frc::DriverStation::WaitForData();
       }
-      lw.SetEnabled(false);
+      frc::LiveWindow::SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
       frc::DriverStation::InOperatorControl(true);
