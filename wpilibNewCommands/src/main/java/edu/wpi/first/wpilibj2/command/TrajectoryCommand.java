@@ -25,10 +25,10 @@ public class TrajectoryCommand extends CommandBase {
   /**
    * Create a new TrajectoryCommand.
    *
-   * @param trajectory the trajectory to follow.
-   * @param output a function that consumes the target state for each timestep. This state can be
+   * @param trajectory The trajectory to follow.
+   * @param output A function that consumes the target state for each timestep. This state can be
    *     fed into a Ramsete controller or similar.
-   * @param requirements the subsystems to require.
+   * @param requirements The subsystems to require.
    */
   public TrajectoryCommand(
       Trajectory trajectory, Consumer<Trajectory.State> output, Subsystem... requirements) {

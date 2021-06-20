@@ -69,6 +69,7 @@ constexpr double kPDriveVel = 8.5;
 }  // namespace DriveConstants
 
 namespace AutoConstants {
+constexpr auto kTimestep = 0.02_s;
 constexpr auto kMaxSpeed = 3_mps;
 constexpr auto kMaxAcceleration = 3_mps_sq;
 

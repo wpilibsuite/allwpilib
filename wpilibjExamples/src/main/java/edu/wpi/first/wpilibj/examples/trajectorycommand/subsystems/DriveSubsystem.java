@@ -15,7 +15,6 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants;
 import edu.wpi.first.wpilibj.examples.trajectorycommand.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.trajectorycommand.Constants.DriveConstants;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -71,9 +70,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final PIDController m_rightController =
       new PIDController(DriveConstants.kPDriveVel, 0, 0);
 
-  // track previous target velocities for acceleration calculation
-  private DifferentialDriveWheelSpeeds m_previousSpeeds;
-  private double m_previousTime;
+  // Track previous target velocities for feedforward calculation
+  private DifferentialDriveWheelSpeeds m_previousSpeeds = new DifferentialDriveWheelSpeeds();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -114,8 +112,8 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
+   * @param fwd The commanded forward movement
+   * @param rot The commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
     m_drive.arcadeDrive(fwd, rot);
@@ -130,7 +128,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Gets the average distance of the two encoders.
    *
-   * @return the average of the two encoder readings
+   * @return The average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
     return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
@@ -139,7 +137,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Sets the max output of the drive. Useful for scaling the drive to drive more slowly.
    *
-   * @param maxOutput the maximum output to which the drive will be constrained
+   * @param maxOutput The maximum output to which the drive will be constrained
    */
   public void setMaxOutput(double maxOutput) {
     m_drive.setMaxOutput(maxOutput);
@@ -153,7 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return The robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
     return m_gyro.getRotation2d().getDegrees();
@@ -171,15 +169,15 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Reaches the given target state. Used internally to follow the TrajectoryCommand's output.
    *
-   * @param targetState the target state struct.
+   * @param targetState The target state struct.
    */
   private void followState(Trajectory.State targetState) {
-    // calculate via Ramsete the speed vector needed to reach the target state
+    // Calculate via Ramsete the speed vector needed to reach the target state
     ChassisSpeeds speedVector =
         m_ramseteController.calculate(m_odometry.getPoseMeters(), targetState);
-    // convert the vector to the separate velocities of each side of the drivetrain
-    DifferentialDriveWheelSpeeds wheelSpeeds =
-        Constants.DriveConstants.kDriveKinematics.toWheelSpeeds(speedVector);
+    // Convert the vector to the separate velocities of each side of the drivetrain
+    DifferentialDriveWheelSpeeds targetSpeeds =
+        DriveConstants.kDriveKinematics.toWheelSpeeds(speedVector);
 
     // PID and Feedforward control
     // This can be replaced by calls to smart motor controller closed-loop control
@@ -188,35 +186,32 @@ public class DriveSubsystem extends SubsystemBase {
 
     double leftFeedforward =
         m_feedforward.calculate(
-            wheelSpeeds.leftMetersPerSecond,
-            (wheelSpeeds.leftMetersPerSecond - m_previousSpeeds.leftMetersPerSecond)
-                    / targetState.timeSeconds
-                - m_previousTime);
+            m_previousSpeeds.leftMetersPerSecond,
+            targetSpeeds.leftMetersPerSecond,
+            AutoConstants.kTimestepSeconds);
 
     double rightFeedforward =
         m_feedforward.calculate(
-            wheelSpeeds.rightMetersPerSecond,
-            (wheelSpeeds.rightMetersPerSecond - m_previousSpeeds.rightMetersPerSecond)
-                    / targetState.timeSeconds
-                - m_previousTime);
+            m_previousSpeeds.rightMetersPerSecond,
+            targetSpeeds.rightMetersPerSecond,
+            AutoConstants.kTimestepSeconds);
 
     double leftOutput =
         leftFeedforward
-            + m_leftController.calculate(m_leftEncoder.getRate(), wheelSpeeds.leftMetersPerSecond);
+            + m_leftController.calculate(m_leftEncoder.getRate(), targetSpeeds.leftMetersPerSecond);
 
     double rightOutput =
         rightFeedforward
             + m_rightController.calculate(
-                m_rightEncoder.getRate(), wheelSpeeds.rightMetersPerSecond);
+                m_rightEncoder.getRate(), targetSpeeds.rightMetersPerSecond);
 
-    // apply the voltages
+    // Apply the voltages
     m_leftMotors.setVoltage(leftOutput);
     m_rightMotors.setVoltage(rightOutput);
     m_drive.feed();
 
-    // track previous speeds and time
-    m_previousSpeeds = wheelSpeeds;
-    m_previousTime = targetState.timeSeconds;
+    // Track previous speed setpoints
+    m_previousSpeeds = targetSpeeds;
   }
 
   /**
@@ -230,14 +225,19 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * <p>- stopping at the end of the path
    *
-   * @param trajectory the path to follow
-   * @return a command group that tracks the given trajectory
+   * @param trajectory The path to follow
+   * @return A command group that tracks the given trajectory
    */
   public Command buildTrajectoryGroup(Trajectory trajectory) {
     return new TrajectoryCommand(trajectory, this::followState, this)
         // Reset odometry to the starting pose of the trajectory.
         .beforeStarting(() -> resetOdometry(trajectory.getInitialPose()), this)
         // Stop at the end of the trajectory.
-        .andThen(m_drive::stopMotor, this);
+        .andThen(
+            () -> {
+              m_previousSpeeds = new DifferentialDriveWheelSpeeds();
+              m_drive.stopMotor();
+            },
+            this);
   }
 }

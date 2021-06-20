@@ -56,7 +56,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * Reaches the given target state. Used internally to follow the
    * TrajectoryCommand's output.
    *
-   * @param targetState the target state struct.
+   * @param targetState The target state struct.
    */
   void FollowState(const frc::Trajectory::State& targetState);
 
@@ -112,10 +112,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * <p>- stopping at the end of the path
    *
-   * @param trajectory the path to follow
-   * @return a command group that tracks the given trajectory
+   * @param trajectory The path to follow
+   * @return A command group that tracks the given trajectory
    */
-  frc2::Command* BuildTrajectoryGroup(frc::Trajectory trajectory);
+  frc2::Command* BuildTrajectoryGroup(const frc::Trajectory& trajectory);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -172,7 +172,6 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::PIDController m_leftController{DriveConstants::kPDriveVel, 0, 0};
   frc::PIDController m_rightController{DriveConstants::kPDriveVel, 0, 0};
 
-  // track previous target velocities for acceleration calculation
+  // Track previous target velocities for feedforward calculation
   frc::DifferentialDriveWheelSpeeds m_previousSpeeds;
-  units::second_t m_previousTime = -1_s;
 };

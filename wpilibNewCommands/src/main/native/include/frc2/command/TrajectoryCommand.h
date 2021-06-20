@@ -28,10 +28,10 @@ class TrajectoryCommand : public CommandHelper<CommandBase, TrajectoryCommand> {
   /**
    * Create a new TrajectoryCommand.
    *
-   * @param trajectory the trajectory to follow.
-   * @param output a function that consumes the target state for each timestep.
+   * @param trajectory The trajectory to follow.
+   * @param output A function that consumes the target state for each timestep.
    * This state can be fed into a Ramsete controller or similar.
-   * @param requirements the subsystems to require.
+   * @param requirements The subsystems to require.
    */
   TrajectoryCommand(frc::Trajectory trajectory,
                     std::function<void(const frc::Trajectory::State&)> output,
@@ -40,10 +40,10 @@ class TrajectoryCommand : public CommandHelper<CommandBase, TrajectoryCommand> {
   /**
    * Create a new TrajectoryCommand.
    *
-   * @param trajectory the trajectory to follow.
-   * @param output a function that consumes the target state for each timestep.
+   * @param trajectory The trajectory to follow.
+   * @param output A function that consumes the target state for each timestep.
    * This state can be fed into a Ramsete controller or similar.
-   * @param requirements the subsystems to require.
+   * @param requirements The subsystems to require.
    */
   TrajectoryCommand(frc::Trajectory trajectory,
                     std::function<void(const frc::Trajectory::State&)> output,

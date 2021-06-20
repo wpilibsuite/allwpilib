@@ -34,8 +34,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Drives the robot using arcade controls.
    *
-   * @param fwd the commanded forward movement
-   * @param rot the commanded rotation
+   * @param fwd The commanded forward movement
+   * @param rot The commanded rotation
    */
   void ArcadeDrive(double fwd, double rot);
 
@@ -43,7 +43,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * Reaches the given target state. Used internally to follow the
    * TrajectoryCommand's output.
    *
-   * @param targetState the target state struct.
+   * @param targetState The target state struct.
    */
   void FollowState(const frc::Trajectory::State& targetState);
 
@@ -55,7 +55,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   /**
    * Gets the average distance of the TWO encoders.
    *
-   * @return the average of the TWO encoder readings
+   * @return The average of the TWO encoder readings
    */
   double GetAverageEncoderDistance();
 
@@ -63,14 +63,14 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * Sets the max output of the drive.  Useful for scaling the drive to drive
    * more slowly.
    *
-   * @param maxOutput the maximum output to which the drive will be constrained
+   * @param maxOutput The maximum output to which the drive will be constrained
    */
   void SetMaxOutput(double maxOutput);
 
   /**
    * Returns the heading of the robot.
    *
-   * @return the robot's heading in degrees, from -180 to 180
+   * @return The robot's heading in degrees, from -180 to 180
    */
   units::degree_t GetHeading() const;
 
@@ -104,10 +104,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * <p>- stopping at the end of the path
    *
-   * @param trajectory the path to follow
-   * @return a command group that tracks the given trajectory
+   * @param trajectory The path to follow
+   * @return A command group that tracks the given trajectory
    */
-  frc2::Command* BuildTrajectoryGroup(frc::Trajectory trajectory);
+  frc2::Command* BuildTrajectoryGroup(const frc::Trajectory& trajectory);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
@@ -137,22 +137,21 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // The gyro sensor
   frc::ADXRS450_Gyro m_gyro;
 
-  // the RAMSETE controller
+  // The RAMSETE controller
   frc::RamseteController m_ramseteController;
 
-  // the PID controllers for each side
+  // The PID controllers for each side
   frc::PIDController m_leftController;
   frc::PIDController m_rightController;
 
-  // the feedforward
-  // if the two sides of the drivetrain are different,
+  // The feedforward
+  // If the two sides of the drivetrain are different,
   // a separate feedforward object can be used for each side
   frc::SimpleMotorFeedforward<units::meters> m_feedforward;
 
   // Odometry class for tracking robot pose
   frc::DifferentialDriveOdometry m_odometry;
 
-  // track previous target velocity for acceleration calculations
+  // Track previous target velocities for feedforward calculation
   frc::DifferentialDriveWheelSpeeds m_previousSpeeds;
-  units::second_t m_previousTime;
 };

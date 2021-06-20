@@ -88,9 +88,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final PIDController m_rightController =
       new PIDController(DriveConstants.kPDriveVel, 0, 0);
 
-  // Track previous target velocities for acceleration calculation
-  private DifferentialDriveWheelSpeeds m_previousSpeeds;
-  private double m_previousTime = -1;
+  // Track previous target velocities for feedforward calculation
+  private DifferentialDriveWheelSpeeds m_previousSpeeds = new DifferentialDriveWheelSpeeds();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -228,14 +227,14 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Reaches the given target state. Used internally to follow the TrajectoryCommand's output.
    *
-   * @param targetState the target state struct.
+   * @param targetState The target state struct.
    */
   private void followState(Trajectory.State targetState) {
     // Calculate via Ramsete the speed vector needed to reach the target state
     ChassisSpeeds speedVector =
         m_ramseteController.calculate(m_odometry.getPoseMeters(), targetState);
     // Convert the vector to the separate velocities of each side of the drivetrain
-    DifferentialDriveWheelSpeeds wheelSpeeds =
+    DifferentialDriveWheelSpeeds targetSpeeds =
         DriveConstants.kDriveKinematics.toWheelSpeeds(speedVector);
 
     // PID and Feedforward control
@@ -245,33 +244,32 @@ public class DriveSubsystem extends SubsystemBase {
 
     double leftFeedforward =
         m_feedforward.calculate(
-            wheelSpeeds.leftMetersPerSecond,
-            (wheelSpeeds.leftMetersPerSecond - m_previousSpeeds.leftMetersPerSecond)
-                / (targetState.timeSeconds - m_previousTime));
+            m_previousSpeeds.leftMetersPerSecond,
+            targetSpeeds.leftMetersPerSecond,
+            AutoConstants.kTimestepSeconds);
 
     double rightFeedforward =
         m_feedforward.calculate(
-            wheelSpeeds.rightMetersPerSecond,
-            (wheelSpeeds.rightMetersPerSecond - m_previousSpeeds.rightMetersPerSecond)
-                / (targetState.timeSeconds - m_previousTime));
+            m_previousSpeeds.rightMetersPerSecond,
+            targetSpeeds.rightMetersPerSecond,
+            AutoConstants.kTimestepSeconds);
 
     double leftOutput =
         leftFeedforward
-            + m_leftController.calculate(m_leftEncoder.getRate(), wheelSpeeds.leftMetersPerSecond);
+            + m_leftController.calculate(m_leftEncoder.getRate(), targetSpeeds.leftMetersPerSecond);
 
     double rightOutput =
         rightFeedforward
             + m_rightController.calculate(
-                m_rightEncoder.getRate(), wheelSpeeds.rightMetersPerSecond);
+                m_rightEncoder.getRate(), targetSpeeds.rightMetersPerSecond);
 
     // Apply the voltages
     m_leftMotors.setVoltage(leftOutput);
     m_rightMotors.setVoltage(rightOutput);
     m_drive.feed();
 
-    // Track previous speeds and time
-    m_previousSpeeds = wheelSpeeds;
-    m_previousTime = targetState.timeSeconds;
+    // Track previous speed setpoints
+    m_previousSpeeds = targetSpeeds;
   }
 
   /**
@@ -285,14 +283,19 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * <p>- stopping at the end of the path
    *
-   * @param trajectory the path to follow
-   * @return a command group that tracks the given trajectory
+   * @param trajectory The path to follow
+   * @return A command group that tracks the given trajectory
    */
   public Command buildTrajectoryGroup(Trajectory trajectory) {
     return new TrajectoryCommand(trajectory, this::followState, this)
         // Reset odometry to the starting pose of the trajectory.
         .beforeStarting(() -> resetOdometry(trajectory.getInitialPose()), this)
         // Stop at the end of the trajectory.
-        .andThen(m_drive::stopMotor, this);
+        .andThen(
+            () -> {
+              m_previousSpeeds = new DifferentialDriveWheelSpeeds();
+              m_drive.stopMotor();
+            },
+            this);
   }
 }
