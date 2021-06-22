@@ -1,5 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
+nativeUtils.skipInstallPdb = project.hasProperty('buildServer')
+
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withRoboRIO()
 nativeUtils.withRaspbian()
