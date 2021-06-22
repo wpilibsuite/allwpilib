@@ -70,6 +70,7 @@
 #define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
 
 FMT_BEGIN_NAMESPACE
+FMT_MODULE_EXPORT_BEGIN
 
 /**
   \rst
@@ -139,7 +140,7 @@ template <typename Char> struct formatter<std::error_code, Char> {
 #ifdef _WIN32
 FMT_API const std::error_category& system_category() FMT_NOEXCEPT;
 
-namespace detail {
+FMT_BEGIN_DETAIL_NAMESPACE
 // A converter from UTF-16 to UTF-8.
 // It is only provided for Windows since other systems support UTF-8 natively.
 class utf16_to_utf8 {
@@ -162,7 +163,7 @@ class utf16_to_utf8 {
 
 FMT_API void format_windows_error(buffer<char>& out, int error_code,
                                   const char* message) FMT_NOEXCEPT;
-}  // namespace detail
+FMT_END_DETAIL_NAMESPACE
 
 FMT_API std::system_error vwindows_error(int error_code, string_view format_str,
                                          format_args args);
@@ -198,7 +199,7 @@ FMT_API std::system_error vwindows_error(int error_code, string_view format_str,
 template <typename... Args>
 std::system_error windows_error(int error_code, string_view message,
                                 const Args&... args) {
-  return vwindows_error(error_code, message, make_format_args(args...));
+  return vwindows_error(error_code, message, fmt::make_format_args(args...));
 }
 
 // Reports a Windows error without throwing an exception.
@@ -269,7 +270,7 @@ class buffered_file {
 
   template <typename... Args>
   inline void print(string_view format_str, const Args&... args) {
-    vprint(format_str, make_format_args(args...));
+    vprint(format_str, fmt::make_format_args(args...));
   }
 };
 
@@ -361,7 +362,7 @@ class file {
 // Returns the memory page size.
 long getpagesize();
 
-namespace detail {
+FMT_BEGIN_DETAIL_NAMESPACE
 
 struct buffer_size {
   buffer_size() = default;
@@ -390,7 +391,8 @@ struct ostream_params {
     this->buffer_size = bs.value;
   }
 };
-}  // namespace detail
+
+FMT_END_DETAIL_NAMESPACE
 
 static constexpr detail::buffer_size buffer_size;
 
@@ -438,7 +440,7 @@ class FMT_API ostream final : private detail::buffer<char> {
    */
   template <typename... T> void print(format_string<T...> fmt, T&&... args) {
     vformat_to(detail::buffer_appender<char>(*this), fmt,
-               make_format_args(args...));
+               fmt::make_format_args(args...));
   }
 };
 
@@ -507,6 +509,7 @@ class locale {
 };
 using Locale FMT_DEPRECATED_ALIAS = locale;
 #endif  // FMT_LOCALE
+FMT_MODULE_EXPORT_END
 FMT_END_NAMESPACE
 
 #endif  // FMT_OS_H_

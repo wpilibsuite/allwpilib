@@ -59,8 +59,8 @@ void frc::ReportErrorV(int32_t status, const char* fileName, int lineNumber,
     return;
   }
   fmt::memory_buffer out;
-  fmt::format_to(out, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(out, format, args);
+  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
+  fmt::vformat_to(fmt::appender{out}, format, args);
   out.push_back('\0');
   HAL_SendError(status < 0, status, 0, out.data(), funcName,
                 wpi::GetStackTrace(2).c_str(), 1);
@@ -70,8 +70,8 @@ RuntimeError frc::MakeErrorV(int32_t status, const char* fileName,
                              int lineNumber, const char* funcName,
                              fmt::string_view format, fmt::format_args args) {
   fmt::memory_buffer out;
-  fmt::format_to(out, "{}: ", GetErrorMessage(&status));
-  fmt::vformat_to(out, format, args);
+  fmt::format_to(fmt::appender{out}, "{}: ", GetErrorMessage(&status));
+  fmt::vformat_to(fmt::appender{out}, format, args);
   return RuntimeError{status,
                       fileName,
                       lineNumber,
