@@ -85,12 +85,12 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     if (printMsg) {
       fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
-        fmt::format_to(buf, "{} at {}: ", isError ? "Error" : "Warning",
-                       location);
+        fmt::format_to(fmt::appender{buf},
+                       "{} at {}: ", isError ? "Error" : "Warning", location);
       }
-      fmt::format_to(buf, "{}\n", details);
+      fmt::format_to(fmt::appender{buf}, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        fmt::format_to(buf, "{}\n", callStack);
+        fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
       std::fwrite(buf.data(), buf.size(), 1, stderr);
     }

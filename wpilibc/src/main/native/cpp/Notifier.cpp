@@ -140,7 +140,7 @@ Notifier& Notifier::operator=(Notifier&& rhs) {
 
 void Notifier::SetName(std::string_view name) {
   fmt::memory_buffer buf;
-  fmt::format_to(buf, "{}", name);
+  fmt::format_to(fmt::appender{buf}, "{}", name);
   buf.push_back('\0');  // null terminate
   int32_t status = 0;
   HAL_SetNotifierName(m_notifier, buf.data(), &status);

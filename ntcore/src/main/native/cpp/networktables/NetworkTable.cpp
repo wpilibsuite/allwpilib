@@ -93,7 +93,7 @@ NetworkTableEntry NetworkTable::GetEntry(std::string_view key) const {
   NT_Entry& entry = m_entries[key];
   if (entry == 0) {
     fmt::memory_buffer buf;
-    fmt::format_to(buf, "{}/{}", m_path, key);
+    fmt::format_to(fmt::appender{buf}, "{}/{}", m_path, key);
     entry = nt::GetEntry(m_inst, {buf.data(), buf.size()});
   }
   return NetworkTableEntry{entry};
