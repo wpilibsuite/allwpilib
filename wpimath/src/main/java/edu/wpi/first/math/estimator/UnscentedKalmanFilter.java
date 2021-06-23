@@ -334,7 +334,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Measurement noise covariance matrix.
+   * @param R Measurement noise covariance matrix (continuous-time).
    */
   @SuppressWarnings({"ParameterName", "LambdaParameterName", "LocalVariableName"})
   public <R extends Num> void correct(
@@ -364,7 +364,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement vector.
-   * @param R Measurement noise covariance matrix.
+   * @param R Measurement noise covariance matrix (continuous-time).
    * @param meanFuncY A function that computes the mean of 2 * States + 1 measurement vectors using
    *     a given set of weights.
    * @param residualFuncY A function that computes the residual of two measurement vectors (i.e. it

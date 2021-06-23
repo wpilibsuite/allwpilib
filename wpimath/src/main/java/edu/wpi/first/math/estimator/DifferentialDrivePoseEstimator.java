@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -59,7 +58,7 @@ public class DifferentialDrivePoseEstimator {
   private Rotation2d m_gyroOffset;
   private Rotation2d m_previousAngle;
 
-  private Matrix<N3, N3> m_visionDiscreteR;
+  private Matrix<N3, N3> m_visionContR;
 
   /**
    * Constructs a DifferentialDrivePoseEstimator.
@@ -143,7 +142,7 @@ public class DifferentialDrivePoseEstimator {
                 u,
                 y,
                 (x, u1) -> new Matrix<>(x.getStorage().extractMatrix(0, 3, 0, 1)),
-                m_visionDiscreteR,
+                m_visionContR,
                 AngleStatistics.angleMean(2),
                 AngleStatistics.angleResidual(2),
                 AngleStatistics.angleResidual(2),
@@ -164,8 +163,7 @@ public class DifferentialDrivePoseEstimator {
    *     theta]^T, with units in meters and radians.
    */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
-    var visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
-    m_visionDiscreteR = Discretization.discretizeR(visionContR, m_nominalDt);
+    m_visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
   }
 
   @SuppressWarnings({"ParameterName", "MethodName"})

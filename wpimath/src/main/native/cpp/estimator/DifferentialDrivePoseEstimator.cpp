@@ -36,7 +36,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
         u, y,
         [](const Eigen::Matrix<double, 5, 1>& x,
            const Eigen::Matrix<double, 3, 1>&) { return x.block<3, 1>(0, 0); },
-        m_visionDiscR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
+        m_visionContR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
         frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
   };
 
@@ -48,9 +48,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
 void DifferentialDrivePoseEstimator::SetVisionMeasurementStdDevs(
     const wpi::array<double, 3>& visionMeasurmentStdDevs) {
   // Create R (covariances) for vision measurements.
-  Eigen::Matrix<double, 3, 3> visionContR =
-      frc::MakeCovMatrix(visionMeasurmentStdDevs);
-  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+  m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
 }
 
 void DifferentialDrivePoseEstimator::ResetPosition(

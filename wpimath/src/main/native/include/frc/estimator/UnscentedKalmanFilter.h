@@ -251,7 +251,7 @@ class UnscentedKalmanFilter {
    * @param y Measurement vector.
    * @param h A vector-valued function of x and u that returns the measurement
    *          vector.
-   * @param R Measurement noise covariance matrix.
+   * @param R Measurement noise covariance matrix (continuous-time).
    */
   template <int Rows>
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
@@ -290,7 +290,7 @@ class UnscentedKalmanFilter {
    * @param y             Measurement vector.
    * @param h             A vector-valued function of x and u that returns the
    *                      measurement vector.
-   * @param R             Measurement noise covariance matrix.
+   * @param R             Measurement noise covariance matrix (continuous-time).
    * @param meanFuncY     A function that computes the mean of 2 * States + 1
    *                      measurement vectors using a given set of weights.
    * @param residualFuncY A function that computes the residual of two

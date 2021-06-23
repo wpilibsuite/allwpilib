@@ -38,7 +38,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
         u, y,
         [](const Eigen::Matrix<double, 3, 1>& x,
            const Eigen::Matrix<double, 3, 1>&) { return x; },
-        m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
+        m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
         frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
   };
 
@@ -53,9 +53,7 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
 void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
     const wpi::array<double, 3>& visionMeasurmentStdDevs) {
   // Create R (covariances) for vision measurements.
-  Eigen::Matrix<double, 3, 3> visionContR =
-      frc::MakeCovMatrix(visionMeasurmentStdDevs);
-  m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+  m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
 }
 
 void frc::MecanumDrivePoseEstimator::ResetPosition(

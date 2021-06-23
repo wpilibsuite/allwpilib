@@ -208,7 +208,7 @@ class MecanumDrivePoseEstimator {
                      const Eigen::Matrix<double, 3, 1>& y)>
       m_visionCorrect;
 
-  Eigen::Matrix3d m_visionDiscR;
+  Eigen::Matrix3d m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;

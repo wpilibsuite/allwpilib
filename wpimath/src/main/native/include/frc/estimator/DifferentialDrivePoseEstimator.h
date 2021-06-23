@@ -212,7 +212,7 @@ class DifferentialDrivePoseEstimator {
                      const Eigen::Matrix<double, 3, 1>& y)>
       m_visionCorrect;
 
-  Eigen::Matrix<double, 3, 3> m_visionDiscR;
+  Eigen::Matrix<double, 3, 3> m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
