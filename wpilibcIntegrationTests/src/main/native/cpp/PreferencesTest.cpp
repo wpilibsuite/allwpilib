@@ -45,14 +45,14 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 
   inst.StartServer();
 
-  auto& preferences = *frc::Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
-            preferences.GetString("testFileGetString"));
-  EXPECT_EQ(1, preferences.GetInt("testFileGetInt"));
-  EXPECT_FLOAT_EQ(0.5, preferences.GetDouble("testFileGetDouble"));
-  EXPECT_FLOAT_EQ(0.25f, preferences.GetFloat("testFileGetFloat"));
-  EXPECT_TRUE(preferences.GetBoolean("testFileGetBoolean"));
-  EXPECT_EQ(1000000000000000000ll, preferences.GetLong("testFileGetLong"));
+            frc::Preferences::GetString("testFileGetString"));
+  EXPECT_EQ(1, frc::Preferences::GetInt("testFileGetInt"));
+  EXPECT_FLOAT_EQ(0.5, frc::Preferences::GetDouble("testFileGetDouble"));
+  EXPECT_FLOAT_EQ(0.25f, frc::Preferences::GetFloat("testFileGetFloat"));
+  EXPECT_TRUE(frc::Preferences::GetBoolean("testFileGetBoolean"));
+  EXPECT_EQ(1000000000000000000ll,
+            frc::Preferences::GetLong("testFileGetLong"));
 }
 
 /**
@@ -62,22 +62,21 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.StartServer();
-  auto& preferences = *frc::Preferences::GetInstance();
-  preferences.Remove("testFileGetString");
-  preferences.Remove("testFileGetInt");
-  preferences.Remove("testFileGetDouble");
-  preferences.Remove("testFileGetFloat");
-  preferences.Remove("testFileGetBoolean");
-  preferences.Remove("testFileGetLong");
+  frc::Preferences::Remove("testFileGetString");
+  frc::Preferences::Remove("testFileGetInt");
+  frc::Preferences::Remove("testFileGetDouble");
+  frc::Preferences::Remove("testFileGetFloat");
+  frc::Preferences::Remove("testFileGetBoolean");
+  frc::Preferences::Remove("testFileGetLong");
 
   frc::Wait(kSaveTime);
 
-  preferences.SetString("testFileSetString", "Hello, preferences file");
-  preferences.SetInt("testFileSetInt", 1);
-  preferences.SetDouble("testFileSetDouble", 0.5);
-  preferences.SetFloat("testFileSetFloat", 0.25f);
-  preferences.SetBoolean("testFileSetBoolean", true);
-  preferences.SetLong("testFileSetLong", 1000000000000000000ll);
+  frc::Preferences::SetString("testFileSetString", "Hello, preferences file");
+  frc::Preferences::SetInt("testFileSetInt", 1);
+  frc::Preferences::SetDouble("testFileSetDouble", 0.5);
+  frc::Preferences::SetFloat("testFileSetFloat", 0.25f);
+  frc::Preferences::SetBoolean("testFileSetBoolean", true);
+  frc::Preferences::SetLong("testFileSetLong", 1000000000000000000ll);
 
   frc::Wait(kSaveTime);
 
