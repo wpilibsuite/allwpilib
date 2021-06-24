@@ -101,7 +101,7 @@ class SwerveDrivePoseEstimator {
           u, y,
           [](const Eigen::Matrix<double, 3, 1>& x,
              const Eigen::Matrix<double, 3, 1>& u) { return x; },
-          m_visionDiscR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
+          m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
 
@@ -161,9 +161,7 @@ class SwerveDrivePoseEstimator {
   void SetVisionMeasurementStdDevs(
       const wpi::array<double, 3>& visionMeasurementStdDevs) {
     // Create R (covariances) for vision measurements.
-    Eigen::Matrix<double, 3, 3> visionContR =
-        frc::MakeCovMatrix(visionMeasurementStdDevs);
-    m_visionDiscR = frc::DiscretizeR<3>(visionContR, m_nominalDt);
+    m_visionContR = frc::MakeCovMatrix(visionMeasurementStdDevs);
   }
 
   /**
@@ -296,7 +294,7 @@ class SwerveDrivePoseEstimator {
                      const Eigen::Matrix<double, 3, 1>& y)>
       m_visionCorrect;
 
-  Eigen::Matrix3d m_visionDiscR;
+  Eigen::Matrix3d m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
