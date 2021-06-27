@@ -22,9 +22,6 @@ class PneumaticsControlModule
 
   ~PneumaticsControlModule() override;
 
-  PneumaticsControlModule(PneumaticsControlModule&&) = default;
-  PneumaticsControlModule& operator=(PneumaticsControlModule&&) = default;
-
   bool GetCompressor();
 
   void SetClosedLoopControl(bool enabled);
