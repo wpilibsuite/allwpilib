@@ -243,7 +243,7 @@ class ConnectionNotification {
 class LogMessage {
  public:
   LogMessage() = default;
-  LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
+  LogMessage(NT_Logger logger_, unsigned int level_, std::string_view filename_,
              unsigned int line_, std::string_view message_)
       : logger(logger_),
         level(level_),
@@ -258,7 +258,7 @@ class LogMessage {
   unsigned int level{0};
 
   /** The filename of the source file that generated the message. */
-  const char* filename{""};
+  std::string filename;
 
   /** The line number in the source file that generated the message. */
   unsigned int line{0};

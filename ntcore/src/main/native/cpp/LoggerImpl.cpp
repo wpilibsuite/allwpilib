@@ -71,5 +71,5 @@ void LoggerImpl::Log(unsigned int level, const char* file, unsigned int line,
       DefaultLogger(level, filename.string().c_str(), line, msg);
     }
   }
-  Send(UINT_MAX, 0, level, filename.string().c_str(), line, msg);
+  Send(UINT_MAX, 0, level, filename.string(), line, msg);
 }
