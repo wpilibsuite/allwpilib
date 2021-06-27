@@ -66,7 +66,6 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   int checkAndReserveSolenoids(int mask);
 
-
   /**
    * Unreserve the masked solenoids.
    *
