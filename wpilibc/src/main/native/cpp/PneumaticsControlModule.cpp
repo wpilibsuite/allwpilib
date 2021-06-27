@@ -6,6 +6,8 @@
 
 #include <hal/CTREPCM.h>
 #include <wpi/StackTrace.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
@@ -21,6 +23,7 @@ PneumaticsControlModule::PneumaticsControlModule(int module) {
   m_handle = HAL_InitializeCTREPCM(module, stackTrace.c_str(), &status);
   FRC_CheckErrorStatus(status, "Module {}", module);
   m_module = module;
+  wpi::SendableRegistry::AddLW(this, "Compressor", module);
 }
 
 PneumaticsControlModule::~PneumaticsControlModule() {
@@ -159,4 +162,30 @@ void PneumaticsControlModule::SetOneShotDuration(int index,
 
 bool PneumaticsControlModule::CheckSolenoidChannel(int channel) const {
   return HAL_CheckCTREPCMSolenoidChannel(channel);
+}
+
+int PneumaticsControlModule::CheckAndReserveSolenoids(int mask) {
+  std::scoped_lock lock{m_reservedLock};
+  uint32_t uMask = static_cast<uint32_t>(mask);
+  if ((m_reservedMask & uMask) != 0) {
+    return m_reservedMask & uMask;
+  }
+  m_reservedMask |= uMask;
+  return 0;
+}
+
+void PneumaticsControlModule::UnreserveSolenoids(int mask) {
+  std::scoped_lock lock{m_reservedLock};
+  m_reservedMask &= ~(static_cast<uint32_t>(mask));
+}
+
+void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Compressor");
+  builder.AddBooleanProperty(
+      "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
+      [=](bool value) { SetClosedLoopControl(value); });
+  builder.AddBooleanProperty(
+      "Enabled", [=] { return GetCompressor(); }, nullptr);
+  builder.AddBooleanProperty(
+      "Pressure switch", [=]() { return GetPressureSwitch(); }, nullptr);
 }

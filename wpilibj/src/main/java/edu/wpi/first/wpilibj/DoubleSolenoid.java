@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -52,6 +53,11 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
+    if (module.checkAndReserveSolenoids(m_mask) != 0) {
+      // TODO tell which solenoid is already allocated
+      throw new AllocationException("Solenoid(s) already allocated");
+    }
+
     HAL.report(
         tResourceType.kResourceType_Solenoid, forwardChannel + 1, module.getModuleNumber() + 1);
     HAL.report(
@@ -62,6 +68,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   @Override
   public synchronized void close() {
     SendableRegistry.remove(this);
+    m_module.unreserveSolenoids(m_mask);
     m_module = null;
   }
 

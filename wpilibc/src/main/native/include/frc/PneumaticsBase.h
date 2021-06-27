@@ -24,5 +24,9 @@ class PneumaticsBase {
   virtual void SetOneShotDuration(int index, units::second_t duration) = 0;
 
   virtual bool CheckSolenoidChannel(int channel) const = 0;
+
+  virtual int CheckAndReserveSolenoids(int mask) = 0;
+
+  virtual void UnreserveSolenoids(int mask) = 0;
 };
 }  // namespace frc
