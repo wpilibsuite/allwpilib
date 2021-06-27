@@ -15,6 +15,7 @@
 #include <imgui_internal.h>
 #include <implot.h>
 #include <stb_image.h>
+#include <wpi/fs.h>
 
 #include "wpigui_internal.h"
 
@@ -290,6 +291,11 @@ void gui::Main() {
   ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
+  // Delete the save file if requested.
+  if (gContext->resetOnExit) {
+    fs::remove(fs::path{gContext->iniPath});
+  }
+
   glfwDestroyWindow(gContext->window);
   glfwTerminate();
 }
@@ -466,6 +472,8 @@ void gui::EmitViewMenu() {
       }
       ImGui::EndMenu();
     }
+
+    ImGui::MenuItem("Reset UI on Exit?", nullptr, &gContext->resetOnExit);
     ImGui::EndMenu();
   }
 }
