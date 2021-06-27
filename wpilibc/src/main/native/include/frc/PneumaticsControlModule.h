@@ -12,9 +12,10 @@
 #include "PneumaticsBase.h"
 
 namespace frc {
-class PneumaticsControlModule : public PneumaticsBase,
-                                public wpi::Sendable,
-                                public wpi::SendableHelper<PneumaticsControlModule> {
+class PneumaticsControlModule
+    : public PneumaticsBase,
+      public wpi::Sendable,
+      public wpi::SendableHelper<PneumaticsControlModule> {
  public:
   PneumaticsControlModule();
   explicit PneumaticsControlModule(int module);

@@ -51,7 +51,8 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
 
   if (m_module->CheckAndReserveSolenoids(m_mask) != 0) {
     // TODO tell which solenoid is already allocated
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {} {}", m_forwardChannel, m_reverseChannel);
+    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {} {}",
+                        m_forwardChannel, m_reverseChannel);
   }
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,
