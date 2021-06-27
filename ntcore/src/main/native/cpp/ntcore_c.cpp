@@ -96,7 +96,7 @@ static void ConvertToC(const ConnectionNotification& in,
 static void ConvertToC(const LogMessage& in, NT_LogMessage* out) {
   out->logger = in.logger;
   out->level = in.level;
-  out->filename = in.filename;
+  ConvertToC(in.filename, &out->filename);
   out->line = in.line;
   ConvertToC(in.message, &out->message);
 }
@@ -847,6 +847,7 @@ void NT_DisposeLogMessageArray(NT_LogMessage* arr, size_t count) {
 }
 
 void NT_DisposeLogMessage(NT_LogMessage* info) {
+  std::free(info->filename);
   std::free(info->message);
 }
 
