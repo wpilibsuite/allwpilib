@@ -6,7 +6,7 @@
 
 namespace halsimgui {
 
-class PDPSimGui {
+class PowerDistributionSimGui {
  public:
   static void Initialize();
 };

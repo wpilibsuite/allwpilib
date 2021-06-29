@@ -7,7 +7,6 @@
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
 #include <hal/DIO.h>
-#include <hal/PDP.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
@@ -45,12 +44,4 @@ bool SensorUtil::CheckAnalogInputChannel(int channel) {
 
 bool SensorUtil::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
-}
-
-bool SensorUtil::CheckPDPChannel(int channel) {
-  return HAL_CheckPDPChannel(channel);
-}
-
-bool SensorUtil::CheckPDPModule(int module) {
-  return HAL_CheckPDPModule(module);
 }

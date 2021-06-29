@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.PDPJNI;
+import edu.wpi.first.hal.PowerDistributionJNI;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -15,30 +15,29 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
  * Panel over CAN.
  */
-public class PowerDistributionPanel implements Sendable, AutoCloseable {
+public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
   /**
-   * Constructs a PowerDistributionPanel.
+   * Constructs a PowerDistribution.
    *
    * @param module The CAN ID of the PDP
    */
-  public PowerDistributionPanel(int module) {
-    SensorUtil.checkPDPModule(module);
-    m_handle = PDPJNI.initializePDP(module);
+  public PowerDistribution(int module) {
+    m_handle = PowerDistributionJNI.initialize(module, 0);
     m_module = module;
 
     HAL.report(tResourceType.kResourceType_PDP, module + 1);
-    SendableRegistry.addLW(this, "PowerDistributionPanel", module);
+    SendableRegistry.addLW(this, "PowerDistribution", module);
   }
 
   /**
-   * Constructs a PowerDistributionPanel.
+   * Constructs a PowerDistribution.
    *
    * <p>Uses the default CAN ID (0).
    */
-  public PowerDistributionPanel() {
+  public PowerDistribution() {
     this(0);
   }
 
@@ -53,7 +52,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return The voltage of the PDP in volts
    */
   public double getVoltage() {
-    return PDPJNI.getPDPVoltage(m_handle);
+    return PowerDistributionJNI.getVoltage(m_handle);
   }
 
   /**
@@ -62,7 +61,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return The temperature of the PDP in degrees Celsius
    */
   public double getTemperature() {
-    return PDPJNI.getPDPTemperature(m_handle);
+    return PowerDistributionJNI.getTemperature(m_handle);
   }
 
   /**
@@ -72,9 +71,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
-    double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_handle);
-
-    SensorUtil.checkPDPChannel(channel);
+    double current = PowerDistributionJNI.getChannelCurrent((byte) channel, m_handle);
 
     return current;
   }
@@ -85,7 +82,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return The current of all the channels in Amperes
    */
   public double getTotalCurrent() {
-    return PDPJNI.getPDPTotalCurrent(m_handle);
+    return PowerDistributionJNI.getTotalCurrent(m_handle);
   }
 
   /**
@@ -94,7 +91,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return the total power in Watts
    */
   public double getTotalPower() {
-    return PDPJNI.getPDPTotalPower(m_handle);
+    return PowerDistributionJNI.getTotalPower(m_handle);
   }
 
   /**
@@ -103,17 +100,17 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
    * @return the total energy in Joules
    */
   public double getTotalEnergy() {
-    return PDPJNI.getPDPTotalEnergy(m_handle);
+    return PowerDistributionJNI.getTotalEnergy(m_handle);
   }
 
   /** Reset the total energy to 0. */
   public void resetTotalEnergy() {
-    PDPJNI.resetPDPTotalEnergy(m_handle);
+    PowerDistributionJNI.resetTotalEnergy(m_handle);
   }
 
   /** Clear all PDP sticky faults. */
   public void clearStickyFaults() {
-    PDPJNI.clearPDPStickyFaults(m_handle);
+    PowerDistributionJNI.clearStickyFaults(m_handle);
   }
 
   /**
@@ -127,7 +124,7 @@ public class PowerDistributionPanel implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PowerDistributionPanel");
+    builder.setSmartDashboardType("PowerDistribution");
     for (int i = 0; i < SensorUtil.kPDPChannels; ++i) {
       final int chan = i;
       builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);

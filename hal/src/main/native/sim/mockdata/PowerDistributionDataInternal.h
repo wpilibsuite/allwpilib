@@ -5,11 +5,11 @@
 #pragma once
 
 #include "../PortsInternal.h"
-#include "hal/simulation/PDPData.h"
+#include "hal/simulation/PowerDistributionData.h"
 #include "hal/simulation/SimDataValue.h"
 
 namespace hal {
-class PDPData {
+class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Temperature)
   HAL_SIMDATAVALUE_DEFINE_NAME(Voltage)
@@ -29,5 +29,5 @@ class PDPData {
 
   virtual void ResetData();
 };
-extern PDPData* SimPDPData;
+extern PowerDistributionData* SimPowerDistributionData;
 }  // namespace hal

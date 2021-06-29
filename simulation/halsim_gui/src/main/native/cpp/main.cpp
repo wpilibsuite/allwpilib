@@ -24,7 +24,7 @@
 #include "HALSimGui.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
-#include "PDPSimGui.h"
+#include "PowerDistributionSimGui.h"
 #include "PWMSimGui.h"
 #include "RelaySimGui.h"
 #include "RoboRioSimGui.h"
@@ -62,7 +62,7 @@ __declspec(dllexport)
   gui::AddInit(DIOSimGui::Initialize);
   gui::AddInit(NetworkTablesSimGui::Initialize);
   gui::AddInit(PCMSimGui::Initialize);
-  gui::AddInit(PDPSimGui::Initialize);
+  gui::AddInit(PowerDistributionSimGui::Initialize);
   gui::AddInit(PWMSimGui::Initialize);
   gui::AddInit(RelaySimGui::Initialize);
   gui::AddInit(RoboRioSimGui::Initialize);

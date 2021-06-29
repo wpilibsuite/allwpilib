@@ -14,26 +14,26 @@ namespace frc {
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistributionPanel
+class PowerDistribution
     : public wpi::Sendable,
-      public wpi::SendableHelper<PowerDistributionPanel> {
+      public wpi::SendableHelper<PowerDistribution> {
  public:
   /**
-   * Constructs a PowerDistributionPanel.
+   * Constructs a PowerDistribution.
    *
    * Uses the default CAN ID (0).
    */
-  PowerDistributionPanel();
+  PowerDistribution();
 
   /**
-   * Constructs a PowerDistributionPanel.
+   * Constructs a PowerDistribution.
    *
    * @param module The CAN ID of the PDP
    */
-  explicit PowerDistributionPanel(int module);
+  explicit PowerDistribution(int module);
 
-  PowerDistributionPanel(PowerDistributionPanel&&) = default;
-  PowerDistributionPanel& operator=(PowerDistributionPanel&&) = default;
+  PowerDistribution(PowerDistribution&&) = default;
+  PowerDistribution& operator=(PowerDistribution&&) = default;
 
   /**
    * Query the input voltage of the PDP.
@@ -80,7 +80,7 @@ class PowerDistributionPanel
   /**
    * Reset the total energy drawn from the PDP.
    *
-   * @see PowerDistributionPanel#GetTotalEnergy
+   * @see PowerDistribution#GetTotalEnergy
    */
   void ResetTotalEnergy();
 

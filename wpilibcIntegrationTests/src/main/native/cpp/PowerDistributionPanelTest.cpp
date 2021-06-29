@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/PowerDistributionPanel.h"  // NOLINT(build/include_order)
+#include "frc/PowerDistribution.h"  // NOLINT(build/include_order)
 
 #include <hal/Ports.h>
 #include <units/time.h>
@@ -14,13 +14,13 @@
 
 static constexpr auto kMotorTime = 0.25_s;
 
-class PowerDistributionPanelTest : public testing::Test {
+class PowerDistributionTest : public testing::Test {
  protected:
-  frc::PowerDistributionPanel m_pdp;
+  frc::PowerDistribution m_pdp;
   frc::Talon m_talon{TestBench::kTalonChannel};
 };
 
-TEST_F(PowerDistributionPanelTest, CheckRepeatedCalls) {
+TEST_F(PowerDistributionTest, CheckRepeatedCalls) {
   auto numChannels = HAL_GetNumPDPChannels();
   // 1 second
   for (int i = 0; i < 50; i++) {
@@ -35,7 +35,7 @@ TEST_F(PowerDistributionPanelTest, CheckRepeatedCalls) {
 /**
  * Test if the current changes when the motor is driven using a talon
  */
-TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
+TEST_F(PowerDistributionTest, CheckCurrentTalon) {
   frc::Wait(kMotorTime);
 
   /* The Current should be 0 */
