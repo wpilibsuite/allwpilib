@@ -5,7 +5,8 @@
 
 #include <Eigen/Core>
 
-namespace drake::math {
+namespace drake {
+namespace math {
 
 /// Computes the unique stabilizing solution X to the discrete-time algebraic
 /// Riccati equation:
@@ -47,4 +48,6 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
     const Eigen::Ref<const Eigen::MatrixXd>& Q,
     const Eigen::Ref<const Eigen::MatrixXd>& R,
     const Eigen::Ref<const Eigen::MatrixXd>& N);
-}  // namespace drake::math
+}  // namespace math
+}  // namespace drake
+

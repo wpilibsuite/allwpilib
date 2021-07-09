@@ -1,11 +1,11 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 
+#include <Eigen/Eigenvalues>
+#include <Eigen/QR>
+
 #include "drake/common/drake_assert.h"
 #include "drake/common/drake_throw.h"
 #include "drake/common/is_approx_equal_abstol.h"
-
-#include <Eigen/Eigenvalues>
-#include <Eigen/QR>
 
 namespace drake {
 namespace math {
