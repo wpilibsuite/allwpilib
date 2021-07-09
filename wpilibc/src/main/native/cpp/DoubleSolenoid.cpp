@@ -53,13 +53,13 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
   if (allocMask != 0) {
     if (allocMask == m_mask) {
       throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channels {} and {}",
-                    m_forwardChannel, m_reverseChannel);
+                          m_forwardChannel, m_reverseChannel);
     } else if (allocMask == m_forwardMask) {
       throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
-              m_forwardChannel);
+                          m_forwardChannel);
     } else {
       throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
-                    m_reverseChannel);
+                          m_reverseChannel);
     }
   }
 
