@@ -62,8 +62,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     int allocMask = module.checkAndReserveSolenoids(m_mask);
     if (allocMask != 0) {
       if (allocMask == m_mask) {
-          throw new AllocationException("Channels " + forwardChannel + " and " + reverseChannel
-            + " already allocated");
+        throw new AllocationException(
+            "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
       } else if (allocMask == m_forwardMask) {
         throw new AllocationException("Channel " + forwardChannel + " already allocated");
       } else {
