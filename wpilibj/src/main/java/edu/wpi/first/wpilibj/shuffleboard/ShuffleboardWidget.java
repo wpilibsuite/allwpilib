@@ -13,7 +13,6 @@ package edu.wpi.first.wpilibj.shuffleboard;
  */
 abstract class ShuffleboardWidget<W extends ShuffleboardWidget<W>>
     extends ShuffleboardComponent<W> {
-
   ShuffleboardWidget(ShuffleboardContainer parent, String title) {
     super(parent, title);
   }

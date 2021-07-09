@@ -15,7 +15,6 @@ import org.ejml.simple.SimpleMatrix;
  * @param <R> The number of rows in this matrix.
  */
 public class Vector<R extends Num> extends Matrix<R, N1> {
-
   /**
    * Constructs an empty zero vector of the given dimensions.
    *

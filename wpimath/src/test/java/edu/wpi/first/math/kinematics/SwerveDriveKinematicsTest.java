@@ -52,7 +52,6 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testStraightStrafeInverseKinematics() {
-
     ChassisSpeeds speeds = new ChassisSpeeds(0, 5, 0);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
@@ -80,7 +79,6 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testTurnInPlaceInverseKinematics() {
-
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
@@ -119,7 +117,6 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testOffCenterCORRotationInverseKinematics() {
-
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds, m_fl);
 
@@ -188,7 +185,6 @@ class SwerveDriveKinematicsTest {
    */
   @Test
   void testOffCenterCORRotationAndTranslationInverseKinematics() {
-
     ChassisSpeeds speeds = new ChassisSpeeds(0.0, 3.0, 1.5);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds, new Translation2d(24, 0));
 

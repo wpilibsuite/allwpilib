@@ -16,7 +16,6 @@ public class NumericalIntegrationTest {
   @Test
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponential() {
-
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     //noinspection SuspiciousNameCombination
@@ -36,7 +35,6 @@ public class NumericalIntegrationTest {
   @Test
   @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponentialAdaptive() {
-
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     //noinspection SuspiciousNameCombination

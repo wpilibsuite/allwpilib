@@ -195,7 +195,6 @@ public final class LinearSystemId {
   @SuppressWarnings("ParameterName")
   public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
       double kVLinear, double kALinear, double kVAngular, double kAAngular) {
-
     final double A1 = 0.5 * -(kVLinear / kALinear + kVAngular / kAAngular);
     final double A2 = 0.5 * -(kVLinear / kALinear - kVAngular / kAAngular);
     final double B1 = 0.5 * (1.0 / kALinear + 1.0 / kAAngular);

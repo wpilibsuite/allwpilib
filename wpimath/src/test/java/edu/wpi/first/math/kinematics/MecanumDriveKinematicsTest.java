@@ -35,7 +35,6 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testStraightLineForwardKinematicsKinematics() {
-
     var wheelSpeeds = new MecanumDriveWheelSpeeds(3.536, 3.536, 3.536, 3.536);
     var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
@@ -59,7 +58,6 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testStrafeForwardKinematicsKinematics() {
-
     var wheelSpeeds = new MecanumDriveWheelSpeeds(-2.828427, 2.828427, 2.828427, -2.828427);
     var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
 
@@ -152,7 +150,6 @@ class MecanumDriveKinematicsTest {
 
   @Test
   void testOffCenterRotationTranslationForwardKinematicsKinematics() {
-
     var wheelSpeeds = new MecanumDriveWheelSpeeds(2.12, 21.92, -12.02, 36.06);
     var moduleStates = m_kinematics.toChassisSpeeds(wheelSpeeds);
 

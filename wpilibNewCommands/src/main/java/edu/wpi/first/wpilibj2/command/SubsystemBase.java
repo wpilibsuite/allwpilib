@@ -13,7 +13,6 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * method for setting the default command.
  */
 public abstract class SubsystemBase implements Subsystem, Sendable {
-
   /** Constructor. */
   public SubsystemBase() {
     String name = this.getClass().getSimpleName();

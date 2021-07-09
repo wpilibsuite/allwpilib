@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 public interface PneumaticsBase extends AutoCloseable {
-
   /**
    * Sets solenoids on a pneumatics module.
    *

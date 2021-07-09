@@ -23,7 +23,6 @@ import org.ejml.simple.SimpleMatrix;
  * State-Space Models" (Doctoral dissertation)
  */
 public class MerweScaledSigmaPoints<S extends Num> {
-
   private final double m_alpha;
   private final int m_kappa;
   private final Nat<S> m_states;

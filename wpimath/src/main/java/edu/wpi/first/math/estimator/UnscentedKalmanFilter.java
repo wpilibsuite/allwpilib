@@ -29,7 +29,6 @@ import org.ejml.simple.SimpleMatrix;
 @SuppressWarnings({"MemberName", "ClassTypeParameterName"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
     implements KalmanTypeFilter<States, Inputs, Outputs> {
-
   private final Nat<States> m_states;
   private final Nat<Outputs> m_outputs;
 

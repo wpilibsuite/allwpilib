@@ -16,7 +16,6 @@ import java.util.function.BooleanSupplier;
  * specified explicitly from the command implementation.
  */
 public interface Command {
-
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
   default void initialize() {}
 

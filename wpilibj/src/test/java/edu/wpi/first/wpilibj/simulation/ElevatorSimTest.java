@@ -21,7 +21,6 @@ public class ElevatorSimTest {
   @Test
   @SuppressWarnings({"LocalVariableName", "resource"})
   public void testStateSpaceSimWithElevator() {
-
     var controller = new PIDController(10, 0, 0);
 
     var sim =

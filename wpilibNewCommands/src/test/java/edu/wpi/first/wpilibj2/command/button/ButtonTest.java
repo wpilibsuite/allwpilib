@@ -135,7 +135,6 @@ class ButtonTest extends CommandTestBase {
 
   @Test
   void runnableBindingTest() {
-
     InternalButton buttonWhenPressed = new InternalButton();
     InternalButton buttonWhileHeld = new InternalButton();
     InternalButton buttonWhenReleased = new InternalButton();

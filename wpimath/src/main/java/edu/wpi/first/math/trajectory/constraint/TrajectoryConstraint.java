@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
  * trajectories.
  */
 public interface TrajectoryConstraint {
-
   /**
    * Returns the max velocity given the current pose and curvature.
    *

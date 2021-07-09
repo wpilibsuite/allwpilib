@@ -51,7 +51,6 @@ public class DifferentialDriveVoltageConstraint implements TrajectoryConstraint 
   @Override
   public MinMax getMinMaxAccelerationMetersPerSecondSq(
       Pose2d poseMeters, double curvatureRadPerMeter, double velocityMetersPerSecond) {
-
     var wheelSpeeds =
         m_kinematics.toWheelSpeeds(
             new ChassisSpeeds(
