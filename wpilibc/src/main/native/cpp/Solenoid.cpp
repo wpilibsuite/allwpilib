@@ -34,13 +34,19 @@ Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
   m_channel = channel;
   m_mask = 1 << channel;
 
+  if (m_module->CheckAndReserveSolenoids(m_mask) != 0) {
+    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}", m_channel);
+  }
+
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel + 1,
              m_module->GetModuleNumber() + 1);
   wpi::SendableRegistry::AddLW(this, "Solenoid", m_module->GetModuleNumber(),
                                m_channel);
 }
 
-Solenoid::~Solenoid() {}
+Solenoid::~Solenoid() {
+  m_module->UnreserveSolenoids(m_mask);
+}
 
 void Solenoid::Set(bool on) {
   int value = on ? (0xFFFF & m_mask) : 0;

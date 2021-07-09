@@ -49,5 +49,26 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   void setOneShotDuration(int index, int durMs);
 
+  /**
+   * Check if a solenoid channel is valid.
+   *
+   * @param channel Channel to check
+   * @return True if channel exists
+   */
   boolean checkSolenoidChannel(int channel);
+
+  /**
+   * Check to see if the masked solenoids can be reserved, and if not reserve them.
+   *
+   * @param mask The solenoid mask to reserve
+   * @return 0 if successful, mask of solenoids that couldn't be allocated otherwise
+   */
+  int checkAndReserveSolenoids(int mask);
+
+  /**
+   * Unreserve the masked solenoids.
+   *
+   * @param mask The solenoid mask to unreserve
+   */
+  void unreserveSolenoids(int mask);
 }

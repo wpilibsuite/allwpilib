@@ -5,19 +5,22 @@
 #pragma once
 
 #include <hal/Types.h>
+#include <wpi/mutex.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "PneumaticsBase.h"
 
 namespace frc {
-class PneumaticsControlModule : public PneumaticsBase {
+class PneumaticsControlModule
+    : public PneumaticsBase,
+      public wpi::Sendable,
+      public wpi::SendableHelper<PneumaticsControlModule> {
  public:
   PneumaticsControlModule();
   explicit PneumaticsControlModule(int module);
 
   ~PneumaticsControlModule() override;
-
-  PneumaticsControlModule(PneumaticsControlModule&&) = default;
-  PneumaticsControlModule& operator=(PneumaticsControlModule&&) = default;
 
   bool GetCompressor();
 
@@ -55,8 +58,16 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   bool CheckSolenoidChannel(int channel) const override;
 
+  int CheckAndReserveSolenoids(int mask) override;
+
+  void UnreserveSolenoids(int mask) override;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   int m_module;
   hal::Handle<HAL_CTREPCMHandle> m_handle;
+  uint32_t m_reservedMask;
+  wpi::mutex m_reservedLock;
 };
 }  // namespace frc
