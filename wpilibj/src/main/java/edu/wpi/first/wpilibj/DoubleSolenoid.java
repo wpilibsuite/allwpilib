@@ -71,7 +71,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     }
 
     if (module.checkAndReserveSolenoids(m_mask) != 0) {
-
       throw new AllocationException("Solenoid(s) already allocated");
     }
 

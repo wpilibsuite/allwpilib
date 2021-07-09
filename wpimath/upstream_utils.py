@@ -89,12 +89,12 @@ def copy_to(files, root):
         shutil.copyfile(f, dest_file)
 
 
-def comment_out_invalid_includes(filename, include_root):
+def comment_out_invalid_includes(filename, include_roots):
     """Comment out #include directives that include a nonexistent file
 
     Keyword arguments:
     filename -- file to search for includes
-    include_root -- the search path for includes
+    include_roots -- list of search paths for includes
     """
     # Read header
     with open(filename) as f:
@@ -111,8 +111,9 @@ def comment_out_invalid_includes(filename, include_root):
         # Comment out #include if the file doesn't exist in current directory or
         # include root
         if not os.path.exists(os.path.join(
-                os.path.dirname(filename), include)) and not os.path.exists(
-                    os.path.join(include_root, include)):
+                os.path.dirname(filename), include)) and not any(
+                    os.path.exists(os.path.join(include_root, include))
+                    for include_root in include_roots):
             new_contents += "// "
 
         new_contents += match.group()
