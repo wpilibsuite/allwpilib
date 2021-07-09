@@ -40,7 +40,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
   public DoubleSolenoid(PneumaticsBase module, final int forwardChannel, final int reverseChannel) {
-
     m_module = Objects.requireNonNull(module, "Module cannot be null");
 
     // TODO check channels

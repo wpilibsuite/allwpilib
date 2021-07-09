@@ -157,7 +157,6 @@ public final class TestBench {
    * @return a freshly allocated Servo's and a freshly allocated Gyroscope
    */
   public static TiltPanCameraFixture getTiltPanCam() {
-
     return new TiltPanCameraFixture() {
       @Override
       protected AnalogGyro giveGyro() {

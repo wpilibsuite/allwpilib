@@ -171,7 +171,6 @@ public class UnscentedKalmanFilterTest {
 
     double totalTime = trajectory.getTotalTimeSeconds();
     for (int i = 0; i < (totalTime / dtSeconds); i++) {
-
       ref = trajectory.sample(dtSeconds * i);
       double vl = ref.velocityMetersPerSecond * (1 - (ref.curvatureRadPerMeter * rbMeters));
       double vr = ref.velocityMetersPerSecond * (1 + (ref.curvatureRadPerMeter * rbMeters));

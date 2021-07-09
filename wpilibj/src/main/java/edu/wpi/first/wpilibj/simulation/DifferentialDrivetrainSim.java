@@ -155,7 +155,6 @@ public class DifferentialDrivetrainSim {
    */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
-
     // Update state estimate with RK4
     m_x = NumericalIntegration.rk4(this::getDynamics, m_x, m_u, dtSeconds);
     m_y = m_x;
@@ -319,7 +318,6 @@ public class DifferentialDrivetrainSim {
 
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName", "ParameterName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
-
     // Because G can be factored out of B, we can divide by the old ratio and multiply
     // by the new ratio to get a new drivetrain model.
     var B = new Matrix<>(Nat.N4(), Nat.N2());

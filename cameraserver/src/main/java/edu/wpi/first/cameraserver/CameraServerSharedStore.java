@@ -18,7 +18,6 @@ public final class CameraServerSharedStore {
     if (cameraServerShared == null) {
       cameraServerShared =
           new CameraServerShared() {
-
             @Override
             public void reportVideoServer(int id) {}
 

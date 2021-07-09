@@ -11,7 +11,6 @@ import edu.wpi.first.math.numbers.N1;
 
 @SuppressWarnings("ClassTypeParameterName")
 public class LinearSystem<States extends Num, Inputs extends Num, Outputs extends Num> {
-
   /** Continuous system matrix. */
   @SuppressWarnings("MemberName")
   private final Matrix<States, States> m_A;
@@ -42,7 +41,6 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
       Matrix<States, Inputs> b,
       Matrix<Outputs, States> c,
       Matrix<Outputs, Inputs> d) {
-
     this.m_A = a;
     this.m_B = b;
     this.m_C = c;

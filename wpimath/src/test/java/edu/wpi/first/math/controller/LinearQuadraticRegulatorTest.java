@@ -48,7 +48,6 @@ public class LinearQuadraticRegulatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testLQROnElevator() {
-
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
@@ -63,7 +62,6 @@ public class LinearQuadraticRegulatorTest {
 
   @Test
   public void testFourMotorElevator() {
-
     var dt = 0.020;
 
     var plant =
@@ -80,7 +78,6 @@ public class LinearQuadraticRegulatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testLQROnArm() {
-
     var motors = DCMotor.getVex775Pro(2);
 
     var m = 4.0;

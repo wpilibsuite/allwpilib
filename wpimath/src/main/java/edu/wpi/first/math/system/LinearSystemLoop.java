@@ -30,7 +30,6 @@ import org.ejml.simple.SimpleMatrix;
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs extends Num> {
-
   private final LinearQuadraticRegulator<States, Inputs, Outputs> m_controller;
   private final LinearPlantInversionFeedforward<States, Inputs, Outputs> m_feedforward;
   private final KalmanFilter<States, Inputs, Outputs> m_observer;

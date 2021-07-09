@@ -194,7 +194,6 @@ public class MecanumControllerCommand extends CommandBase {
       Supplier<MecanumDriveWheelSpeeds> currentWheelSpeeds,
       Consumer<MecanumDriveMotorVoltages> outputDriveVoltages,
       Subsystem... requirements) {
-
     this(
         trajectory,
         pose,

@@ -260,7 +260,6 @@ public final class TrajectoryParameterizer {
 
   private static void enforceAccelerationLimits(
       boolean reverse, List<TrajectoryConstraint> constraints, ConstrainedState state) {
-
     for (final var constraint : constraints) {
       double factor = reverse ? -1.0 : 1.0;
       final var minMaxAccel =

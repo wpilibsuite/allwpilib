@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 class CommandGroupErrorTest extends CommandTestBase {
   @Test
   void commandInMultipleGroupsTest() {
-
     MockCommandHolder command1Holder = new MockCommandHolder(true);
     Command command1 = command1Holder.getMock();
     MockCommandHolder command2Holder = new MockCommandHolder(true);
