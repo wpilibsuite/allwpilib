@@ -1,0 +1,30 @@
+diff --git b/wpimath/src/main/native/include/drake/common/drake_assert.h a/wpimath/src/main/native/include/drake/common/drake_assert.h
+index acc1298fe..21e7bd100 100644
+--- b/wpimath/src/main/native/include/drake/common/drake_assert.h
++++ a/wpimath/src/main/native/include/drake/common/drake_assert.h
+@@ -83,10 +83,10 @@
+ namespace drake {
+ namespace internal {
+ // Abort the program with an error message.
+-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
++[[noreturn]]
+ void Abort(const char* condition, const char* func, const char* file, int line);
+ // Report an assertion failure; will either Abort(...) or throw.
+-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
++[[noreturn]]
+ void AssertionFailed(
+     const char* condition, const char* func, const char* file, int line);
+ }  // namespace internal
+diff --git b/wpimath/src/main/native/include/drake/common/drake_throw.h a/wpimath/src/main/native/include/drake/common/drake_throw.h
+index ffa617c25..d19e4efb7 100644
+--- b/wpimath/src/main/native/include/drake/common/drake_throw.h
++++ a/wpimath/src/main/native/include/drake/common/drake_throw.h
+@@ -12,7 +12,7 @@
+ namespace drake {
+ namespace internal {
+ // Throw an error message.
+-__attribute__((noreturn)) /* gcc is ok with [[noreturn]]; clang is not. */
++[[noreturn]]
+ void Throw(const char* condition, const char* func, const char* file, int line);
+ }  // namespace internal
+ }  // namespace drake
