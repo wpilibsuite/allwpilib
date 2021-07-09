@@ -49,10 +49,18 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
   m_reverseMask = 1 << reverseChannel;
   m_mask = m_forwardMask | m_reverseMask;
 
-  if (m_module->CheckAndReserveSolenoids(m_mask) != 0) {
-    // TODO tell which solenoid is already allocated
-    throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {} {}",
-                        m_forwardChannel, m_reverseChannel);
+  int allocMask = m_module->CheckAndReserveSolenoids(m_mask);
+  if (allocMask != 0) {
+    if (allocMask == m_mask) {
+        throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channels {} and {}",
+                      m_forwardChannel, m_reverseChannel);
+    } else if (allocMask == m_forwardMask) {
+        throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+                m_forwardChannel);
+    } else {
+        throw FRC_MakeError(err::ResourceAlreadyAllocated, "Channel {}",
+                      m_reverseChannel);
+    }
   }
 
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_forwardChannel + 1,

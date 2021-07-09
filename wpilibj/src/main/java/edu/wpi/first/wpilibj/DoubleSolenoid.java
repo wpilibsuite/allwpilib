@@ -44,7 +44,13 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
     m_module = Objects.requireNonNull(module, "Module cannot be null");
 
-    // TODO check channels
+    if (!module.checkSolenoidChannel(forwardChannel)) {
+      throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
+    }
+
+    if (!module.checkSolenoidChannel(reverseChannel)) {
+      throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
+    }
 
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
@@ -53,8 +59,20 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
+    int allocMask = module.checkAndReserveSolenoids(m_mask);
+    if (allocMask != 0) {
+      if (allocMask == m_mask) {
+          throw new AllocationException("Channels " + forwardChannel + " and " + reverseChannel
+            + " already allocated");
+      } else if (allocMask == m_forwardMask) {
+        throw new AllocationException("Channel " + forwardChannel + " already allocated");
+      } else {
+        throw new AllocationException("Channel " + reverseChannel + " already allocated");
+      }
+    }
+
     if (module.checkAndReserveSolenoids(m_mask) != 0) {
-      // TODO tell which solenoid is already allocated
+
       throw new AllocationException("Solenoid(s) already allocated");
     }
 
