@@ -75,11 +75,11 @@ Java_edu_wpi_first_hal_DIOJNI_setDIOSimDevice
 /*
  * Class:     edu_wpi_first_hal_DIOJNI
  * Method:    setDIO
- * Signature: (IS)V
+ * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DIOJNI_setDIO
-  (JNIEnv* env, jclass, jint id, jshort value)
+  (JNIEnv* env, jclass, jint id, jboolean value)
 {
   int32_t status = 0;
   HAL_SetDIO((HAL_DigitalHandle)id, value, &status);
