@@ -79,7 +79,8 @@ void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   }
 }
 
-void glass::DisplayPowerDistributions(PowerDistributionsModel* model, std::string_view noneMsg) {
+void glass::DisplayPowerDistributions(PowerDistributionsModel* model,
+                                      std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPowerDistribution([&](PowerDistributionModel& pdp, int i) {
     hasAny = true;

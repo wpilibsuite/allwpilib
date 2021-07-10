@@ -108,7 +108,7 @@ struct PDP {
   HAL_CANHandle canHandle;
   std::string previousAllocation;
 };
-}
+}  // namespace
 
 static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
                              HAL_HandleEnum::CTREPDP>* pdpHandles;
@@ -116,7 +116,7 @@ static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
 namespace hal::init {
 void InitializePDP() {
   static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
-                             HAL_HandleEnum::CTREPDP>
+                               HAL_HandleEnum::CTREPDP>
       pH;
   pdpHandles = &pH;
 }
@@ -124,7 +124,8 @@ void InitializePDP() {
 
 extern "C" {
 
-HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation, int32_t* status) {
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
+                                int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
     *status = PARAMETER_OUT_OF_RANGE;
@@ -423,8 +424,8 @@ double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
@@ -447,8 +448,8 @@ double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status) {
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
@@ -473,8 +474,8 @@ double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }

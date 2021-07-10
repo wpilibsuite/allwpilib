@@ -30,10 +30,13 @@ class PowerDistributionModel : public Model {
 class PowerDistributionsModel : public Model {
  public:
   virtual void ForEachPowerDistribution(
-      wpi::function_ref<void(PowerDistributionModel& model, int index)> func) = 0;
+      wpi::function_ref<void(PowerDistributionModel& model, int index)>
+          func) = 0;
 };
 
 void DisplayPowerDistribution(PowerDistributionModel* model, int index);
-void DisplayPowerDistributions(PowerDistributionsModel* model, std::string_view noneMsg = "No Power Distributions");
+void DisplayPowerDistributions(
+    PowerDistributionsModel* model,
+    std::string_view noneMsg = "No Power Distributions");
 
 }  // namespace glass

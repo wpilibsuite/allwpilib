@@ -19,7 +19,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_InitializePDP(moduleNumber, nullptr, status)); // TODO
+        HAL_InitializePDP(moduleNumber, nullptr, status));  // TODO
   } else {
     *status = PARAMETER_OUT_OF_RANGE;
     SetLastError(status, "Rev Power not currently supported");
@@ -101,11 +101,11 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
-      if (currentsLength < kNumPDPChannels) {
-          *status = PARAMETER_OUT_OF_RANGE;
-          SetLastError(status, "Output array not large enough");
-          return;
-      }
+    if (currentsLength < kNumPDPChannels) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      SetLastError(status, "Output array not large enough");
+      return;
+    }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
     *status = PARAMETER_OUT_OF_RANGE;
