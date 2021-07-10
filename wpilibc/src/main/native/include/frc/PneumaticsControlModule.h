@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <hal/Types.h>
-#include <wpi/mutex.h>
-#include <wpi/DenseMap.h>
-
 #include <memory>
+
+#include <hal/Types.h>
+#include <wpi/DenseMap.h>
+#include <wpi/mutex.h>
 
 #include "PneumaticsBase.h"
 
