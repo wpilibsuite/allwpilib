@@ -41,7 +41,6 @@ class LinearSystemIDTest {
 
   @Test
   public void testElevatorSystem() {
-
     var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
     assertTrue(
         model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -99.05473), 0.001));

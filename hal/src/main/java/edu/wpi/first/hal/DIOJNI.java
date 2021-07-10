@@ -14,8 +14,7 @@ public class DIOJNI extends JNIWrapper {
 
   public static native void setDIOSimDevice(int handle, int device);
 
-  // TODO(Thad): Switch this to use boolean
-  public static native void setDIO(int dioPortHandle, short value);
+  public static native void setDIO(int dioPortHandle, boolean value);
 
   public static native void setDIODirection(int dioPortHandle, boolean input);
 

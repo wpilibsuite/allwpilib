@@ -20,7 +20,6 @@ package edu.wpi.first.wpilibj2.command;
  * base for user implementations that handles this.
  */
 public interface Subsystem {
-
   /**
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that you don't want to offload to a {@link Command}. Teams should try

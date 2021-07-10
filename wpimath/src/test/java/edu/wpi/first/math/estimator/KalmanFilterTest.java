@@ -64,7 +64,6 @@ public class KalmanFilterTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testElevatorKalmanFilter() {
-
     var Q = VecBuilder.fill(0.05, 1.0);
     var R = VecBuilder.fill(0.0001);
 
@@ -73,7 +72,6 @@ public class KalmanFilterTest {
 
   @Test
   public void testSwerveKFStationary() {
-
     var random = new Random();
 
     var filter =
@@ -121,7 +119,6 @@ public class KalmanFilterTest {
 
   @Test
   public void testSwerveKFMovingWithoutAccelerating() {
-
     var random = new Random();
 
     var filter =
@@ -178,7 +175,6 @@ public class KalmanFilterTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testSwerveKFMovingOverTrajectory() {
-
     var random = new Random();
 
     var filter =

@@ -55,7 +55,6 @@ public class RobotContainer {
    * JoystickButton}.
    */
   private void configureButtonBindings() {
-
     // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
     new JoystickButton(m_driverController, Button.kA.value)
         .whenPressed(

@@ -1,0 +1,55 @@
+diff --git a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+index 9585c4dae..d53fbdddf 100644
+--- a/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
++++ b/wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
+@@ -453,5 +453,18 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
+   return X;
+ }
+ 
++Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
++    const Eigen::Ref<const Eigen::MatrixXd>& A,
++    const Eigen::Ref<const Eigen::MatrixXd>& B,
++    const Eigen::Ref<const Eigen::MatrixXd>& Q,
++    const Eigen::Ref<const Eigen::MatrixXd>& R,
++    const Eigen::Ref<const Eigen::MatrixXd>& N) {
++    DRAKE_DEMAND(N.rows() == B.rows() && N.cols() == B.cols());
++
++    Eigen::MatrixXd scrA = A - B * R.llt().solve(N.transpose());
++    Eigen::MatrixXd scrQ = Q - N * R.llt().solve(N.transpose());
++    return DiscreteAlgebraicRiccatiEquation(scrA, B, scrQ, R);
++}
++
+ }  // namespace math
+ }  // namespace drake
+diff --git a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
+index e3fea30c5..9b9fe97ec 100644
+--- a/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
++++ b/wpimath/src/main/native/include/drake/math/discrete_algebraic_riccati_equation.h
+@@ -27,6 +27,27 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
+     const Eigen::Ref<const Eigen::MatrixXd>& B,
+     const Eigen::Ref<const Eigen::MatrixXd>& Q,
+     const Eigen::Ref<const Eigen::MatrixXd>& R);
++
++/// DiscreteAlgebraicRiccatiEquation function
++/// computes the unique stabilizing solution X to the discrete-time algebraic
++/// Riccati equation:
++/// \f[
++/// A'XA - X - (A'XB + N)(B'XB + R)^{-1}(B'XA + N') + Q = 0
++/// \f]
++///
++/// See
++/// https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator#Infinite-horizon,_discrete-time_LQR
++/// for the change of variables used here.
++///
++/// @throws std::runtime_error if Q is not positive semi-definite.
++/// @throws std::runtime_error if R is not positive definite.
++///
++Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
++    const Eigen::Ref<const Eigen::MatrixXd>& A,
++    const Eigen::Ref<const Eigen::MatrixXd>& B,
++    const Eigen::Ref<const Eigen::MatrixXd>& Q,
++    const Eigen::Ref<const Eigen::MatrixXd>& R,
++    const Eigen::Ref<const Eigen::MatrixXd>& N);
+ }  // namespace math
+ }  // namespace drake
+ 

@@ -57,7 +57,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
    * @param value true is on, off is false
    */
   public void set(boolean value) {
-    DIOJNI.setDIO(m_handle, (short) (value ? 1 : 0));
+    DIOJNI.setDIO(m_handle, value);
   }
 
   /**

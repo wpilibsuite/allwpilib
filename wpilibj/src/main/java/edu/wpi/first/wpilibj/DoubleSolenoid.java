@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -40,10 +41,15 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
   public DoubleSolenoid(PneumaticsBase module, final int forwardChannel, final int reverseChannel) {
-
     m_module = Objects.requireNonNull(module, "Module cannot be null");
 
-    // TODO check channels
+    if (!module.checkSolenoidChannel(forwardChannel)) {
+      throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
+    }
+
+    if (!module.checkSolenoidChannel(reverseChannel)) {
+      throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
+    }
 
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
@@ -51,6 +57,22 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_forwardMask = 1 << forwardChannel;
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
+
+    int allocMask = module.checkAndReserveSolenoids(m_mask);
+    if (allocMask != 0) {
+      if (allocMask == m_mask) {
+        throw new AllocationException(
+            "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
+      } else if (allocMask == m_forwardMask) {
+        throw new AllocationException("Channel " + forwardChannel + " already allocated");
+      } else {
+        throw new AllocationException("Channel " + reverseChannel + " already allocated");
+      }
+    }
+
+    if (module.checkAndReserveSolenoids(m_mask) != 0) {
+      throw new AllocationException("Solenoid(s) already allocated");
+    }
 
     HAL.report(
         tResourceType.kResourceType_Solenoid, forwardChannel + 1, module.getModuleNumber() + 1);
@@ -62,6 +84,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   @Override
   public synchronized void close() {
     SendableRegistry.remove(this);
+    m_module.unreserveSolenoids(m_mask);
     m_module = null;
   }
 

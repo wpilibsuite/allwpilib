@@ -54,7 +54,6 @@ public class LinearSystemLoopTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testStateSpaceEnabled() {
-
     m_loop.reset(VecBuilder.fill(0, 0));
     Matrix<N2, N1> references = VecBuilder.fill(2.0, 0.0);
     var constraints = new TrapezoidProfile.Constraints(4, 3);
@@ -84,7 +83,6 @@ public class LinearSystemLoopTest {
   @Test
   @SuppressWarnings("LocalVariableName")
   public void testFlywheelEnabled() {
-
     LinearSystem<N1, N1, N1> plant =
         LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
@@ -113,7 +111,6 @@ public class LinearSystemLoopTest {
 
     var time = 0.0;
     while (time < 10) {
-
       if (time > 10) {
         break;
       }

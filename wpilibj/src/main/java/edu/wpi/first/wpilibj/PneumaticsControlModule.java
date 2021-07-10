@@ -5,23 +5,36 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
-public class PneumaticsControlModule implements PneumaticsBase {
+public class PneumaticsControlModule implements PneumaticsBase, Sendable {
   private final int m_handle;
   private final int m_module;
+  private int m_reservedMask;
+  private final Object m_reserveLock = new Object();
 
   public PneumaticsControlModule() {
     this(SensorUtil.getDefaultCTREPCMModule());
   }
 
+  /**
+   * Constructs a PneumaticsControlModule.
+   *
+   * @param module module number to construct
+   */
   public PneumaticsControlModule(int module) {
     m_handle = CTREPCMJNI.initialize(module);
     m_module = module;
+
+    SendableRegistry.addLW(this, "Compressor", module);
   }
 
   @Override
   public void close() throws Exception {
     CTREPCMJNI.free(m_handle);
+    SendableRegistry.remove(this);
   }
 
   public boolean getCompressor() {
@@ -113,5 +126,32 @@ public class PneumaticsControlModule implements PneumaticsBase {
   @Override
   public boolean checkSolenoidChannel(int channel) {
     return CTREPCMJNI.checkSolenoidChannel(channel);
+  }
+
+  @Override
+  public int checkAndReserveSolenoids(int mask) {
+    synchronized (m_reserveLock) {
+      if ((m_reservedMask & mask) != 0) {
+        return m_reservedMask & mask;
+      }
+      m_reservedMask |= mask;
+      return 0;
+    }
+  }
+
+  @Override
+  public void unreserveSolenoids(int mask) {
+    synchronized (m_reserveLock) {
+      m_reservedMask &= ~mask;
+    }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Compressor");
+    builder.addBooleanProperty(
+        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
+    builder.addBooleanProperty("Enabled", this::getCompressor, null);
+    builder.addBooleanProperty("Pressure switch", this::getPressureSwitch, null);
   }
 }

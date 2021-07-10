@@ -97,7 +97,6 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
   @Test(timeout = 2000)
   public void testMultipleInterruptsTriggering() {
-
     AtomicBoolean hasFired = new AtomicBoolean(false);
     AtomicInteger counter = new AtomicInteger(0);
 
@@ -130,7 +129,6 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
   @Test(timeout = (long) (synchronousTimeout * 1e3))
   public void testSynchronousInterruptsTriggering() {
-
     try (SynchronousInterrupt interrupt = new SynchronousInterrupt(getSource())) {
       final double synchronousDelay = synchronousTimeout / 2.0;
       final Runnable runnable =
@@ -176,7 +174,6 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
   @Test(timeout = (long) (synchronousTimeout * 1e3))
   public void testSynchronousInterruptsWaitResultRisingEdge() {
     try (SynchronousInterrupt interrupt = new SynchronousInterrupt(getSource())) {
-
       final double synchronousDelay = synchronousTimeout / 2.0;
       final Runnable runnable =
           () -> {

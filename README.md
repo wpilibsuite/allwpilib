@@ -38,7 +38,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On Windows, install the JDK 11 .msi from the link above
     - On macOS, install the JDK 11 .pkg from the link above
 - C++ compiler
-    - On Linux, install GCC 7 or greater
+    - On Linux, install GCC 8 or greater
     - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - ARM compiler toolchain

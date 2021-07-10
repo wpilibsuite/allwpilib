@@ -12,7 +12,6 @@ import java.util.Set;
 
 /** A {@link Sendable} base class for {@link Command}s. */
 public abstract class CommandBase implements Sendable, Command {
-
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
   protected CommandBase() {

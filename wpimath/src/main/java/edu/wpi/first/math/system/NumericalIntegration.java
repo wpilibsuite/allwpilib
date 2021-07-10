@@ -75,7 +75,6 @@ public final class NumericalIntegration {
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
       double dtSeconds) {
-
     final var halfDt = 0.5 * dtSeconds;
     Matrix<States, N1> k1 = f.apply(x, u);
     Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)), u);
@@ -96,7 +95,6 @@ public final class NumericalIntegration {
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num> Matrix<States, N1> rk4(
       Function<Matrix<States, N1>, Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
-
     final var halfDt = 0.5 * dtSeconds;
     Matrix<States, N1> k1 = f.apply(x);
     Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)));
@@ -147,7 +145,6 @@ public final class NumericalIntegration {
       Matrix<Inputs, N1> u,
       double dtSeconds,
       double maxError) {
-
     double dtElapsed = 0;
     double previousH = dtSeconds;
     // Loop until we've gotten to our desired dt
@@ -224,7 +221,6 @@ public final class NumericalIntegration {
           double initialH,
           double maxTruncationError,
           double dtRemaining) {
-
     double truncationErr;
     double h = initialH;
     Matrix<States, N1> newX;

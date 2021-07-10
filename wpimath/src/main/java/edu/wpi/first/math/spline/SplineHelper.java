@@ -81,7 +81,6 @@ public final class SplineHelper {
   @SuppressWarnings("LocalVariableName")
   public static CubicHermiteSpline[] getCubicSplinesFromControlVectors(
       Spline.ControlVector start, Translation2d[] waypoints, Spline.ControlVector end) {
-
     CubicHermiteSpline[] splines = new CubicHermiteSpline[waypoints.length + 1];
 
     double[] xInitial = start.x;
