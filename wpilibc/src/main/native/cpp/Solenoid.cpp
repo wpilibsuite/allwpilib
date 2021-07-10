@@ -17,17 +17,7 @@
 using namespace frc;
 
 Solenoid::Solenoid(PneumaticsBase& module, int channel)
-    : Solenoid{std::shared_ptr<PneumaticsBase>{
-                   &module, wpi::NullDeleter<PneumaticsBase>()},
-               channel} {}
-
-Solenoid::Solenoid(PneumaticsBase* module, int channel)
-    : Solenoid{std::shared_ptr<PneumaticsBase>{
-                   module, wpi::NullDeleter<PneumaticsBase>()},
-               channel} {}
-
-Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
-    : m_module{std::move(module)} {
+    : m_module{module.Duplicate()}, m_channel{channel} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }
@@ -43,6 +33,9 @@ Solenoid::Solenoid(std::shared_ptr<PneumaticsBase> module, int channel)
   wpi::SendableRegistry::AddLW(this, "Solenoid", m_module->GetModuleNumber(),
                                m_channel);
 }
+
+Solenoid::Solenoid(PneumaticsBase* module, int channel)
+    : Solenoid{*module, channel} {}
 
 Solenoid::~Solenoid() {
   m_module->UnreserveSolenoids(m_mask);

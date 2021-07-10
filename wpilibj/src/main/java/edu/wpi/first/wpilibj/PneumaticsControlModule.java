@@ -5,15 +5,65 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.util.sendable.SendableRegistry;
+import java.util.HashMap;
+import java.util.Map;
 
-public class PneumaticsControlModule implements PneumaticsBase, Sendable {
+public class PneumaticsControlModule implements PneumaticsBase {
+
+  private static class DataStore implements AutoCloseable {
+    public final int m_module;
+    public final int m_handle;
+    private int m_refCount;
+    private int m_reservedMask;
+    private final Object m_reserveLock = new Object();
+
+    DataStore(int module) {
+      m_handle = CTREPCMJNI.initialize(module);
+      m_module = module;
+      m_handleMap.put(module, this);
+    }
+
+    @Override
+    public void close() {
+      CTREPCMJNI.free(m_handle);
+      m_handleMap.remove(m_module);
+    }
+
+    public void addRef() {
+      m_refCount++;
+    }
+
+    public void removeRef() {
+      m_refCount--;
+      if (m_refCount == 0) {
+        this.close();
+      }
+    }
+  }
+
+  private static final Map<Integer, DataStore> m_handleMap = new HashMap<>();
+  private static final Object m_handleLock = new Object();
+
+  private static DataStore getForModule(int module) {
+    synchronized (m_handleLock) {
+      Integer moduleBoxed = module;
+      DataStore pcm = m_handleMap.get(moduleBoxed);
+      if (pcm == null) {
+        pcm = new DataStore(module);
+      }
+      pcm.addRef();
+      return pcm;
+    }
+  }
+
+  private static void freeModule(DataStore store) {
+    synchronized (m_handleLock) {
+      store.removeRef();
+    }
+  }
+
+  private final DataStore m_dataStore;
   private final int m_handle;
-  private final int m_module;
-  private int m_reservedMask;
-  private final Object m_reserveLock = new Object();
 
   public PneumaticsControlModule() {
     this(SensorUtil.getDefaultCTREPCMModule());
@@ -25,16 +75,18 @@ public class PneumaticsControlModule implements PneumaticsBase, Sendable {
    * @param module module number to construct
    */
   public PneumaticsControlModule(int module) {
-    m_handle = CTREPCMJNI.initialize(module);
-    m_module = module;
-
-    SendableRegistry.addLW(this, "Compressor", module);
+    m_dataStore = getForModule(module);
+    m_handle = m_dataStore.m_handle;
   }
 
   @Override
-  public void close() throws Exception {
-    CTREPCMJNI.free(m_handle);
-    SendableRegistry.remove(this);
+  public void close() {
+    freeModule(m_dataStore);
+  }
+
+  @Override
+  public PneumaticsControlModule duplicate() {
+    return new PneumaticsControlModule(m_dataStore.m_module);
   }
 
   public boolean getCompressor() {
@@ -93,7 +145,7 @@ public class PneumaticsControlModule implements PneumaticsBase, Sendable {
 
   @Override
   public int getModuleNumber() {
-    return m_module;
+    return m_dataStore.m_handle;
   }
 
   @Override
@@ -130,28 +182,28 @@ public class PneumaticsControlModule implements PneumaticsBase, Sendable {
 
   @Override
   public int checkAndReserveSolenoids(int mask) {
-    synchronized (m_reserveLock) {
-      if ((m_reservedMask & mask) != 0) {
-        return m_reservedMask & mask;
+    synchronized (m_dataStore.m_reserveLock) {
+      if ((m_dataStore.m_reservedMask & mask) != 0) {
+        return m_dataStore.m_reservedMask & mask;
       }
-      m_reservedMask |= mask;
+      m_dataStore.m_reservedMask |= mask;
       return 0;
     }
   }
 
   @Override
   public void unreserveSolenoids(int mask) {
-    synchronized (m_reserveLock) {
-      m_reservedMask &= ~mask;
+    synchronized (m_dataStore.m_reserveLock) {
+      m_dataStore.m_reservedMask &= ~mask;
     }
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty(
-        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
-    builder.addBooleanProperty("Enabled", this::getCompressor, null);
-    builder.addBooleanProperty("Pressure switch", this::getPressureSwitch, null);
-  }
+  // @Override
+  // public void initSendable(SendableBuilder builder) {
+  //   builder.setSmartDashboardType("Compressor");
+  //   builder.addBooleanProperty(
+  //       "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
+  //   builder.addBooleanProperty("Enabled", this::getCompressor, null);
+  //   builder.addBooleanProperty("Pressure switch", this::getPressureSwitch, null);
+  // }
 }

@@ -20,19 +20,9 @@ using namespace frc;
 
 DoubleSolenoid::DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
                                int reverseChannel)
-    : DoubleSolenoid{std::shared_ptr<PneumaticsBase>{
-                         &module, wpi::NullDeleter<PneumaticsBase>()},
-                     forwardChannel, reverseChannel} {}
-
-DoubleSolenoid::DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
-                               int reverseChannel)
-    : DoubleSolenoid{std::shared_ptr<PneumaticsBase>{
-                         module, wpi::NullDeleter<PneumaticsBase>()},
-                     forwardChannel, reverseChannel} {}
-
-DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
-                               int forwardChannel, int reverseChannel)
-    : m_module{std::move(module)} {
+    : m_module{module.Duplicate()},
+      m_forwardChannel{forwardChannel},
+      m_reverseChannel{reverseChannel} {
   if (!m_module->CheckSolenoidChannel(forwardChannel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
                         forwardChannel);
@@ -71,6 +61,10 @@ DoubleSolenoid::DoubleSolenoid(std::shared_ptr<PneumaticsBase> module,
   wpi::SendableRegistry::AddLW(this, "DoubleSolenoid",
                                m_module->GetModuleNumber(), m_forwardChannel);
 }
+
+DoubleSolenoid::DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
+                               int reverseChannel)
+    : DoubleSolenoid{*module, forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::~DoubleSolenoid() {
   m_module->UnreserveSolenoids(m_mask);

@@ -41,7 +41,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
   public DoubleSolenoid(PneumaticsBase module, final int forwardChannel, final int reverseChannel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null");
+    m_module = Objects.requireNonNull(module, "Module cannot be null").duplicate();
 
     if (!module.checkSolenoidChannel(forwardChannel)) {
       throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
@@ -85,6 +85,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   public synchronized void close() {
     SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
+    m_module.close();
     m_module = null;
   }
 

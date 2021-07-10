@@ -6,29 +6,57 @@
 
 #include <hal/CTREPCM.h>
 #include <wpi/StackTrace.h>
-#include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;
 
+wpi::mutex PneumaticsControlModule::m_handleLock;
+wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>
+    PneumaticsControlModule::m_handleMap;
+
+class PneumaticsControlModule::DataStore {
+ public:
+  explicit DataStore(int module, const char* stackTrace) {
+    int32_t status = 0;
+    HAL_CTREPCMHandle handle =
+        HAL_InitializeCTREPCM(module, stackTrace, &status);
+    FRC_CheckErrorStatus(status, "Module {}", module);
+    m_moduleObject = PneumaticsControlModule{handle, module};
+  }
+
+  ~DataStore() noexcept { HAL_FreeCTREPCM(m_moduleObject.m_handle); }
+
+  DataStore(DataStore&&) = delete;
+  DataStore& operator=(DataStore&&) = delete;
+
+ private:
+  friend class PneumaticsControlModule;
+  uint32_t m_reservedMask;
+  wpi::mutex m_reservedLock;
+  PneumaticsControlModule m_moduleObject{HAL_kInvalidHandle, 0};
+};
+
 PneumaticsControlModule::PneumaticsControlModule()
     : PneumaticsControlModule{SensorUtil::GetDefaultCTREPCMModule()} {}
 
 PneumaticsControlModule::PneumaticsControlModule(int module) {
-  int32_t status = 0;
   std::string stackTrace = wpi::GetStackTrace(1);
-  m_handle = HAL_InitializeCTREPCM(module, stackTrace.c_str(), &status);
-  FRC_CheckErrorStatus(status, "Module {}", module);
+  std::scoped_lock lock(m_handleLock);
+  auto& res = m_handleMap[module];
+  auto m_dataStore = res.lock();
+  if (!m_dataStore) {
+    m_dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
+    res = m_dataStore;
+  }
+  m_handle = m_dataStore->m_moduleObject.m_handle;
   m_module = module;
-  wpi::SendableRegistry::AddLW(this, "Compressor", module);
 }
 
-PneumaticsControlModule::~PneumaticsControlModule() {
-  HAL_FreeCTREPCM(m_handle);
-}
+PneumaticsControlModule::PneumaticsControlModule(HAL_CTREPCMHandle handle,
+                                                 int module)
+    : m_handle{handle}, m_module{module} {}
 
 bool PneumaticsControlModule::GetCompressor() {
   int32_t status = 0;
@@ -165,27 +193,31 @@ bool PneumaticsControlModule::CheckSolenoidChannel(int channel) const {
 }
 
 int PneumaticsControlModule::CheckAndReserveSolenoids(int mask) {
-  std::scoped_lock lock{m_reservedLock};
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
   uint32_t uMask = static_cast<uint32_t>(mask);
-  if ((m_reservedMask & uMask) != 0) {
-    return m_reservedMask & uMask;
+  if ((m_dataStore->m_reservedMask & uMask) != 0) {
+    return m_dataStore->m_reservedMask & uMask;
   }
-  m_reservedMask |= uMask;
+  m_dataStore->m_reservedMask |= uMask;
   return 0;
 }
 
 void PneumaticsControlModule::UnreserveSolenoids(int mask) {
-  std::scoped_lock lock{m_reservedLock};
-  m_reservedMask &= ~(static_cast<uint32_t>(mask));
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
+  m_dataStore->m_reservedMask &= ~(static_cast<uint32_t>(mask));
 }
 
-void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty(
-      "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
-      [=](bool value) { SetClosedLoopControl(value); });
-  builder.AddBooleanProperty(
-      "Enabled", [=] { return GetCompressor(); }, nullptr);
-  builder.AddBooleanProperty(
-      "Pressure switch", [=]() { return GetPressureSwitch(); }, nullptr);
+std::shared_ptr<PneumaticsBase> PneumaticsControlModule::Duplicate() {
+  return std::shared_ptr<PneumaticsBase>{m_dataStore, &m_dataStore->m_moduleObject};
 }
+
+// void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {
+//   builder.SetSmartDashboardType("Compressor");
+//   builder.AddBooleanProperty(
+//       "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
+//       [=](bool value) { SetClosedLoopControl(value); });
+//   builder.AddBooleanProperty(
+//       "Enabled", [=] { return GetCompressor(); }, nullptr);
+//   builder.AddBooleanProperty(
+//       "Pressure switch", [=]() { return GetPressureSwitch(); }, nullptr);
+// }

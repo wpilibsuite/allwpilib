@@ -25,7 +25,6 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
   Solenoid(PneumaticsBase& module, int channel);
   Solenoid(PneumaticsBase* module, int channel);
-  Solenoid(std::shared_ptr<PneumaticsBase> module, int channel);
 
   ~Solenoid() override;
 

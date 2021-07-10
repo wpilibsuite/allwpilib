@@ -6,21 +6,20 @@
 
 #include <hal/Types.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/DenseMap.h>
+
+#include <memory>
 
 #include "PneumaticsBase.h"
 
 namespace frc {
 class PneumaticsControlModule
-    : public PneumaticsBase,
-      public wpi::Sendable,
-      public wpi::SendableHelper<PneumaticsControlModule> {
+    : public PneumaticsBase {
  public:
   PneumaticsControlModule();
   explicit PneumaticsControlModule(int module);
 
-  ~PneumaticsControlModule() override;
+  ~PneumaticsControlModule() override = default;
 
   bool GetCompressor();
 
@@ -62,12 +61,20 @@ class PneumaticsControlModule
 
   void UnreserveSolenoids(int mask) override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  std::shared_ptr<PneumaticsBase> Duplicate() override;
+
+  //void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  class DataStore;
+  friend class DataStore;
+  PneumaticsControlModule(HAL_CTREPCMHandle handle, int module);
+
+  std::shared_ptr<DataStore> m_dataStore;
+  HAL_CTREPCMHandle m_handle;
   int m_module;
-  hal::Handle<HAL_CTREPCMHandle> m_handle;
-  uint32_t m_reservedMask;
-  wpi::mutex m_reservedLock;
+
+  static wpi::mutex m_handleLock;
+  static wpi::DenseMap<int, std::weak_ptr<DataStore>> m_handleMap;
 };
 }  // namespace frc

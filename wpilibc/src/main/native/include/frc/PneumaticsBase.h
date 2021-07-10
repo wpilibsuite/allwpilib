@@ -28,5 +28,7 @@ class PneumaticsBase {
   virtual int CheckAndReserveSolenoids(int mask) = 0;
 
   virtual void UnreserveSolenoids(int mask) = 0;
+
+  virtual std::shared_ptr<PneumaticsBase> Duplicate() = 0;
 };
 }  // namespace frc

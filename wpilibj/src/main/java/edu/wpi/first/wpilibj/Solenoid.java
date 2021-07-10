@@ -30,7 +30,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * @param channel The channel on the PCM to control (0..7).
    */
   public Solenoid(PneumaticsBase module, final int channel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null");
+    m_module = Objects.requireNonNull(module, "Module cannot be null").duplicate();
 
     if (!module.checkSolenoidChannel(channel)) {
       throw new IllegalArgumentException(); // TODO fix me
@@ -51,6 +51,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   public void close() {
     SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
+    m_module.close();
     m_module = null;
   }
 

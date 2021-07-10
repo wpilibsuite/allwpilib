@@ -30,8 +30,6 @@ class DoubleSolenoid : public wpi::Sendable,
                  int reverseChannel);
   DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
                  int reverseChannel);
-  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel,
-                 int reverseChannel);
 
   ~DoubleSolenoid() override;
 
@@ -100,12 +98,12 @@ class DoubleSolenoid : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  std::shared_ptr<PneumaticsBase> m_module;
   int m_forwardChannel;  // The forward channel on the module to control.
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
   int m_mask;
-  std::shared_ptr<PneumaticsBase> m_module;
 };
 
 }  // namespace frc
