@@ -100,7 +100,7 @@ def main():
         files[i] = os.path.join(dest, files[i])
 
     for f in files:
-        comment_out_invalid_includes(f, dest)
+        comment_out_invalid_includes(f, [dest])
 
     # Copy unsupported headers into allwpilib
     os.chdir(os.path.join(repo, "unsupported"))
@@ -113,7 +113,7 @@ def main():
         files[i] = os.path.join(dest, files[i])
 
     for f in files:
-        comment_out_invalid_includes(f, dest)
+        comment_out_invalid_includes(f, [dest])
 
     # Apply patches
     os.chdir(wpimath)
