@@ -13,8 +13,7 @@
 #include "PneumaticsBase.h"
 
 namespace frc {
-class PneumaticsControlModule
-    : public PneumaticsBase {
+class PneumaticsControlModule : public PneumaticsBase {
  public:
   PneumaticsControlModule();
   explicit PneumaticsControlModule(int module);
@@ -63,7 +62,7 @@ class PneumaticsControlModule
 
   std::shared_ptr<PneumaticsBase> Duplicate() override;
 
-  //void InitSendable(wpi::SendableBuilder& builder) override;
+  // void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   class DataStore;

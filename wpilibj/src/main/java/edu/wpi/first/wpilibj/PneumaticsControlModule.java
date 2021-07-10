@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PneumaticsControlModule implements PneumaticsBase {
-
   private static class DataStore implements AutoCloseable {
     public final int m_module;
     public final int m_handle;

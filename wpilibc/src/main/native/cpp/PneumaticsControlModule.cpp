@@ -208,7 +208,8 @@ void PneumaticsControlModule::UnreserveSolenoids(int mask) {
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::Duplicate() {
-  return std::shared_ptr<PneumaticsBase>{m_dataStore, &m_dataStore->m_moduleObject};
+  return std::shared_ptr<PneumaticsBase>{m_dataStore,
+                                         &m_dataStore->m_moduleObject};
 }
 
 // void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {
