@@ -73,8 +73,7 @@ public interface PneumaticsBase extends AutoCloseable {
   void unreserveSolenoids(int mask);
 
   /**
-   * Duplicate a Pneumatics base module. Used for lifetime management.
-   * Not usually needed by teams.
+   * Duplicate a Pneumatics base module. Used for lifetime management. Not usually needed by teams.
    *
    * @return A copy of the PneumaticsBase object
    */
