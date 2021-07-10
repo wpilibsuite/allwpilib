@@ -5,6 +5,7 @@
 #include "frc/PneumaticsControlModule.h"
 
 #include <hal/CTREPCM.h>
+#include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 
 #include "frc/Errors.h"
@@ -24,6 +25,8 @@ class PneumaticsControlModule::DataStore {
         HAL_InitializeCTREPCM(module, stackTrace, &status);
     FRC_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticsControlModule{handle, module};
+    m_moduleObject.m_dataStore =
+        std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
   }
 
   ~DataStore() noexcept { HAL_FreeCTREPCM(m_moduleObject.m_handle); }
@@ -33,7 +36,7 @@ class PneumaticsControlModule::DataStore {
 
  private:
   friend class PneumaticsControlModule;
-  uint32_t m_reservedMask;
+  uint32_t m_reservedMask{0};
   wpi::mutex m_reservedLock;
   PneumaticsControlModule m_moduleObject{HAL_kInvalidHandle, 0};
 };
@@ -45,7 +48,7 @@ PneumaticsControlModule::PneumaticsControlModule(int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = m_handleMap[module];
-  auto m_dataStore = res.lock();
+  m_dataStore = res.lock();
   if (!m_dataStore) {
     m_dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
     res = m_dataStore;
