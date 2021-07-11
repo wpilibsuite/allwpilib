@@ -1,4 +1,4 @@
-= Network Tables Protocol Specification, Version 3.0
+= NetworkTables Protocol Specification, Version 3.0
 WPILib Developers <wpilib@wpi.edu>
 Protocol Revision 3.0 (0x0300), 6/12/2015
 :toc:
@@ -20,7 +20,7 @@ a client must have received a server's most recent state before it can replace
 it with a new value.
 
 This is a backwards-compatible update of <<networktables2,version 2.0>> of the
-Network Tables network protocol. The protocol is designed such that 3.0 clients
+NetworkTables network protocol. The protocol is designed such that 3.0 clients
 and servers can interoperate with 2.0 clients and servers with the only loss of
 functionality being the extended features introduced in 3.0.
 
@@ -50,7 +50,7 @@ the deletion message will not be propagated to the 2.0 Clients.
 
 Remote procedure call:: The Server may create specially-typed entries that
 inform Clients of remotely callable functions on the Server. Clients can then
-execute these functions via the Network Tables protocol. See <<rpc-operation>>.
+execute these functions via the NetworkTables protocol. See <<rpc-operation>>.
 
 Raw data type:: An arbitrary data type has been added. While string could be
 used to encode raw data, the reason for a different data type is so that
@@ -108,7 +108,7 @@ conflicting values when reconnecting to a Server has been clarified.
 == References
 
 [[networktables2]]
-* <<networktables2.adoc#,Network Tables Protocol Specification, Protocol
+* <<networktables2.adoc#,NetworkTables Protocol Specification, Protocol
 Revision 2.0 (0x0200)>>, dated 1/8/2013.
 
 [[leb128,LEB128]]
