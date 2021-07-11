@@ -51,7 +51,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // While holding the shoulder button, drive at half speed
   frc2::JoystickButton(&m_driverController, 6)
-      .WhenPressed([this] { m_drive.SetMaxOutput(.5); })
+      .WhenPressed([this] { m_drive.SetMaxOutput(0.5); })
       .WhenReleased([this] { m_drive.SetMaxOutput(1); });
 }
 

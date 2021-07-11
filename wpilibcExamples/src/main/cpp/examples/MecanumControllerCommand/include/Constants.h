@@ -48,7 +48,7 @@ constexpr auto kWheelBase =
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
 constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterMeters = .15;
+constexpr double kWheelDiameterMeters = 0.15;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
     (kWheelDiameterMeters * wpi::numbers::pi) /
