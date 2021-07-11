@@ -6,34 +6,38 @@
 
 #include <fmt/core.h>
 
-#include "TestBench.h"
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-unsigned notifierCounter;
+TEST(NotifierTest, TestStartPeriodicAndStop) {
+  uint32_t counter = 0;
 
-void notifierHandler(void*) {
-  notifierCounter++;
-}
-
-/**
- * Test if the Wait function works
- */
-TEST(NotifierTest, DISABLED_TestTimerNotifications) {
-  fmt::print("NotifierTest...\n");
-  notifierCounter = 0;
-  fmt::print("notifier(notifierHandler, nullptr)...\n");
-  frc::Notifier notifier(notifierHandler, nullptr);
-  fmt::print("Start Periodic...\n");
+  frc::Notifier notifier{[&] { ++counter; }};
   notifier.StartPeriodic(1_s);
 
-  fmt::print("Wait...\n");
   frc::Wait(10.5_s);
-  fmt::print("...Wait\n");
 
-  EXPECT_EQ(10u, notifierCounter)
-      << "Received " << notifierCounter << " notifications in 10.5 seconds";
-  fmt::print("Received {} notifications in 10.5 seconds", notifierCounter);
+  notifier.Stop();
+  EXPECT_EQ(10u, counter) << "Received " << counter
+                          << " notifications in 10.5 seconds\n";
+  fmt::print("Received {} notifications in 10.5 seconds\n", counter);
 
-  fmt::print("...NotifierTest\n");
+  frc::Wait(3_s);
+
+  EXPECT_EQ(10u, counter) << "Received " << counter - 10
+                          << " notifications in 3 seconds\n";
+  fmt::print("Received {} notifications in 3 seconds\n", counter - 10);
+}
+
+TEST(NotifierTest, TestStartSingle) {
+  uint32_t counter = 0;
+
+  frc::Notifier notifier{[&] { ++counter; }};
+  notifier.StartSingle(1_s);
+
+  frc::Wait(10.5_s);
+
+  EXPECT_EQ(1u, counter) << "Received " << counter
+                         << " notifications in 10.5 seconds\n";
+  fmt::print("Received {} notifications in 10.5 seconds\n", counter);
 }
