@@ -20,5 +20,5 @@ TEST(FormatterTest, Eigen) {
 }
 
 TEST(FormatterTest, Units) {
-  EXPECT_EQ("4 m s^-1", fmt::format("{}", 4_mps));
+  EXPECT_EQ("4 mps", fmt::format("{}", 4_mps));
 }
