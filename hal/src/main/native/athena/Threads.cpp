@@ -6,8 +6,41 @@
 
 #include <pthread.h>
 #include <sched.h>
+#include <unistd.h>
+
+#include <cerrno>
+#include <cstdlib>
+#include <system_error>
+
+#include <fmt/format.h>
 
 #include "hal/Errors.h"
+
+namespace {
+class UidSetter {
+ public:
+  explicit UidSetter(uid_t uid) {
+    m_uid = geteuid();
+    if (uid == 0 && setuid(uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              fmt::format("setuid({}) failed", uid));
+    } else if (uid != 0 && seteuid(uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              fmt::format("seteuid({}) failed", uid));
+    }
+  }
+
+  ~UidSetter() noexcept(false) {
+    if (seteuid(m_uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              fmt::format("seteuid({}) failed", m_uid));
+    }
+  }
+
+ private:
+  uid_t m_uid;
+};
+}  // namespace
 
 namespace hal::init {
 void InitializeThreads() {}
@@ -70,13 +103,21 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
     // Only need to set 0 priority for non RT thread
     sch.sched_priority = 0;
   }
-  if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
-                            scheduler, &sch)) {
-    *status = HAL_THREAD_PRIORITY_ERROR;
+
+  try {
+    UidSetter uidSetter{0};
+
+    if (pthread_setschedparam(*reinterpret_cast<const pthread_t*>(handle),
+                              scheduler, &sch)) {
+      *status = HAL_THREAD_PRIORITY_ERROR;
+      return false;
+    } else {
+      *status = 0;
+      return true;
+    }
+  } catch (const std::system_error& e) {
+    *status = HAL_SETUID_ERROR;
     return false;
-  } else {
-    *status = 0;
-    return true;
   }
 }
 

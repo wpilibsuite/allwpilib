@@ -422,6 +422,10 @@ public abstract class RobotBase implements AutoCloseable {
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
 
+    if (!Notifier.setHALThreadPriority(true, 40)) {
+      DriverStation.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);
+    }
+
     if (HAL.hasMain()) {
       Thread thread =
           new Thread(
