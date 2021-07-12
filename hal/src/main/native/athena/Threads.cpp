@@ -6,8 +6,34 @@
 
 #include <pthread.h>
 #include <sched.h>
+#include <unistd.h>
+
+#include <system_error>
 
 #include "hal/Errors.h"
+
+namespace {
+class UidSetter {
+ public:
+  explicit UidSetter(uid_t uid) {
+    m_uid = getuid();
+    if (setuid(uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              "setuid(0) failed");
+    }
+  }
+
+  ~UidSetter() noexcept(false) {
+    if (setuid(m_uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              "Restoring uid failed");
+    }
+  }
+
+ private:
+  uid_t m_uid;
+};
+}  // namespace
 
 namespace hal::init {
 void InitializeThreads() {}
@@ -44,6 +70,8 @@ int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status) {
 
 HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
                                int32_t priority, int32_t* status) {
+  UidSetter uidSetter{0};
+
   if (handle == nullptr) {
     *status = NULL_PARAMETER;
     return false;
@@ -82,6 +110,8 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
 
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status) {
+  UidSetter uidSetter{0};
+
   auto thread = pthread_self();
   return HAL_SetThreadPriority(&thread, realTime, priority, status);
 }

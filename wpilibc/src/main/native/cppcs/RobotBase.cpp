@@ -20,6 +20,8 @@
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "frc/Notifier.h"
+#include "frc/Processes.h"
 #include "frc/RobotState.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -35,6 +37,20 @@ int frc::RunHALInitialization() {
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
+
+  if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
+    FRC_ReportError(err::Error, "{}",
+                    "Setting HAL Notifier RT priority to 40 failed\n");
+  }
+
+  // Give FRC_NetCommDaemon RT priority 35 so it's not preempted by robot code
+  // during high CPU utilization.
+  if (!frc::SetProcessPriority("/usr/local/frc/bin/FRC_NetCommDaemon", true,
+                               35)) {
+    FRC_ReportError(err::Error, "{}",
+                    "Setting FRC_NetCommDaemon RT priority to 35 failed\n");
+  }
+
   std::puts("\n********** Robot program starting **********");
   return 0;
 }
