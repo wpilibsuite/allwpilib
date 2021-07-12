@@ -12,6 +12,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
@@ -23,8 +24,8 @@ namespace frc {
  */
 class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
-  Solenoid(PneumaticsBase& module, int channel);
-  Solenoid(PneumaticsBase* module, int channel);
+  Solenoid(int module, PneumaticsModuleType moduleType, int channel);
+  Solenoid(PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 

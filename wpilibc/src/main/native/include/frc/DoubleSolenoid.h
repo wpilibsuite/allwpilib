@@ -11,6 +11,7 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
@@ -26,9 +27,9 @@ class DoubleSolenoid : public wpi::Sendable,
  public:
   enum Value { kOff, kForward, kReverse };
 
-  DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
+  DoubleSolenoid(int module, PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
-  DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
+  DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 
   ~DoubleSolenoid() override;

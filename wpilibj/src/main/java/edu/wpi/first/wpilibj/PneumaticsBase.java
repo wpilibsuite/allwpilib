@@ -5,6 +5,20 @@
 package edu.wpi.first.wpilibj;
 
 public interface PneumaticsBase extends AutoCloseable {
+  public static PneumaticsControlModule getForType(int module, PneumaticsModuleType type) {
+    if (type == PneumaticsModuleType.CTREPCM) {
+      return new PneumaticsControlModule();
+    }
+    throw new IllegalArgumentException("Unknown module type");
+  }
+
+  public static int getDefaultForType(PneumaticsModuleType type) {
+    if (type == PneumaticsModuleType.CTREPCM) {
+      return SensorUtil.getDefaultCTREPCMModule();
+    }
+    throw new IllegalArgumentException("Unknown module type");
+  }
+
   /**
    * Sets solenoids on a pneumatics module.
    *
@@ -72,13 +86,9 @@ public interface PneumaticsBase extends AutoCloseable {
    */
   void unreserveSolenoids(int mask);
 
-  /**
-   * Duplicate a Pneumatics base module. Used for lifetime management. Not usually needed by teams.
-   *
-   * @return A copy of the PneumaticsBase object
-   */
-  PneumaticsBase duplicate();
-
   @Override
   void close();
+
+  Solenoid makeSolenoid(int channel);
+  DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel);
 }

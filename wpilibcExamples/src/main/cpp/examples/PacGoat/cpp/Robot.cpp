@@ -83,11 +83,6 @@ void Robot::Log() {
                                  drivetrain.GetRightEncoder().GetDistance());
 }
 
-frc::PneumaticsControlModule* pac::GetPneumatics() {
-  static frc::PneumaticsControlModule pcm;
-  return &pcm;
-}
-
 #ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();

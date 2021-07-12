@@ -30,8 +30,6 @@ public class Robot extends TimedRobot {
   Command m_autonomousCommand;
   public static OI oi;
 
-  public static PneumaticsControlModule pneumaticsModule = new PneumaticsControlModule(1);
-
   // Initialize the subsystems
   public static DriveTrain drivetrain = new DriveTrain();
   public static Collector collector = new Collector();

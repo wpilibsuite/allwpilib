@@ -83,11 +83,6 @@ public class PneumaticsControlModule implements PneumaticsBase {
     freeModule(m_dataStore);
   }
 
-  @Override
-  public PneumaticsControlModule duplicate() {
-    return new PneumaticsControlModule(m_dataStore.m_module);
-  }
-
   public boolean getCompressor() {
     return CTREPCMJNI.getCompressor(m_handle);
   }
@@ -195,6 +190,16 @@ public class PneumaticsControlModule implements PneumaticsBase {
     synchronized (m_dataStore.m_reserveLock) {
       m_dataStore.m_reservedMask &= ~mask;
     }
+  }
+
+  @Override
+  public Solenoid makeSolenoid(int channel) {
+    return new Solenoid(m_dataStore.m_module, PneumaticsModuleType.CTREPCM, channel);
+  }
+
+  @Override
+  public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
+    return new DoubleSolenoid(m_dataStore.m_module, PneumaticsModuleType.CTREPCM, forwardChannel, reverseChannel);
   }
 
   // @Override

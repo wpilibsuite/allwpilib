@@ -60,14 +60,18 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void UnreserveSolenoids(int mask) override;
 
-  std::shared_ptr<PneumaticsBase> Duplicate() override;
+  Solenoid makeSolenoid(int channel) override;
+  DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) override;
 
   // void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   class DataStore;
   friend class DataStore;
+  friend class PneumaticsBase;
   PneumaticsControlModule(HAL_CTREPCMHandle handle, int module);
+
+  static std::shared_ptr<PneumaticsBase> GetForModule(int module);
 
   std::shared_ptr<DataStore> m_dataStore;
   HAL_CTREPCMHandle m_handle;

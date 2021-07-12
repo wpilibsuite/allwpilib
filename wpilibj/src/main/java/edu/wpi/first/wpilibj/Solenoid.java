@@ -10,7 +10,6 @@ import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.Objects;
 
 /**
  * Solenoid class for running high voltage Digital Output on the PCM.
@@ -23,28 +22,33 @@ public class Solenoid implements Sendable, AutoCloseable {
   private final int m_channel;
   private PneumaticsBase m_module;
 
+  public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
+  }
+
   /**
    * Constructor.
    *
-   * @param module The PCM the solenoid is attached to.
-   * @param channel The channel on the PCM to control (0..7).
+   * @param module The module number the solenoid is attached to.
+   * @param moduleType The module type the solenoid is attached to.
+   * @param channel The channel on the PCM to control.
    */
-  public Solenoid(PneumaticsBase module, final int channel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null").duplicate();
+  public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
 
-    if (!module.checkSolenoidChannel(channel)) {
-      throw new IllegalArgumentException(); // TODO fix me
+    if (!m_module.checkSolenoidChannel(channel)) {
+      throw new IllegalArgumentException("Channel " + channel + " out of range");
     }
 
     m_mask = 1 << channel;
     m_channel = channel;
 
-    if (module.checkAndReserveSolenoids(m_mask) != 0) {
+    if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
       throw new AllocationException("Solenoid already allocated");
     }
 
-    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "Solenoid", module.getModuleNumber(), channel);
+    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+    SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
   }
 
   @Override

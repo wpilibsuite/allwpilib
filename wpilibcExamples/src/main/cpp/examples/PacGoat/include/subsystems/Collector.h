@@ -9,8 +9,6 @@
 #include <frc/commands/Subsystem.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 
-#include "PneumaticsModule.h"
-
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for
  * ball

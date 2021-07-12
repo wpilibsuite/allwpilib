@@ -8,7 +8,11 @@
 
 #include <units/time.h>
 
+#include "frc/PneumaticsModuleType.h"
+
 namespace frc {
+class Solenoid;
+class DoubleSolenoid;
 class PneumaticsBase {
  public:
   virtual ~PneumaticsBase() = default;
@@ -31,6 +35,10 @@ class PneumaticsBase {
 
   virtual void UnreserveSolenoids(int mask) = 0;
 
-  virtual std::shared_ptr<PneumaticsBase> Duplicate() = 0;
+  virtual Solenoid makeSolenoid(int channel) = 0;
+  virtual DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) = 0;
+
+  static std::shared_ptr<PneumaticsBase> GetForType(int module, PneumaticsModuleType moduleType);
+  static int GetDefaultForType(PneumaticsModuleType moduleType);
 };
 }  // namespace frc

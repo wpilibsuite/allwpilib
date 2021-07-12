@@ -10,6 +10,8 @@
 
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
+#include "frc/Solenoid.h"
+#include "frc/DoubleSolenoid.h"
 
 using namespace frc;
 
@@ -210,9 +212,25 @@ void PneumaticsControlModule::UnreserveSolenoids(int mask) {
   m_dataStore->m_reservedMask &= ~(static_cast<uint32_t>(mask));
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticsControlModule::Duplicate() {
-  return std::shared_ptr<PneumaticsBase>{m_dataStore,
-                                         &m_dataStore->m_moduleObject};
+Solenoid PneumaticsControlModule::makeSolenoid(int channel) {
+  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
+}
+DoubleSolenoid PneumaticsControlModule::makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
+  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel, reverseChannel};
+}
+
+std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(int module) {
+  std::string stackTrace = wpi::GetStackTrace(1);
+  std::scoped_lock lock(m_handleLock);
+  auto& res = m_handleMap[module];
+  std::shared_ptr<DataStore> dataStore = res.lock();
+  if (!dataStore) {
+    dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
+    res = dataStore;
+  }
+
+  return std::shared_ptr<PneumaticsBase>{dataStore,
+                                         &dataStore->m_moduleObject};
 }
 
 // void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {

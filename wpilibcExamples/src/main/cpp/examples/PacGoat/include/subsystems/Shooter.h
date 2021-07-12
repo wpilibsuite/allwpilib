@@ -9,8 +9,6 @@
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
 
-#include "PneumaticsModule.h"
-
 /**
  * The Shooter subsystem handles shooting. The mechanism for shooting is
  * slightly complicated because it has to pneumatic cylinders for shooting, and

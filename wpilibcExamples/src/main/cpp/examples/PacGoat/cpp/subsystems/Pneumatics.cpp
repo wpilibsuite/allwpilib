@@ -6,8 +6,6 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "PneumaticsModule.h"
-
 Pneumatics::Pneumatics() : frc::Subsystem("Pneumatics") {
   AddChild("Pressure Sensor", m_pressureSensor);
 }

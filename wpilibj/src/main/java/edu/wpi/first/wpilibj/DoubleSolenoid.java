@@ -10,7 +10,6 @@ import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.Objects;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -33,6 +32,10 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   private final int m_forwardChannel;
   private final int m_reverseChannel;
 
+  public DoubleSolenoid(final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
+  }
+
   /**
    * Constructor.
    *
@@ -40,14 +43,14 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param forwardChannel The forward channel on the module to control (0..7).
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
-  public DoubleSolenoid(PneumaticsBase module, final int forwardChannel, final int reverseChannel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null").duplicate();
+  public DoubleSolenoid(final int module, final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
 
-    if (!module.checkSolenoidChannel(forwardChannel)) {
+    if (!m_module.checkSolenoidChannel(forwardChannel)) {
       throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
     }
 
-    if (!module.checkSolenoidChannel(reverseChannel)) {
+    if (!m_module.checkSolenoidChannel(reverseChannel)) {
       throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
     }
 
@@ -58,7 +61,7 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
-    int allocMask = module.checkAndReserveSolenoids(m_mask);
+    int allocMask = m_module.checkAndReserveSolenoids(m_mask);
     if (allocMask != 0) {
       if (allocMask == m_mask) {
         throw new AllocationException(
@@ -70,15 +73,15 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
       }
     }
 
-    if (module.checkAndReserveSolenoids(m_mask) != 0) {
+    if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
       throw new AllocationException("Solenoid(s) already allocated");
     }
 
     HAL.report(
-        tResourceType.kResourceType_Solenoid, forwardChannel + 1, module.getModuleNumber() + 1);
+        tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
     HAL.report(
-        tResourceType.kResourceType_Solenoid, reverseChannel + 1, module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "DoubleSolenoid", module.getModuleNumber(), forwardChannel);
+        tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
+    SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
   }
 
   @Override
