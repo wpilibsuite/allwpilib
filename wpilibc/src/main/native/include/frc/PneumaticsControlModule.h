@@ -20,25 +20,25 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   ~PneumaticsControlModule() override = default;
 
-  bool GetCompressor();
+  bool GetCompressor() const override;
 
-  void SetClosedLoopControl(bool enabled);
+  void SetClosedLoopControl(bool enabled) override;
 
-  bool GetClosedLoopControl();
+  bool GetClosedLoopControl() const override;
 
-  bool GetPressureSwitch();
+  bool GetPressureSwitch() const override;
 
-  double GetCompressorCurrent();
+  double GetCompressorCurrent() const override;
 
-  bool GetCompressorCurrentTooHighFault();
-  bool GetCompressorCurrentTooHighStickyFault();
-  bool GetCompressorShortedFault();
-  bool GetCompressorShortedStickyFault();
-  bool GetCompressorNotConnectedFault();
-  bool GetCompressorNotConnectedStickyFault();
+  bool GetCompressorCurrentTooHighFault() const;
+  bool GetCompressorCurrentTooHighStickyFault() const;
+  bool GetCompressorShortedFault() const;
+  bool GetCompressorShortedStickyFault() const;
+  bool GetCompressorNotConnectedFault() const;
+  bool GetCompressorNotConnectedStickyFault() const;
 
-  bool GetSolenoidVoltageFault();
-  bool GetSolenoidVoltageStickyFault();
+  bool GetSolenoidVoltageFault() const;
+  bool GetSolenoidVoltageStickyFault() const;
 
   void ClearAllStickyFaults();
 
@@ -60,10 +60,14 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void UnreserveSolenoids(int mask) override;
 
-  Solenoid makeSolenoid(int channel) override;
-  DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) override;
+  bool ReserveCompressor() override;
 
-  // void InitSendable(wpi::SendableBuilder& builder) override;
+  void UnreserveCompressor() override;
+
+  Solenoid MakeSolenoid(int channel) override;
+  DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
+                                    int reverseChannel) override;
+  Compressor MakeCompressor() override;
 
  private:
   class DataStore;

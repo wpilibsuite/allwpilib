@@ -14,6 +14,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
     public final int m_handle;
     private int m_refCount;
     private int m_reservedMask;
+    private boolean m_compressorReserved;
     private final Object m_reserveLock = new Object();
 
     DataStore(int module) {
@@ -83,22 +84,27 @@ public class PneumaticsControlModule implements PneumaticsBase {
     freeModule(m_dataStore);
   }
 
+  @Override
   public boolean getCompressor() {
     return CTREPCMJNI.getCompressor(m_handle);
   }
 
+  @Override
   public void setClosedLoopControl(boolean enabled) {
     CTREPCMJNI.setClosedLoopControl(m_handle, enabled);
   }
 
+  @Override
   public boolean getClosedLoopControl() {
     return CTREPCMJNI.getClosedLoopControl(m_handle);
   }
 
+  @Override
   public boolean getPressureSwitch() {
     return CTREPCMJNI.getPressureSwitch(m_handle);
   }
 
+  @Override
   public double getCompressorCurrent() {
     return CTREPCMJNI.getCompressorCurrent(m_handle);
   }
@@ -199,15 +205,30 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
-    return new DoubleSolenoid(m_dataStore.m_module, PneumaticsModuleType.CTREPCM, forwardChannel, reverseChannel);
+    return new DoubleSolenoid(
+        m_dataStore.m_module, PneumaticsModuleType.CTREPCM, forwardChannel, reverseChannel);
   }
 
-  // @Override
-  // public void initSendable(SendableBuilder builder) {
-  //   builder.setSmartDashboardType("Compressor");
-  //   builder.addBooleanProperty(
-  //       "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
-  //   builder.addBooleanProperty("Enabled", this::getCompressor, null);
-  //   builder.addBooleanProperty("Pressure switch", this::getPressureSwitch, null);
-  // }
+  @Override
+  public Compressor makeCompressor() {
+    return new Compressor(m_dataStore.m_module, PneumaticsModuleType.CTREPCM);
+  }
+
+  @Override
+  public boolean reserveCompressor() {
+    synchronized (m_dataStore.m_reserveLock) {
+      if (m_dataStore.m_compressorReserved) {
+        return false;
+      }
+      m_dataStore.m_compressorReserved = true;
+      return true;
+    }
+  }
+
+  @Override
+  public void unreserveCompressor() {
+    synchronized (m_dataStore.m_reserveLock) {
+      m_dataStore.m_compressorReserved = false;
+    }
+  }
 }

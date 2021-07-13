@@ -32,7 +32,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   private final int m_forwardChannel;
   private final int m_reverseChannel;
 
-  public DoubleSolenoid(final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
+  public DoubleSolenoid(
+      final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
   }
 
@@ -43,7 +44,11 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
    * @param forwardChannel The forward channel on the module to control (0..7).
    * @param reverseChannel The reverse channel on the module to control (0..7).
    */
-  public DoubleSolenoid(final int module, final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
+  public DoubleSolenoid(
+      final int module,
+      final PneumaticsModuleType moduleType,
+      final int forwardChannel,
+      final int reverseChannel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
 
     if (!m_module.checkSolenoidChannel(forwardChannel)) {

@@ -3,12 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/TimedRobot.h>
-#include <frc/DoubleSolenoid.h>
-#include <frc/PneumaticsControlModule.h>
 
 class MyRobot : public frc::TimedRobot {
-  frc::PneumaticsControlModule module{};
-  frc::DoubleSolenoid ds{module, 0, 1};
 
   /**
    * This function is run when the robot is first started up and should be
@@ -34,9 +30,7 @@ class MyRobot : public frc::TimedRobot {
   /**
    * This function is called periodically during operator control
    */
-  void TeleopPeriodic() override {
-    ds.Set(frc::DoubleSolenoid::Value::kForward);
-  }
+  void TeleopPeriodic() override {}
 
   /**
    * This function is called periodically during test mode

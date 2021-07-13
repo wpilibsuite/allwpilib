@@ -13,9 +13,20 @@
 namespace frc {
 class Solenoid;
 class DoubleSolenoid;
+class Compressor;
 class PneumaticsBase {
  public:
   virtual ~PneumaticsBase() = default;
+
+  virtual bool GetCompressor() const = 0;
+
+  virtual bool GetPressureSwitch() const = 0;
+
+  virtual double GetCompressorCurrent() const = 0;
+
+  virtual void SetClosedLoopControl(bool on) = 0;
+
+  virtual bool GetClosedLoopControl() const = 0;
 
   virtual void SetSolenoids(int mask, int values) = 0;
 
@@ -35,8 +46,13 @@ class PneumaticsBase {
 
   virtual void UnreserveSolenoids(int mask) = 0;
 
-  virtual Solenoid makeSolenoid(int channel) = 0;
-  virtual DoubleSolenoid makeDoubleSolenoid(int forwardChannel, int reverseChannel) = 0;
+  virtual bool ReserveCompressor() = 0;
+
+  virtual void UnreserveCompressor() = 0;
+
+  virtual Solenoid MakeSolenoid(int channel) = 0;
+  virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel, int reverseChannel) = 0;
+  virtual Compressor MakeCompressor() = 0;
 
   static std::shared_ptr<PneumaticsBase> GetForType(int module, PneumaticsModuleType moduleType);
   static int GetDefaultForType(PneumaticsModuleType moduleType);

@@ -68,6 +68,6 @@ class Collector : public frc::Subsystem {
   // Subsystem devices
   frc::PWMSparkMax m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
-  frc::Solenoid m_piston{pac::GetPneumatics(), 1};
+  frc::Solenoid m_piston{frc::PneumaticsModuleType::CTREPCM, 1};
   frc::DigitalInput m_openDetector{6};
 };

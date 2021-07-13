@@ -28,7 +28,8 @@ public class Robot extends TimedRobot {
   private final Solenoid m_solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
-  private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
+  private final DoubleSolenoid m_doubleSolenoid =
+      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
 
   private static final int kSolenoidButton = 1;
   private static final int kDoubleSolenoidForward = 2;

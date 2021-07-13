@@ -12,6 +12,7 @@
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
 #include "frc/DoubleSolenoid.h"
+#include "frc/Compressor.h"
 
 using namespace frc;
 
@@ -39,6 +40,7 @@ class PneumaticsControlModule::DataStore {
  private:
   friend class PneumaticsControlModule;
   uint32_t m_reservedMask{0};
+  bool m_compressorReserved{false};
   wpi::mutex m_reservedLock;
   PneumaticsControlModule m_moduleObject{HAL_kInvalidHandle, 0};
 };
@@ -63,7 +65,7 @@ PneumaticsControlModule::PneumaticsControlModule(HAL_CTREPCMHandle handle,
                                                  int module)
     : m_handle{handle}, m_module{module} {}
 
-bool PneumaticsControlModule::GetCompressor() {
+bool PneumaticsControlModule::GetCompressor() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressor(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
@@ -76,59 +78,59 @@ void PneumaticsControlModule::SetClosedLoopControl(bool enabled) {
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-bool PneumaticsControlModule::GetClosedLoopControl() {
+bool PneumaticsControlModule::GetClosedLoopControl() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
 
-bool PneumaticsControlModule::GetPressureSwitch() {
+bool PneumaticsControlModule::GetPressureSwitch() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMPressureSwitch(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
 
-double PneumaticsControlModule::GetCompressorCurrent() {
+double PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
 
-bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() {
+bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrentTooHighFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetCompressorCurrentTooHighStickyFault() {
+bool PneumaticsControlModule::GetCompressorCurrentTooHighStickyFault() const {
   int32_t status = 0;
   auto result =
       HAL_GetCTREPCMCompressorCurrentTooHighStickyFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetCompressorShortedFault() {
+bool PneumaticsControlModule::GetCompressorShortedFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorShortedFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetCompressorShortedStickyFault() {
+bool PneumaticsControlModule::GetCompressorShortedStickyFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorShortedStickyFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetCompressorNotConnectedFault() {
+bool PneumaticsControlModule::GetCompressorNotConnectedFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorNotConnectedFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetCompressorNotConnectedStickyFault() {
+bool PneumaticsControlModule::GetCompressorNotConnectedStickyFault() const {
   int32_t status = 0;
   auto result =
       HAL_GetCTREPCMCompressorNotConnectedStickyFault(m_handle, &status);
@@ -136,13 +138,13 @@ bool PneumaticsControlModule::GetCompressorNotConnectedStickyFault() {
   return result;
 }
 
-bool PneumaticsControlModule::GetSolenoidVoltageFault() {
+bool PneumaticsControlModule::GetSolenoidVoltageFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoidVoltageFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   return result;
 }
-bool PneumaticsControlModule::GetSolenoidVoltageStickyFault() {
+bool PneumaticsControlModule::GetSolenoidVoltageStickyFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoidVoltageStickyFault(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
@@ -212,14 +214,37 @@ void PneumaticsControlModule::UnreserveSolenoids(int mask) {
   m_dataStore->m_reservedMask &= ~(static_cast<uint32_t>(mask));
 }
 
-Solenoid PneumaticsControlModule::makeSolenoid(int channel) {
-  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
-}
-DoubleSolenoid PneumaticsControlModule::makeDoubleSolenoid(int forwardChannel, int reverseChannel) {
-  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel, reverseChannel};
+bool PneumaticsControlModule::ReserveCompressor() {
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
+  if (m_dataStore->m_compressorReserved) {
+    return false;
+  }
+  m_dataStore->m_compressorReserved = true;
+  return true;
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(int module) {
+void PneumaticsControlModule::UnreserveCompressor() {
+  std::scoped_lock lock{m_dataStore->m_reservedLock};
+  m_dataStore->m_compressorReserved = false;
+}
+
+
+Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
+  return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};
+}
+
+DoubleSolenoid PneumaticsControlModule::MakeDoubleSolenoid(int forwardChannel,
+                                                           int reverseChannel) {
+  return DoubleSolenoid{m_module, PneumaticsModuleType::CTREPCM, forwardChannel,
+                        reverseChannel};
+}
+
+Compressor PneumaticsControlModule::MakeCompressor() {
+  return Compressor{m_module, PneumaticsModuleType::CTREPCM};
+}
+
+std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(
+    int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = m_handleMap[module];
@@ -229,17 +254,5 @@ std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(int module
     res = dataStore;
   }
 
-  return std::shared_ptr<PneumaticsBase>{dataStore,
-                                         &dataStore->m_moduleObject};
+  return std::shared_ptr<PneumaticsBase>{dataStore, &dataStore->m_moduleObject};
 }
-
-// void PneumaticsControlModule::InitSendable(wpi::SendableBuilder& builder) {
-//   builder.SetSmartDashboardType("Compressor");
-//   builder.AddBooleanProperty(
-//       "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
-//       [=](bool value) { SetClosedLoopControl(value); });
-//   builder.AddBooleanProperty(
-//       "Enabled", [=] { return GetCompressor(); }, nullptr);
-//   builder.AddBooleanProperty(
-//       "Pressure switch", [=]() { return GetPressureSwitch(); }, nullptr);
-// }
