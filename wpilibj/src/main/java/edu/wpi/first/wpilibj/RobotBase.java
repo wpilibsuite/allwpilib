@@ -398,6 +398,16 @@ public abstract class RobotBase implements AutoCloseable {
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
 
+    if (!Notifier.setHALThreadPriority(true, 40)) {
+      throw new IllegalStateException("Setting HAL Notifier RT priority to 40 failed\n");
+    }
+
+    // Give FRC_NetCommDaemon RT priority 35 so it's not preempted by robot code
+    // during high CPU utilization.
+    if (!Processes.setProcessPriority("/usr/local/frc/bin/FRC_NetCommDaemon", true, 35)) {
+      throw new IllegalStateException("Setting FRC_NetCommDaemon RT priority to 35 failed\n");
+    }
+
     if (HAL.hasMain()) {
       Thread thread =
           new Thread(
