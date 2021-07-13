@@ -21,8 +21,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_registerInitializedCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterPowerDistributionInitializedCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterPowerDistributionInitializedCallback);
 }
 
 /*
@@ -71,8 +72,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_registerTemperatureCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterPowerDistributionTemperatureCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterPowerDistributionTemperatureCallback);
 }
 
 /*
@@ -121,8 +123,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_registerVoltageCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterPowerDistributionVoltageCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterPowerDistributionVoltageCallback);
 }
 
 /*
@@ -172,9 +175,9 @@ Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_registerCurrentCallba
   (JNIEnv* env, jclass, jint index, jint channel, jobject callback,
    jboolean initialNotify)
 {
-  return sim::AllocateChannelCallback(env, index, channel, callback,
-                                      initialNotify,
-                                      &HALSIM_RegisterPowerDistributionCurrentCallback);
+  return sim::AllocateChannelCallback(
+      env, index, channel, callback, initialNotify,
+      &HALSIM_RegisterPowerDistributionCurrentCallback);
 }
 
 /*
@@ -186,8 +189,9 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_PowerDistributionDataJNI_cancelCurrentCallback
   (JNIEnv* env, jclass, jint index, jint channel, jint handle)
 {
-  return sim::FreeChannelCallback(env, handle, index, channel,
-                                  &HALSIM_CancelPowerDistributionCurrentCallback);
+  return sim::FreeChannelCallback(
+      env, handle, index, channel,
+      &HALSIM_CancelPowerDistributionCurrentCallback);
 }
 
 /*

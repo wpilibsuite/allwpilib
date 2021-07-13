@@ -58,7 +58,8 @@ class PowerDistributionSim {
   void SetInitialized(bool initialized);
 
   /**
-   * Register a callback to be run whenever the PowerDistribution temperature changes.
+   * Register a callback to be run whenever the PowerDistribution temperature
+   * changes.
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
@@ -82,7 +83,8 @@ class PowerDistributionSim {
   void SetTemperature(double temperature);
 
   /**
-   * Register a callback to be run whenever the PowerDistribution voltage changes.
+   * Register a callback to be run whenever the PowerDistribution voltage
+   * changes.
    *
    * @param callback the callback
    * @param initialNotify whether to call the callback with the initial state
@@ -137,7 +139,8 @@ class PowerDistributionSim {
    * Read the current of all of the PowerDistribution channels.
    *
    * @param currents output array; set to the current in each channel. The
-   *                 array must be big enough to hold all the PowerDistribution channels
+   *                 array must be big enough to hold all the PowerDistribution
+   * channels
    */
   void GetAllCurrents(double* currents) const;
 
@@ -145,7 +148,8 @@ class PowerDistributionSim {
    * Change the current in all of the PowerDistribution channels.
    *
    * @param currents array containing the current values for each channel. The
-   *                 array must be big enough to hold all the PowerDistribution channels
+   *                 array must be big enough to hold all the PowerDistribution
+   * channels
    */
   void SetAllCurrents(const double* currents);
 

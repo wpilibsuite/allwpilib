@@ -24,10 +24,10 @@ void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents) {
   }
 }
 
-void HALSIM_SetPowerDistributionAllCurrents(int32_t index, const double* currents) {}
+void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
+                                            const double* currents) {}
 
-void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(int32_t index, int32_t channel,
-                                              HAL_NotifyCallback callback,
-                                              void* param,
-                                              HAL_Bool initialNotify) {}
+void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(
+    int32_t index, int32_t channel, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {}
 }  // extern "C"

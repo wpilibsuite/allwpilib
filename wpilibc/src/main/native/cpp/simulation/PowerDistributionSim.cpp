@@ -16,12 +16,15 @@ using namespace frc::sim;
 
 PowerDistributionSim::PowerDistributionSim(int module) : m_index{module} {}
 
-PowerDistributionSim::PowerDistributionSim(const PowerDistribution& pdp) : m_index{pdp.GetModule()} {}
+PowerDistributionSim::PowerDistributionSim(const PowerDistribution& pdp)
+    : m_index{pdp.GetModule()} {}
 
-std::unique_ptr<CallbackStore> PowerDistributionSim::RegisterInitializedCallback(
-    NotifyCallback callback, bool initialNotify) {
+std::unique_ptr<CallbackStore>
+PowerDistributionSim::RegisterInitializedCallback(NotifyCallback callback,
+                                                  bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelPowerDistributionInitializedCallback);
+      m_index, -1, callback,
+      &HALSIM_CancelPowerDistributionInitializedCallback);
   store->SetUid(HALSIM_RegisterPowerDistributionInitializedCallback(
       m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
@@ -35,10 +38,12 @@ void PowerDistributionSim::SetInitialized(bool initialized) {
   HALSIM_SetPowerDistributionInitialized(m_index, initialized);
 }
 
-std::unique_ptr<CallbackStore> PowerDistributionSim::RegisterTemperatureCallback(
-    NotifyCallback callback, bool initialNotify) {
+std::unique_ptr<CallbackStore>
+PowerDistributionSim::RegisterTemperatureCallback(NotifyCallback callback,
+                                                  bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelPowerDistributionTemperatureCallback);
+      m_index, -1, callback,
+      &HALSIM_CancelPowerDistributionTemperatureCallback);
   store->SetUid(HALSIM_RegisterPowerDistributionTemperatureCallback(
       m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
@@ -56,8 +61,8 @@ std::unique_ptr<CallbackStore> PowerDistributionSim::RegisterVoltageCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
       m_index, -1, callback, &HALSIM_CancelPowerDistributionVoltageCallback);
-  store->SetUid(HALSIM_RegisterPowerDistributionVoltageCallback(m_index, &CallbackStoreThunk,
-                                                  store.get(), initialNotify));
+  store->SetUid(HALSIM_RegisterPowerDistributionVoltageCallback(
+      m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
@@ -72,7 +77,8 @@ void PowerDistributionSim::SetVoltage(double voltage) {
 std::unique_ptr<CallbackStore> PowerDistributionSim::RegisterCurrentCallback(
     int channel, NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, channel, -1, callback, &HALSIM_CancelPowerDistributionCurrentCallback);
+      m_index, channel, -1, callback,
+      &HALSIM_CancelPowerDistributionCurrentCallback);
   store->SetUid(HALSIM_RegisterPowerDistributionCurrentCallback(
       m_index, channel, &CallbackStoreThunk, store.get(), initialNotify));
   return store;

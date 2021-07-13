@@ -37,7 +37,8 @@ extern "C" {
  * @param  type   the type of module to intialize
  * @return the created PowerDistribution
  */
-HAL_PowerDistributionHandle HAL_InitializePowerDistribution(int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status);
+HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
+    int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status);
 
 /**
  * Cleans a PowerDistribution module.
@@ -53,7 +54,8 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle);
  * @param channel the channel to check
  * @return        true if the channel is valid, otherwise false
  */
-HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle, int32_t channel);
+HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
+                                           int32_t channel);
 
 /**
  * Checks if a PowerDistribution module is valid.
@@ -61,14 +63,16 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle, i
  * @param channel the module to check
  * @return        true if the module is valid, otherwise false
  */
-HAL_Bool HAL_CheckPowerDistributionModule(int32_t module, HAL_PowerDistributionType type);
+HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
+                                          HAL_PowerDistributionType type);
 
 /**
  * Gets the type of PowerDistribution module.
  *
  * @return the type of module
  */
-HAL_PowerDistributionType HAL_GetPowerDistributionType(HAL_PowerDistributionHandle handle, int32_t* status);
+HAL_PowerDistributionType HAL_GetPowerDistributionType(
+    HAL_PowerDistributionHandle handle, int32_t* status);
 
 /**
  * Gets the temperature of the PowerDistribution.
@@ -76,7 +80,8 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(HAL_PowerDistributionHand
  * @param handle the module handle
  * @return       the module temperature (celsius)
  */
-double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle, int32_t* status);
+double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
+                                           int32_t* status);
 
 /**
  * Gets the PowerDistribution input voltage.
@@ -84,7 +89,8 @@ double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle, i
  * @param handle the module handle
  * @return       the input voltage (volts)
  */
-double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle, int32_t* status);
+double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
+                                       int32_t* status);
 
 /**
  * Gets the current of a specific PowerDistribution channel.
@@ -93,8 +99,8 @@ double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle, int32
  * @param channel the channel
  * @return        the channel current (amps)
  */
-double HAL_GetPowerDistributionChannelCurrent(HAL_PowerDistributionHandle handle, int32_t channel,
-                                int32_t* status);
+double HAL_GetPowerDistributionChannelCurrent(
+    HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status);
 
 /**
  * Gets the current of all 16 channels on the PowerDistribution.
@@ -105,8 +111,9 @@ double HAL_GetPowerDistributionChannelCurrent(HAL_PowerDistributionHandle handle
  * @param currents the currents (output)
  * @param currentsLength the length of the currents array
  */
-void HAL_GetPowerDistributionAllChannelCurrents(HAL_PowerDistributionHandle handle, double* currents,
-                                  int32_t currentsLength, int32_t* status);
+void HAL_GetPowerDistributionAllChannelCurrents(
+    HAL_PowerDistributionHandle handle, double* currents,
+    int32_t currentsLength, int32_t* status);
 
 /**
  * Gets the total current of the PowerDistribution.
@@ -114,7 +121,8 @@ void HAL_GetPowerDistributionAllChannelCurrents(HAL_PowerDistributionHandle hand
  * @param handle the module handle
  * @return       the total current (amps)
  */
-double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle, int32_t* status);
+double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
+                                            int32_t* status);
 
 /**
  * Gets the total power of the PowerDistribution.
@@ -122,7 +130,8 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle, 
  * @param handle the module handle
  * @return       the total power (watts)
  */
-double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle, int32_t* status);
+double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
+                                          int32_t* status);
 
 /**
  * Gets the total energy of the PowerDistribution.
@@ -130,21 +139,24 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle, in
  * @param handle the module handle
  * @return       the total energy (joules)
  */
-double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle, int32_t* status);
+double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
+                                           int32_t* status);
 
 /**
  * Resets the PowerDistribution accumulated energy.
  *
  * @param handle the module handle
  */
-void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle, int32_t* status);
+void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
+                                           int32_t* status);
 
 /**
  * Clears any PowerDistribution sticky faults.
  *
  * @param handle the module handle
  */
-void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle, int32_t* status);
+void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
+                                            int32_t* status);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

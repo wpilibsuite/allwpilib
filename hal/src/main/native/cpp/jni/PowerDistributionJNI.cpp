@@ -4,8 +4,8 @@
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PowerDistributionJNI.h"
-#include "hal/PowerDistribution.h"
 #include "hal/Ports.h"
+#include "hal/PowerDistribution.h"
 
 using namespace hal;
 
@@ -16,8 +16,10 @@ extern "C" {
  * Method:    initialize
  * Signature: (II)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_initialize(
-    JNIEnv* env, jclass, jint module, jint type) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
+  (JNIEnv* env, jclass, jint module, jint type)
+{
   int32_t status = 0;
   auto handle = HAL_InitializePowerDistribution(
       module, static_cast<HAL_PowerDistributionType>(type), &status);
@@ -31,8 +33,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_initialize(
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_checkChannel(JNIEnv* env, jclass,
-                                                         jint handle, jint channel) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_checkChannel
+  (JNIEnv* env, jclass, jint handle, jint channel)
+{
   return HAL_CheckPowerDistributionChannel(handle, channel);
 }
 
@@ -42,9 +45,11 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_checkChannel(JNIEnv* env, jclass,
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_checkModule(JNIEnv* env, jclass,
-                                                        jint module, jint type) {
-  return HAL_CheckPowerDistributionModule(module, static_cast<HAL_PowerDistributionType>(type));
+Java_edu_wpi_first_hal_PowerDistributionJNI_checkModule
+  (JNIEnv* env, jclass, jint module, jint type)
+{
+  return HAL_CheckPowerDistributionModule(
+      module, static_cast<HAL_PowerDistributionType>(type));
 }
 
 /*
@@ -52,13 +57,15 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_checkModule(JNIEnv* env, jclass,
  * Method:    getType
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_getType
-  (JNIEnv * env, jclass, jint handle) {
-    int32_t status = 0;
-    auto result = HAL_GetPowerDistributionType(handle, &status);
-    CheckStatus(env, status);
-    return result;
-  }
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getType
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto result = HAL_GetPowerDistributionType(handle, &status);
+  CheckStatus(env, status);
+  return result;
+}
 
 /*
  * Class:     edu_wpi_first_hal_PowerDistributionJNI
@@ -66,8 +73,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_getType
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTemperature(JNIEnv* env, jclass,
-                                                           jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getTemperature
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   double temperature = HAL_GetPowerDistributionTemperature(handle, &status);
   CheckStatus(env, status, false);
@@ -80,8 +88,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTemperature(JNIEnv* env, jclass,
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage(JNIEnv* env, jclass,
-                                                       jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   double voltage = HAL_GetPowerDistributionVoltage(handle, &status);
   CheckStatus(env, status, false);
@@ -94,10 +103,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage(JNIEnv* env, jclass,
  * Signature: (BI)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent(JNIEnv* env,
-                                                              jclass,
-                                                              jbyte channel,
-                                                              jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent
+  (JNIEnv* env, jclass, jbyte channel, jint handle)
+{
   int32_t status = 0;
   double current =
       HAL_GetPowerDistributionChannelCurrent(handle, channel, &status);
@@ -111,9 +119,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent(JNIEnv* env,
  * Signature: (I[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents(JNIEnv* env, jclass,
-                                                           jint handle,
-                                                           jdoubleArray jarr) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents
+  (JNIEnv* env, jclass, jint handle, jdoubleArray jarr)
+{
   double storage[16];
   int32_t status = 0;
   // TODO fix me
@@ -131,8 +139,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getAllCurrents(JNIEnv* env, jclass,
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrent(JNIEnv* env, jclass,
-                                                            jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrent
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   double current = HAL_GetPowerDistributionTotalCurrent(handle, &status);
   CheckStatus(env, status, false);
@@ -145,8 +154,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrent(JNIEnv* env, jclass,
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalPower(JNIEnv* env, jclass,
-                                                          jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalPower
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   double power = HAL_GetPowerDistributionTotalPower(handle, &status);
   CheckStatus(env, status, false);
@@ -159,8 +169,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalPower(JNIEnv* env, jclass,
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalEnergy(JNIEnv* env, jclass,
-                                                           jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalEnergy
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   double energy = HAL_GetPowerDistributionTotalEnergy(handle, &status);
   CheckStatus(env, status, false);
@@ -173,9 +184,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalEnergy(JNIEnv* env, jclass,
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_resetTotalEnergy(JNIEnv* env,
-                                                             jclass,
-                                                             jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_resetTotalEnergy
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   HAL_ResetPowerDistributionTotalEnergy(handle, &status);
   CheckStatus(env, status, false);
@@ -187,9 +198,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_resetTotalEnergy(JNIEnv* env,
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults(JNIEnv* env,
-                                                              jclass,
-                                                              jint handle) {
+Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults
+  (JNIEnv* env, jclass, jint handle)
+{
   int32_t status = 0;
   HAL_ClearPowerDistributionStickyFaults(handle, &status);
   CheckStatus(env, status, false);

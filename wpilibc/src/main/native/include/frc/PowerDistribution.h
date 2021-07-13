@@ -14,9 +14,8 @@ namespace frc {
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistribution
-    : public wpi::Sendable,
-      public wpi::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::Sendable,
+                          public wpi::SendableHelper<PowerDistribution> {
  public:
   /**
    * Constructs a PowerDistribution.

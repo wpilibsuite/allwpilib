@@ -29,15 +29,15 @@ void HALSIM_ResetPowerDistributionData(int32_t index) {
   SimPowerDistributionData[index].ResetData();
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                          \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PowerDistribution##CAPINAME, SimPowerDistributionData, \
-                               LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                            \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, PowerDistribution##CAPINAME, \
+                               SimPowerDistributionData, LOWERNAME)
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(double, Temperature, temperature)
 DEFINE_CAPI(double, Voltage, voltage)
-HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent, SimPowerDistributionData,
-                                     current)
+HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent,
+                                     SimPowerDistributionData, current)
 
 void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents) {
   auto& data = SimPowerDistributionData[index].current;
@@ -46,20 +46,21 @@ void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents) {
   }
 }
 
-void HALSIM_SetPowerDistributionAllCurrents(int32_t index, const double* currents) {
+void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
+                                            const double* currents) {
   auto& data = SimPowerDistributionData[index].current;
   for (int i = 0; i < kNumPDPChannels; i++) {
     data[i] = currents[i];
   }
 }
 
-#define REGISTER(NAME) \
-  SimPowerDistributionData[index].NAME.RegisterCallback(callback, param, initialNotify)
+#define REGISTER(NAME)                                                   \
+  SimPowerDistributionData[index].NAME.RegisterCallback(callback, param, \
+                                                        initialNotify)
 
-void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(int32_t index, int32_t channel,
-                                              HAL_NotifyCallback callback,
-                                              void* param,
-                                              HAL_Bool initialNotify) {
+void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(
+    int32_t index, int32_t channel, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(temperature);
   REGISTER(voltage);

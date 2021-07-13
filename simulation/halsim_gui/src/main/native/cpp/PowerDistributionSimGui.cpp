@@ -20,9 +20,12 @@
 using namespace halsimgui;
 
 namespace {
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PowerDistributionTemperature, "Power Distribution Temp");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PowerDistributionVoltage, "Power Distribution Voltage");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED2(PowerDistributionCurrent, "Power Distribution Current");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PowerDistributionTemperature,
+                                    "Power Distribution Temp");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PowerDistributionVoltage,
+                                    "Power Distribution Voltage");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED2(PowerDistributionCurrent,
+                                     "Power Distribution Current");
 
 class PowerDistributionSimModel : public glass::PowerDistributionModel {
  public:
@@ -31,13 +34,16 @@ class PowerDistributionSimModel : public glass::PowerDistributionModel {
     const int numChannels = HAL_GetNumPDPChannels();
     m_currents.reserve(numChannels);
     for (int i = 0; i < numChannels; ++i) {
-      m_currents.emplace_back(std::make_unique<PowerDistributionCurrentSource>(index, i));
+      m_currents.emplace_back(
+          std::make_unique<PowerDistributionCurrentSource>(index, i));
     }
   }
 
   void Update() override {}
 
-  bool Exists() override { return HALSIM_GetPowerDistributionInitialized(m_index); }
+  bool Exists() override {
+    return HALSIM_GetPowerDistributionInitialized(m_index);
+  }
 
   int GetNumChannels() const override { return m_currents.size(); }
 
@@ -50,7 +56,9 @@ class PowerDistributionSimModel : public glass::PowerDistributionModel {
   void SetTemperature(double val) override {
     HALSIM_SetPowerDistributionTemperature(m_index, val);
   }
-  void SetVoltage(double val) override { HALSIM_SetPowerDistributionVoltage(m_index, val); }
+  void SetVoltage(double val) override {
+    HALSIM_SetPowerDistributionVoltage(m_index, val);
+  }
   void SetCurrent(int channel, double val) override {
     HALSIM_SetPowerDistributionCurrent(m_index, channel, val);
   }
@@ -71,7 +79,8 @@ class PowerDistributionsSimModel : public glass::PowerDistributionsModel {
   bool Exists() override { return true; }
 
   void ForEachPowerDistribution(
-      wpi::function_ref<void(glass::PowerDistributionModel& model, int index)> func) override;
+      wpi::function_ref<void(glass::PowerDistributionModel& model, int index)>
+          func) override;
 
  private:
   std::vector<std::unique_ptr<PowerDistributionSimModel>> m_models;
@@ -93,7 +102,8 @@ void PowerDistributionsSimModel::Update() {
 }
 
 void PowerDistributionsSimModel::ForEachPowerDistribution(
-    wpi::function_ref<void(glass::PowerDistributionModel& model, int index)> func) {
+    wpi::function_ref<void(glass::PowerDistributionModel& model, int index)>
+        func) {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     if (auto model = m_models[i].get()) {
@@ -118,7 +128,9 @@ void PowerDistributionSimGui::Initialize() {
       [] { return std::make_unique<PowerDistributionsSimModel>(); },
       [](glass::Window* win, glass::Model* model) {
         win->SetDefaultPos(245, 155);
-        return glass::MakeFunctionView(
-            [=] { DisplayPowerDistributions(static_cast<PowerDistributionsSimModel*>(model)); });
+        return glass::MakeFunctionView([=] {
+          DisplayPowerDistributions(
+              static_cast<PowerDistributionsSimModel*>(model));
+        });
       });
 }
