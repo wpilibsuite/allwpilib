@@ -9,22 +9,8 @@
 #include "units/base.h"
 
 template <class Units, typename T, template <typename> class NonLinearScale>
-struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>> {
-  char presentation = 'f';
-
-  constexpr auto parse(fmt::format_parse_context& ctx) {
-    auto it = ctx.begin(), end = ctx.end();
-    if (it != end && (*it == 'f' || *it == 'e')) {
-      presentation = *it++;
-    }
-
-    if (it != end && *it != '}') {
-      throw fmt::format_error("invalid format");
-    }
-
-    return it;
-  }
-
+struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>>
+    : fmt::formatter<double> {
   template <typename FormatContext>
   auto format(const units::unit_t<Units, T, NonLinearScale>& obj,
               FormatContext& ctx) {
@@ -34,7 +20,8 @@ struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>> {
 
     auto out = ctx.out();
 
-    out = fmt::format_to(out, "{}", units::convert<Units, BaseUnits>(obj()));
+    out = fmt::formatter<double>::format(
+        units::convert<Units, BaseUnits>(obj()), ctx);
 
     if constexpr (units::traits::unit_traits<
                       Units>::base_unit_type::meter_ratio::num != 0) {

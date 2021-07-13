@@ -1337,7 +1337,7 @@ TEST_F(UnitContainer, convertMethod) {
   EXPECT_NEAR(9.84252, test, 5.0e-6);
 }
 
-#ifndef UNIT_LIB_DISABLE_IOSTREAM
+#ifdef UNIT_LIB_ENABLE_IOSTREAM
 TEST_F(UnitContainer, cout) {
   testing::internal::CaptureStdout();
   std::cout << degree_t(349.87);
@@ -1418,6 +1418,88 @@ TEST_F(UnitContainer, cout) {
   EXPECT_STREQ("5.670367e-08 kg s^-3 K^-4", output.c_str());
 #endif
 }
+#endif
+
+TEST_F(UnitContainer, fmtlib) {
+  testing::internal::CaptureStdout();
+  fmt::print("{}", degree_t(349.87));
+  std::string output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("349.87 deg", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", meter_t(1.0));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("1 m", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", dB_t(31.0));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("31 dB", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", volt_t(21.79));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("21.79 V", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", dBW_t(12.0));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("12 dBW", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", dBm_t(120.0));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("120 dBm", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", miles_per_hour_t(72.1));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("72.1 mph", output.c_str());
+
+  // undefined unit
+  testing::internal::CaptureStdout();
+  fmt::print("{}", units::math::cpow<4>(meter_t(2)));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("16 m^4", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{}", units::math::cpow<3>(foot_t(2)));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("8 cu_ft", output.c_str());
+
+  testing::internal::CaptureStdout();
+  fmt::print("{:.9}", units::math::cpow<4>(foot_t(2)));
+  output = testing::internal::GetCapturedStdout();
+  EXPECT_STREQ("0.138095597 m^4", output.c_str());
+
+  // constants
+  testing::internal::CaptureStdout();
+  fmt::print("{:.8}", constants::k_B);
+  output = testing::internal::GetCapturedStdout();
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
+  EXPECT_STREQ("1.3806485e-023 m^2 kg s^-2 K^-1", output.c_str());
+#else
+  EXPECT_STREQ("1.3806485e-23 m^2 kg s^-2 K^-1", output.c_str());
+#endif
+
+  testing::internal::CaptureStdout();
+  fmt::print("{:.9}", constants::mu_B);
+  output = testing::internal::GetCapturedStdout();
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
+  EXPECT_STREQ("9.27400999e-024 m^2 A", output.c_str());
+#else
+  EXPECT_STREQ("9.27400999e-24 m^2 A", output.c_str());
+#endif
+
+  testing::internal::CaptureStdout();
+  fmt::print("{:.7}", constants::sigma);
+  output = testing::internal::GetCapturedStdout();
+#if defined(_MSC_VER) && (_MSC_VER <= 1800)
+  EXPECT_STREQ("5.670367e-008 kg s^-3 K^-4", output.c_str());
+#else
+  EXPECT_STREQ("5.670367e-08 kg s^-3 K^-4", output.c_str());
+#endif
+}
 
 TEST_F(UnitContainer, to_string) {
   foot_t a(3.5);
@@ -1476,7 +1558,6 @@ TEST_F(UnitContainer, nameAndAbbreviation) {
   EXPECT_STREQ("m", b.abbreviation());
   EXPECT_STREQ("meter", b.name());
 }
-#endif
 
 TEST_F(UnitContainer, negative) {
   meter_t a(5.3);
