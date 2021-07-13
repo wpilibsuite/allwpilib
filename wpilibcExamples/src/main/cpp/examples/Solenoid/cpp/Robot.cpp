@@ -58,7 +58,8 @@ class Robot : public frc::TimedRobot {
   frc::Solenoid m_solenoid{frc::PneumaticsModuleType::CTREPCM, 0};
 
   // DoubleSolenoid corresponds to a double solenoid.
-  frc::DoubleSolenoid m_doubleSolenoid{frc::PneumaticsModuleType::CTREPCM, 1, 2};
+  frc::DoubleSolenoid m_doubleSolenoid{frc::PneumaticsModuleType::CTREPCM, 1,
+                                       2};
 
   static constexpr int kSolenoidButton = 1;
   static constexpr int kDoubleSolenoidForward = 2;

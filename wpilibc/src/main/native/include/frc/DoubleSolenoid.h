@@ -27,8 +27,8 @@ class DoubleSolenoid : public wpi::Sendable,
  public:
   enum Value { kOff, kForward, kReverse };
 
-  DoubleSolenoid(int module, PneumaticsModuleType moduleType, int forwardChannel,
-                 int reverseChannel);
+  DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+                 int forwardChannel, int reverseChannel);
   DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 

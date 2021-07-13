@@ -6,16 +6,15 @@
 
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
-
-#include "frc/Errors.h"
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
+
+#include "frc/Errors.h"
 
 using namespace frc;
 
 Compressor::Compressor(int module, PneumaticsModuleType moduleType)
-  : m_module{PneumaticsBase::GetForType(module, moduleType)} {
-
+    : m_module{PneumaticsBase::GetForType(module, moduleType)} {
   if (!m_module->ReserveCompressor()) {
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }

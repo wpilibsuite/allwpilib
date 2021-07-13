@@ -5,13 +5,12 @@
 #pragma once
 
 #include <hal/Types.h>
-
-#include "frc/SensorUtil.h"
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
+#include "frc/SensorUtil.h"
 
 namespace frc {
 
@@ -30,7 +29,8 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public wpi::Sendable, public wpi::SendableHelper<Compressor> {
+class Compressor : public wpi::Sendable,
+                   public wpi::SendableHelper<Compressor> {
  public:
   /**
    * Constructor. The default PCM ID is 0.

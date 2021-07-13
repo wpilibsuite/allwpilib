@@ -8,11 +8,11 @@
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
 
+#include "frc/Compressor.h"
+#include "frc/DoubleSolenoid.h"
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/Compressor.h"
 
 using namespace frc;
 
@@ -227,7 +227,6 @@ void PneumaticsControlModule::UnreserveCompressor() {
   std::scoped_lock lock{m_dataStore->m_reservedLock};
   m_dataStore->m_compressorReserved = false;
 }
-
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
   return Solenoid{m_module, PneumaticsModuleType::CTREPCM, channel};

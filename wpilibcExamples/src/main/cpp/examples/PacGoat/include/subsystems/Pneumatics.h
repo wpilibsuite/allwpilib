@@ -43,7 +43,8 @@ class Pneumatics : public frc::Subsystem {
   frc::AnalogInput m_pressureSensor{3};
 
 #ifndef SIMULATION
-  frc::Compressor m_compressor{1, frc::PneumaticsModuleType::CTREPCM};  // TODO: (1, 14, 1, 8);
+  frc::Compressor m_compressor{
+      1, frc::PneumaticsModuleType::CTREPCM};  // TODO: (1, 14, 1, 8);
 #endif
 
   static constexpr double kMaxPressure = 2.55;

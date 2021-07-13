@@ -18,8 +18,8 @@
 
 using namespace frc;
 
-DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType, int forwardChannel,
-                               int reverseChannel)
+DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+                               int forwardChannel, int reverseChannel)
     : m_module{PneumaticsBase::GetForType(module, moduleType)},
       m_forwardChannel{forwardChannel},
       m_reverseChannel{reverseChannel} {
@@ -62,9 +62,10 @@ DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType, int 
                                m_module->GetModuleNumber(), m_forwardChannel);
 }
 
-DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
-                               int reverseChannel)
-    : DoubleSolenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel} {}
+DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType,
+                               int forwardChannel, int reverseChannel)
+    : DoubleSolenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType,
+                     forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::~DoubleSolenoid() {
   m_module->UnreserveSolenoids(m_mask);

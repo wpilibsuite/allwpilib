@@ -51,10 +51,12 @@ class PneumaticsBase {
   virtual void UnreserveCompressor() = 0;
 
   virtual Solenoid MakeSolenoid(int channel) = 0;
-  virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel, int reverseChannel) = 0;
+  virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
+                                            int reverseChannel) = 0;
   virtual Compressor MakeCompressor() = 0;
 
-  static std::shared_ptr<PneumaticsBase> GetForType(int module, PneumaticsModuleType moduleType);
+  static std::shared_ptr<PneumaticsBase> GetForType(
+      int module, PneumaticsModuleType moduleType);
   static int GetDefaultForType(PneumaticsModuleType moduleType);
 };
 }  // namespace frc

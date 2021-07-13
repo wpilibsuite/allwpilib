@@ -17,7 +17,8 @@
 using namespace frc;
 
 Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
-    : m_module{PneumaticsBase::GetForType(module, moduleType)}, m_channel{channel} {
+    : m_module{PneumaticsBase::GetForType(module, moduleType)},
+      m_channel{channel} {
   if (!m_module->CheckSolenoidChannel(m_channel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}", m_channel);
   }
@@ -35,7 +36,8 @@ Solenoid::Solenoid(int module, PneumaticsModuleType moduleType, int channel)
 }
 
 Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
-    : Solenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType, channel} {}
+    : Solenoid{PneumaticsBase::GetDefaultForType(moduleType), moduleType,
+               channel} {}
 
 Solenoid::~Solenoid() {
   m_module->UnreserveSolenoids(m_mask);
