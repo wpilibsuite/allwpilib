@@ -94,6 +94,10 @@ public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
   }
 
+  public int getPort() {
+    return m_spi.getPort();
+  }
+
   @Override
   public void close() {
     SendableRegistry.remove(this);

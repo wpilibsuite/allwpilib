@@ -80,6 +80,10 @@ Ultrasonic::~Ultrasonic() {
   }
 }
 
+int Ultrasonic::GetEchoChannel() const {
+  return m_echoChannel->GetChannel();
+}
+
 void Ultrasonic::Ping() {
   if (m_automaticEnabled) {
     throw FRC_MakeError(err::IncompatibleMode, "{}",

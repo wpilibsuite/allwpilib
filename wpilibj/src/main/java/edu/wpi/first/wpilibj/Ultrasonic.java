@@ -111,6 +111,10 @@ public class Ultrasonic implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
+  public int getEchoChannel() {
+    return m_echoChannel.getChannel();
+  }
+
   /**
    * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
    * and Vex ultrasonic sensors.

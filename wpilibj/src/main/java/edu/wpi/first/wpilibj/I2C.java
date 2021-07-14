@@ -48,6 +48,14 @@ public class I2C implements AutoCloseable {
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
+  public int getPort() {
+    return m_port;
+  }
+
+  public int getDeviceAddress() {
+    return m_deviceAddress;
+  }
+
   @Override
   public void close() {
     I2CJNI.i2CClose(m_port);

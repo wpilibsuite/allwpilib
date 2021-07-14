@@ -43,7 +43,6 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
   private static final int kSNLowRegister = 0x10;
 
   private SPI m_spi;
-  private SPI.Port m_port;
 
   private SimDevice m_simDevice;
   private SimBoolean m_simConnected;
@@ -62,7 +61,6 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
    */
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
-    m_port = port;
 
     // simulation
     m_simDevice = SimDevice.create("Gyro:ADXRS450", port.value);
@@ -132,7 +130,7 @@ public class ADXRS450_Gyro implements Gyro, Sendable {
    * @return The SPI port number.
    */
   public int getPort() {
-    return m_port.value;
+    return m_spi.getPort();
   }
 
   private boolean calcParity(int value) {

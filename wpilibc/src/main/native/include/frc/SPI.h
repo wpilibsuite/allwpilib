@@ -40,6 +40,8 @@ class SPI {
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
 
+  Port GetPort() const;
+
   /**
    * Configure the rate of the generated clock signal.
    *

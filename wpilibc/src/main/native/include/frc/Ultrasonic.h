@@ -90,6 +90,8 @@ class Ultrasonic : public wpi::Sendable,
   Ultrasonic(Ultrasonic&&) = default;
   Ultrasonic& operator=(Ultrasonic&&) = default;
 
+  int GetEchoChannel() const;
+
   /**
    * Single ping to ultrasonic sensor.
    *

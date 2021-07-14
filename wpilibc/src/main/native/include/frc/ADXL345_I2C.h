@@ -46,6 +46,9 @@ class ADXL345_I2C : public Accelerometer,
   ADXL345_I2C(ADXL345_I2C&&) = default;
   ADXL345_I2C& operator=(ADXL345_I2C&&) = default;
 
+  I2C::Port GetI2CPort() const;
+  int GetI2CDeviceAddress() const;
+
   // Accelerometer interface
   void SetRange(Range range) final;
   double GetX() override;

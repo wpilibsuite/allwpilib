@@ -26,6 +26,14 @@ I2C::~I2C() {
   HAL_CloseI2C(m_port);
 }
 
+I2C::Port I2C::GetPort() const {
+  return static_cast<Port>(static_cast<int>(m_port));
+}
+
+int I2C::GetDeviceAddress() const {
+  return m_deviceAddress;
+}
+
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {
   int32_t status = 0;
