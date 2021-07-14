@@ -118,3 +118,62 @@ TEST_P(LinearFilterOutputTest, Output) {
 INSTANTIATE_TEST_SUITE_P(Test, LinearFilterOutputTest,
                          testing::Values(kTestSinglePoleIIR, kTestHighPass,
                                          kTestMovAvg, kTestPulse));
+
+/**
+ * Test backward finite difference.
+ */
+TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
+  constexpr auto h = 50_ms;
+
+  auto AssertResults = [](auto&& f, auto&& dfdx, units::second_t h, double min,
+                          double max) {
+    auto filter = frc::LinearFilter<double>::BackwardFiniteDifference<1, 2>(h);
+
+    for (int i = min / h.to<double>(); i < max / h.to<double>(); ++i) {
+      // Let filter initialize
+      if (i < static_cast<int>(min / h.to<double>()) + 2) {
+        filter.Calculate(f(i * h.to<double>()));
+        continue;
+      }
+
+      // The order of accuracy is O(h^(N - d)) where N is number of stencil
+      // points and d is order of derivative
+      EXPECT_NEAR(dfdx(i * h.to<double>()),
+                  filter.Calculate(f(i * h.to<double>())),
+                  std::max(std::pow(h.to<double>(), 2 - 1), 1e-7) + 1e-5);
+    }
+  };
+
+  AssertResults(
+      [](double x) {
+        // f(x) = x^2
+        return x * x;
+      },
+      [](double x) {
+        // df/dx = 2x
+        return 2.0 * x;
+      },
+      h, -20.0, 20.0);
+
+  AssertResults(
+      [](double x) {
+        // f(x) = std::sin(x)
+        return std::sin(x);
+      },
+      [](double x) {
+        // df/dx = std::cos(x)
+        return std::cos(x);
+      },
+      h, -20.0, 20.0);
+
+  AssertResults(
+      [](double x) {
+        // f(x) = ln(x)
+        return std::log(x);
+      },
+      [](double x) {
+        // df/dx = 1 / x
+        return 1.0 / x;
+      },
+      h, 1.0, 20.0);
+}

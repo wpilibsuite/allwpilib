@@ -108,4 +108,66 @@ class LinearFilterTest {
             (DoubleFunction<Double>) LinearFilterTest::getPulseData,
             0.0));
   }
+
+  /** Test backward finite difference. */
+  @Test
+  void backwardFiniteDifferenceTest() {
+    double h = 0.05;
+
+    assertResults(
+        // f(x) = x^2
+        (double x) -> x * x,
+        // df/dx = 2x
+        (double x) -> 2.0 * x,
+        h,
+        -20.0,
+        20.0);
+
+    assertResults(
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // df/dx = cos(x)
+        (double x) -> Math.cos(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertResults(
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // df/dx = 1 / x
+        (double x) -> 1.0 / x,
+        h,
+        1.0,
+        20.0);
+  }
+
+  /**
+   * Helper for checking results of backward finite difference.
+   *
+   * @param f Function of which to take derivative.
+   * @param dfdx Derivative of f.
+   * @param h Sample period in seconds.
+   * @param min Minimum of f's domain to test.
+   * @param max Maximum of f's domain to test.
+   */
+  void assertResults(
+      DoubleFunction<Double> f, DoubleFunction<Double> dfdx, double h, double min, double max) {
+    var filter = LinearFilter.backwardFiniteDifference(1, 2, h);
+
+    for (int i = (int) (min / h); i < (int) (max / h); ++i) {
+      // Let filter initialize
+      if (i < (int) (min / h) + 2) {
+        filter.calculate(f.apply(i * h));
+        continue;
+      }
+
+      // The order of accuracy is O(h^(N - d)) where N is number of stencil
+      // points and d is order of derivative
+      assertEquals(
+          dfdx.apply(i * h),
+          filter.calculate(f.apply(i * h)),
+          Math.max(Math.pow(h, 2 - 1), 1e-7) + 1e-5);
+    }
+  }
 }

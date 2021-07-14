@@ -13,6 +13,8 @@
 #include <wpi/circular_buffer.h>
 #include <wpi/span.h>
 
+#include "Eigen/Core"
+#include "Eigen/QR"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -74,8 +76,8 @@ class LinearFilter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
   LinearFilter(wpi::span<const double> ffGains, wpi::span<const double> fbGains)
       : m_inputs(ffGains.size()),
@@ -98,8 +100,8 @@ class LinearFilter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
   LinearFilter(std::initializer_list<double> ffGains,
                std::initializer_list<double> fbGains)
@@ -165,6 +167,76 @@ class LinearFilter {
   }
 
   /**
+   * Creates a backward finite difference filter that computes the nth
+   * derivative of the input given the specified number of samples.
+   *
+   * For example, a first derivative filter that uses two samples and a sample
+   * period of 20 ms would be
+   *
+   * <pre><code>
+   * LinearFilter<double>::BackwardFiniteDifference<1, 2>(20_ms);
+   * </code></pre>
+   *
+   * @tparam Derivative The order of the derivative to compute.
+   * @tparam Samples    The number of samples to use to compute the given
+   *                    derivative. This must be one more than the order of
+   *                    derivative or higher.
+   * @param period      The period in seconds between samples taken by the user.
+   */
+  template <int Derivative, int Samples>
+  static auto BackwardFiniteDifference(units::second_t period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
+    //
+    // For a given list of stencil points s of length n and the order of
+    // derivative d < n, the finite difference coefficients can be obtained by
+    // solving the following linear system for the vector a.
+    //
+    // @verbatim
+    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
+    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
+    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
+    // @endverbatim
+    //
+    // where δᵢ,ⱼ are the Kronecker delta. For backward finite difference, the
+    // stencil points are the range [-n + 1, 0]. The FIR gains are the elements
+    // of the vector a in reverse order divided by hᵈ.
+    //
+    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+
+    static_assert(Derivative >= 1,
+                  "Order of derivative must be greater than or equal to one.");
+    static_assert(Samples > 0, "Number of samples must be greater than zero.");
+    static_assert(Derivative < Samples,
+                  "Order of derivative must be less than number of samples.");
+
+    Eigen::Matrix<double, Samples, Samples> S;
+    for (int row = 0; row < Samples; ++row) {
+      for (int col = 0; col < Samples; ++col) {
+        double s = 1 - Samples + col;
+        S(row, col) = std::pow(s, row);
+      }
+    }
+
+    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
+    Eigen::Matrix<double, Samples, 1> d;
+    for (int i = 0; i < Samples; ++i) {
+      d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
+    }
+
+    Eigen::Matrix<double, Samples, 1> a =
+        S.householderQr().solve(d) / std::pow(period.to<double>(), Derivative);
+
+    // Reverse gains list
+    std::vector<double> gains;
+    for (int i = Samples - 1; i >= 0; --i) {
+      gains.push_back(a(i));
+    }
+
+    return LinearFilter(gains, {});
+  }
+
+  /**
    * Reset the filter state.
    */
   void Reset() {
@@ -208,6 +280,19 @@ class LinearFilter {
   wpi::circular_buffer<T> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
+
+  /**
+   * Factorial of n.
+   *
+   * @param n Argument of which to take factorial.
+   */
+  static int Factorial(int n) {
+    if (n < 2) {
+      return 1;
+    } else {
+      return n * Factorial(n - 1);
+    }
+  }
 };
 
 }  // namespace frc
