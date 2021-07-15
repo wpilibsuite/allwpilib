@@ -18,7 +18,7 @@ def clone_repo(url, treeish):
     os.chdir(tempfile.gettempdir())
 
     repo = os.path.basename(url)
-    dest = os.path.join(os.getcwd(), repo).rstrip(".git")
+    dest = os.path.join(os.getcwd(), repo).removesuffix(".git")
 
     # Clone Git repository into current directory or update it
     if not os.path.exists(dest):
@@ -45,6 +45,39 @@ def clone_repo(url, treeish):
         subprocess.run(["git", "checkout", treeish])
 
 
+def get_repo_root():
+    """Returns the Git repository root as an absolute path.
+
+    An empty string is returned if no repository root was found.
+    """
+    current_dir = os.path.abspath(os.getcwd())
+    while current_dir != os.path.dirname(current_dir):
+        if os.path.exists(current_dir + os.sep + ".git"):
+            return current_dir
+        current_dir = os.path.dirname(current_dir)
+    return ""
+
+
+def setup_upstream_repo(url, treeish):
+    """Clones the given upstream repository, then returns the root of the
+    destination Git repository as well as the cloned upstream Git repository.
+
+    The current working directory will be set to the cloned upstream repository
+    folder.
+
+    Keyword arguments:
+    url -- The URL of the git repo
+    treeish -- The tree-ish to check out (branch or tag)
+
+    Returns:
+    root -- root directory of destination Git repository
+    repo -- root directory of cloned upstream Git repository
+    """
+    root = get_repo_root()
+    clone_repo(url, treeish)
+    return root, os.getcwd()
+
+
 def walk_if(top, pred):
     """Walks the current directory, then returns a list of files for which the
     given predicate is true.
@@ -63,17 +96,22 @@ def walk_if(top, pred):
 
 
 def copy_to(files, root):
-    if os.path.exists(root):
-        # Delete old install
-        for filename in os.listdir(root):
-            filepath = os.path.join(root, filename)
-            if os.path.isfile(filepath) or os.path.islink(filepath):
-                os.unlink(filepath)
-            elif os.path.isdir(filepath):
-                shutil.rmtree(filepath)
-    else:
+    """Copies list of files to root by appending the relative paths of the files
+    to root.
+
+    The leading directories of root will be created if they don't yet exist.
+
+    Keyword arguments:
+    files -- list of files to copy
+    root -- destination
+
+    Returns:
+    The list of files in their destination.
+    """
+    if not os.path.exists(root):
         os.makedirs(root)
 
+    dest_files = []
     for f in files:
         dest_file = os.path.join(root, f)
 
@@ -87,6 +125,28 @@ def copy_to(files, root):
             os.makedirs(dest_dir)
 
         shutil.copyfile(f, dest_file)
+        dest_files.append(dest_file)
+    return dest_files
+
+
+def walk_cwd_and_copy_if(pred, root):
+    """Walks the current directory, generates a list of files for which the
+    given predicate is true, then copies that list to root by appending the
+    relative paths of the files to root.
+
+    The leading directories of root will be created if they don't yet exist.
+
+    Keyword arguments:
+    pred -- a function that takes a directory path and a filename, then returns
+            True if the file should be included in the output list
+    root -- destination
+
+    Returns:
+    The list of files in their destination.
+    """
+    files = walk_if(".", pred)
+    files = copy_to(files, root)
+    return files
 
 
 def comment_out_invalid_includes(filename, include_roots):
@@ -127,3 +187,15 @@ def comment_out_invalid_includes(filename, include_roots):
     if old_contents != new_contents:
         with open(filename, "w") as f:
             f.write(new_contents)
+
+
+def apply_patches(root, patches):
+    """Apply list of patches to the destination Git repository.
+
+    Keyword arguments:
+    root -- the root directory of the destination Git repository
+    patches -- list of patch files relative to the root
+    """
+    os.chdir(root)
+    for patch in patches:
+        subprocess.check_output(["git", "apply", patch])
