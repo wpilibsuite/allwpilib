@@ -83,12 +83,11 @@
 namespace drake {
 namespace internal {
 // Abort the program with an error message.
-[[noreturn]]
-void Abort(const char* condition, const char* func, const char* file, int line);
+[[noreturn]] void Abort(const char* condition, const char* func,
+                        const char* file, int line);
 // Report an assertion failure; will either Abort(...) or throw.
-[[noreturn]]
-void AssertionFailed(
-    const char* condition, const char* func, const char* file, int line);
+[[noreturn]] void AssertionFailed(const char* condition, const char* func,
+                                  const char* file, int line);
 }  // namespace internal
 namespace assert {
 // Allows for specialization of how to bool-convert Conditions used in
