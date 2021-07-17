@@ -194,6 +194,10 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
     return {this->m_elements, this->m_size};
   }
 
+  size_t size() const { return this->m_size; }
+  T& operator[](size_t i) { return this->m_elements[i]; }
+  const T& operator[](size_t i) const { return this->m_elements[i]; }
+
   JArrayRefBase(const JArrayRefBase&) = delete;
   JArrayRefBase& operator=(const JArrayRefBase&) = delete;
 
