@@ -2,8 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.math;
+package edu.wpi.first.math.system;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Num;
+import edu.wpi.first.math.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
@@ -28,46 +31,75 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and B matrices.
    *
-   * <p>Rather than solving a (States + Inputs) x (States + Inputs) matrix exponential like in
-   * DiscretizeAB(), we take advantage of the structure of the block matrix of A and B.
-   *
-   * <p>1) The exponential of A*t, which is only N x N, is relatively cheap. 2) The upper-right
-   * quarter of the (States + Inputs) x (States + Inputs) matrix, which we can approximate using a
-   * taylor series to several terms and still be substantially cheaper than taking the big
-   * exponential.
-   *
-   * @param <States> Number of states.
-   * @param <Inputs> Number of inputs.
-   * @param states Nat representing the states of the system.
+   * @param <States> Nat representing the states of the system.
+   * @param <Inputs> Nat representing the inputs to the system.
    * @param contA Continuous system matrix.
    * @param contB Continuous input matrix.
-   * @param dtseconds Discretization timestep.
-   * @return Pair containing discretized A and B matrices.
+   * @param dtSeconds Discretization timestep.
+   * @return a Pair representing discA and diskB.
    */
+  @SuppressWarnings("LocalVariableName")
   public static <States extends Num, Inputs extends Num>
-      Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeABTaylor(
-          Nat<States> states,
-          Matrix<States, States> contA,
-          Matrix<States, Inputs> contB,
-          double dtseconds) {
-    Matrix<States, States> lastTerm = Matrix.eye(states);
-    double lastCoeff = dtseconds;
+      Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
+          Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
+    var scaledA = contA.times(dtSeconds);
+    var scaledB = contB.times(dtSeconds);
 
-    var phi12 = lastTerm.times(lastCoeff);
+    int states = contA.getNumRows();
+    int inputs = contB.getNumCols();
+    var M = new Matrix<>(new SimpleMatrix(states + inputs, states + inputs));
+    M.assignBlock(0, 0, scaledA);
+    M.assignBlock(0, scaledA.getNumCols(), scaledB);
+    var phi = M.exp();
 
-    // i = 6 i.e. 5th order should be enough precision
-    for (int i = 2; i < 6; ++i) {
-      lastTerm = contA.times(lastTerm);
-      lastCoeff *= dtseconds / ((double) i);
+    var discA = new Matrix<States, States>(new SimpleMatrix(states, states));
+    var discB = new Matrix<States, Inputs>(new SimpleMatrix(states, inputs));
 
-      phi12 = phi12.plus(lastTerm.times(lastCoeff));
-    }
+    discA.extractFrom(0, 0, phi);
+    discB.extractFrom(0, contB.getNumRows(), phi);
 
-    var discB = phi12.times(contB);
+    return new Pair<>(discA, discB);
+  }
 
-    var discA = discretizeA(contA, dtseconds);
+  /**
+   * Discretizes the given continuous A and Q matrices.
+   *
+   * @param contA Continuous system matrix.
+   * @param contQ Continuous process noise covariance matrix.
+   * @param dtSeconds Discretization timestep.
+   * @return a pair representing the discrete system matrix and process noise covariance matrix.
+   */
+  @SuppressWarnings("LocalVariableName")
+  public static <States extends Num>
+      Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQ(
+          Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
+    int states = contA.getNumRows();
 
-    return Pair.of(discA, discB);
+    // Make continuous Q symmetric if it isn't already
+    Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
+
+    // Set up the matrix M = [[-A, Q], [0, A.T]]
+    final var M = new Matrix<>(new SimpleMatrix(2 * states, 2 * states));
+    M.assignBlock(0, 0, contA.times(-1.0));
+    M.assignBlock(0, states, Q);
+    M.assignBlock(states, 0, new Matrix<>(new SimpleMatrix(states, states)));
+    M.assignBlock(states, states, contA.transpose());
+
+    final var phi = M.times(dtSeconds).exp();
+
+    // Phi12 = phi[0:States,        States:2*States]
+    // Phi22 = phi[States:2*States, States:2*States]
+    final Matrix<States, States> phi12 = phi.block(states, states, 0, states);
+    final Matrix<States, States> phi22 = phi.block(states, states, states, states);
+
+    final var discA = phi22.transpose();
+
+    Q = discA.times(phi12);
+
+    // Make discrete Q symmetric if it isn't already
+    final var discQ = Q.plus(Q.transpose()).div(2.0);
+
+    return new Pair<>(discA, discQ);
   }
 
   /**
@@ -90,7 +122,8 @@ public final class Discretization {
   public static <States extends Num>
       Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
           Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds) {
-    Matrix<States, States> Q = (contQ.plus(contQ.transpose())).div(2.0);
+    // Make continuous Q symmetric if it isn't already
+    Matrix<States, States> Q = contQ.plus(contQ.transpose()).div(2.0);
 
     Matrix<States, States> lastTerm = Q.copy();
     double lastCoeff = dtSeconds;
@@ -129,39 +162,5 @@ public final class Discretization {
    */
   public static <O extends Num> Matrix<O, O> discretizeR(Matrix<O, O> R, double dtSeconds) {
     return R.div(dtSeconds);
-  }
-
-  /**
-   * Discretizes the given continuous A and B matrices.
-   *
-   * @param <States> Nat representing the states of the system.
-   * @param <Inputs> Nat representing the inputs to the system.
-   * @param contA Continuous system matrix.
-   * @param contB Continuous input matrix.
-   * @param dtSeconds Discretization timestep.
-   * @return a Pair representing discA and diskB.
-   */
-  @SuppressWarnings("LocalVariableName")
-  public static <States extends Num, Inputs extends Num>
-      Pair<Matrix<States, States>, Matrix<States, Inputs>> discretizeAB(
-          Matrix<States, States> contA, Matrix<States, Inputs> contB, double dtSeconds) {
-    var scaledA = contA.times(dtSeconds);
-    var scaledB = contB.times(dtSeconds);
-
-    var contSize = contB.getNumRows() + contB.getNumCols();
-    var Mcont = new Matrix<>(new SimpleMatrix(contSize, contSize));
-    Mcont.assignBlock(0, 0, scaledA);
-    Mcont.assignBlock(0, scaledA.getNumCols(), scaledB);
-    var Mdisc = Mcont.exp();
-
-    var discA =
-        new Matrix<States, States>(new SimpleMatrix(contB.getNumRows(), contB.getNumRows()));
-    var discB =
-        new Matrix<States, Inputs>(new SimpleMatrix(contB.getNumRows(), contB.getNumCols()));
-
-    discA.extractFrom(0, 0, Mdisc);
-    discB.extractFrom(0, contB.getNumRows(), Mdisc);
-
-    return new Pair<>(discA, discB);
   }
 }

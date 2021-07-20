@@ -26,12 +26,13 @@ public final class NumericalIntegration {
    */
   @SuppressWarnings("ParameterName")
   public static double rk4(DoubleFunction<Double> f, double x, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
     final var k1 = f.apply(x);
-    final var k2 = f.apply(x + k1 * halfDt);
-    final var k3 = f.apply(x + k2 * halfDt);
-    final var k4 = f.apply(x + k3 * dtSeconds);
-    return x + dtSeconds / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    final var k2 = f.apply(x + h * k1 * 0.5);
+    final var k3 = f.apply(x + h * k2 * 0.5);
+    final var k4 = f.apply(x + h * k3);
+
+    return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
 
   /**
@@ -46,12 +47,14 @@ public final class NumericalIntegration {
   @SuppressWarnings("ParameterName")
   public static double rk4(
       BiFunction<Double, Double, Double> f, double x, Double u, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     final var k1 = f.apply(x, u);
-    final var k2 = f.apply(x + k1 * halfDt, u);
-    final var k3 = f.apply(x + k2 * halfDt, u);
-    final var k4 = f.apply(x + k3 * dtSeconds, u);
-    return x + dtSeconds / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    final var k2 = f.apply(x + h * k1 * 0.5, u);
+    final var k3 = f.apply(x + h * k2 * 0.5, u);
+    final var k4 = f.apply(x + h * k3, u);
+
+    return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
 
   /**
@@ -71,12 +74,14 @@ public final class NumericalIntegration {
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
       double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     Matrix<States, N1> k1 = f.apply(x, u);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)), u);
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)), u);
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)), u);
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)), u);
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)), u);
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)), u);
+
+    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
 
   /**
@@ -91,12 +96,14 @@ public final class NumericalIntegration {
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num> Matrix<States, N1> rk4(
       Function<Matrix<States, N1>, Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     Matrix<States, N1> k1 = f.apply(x);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)));
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)));
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)));
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)));
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)));
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)));
+
+    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
 
   /**
@@ -145,13 +152,8 @@ public final class NumericalIntegration {
     // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
     // for the Butcher tableau the following arrays came from.
 
-    // This is used for time-varying integration
-    // // final double[5]
-    // final double[] A = {
-    //     1.0 / 4.0, 3.0 / 8.0, 12.0 / 13.0, 1.0, 1.0 / 2.0};
-
     // final double[5][5]
-    final double[][] B = {
+    final double[][] A = {
       {1.0 / 4.0},
       {3.0 / 32.0, 9.0 / 32.0},
       {1932.0 / 2197.0, -7200.0 / 2197.0, 7296.0 / 2197.0},
@@ -160,12 +162,12 @@ public final class NumericalIntegration {
     };
 
     // final double[6]
-    final double[] C1 = {
+    final double[] b1 = {
       16.0 / 135.0, 0.0, 6656.0 / 12825.0, 28561.0 / 56430.0, -9.0 / 50.0, 2.0 / 55.0
     };
 
     // final double[6]
-    final double[] C2 = {25.0 / 216.0, 0.0, 1408.0 / 2565.0, 2197.0 / 4104.0, -1.0 / 5.0, 0.0};
+    final double[] b2 = {25.0 / 216.0, 0.0, 1408.0 / 2565.0, 2197.0 / 4104.0, -1.0 / 5.0, 0.0};
 
     Matrix<States, N1> newX;
     double truncationError;
@@ -181,47 +183,53 @@ public final class NumericalIntegration {
 
         // Notice how the derivative in the Wikipedia notation is dy/dx.
         // That means their y is our x and their x is our t
-        var k1 = f.apply(x, u).times(h);
-        var k2 = f.apply(x.plus(k1.times(B[0][0])), u).times(h);
-        var k3 = f.apply(x.plus(k1.times(B[1][0])).plus(k2.times(B[1][1])), u).times(h);
+        var k1 = f.apply(x, u);
+        var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
+        var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
         var k4 =
-            f.apply(x.plus(k1.times(B[2][0])).plus(k2.times(B[2][1])).plus(k3.times(B[2][2])), u)
-                .times(h);
+            f.apply(
+                x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
+                u);
         var k5 =
             f.apply(
-                    x.plus(k1.times(B[3][0]))
-                        .plus(k2.times(B[3][1]))
-                        .plus(k3.times(B[3][2]))
-                        .plus(k4.times(B[3][3])),
-                    u)
-                .times(h);
+                x.plus(
+                    k1.times(A[3][0])
+                        .plus(k2.times(A[3][1]))
+                        .plus(k3.times(A[3][2]))
+                        .plus(k4.times(A[3][3]))
+                        .times(h)),
+                u);
         var k6 =
             f.apply(
-                    x.plus(k1.times(B[4][0]))
-                        .plus(k2.times(B[4][1]))
-                        .plus(k3.times(B[4][2]))
-                        .plus(k4.times(B[4][3]))
-                        .plus(k5.times(B[4][4])),
-                    u)
-                .times(h);
+                x.plus(
+                    k1.times(A[4][0])
+                        .plus(k2.times(A[4][1]))
+                        .plus(k3.times(A[4][2]))
+                        .plus(k4.times(A[4][3]))
+                        .plus(k5.times(A[4][4]))
+                        .times(h)),
+                u);
 
         newX =
-            x.plus(k1.times(C1[0]))
-                .plus(k2.times(C1[1]))
-                .plus(k3.times(C1[2]))
-                .plus(k4.times(C1[3]))
-                .plus(k5.times(C1[4]))
-                .plus(k6.times(C1[5]));
+            x.plus(
+                k1.times(b1[0])
+                    .plus(k2.times(b1[1]))
+                    .plus(k3.times(b1[2]))
+                    .plus(k4.times(b1[3]))
+                    .plus(k5.times(b1[4]))
+                    .plus(k6.times(b1[5]))
+                    .times(h));
         truncationError =
-            (k1.times(C1[0] - C2[0])
-                    .plus(k2.times(C1[1] - C2[1]))
-                    .plus(k3.times(C1[2] - C2[2]))
-                    .plus(k4.times(C1[3] - C2[3]))
-                    .plus(k5.times(C1[4] - C2[4]))
-                    .plus(k6.times(C1[5] - C2[5])))
+            (k1.times(b1[0] - b2[0])
+                    .plus(k2.times(b1[1] - b2[1]))
+                    .plus(k3.times(b1[2] - b2[2]))
+                    .plus(k4.times(b1[3] - b2[3]))
+                    .plus(k5.times(b1[4] - b2[4]))
+                    .plus(k6.times(b1[5] - b2[5]))
+                    .times(h))
                 .normF();
 
-        h = 0.9 * h * Math.pow(maxError / truncationError, 1.0 / 5.0);
+        h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
       } while (truncationError > maxError);
 
       dtElapsed += h;
@@ -274,13 +282,8 @@ public final class NumericalIntegration {
     // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
     // Butcher tableau the following arrays came from.
 
-    // This is used for time-varying integration
-    // // final double[6]
-    // final double[] A = {
-    //     1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0, 8.0 / 9.0, 1.0, 1.0};
-
     // final double[6][6]
-    final double[][] B = {
+    final double[][] A = {
       {1.0 / 5.0},
       {3.0 / 40.0, 9.0 / 40.0},
       {44.0 / 45.0, -56.0 / 15.0, 32.0 / 9.0},
@@ -290,12 +293,12 @@ public final class NumericalIntegration {
     };
 
     // final double[7]
-    final double[] C1 = {
+    final double[] b1 = {
       35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0, 11.0 / 84.0, 0.0
     };
 
     // final double[7]
-    final double[] C2 = {
+    final double[] b2 = {
       5179.0 / 57600.0,
       0.0,
       7571.0 / 16695.0,
@@ -317,52 +320,58 @@ public final class NumericalIntegration {
         // Only allow us to advance up to the dt remaining
         h = Math.min(h, dtSeconds - dtElapsed);
 
-        var k1 = f.apply(x, u).times(h);
-        var k2 = f.apply(x.plus(k1.times(B[0][0])), u).times(h);
-        var k3 = f.apply(x.plus(k1.times(B[1][0])).plus(k2.times(B[1][1])), u).times(h);
+        var k1 = f.apply(x, u);
+        var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
+        var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
         var k4 =
-            f.apply(x.plus(k1.times(B[2][0])).plus(k2.times(B[2][1])).plus(k3.times(B[2][2])), u)
-                .times(h);
+            f.apply(
+                x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
+                u);
         var k5 =
             f.apply(
-                    x.plus(k1.times(B[3][0]))
-                        .plus(k2.times(B[3][1]))
-                        .plus(k3.times(B[3][2]))
-                        .plus(k4.times(B[3][3])),
-                    u)
-                .times(h);
+                x.plus(
+                    k1.times(A[3][0])
+                        .plus(k2.times(A[3][1]))
+                        .plus(k3.times(A[3][2]))
+                        .plus(k4.times(A[3][3]))
+                        .times(h)),
+                u);
         var k6 =
             f.apply(
-                    x.plus(k1.times(B[4][0]))
-                        .plus(k2.times(B[4][1]))
-                        .plus(k3.times(B[4][2]))
-                        .plus(k4.times(B[4][3]))
-                        .plus(k5.times(B[4][4])),
-                    u)
-                .times(h);
+                x.plus(
+                    k1.times(A[4][0])
+                        .plus(k2.times(A[4][1]))
+                        .plus(k3.times(A[4][2]))
+                        .plus(k4.times(A[4][3]))
+                        .plus(k5.times(A[4][4]))
+                        .times(h)),
+                u);
 
-        // Since the final row of B and the array C1 have the same coefficients
+        // Since the final row of A and the array b1 have the same coefficients
         // and k7 has no effect on newX, we can reuse the calculation.
         newX =
-            x.plus(k1.times(B[5][0]))
-                .plus(k2.times(B[5][1]))
-                .plus(k3.times(B[5][2]))
-                .plus(k4.times(B[5][3]))
-                .plus(k5.times(B[5][4]))
-                .plus(k6.times(B[5][5]));
-        var k7 = f.apply(newX, u).times(h);
+            x.plus(
+                k1.times(A[5][0])
+                    .plus(k2.times(A[5][1]))
+                    .plus(k3.times(A[5][2]))
+                    .plus(k4.times(A[5][3]))
+                    .plus(k5.times(A[5][4]))
+                    .plus(k6.times(A[5][5]))
+                    .times(h));
+        var k7 = f.apply(newX, u);
 
         truncationError =
-            (k1.times(C1[0] - C2[0])
-                    .plus(k2.times(C1[1] - C2[1]))
-                    .plus(k3.times(C1[2] - C2[2]))
-                    .plus(k4.times(C1[3] - C2[3]))
-                    .plus(k5.times(C1[4] - C2[4]))
-                    .plus(k6.times(C1[5] - C2[5]))
-                    .plus(k7.times(C1[6] - C2[6])))
+            (k1.times(b1[0] - b2[0])
+                    .plus(k2.times(b1[1] - b2[1]))
+                    .plus(k3.times(b1[2] - b2[2]))
+                    .plus(k4.times(b1[3] - b2[3]))
+                    .plus(k5.times(b1[4] - b2[4]))
+                    .plus(k6.times(b1[5] - b2[5]))
+                    .plus(k7.times(b1[6] - b2[6]))
+                    .times(h))
                 .normF();
 
-        h = 0.9 * h * Math.pow(maxError / truncationError, 1.0 / 5.0);
+        h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
       } while (truncationError > maxError);
 
       dtElapsed += h;
