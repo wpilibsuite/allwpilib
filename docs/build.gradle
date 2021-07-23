@@ -39,7 +39,7 @@ cppProjectZips.add(project(':wpilibNewCommands').cppHeadersZip)
 
 doxygen {
     executables {
-        doxygen version : '1.8.18',
+        doxygen version : '1.9.1',
         baseURI : 'https://frcmaven.wpi.edu/artifactory/generic-release-mirror/doxygen'
     }
 }

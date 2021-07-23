@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 13
+      - name: Install libclang-9
+        run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
       - name: Set environment variables (Development)
         run: |
           echo "TARGET_FOLDER=$BASE_PATH/development" >> $GITHUB_ENV
