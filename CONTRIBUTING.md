@@ -41,6 +41,8 @@ WPILib uses modified Google style guides for both C++ and Java, which can be fou
 
 While the library should be fully formatted according to the styles, additional elements of the style guide were not followed when the library was initially created. All new code should follow the guidelines. If you are looking for some easy ramp-up tasks, finding areas that don't follow the style guide and fixing them is very welcome.
 
+When writing math expressions in documentation, use https://www.unicodeit.net/ to convert LaTeX to a Unicode equivalent that's easier to read. Not all expressions will translate (e.g., superscripts of superscripts) so focus on making it readable by someone who isn't familiar with LaTeX. If content on multiple lines needs to be aligned in Doxygen/Javadoc comments (e.g., integration/summation limits, matrices packed with square brackets and superscripts for them), put them in @verbatim/@endverbatim blocks in Doxygen or `<pre>` tags in Javadoc so they render with monospace font.
+
 ## Submitting Changes
 
 ### Pull Request Format

@@ -32,16 +32,16 @@ namespace frc {
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, theta, dist_l, dist_r]]^T </strong> in the field
+ * <strong> x = [[x, y, theta, dist_l, dist_r]]ᵀ </strong> in the field
  * coordinate system.
  *
- * <strong> u = [[d_l, d_r, dtheta]]^T </strong> (robot-relative velocities) --
+ * <strong> u = [[d_l, d_r, dtheta]]ᵀ </strong> (robot-relative velocities) --
  * NB: using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we
  * suspect that it's easier for teams to get good encoder data than it is for
  * them to perform system identification well enough to get a good model
  *
- * <strong>y = [[x, y, theta]]^T </strong> from vision,
+ * <strong>y = [[x, y, theta]]ᵀ </strong> from vision,
  * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
  */
 class DifferentialDrivePoseEstimator {
@@ -55,20 +55,20 @@ class DifferentialDrivePoseEstimator {
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
    *                                 is in the form
-   *                                 [x, y, theta, dist_l, dist_r]^T,
+   *                                 [x, y, theta, dist_l, dist_r]ᵀ,
    *                                 with units in meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
    *                                 measurements. Increase these numbers to
    *                                 trust sensor readings from
    *                                 encoders and gyros less.
    *                                 This matrix is in the form
-   *                                 [dist_l, dist_r, theta]^T, with units in
+   *                                 [dist_l, dist_r, theta]ᵀ, with units in
    *                                 meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from
    *                                 vision less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    * @param nominalDt                The period of the loop calling Update().
    */
@@ -88,7 +88,7 @@ class DifferentialDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
@@ -163,7 +163,7 @@ class DifferentialDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void AddVisionMeasurement(

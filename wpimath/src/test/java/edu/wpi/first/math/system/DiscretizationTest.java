@@ -58,8 +58,9 @@ public class DiscretizationTest {
     assertEquals(x1Truth, x1Discrete);
   }
 
-  // Test that the discrete approximation of Q is roughly equal to
-  // integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+  //                                             dt
+  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                             0
   @Test
   public void testDiscretizeSlowModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
@@ -86,8 +87,9 @@ public class DiscretizationTest {
             + discQIntegrated);
   }
 
-  // Test that the discrete approximation of Q is roughly equal to
-  // integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+  //                                             dt
+  // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+  //                                             0
   @Test
   public void testDiscretizeFastModelAQ() {
     final var contA = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1, 0, -1406.29);

@@ -88,8 +88,8 @@ public final class StateSpaceUtil {
    * Returns true if (A, B) is a stabilizable pair.
    *
    * <p>(A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
-   * absolute values less than one, where an eigenvalue is uncontrollable if rank(lambda * I - A, B)
-   * %3C n where n is number of states.
+   * absolute values less than one, where an eigenvalue is uncontrollable if rank(λI - A, B) %3C n
+   * where n is number of states.
    *
    * @param <States> Num representing the size of A.
    * @param <Inputs> Num representing the columns of B.

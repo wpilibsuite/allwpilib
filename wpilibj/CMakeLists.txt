@@ -6,7 +6,7 @@ find_package( OpenCV REQUIRED )
 if (WITH_JAVA)
     find_package(Java REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
+    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     set(OPENCV_JAVA_INSTALL_DIR ${OpenCV_INSTALL_PATH}/share/OpenCV/java/)
 
