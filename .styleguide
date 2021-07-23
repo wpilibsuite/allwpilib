@@ -9,6 +9,10 @@ cppSrcFileInclude {
   \.cpp$
 }
 
+modifiableFileExclude {
+  \.patch$
+}
+
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
