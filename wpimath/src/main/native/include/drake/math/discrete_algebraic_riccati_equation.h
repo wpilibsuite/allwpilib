@@ -11,12 +11,10 @@ namespace math {
 /// Computes the unique stabilizing solution X to the discrete-time algebraic
 /// Riccati equation:
 ///
-/// @f[
-/// A'XA - X - A'XB(B'XB+R)^{-1}B'XA + Q = 0
-/// @f]
+/// AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
 ///
-/// @throws std::runtime_error if Q is not positive semi-definite.
-/// @throws std::runtime_error if R is not positive definite.
+/// @throws std::exception if Q is not positive semi-definite.
+/// @throws std::exception if R is not positive definite.
 ///
 /// Based on the Schur Vector approach outlined in this paper:
 /// "On the Numerical Solution of the Discrete-Time Algebraic Riccati Equation"
@@ -28,18 +26,47 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
     const Eigen::Ref<const Eigen::MatrixXd>& Q,
     const Eigen::Ref<const Eigen::MatrixXd>& R);
 
-/// DiscreteAlgebraicRiccatiEquation function
-/// computes the unique stabilizing solution X to the discrete-time algebraic
+/// Computes the unique stabilizing solution X to the discrete-time algebraic
 /// Riccati equation:
-/// \f[
-/// A'XA - X - (A'XB + N)(B'XB + R)^{-1}(B'XA + N') + Q = 0
-/// \f]
 ///
-/// See
-/// https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator#Infinite-horizon,_discrete-time_LQR
-/// for the change of variables used here.
+/// AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
 ///
-/// @throws std::runtime_error if Q is not positive semi-definite.
+/// This is equivalent to solving the original DARE:
+///
+/// A₂ᵀXA₂ − X − A₂ᵀXB(BᵀXB + R)⁻¹BᵀXA₂ + Q₂ = 0
+///
+/// where A₂ and Q₂ are a change of variables:
+///
+/// A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
+///
+/// This overload of the DARE is useful for finding the control law uₖ that
+/// minimizes the following cost function subject to xₖ₊₁ = Axₖ + Buₖ.
+///
+/// @verbatim
+///     ∞ [xₖ]ᵀ[Q  N][xₖ]
+/// J = Σ [uₖ] [Nᵀ R][uₖ] ΔT
+///    k=0
+/// @endverbatim
+///
+/// This is a more general form of the following. The linear-quadratic regulator
+/// is the feedback control law uₖ that minimizes the following cost function
+/// subject to xₖ₊₁ = Axₖ + Buₖ:
+///
+/// @verbatim
+///     ∞
+/// J = Σ (xₖᵀQxₖ + uₖᵀRuₖ) ΔT
+///    k=0
+/// @endverbatim
+///
+/// This can be refactored as:
+///
+/// @verbatim
+///     ∞ [xₖ]ᵀ[Q 0][xₖ]
+/// J = Σ [uₖ] [0 R][uₖ] ΔT
+///    k=0
+/// @endverbatim
+///
+/// @throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semi-definite.
 /// @throws std::runtime_error if R is not positive definite.
 ///
 Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(

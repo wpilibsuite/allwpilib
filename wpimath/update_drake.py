@@ -59,7 +59,8 @@ def drake_test_h_inclusions(dp, f):
 
 def main():
     wpimath = os.getcwd()
-    clone_repo("https://github.com/RobotLocomotion/drake", "v0.31.0")
+    clone_repo("https://github.com/RobotLocomotion/drake",
+               "8b72428dce6959d077e17c3c3a7a5ef4a17107ee")
     repo = os.getcwd()
 
     # Copy drake source files into allwpilib
@@ -128,10 +129,6 @@ def main():
 
     # Apply patches
     os.chdir(wpimath)
-    subprocess.check_output(["git", "apply", "drake-dare-qrn.patch"])
-    subprocess.check_output(["git", "apply", "drake-dare-qrn-tests.patch"])
-    subprocess.check_output(
-        ["git", "apply", "drake-replace-noreturn-attributes.patch"])
     subprocess.check_output(
         ["git", "apply", "drake-replace-dense-with-core.patch"])
 
