@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 class DifferentialDriveAccelerationLimiterTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testLowLimits() {
     final double trackwidth = 0.9;
     final double dt = 0.005;
@@ -137,7 +136,6 @@ class DifferentialDriveAccelerationLimiterTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testHighLimits() {
     final double trackwidth = 0.9;
     final double dt = 0.005;

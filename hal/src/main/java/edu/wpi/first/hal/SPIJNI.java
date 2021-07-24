@@ -6,7 +6,6 @@ package edu.wpi.first.hal;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 public class SPIJNI extends JNIWrapper {
   public static native void spiInitialize(int port);
 

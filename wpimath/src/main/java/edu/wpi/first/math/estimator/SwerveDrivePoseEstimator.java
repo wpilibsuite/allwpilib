@@ -110,7 +110,6 @@ public class SwerveDrivePoseEstimator {
    *     theta]ᵀ, with units in meters and radians.
    * @param nominalDtSeconds The time in seconds between each robot loop.
    */
-  @SuppressWarnings("ParameterName")
   public SwerveDrivePoseEstimator(
       Rotation2d gyroAngle,
       Pose2d initialPoseMeters,
@@ -288,7 +287,6 @@ public class SwerveDrivePoseEstimator {
    * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  @SuppressWarnings("LocalVariableName")
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModuleState... moduleStates) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;

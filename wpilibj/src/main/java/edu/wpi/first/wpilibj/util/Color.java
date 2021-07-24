@@ -50,7 +50,6 @@ public class Color {
    * @param v The v value [0-255]
    * @return The color
    */
-  @SuppressWarnings("ParameterName")
   public static Color fromHSV(int h, int s, int v) {
     if (s == 0) {
       return new Color(v / 255.0, v / 255.0, v / 255.0);

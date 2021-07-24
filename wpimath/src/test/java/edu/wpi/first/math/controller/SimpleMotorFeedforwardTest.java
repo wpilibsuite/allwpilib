@@ -13,7 +13,6 @@ import edu.wpi.first.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
 class SimpleMotorFeedforwardTest {
-  @SuppressWarnings("LocalVariableName")
   @Test
   void testCalculate() {
     double Ks = 0.5;

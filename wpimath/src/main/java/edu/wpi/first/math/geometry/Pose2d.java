@@ -244,7 +244,6 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   @Override
-  @SuppressWarnings("ParameterName")
   public Pose2d interpolate(Pose2d endValue, double t) {
     if (t < 0) {
       return this;

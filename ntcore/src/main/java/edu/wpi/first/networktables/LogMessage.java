@@ -5,6 +5,7 @@
 package edu.wpi.first.networktables;
 
 /** NetworkTables log message. */
+@SuppressWarnings("MemberName")
 public final class LogMessage {
   /** Logging levels. */
   public static final int kCritical = 50;
@@ -19,23 +20,18 @@ public final class LogMessage {
   public static final int kDebug4 = 6;
 
   /** The logger that generated the message. */
-  @SuppressWarnings("MemberName")
   public final int logger;
 
   /** Log level of the message. */
-  @SuppressWarnings("MemberName")
   public final int level;
 
   /** The filename of the source file that generated the message. */
-  @SuppressWarnings("MemberName")
   public final String filename;
 
   /** The line number in the source file that generated the message. */
-  @SuppressWarnings("MemberName")
   public final int line;
 
   /** The message. */
-  @SuppressWarnings("MemberName")
   public final String message;
 
   /**

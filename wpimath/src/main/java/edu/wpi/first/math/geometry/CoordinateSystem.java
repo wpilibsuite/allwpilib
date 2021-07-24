@@ -32,7 +32,6 @@ public class CoordinateSystem {
     // Construct a change of basis matrix from the source coordinate system to the
     // NWU coordinate system. Each column vector in the change of basis matrix is
     // one of the old basis vectors mapped to its representation in the new basis.
-    @SuppressWarnings("LocalVariableName")
     var R = new Matrix<>(Nat.N3(), Nat.N3());
     R.assignBlock(0, 0, positiveX.m_axis);
     R.assignBlock(0, 1, positiveY.m_axis);
@@ -50,7 +49,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the North-West-Up (NWU) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem NWU() {
     return m_nwu;
   }
@@ -62,7 +60,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the East-Down-North (EDN) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem EDN() {
     return m_edn;
   }
@@ -74,7 +71,6 @@ public class CoordinateSystem {
    *
    * @return An instance of the North-East-Down (NED) coordinate system.
    */
-  @SuppressWarnings("MethodName")
   public static CoordinateSystem NED() {
     return m_ned;
   }

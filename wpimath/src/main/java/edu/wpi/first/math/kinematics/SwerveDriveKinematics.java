@@ -89,7 +89,7 @@ public class SwerveDriveKinematics {
    *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
    *     DesaturateWheelSpeeds} function to rectify this issue.
    */
-  @SuppressWarnings({"LocalVariableName", "PMD.MethodReturnsInternalArray"})
+  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public SwerveModuleState[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
     if (chassisSpeeds.vxMetersPerSecond == 0.0

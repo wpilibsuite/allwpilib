@@ -50,7 +50,6 @@ class StateSpaceUtilTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testIsStabilizable() {
     Matrix<N2, N2> A;
     Matrix<N2, N1> B = VecBuilder.fill(0, 1);
@@ -77,7 +76,6 @@ class StateSpaceUtilTest {
   }
 
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testIsDetectable() {
     Matrix<N2, N2> A;
     Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(0, 1);

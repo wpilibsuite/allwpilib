@@ -49,7 +49,6 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
     kZ((byte) 0x04);
 
     /** The integer value representing this enumeration. */
-    @SuppressWarnings("MemberName")
     public final byte value;
 
     Axes(byte value) {

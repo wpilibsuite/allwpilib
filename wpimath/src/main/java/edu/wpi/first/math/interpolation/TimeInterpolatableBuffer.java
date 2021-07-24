@@ -101,7 +101,6 @@ public final class TimeInterpolatableBuffer<T> {
    * @param timeSeconds The time at which to sample.
    * @return The interpolated value at that timestamp or an empty Optional.
    */
-  @SuppressWarnings("UnnecessaryParentheses")
   public Optional<T> getSample(double timeSeconds) {
     if (m_pastSnapshots.isEmpty()) {
       return Optional.empty();
@@ -131,7 +130,7 @@ public final class TimeInterpolatableBuffer<T> {
           m_interpolatingFunc.interpolate(
               bottomBound.getValue(),
               topBound.getValue(),
-              ((timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey()))));
+              (timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey())));
     }
   }
 
@@ -145,7 +144,6 @@ public final class TimeInterpolatableBuffer<T> {
      * @param t How far between the lower and upper bound we are. This should be bounded in [0, 1].
      * @return The interpolated value.
      */
-    @SuppressWarnings("ParameterName")
     T interpolate(T start, T end, double t);
   }
 }

@@ -155,7 +155,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation) {
     arcadeDrive(xSpeed, zRotation, true);
   }
@@ -168,7 +167,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
-  @SuppressWarnings("ParameterName")
   public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
     if (!m_reported) {
       HAL.report(
@@ -198,7 +196,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
    *     maneuvers. zRotation will control turning rate instead of curvature.
    */
-  @SuppressWarnings("ParameterName")
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
       HAL.report(
@@ -264,7 +261,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
@@ -323,7 +319,6 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    *     maneuvers. zRotation will control rotation rate around the Z axis instead of curvature.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds curvatureDriveIK(
       double xSpeed, double zRotation, boolean allowTurnInPlace) {
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);

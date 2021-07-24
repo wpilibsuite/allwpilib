@@ -8,7 +8,6 @@ package edu.wpi.first.math.controller;
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
-@SuppressWarnings("MemberName")
 public class ArmFeedforward {
   public final double ks;
   public final double kcos;

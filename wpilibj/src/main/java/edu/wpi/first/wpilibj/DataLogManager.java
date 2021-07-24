@@ -188,7 +188,6 @@ public final class DataLogManager {
     }
   }
 
-  @SuppressWarnings("PMD.EmptyCatchBlock")
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;

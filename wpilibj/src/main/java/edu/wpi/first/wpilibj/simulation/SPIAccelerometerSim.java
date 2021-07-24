@@ -109,7 +109,6 @@ public class SPIAccelerometerSim {
    *
    * @param x the new reading of the X axis
    */
-  @SuppressWarnings("ParameterName")
   public void setX(double x) {
     SPIAccelerometerDataJNI.setX(m_index, x);
   }
@@ -141,7 +140,6 @@ public class SPIAccelerometerSim {
    *
    * @param y the new reading of the Y axis
    */
-  @SuppressWarnings("ParameterName")
   public void setY(double y) {
     SPIAccelerometerDataJNI.setY(m_index, y);
   }
@@ -173,7 +171,6 @@ public class SPIAccelerometerSim {
    *
    * @param z the new reading of the Z axis
    */
-  @SuppressWarnings("ParameterName")
   public void setZ(double z) {
     SPIAccelerometerDataJNI.setZ(m_index, z);
   }

@@ -8,28 +8,13 @@ import edu.wpi.first.math.util.Units;
 
 /** Holds the constants for a DC motor. */
 public class DCMotor {
-  @SuppressWarnings("MemberName")
   public final double nominalVoltageVolts;
-
-  @SuppressWarnings("MemberName")
   public final double stallTorqueNewtonMeters;
-
-  @SuppressWarnings("MemberName")
   public final double stallCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeCurrentAmps;
-
-  @SuppressWarnings("MemberName")
   public final double freeSpeedRadPerSec;
-
-  @SuppressWarnings("MemberName")
   public final double rOhms;
-
-  @SuppressWarnings("MemberName")
   public final double KvRadPerSecPerVolt;
-
-  @SuppressWarnings("MemberName")
   public final double KtNMPerAmp;
 
   /**

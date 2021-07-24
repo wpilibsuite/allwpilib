@@ -29,18 +29,15 @@ import edu.wpi.first.math.system.LinearSystem;
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
  * theory".
  */
-@SuppressWarnings("ClassTypeParameterName")
 public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
   private final Nat<States> m_states;
 
   private final LinearSystem<States, Inputs, Outputs> m_plant;
 
   /** The steady-state Kalman gain matrix. */
-  @SuppressWarnings("MemberName")
   private final Matrix<States, Outputs> m_K;
 
   /** The state estimate. */
-  @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
   /**
@@ -54,7 +51,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param dtSeconds Nominal discretization timestep.
    * @throws IllegalArgumentException If the system is unobservable.
    */
-  @SuppressWarnings("LocalVariableName")
   public KalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -185,7 +181,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param u New control input from controller.
    * @param dtSeconds Timestep for prediction.
    */
-  @SuppressWarnings("ParameterName")
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
   }
@@ -196,7 +191,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  @SuppressWarnings("ParameterName")
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();

@@ -4,14 +4,10 @@
 
 package edu.wpi.first.hal;
 
+@SuppressWarnings("MemberName")
 public class CANData {
-  @SuppressWarnings("MemberName")
   public final byte[] data = new byte[8];
-
-  @SuppressWarnings("MemberName")
   public int length;
-
-  @SuppressWarnings("MemberName")
   public long timestamp;
 
   /**

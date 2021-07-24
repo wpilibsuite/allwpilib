@@ -54,7 +54,6 @@ public class Field2d implements NTSendable {
    * @param yMeters Y location, in meters
    * @param rotation rotation
    */
-  @SuppressWarnings("ParameterName")
   public synchronized void setRobotPose(double xMeters, double yMeters, Rotation2d rotation) {
     m_objects.get(0).setPose(xMeters, yMeters, rotation);
   }

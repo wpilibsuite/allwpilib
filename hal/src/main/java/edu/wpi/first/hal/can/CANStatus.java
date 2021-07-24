@@ -5,28 +5,32 @@
 package edu.wpi.first.hal.can;
 
 /** Structure for holding the result of a CAN Status request. */
+@SuppressWarnings("MemberName")
 public class CANStatus {
   /** The utilization of the CAN Bus. */
-  @SuppressWarnings("MemberName")
   public double percentBusUtilization;
 
   /** The CAN Bus off count. */
-  @SuppressWarnings("MemberName")
   public int busOffCount;
 
   /** The CAN Bus TX full count. */
-  @SuppressWarnings("MemberName")
   public int txFullCount;
 
   /** The CAN Bus receive error count. */
-  @SuppressWarnings("MemberName")
   public int receiveErrorCount;
 
   /** The CAN Bus transmit error count. */
-  @SuppressWarnings("MemberName")
   public int transmitErrorCount;
 
-  @SuppressWarnings("MissingJavadocMethod")
+  /**
+   * Set CAN bus status.
+   *
+   * @param percentBusUtilization CAN bus utilization as a percent.
+   * @param busOffCount Bus off event count.
+   * @param txFullCount TX buffer full event count.
+   * @param receiveErrorCount Receive error event count.
+   * @param transmitErrorCount Transmit error event count.
+   */
   public void setStatus(
       double percentBusUtilization,
       int busOffCount,

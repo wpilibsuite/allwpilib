@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 class MecanumDrivePoseEstimatorTest {
   @Test
-  @SuppressWarnings("LocalVariableName")
   void testAccuracy() {
     var kinematics =
         new MecanumDriveKinematics(

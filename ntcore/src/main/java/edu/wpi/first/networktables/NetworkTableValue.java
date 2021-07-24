@@ -7,6 +7,7 @@ package edu.wpi.first.networktables;
 import java.util.Objects;
 
 /** A network table entry value. */
+@SuppressWarnings("PMD.MethodReturnsInternalArray")
 public final class NetworkTableValue {
   NetworkTableValue(NetworkTableType type, Object value, long time) {
     m_type = type;
@@ -183,7 +184,6 @@ public final class NetworkTableValue {
    * @return The raw value.
    * @throws ClassCastException if the entry value is not of raw type.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] getRaw() {
     if (m_type != NetworkTableType.kRaw) {
       throw new ClassCastException("cannot convert " + m_type + " to raw");
@@ -197,7 +197,6 @@ public final class NetworkTableValue {
    * @return The rpc definition value.
    * @throws ClassCastException if the entry value is not of rpc definition type.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public byte[] getRpc() {
     if (m_type != NetworkTableType.kRpc) {
       throw new ClassCastException("cannot convert " + m_type + " to rpc");
@@ -211,7 +210,6 @@ public final class NetworkTableValue {
    * @return The boolean array value.
    * @throws ClassCastException if the entry value is not of boolean array type.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public boolean[] getBooleanArray() {
     if (m_type != NetworkTableType.kBooleanArray) {
       throw new ClassCastException("cannot convert " + m_type + " to boolean array");
@@ -225,7 +223,6 @@ public final class NetworkTableValue {
    * @return The double array value.
    * @throws ClassCastException if the entry value is not of double array type.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public double[] getDoubleArray() {
     if (m_type != NetworkTableType.kDoubleArray) {
       throw new ClassCastException("cannot convert " + m_type + " to double array");
@@ -239,7 +236,6 @@ public final class NetworkTableValue {
    * @return The string array value.
    * @throws ClassCastException if the entry value is not of string array type.
    */
-  @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public String[] getStringArray() {
     if (m_type != NetworkTableType.kStringArray) {
       throw new ClassCastException("cannot convert " + m_type + " to string array");

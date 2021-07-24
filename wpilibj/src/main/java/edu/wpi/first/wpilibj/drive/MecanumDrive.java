@@ -139,7 +139,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation) {
     driveCartesian(ySpeed, xSpeed, zRotation, 0.0);
   }
@@ -157,7 +156,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
    */
-  @SuppressWarnings("ParameterName")
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
       HAL.report(
@@ -189,7 +187,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *     positive.
    */
-  @SuppressWarnings("ParameterName")
   public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_MecanumPolar, 4);
@@ -215,7 +212,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds driveCartesianIK(double ySpeed, double xSpeed, double zRotation) {
     return driveCartesianIK(ySpeed, xSpeed, zRotation, 0.0);
   }
@@ -234,7 +230,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     to implement field-oriented controls.
    * @return Wheel speeds [-1.0..1.0].
    */
-  @SuppressWarnings("ParameterName")
   public static WheelSpeeds driveCartesianIK(
       double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     ySpeed = MathUtil.clamp(ySpeed, -1.0, 1.0);

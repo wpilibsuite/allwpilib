@@ -5,6 +5,7 @@
 package edu.wpi.first.cscore;
 
 /** Video event. */
+@SuppressWarnings("MemberName")
 public class VideoEvent {
   public enum Kind {
     kUnknown(0x0000),
@@ -117,39 +118,29 @@ public class VideoEvent {
     this.listener = listener;
   }
 
-  @SuppressWarnings("MemberName")
   public Kind kind;
 
   // Valid for kSource* and kSink* respectively
-  @SuppressWarnings("MemberName")
   public int sourceHandle;
 
-  @SuppressWarnings("MemberName")
   public int sinkHandle;
 
   // Source/sink/property name
-  @SuppressWarnings("MemberName")
   public String name;
 
   // Fields for kSourceVideoModeChanged event
-  @SuppressWarnings("MemberName")
   public VideoMode mode;
 
   // Fields for kSourceProperty* events
-  @SuppressWarnings("MemberName")
   public int propertyHandle;
 
-  @SuppressWarnings("MemberName")
   public VideoProperty.Kind propertyKind;
 
-  @SuppressWarnings("MemberName")
   public int value;
 
-  @SuppressWarnings("MemberName")
   public String valueStr;
 
   // Listener that was triggered
-  @SuppressWarnings("MemberName")
   public int listener;
 
   public VideoSource getSource() {

@@ -138,7 +138,6 @@ public final class DriverStationSim {
    *
    * @param eStop true to activate
    */
-  @SuppressWarnings("ParameterName")
   public static void setEStop(boolean eStop) {
     DriverStationDataJNI.setEStop(eStop);
   }

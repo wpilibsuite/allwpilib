@@ -16,7 +16,6 @@ class Transform3dTest {
 
   @Test
   void testInverse() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial =
@@ -40,7 +39,6 @@ class Transform3dTest {
 
   @Test
   void testComposition() {
-    @SuppressWarnings("LocalVariableName")
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial =

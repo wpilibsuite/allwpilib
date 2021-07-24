@@ -21,14 +21,13 @@ public class SynchronousInterrupt implements AutoCloseable {
 
   private final int m_handle;
 
-  @SuppressWarnings("JavadocMethod")
+  /** Event trigger combinations for a synchronous interrupt. */
   public enum WaitResult {
     kTimeout(0x0),
     kRisingEdge(0x1),
     kFallingEdge(0x100),
     kBoth(0x101);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     WaitResult(int value) {

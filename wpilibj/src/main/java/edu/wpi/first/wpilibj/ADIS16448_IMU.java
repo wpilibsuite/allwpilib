@@ -613,7 +613,6 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_spi.write(buf, 2);
   }
 
-  /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
       m_integ_gyro_angle_x = 0.0;
