@@ -14,11 +14,9 @@ import org.junit.jupiter.api.Test;
 
 public class NumericalIntegrationTest {
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponential() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    //noinspection SuspiciousNameCombination
     var y1 =
         NumericalIntegration.rk4(
             (Matrix<N1, N1> x) -> {
@@ -33,11 +31,9 @@ public class NumericalIntegrationTest {
   }
 
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponentialRKF45() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    //noinspection SuspiciousNameCombination
     var y1 =
         NumericalIntegration.rkf45(
             (x, u) -> {
@@ -53,11 +49,9 @@ public class NumericalIntegrationTest {
   }
 
   @Test
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
   public void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
-    //noinspection SuspiciousNameCombination
     var y1 =
         NumericalIntegration.rkdp(
             (x, u) -> {

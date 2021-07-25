@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.Discretization;
 import java.util.ArrayList;
 import java.util.List;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
