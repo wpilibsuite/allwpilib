@@ -36,34 +36,34 @@ public class Robot extends RobotBase {
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       if (isDisabled()) {
-        DriverStation.InDisabled(true);
+        DriverStation.inDisabled(true);
         disabled();
-        DriverStation.InDisabled(false);
+        DriverStation.inDisabled(false);
         while (isDisabled()) {
           DriverStation.waitForData();
         }
       } else if (isAutonomous()) {
-        DriverStation.InAutonomous(true);
+        DriverStation.inAutonomous(true);
         autonomous();
-        DriverStation.InAutonomous(false);
+        DriverStation.inAutonomous(false);
         while (isAutonomousEnabled()) {
           DriverStation.waitForData();
         }
       } else if (isTest()) {
         LiveWindow.setEnabled(true);
         Shuffleboard.enableActuatorWidgets();
-        DriverStation.InTest(true);
+        DriverStation.inTest(true);
         test();
-        DriverStation.InTest(false);
+        DriverStation.inTest(false);
         while (isTest() && isEnabled()) {
           DriverStation.waitForData();
         }
         LiveWindow.setEnabled(false);
         Shuffleboard.disableActuatorWidgets();
       } else {
-        DriverStation.InOperatorControl(true);
+        DriverStation.inOperatorControl(true);
         teleop();
-        DriverStation.InOperatorControl(false);
+        DriverStation.inOperatorControl(false);
         while (isOperatorControlEnabled()) {
           DriverStation.waitForData();
         }

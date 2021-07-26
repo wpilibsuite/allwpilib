@@ -1104,8 +1104,7 @@ public class DriverStation {
    *
    * @param entering If true, starting disabled code; if false, leaving disabled code
    */
-  @SuppressWarnings("MethodName")
-  public static void InDisabled(boolean entering) {
+  public static void inDisabled(boolean entering) {
     m_userInDisabled = entering;
   }
 
@@ -1115,8 +1114,7 @@ public class DriverStation {
    *
    * @param entering If true, starting autonomous code; if false, leaving autonomous code
    */
-  @SuppressWarnings("MethodName")
-  public static void InAutonomous(boolean entering) {
+  public static void inAutonomous(boolean entering) {
     m_userInAutonomous = entering;
   }
 
@@ -1126,8 +1124,7 @@ public class DriverStation {
    *
    * @param entering If true, starting teleop code; if false, leaving teleop code
    */
-  @SuppressWarnings("MethodName")
-  public static void InOperatorControl(boolean entering) {
+  public static void inOperatorControl(boolean entering) {
     m_userInTeleop = entering;
   }
 
@@ -1137,8 +1134,7 @@ public class DriverStation {
    *
    * @param entering If true, starting test code; if false, leaving test code
    */
-  @SuppressWarnings("MethodName")
-  public static void InTest(boolean entering) {
+  public static void inTest(boolean entering) {
     m_userInTest = entering;
   }
 
