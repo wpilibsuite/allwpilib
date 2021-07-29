@@ -13,10 +13,10 @@
 namespace frc::sim {
 
 namespace {
-constexpr double DEFAULT_DISTANCE_PER_PULSE = .0005;
+constexpr double kDefaultDistancePerPulse = .0005;
 }  // namespace
 
-TEST(EncoderSimTest, testInitialization) {
+TEST(EncoderSimTest, TestInitialization) {
   HAL_Initialize(500, 0);
 
   EncoderSim sim = EncoderSim::CreateForIndex(0);
@@ -32,27 +32,27 @@ TEST(EncoderSimTest, testInitialization) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testRate) {
+TEST(EncoderSimTest, TestRate) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   sim.SetRate(1.91);
   EXPECT_EQ(1.91, sim.GetRate());
 }
 
-TEST(EncoderSimTest, testCount) {
+TEST(EncoderSimTest, TestCount) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   IntCallback callback;
   auto cb = sim.RegisterCountCallback(callback.GetCallback(), false);
@@ -64,48 +64,48 @@ TEST(EncoderSimTest, testCount) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testDistance) {
+TEST(EncoderSimTest, TestDistance) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   sim.SetDistance(229.174);
   EXPECT_EQ(229.174, sim.GetDistance());
   EXPECT_EQ(229.174, encoder.GetDistance());
 }
 
-TEST(EncoderSimTest, testPeriod) {
+TEST(EncoderSimTest, TestPeriod) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   DoubleCallback callback;
   auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
   sim.SetPeriod(123.456);
   EXPECT_EQ(123.456, sim.GetPeriod());
   EXPECT_EQ(123.456, encoder.GetPeriod().to<double>());
-  EXPECT_EQ(DEFAULT_DISTANCE_PER_PULSE / 123.456, encoder.GetRate());
+  EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(123.456, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testSetMaxPeriod) {
+TEST(EncoderSimTest, TestSetMaxPeriod) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   DoubleCallback callback;
   auto cb = sim.RegisterMaxPeriodCallback(callback.GetCallback(), false);
@@ -117,14 +117,14 @@ TEST(EncoderSimTest, testSetMaxPeriod) {
   EXPECT_EQ(123.456, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testSetDirection) {
+TEST(EncoderSimTest, TestSetDirection) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   BooleanCallback callback;
   auto cb = sim.RegisterDirectionCallback(callback.GetCallback(), false);
@@ -142,14 +142,14 @@ TEST(EncoderSimTest, testSetDirection) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testSetReverseDirection) {
+TEST(EncoderSimTest, TestSetReverseDirection) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   BooleanCallback callback;
   auto cb = sim.RegisterReverseDirectionCallback(callback.GetCallback(), false);
@@ -165,14 +165,14 @@ TEST(EncoderSimTest, testSetReverseDirection) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testSetSamplesToAverage) {
+TEST(EncoderSimTest, TestSetSamplesToAverage) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   IntCallback callback;
   auto cb = sim.RegisterSamplesToAverageCallback(callback.GetCallback(), false);
@@ -184,7 +184,7 @@ TEST(EncoderSimTest, testSetSamplesToAverage) {
   EXPECT_EQ(57, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testSetDistancePerPulse) {
+TEST(EncoderSimTest, TestSetDistancePerPulse) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -201,14 +201,14 @@ TEST(EncoderSimTest, testSetDistancePerPulse) {
   EXPECT_EQ(.03405, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, testReset) {
+TEST(EncoderSimTest, TestReset) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
+  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
 
   BooleanCallback callback;
   auto cb = sim.RegisterResetCallback(callback.GetCallback(), false);

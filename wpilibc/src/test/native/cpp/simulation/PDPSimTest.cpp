@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(PDPSimTest, testInitialization) {
+TEST(PDPSimTest, TestInitialization) {
   HAL_Initialize(500, 0);
   PDPSim sim(2);
   EXPECT_FALSE(sim.GetInitialized());
@@ -71,10 +71,10 @@ TEST(PDPSimTest, TestSetCurrent) {
     auto cb =
         sim.RegisterCurrentCallback(channel, callback.GetCallback(), false);
 
-    const double TEST_CURRENT = 35.04 + channel;
-    sim.SetCurrent(channel, TEST_CURRENT);
-    EXPECT_EQ(TEST_CURRENT, sim.GetCurrent(channel));
-    EXPECT_EQ(TEST_CURRENT, pdp.GetCurrent(channel));
+    const double kTestCurrent = 35.04 + channel;
+    sim.SetCurrent(channel, kTestCurrent);
+    EXPECT_EQ(kTestCurrent, sim.GetCurrent(channel));
+    EXPECT_EQ(kTestCurrent, pdp.GetCurrent(channel));
     EXPECT_TRUE(callback.WasTriggered());
     EXPECT_TRUE(callback.GetLastValue());
   }

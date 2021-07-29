@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(DigitalPWMSimTests, testInitialization) {
+TEST(DigitalPWMSimTests, TestInitialization) {
   HAL_Initialize(500, 0);
 
   DigitalOutput output{0};
@@ -27,16 +27,16 @@ TEST(DigitalPWMSimTests, testInitialization) {
   auto dutyCycleCB =
       sim.RegisterDutyCycleCallback(dutyCycleCallback.GetCallback(), false);
 
-  constexpr double TEST_DUTY_CYCLE = .191;
-  output.EnablePWM(TEST_DUTY_CYCLE);
+  constexpr double kTestDutyCycle = 0.191;
+  output.EnablePWM(kTestDutyCycle);
 
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(initializeCallback.WasTriggered());
   EXPECT_TRUE(initializeCallback.GetLastValue());
 
-  EXPECT_EQ(TEST_DUTY_CYCLE, sim.GetDutyCycle());
+  EXPECT_EQ(kTestDutyCycle, sim.GetDutyCycle());
   EXPECT_TRUE(dutyCycleCallback.WasTriggered());
-  EXPECT_EQ(TEST_DUTY_CYCLE, dutyCycleCallback.GetLastValue());
+  EXPECT_EQ(kTestDutyCycle, dutyCycleCallback.GetLastValue());
 }
 
 TEST(DigitalPWMSimTests, TestSetPin) {

@@ -39,7 +39,7 @@ TEST(AcclerometerSimTests, TestActiveCallback) {
   EXPECT_TRUE(sim.GetActive());
 }
 
-TEST(AcclerometerSimTests, testX) {
+TEST(AcclerometerSimTests, TestX) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim sim;
   sim.ResetData();
@@ -56,7 +56,7 @@ TEST(AcclerometerSimTests, testX) {
   EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTests, testY) {
+TEST(AcclerometerSimTests, TestY) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim sim;
   sim.ResetData();
@@ -73,7 +73,7 @@ TEST(AcclerometerSimTests, testY) {
   EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTests, testZ) {
+TEST(AcclerometerSimTests, TestZ) {
   HAL_Initialize(500, 0);
 
   BuiltInAccelerometer accel;
@@ -91,7 +91,7 @@ TEST(AcclerometerSimTests, testZ) {
   EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
 }
 
-TEST(AcclerometerSimTests, testRange) {
+TEST(AcclerometerSimTests, TestRange) {
   HAL_Initialize(500, 0);
 
   BuiltInAccelerometerSim sim;

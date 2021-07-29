@@ -16,7 +16,7 @@
 using namespace frc;
 using namespace frc::sim;
 
-TEST(DriverStationTests, testEnabled) {
+TEST(DriverStationTests, TestEnabled) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -33,7 +33,7 @@ TEST(DriverStationTests, testEnabled) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testAutonomus) {
+TEST(DriverStationTests, TestAutonomus) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -50,7 +50,7 @@ TEST(DriverStationTests, testAutonomus) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testTest) {
+TEST(DriverStationTests, TestTestMode) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -67,7 +67,7 @@ TEST(DriverStationTests, testTest) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testEstop) {
+TEST(DriverStationTests, TestEstop) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -84,7 +84,7 @@ TEST(DriverStationTests, testEstop) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testFmsAttached) {
+TEST(DriverStationTests, TestFmsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -100,7 +100,7 @@ TEST(DriverStationTests, testFmsAttached) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testDsAttached) {
+TEST(DriverStationTests, TestDsAttached) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -118,7 +118,7 @@ TEST(DriverStationTests, testDsAttached) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testAllianceStationId) {
+TEST(DriverStationTests, TestAllianceStationId) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -184,7 +184,7 @@ TEST(DriverStationTests, testAllianceStationId) {
   EXPECT_EQ(allianceStation, callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testReplayNumber) {
+TEST(DriverStationTests, TestReplayNumber) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -193,7 +193,7 @@ TEST(DriverStationTests, testReplayNumber) {
   EXPECT_EQ(4, DriverStation::GetReplayNumber());
 }
 
-TEST(DriverStationTests, testMatchNumber) {
+TEST(DriverStationTests, TestMatchNumber) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -202,22 +202,22 @@ TEST(DriverStationTests, testMatchNumber) {
   EXPECT_EQ(3, DriverStation::GetMatchNumber());
 }
 
-TEST(DriverStationTests, testMatchTime) {
+TEST(DriverStationTests, TestMatchTime) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
   DoubleCallback callback;
   auto cb = DriverStationSim::RegisterMatchTimeCallback(callback.GetCallback(),
                                                         false);
-  constexpr double testTime = 19.174;
-  DriverStationSim::SetMatchTime(testTime);
-  EXPECT_EQ(testTime, DriverStationSim::GetMatchTime());
-  EXPECT_EQ(testTime, DriverStation::GetMatchTime());
+  constexpr double kTestTime = 19.174;
+  DriverStationSim::SetMatchTime(kTestTime);
+  EXPECT_EQ(kTestTime, DriverStationSim::GetMatchTime());
+  EXPECT_EQ(kTestTime, DriverStation::GetMatchTime());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(testTime, callback.GetLastValue());
+  EXPECT_EQ(kTestTime, callback.GetLastValue());
 }
 
-TEST(DriverStationTests, testSetGameSpecificMessage) {
+TEST(DriverStationTests, TestSetGameSpecificMessage) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 
@@ -227,7 +227,7 @@ TEST(DriverStationTests, testSetGameSpecificMessage) {
   EXPECT_EQ(message, DriverStation::GetGameSpecificMessage());
 }
 
-TEST(DriverStationTests, testSetEventName) {
+TEST(DriverStationTests, TestSetEventName) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 

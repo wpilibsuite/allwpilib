@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogOutputSimTest, testInitialization) {
+TEST(AnalogOutputSimTest, TestInitialization) {
   HAL_Initialize(500, 0);
 
   AnalogOutputSim outputSim(0);
@@ -29,7 +29,7 @@ TEST(AnalogOutputSimTest, testInitialization) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AnalogOutputSimTest, setCallbackTest) {
+TEST(AnalogOutputSimTest, TestSetCallback) {
   HAL_Initialize(500, 0);
 
   AnalogOutput output(0);
@@ -74,7 +74,7 @@ TEST(AnalogOutputSimTest, setCallbackTest) {
   }
 }
 
-TEST(AnalogOutputSimTest, testReset) {
+TEST(AnalogOutputSimTest, TestReset) {
   HAL_Initialize(500, 0);
 
   AnalogOutputSim outputSim(0);

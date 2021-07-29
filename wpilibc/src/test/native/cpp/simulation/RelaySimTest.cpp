@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(RelaySimTest, testInitializationBidrectional) {
+TEST(RelaySimTest, TestInitializationBidrectional) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -39,7 +39,7 @@ TEST(RelaySimTest, testInitializationBidrectional) {
   EXPECT_TRUE(reverseCallback.GetLastValue());
 }
 
-TEST(RelaySimTest, testInitializationForwardOnly) {
+TEST(RelaySimTest, TestInitializationForwardOnly) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -65,7 +65,7 @@ TEST(RelaySimTest, testInitializationForwardOnly) {
   EXPECT_FALSE(reverseCallback.WasTriggered());
 }
 
-TEST(RelaySimTest, testInitializationReverseOnly) {
+TEST(RelaySimTest, TestInitializationReverseOnly) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -91,7 +91,7 @@ TEST(RelaySimTest, testInitializationReverseOnly) {
   EXPECT_TRUE(reverseCallback.GetLastValue());
 }
 
-TEST(RelaySimTest, testBidirectionalSetForward) {
+TEST(RelaySimTest, TestBidirectionalSetForward) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -114,7 +114,7 @@ TEST(RelaySimTest, testBidirectionalSetForward) {
   EXPECT_FALSE(reverseCallback.WasTriggered());
 }
 
-TEST(RelaySimTest, testBidirectionalSetReverse) {
+TEST(RelaySimTest, TestBidirectionalSetReverse) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -133,12 +133,11 @@ TEST(RelaySimTest, testBidirectionalSetReverse) {
   EXPECT_TRUE(sim.GetReverse());
 
   EXPECT_FALSE(forwardCallback.WasTriggered());
-  //            assertNull(forwardCallback.GetLastValue());
   EXPECT_TRUE(reverseCallback.WasTriggered());
   EXPECT_TRUE(reverseCallback.GetLastValue());
 }
 
-TEST(RelaySimTest, testBidirectionalSetOn) {
+TEST(RelaySimTest, TestBidirectionalSetOn) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -162,7 +161,7 @@ TEST(RelaySimTest, testBidirectionalSetOn) {
   EXPECT_TRUE(reverseCallback.GetLastValue());
 }
 
-TEST(RelaySimTest, testBidirectionalSetOff) {
+TEST(RelaySimTest, TestBidirectionalSetOff) {
   HAL_Initialize(500, 0);
 
   RelaySim sim(0);
@@ -191,7 +190,7 @@ TEST(RelaySimTest, testBidirectionalSetOff) {
   EXPECT_FALSE(reverseCallback.GetLastValue());
 }
 
-TEST(RelaySimTest, testStopMotor) {
+TEST(RelaySimTest, TestStopMotor) {
   Relay relay(0);
   RelaySim sim(relay);
 

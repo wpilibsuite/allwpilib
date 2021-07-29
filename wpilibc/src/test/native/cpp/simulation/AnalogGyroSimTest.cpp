@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogGyroSimTests, testInitialization) {
+TEST(AnalogGyroSimTests, TestInitialization) {
   HAL_Initialize(500, 0);
   AnalogGyroSim sim(0);
   EXPECT_FALSE(sim.GetInitialized());
@@ -28,7 +28,7 @@ TEST(AnalogGyroSimTests, testInitialization) {
   EXPECT_TRUE(initializedCallback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, testSetAngle) {
+TEST(AnalogGyroSimTests, TestSetAngle) {
   HAL_Initialize(500, 0);
 
   AnalogGyroSim sim(0);
@@ -39,16 +39,16 @@ TEST(AnalogGyroSimTests, testSetAngle) {
   auto cb = sim.RegisterAngleCallback(callback.GetCallback(), false);
   EXPECT_EQ(0, gyro.GetAngle());
 
-  constexpr double TEST_ANGLE = 35.04;
-  sim.SetAngle(TEST_ANGLE);
-  EXPECT_EQ(TEST_ANGLE, sim.GetAngle());
-  EXPECT_EQ(TEST_ANGLE, gyro.GetAngle());
-  EXPECT_EQ(-TEST_ANGLE, gyro.GetRotation2d().Degrees().to<double>());
+  constexpr double kTestAngle = 35.04;
+  sim.SetAngle(kTestAngle);
+  EXPECT_EQ(kTestAngle, sim.GetAngle());
+  EXPECT_EQ(kTestAngle, gyro.GetAngle());
+  EXPECT_EQ(-kTestAngle, gyro.GetRotation2d().Degrees().to<double>());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(TEST_ANGLE, callback.GetLastValue());
+  EXPECT_EQ(kTestAngle, callback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, testSetRate) {
+TEST(AnalogGyroSimTests, TestSetRate) {
   HAL_Initialize(500, 0);
 
   AnalogGyroSim sim(0);
@@ -59,16 +59,16 @@ TEST(AnalogGyroSimTests, testSetRate) {
   auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
   EXPECT_EQ(0, gyro.GetRate());
 
-  constexpr double TEST_RATE = -19.1;
-  sim.SetRate(TEST_RATE);
-  EXPECT_EQ(TEST_RATE, sim.GetRate());
-  EXPECT_EQ(TEST_RATE, gyro.GetRate());
+  constexpr double kTestRate = -19.1;
+  sim.SetRate(kTestRate);
+  EXPECT_EQ(kTestRate, sim.GetRate());
+  EXPECT_EQ(kTestRate, gyro.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(TEST_RATE, callback.GetLastValue());
+  EXPECT_EQ(kTestRate, callback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, testReset) {
+TEST(AnalogGyroSimTests, TestReset) {
   HAL_Initialize(500, 0);
 
   AnalogInput ai(0);

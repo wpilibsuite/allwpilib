@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(DutyCycleSimTests, testInitialization) {
+TEST(DutyCycleSimTests, TestInitialization) {
   HAL_Initialize(500, 0);
   DutyCycleSim sim = DutyCycleSim::CreateForIndex(0);
   EXPECT_FALSE(sim.GetInitialized());

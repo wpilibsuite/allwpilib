@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(PWMSimTests, testInitialize) {
+TEST(PWMSimTests, TestInitialize) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);
@@ -26,7 +26,7 @@ TEST(PWMSimTests, testInitialize) {
   EXPECT_TRUE(sim.GetInitialized());
 }
 
-TEST(PWMSimTests, testSetRawValue) {
+TEST(PWMSimTests, TestSetRawValue) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);
@@ -44,7 +44,7 @@ TEST(PWMSimTests, testSetRawValue) {
   EXPECT_EQ(229, callback.GetLastValue());
 }
 
-TEST(PWMSimTests, testSetSpeed) {
+TEST(PWMSimTests, TestSetSpeed) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);
@@ -64,7 +64,7 @@ TEST(PWMSimTests, testSetSpeed) {
   EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
 }
 
-TEST(PWMSimTests, testSetPosition) {
+TEST(PWMSimTests, TestSetPosition) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);
@@ -84,7 +84,7 @@ TEST(PWMSimTests, testSetPosition) {
   EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
 }
 
-TEST(PWMSimTests, testSetPeriodScale) {
+TEST(PWMSimTests, TestSetPeriodScale) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);
@@ -101,7 +101,7 @@ TEST(PWMSimTests, testSetPeriodScale) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(PWMSimTests, testSetZeroLatch) {
+TEST(PWMSimTests, TestSetZeroLatch) {
   HAL_Initialize(500, 0);
 
   PWMSim sim(0);

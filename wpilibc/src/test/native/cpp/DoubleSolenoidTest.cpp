@@ -11,7 +11,7 @@
 
 namespace frc {
 
-TEST(DoubleSolenoidTests, testValidInitialization) {
+TEST(DoubleSolenoidTests, TestValidInitialization) {
   PneumaticsControlModule pcm(3);
   DoubleSolenoid solenoid(pcm, 2, 3);
   solenoid.Set(DoubleSolenoid::kReverse);
@@ -24,21 +24,21 @@ TEST(DoubleSolenoidTests, testValidInitialization) {
   EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
 }
 
-TEST(DoubleSolenoidTests, testThrowForwardPortAlreadyInitialized) {
+TEST(DoubleSolenoidTests, TestThrowForwardPortAlreadyInitialized) {
   PneumaticsControlModule pcm(5);
   // Single solenoid that is reused for forward port
   Solenoid solenoid(pcm, 2);
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, testThrowReversePortAlreadyInitialized) {
+TEST(DoubleSolenoidTests, TestThrowReversePortAlreadyInitialized) {
   PneumaticsControlModule pcm(6);
   // Single solenoid that is reused for forward port
   Solenoid solenoid(pcm, 3);
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, testThrowBothPortsAlreadyInitialized) {
+TEST(DoubleSolenoidTests, TestThrowBothPortsAlreadyInitialized) {
   PneumaticsControlModule pcm(6);
   // Single solenoid that is reused for forward port
   Solenoid solenoid0(pcm, 2);
@@ -46,7 +46,7 @@ TEST(DoubleSolenoidTests, testThrowBothPortsAlreadyInitialized) {
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, testToggle) {
+TEST(DoubleSolenoidTests, TestToggle) {
   PneumaticsControlModule pcm(4);
   DoubleSolenoid solenoid(&pcm, 2, 3);
   // Bootstrap it into reverse
@@ -64,12 +64,12 @@ TEST(DoubleSolenoidTests, testToggle) {
   EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
 }
 
-TEST(DoubleSolenoidTests, testInvalidForwardPort) {
+TEST(DoubleSolenoidTests, TestInvalidForwardPort) {
   PneumaticsControlModule pcm(0);
   EXPECT_THROW(DoubleSolenoid(pcm, 100, 1), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, testInvalidReversePort) {
+TEST(DoubleSolenoidTests, TestInvalidReversePort) {
   PneumaticsControlModule pcm(0);
   EXPECT_THROW(DoubleSolenoid(pcm, 0, 100), std::runtime_error);
 }

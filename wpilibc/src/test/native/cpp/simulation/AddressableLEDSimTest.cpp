@@ -27,7 +27,7 @@ TEST(AddressableLEDSimTest, TestInitializationCallback) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, testLength) {
+TEST(AddressableLEDSimTest, TestLength) {
   HAL_Initialize(500, 0);
 
   AddressableLED led{0};
@@ -47,7 +47,7 @@ TEST(AddressableLEDSimTest, testLength) {
   EXPECT_EQ(50, callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, testSetRunning) {
+TEST(AddressableLEDSimTest, TestSetRunning) {
   HAL_Initialize(500, 0);
 
   AddressableLEDSim sim = AddressableLEDSim::CreateForIndex(0);
@@ -69,7 +69,7 @@ TEST(AddressableLEDSimTest, testSetRunning) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, testSetData) {
+TEST(AddressableLEDSimTest, TestSetData) {
   AddressableLED led{0};
   AddressableLEDSim sim = AddressableLEDSim::CreateForChannel(0);
 

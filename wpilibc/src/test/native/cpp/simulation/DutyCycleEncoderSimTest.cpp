@@ -18,9 +18,9 @@ TEST(DutyCycleEncoderSimTests, TestSet) {
   DutyCycleEncoder enc{0};
   DutyCycleEncoderSim sim(enc);
 
-  constexpr units::turn_t TEST_VALUE{5.67};
-  sim.Set(TEST_VALUE);
-  EXPECT_EQ(TEST_VALUE, enc.Get());
+  constexpr units::turn_t kTestValue{5.67};
+  sim.Set(kTestValue);
+  EXPECT_EQ(kTestValue, enc.Get());
 }
 
 TEST(DutyCycleEncoderSimTests, TestSetDistance) {

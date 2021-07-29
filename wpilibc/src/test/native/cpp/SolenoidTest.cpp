@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 
 namespace frc {
-TEST(SolenoidTests, testValidInitialization) {
+TEST(SolenoidTests, TestValidInitialization) {
   PneumaticsControlModule pcm(3);
   Solenoid solenoid(pcm, 2);
   EXPECT_EQ(2, solenoid.GetChannel());
@@ -22,24 +22,24 @@ TEST(SolenoidTests, testValidInitialization) {
   EXPECT_FALSE(solenoid.Get());
 }
 
-TEST(SolenoidTests, testDoubleInitialization) {
+TEST(SolenoidTests, TestDoubleInitialization) {
   PneumaticsControlModule pcm(3);
   Solenoid solenoid(&pcm, 2);
   EXPECT_THROW(Solenoid(pcm, 2), std::runtime_error);
 }
 
-TEST(SolenoidTests, testDoubleInitializationFromDoubleSolenoid) {
+TEST(SolenoidTests, TestDoubleInitializationFromDoubleSolenoid) {
   PneumaticsControlModule pcm(3);
   DoubleSolenoid solenoid(pcm, 2, 3);
   EXPECT_THROW(Solenoid(pcm, 2), std::runtime_error);
 }
 
-TEST(SolenoidTests, testInvalidChannel) {
+TEST(SolenoidTests, TestInvalidChannel) {
   PneumaticsControlModule pcm(3);
   EXPECT_THROW(Solenoid(pcm, 100), std::runtime_error);
 }
 
-TEST(SolenoidTests, testToggle) {
+TEST(SolenoidTests, TestToggle) {
   PneumaticsControlModule pcm(3);
   Solenoid solenoid(pcm, 2);
   solenoid.Set(true);

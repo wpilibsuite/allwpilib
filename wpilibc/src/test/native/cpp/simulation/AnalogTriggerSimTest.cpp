@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogTriggerSimTest, testInitialization) {
+TEST(AnalogTriggerSimTest, TestInitialization) {
   HAL_Initialize(500, 0);
 
   AnalogTriggerSim sim = AnalogTriggerSim::CreateForIndex(0);
@@ -40,13 +40,13 @@ TEST(AnalogTriggerSimTest, TestTriggerLowerBound) {
   auto upperCb =
       sim.RegisterTriggerUpperBoundCallback(upperCallback.GetCallback(), false);
 
-  trigger.SetLimitsVoltage(.299, 1.91);
+  trigger.SetLimitsVoltage(0.299, 1.91);
 
-  EXPECT_EQ(.299, sim.GetTriggerLowerBound());
+  EXPECT_EQ(0.299, sim.GetTriggerLowerBound());
   EXPECT_EQ(1.91, sim.GetTriggerUpperBound());
 
   EXPECT_TRUE(lowerCallback.WasTriggered());
-  EXPECT_EQ(.299, lowerCallback.GetLastValue());
+  EXPECT_EQ(0.299, lowerCallback.GetLastValue());
 
   EXPECT_TRUE(upperCallback.WasTriggered());
   EXPECT_EQ(1.91, upperCallback.GetLastValue());

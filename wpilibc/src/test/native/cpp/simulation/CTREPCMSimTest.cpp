@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(CTREPCMSimTests, setInitializeTest) {
+TEST(CTREPCMSimTests, TestInitialization) {
   CTREPCMSim sim;
 
   sim.ResetData();
@@ -28,7 +28,7 @@ TEST(CTREPCMSimTests, setInitializeTest) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTests, testSolenoidOutput) {
+TEST(CTREPCMSimTests, TestSolenoidOutput) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();
