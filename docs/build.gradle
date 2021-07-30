@@ -108,8 +108,8 @@ apply from: "${rootDir}/shared/opencv.gradle"
 task generateJavaDocs(type: Javadoc) {
     classpath += project(":wpimath").sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/11/docs/api/")
-    options.addStringOption "tag", "pre:a:Pre-Condition"
-    options.addBooleanOption "Xdoclint:html,missing,reference,syntax", true
+    options.addStringOption("tag", "pre:a:Pre-Condition")
+    options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
@@ -126,7 +126,6 @@ task generateJavaDocs(type: Javadoc) {
     source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
-    options.encoding = 'UTF-8'
 
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"

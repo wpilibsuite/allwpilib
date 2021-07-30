@@ -45,8 +45,8 @@ public class KalmanFilterTest {
     elevatorPlant = LinearSystemId.createElevatorSystem(motors, m, r, G);
   }
 
-  // A swerve drive system where the states are [x, y, theta, vx, vy, vTheta]^T,
-  // Y is [x, y, theta]^T and u is [ax, ay, alpha}^T
+  // A swerve drive system where the states are [x, y, theta, vx, vy, vTheta]ᵀ,
+  // Y is [x, y, theta]ᵀ and u is [ax, ay, alpha}ᵀ
   LinearSystem<N6, N3, N3> m_swerveObserverSystem =
       new LinearSystem<>(
           Matrix.mat(Nat.N6(), Nat.N6())

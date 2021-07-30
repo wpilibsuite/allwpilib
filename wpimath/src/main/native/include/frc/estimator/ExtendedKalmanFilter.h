@@ -71,7 +71,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, Outputs, Outputs> discR =
         DiscretizeR<Outputs>(m_contR, dt);
 
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
+    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
     bool isObservable =
         IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
     if (isObservable && Outputs <= States) {
@@ -137,7 +137,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, Outputs, Outputs> discR =
         DiscretizeR<Outputs>(m_contR, dt);
 
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
+    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
     bool isObservable =
         IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
     if (isObservable && Outputs <= States) {
@@ -211,8 +211,6 @@ class ExtendedKalmanFilter {
    * @param dt Timestep for prediction.
    */
   void Predict(const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
-    m_dt = dt;
-
     // Find continuous A
     Eigen::Matrix<double, States, States> contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -223,7 +221,11 @@ class ExtendedKalmanFilter {
     DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
 
     m_xHat = RK4(m_f, m_xHat, u, dt);
+
+    // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
     m_P = discA * m_P * discA.transpose() + discQ;
+
+    m_dt = dt;
   }
 
   /**
@@ -292,22 +294,25 @@ class ExtendedKalmanFilter {
 
     Eigen::Matrix<double, Rows, Rows> S = C * m_P * C.transpose() + discR;
 
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
     //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
     //
     // The solution of Ax = b can be found via x = A.solve(b).
     //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
     Eigen::Matrix<double, States, Rows> K =
         S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
 
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));
+
+    // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
     m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
   }
 

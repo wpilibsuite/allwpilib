@@ -290,7 +290,7 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
-   * Calculates the transpose, M^T of this matrix.
+   * Calculates the transpose, Mᵀ of this matrix.
    *
    * @return The transpose matrix.
    */

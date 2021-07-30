@@ -47,6 +47,7 @@ public final class CameraServer {
   /**
    * Get the CameraServer instance.
    *
+   * @return The CameraServer instance.
    * @deprecated Use the static methods
    */
   @Deprecated

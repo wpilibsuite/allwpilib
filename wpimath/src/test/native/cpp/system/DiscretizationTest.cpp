@@ -60,8 +60,9 @@ TEST(DiscretizationTest, DiscretizeAB) {
   EXPECT_EQ(x1Truth, x1Discrete);
 }
 
-// Test that the discrete approximation of Q is roughly equal to
-// integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+//                                             dt
+// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                             0
 TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, 0;
@@ -92,8 +93,9 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
       << discQIntegrated;
 }
 
-// Test that the discrete approximation of Q is roughly equal to
-// integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+//                                             dt
+// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                             0
 TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, -1406.29;

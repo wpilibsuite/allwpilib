@@ -7,7 +7,7 @@ include(AddTest)
 if (WITH_JAVA)
   find_package(Java REQUIRED)
   include(UseJava)
-  set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
+  set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
   file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
   add_jar(wpilibNewCommands_jar ${JAVA_SOURCES} INCLUDE_JARS hal_jar ntcore_jar cscore_jar cameraserver_jar wpimath_jar wpiutil_jar wpilibj_jar OUTPUT_NAME wpilibNewCommands)

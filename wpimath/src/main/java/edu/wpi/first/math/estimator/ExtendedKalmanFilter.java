@@ -141,7 +141,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
+    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
     boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (isObservable && outputs.getNum() <= states.getNum()) {
       m_initP =
@@ -267,7 +267,10 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     final var discQ = discPair.getSecond();
 
     m_xHat = NumericalIntegration.rk4(f, m_xHat, u, dtSeconds);
+
+    // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
     m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
+
     m_dtSeconds = dtSeconds;
   }
 
@@ -338,23 +341,24 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
     //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
     //
     // The solution of Ax = b can be found via x = A.solve(b).
     //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
-    //
-    // Now we have the Kalman gain
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
     final Matrix<States, Rows> K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, h.apply(m_xHat, u))));
+
+    // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
     m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);
   }
 }

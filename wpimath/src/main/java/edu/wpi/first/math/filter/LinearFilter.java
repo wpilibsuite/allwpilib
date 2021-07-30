@@ -13,8 +13,8 @@ import java.util.Arrays;
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
  * Static factory methods are provided to create commonly used types of filters.
  *
- * <p>Filters are of the form: y[n] = (b0*x[n] + b1*x[n-1] + ... + bP*x[n-P]) - (a0*y[n-1] +
- * a2*y[n-2] + ... + aQ*y[n-Q])
+ * <p>Filters are of the form: y[n] = (b0 x[n] + b1 x[n-1] + ... + bP x[n-P]) - (a0 y[n-1] + a2
+ * y[n-2] + ... + aQ y[n-Q])
  *
  * <p>Where: y[n] is the output at time "n" x[n] is the input at time "n" y[n-1] is the output from
  * the LAST time step ("n-1") x[n-1] is the input from the LAST time step ("n-1") b0...bP are the
@@ -71,8 +71,8 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a one-pole IIR low-pass filter of the form: y[n] = (1-gain)*x[n] + gain*y[n-1] where
-   * gain = e^(-dt / T), T is the time constant in seconds.
+   * Creates a one-pole IIR low-pass filter of the form: y[n] = (1-gain) x[n] + gain y[n-1] where
+   * gain = e<sup>-dt / T</sup>, T is the time constant in seconds.
    *
    * <p>Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency above which the
    * input starts to attenuate.
@@ -92,8 +92,8 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a first-order high-pass filter of the form: y[n] = gain*x[n] + (-gain)*x[n-1] +
-   * gain*y[n-1] where gain = e^(-dt / T), T is the time constant in seconds.
+   * Creates a first-order high-pass filter of the form: y[n] = gain x[n] + (-gain) x[n-1] + gain
+   * y[n-1] where gain = e<sup>-dt / T</sup>, T is the time constant in seconds.
    *
    * <p>Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency below which the
    * input starts to attenuate.
@@ -113,8 +113,7 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a K-tap FIR moving average filter of the form: y[n] = 1/k * (x[k] + x[k-1] + ... +
-   * x[0]).
+   * Creates a K-tap FIR moving average filter of the form: y[n] = 1/k (x[k] + x[k-1] + ... + x[0]).
    *
    * <p>This filter is always stable.
    *

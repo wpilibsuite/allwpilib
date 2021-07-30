@@ -252,7 +252,7 @@ Eigen::Matrix<double, 4, 1> PoseTo4dVector(const Pose2d& pose);
  *
  * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(lambda * I - A, B) < n where n is number of states.
+ * uncontrollable if rank(λI - A, B) < n where n is number of states.
  *
  * @param A System matrix.
  * @param B Input matrix.

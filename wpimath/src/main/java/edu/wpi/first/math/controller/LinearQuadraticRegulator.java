@@ -103,8 +103,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 
+    // K = (BᵀSB + R)⁻¹BᵀSA
     var temp = discB.transpose().times(S).times(discB).plus(R);
-
     m_K = temp.solve(discB.transpose().times(S).times(discA));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
@@ -137,8 +137,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
+    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     var temp = discB.transpose().times(S).times(discB).plus(R);
-
     m_K = temp.solve(discB.transpose().times(S).times(discA).plus(N.transpose()));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
