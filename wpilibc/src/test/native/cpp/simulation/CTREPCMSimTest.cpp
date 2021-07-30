@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(CTREPCMSimTests, TestInitialization) {
+TEST(CTREPCMSimTest, Initializen) {
   CTREPCMSim sim;
 
   sim.ResetData();
@@ -28,7 +28,7 @@ TEST(CTREPCMSimTests, TestInitialization) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTests, TestSolenoidOutput) {
+TEST(CTREPCMSimTest, SolenoidOutput) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();
@@ -79,7 +79,7 @@ TEST(CTREPCMSimTests, TestSolenoidOutput) {
   EXPECT_EQ(0b00000000, sim.GetAllSolenoidOutputs());
 }
 
-TEST(CTREPCMSimTests, TestSetCompressorOn) {
+TEST(CTREPCMSimTest, SetCompressorOn) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();
@@ -96,7 +96,7 @@ TEST(CTREPCMSimTests, TestSetCompressorOn) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTests, TestSetClosedLoopEnabled) {
+TEST(CTREPCMSimTest, SetClosedLoopEnabled) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();
@@ -115,7 +115,7 @@ TEST(CTREPCMSimTests, TestSetClosedLoopEnabled) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTests, TestSetPressureSwitchEnabled) {
+TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();
@@ -132,7 +132,7 @@ TEST(CTREPCMSimTests, TestSetPressureSwitchEnabled) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTests, TestSetCompressorCurrent) {
+TEST(CTREPCMSimTest, SetCompressorCurrent) {
   PneumaticsControlModule pcm;
   CTREPCMSim sim(pcm);
   sim.ResetData();

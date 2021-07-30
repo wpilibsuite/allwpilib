@@ -16,7 +16,7 @@ namespace {
 constexpr double kDefaultDistancePerPulse = .0005;
 }  // namespace
 
-TEST(EncoderSimTest, TestInitialization) {
+TEST(EncoderSimTest, Initialize) {
   HAL_Initialize(500, 0);
 
   EncoderSim sim = EncoderSim::CreateForIndex(0);
@@ -32,7 +32,7 @@ TEST(EncoderSimTest, TestInitialization) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestRate) {
+TEST(EncoderSimTest, Rate) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -45,7 +45,7 @@ TEST(EncoderSimTest, TestRate) {
   EXPECT_EQ(1.91, sim.GetRate());
 }
 
-TEST(EncoderSimTest, TestCount) {
+TEST(EncoderSimTest, Count) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -64,7 +64,7 @@ TEST(EncoderSimTest, TestCount) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestDistance) {
+TEST(EncoderSimTest, Distance) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -78,7 +78,7 @@ TEST(EncoderSimTest, TestDistance) {
   EXPECT_EQ(229.174, encoder.GetDistance());
 }
 
-TEST(EncoderSimTest, TestPeriod) {
+TEST(EncoderSimTest, Period) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -98,7 +98,7 @@ TEST(EncoderSimTest, TestPeriod) {
   EXPECT_EQ(123.456, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestSetMaxPeriod) {
+TEST(EncoderSimTest, SetMaxPeriod) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -117,7 +117,7 @@ TEST(EncoderSimTest, TestSetMaxPeriod) {
   EXPECT_EQ(123.456, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestSetDirection) {
+TEST(EncoderSimTest, SetDirection) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -142,7 +142,7 @@ TEST(EncoderSimTest, TestSetDirection) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestSetReverseDirection) {
+TEST(EncoderSimTest, SetReverseDirection) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -165,7 +165,7 @@ TEST(EncoderSimTest, TestSetReverseDirection) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestSetSamplesToAverage) {
+TEST(EncoderSimTest, SetSamplesToAverage) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -184,7 +184,7 @@ TEST(EncoderSimTest, TestSetSamplesToAverage) {
   EXPECT_EQ(57, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestSetDistancePerPulse) {
+TEST(EncoderSimTest, SetDistancePerPulse) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);
@@ -201,7 +201,7 @@ TEST(EncoderSimTest, TestSetDistancePerPulse) {
   EXPECT_EQ(.03405, callback.GetLastValue());
 }
 
-TEST(EncoderSimTest, TestReset) {
+TEST(EncoderSimTest, Reset) {
   HAL_Initialize(500, 0);
 
   Encoder encoder(0, 1);

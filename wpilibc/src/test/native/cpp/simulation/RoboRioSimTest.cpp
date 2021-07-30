@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(RoboRioSimTest, TestFPGAButton) {
+TEST(RoboRioSimTest, FPGAButton) {
   RoboRioSim::ResetData();
 
   int dummyStatus = 0;
@@ -35,7 +35,7 @@ TEST(RoboRioSimTest, TestFPGAButton) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(RoboRioSimTest, TestSetVin) {
+TEST(RoboRioSimTest, SetVin) {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -60,7 +60,7 @@ TEST(RoboRioSimTest, TestSetVin) {
   EXPECT_EQ(kTestCurrent, RobotController::GetInputCurrent());
 }
 
-TEST(RoboRioSimTest, Test6V) {
+TEST(RoboRioSimTest, Set6V) {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -104,7 +104,7 @@ TEST(RoboRioSimTest, Test6V) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount6V());
 }
 
-TEST(RoboRioSimTest, test5V) {
+TEST(RoboRioSimTest, Set5V) {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;
@@ -148,7 +148,7 @@ TEST(RoboRioSimTest, test5V) {
   EXPECT_EQ(kTestFaults, RobotController::GetFaultCount5V());
 }
 
-TEST(RoboRioSimTest, test3V3) {
+TEST(RoboRioSimTest, Set3V3) {
   RoboRioSim::ResetData();
 
   DoubleCallback voltageCallback;

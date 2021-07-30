@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogInputSimTest, SetInitializeTest) {
+TEST(AnalogInputSimTest, SetInitialized) {
   HAL_Initialize(500, 0);
 
   AnalogInputSim sim{5};
@@ -26,7 +26,7 @@ TEST(AnalogInputSimTest, SetInitializeTest) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TestSetVoltage) {
+TEST(AnalogInputSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
 
   AnalogInputSim sim(5);
@@ -62,7 +62,7 @@ TEST(AnalogInputSimTest, TestSetVoltage) {
   }
 }
 
-TEST(AnalogInputSimTest, TestSetOverSampleBits) {
+TEST(AnalogInputSimTest, SetOverSampleBits) {
   HAL_Initialize(500, 0);
   AnalogInput input(5);
   AnalogInputSim sim(input);
@@ -77,7 +77,7 @@ TEST(AnalogInputSimTest, TestSetOverSampleBits) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TestSetAverageBits) {
+TEST(AnalogInputSimTest, SetAverageBits) {
   HAL_Initialize(500, 0);
   AnalogInput input(5);
   AnalogInputSim sim(input);
@@ -92,7 +92,7 @@ TEST(AnalogInputSimTest, TestSetAverageBits) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TestInitAccumulator) {
+TEST(AnalogInputSimTest, InitAccumulator) {
   HAL_Initialize(500, 0);
   AnalogInput input(0);
   AnalogInputSim sim(input);
@@ -108,7 +108,7 @@ TEST(AnalogInputSimTest, TestInitAccumulator) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TesInitAccumulatorOnInvalidPort) {
+TEST(AnalogInputSimTest, InitAccumulatorOnInvalidPort) {
   HAL_Initialize(500, 0);
   AnalogInput input{5};
   AnalogInputSim sim(input);
@@ -121,7 +121,7 @@ TEST(AnalogInputSimTest, TesInitAccumulatorOnInvalidPort) {
   EXPECT_FALSE(callback.WasTriggered());
 }
 
-TEST(AnalogInputSimTest, TestSetAccumulatorValue) {
+TEST(AnalogInputSimTest, SetAccumulatorValue) {
   HAL_Initialize(500, 0);
   AnalogInput input(0);
   AnalogInputSim sim(input);
@@ -137,7 +137,7 @@ TEST(AnalogInputSimTest, TestSetAccumulatorValue) {
   EXPECT_EQ(3504191229, callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TestSetAccumulatorCount) {
+TEST(AnalogInputSimTest, SetAccumulatorCount) {
   HAL_Initialize(500, 0);
   AnalogInput input(0);
   AnalogInputSim sim(input);
@@ -153,7 +153,7 @@ TEST(AnalogInputSimTest, TestSetAccumulatorCount) {
   EXPECT_EQ(3504191229, callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, TestSetAccumulatorDeadband) {
+TEST(AnalogInputSimTest, SetAccumulatorDeadband) {
   HAL_Initialize(500, 0);
   AnalogInput input(0);
   AnalogInputSim sim(input);
@@ -169,7 +169,7 @@ TEST(AnalogInputSimTest, TestSetAccumulatorDeadband) {
   EXPECT_EQ(3504, callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, testSetAccumulatorCenter) {
+TEST(AnalogInputSimTest, SetAccumulatorCenter) {
   HAL_Initialize(500, 0);
   AnalogInput input(0);
   AnalogInputSim sim(input);

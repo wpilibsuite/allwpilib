@@ -11,7 +11,7 @@
 
 namespace frc {
 
-TEST(DoubleSolenoidTests, TestValidInitialization) {
+TEST(DoubleSolenoidTest, ValidInitialization) {
   PneumaticsControlModule pcm(3);
   DoubleSolenoid solenoid(pcm, 2, 3);
   solenoid.Set(DoubleSolenoid::kReverse);
@@ -24,21 +24,21 @@ TEST(DoubleSolenoidTests, TestValidInitialization) {
   EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
 }
 
-TEST(DoubleSolenoidTests, TestThrowForwardPortAlreadyInitialized) {
+TEST(DoubleSolenoidTest, ThrowForwardPortAlreadyInitialized) {
   PneumaticsControlModule pcm(5);
   // Single solenoid that is reused for forward port
   Solenoid solenoid(pcm, 2);
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, TestThrowReversePortAlreadyInitialized) {
+TEST(DoubleSolenoidTest, ThrowReversePortAlreadyInitialized) {
   PneumaticsControlModule pcm(6);
   // Single solenoid that is reused for forward port
   Solenoid solenoid(pcm, 3);
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, TestThrowBothPortsAlreadyInitialized) {
+TEST(DoubleSolenoidTest, ThrowBothPortsAlreadyInitialized) {
   PneumaticsControlModule pcm(6);
   // Single solenoid that is reused for forward port
   Solenoid solenoid0(pcm, 2);
@@ -46,7 +46,7 @@ TEST(DoubleSolenoidTests, TestThrowBothPortsAlreadyInitialized) {
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, TestToggle) {
+TEST(DoubleSolenoidTest, Toggle) {
   PneumaticsControlModule pcm(4);
   DoubleSolenoid solenoid(&pcm, 2, 3);
   // Bootstrap it into reverse
@@ -64,12 +64,12 @@ TEST(DoubleSolenoidTests, TestToggle) {
   EXPECT_EQ(DoubleSolenoid::kOff, solenoid.Get());
 }
 
-TEST(DoubleSolenoidTests, TestInvalidForwardPort) {
+TEST(DoubleSolenoidTest, InvalidForwardPort) {
   PneumaticsControlModule pcm(0);
   EXPECT_THROW(DoubleSolenoid(pcm, 100, 1), std::runtime_error);
 }
 
-TEST(DoubleSolenoidTests, TestInvalidReversePort) {
+TEST(DoubleSolenoidTest, InvalidReversePort) {
   PneumaticsControlModule pcm(0);
   EXPECT_THROW(DoubleSolenoid(pcm, 0, 100), std::runtime_error);
 }

@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(PDPSimTest, TestInitialization) {
+TEST(PDPSimTest, Initialize) {
   HAL_Initialize(500, 0);
   PDPSim sim(2);
   EXPECT_FALSE(sim.GetInitialized());
@@ -31,7 +31,7 @@ TEST(PDPSimTest, TestInitialization) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, TestSetTemperature) {
+TEST(PDPSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
   PowerDistributionPanel pdp(2);
   PDPSim sim(pdp);
@@ -46,7 +46,7 @@ TEST(PDPSimTest, TestSetTemperature) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, TestSetVoltage) {
+TEST(PDPSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
   PowerDistributionPanel pdp(2);
   PDPSim sim(pdp);
@@ -61,7 +61,7 @@ TEST(PDPSimTest, TestSetVoltage) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, TestSetCurrent) {
+TEST(PDPSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
   PowerDistributionPanel pdp(2);
   PDPSim sim(pdp);

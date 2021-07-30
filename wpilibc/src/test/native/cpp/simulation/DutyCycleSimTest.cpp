@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(DutyCycleSimTests, TestInitialization) {
+TEST(DutyCycleSimTest, Initialization) {
   HAL_Initialize(500, 0);
   DutyCycleSim sim = DutyCycleSim::CreateForIndex(0);
   EXPECT_FALSE(sim.GetInitialized());
@@ -33,7 +33,7 @@ TEST(DutyCycleSimTests, TestInitialization) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(DutyCycleSimTests, TestSetFrequency) {
+TEST(DutyCycleSimTest, SetFrequency) {
   HAL_Initialize(500, 0);
 
   DigitalInput di{2};
@@ -50,7 +50,7 @@ TEST(DutyCycleSimTests, TestSetFrequency) {
   EXPECT_EQ(191, callback.GetLastValue());
 }
 
-TEST(DutyCycleSimTests, TestSetOutput) {
+TEST(DutyCycleSimTest, SetOutput) {
   HAL_Initialize(500, 0);
 
   DigitalInput di{2};

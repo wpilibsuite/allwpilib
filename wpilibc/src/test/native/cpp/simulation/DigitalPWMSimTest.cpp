@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(DigitalPWMSimTests, TestInitialization) {
+TEST(DigitalPWMSimTest, Initialize) {
   HAL_Initialize(500, 0);
 
   DigitalOutput output{0};
@@ -39,7 +39,7 @@ TEST(DigitalPWMSimTests, TestInitialization) {
   EXPECT_EQ(kTestDutyCycle, dutyCycleCallback.GetLastValue());
 }
 
-TEST(DigitalPWMSimTests, TestSetPin) {
+TEST(DigitalPWMSimTest, SetPin) {
   HAL_Initialize(500, 0);
 
   DigitalOutput output{2};

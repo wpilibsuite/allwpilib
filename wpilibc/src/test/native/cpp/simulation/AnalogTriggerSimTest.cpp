@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogTriggerSimTest, TestInitialization) {
+TEST(AnalogTriggerSimTest, Initialization) {
   HAL_Initialize(500, 0);
 
   AnalogTriggerSim sim = AnalogTriggerSim::CreateForIndex(0);
@@ -27,7 +27,7 @@ TEST(AnalogTriggerSimTest, TestInitialization) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AnalogTriggerSimTest, TestTriggerLowerBound) {
+TEST(AnalogTriggerSimTest, TriggerLowerBound) {
   HAL_Initialize(500, 0);
 
   AnalogTrigger trigger(0);

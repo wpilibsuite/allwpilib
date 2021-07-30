@@ -11,7 +11,7 @@
 
 namespace frc {
 using namespace frc::sim;
-TEST(AnalogPotentiometerTests, TestInitializeWithAnalogInput) {
+TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
   HAL_Initialize(500, 0);
 
   AnalogInput ai(0);
@@ -23,7 +23,7 @@ TEST(AnalogPotentiometerTests, TestInitializeWithAnalogInput) {
   EXPECT_EQ(0.8, pot.Get());
 }
 
-TEST(AnalogPotentiometerTests, TestInitializeWithAnalogInputAndScale) {
+TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
   HAL_Initialize(500, 0);
 
   AnalogInput ai(0);
@@ -41,7 +41,7 @@ TEST(AnalogPotentiometerTests, TestInitializeWithAnalogInputAndScale) {
   EXPECT_EQ(0.0, pot.Get());
 }
 
-TEST(AnalogPotentiometerTests, TestInitializeWithChannel) {
+TEST(AnalogPotentiometerTest, InitializeWithChannel) {
   HAL_Initialize(500, 0);
 
   AnalogPotentiometer pot(1);
@@ -52,7 +52,7 @@ TEST(AnalogPotentiometerTests, TestInitializeWithChannel) {
   EXPECT_EQ(1.0, pot.Get());
 }
 
-TEST(AnalogPotentiometerTests, TestInitializeWithChannelAndScale) {
+TEST(AnalogPotentiometerTest, InitializeWithChannelAndScale) {
   HAL_Initialize(500, 0);
 
   AnalogPotentiometer pot(1, 180.0);
@@ -66,7 +66,7 @@ TEST(AnalogPotentiometerTests, TestInitializeWithChannelAndScale) {
   EXPECT_EQ(0.0, pot.Get());
 }
 
-TEST(AnalogPotentiometerTests, TestWithModifiedBatteryVoltage) {
+TEST(AnalogPotentiometerTest, WithModifiedBatteryVoltage) {
   AnalogPotentiometer pot(1, 180.0, 90.0);
   RoboRioSim::ResetData();
   AnalogInputSim sim(1);

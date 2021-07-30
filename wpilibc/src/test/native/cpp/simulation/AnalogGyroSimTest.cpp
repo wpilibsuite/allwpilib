@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(AnalogGyroSimTests, TestInitialization) {
+TEST(AnalogGyroSimTest, InitializeGyro) {
   HAL_Initialize(500, 0);
   AnalogGyroSim sim(0);
   EXPECT_FALSE(sim.GetInitialized());
@@ -28,7 +28,7 @@ TEST(AnalogGyroSimTests, TestInitialization) {
   EXPECT_TRUE(initializedCallback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, TestSetAngle) {
+TEST(AnalogGyroSimTest, SetAngle) {
   HAL_Initialize(500, 0);
 
   AnalogGyroSim sim(0);
@@ -48,7 +48,7 @@ TEST(AnalogGyroSimTests, TestSetAngle) {
   EXPECT_EQ(kTestAngle, callback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, TestSetRate) {
+TEST(AnalogGyroSimTest, SetRate) {
   HAL_Initialize(500, 0);
 
   AnalogGyroSim sim(0);
@@ -68,7 +68,7 @@ TEST(AnalogGyroSimTests, TestSetRate) {
   EXPECT_EQ(kTestRate, callback.GetLastValue());
 }
 
-TEST(AnalogGyroSimTests, TestReset) {
+TEST(AnalogGyroSimTest, Reset) {
   HAL_Initialize(500, 0);
 
   AnalogInput ai(0);

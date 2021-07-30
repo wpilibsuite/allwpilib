@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(AddressableLEDSimTest, TestInitializationCallback) {
+TEST(AddressableLEDSimTest, InitializationCallback) {
   HAL_Initialize(500, 0);
 
   BooleanCallback callback;
@@ -27,7 +27,7 @@ TEST(AddressableLEDSimTest, TestInitializationCallback) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, TestLength) {
+TEST(AddressableLEDSimTest, SetLength) {
   HAL_Initialize(500, 0);
 
   AddressableLED led{0};
@@ -47,7 +47,7 @@ TEST(AddressableLEDSimTest, TestLength) {
   EXPECT_EQ(50, callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, TestSetRunning) {
+TEST(AddressableLEDSimTest, SetRunning) {
   HAL_Initialize(500, 0);
 
   AddressableLEDSim sim = AddressableLEDSim::CreateForIndex(0);
@@ -69,7 +69,7 @@ TEST(AddressableLEDSimTest, TestSetRunning) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, TestSetData) {
+TEST(AddressableLEDSimTest, SetData) {
   AddressableLED led{0};
   AddressableLEDSim sim = AddressableLEDSim::CreateForChannel(0);
 

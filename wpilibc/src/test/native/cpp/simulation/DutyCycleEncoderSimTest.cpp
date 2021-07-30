@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(DutyCycleEncoderSimTests, TestSet) {
+TEST(DutyCycleEncoderSimTest, Set) {
   HAL_Initialize(500, 0);
 
   DutyCycleEncoder enc{0};
@@ -23,7 +23,7 @@ TEST(DutyCycleEncoderSimTests, TestSet) {
   EXPECT_EQ(kTestValue, enc.Get());
 }
 
-TEST(DutyCycleEncoderSimTests, TestSetDistance) {
+TEST(DutyCycleEncoderSimTest, SetDistance) {
   HAL_Initialize(500, 0);
 
   DutyCycleEncoder enc{0};
