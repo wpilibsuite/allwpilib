@@ -13,7 +13,7 @@
 
 namespace frc::sim {
 
-TEST(CTREPCMSimTest, Initializen) {
+TEST(CTREPCMSimTest, InitializedCallback) {
   CTREPCMSim sim;
 
   sim.ResetData();

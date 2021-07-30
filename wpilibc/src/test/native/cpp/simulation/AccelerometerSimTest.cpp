@@ -45,15 +45,15 @@ TEST(AcclerometerSimTest, SetX) {
   sim.ResetData();
 
   DoubleCallback callback;
-  constexpr double TEST_VALUE = 1.91;
+  constexpr double kTestValue = 1.91;
 
   BuiltInAccelerometer accel;
   auto cb = sim.RegisterXCallback(callback.GetCallback(), false);
-  sim.SetX(TEST_VALUE);
-  EXPECT_EQ(TEST_VALUE, accel.GetX());
-  EXPECT_EQ(TEST_VALUE, sim.GetX());
+  sim.SetX(kTestValue);
+  EXPECT_EQ(kTestValue, accel.GetX());
+  EXPECT_EQ(kTestValue, sim.GetX());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
+  EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
 TEST(AcclerometerSimTest, SetY) {
@@ -62,15 +62,15 @@ TEST(AcclerometerSimTest, SetY) {
   sim.ResetData();
 
   DoubleCallback callback;
-  constexpr double TEST_VALUE = 2.29;
+  constexpr double kTestValue = 2.29;
 
   BuiltInAccelerometer accel;
   auto cb = sim.RegisterYCallback(callback.GetCallback(), false);
-  sim.SetY(TEST_VALUE);
-  EXPECT_EQ(TEST_VALUE, accel.GetY());
-  EXPECT_EQ(TEST_VALUE, sim.GetY());
+  sim.SetY(kTestValue);
+  EXPECT_EQ(kTestValue, accel.GetY());
+  EXPECT_EQ(kTestValue, sim.GetY());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
+  EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
 TEST(AcclerometerSimTest, SetZ) {
@@ -81,14 +81,14 @@ TEST(AcclerometerSimTest, SetZ) {
   sim.ResetData();
 
   DoubleCallback callback;
-  constexpr double TEST_VALUE = 3.405;
+  constexpr double kTestValue = 3.405;
 
   auto cb = sim.RegisterZCallback(callback.GetCallback(), false);
-  sim.SetZ(TEST_VALUE);
-  EXPECT_EQ(TEST_VALUE, accel.GetZ());
-  EXPECT_EQ(TEST_VALUE, sim.GetZ());
+  sim.SetZ(kTestValue);
+  EXPECT_EQ(kTestValue, accel.GetZ());
+  EXPECT_EQ(kTestValue, sim.GetZ());
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(TEST_VALUE, callback.GetLastValue());
+  EXPECT_EQ(kTestValue, callback.GetLastValue());
 }
 
 TEST(AcclerometerSimTest, SetRange) {
