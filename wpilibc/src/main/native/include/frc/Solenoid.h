@@ -29,7 +29,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    * Constructs a solenoid for a specified module and type.
    *
    * @param module The module ID to use.
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
   Solenoid(int module, PneumaticsModuleType moduleType, int channel);
@@ -37,7 +37,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   /**
    * Constructs a solenoid for a default module and specified type.
    *
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
   Solenoid(PneumaticsModuleType moduleType, int channel);

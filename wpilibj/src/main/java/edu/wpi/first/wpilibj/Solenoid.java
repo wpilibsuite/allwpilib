@@ -25,7 +25,7 @@ public class Solenoid implements Sendable, AutoCloseable {
   /**
    * Constructs a solenoid for a default module and specified type.
    *
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
   public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
@@ -36,7 +36,7 @@ public class Solenoid implements Sendable, AutoCloseable {
    * Constructs a solenoid for a specified module and type.
    *
    * @param module The module ID to use.
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {

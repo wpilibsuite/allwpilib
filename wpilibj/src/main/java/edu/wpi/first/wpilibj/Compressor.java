@@ -29,7 +29,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * Constructs a compressor for a specified module and type.
    *
    * @param module The module ID to use.
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    */
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
@@ -47,7 +47,7 @@ public class Compressor implements Sendable, AutoCloseable {
   /**
    * Constructs a compressor for a default module and specified type.
    *
-   * @param PneumaticsModuleType The module type to use.
+   * @param moduleType The module type to use.
    */
   public Compressor(PneumaticsModuleType moduleType) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType);
