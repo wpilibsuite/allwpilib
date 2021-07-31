@@ -28,7 +28,8 @@ class DoubleSolenoid : public wpi::Sendable,
   enum Value { kOff, kForward, kReverse };
 
   /**
-   * Constructs a double solenoid for a specified module of a specific module type.
+   * Constructs a double solenoid for a specified module of a specific module
+   * type.
    *
    * @param module The module of the solenoid module to use.
    * @param moduleType The module type to use.
@@ -39,7 +40,8 @@ class DoubleSolenoid : public wpi::Sendable,
                  int forwardChannel, int reverseChannel);
 
   /**
-   * Constructs a double solenoid for a default module of a specific module type.
+   * Constructs a double solenoid for a default module of a specific module
+   * type.
    *
    * @param moduleType The module type to use.
    * @param forwardChannel The forward channel on the module to control.
