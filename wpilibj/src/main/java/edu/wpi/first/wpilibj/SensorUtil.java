@@ -132,39 +132,6 @@ public final class SensorUtil {
     }
   }
 
-  // /**
-  //  * Verify that the power distribution channel number is within limits. Channel numbers are
-  //  * 0-based.
-  //  *
-  //  * @param channel The channel number to check.
-  //  */
-  // public static void checkPDPChannel(final int channel) {
-  //   if (!PowerDistributionJNI.checkPDPChannel(channel)) {
-  //     StringBuilder buf = new StringBuilder();
-  //     buf.append("Requested PDP channel is out of range. Minimum: 0, Maximum: ")
-  //         .append(kPDPChannels)
-  //         .append(", Requested: ")
-  //         .append(channel);
-  //     throw new IllegalArgumentException(buf.toString());
-  //   }
-  // }
-
-  // /**
-  //  * Verify that the PDP module number is within limits. module numbers are 0-based.
-  //  *
-  //  * @param module The module number to check.
-  //  */
-  // public static void checkPDPModule(final int module) {
-  //   if (!PowerDistributionJNI.checkPDPModule(module)) {
-  //     StringBuilder buf = new StringBuilder();
-  //     buf.append("Requested PDP module is out of range. Minimum: 0, Maximum: ")
-  //         .append(kPDPModules)
-  //         .append(", Requested: ")
-  //         .append(module);
-  //     throw new IllegalArgumentException(buf.toString());
-  //   }
-  // }
-
   /**
    * Get the number of the default solenoid module.
    *
