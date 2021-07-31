@@ -12,11 +12,11 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for operating a compressor connected to a pneumatics module. The module will
- * automatically run in closed loop mode by default whenever a {@link Solenoid} object is created.
- * For most cases, a Compressor object does not need to be instantiated or used in a robot program.
- * This class is only required in cases where the robot program needs a more detailed status of the
- * compressor or to enable/disable closed loop control.
+ * Class for operating a compressor connected to a pneumatics module. The module will automatically
+ * run in closed loop mode by default whenever a {@link Solenoid} object is created. For most cases,
+ * a Compressor object does not need to be instantiated or used in a robot program. This class is
+ * only required in cases where the robot program needs a more detailed status of the compressor or
+ * to enable/disable closed loop control.
  *
  * <p>Note: you cannot operate the compressor directly from this class as doing so would circumvent
  * the safety provided by using the pressure switch and closed loop control. You can only turn off

@@ -8,9 +8,7 @@ import edu.wpi.first.hal.CTREPCMJNI;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Module class for controlling a Cross The Road Electronics Pneumatics Control Module.
- */
+/** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     public final int m_module;
@@ -68,9 +66,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /**
-   * Constructs a PneumaticsControlModule with the default id (0).
-   */
+  /** Constructs a PneumaticsControlModule with the default id (0). */
   public PneumaticsControlModule() {
     this(SensorUtil.getDefaultCTREPCMModule());
   }

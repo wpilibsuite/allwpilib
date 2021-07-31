@@ -12,7 +12,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics module.
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics
+ * module.
  *
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
