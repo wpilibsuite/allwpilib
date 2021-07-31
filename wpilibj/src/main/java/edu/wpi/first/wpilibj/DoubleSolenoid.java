@@ -12,7 +12,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics module.
  *
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
@@ -32,17 +32,25 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   private final int m_forwardChannel;
   private final int m_reverseChannel;
 
+  /**
+   * Constructs a double solenoid for a default module of a specific module type.
+   *
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
   public DoubleSolenoid(
       final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
   }
 
   /**
-   * Constructor.
+   * Constructs a double solenoid for a specified module of a specific module type.
    *
    * @param module The module of the solenoid module to use.
-   * @param forwardChannel The forward channel on the module to control (0..7).
-   * @param reverseChannel The reverse channel on the module to control (0..7).
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(
       final int module,

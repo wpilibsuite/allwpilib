@@ -12,7 +12,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
+ * Class for operating a compressor connected to a pneumatics module. The module will
  * automatically run in closed loop mode by default whenever a {@link Solenoid} object is created.
  * For most cases, a Compressor object does not need to be instantiated or used in a robot program.
  * This class is only required in cases where the robot program needs a more detailed status of the
@@ -26,10 +26,10 @@ public class Compressor implements Sendable, AutoCloseable {
   private PneumaticsBase m_module;
 
   /**
-   * Makes a new instance of the compressor using the provided CAN device ID. Use this constructor
-   * when you have more than one PCM.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM CAN device ID (0 - 62 inclusive)
+   * @param module The module ID to use.
+   * @param PneumaticsModuleType The module type to use.
    */
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
@@ -45,9 +45,9 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Makes a new instance of the compressor using the default PCM ID of 0.
+   * Constructs a compressor for a default module and specified type.
    *
-   * <p>Additional modules can be supported by making a new instance and specifying the CAN ID.}
+   * @param PneumaticsModuleType The module type to use.
    */
   public Compressor(PneumaticsModuleType moduleType) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType);

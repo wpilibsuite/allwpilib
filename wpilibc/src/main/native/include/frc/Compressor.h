@@ -17,10 +17,9 @@
 namespace frc {
 
 /**
- * Class for operating a compressor connected to a %PCM (Pneumatic Control
- * Module).
+ * Class for operating a compressor connected to a pneumatics module.
  *
- * The PCM will automatically run in closed loop mode by default whenever a
+ * The module will automatically run in closed loop mode by default whenever a
  * Solenoid object is created. For most cases, a Compressor object does not need
  * to be instantiated or used in a robot program. This class is only required in
  * cases where the robot program needs a more detailed status of the compressor
@@ -35,12 +34,18 @@ class Compressor : public wpi::Sendable,
                    public wpi::SendableHelper<Compressor> {
  public:
   /**
-   * Constructor. The default PCM ID is 0.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM ID to use (0-62)
+   * @param module The module ID to use.
+   * @param PneumaticsModuleType The module type to use.
    */
   Compressor(int module, PneumaticsModuleType moduleType);
 
+  /**
+   * Constructs a compressor for a default module and specified type.
+   *
+   * @param PneumaticsModuleType The module type to use.
+   */
   explicit Compressor(PneumaticsModuleType moduleType);
 
   ~Compressor() override;

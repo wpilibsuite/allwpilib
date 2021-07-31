@@ -23,17 +23,14 @@ DoubleSolenoid::DoubleSolenoid(int module, PneumaticsModuleType moduleType,
     : m_module{PneumaticsBase::GetForType(module, moduleType)},
       m_forwardChannel{forwardChannel},
       m_reverseChannel{reverseChannel} {
-  if (!m_module->CheckSolenoidChannel(forwardChannel)) {
+  if (!m_module->CheckSolenoidChannel(m_forwardChannel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
-                        forwardChannel);
+                        m_forwardChannel);
   }
-  if (!m_module->CheckSolenoidChannel(reverseChannel)) {
+  if (!m_module->CheckSolenoidChannel(m_reverseChannel)) {
     throw FRC_MakeError(err::ChannelIndexOutOfRange, "Channel {}",
-                        reverseChannel);
+                        m_reverseChannel);
   }
-
-  m_forwardChannel = forwardChannel;
-  m_reverseChannel = reverseChannel;
 
   m_forwardMask = 1 << forwardChannel;
   m_reverseMask = 1 << reverseChannel;

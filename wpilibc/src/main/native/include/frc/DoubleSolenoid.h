@@ -17,7 +17,7 @@ namespace frc {
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
- * (PCM).
+ * on a pneumatics module.
  *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
@@ -27,8 +27,24 @@ class DoubleSolenoid : public wpi::Sendable,
  public:
   enum Value { kOff, kForward, kReverse };
 
+  /**
+   * Constructs a double solenoid for a specified module of a specific module type.
+   *
+   * @param module The module of the solenoid module to use.
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
   DoubleSolenoid(int module, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
+
+  /**
+   * Constructs a double solenoid for a default module of a specific module type.
+   *
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
   DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 

@@ -12,26 +12,32 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Solenoid class for running high voltage Digital Output on the PCM.
+ * Solenoid class for running high voltage Digital Output on a pneumatics module.
  *
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
- * within the current spec of the PCM.
+ * within the current spec of the module.
  */
 public class Solenoid implements Sendable, AutoCloseable {
   private final int m_mask; // The channel mask
   private final int m_channel;
   private PneumaticsBase m_module;
 
+  /**
+   * Constructs a solenoid for a default module and specified type.
+   *
+   * @param PneumaticsModuleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
   public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
     this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
   /**
-   * Constructor.
+   * Constructs a solenoid for a specified module and type.
    *
-   * @param module The module number the solenoid is attached to.
-   * @param moduleType The module type the solenoid is attached to.
-   * @param channel The channel on the PCM to control.
+   * @param module The module ID to use.
+   * @param PneumaticsModuleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
