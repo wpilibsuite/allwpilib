@@ -43,5 +43,5 @@ constexpr auto kMaxAcceleration = 3_mps_sq;
 }  // namespace DriveConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

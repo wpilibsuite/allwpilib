@@ -20,6 +20,6 @@ public final class Constants {
    */
   public static final class OIConstants {
     // Example: the port of the driver's controller
-    public static final int kDriverControllerPort = 1;
+    public static final int kDriverControllerPort = 0;
   }
 }
