@@ -100,6 +100,13 @@ subprojects {
         }
     }
 
+    // Enables UTF-8 support in Javadoc
+    tasks.withType(Javadoc) {
+        options.addStringOption("charset", "utf-8")
+        options.addStringOption("docencoding", "utf-8")
+        options.addStringOption("encoding", "utf-8")
+    }
+
     // Sign outputs with Developer ID
     if (project.hasProperty("developerID")) {
         tasks.withType(AbstractLinkTask) { task ->

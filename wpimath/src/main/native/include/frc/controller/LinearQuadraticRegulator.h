@@ -86,6 +86,8 @@ class LinearQuadraticRegulatorImpl {
 
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
+
+    // K = (BᵀSB + R)⁻¹BᵀSA
     m_K = (discB.transpose() * S * discB + R)
               .llt()
               .solve(discB.transpose() * S * discA);
@@ -115,6 +117,8 @@ class LinearQuadraticRegulatorImpl {
 
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
+
+    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     m_K = (B.transpose() * S * B + R)
               .llt()
               .solve(discB.transpose() * S * discA + N.transpose());
@@ -225,6 +229,7 @@ class LinearQuadraticRegulatorImpl {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
+
     m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
   }
 

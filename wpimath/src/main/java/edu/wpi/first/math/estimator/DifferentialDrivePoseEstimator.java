@@ -36,15 +36,15 @@ import java.util.function.BiConsumer;
  *
  * <p>Our state-space system is:
  *
- * <p><strong> x = [[x, y, theta, dist_l, dist_r]]^T </strong> in the field coordinate system
- * (dist_* are wheel distances.)
+ * <p><strong> x = [[x, y, theta, dist_l, dist_r]]ᵀ </strong> in the field coordinate system (dist_*
+ * are wheel distances.)
  *
- * <p><strong> u = [[vx, vy, omega]]^T </strong> (robot-relative velocities) -- NB: using velocities
+ * <p><strong> u = [[vx, vy, omega]]ᵀ </strong> (robot-relative velocities) -- NB: using velocities
  * make things considerably easier, because it means that teams don't have to worry about getting an
  * accurate model. Basically, we suspect that it's easier for teams to get good encoder data than it
  * is for them to perform system identification well enough to get a good model.
  *
- * <p><strong>y = [[x, y, theta]]^T </strong> from vision, or <strong>y = [[dist_l, dist_r, theta]]
+ * <p><strong>y = [[x, y, theta]]ᵀ </strong> from vision, or <strong>y = [[dist_l, dist_r, theta]]
  * </strong> from encoders and gyro.
  */
 public class DifferentialDrivePoseEstimator {
@@ -66,14 +66,14 @@ public class DifferentialDrivePoseEstimator {
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]^T,
+   *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]ᵀ,
    *     with units in meters and radians.
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
-   *     is in the form [dist_l, dist_r, theta]^T, with units in meters and radians.
+   *     is in the form [dist_l, dist_r, theta]ᵀ, with units in meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public DifferentialDrivePoseEstimator(
       Rotation2d gyroAngle,
@@ -96,14 +96,14 @@ public class DifferentialDrivePoseEstimator {
    * @param gyroAngle The current gyro angle.
    * @param initialPoseMeters The starting pose estimate.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]^T,
+   *     model's state estimates less. This matrix is in the form [x, y, theta, dist_l, dist_r]ᵀ,
    *     with units in meters and radians.
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
-   *     is in the form [dist_l, dist_r, theta]^T, with units in meters and radians.
+   *     is in the form [dist_l, dist_r, theta]ᵀ, with units in meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    * @param nominalDtSeconds The time in seconds between each robot loop.
    */
   @SuppressWarnings("ParameterName")
@@ -160,7 +160,7 @@ public class DifferentialDrivePoseEstimator {
    *
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     m_visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
@@ -279,7 +279,7 @@ public class DifferentialDrivePoseEstimator {
    *     source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,

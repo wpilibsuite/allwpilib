@@ -64,6 +64,7 @@ public final class Discretization {
   /**
    * Discretizes the given continuous A and Q matrices.
    *
+   * @param <States> Nat representing the number of states.
    * @param contA Continuous system matrix.
    * @param contQ Continuous process noise covariance matrix.
    * @param dtSeconds Discretization timestep.
@@ -128,11 +129,11 @@ public final class Discretization {
     Matrix<States, States> lastTerm = Q.copy();
     double lastCoeff = dtSeconds;
 
-    // A^T^n
+    // Aᵀⁿ
     Matrix<States, States> Atn = contA.transpose();
     Matrix<States, States> phi12 = lastTerm.times(lastCoeff);
 
-    // i = 6 i.e. 6th order should be enough precision
+    // i = 6 i.e. 5th order should be enough precision
     for (int i = 2; i < 6; ++i) {
       lastTerm = contA.times(-1).times(lastTerm).plus(Q.times(Atn));
       lastCoeff *= dtSeconds / ((double) i);

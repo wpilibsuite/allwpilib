@@ -98,6 +98,19 @@
     "commandversion": 2
   },
   {
+    "name": "Tank Drive",
+    "description": "An example program which demonstrates the use of Tank Drive with the DifferentialDrive class",
+    "tags": [
+      "Getting Started with C++",
+      "Robot and Motor",
+      "Joystick",
+      "Complete List"
+    ],
+    "foldername": "TankDrive",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Mecanum Drive",
     "description": "An example program which demonstrates the use of Mecanum Drive with the MecanumDrive class",
     "tags": [

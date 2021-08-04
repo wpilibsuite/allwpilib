@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj.RobotController;
  *
  * <p>Our state-space system is:
  *
- * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]^T in the field coordinate system (dist_* are
+ * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]ᵀ in the field coordinate system (dist_* are
  * wheel distances.)
  *
- * <p>u = [[voltage_l, voltage_r]]^T This is typically the control input of the last timestep from a
+ * <p>u = [[voltage_l, voltage_r]]ᵀ This is typically the control input of the last timestep from a
  * LTVDiffDriveController.
  *
  * <p>y = x
@@ -67,7 +67,7 @@ public class DifferentialDrivetrainSim {
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
    * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
@@ -112,7 +112,7 @@ public class DifferentialDrivetrainSim {
    *     frc-characterization.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
@@ -447,7 +447,7 @@ public class DifferentialDrivetrainSim {
    * @param gearing The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
@@ -476,7 +476,7 @@ public class DifferentialDrivetrainSim {
    * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
    *     frc-characterization.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.

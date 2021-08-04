@@ -24,8 +24,8 @@ namespace frc {
  * used types of filters.
  *
  * Filters are of the form:<br>
- *  y[n] = (b0 * x[n] + b1 * x[n-1] + … + bP * x[n-P]) -
- *         (a0 * y[n-1] + a2 * y[n-2] + … + aQ * y[n-Q])
+ *  y[n] = (b0 x[n] + b1 x[n-1] + … + bP x[n-P]) -
+ *         (a0 y[n-1] + a2 y[n-2] + … + aQ y[n-Q])
  *
  * Where:<br>
  *  y[n] is the output at time "n"<br>
@@ -109,7 +109,7 @@ class LinearFilter {
   // Static methods to create commonly used filters
   /**
    * Creates a one-pole IIR low-pass filter of the form:<br>
-   *   y[n] = (1 - gain) * x[n] + gain * y[n-1]<br>
+   *   y[n] = (1 - gain) x[n] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
    * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
@@ -129,7 +129,7 @@ class LinearFilter {
 
   /**
    * Creates a first-order high-pass filter of the form:<br>
-   *   y[n] = gain * x[n] + (-gain) * x[n-1] + gain * y[n-1]<br>
+   *   y[n] = gain x[n] + (-gain) x[n-1] + gain y[n-1]<br>
    * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
    *
    * Note: T = 1 / (2 pi f) where f is the cutoff frequency in Hz, the frequency
@@ -148,7 +148,7 @@ class LinearFilter {
 
   /**
    * Creates a K-tap FIR moving average filter of the form:<br>
-   *   y[n] = 1/k * (x[k] + x[k-1] + … + x[0])
+   *   y[n] = 1/k (x[k] + x[k-1] + … + x[0])
    *
    * This filter is always stable.
    *

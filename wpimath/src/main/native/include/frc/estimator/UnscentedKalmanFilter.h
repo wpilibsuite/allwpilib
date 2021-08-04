@@ -343,6 +343,7 @@ class UnscentedKalmanFilter {
     Eigen::Matrix<double, States, Rows> Pxy;
     Pxy.setZero();
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
+      // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
       Pxy +=
           m_pts.Wc(i) *
           (residualFuncX(m_sigmasF.template block<States, 1>(0, i), m_xHat)) *
@@ -350,15 +351,18 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // K = P_{xy} Py^-1
-    // K^T = P_y^T^-1 P_{xy}^T
-    // P_y^T K^T = P_{xy}^T
-    // K^T = P_y^T.solve(P_{xy}^T)
-    // K = (P_y^T.solve(P_{xy}^T)^T
+    // K = P_{xy} P_y⁻¹
+    // Kᵀ = P_yᵀ⁻¹ P_{xy}ᵀ
+    // P_yᵀKᵀ = P_{xy}ᵀ
+    // Kᵀ = P_yᵀ.solve(P_{xy}ᵀ)
+    // K = (P_yᵀ.solve(P_{xy}ᵀ)ᵀ
     Eigen::Matrix<double, States, Rows> K =
         Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
 
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
+
+    // Pₖ₊₁⁺ = Pₖ₊₁⁻ − KP_yKᵀ
     m_P -= K * Py * K.transpose();
   }
 

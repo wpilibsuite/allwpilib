@@ -34,12 +34,12 @@ import java.util.function.BiConsumer;
  *
  * <p>Our state-space system is:
  *
- * <p><strong> x = [[x, y, theta]]^T </strong> in the field-coordinate system.
+ * <p><strong> x = [[x, y, theta]]ᵀ </strong> in the field-coordinate system.
  *
- * <p><strong> u = [[vx, vy, theta]]^T </strong> in the field-coordinate system.
+ * <p><strong> u = [[vx, vy, theta]]ᵀ </strong> in the field-coordinate system.
  *
- * <p><strong> y = [[x, y, theta]]^T </strong> in field coords from vision, or <strong> y =
- * [[theta]]^T </strong> from the gyro.
+ * <p><strong> y = [[x, y, theta]]ᵀ </strong> in field coords from vision, or <strong> y =
+ * [[theta]]ᵀ </strong> from the gyro.
  */
 public class MecanumDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
@@ -62,14 +62,14 @@ public class MecanumDrivePoseEstimator {
    * @param initialPoseMeters The starting pose estimate.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]^T, with units in
+   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
    *     meters and radians.
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
    *     is in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public MecanumDrivePoseEstimator(
       Rotation2d gyroAngle,
@@ -95,14 +95,14 @@ public class MecanumDrivePoseEstimator {
    * @param initialPoseMeters The starting pose estimate.
    * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
-   *     model's state estimates less. This matrix is in the form [x, y, theta]^T, with units in
+   *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
    *     meters and radians.
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
    *     is in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    * @param nominalDtSeconds The time in seconds between each robot loop.
    */
   @SuppressWarnings("ParameterName")
@@ -161,7 +161,7 @@ public class MecanumDrivePoseEstimator {
    *
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     m_visionContR = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), visionMeasurementStdDevs);
@@ -242,7 +242,7 @@ public class MecanumDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source in this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]^T, with units in meters and radians.
+   *     theta]ᵀ, with units in meters and radians.
    */
   public void addVisionMeasurement(
       Pose2d visionRobotPoseMeters,
