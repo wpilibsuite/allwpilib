@@ -15,7 +15,7 @@ namespace frc::sim {
 
 TEST(DIOSimTest, Initialization) {
   HAL_Initialize(500, 0);
-  DIOSim sim(2);
+  DIOSim sim{2};
   sim.ResetData();
   EXPECT_FALSE(sim.GetInitialized());
 
@@ -44,7 +44,7 @@ TEST(DIOSimTest, Initialization) {
 TEST(DIOSimTest, Input) {
   HAL_Initialize(500, 0);
 
-  DigitalInput input(0);
+  DigitalInput input{0};
   DIOSim sim(input);
   EXPECT_TRUE(sim.GetIsInput());
 
@@ -62,7 +62,7 @@ TEST(DIOSimTest, Input) {
 
 TEST(DIOSimTest, Output) {
   HAL_Initialize(500, 0);
-  DigitalOutput output(0);
+  DigitalOutput output{0};
   DIOSim sim(output);
   EXPECT_FALSE(sim.GetIsInput());
 

@@ -15,7 +15,7 @@ namespace frc::sim {
 
 TEST(AnalogGyroSimTest, InitializeGyro) {
   HAL_Initialize(500, 0);
-  AnalogGyroSim sim(0);
+  AnalogGyroSim sim{0};
   EXPECT_FALSE(sim.GetInitialized());
 
   BooleanCallback initializedCallback;
@@ -31,7 +31,7 @@ TEST(AnalogGyroSimTest, InitializeGyro) {
 TEST(AnalogGyroSimTest, SetAngle) {
   HAL_Initialize(500, 0);
 
-  AnalogGyroSim sim(0);
+  AnalogGyroSim sim{0};
   DoubleCallback callback;
 
   AnalogInput ai(0);
@@ -51,7 +51,7 @@ TEST(AnalogGyroSimTest, SetAngle) {
 TEST(AnalogGyroSimTest, SetRate) {
   HAL_Initialize(500, 0);
 
-  AnalogGyroSim sim(0);
+  AnalogGyroSim sim{0};
   DoubleCallback callback;
 
   std::shared_ptr<AnalogInput> ai(new AnalogInput(0));
@@ -71,7 +71,7 @@ TEST(AnalogGyroSimTest, SetRate) {
 TEST(AnalogGyroSimTest, Reset) {
   HAL_Initialize(500, 0);
 
-  AnalogInput ai(0);
+  AnalogInput ai{0};
   AnalogGyro gyro(&ai);
   AnalogGyroSim sim(gyro);
   sim.SetAngle(12.34);

@@ -14,7 +14,7 @@ using namespace frc::sim;
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
   HAL_Initialize(500, 0);
 
-  AnalogInput ai(0);
+  AnalogInput ai{0;
   AnalogPotentiometer pot(&ai);
   AnalogInputSim sim(ai);
 
@@ -26,7 +26,7 @@ TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
   HAL_Initialize(500, 0);
 
-  AnalogInput ai(0);
+  AnalogInput ai{0};
   AnalogPotentiometer pot(&ai, 270.0);
   RoboRioSim::ResetData();
   AnalogInputSim sim(ai);
@@ -45,8 +45,7 @@ TEST(AnalogPotentiometerTest, InitializeWithChannel) {
   HAL_Initialize(500, 0);
 
   AnalogPotentiometer pot(1);
-  RoboRioSim::ResetData();
-  AnalogInputSim sim(1);
+  AnalogInputSim sim{1};
 
   sim.SetVoltage(5.0);
   EXPECT_EQ(1.0, pot.Get());
@@ -55,7 +54,7 @@ TEST(AnalogPotentiometerTest, InitializeWithChannel) {
 TEST(AnalogPotentiometerTest, InitializeWithChannelAndScale) {
   HAL_Initialize(500, 0);
 
-  AnalogPotentiometer pot(1, 180.0);
+  AnalogPotentiometer pot{1, 180.0};
   RoboRioSim::ResetData();
   AnalogInputSim sim(1);
 
@@ -67,9 +66,9 @@ TEST(AnalogPotentiometerTest, InitializeWithChannelAndScale) {
 }
 
 TEST(AnalogPotentiometerTest, WithModifiedBatteryVoltage) {
-  AnalogPotentiometer pot(1, 180.0, 90.0);
+  AnalogPotentiometer pot{1, 180.0, 90.0};
   RoboRioSim::ResetData();
-  AnalogInputSim sim(1);
+  AnalogInputSim sim{1};
 
   // Test at 5v
   sim.SetVoltage(5.0);

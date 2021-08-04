@@ -28,7 +28,7 @@ TEST(RelaySimTest, InitializationBidrectional) {
       forwardCallback.GetCallback(), false);
   auto revCb = sim.RegisterInitializedReverseCallback(
       reverseCallback.GetCallback(), false);
-  Relay relay(0);
+  Relay relay{0};
 
   EXPECT_TRUE(sim.GetInitializedForward());
   EXPECT_TRUE(sim.GetInitializedReverse());
@@ -42,7 +42,7 @@ TEST(RelaySimTest, InitializationBidrectional) {
 TEST(RelaySimTest, InitializationForwardOnly) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   sim.ResetData();
 
   BooleanCallback forwardCallback;
@@ -68,7 +68,7 @@ TEST(RelaySimTest, InitializationForwardOnly) {
 TEST(RelaySimTest, InitializationReverseOnly) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   sim.ResetData();
 
   BooleanCallback forwardCallback;
@@ -94,11 +94,11 @@ TEST(RelaySimTest, InitializationReverseOnly) {
 TEST(RelaySimTest, BidirectionalSetForward) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   BooleanCallback forwardCallback;
   BooleanCallback reverseCallback;
 
-  Relay relay(0);
+  Relay relay{0};
   auto fwdCb =
       sim.RegisterForwardCallback(forwardCallback.GetCallback(), false);
   auto revCb =
@@ -117,11 +117,11 @@ TEST(RelaySimTest, BidirectionalSetForward) {
 TEST(RelaySimTest, BidirectionalSetReverse) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   BooleanCallback forwardCallback;
   BooleanCallback reverseCallback;
 
-  Relay relay(0);
+  Relay relay{0};
   auto fwdCb =
       sim.RegisterForwardCallback(forwardCallback.GetCallback(), false);
   auto revCb =
@@ -140,11 +140,11 @@ TEST(RelaySimTest, BidirectionalSetReverse) {
 TEST(RelaySimTest, BidirectionalSetOn) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   BooleanCallback forwardCallback;
   BooleanCallback reverseCallback;
 
-  Relay relay(0);
+  Relay relay{0};
   auto fwdCb =
       sim.RegisterForwardCallback(forwardCallback.GetCallback(), false);
   auto revCb =
@@ -164,11 +164,11 @@ TEST(RelaySimTest, BidirectionalSetOn) {
 TEST(RelaySimTest, BidirectionalSetOff) {
   HAL_Initialize(500, 0);
 
-  RelaySim sim(0);
+  RelaySim sim{0};
   BooleanCallback forwardCallback;
   BooleanCallback reverseCallback;
 
-  Relay relay(0);
+  Relay relay{0};
   auto fwdCb =
       sim.RegisterForwardCallback(forwardCallback.GetCallback(), false);
   auto revCb =
@@ -191,7 +191,7 @@ TEST(RelaySimTest, BidirectionalSetOff) {
 }
 
 TEST(RelaySimTest, StopMotor) {
-  Relay relay(0);
+  Relay relay{0};
   RelaySim sim(relay);
 
   // Bootstrap into non-off state

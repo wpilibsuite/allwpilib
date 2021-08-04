@@ -21,7 +21,7 @@ TEST(AnalogTriggerSimTest, Initialization) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  AnalogTrigger trigger(0);
+  AnalogTrigger trigger{0};
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -30,7 +30,7 @@ TEST(AnalogTriggerSimTest, Initialization) {
 TEST(AnalogTriggerSimTest, TriggerLowerBound) {
   HAL_Initialize(500, 0);
 
-  AnalogTrigger trigger(0);
+  AnalogTrigger trigger{0};
   AnalogTriggerSim sim(trigger);
 
   DoubleCallback lowerCallback;

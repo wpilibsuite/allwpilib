@@ -29,11 +29,11 @@ TEST(AnalogInputSimTest, SetInitialized) {
 TEST(AnalogInputSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
 
-  AnalogInputSim sim(5);
+  AnalogInputSim sim{5};
   DoubleCallback callback;
 
   auto cb = sim.RegisterVoltageCallback(callback.GetCallback(), false);
-  AnalogInput input(5);
+  AnalogInput input{5};
 
   for (int i = 0; i < 50; ++i) {
     double voltage = i * .1;
@@ -64,7 +64,7 @@ TEST(AnalogInputSimTest, SetVoltage) {
 
 TEST(AnalogInputSimTest, SetOverSampleBits) {
   HAL_Initialize(500, 0);
-  AnalogInput input(5);
+  AnalogInput input{5};
   AnalogInputSim sim(input);
 
   IntCallback callback;
@@ -79,7 +79,7 @@ TEST(AnalogInputSimTest, SetOverSampleBits) {
 
 TEST(AnalogInputSimTest, SetAverageBits) {
   HAL_Initialize(500, 0);
-  AnalogInput input(5);
+  AnalogInput input{5};
   AnalogInputSim sim(input);
 
   IntCallback callback;
@@ -94,7 +94,7 @@ TEST(AnalogInputSimTest, SetAverageBits) {
 
 TEST(AnalogInputSimTest, InitAccumulator) {
   HAL_Initialize(500, 0);
-  AnalogInput input(0);
+  AnalogInput input{0};
   AnalogInputSim sim(input);
 
   BooleanCallback callback;
@@ -123,7 +123,7 @@ TEST(AnalogInputSimTest, InitAccumulatorOnInvalidPort) {
 
 TEST(AnalogInputSimTest, SetAccumulatorValue) {
   HAL_Initialize(500, 0);
-  AnalogInput input(0);
+  AnalogInput input{0};
   AnalogInputSim sim(input);
 
   LongCallback callback;
@@ -139,7 +139,7 @@ TEST(AnalogInputSimTest, SetAccumulatorValue) {
 
 TEST(AnalogInputSimTest, SetAccumulatorCount) {
   HAL_Initialize(500, 0);
-  AnalogInput input(0);
+  AnalogInput input{};
   AnalogInputSim sim(input);
 
   LongCallback callback;
@@ -155,7 +155,7 @@ TEST(AnalogInputSimTest, SetAccumulatorCount) {
 
 TEST(AnalogInputSimTest, SetAccumulatorDeadband) {
   HAL_Initialize(500, 0);
-  AnalogInput input(0);
+  AnalogInput input{0};
   AnalogInputSim sim(input);
 
   IntCallback callback;
@@ -171,7 +171,7 @@ TEST(AnalogInputSimTest, SetAccumulatorDeadband) {
 
 TEST(AnalogInputSimTest, SetAccumulatorCenter) {
   HAL_Initialize(500, 0);
-  AnalogInput input(0);
+  AnalogInput input{0};
   AnalogInputSim sim(input);
 
   IntCallback callback;

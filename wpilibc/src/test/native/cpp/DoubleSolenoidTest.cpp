@@ -12,8 +12,8 @@
 namespace frc {
 
 TEST(DoubleSolenoidTest, ValidInitialization) {
-  PneumaticsControlModule pcm(3);
-  DoubleSolenoid solenoid(pcm, 2, 3);
+  PneumaticsControlModule pcm{3};
+  DoubleSolenoid solenoid{pcm, 2, 3};
   solenoid.Set(DoubleSolenoid::kReverse);
   EXPECT_EQ(DoubleSolenoid::kReverse, solenoid.Get());
 
@@ -25,21 +25,21 @@ TEST(DoubleSolenoidTest, ValidInitialization) {
 }
 
 TEST(DoubleSolenoidTest, ThrowForwardPortAlreadyInitialized) {
-  PneumaticsControlModule pcm(5);
+  PneumaticsControlModule pcm{5};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid(pcm, 2);
+  Solenoid solenoid{pcm, 2};
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
 TEST(DoubleSolenoidTest, ThrowReversePortAlreadyInitialized) {
-  PneumaticsControlModule pcm(6);
+  PneumaticsControlModule pcm{6};
   // Single solenoid that is reused for forward port
-  Solenoid solenoid(pcm, 3);
+  Solenoid solenoid{pcm, 3};
   EXPECT_THROW(DoubleSolenoid(pcm, 2, 3), std::runtime_error);
 }
 
 TEST(DoubleSolenoidTest, ThrowBothPortsAlreadyInitialized) {
-  PneumaticsControlModule pcm(6);
+  PneumaticsControlModule pcm{6};
   // Single solenoid that is reused for forward port
   Solenoid solenoid0(pcm, 2);
   Solenoid solenoid1(pcm, 3);
@@ -47,8 +47,8 @@ TEST(DoubleSolenoidTest, ThrowBothPortsAlreadyInitialized) {
 }
 
 TEST(DoubleSolenoidTest, Toggle) {
-  PneumaticsControlModule pcm(4);
-  DoubleSolenoid solenoid(&pcm, 2, 3);
+  PneumaticsControlModule pcm{4};
+  DoubleSolenoid solenoid{&pcm, 2, 3};
   // Bootstrap it into reverse
   solenoid.Set(DoubleSolenoid::kReverse);
 
@@ -65,12 +65,12 @@ TEST(DoubleSolenoidTest, Toggle) {
 }
 
 TEST(DoubleSolenoidTest, InvalidForwardPort) {
-  PneumaticsControlModule pcm(0);
-  EXPECT_THROW(DoubleSolenoid(pcm, 100, 1), std::runtime_error);
+  PneumaticsControlModule pcm{0};
+  EXPECT_THROW(DoubleSolenoid{pcm, 100, 1}, std::runtime_error);
 }
 
 TEST(DoubleSolenoidTest, InvalidReversePort) {
-  PneumaticsControlModule pcm(0);
-  EXPECT_THROW(DoubleSolenoid(pcm, 0, 100), std::runtime_error);
+  PneumaticsControlModule pcm{0};
+  EXPECT_THROW(DoubleSolenoid{pcm, 0, 100}, std::runtime_error);
 }
 }  // namespace frc

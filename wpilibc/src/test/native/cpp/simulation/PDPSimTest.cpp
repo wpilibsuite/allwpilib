@@ -14,7 +14,7 @@ namespace frc::sim {
 
 TEST(PDPSimTest, Initialize) {
   HAL_Initialize(500, 0);
-  PDPSim sim(2);
+  PDPSim sim{2};
   EXPECT_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
@@ -33,7 +33,7 @@ TEST(PDPSimTest, Initialize) {
 
 TEST(PDPSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp(2);
+  PowerDistributionPanel pdp{2};
   PDPSim sim(pdp);
 
   DoubleCallback callback;
@@ -48,7 +48,7 @@ TEST(PDPSimTest, SetTemperature) {
 
 TEST(PDPSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp(2);
+  PowerDistributionPanel pdp{2};
   PDPSim sim(pdp);
 
   DoubleCallback callback;
@@ -63,7 +63,7 @@ TEST(PDPSimTest, SetVoltage) {
 
 TEST(PDPSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp(2);
+  PowerDistributionPanel pdp{2};
   PDPSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumPDPChannels(); ++channel) {
