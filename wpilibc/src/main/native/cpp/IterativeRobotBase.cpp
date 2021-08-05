@@ -94,6 +94,14 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
+void IterativeRobotBase::DisabledExit() {}
+
+void IterativeRobotBase::AutonomousExit() {}
+
+void IterativeRobotBase::TeleopExit() {}
+
+void IterativeRobotBase::TestExit() {}
+
 void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
@@ -105,60 +113,72 @@ units::second_t IterativeRobotBase::GetPeriod() const {
 void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 
-  // Call the appropriate function depending upon the current robot mode
+  // Get current mode
+  Mode mode = Mode::kNone;
   if (IsDisabled()) {
-    // Call DisabledInit() if we are now just entering disabled mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kDisabled) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
-      m_lastMode = Mode::kDisabled;
+    mode = Mode::kDisabled;
+  } else if (IsAutonomous()) {
+    mode = Mode::kAutonomous;
+  } else if (IsOperatorControl()) {
+    mode = Mode::kTeleop;
+  } else if (IsTest()) {
+    mode = Mode::kTest;
+  }
+
+  // If mode changed, call mode exit and entry functions
+  if (m_lastMode != mode) {
+    // Call last mode's exit function
+    if (m_lastMode == Mode::kDisabled) {
+      DisabledExit();
+    } else if (m_lastMode == Mode::kAutonomous) {
+      AutonomousExit();
+    } else if (m_lastMode == Mode::kTeleop) {
+      TeleopExit();
+    } else if (m_lastMode == Mode::kTest) {
+      TestExit();
     }
 
+    // Enable LiveWindow and Shuffleboard actuator widgets in test mode
+    if (mode == Mode::kTest) {
+      LiveWindow::SetEnabled(true);
+      Shuffleboard::EnableActuatorWidgets();
+    } else {
+      LiveWindow::SetEnabled(false);
+      Shuffleboard::DisableActuatorWidgets();
+    }
+
+    // Call current mode's entry function
+    if (mode == Mode::kDisabled) {
+      DisabledInit();
+      m_watchdog.AddEpoch("DisabledInit()");
+    } else if (mode == Mode::kAutonomous) {
+      AutonomousInit();
+      m_watchdog.AddEpoch("AutonomousInit()");
+    } else if (mode == Mode::kTeleop) {
+      TeleopInit();
+      m_watchdog.AddEpoch("TeleopInit()");
+    } else if (mode == Mode::kTest) {
+      TestInit();
+      m_watchdog.AddEpoch("TestInit()");
+    }
+
+    m_lastMode = mode;
+  }
+
+  // Call the appropriate function depending upon the current robot mode
+  if (mode == Mode::kDisabled) {
     HAL_ObserveUserProgramDisabled();
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");
-  } else if (IsAutonomous()) {
-    // Call AutonomousInit() if we are now just entering autonomous mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kAutonomous) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
-      AutonomousInit();
-      m_watchdog.AddEpoch("AutonomousInit()");
-      m_lastMode = Mode::kAutonomous;
-    }
-
+  } else if (mode == Mode::kAutonomous) {
     HAL_ObserveUserProgramAutonomous();
     AutonomousPeriodic();
     m_watchdog.AddEpoch("AutonomousPeriodic()");
-  } else if (IsOperatorControl()) {
-    // Call TeleopInit() if we are now just entering teleop mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kTeleop) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
-      TeleopInit();
-      m_watchdog.AddEpoch("TeleopInit()");
-      m_lastMode = Mode::kTeleop;
-    }
-
+  } else if (mode == Mode::kTeleop) {
     HAL_ObserveUserProgramTeleop();
     TeleopPeriodic();
     m_watchdog.AddEpoch("TeleopPeriodic()");
-  } else {
-    // Call TestInit() if we are now just entering test mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kTest) {
-      LiveWindow::SetEnabled(true);
-      Shuffleboard::EnableActuatorWidgets();
-      TestInit();
-      m_watchdog.AddEpoch("TestInit()");
-      m_lastMode = Mode::kTest;
-    }
-
+  } else if (mode == Mode::kTest) {
     HAL_ObserveUserProgramTest();
     TestPeriodic();
     m_watchdog.AddEpoch("TestPeriodic()");
