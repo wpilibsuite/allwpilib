@@ -291,16 +291,9 @@ public abstract class IterativeRobotBase extends RobotBase {
       } else if (m_lastMode == Mode.kTeleop) {
         teleopExit();
       } else if (m_lastMode == Mode.kTest) {
-        testExit();
-      }
-
-      // Enable LiveWindow and Shuffleboard actuator widgets in test mode
-      if (mode == Mode.kTest) {
-        LiveWindow.setEnabled(true);
-        Shuffleboard.enableActuatorWidgets();
-      } else {
         LiveWindow.setEnabled(false);
         Shuffleboard.disableActuatorWidgets();
+        testExit();
       }
 
       // Call current mode's entry function
@@ -314,6 +307,8 @@ public abstract class IterativeRobotBase extends RobotBase {
         teleopInit();
         m_watchdog.addEpoch("teleopInit()");
       } else if (mode == Mode.kTest) {
+        LiveWindow.setEnabled(true);
+        Shuffleboard.enableActuatorWidgets();
         testInit();
         m_watchdog.addEpoch("testInit()");
       }

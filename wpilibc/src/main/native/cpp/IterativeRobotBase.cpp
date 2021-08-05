@@ -135,16 +135,9 @@ void IterativeRobotBase::LoopFunc() {
     } else if (m_lastMode == Mode::kTeleop) {
       TeleopExit();
     } else if (m_lastMode == Mode::kTest) {
-      TestExit();
-    }
-
-    // Enable LiveWindow and Shuffleboard actuator widgets in test mode
-    if (mode == Mode::kTest) {
-      LiveWindow::SetEnabled(true);
-      Shuffleboard::EnableActuatorWidgets();
-    } else {
       LiveWindow::SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
+      TestExit();
     }
 
     // Call current mode's entry function
@@ -158,6 +151,8 @@ void IterativeRobotBase::LoopFunc() {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
     } else if (mode == Mode::kTest) {
+      LiveWindow::SetEnabled(true);
+      Shuffleboard::EnableActuatorWidgets();
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
     }
