@@ -1,7 +1,8 @@
-package frc.sim.wpiClasses;
+package edu.wpi.first.wpilibj.simulation.swerve;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
+
 
 class SimpleMotorWithMassModel {
     

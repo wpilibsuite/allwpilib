@@ -1,11 +1,12 @@
-package frc.sim.wpiClasses;
+package edu.wpi.first.wpilibj.simulation.swerve;
 
 import org.ejml.simple.SimpleMatrix;
 
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 
 public class Force2d {
   Matrix<N2, N1> m;

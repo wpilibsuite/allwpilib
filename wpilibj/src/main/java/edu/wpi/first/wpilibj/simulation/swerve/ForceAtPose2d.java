@@ -1,9 +1,11 @@
-package frc.sim.wpiClasses;
+package edu.wpi.first.wpilibj.simulation.swerve;
 
 import java.util.Objects;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.drive.Vector2d;
+
 
 public class ForceAtPose2d {
   public Force2d force;

@@ -1,8 +1,9 @@
-package frc.sim.wpiClasses;
+package edu.wpi.first.wpilibj.simulation.swerve;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 
 public class SwerveModuleSim {
 
