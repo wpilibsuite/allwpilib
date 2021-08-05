@@ -98,6 +98,7 @@ public class TimedRobot extends IterativeRobotBase {
     }
 
     // Tell the DS that the robot is ready to be enabled
+    System.out.println("********** Robot program startup complete **********");
     HAL.observeUserProgramStarting();
 
     // Loop forever, calling the appropriate mode-dependent function
