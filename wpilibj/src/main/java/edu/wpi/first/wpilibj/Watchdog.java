@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long kMinPrintPeriodMicroS = 1000000;
+  private static final long kMinPrintPeriodMicroS = 1e6;
 
   private double m_startTimeSeconds;
   private double m_timeoutSeconds;

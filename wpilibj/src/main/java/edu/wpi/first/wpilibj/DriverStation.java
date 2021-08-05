@@ -1047,7 +1047,7 @@ public class DriverStation {
    */
   public static boolean waitForData(double timeoutSeconds) {
     long startTimeMicroS = RobotController.getFPGATime();
-    long timeoutMicroS = (long) (timeoutSeconds * 1000000);
+    long timeoutMicroS = (long) (timeoutSeconds * 1e6);
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
