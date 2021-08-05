@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/PDP.h"
+#include "glass/hardware/PowerDistribution.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -15,7 +15,7 @@
 
 using namespace glass;
 
-static float DisplayChannel(PDPModel& pdp, int channel) {
+static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
   float width = 0;
   if (auto currentData = pdp.GetCurrentData(channel)) {
     ImGui::PushID(channel);
@@ -34,9 +34,9 @@ static float DisplayChannel(PDPModel& pdp, int channel) {
   return width;
 }
 
-void glass::DisplayPDP(PDPModel* model, int index) {
+void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   char name[128];
-  std::snprintf(name, sizeof(name), "PDP[%d]", index);
+  std::snprintf(name, sizeof(name), "PowerDistribution[%d]", index);
   if (CollapsingHeader(name)) {
     // temperature
     if (auto tempData = model->GetTemperatureData()) {
@@ -56,7 +56,7 @@ void glass::DisplayPDP(PDPModel* model, int index) {
       }
     }
 
-    // channel currents; show as two columns laid out like PDP
+    // channel currents; show as two columns laid out like PowerDistribution
     const int numChannels = model->GetNumChannels();
     ImGui::Text("Channel Current (A)");
     ImGui::Columns(2, "channels", false);
@@ -79,12 +79,13 @@ void glass::DisplayPDP(PDPModel* model, int index) {
   }
 }
 
-void glass::DisplayPDPs(PDPsModel* model, std::string_view noneMsg) {
+void glass::DisplayPowerDistributions(PowerDistributionsModel* model,
+                                      std::string_view noneMsg) {
   bool hasAny = false;
-  model->ForEachPDP([&](PDPModel& pdp, int i) {
+  model->ForEachPowerDistribution([&](PowerDistributionModel& pdp, int i) {
     hasAny = true;
     PushID(i);
-    DisplayPDP(&pdp, i);
+    DisplayPowerDistribution(&pdp, i);
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {

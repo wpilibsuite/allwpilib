@@ -74,7 +74,7 @@ void InitializeHAL() {
   InitializeEncoderData();
   InitializeI2CData();
   InitializeCTREPCMData();
-  InitializePDPData();
+  InitializePowerDistributionData();
   InitializePWMData();
   InitializeRelayData();
   InitializeRoboRioData();
@@ -103,7 +103,7 @@ void InitializeHAL() {
   InitializeMain();
   InitializeMockHooks();
   InitializeNotifier();
-  InitializePDP();
+  InitializePowerDistribution();
   InitializePorts();
   InitializePower();
   InitializeCTREPCM();

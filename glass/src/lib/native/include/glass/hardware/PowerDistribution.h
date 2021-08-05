@@ -14,7 +14,7 @@ namespace glass {
 
 class DataSource;
 
-class PDPModel : public Model {
+class PowerDistributionModel : public Model {
  public:
   virtual int GetNumChannels() const = 0;
 
@@ -27,13 +27,16 @@ class PDPModel : public Model {
   virtual void SetCurrent(int channel, double val) = 0;
 };
 
-class PDPsModel : public Model {
+class PowerDistributionsModel : public Model {
  public:
-  virtual void ForEachPDP(
-      wpi::function_ref<void(PDPModel& model, int index)> func) = 0;
+  virtual void ForEachPowerDistribution(
+      wpi::function_ref<void(PowerDistributionModel& model, int index)>
+          func) = 0;
 };
 
-void DisplayPDP(PDPModel* model, int index);
-void DisplayPDPs(PDPsModel* model, std::string_view noneMsg = "No PDPs");
+void DisplayPowerDistribution(PowerDistributionModel* model, int index);
+void DisplayPowerDistributions(
+    PowerDistributionsModel* model,
+    std::string_view noneMsg = "No Power Distributions");
 
 }  // namespace glass

@@ -24,18 +24,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/** Test that covers the {@link PowerDistributionPanel}. */
+/** Test that covers the {@link PowerDistribution}. */
 @RunWith(Parameterized.class)
 public class PDPTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PDPTest.class.getName());
 
-  private static PowerDistributionPanel pdp;
+  private static PowerDistribution pdp;
   private static MotorEncoderFixture<?> me;
   private final double m_expectedStoppedCurrentDraw;
 
   @BeforeClass
   public static void setUpBeforeClass() {
-    pdp = new PowerDistributionPanel();
+    pdp = new PowerDistribution();
   }
 
   @AfterClass

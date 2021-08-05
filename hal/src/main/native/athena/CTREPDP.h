@@ -25,7 +25,8 @@ extern "C" {
  * @param  module the module number to initialize
  * @return the created PDP
  */
-HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status);
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
+                                int32_t* status);
 
 /**
  * Cleans a PDP module.

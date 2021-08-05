@@ -18,8 +18,8 @@
 #include "frc/simulation/DriverStationSim.h"
 #include "frc/simulation/DutyCycleSim.h"
 #include "frc/simulation/EncoderSim.h"
-#include "frc/simulation/PDPSim.h"
 #include "frc/simulation/PWMSim.h"
+#include "frc/simulation/PowerDistributionSim.h"
 #include "frc/simulation/RelaySim.h"
 #include "frc/simulation/RoboRioSim.h"
 #include "frc/simulation/SPIAccelerometerSim.h"
@@ -41,7 +41,7 @@ TEST(SimInitializationTests, TestAllInitialize) {
   EncoderSim esim = EncoderSim::CreateForIndex(0);
   (void)esim;
   CTREPCMSim pcmsim{0};
-  PDPSim pdpsim{0};
+  PowerDistributionSim pdpsim{0};
   PWMSim pwmsim{0};
   RelaySim rsim{0};
   RoboRioSim rrsim;

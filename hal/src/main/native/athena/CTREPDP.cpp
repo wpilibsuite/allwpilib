@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/PDP.h"
+#include "CTREPDP.h"
 
 #include <fmt/format.h>
 #include <wpi/mutex.h>
@@ -12,6 +12,7 @@
 #include "PortsInternal.h"
 #include "hal/CANAPI.h"
 #include "hal/Errors.h"
+#include "hal/handles/IndexedHandleResource.h"
 
 using namespace hal;
 
@@ -102,20 +103,29 @@ union PdpStatusEnergy {
   } bits;
 };
 
-static wpi::mutex pdpHandleMutex;
-static HAL_PDPHandle pdpHandles[kNumPDPModules];
+namespace {
+struct PDP {
+  HAL_CANHandle canHandle;
+  std::string previousAllocation;
+};
+}  // namespace
+
+static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
+                             HAL_HandleEnum::CTREPDP>* pdpHandles;
 
 namespace hal::init {
 void InitializePDP() {
-  for (int i = 0; i < kNumPDPModules; i++) {
-    pdpHandles[i] = HAL_kInvalidHandle;
-  }
+  static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
+                               HAL_HandleEnum::CTREPDP>
+      pH;
+  pdpHandles = &pH;
 }
 }  // namespace hal::init
 
 extern "C" {
 
-HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
+HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
+                                int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckPDPModule(module)) {
     *status = PARAMETER_OUT_OF_RANGE;
@@ -123,34 +133,37 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, int32_t* status) {
     return HAL_kInvalidHandle;
   }
 
-  std::scoped_lock lock(pdpHandleMutex);
-
-  if (pdpHandles[module] != HAL_kInvalidHandle) {
-    *status = 0;
-    return pdpHandles[module];
-  }
-
-  auto handle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
+  HAL_PDPHandle handle;
+  auto pdp = pdpHandles->Allocate(module, &handle, status);
 
   if (*status != 0) {
-    HAL_CleanCAN(handle);
+    if (pdp) {
+      hal::SetLastErrorPreviouslyAllocated(status, "CTRE PDP", module,
+                                           pdp->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
+                                       kNumPDPModules, module);
+    }
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  }
+
+  pdp->canHandle = HAL_InitializeCAN(manufacturer, module, deviceType, status);
+  if (*status != 0) {
+    pdpHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
 
-  pdpHandles[module] = handle;
+  pdp->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
 
 void HAL_CleanPDP(HAL_PDPHandle handle) {
-  HAL_CleanCAN(handle);
-
-  for (int i = 0; i < kNumPDPModules; i++) {
-    if (pdpHandles[i] == handle) {
-      pdpHandles[i] = HAL_kInvalidHandle;
-      return;
-    }
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp) {
+    HAL_CleanCAN(pdp->canHandle);
   }
+  pdpHandles->Free(handle);
 }
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
@@ -162,11 +175,17 @@ HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
 }
 
 double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   PdpStatus3 pdpStatus;
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus.data, &length,
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
 
   if (*status != 0) {
@@ -177,11 +196,17 @@ double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {
 }
 
 double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   PdpStatus3 pdpStatus;
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus.data, &length,
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
 
   if (*status != 0) {
@@ -199,6 +224,12 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     return 0;
   }
 
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
@@ -206,7 +237,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
 
   if (channel <= 5) {
     PdpStatus1 pdpStatus;
-    HAL_ReadCANPacketTimeout(handle, Status1, pdpStatus.data, &length,
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, pdpStatus.data, &length,
                              &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
@@ -239,7 +270,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     }
   } else if (channel <= 11) {
     PdpStatus2 pdpStatus;
-    HAL_ReadCANPacketTimeout(handle, Status2, pdpStatus.data, &length,
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, pdpStatus.data, &length,
                              &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
@@ -272,7 +303,7 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
     }
   } else {
     PdpStatus3 pdpStatus;
-    HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus.data, &length,
+    HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus.data, &length,
                              &receivedTimestamp, TimeoutMs, status);
     if (*status != 0) {
       return 0;
@@ -303,22 +334,28 @@ double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
 
 void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
                                   int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
   PdpStatus1 pdpStatus;
-  HAL_ReadCANPacketTimeout(handle, Status1, pdpStatus.data, &length,
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status1, pdpStatus.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
   }
   PdpStatus2 pdpStatus2;
-  HAL_ReadCANPacketTimeout(handle, Status2, pdpStatus2.data, &length,
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status2, pdpStatus2.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
   }
   PdpStatus3 pdpStatus3;
-  HAL_ReadCANPacketTimeout(handle, Status3, pdpStatus3.data, &length,
+  HAL_ReadCANPacketTimeout(pdp->canHandle, Status3, pdpStatus3.data, &length,
                            &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return;
@@ -377,12 +414,18 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
 }
 
 double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   PdpStatusEnergy pdpStatus;
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(handle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
@@ -395,12 +438,18 @@ double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status) {
 }
 
 double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   PdpStatusEnergy pdpStatus;
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(handle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
@@ -415,12 +464,18 @@ double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status) {
 }
 
 double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
   PdpStatusEnergy pdpStatus;
   int32_t length = 0;
   uint64_t receivedTimestamp = 0;
 
-  HAL_ReadCANPacketTimeout(handle, StatusEnergy, pdpStatus.data, &length,
-                           &receivedTimestamp, TimeoutMs, status);
+  HAL_ReadCANPacketTimeout(pdp->canHandle, StatusEnergy, pdpStatus.data,
+                           &length, &receivedTimestamp, TimeoutMs, status);
   if (*status != 0) {
     return 0;
   }
@@ -443,13 +498,25 @@ double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
 }
 
 void HAL_ResetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
   uint8_t pdpControl[] = {0x40}; /* only bit set is ResetEnergy */
-  HAL_WriteCANPacket(handle, pdpControl, 1, Control1, status);
+  HAL_WriteCANPacket(pdp->canHandle, pdpControl, 1, Control1, status);
 }
 
 void HAL_ClearPDPStickyFaults(HAL_PDPHandle handle, int32_t* status) {
+  auto pdp = pdpHandles->Get(handle);
+  if (pdp == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
   uint8_t pdpControl[] = {0x80}; /* only bit set is ClearStickyFaults */
-  HAL_WriteCANPacket(handle, pdpControl, 1, Control1, status);
+  HAL_WriteCANPacket(pdp->canHandle, pdpControl, 1, Control1, status);
 }
 
 }  // extern "C"
