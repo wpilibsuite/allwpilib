@@ -66,11 +66,11 @@ TEST(DoubleSolenoidTest, Toggle) {
 
 TEST(DoubleSolenoidTest, InvalidForwardPort) {
   PneumaticsControlModule pcm{0};
-  EXPECT_THROW(DoubleSolenoid{pcm, 100, 1}, std::runtime_error);
+  EXPECT_THROW(DoubleSolenoid(pcm, 100, 1), std::runtime_error);
 }
 
 TEST(DoubleSolenoidTest, InvalidReversePort) {
   PneumaticsControlModule pcm{0};
-  EXPECT_THROW(DoubleSolenoid{pcm, 0, 100}, std::runtime_error);
+  EXPECT_THROW(DoubleSolenoid(pcm, 0, 100), std::runtime_error);
 }
 }  // namespace frc

@@ -14,9 +14,9 @@ using namespace frc::sim;
 TEST(AnalogPotentiometerTest, InitializeWithAnalogInput) {
   HAL_Initialize(500, 0);
 
-  AnalogInput ai{0;
-  AnalogPotentiometer pot(&ai);
-  AnalogInputSim sim(ai);
+  AnalogInput ai{0};
+  AnalogPotentiometer pot{&ai};
+  AnalogInputSim sim{ai};
 
   RoboRioSim::ResetData();
   sim.SetVoltage(4.0);
@@ -27,9 +27,9 @@ TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
   HAL_Initialize(500, 0);
 
   AnalogInput ai{0};
-  AnalogPotentiometer pot(&ai, 270.0);
+  AnalogPotentiometer pot{&ai, 270.0};
   RoboRioSim::ResetData();
-  AnalogInputSim sim(ai);
+  AnalogInputSim sim{ai};
 
   sim.SetVoltage(5.0);
   EXPECT_EQ(270.0, pot.Get());
@@ -44,7 +44,7 @@ TEST(AnalogPotentiometerTest, InitializeWithAnalogInputAndScale) {
 TEST(AnalogPotentiometerTest, InitializeWithChannel) {
   HAL_Initialize(500, 0);
 
-  AnalogPotentiometer pot(1);
+  AnalogPotentiometer pot{1};
   AnalogInputSim sim{1};
 
   sim.SetVoltage(5.0);
@@ -56,7 +56,7 @@ TEST(AnalogPotentiometerTest, InitializeWithChannelAndScale) {
 
   AnalogPotentiometer pot{1, 180.0};
   RoboRioSim::ResetData();
-  AnalogInputSim sim(1);
+  AnalogInputSim sim{1};
 
   sim.SetVoltage(5.0);
   EXPECT_EQ(180.0, pot.Get());

@@ -139,7 +139,7 @@ TEST(AnalogInputSimTest, SetAccumulatorValue) {
 
 TEST(AnalogInputSimTest, SetAccumulatorCount) {
   HAL_Initialize(500, 0);
-  AnalogInput input{};
+  AnalogInput input{0};
   AnalogInputSim sim(input);
 
   LongCallback callback;

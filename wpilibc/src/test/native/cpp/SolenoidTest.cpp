@@ -36,12 +36,12 @@ TEST(SolenoidTest, DoubleInitializationFromDoubleSolenoid) {
 
 TEST(SolenoidTest, InvalidChannel) {
   PneumaticsControlModule pcm{3};
-  EXPECT_THROW(Solenoid{pcm, 100}, std::runtime_error);
+  EXPECT_THROW(Solenoid(pcm, 100), std::runtime_error);
 }
 
 TEST(SolenoidTest, Toggle) {
   PneumaticsControlModule pcm{3};
-  Solenoid solenoid{(}pcm, 2};
+  Solenoid solenoid{pcm, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());
 
