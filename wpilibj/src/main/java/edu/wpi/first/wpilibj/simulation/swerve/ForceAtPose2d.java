@@ -30,22 +30,22 @@ public class ForceAtPose2d {
     pos = pos_in;
   }
 
-  /** 
+  /**
    * Returns the torque associated with this force at distance
    * positive is counter-clockwise, negative is clockwise
    */
-  public double getTorque(Pose2d centerOfRotation){
+  public double getTorque(Pose2d centerOfRotation) {
     Transform2d transCORtoF = new Transform2d(centerOfRotation, pos);
 
     //Align the force to the reference frame of the center of rotation
-    Force2d alignedForce = getForceInRefFrame(centerOfRotation); 
+    Force2d alignedForce = getForceInRefFrame(centerOfRotation);
 
     //Calculate the lever arm the force acts at
     Vector2d leverArm = new Vector2d(transCORtoF.getX(), transCORtoF.getY());
     return leverArm.cross(alignedForce.getVector2d());
   }
 
-  public Force2d getForceInRefFrame(Pose2d refFrame){
+  public Force2d getForceInRefFrame(Pose2d refFrame) {
     Transform2d trans = new Transform2d(refFrame, pos);
     return force.rotateBy(trans.getRotation());
   }

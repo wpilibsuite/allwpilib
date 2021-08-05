@@ -64,12 +64,12 @@ public class Vector2d {
   }
 
   /**
-   * Returns the cross product of this vector with another
+   * Returns the cross product of this vector with another.
    *
    * @param other Other vector to cross with
    * @return this X other
    */
-  public double cross(Vector2d other){
-    return this.x*other.y - this.y*other.x;
-}
+  public double cross(Vector2d other) {
+    return this.x * other.y - this.y * other.x;
+  }
 }
