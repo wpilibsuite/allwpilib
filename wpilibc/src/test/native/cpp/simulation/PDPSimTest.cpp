@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/PDPSim.h"  // NOLINT(build/include_order)
+#include "frc/simulation/PowerDistributionSim.h"  // NOLINT(build/include_order)
 
 #include <hal/HAL.h>
 
 #include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/PowerDistributionPanel.h"
+#include "frc/PowerDistribution.h"
 #include "gtest/gtest.h"
 
 namespace frc::sim {
 
-TEST(PDPSimTest, Initialize) {
+TEST(PowerDistributionSimTest, Initialize) {
   HAL_Initialize(500, 0);
-  PDPSim sim{2};
+  PowerDistributionSim sim{2};
   EXPECT_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistributionPanel pdp(2);
+  PowerDistribution pdp(2);
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -31,10 +31,10 @@ TEST(PDPSimTest, Initialize) {
   EXPECT_FALSE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, SetTemperature) {
+TEST(PowerDistributionSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp{2};
-  PDPSim sim(pdp);
+  PowerDistribution pdp{2};
+  PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
   auto cb = sim.RegisterTemperatureCallback(callback.GetCallback(), false);
@@ -46,10 +46,10 @@ TEST(PDPSimTest, SetTemperature) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, SetVoltage) {
+TEST(PowerDistributionSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp{2};
-  PDPSim sim(pdp);
+  PowerDistribution pdp{2};
+  PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
   auto cb = sim.RegisterVoltageCallback(callback.GetCallback(), false);
@@ -61,10 +61,10 @@ TEST(PDPSimTest, SetVoltage) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(PDPSimTest, SetCurrent) {
+TEST(PowerDistributionSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
-  PowerDistributionPanel pdp{2};
-  PDPSim sim(pdp);
+  PowerDistribution pdp{2};
+  PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumPDPChannels(); ++channel) {
     DoubleCallback callback;
