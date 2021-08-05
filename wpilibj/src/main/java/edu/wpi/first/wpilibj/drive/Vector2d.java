@@ -62,4 +62,14 @@ public class Vector2d {
   public double scalarProject(Vector2d vec) {
     return dot(vec) / vec.magnitude();
   }
+
+  /**
+   * Returns the cross product of this vector with another
+   *
+   * @param other Other vector to cross with
+   * @return this X other
+   */
+  public double cross(Vector2d other){
+    return this.x*other.y - this.y*other.x;
+}
 }
