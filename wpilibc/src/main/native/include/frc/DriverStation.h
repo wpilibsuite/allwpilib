@@ -195,8 +195,27 @@ class DriverStation {
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
+   * @deprecated Use IsTeleop() instead.
    */
+  WPI_DEPRECATED("Use IsTeleop() instead")
   static bool IsOperatorControl();
+
+  /**
+   * Check if the DS is commanding teleop mode.
+   *
+   * @return True if the robot is being commanded to be in teleop mode
+   */
+  static bool IsTeleop();
+
+  /**
+   * Check if the DS is commanding teleop mode and if it has enabled the robot.
+   *
+   * @return True if the robot is being commanded to be in teleop mode and
+   * enabled.
+   * @deprecated Use IsTeleopEnabled() instead.
+   */
+  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
+  static bool IsOperatorControlEnabled();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -204,7 +223,7 @@ class DriverStation {
    * @return True if the robot is being commanded to be in teleop mode and
    * enabled.
    */
-  static bool IsOperatorControlEnabled();
+  static bool IsTeleopEnabled();
 
   /**
    * Check if the DS is commanding test mode.
@@ -377,8 +396,19 @@ class DriverStation {
    *
    * @param entering If true, starting teleop code; if false, leaving teleop
    *                 code.
+   * @deprecated Use InTeleop() instead.
    */
+  WPI_DEPRECATED("Use InTeleop() instead")
   static void InOperatorControl(bool entering);
+
+  /**
+   * Only to be used to tell the Driver Station what code you claim to be
+   * executing for diagnostic purposes only.
+   *
+   * @param entering If true, starting teleop code; if false, leaving teleop
+   *                 code.
+   */
+  static void InTeleop(bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be

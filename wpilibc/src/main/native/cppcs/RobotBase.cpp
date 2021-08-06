@@ -179,11 +179,19 @@ bool RobotBase::IsAutonomousEnabled() const {
 }
 
 bool RobotBase::IsOperatorControl() const {
-  return DriverStation::IsOperatorControl();
+  return DriverStation::IsTeleop();
+}
+
+bool RobotBase::IsTeleop() const {
+  return DriverStation::IsTeleop();
 }
 
 bool RobotBase::IsOperatorControlEnabled() const {
-  return DriverStation::IsOperatorControlEnabled();
+  return DriverStation::IsTeleopEnabled();
+}
+
+bool RobotBase::IsTeleopEnabled() const {
+  return DriverStation::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTest() const {

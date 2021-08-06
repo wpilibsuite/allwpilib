@@ -812,8 +812,20 @@ public class DriverStation {
    * operator-controlled mode.
    *
    * @return True if operator-controlled mode should be enabled, false otherwise.
+   * @deprecated Use isTeleop() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public static boolean isOperatorControl() {
+    return isTeleop();
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controlled mode.
+   *
+   * @return True if operator-controlled mode should be enabled, false otherwise.
+   */
+  public static boolean isTeleop() {
     return !(isAutonomous() || isTest());
   }
 
@@ -822,8 +834,20 @@ public class DriverStation {
    * operator-controller mode and enabled.
    *
    * @return True if operator-controlled mode should be set and the robot should be enabled.
+   * @deprecated Use isTeleopEnabled() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public static boolean isOperatorControlEnabled() {
+    return isTeleopEnabled();
+  }
+
+  /**
+   * Gets a value indicating whether the Driver Station requires the robot to be running in
+   * operator-controller mode and enabled.
+   *
+   * @return True if operator-controlled mode should be set and the robot should be enabled.
+   */
+  public static boolean isTeleopEnabled() {
     synchronized (m_controlWordMutex) {
       updateControlWord(false);
       return !m_controlWordCache.getAutonomous()
@@ -1124,8 +1148,20 @@ public class DriverStation {
    * purposes only.
    *
    * @param entering If true, starting teleop code; if false, leaving teleop code
+   * @deprecated Use {@link #inTeleop(boolean)} instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public static void inOperatorControl(boolean entering) {
+    m_userInTeleop = entering;
+  }
+
+  /**
+   * Only to be used to tell the Driver Station what code you claim to be executing for diagnostic
+   * purposes only.
+   *
+   * @param entering If true, starting teleop code; if false, leaving teleop code
+   */
+  public static void inTeleop(boolean entering) {
     m_userInTeleop = entering;
   }
 

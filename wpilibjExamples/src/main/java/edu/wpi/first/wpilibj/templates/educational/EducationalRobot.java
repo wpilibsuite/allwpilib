@@ -60,10 +60,10 @@ public class EducationalRobot extends RobotBase {
           DriverStation.waitForData();
         }
       } else {
-        DriverStation.inOperatorControl(true);
+        DriverStation.inTeleop(true);
         teleop();
-        DriverStation.inOperatorControl(false);
-        while (isOperatorControlEnabled()) {
+        DriverStation.inTeleop(false);
+        while (isTeleopEnabled()) {
           DriverStation.waitForData();
         }
       }
