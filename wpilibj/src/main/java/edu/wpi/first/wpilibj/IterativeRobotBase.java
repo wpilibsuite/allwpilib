@@ -270,14 +270,15 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.reset();
 
     // Get current mode
+    var word = new DSControlWord();
     Mode mode = Mode.kNone;
-    if (isDisabled()) {
+    if (word.isDisabled()) {
       mode = Mode.kDisabled;
-    } else if (isAutonomous()) {
+    } else if (word.isAutonomous()) {
       mode = Mode.kAutonomous;
-    } else if (isOperatorControl()) {
+    } else if (word.isTeleop()) {
       mode = Mode.kTeleop;
-    } else if (isTest()) {
+    } else if (word.isTest()) {
       mode = Mode.kTest;
     }
 
