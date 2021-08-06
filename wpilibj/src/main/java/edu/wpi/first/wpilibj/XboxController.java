@@ -34,6 +34,23 @@ public class XboxController extends GenericHID {
     Button(int value) {
       this.value = value;
     }
+
+    /**
+     * Get the human-friendly name of the button, matching the relevant methods. This is done by
+     * stripping the leading `k`, and if not a Bumper button append `Button`.
+     *
+     * <p>Primarily used for automated unit tests.
+     *
+     * @return the human-friendly name of the button.
+     */
+    @Override
+    public String toString() {
+      var name = this.name().substring(1); // Remove leading `k`
+      if (name.endsWith("Bumper")) {
+        return name;
+      }
+      return name + "Button";
+    }
   }
 
   /** Represents an axis on an XboxController. */
@@ -50,6 +67,23 @@ public class XboxController extends GenericHID {
 
     Axis(int value) {
       this.value = value;
+    }
+
+    /**
+     * Get the human-friendly name of the axis, matching the relevant methods. This is done by
+     * stripping the leading `k`, and if a trigger axis append `Axis`.
+     *
+     * <p>Primarily used for automated unit tests.
+     *
+     * @return the human-friendly name of the axis.
+     */
+    @Override
+    public String toString() {
+      var name = this.name().substring(1); // Remove leading `k`
+      if (name.endsWith("Trigger")) {
+        return name + "Axis";
+      }
+      return name;
     }
   }
 

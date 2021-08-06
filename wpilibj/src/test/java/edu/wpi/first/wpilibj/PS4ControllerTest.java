@@ -9,21 +9,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
+import edu.wpi.first.wpilibj.simulation.PS4ControllerSim;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class XboxControllerTest {
+class PS4ControllerTest {
   @ParameterizedTest
-  @EnumSource(value = XboxController.Button.class)
+  @EnumSource(value = PS4Controller.Button.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testButtons(XboxController.Button button)
+  public void testButtons(PS4Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
-    XboxController joy = new XboxController(2);
-    XboxControllerSim joysim = new XboxControllerSim(joy);
+    PS4Controller joy = new PS4Controller(2);
+    PS4ControllerSim joysim = new PS4ControllerSim(joy);
 
     var buttonName = button.toString();
 
@@ -58,13 +58,13 @@ class XboxControllerTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = XboxController.Axis.class)
+  @EnumSource(value = PS4Controller.Axis.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testAxes(XboxController.Axis axis)
+  public void testAxes(PS4Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
-    XboxController joy = new XboxController(2);
-    XboxControllerSim joysim = new XboxControllerSim(joy);
+    PS4Controller joy = new PS4Controller(2);
+    PS4ControllerSim joysim = new PS4ControllerSim(joy);
 
     var axisName = axis.toString();
 
