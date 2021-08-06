@@ -17,8 +17,19 @@
 using namespace frc;
 
 wpi::mutex PneumaticsControlModule::m_handleLock;
-wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>
-    PneumaticsControlModule::m_handleMap;
+std::unique_ptr<
+    wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>>
+    PneumaticsControlModule::m_handleMap = nullptr;
+
+// Always called under lock, so we can avoid the double lock from the magic static
+std::weak_ptr<PneumaticsControlModule::DataStore>&
+PneumaticsControlModule::GetDataStore(int module) {
+  if (!m_handleMap) {
+    m_handleMap = std::make_unique<wpi::DenseMap<
+        int, std::weak_ptr<PneumaticsControlModule::DataStore>>>();
+  }
+  return (*m_handleMap)[module];
+}
 
 class PneumaticsControlModule::DataStore {
  public:
@@ -51,7 +62,7 @@ PneumaticsControlModule::PneumaticsControlModule()
 PneumaticsControlModule::PneumaticsControlModule(int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
-  auto& res = m_handleMap[module];
+  auto& res = GetDataStore(module);
   m_dataStore = res.lock();
   if (!m_dataStore) {
     m_dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());
@@ -246,7 +257,7 @@ std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(
     int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
-  auto& res = m_handleMap[module];
+  auto& res = GetDataStore(module);
   std::shared_ptr<DataStore> dataStore = res.lock();
   if (!dataStore) {
     dataStore = std::make_shared<DataStore>(module, stackTrace.c_str());

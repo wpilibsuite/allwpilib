@@ -82,6 +82,7 @@ class PneumaticsControlModule : public PneumaticsBase {
   int m_module;
 
   static wpi::mutex m_handleLock;
-  static wpi::DenseMap<int, std::weak_ptr<DataStore>> m_handleMap;
+  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>> m_handleMap;
+  static std::weak_ptr<DataStore>& GetDataStore(int module);
 };
 }  // namespace frc
