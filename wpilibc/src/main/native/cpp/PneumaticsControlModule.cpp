@@ -21,7 +21,8 @@ std::unique_ptr<
     wpi::DenseMap<int, std::weak_ptr<PneumaticsControlModule::DataStore>>>
     PneumaticsControlModule::m_handleMap = nullptr;
 
-// Always called under lock, so we can avoid the double lock from the magic static
+// Always called under lock, so we can avoid the double lock from the magic
+// static
 std::weak_ptr<PneumaticsControlModule::DataStore>&
 PneumaticsControlModule::GetDataStore(int module) {
   if (!m_handleMap) {
