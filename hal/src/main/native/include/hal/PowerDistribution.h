@@ -46,7 +46,8 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
  * @param handle the module handle
  * @return the module number
  */
-int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle, int32_t* status);
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
+                                             int32_t* status);
 
 /**
  * Cleans a PowerDistribution module.

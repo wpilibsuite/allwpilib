@@ -46,14 +46,14 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   return handle;
 }
 
-int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle, int32_t* status) {
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
+                                             int32_t* status) {
   auto module = hal::can::GetCANModuleFromHandle(handle, status);
   if (*status != 0) {
     return 0;
   }
   return module;
 }
-
 
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {

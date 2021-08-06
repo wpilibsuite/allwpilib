@@ -5,9 +5,9 @@
 #include "hal/PowerDistribution.h"
 
 #include "CTREPDP.h"
-#include "REVPDH.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
+#include "REVPDH.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
 
