@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/GenericHID.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 #include <frc/drive/DifferentialDrive.h>
@@ -23,9 +22,8 @@ class Robot : public frc::TimedRobot {
     // Drive with split arcade style
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
-    m_robotDrive.ArcadeDrive(
-        m_driverController.GetY(frc::GenericHID::JoystickHand::kLeftHand),
-        m_driverController.GetX(frc::GenericHID::JoystickHand::kRightHand));
+    m_robotDrive.ArcadeDrive(m_driverController.GetLeftY(),
+                             m_driverController.GetRightX());
   }
 };
 

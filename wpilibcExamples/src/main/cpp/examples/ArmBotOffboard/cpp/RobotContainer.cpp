@@ -17,9 +17,8 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.ArcadeDrive(
-            m_driverController.GetY(frc::GenericHID::kLeftHand),
-            m_driverController.GetX(frc::GenericHID::kRightHand));
+        m_drive.ArcadeDrive(m_driverController.GetLeftY(),
+                            m_driverController.GetRightX());
       },
       {&m_drive}));
 }
@@ -28,16 +27,17 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // Move the arm to 2 radians above horizontal when the 'A' button is pressed.
-  frc2::JoystickButton(&m_driverController, 1)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
       .WhenPressed([this] { m_arm.SetGoal(2_rad); }, {&m_arm});
 
   // Move the arm to neutral position when the 'B' button is pressed.
-  frc2::JoystickButton(&m_driverController, 1)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .WhenPressed([this] { m_arm.SetGoal(ArmConstants::kArmOffset); },
                    {&m_arm});
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  frc2::JoystickButton(&m_driverController,
+                       frc::XboxController::Button::kRightBumper)
       .WhenPressed([this] { m_drive.SetMaxOutput(0.5); })
       .WhenReleased([this] { m_drive.SetMaxOutput(1); });
 }
