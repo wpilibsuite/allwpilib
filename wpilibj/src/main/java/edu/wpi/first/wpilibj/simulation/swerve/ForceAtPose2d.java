@@ -1,41 +1,37 @@
 package edu.wpi.first.wpilibj.simulation.swerve;
 
-import java.util.Objects;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.drive.Vector2d;
-
+import java.util.Objects;
 
 public class ForceAtPose2d {
-  public Force2d force;
-  public Pose2d pos;
+  public Force2d m_force;
+  public Pose2d m_pos;
 
   /**
-   * Constructs a ForceAtDistance2d that's all zeroed out
+   * Constructs a ForceAtDistance2d that's all zeroed out.
    */
-  public ForceAtPose2d () {
+  public ForceAtPose2d() {
     this(new Force2d(), new Pose2d());
   }
 
   /**
-   * Constructs a Force2d with the X and Y components equal to the
-   * provided values.
-   *
-   * @param x The x component of the force.
-   * @param y The y component of the force.
+   * Constructs from a given force and position that force acts at.
+   * @param force The force
+   * @param pos The position the force is acting at
    */
-  public ForceAtPose2d ( Force2d force_in, Pose2d pos_in) {
-    force = force_in;
-    pos = pos_in;
+  public ForceAtPose2d( Force2d force, Pose2d pos) {
+    m_force = force;
+    m_pos = pos;
   }
 
   /**
-   * Returns the torque associated with this force at distance
+   * Returns the torque associated with this force at distance.
    * positive is counter-clockwise, negative is clockwise
    */
   public double getTorque(Pose2d centerOfRotation) {
-    Transform2d transCORtoF = new Transform2d(centerOfRotation, pos);
+    Transform2d transCORtoF = new Transform2d(centerOfRotation, m_pos);
 
     //Align the force to the reference frame of the center of rotation
     Force2d alignedForce = getForceInRefFrame(centerOfRotation);
@@ -46,13 +42,13 @@ public class ForceAtPose2d {
   }
 
   public Force2d getForceInRefFrame(Pose2d refFrame) {
-    Transform2d trans = new Transform2d(refFrame, pos);
-    return force.rotateBy(trans.getRotation());
+    Transform2d trans = new Transform2d(refFrame, m_pos);
+    return m_force.rotateBy(trans.getRotation());
   }
 
   @Override
   public String toString() {
-    return String.format("ForceAtDistance2D(X: %.2fN, Y: %.2fN)", force.getX(), force.getY());
+    return String.format("ForceAtDistance2D(X: %.2fN, Y: %.2fN)", m_force.getX(), m_force.getY());
   }
 
   /**
@@ -64,16 +60,16 @@ public class ForceAtPose2d {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ForceAtPose2d) {
-      return Math.abs(((ForceAtPose2d) obj).force.getX() - force.getX()) < 1E-9
-          && Math.abs(((ForceAtPose2d) obj).force.getY() - force.getY()) < 1E-9
-          && Math.abs(((ForceAtPose2d) obj).pos.getX() - pos.getX()) < 1E-9
-          && Math.abs(((ForceAtPose2d) obj).pos.getY() - pos.getY()) < 1E-9;
+      return Math.abs(((ForceAtPose2d) obj).m_force.getX() - m_force.getX()) < 1E-9
+          && Math.abs(((ForceAtPose2d) obj).m_force.getY() - m_force.getY()) < 1E-9
+          && Math.abs(((ForceAtPose2d) obj).m_pos.getX() - m_pos.getX()) < 1E-9
+          && Math.abs(((ForceAtPose2d) obj).m_pos.getY() - m_pos.getY()) < 1E-9;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(force.getX(), force.getY(), pos.getX(), pos.getY());
+    return Objects.hash(m_force.getX(), m_force.getY(), m_pos.getX(), m_pos.getY());
   }
 }

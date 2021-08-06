@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 
 class SimpleMotorWithMassModel {
-   
-    double m_curDisplacement_Rev;
+ 
+    double m_curDisplacementRev;
 
     FlywheelSim m_fwSim;
 
@@ -24,30 +24,27 @@ class SimpleMotorWithMassModel {
         m_fwSim.setInputVoltage(motorVoltage);
         m_fwSim.update(dtSeconds);
         //Add additional state of displacement in a hacky-ish calculation
-        m_curDisplacement_Rev += m_fwSim.getAngularVelocityRPM() / 60 * dtSeconds;
+        m_curDisplacementRev += m_fwSim.getAngularVelocityRPM() / 60 * dtSeconds;
     }
 
     /**
-     *
-     * @return The present speed of the rotating mass
+     * Gets the present speed of the rotating mass.
      */
     double getMechanismSpeed_RPM() {
         return m_fwSim.getAngularVelocityRPM();
     }
 
     /**
-     *
-     * @return The present current draw of the mechanism
+     * Returns the present current draw of the mechanism.
      */
     double getCurrent_A() {
         return m_fwSim.getCurrentDrawAmps();
     }
 
     /**
-     *
-     * @return The present displacement in Revolutions
+     * Returns the present displacement in Revolutions.
      */
-    double getMechanismPosition_Rev() {
-        return m_curDisplacement_Rev;
+    double getMechanismPositionRev() {
+        return m_curDisplacementRev;
     }
 }

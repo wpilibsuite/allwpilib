@@ -1,12 +1,11 @@
 package edu.wpi.first.wpilibj.simulation.swerve;
 
-import org.ejml.simple.SimpleMatrix;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.drive.Vector2d;
+import org.ejml.simple.SimpleMatrix;
 
 public class Force2d {
   Matrix<N2, N1> m_matrix;
@@ -43,58 +42,49 @@ public class Force2d {
   }
 
   /**
-   * Constructs a Force2d with the provided 2-element column matrix as the x/y components
+   * Constructs a Force2d with the provided 2-element column matrix as the x/y components.
    *
-   * @param m_in 2 row, 1 column input matrix
+   * @param m 2 row, 1 column input matrix
    */
-  public Force2d(Matrix<N2, N1> m_in) {
-    m_matrix = m_in;
+  public Force2d(Matrix<N2, N1> m) {
+    m_matrix = m;
   }
- 
+
   /**
-   * Constructs a Force2d with the provided vector assumed to represent the force
+   * Constructs a Force2d with the provided vector assumed to represent the force.
    *
-   * @param force_vec
+   * @param forceVec vector which represents some force in two dimensions
    */
-  public Force2d(Vector2d force_vec) {
-    this(force_vec.x, force_vec.y);
+  public Force2d(Vector2d forceVec) {
+    this(forceVec.x, forceVec.y);
   }
 
   /**
    * Returns the X component of the force.
-   *
-   * @return The x component of the force.
    */
-
   public double getX() {
     return m_matrix.get(0, 0);
   }
 
   /**
    * Returns the Y component of the force.
-   *
-   * @return The y component of the force.
    */
-
   public double getY() {
     return m_matrix.get(1, 0);
   }
 
   /**
    * Returns the norm, or distance from the origin to the force.
-   *
-   * @return The norm of the force.
    */
   public double getNorm() {
     return m_matrix.normF();
   }
 
   /**
-   *
-   * @return a unit vector in the directino this force points
+   * Gets a unit vector in the direction this force points.
    */
   public Vector2d getUnitVector() {
-    return new Vector2d(this.getX()/this.getNorm(), this.getY()/this.getNorm());
+    return new Vector2d(this.getX() / this.getNorm(), this.getY() / this.getNorm());
   }
 
   /**
@@ -133,11 +123,8 @@ public class Force2d {
   }
 
   /**
-   * Accumulates another force into this force
-   *
-   *
+   * Accumulates another force into this force. Returns nothing, acts "in-place" on this force.
    * @param other The force to add.
-   * @return nothing (acts on this force in-place)
    */
   public void accum(Force2d other) {
     this.m_matrix = this.m_matrix.plus(other.m_matrix);
@@ -213,7 +200,7 @@ public class Force2d {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Force2d) {
-      return this.m_matrix.isEqual(((Force2d)obj).m_matrix, 1E-9);
+      return this.m_matrix.isEqual(((Force2d) obj).m_matrix, 1E-9);
     } else {
       return false;
     }
