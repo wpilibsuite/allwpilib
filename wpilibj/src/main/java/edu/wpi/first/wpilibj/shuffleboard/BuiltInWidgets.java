@@ -188,11 +188,11 @@ public enum BuiltInWidgets implements WidgetType {
    */
   kVoltageView("Voltage View"),
   /**
-   * Displays a {@link edu.wpi.first.wpilibj.PowerDistributionPanel PowerDistributionPanel}. <br>
+   * Displays a {@link edu.wpi.first.wpilibj.PowerDistribution PowerDistribution}. <br>
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PowerDistributionPanel}
+   *   <li>{@link edu.wpi.first.wpilibj.PowerDistribution}
    * </ul>
    *
    * <br>
@@ -204,7 +204,7 @@ public enum BuiltInWidgets implements WidgetType {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  kPowerDistributionPanel("PDP"),
+  kPowerDistribution("PDP"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.smartdashboard.SendableChooser SendableChooser} with a
    * dropdown combo box with a list of options. <br>

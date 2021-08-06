@@ -41,14 +41,16 @@ UnscentedTransform(const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
                        const Eigen::Matrix<double, CovDim, 1>&)>
                        residualFunc) {
   // New mean is usually just the sum of the sigmas * weight:
-  // dot = \Sigma^n_1 (W[k]*Xi[k])
+  //       n
+  // dot = Σ W[k] Xᵢ[k]
+  //      k=1
   Eigen::Matrix<double, CovDim, 1> x = meanFunc(sigmas, Wm);
 
   // New covariance is the sum of the outer product of the residuals times the
   // weights
   Eigen::Matrix<double, CovDim, 2 * States + 1> y;
   for (int i = 0; i < 2 * States + 1; ++i) {
-    // y[:, i] = sigmas[:, i] - x;
+    // y[:, i] = sigmas[:, i] - x
     y.template block<CovDim, 1>(0, i) =
         residualFunc(sigmas.template block<CovDim, 1>(0, i), x);
   }

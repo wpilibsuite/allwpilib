@@ -4,9 +4,9 @@
 
 #include "gtest/gtest.h"
 #include "hal/HAL.h"
-#include "hal/PDP.h"
+#include "hal/PowerDistribution.h"
 #include "hal/handles/HandlesInternal.h"
-#include "hal/simulation/PDPData.h"
+#include "hal/simulation/PowerDistributionData.h"
 
 namespace hal {
 
@@ -23,7 +23,7 @@ TEST(PdpSimTests, TestPdpInitialization) {
   const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;
-  int callbackId = HALSIM_RegisterPDPInitializedCallback(
+  int callbackId = HALSIM_RegisterPowerDistributionInitializedCallback(
       INDEX_TO_TEST, &TestPdpInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
@@ -31,7 +31,8 @@ TEST(PdpSimTests, TestPdpInitialization) {
 
   // Use out of range index
   gTestPdpCallbackName = "Unset";
-  HAL_InitializePDP(INDEX_TO_TEST, &status);
+  HAL_InitializePowerDistribution(INDEX_TO_TEST,
+                                  HAL_PowerDistributionType_kCTRE, &status);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }

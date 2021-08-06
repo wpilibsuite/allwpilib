@@ -41,19 +41,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Prepare vcpkg
-        uses: lukka/run-vcpkg@v4
+        uses: lukka/run-vcpkg@v7
         with:
           vcpkgArguments: opencv
-          vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
-          vcpkgGitCommitId: 544f8e4593764f78faa94bac2adb81cca5232943
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
           vcpkgTriplet: x64-windows
+          vcpkgGitCommitId: d781bd9ca77ac3dc2f13d88169021d48459c665f # HEAD on 2021-07-25
       - name: Configure & Build
         uses: lukka/run-cmake@v3
         with:
-          buildDirectory: ${{ runner.workspace }}/build/
+          buildDirectory: ${{ runner.workspace }}/build
           cmakeAppendedArgs: -DWITH_JAVA=OFF
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests
         run: ctest -C "Debug"
-        working-directory: ${{ runner.workspace }}/build/
+        working-directory: ${{ runner.workspace }}/build

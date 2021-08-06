@@ -5,12 +5,8 @@
 package edu.wpi.first.math.system;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N5;
-import edu.wpi.first.math.numbers.N6;
 import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
@@ -30,12 +26,13 @@ public final class NumericalIntegration {
    */
   @SuppressWarnings("ParameterName")
   public static double rk4(DoubleFunction<Double> f, double x, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
     final var k1 = f.apply(x);
-    final var k2 = f.apply(x + k1 * halfDt);
-    final var k3 = f.apply(x + k2 * halfDt);
-    final var k4 = f.apply(x + k3 * dtSeconds);
-    return x + dtSeconds / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    final var k2 = f.apply(x + h * k1 * 0.5);
+    final var k3 = f.apply(x + h * k2 * 0.5);
+    final var k4 = f.apply(x + h * k3);
+
+    return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
 
   /**
@@ -50,12 +47,14 @@ public final class NumericalIntegration {
   @SuppressWarnings("ParameterName")
   public static double rk4(
       BiFunction<Double, Double, Double> f, double x, Double u, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     final var k1 = f.apply(x, u);
-    final var k2 = f.apply(x + k1 * halfDt, u);
-    final var k3 = f.apply(x + k2 * halfDt, u);
-    final var k4 = f.apply(x + k3 * dtSeconds, u);
-    return x + dtSeconds / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    final var k2 = f.apply(x + h * k1 * 0.5, u);
+    final var k3 = f.apply(x + h * k2 * 0.5, u);
+    final var k4 = f.apply(x + h * k3, u);
+
+    return x + h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
   }
 
   /**
@@ -75,12 +74,14 @@ public final class NumericalIntegration {
       Matrix<States, N1> x,
       Matrix<Inputs, N1> u,
       double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     Matrix<States, N1> k1 = f.apply(x, u);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)), u);
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)), u);
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)), u);
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)), u);
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)), u);
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)), u);
+
+    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
 
   /**
@@ -95,12 +96,14 @@ public final class NumericalIntegration {
   @SuppressWarnings({"ParameterName", "MethodTypeParameterName"})
   public static <States extends Num> Matrix<States, N1> rk4(
       Function<Matrix<States, N1>, Matrix<States, N1>> f, Matrix<States, N1> x, double dtSeconds) {
-    final var halfDt = 0.5 * dtSeconds;
+    final var h = dtSeconds;
+
     Matrix<States, N1> k1 = f.apply(x);
-    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(halfDt)));
-    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(halfDt)));
-    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(dtSeconds)));
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(dtSeconds).div(6.0));
+    Matrix<States, N1> k2 = f.apply(x.plus(k1.times(h * 0.5)));
+    Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)));
+    Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)));
+
+    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
   }
 
   /**
@@ -145,142 +148,236 @@ public final class NumericalIntegration {
       Matrix<Inputs, N1> u,
       double dtSeconds,
       double maxError) {
-    double dtElapsed = 0;
-    double previousH = dtSeconds;
+    // See
+    // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta%E2%80%93Fehlberg_method
+    // for the Butcher tableau the following arrays came from.
+
+    // final double[5][5]
+    final double[][] A = {
+      {1.0 / 4.0},
+      {3.0 / 32.0, 9.0 / 32.0},
+      {1932.0 / 2197.0, -7200.0 / 2197.0, 7296.0 / 2197.0},
+      {439.0 / 216.0, -8.0, 3680.0 / 513.0, -845.0 / 4104.0},
+      {-8.0 / 27.0, 2.0, -3544.0 / 2565.0, 1859.0 / 4104.0, -11.0 / 40.0}
+    };
+
+    // final double[6]
+    final double[] b1 = {
+      16.0 / 135.0, 0.0, 6656.0 / 12825.0, 28561.0 / 56430.0, -9.0 / 50.0, 2.0 / 55.0
+    };
+
+    // final double[6]
+    final double[] b2 = {25.0 / 216.0, 0.0, 1408.0 / 2565.0, 2197.0 / 4104.0, -1.0 / 5.0, 0.0};
+
+    Matrix<States, N1> newX;
+    double truncationError;
+
+    double dtElapsed = 0.0;
+    double h = dtSeconds;
+
     // Loop until we've gotten to our desired dt
     while (dtElapsed < dtSeconds) {
-      // RKF45 will give us an updated x and a dt back.
-      // We use the new dt (h) as the initial dt for our next loop
-      var ret = rkf45Impl(f, x, u, previousH, maxError, dtSeconds - dtElapsed);
-      dtElapsed += ret.getSecond();
-      previousH = ret.getSecond();
-      x = ret.getFirst();
+      do {
+        // Only allow us to advance up to the dt remaining
+        h = Math.min(h, dtSeconds - dtElapsed);
+
+        // Notice how the derivative in the Wikipedia notation is dy/dx.
+        // That means their y is our x and their x is our t
+        var k1 = f.apply(x, u);
+        var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
+        var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
+        var k4 =
+            f.apply(
+                x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
+                u);
+        var k5 =
+            f.apply(
+                x.plus(
+                    k1.times(A[3][0])
+                        .plus(k2.times(A[3][1]))
+                        .plus(k3.times(A[3][2]))
+                        .plus(k4.times(A[3][3]))
+                        .times(h)),
+                u);
+        var k6 =
+            f.apply(
+                x.plus(
+                    k1.times(A[4][0])
+                        .plus(k2.times(A[4][1]))
+                        .plus(k3.times(A[4][2]))
+                        .plus(k4.times(A[4][3]))
+                        .plus(k5.times(A[4][4]))
+                        .times(h)),
+                u);
+
+        newX =
+            x.plus(
+                k1.times(b1[0])
+                    .plus(k2.times(b1[1]))
+                    .plus(k3.times(b1[2]))
+                    .plus(k4.times(b1[3]))
+                    .plus(k5.times(b1[4]))
+                    .plus(k6.times(b1[5]))
+                    .times(h));
+        truncationError =
+            (k1.times(b1[0] - b2[0])
+                    .plus(k2.times(b1[1] - b2[1]))
+                    .plus(k3.times(b1[2] - b2[2]))
+                    .plus(k4.times(b1[3] - b2[3]))
+                    .plus(k5.times(b1[4] - b2[4]))
+                    .plus(k6.times(b1[5] - b2[5]))
+                    .times(h))
+                .normF();
+
+        h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
+      } while (truncationError > maxError);
+
+      dtElapsed += h;
+      x = newX;
     }
+
     return x;
   }
 
-  static final double[] ch = {47 / 450.0, 0, 12 / 25.0, 32 / 225.0, 1 / 30.0, 6 / 25.0};
-  static final double[] ct = {-1 / 150.0, 0, 3 / 100.0, -16 / 75.0, -1 / 20.0, 6 / 25.0};
-  static final Matrix<N6, N5> Bs =
-      Matrix.mat(Nat.N6(), Nat.N5())
-          .fill(
-              0,
-              0,
-              0,
-              0,
-              0,
-              2 / 9.0,
-              0,
-              0,
-              0,
-              0,
-              1 / 12.0,
-              1 / 4.0,
-              0,
-              0,
-              0,
-              69 / 128.0,
-              -243 / 128.0,
-              135 / 64.0,
-              0,
-              0,
-              -17 / 12.0,
-              27 / 4.0,
-              -27 / 5.0,
-              16 / 15.0,
-              0,
-              65 / 432.0,
-              -5 / 16.0,
-              13 / 16.0,
-              4 / 27.0,
-              5 / 144.0);
-
   /**
-   * Implements one loop of RKF45. This takes an initial state, dt guess, and max truncation error,
-   * and returns a new x and the dt over which that x was updated. This should be called until there
-   * is no dt remaining.
+   * Performs adaptive Dormand-Prince integration of dx/dt = f(x, u) for dt. By default, the max
+   * error is 1e-6.
    *
-   * @param <States> Num representing the states of the system to integrate.
+   * @param <States> A Num representing the states of the system to integrate.
    * @param <Inputs> A Num representing the inputs of the system to integrate.
    * @param f The function to integrate. It must take two arguments x and u.
    * @param x The initial value of x.
    * @param u The value u held constant over the integration period.
-   * @param initialH The initial dt guess. This is refined to clamp truncation error to the
-   *     specified max.
-   * @param maxTruncationError The max truncation error acceptable. Usually a small number like
-   *     1e-6.
-   * @param dtRemaining How much time is left to integrate over. Used to clamp h.
+   * @param dtSeconds The time over which to integrate.
    * @return the integration of dx/dt = f(x, u) for dt.
    */
   @SuppressWarnings("MethodTypeParameterName")
-  private static <States extends Num, Inputs extends Num>
-      Pair<Matrix<States, N1>, Double> rkf45Impl(
-          BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
-          Matrix<States, N1> x,
-          Matrix<Inputs, N1> u,
-          double initialH,
-          double maxTruncationError,
-          double dtRemaining) {
-    double truncationErr;
-    double h = initialH;
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      Matrix<States, N1> x,
+      Matrix<Inputs, N1> u,
+      double dtSeconds) {
+    return rkdp(f, x, u, dtSeconds, 1e-6);
+  }
+
+  /**
+   * Performs adaptive Dormand-Prince integration of dx/dt = f(x, u) for dt.
+   *
+   * @param <States> A Num representing the states of the system to integrate.
+   * @param <Inputs> A Num representing the inputs of the system to integrate.
+   * @param f The function to integrate. It must take two arguments x and u.
+   * @param x The initial value of x.
+   * @param u The value u held constant over the integration period.
+   * @param dtSeconds The time over which to integrate.
+   * @param maxError The maximum acceptable truncation error. Usually a small number like 1e-6.
+   * @return the integration of dx/dt = f(x, u) for dt.
+   */
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num, Inputs extends Num> Matrix<States, N1> rkdp(
+      BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
+      Matrix<States, N1> x,
+      Matrix<Inputs, N1> u,
+      double dtSeconds,
+      double maxError) {
+    // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
+    // Butcher tableau the following arrays came from.
+
+    // final double[6][6]
+    final double[][] A = {
+      {1.0 / 5.0},
+      {3.0 / 40.0, 9.0 / 40.0},
+      {44.0 / 45.0, -56.0 / 15.0, 32.0 / 9.0},
+      {19372.0 / 6561.0, -25360.0 / 2187.0, 64448.0 / 6561.0, -212.0 / 729.0},
+      {9017.0 / 3168.0, -355.0 / 33.0, 46732.0 / 5247.0, 49.0 / 176.0, -5103.0 / 18656.0},
+      {35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0, 11.0 / 84.0}
+    };
+
+    // final double[7]
+    final double[] b1 = {
+      35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0, 11.0 / 84.0, 0.0
+    };
+
+    // final double[7]
+    final double[] b2 = {
+      5179.0 / 57600.0,
+      0.0,
+      7571.0 / 16695.0,
+      393.0 / 640.0,
+      -92097.0 / 339200.0,
+      187.0 / 2100.0,
+      1.0 / 40.0
+    };
+
     Matrix<States, N1> newX;
+    double truncationError;
 
-    do {
-      // only allow us to advance up to the dt remaining
-      h = Math.min(h, dtRemaining);
+    double dtElapsed = 0.0;
+    double h = dtSeconds;
 
-      // Notice how the derivative in the Wikipedia notation is dy/dx.
-      // That means their y is our x and their x is our t
-      Matrix<States, N1> k1 = f.apply(x, u).times(h);
-      Matrix<States, N1> k2 = f.apply(x.plus(k1.times(Bs.get(1, 0))), u).times(h);
-      Matrix<States, N1> k3 =
-          f.apply(x.plus(k1.times(Bs.get(2, 0))).plus(k2.times(Bs.get(2, 1))), u).times(h);
-      Matrix<States, N1> k4 =
-          f.apply(
-                  x.plus(k1.times(Bs.get(3, 0)))
-                      .plus(k2.times(Bs.get(3, 1)))
-                      .plus(k3.times(Bs.get(3, 2))),
-                  u)
-              .times(h);
-      Matrix<States, N1> k5 =
-          f.apply(
-                  x.plus(k1.times(Bs.get(4, 0)))
-                      .plus(k2.times(Bs.get(4, 1)))
-                      .plus(k3.times(Bs.get(4, 2)))
-                      .plus(k4.times(Bs.get(4, 3))),
-                  u)
-              .times(h);
-      Matrix<States, N1> k6 =
-          f.apply(
-                  x.plus(k1.times(Bs.get(5, 0)))
-                      .plus(k2.times(Bs.get(5, 1)))
-                      .plus(k3.times(Bs.get(5, 2)))
-                      .plus(k4.times(Bs.get(5, 3)))
-                      .plus(k5.times(Bs.get(5, 4))),
-                  u)
-              .times(h);
+    // Loop until we've gotten to our desired dt
+    while (dtElapsed < dtSeconds) {
+      do {
+        // Only allow us to advance up to the dt remaining
+        h = Math.min(h, dtSeconds - dtElapsed);
 
-      newX =
-          x.plus(k1.times(ch[0]))
-              .plus(k2.times(ch[1]))
-              .plus(k3.times(ch[2]))
-              .plus(k4.times(ch[3]))
-              .plus(k5.times(ch[4]))
-              .plus(k6.times(ch[5]));
+        var k1 = f.apply(x, u);
+        var k2 = f.apply(x.plus(k1.times(A[0][0]).times(h)), u);
+        var k3 = f.apply(x.plus(k1.times(A[1][0]).plus(k2.times(A[1][1])).times(h)), u);
+        var k4 =
+            f.apply(
+                x.plus(k1.times(A[2][0]).plus(k2.times(A[2][1])).plus(k3.times(A[2][2])).times(h)),
+                u);
+        var k5 =
+            f.apply(
+                x.plus(
+                    k1.times(A[3][0])
+                        .plus(k2.times(A[3][1]))
+                        .plus(k3.times(A[3][2]))
+                        .plus(k4.times(A[3][3]))
+                        .times(h)),
+                u);
+        var k6 =
+            f.apply(
+                x.plus(
+                    k1.times(A[4][0])
+                        .plus(k2.times(A[4][1]))
+                        .plus(k3.times(A[4][2]))
+                        .plus(k4.times(A[4][3]))
+                        .plus(k5.times(A[4][4]))
+                        .times(h)),
+                u);
 
-      truncationErr =
-          k1.times(ct[0])
-              .plus(k2.times(ct[1]))
-              .plus(k3.times(ct[2]))
-              .plus(k4.times(ct[3]))
-              .plus(k5.times(ct[4]))
-              .plus(k6.times(ct[5]))
-              .normF();
+        // Since the final row of A and the array b1 have the same coefficients
+        // and k7 has no effect on newX, we can reuse the calculation.
+        newX =
+            x.plus(
+                k1.times(A[5][0])
+                    .plus(k2.times(A[5][1]))
+                    .plus(k3.times(A[5][2]))
+                    .plus(k4.times(A[5][3]))
+                    .plus(k5.times(A[5][4]))
+                    .plus(k6.times(A[5][5]))
+                    .times(h));
+        var k7 = f.apply(newX, u);
 
-      h = 0.9 * h * Math.pow(maxTruncationError / truncationErr, 1 / 5.0);
-    } while (truncationErr > maxTruncationError);
+        truncationError =
+            (k1.times(b1[0] - b2[0])
+                    .plus(k2.times(b1[1] - b2[1]))
+                    .plus(k3.times(b1[2] - b2[2]))
+                    .plus(k4.times(b1[3] - b2[3]))
+                    .plus(k5.times(b1[4] - b2[4]))
+                    .plus(k6.times(b1[5] - b2[5]))
+                    .plus(k7.times(b1[6] - b2[6]))
+                    .times(h))
+                .normF();
 
-    // Return the new x, and the timestep
-    return Pair.of(newX, h);
+        h *= 0.9 * Math.pow(maxError / truncationError, 1.0 / 5.0);
+      } while (truncationError > maxError);
+
+      dtElapsed += h;
+      x = newX;
+    }
+
+    return x;
   }
 }

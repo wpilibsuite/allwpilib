@@ -290,7 +290,7 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
-   * Calculates the transpose, M^T of this matrix.
+   * Calculates the transpose, Mᵀ of this matrix.
    *
    * @return The transpose matrix.
    */
@@ -491,9 +491,27 @@ public class Matrix<R extends Num, C extends Num> {
     return new Matrix<>(
         this.m_storage.extractMatrix(
             startingRow,
-            Objects.requireNonNull(height).getNum() + startingRow,
+            startingRow + Objects.requireNonNull(height).getNum(),
             startingCol,
-            Objects.requireNonNull(width).getNum() + startingCol));
+            startingCol + Objects.requireNonNull(width).getNum()));
+  }
+
+  /**
+   * Extracts a matrix of a given size and start position with new underlying storage.
+   *
+   * @param <R2> Number of rows to extract.
+   * @param <C2> Number of columns to extract.
+   * @param height The number of rows of the extracted matrix.
+   * @param width The number of columns of the extracted matrix.
+   * @param startingRow The starting row of the extracted matrix.
+   * @param startingCol The starting column of the extracted matrix.
+   * @return The extracted matrix.
+   */
+  public final <R2 extends Num, C2 extends Num> Matrix<R2, C2> block(
+      int height, int width, int startingRow, int startingCol) {
+    return new Matrix<R2, C2>(
+        this.m_storage.extractMatrix(
+            startingRow, startingRow + height, startingCol, startingCol + width));
   }
 
   /**

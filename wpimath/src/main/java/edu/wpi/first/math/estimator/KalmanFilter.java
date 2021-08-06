@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
@@ -12,6 +11,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 
 /**
@@ -76,7 +76,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     var C = plant.getC();
 
-    // isStabilizable(A^T, C^T) will tell us if the system is observable.
+    // isStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
     var isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
     if (!isObservable) {
       MathSharedStore.reportError(
@@ -90,20 +90,21 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
         new Matrix<>(
             Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR));
 
+    // S = CPCᵀ + R
     var S = C.times(P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
     //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
     //
     // The solution of Ax = b can be found via x = A.solve(b).
     //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K =
         new Matrix<>(
             S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose());
@@ -194,6 +195,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
   }
 }

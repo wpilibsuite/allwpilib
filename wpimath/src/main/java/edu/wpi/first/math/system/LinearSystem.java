@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.system;
 
-import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;

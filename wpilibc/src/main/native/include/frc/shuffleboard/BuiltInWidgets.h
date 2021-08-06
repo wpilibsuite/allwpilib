@@ -160,8 +160,8 @@ enum class BuiltInWidgets {
    */
   kVoltageView,
   /**
-   * Displays a PowerDistributionPanel. <br>Supported types: <ul> <li>
-   * PowerDistributionPanel</li>
+   * Displays a PowerDistribution. <br>Supported types: <ul> <li>
+   * PowerDistribution</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -170,7 +170,7 @@ enum class BuiltInWidgets {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  kPowerDistributionPanel,
+  kPowerDistribution,
   /**
    * Displays a SendableChooser with a dropdown combo box with a list of
    * options.

@@ -18,9 +18,9 @@ public class Notifier implements AutoCloseable {
   // The C pointer to the notifier object. We don't use it directly, it is
   // just passed to the JNI bindings.
   private final AtomicInteger m_notifier = new AtomicInteger();
-  // The time, in microseconds, at which the corresponding handler should be
-  // called. Has the same zero as Utility.getFPGATime().
-  private double m_expirationTime;
+  // The time, in seconds, at which the corresponding handler should be
+  // called. Has the same zero as RobotController.getFPGATime().
+  private double m_expirationTimeSeconds;
   // The handler passed in by the user which should be called at the
   // appropriate interval.
   private Runnable m_handler;
@@ -28,7 +28,7 @@ public class Notifier implements AutoCloseable {
   private boolean m_periodic;
   // If periodic, the period of the calling; if just once, stores how long it
   // is until we call the handler.
-  private double m_period;
+  private double m_periodSeconds;
 
   @Override
   @SuppressWarnings("NoFinalizer")
@@ -59,19 +59,19 @@ public class Notifier implements AutoCloseable {
   /**
    * Update the alarm hardware to reflect the next alarm.
    *
-   * @param triggerTime the time at which the next alarm will be triggered
+   * @param triggerTimeMicroS the time in microseconds at which the next alarm will be triggered
    */
-  private void updateAlarm(long triggerTime) {
+  private void updateAlarm(long triggerTimeMicroS) {
     int notifier = m_notifier.get();
     if (notifier == 0) {
       return;
     }
-    NotifierJNI.updateNotifierAlarm(notifier, triggerTime);
+    NotifierJNI.updateNotifierAlarm(notifier, triggerTimeMicroS);
   }
 
   /** Update the alarm hardware to reflect the next alarm. */
   private void updateAlarm() {
-    updateAlarm((long) (m_expirationTime * 1e6));
+    updateAlarm((long) (m_expirationTimeSeconds * 1e6));
   }
 
   /**
@@ -104,7 +104,7 @@ public class Notifier implements AutoCloseable {
                 try {
                   handler = m_handler;
                   if (m_periodic) {
-                    m_expirationTime += m_period;
+                    m_expirationTimeSeconds += m_periodSeconds;
                     updateAlarm();
                   } else {
                     // need to update the alarm to cause it to wait again
@@ -165,14 +165,14 @@ public class Notifier implements AutoCloseable {
    * Register for single event notification. A timer event is queued for a single event after the
    * specified delay.
    *
-   * @param delay Seconds to wait before the handler is called.
+   * @param delaySeconds Seconds to wait before the handler is called.
    */
-  public void startSingle(double delay) {
+  public void startSingle(double delaySeconds) {
     m_processLock.lock();
     try {
       m_periodic = false;
-      m_period = delay;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + delay;
+      m_periodSeconds = delaySeconds;
+      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + delaySeconds;
       updateAlarm();
     } finally {
       m_processLock.unlock();
@@ -184,15 +184,15 @@ public class Notifier implements AutoCloseable {
    * notification. Each time the interrupt occurs, the event will be immediately requeued for the
    * same time interval.
    *
-   * @param period Period in seconds to call the handler starting one period after the call to this
-   *     method.
+   * @param periodSeconds Period in seconds to call the handler starting one period after the call
+   *     to this method.
    */
-  public void startPeriodic(double period) {
+  public void startPeriodic(double periodSeconds) {
     m_processLock.lock();
     try {
       m_periodic = true;
-      m_period = period;
-      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
+      m_periodSeconds = periodSeconds;
+      m_expirationTimeSeconds = RobotController.getFPGATime() * 1e-6 + periodSeconds;
       updateAlarm();
     } finally {
       m_processLock.unlock();

@@ -35,7 +35,7 @@ class DifferentialDrivetrainSim {
    * meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    * [x, y, heading, left velocity, right velocity, left distance, right
-   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
    * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
    * position measurement standard deviations of 0.005 meters are a reasonable
    * starting point.
@@ -61,7 +61,7 @@ class DifferentialDrivetrainSim {
    * right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    * [x, y, heading, left velocity, right velocity, left distance, right
-   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
    * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
    * position measurement standard deviations of 0.005 meters are a reasonable
    * starting point.
@@ -242,7 +242,7 @@ class DifferentialDrivetrainSim {
    * @param wheelSize The wheel size.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    * [x, y, heading, left velocity, right velocity, left distance, right
-   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
    * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
    * position measurement standard deviations of 0.005 meters are a reasonable
    * starting point.
@@ -271,7 +271,7 @@ class DifferentialDrivetrainSim {
    * calculated using frc-characterization.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    * [x, y, heading, left velocity, right velocity, left distance, right
-   * distance]^T. Can be omitted if no noise is desired. Gyro standard
+   * distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
    * deviations of 0.0001 radians, velocity standard deviations of 0.05 m/s, and
    * position measurement standard deviations of 0.005 meters are a reasonable
    * starting point.

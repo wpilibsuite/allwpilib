@@ -4,13 +4,13 @@
 
 package edu.wpi.first.math.estimator;
 
-import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
 import java.util.function.BiFunction;
@@ -171,7 +171,9 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     }
 
     // New mean is usually just the sum of the sigmas * weight:
-    // dot = \Sigma^n_1 (W[k]*Xi[k])
+    //       n
+    // dot = Σ W[k] Xᵢ[k]
+    //      k=1
     Matrix<C, N1> x = meanFunc.apply(sigmas, Wm);
 
     // New covariance is the sum of the outer product of the residuals times the
@@ -403,22 +405,24 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // Compute cross covariance of the state and the measurements
     Matrix<States, R> Pxy = new Matrix<>(m_states, rows);
     for (int i = 0; i < m_pts.getNumSigmas(); i++) {
-      // Pxy += (sigmas_f[:, i] - xHat) * (sigmas_h[:, i] - yHat)^T * W_c[i]
+      // Pxy += (sigmas_f[:, i] - x̂)(sigmas_h[:, i] - ŷ)ᵀ W_c[i]
       var dx = residualFuncX.apply(m_sigmasF.extractColumnVector(i), m_xHat);
       var dy = residualFuncY.apply(sigmasH.extractColumnVector(i), yHat).transpose();
 
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // K = P_{xy} Py^-1
-    // K^T = P_y^T^-1 P_{xy}^T
-    // P_y^T K^T = P_{xy}^T
-    // K^T = P_y^T.solve(P_{xy}^T)
-    // K = (P_y^T.solve(P_{xy}^T)^T
+    // K = P_{xy} P_y⁻¹
+    // Kᵀ = P_yᵀ⁻¹ P_{xy}ᵀ
+    // P_yᵀKᵀ = P_{xy}ᵀ
+    // Kᵀ = P_yᵀ.solve(P_{xy}ᵀ)
+    // K = (P_yᵀ.solve(P_{xy}ᵀ)ᵀ
     Matrix<States, R> K = new Matrix<>(Py.transpose().solve(Pxy.transpose()).transpose());
 
-    // xHat + K * (y - yHat)
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));
+
+    // Pₖ₊₁⁺ = Pₖ₊₁⁻ − KP_yKᵀ
     m_P = m_P.minus(K.times(Py).times(K.transpose()));
   }
 }

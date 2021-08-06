@@ -152,7 +152,8 @@ class CvSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
+  [[nodiscard]] uint64_t GrabFrame(cv::Mat& image,
+                                   double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -162,7 +163,7 @@ class CvSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
+  [[nodiscard]] uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 };
 
 inline CvSource::CvSource(std::string_view name, const VideoMode& mode) {

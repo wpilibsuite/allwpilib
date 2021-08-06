@@ -4,7 +4,6 @@
 
 package edu.wpi.first.math.controller;
 
-import edu.wpi.first.math.Discretization;
 import edu.wpi.first.math.Drake;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -12,6 +11,7 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 import org.ejml.simple.SimpleMatrix;
 
@@ -103,8 +103,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 
+    // K = (BᵀSB + R)⁻¹BᵀSA
     var temp = discB.transpose().times(S).times(discB).plus(R);
-
     m_K = temp.solve(discB.transpose().times(S).times(discA));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
@@ -137,8 +137,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
+    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
     var temp = discB.transpose().times(S).times(discB).plus(R);
-
     m_K = temp.solve(discB.transpose().times(S).times(discA).plus(N.transpose()));
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));

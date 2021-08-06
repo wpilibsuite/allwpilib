@@ -64,7 +64,7 @@ class KalmanFilterImpl {
 
     const auto& C = plant.C();
 
-    // IsStabilizable(A^T, C^T) will tell us if the system is observable.
+    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
     bool isObservable =
         IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
     if (!isObservable) {
@@ -78,20 +78,21 @@ class KalmanFilterImpl {
         drake::math::DiscreteAlgebraicRiccatiEquation(
             discA.transpose(), C.transpose(), discQ, discR);
 
+    // S = CPCᵀ + R
     Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
 
-    // We want to put K = PC^T S^-1 into Ax = b form so we can solve it more
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
     //
-    // K = PC^T S^-1
-    // KS = PC^T
-    // (KS)^T = (PC^T)^T
-    // S^T K^T = CP^T
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
     //
     // The solution of Ax = b can be found via x = A.solve(b).
     //
-    // K^T = S^T.solve(CP^T)
-    // K = (S^T.solve(CP^T))^T
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
 
     Reset();
@@ -163,6 +164,7 @@ class KalmanFilterImpl {
    */
   void Correct(const Eigen::Matrix<double, Inputs, 1>& u,
                const Eigen::Matrix<double, Outputs, 1>& y) {
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
   }
 

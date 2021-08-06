@@ -219,7 +219,7 @@ Java_edu_wpi_first_math_WPIMathJNI_fromPathweaverJson
     std::vector<double> elements = GetElementsFromTrajectory(trajectory);
     return MakeJDoubleArray(env, elements);
   } catch (std::exception& e) {
-    jclass cls = env->FindClass("java/lang/IOException");
+    jclass cls = env->FindClass("java/io/IOException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }
@@ -242,7 +242,7 @@ Java_edu_wpi_first_math_WPIMathJNI_toPathweaverJson
     frc::TrajectoryUtil::ToPathweaverJson(trajectory,
                                           JStringRef{env, path}.c_str());
   } catch (std::exception& e) {
-    jclass cls = env->FindClass("java/lang/IOException");
+    jclass cls = env->FindClass("java/io/IOException");
     if (cls) {
       env->ThrowNew(cls, e.what());
     }

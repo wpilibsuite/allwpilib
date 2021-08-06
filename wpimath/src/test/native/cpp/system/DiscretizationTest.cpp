@@ -10,6 +10,7 @@
 #include "Eigen/Eigenvalues"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/system/RungeKuttaTimeVarying.h"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -26,8 +27,8 @@ TEST(DiscretizationTest, DiscretizeA) {
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
   Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(1) = x0(1);
-  x1Truth(0) = x0(0) + 1.0 * x0(1);
+  x1Truth(0) = 1.0 * x0(0) + 1.0 * x0(1);
+  x1Truth(1) = 0.0 * x0(0) + 1.0 * x0(1);
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -53,14 +54,15 @@ TEST(DiscretizationTest, DiscretizeAB) {
 
   // We now have pos = vel = accel = 1, which should give us:
   Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(1) = x0(1) + 1.0 * u(0);
-  x1Truth(0) = x0(0) + 1.0 * x0(1) + 0.5 * u(0);
+  x1Truth(0) = 1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0);
+  x1Truth(1) = 0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0);
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
 
-// Test that the discrete approximation of Q is roughly equal to
-// integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+//                                             dt
+// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                             0
 TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, 0;
@@ -79,7 +81,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
             (contA * t.to<double>()).exp() * contQ *
             (contA.transpose() * t.to<double>()).exp());
       },
-      Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
+      0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discQ;
@@ -91,8 +93,9 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
       << discQIntegrated;
 }
 
-// Test that the discrete approximation of Q is roughly equal to
-// integral from 0 to dt of e^(A tau) Q e^(A.T tau) dtau
+//                                             dt
+// Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
+//                                             0
 TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, -1406.29;
@@ -100,7 +103,7 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   Eigen::Matrix<double, 2, 2> contQ;
   contQ << 0.0025, 0, 0, 1;
 
-  constexpr auto dt = 5.05_ms;
+  constexpr auto dt = 5_ms;
 
   Eigen::Matrix<double, 2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
       std::function<Eigen::Matrix<double, 2, 2>(
@@ -111,7 +114,7 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
             (contA * t.to<double>()).exp() * contQ *
             (contA.transpose() * t.to<double>()).exp());
       },
-      Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
+      0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discQ;
@@ -128,9 +131,6 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, 0;
 
-  Eigen::Matrix<double, 2, 1> contB;
-  contB << 0, 1;
-
   Eigen::Matrix<double, 2, 2> contQ;
   contQ << 1, 0, 0, 1;
 
@@ -139,12 +139,11 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   Eigen::Matrix<double, 2, 2> discQTaylor;
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discATaylor;
-  Eigen::Matrix<double, 2, 1> discB;
 
   // Continuous Q should be positive semidefinite
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont(contQ);
-  for (int i = 0; i < contQ.rows(); i++) {
-    EXPECT_GT(esCont.eigenvalues()[i], 0);
+  for (int i = 0; i < contQ.rows(); ++i) {
+    EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
 
   Eigen::Matrix<double, 2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
@@ -156,9 +155,9 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
             (contA * t.to<double>()).exp() * contQ *
             (contA.transpose() * t.to<double>()).exp());
       },
-      Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
+      0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
-  frc::DiscretizeAB<2, 1>(contA, contB, dt, &discA, &discB);
+  frc::DiscretizeA<2>(contA, dt, &discA);
   frc::DiscretizeAQTaylor<2>(contA, contQ, dt, &discATaylor, &discQTaylor);
 
   EXPECT_LT((discQIntegrated - discQTaylor).norm(), 1e-10)
@@ -169,8 +168,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
 
   // Discrete Q should be positive semidefinite
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc(discQTaylor);
-  for (int i = 0; i < discQTaylor.rows(); i++) {
-    EXPECT_GT(esDisc.eigenvalues()[i], 0);
+  for (int i = 0; i < discQTaylor.rows(); ++i) {
+    EXPECT_GE(esDisc.eigenvalues()[i], 0);
   }
 }
 
@@ -179,23 +178,19 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
   Eigen::Matrix<double, 2, 2> contA;
   contA << 0, 1, 0, -1500;
 
-  Eigen::Matrix<double, 2, 1> contB;
-  contB << 0, 1;
-
   Eigen::Matrix<double, 2, 2> contQ;
   contQ << 0.0025, 0, 0, 1;
 
-  constexpr auto dt = 5.05_ms;
+  constexpr auto dt = 5_ms;
 
   Eigen::Matrix<double, 2, 2> discQTaylor;
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 2> discATaylor;
-  Eigen::Matrix<double, 2, 1> discB;
 
   // Continuous Q should be positive semidefinite
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont(contQ);
-  for (int i = 0; i < contQ.rows(); i++) {
-    EXPECT_GT(esCont.eigenvalues()[i], 0);
+  for (int i = 0; i < contQ.rows(); ++i) {
+    EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
 
   Eigen::Matrix<double, 2, 2> discQIntegrated = frc::RungeKuttaTimeVarying<
@@ -207,9 +202,9 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
             (contA * t.to<double>()).exp() * contQ *
             (contA.transpose() * t.to<double>()).exp());
       },
-      Eigen::Matrix<double, 2, 2>::Zero(), 0_s, dt);
+      0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
-  frc::DiscretizeAB<2, 1>(contA, contB, dt, &discA, &discB);
+  frc::DiscretizeA<2>(contA, dt, &discA);
   frc::DiscretizeAQTaylor<2>(contA, contQ, dt, &discATaylor, &discQTaylor);
 
   EXPECT_LT((discQIntegrated - discQTaylor).norm(), 1e-3)
@@ -220,8 +215,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
 
   // Discrete Q should be positive semidefinite
   Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc(discQTaylor);
-  for (int i = 0; i < discQTaylor.rows(); i++) {
-    EXPECT_GT(esDisc.eigenvalues()[i], 0);
+  for (int i = 0; i < discQTaylor.rows(); ++i) {
+    EXPECT_GE(esDisc.eigenvalues()[i], 0);
   }
 }
 

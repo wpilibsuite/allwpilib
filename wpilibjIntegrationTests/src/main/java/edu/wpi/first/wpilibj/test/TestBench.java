@@ -41,7 +41,7 @@ public final class TestBench {
   public static final int kTiltServoChannel = 9;
   public static final int kPanServoChannel = 8;
 
-  /* PowerDistributionPanel channels */
+  /* PowerDistribution channels */
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
   public static final int kTalonPDPChannel = 10;

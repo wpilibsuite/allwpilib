@@ -36,13 +36,13 @@ namespace frc {
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, theta]]^T </strong> in the
+ * <strong> x = [[x, y, theta]]ᵀ </strong> in the
  * field-coordinate system.
  *
- * <strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
+ * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
  *
- * <strong> y = [[x, y, theta]]^T </strong> in field coords from vision,
- * or <strong> y = [[theta]]^T </strong> from the gyro.
+ * <strong> y = [[x, y, theta]]ᵀ </strong> in field coords from vision,
+ * or <strong> y = [[theta]]ᵀ </strong> from the gyro.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
@@ -57,7 +57,7 @@ class SwerveDrivePoseEstimator {
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]^T, with units
+   *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
    *                                 measurements. Increase these numbers to
@@ -68,7 +68,7 @@ class SwerveDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
@@ -155,7 +155,7 @@ class SwerveDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
@@ -217,7 +217,7 @@ class SwerveDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void AddVisionMeasurement(

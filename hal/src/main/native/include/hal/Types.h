@@ -62,6 +62,8 @@ typedef HAL_Handle HAL_AddressableLEDHandle;
 
 typedef HAL_CANHandle HAL_PDPHandle;
 
+typedef HAL_Handle HAL_PowerDistributionHandle;
+
 typedef HAL_Handle HAL_CTREPCMHandle;
 
 typedef int32_t HAL_Bool;
