@@ -7,7 +7,6 @@
 
 using namespace hal;
 
-
 namespace hal::init {
 void InitializePowerDistributionData() {
   static PowerDistributionData spd[kNumPDSimModules];
@@ -40,7 +39,8 @@ DEFINE_CAPI(double, Voltage, voltage)
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent,
                                      SimPowerDistributionData, current)
 
-void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents, int length) {
+void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents,
+                                            int length) {
   auto& data = SimPowerDistributionData[index].current;
   int toCopy = (std::min)(length, kNumPDSimChannels);
   for (int i = 0; i < toCopy; i++) {

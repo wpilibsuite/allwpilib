@@ -41,7 +41,8 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
   }
 }
 
-int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle, int32_t* status) {
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
+                                             int32_t* status) {
   if (IsCtre(handle)) {
     return HAL_GetPDPModuleNumber(handle, status);
   } else {

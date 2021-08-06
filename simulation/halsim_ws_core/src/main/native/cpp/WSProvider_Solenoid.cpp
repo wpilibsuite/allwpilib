@@ -22,7 +22,7 @@ void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
   for (int32_t CTREPCMIndex = 0; CTREPCMIndex < HAL_GetNumCTREPCMModules();
        ++CTREPCMIndex) {
     for (int32_t solenoidIndex = 0;
-         solenoidIndex < HAL_GetNumSolenoidChannels(); ++solenoidIndex) {
+         solenoidIndex < HAL_GetNumCTRESolenoidChannels(); ++solenoidIndex) {
       auto key = fmt::format("Solenoid/{},{}", CTREPCMIndex, solenoidIndex);
       auto ptr = std::make_unique<HALSimWSProviderSolenoid>(
           CTREPCMIndex, solenoidIndex, key, "Solenoid");
