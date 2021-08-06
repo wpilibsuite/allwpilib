@@ -11,5 +11,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PmakeSim -Dorg.gradle.jvmargs=-Xmx2g
+      - name: Build Gazebo plugins
+        run: ./gradlew simulation:frc_gazebo_plugins:build -PbuildServer -PmakeSim
+      - name: Build Gazebo HALSIM plugin
+        run: ./gradlew simulation:halsim_gazebo:build -PbuildServer -PmakeSim
