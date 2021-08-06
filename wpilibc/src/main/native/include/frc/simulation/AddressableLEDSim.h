@@ -160,7 +160,7 @@ class AddressableLEDSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterDataCallback(
-      NotifyCallback callback, bool initialNotify);
+      ConstBufferCallback callback, bool initialNotify);
 
   /**
    * Get the LED data.

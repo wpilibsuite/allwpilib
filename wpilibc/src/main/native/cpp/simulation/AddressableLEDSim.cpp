@@ -99,7 +99,7 @@ void AddressableLEDSim::SetRunning(bool running) {
 }
 
 std::unique_ptr<CallbackStore> AddressableLEDSim::RegisterDataCallback(
-    NotifyCallback callback, bool initialNotify) {
+    ConstBufferCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
       m_index, -1, callback, &HALSIM_CancelAddressableLEDDataCallback);
   store->SetUid(HALSIM_RegisterAddressableLEDDataCallback(

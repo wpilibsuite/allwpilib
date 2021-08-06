@@ -67,7 +67,7 @@ class PneumaticsControlModule
  private:
   int m_module;
   hal::Handle<HAL_CTREPCMHandle> m_handle;
-  uint32_t m_reservedMask;
+  uint32_t m_reservedMask{0};
   wpi::mutex m_reservedLock;
 };
 }  // namespace frc
