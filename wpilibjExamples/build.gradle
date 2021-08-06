@@ -53,7 +53,7 @@ jacocoTestReport {
     }
 }
 
-if (!project.hasProperty('skipPMD')) {
+if (!project.hasProperty('skipJavaFormat')) {
     apply plugin: 'pmd'
 
     pmd {
