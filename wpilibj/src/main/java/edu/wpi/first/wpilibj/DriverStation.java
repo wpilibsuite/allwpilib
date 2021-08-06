@@ -1042,12 +1042,12 @@ public class DriverStation {
    * <p>Checks if new control data has arrived since the last waitForData call on the current
    * thread. If new data has not arrived, returns immediately.
    *
-   * @param timeout The maximum time in seconds to wait.
+   * @param timeoutSeconds The maximum time in seconds to wait.
    * @return true if there is new data, otherwise false
    */
-  public static boolean waitForData(double timeout) {
-    long startTime = RobotController.getFPGATime();
-    long timeoutMicros = (long) (timeout * 1000000);
+  public static boolean waitForData(double timeoutSeconds) {
+    long startTimeMicroS = RobotController.getFPGATime();
+    long timeoutMicroS = (long) (timeoutSeconds * 1e6);
     m_waitForDataMutex.lock();
     try {
       int currentCount = m_waitForDataCount;
@@ -1056,12 +1056,13 @@ public class DriverStation {
         return true;
       }
       while (m_waitForDataCount == currentCount) {
-        if (timeout > 0) {
-          long now = RobotController.getFPGATime();
-          if (now < startTime + timeoutMicros) {
+        if (timeoutMicroS > 0) {
+          long nowMicroS = RobotController.getFPGATime();
+          if (nowMicroS < startTimeMicroS + timeoutMicroS) {
             // We still have time to wait
             boolean signaled =
-                m_waitForDataCond.await(startTime + timeoutMicros - now, TimeUnit.MICROSECONDS);
+                m_waitForDataCond.await(
+                    startTimeMicroS + timeoutMicroS - nowMicroS, TimeUnit.MICROSECONDS);
             if (!signaled) {
               // Return false if a timeout happened
               return false;
