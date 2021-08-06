@@ -66,7 +66,7 @@ TEST(PowerDistributionSimTest, SetCurrent) {
   PowerDistribution pdp{2};
   PowerDistributionSim sim(pdp);
 
-  for (int channel = 0; channel < HAL_GetNumPDPChannels(); ++channel) {
+  for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
     DoubleCallback callback;
     auto cb =
         sim.RegisterCurrentCallback(channel, callback.GetCallback(), false);
