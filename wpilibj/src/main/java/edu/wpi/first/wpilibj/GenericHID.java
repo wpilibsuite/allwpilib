@@ -8,8 +8,14 @@ import edu.wpi.first.hal.HAL;
 import java.util.HashMap;
 import java.util.Map;
 
-/** GenericHID Interface. */
-public abstract class GenericHID {
+/**
+ * Handle input from standard HID devices connected to the Driver Station.
+ *
+ * <p>This class handles standard input that comes from the Driver Station. Each time a value is
+ * requested the most recent value is returned. There is a single class instance for each device and
+ * the mapping of ports to hardware buttons depends on the code in the Driver Station.
+ */
+public class GenericHID {
   /** Represents a rumble output on the JoyStick. */
   public enum RumbleType {
     kLeftRumble,
@@ -55,60 +61,19 @@ public abstract class GenericHID {
     }
   }
 
-  /** Which hand the Human Interface Device is associated with. */
-  public enum Hand {
-    kLeft(0),
-    kRight(1);
-
-    public final int value;
-
-    Hand(int value) {
-      this.value = value;
-    }
-  }
-
   private final int m_port;
   private int m_outputs;
   private short m_leftRumble;
   private short m_rightRumble;
 
+  /**
+   * Construct an instance of a device.
+   *
+   * @param port The port index on the Driver Station that the device is plugged into.
+   */
   public GenericHID(int port) {
     m_port = port;
   }
-
-  /**
-   * Get the x position of the HID.
-   *
-   * @return the x position of the HID
-   */
-  public final double getX() {
-    return getX(Hand.kRight);
-  }
-
-  /**
-   * Get the x position of HID.
-   *
-   * @param hand which hand, left or right
-   * @return the x position
-   */
-  public abstract double getX(Hand hand);
-
-  /**
-   * Get the y position of the HID.
-   *
-   * @return the y position
-   */
-  public final double getY() {
-    return getY(Hand.kRight);
-  }
-
-  /**
-   * Get the y position of the HID.
-   *
-   * @param hand which hand, left or right
-   * @return the y position
-   */
-  public abstract double getY(Hand hand);
 
   /**
    * Get the button value (starting at button 1).
@@ -170,13 +135,21 @@ public abstract class GenericHID {
    * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
    * upper-left is 315).
    *
-   * @param pov The index of the POV to read (starting at 0)
+   * @param pov The index of the POV to read (starting at 0). Defaults to 0.
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
   public int getPOV(int pov) {
     return DriverStation.getStickPOV(m_port, pov);
   }
 
+  /**
+   * Get the angle in degrees of the default POV (index 0) on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * upper-left is 315).
+   *
+   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   */
   public int getPOV() {
     return getPOV(0);
   }

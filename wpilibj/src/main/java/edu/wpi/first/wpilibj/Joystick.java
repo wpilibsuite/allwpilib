@@ -8,7 +8,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 
 /**
- * Handle input from standard Joysticks connected to the Driver Station.
+ * Handle input from Flight Joysticks connected to the Driver Station.
  *
  * <p>This class handles standard input that comes from the Driver Station. Each time a value is
  * requested the most recent value is returned. There is a single class instance for each joystick
@@ -79,9 +79,9 @@ public class Joystick extends GenericHID {
   private final byte[] m_axes = new byte[Axis.kNumAxes.value];
 
   /**
-   * Construct an instance of a joystick. The joystick index is the USB port on the drivers station.
+   * Construct an instance of a joystick.
    *
-   * @param port The port on the Driver Station that the joystick is plugged into.
+   * @param port The port index on the Driver Station that the joystick is plugged into.
    */
   public Joystick(final int port) {
     super(port);
@@ -189,11 +189,9 @@ public class Joystick extends GenericHID {
    * Get the X value of the joystick. This depends on the mapping of the joystick connected to the
    * current port.
    *
-   * @param hand Unused
    * @return The X value of the joystick.
    */
-  @Override
-  public final double getX(Hand hand) {
+  public final double getX() {
     return getRawAxis(m_axes[Axis.kX.value]);
   }
 
@@ -201,11 +199,9 @@ public class Joystick extends GenericHID {
    * Get the Y value of the joystick. This depends on the mapping of the joystick connected to the
    * current port.
    *
-   * @param hand Unused
    * @return The Y value of the joystick.
    */
-  @Override
-  public final double getY(Hand hand) {
+  public final double getY() {
     return getRawAxis(m_axes[Axis.kY.value]);
   }
 

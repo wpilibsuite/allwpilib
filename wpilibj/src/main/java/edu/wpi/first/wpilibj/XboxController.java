@@ -17,10 +17,10 @@ import edu.wpi.first.hal.HAL;
 public class XboxController extends GenericHID {
   /** Represents a digital button on an XboxController. */
   public enum Button {
-    kBumperLeft(5),
-    kBumperRight(6),
-    kStickLeft(9),
-    kStickRight(10),
+    kLeftBumper(5),
+    kRightBumper(6),
+    kLeftStick(9),
+    kRightStick(10),
     kA(1),
     kB(2),
     kX(3),
@@ -54,9 +54,9 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Construct an instance of a joystick. The joystick index is the USB port on the drivers station.
+   * Construct an instance of a controller.
    *
-   * @param port The port on the Driver Station that the joystick is plugged into.
+   * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public XboxController(final int port) {
     super(port);
@@ -65,131 +65,167 @@ public class XboxController extends GenericHID {
   }
 
   /**
-   * Get the X axis value of the controller.
+   * Get the X axis value of left side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return The X axis value of the controller.
+   * @return The axis value.
    */
-  @Override
-  public double getX(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawAxis(Axis.kLeftX.value);
-    } else {
-      return getRawAxis(Axis.kRightX.value);
-    }
+  public double getLeftX() {
+    return getRawAxis(Axis.kLeftX.value);
   }
 
   /**
-   * Get the Y axis value of the controller.
+   * Get the X axis value of right side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return The Y axis value of the controller.
+   * @return The axis value.
    */
-  @Override
-  public double getY(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawAxis(Axis.kLeftY.value);
-    } else {
-      return getRawAxis(Axis.kRightY.value);
-    }
+  public double getRightX() {
+    return getRawAxis(Axis.kRightX.value);
   }
 
   /**
-   * Get the trigger axis value of the controller.
+   * Get the Y axis value of left side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return The trigger axis value of the controller.
+   * @return The axis value.
    */
-  public double getTriggerAxis(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawAxis(Axis.kLeftTrigger.value);
-    } else {
-      return getRawAxis(Axis.kRightTrigger.value);
-    }
+  public double getLeftY() {
+    return getRawAxis(Axis.kLeftY.value);
   }
 
   /**
-   * Read the value of the bumper button on the controller.
+   * Get the Y axis value of right side of the controller.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return The axis value.
+   */
+  public double getRightY() {
+    return getRawAxis(Axis.kRightY.value);
+  }
+
+  /**
+   * Get the left trigger (LT) axis value of the controller. Note that this axis is bound to the
+   * range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return The axis value.
+   */
+  public double getLeftTriggerAxis() {
+    return getRawAxis(Axis.kLeftTrigger.value);
+  }
+
+  /**
+   * Get the right trigger (RT) axis value of the controller. Note that this axis is bound to the
+   * range of [0, 1] as opposed to the usual [-1, 1].
+   *
+   * @return The axis value.
+   */
+  public double getRightTriggerAxis() {
+    return getRawAxis(Axis.kRightTrigger.value);
+  }
+
+  /**
+   * Read the value of the left bumper (LB) button on the controller.
+   *
    * @return The state of the button.
    */
-  public boolean getBumper(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawButton(Button.kBumperLeft.value);
-    } else {
-      return getRawButton(Button.kBumperRight.value);
-    }
+  public boolean getLeftBumper() {
+    return getRawButton(Button.kLeftBumper.value);
   }
 
   /**
-   * Whether the bumper was pressed since the last check.
+   * Read the value of the right bumper (RB) button on the controller.
    *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
-   */
-  public boolean getBumperPressed(Hand hand) {
-    if (hand == Hand.kLeft) {
-      return getRawButtonPressed(Button.kBumperLeft.value);
-    } else {
-      return getRawButtonPressed(Button.kBumperRight.value);
-    }
-  }
-
-  /**
-   * Whether the bumper was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was released since the last check.
-   */
-  public boolean getBumperReleased(Hand hand) {
-    if (hand == Hand.kLeft) {
-      return getRawButtonReleased(Button.kBumperLeft.value);
-    } else {
-      return getRawButtonReleased(Button.kBumperRight.value);
-    }
-  }
-
-  /**
-   * Read the value of the stick button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
-  public boolean getStickButton(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawButton(Button.kStickLeft.value);
-    } else {
-      return getRawButton(Button.kStickRight.value);
-    }
+  public boolean getRightBumper() {
+    return getRawButton(Button.kRightBumper.value);
   }
 
   /**
-   * Whether the stick button was pressed since the last check.
+   * Whether the left bumper (LB) was pressed since the last check.
    *
-   * @param hand Side of controller whose value should be returned.
    * @return Whether the button was pressed since the last check.
    */
-  public boolean getStickButtonPressed(Hand hand) {
-    if (hand == Hand.kLeft) {
-      return getRawButtonPressed(Button.kStickLeft.value);
-    } else {
-      return getRawButtonPressed(Button.kStickRight.value);
-    }
+  public boolean getLeftBumperPressed() {
+    return getRawButtonPressed(Button.kLeftBumper.value);
   }
 
   /**
-   * Whether the stick button was released since the last check.
+   * Whether the right bumper (RB) was pressed since the last check.
    *
-   * @param hand Side of controller whose value should be returned.
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getRightBumperPressed() {
+    return getRawButtonPressed(Button.kRightBumper.value);
+  }
+
+  /**
+   * Whether the left bumper (LB) was released since the last check.
+   *
    * @return Whether the button was released since the last check.
    */
-  public boolean getStickButtonReleased(Hand hand) {
-    if (hand == Hand.kLeft) {
-      return getRawButtonReleased(Button.kStickLeft.value);
-    } else {
-      return getRawButtonReleased(Button.kStickRight.value);
-    }
+  public boolean getLeftBumperReleased() {
+    return getRawButtonReleased(Button.kLeftBumper.value);
+  }
+
+  /**
+   * Whether the right bumper (RB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getRightBumperReleased() {
+    return getRawButtonReleased(Button.kRightBumper.value);
+  }
+
+  /**
+   * Read the value of the left stick button (LSB) on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getLeftStickButton() {
+    return getRawButton(Button.kLeftStick.value);
+  }
+
+  /**
+   * Read the value of the right stick button (RSB) on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getRightStickButton() {
+    return getRawButton(Button.kRightStick.value);
+  }
+
+  /**
+   * Whether the left stick button (LSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getLeftStickButtonPressed() {
+    return getRawButtonPressed(Button.kLeftStick.value);
+  }
+
+  /**
+   * Whether the right stick button (RSB) was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getRightStickButtonPressed() {
+    return getRawButtonPressed(Button.kRightStick.value);
+  }
+
+  /**
+   * Whether the left stick button (LSB) was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getLeftStickButtonReleased() {
+    return getRawButtonReleased(Button.kLeftStick.value);
+  }
+
+  /**
+   * Whether the right stick (RSB) button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getRightStickButtonReleased() {
+    return getRawButtonReleased(Button.kRightStick.value);
   }
 
   /**
