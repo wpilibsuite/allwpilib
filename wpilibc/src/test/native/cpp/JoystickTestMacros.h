@@ -4,13 +4,13 @@
 
 #pragma once
 
-#define AXIS_TEST(JoystickType, AxisName)                    \
-  TEST(JoystickType##Test, Get##AxisName) {                  \
-    JoystickType joy{2};                                     \
-    sim::JoystickType##Sim joysim{joy};                      \
-    joysim.Set##AxisName(0.35);                              \
-    joysim.NotifyNewData();                                  \
-    ASSERT_NEAR(joy.Get##AxisName(), 0.35, 0.001);           \
+#define AXIS_TEST(JoystickType, AxisName)          \
+  TEST(JoystickType##Test, Get##AxisName) {        \
+    JoystickType joy{2};                           \
+    sim::JoystickType##Sim joysim{joy};            \
+    joysim.Set##AxisName(0.35);                    \
+    joysim.NotifyNewData();                        \
+    ASSERT_NEAR(joy.Get##AxisName(), 0.35, 0.001); \
   }
 
 #define BUTTON_TEST(JoystickType, ButtonName)              \
