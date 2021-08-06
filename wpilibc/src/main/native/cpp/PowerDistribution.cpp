@@ -15,17 +15,19 @@
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution() : PowerDistribution(0) {}
+PowerDistribution::PowerDistribution() : PowerDistribution(-1) {}
 
-PowerDistribution::PowerDistribution(int module) : m_module(module) {
+PowerDistribution::PowerDistribution(int module) {
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
       module, HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
       &status);
   FRC_CheckErrorStatus(status, "Module {}", module);
+  m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", module);
 
-  HAL_Report(HALUsageReporting::kResourceType_PDP, module + 1);
-  wpi::SendableRegistry::AddLW(this, "PowerDistribution", module);
+  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
+  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
 double PowerDistribution::GetVoltage() const {
@@ -97,7 +99,10 @@ int PowerDistribution::GetModule() const {
 
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
-  for (int i = 0; i < SensorUtil::kPDPChannels; ++i) {
+  int32_t status = 0;
+  int numChannels = HAL_GetPowerDistributionNumChannels(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
         fmt::format("Chan{}", i), [=] { return GetCurrent(i); }, nullptr);
   }

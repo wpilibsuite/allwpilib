@@ -5,6 +5,7 @@
 #include "hal/PowerDistribution.h"
 
 #include "CTREPDP.h"
+#include "REVPDH.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/Errors.h"
@@ -18,15 +19,15 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
     type = HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
+    moduleNumber = 0;
   }
 
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
     return static_cast<HAL_PowerDistributionHandle>(
         HAL_InitializePDP(moduleNumber, nullptr, status));  // TODO
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
-    return HAL_kInvalidHandle;
+    return static_cast<HAL_PowerDistributionHandle>(
+        HAL_REV_InitializePDH(moduleNumber, nullptr, status));
   }
 }
 
@@ -36,7 +37,15 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
   if (IsCtre(handle)) {
     HAL_CleanPDP(handle);
   } else {
-    // TODO
+    HAL_REV_FreePDH(handle);
+  }
+}
+
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle, int32_t* status) {
+  if (IsCtre(handle)) {
+    return HAL_GetPDPModuleNumber(handle, status);
+  } else {
+    return HAL_REV_GetPDHModuleNumber(handle, status);
   }
 }
 
@@ -45,8 +54,7 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_CheckPDPChannel(channel);
   } else {
-    return false;
-    // TODO
+    return HAL_REV_CheckPDHChannelNumber(channel);
   }
 }
 
@@ -55,8 +63,7 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
     return HAL_CheckPDPModule(module);
   } else {
-    return false;
-    // TODO
+    return HAL_REV_CheckPDHModuleNumber(module);
   }
 }
 
@@ -67,14 +74,22 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(
              : HAL_PowerDistributionType::HAL_PowerDistributionType_kRev;
 }
 
+int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
+                                            int32_t* status) {
+  if (IsCtre(handle)) {
+    return kNumCTREPDPChannels;
+  } else {
+    return kNumREVPDHChannels;
+  }
+}
+
 double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
                                            int32_t* status) {
   if (IsCtre(handle)) {
     return HAL_GetPDPTemperature(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
-    return false;
+    // Not supported
+    return 0;
   }
 }
 
@@ -83,9 +98,7 @@ double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPVoltage(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
-    return false;
+    return HAL_REV_GetPDHSupplyVoltage(handle, status);
   }
 }
 
@@ -94,9 +107,7 @@ double HAL_GetPowerDistributionChannelCurrent(
   if (IsCtre(handle)) {
     return HAL_GetPDPChannelCurrent(handle, channel, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
-    return 0;
+    return HAL_REV_GetPDHChannelCurrent(handle, channel, status);
   }
 }
 
@@ -104,15 +115,19 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
-    if (currentsLength < kNumPDPChannels) {
+    if (currentsLength < kNumCTREPDPChannels) {
       *status = PARAMETER_OUT_OF_RANGE;
       SetLastError(status, "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
+    if (currentsLength < kNumREVPDHChannels) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      SetLastError(status, "Output array not large enough");
+      return;
+    }
+    return HAL_REV_GetPDHAllChannelCurrents(handle, currents, status);
   }
 }
 
@@ -121,9 +136,7 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPTotalCurrent(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
-    return 0;
+    return HAL_REV_GetPDHTotalCurrent(handle, status);
   }
 }
 
@@ -132,8 +145,7 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPTotalPower(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
+    // Not currently supported
     return 0;
   }
 }
@@ -143,8 +155,7 @@ double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPTotalEnergy(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
+    // Not currently supported
     return 0;
   }
 }
@@ -154,8 +165,7 @@ void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     HAL_ResetPDPTotalEnergy(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
+    // Not supported
   }
 }
 
@@ -164,8 +174,28 @@ void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     HAL_ClearPDPStickyFaults(handle, status);
   } else {
-    *status = PARAMETER_OUT_OF_RANGE;
-    SetLastError(status, "Rev Power not currently supported");
+    HAL_REV_ClearPDHFaults(handle, status);
   }
 }
+
+void HAL_SetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, HAL_Bool enabled, int32_t* status) {
+  if (IsCtre(handle)) {
+    // No-op on CTRE
+    return;
+  } else {
+    HAL_REV_SetPDHSwitchableChannel(handle, enabled, status);
+  }
+}
+
+HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, int32_t* status) {
+  if (IsCtre(handle)) {
+    // No-op on CTRE
+    return false;
+  } else {
+    return HAL_REV_GetPDHSwitchableChannelState(handle, status);
+  }
+}
+
 }  // extern "C"

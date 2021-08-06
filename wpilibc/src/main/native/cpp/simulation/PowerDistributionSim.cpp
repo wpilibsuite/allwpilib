@@ -92,12 +92,12 @@ void PowerDistributionSim::SetCurrent(int channel, double current) {
   HALSIM_SetPowerDistributionCurrent(m_index, channel, current);
 }
 
-void PowerDistributionSim::GetAllCurrents(double* currents) const {
-  HALSIM_GetPowerDistributionAllCurrents(m_index, currents);
+void PowerDistributionSim::GetAllCurrents(double* currents, int length) const {
+  HALSIM_GetPowerDistributionAllCurrents(m_index, currents, length);
 }
 
-void PowerDistributionSim::SetAllCurrents(const double* currents) {
-  HALSIM_SetPowerDistributionAllCurrents(m_index, currents);
+void PowerDistributionSim::SetAllCurrents(const double* currents, int length) {
+  HALSIM_SetPowerDistributionAllCurrents(m_index, currents, length);
 }
 
 void PowerDistributionSim::ResetData() {

@@ -25,25 +25,34 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param module The CAN ID of the PDP
    */
   public PowerDistribution(int module) {
-    m_handle = PowerDistributionJNI.initialize(module, 0);
-    m_module = module;
+    m_handle = PowerDistributionJNI.initialize(module, PowerDistributionJNI.AUTOMATIC_TYPE);
+    m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
-    HAL.report(tResourceType.kResourceType_PDP, module + 1);
-    SendableRegistry.addLW(this, "PowerDistribution", module);
+    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
+    SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
 
   /**
    * Constructs a PowerDistribution.
    *
-   * <p>Uses the default CAN ID (0).
+   * <p>Uses the default CAN ID.
    */
   public PowerDistribution() {
-    this(0);
+    this(-1);
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+  }
+
+  /**
+   * Gets the number of channel for this power distribution.
+   *
+   * @return Number of output channels.
+   */
+  public int getNumChannels() {
+    return PowerDistributionJNI.getNumChannels(m_handle);
   }
 
   /**
@@ -125,7 +134,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
-    for (int i = 0; i < SensorUtil.kPDPChannels; ++i) {
+    int numChannels = getNumChannels();
+    for (int i = 0; i < numChannels; ++i) {
       final int chan = i;
       builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);
     }

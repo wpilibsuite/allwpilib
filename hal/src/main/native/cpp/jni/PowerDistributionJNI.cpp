@@ -9,6 +9,10 @@
 
 using namespace hal;
 
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic, "Values must match");
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE, "Values must match");
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE == HAL_PowerDistributionType::HAL_PowerDistributionType_kRev, "Values must match");
+
 extern "C" {
 
 /*
@@ -25,6 +29,29 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
       module, static_cast<HAL_PowerDistributionType>(type), &status);
   CheckStatusForceThrow(env, status);
   return static_cast<jint>(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    free
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_free
+  (JNIEnv *, jclass, jint handle) {
+  HAL_CleanPowerDistribution(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getModuleNumber
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_PowerDistributionJNI_getModuleNumber
+  (JNIEnv* env, jclass, jint handle) {
+  int32_t status = 0;
+  auto result = HAL_GetPowerDistributionModuleNumber(handle, &status);
+  CheckStatus(env, status);
+  return result;
 }
 
 /*
@@ -63,6 +90,21 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getType
 {
   int32_t status = 0;
   auto result = HAL_GetPowerDistributionType(handle, &status);
+  CheckStatus(env, status);
+  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getNumChannels
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getNumChannels
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto result = HAL_GetPowerDistributionNumChannels(handle, &status);
   CheckStatus(env, status);
   return result;
 }
