@@ -45,7 +45,7 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_free
-  (JNIEnv *, jclass, jint handle)
+  (JNIEnv*, jclass, jint handle)
 {
   HAL_CleanPowerDistribution(handle);
 }

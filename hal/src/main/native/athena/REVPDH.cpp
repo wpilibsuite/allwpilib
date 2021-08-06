@@ -14,9 +14,9 @@
 
 #include <fmt/format.h>
 
-#include "PortsInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "PortsInternal.h"
 #include "rev/PDHFrames.h"
 
 using namespace hal;
