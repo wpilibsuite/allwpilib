@@ -17,6 +17,11 @@ public class DSControlWord {
    * <p>Upon construction, the current Driver Station control word is read and stored internally.
    */
   public DSControlWord() {
+    update();
+  }
+
+  /** Update internal Driver Station control word. */
+  public void update() {
     HAL.getControlWord(m_controlWord);
   }
 
