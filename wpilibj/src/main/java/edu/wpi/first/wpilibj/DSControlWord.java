@@ -69,7 +69,9 @@ public class DSControlWord {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_controlWord.getAutonomous() && m_controlWord.getEnabled();
+    return m_controlWord.getAutonomous()
+        && m_controlWord.getEnabled()
+        && m_controlWord.getDSAttached();
   }
 
   /**
@@ -89,7 +91,10 @@ public class DSControlWord {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public boolean isTeleopEnabled() {
-    return !m_controlWord.getAutonomous() && !m_controlWord.getTest() && m_controlWord.getEnabled();
+    return !m_controlWord.getAutonomous()
+        && !m_controlWord.getTest()
+        && m_controlWord.getEnabled()
+        && m_controlWord.getDSAttached();
   }
 
   /**

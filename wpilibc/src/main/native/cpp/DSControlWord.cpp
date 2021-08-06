@@ -29,7 +29,8 @@ bool DSControlWord::IsAutonomous() const {
 }
 
 bool DSControlWord::IsAutonomousEnabled() const {
-  return m_controlWord.autonomous && m_controlWord.enabled;
+  return m_controlWord.autonomous && m_controlWord.enabled &&
+         m_controlWord.dsAttached;
 }
 
 bool DSControlWord::IsTeleop() const {
@@ -38,7 +39,7 @@ bool DSControlWord::IsTeleop() const {
 
 bool DSControlWord::IsTeleopEnabled() const {
   return !m_controlWord.autonomous && !m_controlWord.test &&
-         m_controlWord.enabled;
+         m_controlWord.enabled && m_controlWord.dsAttached;
 }
 
 bool DSControlWord::IsTest() const {
