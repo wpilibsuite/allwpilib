@@ -11,4 +11,4 @@ The following 3 tasks can be used for deployment:
 
 Deploying any of these to the RoboRIO will disable the current startup project until it is redeployed.
 
-From here, ssh into the RoboRIO using the `admin` account (`lvuser` will fail to run in many cases). In the admin home directory, a file for each deploy type will exist (`myRobotCpp`, `myRobotCppStatic` and `myRobotJavaRun`). These can be ran to start up the corresponding project.
+From here, ssh into the RoboRIO using the `admin` account (`lvuser` will fail to run in many cases). In the admin home directory, a file for each deploy type will exist (`myRobotCpp`, `myRobotCppStatic` and `myRobotJavaRun`). These can be run to start up the corresponding project.
