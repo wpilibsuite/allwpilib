@@ -1,6 +1,6 @@
 # RoboRIO Development
 
-The repo contains a myRobot project built in way to do full project development without needing to do a full publish into GradleRIO. These also only require building the minimum amount of binaries for the RoboRIO, so the builds are much faster as well.
+This repo contains a myRobot project built in way to do full project development without needing to do a full publish into GradleRIO. These also only require building the minimum amount of binaries for the RoboRIO, so the builds are much faster as well.
 
 The setup only works if the RoboRIO is USB connected. If an alternate IP address is preferred, the `address` block in myRobot\build.gradle can be changed to point to another address.
 
