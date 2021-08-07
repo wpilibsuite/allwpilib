@@ -28,7 +28,8 @@ void InitializePowerDistribution() {}
 
 extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t module, HAL_PowerDistributionType type, int32_t* status) {
+    int32_t module, HAL_PowerDistributionType type,
+    const char* allocationLocation, int32_t* status) {
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));

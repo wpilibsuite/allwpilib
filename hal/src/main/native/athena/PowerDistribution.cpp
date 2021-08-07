@@ -16,18 +16,24 @@ using namespace hal;
 extern "C" {
 
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status) {
+    int32_t moduleNumber, HAL_PowerDistributionType type,
+    const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
     type = HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
-    moduleNumber = 0;
   }
 
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+    if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
+      moduleNumber = 0;
+    }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_InitializePDP(moduleNumber, nullptr, status));  // TODO
+        HAL_InitializePDP(moduleNumber, allocationLocation, status));  // TODO
   } else {
+    if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
+      moduleNumber = 1;
+    }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_REV_InitializePDH(moduleNumber, nullptr, status));
+        HAL_REV_InitializePDH(moduleNumber, allocationLocation, status));
   }
 }
 

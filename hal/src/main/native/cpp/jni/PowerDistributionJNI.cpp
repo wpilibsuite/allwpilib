@@ -11,14 +11,13 @@ using namespace hal;
 
 static_assert(
     edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
-        HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
-    "Values must match");
+        HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE ==
-                  HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE,
-              "Values must match");
+                  HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE ==
-                  HAL_PowerDistributionType::HAL_PowerDistributionType_kRev,
-              "Values must match");
+                  HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_DEFAULT_MODULE ==
+                  HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 extern "C" {
 
@@ -61,7 +60,7 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getModuleNumber
 {
   int32_t status = 0;
   auto result = HAL_GetPowerDistributionModuleNumber(handle, &status);
-  CheckStatus(env, status);
+  CheckStatus(env, status, false);
   return result;
 }
 
@@ -153,11 +152,11 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage
 /*
  * Class:     edu_wpi_first_hal_PowerDistributionJNI
  * Method:    getChannelCurrent
- * Signature: (BI)D
+ * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent
-  (JNIEnv* env, jclass, jbyte channel, jint handle)
+  (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
   double current =
@@ -257,6 +256,35 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults
   int32_t status = 0;
   HAL_ClearPowerDistributionStickyFaults(handle, &status);
   CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    setSwitchableChannel
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannel
+  (JNIEnv* env, jclass, jint handle, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetPowerDistributionSwitchableChannel(handle, enabled, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getSwitchableChannel
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannel
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto state = HAL_GetPowerDistributionSwitchableChannel(handle, &status);
+  CheckStatus(env, status, false);
+  return state;
 }
 
 }  // extern "C"

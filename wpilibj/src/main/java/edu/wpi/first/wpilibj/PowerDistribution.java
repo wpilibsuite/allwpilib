@@ -19,13 +19,27 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
+  public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
+
+  public enum ModuleType {
+    kAutomatic(PowerDistributionJNI.AUTOMATIC_TYPE),
+    kCTRE(PowerDistributionJNI.CTRE_TYPE),
+    kRev(PowerDistributionJNI.REV_TYPE);
+
+    public final int value;
+
+    ModuleType(int value) {
+      this.value = value;
+    }
+  }
+
   /**
    * Constructs a PowerDistribution.
    *
    * @param module The CAN ID of the PDP
    */
-  public PowerDistribution(int module) {
-    m_handle = PowerDistributionJNI.initialize(module, PowerDistributionJNI.AUTOMATIC_TYPE);
+  public PowerDistribution(int module, ModuleType moduleType) {
+    m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
@@ -38,7 +52,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * <p>Uses the default CAN ID.
    */
   public PowerDistribution() {
-    this(-1);
+    this(kDefaultModule, ModuleType.kAutomatic);
   }
 
   @Override
@@ -80,7 +94,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
-    double current = PowerDistributionJNI.getChannelCurrent((byte) channel, m_handle);
+    double current = PowerDistributionJNI.getChannelCurrent(m_handle, channel);
 
     return current;
   }
@@ -131,6 +145,14 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return m_module;
   }
 
+  public boolean getSwitchableChannel() {
+    return PowerDistributionJNI.getSwitchableChannel(m_handle);
+  }
+
+  public void setSwitchableChannel(boolean enabled) {
+    PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
@@ -141,5 +163,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     }
     builder.addDoubleProperty("Voltage", this::getVoltage, null);
     builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
+    builder.addBooleanProperty("SwitchableChannel",
+                               this::getSwitchableChannel,
+                               this::setSwitchableChannel);
   }
 }

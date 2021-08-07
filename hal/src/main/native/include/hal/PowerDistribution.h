@@ -26,6 +26,8 @@ HAL_ENUM(HAL_PowerDistributionType) {
 };
 // clang-format on
 
+#define HAL_DEFAULT_POWER_DISTRIBUTION_MODULE -1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,7 +40,8 @@ extern "C" {
  * @return the created PowerDistribution
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status);
+    int32_t moduleNumber, HAL_PowerDistributionType type,
+    const char* allocationLocation, int32_t* status);
 
 /**
  * Gets the module number for a specific handle.

@@ -14,19 +14,53 @@
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 
+static_assert(static_cast<HAL_PowerDistributionType>(
+                  frc::PowerDistribution::ModuleType::kAutomatic) ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
+static_assert(static_cast<HAL_PowerDistributionType>(
+                  frc::PowerDistribution::ModuleType::kCTRE) ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+static_assert(static_cast<HAL_PowerDistributionType>(
+                  frc::PowerDistribution::ModuleType::kRev) ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+static_assert(frc::PowerDistribution::kDefaultModule ==
+              HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
+
 using namespace frc;
 
-PowerDistribution::PowerDistribution() : PowerDistribution(-1) {}
+struct PowerDistribution::DataStore {
+  hal::Handle<HAL_PowerDistributionHandle> m_handle;
+  int m_module;
 
-PowerDistribution::PowerDistribution(int module) {
-  int32_t status = 0;
-  m_handle = HAL_InitializePowerDistribution(
-      module, HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
-      &status);
-  FRC_CheckErrorStatus(status, "Module {}", module);
-  m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", module);
+  DataStore(int module, ModuleType moduleType) {
+    int32_t status = 0;
+    m_handle = HAL_InitializePowerDistribution(
+        module, static_cast<HAL_PowerDistributionType>(moduleType), nullptr,
+        &status);
+    FRC_CheckErrorStatus(status, "Module {}", module);
+    m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
+    FRC_ReportError(status, "Module {}", module);
+  }
 
+  ~DataStore() { HAL_CleanPowerDistribution(m_handle); }
+};
+
+template <typename Function>
+std::shared_ptr<PowerDistribution::DataStore> PowerDistribution::GetStorage(
+    int module, Function allocFunc) {
+  static wpi::RefCountedSingleton<int, DataStore> singleton;
+  return singleton.GetStorage(module, allocFunc);
+}
+
+PowerDistribution::PowerDistribution()
+    : PowerDistribution(-1, ModuleType::kAutomatic) {}
+
+PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
+    : m_storage{GetStorage(module, [=] {
+        return std::make_shared<DataStore>(module, moduleType);
+      })} {
+  m_handle = m_storage->m_handle;
+  m_module = m_storage->m_module;
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
@@ -34,29 +68,22 @@ PowerDistribution::PowerDistribution(int module) {
 double PowerDistribution::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetPowerDistributionVoltage(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return voltage;
 }
 
 double PowerDistribution::GetTemperature() const {
   int32_t status = 0;
   double temperature = HAL_GetPowerDistributionTemperature(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return temperature;
 }
 
 double PowerDistribution::GetCurrent(int channel) const {
   int32_t status = 0;
-
-  if (!HAL_CheckPowerDistributionChannel(m_handle, channel)) {
-    FRC_ReportError(err::ChannelIndexOutOfRange, "Module {} Channel {}",
-                    m_module, channel);
-    return 0;
-  }
-
   double current =
       HAL_GetPowerDistributionChannelCurrent(m_handle, channel, &status);
-  FRC_CheckErrorStatus(status, "Module {} Channel {}", m_module, channel);
+  FRC_ReportError(status, "Module {} Channel {}", m_module, channel);
 
   return current;
 }
@@ -64,45 +91,58 @@ double PowerDistribution::GetCurrent(int channel) const {
 double PowerDistribution::GetTotalCurrent() const {
   int32_t status = 0;
   double current = HAL_GetPowerDistributionTotalCurrent(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return current;
 }
 
 double PowerDistribution::GetTotalPower() const {
   int32_t status = 0;
   double power = HAL_GetPowerDistributionTotalPower(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return power;
 }
 
 double PowerDistribution::GetTotalEnergy() const {
   int32_t status = 0;
   double energy = HAL_GetPowerDistributionTotalEnergy(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return energy;
 }
 
 void PowerDistribution::ResetTotalEnergy() {
   int32_t status = 0;
   HAL_ResetPowerDistributionTotalEnergy(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PowerDistribution::ClearStickyFaults() {
   int32_t status = 0;
   HAL_ClearPowerDistributionStickyFaults(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 int PowerDistribution::GetModule() const {
   return m_module;
 }
 
+bool PowerDistribution::GetSwitchableChannel() const {
+  int32_t status = 0;
+  bool state = HAL_GetPowerDistributionSwitchableChannel(m_handle, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  return state;
+}
+
+void PowerDistribution::SetSwitchableChannel(bool enabled) {
+  int32_t status = 0;
+  HAL_SetPowerDistributionSwitchableChannel(m_handle, enabled, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+}
+
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
   int32_t status = 0;
   int numChannels = HAL_GetPowerDistributionNumChannels(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
         fmt::format("Chan{}", i), [=] { return GetCurrent(i); }, nullptr);
@@ -111,4 +151,7 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
       "Voltage", [=] { return GetVoltage(); }, nullptr);
   builder.AddDoubleProperty(
       "TotalCurrent", [=] { return GetTotalCurrent(); }, nullptr);
+  builder.AddBooleanProperty(
+      "SwitchableChannel", [=] { return GetSwitchableChannel(); },
+      [=](bool value) { SetSwitchableChannel(value); });
 }
