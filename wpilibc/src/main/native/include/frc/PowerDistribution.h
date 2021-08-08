@@ -7,7 +7,6 @@
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
-#include <wpi/RefCountedSingleton.h>
 
 namespace frc {
 
@@ -18,9 +17,6 @@ namespace frc {
 class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
-
-
-
   static constexpr int kDefaultModule = -1;
   enum class ModuleType {
     kAutomatic = 0,
@@ -43,6 +39,7 @@ class PowerDistribution : public wpi::Sendable,
    */
   PowerDistribution(int module, ModuleType moduleType);
 
+  ~PowerDistribution() noexcept;
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
 
@@ -112,13 +109,8 @@ class PowerDistribution : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  struct DataStore;
-  std::shared_ptr<DataStore> m_storage;
-  HAL_PowerDistributionHandle m_handle;
+  hal::Handle<HAL_PowerDistributionHandle> m_handle;
   int m_module;
-
-  template<typename Function>
-  static std::shared_ptr<DataStore> GetStorage(int module, Function allocFunc);
 };
 
 }  // namespace frc

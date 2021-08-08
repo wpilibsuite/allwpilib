@@ -3,11 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/TimedRobot.h>
-#include <frc/PowerDistribution.h>
 
 class MyRobot : public frc::TimedRobot {
-  frc::PowerDistribution pd{frc::PowerDistribution::kDefaultModule, frc::PowerDistribution::ModuleType::kRev};
-  frc::PowerDistribution pd2{frc::PowerDistribution::kDefaultModule, frc::PowerDistribution::ModuleType::kRev};
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.

@@ -28,41 +28,27 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-struct PowerDistribution::DataStore {
-  hal::Handle<HAL_PowerDistributionHandle> m_handle;
-  int m_module;
-
-  DataStore(int module, ModuleType moduleType) {
-    int32_t status = 0;
-    m_handle = HAL_InitializePowerDistribution(
-        module, static_cast<HAL_PowerDistributionType>(moduleType), nullptr,
-        &status);
-    FRC_CheckErrorStatus(status, "Module {}", module);
-    m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
-    FRC_ReportError(status, "Module {}", module);
-  }
-
-  ~DataStore() { HAL_CleanPowerDistribution(m_handle); }
-};
-
-template <typename Function>
-std::shared_ptr<PowerDistribution::DataStore> PowerDistribution::GetStorage(
-    int module, Function allocFunc) {
-  static wpi::RefCountedSingleton<int, DataStore> singleton;
-  return singleton.GetStorage(module, allocFunc);
-}
-
 PowerDistribution::PowerDistribution()
     : PowerDistribution(-1, ModuleType::kAutomatic) {}
 
-PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
-    : m_storage{GetStorage(module, [=] {
-        return std::make_shared<DataStore>(module, moduleType);
-      })} {
-  m_handle = m_storage->m_handle;
-  m_module = m_storage->m_module;
+PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
+  int32_t status = 0;
+  m_handle = HAL_InitializePowerDistribution(
+      module, static_cast<HAL_PowerDistributionType>(moduleType), nullptr,
+      &status);
+  FRC_CheckErrorStatus(status, "Module {}", module);
+  m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
+  FRC_ReportError(status, "Module {}", module);
+
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+}
+
+PowerDistribution::~PowerDistribution() noexcept {
+  if (m_handle != HAL_kInvalidHandle) {
+    HAL_CleanPowerDistribution(m_handle);
+    m_handle = HAL_kInvalidHandle;
+  }
 }
 
 double PowerDistribution::GetVoltage() const {
