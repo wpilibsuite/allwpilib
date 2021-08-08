@@ -69,3 +69,23 @@ jobs:
         run: wpiformat -list-changed-files
       - name: Run clang-tidy
         run: wpiformat -clang 12 -no-format -tidy-changed -compile-commands=build-cmake
+  spotless:
+    name: "Spotless"
+    runs-on: ubuntu-latest
+    container: wpilib/ubuntu-base:18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run spotless
+        run: ./gradlew spotlessCheck
+  javaformat:
+    name: "Checkstyle and PMD"
+    runs-on: ubuntu-latest
+    container: wpilib/ubuntu-base:18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run Java format
+        run: ./gradlew javaFormat
