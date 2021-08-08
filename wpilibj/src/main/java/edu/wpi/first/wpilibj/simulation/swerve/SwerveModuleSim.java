@@ -76,6 +76,8 @@ public class SwerveModuleSim {
         this.m_wheelEncGearRatio     = wheelEncGearRatio;
         this.m_treadStaticFricForce  = treadStaticCoefFric * moduleNormalForce;
         this.m_treadKineticFricForce = treadKineticCoefFric * moduleNormalForce;
+
+        this.reset(new Pose2d());
     }
 
     public void setInputVoltages(double wheelVoltage, double azmthVoltage) {
