@@ -20,7 +20,7 @@ TEST(PowerDistributionSimTest, Initialize) {
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistribution pdp(2);
+  PowerDistribution pdp(2, frc::PowerDistribution::ModuleType::kCTRE);
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
@@ -33,7 +33,7 @@ TEST(PowerDistributionSimTest, Initialize) {
 
 TEST(PowerDistributionSimTest, SetTemperature) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{2};
+  PowerDistribution pdp{2, frc::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -48,7 +48,7 @@ TEST(PowerDistributionSimTest, SetTemperature) {
 
 TEST(PowerDistributionSimTest, SetVoltage) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{2};
+  PowerDistribution pdp{2, frc::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
@@ -63,7 +63,7 @@ TEST(PowerDistributionSimTest, SetVoltage) {
 
 TEST(PowerDistributionSimTest, SetCurrent) {
   HAL_Initialize(500, 0);
-  PowerDistribution pdp{2};
+  PowerDistribution pdp{2, frc::PowerDistribution::ModuleType::kCTRE};
   PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
