@@ -8,6 +8,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
+#include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
@@ -32,9 +33,11 @@ PowerDistribution::PowerDistribution()
     : PowerDistribution(-1, ModuleType::kAutomatic) {}
 
 PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
+  auto stack = wpi::GetStackTrace(1);
+
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      module, static_cast<HAL_PowerDistributionType>(moduleType), nullptr,
+      module, static_cast<HAL_PowerDistributionType>(moduleType), stack.c_str(),
       &status);
   FRC_CheckErrorStatus(status, "Module {}", module);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);

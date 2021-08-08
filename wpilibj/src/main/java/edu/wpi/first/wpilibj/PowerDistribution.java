@@ -163,8 +163,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     }
     builder.addDoubleProperty("Voltage", this::getVoltage, null);
     builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
-    builder.addBooleanProperty("SwitchableChannel",
-                               this::getSwitchableChannel,
-                               this::setSwitchableChannel);
+    builder.addBooleanProperty(
+        "SwitchableChannel", this::getSwitchableChannel, this::setSwitchableChannel);
   }
 }
