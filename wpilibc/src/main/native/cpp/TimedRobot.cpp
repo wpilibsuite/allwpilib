@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <cstdio>
 #include <utility>
 
 #include <hal/DriverStation.h>
@@ -25,6 +26,7 @@ void TimedRobot::StartCompetition() {
   }
 
   // Tell the DS that the robot is ready to be enabled
+  std::puts("\n********** Robot program startup complete **********");
   HAL_ObserveUserProgramStarting();
 
   // Loop forever, calling the appropriate mode-dependent function

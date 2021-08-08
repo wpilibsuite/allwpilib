@@ -58,7 +58,7 @@ deploy {
         }
 
         artifact('jre', JREArtifact) {
-            jreDependency = 'edu.wpi.first.jdk:roborio-2020:11.0.4u10-2'
+            jreDependency = 'edu.wpi.first.jdk:roborio-2021:11.0.9u11-1'
         }
 
         javaArtifact('myRobotJava') {

@@ -22,29 +22,17 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
-void IterativeRobotBase::RobotInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::RobotInit() {}
 
-void IterativeRobotBase::SimulationInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::SimulationInit() {}
 
-void IterativeRobotBase::DisabledInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::DisabledInit() {}
 
-void IterativeRobotBase::AutonomousInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::AutonomousInit() {}
 
-void IterativeRobotBase::TeleopInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::TeleopInit() {}
 
-void IterativeRobotBase::TestInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::TestInit() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;

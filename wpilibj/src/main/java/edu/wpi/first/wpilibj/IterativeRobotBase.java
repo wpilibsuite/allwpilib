@@ -92,9 +92,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * until RobotInit() exits. Code in RobotInit() that waits for enable will cause the robot to
    * never indicate that the code is ready, causing the robot to be bypassed in a match.
    */
-  public void robotInit() {
-    System.out.println("Default robotInit() method... Override me!");
-  }
+  public void robotInit() {}
 
   /**
    * Robot-wide simulation initialization code should go here.
@@ -103,9 +101,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * which will be called when the robot is first started. It will be called exactly one time after
    * RobotInit is called only when the robot is in simulation.
    */
-  public void simulationInit() {
-    System.out.println("Default simulationInit() method... Override me!");
-  }
+  public void simulationInit() {}
 
   /**
    * Initialization code for disabled mode should go here.
@@ -113,9 +109,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters disabled mode.
    */
-  public void disabledInit() {
-    System.out.println("Default disabledInit() method... Override me!");
-  }
+  public void disabledInit() {}
 
   /**
    * Initialization code for autonomous mode should go here.
@@ -123,9 +117,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters autonomous mode.
    */
-  public void autonomousInit() {
-    System.out.println("Default autonomousInit() method... Override me!");
-  }
+  public void autonomousInit() {}
 
   /**
    * Initialization code for teleop mode should go here.
@@ -133,9 +125,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters teleop mode.
    */
-  public void teleopInit() {
-    System.out.println("Default teleopInit() method... Override me!");
-  }
+  public void teleopInit() {}
 
   /**
    * Initialization code for test mode should go here.
@@ -144,9 +134,7 @@ public abstract class IterativeRobotBase extends RobotBase {
    * robot enters test mode.
    */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
-  public void testInit() {
-    System.out.println("Default testInit() method... Override me!");
-  }
+  public void testInit() {}
 
   /* ----------- Overridable periodic code ----------------- */
 
