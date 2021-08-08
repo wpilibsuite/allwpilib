@@ -35,7 +35,7 @@ class PowerDistribution : public wpi::Sendable,
    */
   PowerDistribution(int module, ModuleType moduleType);
 
-  ~PowerDistribution() override noexcept;
+  ~PowerDistribution() override;
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
 
