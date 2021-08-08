@@ -38,8 +38,8 @@ public interface Subsystem {
   default void simulationPeriodic() {}
 
   /**
-   * This method is called once by the {@link CommandScheduler} when the robot enters disabled
-   * mode. Useful for stopping motor controllers (ie {@link
+   * This method is called once by the {@link CommandScheduler} when the robot enters disabled mode.
+   * Useful for stopping motor controllers (ie {@link
    * edu.wpi.first.wpilibj.motorcontrol.MotorController#stopMotor() MotorController.stopMotor()}),
    * resetting control loops (ie {@link edu.wpi.first.math.controller.PIDController#reset()
    * PIDController.reset()}), etc. to prevent sudden responses to leftover state on re-enable.

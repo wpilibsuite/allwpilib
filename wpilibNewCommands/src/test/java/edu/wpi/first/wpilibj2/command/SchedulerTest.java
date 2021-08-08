@@ -76,12 +76,13 @@ class SchedulerTest extends CommandTestBase {
   void disabledInitTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       AtomicInteger counter = new AtomicInteger(0);
-      Subsystem subsystem = new Subsystem() {
-        @Override
-        public void disabledInit() {
-          counter.incrementAndGet();
-        }
-      };
+      Subsystem subsystem =
+          new Subsystem() {
+            @Override
+            public void disabledInit() {
+              counter.incrementAndGet();
+            }
+          };
       scheduler.registerSubsystem(subsystem);
 
       DriverStationSim.setEnabled(false);

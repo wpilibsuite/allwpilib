@@ -75,8 +75,8 @@ TEST_F(SchedulerTest, SchedulerCancelAllTest) {
 
 class CounterSubsystem : public Subsystem {
  public:
-  int counter;
-  CounterSubsystem() : counter{0} {}
+  int counter{0};
+  CounterSubsystem() {}
   void DisabledInit() override { counter++; }
 };
 
