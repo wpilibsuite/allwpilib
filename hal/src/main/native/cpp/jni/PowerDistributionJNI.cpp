@@ -13,15 +13,14 @@
 
 using namespace hal;
 
-static_assert(
-    edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
-        HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE ==
-                  HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE ==
-                  HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
 static_assert(edu_wpi_first_hal_PowerDistributionJNI_DEFAULT_MODULE ==
-                  HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
+              HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 extern "C" {
 
