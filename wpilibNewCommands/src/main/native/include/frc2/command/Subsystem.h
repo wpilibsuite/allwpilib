@@ -50,8 +50,22 @@ class Subsystem {
    * updating subsystem-specific state that needs to be maintained for
    * simulations, such as for updating simulation classes and setting simulated
    * sensor readings.
+   *
+   * <p>This will be called after Periodic() but before commands.
    */
   virtual void SimulationPeriodic();
+
+  /**
+   * This method is called once by the CommandScheduler when the robot enters
+   * disabled mode. Useful for stopping motor controllers (ie
+   * MotorController.StopMotor()), resetting control loops (ie
+   * PIDController.Reset()), etc. to prevent sudden responses to leftover state
+   * on re-enable.
+   *
+   * <p>This will be called before commands and the Periodic() and
+   * SimulationPeriodic() functions.
+   */
+  virtual void DisabledInit();
 
   /**
    * Sets the default Command of the subsystem.  The default command will be

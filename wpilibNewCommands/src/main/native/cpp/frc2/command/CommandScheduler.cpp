@@ -42,7 +42,10 @@ class CommandScheduler::Impl {
   // iteration.
   wpi::SmallVector<wpi::unique_function<void()>, 4> buttons;
 
+  // Whether the scheduler is disabled
   bool disabled{false};
+  // Whether subsystem DisabledInit() functions have been called this disable
+  bool hasRunDisabled{false};
 
   // Lists of user-supplied actions to be executed on scheduling events for
   // every command.
@@ -189,10 +192,22 @@ void CommandScheduler::Run() {
     return;
   }
 
+  bool runDisabledInit;  // Whether we're running disabledInit in this iteration
+  if (frc::RobotState::IsDisabled()) {
+    runDisabledInit = !m_impl->hasRunDisabled;  // Run iff we haven't run yet
+    m_impl->hasRunDisabled = true;              // Flag that we ran
+  } else {  // Set both to false when not disabled
+    m_impl->hasRunDisabled = false;
+    runDisabledInit = false;
+  }
+
   m_watchdog.Reset();
 
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
+    if (runDisabledInit) {
+      subsystem.getFirst()->DisabledInit();
+    }
     subsystem.getFirst()->Periodic();
     if constexpr (frc::RobotBase::IsSimulation()) {
       subsystem.getFirst()->SimulationPeriodic();

@@ -2,9 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/simulation/DriverStationSim.h>
+
 #include "CommandTestBase.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/RunCommand.h"
+#include "frc2/command/Subsystem.h"
 
 using namespace frc2;
 class SchedulerTest : public CommandTestBase {};
@@ -68,4 +71,36 @@ TEST_F(SchedulerTest, SchedulerCancelAllTest) {
   scheduler.CancelAll();
 
   EXPECT_EQ(counter, 2);
+}
+
+class CounterSubsystem : public Subsystem {
+ public:
+  int counter;
+  CounterSubsystem() : counter{0} {}
+  void DisabledInit() override { counter++; }
+};
+
+TEST_F(SchedulerTest, DisabledInitTest) {
+  using namespace frc::sim;
+  CommandScheduler scheduler = GetScheduler();
+  CounterSubsystem subsystem{};
+  scheduler.RegisterSubsystem(&subsystem);
+
+  DriverStationSim::SetEnabled(false);
+  DriverStationSim::NotifyNewData();
+  scheduler.Run();
+  EXPECT_EQ(1, subsystem.counter) << "DisabledInit() didn't run";
+
+  scheduler.Run();
+  EXPECT_EQ(1, subsystem.counter) << "DisabledInit() ran twice on same disable";
+
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  scheduler.Run();
+  EXPECT_EQ(1, subsystem.counter) << "DisabledInit() ran when enabled";
+
+  DriverStationSim::SetEnabled(false);
+  DriverStationSim::NotifyNewData();
+  scheduler.Run();
+  EXPECT_EQ(2, subsystem.counter) << "DisabledInit() didn't run on re-disable";
 }

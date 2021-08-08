@@ -13,6 +13,8 @@ void Subsystem::Periodic() {}
 
 void Subsystem::SimulationPeriodic() {}
 
+void Subsystem::DisabledInit() {}
+
 Command* Subsystem::GetDefaultCommand() const {
   return CommandScheduler::GetInstance().GetDefaultCommand(this);
 }

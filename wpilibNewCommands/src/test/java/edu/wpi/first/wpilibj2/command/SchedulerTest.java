@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 class SchedulerTest extends CommandTestBase {
@@ -67,6 +69,38 @@ class SchedulerTest extends CommandTestBase {
       scheduler.cancelAll();
 
       assertEquals(counter.m_counter, 2);
+    }
+  }
+
+  @Test
+  void disabledInitTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      AtomicInteger counter = new AtomicInteger(0);
+      Subsystem subsystem = new Subsystem() {
+        @Override
+        public void disabledInit() {
+          counter.incrementAndGet();
+        }
+      };
+      scheduler.registerSubsystem(subsystem);
+
+      DriverStationSim.setEnabled(false);
+      DriverStationSim.notifyNewData();
+      scheduler.run();
+      assertEquals(1, counter.get(), "disabledInit() either didn't run");
+
+      scheduler.run();
+      assertEquals(1, counter.get(), "disabledInit() ran twice on same disable");
+
+      DriverStationSim.setEnabled(true);
+      DriverStationSim.notifyNewData();
+      scheduler.run();
+      assertEquals(1, counter.get(), "disabledInit() ran when enabled");
+
+      DriverStationSim.setEnabled(false);
+      DriverStationSim.notifyNewData();
+      scheduler.run();
+      assertEquals(2, counter.get(), "disabledInit() didn't run on re-disable");
     }
   }
 }

@@ -65,7 +65,10 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
   // The set of currently-registered buttons that will be polled every iteration.
   private final Collection<Runnable> m_buttons = new LinkedHashSet<>();
 
+  // Whether the scheduler is disabled
   private boolean m_disabled;
+  // Whether subsystem disabledInit() functions have been called this disable
+  private boolean m_hasRunDisabled;
 
   // Lists of user-supplied actions to be executed on scheduling events for every command.
   private final List<Consumer<Command>> m_initActions = new ArrayList<>();
@@ -241,10 +244,23 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     if (m_disabled) {
       return;
     }
+
+    boolean runDisabledInit; // Whether we're running disabledInit in this iteration
+    if (RobotState.isDisabled()) {
+      runDisabledInit = !m_hasRunDisabled; // Run iff we haven't run yet
+      m_hasRunDisabled = true; // Flag that we ran
+    } else { // Set both to false when not disabled
+      m_hasRunDisabled = false;
+      runDisabledInit = false;
+    }
+
     m_watchdog.reset();
 
     // Run the periodic method of all registered subsystems.
     for (Subsystem subsystem : m_subsystems.keySet()) {
+      if (runDisabledInit) {
+        subsystem.disabledInit();
+      }
       subsystem.periodic();
       if (RobotBase.isSimulation()) {
         subsystem.simulationPeriodic();

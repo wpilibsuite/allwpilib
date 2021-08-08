@@ -32,8 +32,22 @@ public interface Subsystem {
    * This method is called periodically by the {@link CommandScheduler}. Useful for updating
    * subsystem-specific state that needs to be maintained for simulations, such as for updating
    * {@link edu.wpi.first.wpilibj.simulation} classes and setting simulated sensor readings.
+   *
+   * <p>This will be called after {@link #periodic()} but before commands.
    */
   default void simulationPeriodic() {}
+
+  /**
+   * This method is called once by the {@link CommandScheduler} when the robot enters disabled
+   * mode. Useful for stopping motor controllers (ie {@link
+   * edu.wpi.first.wpilibj.motorcontrol.MotorController#stopMotor() MotorController.stopMotor()}),
+   * resetting control loops (ie {@link edu.wpi.first.math.controller.PIDController#reset()
+   * PIDController.reset()}), etc. to prevent sudden responses to leftover state on re-enable.
+   *
+   * <p>This will be called before commands and the {@link #periodic()} and {@link
+   * #simulationPeriodic()} functions.
+   */
+  default void disabledInit() {}
 
   /**
    * Sets the default {@link Command} of the subsystem. The default command will be automatically
