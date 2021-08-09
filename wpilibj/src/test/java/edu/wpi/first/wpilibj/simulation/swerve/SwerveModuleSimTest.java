@@ -6,21 +6,39 @@ package edu.wpi.first.wpilibj.simulation.swerve;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.utils.SimpleCSVWriter;
 
 import org.junit.jupiter.api.Test;
 
 public class SwerveModuleSimTest {
   @Test
   @SuppressWarnings({"LocalVariableName", "resource"})
-  public void testBasic() {
+  public void testBasicWheel(TestInfo testInfo) {
 
-    var wheelVel = 0;
+    SimpleCSVWriter log = new SimpleCSVWriter(
+      new ArrayList<String>(Arrays.asList("u_wheel", "y_wheelforce", "wheelvel", "u_azmth", "y_azmthPos")),
+      new ArrayList<String>(Arrays.asList("V", "N", "RPM", "V", "rev"))
+      );
+
+    var wheelVelRadPerSec = 0.0;
+    var wheelPosRad = 0.0;
+
+    final var SIM_TS = 0.020;
+    final var WHEEL_RAD_M = Units.inchesToMeters(1.5);
+    final var TEST_PLANT_MASS_RADPERSEC2_PER_N = 6.0/90.0;
 
     var wheelController = new PIDController(10, 0, 0);
     var azmthController = new PIDController(10, 0, 0);
@@ -30,10 +48,12 @@ public class SwerveModuleSimTest {
     var wheelEncoder = new Encoder(4, 5);
     var azmthEncoder = new Encoder(6, 7);
 
+    final var TEST_DIR = new Vector2d(1, 0);
+
     var sim =
         new SwerveModuleSim(DCMotor.getCIM(1),
                             DCMotor.getCIM(1), 
-                            0.1, 
+                            WHEEL_RAD_M, 
                             130, 
                             9.0, 
                             1.0, 
@@ -41,13 +61,13 @@ public class SwerveModuleSimTest {
                             1.1, 
                             0.8, 
                             16.0, 
-                            0.01);
+                            0.001);
 
 
     var wheelEncoderSim = new EncoderSim(wheelEncoder);
     var azmthEncoderSim = new EncoderSim(azmthEncoder);
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
 
       // ------ User Periodic -------
 
@@ -67,21 +87,41 @@ public class SwerveModuleSimTest {
       var u_azmth = azmthMotor.get() * currentBatteryVoltage;
       sim.setInputVoltages(u_wheel, u_azmth);
 
-      sim.update(0.020);
+      var modulePose = new Pose2d(TEST_DIR.x * wheelPosRad * WHEEL_RAD_M,
+                                  TEST_DIR.y * wheelPosRad * WHEEL_RAD_M,
+                                  new Rotation2d());
+      sim.setModulePose(modulePose);
+
+      sim.update(SIM_TS);
 
       // Wheel plant model - separate from the module
       // Very simple test - F = ma
       var y_wheelforce = sim.getWheelMotiveForce();
-      wheelVel += y_wheelforce.m_force.getNorm()/2.0;
-      wheelEncoderSim.setRate(wheelVel);
+      wheelVelRadPerSec += y_wheelforce.m_force.getVector2d().dot(TEST_DIR) * TEST_PLANT_MASS_RADPERSEC2_PER_N * SIM_TS;
+      wheelEncoderSim.setRate(Units.radiansPerSecondToRotationsPerMinute(wheelVelRadPerSec));
+      wheelPosRad += wheelVelRadPerSec * SIM_TS;
      
       //Azmth plant model is built into module simulation.
       var y_azmthPos = sim.getAzimuthEncoderPositionRev();
       azmthEncoderSim.setDistance(y_azmthPos);
+
+      var logVals = new ArrayList<Double>();
+      logVals.add(u_wheel);
+      logVals.add(y_wheelforce.m_force.getNorm());
+      logVals.add(wheelVelRadPerSec);
+      logVals.add(u_azmth);
+      logVals.add(y_azmthPos);
+      log.writeData(i*SIM_TS, logVals);
     }
 
+    log.close();
+
     assertEquals(wheelController.getSetpoint(), wheelEncoder.getRate(), 2);
-    assertEquals(azmthController.getSetpoint(), azmthEncoder.getDistance(), 0.02);
+
+  }
+
+  public void testBasicAzmth(TestInfo testInfo){
+
   }
 
 }
