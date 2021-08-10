@@ -9,16 +9,20 @@ import java.util.List;
 
 public class SimpleCSVWriter {
 
-    File csvOutputFile;
+    File m_csvOutputFile;
+    String m_fname;
 
-    List<List<String>> dataLines = new ArrayList<>();
+    List<List<String>> m_dataLines = new ArrayList<>();
 
-    public SimpleCSVWriter(List<String> names, List<String>units){
+    public SimpleCSVWriter(String fname, List<String> names, List<String>units){
+
+        m_fname = fname;
+
         names.add(0,"TIME");
         units.add(0,"sec");
 
-        dataLines.add(names);
-        dataLines.add(units);
+        m_dataLines.add(names);
+        m_dataLines.add(units);
     }
 
     public void writeData(double time, List<Double> vals){
@@ -27,21 +31,23 @@ public class SimpleCSVWriter {
         for(Double val : vals){
             data.add(val.toString());
         }
-        dataLines.add(data);
+        m_dataLines.add(data);
     }
 
     public void close(){
-        csvOutputFile = new File("./log.csv");
+        String fpath = "./" + m_fname + ".csv";
+        System.out.println("Logging run data to " + fpath);
+        m_csvOutputFile = new File(fpath);
         PrintWriter pw;
         try {
-            pw = new PrintWriter(csvOutputFile);
+            pw = new PrintWriter(m_csvOutputFile);
         } catch (FileNotFoundException e) {
             System.out.println("Could not open CSV log file");
             e.printStackTrace();
             return;
         }
 
-        for(List<String> line :dataLines){
+        for(List<String> line :m_dataLines){
             for(String item : line){
                 pw.print(item);
                 pw.print(",");

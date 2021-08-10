@@ -80,15 +80,31 @@ public class SwerveModuleSim {
         this.reset(new Pose2d());
     }
 
+    /**
+     * Sets the voltages applied to each motor in the mechanism
+     * @param wheelVoltage voltage applied to the wheel motor
+     * @param azmthVoltage voltage applied to the azimuth motor
+     */
     public void setInputVoltages(double wheelVoltage, double azmthVoltage) {
         this.m_wheelVoltage = wheelVoltage;
         this.m_azmthVoltage = azmthVoltage;
     }
 
+    /**
+     * Returns the current physical rotation count of the azimuth encoder axle 
+     * shaft in total rotations since last reset - not wrapped. 
+     * IE, if you spin your module exactly two and a half times in the
+     *  positive direction, this will return 2.5 (not 0.5).
+     */
     public double getAzimuthEncoderPositionRev() {
         return m_azmthMotor.getMechanismPositionRev() * m_azimuthEncGearRatio;
     }
 
+    /**
+     * Returns the total number of physical rotations the wheel has done
+     * since the last reset - not wrapped. IE, if your wheel rotated through
+     * 20.5 rotations, this function would return 20.5 (not 0.5).
+     */
     public double getWheelEncoderPositionRev() {
         return m_wheelMotor.getPositionRev() * m_wheelEncGearRatio;
     }
