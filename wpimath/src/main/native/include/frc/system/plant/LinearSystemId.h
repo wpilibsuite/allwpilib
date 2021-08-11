@@ -42,15 +42,15 @@ class LinearSystemId {
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t m,
                                               units::meter_t r, double G) {
-    auto A = frc::MakeMatrix<2, 2>(
+    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
         0.0, 1.0, 0.0,
         (-std::pow(G, 2) * motor.Kt /
          (motor.R * units::math::pow<2>(r) * m * motor.Kv))
             .to<double>());
-    auto B = frc::MakeMatrix<2, 1>(
+    Eigen::Matrix<double, 2, 1> B = frc::MakeMatrix<2, 1>(
         0.0, (G * motor.Kt / (motor.R * r * m)).to<double>());
-    auto C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    auto D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
+    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -68,13 +68,13 @@ class LinearSystemId {
    */
   static LinearSystem<2, 1, 1> SingleJointedArmSystem(
       DCMotor motor, units::kilogram_square_meter_t J, double G) {
-    auto A = frc::MakeMatrix<2, 2>(
+    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
         0.0, 1.0, 0.0,
         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>());
-    auto B =
+    Eigen::Matrix<double, 2, 1> B =
         frc::MakeMatrix<2, 1>(0.0, (G * motor.Kt / (motor.R * J)).to<double>());
-    auto C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    auto D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
+    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -105,11 +105,12 @@ class LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    auto A = frc::MakeMatrix<1, 1>(-kV.template to<double>() /
-                                   kA.template to<double>());
-    auto B = frc::MakeMatrix<1, 1>(1.0 / kA.template to<double>());
-    auto C = frc::MakeMatrix<1, 1>(1.0);
-    auto D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 1> A = frc::MakeMatrix<1, 1>(
+        -kV.template to<double>() / kA.template to<double>());
+    Eigen::Matrix<double, 1, 1> B =
+        frc::MakeMatrix<1, 1>(1.0 / kA.template to<double>());
+    Eigen::Matrix<double, 1, 1> C = frc::MakeMatrix<1, 1>(1.0);
+    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -140,11 +141,12 @@ class LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    auto A = frc::MakeMatrix<2, 2>(
+    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
         0.0, 1.0, 0.0, -kV.template to<double>() / kA.template to<double>());
-    auto B = frc::MakeMatrix<2, 1>(0.0, 1.0 / kA.template to<double>());
-    auto C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    auto D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 2, 1> B =
+        frc::MakeMatrix<2, 1>(0.0, 1.0 / kA.template to<double>());
+    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
+    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -174,10 +176,10 @@ class LinearSystemId {
     double B1 = 1.0 / kAlinear.to<double>() + 1.0 / kAangular.to<double>();
     double B2 = 1.0 / kAlinear.to<double>() - 1.0 / kAangular.to<double>();
 
-    auto A = 0.5 * frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
-    auto B = 0.5 * frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
-    auto C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
-    auto D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
+    Eigen::Matrix<double, 2, 2> A = 0.5 * frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
+    Eigen::Matrix<double, 2, 2> B = 0.5 * frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
+    Eigen::Matrix<double, 2, 2> C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
+    Eigen::Matrix<double, 2, 2> D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
@@ -235,9 +237,10 @@ class LinearSystemId {
                                               double G) {
     auto A = frc::MakeMatrix<1, 1>(
         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>());
-    auto B = frc::MakeMatrix<1, 1>((G * motor.Kt / (motor.R * J)).to<double>());
-    auto C = frc::MakeMatrix<1, 1>(1.0);
-    auto D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 1> B =
+        frc::MakeMatrix<1, 1>((G * motor.Kt / (motor.R * J)).to<double>());
+    Eigen::Matrix<double, 1, 1> C = frc::MakeMatrix<1, 1>(1.0);
+    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -263,18 +266,18 @@ class LinearSystemId {
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
 
-    auto A = frc::MakeMatrix<2, 2>(
+    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
         ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>(),
         ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
         ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
         ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>());
-    auto B = frc::MakeMatrix<2, 2>(
+    Eigen::Matrix<double, 2, 2> B = frc::MakeMatrix<2, 2>(
         ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>(),
         ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
         ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
         ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>());
-    auto C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
-    auto D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
+    Eigen::Matrix<double, 2, 2> C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
+    Eigen::Matrix<double, 2, 2> D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
