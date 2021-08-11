@@ -17,7 +17,7 @@ namespace internal {
 // pre:  T.block(i,i,2,2) has complex conjugate eigenvalues
 // post: sqrtT.block(i,i,2,2) is square root of T.block(i,i,2,2)
 template <typename MatrixType, typename ResultType>
-void matrix_sqrt_quasi_triangular_2x2_diagonal_block(const MatrixType& T, typename MatrixType::Index i, ResultType& sqrtT)
+void matrix_sqrt_quasi_triangular_2x2_diagonal_block(const MatrixType& T, Index i, ResultType& sqrtT)
 {
   // TODO: This case (2-by-2 blocks with complex conjugate eigenvalues) is probably hidden somewhere
   //       in EigenSolver. If we expose it, we could call it directly from here.
@@ -32,7 +32,7 @@ void matrix_sqrt_quasi_triangular_2x2_diagonal_block(const MatrixType& T, typena
 //       all blocks of sqrtT to left of and below (i,j) are correct
 // post: sqrtT(i,j) has the correct value
 template <typename MatrixType, typename ResultType>
-void matrix_sqrt_quasi_triangular_1x1_off_diagonal_block(const MatrixType& T, typename MatrixType::Index i, typename MatrixType::Index j, ResultType& sqrtT)
+void matrix_sqrt_quasi_triangular_1x1_off_diagonal_block(const MatrixType& T, Index i, Index j, ResultType& sqrtT)
 {
   typedef typename traits<MatrixType>::Scalar Scalar;
   Scalar tmp = (sqrtT.row(i).segment(i+1,j-i-1) * sqrtT.col(j).segment(i+1,j-i-1)).value();
@@ -41,7 +41,7 @@ void matrix_sqrt_quasi_triangular_1x1_off_diagonal_block(const MatrixType& T, ty
 
 // similar to compute1x1offDiagonalBlock()
 template <typename MatrixType, typename ResultType>
-void matrix_sqrt_quasi_triangular_1x2_off_diagonal_block(const MatrixType& T, typename MatrixType::Index i, typename MatrixType::Index j, ResultType& sqrtT)
+void matrix_sqrt_quasi_triangular_1x2_off_diagonal_block(const MatrixType& T, Index i, Index j, ResultType& sqrtT)
 {
   typedef typename traits<MatrixType>::Scalar Scalar;
   Matrix<Scalar,1,2> rhs = T.template block<1,2>(i,j);
@@ -54,7 +54,7 @@ void matrix_sqrt_quasi_triangular_1x2_off_diagonal_block(const MatrixType& T, ty
 
 // similar to compute1x1offDiagonalBlock()
 template <typename MatrixType, typename ResultType>
-void matrix_sqrt_quasi_triangular_2x1_off_diagonal_block(const MatrixType& T, typename MatrixType::Index i, typename MatrixType::Index j, ResultType& sqrtT)
+void matrix_sqrt_quasi_triangular_2x1_off_diagonal_block(const MatrixType& T, Index i, Index j, ResultType& sqrtT)
 {
   typedef typename traits<MatrixType>::Scalar Scalar;
   Matrix<Scalar,2,1> rhs = T.template block<2,1>(i,j);
@@ -101,7 +101,7 @@ void matrix_sqrt_quasi_triangular_solve_auxiliary_equation(MatrixType& X, const 
 
 // similar to compute1x1offDiagonalBlock()
 template <typename MatrixType, typename ResultType>
-void matrix_sqrt_quasi_triangular_2x2_off_diagonal_block(const MatrixType& T, typename MatrixType::Index i, typename MatrixType::Index j, ResultType& sqrtT)
+void matrix_sqrt_quasi_triangular_2x2_off_diagonal_block(const MatrixType& T, Index i, Index j, ResultType& sqrtT)
 {
   typedef typename traits<MatrixType>::Scalar Scalar;
   Matrix<Scalar,2,2> A = sqrtT.template block<2,2>(i,i);
@@ -204,7 +204,7 @@ template <typename MatrixType, typename ResultType>
 void matrix_sqrt_triangular(const MatrixType &arg, ResultType &result)
 {
   using std::sqrt;
-      typedef typename MatrixType::Scalar Scalar;
+  typedef typename MatrixType::Scalar Scalar;
 
   eigen_assert(arg.rows() == arg.cols());
 

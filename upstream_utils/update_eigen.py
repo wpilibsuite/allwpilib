@@ -20,10 +20,6 @@ def eigen_inclusions(dp, f):
 
     abspath = os.path.join(dp, f)
 
-    # Exclude build system
-    if f == "CMakeLists.txt":
-        return False
-
     # Exclude NonMPL2.h since all non-MPL2 code will be excluded anyway
     if f == "NonMPL2.h":
         return False
@@ -92,7 +88,7 @@ def unsupported_inclusions(dp, f):
 
 def main():
     root, repo = setup_upstream_repo("https://gitlab.com/libeigen/eigen.git",
-                                     "3.3.9")
+                                     "3.4.0")
     wpimath = os.path.join(root, "wpimath")
 
     # Delete old install
