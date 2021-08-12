@@ -32,7 +32,7 @@ public class PneumaticsControlModule implements PneumaticsBase, Sendable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() {
     CTREPCMJNI.free(m_handle);
     SendableRegistry.remove(this);
   }

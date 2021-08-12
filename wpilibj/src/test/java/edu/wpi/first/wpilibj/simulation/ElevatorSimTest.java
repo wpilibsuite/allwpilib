@@ -21,6 +21,8 @@ public class ElevatorSimTest {
   @Test
   @SuppressWarnings({"LocalVariableName", "resource"})
   public void testStateSpaceSimWithElevator() {
+    RoboRioSim.resetData();
+
     var controller = new PIDController(10, 0, 0);
 
     var sim =
@@ -33,28 +35,29 @@ public class ElevatorSimTest {
             3.0,
             VecBuilder.fill(0.01));
 
-    var motor = new PWMVictorSPX(0);
-    var encoder = new Encoder(0, 1);
-    var encoderSim = new EncoderSim(encoder);
+    try (var motor = new PWMVictorSPX(0);
+        var encoder = new Encoder(0, 1)) {
+      var encoderSim = new EncoderSim(encoder);
 
-    for (int i = 0; i < 100; i++) {
-      controller.setSetpoint(2.0);
+      for (int i = 0; i < 100; i++) {
+        controller.setSetpoint(2.0);
 
-      double nextVoltage = controller.calculate(encoderSim.getDistance());
+        double nextVoltage = controller.calculate(encoderSim.getDistance());
 
-      double currentBatteryVoltage = RobotController.getBatteryVoltage();
-      motor.set(nextVoltage / currentBatteryVoltage);
+        double currentBatteryVoltage = RobotController.getBatteryVoltage();
+        motor.set(nextVoltage / currentBatteryVoltage);
 
-      // ------ SimulationPeriodic() happens after user code -------
+        // ------ SimulationPeriodic() happens after user code -------
 
-      var u = VecBuilder.fill(motor.get() * currentBatteryVoltage);
-      sim.setInput(u);
-      sim.update(0.020);
-      var y = sim.getOutput();
-      encoderSim.setDistance(y.get(0, 0));
+        var u = VecBuilder.fill(motor.get() * currentBatteryVoltage);
+        sim.setInput(u);
+        sim.update(0.020);
+        var y = sim.getOutput();
+        encoderSim.setDistance(y.get(0, 0));
+      }
+
+      assertEquals(controller.getSetpoint(), sim.getPositionMeters(), 0.2);
     }
-
-    assertEquals(controller.getSetpoint(), sim.getPositionMeters(), 0.2);
   }
 
   @Test
