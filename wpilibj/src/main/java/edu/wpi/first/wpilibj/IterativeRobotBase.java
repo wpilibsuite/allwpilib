@@ -61,6 +61,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     kTest
   }
 
+  private final DSControlWord m_word = new DSControlWord();
   private Mode m_lastMode = Mode.kNone;
   private final double m_period;
   private final Watchdog m_watchdog;
@@ -258,14 +259,15 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.reset();
 
     // Get current mode
+    m_word.update();
     Mode mode = Mode.kNone;
-    if (isDisabled()) {
+    if (m_word.isDisabled()) {
       mode = Mode.kDisabled;
-    } else if (isAutonomous()) {
+    } else if (m_word.isAutonomous()) {
       mode = Mode.kAutonomous;
-    } else if (isOperatorControl()) {
+    } else if (m_word.isTeleop()) {
       mode = Mode.kTeleop;
-    } else if (isTest()) {
+    } else if (m_word.isTest()) {
       mode = Mode.kTest;
     }
 

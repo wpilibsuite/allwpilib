@@ -8,6 +8,7 @@
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include "frc/DSControlWord.h"
 #include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
@@ -102,14 +103,15 @@ void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 
   // Get current mode
+  DSControlWord word;
   Mode mode = Mode::kNone;
-  if (IsDisabled()) {
+  if (word.IsDisabled()) {
     mode = Mode::kDisabled;
-  } else if (IsAutonomous()) {
+  } else if (word.IsAutonomous()) {
     mode = Mode::kAutonomous;
-  } else if (IsOperatorControl()) {
+  } else if (word.IsTeleop()) {
     mode = Mode::kTeleop;
-  } else if (IsTest()) {
+  } else if (word.IsTest()) {
     mode = Mode::kTest;
   }
 
