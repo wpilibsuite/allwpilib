@@ -229,9 +229,33 @@ public abstract class RobotBase implements AutoCloseable {
    * controls.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
+   * @deprecated Use isTeleop() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public boolean isOperatorControl() {
-    return DriverStation.isOperatorControl();
+    return DriverStation.isTeleop();
+  }
+
+  /**
+   * Determine if the robot is currently in Operator Control mode as determined by the field
+   * controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode.
+   */
+  public boolean isTeleop() {
+    return DriverStation.isTeleop();
+  }
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled as determined by the
+   * field controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while enabled.
+   * @deprecated Use isTeleopEnabled() instead.
+   */
+  @Deprecated(since = "2022", forRemoval = true)
+  public boolean isOperatorControlEnabled() {
+    return DriverStation.isTeleopEnabled();
   }
 
   /**
@@ -240,8 +264,8 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
-  public boolean isOperatorControlEnabled() {
-    return DriverStation.isOperatorControlEnabled();
+  public boolean isTeleopEnabled() {
+    return DriverStation.isTeleopEnabled();
   }
 
   /**

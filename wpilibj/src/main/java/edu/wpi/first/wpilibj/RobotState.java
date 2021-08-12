@@ -18,8 +18,13 @@ public final class RobotState {
     return DriverStation.isEStopped();
   }
 
+  @Deprecated
   public static boolean isOperatorControl() {
-    return DriverStation.isOperatorControl();
+    return isTeleop();
+  }
+
+  public static boolean isTeleop() {
+    return DriverStation.isTeleop();
   }
 
   public static boolean isAutonomous() {

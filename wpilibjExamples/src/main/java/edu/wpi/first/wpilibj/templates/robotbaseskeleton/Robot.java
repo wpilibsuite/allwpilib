@@ -61,10 +61,10 @@ public class Robot extends RobotBase {
         LiveWindow.setEnabled(false);
         Shuffleboard.disableActuatorWidgets();
       } else {
-        DriverStation.inOperatorControl(true);
+        DriverStation.inTeleop(true);
         teleop();
-        DriverStation.inOperatorControl(false);
-        while (isOperatorControlEnabled()) {
+        DriverStation.inTeleop(false);
+        while (isTeleopEnabled()) {
           DriverStation.waitForData();
         }
       }

@@ -53,10 +53,10 @@ void Robot::StartCompetition() {
       frc::LiveWindow::SetEnabled(false);
       frc::Shuffleboard::DisableActuatorWidgets();
     } else {
-      frc::DriverStation::InOperatorControl(true);
+      frc::DriverStation::InTeleop(true);
       Teleop();
-      frc::DriverStation::InOperatorControl(false);
-      while (IsOperatorControlEnabled()) {
+      frc::DriverStation::InTeleop(false);
+      while (IsTeleopEnabled()) {
         frc::DriverStation::WaitForData();
       }
     }
