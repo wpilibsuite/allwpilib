@@ -56,9 +56,29 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
     std::fflush(stdout);
   }
 
+  int64_t longValue = 0;
+
+  switch (value->type) {
+    case HAL_BOOLEAN:
+      longValue = value->data.v_boolean;
+      break;
+    case HAL_ENUM:
+      longValue = value->data.v_enum;
+      break;
+    case HAL_INT:
+      longValue = value->data.v_int;
+      break;
+    case HAL_LONG:
+      longValue = value->data.v_long;
+      break;
+    case HAL_DOUBLE:
+    case HAL_UNASSIGNED:
+      break;
+  }
+
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),
                       static_cast<jint>(value->type),
-                      static_cast<jlong>(value->data.v_long),
+                      static_cast<jlong>(longValue),
                       static_cast<jdouble>(value->data.v_double));
 
   if (env->ExceptionCheck()) {

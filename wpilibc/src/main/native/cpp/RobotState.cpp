@@ -21,7 +21,11 @@ bool RobotState::IsEStopped() {
 }
 
 bool RobotState::IsOperatorControl() {
-  return DriverStation::IsOperatorControl();
+  return IsTeleop();
+}
+
+bool RobotState::IsTeleop() {
+  return DriverStation::IsTeleop();
 }
 
 bool RobotState::IsAutonomous() {

@@ -462,12 +462,20 @@ bool DriverStation::IsAutonomousEnabled() {
 }
 
 bool DriverStation::IsOperatorControl() {
+  return IsTeleop();
+}
+
+bool DriverStation::IsTeleop() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
 
 bool DriverStation::IsOperatorControlEnabled() {
+  return IsTeleopEnabled();
+}
+
+bool DriverStation::IsTeleopEnabled() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !controlWord.autonomous && !controlWord.test && controlWord.enabled;
@@ -621,6 +629,10 @@ void DriverStation::InAutonomous(bool entering) {
 }
 
 void DriverStation::InOperatorControl(bool entering) {
+  InTeleop(entering);
+}
+
+void DriverStation::InTeleop(bool entering) {
   ::GetInstance().userInTeleop = entering;
 }
 

@@ -137,6 +137,9 @@ ext.getCurrentArch = {
 }
 
 spotless {
+    if (project.hasProperty('skipJavaFormat')) {
+        enforceCheck false
+    }
     java {
         target fileTree('.') {
             include '**/*.java'

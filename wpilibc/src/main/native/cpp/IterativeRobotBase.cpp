@@ -8,6 +8,7 @@
 #include <hal/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include "frc/DSControlWord.h"
 #include "frc/Errors.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/shuffleboard/Shuffleboard.h"
@@ -22,29 +23,17 @@ IterativeRobotBase::IterativeRobotBase(units::second_t period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
-void IterativeRobotBase::RobotInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::RobotInit() {}
 
-void IterativeRobotBase::SimulationInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::SimulationInit() {}
 
-void IterativeRobotBase::DisabledInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::DisabledInit() {}
 
-void IterativeRobotBase::AutonomousInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::AutonomousInit() {}
 
-void IterativeRobotBase::TeleopInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::TeleopInit() {}
 
-void IterativeRobotBase::TestInit() {
-  fmt::print("Default {}() method... Override me!\n", __FUNCTION__);
-}
+void IterativeRobotBase::TestInit() {}
 
 void IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
@@ -94,6 +83,14 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
+void IterativeRobotBase::DisabledExit() {}
+
+void IterativeRobotBase::AutonomousExit() {}
+
+void IterativeRobotBase::TeleopExit() {}
+
+void IterativeRobotBase::TestExit() {}
+
 void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
@@ -105,60 +102,68 @@ units::second_t IterativeRobotBase::GetPeriod() const {
 void IterativeRobotBase::LoopFunc() {
   m_watchdog.Reset();
 
-  // Call the appropriate function depending upon the current robot mode
-  if (IsDisabled()) {
-    // Call DisabledInit() if we are now just entering disabled mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kDisabled) {
+  // Get current mode
+  DSControlWord word;
+  Mode mode = Mode::kNone;
+  if (word.IsDisabled()) {
+    mode = Mode::kDisabled;
+  } else if (word.IsAutonomous()) {
+    mode = Mode::kAutonomous;
+  } else if (word.IsTeleop()) {
+    mode = Mode::kTeleop;
+  } else if (word.IsTest()) {
+    mode = Mode::kTest;
+  }
+
+  // If mode changed, call mode exit and entry functions
+  if (m_lastMode != mode) {
+    // Call last mode's exit function
+    if (m_lastMode == Mode::kDisabled) {
+      DisabledExit();
+    } else if (m_lastMode == Mode::kAutonomous) {
+      AutonomousExit();
+    } else if (m_lastMode == Mode::kTeleop) {
+      TeleopExit();
+    } else if (m_lastMode == Mode::kTest) {
       LiveWindow::SetEnabled(false);
       Shuffleboard::DisableActuatorWidgets();
+      TestExit();
+    }
+
+    // Call current mode's entry function
+    if (mode == Mode::kDisabled) {
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
-      m_lastMode = Mode::kDisabled;
-    }
-
-    HAL_ObserveUserProgramDisabled();
-    DisabledPeriodic();
-    m_watchdog.AddEpoch("DisabledPeriodic()");
-  } else if (IsAutonomous()) {
-    // Call AutonomousInit() if we are now just entering autonomous mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kAutonomous) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
+    } else if (mode == Mode::kAutonomous) {
       AutonomousInit();
       m_watchdog.AddEpoch("AutonomousInit()");
-      m_lastMode = Mode::kAutonomous;
-    }
-
-    HAL_ObserveUserProgramAutonomous();
-    AutonomousPeriodic();
-    m_watchdog.AddEpoch("AutonomousPeriodic()");
-  } else if (IsOperatorControl()) {
-    // Call TeleopInit() if we are now just entering teleop mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kTeleop) {
-      LiveWindow::SetEnabled(false);
-      Shuffleboard::DisableActuatorWidgets();
+    } else if (mode == Mode::kTeleop) {
       TeleopInit();
       m_watchdog.AddEpoch("TeleopInit()");
-      m_lastMode = Mode::kTeleop;
-    }
-
-    HAL_ObserveUserProgramTeleop();
-    TeleopPeriodic();
-    m_watchdog.AddEpoch("TeleopPeriodic()");
-  } else {
-    // Call TestInit() if we are now just entering test mode from
-    // either a different mode or from power-on.
-    if (m_lastMode != Mode::kTest) {
+    } else if (mode == Mode::kTest) {
       LiveWindow::SetEnabled(true);
       Shuffleboard::EnableActuatorWidgets();
       TestInit();
       m_watchdog.AddEpoch("TestInit()");
-      m_lastMode = Mode::kTest;
     }
 
+    m_lastMode = mode;
+  }
+
+  // Call the appropriate function depending upon the current robot mode
+  if (mode == Mode::kDisabled) {
+    HAL_ObserveUserProgramDisabled();
+    DisabledPeriodic();
+    m_watchdog.AddEpoch("DisabledPeriodic()");
+  } else if (mode == Mode::kAutonomous) {
+    HAL_ObserveUserProgramAutonomous();
+    AutonomousPeriodic();
+    m_watchdog.AddEpoch("AutonomousPeriodic()");
+  } else if (mode == Mode::kTeleop) {
+    HAL_ObserveUserProgramTeleop();
+    TeleopPeriodic();
+    m_watchdog.AddEpoch("TeleopPeriodic()");
+  } else if (mode == Mode::kTest) {
     HAL_ObserveUserProgramTest();
     TestPeriodic();
     m_watchdog.AddEpoch("TestPeriodic()");

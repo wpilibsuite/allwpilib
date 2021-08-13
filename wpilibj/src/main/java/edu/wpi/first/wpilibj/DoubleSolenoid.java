@@ -87,10 +87,6 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
       }
     }
 
-    if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
-      throw new AllocationException("Solenoid(s) already allocated");
-    }
-
     HAL.report(
         tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
     HAL.report(
