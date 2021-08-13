@@ -47,7 +47,7 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 }
 
-PowerDistribution::~PowerDistribution() noexcept {
+PowerDistribution::~PowerDistribution() {
   if (m_handle != HAL_kInvalidHandle) {
     HAL_CleanPowerDistribution(m_handle);
     m_handle = HAL_kInvalidHandle;
