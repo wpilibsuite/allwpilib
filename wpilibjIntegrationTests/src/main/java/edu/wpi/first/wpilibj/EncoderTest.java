@@ -4,32 +4,23 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.fixtures.FakeEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /** Test to see if the FPGA properly recognizes a mock Encoder input. */
-@RunWith(Parameterized.class)
 public class EncoderTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(EncoderTest.class.getName());
   private static FakeEncoderFixture encoder = null;
-
-  private final boolean m_flip; // Does this test need to flip the inputs
-  private final int m_inputA;
-  private final int m_inputB;
-  private final int m_outputA;
-  private final int m_outputB;
 
   @Override
   protected Logger getClassLogger() {
@@ -41,9 +32,84 @@ public class EncoderTest extends AbstractComsSetup {
    * Collection of Arrays. For each Array in the Collection, each array element corresponds to a
    * parameter in the constructor.
    */
-  @Parameters
   public static Collection<Integer[]> generateData() {
     return TestBench.getEncoderDIOCrossConnectCollection();
+  }
+
+  @AfterAll
+  public static void tearDownAfterAll() {
+    encoder.teardown();
+    encoder = null;
+  }
+
+  /** Sets up the test and verifies that the test was reset to the default state. */
+  @BeforeEach
+  public void setUp() {
+    encoder.setup();
+  }
+
+  @AfterEach
+  public void tearDown() {
+    encoder.reset();
+  }
+
+  /**
+   * Tests to see if Encoders initialize to zero.
+   *
+   * @param inputA The port number for inputA
+   * @param outputA The port number for outputA
+   * @param inputB The port number for inputB
+   * @param outputB The port number for outputB
+   * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
+   */
+  @ParameterizedTest
+  @MethodSource("generateData")
+  public void testDefaultState(int inputA, int outputA, int inputB, int outputB, boolean flip) {
+    init(inputA, outputA, inputB, outputB, flip);
+    int value = encoder.getEncoder().get();
+    assertTrue(value == 0, errorMessage(0, value, inputA, outputA, inputB, outputB));
+  }
+
+  /**
+   * Tests to see if Encoders can count up successfully.
+   *
+   * @param inputA The port number for inputA
+   * @param outputA The port number for outputA
+   * @param inputB The port number for inputB
+   * @param outputB The port number for outputB
+   * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
+   */
+  @ParameterizedTest
+  @MethodSource("generateData")
+  public void testCountUp(int inputA, int outputA, int inputB, int outputB, boolean flip) {
+    init(inputA, outputA, inputB, outputB, flip);
+    int goal = 100;
+    encoder.getFakeEncoderSource().setCount(goal);
+    encoder.getFakeEncoderSource().setForward(flip);
+    encoder.getFakeEncoderSource().execute();
+    int value = encoder.getEncoder().get();
+    assertTrue(value == goal, errorMessage(goal, value, inputA, outputA, inputB, outputB));
+  }
+
+  /**
+   * Tests to see if Encoders can count down successfully.
+   *
+   * @param inputA The port number for inputA
+   * @param outputA The port number for outputA
+   * @param inputB The port number for inputB
+   * @param outputB The port number for outputB
+   * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
+   */
+  @ParameterizedTest
+  @MethodSource("generateData")
+  public void testCountDown(int inputA, int outputA, int inputB, int outputB, boolean flip) {
+    init(inputA, outputA, inputB, outputB, flip);
+    int goal = -100;
+    encoder.getFakeEncoderSource().setCount(goal); // Goal has to be positive
+    encoder.getFakeEncoderSource().setForward(!flip);
+    encoder.getFakeEncoderSource().execute();
+    int value = encoder.getEncoder().get();
+    assertTrue(value == goal, errorMessage(goal, value, inputA, outputA, inputB, outputB));
   }
 
   /**
@@ -55,66 +121,13 @@ public class EncoderTest extends AbstractComsSetup {
    * @param outputB The port number for outputB
    * @param flip whether or not these set of values require the encoder to be reversed (0 or 1)
    */
-  public EncoderTest(int inputA, int outputA, int inputB, int outputB, int flip) {
-    m_inputA = inputA;
-    m_inputB = inputB;
-    m_outputA = outputA;
-    m_outputB = outputB;
-
+  private void init(int inputA, int outputA, int inputB, int outputB, boolean flip) {
     // If the encoder from a previous test is allocated then we must free its
     // members
     if (encoder != null) {
       encoder.teardown();
     }
-    m_flip = flip == 0;
     encoder = new FakeEncoderFixture(inputA, outputA, inputB, outputB);
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() {
-    encoder.teardown();
-    encoder = null;
-  }
-
-  /** Sets up the test and verifies that the test was reset to the default state. */
-  @Before
-  public void setUp() {
-    encoder.setup();
-    testDefaultState();
-  }
-
-  @After
-  public void tearDown() {
-    encoder.reset();
-  }
-
-  /** Tests to see if Encoders initialize to zero. */
-  @Test
-  public void testDefaultState() {
-    int value = encoder.getEncoder().get();
-    assertTrue(errorMessage(0, value), value == 0);
-  }
-
-  /** Tests to see if Encoders can count up successfully. */
-  @Test
-  public void testCountUp() {
-    int goal = 100;
-    encoder.getFakeEncoderSource().setCount(goal);
-    encoder.getFakeEncoderSource().setForward(m_flip);
-    encoder.getFakeEncoderSource().execute();
-    int value = encoder.getEncoder().get();
-    assertTrue(errorMessage(goal, value), value == goal);
-  }
-
-  /** Tests to see if Encoders can count down successfully. */
-  @Test
-  public void testCountDown() {
-    int goal = -100;
-    encoder.getFakeEncoderSource().setCount(goal); // Goal has to be positive
-    encoder.getFakeEncoderSource().setForward(!m_flip);
-    encoder.getFakeEncoderSource().execute();
-    int value = encoder.getEncoder().get();
-    assertTrue(errorMessage(goal, value), value == goal);
   }
 
   /**
@@ -122,17 +135,22 @@ public class EncoderTest extends AbstractComsSetup {
    *
    * @param goal The goal that was trying to be reached
    * @param trueValue The actual value that was reached by the test
+   * @param inputA The port number for inputA
+   * @param outputA The port number for outputA
+   * @param inputB The port number for inputB
+   * @param outputB The port number for outputB
    * @return A fully constructed message with data about where and why the the test failed.
    */
-  private String errorMessage(int goal, int trueValue) {
+  private String errorMessage(
+      int goal, int trueValue, int inputA, int outputA, int inputB, int outputB) {
     return "Encoder ({In,Out}): {"
-        + m_inputA
+        + inputA
         + ", "
-        + m_outputA
+        + outputA
         + "},{"
-        + m_inputB
+        + inputB
         + ", "
-        + m_outputB
+        + outputB
         + "} Returned: "
         + trueValue
         + ", Wanted: "

@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,9 +50,6 @@ public final class TestBench {
   public static final int DIOCrossConnectB1 = 8;
   public static final int DIOCrossConnectA2 = 7;
   public static final int DIOCrossConnectA1 = 6;
-
-  /** The Singleton instance of the Test Bench. */
-  private static TestBench instance = null;
 
   /**
    * The single constructor for the TestBench. This method is private in order to prevent multiple
@@ -308,42 +304,5 @@ public final class TestBench {
         getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0), false));
     assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
-  }
-
-  /**
-   * Gets the singleton of the TestBench. If the TestBench is not already allocated in constructs an
-   * new instance of it. Otherwise it returns the existing instance.
-   *
-   * @return The Singleton instance of the TestBench
-   * @deprecated Use the static methods instead
-   */
-  @Deprecated
-  public static TestBench getInstance() {
-    if (instance == null) {
-      instance = new TestBench();
-    }
-    return instance;
-  }
-
-  /**
-   * Provides access to the output stream for the test system. This should be used instead of
-   * System.out This is gives us a way to implement changes to where the output text of this test
-   * system is sent.
-   *
-   * @return The test bench global print stream.
-   */
-  public static PrintStream out() {
-    return System.out;
-  }
-
-  /**
-   * Provides access to the error stream for the test system. This should be used instead of
-   * System.err This is gives us a way to implement changes to where the output text of this test
-   * system is sent.
-   *
-   * @return The test bench global print stream.
-   */
-  public static PrintStream err() {
-    return System.err;
   }
 }

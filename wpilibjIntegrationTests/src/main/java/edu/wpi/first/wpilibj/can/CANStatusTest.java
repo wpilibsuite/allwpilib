@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.can;
 
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CANStatusTest {
   @Test

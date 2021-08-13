@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.logging.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Tests to see if the Notifier is working properly. */
 public class NotifierTest extends AbstractComsSetup {
@@ -29,12 +29,12 @@ public class NotifierTest extends AbstractComsSetup {
     Timer.delay(10.5);
 
     notifier.stop();
-    assertEquals("Received " + counter + " notifications in 10.5 seconds\n", 10, counter);
+    assertEquals(10, counter, "Received " + counter + " notifications in 10.5 seconds\n");
     System.out.println("Received " + counter + " notifications in 10.5 seconds");
 
     Timer.delay(3.0);
 
-    assertEquals("Received " + (counter - 10) + " notifications in 3 seconds\n", 10, counter);
+    assertEquals(10, counter, "Received " + (counter - 10) + " notifications in 3 seconds\n");
     System.out.println("Received " + (counter - 10) + " notifications in 3 seconds");
 
     notifier.close();
@@ -48,7 +48,7 @@ public class NotifierTest extends AbstractComsSetup {
 
     Timer.delay(10.5);
 
-    assertEquals("Received " + counter + " notifications in 10.5 seconds\n", 1, counter);
+    assertEquals(1, counter, "Received " + counter + " notifications in 10.5 seconds\n");
     System.out.println("Received " + counter + " notifications in 10.5 seconds");
 
     notifier.close();

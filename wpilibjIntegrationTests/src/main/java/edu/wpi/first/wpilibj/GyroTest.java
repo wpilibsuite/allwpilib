@@ -4,15 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /** Tests that the {@link TiltPanCameraFixture}. */
 public class GyroTest extends AbstractComsSetup {
@@ -27,14 +27,14 @@ public class GyroTest extends AbstractComsSetup {
     return logger;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     logger.fine("Setup: TiltPan camera");
     m_tpcam = TestBench.getTiltPanCam();
     m_tpcam.setup();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     m_tpcam.teardown();
   }
@@ -49,7 +49,7 @@ public class GyroTest extends AbstractComsSetup {
 
   public void testInitial(AnalogGyro gyro) {
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
+    assertEquals(0, angle, 0.5, errorMessage(angle, 0));
   }
 
   /**
@@ -82,7 +82,7 @@ public class GyroTest extends AbstractComsSetup {
 
     double diff = Math.abs(difference);
 
-    assertEquals(errorMessage(diff, TEST_ANGLE), TEST_ANGLE, angle, 10);
+    assertEquals(TEST_ANGLE, angle, 10, errorMessage(diff, TEST_ANGLE));
   }
 
   protected void testDeviationOverTime(AnalogGyro gyro) {
@@ -91,10 +91,10 @@ public class GyroTest extends AbstractComsSetup {
     gyro.reset();
     Timer.delay(0.25);
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, 0.5);
+    assertEquals(0, angle, 0.5, errorMessage(angle, 0));
     Timer.delay(5);
     angle = gyro.getAngle();
-    assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 2.0);
+    assertEquals(0, angle, 2.0, "After 5 seconds " + errorMessage(angle, 0));
   }
 
   /**

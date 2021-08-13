@@ -4,16 +4,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /** Tests the {@link AnalogPotentiometer}. */
 public class AnalogPotentiometerTest extends AbstractComsSetup {
@@ -24,14 +24,14 @@ public class AnalogPotentiometerTest extends AbstractComsSetup {
 
   private static final double DOUBLE_COMPARISON_DELTA = 2.0;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_potSource = new FakePotentiometerSource(m_analogIO.getOutput(), 360);
     m_pot = new AnalogPotentiometer(m_analogIO.getInput(), 360.0, 0);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     m_potSource.reset();
     m_pot.close();

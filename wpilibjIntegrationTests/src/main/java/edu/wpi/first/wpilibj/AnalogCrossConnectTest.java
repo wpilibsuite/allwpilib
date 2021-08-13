@@ -4,18 +4,19 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.logging.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /** Test that covers the {@link AnalogCrossConnectFixture}. */
 public class AnalogCrossConnectTest extends AbstractInterruptTest {
@@ -30,18 +31,18 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     return logger;
   }
 
-  @BeforeClass
-  public static void setUpBeforeClass() {
+  @BeforeAll
+  public static void setUpBeforeAll() {
     analogIO = TestBench.getAnalogCrossConnectFixture();
   }
 
-  @AfterClass
-  public static void tearDownAfterClass() {
+  @AfterAll
+  public static void tearDownAfterAll() {
     analogIO.teardown();
     analogIO = null;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     analogIO.setup();
   }
@@ -66,8 +67,8 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     Timer.delay(kDelayTime);
 
     // Then the analog trigger is not in the window and the trigger state is off
-    assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
-    assertFalse("Analog trigger is on", trigger.getTriggerState());
+    assertFalse(trigger.getInWindow(), "Analog trigger is in the window (2V, 3V)");
+    assertFalse(trigger.getTriggerState(), "Analog trigger is on");
 
     trigger.close();
   }
@@ -83,8 +84,8 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     Timer.delay(kDelayTime);
 
     // Then the analog trigger is in the window and the trigger state is off
-    assertTrue("Analog trigger is not in the window (2V, 3V)", trigger.getInWindow());
-    assertFalse("Analog trigger is on", trigger.getTriggerState());
+    assertTrue(trigger.getInWindow(), "Analog trigger is not in the window (2V, 3V)");
+    assertFalse(trigger.getTriggerState(), "Analog trigger is on");
 
     trigger.close();
   }
@@ -100,8 +101,8 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     Timer.delay(kDelayTime);
 
     // Then the analog trigger is not in the window and the trigger state is on
-    assertFalse("Analog trigger is in the window (2V, 3V)", trigger.getInWindow());
-    assertTrue("Analog trigger is not on", trigger.getTriggerState());
+    assertFalse(trigger.getInWindow(), "Analog trigger is in the window (2V, 3V)");
+    assertTrue(trigger.getTriggerState(), "Analog trigger is not on");
 
     trigger.close();
   }
@@ -122,14 +123,14 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
     }
 
     // Then the counter should be at 50
-    assertEquals("Analog trigger counter did not count 50 ticks", 50, counter.get());
+    assertEquals(50, counter.get(), "Analog trigger counter did not count 50 ticks");
 
     counter.close();
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testRuntimeExceptionOnInvalidAccumulatorPort() {
-    analogIO.getInput().getAccumulatorCount();
+    assertThrows(RuntimeException.class, analogIO.getInput()::getAccumulatorCount);
   }
 
   private AnalogTrigger m_interruptTrigger;

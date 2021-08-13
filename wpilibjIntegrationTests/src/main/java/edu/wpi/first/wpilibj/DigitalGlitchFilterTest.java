@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.logging.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Test for the DigitalGlitchFilter class. */
 public class DigitalGlitchFilterTest extends AbstractComsSetup {

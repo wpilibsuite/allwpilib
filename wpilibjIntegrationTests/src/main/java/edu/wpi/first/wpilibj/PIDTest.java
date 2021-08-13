@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
@@ -19,17 +19,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /** Test that covers the {@link PIDController}. */
-@RunWith(Parameterized.class)
 public class PIDTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
   private NetworkTable m_table;
@@ -61,7 +59,6 @@ public class PIDTest extends AbstractComsSetup {
     this.k_d = d;
   }
 
-  @Parameters
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
     Collection<Object[]> data = new ArrayList<Object[]>();
@@ -80,17 +77,17 @@ public class PIDTest extends AbstractComsSetup {
     return data;
   }
 
-  @BeforeClass
-  public static void setUpBeforeClass() {}
+  @BeforeAll
+  public static void setUpBeforeAll() {}
 
-  @AfterClass
-  public static void tearDownAfterClass() {
-    logger.fine("TearDownAfterClass: " + me.getType());
+  @AfterAll
+  public static void tearDownAfterAll() {
+    logger.fine("TearDownAfterAll: " + me.getType());
     me.teardown();
     me = null;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     logger.fine("Setup: " + me.getType());
     me.setup();
@@ -101,7 +98,7 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.initSendable(m_builder);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     logger.fine("Teardown: " + me.getType());
     m_controller = null;
@@ -116,17 +113,18 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setIntegratorRange(-integratorRange, integratorRange);
   }
 
-  @Test
+  @ParameterizedTest
+  @MethodSource("generateData")
   public void testInitialSettings() {
     setupTolerance();
     setupIntegratorRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
     assertEquals(
-        "PID.getPositionError() did not start at " + reference,
         reference,
         m_controller.getPositionError(),
-        0);
+        0,
+        "PID.getPositionError() did not start at " + reference);
     m_builder.update();
     assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
@@ -135,27 +133,30 @@ public class PIDTest extends AbstractComsSetup {
     assertFalse(m_table.getEntry("enabled").getBoolean(true));
   }
 
-  @Test
+  @ParameterizedTest
+  @MethodSource("generateData")
   public void testSetSetpoint() {
     setupTolerance();
     setupIntegratorRange();
     double reference = 2500.0;
     m_controller.setSetpoint(reference);
-    assertEquals("Did not correctly set reference", reference, m_controller.getSetpoint(), 1e-3);
+    assertEquals(reference, m_controller.getSetpoint(), 1e-3, "Did not correctly set reference");
   }
 
-  @Test(timeout = 10000)
+  @Timeout(10)
+  @ParameterizedTest
+  @MethodSource("generateData")
   public void testRotateToTarget() {
     setupTolerance();
     setupIntegratorRange();
     double reference = 1000.0;
-    assertEquals(pidData() + "did not start at 0", 0, me.getMotor().get(), 0);
+    assertEquals(0, me.getMotor().get(), 0, pidData() + "did not start at 0");
     m_controller.setSetpoint(reference);
     assertEquals(
-        pidData() + "did not have an error of " + reference,
         reference,
         m_controller.getPositionError(),
-        0);
+        0,
+        pidData() + "did not have an error of " + reference);
     Notifier pidRunner =
         new Notifier(
             () -> me.getMotor().set(m_controller.calculate(me.getEncoder().getDistance())));
@@ -163,8 +164,8 @@ public class PIDTest extends AbstractComsSetup {
     Timer.delay(5);
     pidRunner.stop();
     assertTrue(
-        pidData() + "Was not on Target. Controller Error: " + m_controller.getPositionError(),
-        m_controller.atSetpoint());
+        m_controller.atSetpoint(),
+        pidData() + "Was not on Target. Controller Error: " + m_controller.getPositionError());
 
     pidRunner.close();
   }
@@ -180,7 +181,6 @@ public class PIDTest extends AbstractComsSetup {
         + "} ";
   }
 
-  @Test(expected = RuntimeException.class)
   public void testOnTargetNoToleranceSet() {
     setupIntegratorRange();
     m_controller.atSetpoint();

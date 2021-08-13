@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.can.CANMessageNotFoundException;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
@@ -16,16 +16,13 @@ import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /** Test that covers the {@link PowerDistribution}. */
-@RunWith(Parameterized.class)
 public class PDPTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PDPTest.class.getName());
 
@@ -33,13 +30,13 @@ public class PDPTest extends AbstractComsSetup {
   private static MotorEncoderFixture<?> me;
   private final double m_expectedStoppedCurrentDraw;
 
-  @BeforeClass
-  public static void setUpBeforeClass() {
+  @BeforeAll
+  public static void setUpBeforeAll() {
     pdp = new PowerDistribution();
   }
 
-  @AfterClass
-  public static void tearDownAfterClass() {
+  @AfterAll
+  public static void tearDownAfterAll() {
     pdp = null;
     me.teardown();
     me = null;
@@ -57,32 +54,33 @@ public class PDPTest extends AbstractComsSetup {
     m_expectedStoppedCurrentDraw = expectedCurrentDraw;
   }
 
-  @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
     return Arrays.asList(new Object[][] {{TestBench.getTalonPair(), 0.0}});
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     me.reset();
   }
 
   /** Test if the current changes when the motor is driven using a talon. */
-  @Test
+  @ParameterizedTest(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
+  @MethodSource("generateData")
   public void checkStoppedCurrentForMotorController() throws CANMessageNotFoundException {
     Timer.delay(0.25);
 
     /* The Current should be 0 */
     assertEquals(
-        "The low current was not within the expected range.",
         m_expectedStoppedCurrentDraw,
         pdp.getCurrent(me.getPDPChannel()),
-        0.001);
+        0.001,
+        "The low current was not within the expected range.");
   }
 
   /** Test if the current changes when the motor is driven using a talon. */
-  @Test
+  @ParameterizedTest(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
+  @MethodSource("generateData")
   public void checkRunningCurrentForMotorController() throws CANMessageNotFoundException {
     /* Set the motor to full forward */
     me.getMotor().set(1.0);

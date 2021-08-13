@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class DMATest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(DMATest.class.getName());
 
@@ -36,7 +36,7 @@ public class DMATest extends AbstractComsSetup {
   private DMA m_dma;
   private DMASample m_dmaSample;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     m_analogIO = TestBench.getAnalogCrossConnectFixture();
     m_manualTrigger = new DigitalOutput(7);
@@ -49,7 +49,7 @@ public class DMATest extends AbstractComsSetup {
     m_manualTrigger.set(true);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     m_dma.close();
     m_manualTrigger.close();
@@ -143,7 +143,7 @@ public class DMATest extends AbstractComsSetup {
 
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
     assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
-    assertTrue("Received more then 5 samples in 100 ms", m_dmaSample.getRemaining() > 5);
+    assertTrue(m_dmaSample.getRemaining() > 5, "Received more then 5 samples in 100 ms");
   }
 
   @Test
@@ -156,6 +156,6 @@ public class DMATest extends AbstractComsSetup {
 
     var timedOut = m_dmaSample.update(m_dma, Units.millisecondsToSeconds(1));
     assertEquals(DMASample.DMAReadStatus.kOk, timedOut);
-    assertTrue("Received more then 5 samples in 100 ms", m_dmaSample.getRemaining() > 5);
+    assertTrue(m_dmaSample.getRemaining() > 5, "Received more then 5 samples in 100 ms");
   }
 }

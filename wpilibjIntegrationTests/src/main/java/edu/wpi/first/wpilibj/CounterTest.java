@@ -4,24 +4,22 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.fixtures.FakeCounterFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /** Tests to see if the Counter is working properly. */
-@RunWith(Parameterized.class)
 public class CounterTest extends AbstractComsSetup {
   private static FakeCounterFixture counter = null;
   private static final Logger logger = Logger.getLogger(CounterTest.class.getName());
@@ -59,7 +57,6 @@ public class CounterTest extends AbstractComsSetup {
    * a Collection of Arrays. For each Array in the Collection, each array element corresponds to a
    * parameter in the constructor.
    */
-  @Parameters
   public static Collection<Integer[]> generateData() {
     // In this example, the parameter generator returns a List of
     // arrays. Each array has two elements: { Digital input port, Digital output
@@ -69,27 +66,30 @@ public class CounterTest extends AbstractComsSetup {
     return TestBench.getDIOCrossConnectCollection();
   }
 
-  @BeforeClass
-  public static void setUpBeforeClass() {}
+  @BeforeAll
+  public static void setUpBeforeAll() {}
 
-  @AfterClass
-  public static void tearDownAfterClass() {
+  @AfterAll
+  public static void tearDownAfterAll() {
     counter.teardown();
     counter = null;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     counter.setup();
   }
 
   /** Tests the default state of the counter immediately after reset. */
-  @Test
+  @ParameterizedTest
+  @MethodSource("generateData")
   public void testDefault() {
-    assertEquals("Counter did not reset to 0", 0, counter.getCounter().get());
+    assertEquals(0, counter.getCounter().get(), "Counter did not reset to 0");
   }
 
-  @Test(timeout = 5000)
+  @Timeout(5)
+  @ParameterizedTest
+  @MethodSource("generateData")
   public void testCount() {
     final int goal = 100;
     counter.getFakeCounterSource().setCount(goal);
@@ -98,6 +98,7 @@ public class CounterTest extends AbstractComsSetup {
     final int count = counter.getCounter().get();
 
     assertTrue(
+        count == goal,
         "Fake Counter, Input: "
             + m_input
             + ", Output: "
@@ -105,7 +106,6 @@ public class CounterTest extends AbstractComsSetup {
             + ", did not return "
             + goal
             + " instead got: "
-            + count,
-        count == goal);
+            + count);
   }
 }

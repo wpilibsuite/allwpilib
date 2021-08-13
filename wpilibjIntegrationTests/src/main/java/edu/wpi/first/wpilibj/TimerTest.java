@@ -4,11 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import java.util.logging.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TimerTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(TimerTest.class.getName());
@@ -33,9 +33,9 @@ public class TimerTest extends AbstractComsSetup {
     // Then
     long offset = difference - TIMER_RUNTIME;
     assertEquals(
-        "Timer.delay ran " + offset + " microseconds too long",
         TIMER_RUNTIME,
         difference,
-        TIMER_TOLERANCE);
+        TIMER_TOLERANCE,
+        "Timer.delay ran " + offset + " microseconds too long");
   }
 }

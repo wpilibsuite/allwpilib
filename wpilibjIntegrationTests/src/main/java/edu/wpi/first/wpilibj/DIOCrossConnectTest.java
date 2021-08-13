@@ -4,22 +4,19 @@
 
 package edu.wpi.first.wpilibj;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.test.TestBench;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /** Tests to see if the Digital ports are working properly. */
-@RunWith(Parameterized.class)
 public class DIOCrossConnectTest extends AbstractInterruptTest {
   private static final Logger logger = Logger.getLogger(DIOCrossConnectTest.class.getName());
 
@@ -51,7 +48,6 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
    * a Collection of Arrays. For each Array in the Collection, each array element corresponds to a
    * parameter in the constructor.
    */
-  @Parameters(name = "{index}: Input Port: {0} Output Port: {1}")
   public static Collection<Integer[]> generateData() {
     // In this example, the parameter generator returns a List of
     // arrays. Each array has two elements: { Digital input port, Digital output
@@ -61,40 +57,58 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     return TestBench.getDIOCrossConnectCollection();
   }
 
-  @AfterClass
-  public static void tearDownAfterClass() {
+  @AfterAll
+  public static void tearDownAfterAll() {
     dio.teardown();
     dio = null;
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     dio.reset();
   }
 
   /** Tests to see if the DIO can create and recognize a high value. */
-  @Test
-  public void testSetHigh() {
+  @ParameterizedTest(name = "{index}: Input Port: {0} Output Port: {1}")
+  @MethodSource("generateData")
+  public void testSetHigh(int input, int output) {
+    if (dio != null) {
+      dio.teardown();
+    }
+    dio = new DIOCrossConnectFixture(input, output);
+
     dio.getOutput().set(true);
-    assertTrue("DIO Not High after no delay", dio.getInput().get());
+    assertTrue(dio.getInput().get(), "DIO Not High after no delay");
     Timer.delay(0.02);
-    assertTrue("DIO Not High after .05s delay", dio.getInput().get());
+    assertTrue(dio.getInput().get(), "DIO Not High after .05s delay");
   }
 
   /** Tests to see if the DIO can create and recognize a low value. */
-  @Test
-  public void testSetLow() {
+  @ParameterizedTest(name = "{index}: Input Port: {0} Output Port: {1}")
+  @MethodSource("generateData")
+  public void testSetLow(int input, int output) {
+    if (dio != null) {
+      dio.teardown();
+    }
+    dio = new DIOCrossConnectFixture(input, output);
+
     dio.getOutput().set(false);
-    assertFalse("DIO Not Low after no delay", dio.getInput().get());
+    assertFalse(dio.getInput().get(), "DIO Not Low after no delay");
     Timer.delay(0.02);
-    assertFalse("DIO Not Low after .05s delay", dio.getInput().get());
+    assertFalse(dio.getInput().get(), "DIO Not Low after .05s delay");
   }
 
   /** Tests to see if the DIO PWM functionality works. */
-  @Test
-  public void testDIOpulseWidthModulation() {
+  @ParameterizedTest(name = "{index}: Input Port: {0} Output Port: {1}")
+  @MethodSource("generateData")
+  public void testDIOpulseWidthModulation(int input, int output) {
+    if (dio != null) {
+      dio.teardown();
+    }
+    dio = new DIOCrossConnectFixture(input, output);
+
     dio.getOutput().set(false);
-    assertFalse("DIO Not Low after no delay", dio.getInput().get());
+    assertFalse(dio.getInput().get(), "DIO Not Low after no delay");
     // Set frequency to 2.0 Hz
     dio.getOutput().setPWMRate(2.0);
     // Enable PWM, but leave it off.
@@ -126,15 +140,15 @@ public class DIOCrossConnectTest extends AbstractInterruptTest {
     Timer.delay(0.5);
     final boolean secondAfterStop = dio.getInput().get();
 
-    assertFalse("DIO Not Low after first delay", firstCycle);
-    assertTrue("DIO Not High after second delay", secondCycle);
-    assertFalse("DIO Not Low after third delay", thirdCycle);
-    assertTrue("DIO Not High after forth delay", forthCycle);
-    assertFalse("DIO Not Low after fifth delay", fifthCycle);
-    assertTrue("DIO Not High after sixth delay", sixthCycle);
-    assertFalse("DIO Not Low after seventh delay", seventhCycle);
-    assertFalse("DIO Not Low after stopping first read", firstAfterStop);
-    assertFalse("DIO Not Low after stopping second read", secondAfterStop);
+    assertFalse(firstCycle, "DIO Not Low after first delay");
+    assertTrue(secondCycle, "DIO Not High after second delay");
+    assertFalse(thirdCycle, "DIO Not Low after third delay");
+    assertTrue(forthCycle, "DIO Not High after forth delay");
+    assertFalse(fifthCycle, "DIO Not Low after fifth delay");
+    assertTrue(sixthCycle, "DIO Not High after sixth delay");
+    assertFalse(seventhCycle, "DIO Not Low after seventh delay");
+    assertFalse(firstAfterStop, "DIO Not Low after stopping first read");
+    assertFalse(secondAfterStop, "DIO Not Low after stopping second read");
   }
 
   /*
