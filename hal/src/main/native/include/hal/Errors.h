@@ -135,6 +135,10 @@
 #define HAL_USE_LAST_ERROR_MESSAGE \
   "HAL: Use HAL_GetLastError(status) to get last error"
 
+#define HAL_SETUID_ERROR -1157
+#define HAL_SETUID_ERROR_MESSAGE \
+  "HAL: Setting the effective user ID has failed";
+
 #define HAL_CAN_BUFFER_OVERRUN -35007
 #define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
   "HAL: CAN Output Buffer Full. Ensure a device is attached"
