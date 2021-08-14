@@ -30,8 +30,10 @@ constexpr int32_t kNumRelayChannels = 8;
 constexpr int32_t kNumRelayHeaders = kNumRelayChannels / 2;
 constexpr int32_t kNumCTREPCMModules = 63;
 constexpr int32_t kNumCTRESolenoidChannels = 8;
-constexpr int32_t kNumPDPModules = 63;
-constexpr int32_t kNumPDPChannels = 16;
+constexpr int32_t kNumCTREPDPModules = 63;
+constexpr int32_t kNumCTREPDPChannels = 16;
+constexpr int32_t kNumREVPDHModules = 63;
+constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumDutyCycles = tDutyCycle::kNumSystems;
 constexpr int32_t kNumAddressableLEDs = tLED::kNumSystems;
 

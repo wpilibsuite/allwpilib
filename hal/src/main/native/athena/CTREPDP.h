@@ -36,6 +36,11 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
 void HAL_CleanPDP(HAL_PDPHandle handle);
 
 /**
+ * Gets the module number for a pdp.
+ */
+int32_t HAL_GetPDPModuleNumber(HAL_PDPHandle handle, int32_t* status);
+
+/**
  * Checks if a PDP channel is valid.
  *
  * @param channel the channel to check

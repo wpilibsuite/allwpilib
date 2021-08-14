@@ -28,7 +28,8 @@ void InitializePowerDistribution() {}
 
 extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t module, HAL_PowerDistributionType type, int32_t* status) {
+    int32_t module, HAL_PowerDistributionType type,
+    const char* allocationLocation, int32_t* status) {
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));
@@ -46,19 +47,47 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
   return handle;
 }
 
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
+                                             int32_t* status) {
+  auto module = hal::can::GetCANModuleFromHandle(handle, status);
+  if (*status != 0) {
+    return 0;
+  }
+  return module;
+}
+
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
-  return module < kNumPDPModules && module >= 0;
+  if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
+    return module < kNumCTREPDPModules && module >= 0;
+  } else {
+    return module < kNumREVPDHModules && module >= 1;
+  }
 }
 
 HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
                                            int32_t channel) {
-  return channel < kNumPDPChannels && channel >= 0;
+  // TODO make this grab from the handle directly
+  if (false) {
+    return channel < kNumCTREPDPChannels && channel >= 0;
+  } else {
+    return channel < kNumREVPDHChannels && channel >= 0;
+  }
 }
 
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status) {
   return HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
+}
+
+int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
+                                            int32_t* status) {
+  // TODO make this grab from the handle directly
+  if (false) {
+    return kNumCTREPDPChannels;
+  } else {
+    return kNumREVPDHChannels;
+  }
 }
 
 void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
@@ -98,7 +127,8 @@ void HAL_GetPowerDistributionAllChannelCurrents(
   }
 
   auto& data = SimPowerDistributionData[module];
-  for (int i = 0; i < kNumPDPChannels; i++) {
+  int toCopy = (std::min)(currentsLength, kNumPDSimChannels);
+  for (int i = 0; i < toCopy; i++) {
     currents[i] = data.current[i];
   }
 }
@@ -118,4 +148,11 @@ void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
                                            int32_t* status) {}
 void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {}
+void HAL_SetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, HAL_Bool state, int32_t* status) {}
+
+HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, int32_t* status) {
+  return false;
+}
 }  // extern "C"

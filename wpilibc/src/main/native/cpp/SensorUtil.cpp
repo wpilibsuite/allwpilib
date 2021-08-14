@@ -16,11 +16,8 @@ using namespace frc;
 const int SensorUtil::kDigitalChannels = HAL_GetNumDigitalChannels();
 const int SensorUtil::kAnalogInputs = HAL_GetNumAnalogInputs();
 const int SensorUtil::kAnalogOutputs = HAL_GetNumAnalogOutputs();
-const int SensorUtil::kSolenoidChannels = HAL_GetNumSolenoidChannels();
-const int SensorUtil::kSolenoidModules = HAL_GetNumCTREPCMModules();
 const int SensorUtil::kPwmChannels = HAL_GetNumPWMChannels();
 const int SensorUtil::kRelayChannels = HAL_GetNumRelayHeaders();
-const int SensorUtil::kPDPChannels = HAL_GetNumPDPChannels();
 
 int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;

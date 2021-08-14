@@ -64,7 +64,8 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
-  InitializePDP();
+  InitializeCTREPDP();
+  InitializeREVPDH();
   InitializePorts();
   InitializePower();
   InitializePWM();

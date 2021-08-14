@@ -142,7 +142,7 @@ class PowerDistributionSim {
    *                 array must be big enough to hold all the PowerDistribution
    * channels
    */
-  void GetAllCurrents(double* currents) const;
+  void GetAllCurrents(double* currents, int length) const;
 
   /**
    * Change the current in all of the PowerDistribution channels.
@@ -151,7 +151,7 @@ class PowerDistributionSim {
    *                 array must be big enough to hold all the PowerDistribution
    * channels
    */
-  void SetAllCurrents(const double* currents);
+  void SetAllCurrents(const double* currents, int length);
 
   /**
    * Reset all PowerDistribution simulation data.

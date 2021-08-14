@@ -31,7 +31,8 @@ class PowerDistributionSimModel : public glass::PowerDistributionModel {
  public:
   explicit PowerDistributionSimModel(int32_t index)
       : m_index{index}, m_temp{index}, m_voltage{index} {
-    const int numChannels = HAL_GetNumPDPChannels();
+    // TODO make this better
+    const int numChannels = HAL_GetNumREVPDHChannels();
     m_currents.reserve(numChannels);
     for (int i = 0; i < numChannels; ++i) {
       m_currents.emplace_back(
@@ -72,7 +73,7 @@ class PowerDistributionSimModel : public glass::PowerDistributionModel {
 
 class PowerDistributionsSimModel : public glass::PowerDistributionsModel {
  public:
-  PowerDistributionsSimModel() : m_models(HAL_GetNumPDPModules()) {}
+  PowerDistributionsSimModel() : m_models(HAL_GetNumREVPDHModules()) {}
 
   void Update() override;
 
@@ -113,7 +114,7 @@ void PowerDistributionsSimModel::ForEachPowerDistribution(
 }
 
 static bool PowerDistributionsAnyInitialized() {
-  static const int32_t num = HAL_GetNumPDPModules();
+  static const int32_t num = HAL_GetNumREVPDHModules();
   for (int32_t i = 0; i < num; ++i) {
     if (HALSIM_GetPowerDistributionInitialized(i)) {
       return true;

@@ -2,12 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <jni.h>
+
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_PowerDistributionJNI.h"
 #include "hal/Ports.h"
 #include "hal/PowerDistribution.h"
 
 using namespace hal;
+
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_AUTOMATIC_TYPE ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_CTRE_TYPE ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_REV_TYPE ==
+              HAL_PowerDistributionType::HAL_PowerDistributionType_kRev);
+static_assert(edu_wpi_first_hal_PowerDistributionJNI_DEFAULT_MODULE ==
+              HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 extern "C" {
 
@@ -21,10 +34,39 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_initialize
   (JNIEnv* env, jclass, jint module, jint type)
 {
   int32_t status = 0;
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
   auto handle = HAL_InitializePowerDistribution(
-      module, static_cast<HAL_PowerDistributionType>(type), &status);
+      module, static_cast<HAL_PowerDistributionType>(type), stack.c_str(),
+      &status);
   CheckStatusForceThrow(env, status);
   return static_cast<jint>(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    free
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_free
+  (JNIEnv*, jclass, jint handle)
+{
+  HAL_CleanPowerDistribution(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getModuleNumber
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getModuleNumber
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto result = HAL_GetPowerDistributionModuleNumber(handle, &status);
+  CheckStatus(env, status, false);
+  return result;
 }
 
 /*
@@ -69,6 +111,21 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getType
 
 /*
  * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getNumChannels
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getNumChannels
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto result = HAL_GetPowerDistributionNumChannels(handle, &status);
+  CheckStatus(env, status);
+  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
  * Method:    getTemperature
  * Signature: (I)D
  */
@@ -100,11 +157,11 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltage
 /*
  * Class:     edu_wpi_first_hal_PowerDistributionJNI
  * Method:    getChannelCurrent
- * Signature: (BI)D
+ * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrent
-  (JNIEnv* env, jclass, jbyte channel, jint handle)
+  (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
   double current =
@@ -204,6 +261,35 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_clearStickyFaults
   int32_t status = 0;
   HAL_ClearPowerDistributionStickyFaults(handle, &status);
   CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    setSwitchableChannel
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannel
+  (JNIEnv* env, jclass, jint handle, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetPowerDistributionSwitchableChannel(handle, enabled, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getSwitchableChannel
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannel
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto state = HAL_GetPowerDistributionSwitchableChannel(handle, &status);
+  CheckStatus(env, status, false);
+  return state;
 }
 
 }  // extern "C"

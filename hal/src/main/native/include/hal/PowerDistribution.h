@@ -26,6 +26,8 @@ HAL_ENUM(HAL_PowerDistributionType) {
 };
 // clang-format on
 
+#define HAL_DEFAULT_POWER_DISTRIBUTION_MODULE -1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,7 +40,17 @@ extern "C" {
  * @return the created PowerDistribution
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
-    int32_t moduleNumber, HAL_PowerDistributionType type, int32_t* status);
+    int32_t moduleNumber, HAL_PowerDistributionType type,
+    const char* allocationLocation, int32_t* status);
+
+/**
+ * Gets the module number for a specific handle.
+ *
+ * @param handle the module handle
+ * @return the module number
+ */
+int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
+                                             int32_t* status);
 
 /**
  * Cleans a PowerDistribution module.
@@ -75,6 +87,15 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(
     HAL_PowerDistributionHandle handle, int32_t* status);
 
 /**
+ * Gets the number of channels for this handle.
+ *
+ * @param handle the handle
+ * @return number of channels
+ */
+int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
+                                            int32_t* status);
+
+/**
  * Gets the temperature of the PowerDistribution.
  *
  * @param handle the module handle
@@ -103,7 +124,7 @@ double HAL_GetPowerDistributionChannelCurrent(
     HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status);
 
 /**
- * Gets the current of all 16 channels on the PowerDistribution.
+ * Gets the current of all 24 channels on the PowerDistribution.
  *
  * The array must be large enough to hold all channels.
  *
@@ -157,6 +178,14 @@ void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
  */
 void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
+
+// REV PDH Specific functions. This functions will no-op on CTRE PDP
+void HAL_SetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, HAL_Bool enabled, int32_t* status);
+
+HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
+    HAL_PowerDistributionHandle handle, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -6,7 +6,16 @@ package edu.wpi.first.hal;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class PowerDistributionJNI extends JNIWrapper {
+  public static final int AUTOMATIC_TYPE = 0;
+  public static final int CTRE_TYPE = 1;
+  public static final int REV_TYPE = 2;
+  public static final int DEFAULT_MODULE = -1;
+
   public static native int initialize(int module, int type);
+
+  public static native void free(int handle);
+
+  public static native int getModuleNumber(int handle);
 
   public static native boolean checkModule(int module, int type);
 
@@ -14,11 +23,13 @@ public class PowerDistributionJNI extends JNIWrapper {
 
   public static native int getType(int handle);
 
+  public static native int getNumChannels(int handle);
+
   public static native double getTemperature(int handle);
 
   public static native double getVoltage(int handle);
 
-  public static native double getChannelCurrent(byte channel, int handle);
+  public static native double getChannelCurrent(int handle, int channel);
 
   public static native void getAllCurrents(int handle, double[] currents);
 
@@ -31,4 +42,8 @@ public class PowerDistributionJNI extends JNIWrapper {
   public static native void resetTotalEnergy(int handle);
 
   public static native void clearStickyFaults(int handle);
+
+  public static native boolean getSwitchableChannel(int handle);
+
+  public static native void setSwitchableChannel(int handle, boolean enabled);
 }
