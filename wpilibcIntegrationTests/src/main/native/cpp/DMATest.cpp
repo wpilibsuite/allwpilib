@@ -32,7 +32,7 @@ class DMATest : public testing::Test {
   }
 };
 
-TEST_F(DMATest, PausingWorks_DISABLED) {
+TEST_F(DMATest, DISABLED_PausingWorks) {
   m_dma.Start(1024);
   m_dma.SetPause(true);
   m_manualTrigger.Set(false);
@@ -46,7 +46,7 @@ TEST_F(DMATest, PausingWorks_DISABLED) {
   ASSERT_EQ(DMASample::DMAReadStatus::kTimeout, timedOut);
 }
 
-TEST_F(DMATest, RemovingTriggersWorks_DISABLED) {
+TEST_F(DMATest, DISABLED_RemovingTriggersWorks) {
   m_dma.ClearExternalTriggers();
   m_dma.Start(1024);
   m_manualTrigger.Set(false);
@@ -60,7 +60,7 @@ TEST_F(DMATest, RemovingTriggersWorks_DISABLED) {
   ASSERT_EQ(DMASample::DMAReadStatus::kTimeout, timedOut);
 }
 
-TEST_F(DMATest, ManualTriggerOnlyHappensOnce_DISABLED) {
+TEST_F(DMATest, DISABLED_ManualTriggerOnlyHappensOnce) {
   m_dma.Start(1024);
   m_manualTrigger.Set(false);
 
@@ -76,7 +76,7 @@ TEST_F(DMATest, ManualTriggerOnlyHappensOnce_DISABLED) {
   ASSERT_EQ(DMASample::DMAReadStatus::kTimeout, timedOut);
 }
 
-TEST_F(DMATest, AnalogIndividualTriggers_DISABLED) {
+TEST_F(DMATest, DISABLED_AnalogIndividualTriggers) {
   m_dma.Start(1024);
   for (double i = 0; i < 5; i += 0.5) {
     frc::DMASample sample;
@@ -96,7 +96,7 @@ TEST_F(DMATest, AnalogIndividualTriggers_DISABLED) {
   }
 }
 
-TEST_F(DMATest, AnalogMultipleTriggers_DISABLED) {
+TEST_F(DMATest, DISABLED_AnalogMultipleTriggers) {
   m_dma.Start(1024);
   std::vector<double> values;
   for (double i = 0; i < 5; i += 0.5) {
@@ -121,7 +121,7 @@ TEST_F(DMATest, AnalogMultipleTriggers_DISABLED) {
   }
 }
 
-TEST_F(DMATest, TimedTriggers_DISABLED) {
+TEST_F(DMATest, DISABLED_TimedTriggers) {
   m_dma.SetTimedTrigger(10_ms);
   m_dma.Start(1024);
   frc::Wait(kDelayTime);
@@ -137,7 +137,7 @@ TEST_F(DMATest, TimedTriggers_DISABLED) {
   ASSERT_GT(remaining, 5);
 }
 
-TEST_F(DMATest, PWMTimedTriggers_DISABLED) {
+TEST_F(DMATest, DISABLED_PWMTimedTriggers) {
   m_dma.ClearExternalTriggers();
   m_dma.SetPwmEdgeTrigger(&m_pwm, true, false);
   m_dma.Start(1024);
