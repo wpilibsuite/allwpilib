@@ -18,9 +18,8 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.ArcadeDrive(
-            m_driverController.GetY(frc::GenericHID::kLeftHand),
-            m_driverController.GetX(frc::GenericHID::kRightHand));
+        m_drive.ArcadeDrive(m_driverController.GetLeftY(),
+                            m_driverController.GetRightX());
       },
       {&m_drive}));
 }
@@ -29,18 +28,19 @@ void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  frc2::JoystickButton(&m_driverController,
+                       frc::XboxController::Button::kRightBumper)
       .WhenPressed(&m_driveHalfSpeed)
       .WhenReleased(&m_driveFullSpeed);
 
   // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
   // 10 seconds
-  frc2::JoystickButton(&m_driverController, 1)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kA)
       .WhenPressed(DriveDistanceProfiled(3_m, &m_drive).WithTimeout(10_s));
 
   // Do the same thing as above when the 'B' button is pressed, but defined
   // inline
-  frc2::JoystickButton(&m_driverController, 2)
+  frc2::JoystickButton(&m_driverController, frc::XboxController::Button::kB)
       .WhenPressed(
           frc2::TrapezoidProfileCommand<units::meters>(
               frc::TrapezoidProfile<units::meters>(

@@ -119,24 +119,18 @@ class Joystick : public GenericHID {
   int GetThrottleChannel() const;
 
   /**
-   * Get the X value of the joystick.
+   * Get the X value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only
-   *             here to complete the GenericHID interface.
    */
-  double GetX(JoystickHand hand = kRightHand) const override;
+  double GetX() const;
 
   /**
-   * Get the Y value of the joystick.
+   * Get the Y value of the current joystick.
    *
    * This depends on the mapping of the joystick connected to the current port.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only
-   *             here to complete the GenericHID interface.
    */
-  double GetY(JoystickHand hand = kRightHand) const override;
+  double GetY() const;
 
   /**
    * Get the Z value of the current joystick.

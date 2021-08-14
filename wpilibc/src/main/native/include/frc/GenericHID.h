@@ -13,7 +13,12 @@ namespace frc {
 class DriverStation;
 
 /**
- * GenericHID Interface.
+ * Handle input from standard HID devices connected to the Driver Station.
+ *
+ * <p>This class handles standard input that comes from the Driver Station. Each
+ * time a value is requested the most recent value is returned. There is a
+ * single class instance for each device and the mapping of ports to hardware
+ * buttons depends on the code in the Driver Station.
  */
 class GenericHID {
  public:
@@ -39,16 +44,11 @@ class GenericHID {
     kHID1stPerson = 24
   };
 
-  enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
-
   explicit GenericHID(int port);
   virtual ~GenericHID() = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
-
-  virtual double GetX(JoystickHand hand = kRightHand) const = 0;
-  virtual double GetY(JoystickHand hand = kRightHand) const = 0;
 
   /**
    * Get the button value (starting at button 1).

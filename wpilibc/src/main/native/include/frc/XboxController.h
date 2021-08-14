@@ -35,72 +35,96 @@ class XboxController : public GenericHID {
   XboxController& operator=(XboxController&&) = default;
 
   /**
-   * Get the X axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the X axis value of left side of the controller.
    */
-  double GetX(JoystickHand hand) const override;
+  double GetLeftX() const;
 
   /**
-   * Get the Y axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the X axis value of right side of the controller.
    */
-  double GetY(JoystickHand hand) const override;
+  double GetRightX() const;
 
   /**
-   * Get the trigger axis value of the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the Y axis value of left side of the controller.
    */
-  double GetTriggerAxis(JoystickHand hand) const;
+  double GetLeftY() const;
 
   /**
-   * Read the value of the bumper button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
+   * Get the Y axis value of right side of the controller.
    */
-  bool GetBumper(JoystickHand hand) const;
+  double GetRightY() const;
 
   /**
-   * Whether the bumper was pressed since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
+   * Get the left trigger (LT) axis value of the controller. Note that this axis
+   * is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    */
-  bool GetBumperPressed(JoystickHand hand);
+  double GetLeftTriggerAxis() const;
 
   /**
-   * Whether the bumper was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was released since the last check.
+   * Get the right trigger (RT) axis value of the controller. Note that this
+   * axis is bound to the range of [0, 1] as opposed to the usual [-1, 1].
    */
-  bool GetBumperReleased(JoystickHand hand);
+  double GetRightTriggerAxis() const;
 
   /**
-   * Read the value of the stick button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return The state of the button.
+   * Read the value of the left bumper (LB) button on the controller.
    */
-  bool GetStickButton(JoystickHand hand) const;
+  bool GetLeftBumper() const;
 
   /**
-   * Whether the stick button was pressed since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was pressed since the last check.
+   * Read the value of the right bumper (RB) button on the controller.
    */
-  bool GetStickButtonPressed(JoystickHand hand);
+  bool GetRightBumper() const;
 
   /**
-   * Whether the stick button was released since the last check.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return Whether the button was released since the last check.
+   * Whether the left bumper (LB) was pressed since the last check.
    */
-  bool GetStickButtonReleased(JoystickHand hand);
+  bool GetLeftBumperPressed();
+
+  /**
+   * Whether the right bumper (RB) was pressed since the last check.
+   */
+  bool GetRightBumperPressed();
+
+  /**
+   * Whether the left bumper (LB) was released since the last check.
+   */
+  bool GetLeftBumperReleased();
+
+  /**
+   * Whether the right bumper (RB) was released since the last check.
+   */
+  bool GetRightBumperReleased();
+
+  /**
+   * Read the value of the left stick button (LSB) on the controller.
+   */
+  bool GetLeftStickButton() const;
+
+  /**
+   * Read the value of the right stick button (RSB) on the controller.
+   */
+  bool GetRightStickButton() const;
+
+  /**
+   * Whether the left stick button (LSB) was pressed since the last check.
+   */
+  bool GetLeftStickButtonPressed();
+
+  /**
+   * Whether the right stick button (RSB) was pressed since the last check.
+   */
+  bool GetRightStickButtonPressed();
+
+  /**
+   * Whether the left stick button (LSB) was released since the last check.
+   */
+  bool GetLeftStickButtonReleased();
+
+  /**
+   * Whether the right stick button (RSB) was released since the last check.
+   */
+  bool GetRightStickButtonReleased();
 
   /**
    * Read the value of the A button on the controller.
@@ -210,7 +234,6 @@ class XboxController : public GenericHID {
   /**
    * Read the value of the start button on the controller.
    *
-   * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
   bool GetStartButton() const;
@@ -229,26 +252,26 @@ class XboxController : public GenericHID {
    */
   bool GetStartButtonReleased();
 
-  enum class Button {
-    kBumperLeft = 5,
-    kBumperRight = 6,
-    kStickLeft = 9,
-    kStickRight = 10,
-    kA = 1,
-    kB = 2,
-    kX = 3,
-    kY = 4,
-    kBack = 7,
-    kStart = 8
+  struct Button {
+    static constexpr int kLeftBumper = 5;
+    static constexpr int kRightBumper = 6;
+    static constexpr int kLeftStick = 9;
+    static constexpr int kRightStick = 10;
+    static constexpr int kA = 1;
+    static constexpr int kB = 2;
+    static constexpr int kX = 3;
+    static constexpr int kY = 4;
+    static constexpr int kBack = 7;
+    static constexpr int kStart = 8;
   };
 
-  enum class Axis {
-    kLeftX = 0,
-    kRightX = 4,
-    kLeftY = 1,
-    kRightY = 5,
-    kLeftTrigger = 2,
-    kRightTrigger = 3
+  struct Axis {
+    static constexpr int kLeftX = 0;
+    static constexpr int kRightX = 4;
+    static constexpr int kLeftY = 1;
+    static constexpr int kRightY = 5;
+    static constexpr int kLeftTrigger = 2;
+    static constexpr int kRightTrigger = 3;
   };
 };
 

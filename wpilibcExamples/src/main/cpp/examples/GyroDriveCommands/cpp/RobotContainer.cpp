@@ -19,9 +19,8 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.ArcadeDrive(
-            m_driverController.GetY(frc::GenericHID::kLeftHand),
-            m_driverController.GetX(frc::GenericHID::kRightHand));
+        m_drive.ArcadeDrive(m_driverController.GetLeftY(),
+                            m_driverController.GetRightX());
       },
       {&m_drive}));
 }
@@ -31,8 +30,8 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Assorted commands to be bound to buttons
 
-  // Stabilize robot to drive straight with gyro when left bumper is held
-  frc2::JoystickButton(&m_driverController, 5)
+  // Stabilize robot to drive straight with gyro when L1 is held
+  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kL1)
       .WhenHeld(frc2::PIDCommand{
           frc2::PIDController{dc::kStabilizationP, dc::kStabilizationI,
                               dc::kStabilizationD},
@@ -42,24 +41,22 @@ void RobotContainer::ConfigureButtonBindings() {
           0,
           // Pipe the output to the turning controls
           [this](double output) {
-            m_drive.ArcadeDrive(m_driverController.GetY(
-                                    frc::GenericHID::JoystickHand::kLeftHand),
-                                output);
+            m_drive.ArcadeDrive(m_driverController.GetLeftY(), output);
           },
           // Require the robot drive
           {&m_drive}});
 
-  // Turn to 90 degrees when the 'X' button is pressed
-  frc2::JoystickButton(&m_driverController, 3)
+  // Turn to 90 degrees when the 'Cross' button is pressed
+  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kCross)
       .WhenPressed(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
-  // Turn to -90 degrees with a profile when the 'A' button is pressed, with a 5
-  // second timeout
-  frc2::JoystickButton(&m_driverController, 1)
+  // Turn to -90 degrees with a profile when the 'Square' button is pressed,
+  // with a 5 second timeout
+  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kSquare)
       .WhenPressed(TurnToAngle{90_deg, &m_drive}.WithTimeout(5_s));
 
-  // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&m_driverController, 6)
+  // While holding R1, drive at half speed
+  frc2::JoystickButton(&m_driverController, frc::PS4Controller::Button::kR1)
       .WhenPressed(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(0.5); }})
       .WhenReleased(frc2::InstantCommand{[this] { m_drive.SetMaxOutput(1); }});
 }

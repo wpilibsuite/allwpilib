@@ -4,9 +4,9 @@
 
 #include "triggers/DoubleButton.h"
 
-#include <frc/Joystick.h>
+#include <frc/GenericHID.h>
 
-DoubleButton::DoubleButton(frc::Joystick* joy, int button1, int button2)
+DoubleButton::DoubleButton(frc::GenericHID* joy, int button1, int button2)
     : m_joy(*joy) {
   m_button1 = button1;
   m_button2 = button2;

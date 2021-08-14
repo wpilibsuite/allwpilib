@@ -7,17 +7,17 @@
 #include <frc/buttons/Trigger.h>
 
 namespace frc {
-class Joystick;
+class GenericHID;
 }  // namespace frc
 
 class DoubleButton : public frc::Trigger {
  public:
-  DoubleButton(frc::Joystick* joy, int button1, int button2);
+  DoubleButton(frc::GenericHID* joy, int button1, int button2);
 
   bool Get() override;
 
  private:
-  frc::Joystick& m_joy;
+  frc::GenericHID& m_joy;
   int m_button1;
   int m_button2;
 };
