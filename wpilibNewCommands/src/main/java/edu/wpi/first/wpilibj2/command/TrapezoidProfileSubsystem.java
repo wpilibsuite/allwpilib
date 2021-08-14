@@ -90,9 +90,14 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
     m_enabled = true;
   }
 
-  /** Disable the TrapezoidProfileSubsystem's output. */
+  /** Disable the TrapezoidProfileSubsystem's output. Called on robot disable. */
   public void disable() {
     m_enabled = false;
+  }
+
+  @Override
+  public void disabledInit() {
+    disable();
   }
 
   /**

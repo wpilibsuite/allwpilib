@@ -123,4 +123,9 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     log();
   }
+
+  @Override
+  public void disabledInit() {
+    m_drive.stopMotor();
+  }
 }

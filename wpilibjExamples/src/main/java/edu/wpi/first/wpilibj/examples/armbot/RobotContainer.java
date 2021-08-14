@@ -81,14 +81,6 @@ public class RobotContainer {
   }
 
   /**
-   * Disables all ProfiledPIDSubsystem and PIDSubsystem instances. This should be called on robot
-   * disable to prevent integral windup.
-   */
-  public void disablePIDSubsystems() {
-    m_robotArm.disable();
-  }
-
-  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous

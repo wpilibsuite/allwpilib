@@ -60,4 +60,9 @@ public class RomiDrivetrain extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+  @Override
+  public void disabledInit() {
+    m_diffDrive.stopMotor(); // Stop motors on disable
+  }
 }

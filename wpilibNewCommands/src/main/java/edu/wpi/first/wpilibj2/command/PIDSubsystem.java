@@ -89,10 +89,15 @@ public abstract class PIDSubsystem extends SubsystemBase {
     m_controller.reset();
   }
 
-  /** Disables the PID control. Sets output to zero. */
+  /** Disables the PID control. Sets output to zero. Called on robot disable. */
   public void disable() {
     m_enabled = false;
     useOutput(0, 0);
+  }
+
+  @Override
+  public void disabledInit() {
+    disable();
   }
 
   /**

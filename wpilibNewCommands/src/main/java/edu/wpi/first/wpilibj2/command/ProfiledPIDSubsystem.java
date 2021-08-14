@@ -90,10 +90,15 @@ public abstract class ProfiledPIDSubsystem extends SubsystemBase {
     m_controller.reset(getMeasurement());
   }
 
-  /** Disables the PID control. Sets output to zero. */
+  /** Disables the PID control. Sets output to zero. Called on robot disable. */
   public void disable() {
     m_enabled = false;
     useOutput(0, new State());
+  }
+
+  @Override
+  public void disabledInit() {
+    disable();
   }
 
   /**

@@ -52,4 +52,10 @@ public class ShooterSubsystem extends PIDSubsystem {
   public void stopFeeder() {
     m_feederMotor.set(0);
   }
+
+  @Override
+  public void disabledInit() {
+    super.disabledInit(); // Disable the shooter PID.
+    stopFeeder(); // Stop the feeder.
+  }
 }

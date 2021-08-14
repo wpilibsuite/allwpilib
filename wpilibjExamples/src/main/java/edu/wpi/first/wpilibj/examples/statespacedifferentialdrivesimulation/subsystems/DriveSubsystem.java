@@ -253,4 +253,9 @@ public class DriveSubsystem extends SubsystemBase {
   public double getHeading() {
     return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  @Override
+  public void disabledInit() {
+    m_drive.stopMotor();
+  }
 }

@@ -19,4 +19,9 @@ public class ExampleSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+  @Override
+  public void disabledInit() {
+    // This method will be called once on entrance to Disabled mode
+  }
 }

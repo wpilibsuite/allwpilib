@@ -188,4 +188,9 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return -m_gyro.getRate();
   }
+
+  @Override
+  public void disabledInit() {
+    m_drive.stopMotor();
+  }
 }

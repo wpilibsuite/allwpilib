@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 /**
  * This is a sample program to demonstrate the use of state-space classes in robot simulation. This
  * robot has a flywheel, elevator, arm and differential drivetrain, and interfaces with the sim
- * GUI's {@link edu.wpi.first.wpilibj.simulation.Field2d} class.
+ * GUI's {@link edu.wpi.first.wpilibj.smartdashboard.Field2d} class.
  */
 public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
@@ -56,6 +56,5 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
-    m_robotContainer.zeroAllOutputs();
   }
 }

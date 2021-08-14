@@ -36,4 +36,10 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
     m_motor.setSetpoint(
         ExampleSmartMotorController.PIDMode.kPosition, setpoint.position, feedforward / 12.0);
   }
+
+  @Override
+  public void disabledInit() {
+    super.disabledInit();
+    m_motor.set(0); // Stop the motor to prevent integral windup.
+  }
 }

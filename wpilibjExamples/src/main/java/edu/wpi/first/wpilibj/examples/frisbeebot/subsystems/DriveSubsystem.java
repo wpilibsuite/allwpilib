@@ -104,4 +104,9 @@ public class DriveSubsystem extends SubsystemBase {
   public void setMaxOutput(double maxOutput) {
     m_drive.setMaxOutput(maxOutput);
   }
+
+  @Override
+  public void disabledInit() {
+    m_drive.stopMotor();
+  }
 }

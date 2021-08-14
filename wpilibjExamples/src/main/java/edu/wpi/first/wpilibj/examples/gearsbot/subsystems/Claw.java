@@ -53,4 +53,9 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     log();
   }
+
+  @Override
+  public void disabledInit() {
+    stop();
+  }
 }

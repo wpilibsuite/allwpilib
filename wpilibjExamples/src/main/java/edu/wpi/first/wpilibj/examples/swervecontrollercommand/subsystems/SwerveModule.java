@@ -111,4 +111,12 @@ public class SwerveModule {
     m_driveEncoder.reset();
     m_turningEncoder.reset();
   }
+
+  /** Stop the motors. */
+  public void stop() {
+    m_driveMotor.stopMotor();
+    m_turningMotor.stopMotor();
+    m_drivePIDController.reset();
+    m_turningPIDController.reset(m_turningEncoder.get());
+  }
 }
