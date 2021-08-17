@@ -79,6 +79,17 @@ jobs:
           fetch-depth: 0
       - name: Run spotless
         run: ./gradlew spotlessCheck
+      - name: Apply Spotless
+        run: ./gradlew :spotlessApply
+        if: ${{ failure() }}
+      - name: Generate diff
+        run: git diff HEAD > spotless-fixes.patch
+        if: ${{ failure() }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: spotless fixes
+          path: spotless-fixes.patch
+        if: ${{ failure() }}
   javaformat:
     name: "Checkstyle and PMD"
     runs-on: ubuntu-latest
