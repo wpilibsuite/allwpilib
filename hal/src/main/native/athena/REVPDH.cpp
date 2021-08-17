@@ -611,16 +611,6 @@ HAL_Bool HAL_REV_CheckPDHBrownout(HAL_REVPDHHandle handle, int32_t* status) {
   return PDH_status4_brownout_decode(statusFrame.brownout);
 }
 
-HAL_Bool HAL_REV_CheckPDHOverCurrent(HAL_REVPDHHandle handle, int32_t* status) {
-  PDH_status4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
-
-  if (*status != 0) {
-    return false;
-  }
-
-  return PDH_status4_over_current_decode(statusFrame.over_current);
-}
-
 HAL_Bool HAL_REV_CheckPDHCANWarning(HAL_REVPDHHandle handle, int32_t* status) {
   PDH_status4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
 
@@ -651,18 +641,6 @@ HAL_Bool HAL_REV_CheckPDHStickyBrownout(HAL_REVPDHHandle handle,
   }
 
   return PDH_status4_sticky_brownout_decode(statusFrame.sticky_brownout);
-}
-
-HAL_Bool HAL_REV_CheckPDHStickyOverCurrent(HAL_REVPDHHandle handle,
-                                           int32_t* status) {
-  PDH_status4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
-
-  if (*status != 0) {
-    return 0.0;
-  }
-
-  return PDH_status4_sticky_over_current_decode(
-      statusFrame.sticky_over_current);
 }
 
 HAL_Bool HAL_REV_CheckPDHStickyCANWarning(HAL_REVPDHHandle handle,
