@@ -70,11 +70,8 @@ class SimpleMotorFeedforward {
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
 
-    Eigen::Matrix<double, 1, 1> r;
-    r << currentVelocity.template to<double>();
-
-    Eigen::Matrix<double, 1, 1> nextR;
-    nextR << nextVelocity.template to<double>();
+    Eigen::Vector<double, 1> r{currentVelocity.template to<double>()};
+    Eigen::Vector<double, 1> nextR{nextVelocity.template to<double>()};
 
     return kS * wpi::sgn(currentVelocity.template to<double>()) +
            units::volt_t{feedforward.Calculate(r, nextR)(0)};

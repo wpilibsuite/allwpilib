@@ -43,15 +43,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t m,
                                               units::meter_t r, double G) {
-    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
-        0.0, 1.0, 0.0,
-        (-std::pow(G, 2) * motor.Kt /
-         (motor.R * units::math::pow<2>(r) * m * motor.Kv))
-            .to<double>());
-    Eigen::Matrix<double, 2, 1> B = frc::MakeMatrix<2, 1>(
-        0.0, (G * motor.Kt / (motor.R * r * m)).to<double>());
-    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 2, 2> A{
+        {0.0, 1.0},
+        {0.0, (-std::pow(G, 2) * motor.Kt /
+               (motor.R * units::math::pow<2>(r) * m * motor.Kv))
+                  .to<double>()}};
+    Eigen::Matrix<double, 2, 1> B{
+        0.0, (G * motor.Kt / (motor.R * r * m)).to<double>()};
+    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
+    Eigen::Matrix<double, 1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -69,13 +69,14 @@ class WPILIB_DLLEXPORT LinearSystemId {
    */
   static LinearSystem<2, 1, 1> SingleJointedArmSystem(
       DCMotor motor, units::kilogram_square_meter_t J, double G) {
-    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
-        0.0, 1.0, 0.0,
-        (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>());
-    Eigen::Matrix<double, 2, 1> B =
-        frc::MakeMatrix<2, 1>(0.0, (G * motor.Kt / (motor.R * J)).to<double>());
-    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 2, 2> A{
+        {0.0, 1.0},
+        {0.0,
+         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>()}};
+    Eigen::Matrix<double, 2, 1> B{0.0,
+                                  (G * motor.Kt / (motor.R * J)).to<double>()};
+    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
+    Eigen::Matrix<double, 1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -106,12 +107,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    Eigen::Matrix<double, 1, 1> A = frc::MakeMatrix<1, 1>(
-        -kV.template to<double>() / kA.template to<double>());
-    Eigen::Matrix<double, 1, 1> B =
-        frc::MakeMatrix<1, 1>(1.0 / kA.template to<double>());
-    Eigen::Matrix<double, 1, 1> C = frc::MakeMatrix<1, 1>(1.0);
-    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 1> A{-kV.template to<double>() /
+                                  kA.template to<double>()};
+    Eigen::Matrix<double, 1, 1> B{1.0 / kA.template to<double>()};
+    Eigen::Matrix<double, 1, 1> C{1.0};
+    Eigen::Matrix<double, 1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -142,12 +142,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
-        0.0, 1.0, 0.0, -kV.template to<double>() / kA.template to<double>());
-    Eigen::Matrix<double, 2, 1> B =
-        frc::MakeMatrix<2, 1>(0.0, 1.0 / kA.template to<double>());
-    Eigen::Matrix<double, 1, 2> C = frc::MakeMatrix<1, 2>(1.0, 0.0);
-    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 2, 2> A{
+        {0.0, 1.0},
+        {0.0, -kV.template to<double>() / kA.template to<double>()}};
+    Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.template to<double>()};
+    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
+    Eigen::Matrix<double, 1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -177,10 +177,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
     double B1 = 1.0 / kAlinear.to<double>() + 1.0 / kAangular.to<double>();
     double B2 = 1.0 / kAlinear.to<double>() - 1.0 / kAangular.to<double>();
 
-    Eigen::Matrix<double, 2, 2> A = 0.5 * frc::MakeMatrix<2, 2>(A1, A2, A2, A1);
-    Eigen::Matrix<double, 2, 2> B = 0.5 * frc::MakeMatrix<2, 2>(B1, B2, B2, B1);
-    Eigen::Matrix<double, 2, 2> C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
-    Eigen::Matrix<double, 2, 2> D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
+    Eigen::Matrix<double, 2, 2> A =
+        0.5 * Eigen::Matrix<double, 2, 2>{{A1, A2}, {A2, A1}};
+    Eigen::Matrix<double, 2, 2> B =
+        0.5 * Eigen::Matrix<double, 2, 2>{{B1, B2}, {B2, B1}};
+    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
@@ -236,12 +238,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> FlywheelSystem(DCMotor motor,
                                               units::kilogram_square_meter_t J,
                                               double G) {
-    auto A = frc::MakeMatrix<1, 1>(
-        (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>());
-    Eigen::Matrix<double, 1, 1> B =
-        frc::MakeMatrix<1, 1>((G * motor.Kt / (motor.R * J)).to<double>());
-    Eigen::Matrix<double, 1, 1> C = frc::MakeMatrix<1, 1>(1.0);
-    Eigen::Matrix<double, 1, 1> D = frc::MakeMatrix<1, 1>(0.0);
+    Eigen::Matrix<double, 1, 1> A{
+        (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>()};
+    Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).to<double>()};
+    Eigen::Matrix<double, 1, 1> C{1.0};
+    Eigen::Matrix<double, 1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -267,18 +268,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
 
-    Eigen::Matrix<double, 2, 2> A = frc::MakeMatrix<2, 2>(
-        ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>(),
-        ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
-        ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
-        ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>());
-    Eigen::Matrix<double, 2, 2> B = frc::MakeMatrix<2, 2>(
-        ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>(),
-        ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
-        ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
-        ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>());
-    Eigen::Matrix<double, 2, 2> C = frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0);
-    Eigen::Matrix<double, 2, 2> D = frc::MakeMatrix<2, 2>(0.0, 0.0, 0.0, 0.0);
+    Eigen::Matrix<double, 2, 2> A{
+        {((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>(),
+         ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>()},
+        {((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
+         ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>()}};
+    Eigen::Matrix<double, 2, 2> B{
+        {((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>(),
+         ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>()},
+        {((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
+         ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>()}};
+    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }

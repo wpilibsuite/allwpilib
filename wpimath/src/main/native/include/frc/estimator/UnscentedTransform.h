@@ -27,24 +27,23 @@ namespace frc {
  *         passing through the transform.
  */
 template <int States, int CovDim>
-std::tuple<Eigen::Matrix<double, CovDim, 1>,
-           Eigen::Matrix<double, CovDim, CovDim>>
+std::tuple<Eigen::Vector<double, CovDim>, Eigen::Matrix<double, CovDim, CovDim>>
 UnscentedTransform(const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
-                   const Eigen::Matrix<double, 2 * States + 1, 1>& Wm,
-                   const Eigen::Matrix<double, 2 * States + 1, 1>& Wc,
-                   std::function<Eigen::Matrix<double, CovDim, 1>(
+                   const Eigen::Vector<double, 2 * States + 1>& Wm,
+                   const Eigen::Vector<double, 2 * States + 1>& Wc,
+                   std::function<Eigen::Vector<double, CovDim>(
                        const Eigen::Matrix<double, CovDim, 2 * States + 1>&,
-                       const Eigen::Matrix<double, 2 * States + 1, 1>&)>
+                       const Eigen::Vector<double, 2 * States + 1>&)>
                        meanFunc,
-                   std::function<Eigen::Matrix<double, CovDim, 1>(
-                       const Eigen::Matrix<double, CovDim, 1>&,
-                       const Eigen::Matrix<double, CovDim, 1>&)>
+                   std::function<Eigen::Vector<double, CovDim>(
+                       const Eigen::Vector<double, CovDim>&,
+                       const Eigen::Vector<double, CovDim>&)>
                        residualFunc) {
   // New mean is usually just the sum of the sigmas * weight:
   //       n
   // dot = Σ W[k] Xᵢ[k]
   //      k=1
-  Eigen::Matrix<double, CovDim, 1> x = meanFunc(sigmas, Wm);
+  Eigen::Vector<double, CovDim> x = meanFunc(sigmas, Wm);
 
   // New covariance is the sum of the outer product of the residuals times the
   // weights

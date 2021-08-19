@@ -19,9 +19,9 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     units::second_t nominalDt)
     : m_observer(
           &DifferentialDrivePoseEstimator::F,
-          [](const Eigen::Matrix<double, 5, 1>& x,
-             const Eigen::Matrix<double, 3, 1>& u) {
-            return frc::MakeMatrix<3, 1>(x(3, 0), x(4, 0), x(2, 0));
+          [](const Eigen::Vector<double, 5>& x,
+             const Eigen::Vector<double, 3>& u) {
+            return Eigen::Vector<double, 3>{x(3, 0), x(4, 0), x(2, 0)};
           },
           stateStdDevs, localMeasurementStdDevs, frc::AngleMean<5, 5>(2),
           frc::AngleMean<3, 5>(2), frc::AngleResidual<5>(2),
@@ -30,12 +30,13 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
   SetVisionMeasurementStdDevs(visionMeasurmentStdDevs);
 
   // Create correction mechanism for vision measurements.
-  m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
-                        const Eigen::Matrix<double, 3, 1>& y) {
+  m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
+                        const Eigen::Vector<double, 3>& y) {
     m_observer.Correct<3>(
         u, y,
-        [](const Eigen::Matrix<double, 5, 1>& x,
-           const Eigen::Matrix<double, 3, 1>&) { return x.block<3, 1>(0, 0); },
+        [](const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 3>&) {
+          return x.block<3, 1>(0, 0);
+        },
         m_visionContR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
         frc::AngleResidual<5>(2), frc::AngleAdd<5>(2));
   };
@@ -94,15 +95,15 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   auto angle = gyroAngle + m_gyroOffset;
   auto omega = (gyroAngle - m_previousAngle).Radians() / dt;
 
-  auto u = frc::MakeMatrix<3, 1>(
+  auto u = Eigen::Vector<double, 3>{
       (wheelSpeeds.left + wheelSpeeds.right).to<double>() / 2.0, 0.0,
-      omega.to<double>());
+      omega.to<double>()};
 
   m_previousAngle = angle;
 
-  auto localY = frc::MakeMatrix<3, 1>(leftDistance.to<double>(),
-                                      rightDistance.to<double>(),
-                                      angle.Radians().to<double>());
+  auto localY = Eigen::Vector<double, 3>{leftDistance.to<double>(),
+                                         rightDistance.to<double>(),
+                                         angle.Radians().to<double>()};
 
   m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
   m_observer.Predict(u, dt);
@@ -111,26 +112,24 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   return GetEstimatedPosition();
 }
 
-Eigen::Matrix<double, 5, 1> DifferentialDrivePoseEstimator::F(
-    const Eigen::Matrix<double, 5, 1>& x,
-    const Eigen::Matrix<double, 3, 1>& u) {
+Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::F(
+    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 3>& u) {
   // Apply a rotation matrix. Note that we do not add x because Runge-Kutta does
   // that for us.
-  auto& theta = x(2, 0);
-  Eigen::Matrix<double, 5, 5> toFieldRotation = frc::MakeMatrix<5, 5>(
-      // clang-format off
-    std::cos(theta), -std::sin(theta), 0.0, 0.0, 0.0,
-    std::sin(theta), std::cos(theta), 0.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 1.0);  // clang-format on
+  auto& theta = x(2);
+  Eigen::Matrix<double, 5, 5> toFieldRotation{
+      {std::cos(theta), -std::sin(theta), 0.0, 0.0, 0.0},
+      {std::sin(theta), std::cos(theta), 0.0, 0.0, 0.0},
+      {0.0, 0.0, 1.0, 0.0, 0.0},
+      {0.0, 0.0, 0.0, 1.0, 0.0},
+      {0.0, 0.0, 0.0, 0.0, 1.0}};
   return toFieldRotation *
-         frc::MakeMatrix<5, 1>(u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0));
+         Eigen::Vector<double, 5>{u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0)};
 }
 
 template <int Dim>
 wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
-    const Eigen::Matrix<double, Dim, 1>& stdDevs) {
+    const Eigen::Vector<double, Dim>& stdDevs) {
   wpi::array<double, Dim> array;
   for (size_t i = 0; i < Dim; ++i) {
     array[i] = stdDevs(i);
@@ -138,11 +137,11 @@ wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
   return array;
 }
 
-Eigen::Matrix<double, 5, 1> DifferentialDrivePoseEstimator::FillStateVector(
+Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::FillStateVector(
     const Pose2d& pose, units::meter_t leftDistance,
     units::meter_t rightDistance) {
-  return frc::MakeMatrix<5, 1>(
+  return Eigen::Vector<double, 5>{
       pose.Translation().X().to<double>(), pose.Translation().Y().to<double>(),
       pose.Rotation().Radians().to<double>(), leftDistance.to<double>(),
-      rightDistance.to<double>());
+      rightDistance.to<double>()};
 }

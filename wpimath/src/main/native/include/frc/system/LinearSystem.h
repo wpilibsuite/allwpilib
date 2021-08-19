@@ -110,10 +110,9 @@ class LinearSystem {
    * @param u  The control input.
    * @param dt Timestep for model update.
    */
-  Eigen::Matrix<double, States, 1> CalculateX(
-      const Eigen::Matrix<double, States, 1>& x,
-      const Eigen::Matrix<double, Inputs, 1>& clampedU,
-      units::second_t dt) const {
+  Eigen::Vector<double, States> CalculateX(
+      const Eigen::Vector<double, States>& x,
+      const Eigen::Vector<double, Inputs>& clampedU, units::second_t dt) const {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
@@ -130,9 +129,9 @@ class LinearSystem {
    * @param x The current state.
    * @param clampedU The control input.
    */
-  Eigen::Matrix<double, Outputs, 1> CalculateY(
-      const Eigen::Matrix<double, States, 1>& x,
-      const Eigen::Matrix<double, Inputs, 1>& clampedU) const {
+  Eigen::Vector<double, Outputs> CalculateY(
+      const Eigen::Vector<double, States>& x,
+      const Eigen::Vector<double, Inputs>& clampedU) const {
     return m_C * x + m_D * clampedU;
   }
 

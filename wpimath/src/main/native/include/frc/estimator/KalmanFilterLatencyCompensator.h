@@ -20,14 +20,14 @@ template <int States, int Inputs, int Outputs, typename KalmanFilterType>
 class KalmanFilterLatencyCompensator {
  public:
   struct ObserverSnapshot {
-    Eigen::Matrix<double, States, 1> xHat;
+    Eigen::Vector<double, States> xHat;
     Eigen::Matrix<double, States, States> errorCovariances;
-    Eigen::Matrix<double, Inputs, 1> inputs;
-    Eigen::Matrix<double, Outputs, 1> localMeasurements;
+    Eigen::Vector<double, Inputs> inputs;
+    Eigen::Vector<double, Outputs> localMeasurements;
 
     ObserverSnapshot(const KalmanFilterType& observer,
-                     const Eigen::Matrix<double, Inputs, 1>& u,
-                     const Eigen::Matrix<double, Outputs, 1>& localY)
+                     const Eigen::Vector<double, Inputs>& u,
+                     const Eigen::Vector<double, Outputs>& localY)
         : xHat(observer.Xhat()),
           errorCovariances(observer.P()),
           inputs(u),
@@ -48,8 +48,8 @@ class KalmanFilterLatencyCompensator {
    * @param timestamp The timesnap of the state.
    */
   void AddObserverState(const KalmanFilterType& observer,
-                        Eigen::Matrix<double, Inputs, 1> u,
-                        Eigen::Matrix<double, Outputs, 1> localY,
+                        Eigen::Vector<double, Inputs> u,
+                        Eigen::Vector<double, Outputs> localY,
                         units::second_t timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
@@ -75,9 +75,9 @@ class KalmanFilterLatencyCompensator {
   template <int Rows>
   void ApplyPastGlobalMeasurement(
       KalmanFilterType* observer, units::second_t nominalDt,
-      Eigen::Matrix<double, Rows, 1> y,
-      std::function<void(const Eigen::Matrix<double, Inputs, 1>& u,
-                         const Eigen::Matrix<double, Rows, 1>& y)>
+      Eigen::Vector<double, Rows> y,
+      std::function<void(const Eigen::Vector<double, Inputs>& u,
+                         const Eigen::Vector<double, Rows>& y)>
           globalMeasurementCorrect,
       units::second_t timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {

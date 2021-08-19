@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
-#include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
@@ -98,7 +97,7 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override {
     // Reset our loop to make sure it's in a known state.
     m_loop.Reset(
-        frc::MakeMatrix<2, 1>(m_encoder.GetDistance(), m_encoder.GetRate()));
+        Eigen::Vector<double, 2>{m_encoder.GetDistance(), m_encoder.GetRate()});
 
     m_lastProfiledReference = {units::meter_t(m_encoder.GetDistance()),
                                units::meters_per_second_t(m_encoder.GetRate())};
@@ -120,12 +119,12 @@ class Robot : public frc::TimedRobot {
                                               m_lastProfiledReference))
             .Calculate(20_ms);
 
-    m_loop.SetNextR(
-        frc::MakeMatrix<2, 1>(m_lastProfiledReference.position.to<double>(),
-                              m_lastProfiledReference.velocity.to<double>()));
+    m_loop.SetNextR(Eigen::Vector<double, 2>{
+        m_lastProfiledReference.position.to<double>(),
+        m_lastProfiledReference.velocity.to<double>()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(frc::MakeMatrix<1, 1>(m_encoder.GetDistance()));
+    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.

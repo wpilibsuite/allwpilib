@@ -80,10 +80,10 @@ class SwerveDrivePoseEstimator {
       const wpi::array<double, 1>& localMeasurementStdDevs,
       const wpi::array<double, 3>& visionMeasurementStdDevs,
       units::second_t nominalDt = 0.02_s)
-      : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
-                      const Eigen::Matrix<double, 3, 1>& u) { return u; },
-                   [](const Eigen::Matrix<double, 3, 1>& x,
-                      const Eigen::Matrix<double, 3, 1>& u) {
+      : m_observer([](const Eigen::Vector<double, 3>& x,
+                      const Eigen::Vector<double, 3>& u) { return u; },
+                   [](const Eigen::Vector<double, 3>& x,
+                      const Eigen::Vector<double, 3>& u) {
                      return x.block<1, 1>(2, 0);
                    },
                    stateStdDevs, localMeasurementStdDevs,
@@ -95,12 +95,12 @@ class SwerveDrivePoseEstimator {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
     // Create correction mechanism for vision measurements.
-    m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
-                          const Eigen::Matrix<double, 3, 1>& y) {
+    m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
+                          const Eigen::Vector<double, 3>& y) {
       m_observer.Correct<3>(
           u, y,
-          [](const Eigen::Matrix<double, 3, 1>& x,
-             const Eigen::Matrix<double, 3, 1>& u) { return x; },
+          [](const Eigen::Vector<double, 3>& x,
+             const Eigen::Vector<double, 3>& u) { return x; },
           m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
           frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
     };
@@ -269,12 +269,11 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    auto u =
-        frc::MakeMatrix<3, 1>(fieldRelativeSpeeds.X().template to<double>(),
-                              fieldRelativeSpeeds.Y().template to<double>(),
-                              omega.template to<double>());
+    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().template to<double>(),
+                               fieldRelativeSpeeds.Y().template to<double>(),
+                               omega.template to<double>()};
 
-    auto localY = frc::MakeMatrix<1, 1>(angle.Radians().template to<double>());
+    Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
     m_previousAngle = angle;
 
     m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
@@ -290,8 +289,8 @@ class SwerveDrivePoseEstimator {
   SwerveDriveKinematics<NumModules>& m_kinematics;
   KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
-                     const Eigen::Matrix<double, 3, 1>& y)>
+  std::function<void(const Eigen::Vector<double, 3>& u,
+                     const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
@@ -304,7 +303,7 @@ class SwerveDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Matrix<double, Dim, 1>& vector) {
+      const Eigen::Vector<double, Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

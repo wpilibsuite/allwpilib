@@ -80,7 +80,7 @@ class DifferentialDrivetrainSim {
    * @param maxVoltage The maximum voltage.
    * @return The normalized input.
    */
-  Eigen::Matrix<double, 2, 1> ClampInput(Eigen::Matrix<double, 2, 1> u);
+  Eigen::Vector<double, 2> ClampInput(const Eigen::Vector<double, 2>& u);
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -178,7 +178,7 @@ class DifferentialDrivetrainSim {
    *
    * @param state The state.
    */
-  void SetState(const Eigen::Matrix<double, 7, 1>& state);
+  void SetState(const Eigen::Vector<double, 7>& state);
 
   /**
    * Sets the system pose.
@@ -187,8 +187,8 @@ class DifferentialDrivetrainSim {
    */
   void SetPose(const frc::Pose2d& pose);
 
-  Eigen::Matrix<double, 7, 1> Dynamics(const Eigen::Matrix<double, 7, 1>& x,
-                                       const Eigen::Matrix<double, 2, 1>& u);
+  Eigen::Vector<double, 7> Dynamics(const Eigen::Vector<double, 7>& x,
+                                    const Eigen::Vector<double, 2>& u);
 
   class State {
    public:
@@ -295,7 +295,7 @@ class DifferentialDrivetrainSim {
   /**
    * Returns the current output vector y.
    */
-  Eigen::Matrix<double, 7, 1> GetOutput() const;
+  Eigen::Vector<double, 7> GetOutput() const;
 
   /**
    * Returns an element of the state vector. Note that this will not include
@@ -308,7 +308,7 @@ class DifferentialDrivetrainSim {
   /**
    * Returns the current state vector x. Note that this will not include noise!
    */
-  Eigen::Matrix<double, 7, 1> GetState() const;
+  Eigen::Vector<double, 7> GetState() const;
 
   LinearSystem<2, 2, 2> m_plant;
   units::meter_t m_rb;
@@ -319,9 +319,9 @@ class DifferentialDrivetrainSim {
   double m_originalGearing;
   double m_currentGearing;
 
-  Eigen::Matrix<double, 7, 1> m_x;
-  Eigen::Matrix<double, 2, 1> m_u;
-  Eigen::Matrix<double, 7, 1> m_y;
+  Eigen::Vector<double, 7> m_x;
+  Eigen::Vector<double, 2> m_u;
+  Eigen::Vector<double, 7> m_y;
   std::array<double, 7> m_measurementStdDevs;
 };
 }  // namespace frc::sim

@@ -9,10 +9,9 @@
 #include "frc/system/RungeKuttaTimeVarying.h"
 
 namespace {
-Eigen::Matrix<double, 1, 1> RungeKuttaTimeVaryingSolution(double t) {
-  return (Eigen::Matrix<double, 1, 1>()
-          << 12.0 * std::exp(t) / (std::pow(std::exp(t) + 1.0, 2.0)))
-      .finished();
+Eigen::Vector<double, 1> RungeKuttaTimeVaryingSolution(double t) {
+  return Eigen::Vector<double, 1>{12.0 * std::exp(t) /
+                                  (std::pow(std::exp(t) + 1.0, 2.0))};
 }
 }  // namespace
 
@@ -24,13 +23,12 @@ Eigen::Matrix<double, 1, 1> RungeKuttaTimeVaryingSolution(double t) {
 //
 // x(t) = 12 * e^t / ((e^t + 1)^2)
 TEST(RungeKuttaTimeVaryingTest, RungeKuttaTimeVarying) {
-  Eigen::Matrix<double, 1, 1> y0 = RungeKuttaTimeVaryingSolution(5.0);
+  Eigen::Vector<double, 1> y0 = RungeKuttaTimeVaryingSolution(5.0);
 
-  Eigen::Matrix<double, 1, 1> y1 = frc::RungeKuttaTimeVarying(
-      [](units::second_t t, Eigen::Matrix<double, 1, 1> x) {
-        return (Eigen::Matrix<double, 1, 1>()
-                << x(0) * (2.0 / (std::exp(t.to<double>()) + 1.0) - 1.0))
-            .finished();
+  Eigen::Vector<double, 1> y1 = frc::RungeKuttaTimeVarying(
+      [](units::second_t t, const Eigen::Vector<double, 1>& x) {
+        return Eigen::Vector<double, 1>{
+            x(0) * (2.0 / (std::exp(t.to<double>()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s);
   EXPECT_NEAR(y1(0), RungeKuttaTimeVaryingSolution(6.0)(0), 1e-3);

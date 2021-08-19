@@ -7,61 +7,46 @@
 #include <cmath>
 
 #include "Eigen/Core"
-#include "frc/StateSpaceUtil.h"
 #include "frc/controller/ControlAffinePlantInversionFeedforward.h"
 #include "units/time.h"
 
 namespace frc {
 
-Eigen::Matrix<double, 2, 1> Dynamics(const Eigen::Matrix<double, 2, 1>& x,
-                                     const Eigen::Matrix<double, 1, 1>& u) {
-  Eigen::Matrix<double, 2, 1> result;
-
-  result = (frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0) * x) +
-           (frc::MakeMatrix<2, 1>(0.0, 1.0) * u);
-
-  return result;
+Eigen::Vector<double, 2> Dynamics(const Eigen::Vector<double, 2>& x,
+                                  const Eigen::Vector<double, 1>& u) {
+  return Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x +
+         Eigen::Matrix<double, 2, 1>{0.0, 1.0} * u;
 }
 
-Eigen::Matrix<double, 2, 1> StateDynamics(
-    const Eigen::Matrix<double, 2, 1>& x) {
-  Eigen::Matrix<double, 2, 1> result;
-
-  result = (frc::MakeMatrix<2, 2>(1.0, 0.0, 0.0, 1.0) * x);
-
-  return result;
+Eigen::Vector<double, 2> StateDynamics(const Eigen::Vector<double, 2>& x) {
+  return Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x;
 }
 
 TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
-  std::function<Eigen::Matrix<double, 2, 1>(const Eigen::Matrix<double, 2, 1>&,
-                                            const Eigen::Matrix<double, 1, 1>&)>
+  std::function<Eigen::Vector<double, 2>(const Eigen::Vector<double, 2>&,
+                                         const Eigen::Vector<double, 1>&)>
       modelDynamics = [](auto& x, auto& u) { return Dynamics(x, u); };
 
   frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
-      modelDynamics, units::second_t(0.02)};
+      modelDynamics, units::second_t{0.02}};
 
-  Eigen::Matrix<double, 2, 1> r;
-  r << 2, 2;
-  Eigen::Matrix<double, 2, 1> nextR;
-  nextR << 3, 3;
+  Eigen::Vector<double, 2> r{2, 2};
+  Eigen::Vector<double, 2> nextR{3, 3};
 
   EXPECT_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
 }
 
 TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
-  std::function<Eigen::Matrix<double, 2, 1>(const Eigen::Matrix<double, 2, 1>&)>
+  std::function<Eigen::Vector<double, 2>(const Eigen::Vector<double, 2>&)>
       modelDynamics = [](auto& x) { return StateDynamics(x); };
 
-  Eigen::Matrix<double, 2, 1> B;
-  B << 0, 1;
+  Eigen::Matrix<double, 2, 1> B{0, 1};
 
   frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
       modelDynamics, B, units::second_t(0.02)};
 
-  Eigen::Matrix<double, 2, 1> r;
-  r << 2, 2;
-  Eigen::Matrix<double, 2, 1> nextR;
-  nextR << 3, 3;
+  Eigen::Vector<double, 2> r{2, 2};
+  Eigen::Vector<double, 2> nextR{3, 3};
 
   EXPECT_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
 }

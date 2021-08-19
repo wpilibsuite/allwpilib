@@ -18,26 +18,26 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const wpi::array<double, 1>& localMeasurementStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs,
     units::second_t nominalDt)
-    : m_observer([](const Eigen::Matrix<double, 3, 1>& x,
-                    const Eigen::Matrix<double, 3, 1>& u) { return u; },
-                 [](const Eigen::Matrix<double, 3, 1>& x,
-                    const Eigen::Matrix<double, 3, 1>& u) {
-                   return x.block<1, 1>(2, 0);
-                 },
-                 stateStdDevs, localMeasurementStdDevs, frc::AngleMean<3, 3>(2),
-                 frc::AngleMean<1, 3>(0), frc::AngleResidual<3>(2),
-                 frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
+    : m_observer(
+          [](const Eigen::Vector<double, 3>& x,
+             const Eigen::Vector<double, 3>& u) { return u; },
+          [](const Eigen::Vector<double, 3>& x,
+             const Eigen::Vector<double, 3>& u) { return x.block<1, 1>(2, 0); },
+          stateStdDevs, localMeasurementStdDevs, frc::AngleMean<3, 3>(2),
+          frc::AngleMean<1, 3>(0), frc::AngleResidual<3>(2),
+          frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
       m_kinematics(kinematics),
       m_nominalDt(nominalDt) {
   SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
   // Create vision correction mechanism.
-  m_visionCorrect = [&](const Eigen::Matrix<double, 3, 1>& u,
-                        const Eigen::Matrix<double, 3, 1>& y) {
+  m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
+                        const Eigen::Vector<double, 3>& y) {
     m_observer.Correct<3>(
         u, y,
-        [](const Eigen::Matrix<double, 3, 1>& x,
-           const Eigen::Matrix<double, 3, 1>&) { return x; },
+        [](const Eigen::Vector<double, 3>& x, const Eigen::Vector<double, 3>&) {
+          return x;
+        },
         m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
         frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
   };
@@ -100,11 +100,11 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
       Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
           .RotateBy(angle);
 
-  auto u = frc::MakeMatrix<3, 1>(fieldRelativeVelocities.X().to<double>(),
-                                 fieldRelativeVelocities.Y().to<double>(),
-                                 omega.to<double>());
+  Eigen::Vector<double, 3> u{fieldRelativeVelocities.X().to<double>(),
+                             fieldRelativeVelocities.Y().to<double>(),
+                             omega.to<double>()};
 
-  auto localY = frc::MakeMatrix<1, 1>(angle.Radians().template to<double>());
+  Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
   m_previousAngle = angle;
 
   m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);

@@ -74,13 +74,10 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
     // [ a1 ] = [  0  1  0  0 ][ P(i+1)  ]
     // [ a0 ] = [  1  0  0  0 ][ P'(i+1) ]
 
-    // clang-format off
-    static auto basis = (Eigen::Matrix<double, 4, 4>() <<
-     +2.0, +1.0, -2.0, +1.0,
-     -3.0, -2.0, +3.0, -1.0,
-     +0.0, +1.0, +0.0, +0.0,
-     +1.0, +0.0, +0.0, +0.0).finished();
-    // clang-format on
+    static const Eigen::Matrix<double, 4, 4> basis{{+2.0, +1.0, -2.0, +1.0},
+                                                   {-3.0, -2.0, +3.0, -1.0},
+                                                   {+0.0, +1.0, +0.0, +0.0},
+                                                   {+1.0, +0.0, +0.0, +0.0}};
     return basis;
   }
 
@@ -95,9 +92,8 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
    */
   static Eigen::Vector4d ControlVectorFromArrays(
       wpi::array<double, 2> initialVector, wpi::array<double, 2> finalVector) {
-    return (Eigen::Vector4d() << initialVector[0], initialVector[1],
-            finalVector[0], finalVector[1])
-        .finished();
+    return Eigen::Vector4d{initialVector[0], initialVector[1], finalVector[0],
+                           finalVector[1]};
   }
 };
 }  // namespace frc

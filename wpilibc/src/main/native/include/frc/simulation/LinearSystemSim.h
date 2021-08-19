@@ -40,9 +40,9 @@ class LinearSystemSim {
       const LinearSystem<States, Inputs, Outputs>& system,
       const std::array<double, Outputs>& measurementStdDevs = {})
       : m_plant(system), m_measurementStdDevs(measurementStdDevs) {
-    m_x = Eigen::Matrix<double, States, 1>::Zero();
-    m_y = Eigen::Matrix<double, Outputs, 1>::Zero();
-    m_u = Eigen::Matrix<double, Inputs, 1>::Zero();
+    m_x = Eigen::Vector<double, States>::Zero();
+    m_y = Eigen::Vector<double, Outputs>::Zero();
+    m_u = Eigen::Vector<double, Inputs>::Zero();
   }
 
   /**
@@ -69,7 +69,7 @@ class LinearSystemSim {
    *
    * @return The current output of the plant.
    */
-  const Eigen::Matrix<double, Outputs, 1>& GetOutput() const { return m_y; }
+  const Eigen::Vector<double, Outputs>& GetOutput() const { return m_y; }
 
   /**
    * Returns an element of the current output of the plant.
@@ -84,9 +84,7 @@ class LinearSystemSim {
    *
    * @param u The system inputs.
    */
-  void SetInput(const Eigen::Matrix<double, Inputs, 1>& u) {
-    m_u = ClampInput(u);
-  }
+  void SetInput(const Eigen::Vector<double, Inputs>& u) { m_u = ClampInput(u); }
 
   /*
    * Sets the system inputs.
@@ -104,7 +102,7 @@ class LinearSystemSim {
    *
    * @param state The new state.
    */
-  void SetState(const Eigen::Matrix<double, States, 1>& state) { m_x = state; }
+  void SetState(const Eigen::Vector<double, States>& state) { m_x = state; }
 
   /**
    * Returns the current drawn by this simulated system. Override this method to
@@ -124,9 +122,9 @@ class LinearSystemSim {
    * @param u           The system inputs (usually voltage).
    * @param dt          The time difference between controller updates.
    */
-  virtual Eigen::Matrix<double, States, 1> UpdateX(
-      const Eigen::Matrix<double, States, 1>& currentXhat,
-      const Eigen::Matrix<double, Inputs, 1>& u, units::second_t dt) {
+  virtual Eigen::Vector<double, States> UpdateX(
+      const Eigen::Vector<double, States>& currentXhat,
+      const Eigen::Vector<double, Inputs>& u, units::second_t dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
   }
 
@@ -137,17 +135,16 @@ class LinearSystemSim {
    * @param u          The input vector.
    * @return The normalized input.
    */
-  Eigen::Matrix<double, Inputs, 1> ClampInput(
-      Eigen::Matrix<double, Inputs, 1> u) {
+  Eigen::Vector<double, Inputs> ClampInput(Eigen::Vector<double, Inputs> u) {
     return frc::NormalizeInputVector<Inputs>(
         u, frc::RobotController::GetInputVoltage());
   }
 
   LinearSystem<States, Inputs, Outputs> m_plant;
 
-  Eigen::Matrix<double, States, 1> m_x;
-  Eigen::Matrix<double, Outputs, 1> m_y;
-  Eigen::Matrix<double, Inputs, 1> m_u;
+  Eigen::Vector<double, States> m_x;
+  Eigen::Vector<double, Outputs> m_y;
+  Eigen::Vector<double, Inputs> m_u;
   std::array<double, Outputs> m_measurementStdDevs;
 };
 }  // namespace frc::sim
