@@ -24,27 +24,26 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
-      m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).template to<double>(),
-        0, 1, (+m_modules[i].X() - centerOfRotation.X()).template to<double>();
+      m_inverseKinematics.template block<2, 3>(i * 2, 0) =
+        Eigen::Matrix<double, 2, 3>{
+          {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).template to<double>()},
+          {0, 1, (+m_modules[i].X() - centerOfRotation.X()).template to<double>()}};
       // clang-format on
     }
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector;
-  chassisSpeedsVector << chassisSpeeds.vx.to<double>(),
-      chassisSpeeds.vy.to<double>(), chassisSpeeds.omega.to<double>();
+  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.to<double>(),
+                                      chassisSpeeds.vy.to<double>(),
+                                      chassisSpeeds.omega.to<double>()};
 
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
       m_inverseKinematics * chassisSpeedsVector;
   wpi::array<SwerveModuleState, NumModules> moduleStates{wpi::empty_array};
 
   for (size_t i = 0; i < NumModules; i++) {
-    units::meters_per_second_t x =
-        units::meters_per_second_t{moduleStatesMatrix(i * 2, 0)};
-    units::meters_per_second_t y =
-        units::meters_per_second_t{moduleStatesMatrix(i * 2 + 1, 0)};
+    units::meters_per_second_t x{moduleStatesMatrix(i * 2, 0)};
+    units::meters_per_second_t y{moduleStatesMatrix(i * 2 + 1, 0)};
 
     auto speed = units::math::hypot(x, y);
     Rotation2d rotation{x.to<double>(), y.to<double>()};
@@ -73,12 +72,12 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
     wpi::array<SwerveModuleState, NumModules> moduleStates) const {
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
 
-  for (size_t i = 0; i < NumModules; i++) {
+  for (size_t i = 0; i < NumModules; ++i) {
     SwerveModuleState module = moduleStates[i];
-    moduleStatesMatrix.row(i * 2)
-        << module.speed.to<double>() * module.angle.Cos();
-    moduleStatesMatrix.row(i * 2 + 1)
-        << module.speed.to<double>() * module.angle.Sin();
+    moduleStatesMatrix(i * 2, 0) =
+        module.speed.to<double>() * module.angle.Cos();
+    moduleStatesMatrix(i * 2 + 1, 0) =
+        module.speed.to<double>() * module.angle.Sin();
   }
 
   Eigen::Vector3d chassisSpeedsVector =

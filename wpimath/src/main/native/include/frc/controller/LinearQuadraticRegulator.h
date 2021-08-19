@@ -146,7 +146,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The reference vector.
    */
-  const Eigen::Matrix<double, States, 1>& R() const { return m_r; }
+  const Eigen::Vector<double, States>& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -162,7 +162,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The control input.
    */
-  const Eigen::Matrix<double, Inputs, 1>& U() const { return m_u; }
+  const Eigen::Vector<double, Inputs>& U() const { return m_u; }
 
   /**
    * Returns an element of the control input vector u.
@@ -186,8 +186,8 @@ class LinearQuadraticRegulatorImpl {
    *
    * @param x The current state x.
    */
-  Eigen::Matrix<double, Inputs, 1> Calculate(
-      const Eigen::Matrix<double, States, 1>& x) {
+  Eigen::Vector<double, Inputs> Calculate(
+      const Eigen::Vector<double, States>& x) {
     m_u = m_K * (m_r - x);
     return m_u;
   }
@@ -198,9 +198,9 @@ class LinearQuadraticRegulatorImpl {
    * @param x     The current state x.
    * @param nextR The next reference vector r.
    */
-  Eigen::Matrix<double, Inputs, 1> Calculate(
-      const Eigen::Matrix<double, States, 1>& x,
-      const Eigen::Matrix<double, States, 1>& nextR) {
+  Eigen::Vector<double, Inputs> Calculate(
+      const Eigen::Vector<double, States>& x,
+      const Eigen::Vector<double, States>& nextR) {
     m_r = nextR;
     return Calculate(x);
   }
@@ -233,10 +233,10 @@ class LinearQuadraticRegulatorImpl {
 
  private:
   // Current reference
-  Eigen::Matrix<double, States, 1> m_r;
+  Eigen::Vector<double, States> m_r;
 
   // Computed controller output
-  Eigen::Matrix<double, Inputs, 1> m_u;
+  Eigen::Vector<double, Inputs> m_u;
 
   // Controller gain
   Eigen::Matrix<double, Inputs, States> m_K;

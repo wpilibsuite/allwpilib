@@ -5,7 +5,6 @@
 #include <frc/Encoder.h>
 #include <frc/Joystick.h>
 #include <frc/RobotController.h>
-#include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
@@ -68,8 +67,8 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_elevatorSim.SetInput(frc::MakeMatrix<1, 1>(
-        m_motor.Get() * frc::RobotController::GetInputVoltage()));
+    m_elevatorSim.SetInput(Eigen::Vector<double, 1>{
+        m_motor.Get() * frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.
     m_elevatorSim.Update(20_ms);

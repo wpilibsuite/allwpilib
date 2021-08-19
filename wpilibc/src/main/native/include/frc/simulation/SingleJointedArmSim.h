@@ -142,9 +142,9 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 1> {
    * @param u           The system inputs (voltage).
    * @param dt          The time difference between controller updates.
    */
-  Eigen::Matrix<double, 2, 1> UpdateX(
-      const Eigen::Matrix<double, 2, 1>& currentXhat,
-      const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) override;
+  Eigen::Vector<double, 2> UpdateX(const Eigen::Vector<double, 2>& currentXhat,
+                                   const Eigen::Vector<double, 1>& u,
+                                   units::second_t dt) override;
 
  private:
   units::meter_t m_r;

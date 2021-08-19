@@ -45,8 +45,8 @@ class StateSpace : public testing::Test {
 
 void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
             double noise) {
-  Eigen::Matrix<double, 1, 1> y = plant.CalculateY(loop.Xhat(), loop.U()) +
-                                  Eigen::Matrix<double, 1, 1>(noise);
+  Eigen::Vector<double, 1> y =
+      plant.CalculateY(loop.Xhat(), loop.U()) + Eigen::Vector<double, 1>{noise};
   loop.Correct(y);
   loop.Predict(kDt);
 }
@@ -55,8 +55,7 @@ TEST_F(StateSpace, CorrectPredictLoop) {
   std::default_random_engine generator;
   std::normal_distribution<double> dist{0.0, kPositionStddev};
 
-  Eigen::Matrix<double, 2, 1> references;
-  references << 2.0, 0.0;
+  Eigen::Vector<double, 2> references{2.0, 0.0};
   loop.SetNextR(references);
 
   for (int i = 0; i < 1000; i++) {

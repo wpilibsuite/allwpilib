@@ -6,7 +6,6 @@
 
 #include <wpi/MathExtras.h>
 
-#include "frc/StateSpaceUtil.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/plant/LinearSystemId.h"
 
@@ -79,25 +78,25 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 }
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(frc::MakeMatrix<1, 1>(voltage.to<double>()));
+  SetInput(Eigen::Vector<double, 1>{voltage.to<double>()});
 }
 
-Eigen::Matrix<double, 2, 1> ElevatorSim::UpdateX(
-    const Eigen::Matrix<double, 2, 1>& currentXhat,
-    const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) {
+Eigen::Vector<double, 2> ElevatorSim::UpdateX(
+    const Eigen::Vector<double, 2>& currentXhat,
+    const Eigen::Vector<double, 1>& u, units::second_t dt) {
   auto updatedXhat = RKDP(
-      [&](const Eigen::Matrix<double, 2, 1>& x,
-          const Eigen::Matrix<double, 1, 1>& u_)
-          -> Eigen::Matrix<double, 2, 1> {
-        return m_plant.A() * x + m_plant.B() * u_ + MakeMatrix<2, 1>(0.0, -9.8);
+      [&](const Eigen::Vector<double, 2>& x,
+          const Eigen::Vector<double, 1>& u_) -> Eigen::Vector<double, 2> {
+        return m_plant.A() * x + m_plant.B() * u_ +
+               Eigen::Vector<double, 2>{0.0, -9.8};
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
   if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_minHeight.to<double>(), 0.0);
+    return Eigen::Vector<double, 2>{m_minHeight.to<double>(), 0.0};
   }
   if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_maxHeight.to<double>(), 0.0);
+    return Eigen::Vector<double, 2>{m_maxHeight.to<double>(), 0.0};
   }
   return updatedXhat;
 }

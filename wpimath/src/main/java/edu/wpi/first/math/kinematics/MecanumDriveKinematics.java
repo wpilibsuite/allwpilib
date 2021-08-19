@@ -109,12 +109,12 @@ public class MecanumDriveKinematics {
         chassisSpeeds.vyMetersPerSecond,
         chassisSpeeds.omegaRadiansPerSecond);
 
-    var wheelsMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
+    var wheelsVector = m_inverseKinematics.mult(chassisSpeedsVector);
     return new MecanumDriveWheelSpeeds(
-        wheelsMatrix.get(0, 0),
-        wheelsMatrix.get(1, 0),
-        wheelsMatrix.get(2, 0),
-        wheelsMatrix.get(3, 0));
+        wheelsVector.get(0, 0),
+        wheelsVector.get(1, 0),
+        wheelsVector.get(2, 0),
+        wheelsVector.get(3, 0));
   }
 
   /**
@@ -137,15 +137,15 @@ public class MecanumDriveKinematics {
    * @return The resulting chassis speed.
    */
   public ChassisSpeeds toChassisSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
-    var wheelSpeedsMatrix = new SimpleMatrix(4, 1);
-    wheelSpeedsMatrix.setColumn(
+    var wheelSpeedsVector = new SimpleMatrix(4, 1);
+    wheelSpeedsVector.setColumn(
         0,
         0,
         wheelSpeeds.frontLeftMetersPerSecond,
         wheelSpeeds.frontRightMetersPerSecond,
         wheelSpeeds.rearLeftMetersPerSecond,
         wheelSpeeds.rearRightMetersPerSecond);
-    var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsMatrix);
+    var chassisSpeedsVector = m_forwardKinematics.mult(wheelSpeedsVector);
 
     return new ChassisSpeeds(
         chassisSpeedsVector.get(0, 0),

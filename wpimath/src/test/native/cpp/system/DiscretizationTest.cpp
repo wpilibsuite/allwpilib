@@ -15,20 +15,17 @@
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
 TEST(DiscretizationTest, DiscretizeA) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, 0;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, 0}};
 
-  Eigen::Matrix<double, 2, 1> x0;
-  x0 << 1, 1;
+  Eigen::Vector<double, 2> x0{1, 1};
   Eigen::Matrix<double, 2, 2> discA;
 
   frc::DiscretizeA<2>(contA, 1_s, &discA);
-  Eigen::Matrix<double, 2, 1> x1Discrete = discA * x0;
+  Eigen::Vector<double, 2> x1Discrete = discA * x0;
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
-  Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(0) = 1.0 * x0(0) + 1.0 * x0(1);
-  x1Truth(1) = 0.0 * x0(0) + 1.0 * x0(1);
+  Eigen::Vector<double, 2> x1Truth{1.0 * x0(0) + 1.0 * x0(1),
+                                   0.0 * x0(0) + 1.0 * x0(1)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -36,26 +33,20 @@ TEST(DiscretizationTest, DiscretizeA) {
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
 TEST(DiscretizationTest, DiscretizeAB) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, 0;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, 0}};
+  Eigen::Matrix<double, 2, 1> contB{0, 1};
 
-  Eigen::Matrix<double, 2, 1> contB;
-  contB << 0, 1;
-
-  Eigen::Matrix<double, 2, 1> x0;
-  x0 << 1, 1;
-  Eigen::Matrix<double, 1, 1> u;
-  u << 1;
+  Eigen::Vector<double, 2> x0{1, 1};
+  Eigen::Vector<double, 1> u{1};
   Eigen::Matrix<double, 2, 2> discA;
   Eigen::Matrix<double, 2, 1> discB;
 
   frc::DiscretizeAB<2, 1>(contA, contB, 1_s, &discA, &discB);
-  Eigen::Matrix<double, 2, 1> x1Discrete = discA * x0 + discB * u;
+  Eigen::Vector<double, 2> x1Discrete = discA * x0 + discB * u;
 
   // We now have pos = vel = accel = 1, which should give us:
-  Eigen::Matrix<double, 2, 1> x1Truth;
-  x1Truth(0) = 1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0);
-  x1Truth(1) = 0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0);
+  Eigen::Vector<double, 2> x1Truth{1.0 * x0(0) + 1.0 * x0(1) + 0.5 * u(0),
+                                   0.0 * x0(0) + 1.0 * x0(1) + 1.0 * u(0)};
 
   EXPECT_EQ(x1Truth, x1Discrete);
 }
@@ -64,11 +55,8 @@ TEST(DiscretizationTest, DiscretizeAB) {
 // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
 //                                             0
 TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, 0;
-
-  Eigen::Matrix<double, 2, 2> contQ;
-  contQ << 1, 0, 0, 1;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, 0}};
+  Eigen::Matrix<double, 2, 2> contQ{{1, 0}, {0, 1}};
 
   constexpr auto dt = 1_s;
 
@@ -97,11 +85,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
 // Test that the discrete approximation of Q ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
 //                                             0
 TEST(DiscretizationTest, DiscretizeFastModelAQ) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, -1406.29;
-
-  Eigen::Matrix<double, 2, 2> contQ;
-  contQ << 0.0025, 0, 0, 1;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, -1406.29}};
+  Eigen::Matrix<double, 2, 2> contQ{{0.0025, 0}, {0, 1}};
 
   constexpr auto dt = 5_ms;
 
@@ -128,11 +113,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
 
 // Test that the Taylor series discretization produces nearly identical results.
 TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, 0;
-
-  Eigen::Matrix<double, 2, 2> contQ;
-  contQ << 1, 0, 0, 1;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, 0}};
+  Eigen::Matrix<double, 2, 2> contQ{{1, 0}, {0, 1}};
 
   constexpr auto dt = 1_s;
 
@@ -141,7 +123,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   Eigen::Matrix<double, 2, 2> discATaylor;
 
   // Continuous Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont(contQ);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esCont{contQ};
   for (int i = 0; i < contQ.rows(); ++i) {
     EXPECT_GE(esCont.eigenvalues()[i], 0);
   }
@@ -167,7 +149,7 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
   EXPECT_LT((discA - discATaylor).norm(), 1e-10);
 
   // Discrete Q should be positive semidefinite
-  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc(discQTaylor);
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> esDisc{discQTaylor};
   for (int i = 0; i < discQTaylor.rows(); ++i) {
     EXPECT_GE(esDisc.eigenvalues()[i], 0);
   }
@@ -175,11 +157,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
 
 // Test that the Taylor series discretization produces nearly identical results.
 TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
-  Eigen::Matrix<double, 2, 2> contA;
-  contA << 0, 1, 0, -1500;
-
-  Eigen::Matrix<double, 2, 2> contQ;
-  contQ << 0.0025, 0, 0, 1;
+  Eigen::Matrix<double, 2, 2> contA{{0, 1}, {0, -1500}};
+  Eigen::Matrix<double, 2, 2> contQ{{0.0025, 0}, {0, 1}};
 
   constexpr auto dt = 5_ms;
 
@@ -222,11 +201,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
 
 // Test that DiscretizeR() works
 TEST(DiscretizationTest, DiscretizeR) {
-  Eigen::Matrix<double, 2, 2> contR;
-  contR << 2.0, 0.0, 0.0, 1.0;
-
-  Eigen::Matrix<double, 2, 2> discRTruth;
-  discRTruth << 4.0, 0.0, 0.0, 2.0;
+  Eigen::Matrix<double, 2, 2> contR{{2.0, 0.0}, {0.0, 1.0}};
+  Eigen::Matrix<double, 2, 2> discRTruth{{4.0, 0.0}, {0.0, 2.0}};
 
   Eigen::Matrix<double, 2, 2> discR = frc::DiscretizeR<2>(contR, 500_ms);
 

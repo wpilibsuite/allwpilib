@@ -63,7 +63,7 @@ class MerweScaledSigmaPoints {
    *
    */
   Eigen::Matrix<double, States, 2 * States + 1> SigmaPoints(
-      const Eigen::Matrix<double, States, 1>& x,
+      const Eigen::Vector<double, States>& x,
       const Eigen::Matrix<double, States, States>& P) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
     Eigen::Matrix<double, States, States> U =
@@ -84,7 +84,7 @@ class MerweScaledSigmaPoints {
   /**
    * Returns the weight for each sigma point for the mean.
    */
-  const Eigen::Matrix<double, 2 * States + 1, 1>& Wm() const { return m_Wm; }
+  const Eigen::Vector<double, 2 * States + 1>& Wm() const { return m_Wm; }
 
   /**
    * Returns an element of the weight for each sigma point for the mean.
@@ -96,7 +96,7 @@ class MerweScaledSigmaPoints {
   /**
    * Returns the weight for each sigma point for the covariance.
    */
-  const Eigen::Matrix<double, 2 * States + 1, 1>& Wc() const { return m_Wc; }
+  const Eigen::Vector<double, 2 * States + 1>& Wc() const { return m_Wc; }
 
   /**
    * Returns an element of the weight for each sigma point for the covariance.
@@ -106,8 +106,8 @@ class MerweScaledSigmaPoints {
   double Wc(int i) const { return m_Wc(i, 0); }
 
  private:
-  Eigen::Matrix<double, 2 * States + 1, 1> m_Wm;
-  Eigen::Matrix<double, 2 * States + 1, 1> m_Wc;
+  Eigen::Vector<double, 2 * States + 1> m_Wm;
+  Eigen::Vector<double, 2 * States + 1> m_Wc;
   double m_alpha;
   int m_kappa;
 
@@ -120,8 +120,8 @@ class MerweScaledSigmaPoints {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
 
     double c = 0.5 / (States + lambda);
-    m_Wm = Eigen::Matrix<double, 2 * States + 1, 1>::Constant(c);
-    m_Wc = Eigen::Matrix<double, 2 * States + 1, 1>::Constant(c);
+    m_Wm = Eigen::Vector<double, 2 * States + 1>::Constant(c);
+    m_Wc = Eigen::Vector<double, 2 * States + 1>::Constant(c);
 
     m_Wm(0) = lambda / (States + lambda);
     m_Wc(0) = lambda / (States + lambda) + (1 - std::pow(m_alpha, 2) + beta);

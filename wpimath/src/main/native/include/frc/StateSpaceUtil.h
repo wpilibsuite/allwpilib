@@ -10,6 +10,7 @@
 #include <type_traits>
 
 #include <wpi/SymbolExports.h>
+#include <wpi/deprecated.h>
 
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
@@ -60,7 +61,7 @@ void WhiteNoiseVectorImpl(Matrix& result, T elem, Ts... elems) {
 template <int States, int Inputs>
 bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
                         const Eigen::Matrix<double, States, Inputs>& B) {
-  Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es(A);
+  Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es{A};
 
   for (int i = 0; i < States; ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
@@ -94,10 +95,13 @@ bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
  *
  * @param elems An array of elements in the matrix.
  * @return A matrix containing the given elements.
+ * @deprecated Use Eigen::Matrix or Eigen::Vector initializer list constructor.
  */
 template <int Rows, int Cols, typename... Ts,
           typename =
               std::enable_if_t<std::conjunction_v<std::is_same<double, Ts>...>>>
+WPI_DEPRECATED(
+    "Use Eigen::Matrix or Eigen::Vector initializer list constructor")
 Eigen::Matrix<double, Rows, Cols> MakeMatrix(Ts... elems) {
   static_assert(
       sizeof...(elems) == Rows * Cols,
@@ -212,12 +216,12 @@ Eigen::Matrix<double, sizeof...(Ts), 1> MakeWhiteNoiseVector(Ts... stdDevs) {
  * @return White noise vector.
  */
 template <int N>
-Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
+Eigen::Vector<double, N> MakeWhiteNoiseVector(
     const std::array<double, N>& stdDevs) {
   std::random_device rd;
   std::mt19937 gen{rd()};
 
-  Eigen::Matrix<double, N, 1> result;
+  Eigen::Vector<double, N> result;
   for (int i = 0; i < N; ++i) {
     // Passing a standard deviation of 0.0 to std::normal_distribution is
     // undefined behavior
@@ -239,7 +243,7 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
+Eigen::Vector<double, 3> PoseTo3dVector(const Pose2d& pose);
 
 /**
  * Converts a Pose2d into a vector of [x, y, std::cos(theta), std::sin(theta)].
@@ -249,7 +253,7 @@ Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Matrix<double, 4, 1> PoseTo4dVector(const Pose2d& pose);
+Eigen::Vector<double, 4> PoseTo4dVector(const Pose2d& pose);
 
 /**
  * Returns true if (A, B) is a stabilizable pair.
@@ -287,7 +291,7 @@ WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(
  * @return The vector.
  */
 WPILIB_DLLEXPORT
-Eigen::Matrix<double, 3, 1> PoseToVector(const Pose2d& pose);
+Eigen::Vector<double, 3> PoseToVector(const Pose2d& pose);
 
 /**
  * Clamps input vector between system's minimum and maximum allowable input.
@@ -296,11 +300,11 @@ Eigen::Matrix<double, 3, 1> PoseToVector(const Pose2d& pose);
  * @return Clamped input vector.
  */
 template <int Inputs>
-Eigen::Matrix<double, Inputs, 1> ClampInputMaxMagnitude(
-    const Eigen::Matrix<double, Inputs, 1>& u,
-    const Eigen::Matrix<double, Inputs, 1>& umin,
-    const Eigen::Matrix<double, Inputs, 1>& umax) {
-  Eigen::Matrix<double, Inputs, 1> result;
+Eigen::Vector<double, Inputs> ClampInputMaxMagnitude(
+    const Eigen::Vector<double, Inputs>& u,
+    const Eigen::Vector<double, Inputs>& umin,
+    const Eigen::Vector<double, Inputs>& umax) {
+  Eigen::Vector<double, Inputs> result;
   for (int i = 0; i < Inputs; ++i) {
     result(i) = std::clamp(u(i), umin(i), umax(i));
   }
@@ -317,8 +321,8 @@ Eigen::Matrix<double, Inputs, 1> ClampInputMaxMagnitude(
  * @return The normalizedInput
  */
 template <int Inputs>
-Eigen::Matrix<double, Inputs, 1> NormalizeInputVector(
-    const Eigen::Matrix<double, Inputs, 1>& u, double maxMagnitude) {
+Eigen::Vector<double, Inputs> NormalizeInputVector(
+    const Eigen::Vector<double, Inputs>& u, double maxMagnitude) {
   double maxValue = u.template lpNorm<Eigen::Infinity>();
 
   if (maxValue > maxMagnitude) {

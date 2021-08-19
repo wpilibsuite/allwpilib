@@ -81,15 +81,13 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
     // [ a1 ] = [   0.0   1.0   0.0   0.0   0.0   0.0 ][ P'(i+1)  ]
     // [ a0 ] = [   1.0   0.0   0.0   0.0   0.0   0.0 ][ P''(i+1) ]
 
-    // clang-format off
-    static const auto basis = (Eigen::Matrix<double, 6, 6>() <<
-      -06.0, -03.0, -00.5, +06.0, -03.0, +00.5,
-      +15.0, +08.0, +01.5, -15.0, +07.0, -01.0,
-      -10.0, -06.0, -01.5, +10.0, -04.0, +00.5,
-      +00.0, +00.0, +00.5, +00.0, +00.0, +00.0,
-      +00.0, +01.0, +00.0, +00.0, +00.0, +00.0,
-      +01.0, +00.0, +00.0, +00.0, +00.0, +00.0).finished();
-    // clang-format on
+    static const Eigen::Matrix<double, 6, 6> basis{
+        {-06.0, -03.0, -00.5, +06.0, -03.0, +00.5},
+        {+15.0, +08.0, +01.5, -15.0, +07.0, -01.0},
+        {-10.0, -06.0, -01.5, +10.0, -04.0, +00.5},
+        {+00.0, +00.0, +00.5, +00.0, +00.0, +00.0},
+        {+00.0, +01.0, +00.0, +00.0, +00.0, +00.0},
+        {+01.0, +00.0, +00.0, +00.0, +00.0, +00.0}};
     return basis;
   }
 
@@ -102,11 +100,11 @@ class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
    *
    * @return The control vector matrix for a dimension.
    */
-  static Eigen::Matrix<double, 6, 1> ControlVectorFromArrays(
+  static Eigen::Vector<double, 6> ControlVectorFromArrays(
       wpi::array<double, 3> initialVector, wpi::array<double, 3> finalVector) {
-    return (Eigen::Matrix<double, 6, 1>() << initialVector[0], initialVector[1],
-            initialVector[2], finalVector[0], finalVector[1], finalVector[2])
-        .finished();
+    return Eigen::Vector<double, 6>{initialVector[0], initialVector[1],
+                                    initialVector[2], finalVector[0],
+                                    finalVector[1],   finalVector[2]};
   }
 };
 }  // namespace frc
