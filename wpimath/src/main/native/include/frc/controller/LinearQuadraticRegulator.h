@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Cholesky"
@@ -321,7 +322,7 @@ class LinearQuadraticRegulator
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
-class LinearQuadraticRegulator<1, 1>
+class WPILIB_DLLEXPORT LinearQuadraticRegulator<1, 1>
     : public detail::LinearQuadraticRegulatorImpl<1, 1> {
  public:
   template <int Outputs>
@@ -357,7 +358,7 @@ class LinearQuadraticRegulator<1, 1>
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
-class LinearQuadraticRegulator<2, 1>
+class WPILIB_DLLEXPORT LinearQuadraticRegulator<2, 1>
     : public detail::LinearQuadraticRegulatorImpl<2, 1> {
  public:
   template <int Outputs>
@@ -393,7 +394,7 @@ class LinearQuadraticRegulator<2, 1>
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
-class LinearQuadraticRegulator<2, 2>
+class WPILIB_DLLEXPORT LinearQuadraticRegulator<2, 2>
     : public detail::LinearQuadraticRegulatorImpl<2, 2> {
  public:
   template <int Outputs>

@@ -7,10 +7,12 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/trajectory/Trajectory.h"
 
 namespace frc {
-class TrajectoryUtil {
+class WPILIB_DLLEXPORT TrajectoryUtil {
  public:
   TrajectoryUtil() = delete;
 

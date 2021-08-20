@@ -7,6 +7,7 @@
 #include <functional>
 #include <limits>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -17,8 +18,9 @@ namespace frc2 {
 /**
  * Implements a PID control loop.
  */
-class PIDController : public wpi::Sendable,
-                      public wpi::SendableHelper<PIDController> {
+class WPILIB_DLLEXPORT PIDController
+    : public wpi::Sendable,
+      public wpi::SendableHelper<PIDController> {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.

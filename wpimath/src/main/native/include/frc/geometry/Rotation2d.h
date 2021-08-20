@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/angle.h"
 
 namespace wpi {
@@ -16,7 +18,7 @@ namespace frc {
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
-class Rotation2d {
+class WPILIB_DLLEXPORT Rotation2d {
  public:
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.
@@ -160,8 +162,10 @@ class Rotation2d {
   double m_sin = 0;
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Rotation2d& rotation);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc

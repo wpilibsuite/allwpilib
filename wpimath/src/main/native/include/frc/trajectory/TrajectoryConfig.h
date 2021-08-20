@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
@@ -29,7 +31,7 @@ namespace frc {
  * have been defaulted to reasonable values (0, 0, {}, false). These values can
  * be changed via the SetXXX methods.
  */
-class TrajectoryConfig {
+class WPILIB_DLLEXPORT TrajectoryConfig {
  public:
   /**
    * Constructs a config object.

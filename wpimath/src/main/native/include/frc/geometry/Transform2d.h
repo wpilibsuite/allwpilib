@@ -4,16 +4,18 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "Translation2d.h"
 
 namespace frc {
 
-class Pose2d;
+class WPILIB_DLLEXPORT Pose2d;
 
 /**
  * Represents a transformation for a Pose2d.
  */
-class Transform2d {
+class WPILIB_DLLEXPORT Transform2d {
  public:
   /**
    * Constructs the transform that maps the initial pose to the final pose.

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/impedance.h"
@@ -15,7 +17,7 @@ namespace frc {
 /**
  * Holds the constants for a DC motor.
  */
-class DCMotor {
+class WPILIB_DLLEXPORT DCMotor {
  public:
   using radians_per_second_per_volt_t =
       units::unit_t<units::compound_unit<units::radians_per_second,

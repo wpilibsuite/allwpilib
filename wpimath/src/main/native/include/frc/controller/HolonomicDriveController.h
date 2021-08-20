@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/controller/PIDController.h"
 #include "frc/controller/ProfiledPIDController.h"
 #include "frc/geometry/Pose2d.h"
@@ -27,7 +29,7 @@ namespace frc {
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
-class HolonomicDriveController {
+class WPILIB_DLLEXPORT HolonomicDriveController {
  public:
   /**
    * Constructs a holonomic drive controller.

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <fmt/format.h>
+#include <wpi/SymbolExports.h>
 
 namespace wpi::math {
 
@@ -23,7 +24,7 @@ enum class MathUsageId {
   kController_ProfiledPIDController,
 };
 
-class MathShared {
+class WPILIB_DLLEXPORT MathShared {
  public:
   virtual ~MathShared() = default;
   virtual void ReportErrorV(fmt::string_view format, fmt::format_args args) = 0;
@@ -42,7 +43,7 @@ class MathShared {
   }
 };
 
-class MathSharedStore {
+class WPILIB_DLLEXPORT MathSharedStore {
  public:
   static MathShared& GetMathShared();
 

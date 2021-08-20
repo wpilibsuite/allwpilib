@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -13,7 +14,7 @@ namespace frc {
 /**
  * Represents a hermite spline of degree 3.
  */
-class CubicHermiteSpline : public Spline<3> {
+class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
  public:
   /**
    * Constructs a cubic hermite spline with the specified control vectors. Each

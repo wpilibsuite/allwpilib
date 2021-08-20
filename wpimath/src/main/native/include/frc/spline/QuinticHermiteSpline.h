@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -13,7 +14,7 @@ namespace frc {
 /**
  * Represents a hermite spline of degree 5.
  */
-class QuinticHermiteSpline : public Spline<5> {
+class WPILIB_DLLEXPORT QuinticHermiteSpline : public Spline<5> {
  public:
   /**
    * Constructs a quintic hermite spline with the specified control vectors.

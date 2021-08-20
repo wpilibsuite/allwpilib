@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/velocity.h"
 
 namespace frc {
 /**
  * Represents the wheel speeds for a differential drive drivetrain.
  */
-struct DifferentialDriveWheelSpeeds {
+struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
   /**
    * Speed of the left side of the robot.
    */

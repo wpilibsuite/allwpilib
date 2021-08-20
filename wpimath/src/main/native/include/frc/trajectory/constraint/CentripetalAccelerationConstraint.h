@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/acceleration.h"
 #include "units/curvature.h"
@@ -20,7 +22,8 @@ namespace frc {
  * robot to slow down around tight turns, making it easier to track trajectories
  * with sharp turns.
  */
-class CentripetalAccelerationConstraint : public TrajectoryConstraint {
+class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
+    : public TrajectoryConstraint {
  public:
   explicit CentripetalAccelerationConstraint(
       units::meters_per_second_squared_t maxCentripetalAcceleration);

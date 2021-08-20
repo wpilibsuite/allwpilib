@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "frc/StateSpaceUtil.h"
+#include <wpi/SymbolExports.h>
+
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
 #include "units/acceleration.h"
@@ -16,7 +17,7 @@
 #include "units/voltage.h"
 
 namespace frc {
-class LinearSystemId {
+class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>
   using Velocity_t = units::unit_t<
