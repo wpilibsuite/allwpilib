@@ -59,6 +59,8 @@ model {
                     it.buildable = false
                     return
                 }
+                it.cppCompiler.define 'WPILIB_BUILDING'
+                it.cCompiler.define 'WPILIB_BUILDING'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }

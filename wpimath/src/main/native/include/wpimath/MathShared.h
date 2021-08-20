@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "WPIMathExports.h"
+
 #include <memory>
 
 #include <fmt/format.h>
@@ -23,7 +25,7 @@ enum class MathUsageId {
   kController_ProfiledPIDController,
 };
 
-class MathShared {
+class WPIMATH_DLLEXPORT MathShared {
  public:
   virtual ~MathShared() = default;
   virtual void ReportErrorV(fmt::string_view format, fmt::format_args args) = 0;
@@ -42,7 +44,7 @@ class MathShared {
   }
 };
 
-class MathSharedStore {
+class WPIMATH_DLLEXPORT MathSharedStore {
  public:
   static MathShared& GetMathShared();
 

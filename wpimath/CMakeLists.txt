@@ -92,7 +92,9 @@ endif()
 file(GLOB_RECURSE wpimath_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpimath_native_src ${wpimath_jni_src})
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 add_library(wpimath ${wpimath_native_src})
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
