@@ -4,11 +4,12 @@
 
 #pragma once
 
+
 #include "Translation2d.h"
 
 namespace frc {
 
-class Pose2d;
+class WPIMATH_DLLEXPORT Pose2d;
 
 /**
  * Represents a transformation for a Pose2d.

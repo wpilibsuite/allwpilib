@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include "WPIMathExports.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
@@ -23,12 +24,12 @@ namespace frc {
  * various States that represent the pose, curvature, time elapsed, velocity,
  * and acceleration at that point.
  */
-class Trajectory {
+class WPIMATH_DLLEXPORT Trajectory {
  public:
   /**
    * Represents one point on the trajectory.
    */
-  struct State {
+  struct WPIMATH_DLLEXPORT State {
     // The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
@@ -41,7 +42,7 @@ class Trajectory {
     // The pose at that point of the trajectory.
     Pose2d pose;
 
-    // The curvature at that point of the trajectory.
+        // The curvature at that point of the trajectory.
     units::curvature_t curvature{0.0};
 
     /**

@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include "WPIMathExports.h"
+
 #include <string>
 #include <string_view>
 
 #include "frc/trajectory/Trajectory.h"
 
 namespace frc {
-class TrajectoryUtil {
+class WPIMATH_DLLEXPORT TrajectoryUtil {
  public:
   TrajectoryUtil() = delete;
 

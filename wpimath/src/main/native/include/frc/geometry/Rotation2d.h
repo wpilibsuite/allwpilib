@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "WPIMathExports.h"
 #include "units/angle.h"
 
 namespace wpi {
@@ -16,7 +17,7 @@ namespace frc {
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
-class Rotation2d {
+class WPIMATH_DLLEXPORT Rotation2d {
  public:
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.

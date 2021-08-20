@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "WPIMathExports.h"
 #include "Transform2d.h"
 #include "Translation2d.h"
 #include "Twist2d.h"
@@ -17,7 +18,7 @@ namespace frc {
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
-class Pose2d {
+class WPIMATH_DLLEXPORT Pose2d {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.
