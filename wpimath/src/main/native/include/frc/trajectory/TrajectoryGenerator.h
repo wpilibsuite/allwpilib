@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/spline/SplineParameterizer.h"
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
@@ -19,7 +21,7 @@ namespace frc {
 /**
  * Helper class used to generate trajectories with various constraints.
  */
-class TrajectoryGenerator {
+class WPILIB_DLLEXPORT TrajectoryGenerator {
  public:
   using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 

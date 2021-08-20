@@ -6,6 +6,7 @@
 
 #include <functional>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -42,7 +43,7 @@ namespace frc {
  * coords from vision, or <strong> y = [[theta]]ᵀ
  * </strong> from the gyro.
  */
-class MecanumDrivePoseEstimator {
+class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator.

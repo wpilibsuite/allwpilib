@@ -9,6 +9,7 @@
 #include <functional>
 #include <limits>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -20,6 +21,7 @@
 
 namespace frc {
 namespace detail {
+WPILIB_DLLEXPORT
 void ReportProfiledPIDController();
 }  // namespace detail
 

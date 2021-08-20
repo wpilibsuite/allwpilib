@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -44,7 +45,7 @@ namespace frc {
  * <strong>y = [[x, y, theta]]ᵀ </strong> from vision,
  * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
  */
-class DifferentialDrivePoseEstimator {
+class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator.

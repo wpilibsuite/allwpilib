@@ -6,6 +6,7 @@
 
 #include <cmath>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Cholesky"
@@ -209,7 +210,8 @@ class KalmanFilter : public detail::KalmanFilterImpl<States, Inputs, Outputs> {
 // Template specializations are used here to make common state-input-output
 // triplets compile faster.
 template <>
-class KalmanFilter<1, 1, 1> : public detail::KalmanFilterImpl<1, 1, 1> {
+class WPILIB_DLLEXPORT KalmanFilter<1, 1, 1>
+    : public detail::KalmanFilterImpl<1, 1, 1> {
  public:
   KalmanFilter(LinearSystem<1, 1, 1>& plant,
                const wpi::array<double, 1>& stateStdDevs,
@@ -223,7 +225,8 @@ class KalmanFilter<1, 1, 1> : public detail::KalmanFilterImpl<1, 1, 1> {
 // Template specializations are used here to make common state-input-output
 // triplets compile faster.
 template <>
-class KalmanFilter<2, 1, 1> : public detail::KalmanFilterImpl<2, 1, 1> {
+class WPILIB_DLLEXPORT KalmanFilter<2, 1, 1>
+    : public detail::KalmanFilterImpl<2, 1, 1> {
  public:
   KalmanFilter(LinearSystem<2, 1, 1>& plant,
                const wpi::array<double, 2>& stateStdDevs,

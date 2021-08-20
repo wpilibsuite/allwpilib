@@ -9,6 +9,8 @@
 #include <random>
 #include <type_traits>
 
+#include <wpi/SymbolExports.h>
+
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 #include "Eigen/QR"
@@ -236,6 +238,7 @@ Eigen::Matrix<double, N, 1> MakeWhiteNoiseVector(
  *
  * @return The vector.
  */
+WPILIB_DLLEXPORT
 Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
 
 /**
@@ -245,6 +248,7 @@ Eigen::Matrix<double, 3, 1> PoseTo3dVector(const Pose2d& pose);
  *
  * @return The vector.
  */
+WPILIB_DLLEXPORT
 Eigen::Matrix<double, 4, 1> PoseTo4dVector(const Pose2d& pose);
 
 /**
@@ -266,14 +270,14 @@ bool IsStabilizable(const Eigen::Matrix<double, States, States>& A,
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
-bool IsStabilizable<1, 1>(const Eigen::Matrix<double, 1, 1>& A,
-                          const Eigen::Matrix<double, 1, 1>& B);
+WPILIB_DLLEXPORT bool IsStabilizable<1, 1>(
+    const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B);
 
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
-bool IsStabilizable<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
-                          const Eigen::Matrix<double, 2, 1>& B);
+WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(
+    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].
@@ -282,6 +286,7 @@ bool IsStabilizable<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
  *
  * @return The vector.
  */
+WPILIB_DLLEXPORT
 Eigen::Matrix<double, 3, 1> PoseToVector(const Pose2d& pose);
 
 /**

@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include <Eigen/Core>
+#include <wpi/SymbolExports.h>
 
 namespace drake {
 namespace math {
@@ -20,6 +21,7 @@ namespace math {
 /// "On the Numerical Solution of the Discrete-Time Algebraic Riccati Equation"
 /// by Thrasyvoulos Pappas, Alan J. Laub, and Nils R. Sandell
 ///
+WPILIB_DLLEXPORT
 Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
     const Eigen::Ref<const Eigen::MatrixXd>& A,
     const Eigen::Ref<const Eigen::MatrixXd>& B,
@@ -69,6 +71,7 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
 /// @throws std::runtime_error if Q − NR⁻¹Nᵀ is not positive semi-definite.
 /// @throws std::runtime_error if R is not positive definite.
 ///
+WPILIB_DLLEXPORT
 Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
     const Eigen::Ref<const Eigen::MatrixXd>& A,
     const Eigen::Ref<const Eigen::MatrixXd>& B,

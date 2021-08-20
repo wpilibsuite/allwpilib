@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
@@ -39,7 +41,7 @@ namespace frc {
  * See <https://file.tavsys.net/control/controls-engineering-in-frc.pdf> section
  * on Ramsete unicycle controller for a derivation and analysis.
  */
-class RamseteController {
+class WPILIB_DLLEXPORT RamseteController {
  public:
   /**
    * Construct a Ramsete unicycle controller.

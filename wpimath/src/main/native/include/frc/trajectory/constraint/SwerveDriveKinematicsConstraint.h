@@ -12,13 +12,12 @@
 
 namespace frc {
 
-template <size_t NumModules>
-
 /**
  * A class that enforces constraints on the swerve drive kinematics.
  * This can be used to ensure that the trajectory is constructed so that the
  * commanded velocities of the wheels stay below a certain limit.
  */
+template <size_t NumModules>
 class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(

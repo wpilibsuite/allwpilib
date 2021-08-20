@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "Rotation2d.h"
 #include "units/length.h"
 
@@ -21,7 +23,7 @@ namespace frc {
  * When the robot is placed on the origin, facing toward the X direction,
  * moving forward increases the X, whereas moving to the left increases the Y.
  */
-class Translation2d {
+class WPILIB_DLLEXPORT Translation2d {
  public:
   /**
    * Constructs a Translation2d with X and Y components equal to zero.
@@ -175,8 +177,10 @@ class Translation2d {
   units::meter_t m_y = 0_m;
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Translation2d& state);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Translation2d& state);
 
 }  // namespace frc

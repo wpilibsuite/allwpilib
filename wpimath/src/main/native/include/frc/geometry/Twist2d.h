@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/angle.h"
 #include "units/length.h"
 #include "units/math.h"
@@ -16,7 +18,7 @@ namespace frc {
  *
  * A Twist can be used to represent a difference between two poses.
  */
-struct Twist2d {
+struct WPILIB_DLLEXPORT Twist2d {
   /**
    * Linear "dx" component
    */

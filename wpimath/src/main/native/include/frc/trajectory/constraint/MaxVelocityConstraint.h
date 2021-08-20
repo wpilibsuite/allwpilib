@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/math.h"
 #include "units/velocity.h"
@@ -14,26 +16,21 @@ namespace frc {
  * with the EllipticalRegionConstraint or RectangularRegionConstraint to enforce
  * a max velocity within a region.
  */
-class MaxVelocityConstraint : public TrajectoryConstraint {
+class WPILIB_DLLEXPORT MaxVelocityConstraint : public TrajectoryConstraint {
  public:
   /**
    * Constructs a new MaxVelocityConstraint.
    *
    * @param maxVelocity The max velocity.
    */
-  explicit MaxVelocityConstraint(units::meters_per_second_t maxVelocity)
-      : m_maxVelocity(units::math::abs(maxVelocity)) {}
+  explicit MaxVelocityConstraint(units::meters_per_second_t maxVelocity);
 
   units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    return m_maxVelocity;
-  }
+      units::meters_per_second_t velocity) const override;
 
   MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
-    return {};
-  }
+                            units::meters_per_second_t speed) const override;
 
  private:
   units::meters_per_second_t m_maxVelocity;

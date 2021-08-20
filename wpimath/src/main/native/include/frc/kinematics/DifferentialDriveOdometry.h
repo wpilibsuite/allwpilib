@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "DifferentialDriveKinematics.h"
 #include "frc/geometry/Pose2d.h"
 #include "units/length.h"
@@ -21,7 +23,7 @@ namespace frc {
  * It is important that you reset your encoders to zero before using this class.
  * Any subsequent pose resets also require the encoders to be reset to zero.
  */
-class DifferentialDriveOdometry {
+class WPILIB_DLLEXPORT DifferentialDriveOdometry {
  public:
   /**
    * Constructs a DifferentialDriveOdometry object.
