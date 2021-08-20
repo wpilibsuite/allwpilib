@@ -4,7 +4,7 @@
 
 #include "Robot.h"
 
-#include <iostream>
+#include <fmt/core.h>
 
 #include <frc/commands/Scheduler.h>
 #include <frc/livewindow/LiveWindow.h>
@@ -53,7 +53,7 @@ void Robot::TeleopInit() {
   if (m_autonomousCommand != nullptr) {
     m_autonomousCommand->Cancel();
   }
-  std::cout << "Starting Teleop" << std::endl;
+  fmt::print("Starting Teleop\n");
 }
 
 void Robot::TeleopPeriodic() {

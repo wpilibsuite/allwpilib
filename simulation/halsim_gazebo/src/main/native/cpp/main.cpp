@@ -2,8 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <iostream>
-
+#include <fmt/core.h>
 #include <hal/Ports.h>
 
 #include "GazeboAnalogIn.h"
@@ -19,14 +18,14 @@ static HALSimGazebo halsim;
 
 extern "C" {
 int HALSIM_InitExtension(void) {
-  std::cout << "Gazebo Simulator Initializing." << std::endl;
+  fmt::print("Gazebo Simulator Initializing.\n");
 
   if (!halsim.node.Connect()) {
-    std::cerr << "Error: unable to connect to Gazebo.  Is it running?."
-              << std::endl;
+    fmt::print(stderr,
+               "Error: unable to connect to Gazebo.  Is it running?.\n");
     return -1;
   }
-  std::cout << "Gazebo Simulator Connected." << std::endl;
+  fmt::print("Gazebo Simulator Connected.\n");
 
   for (int i = 0; i < HALSimGazebo::kPWMCount; i++)
     halsim.pwms[i] = new GazeboPWM(i, &halsim);
