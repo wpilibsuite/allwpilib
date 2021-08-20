@@ -98,6 +98,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
+target_compile_definitions(wpimath WPILIB_BUILDING)
 
 target_compile_features(wpimath PUBLIC cxx_std_17)
 if (MSVC)
