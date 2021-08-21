@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 
+#include <fmt/core.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -153,6 +154,14 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     auto native = notifierThread.native_handle();
     HAL_SetThreadPriority(&native, notifierThreadRealTime,
                           notifierThreadPriority, status);
+    if (*status == HAL_THREAD_PRIORITY_ERROR) {
+      fmt::print("{}: HAL Notifier thread\n",
+                 HAL_THREAD_PRIORITY_ERROR_MESSAGE);
+    }
+    if (*status == HAL_THREAD_PRIORITY_RANGE_ERROR) {
+      fmt::print("{}: HAL Notifier thread\n",
+                 HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE);
+    }
 
     notifierAlarm.reset(tAlarm::create(status));
   }
