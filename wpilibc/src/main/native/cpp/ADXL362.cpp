@@ -75,6 +75,10 @@ ADXL362::ADXL362(SPI::Port port, Range range)
   wpi::SendableRegistry::AddLW(this, "ADXL362", port);
 }
 
+SPI::Port ADXL362::GetSpiPort() const {
+  return m_spi.GetPort();
+}
+
 void ADXL362::SetRange(Range range) {
   if (m_gsPerLSB == 0.0) {
     return;
