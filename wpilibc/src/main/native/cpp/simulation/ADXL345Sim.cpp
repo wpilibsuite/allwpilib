@@ -28,9 +28,11 @@ ADXL345Sim::ADXL345Sim(const frc::ADXL345_SPI& accel) {
 void ADXL345Sim::SetX(double accel) {
   m_simX.Set(accel);
 }
+
 void ADXL345Sim::SetY(double accel) {
   m_simY.Set(accel);
 }
+
 void ADXL345Sim::SetZ(double accel) {
   m_simZ.Set(accel);
 }

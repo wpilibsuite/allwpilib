@@ -19,9 +19,11 @@ ADXL362Sim::ADXL362Sim(const frc::ADXL362& accel) {
 void ADXL362Sim::SetX(double accel) {
   m_simX.Set(accel);
 }
+
 void ADXL362Sim::SetY(double accel) {
   m_simY.Set(accel);
 }
+
 void ADXL362Sim::SetZ(double accel) {
   m_simZ.Set(accel);
 }

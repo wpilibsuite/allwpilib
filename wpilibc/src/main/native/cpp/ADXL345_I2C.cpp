@@ -35,6 +35,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
 I2C::Port ADXL345_I2C::GetI2CPort() const {
   return m_i2c.GetPort();
 }
+
 int ADXL345_I2C::GetI2CDeviceAddress() const {
   return m_i2c.GetDeviceAddress();
 }
