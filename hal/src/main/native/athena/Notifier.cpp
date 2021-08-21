@@ -155,10 +155,12 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     HAL_SetThreadPriority(&native, notifierThreadRealTime,
                           notifierThreadPriority, status);
     if (*status == HAL_THREAD_PRIORITY_ERROR) {
+      *status = 0;
       fmt::print("{}: HAL Notifier thread\n",
                  HAL_THREAD_PRIORITY_ERROR_MESSAGE);
     }
     if (*status == HAL_THREAD_PRIORITY_RANGE_ERROR) {
+      *status = 0;
       fmt::print("{}: HAL Notifier thread\n",
                  HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE);
     }
