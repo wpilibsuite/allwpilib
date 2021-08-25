@@ -37,7 +37,6 @@ class REVPHSim {
   /**
    * Register a callback to be run when a solenoid is initialized on a channel.
    *
-   * @param channel the channel to monitor
    * @param callback the callback
    * @param initialNotify should the callback be run with the initial state
    * @return the CallbackStore object associated with this callback
@@ -55,7 +54,6 @@ class REVPHSim {
   /**
    * Define whether a solenoid has been initialized on a specific channel.
    *
-   * @param channel the channel
    * @param solenoidInitialized is there a solenoid initialized on that channel
    */
   void SetInitialized(bool solenoidInitialized);

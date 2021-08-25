@@ -89,8 +89,8 @@ class Timer {
   /**
    * Check if the period specified has passed.
    *
-   * @param seconds The period to check.
-   * @return        True if the period has passed.
+   * @param period The period to check.
+   * @return       True if the period has passed.
    */
   bool HasElapsed(units::second_t period) const;
 

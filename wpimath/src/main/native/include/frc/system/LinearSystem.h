@@ -106,9 +106,9 @@ class LinearSystem {
    * This is used by state observers directly to run updates based on state
    * estimate.
    *
-   * @param x  The current state.
-   * @param u  The control input.
-   * @param dt Timestep for model update.
+   * @param x        The current state.
+   * @param clampedU The control input.
+   * @param dt       Timestep for model update.
    */
   Eigen::Vector<double, States> CalculateX(
       const Eigen::Vector<double, States>& x,

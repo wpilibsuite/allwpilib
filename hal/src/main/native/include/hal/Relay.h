@@ -26,9 +26,10 @@ extern "C" {
  *
  * @param portHandle the port handle to initialize
  * @param fwd        true for the forward port, false for the reverse port
- * @param allocationLocation    the location where the allocation is occuring
- * (can be null)
- * @return           the created relay handle
+ * @param allocationLocation the location where the allocation is occuring
+ *                           (can be null)
+ * @param status             Error status variable. 0 on success.
+ * @return                   the created relay handle
  */
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         const char* allocationLocation,
@@ -54,6 +55,7 @@ HAL_Bool HAL_CheckRelayChannel(int32_t channel);
  *
  * @param relayPortHandle the relay handle
  * @param on              true for on, false for off
+ * @param status          Error status variable. 0 on success.
  */
 void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
                   int32_t* status);
@@ -62,6 +64,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
  * Gets the current state of the relay channel.
  *
  * @param relayPortHandle the relay handle
+ * @param status          Error status variable. 0 on success.
  * @return                true for on, false for off
  */
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status);

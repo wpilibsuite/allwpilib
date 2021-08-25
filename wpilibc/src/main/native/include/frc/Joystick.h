@@ -54,7 +54,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Y axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetYChannel(int channel);
@@ -62,7 +61,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the Z axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetZChannel(int channel);
@@ -70,7 +68,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the twist axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetTwistChannel(int channel);
@@ -78,7 +75,6 @@ class Joystick : public GenericHID {
   /**
    * Set the channel associated with the throttle axis.
    *
-   * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
   void SetThrottleChannel(int channel);

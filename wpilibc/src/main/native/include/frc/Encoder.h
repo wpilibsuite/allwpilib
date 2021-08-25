@@ -325,8 +325,8 @@ class Encoder : public CounterBase,
    *
    * When this source is activated, the encoder count automatically resets.
    *
-   * @param channel A digital source to set as the encoder index
-   * @param type    The state that will cause the encoder to reset
+   * @param source A digital source to set as the encoder index
+   * @param type   The state that will cause the encoder to reset
    */
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);

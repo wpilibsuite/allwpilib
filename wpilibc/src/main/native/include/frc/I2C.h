@@ -98,7 +98,7 @@ class I2C {
    *
    * @param registerAddress The register to read first in the transaction.
    * @param count           The number of bytes to read in the transaction.
-   * @param buffer          A pointer to the array of bytes to store the data
+   * @param data            A pointer to the array of bytes to store the data
    *                        read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */

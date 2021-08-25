@@ -124,7 +124,7 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
  * Note the version is not checked on the roboRIO.
  *
  * @param handle     the handle
- * @param handleType the type to check
+ * @param enumType   the type to check
  * @param version    the handle version to check
  * @return           true if the handle is proper version and type, otherwise
  * false.

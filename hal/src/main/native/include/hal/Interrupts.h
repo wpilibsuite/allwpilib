@@ -22,7 +22,7 @@ extern "C" {
 /**
  * Initializes an interrupt.
  *
- * @param watcher true for synchronous interrupts, false for asynchronous
+ * @param status  Error status variable. 0 on success.
  * @return        the created interrupt handle
  */
 HAL_InterruptHandle HAL_InitializeInterrupts(int32_t* status);
@@ -40,7 +40,8 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle);
  * @param interruptHandle the interrupt handle
  * @param timeout        timeout in seconds
  * @param ignorePrevious if true, ignore interrupts that happened before
- * waitForInterrupt was called
+ *                       waitForInterrupt was called
+ * @param status         Error status variable. 0 on success.
  * @return               the mask of interrupts that fired
  */
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
@@ -55,6 +56,7 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
  * hour, you will need to fill in the upper 32 bits yourself.
  *
  * @param interruptHandle the interrupt handle
+ * @param status          Error status variable. 0 on success.
  * @return                timestamp in microseconds since FPGA Initialization
  */
 int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
@@ -68,6 +70,7 @@ int64_t HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
  * hour, you will need to fill in the upper 32 bits yourself.
  *
  * @param interruptHandle the interrupt handle
+ * @param status          Error status variable. 0 on success.
  * @return                timestamp in microseconds since FPGA Initialization
  */
 int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
@@ -78,8 +81,9 @@ int64_t HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
  *
  * @param interruptHandle     the interrupt handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
+ *                            HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the trigger type if the source is an AnalogTrigger
+ * @param status              Error status variable. 0 on success.
  */
 void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
                            HAL_Handle digitalSourceHandle,
@@ -94,6 +98,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
  * @param interruptHandle the interrupt handle
  * @param risingEdge      true for triggering on rising edge
  * @param fallingEdge     true for triggering on falling edge
+ * @param status          Error status variable. 0 on success.
  */
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
@@ -105,6 +110,7 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
  * This will release both rising and falling waiters.
  *
  * @param interruptHandle the interrupt handle to release
+ * @param status          Error status variable. 0 on success.
  */
 void HAL_ReleaseWaitingInterrupt(HAL_InterruptHandle interruptHandle,
                                  int32_t* status);

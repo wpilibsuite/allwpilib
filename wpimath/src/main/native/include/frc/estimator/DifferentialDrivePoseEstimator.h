@@ -179,6 +179,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * Note that this should be called every loop iteration.
    *
    * @param gyroAngle     The current gyro angle.
+   * @param wheelSpeeds   The velocities of the wheels in meters per second.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *
@@ -194,6 +195,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * @param currentTime   The time at which this method was called.
    * @param gyroAngle     The current gyro angle.
+   * @param wheelSpeeds   The velocities of the wheels in meters per second.
    * @param leftDistance  The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    *

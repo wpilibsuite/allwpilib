@@ -27,6 +27,7 @@ extern "C" {
  * @param manufacturer the can manufacturer
  * @param deviceId     the device ID (0-63)
  * @param deviceType   the device type
+ * @param status       Error status variable. 0 on success.
  * @return             the created CAN handle
  */
 HAL_CANHandle HAL_InitializeCAN(HAL_CANManufacturer manufacturer,
@@ -49,6 +50,7 @@ void HAL_CleanCAN(HAL_CANHandle handle);
  * @param data   the data to write (0-8 bytes)
  * @param length the length of data (0-8)
  * @param apiId  the ID to write (0-1023 bits)
+ * @param status Error status variable. 0 on success.
  */
 void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
                         int32_t length, int32_t apiId, int32_t* status);
@@ -65,6 +67,7 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, const uint8_t* data,
  * @param length   the length of data (0-8)
  * @param apiId    the ID to write (0-1023)
  * @param repeatMs the period to repeat in ms
+ * @param status   Error status variable. 0 on success.
  */
 void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
                                  int32_t length, int32_t apiId,
@@ -80,6 +83,7 @@ void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, const uint8_t* data,
  * @param handle   the CAN handle
  * @param length   the length of data to request (0-8)
  * @param apiId    the ID to write (0-1023)
+ * @param status   Error status variable. 0 on success.
  */
 void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
                           int32_t* status);
@@ -91,6 +95,7 @@ void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t length, int32_t apiId,
  *
  * @param handle the CAN handle
  * @param apiId  the ID to stop repeating (0-1023)
+ * @param status Error status variable. 0 on success.
  */
 void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                 int32_t* status);
@@ -106,7 +111,8 @@ void HAL_StopCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
  * @param data              the packet data (8 bytes)
  * @param length            the received length (0-8 bytes)
  * @param receivedTimestamp the packet received timestamp (based off of
- * CLOCK_MONOTONIC)
+ *                          CLOCK_MONOTONIC)
+ * @param status            Error status variable. 0 on success.
  */
 void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
                           int32_t* length, uint64_t* receivedTimestamp,
@@ -121,7 +127,8 @@ void HAL_ReadCANPacketNew(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
  * @param data              the packet data (8 bytes)
  * @param length            the received length (0-8 bytes)
  * @param receivedTimestamp the packet received timestamp (based off of
- * CLOCK_MONOTONIC)
+ *                          CLOCK_MONOTONIC)
+ * @param status            Error status variable. 0 on success.
  */
 void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
                              int32_t* length, uint64_t* receivedTimestamp,
@@ -137,8 +144,9 @@ void HAL_ReadCANPacketLatest(HAL_CANHandle handle, int32_t apiId, uint8_t* data,
  * @param data              the packet data (8 bytes)
  * @param length            the received length (0-8 bytes)
  * @param receivedTimestamp the packet received timestamp (based off of
- * CLOCK_MONOTONIC)
+ *                          CLOCK_MONOTONIC)
  * @param timeoutMs         the timeout time for the packet
+ * @param status            Error status variable. 0 on success.
  */
 void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
                               uint8_t* data, int32_t* length,

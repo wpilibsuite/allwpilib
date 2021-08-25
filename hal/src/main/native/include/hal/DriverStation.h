@@ -27,7 +27,7 @@ extern "C" {
  * @param isLVCode  true for a LV error code, false for a standard error code
  * @param details   the details of the error
  * @param location  the file location of the errror
- * @param callstack the callstack of the error
+ * @param callStack the callstack of the error
  * @param printMsg  true to print the error message to stdout as well as to the
  * DS
  */
@@ -90,12 +90,12 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
 /**
  * Retrieves the Joystick Descriptor for particular slot.
  *
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
- *
+ * @param joystickNum the joystick number
+ * @param desc [out] descriptor (data transfer object) to fill in. desc is
+ *             filled in regardless of success. In other words, if descriptor is
+ *             not available, desc is filled in with default values matching the
+ *             init-values in Java and C++ Driver Station for when caller
+ *             requests a too-large joystick index.
  * @return error code reported from Network Comm back-end.  Zero is good,
  * nonzero is bad.
  */

@@ -72,7 +72,6 @@ class FieldObject2d {
    * Set multiple poses from an array of Pose objects.
    * The total number of poses is limited to 85.
    *
-   * @param obj Object entry
    * @param poses array of 2D poses
    */
   void SetPoses(std::initializer_list<Pose2d> poses);
@@ -95,7 +94,6 @@ class FieldObject2d {
   /**
    * Get multiple poses.
    *
-   * @param obj Object entry
    * @param out output SmallVector to hold 2D poses
    * @return span referring to output SmallVector
    */

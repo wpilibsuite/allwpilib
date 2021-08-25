@@ -49,7 +49,8 @@ extern "C" {
  * @param data      the data to send (0-8 bytes)
  * @param dataSize  the size of the data to send (0-8 bytes)
  * @param periodMs  the period to repeat the packet at. Use
- * HAL_CAN_SEND_PERIOD_NO_REPEAT to not repeat.
+ *                  HAL_CAN_SEND_PERIOD_NO_REPEAT to not repeat.
+ * @param status    Error status variable. 0 on success.
  */
 void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
                          uint8_t dataSize, int32_t periodMs, int32_t* status);
@@ -62,7 +63,8 @@ void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,
  * @param data          data output (8 bytes)
  * @param dataSize      data length (0-8 bytes)
  * @param timeStamp     the packet received timestamp (based off of
- * CLOCK_MONOTONIC)
+ *                      CLOCK_MONOTONIC)
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
                             uint8_t* data, uint8_t* dataSize,
@@ -75,6 +77,7 @@ void HAL_CAN_ReceiveMessage(uint32_t* messageID, uint32_t messageIDMask,
  * @param messageID     the message ID to read
  * @param messageIDMask the mssage ID mask
  * @param maxMessages   the maximum number of messages to stream
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_CAN_OpenStreamSession(uint32_t* sessionHandle, uint32_t messageID,
                                uint32_t messageIDMask, uint32_t maxMessages,
@@ -93,7 +96,8 @@ void HAL_CAN_CloseStreamSession(uint32_t sessionHandle);
  * @param sessionHandle  the session handle
  * @param messages       array of messages
  * @param messagesToRead the max number of messages to read
- * @param messageRead    the number of messages actually read
+ * @param messagesRead   the number of messages actually read
+ * @param status         Error status variable. 0 on success.
  */
 void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
                                struct HAL_CANStreamMessage* messages,
@@ -108,6 +112,7 @@ void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
  * @param txFullCount           the number of tx full errors
  * @param receiveErrorCount     the number of receive errors
  * @param transmitErrorCount    the number of transmit errors
+ * @param status                Error status variable. 0 on success.
  */
 void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
                           uint32_t* txFullCount, uint32_t* receiveErrorCount,

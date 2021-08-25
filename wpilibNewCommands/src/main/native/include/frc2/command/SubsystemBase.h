@@ -47,7 +47,7 @@ class SubsystemBase : public Subsystem,
   /**
    * Sets the subsystem name of this Subsystem.
    *
-   * @param subsystem subsystem name
+   * @param name subsystem name
    */
   void SetSubsystem(std::string_view name);
 

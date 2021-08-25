@@ -25,7 +25,7 @@ namespace frc {
  *
  * This class is thread safe.
  *
- * This will also interact with {@link NetworkTable} by creating a table called
+ * This will also interact with NetworkTable by creating a table called
  * "Preferences" with all the key-value pairs.
  */
 class Preferences {

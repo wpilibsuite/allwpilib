@@ -22,9 +22,10 @@ extern "C" {
  * Initializes a PWM port.
  *
  * @param portHandle the port to initialize
- * @param allocationLocation    the location where the allocation is occuring
- * (can be null)
- * @return           the created pwm handle
+ * @param allocationLocation  the location where the allocation is occuring
+ *                            (can be null)
+ * @param status              Error status variable. 0 on success.
+ * @return                    the created pwm handle
  */
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         const char* allocationLocation,
@@ -34,6 +35,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
  * Frees a PWM port.
  *
  * @param pwmPortHandle the pwm handle
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
@@ -56,6 +58,7 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel);
  * @param centerPwm      the center PWM value
  * @param deadbandMinPwm the low range of the center deadband
  * @param minPwm         the minimum PWM value
+ * @param status         Error status variable. 0 on success.
  */
 void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double maxPwm,
                       double deadbandMaxPwm, double centerPwm,
@@ -75,6 +78,7 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double maxPwm,
  * @param centerPwm      the center PWM value
  * @param deadbandMinPwm the low range of the center deadband
  * @param minPwm         the minimum PWM value
+ * @param status         Error status variable. 0 on success.
  */
 void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
                          int32_t deadbandMaxPwm, int32_t centerPwm,
@@ -93,6 +97,7 @@ void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
  * @param centerPwm      the center PWM value
  * @param deadbandMinPwm the low range of the center deadband
  * @param minPwm         the minimum PWM value
+ * @param status         Error status variable. 0 on success.
  */
 void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
                          int32_t* deadbandMaxPwm, int32_t* centerPwm,
@@ -105,6 +110,7 @@ void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
  *
  * @param pwmPortHandle     the PWM handle
  * @param eliminateDeadband true to eliminate deadband, otherwise false
+ * @param status            Error status variable. 0 on success.
  */
 void HAL_SetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
                                  HAL_Bool eliminateDeadband, int32_t* status);
@@ -113,6 +119,7 @@ void HAL_SetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
  * Gets the current eliminate deadband value.
  *
  * @param pwmPortHandle the PWM handle
+ * @param status        Error status variable. 0 on success.
  * @return              true if set, otherwise false
  */
 HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
@@ -126,6 +133,7 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
  *
  * @param pwmPortHandle the PWM handle
  * @param value         the PWM value to set
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
                    int32_t* status);
@@ -137,7 +145,8 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
  * and MinHigh registers.
  *
  * @param pwmPortHandle the PWM handle
- * @param value         the scaled PWM value to set
+ * @param speed         the scaled PWM value to set
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
                      int32_t* status);
@@ -149,7 +158,8 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
  * and MinHigh registers.
  *
  * @param pwmPortHandle the PWM handle
- * @param value         the positional PWM value to set
+ * @param position      the positional PWM value to set
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double position,
                         int32_t* status);
@@ -162,6 +172,7 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double position,
  * channel.
  *
  * @param pwmPortHandle the PWM handle.
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
@@ -172,6 +183,7 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  * FPGA release.
  *
  * @param pwmPortHandle the PWM handle
+ * @param status        Error status variable. 0 on success.
  * @return              the current raw PWM value
  */
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status);
@@ -182,6 +194,7 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  * The values range from -1 to 1.
  *
  * @param pwmPortHandle the PWM handle
+ * @param status        Error status variable. 0 on success.
  * @return              the current speed PWM value
  */
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status);
@@ -192,6 +205,7 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  * The values range from 0 to 1.
  *
  * @param pwmPortHandle the PWM handle
+ * @param status        Error status variable. 0 on success.
  * @return              the current positional PWM value
  */
 double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status);
@@ -200,6 +214,7 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  * Forces a PWM signal to go to 0 temporarily.
  *
  * @param pwmPortHandle the PWM handle.
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status);
 
@@ -208,6 +223,7 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status);
  *
  * @param pwmPortHandle the PWM handle.
  * @param squelchMask   the 2-bit mask of outputs to squelch
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status);
@@ -215,6 +231,7 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
 /**
  * Gets the loop timing of the PWM system.
  *
+ * @param status Error status variable. 0 on success.
  * @return the loop time
  */
 int32_t HAL_GetPWMLoopTiming(int32_t* status);
@@ -224,6 +241,7 @@ int32_t HAL_GetPWMLoopTiming(int32_t* status);
  *
  * This time is relative to the FPGA time.
  *
+ * @param status Error status variable. 0 on success.
  * @return the pwm cycle start time
  */
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status);

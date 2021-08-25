@@ -22,6 +22,7 @@ extern "C" {
  * Is the channel attached to an accumulator.
  *
  * @param analogPortHandle Handle to the analog port.
+ * @param status Error status variable. 0 on success.
  * @return The analog channel is attached to an accumulator.
  */
 HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
@@ -31,6 +32,7 @@ HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
  * Initialize the accumulator.
  *
  * @param analogPortHandle Handle to the analog port.
+ * @param status Error status variable. 0 on success.
  */
 void HAL_InitAccumulator(HAL_AnalogInputHandle analogPortHandle,
                          int32_t* status);
@@ -39,6 +41,7 @@ void HAL_InitAccumulator(HAL_AnalogInputHandle analogPortHandle,
  * Resets the accumulator to the initial value.
  *
  * @param analogPortHandle Handle to the analog port.
+ * @param status Error status variable. 0 on success.
  */
 void HAL_ResetAccumulator(HAL_AnalogInputHandle analogPortHandle,
                           int32_t* status);
@@ -57,6 +60,7 @@ void HAL_ResetAccumulator(HAL_AnalogInputHandle analogPortHandle,
  *
  * @param analogPortHandle Handle to the analog port.
  * @param center The center value of the accumulator.
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analogPortHandle,
                               int32_t center, int32_t* status);
@@ -66,6 +70,7 @@ void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analogPortHandle,
  *
  * @param analogPortHandle Handle to the analog port.
  * @param deadband The deadband of the accumulator.
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analogPortHandle,
                                 int32_t deadband, int32_t* status);
@@ -77,6 +82,7 @@ void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analogPortHandle,
  * The accumulator is attached after the oversample and average engine.
  *
  * @param analogPortHandle Handle to the analog port.
+ * @param status Error status variable. 0 on success.
  * @return The 64-bit value accumulated since the last Reset().
  */
 int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analogPortHandle,
@@ -89,6 +95,7 @@ int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analogPortHandle,
  * Reset().
  *
  * @param analogPortHandle Handle to the analog port.
+ * @param status Error status variable. 0 on success.
  * @return The number of times samples from the channel were accumulated.
  */
 int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle,
@@ -103,6 +110,7 @@ int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle,
  * @param analogPortHandle Handle to the analog port.
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
+ * @param status Error status variable. 0 on success.
  */
 void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
                               int64_t* value, int64_t* count, int32_t* status);

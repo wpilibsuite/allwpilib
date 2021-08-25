@@ -85,7 +85,7 @@ class NetworkTableInstance final {
   /**
    * Construct from native handle.
    *
-   * @param handle Native handle
+   * @param inst Native handle
    */
   explicit NetworkTableInstance(NT_Inst inst) noexcept;
 
@@ -523,7 +523,7 @@ class NetworkTableInstance final {
    * @return Logger handle
    */
   NT_Logger AddLogger(std::function<void(const LogMessage& msg)> func,
-                      unsigned int min_level, unsigned int max_level);
+                      unsigned int minLevel, unsigned int maxLevel);
 
   /**
    * Remove a logger.

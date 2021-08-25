@@ -56,29 +56,95 @@ doxygen {
         }
     }
 
+    // C++20 shims
+    exclude 'wpi/ghc/filesystem.hpp'
+    exclude 'wpi/span.h'
+
+    // Drake
+    exclude 'drake/common/**'
+
+    // Eigen
     exclude 'Eigen/**'
     exclude 'unsupported/**'
-    exclude 'units/**'
+
+    // LLVM
+    exclude 'wpi/AlignOf.h'
+    exclude 'wpi/Chrono.h'
+    exclude 'wpi/Compiler.h'
+    exclude 'wpi/ConvertUTF.h'
+    exclude 'wpi/DenseMap.h'
+    exclude 'wpi/DenseMapInfo.h'
+    exclude 'wpi/Endian.h'
+    exclude 'wpi/EpochTracker.h'
+    exclude 'wpi/Errc.h'
+    exclude 'wpi/Errno.h'
+    exclude 'wpi/ErrorHandling.h'
+    exclude 'wpi/fs.h'
+    exclude 'wpi/FunctionExtras.h'
+    exclude 'wpi/function_ref.h'
+    exclude 'wpi/Hashing.h'
+    exclude 'wpi/IntrusiveRefCntPtr.h'
+    exclude 'wpi/iterator.h'
+    exclude 'wpi/iterator_range.h'
+    exclude 'wpi/ManagedStatic.h'
+    exclude 'wpi/MapVector.h'
+    exclude 'wpi/MathExtras.h'
+    exclude 'wpi/MemAlloc.h'
+    exclude 'wpi/PointerIntPair.h'
+    exclude 'wpi/PointerLikeTypeTraits.h'
+    exclude 'wpi/PointerUnion.h'
+    exclude 'wpi/raw_os_ostream.h'
+    exclude 'wpi/raw_ostream.h'
+    exclude 'wpi/SmallPtrSet.h'
+    exclude 'wpi/SmallSet.h'
+    exclude 'wpi/SmallString.h'
+    exclude 'wpi/SmallVector.h'
+    exclude 'wpi/StringExtras.h'
+    exclude 'wpi/StringMap.h'
+    exclude 'wpi/SwapByteOrder.h'
+    exclude 'wpi/type_traits.h'
+    exclude 'wpi/VersionTuple.h'
+    exclude 'wpi/WindowsError.h'
+
+    // fmtlib
+    exclude 'fmt/**'
+
+    // libuv
     exclude 'uv.h'
     exclude 'uv/**'
+    exclude 'wpi/uv/**'
+
+    // json
+    exclude 'wpi/json.h'
+
+    // units
+    exclude 'units/**'
 
     extension_mapping 'inc=C++'
+    extract_static true
+    full_path_names true
+    generate_html true
+    generate_latex false
+    generate_treeview true
+    html_extra_stylesheet 'theme.css'
+    html_timestamp true
+    javadoc_autobrief true
     project_name 'WPILibC++'
     project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
     project_number wpilibVersioning.version.get()
-    javadoc_autobrief true
-    recursive true
     quiet true
-    warnings false
-    warn_if_undocumented false
-    generate_latex false
-    use_mathjax true
-    html_timestamp true
-    generate_treeview true
-    extract_static true
-    full_path_names true
+    recursive true
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
+    use_mathjax true
+    warnings false
+    warn_if_incomplete_doc true
+    warn_if_undocumented false
+    warn_no_paramdoc true
+
+    if (project.hasProperty('buildServer')) {
+        warn_as_error 'FAIL_ON_WARNINGS'
+    }
 }
 
 tasks.register("zipCppDocs", Zip) {

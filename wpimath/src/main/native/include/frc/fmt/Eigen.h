@@ -8,10 +8,25 @@
 
 #include "Eigen/Core"
 
+/**
+ * Formatter for Eigen::Matrix<>.
+ *
+ * @tparam Rows Number of rows.
+ * @tparam Cols Number of columns.
+ * @tparam Args Defaulted template arguments to Eigen::Matrix<>.
+ */
 template <int Rows, int Cols, int... Args>
 struct fmt::formatter<Eigen::Matrix<double, Rows, Cols, Args...>> {
+  /**
+   * Storage for format specifier.
+   */
   char presentation = 'f';
 
+  /**
+   * Format string parser.
+   *
+   * @param ctx Format string context.
+   */
   constexpr auto parse(fmt::format_parse_context& ctx) {
     auto it = ctx.begin(), end = ctx.end();
     if (it != end && (*it == 'f' || *it == 'e')) {
@@ -25,6 +40,13 @@ struct fmt::formatter<Eigen::Matrix<double, Rows, Cols, Args...>> {
     return it;
   }
 
+  /**
+   * Writes out a formatted matrix.
+   *
+   * @tparam FormatContext Format string context type.
+   * @param mat Matrix to format.
+   * @param ctx Format string context.
+   */
   template <typename FormatContext>
   auto format(const Eigen::Matrix<double, Rows, Cols, Args...>& mat,
               FormatContext& ctx) {

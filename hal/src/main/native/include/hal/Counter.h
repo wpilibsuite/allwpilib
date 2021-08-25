@@ -34,8 +34,9 @@ extern "C" {
 /**
  * Initializes a counter.
  *
- * @param mode  the counter mode
- * @param index the compressor index (output)
+ * @param mode   the counter mode
+ * @param index  the compressor index (output)
+ * @param status Error status variable. 0 on success.
  * @return      the created handle
  */
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
@@ -45,6 +46,7 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
  * Frees a counter.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  */
 void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status);
 
@@ -53,6 +55,7 @@ void HAL_FreeCounter(HAL_CounterHandle counterHandle, int32_t* status);
  *
  * @param counterHandle the counter handle
  * @param size          the size of samples to average
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
                                int32_t* status);
@@ -62,9 +65,10 @@ void HAL_SetCounterAverageSize(HAL_CounterHandle counterHandle, int32_t size,
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
+ *                            HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the analog trigger type if the source is an analog
- * trigger
+ *                            trigger
+ * @param status              Error status variable. 0 on success.
  */
 void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,
                             HAL_Handle digitalSourceHandle,
@@ -79,6 +83,7 @@ void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,
  * @param counterHandle the counter handle
  * @param risingEdge    true to trigger on rising
  * @param fallingEdge   true to trigger on falling
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetCounterUpSourceEdge(HAL_CounterHandle counterHandle,
                                 HAL_Bool risingEdge, HAL_Bool fallingEdge,
@@ -88,6 +93,7 @@ void HAL_SetCounterUpSourceEdge(HAL_CounterHandle counterHandle,
  * Disables the up counting source to the counter.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  */
 void HAL_ClearCounterUpSource(HAL_CounterHandle counterHandle, int32_t* status);
 
@@ -96,9 +102,10 @@ void HAL_ClearCounterUpSource(HAL_CounterHandle counterHandle, int32_t* status);
  *
  * @param counterHandle       the counter handle
  * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
+ *                            HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
  * @param analogTriggerType   the analog trigger type if the source is an analog
- * trigger
+ *                            trigger
+ * @param status              Error status variable. 0 on success.
  */
 void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
                               HAL_Handle digitalSourceHandle,
@@ -112,6 +119,7 @@ void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
  * @param counterHandle the counter handle
  * @param risingEdge    true to trigger on rising
  * @param fallingEdge   true to trigger on falling
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetCounterDownSourceEdge(HAL_CounterHandle counterHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
@@ -121,6 +129,7 @@ void HAL_SetCounterDownSourceEdge(HAL_CounterHandle counterHandle,
  * Disables the down counting source to the counter.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  */
 void HAL_ClearCounterDownSource(HAL_CounterHandle counterHandle,
                                 int32_t* status);
@@ -131,6 +140,7 @@ void HAL_ClearCounterDownSource(HAL_CounterHandle counterHandle,
  * Up and down counts are sourced independently from two inputs.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetCounterUpDownMode(HAL_CounterHandle counterHandle, int32_t* status);
 
@@ -141,6 +151,7 @@ void HAL_SetCounterUpDownMode(HAL_CounterHandle counterHandle, int32_t* status);
  * A input.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetCounterExternalDirectionMode(HAL_CounterHandle counterHandle,
                                          int32_t* status);
@@ -153,6 +164,7 @@ void HAL_SetCounterExternalDirectionMode(HAL_CounterHandle counterHandle,
  *
  * @param counterHandle  the counter handle
  * @param highSemiPeriod true for counting when the input is high, false for low
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counterHandle,
                                   HAL_Bool highSemiPeriod, int32_t* status);
@@ -165,7 +177,8 @@ void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counterHandle,
  *
  * @param counterHandle the counter handle
  * @param threshold The pulse length beyond which the counter counts the
- * opposite direction (seconds)
+ *                  opposite direction (seconds)
+ * @param status Error status variable. 0 on success.
  */
 void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
                                    double threshold, int32_t* status);
@@ -176,6 +189,7 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
  * for mechanical imperfections or as oversampling to increase resolution.
  *
  * @param counterHandle the counter handle
+ * @param status Error status variable. 0 on success.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
 int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
@@ -188,6 +202,7 @@ int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
  *
  * @param counterHandle    the counter handle
  * @param samplesToAverage The number of samples to average from 1 to 127
+ * @param status           Error status variable. 0 on success.
  */
 void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
                                     int32_t samplesToAverage, int32_t* status);
@@ -199,6 +214,7 @@ void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
  * counter, just sets the current value to zero.
  *
  * @param counterHandle the counter handle
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 
@@ -209,6 +225,7 @@ void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
  * current value. Next time it is read, it might have a different value.
  *
  * @param counterHandle the counter handle
+ * @param status        Error status variable. 0 on success.
  * @return              the current counter value
  */
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
@@ -220,6 +237,7 @@ int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
  * velocity calculations to determine shaft speed.
  *
  * @param counterHandle the counter handle
+ * @param status        Error status variable. 0 on success.
  * @returns             the period of the last two pulses in units of seconds
  */
 double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);
@@ -233,7 +251,8 @@ double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);
  *
  * @param counterHandle the counter handle
  * @param maxPeriod     the maximum period where the counted device is
- * considered moving in seconds
+ *                      considered moving in seconds
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
                              int32_t* status);
@@ -260,6 +279,7 @@ void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
  *
  * @param counterHandle the counter handle
  * @param enabled       true to enable counter updating with no samples
+ * @param status        Error status variable. 0 on success.
  */
 void HAL_SetCounterUpdateWhenEmpty(HAL_CounterHandle counterHandle,
                                    HAL_Bool enabled, int32_t* status);
@@ -272,8 +292,9 @@ void HAL_SetCounterUpdateWhenEmpty(HAL_CounterHandle counterHandle,
  * device (and counter) are assumed to be stopped and it returns true.
  *
  * @param counterHandle the counter handle
+ * @param status        Error status variable. 0 on success.
  * @return              true if the most recent counter period exceeds the
- * MaxPeriod value set by SetMaxPeriod
+ *                      MaxPeriod value set by SetMaxPeriod
  */
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status);
@@ -282,6 +303,7 @@ HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
  * Gets the last direction the counter value changed.
  *
  * @param counterHandle the counter handle
+ * @param status        Error status variable. 0 on success.
  * @return              the last direction the counter value changed
  */
 HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
@@ -295,6 +317,7 @@ HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
  *
  * @param counterHandle    the counter handle
  * @param reverseDirection true if the value counted should be negated.
+ * @param status           Error status variable. 0 on success.
  */
 void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
                                     HAL_Bool reverseDirection, int32_t* status);

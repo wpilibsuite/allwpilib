@@ -1059,18 +1059,18 @@ const char* LoadEntries(
 
 NT_Logger AddLogger(NT_Inst inst,
                     std::function<void(const LogMessage& msg)> func,
-                    unsigned int min_level, unsigned int max_level) {
+                    unsigned int minLevel, unsigned int maxLevel) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
   if (!ii) {
     return 0;
   }
 
-  if (min_level < ii->logger.min_level()) {
-    ii->logger.set_min_level(min_level);
+  if (minLevel < ii->logger.min_level()) {
+    ii->logger.set_min_level(minLevel);
   }
 
-  return Handle(i, ii->logger_impl.Add(func, min_level, max_level),
+  return Handle(i, ii->logger_impl.Add(func, minLevel, maxLevel),
                 Handle::kLogger);
 }
 

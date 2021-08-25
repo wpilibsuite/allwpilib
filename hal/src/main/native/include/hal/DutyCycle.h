@@ -21,9 +21,10 @@ extern "C" {
  * Initialize a DutyCycle input.
  *
  * @param digitalSourceHandle the digital source to use (either a
- * HAL_DigitalHandle or a HAL_AnalogTriggerHandle)
+ *                            HAL_DigitalHandle or a HAL_AnalogTriggerHandle)
  * @param triggerType the analog trigger type of the source if it is
- * an analog trigger
+ *                    an analog trigger
+ * @param status Error status variable. 0 on success.
  * @return thre created duty cycle handle
  */
 HAL_DutyCycleHandle HAL_InitializeDutyCycle(HAL_Handle digitalSourceHandle,
@@ -50,6 +51,7 @@ void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
  * Get the frequency of the duty cycle signal.
  *
  * @param dutyCycleHandle the duty cycle handle
+ * @param status Error status variable. 0 on success.
  * @return frequency in Hertz
  */
 int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
@@ -61,6 +63,7 @@ int32_t HAL_GetDutyCycleFrequency(HAL_DutyCycleHandle dutyCycleHandle,
  * <p> 0 means always low, 1 means always high.
  *
  * @param dutyCycleHandle the duty cycle handle
+ * @param status Error status variable. 0 on success.
  * @return output ratio between 0 and 1
  */
 double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
@@ -73,6 +76,7 @@ double HAL_GetDutyCycleOutput(HAL_DutyCycleHandle dutyCycleHandle,
  * GetOutputScaleFactor() means always high.
  *
  * @param dutyCycleHandle the duty cycle handle
+ * @param status Error status variable. 0 on success.
  * @return output ratio in raw units
  */
 int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
@@ -86,6 +90,7 @@ int32_t HAL_GetDutyCycleOutputRaw(HAL_DutyCycleHandle dutyCycleHandle,
  * percentage between 0 and 1.
  *
  * @param dutyCycleHandle the duty cycle handle
+ * @param status Error status variable. 0 on success.
  * @return the output scale factor
  */
 int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
@@ -95,6 +100,7 @@ int32_t HAL_GetDutyCycleOutputScaleFactor(HAL_DutyCycleHandle dutyCycleHandle,
  * Get the FPGA index for the DutyCycle.
  *
  * @param dutyCycleHandle the duty cycle handle
+ * @param status Error status variable. 0 on success.
  * @return the FPGA index
  */
 int32_t HAL_GetDutyCycleFPGAIndex(HAL_DutyCycleHandle dutyCycleHandle,

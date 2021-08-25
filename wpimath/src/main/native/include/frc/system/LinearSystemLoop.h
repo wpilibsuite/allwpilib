@@ -37,6 +37,7 @@ class LinearSystemLoop {
    * call reset with the initial system state before enabling the loop. This
    * constructor assumes that the input(s) to this system are voltage.
    *
+   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
    * @param maxVoltage The maximum voltage that can be applied. Commonly 12.
