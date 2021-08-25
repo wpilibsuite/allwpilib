@@ -10,6 +10,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/MathUtil.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -28,6 +29,10 @@ void RobotDriveBase::SetMaxOutput(double maxOutput) {
 
 void RobotDriveBase::FeedWatchdog() {
   Feed();
+}
+
+double RobotDriveBase::ApplyDeadband(double value, double deadband) {
+  return frc::ApplyDeadband(value, deadband);
 }
 
 void RobotDriveBase::Normalize(wpi::span<double> wheelSpeeds) {
