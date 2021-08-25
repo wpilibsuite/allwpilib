@@ -9,6 +9,24 @@
 #define EXPECT_UNITS_EQ(a, b) \
   EXPECT_FLOAT_EQ((a).to<double>(), (b).to<double>())
 
+TEST(MathUtilTest, ApplyDeadband) {
+  // < 0
+  EXPECT_FLOAT_EQ(-1.0, frc::ApplyDeadband(-1.0, 0.02));
+  EXPECT_FLOAT_EQ((-0.03 + 0.02) / (1.0 - 0.02),
+                  frc::ApplyDeadband(-0.03, 0.02));
+  EXPECT_FLOAT_EQ(0.0, frc::ApplyDeadband(-0.02, 0.02));
+  EXPECT_FLOAT_EQ(0.0, frc::ApplyDeadband(-0.01, 0.02));
+
+  // == 0
+  EXPECT_FLOAT_EQ(0.0, frc::ApplyDeadband(0.0, 0.02));
+
+  // > 0
+  EXPECT_FLOAT_EQ(0.0, frc::ApplyDeadband(0.01, 0.02));
+  EXPECT_FLOAT_EQ(0.0, frc::ApplyDeadband(0.02, 0.02));
+  EXPECT_FLOAT_EQ((0.03 - 0.02) / (1.0 - 0.02), frc::ApplyDeadband(0.03, 0.02));
+  EXPECT_FLOAT_EQ(1.0, frc::ApplyDeadband(1.0, 0.02));
+}
+
 TEST(MathUtilTest, InputModulus) {
   // These tests check error wrapping. That is, the result of wrapping the
   // result of an angle reference minus the measurement.

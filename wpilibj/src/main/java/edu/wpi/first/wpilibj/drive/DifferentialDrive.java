@@ -170,8 +170,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    xSpeed = applyDeadband(xSpeed, m_deadband);
-    zRotation = applyDeadband(zRotation, m_deadband);
+    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
+    zRotation = MathUtil.applyDeadband(zRotation, m_deadband);
 
     var speeds = arcadeDriveIK(xSpeed, zRotation, squareInputs);
 
@@ -203,8 +203,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    xSpeed = applyDeadband(xSpeed, m_deadband);
-    zRotation = applyDeadband(zRotation, m_deadband);
+    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
+    zRotation = MathUtil.applyDeadband(zRotation, m_deadband);
 
     var speeds = curvatureDriveIK(xSpeed, zRotation, allowTurnInPlace);
 
@@ -241,8 +241,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
       m_reported = true;
     }
 
-    leftSpeed = applyDeadband(leftSpeed, m_deadband);
-    rightSpeed = applyDeadband(rightSpeed, m_deadband);
+    leftSpeed = MathUtil.applyDeadband(leftSpeed, m_deadband);
+    rightSpeed = MathUtil.applyDeadband(rightSpeed, m_deadband);
 
     var speeds = tankDriveIK(leftSpeed, rightSpeed, squareInputs);
 

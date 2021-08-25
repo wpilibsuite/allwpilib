@@ -42,7 +42,7 @@ class RobotDriveBase : public MotorSafety {
    *
    * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
    * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * ApplyDeadband().
+   * frc::ApplyDeadband().
    *
    * @param deadband The deadband to set.
    */
@@ -69,15 +69,6 @@ class RobotDriveBase : public MotorSafety {
   std::string GetDescription() const override = 0;
 
  protected:
-  /**
-   * Returns 0.0 if the given value is within the specified range around zero.
-   * The remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
-   *
-   * @param value    value to clip
-   * @param deadband range around zero
-   */
-  static double ApplyDeadband(double number, double deadband);
-
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.

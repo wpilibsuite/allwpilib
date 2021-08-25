@@ -41,7 +41,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    *
    * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
    * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
-   * #applyDeadband}.
+   * edu.wpi.first.math.MathUtil.applyDeadband}.
    *
    * @param deadband The deadband to set.
    */
@@ -75,26 +75,6 @@ public abstract class RobotDriveBase extends MotorSafety {
 
   @Override
   public abstract String getDescription();
-
-  /**
-   * Returns 0.0 if the given value is within the specified range around zero. The remaining range
-   * between the deadband and 1.0 is scaled from 0.0 to 1.0.
-   *
-   * @param value value to clip
-   * @param deadband range around zero
-   * @return The value after the deadband is applied.
-   */
-  protected static double applyDeadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
-      if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
-      } else {
-        return (value + deadband) / (1.0 - deadband);
-      }
-    } else {
-      return 0.0;
-    }
-  }
 
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.

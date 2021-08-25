@@ -10,6 +10,24 @@ import org.junit.jupiter.api.Test;
 
 class MathUtilTest {
   @Test
+  void testApplyDeadband() {
+    // < 0
+    assertEquals(-1.0, MathUtil.applyDeadband(-1.0, 0.02));
+    assertEquals((-0.03 + 0.02) / (1.0 - 0.02), MathUtil.applyDeadband(-0.03, 0.02));
+    assertEquals(0.0, MathUtil.applyDeadband(-0.02, 0.02));
+    assertEquals(0.0, MathUtil.applyDeadband(-0.01, 0.02));
+
+    // == 0
+    assertEquals(0.0, MathUtil.applyDeadband(0.0, 0.02));
+
+    // > 0
+    assertEquals(0.0, MathUtil.applyDeadband(0.01, 0.02));
+    assertEquals(0.0, MathUtil.applyDeadband(0.02, 0.02));
+    assertEquals((0.03 - 0.02) / (1.0 - 0.02), MathUtil.applyDeadband(0.03, 0.02));
+    assertEquals(1.0, MathUtil.applyDeadband(1.0, 0.02));
+  }
+
+  @Test
   void testInputModulus() {
     // These tests check error wrapping. That is, the result of wrapping the
     // result of an angle reference minus the measurement.
