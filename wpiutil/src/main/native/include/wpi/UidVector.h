@@ -80,8 +80,8 @@ class UidVector {
   using const_iterator =
       impl::UidVectorIterator<typename std::vector<T>::const_iterator>;
 
-  bool empty() const { return m_active_count == 0; }
-  size_type size() const { return m_vector.size(); }
+  bool empty() const noexcept { return m_active_count == 0; }
+  size_type size() const noexcept { return m_vector.size(); }
   T& operator[](size_type i) { return m_vector[i]; }
   const T& operator[](size_type i) const { return m_vector[i]; }
 
@@ -105,17 +105,19 @@ class UidVector {
 
   // Removes the identified element by replacing it with a default-constructed
   // one.  The element is added to the freelist for later reuse.
-  void erase(size_type uid) {
+  T erase(size_type uid) {
     if (uid >= m_vector.size() || !m_vector[uid]) {
-      return;
+      return T();
     }
     m_free.push_back(uid);
+    auto rv = std::move(m_vector[uid]);
     m_vector[uid] = T();
     --m_active_count;
+    return rv;
   }
 
   // Removes all elements.
-  void clear() {
+  void clear() noexcept {
     m_vector.clear();
     m_free.clear();
     m_active_count = 0;
