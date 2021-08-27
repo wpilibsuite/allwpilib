@@ -112,10 +112,12 @@ class LinearFilterTest {
   /** Test backward finite difference. */
   @Test
   void backwardFiniteDifferenceTest() {
-    double h = 0.05;
+    double h = 0.005;
 
     assertResults(
-        // f(x) = x^2
+        1,
+        2,
+        // f(x) = x²
         (double x) -> x * x,
         // df/dx = 2x
         (double x) -> 2.0 * x,
@@ -124,6 +126,8 @@ class LinearFilterTest {
         20.0);
 
     assertResults(
+        1,
+        2,
         // f(x) = sin(x)
         (double x) -> Math.sin(x),
         // df/dx = cos(x)
@@ -133,10 +137,45 @@ class LinearFilterTest {
         20.0);
 
     assertResults(
+        1,
+        2,
         // f(x) = ln(x)
         (double x) -> Math.log(x),
         // df/dx = 1 / x
         (double x) -> 1.0 / x,
+        h,
+        1.0,
+        20.0);
+
+    assertResults(
+        2,
+        4,
+        // f(x) = x²
+        (double x) -> x * x,
+        // d²f/dx² = 2
+        (double x) -> 2.0,
+        h,
+        -20.0,
+        20.0);
+
+    assertResults(
+        2,
+        4,
+        // f(x) = sin(x)
+        (double x) -> Math.sin(x),
+        // d²f/dx² = -sin(x)
+        (double x) -> -Math.sin(x),
+        h,
+        -20.0,
+        20.0);
+
+    assertResults(
+        2,
+        4,
+        // f(x) = ln(x)
+        (double x) -> Math.log(x),
+        // d²f/dx² = -1 / x²
+        (double x) -> -1.0 / (x * x),
         h,
         1.0,
         20.0);
@@ -145,6 +184,8 @@ class LinearFilterTest {
   /**
    * Helper for checking results of backward finite difference.
    *
+   * @param derivative The order of the derivative.
+   * @param samples The number of sample points.
    * @param f Function of which to take derivative.
    * @param dfdx Derivative of f.
    * @param h Sample period in seconds.
@@ -152,12 +193,18 @@ class LinearFilterTest {
    * @param max Maximum of f's domain to test.
    */
   void assertResults(
-      DoubleFunction<Double> f, DoubleFunction<Double> dfdx, double h, double min, double max) {
-    var filter = LinearFilter.backwardFiniteDifference(1, 2, h);
+      int derivative,
+      int samples,
+      DoubleFunction<Double> f,
+      DoubleFunction<Double> dfdx,
+      double h,
+      double min,
+      double max) {
+    var filter = LinearFilter.backwardFiniteDifference(derivative, samples, h);
 
     for (int i = (int) (min / h); i < (int) (max / h); ++i) {
       // Let filter initialize
-      if (i < (int) (min / h) + 2) {
+      if (i < (int) (min / h) + samples) {
         filter.calculate(f.apply(i * h));
         continue;
       }
@@ -167,7 +214,7 @@ class LinearFilterTest {
       assertEquals(
           dfdx.apply(i * h),
           filter.calculate(f.apply(i * h)),
-          Math.max(Math.pow(h, 2 - 1), 1e-7) + 1e-5);
+          10.0 * Math.pow(h, samples - derivative));
     }
   }
 }
