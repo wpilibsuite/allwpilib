@@ -169,8 +169,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
       m_reported = true;
     }
 
-    ySpeed = applyDeadband(ySpeed, m_deadband);
-    xSpeed = applyDeadband(xSpeed, m_deadband);
+    ySpeed = MathUtil.applyDeadband(ySpeed, m_deadband);
+    xSpeed = MathUtil.applyDeadband(xSpeed, m_deadband);
 
     var speeds = driveCartesianIK(ySpeed, xSpeed, zRotation, gyroAngle);
 

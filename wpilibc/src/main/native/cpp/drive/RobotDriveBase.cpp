@@ -10,6 +10,7 @@
 
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/MathUtil.h"
 #include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
@@ -31,15 +32,7 @@ void RobotDriveBase::FeedWatchdog() {
 }
 
 double RobotDriveBase::ApplyDeadband(double value, double deadband) {
-  if (std::abs(value) > deadband) {
-    if (value > 0.0) {
-      return (value - deadband) / (1.0 - deadband);
-    } else {
-      return (value + deadband) / (1.0 - deadband);
-    }
-  } else {
-    return 0.0;
-  }
+  return frc::ApplyDeadband(value, deadband);
 }
 
 void RobotDriveBase::Normalize(wpi::span<double> wheelSpeeds) {

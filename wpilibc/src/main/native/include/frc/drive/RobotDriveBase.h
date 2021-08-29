@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
@@ -42,7 +43,7 @@ class RobotDriveBase : public MotorSafety {
    *
    * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
    * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * ApplyDeadband().
+   * frc::ApplyDeadband().
    *
    * @param deadband The deadband to set.
    */
@@ -75,7 +76,9 @@ class RobotDriveBase : public MotorSafety {
    *
    * @param value    value to clip
    * @param deadband range around zero
+   * @deprecated Use ApplyDeadband() in frc/MathUtil.h.
    */
+  WPI_DEPRECATED("Use ApplyDeadband() in frc/MathUtil.h")
   static double ApplyDeadband(double number, double deadband);
 
   /**
