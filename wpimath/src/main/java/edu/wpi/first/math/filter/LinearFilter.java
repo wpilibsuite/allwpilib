@@ -152,6 +152,7 @@ public class LinearFilter {
    * @param samples The number of samples to use to compute the given derivative. This must be one
    *     more than the order of derivative or higher.
    * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
    */
   @SuppressWarnings("LocalVariableName")
   public static LinearFilter backwardFiniteDifference(int derivative, int samples, double period) {
