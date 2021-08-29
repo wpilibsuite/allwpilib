@@ -7,9 +7,8 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 
 def main():
-    root, repo = setup_upstream_repo(
-        "https://github.com/RobotLocomotion/drake",
-        "8b72428dce6959d077e17c3c3a7a5ef4a17107ee")
+    root, repo = setup_upstream_repo("https://github.com/RobotLocomotion/drake",
+                                     "v0.33.0")
     wpimath = os.path.join(root, "wpimath")
 
     # Delete old install
