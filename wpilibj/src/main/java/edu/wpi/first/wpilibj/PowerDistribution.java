@@ -36,7 +36,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution.
    *
-   * @param module The CAN ID of the PDP
+   * @param module The CAN ID of the PDP.
+   * @param moduleType Module type (automatic, CTRE, or REV).
    */
   public PowerDistribution(int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(module, moduleType.value);

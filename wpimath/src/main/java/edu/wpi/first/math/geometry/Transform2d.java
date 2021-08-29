@@ -60,6 +60,7 @@ public class Transform2d {
    * Composes two transformations.
    *
    * @param other The transform to compose with this one.
+   * @return The composition of the two transformations.
    */
   public Transform2d plus(Transform2d other) {
     return new Transform2d(new Pose2d(), new Pose2d().transformBy(this).transformBy(other));
