@@ -161,18 +161,6 @@ HAL_Bool HAL_REV_IsPDHEnabled(HAL_REVPDHHandle handle, int32_t* status);
 HAL_Bool HAL_REV_CheckPDHBrownout(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
- * Checks if the system current on a PDH device is currently exceeding the max
- * system current.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return              1 if the PDH is over max current; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHOverCurrent(HAL_REVPDHHandle handle, int32_t* status);
-
-/**
  * Checks if the CAN RX or TX error levels on a PDH device have exceeded the
  * warning threshold.
  *
@@ -210,19 +198,6 @@ HAL_Bool HAL_REV_CheckPDHHardwareFault(HAL_REVPDHHandle handle,
  */
 HAL_Bool HAL_REV_CheckPDHStickyBrownout(HAL_REVPDHHandle handle,
                                         int32_t* status);
-
-/**
- * Checks if the system current on a PDH device has exceeded the maximum system
- * current.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return              1 if the device has been over current; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyOverCurrent(HAL_REVPDHHandle handle,
-                                           int32_t* status);
 
 /**
  * Checks if the CAN RX or TX error levels on a PDH device have exceeded the
