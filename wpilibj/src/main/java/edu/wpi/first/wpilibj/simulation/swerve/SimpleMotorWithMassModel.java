@@ -24,7 +24,7 @@ class SimpleMotorWithMassModel {
         m_fwSim.setInputVoltage(motorVoltage);
         m_fwSim.update(dtSeconds);
         //Add additional state of displacement in a hacky-ish calculation
-        m_curDisplacementRev += m_fwSim.getAngularVelocityRPM() / 60 * dtSeconds;
+        m_curDisplacementRev += m_fwSim.getAngularVelocityRPM() / 60.0 * dtSeconds;
     }
 
     /**

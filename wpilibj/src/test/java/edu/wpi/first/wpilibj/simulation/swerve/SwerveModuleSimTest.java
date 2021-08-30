@@ -28,7 +28,7 @@ public class SwerveModuleSimTest {
 
   final double SIM_TS = 0.020;
   final double WHEEL_RAD_M = Units.inchesToMeters(1.5);
-  final double TEST_PLANT_MASS_RADPERSEC2_PER_N = 6.0 / 90.0;
+  final double TEST_PLANT_MASS_RADPERSEC2_PER_N = 2.0 / 90.0;
 
   final Vector2d TEST_DIR_XHAT = new Vector2d(1, 0);
   final Vector2d TEST_DIR_YHAT = new Vector2d(0, 1);
@@ -55,7 +55,12 @@ public class SwerveModuleSimTest {
     wheelMotor = new PWMVictorSPX(2);
     azmthMotor = new PWMVictorSPX(3);
     wheelEncoder = new Encoder(4, 5);
+    wheelEncoder.setDistancePerPulse(1.0/128.0);
+    
     azmthEncoder = new Encoder(6, 7);
+    azmthEncoder.setDistancePerPulse(1.0/4096.0);
+
+
   }
 
   private void closeHardware(){
@@ -70,8 +75,8 @@ public class SwerveModuleSimTest {
   public void testBasicWheel(TestInfo testInfo) {
 
     SimpleCSVWriter log = new SimpleCSVWriter(testInfo.getDisplayName(),
-        new ArrayList<String>(Arrays.asList("u_wheel", "y_wheelforce", "wheelvel", "u_azmth", "y_azmthPos")),
-        new ArrayList<String>(Arrays.asList("V", "N", "RPM", "V", "rev")));
+        new ArrayList<String>(Arrays.asList("u_wheel", "y_wheelforce", "wheelVel", "wheelVelEnc", "u_azmth", "y_azmthPos")),
+        new ArrayList<String>(Arrays.asList("V", "N", "RPM", "RPM", "V", "rev")));
 
     var wheelVelRadPerSec = 0.0;
     var wheelPosRad = 0.0;
@@ -80,7 +85,7 @@ public class SwerveModuleSimTest {
     
     // Purposefully bad controller tuning to excite oscillation
     // which helps test coverage.
-    var wheelController = new PIDController(3, 3, 0);
+    var wheelController = new PIDController(3, 0.03, 0);
     wheelController.setIntegratorRange(-99999, 99999);
 
     var wheelEncoderSim = new EncoderSim(wheelEncoder);
@@ -93,7 +98,7 @@ public class SwerveModuleSimTest {
       wheelController.setSetpoint(100); // RPM
 
       double currentBatteryVoltage = RobotController.getBatteryVoltage();
-      double nextWheelVoltage = wheelController.calculate(wheelEncoder.getRate());
+      double nextWheelVoltage = wheelController.calculate(wheelEncoder.getRate()*60.0);
 
       wheelMotor.set(nextWheelVoltage / currentBatteryVoltage);
       azmthMotor.set(0.0);
@@ -104,8 +109,7 @@ public class SwerveModuleSimTest {
       var u_azmth = azmthMotor.get() * currentBatteryVoltage;
       sim.setInputVoltages(u_wheel, u_azmth);
 
-      var modulePose = new Pose2d(TEST_DIR_XHAT.x * wheelPosRad * WHEEL_RAD_M,
-          TEST_DIR_XHAT.y * wheelPosRad * WHEEL_RAD_M, new Rotation2d());
+      var modulePose = new Pose2d(TEST_DIR_XHAT.x * wheelPosRad * WHEEL_RAD_M, 0, new Rotation2d());
       sim.setModulePose(modulePose);
 
       sim.update(SIM_TS);
@@ -115,7 +119,7 @@ public class SwerveModuleSimTest {
       var y_wheelforce = sim.getWheelMotiveForce();
       wheelVelRadPerSec += y_wheelforce.m_force.getVector2d().dot(TEST_DIR_XHAT) 
         * TEST_PLANT_MASS_RADPERSEC2_PER_N * SIM_TS;
-      wheelEncoderSim.setRate(Units.radiansPerSecondToRotationsPerMinute(wheelVelRadPerSec));
+      wheelEncoderSim.setRate(Units.radiansPerSecondToRotationsPerMinute(wheelVelRadPerSec)/60.0);
       wheelPosRad += wheelVelRadPerSec * SIM_TS;
 
       // Azmth plant model is built into module simulation.
@@ -126,6 +130,7 @@ public class SwerveModuleSimTest {
       logVals.add(u_wheel);
       logVals.add(y_wheelforce.m_force.getVector2d().dot(TEST_DIR_XHAT));
       logVals.add(Units.radiansPerSecondToRotationsPerMinute(wheelVelRadPerSec));
+      logVals.add(wheelEncoder.getRate()*60.0);
       logVals.add(u_azmth);
       logVals.add(y_azmthPos);
       log.writeData(i * SIM_TS, logVals);
@@ -135,12 +140,12 @@ public class SwerveModuleSimTest {
 
     wheelController.close();
 
-    var actSpd = wheelEncoder.getRate();
+    var actSpd = wheelEncoder.getRate()*60.0;
     var expSpd = wheelController.getSetpoint();
 
     closeHardware();
 
-    assertEquals(expSpd, actSpd, 2);
+    assertEquals(expSpd, actSpd, 10);
 
   }
 
@@ -149,8 +154,8 @@ public class SwerveModuleSimTest {
   public void testBasicAzmth(TestInfo testInfo) {
 
     SimpleCSVWriter log = new SimpleCSVWriter(testInfo.getDisplayName(),
-        new ArrayList<String>(Arrays.asList("u_wheel", "y_wheelforce", "wheelvel", "u_azmth", "y_azmthPos")),
-        new ArrayList<String>(Arrays.asList("V", "N", "RPM", "V", "rev")));
+        new ArrayList<String>(Arrays.asList("u_wheel", "y_wheelforce", "wheelvel", "u_azmth", "y_azmthPos", "y_azmthEnc")),
+        new ArrayList<String>(Arrays.asList("V", "N", "RPM", "V", "rev", "rev")));
 
     var wheelVelRadPerSec = 0.0;
     var wheelPosRad = 0.0;
@@ -159,7 +164,7 @@ public class SwerveModuleSimTest {
 
     // Purposefully bad controller tuning to excite oscillation
     // which helps test coverage.
-    var azmthController = new PIDController(100, 0, 0);
+    var azmthController = new PIDController(10, 0, 0);
     azmthController.setIntegratorRange(-99999, 99999);
 
     var wheelEncoderSim = new EncoderSim(wheelEncoder);
@@ -207,6 +212,7 @@ public class SwerveModuleSimTest {
       logVals.add(Units.radiansPerSecondToRotationsPerMinute(wheelVelRadPerSec));
       logVals.add(u_azmth);
       logVals.add(y_azmthPos);
+      logVals.add(azmthEncoder.getDistance());
       log.writeData(i * SIM_TS, logVals);
     }
 
