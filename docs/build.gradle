@@ -46,6 +46,7 @@ doxygen {
 
 doxygen {
     generate_html true
+    html_extra_stylesheet 'theme.css'
 
     cppProjectZips.each {
         dependsOn it
