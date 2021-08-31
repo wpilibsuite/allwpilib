@@ -64,6 +64,7 @@ doxygen {
 
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
+    project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
     project_number wpilibVersioning.version.get()
     javadoc_autobrief true
     recursive true
