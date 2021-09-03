@@ -4,6 +4,7 @@
 
 package edu.wpi.first.util.sendable;
 
+import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -40,23 +41,6 @@ public interface SendableBuilder {
    * @param func function
    */
   void setSafeState(Runnable func);
-
-  /**
-   * Represents an operation that accepts a single boolean-valued argument and returns no result.
-   * This is the primitive type specialization of Consumer for boolean. Unlike most other functional
-   * interfaces, BooleanConsumer is expected to operate via side-effects.
-   *
-   * <p>This is a functional interface whose functional method is accept(boolean).
-   */
-  @FunctionalInterface
-  interface BooleanConsumer {
-    /**
-     * Performs the operation on the given value.
-     *
-     * @param value the value
-     */
-    void accept(boolean value);
-  }
 
   /**
    * Add a boolean property.

@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
