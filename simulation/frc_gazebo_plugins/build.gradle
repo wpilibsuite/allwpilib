@@ -21,10 +21,10 @@ try {
     gazebo_linker_args = "pkg-config --libs gazebo protobuf".execute().text.split()
 } catch(Exception ex) { }
 
-if (project.hasProperty("makeSim")) {
+if (project.hasProperty("forceGazebo")) {
     if (!gazebo_version?.trim()) {
         println "Gazebo development files are not available. (pkg-config --modversion gazebo failed)"
-        println "makeSim set. Forcing build - failure likely."
+        println "forceGazebo set. Forcing build - failure likely."
     }
 } else {
     ext.skip_frc_plugins = true
