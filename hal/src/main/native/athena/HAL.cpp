@@ -448,10 +448,4 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
       resource, instanceNumber, context, feature);
 }
 
-// TODO: HACKS
-// No need for header definitions, as we should not run from user code.
-void NumericArrayResize(void) {}
-void RTSetCleanupProc(void) {}
-void EDVR_CreateReference(void) {}
-
 }  // extern "C"
