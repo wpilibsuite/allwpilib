@@ -2,12 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <units/math.h>
-
 #include "frc/MathUtil.h"
 #include "frc/controller/RamseteController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
+#include "units/math.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
