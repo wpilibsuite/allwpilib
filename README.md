@@ -95,10 +95,10 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 
 ### Gazebo simulation
 
-If you also want simulation to be built, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
+If you also want to force building Gazebo simulation support, add -PforceGazebo. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 
 ```bash
-./gradlew build -PmakeSim
+./gradlew build -PforceGazebo
 ```
 
 If you prefer to use CMake directly, the you can still do so.

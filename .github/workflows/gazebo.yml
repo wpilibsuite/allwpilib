@@ -12,4 +12,4 @@ jobs:
         with:
           fetch-depth: 0
       - name: Build with Gradle
-        run: ./gradlew simulation:frc_gazebo_plugins:build simulation:halsim_gazebo:build -PbuildServer -PmakeSim
+        run: ./gradlew simulation:frc_gazebo_plugins:build simulation:halsim_gazebo:build -PbuildServer -PforceGazebo
