@@ -10,7 +10,7 @@ nativeUtils {
     wpi {
         configureDependencies {
             wpiVersion = "-1"
-            niLibVersion = "2022.2.0"
+            niLibVersion = "2022.2.2"
             opencvVersion = "4.5.2-1"
             googleTestVersion = "1.9.0-5-437e100-1"
             imguiVersion = "1.82-1"
