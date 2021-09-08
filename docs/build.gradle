@@ -113,6 +113,7 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
+    options.linkSource(true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     dependsOn project(':wpimath').generateNat
