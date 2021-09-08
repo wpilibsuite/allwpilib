@@ -90,8 +90,9 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Optionally eliminate the deadband from a speed controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the Jaguar to eliminate the deadband
-   *     in the middle of the range. Otherwise, keep the full range without modifying any values.
+   * @param eliminateDeadband If true, set the motor curve for the speed controller to eliminate the
+   *     deadband in the middle of the range. Otherwise, keep the full range without modifying any
+   *     values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
     PWMJNI.setPWMEliminateDeadband(m_handle, eliminateDeadband);
@@ -114,7 +115,7 @@ public class PWM implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
+   * Gets the bounds on the PWM pulse widths. This gets the bounds on the PWM values for a
    * particular type of controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
    *
