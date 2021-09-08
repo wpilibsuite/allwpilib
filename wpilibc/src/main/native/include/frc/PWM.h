@@ -166,10 +166,10 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   /**
    * Optionally eliminate the deadband from a speed controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the Jaguar to
-   *                          eliminate the deadband in the middle of the range.
-   *                          Otherwise, keep the full range without modifying
-   *                          any values.
+   * @param eliminateDeadband If true, set the motor curve on the speed
+   *                          controller to eliminate the deadband in the middle
+   *                          of the range. Otherwise, keep the full range
+   *                          without modifying any values.
    */
   void EnableDeadbandElimination(bool eliminateDeadband);
 
