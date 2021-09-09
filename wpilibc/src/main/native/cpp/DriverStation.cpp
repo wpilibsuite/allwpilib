@@ -172,7 +172,7 @@ Instance::Instance() {
   HAL_Initialize(500, 0);
 
   // All joysticks should default to having zero axes, povs and buttons, so
-  // uninitialized memory doesn't get sent to speed controllers.
+  // uninitialized memory doesn't get sent to motor controllers.
   for (unsigned int i = 0; i < DriverStation::kJoystickPorts; i++) {
     joystickButtonsPressed[i] = 0;
     joystickButtonsReleased[i] = 0;
