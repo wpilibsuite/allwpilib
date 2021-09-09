@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -22,7 +21,7 @@ import java.nio.ByteOrder;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL362 implements Accelerometer, AutoCloseable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 

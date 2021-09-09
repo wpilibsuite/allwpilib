@@ -4,13 +4,16 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * Interface for motor controlling devices.
  *
  * @deprecated Use {@link edu.wpi.first.wpilibj.motorcontrol.MotorController}.
  */
 @Deprecated(since = "2022", forRemoval = true)
-public interface SpeedController {
+public interface SpeedController extends Sendable {
   /**
    * Common interface for setting the speed of a motor controller.
    *
@@ -62,4 +65,12 @@ public interface SpeedController {
    * motor.
    */
   void stopMotor();
+
+  @Override
+  default void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Motor Controller");
+    builder.setActuator(true);
+    builder.setSafeState(this::disable);
+    builder.addDoubleProperty("Value", this::get, this::set);
+  }
 }

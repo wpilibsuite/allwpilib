@@ -8,7 +8,6 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
@@ -18,7 +17,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements Sendable {
+public class DigitalInput extends DigitalSource {
   private final int m_channel;
   private int m_handle;
 

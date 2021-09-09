@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.motorcontrol;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -14,8 +13,7 @@ import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
 
 /** Nidec Brushless Motor. */
-public class NidecBrushless extends MotorSafety
-    implements MotorController, Sendable, AutoCloseable {
+public class NidecBrushless extends MotorSafety implements MotorController, AutoCloseable {
   private boolean m_isInverted;
   private final DigitalOutput m_dio;
   private final PWM m_pwm;

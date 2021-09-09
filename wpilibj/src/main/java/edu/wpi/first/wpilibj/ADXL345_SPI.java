@@ -10,7 +10,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -20,7 +19,7 @@ import java.nio.ByteOrder;
 
 /** ADXL345 SPI Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL345_SPI implements Accelerometer, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;

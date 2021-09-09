@@ -4,8 +4,11 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
+
 /** Interface for 3-axis accelerometers. */
-public interface Accelerometer {
+public interface Accelerometer extends NTSendable {
   enum Range {
     k2G,
     k4G,
@@ -41,4 +44,7 @@ public interface Accelerometer {
    * @return The acceleration along the z axis in g-forces
    */
   double getZ();
+
+  @Override
+  default void initSendable(NTSendableBuilder builder) {}
 }

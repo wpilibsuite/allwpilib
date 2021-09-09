@@ -4,13 +4,16 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * DigitalSource Interface. The DigitalSource represents all the possible inputs for a counter or a
  * quadrature encoder. The source may be either a digital input or an analog input. If the caller
  * just provides a channel, then a digital input will be constructed and freed when finished for the
  * source. The source can either be a digital input or analog trigger but not both.
  */
-public abstract class DigitalSource implements AutoCloseable {
+public abstract class DigitalSource implements Sendable, AutoCloseable {
   public abstract boolean isAnalogTrigger();
 
   public abstract int getChannel();
@@ -28,6 +31,9 @@ public abstract class DigitalSource implements AutoCloseable {
    * @return channel routing number
    */
   public abstract int getPortHandleForRouting();
+
+  @Override
+  public void initSendable(SendableBuilder builder) {}
 
   @Override
   public void close() {}

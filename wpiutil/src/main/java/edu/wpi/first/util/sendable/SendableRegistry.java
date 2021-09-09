@@ -195,7 +195,7 @@ public class SendableRegistry {
    * @param parent parent object
    * @param child child object
    */
-  public static synchronized void addChild(Sendable parent, Object child) {
+  public static synchronized void addChild(Sendable parent, Sendable child) {
     Component comp = components.get(child);
     if (comp == null) {
       comp = new Component();

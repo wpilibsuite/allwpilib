@@ -10,7 +10,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -20,7 +19,7 @@ import java.nio.ByteOrder;
 
 /** ADXL345 I2C Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
+public class ADXL345_I2C implements Accelerometer, AutoCloseable {
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
   private static final byte kDataFormatRegister = 0x31;

@@ -4,15 +4,13 @@
 
 package edu.wpi.first.wpilibj.motorcontrol;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.PWM;
 
 /** Common base class for all PWM Motor Controllers. */
 public abstract class PWMMotorController extends MotorSafety
-    implements MotorController, Sendable, AutoCloseable {
+    implements MotorController, AutoCloseable {
   private boolean m_isInverted;
   protected PWM m_pwm;
 
@@ -102,13 +100,5 @@ public abstract class PWMMotorController extends MotorSafety
    */
   public int getChannel() {
     return m_pwm.getChannel();
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Motor Controller");
-    builder.setActuator(true);
-    builder.setSafeState(this::disable);
-    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

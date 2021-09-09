@@ -9,7 +9,6 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
@@ -38,7 +37,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * the averaging engine may help with this, but rotational speeds of the sensor will then be
  * limited.
  */
-public class AnalogTriggerOutput extends DigitalSource implements Sendable {
+public class AnalogTriggerOutput extends DigitalSource {
   /** Exceptions dealing with improper operation of the Analog trigger output. */
   @SuppressWarnings("serial")
   public static class AnalogTriggerOutputException extends RuntimeException {

@@ -5,9 +5,11 @@
 package edu.wpi.first.wpilibj.interfaces;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 
 /** Interface for yaw rate gyros. */
-public interface Gyro extends AutoCloseable {
+public interface Gyro extends NTSendable, AutoCloseable {
   /**
    * Calibrate the gyro. It's important to make sure that the robot is not moving while the
    * calibration is in progress, this is typically done when the robot is first turned on while it's
@@ -66,4 +68,7 @@ public interface Gyro extends AutoCloseable {
   default Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-getAngle());
   }
+
+  @Override
+  default void initSendable(NTSendableBuilder builder) {}
 }
