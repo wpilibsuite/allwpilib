@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <hal/SimDevice.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/SPI.h"
@@ -28,9 +27,7 @@ namespace frc {
  * This class is for the digital ADXRS450 gyro sensor that connects via SPI.
  * Only one instance of an ADXRS Gyro is supported.
  */
-class ADXRS450_Gyro : public Gyro,
-                      public wpi::Sendable,
-                      public wpi::SendableHelper<ADXRS450_Gyro> {
+class ADXRS450_Gyro : public Gyro, public wpi::SendableHelper<ADXRS450_Gyro> {
  public:
   /**
    * Gyro constructor on onboard CS0.

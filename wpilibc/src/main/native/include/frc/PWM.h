@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
@@ -31,7 +30,7 @@ class DMA;
  *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
+class PWM : public wpi::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
   friend class DMA;

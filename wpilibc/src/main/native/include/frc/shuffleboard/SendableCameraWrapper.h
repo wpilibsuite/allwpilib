@@ -36,8 +36,7 @@ void AddToSendableRegistry(wpi::Sendable* sendable, std::string name);
  * A wrapper to make video sources sendable and usable from Shuffleboard.
  */
 class SendableCameraWrapper
-    : public wpi::Sendable,
-      public wpi::SendableHelper<SendableCameraWrapper> {
+    : public wpi::SendableHelper<SendableCameraWrapper> {
  private:
   struct private_init {};
 

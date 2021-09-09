@@ -7,7 +7,6 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/Counter.h"
@@ -35,9 +34,7 @@ class DMASample;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public CounterBase,
-                public wpi::Sendable,
-                public wpi::SendableHelper<Encoder> {
+class Encoder : public CounterBase, public wpi::SendableHelper<Encoder> {
   friend class DMA;
   friend class DMASample;
 

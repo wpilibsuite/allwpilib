@@ -15,7 +15,7 @@ namespace frc {
 
 class Command;
 
-class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
+class Subsystem : public wpi::SendableHelper<Subsystem> {
   friend class Scheduler;
 
  public:

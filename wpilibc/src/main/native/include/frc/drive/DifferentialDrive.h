@@ -6,7 +6,6 @@
 
 #include <string>
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
@@ -98,7 +97,6 @@ class SpeedController;
  * with SetDeadband().
  */
 class DifferentialDrive : public RobotDriveBase,
-                          public wpi::Sendable,
                           public wpi::SendableHelper<DifferentialDrive> {
  public:
   struct WheelSpeeds {

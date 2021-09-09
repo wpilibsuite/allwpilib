@@ -7,11 +7,10 @@
 #include <atomic>
 #include <string>
 
-#include <networktables/NTSendable.h>
+#include <networktables/NTSendableHelper.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/SmallVector.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
@@ -21,8 +20,7 @@ namespace frc {
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.
  */
-class SendableChooserBase : public nt::NTSendable,
-                            public wpi::SendableHelper<SendableChooserBase> {
+class SendableChooserBase : public nt::NTSendableHelper<SendableChooserBase> {
  public:
   SendableChooserBase();
   ~SendableChooserBase() override = default;

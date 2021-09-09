@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include "wpi/deprecated.h"
+#include "wpi/sendable/Sendable.h"
 #include "wpi/sendable/SendableRegistry.h"
 
 namespace wpi {
@@ -21,21 +22,19 @@ namespace wpi {
  * @tparam CRTP derived class
  */
 template <typename Derived>
-class SendableHelper {
+class SendableHelper : public Sendable {
  public:
   SendableHelper(const SendableHelper& rhs) = default;
   SendableHelper& operator=(const SendableHelper& rhs) = default;
 
   SendableHelper(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
-    SendableRegistry::Move(static_cast<Derived*>(this),
-                           static_cast<Derived*>(&rhs));
+    SendableRegistry::Move(this, &rhs);
   }
 
   SendableHelper& operator=(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
-    SendableRegistry::Move(static_cast<Derived*>(this),
-                           static_cast<Derived*>(&rhs));
+    SendableRegistry::Move(this, &rhs);
     return *this;
   }
 
@@ -47,9 +46,7 @@ class SendableHelper {
    * @return Name
    */
   WPI_DEPRECATED("use SendableRegistry::GetName()")
-  std::string GetName() const {
-    return SendableRegistry::GetName(static_cast<const Derived*>(this));
-  }
+  std::string GetName() const { return SendableRegistry::GetName(this); }
 
   /**
    * Sets the name of this Sendable object.
@@ -59,9 +56,7 @@ class SendableHelper {
    * @param name name
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view name) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), name);
-  }
+  void SetName(std::string_view name) { SendableRegistry::SetName(this, name); }
 
   /**
    * Sets both the subsystem name and device name of this Sendable object.
@@ -73,7 +68,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(std::string_view subsystem, std::string_view name) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), subsystem, name);
+    SendableRegistry::SetName(this, subsystem, name);
   }
 
   /**
@@ -85,7 +80,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::GetSubsystem()")
   std::string GetSubsystem() const {
-    return SendableRegistry::GetSubsystem(static_cast<const Derived*>(this));
+    return SendableRegistry::GetSubsystem(this);
   }
 
   /**
@@ -97,7 +92,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetSubsystem()")
   void SetSubsystem(std::string_view subsystem) {
-    SendableRegistry::SetSubsystem(static_cast<Derived*>(this), subsystem);
+    SendableRegistry::SetSubsystem(this, subsystem);
   }
 
  protected:
@@ -110,7 +105,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
   void AddChild(std::shared_ptr<Sendable> child) {
-    SendableRegistry::AddChild(static_cast<Derived*>(this), child.get());
+    SendableRegistry::AddChild(this, child.get());
   }
 
   /**
@@ -121,9 +116,7 @@ class SendableHelper {
    * @param child child component
    */
   WPI_DEPRECATED("use SendableRegistry::AddChild()")
-  void AddChild(void* child) {
-    SendableRegistry::AddChild(static_cast<Derived*>(this), child);
-  }
+  void AddChild(void* child) { SendableRegistry::AddChild(this, child); }
 
   /**
    * Sets the name of the sensor with a channel number.
@@ -136,7 +129,7 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(std::string_view moduleType, int channel) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType, channel);
+    SendableRegistry::SetName(this, moduleType, channel);
   }
 
   /**
@@ -152,16 +145,15 @@ class SendableHelper {
    */
   WPI_DEPRECATED("use SendableRegistry::SetName()")
   void SetName(std::string_view moduleType, int moduleNumber, int channel) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType,
-                              moduleNumber, channel);
+    SendableRegistry::SetName(this, moduleType, moduleNumber, channel);
   }
 
  protected:
   SendableHelper() = default;
 
-  ~SendableHelper() {
+  ~SendableHelper() override {
     // it is safe to call Remove() multiple times with the same object
-    SendableRegistry::Remove(static_cast<Derived*>(this));
+    SendableRegistry::Remove(this);
   }
 };
 

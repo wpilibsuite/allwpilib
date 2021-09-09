@@ -9,7 +9,6 @@
 #include <array>
 
 #include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
@@ -26,8 +25,7 @@ class Counter;
  * filter. The filter lets the user configure the time that an input must remain
  * high or low before it is classified as high or low.
  */
-class DigitalGlitchFilter : public wpi::Sendable,
-                            public wpi::SendableHelper<DigitalGlitchFilter> {
+class DigitalGlitchFilter : public wpi::SendableHelper<DigitalGlitchFilter> {
  public:
   DigitalGlitchFilter();
   ~DigitalGlitchFilter() override;

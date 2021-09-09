@@ -6,8 +6,7 @@
 
 #include <memory>
 
-#include <networktables/NTSendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <networktables/NTSendableHelper.h>
 
 namespace frc {
 
@@ -15,7 +14,7 @@ class ButtonScheduler;
 class Command;
 class Subsystem;
 
-class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
+class Scheduler : public nt::NTSendableHelper<Scheduler> {
  public:
   /**
    * Returns the Scheduler, creating it if one does not exist.

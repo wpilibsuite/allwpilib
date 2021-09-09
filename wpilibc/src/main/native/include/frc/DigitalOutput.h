@@ -5,7 +5,6 @@
 #pragma once
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
@@ -20,7 +19,6 @@ namespace frc {
  * shouldn't be done here.
  */
 class DigitalOutput : public DigitalSource,
-                      public wpi::Sendable,
                       public wpi::SendableHelper<DigitalOutput> {
  public:
   /**

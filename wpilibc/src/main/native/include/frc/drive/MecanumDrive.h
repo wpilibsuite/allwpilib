@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
@@ -73,7 +72,6 @@ class SpeedController;
  * deadband of 0 is used.
  */
 class MecanumDrive : public RobotDriveBase,
-                     public wpi::Sendable,
                      public wpi::SendableHelper<MecanumDrive> {
  public:
   struct WheelSpeeds {

@@ -26,7 +26,7 @@ class Command;
  * only have to write the {@link Trigger#Get()} method to get the full
  * functionality of the Trigger class.
  */
-class Trigger : public wpi::Sendable, public wpi::SendableHelper<Trigger> {
+class Trigger : public wpi::SendableHelper<Trigger> {
  public:
   Trigger() = default;
   ~Trigger() override = default;

@@ -10,10 +10,9 @@
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
-#include <networktables/NTSendable.h>
+#include <networktables/NTSendableHelper.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
-#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
 namespace frc2 {
@@ -27,8 +26,7 @@ class Subsystem;
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
  */
-class CommandScheduler final : public nt::NTSendable,
-                               public wpi::SendableHelper<CommandScheduler> {
+class CommandScheduler final : public nt::NTSendableHelper<CommandScheduler> {
  public:
   /**
    * Returns the Scheduler instance.

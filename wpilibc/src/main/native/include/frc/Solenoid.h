@@ -8,7 +8,6 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
@@ -21,7 +20,7 @@ namespace frc {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the PCM.
  */
-class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
+class Solenoid : public wpi::SendableHelper<Solenoid> {
  public:
   Solenoid(PneumaticsBase& module, int channel);
   Solenoid(PneumaticsBase* module, int channel);

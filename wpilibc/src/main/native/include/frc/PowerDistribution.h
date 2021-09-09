@@ -5,7 +5,6 @@
 #pragma once
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
@@ -14,8 +13,7 @@ namespace frc {
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
  */
-class PowerDistribution : public wpi::Sendable,
-                          public wpi::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::SendableHelper<PowerDistribution> {
  public:
   static constexpr int kDefaultModule = -1;
   enum class ModuleType { kAutomatic = 0, kCTRE = 1, kRev = 2 };

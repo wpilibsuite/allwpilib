@@ -8,7 +8,6 @@
 
 #include <hal/Types.h>
 #include <units/time.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
@@ -30,9 +29,7 @@ class DMASample;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public CounterBase,
-                public wpi::Sendable,
-                public wpi::SendableHelper<Counter> {
+class Counter : public CounterBase, public wpi::SendableHelper<Counter> {
   friend class DMA;
   friend class DMASample;
 

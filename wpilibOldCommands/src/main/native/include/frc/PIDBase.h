@@ -9,7 +9,6 @@
 
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PIDInterface.h"
@@ -34,7 +33,6 @@ namespace frc {
  */
 class PIDBase : public PIDInterface,
                 public PIDOutput,
-                public wpi::Sendable,
                 public wpi::SendableHelper<PIDBase> {
  public:
   /**

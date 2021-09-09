@@ -9,7 +9,6 @@
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
 #include <units/angle.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/AnalogTrigger.h"
@@ -21,8 +20,7 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public wpi::Sendable,
-                      public wpi::SendableHelper<AnalogEncoder> {
+class AnalogEncoder : public wpi::SendableHelper<AnalogEncoder> {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.

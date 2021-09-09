@@ -7,15 +7,13 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
 
-class MotorControllerGroup : public wpi::Sendable,
-                             public MotorController,
+class MotorControllerGroup : public MotorController,
                              public wpi::SendableHelper<MotorControllerGroup> {
  public:
   template <class... MotorControllers>

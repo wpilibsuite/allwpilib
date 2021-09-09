@@ -4,7 +4,7 @@
 
 #include "frc2/command/SubsystemBase.h"
 
-#include <wpi/sendable/SendableBuilder.h>
+#include <networktables/NTSendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/Command.h"
@@ -17,7 +17,7 @@ SubsystemBase::SubsystemBase() {
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
+void SubsystemBase::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(
       ".hasDefault", [this] { return GetDefaultCommand() != nullptr; },

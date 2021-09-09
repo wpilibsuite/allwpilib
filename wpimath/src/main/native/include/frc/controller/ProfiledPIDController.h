@@ -29,8 +29,7 @@ void ReportProfiledPIDController();
  */
 template <class Distance>
 class ProfiledPIDController
-    : public wpi::Sendable,
-      public wpi::SendableHelper<ProfiledPIDController<Distance>> {
+    : public wpi::SendableHelper<ProfiledPIDController<Distance>> {
  public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

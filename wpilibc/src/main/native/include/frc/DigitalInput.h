@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
@@ -23,7 +22,6 @@ class DigitalGlitchFilter;
  * implemented anywhere else.
  */
 class DigitalInput : public DigitalSource,
-                     public wpi::Sendable,
                      public wpi::SendableHelper<DigitalInput> {
  public:
   /**

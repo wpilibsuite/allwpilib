@@ -6,7 +6,6 @@
 
 #include <hal/Types.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "PneumaticsBase.h"
@@ -14,7 +13,6 @@
 namespace frc {
 class PneumaticsControlModule
     : public PneumaticsBase,
-      public wpi::Sendable,
       public wpi::SendableHelper<PneumaticsControlModule> {
  public:
   PneumaticsControlModule();

@@ -17,8 +17,7 @@ namespace frc2 {
 /**
  * Implements a PID control loop.
  */
-class PIDController : public wpi::Sendable,
-                      public wpi::SendableHelper<PIDController> {
+class PIDController : public wpi::SendableHelper<PIDController> {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.

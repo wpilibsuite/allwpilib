@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <wpi/deprecated.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/motorcontrol/MotorController.h"
@@ -16,8 +15,7 @@
 namespace frc {
 
 class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
-    : public wpi::Sendable,
-      public MotorController,
+    : public MotorController,
       public wpi::SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>

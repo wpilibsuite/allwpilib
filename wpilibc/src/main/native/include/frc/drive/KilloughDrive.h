@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
@@ -55,7 +54,6 @@ class SpeedController;
  * clockwise rotation around the Z axis is positive.
  */
 class KilloughDrive : public RobotDriveBase,
-                      public wpi::Sendable,
                       public wpi::SendableHelper<KilloughDrive> {
  public:
   static constexpr double kDefaultLeftMotorAngle = 60.0;

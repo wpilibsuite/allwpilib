@@ -5,8 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <networktables/NTSendableHelper.h>
 
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -21,8 +20,7 @@ namespace frc {
  * 0x1D (7-bit address).
  */
 class ADXL345_I2C : public Accelerometer,
-                    public nt::NTSendable,
-                    public wpi::SendableHelper<ADXL345_I2C> {
+                    public nt::NTSendableHelper<ADXL345_I2C> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

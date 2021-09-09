@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/DigitalSource.h"
@@ -45,7 +44,6 @@ class AnalogTrigger;
  * may help with this, but rotational speeds of the sensor will then be limited.
  */
 class AnalogTriggerOutput : public DigitalSource,
-                            public wpi::Sendable,
                             public wpi::SendableHelper<AnalogTriggerOutput> {
   friend class AnalogTrigger;
 

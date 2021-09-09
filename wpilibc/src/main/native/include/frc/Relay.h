@@ -8,7 +8,6 @@
 #include <string>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/MotorSafety.h"
@@ -27,9 +26,7 @@ namespace frc {
  * independently for something that does not care about voltage polarity (like
  * a solenoid).
  */
-class Relay : public MotorSafety,
-              public wpi::Sendable,
-              public wpi::SendableHelper<Relay> {
+class Relay : public MotorSafety, public wpi::SendableHelper<Relay> {
  public:
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };

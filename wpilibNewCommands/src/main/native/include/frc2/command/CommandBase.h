@@ -9,7 +9,6 @@
 #include <string_view>
 
 #include <wpi/SmallSet.h>
-#include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
@@ -19,9 +18,7 @@ namespace frc2 {
 /**
  * A Sendable base class for Commands.
  */
-class CommandBase : public Command,
-                    public wpi::Sendable,
-                    public wpi::SendableHelper<CommandBase> {
+class CommandBase : public Command, public wpi::SendableHelper<CommandBase> {
  public:
   /**
    * Adds the specified requirements to the command.
