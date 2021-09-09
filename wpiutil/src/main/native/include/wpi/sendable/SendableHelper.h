@@ -26,13 +26,22 @@ class SendableHelper {
   SendableHelper(const SendableHelper& rhs) = default;
   SendableHelper& operator=(const SendableHelper& rhs) = default;
 
+#if !defined(_MSC_VER) && (defined(__llvm__) || __GNUC__ > 7)
+  // See https://bugzilla.mozilla.org/show_bug.cgi?id=1442819
+  __attribute__((no_sanitize("vptr")))
+#endif
   SendableHelper(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
     SendableRegistry::Move(static_cast<Derived*>(this),
                            static_cast<Derived*>(&rhs));
   }
 
-  SendableHelper& operator=(SendableHelper&& rhs) {
+#if !defined(_MSC_VER) && (defined(__llvm__) || __GNUC__ > 7)
+  // See https://bugzilla.mozilla.org/show_bug.cgi?id=1442819
+  __attribute__((no_sanitize("vptr")))
+#endif
+  SendableHelper&
+  operator=(SendableHelper&& rhs) {
     // it is safe to call Move() multiple times with the same rhs
     SendableRegistry::Move(static_cast<Derived*>(this),
                            static_cast<Derived*>(&rhs));
