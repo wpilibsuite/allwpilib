@@ -7,8 +7,6 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/sendable/Sendable.h>
-
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
 #include "frc/motorcontrol/MotorController.h"
@@ -19,9 +17,7 @@ class DMA;
 /**
  * Common base class for all PWM Motor Controllers.
  */
-class PWMMotorController : public MotorController,
-                           public MotorSafety,
-                           public wpi::Sendable {
+class PWMMotorController : public MotorController, public MotorSafety {
  public:
   friend class DMA;
 
@@ -68,8 +64,6 @@ class PWMMotorController : public MotorController,
    *                on-board, 10-19 are on the MXP port
    */
   PWMMotorController(std::string_view name, int channel);
-
-  void InitSendable(wpi::SendableBuilder& builder) override;
 
   PWM m_pwm;
 

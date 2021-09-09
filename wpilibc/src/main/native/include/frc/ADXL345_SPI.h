@@ -5,7 +5,6 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendable.h>
 
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -18,7 +17,7 @@ namespace frc {
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public Accelerometer, public nt::NTSendable {
+class ADXL345_SPI : public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

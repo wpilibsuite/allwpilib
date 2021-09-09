@@ -19,7 +19,7 @@ namespace frc {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public Accelerometer, public nt::NTSendable {
+class ADXL345_I2C : public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

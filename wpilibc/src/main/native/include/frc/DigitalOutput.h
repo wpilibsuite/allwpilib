@@ -5,7 +5,6 @@
 #pragma once
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 
 #include "frc/DigitalSource.h"
 
@@ -18,7 +17,7 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public DigitalSource, public wpi::Sendable {
+class DigitalOutput : public DigitalSource {
  public:
   /**
    * Create an instance of a digital output.

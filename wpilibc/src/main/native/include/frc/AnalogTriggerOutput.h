@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/sendable/Sendable.h>
-
 #include "frc/DigitalSource.h"
 
 namespace frc {
@@ -43,7 +41,7 @@ class AnalogTrigger;
  * rollover transition is not sharp / clean enough. Using the averaging engine
  * may help with this, but rotational speeds of the sensor will then be limited.
  */
-class AnalogTriggerOutput : public DigitalSource, public wpi::Sendable {
+class AnalogTriggerOutput : public DigitalSource {
   friend class AnalogTrigger;
 
  public:

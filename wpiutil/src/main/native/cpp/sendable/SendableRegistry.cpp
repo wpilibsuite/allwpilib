@@ -165,13 +165,6 @@ void SendableRegistry::AddChild(Sendable* parent, Sendable* child) {
   comp.parent = parent;
 }
 
-void SendableRegistry::AddChild(Sendable* parent, void* child) {
-  auto& inst = GetInstance();
-  std::scoped_lock lock(inst.mutex);
-  auto& comp = inst.GetOrAdd(child);
-  comp.parent = parent;
-}
-
 bool SendableRegistry::Remove(Sendable* sendable) {
   auto& inst = GetInstance();
   std::scoped_lock lock(inst.mutex);

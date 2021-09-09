@@ -7,7 +7,6 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/Sendable.h>
 
 #include "frc/interfaces/Gyro.h"
 
@@ -28,7 +27,7 @@ class AnalogInput;
  *
  * This class is for gyro sensors that connect to an analog input.
  */
-class AnalogGyro : public Gyro, public wpi::Sendable {
+class AnalogGyro : public Gyro {
  public:
   static constexpr int kOversampleBits = 10;
   static constexpr int kAverageBits = 0;

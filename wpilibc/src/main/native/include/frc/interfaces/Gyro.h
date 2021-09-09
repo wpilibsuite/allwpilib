@@ -5,6 +5,7 @@
 #pragma once
 
 #include <units/angle.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/geometry/Rotation2d.h"
 
@@ -13,7 +14,7 @@ namespace frc {
 /**
  * Interface for yaw rate gyros.
  */
-class Gyro {
+class Gyro : public wpi::Sendable {
  public:
   Gyro() = default;
   virtual ~Gyro() = default;
@@ -79,6 +80,8 @@ class Gyro {
   virtual Rotation2d GetRotation2d() const {
     return Rotation2d{units::degree_t{-GetAngle()}};
   }
+
+  void InitSendable(wpi::SendableBuilder&) override {}
 };
 
 }  // namespace frc

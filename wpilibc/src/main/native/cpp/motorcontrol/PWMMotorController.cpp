@@ -46,11 +46,3 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::SendableRegistry::AddLW(this, name, channel);
 }
-
-void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.SetSafeState([=] { Disable(); });
-  builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
-}

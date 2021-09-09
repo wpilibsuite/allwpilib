@@ -4,12 +4,14 @@
 
 #pragma once
 
+#include <networktables/NTSendable.h>
+
 namespace frc {
 
 /**
  * Interface for 3-axis accelerometers.
  */
-class Accelerometer {
+class Accelerometer : public nt::NTSendable {
  public:
   Accelerometer() = default;
   virtual ~Accelerometer() = default;
@@ -48,6 +50,8 @@ class Accelerometer {
    * @return The acceleration along the z axis in g-forces
    */
   virtual double GetZ() = 0;
+
+  void InitSendable(nt::NTSendableBuilder&) override {}
 };
 
 }  // namespace frc

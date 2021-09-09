@@ -6,13 +6,15 @@
 
 #include <units/voltage.h>
 #include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
 
 namespace frc {
 
 /**
  * Interface for speed controlling devices.
  */
-class WPI_DEPRECATED("use MotorController") SpeedController {
+class WPI_DEPRECATED("use MotorController") SpeedController
+    : public wpi::Sendable {
  public:
   virtual ~SpeedController() = default;
 
@@ -67,6 +69,8 @@ class WPI_DEPRECATED("use MotorController") SpeedController {
    * Common interface to stop the motor until Set is called again.
    */
   virtual void StopMotor() = 0;
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

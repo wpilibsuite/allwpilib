@@ -4,10 +4,20 @@
 
 #include "frc/SpeedController.h"
 
-#include <frc/RobotController.h>
+#include <wpi/sendable/SendableBuilder.h>
+
+#include "frc/RobotController.h"
 
 using namespace frc;
 
 void SpeedController::SetVoltage(units::volt_t output) {
   Set(output / units::volt_t(RobotController::GetInputVoltage()));
+}
+
+void SpeedController::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Motor Controller");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { Disable(); });
+  builder.AddDoubleProperty(
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }
