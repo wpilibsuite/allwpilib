@@ -26,7 +26,7 @@ class SendableHelper {
   SendableHelper(const SendableHelper& rhs) = default;
   SendableHelper& operator=(const SendableHelper& rhs) = default;
 
-#if !defined(_MSC_VER) && !defined(__FRC_ROBORIO__)
+#if !defined(_MSC_VER) && (defined(__llvm__) || __GNUC__ > 7)
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1442819
   __attribute__((no_sanitize("vptr")))
 #endif
@@ -36,7 +36,7 @@ class SendableHelper {
                            static_cast<Derived*>(&rhs));
   }
 
-#if !defined(_MSC_VER) && !defined(__FRC_ROBORIO__)
+#if !defined(_MSC_VER) && (defined(__llvm__) || __GNUC__ > 7)
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1442819
   __attribute__((no_sanitize("vptr")))
 #endif
