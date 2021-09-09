@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 namespace frc {
 
@@ -26,7 +26,7 @@ class DMASample;
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi::SendableHelper<AnalogInput> {
+class AnalogInput : public wpi::Sendable {
   friend class AnalogTrigger;
   friend class AnalogGyro;
   friend class DMA;

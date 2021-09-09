@@ -9,7 +9,7 @@
 
 #include <wpi/deprecated.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/PIDInterface.h"
 #include "frc/PIDOutput.h"
@@ -31,9 +31,7 @@ namespace frc {
  *
  * @deprecated All APIs which use this have been deprecated.
  */
-class PIDBase : public PIDInterface,
-                public PIDOutput,
-                public wpi::SendableHelper<PIDBase> {
+class PIDBase : public PIDInterface, public PIDOutput, public wpi::Sendable {
  public:
   /**
    * Allocate a PID object with the given constants for P, I, D.

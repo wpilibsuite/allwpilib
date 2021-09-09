@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/DigitalOutput.h"
 #include "frc/MotorSafety.h"
@@ -20,7 +20,7 @@ namespace frc {
  */
 class NidecBrushless : public MotorController,
                        public MotorSafety,
-                       public wpi::SendableHelper<NidecBrushless> {
+                       public wpi::Sendable {
  public:
   /**
    * Constructor.

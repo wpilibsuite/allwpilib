@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -17,7 +17,7 @@ namespace frc {
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public Accelerometer, public nt::NTSendableHelper<ADXL362> {
+class ADXL362 : public Accelerometer, public nt::NTSendable {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
   struct AllAxes {

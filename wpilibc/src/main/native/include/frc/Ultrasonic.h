@@ -13,7 +13,7 @@
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/Counter.h"
 
@@ -34,7 +34,7 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public wpi::SendableHelper<Ultrasonic> {
+class Ultrasonic : public wpi::Sendable {
  public:
   /**
    * Create an instance of the Ultrasonic Sensor.

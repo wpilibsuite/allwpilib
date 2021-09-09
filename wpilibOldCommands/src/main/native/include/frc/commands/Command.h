@@ -10,7 +10,7 @@
 
 #include <units/time.h>
 #include <wpi/SmallPtrSet.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/commands/Subsystem.h"
 
@@ -42,7 +42,7 @@ class CommandGroup;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public wpi::SendableHelper<Command> {
+class Command : public wpi::Sendable {
   friend class CommandGroup;
   friend class Scheduler;
 

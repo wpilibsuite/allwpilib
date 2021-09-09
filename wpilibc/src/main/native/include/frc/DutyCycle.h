@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 namespace frc {
 class DigitalSource;
@@ -26,7 +26,7 @@ class DMASample;
  * order to implement rollover checking.
  *
  */
-class DutyCycle : public wpi::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::Sendable {
   friend class AnalogTrigger;
   friend class DMA;
   friend class DMASample;

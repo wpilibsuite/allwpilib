@@ -5,7 +5,7 @@
 #pragma once
 
 #include <hal/SimDevice.h>
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
@@ -19,8 +19,7 @@ namespace frc {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public Accelerometer,
-                    public nt::NTSendableHelper<ADXL345_I2C> {
+class ADXL345_I2C : public Accelerometer, public nt::NTSendable {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 

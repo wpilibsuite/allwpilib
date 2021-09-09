@@ -6,6 +6,7 @@
 
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"

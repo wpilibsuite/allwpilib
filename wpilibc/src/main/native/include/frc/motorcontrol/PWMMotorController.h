@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/MotorSafety.h"
 #include "frc/PWM.h"
@@ -21,7 +21,7 @@ class DMA;
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public wpi::SendableHelper<PWMMotorController> {
+                           public wpi::Sendable {
  public:
   friend class DMA;
 

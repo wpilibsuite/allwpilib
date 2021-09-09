@@ -10,7 +10,7 @@
 
 #include <frc/Errors.h>
 #include <frc/Watchdog.h>
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 #include <units/time.h>
 #include <wpi/FunctionExtras.h>
 #include <wpi/span.h>
@@ -26,7 +26,7 @@ class Subsystem;
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
  */
-class CommandScheduler final : public nt::NTSendableHelper<CommandScheduler> {
+class CommandScheduler final : public nt::NTSendable {
  public:
   /**
    * Returns the Scheduler instance.

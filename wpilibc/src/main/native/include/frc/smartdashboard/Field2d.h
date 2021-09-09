@@ -8,7 +8,7 @@
 #include <string_view>
 #include <vector>
 
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <units/length.h>
@@ -38,7 +38,7 @@ namespace frc {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public nt::NTSendableHelper<Field2d> {
+class Field2d : public nt::NTSendable {
  public:
   using Entry = size_t;
 

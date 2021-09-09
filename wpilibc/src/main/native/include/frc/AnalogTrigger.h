@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/AnalogTriggerOutput.h"
 
@@ -16,7 +16,7 @@ namespace frc {
 class AnalogInput;
 class DutyCycle;
 
-class AnalogTrigger : public wpi::SendableHelper<AnalogTrigger> {
+class AnalogTrigger : public wpi::Sendable {
   friend class AnalogTriggerOutput;
 
  public:

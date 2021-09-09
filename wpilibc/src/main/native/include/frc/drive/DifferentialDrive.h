@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/drive/RobotDriveBase.h"
 
@@ -96,8 +96,7 @@ class SpeedController;
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
  */
-class DifferentialDrive : public RobotDriveBase,
-                          public wpi::SendableHelper<DifferentialDrive> {
+class DifferentialDrive : public RobotDriveBase, public wpi::Sendable {
  public:
   struct WheelSpeeds {
     double left = 0.0;

@@ -15,7 +15,7 @@ SendableChooserBase::SendableChooserBase() : m_instance{s_instances++} {
 }
 
 SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)
-    : NTSendableHelper(std::move(oth)),
+    : NTSendable(std::move(oth)),
       m_defaultChoice(std::move(oth.m_defaultChoice)),
       m_selected(std::move(oth.m_selected)),
       m_haveSelected(std::move(oth.m_haveSelected)),
@@ -23,7 +23,7 @@ SendableChooserBase::SendableChooserBase(SendableChooserBase&& oth)
       m_instance(std::move(oth.m_instance)) {}
 
 SendableChooserBase& SendableChooserBase::operator=(SendableChooserBase&& oth) {
-  NTSendableHelper::operator=(oth);
+  NTSendable::operator=(oth);
   std::scoped_lock lock(m_mutex, oth.m_mutex);
   m_defaultChoice = std::move(oth.m_defaultChoice);
   m_selected = std::move(oth.m_selected);

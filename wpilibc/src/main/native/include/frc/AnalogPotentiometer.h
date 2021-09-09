@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/AnalogInput.h"
 
@@ -18,7 +18,7 @@ namespace frc {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public wpi::SendableHelper<AnalogPotentiometer> {
+class AnalogPotentiometer : public wpi::Sendable {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.

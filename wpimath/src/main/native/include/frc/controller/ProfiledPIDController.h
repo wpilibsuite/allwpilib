@@ -11,7 +11,6 @@
 
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
@@ -28,8 +27,7 @@ void ReportProfiledPIDController();
  * profile.
  */
 template <class Distance>
-class ProfiledPIDController
-    : public wpi::SendableHelper<ProfiledPIDController<Distance>> {
+class ProfiledPIDController : public wpi::Sendable {
  public:
   using Distance_t = units::unit_t<Distance>;
   using Velocity =

@@ -16,13 +16,13 @@ Field2d::Field2d() {
   wpi::SendableRegistry::Add(this, "Field");
 }
 
-Field2d::Field2d(Field2d&& rhs) : NTSendableHelper(std::move(rhs)) {
+Field2d::Field2d(Field2d&& rhs) : NTSendable(std::move(rhs)) {
   std::swap(m_table, rhs.m_table);
   std::swap(m_objects, rhs.m_objects);
 }
 
 Field2d& Field2d::operator=(Field2d&& rhs) {
-  NTSendableHelper::operator=(std::move(rhs));
+  NTSendable::operator=(std::move(rhs));
 
   std::swap(m_table, rhs.m_table);
   std::swap(m_objects, rhs.m_objects);

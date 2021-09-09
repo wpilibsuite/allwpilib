@@ -4,6 +4,8 @@
 
 #include "frc/commands/CommandGroup.h"
 
+#include <algorithm>
+
 #include "frc/Errors.h"
 
 using namespace frc;

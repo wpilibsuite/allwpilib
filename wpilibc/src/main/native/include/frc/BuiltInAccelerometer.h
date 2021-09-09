@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/interfaces/Accelerometer.h"
 
@@ -15,8 +15,7 @@ namespace frc {
  *
  * This class allows access to the roboRIO's internal accelerometer.
  */
-class BuiltInAccelerometer : public Accelerometer,
-                             public wpi::SendableHelper<BuiltInAccelerometer> {
+class BuiltInAccelerometer : public Accelerometer, public wpi::Sendable {
  public:
   /**
    * Constructor.

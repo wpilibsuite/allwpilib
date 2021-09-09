@@ -19,7 +19,7 @@ using CS_Source = CS_Handle;  // NOLINT
 #endif
 
 #include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 namespace frc {
 
@@ -35,8 +35,7 @@ void AddToSendableRegistry(wpi::Sendable* sendable, std::string name);
 /**
  * A wrapper to make video sources sendable and usable from Shuffleboard.
  */
-class SendableCameraWrapper
-    : public wpi::SendableHelper<SendableCameraWrapper> {
+class SendableCameraWrapper : public wpi::Sendable {
  private:
   struct private_init {};
 

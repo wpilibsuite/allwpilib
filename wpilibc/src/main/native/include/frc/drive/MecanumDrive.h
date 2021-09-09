@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/drive/RobotDriveBase.h"
 
@@ -71,8 +71,7 @@ class SpeedController;
  * RobotDrive's MecanumDrive_Polar(double, double, double) if a
  * deadband of 0 is used.
  */
-class MecanumDrive : public RobotDriveBase,
-                     public wpi::SendableHelper<MecanumDrive> {
+class MecanumDrive : public RobotDriveBase, public wpi::Sendable {
  public:
   struct WheelSpeeds {
     double frontLeft = 0.0;

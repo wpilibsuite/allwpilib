@@ -9,13 +9,12 @@
 #include <string_view>
 
 #include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 
 class Command;
 
-class Subsystem : public wpi::SendableHelper<Subsystem> {
+class Subsystem : public wpi::Sendable {
   friend class Scheduler;
 
  public:

@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/PneumaticsBase.h"
 
@@ -20,7 +20,7 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public wpi::SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::Sendable {
  public:
   enum Value { kOff, kForward, kReverse };
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/DigitalSource.h"
 
@@ -21,8 +21,7 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public DigitalSource,
-                     public wpi::SendableHelper<DigitalInput> {
+class DigitalInput : public DigitalSource, public wpi::Sendable {
  public:
   /**
    * Create an instance of a Digital Input class.

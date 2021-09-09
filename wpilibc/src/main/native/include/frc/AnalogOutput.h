@@ -5,14 +5,14 @@
 #pragma once
 
 #include <hal/Types.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 namespace frc {
 
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public wpi::SendableHelper<AnalogOutput> {
+class AnalogOutput : public wpi::Sendable {
  public:
   /**
    * Construct an analog output on the given channel.

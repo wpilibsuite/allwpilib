@@ -10,10 +10,22 @@ class SendableBuilder;
 
 /**
  * Interface for Sendable objects.
+ *
+ * Objects add themselves to SendableRegistry. This class takes care of properly
+ * calling Move() and Remove() on move and destruction. No action is taken if
+ * the object is copied.
  */
 class Sendable {
  public:
-  virtual ~Sendable() = default;
+  Sendable() = default;
+
+  Sendable(const Sendable& rhs) = default;
+  Sendable& operator=(const Sendable& rhs) = default;
+
+  Sendable(Sendable&& rhs);
+  Sendable& operator=(Sendable&& rhs);
+
+  virtual ~Sendable();
 
   /**
    * Initializes this Sendable object.

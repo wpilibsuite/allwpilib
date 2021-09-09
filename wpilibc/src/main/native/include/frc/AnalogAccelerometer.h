@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/AnalogInput.h"
 
@@ -19,7 +19,7 @@ namespace frc {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public wpi::SendableHelper<AnalogAccelerometer> {
+class AnalogAccelerometer : public wpi::Sendable {
  public:
   /**
    * Create a new instance of an accelerometer.

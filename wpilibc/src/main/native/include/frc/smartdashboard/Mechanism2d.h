@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/StringMap.h>
 #include <wpi/mutex.h>
@@ -35,7 +35,7 @@ namespace frc {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public nt::NTSendableHelper<Mechanism2d> {
+class Mechanism2d : public nt::NTSendable {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.

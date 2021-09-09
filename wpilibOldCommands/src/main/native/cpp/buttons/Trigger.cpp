@@ -13,22 +13,22 @@
 
 using namespace frc;
 
-Trigger::Trigger(const Trigger& rhs) : SendableHelper(rhs) {}
+Trigger::Trigger(const Trigger& rhs) : Sendable(rhs) {}
 
 Trigger& Trigger::operator=(const Trigger& rhs) {
-  SendableHelper::operator=(rhs);
+  Sendable::operator=(rhs);
   m_sendablePressed = false;
   return *this;
 }
 
 Trigger::Trigger(Trigger&& rhs)
-    : SendableHelper(std::move(rhs)),
+    : Sendable(std::move(rhs)),
       m_sendablePressed(rhs.m_sendablePressed.load()) {
   rhs.m_sendablePressed = false;
 }
 
 Trigger& Trigger::operator=(Trigger&& rhs) {
-  SendableHelper::operator=(std::move(rhs));
+  Sendable::operator=(std::move(rhs));
   m_sendablePressed = rhs.m_sendablePressed.load();
   rhs.m_sendablePressed = false;
   return *this;

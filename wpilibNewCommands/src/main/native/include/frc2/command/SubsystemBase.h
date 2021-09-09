@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <networktables/NTSendableHelper.h>
+#include <networktables/NTSendable.h>
 #include <wpi/sendable/Sendable.h>
 
 #include "frc2/command/Subsystem.h"
@@ -17,8 +17,7 @@ namespace frc2 {
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
  */
-class SubsystemBase : public Subsystem,
-                      public nt::NTSendableHelper<SubsystemBase> {
+class SubsystemBase : public Subsystem, public nt::NTSendable {
  public:
   void InitSendable(nt::NTSendableBuilder& builder) override;
 

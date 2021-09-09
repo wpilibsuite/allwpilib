@@ -12,9 +12,21 @@ class NTSendableBuilder;
 
 /**
  * Interface for NetworkTable Sendable objects.
+ *
+ * Objects add themselves to SendableRegistry. This class takes care of properly
+ * calling Move() and Remove() on move and destruction. No action is taken if
+ * the object is copied.
  */
 class NTSendable : public wpi::Sendable {
  public:
+  NTSendable() = default;
+
+  NTSendable(const NTSendable& rhs) = default;
+  NTSendable& operator=(const NTSendable& rhs) = default;
+
+  NTSendable(NTSendable&& rhs) = default;
+  NTSendable& operator=(NTSendable&& rhs) = default;
+
   /**
    * Initializes this Sendable object.
    *

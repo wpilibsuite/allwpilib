@@ -9,7 +9,7 @@
 #include <hal/SimDevice.h>
 #include <hal/Types.h>
 #include <units/angle.h>
-#include <wpi/sendable/SendableHelper.h>
+#include <wpi/sendable/Sendable.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/Counter.h"
@@ -23,7 +23,7 @@ class DigitalSource;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public wpi::SendableHelper<DutyCycleEncoder> {
+class DutyCycleEncoder : public wpi::Sendable {
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
