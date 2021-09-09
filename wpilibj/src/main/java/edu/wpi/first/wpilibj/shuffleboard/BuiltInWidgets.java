@@ -246,7 +246,7 @@ public enum BuiltInWidgets implements WidgetType {
   kEncoder("Encoder"),
   /**
    * Displays a {@link edu.wpi.first.wpilibj.motorcontrol.MotorController MotorController}. The
-   * speed controller will be controllable from the dashboard when test mode is enabled, but will
+   * motor controller will be controllable from the dashboard when test mode is enabled, but will
    * otherwise be view-only. <br>
    * Supported types:
    *

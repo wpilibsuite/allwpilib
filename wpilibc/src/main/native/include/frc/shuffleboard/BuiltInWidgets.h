@@ -201,7 +201,7 @@ enum class BuiltInWidgets {
   kEncoder,
   /**
    * Displays a MotorController.
-   * The speed controller will be controllable from the dashboard when test mode
+   * The motor controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
    * <li>PWMMotorController</li>
    * <li>DMC60</li>

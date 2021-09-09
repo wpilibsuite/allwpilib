@@ -97,7 +97,7 @@ public final class Shuffleboard {
   }
 
   /**
-   * Enables user control of widgets containing actuators: speed controllers, relays, etc. This
+   * Enables user control of widgets containing actuators: motor controllers, relays, etc. This
    * should only be used when the robot is in test mode. IterativeRobotBase and SampleRobot are both
    * configured to call this method when entering test mode; most users should not need to use this
    * method directly.

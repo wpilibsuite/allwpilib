@@ -60,8 +60,8 @@ class SpeedController;
  * with SetDeadband().
  *
  * RobotDrive porting guide:
- * <br>In MecanumDrive, the right side speed controllers are automatically
- * inverted, while in RobotDrive, no speed controllers are automatically
+ * <br>In MecanumDrive, the right side motor controllers are automatically
+ * inverted, while in RobotDrive, no motor controllers are automatically
  * inverted.
  * <br>DriveCartesian(double, double, double, double) is equivalent to
  * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
