@@ -65,6 +65,7 @@ TEST_F(NetworkTableTest, ContainsKey) {
   ASSERT_TRUE(nt->ContainsKey("testkey"));
   ASSERT_TRUE(inst.GetEntry("/containskey/testkey").Exists());
   ASSERT_FALSE(inst.GetEntry("containskey/testkey").Exists());
+  nt::NetworkTableInstance::Destroy(inst);
 }
 
 TEST_F(NetworkTableTest, LeadingSlash) {
@@ -75,6 +76,7 @@ TEST_F(NetworkTableTest, LeadingSlash) {
   nt2->PutNumber("testkey", 5);
   ASSERT_TRUE(nt->ContainsKey("testkey"));
   ASSERT_TRUE(inst.GetEntry("/leadingslash/testkey").Exists());
+  nt::NetworkTableInstance::Destroy(inst);
 }
 
 TEST_F(NetworkTableTest, EmptyOrNoSlash) {
@@ -85,4 +87,5 @@ TEST_F(NetworkTableTest, EmptyOrNoSlash) {
   nt2->PutNumber("testkey", 5);
   ASSERT_TRUE(nt->ContainsKey("testkey"));
   ASSERT_TRUE(inst.GetEntry("/testkey").Exists());
+  nt::NetworkTableInstance::Destroy(inst);
 }
