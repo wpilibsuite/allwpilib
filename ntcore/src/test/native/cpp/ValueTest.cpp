@@ -46,6 +46,7 @@ TEST_F(ValueTest, Boolean) {
   v = Value::MakeBoolean(true);
   ASSERT_EQ(NT_BOOLEAN, v->type());
   ASSERT_TRUE(v->GetBoolean());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_BOOLEAN, cv.type);
   ASSERT_EQ(1, cv.data.v_boolean);
@@ -66,6 +67,7 @@ TEST_F(ValueTest, Double) {
   v = Value::MakeDouble(0.25);
   ASSERT_EQ(NT_DOUBLE, v->type());
   ASSERT_EQ(0.25, v->GetDouble());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_DOUBLE, cv.type);
   ASSERT_EQ(0.25, cv.data.v_double);
@@ -87,6 +89,7 @@ TEST_F(ValueTest, String) {
   v = Value::MakeString("goodbye");
   ASSERT_EQ(NT_STRING, v->type());
   ASSERT_EQ("goodbye", v->GetString());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING, cv.type);
   ASSERT_EQ("goodbye"sv, cv.data.v_string.str);
@@ -109,6 +112,7 @@ TEST_F(ValueTest, Raw) {
   v = Value::MakeRaw("goodbye");
   ASSERT_EQ(NT_RAW, v->type());
   ASSERT_EQ("goodbye", v->GetRaw());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_RAW, cv.type);
   ASSERT_EQ("goodbye"sv, cv.data.v_string.str);
@@ -136,6 +140,7 @@ TEST_F(ValueTest, BooleanArray) {
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
   ASSERT_EQ(wpi::span<const int>(vec), v->GetBooleanArray());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_boolean.size);
@@ -148,6 +153,7 @@ TEST_F(ValueTest, BooleanArray) {
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
   ASSERT_EQ(wpi::span<const int>(vec), v->GetBooleanArray());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_boolean.size);
@@ -176,6 +182,7 @@ TEST_F(ValueTest, DoubleArray) {
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
   ASSERT_EQ(wpi::span<const double>(vec), v->GetDoubleArray());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_double.size);
@@ -188,6 +195,7 @@ TEST_F(ValueTest, DoubleArray) {
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
   ASSERT_EQ(wpi::span<const double>(vec), v->GetDoubleArray());
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_double.size);
@@ -228,6 +236,7 @@ TEST_F(ValueTest, StringArray) {
   ASSERT_EQ("s1"sv, v->GetStringArray()[0]);
   ASSERT_EQ("str2"sv, v->GetStringArray()[1]);
   ASSERT_EQ("string3"sv, v->GetStringArray()[2]);
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(3u, cv.data.arr_string.size);
@@ -244,6 +253,7 @@ TEST_F(ValueTest, StringArray) {
   ASSERT_EQ(2u, v->GetStringArray().size());
   ASSERT_EQ("short"sv, v->GetStringArray()[0]);
   ASSERT_EQ("er"sv, v->GetStringArray()[1]);
+  NT_DisposeValue(&cv);
   ConvertToC(*v, &cv);
   ASSERT_EQ(NT_STRING_ARRAY, cv.type);
   ASSERT_EQ(2u, cv.data.arr_string.size);
