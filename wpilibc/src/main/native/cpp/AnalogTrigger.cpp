@@ -109,8 +109,7 @@ bool AnalogTrigger::GetTriggerState() {
 std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
   return std::shared_ptr<AnalogTriggerOutput>(
-      new AnalogTriggerOutput(*this, type),
-      wpi::NullDeleter<AnalogTriggerOutput>());
+      new AnalogTriggerOutput(*this, type));
 }
 
 void AnalogTrigger::InitSendable(wpi::SendableBuilder& builder) {
