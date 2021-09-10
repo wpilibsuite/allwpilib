@@ -12,12 +12,14 @@ TEST(UvSimpleBufferPool, ConstructDefault) {
   SimpleBufferPool<> pool;
   auto buf1 = pool.Allocate();
   ASSERT_EQ(buf1.len, 4096u);  // NOLINT
+  pool.Release({&buf1, 1});
 }
 
 TEST(UvSimpleBufferPool, ConstructSize) {
   SimpleBufferPool<4> pool{8192};
   auto buf1 = pool.Allocate();
   ASSERT_EQ(buf1.len, 8192u);  // NOLINT
+  pool.Release({&buf1, 1});
 }
 
 TEST(UvSimpleBufferPool, ReleaseReuse) {
@@ -31,6 +33,7 @@ TEST(UvSimpleBufferPool, ReleaseReuse) {
   auto buf2 = pool.Allocate();
   ASSERT_EQ(buf1copy.base, buf2.base);
   ASSERT_EQ(buf2.len, origSize);
+  pool.Release({&buf2, 1});
 }
 
 TEST(UvSimpleBufferPool, ClearRemaining) {
