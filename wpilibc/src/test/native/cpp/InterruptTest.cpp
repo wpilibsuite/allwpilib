@@ -36,7 +36,7 @@ TEST(InterruptTest, AsynchronousInterrupt) {
 
     int count = 0;
     while (!hasFired) {
-        Wait(5_ms);
+        frc::Wait(5_ms);
         count++;
         ASSERT_TRUE(count < 1000);
     }
