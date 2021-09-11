@@ -22,9 +22,9 @@ TEST(InterruptTest, AsynchronousInterrupt) {
 
     DigitalInput di{0};
     AsynchronousInterrupt interrupt{di, [&](bool rising, bool falling){
-        counter++;
-        hasFired = true;
-    }};
+                                        counter++;
+                                        hasFired = true;
+                                    }};
 
     interrupt.Enable();
     frc::Wait(0.5_s);
