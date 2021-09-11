@@ -110,6 +110,14 @@ public class ADXL345_I2C implements Accelerometer, NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL345_I2C", port.value);
   }
 
+  public int getPort() {
+    return m_i2c.getPort();
+  }
+
+  public int getDeviceAddress() {
+    return m_i2c.getDeviceAddress();
+  }
+
   @Override
   public void close() {
     SendableRegistry.remove(this);

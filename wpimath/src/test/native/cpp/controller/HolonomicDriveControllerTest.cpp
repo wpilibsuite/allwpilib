@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <units/math.h>
-#include <units/time.h>
 #include <wpi/numbers>
 
 #include "frc/MathUtil.h"
 #include "frc/controller/HolonomicDriveController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
+#include "units/math.h"
+#include "units/time.h"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)

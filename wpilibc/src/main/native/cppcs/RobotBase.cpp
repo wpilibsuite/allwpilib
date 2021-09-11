@@ -20,6 +20,7 @@
 #include "WPILibVersion.h"
 #include "frc/DriverStation.h"
 #include "frc/Errors.h"
+#include "frc/Notifier.h"
 #include "frc/RobotState.h"
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
@@ -35,6 +36,12 @@ int frc::RunHALInitialization() {
   }
   HAL_Report(HALUsageReporting::kResourceType_Language,
              HALUsageReporting::kLanguage_CPlusPlus, 0, GetWPILibVersion());
+
+  if (!frc::Notifier::SetHALThreadPriority(true, 40)) {
+    FRC_ReportError(warn::Warning, "{}",
+                    "Setting HAL Notifier RT priority to 40 failed\n");
+  }
+
   std::puts("\n********** Robot program starting **********");
   return 0;
 }

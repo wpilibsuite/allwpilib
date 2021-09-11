@@ -61,11 +61,11 @@ int Joystick::GetThrottleChannel() const {
   return m_axes[Axis::kThrottle];
 }
 
-double Joystick::GetX(JoystickHand hand) const {
+double Joystick::GetX() const {
   return GetRawAxis(m_axes[Axis::kX]);
 }
 
-double Joystick::GetY(JoystickHand hand) const {
+double Joystick::GetY() const {
   return GetRawAxis(m_axes[Axis::kY]);
 }
 

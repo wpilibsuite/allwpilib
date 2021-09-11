@@ -9,6 +9,9 @@
 #include "hal/simulation/SimDataValue.h"
 
 namespace hal {
+constexpr int32_t kNumPDSimModules = hal::kNumREVPDHModules;
+constexpr int32_t kNumPDSimChannels = hal::kNumREVPDHChannels;
+
 class PowerDistributionData {
   HAL_SIMDATAVALUE_DEFINE_NAME(Initialized)
   HAL_SIMDATAVALUE_DEFINE_NAME(Temperature)
@@ -25,7 +28,7 @@ class PowerDistributionData {
   SimDataValue<double, HAL_MakeDouble, GetTemperatureName> temperature{0.0};
   SimDataValue<double, HAL_MakeDouble, GetVoltageName> voltage{12.0};
   SimDataValue<double, HAL_MakeDouble, GetCurrentName, GetCurrentDefault>
-      current[kNumPDPChannels];
+      current[kNumPDSimChannels];
 
   virtual void ResetData();
 };

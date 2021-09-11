@@ -122,7 +122,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   /**
    * Set the PWM value based on a speed.
    *
-   * This is intended to be used by speed controllers.
+   * This is intended to be used by motor controllers.
    *
    * @pre SetMaxPositivePwm() called.
    * @pre SetMinPositivePwm() called.
@@ -130,14 +130,14 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
    * @pre SetMaxNegativePwm() called.
    * @pre SetMinNegativePwm() called.
    *
-   * @param speed The speed to set the speed controller between -1.0 and 1.0.
+   * @param speed The speed to set the motor controller between -1.0 and 1.0.
    */
   virtual void SetSpeed(double speed);
 
   /**
    * Get the PWM value in terms of speed.
    *
-   * This is intended to be used by speed controllers.
+   * This is intended to be used by motor controllers.
    *
    * @pre SetMaxPositivePwm() called.
    * @pre SetMinPositivePwm() called.
@@ -164,12 +164,12 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   void SetZeroLatch();
 
   /**
-   * Optionally eliminate the deadband from a speed controller.
+   * Optionally eliminate the deadband from a motor controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the Jaguar to
-   *                          eliminate the deadband in the middle of the range.
-   *                          Otherwise, keep the full range without modifying
-   *                          any values.
+   * @param eliminateDeadband If true, set the motor curve on the speed
+   *                          controller to eliminate the deadband in the middle
+   *                          of the range. Otherwise, keep the full range
+   *                          without modifying any values.
    */
   void EnableDeadbandElimination(bool eliminateDeadband);
 

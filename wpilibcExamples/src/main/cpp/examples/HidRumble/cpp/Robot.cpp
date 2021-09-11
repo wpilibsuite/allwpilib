@@ -2,7 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/GenericHID.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
 
@@ -24,7 +23,7 @@ class Robot : public frc::TimedRobot {
   }
 
  private:
-  frc::XboxController m_hid{0};
+  frc::GenericHID m_hid{0};
 };
 
 #ifndef RUNNING_FRC_TESTS

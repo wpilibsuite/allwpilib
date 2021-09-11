@@ -137,6 +137,10 @@ public class ADXL362 implements Accelerometer, NTSendable, AutoCloseable {
     SendableRegistry.addLW(this, "ADXL362", port.value);
   }
 
+  public int getPort() {
+    return m_spi.getPort();
+  }
+
   @Override
   public void close() {
     SendableRegistry.remove(this);

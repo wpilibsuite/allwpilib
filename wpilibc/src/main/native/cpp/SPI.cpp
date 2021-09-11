@@ -168,6 +168,10 @@ SPI::~SPI() {
   HAL_CloseSPI(m_port);
 }
 
+SPI::Port SPI::GetPort() const {
+  return static_cast<Port>(static_cast<int>(m_port));
+}
+
 void SPI::SetClockRate(int hz) {
   HAL_SetSPISpeed(m_port, hz);
 }

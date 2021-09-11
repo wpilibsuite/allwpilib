@@ -66,6 +66,8 @@ typedef HAL_Handle HAL_PowerDistributionHandle;
 
 typedef HAL_Handle HAL_CTREPCMHandle;
 
+typedef HAL_Handle HAL_REVPDHHandle;
+
 typedef int32_t HAL_Bool;
 
 #ifdef __cplusplus

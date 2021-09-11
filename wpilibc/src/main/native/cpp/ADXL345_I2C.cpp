@@ -32,6 +32,14 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   wpi::SendableRegistry::AddLW(this, "ADXL345_I2C", port);
 }
 
+I2C::Port ADXL345_I2C::GetI2CPort() const {
+  return m_i2c.GetPort();
+}
+
+int ADXL345_I2C::GetI2CDeviceAddress() const {
+  return m_i2c.GetDeviceAddress();
+}
+
 void ADXL345_I2C::SetRange(Range range) {
   m_i2c.Write(kDataFormatRegister,
               kDataFormat_FullRes | static_cast<uint8_t>(range));

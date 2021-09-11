@@ -54,16 +54,14 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    const auto xSpeed = -m_speedLimiter.Calculate(
-                            m_controller.GetY(frc::GenericHID::kLeftHand)) *
+    const auto xSpeed = -m_speedLimiter.Calculate(m_controller.GetLeftY()) *
                         Drivetrain::kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    const auto rot = -m_rotLimiter.Calculate(
-                         m_controller.GetX(frc::GenericHID::kRightHand)) *
+    const auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
                      Drivetrain::kMaxAngularSpeed;
 
     m_drive.Drive(xSpeed, rot);

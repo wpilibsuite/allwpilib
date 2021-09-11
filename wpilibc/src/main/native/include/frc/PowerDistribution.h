@@ -17,10 +17,13 @@ namespace frc {
 class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
+  static constexpr int kDefaultModule = -1;
+  enum class ModuleType { kAutomatic = 0, kCTRE = 1, kRev = 2 };
+
   /**
    * Constructs a PowerDistribution.
    *
-   * Uses the default CAN ID (0).
+   * Uses the default CAN ID.
    */
   PowerDistribution();
 
@@ -28,9 +31,11 @@ class PowerDistribution : public wpi::Sendable,
    * Constructs a PowerDistribution.
    *
    * @param module The CAN ID of the PDP
+   * @param moduleType The type of module
    */
-  explicit PowerDistribution(int module);
+  PowerDistribution(int module, ModuleType moduleType);
 
+  ~PowerDistribution() override;
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
 
@@ -93,10 +98,14 @@ class PowerDistribution : public wpi::Sendable,
    */
   int GetModule() const;
 
+  bool GetSwitchableChannel() const;
+
+  void SetSwitchableChannel(bool enabled);
+
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  hal::Handle<HAL_PDPHandle> m_handle;
+  hal::Handle<HAL_PowerDistributionHandle> m_handle;
   int m_module;
 };
 

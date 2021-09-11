@@ -50,6 +50,8 @@ class ADXL362 : public Accelerometer,
   ADXL362(ADXL362&&) = default;
   ADXL362& operator=(ADXL362&&) = default;
 
+  SPI::Port GetSpiPort() const;
+
   // Accelerometer interface
   void SetRange(Range range) final;
   double GetX() override;

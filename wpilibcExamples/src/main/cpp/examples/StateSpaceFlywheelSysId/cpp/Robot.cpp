@@ -4,7 +4,6 @@
 
 #include <frc/DriverStation.h>
 #include <frc/Encoder.h>
-#include <frc/GenericHID.h>
 #include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
@@ -94,7 +93,7 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Sets the target speed of our flywheel. This is similar to setting the
     // setpoint of a PID controller.
-    if (m_joystick.GetBumper(frc::GenericHID::kRightHand)) {
+    if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
       m_loop.SetNextR(frc::MakeMatrix<1, 1>(kSpinup.to<double>()));
     } else {

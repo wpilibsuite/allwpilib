@@ -19,31 +19,55 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
 
-  /**
-   * Constructs a PowerDistribution.
-   *
-   * @param module The CAN ID of the PDP
-   */
-  public PowerDistribution(int module) {
-    m_handle = PowerDistributionJNI.initialize(module, 0);
-    m_module = module;
+  public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
-    HAL.report(tResourceType.kResourceType_PDP, module + 1);
-    SendableRegistry.addLW(this, "PowerDistribution", module);
+  public enum ModuleType {
+    kAutomatic(PowerDistributionJNI.AUTOMATIC_TYPE),
+    kCTRE(PowerDistributionJNI.CTRE_TYPE),
+    kRev(PowerDistributionJNI.REV_TYPE);
+
+    public final int value;
+
+    ModuleType(int value) {
+      this.value = value;
+    }
   }
 
   /**
    * Constructs a PowerDistribution.
    *
-   * <p>Uses the default CAN ID (0).
+   * @param module The CAN ID of the PDP.
+   * @param moduleType Module type (automatic, CTRE, or REV).
+   */
+  public PowerDistribution(int module, ModuleType moduleType) {
+    m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
+    m_module = PowerDistributionJNI.getModuleNumber(m_handle);
+
+    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
+    SendableRegistry.addLW(this, "PowerDistribution", m_module);
+  }
+
+  /**
+   * Constructs a PowerDistribution.
+   *
+   * <p>Uses the default CAN ID.
    */
   public PowerDistribution() {
-    this(0);
+    this(kDefaultModule, ModuleType.kAutomatic);
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+  }
+
+  /**
+   * Gets the number of channel for this power distribution.
+   *
+   * @return Number of output channels.
+   */
+  public int getNumChannels() {
+    return PowerDistributionJNI.getNumChannels(m_handle);
   }
 
   /**
@@ -71,7 +95,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
    */
   public double getCurrent(int channel) {
-    double current = PowerDistributionJNI.getChannelCurrent((byte) channel, m_handle);
+    double current = PowerDistributionJNI.getChannelCurrent(m_handle, channel);
 
     return current;
   }
@@ -122,14 +146,25 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return m_module;
   }
 
+  public boolean getSwitchableChannel() {
+    return PowerDistributionJNI.getSwitchableChannel(m_handle);
+  }
+
+  public void setSwitchableChannel(boolean enabled) {
+    PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
-    for (int i = 0; i < SensorUtil.kPDPChannels; ++i) {
+    int numChannels = getNumChannels();
+    for (int i = 0; i < numChannels; ++i) {
       final int chan = i;
       builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);
     }
     builder.addDoubleProperty("Voltage", this::getVoltage, null);
     builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
+    builder.addBooleanProperty(
+        "SwitchableChannel", this::getSwitchableChannel, this::setSwitchableChannel);
   }
 }

@@ -11,6 +11,7 @@
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
 
+#include "frc/MathUtil.h"
 #include "frc/SpeedController.h"
 
 using namespace frc;

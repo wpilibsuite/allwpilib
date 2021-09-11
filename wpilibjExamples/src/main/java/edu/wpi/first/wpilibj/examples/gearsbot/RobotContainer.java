@@ -4,9 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.Autonomous;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.CloseClaw;
@@ -39,7 +36,7 @@ public class RobotContainer {
   private final Wrist m_wrist = new Wrist();
   private final Claw m_claw = new Claw();
 
-  private final Joystick m_joystick = new Joystick(0);
+  private final XboxController m_joystick = new XboxController(0);
 
   private final CommandBase m_autonomousCommand =
       new Autonomous(m_drivetrain, m_claw, m_wrist, m_elevator);
@@ -61,8 +58,7 @@ public class RobotContainer {
 
     // Assign default commands
     m_drivetrain.setDefaultCommand(
-        new TankDrive(
-            () -> m_joystick.getY(Hand.kLeft), () -> m_joystick.getY(Hand.kRight), m_drivetrain));
+        new TankDrive(m_joystick::getLeftY, m_joystick::getRightY, m_drivetrain));
 
     // Show what command your subsystem is running on the SmartDashboard
     SmartDashboard.putData(m_drivetrain);
@@ -76,7 +72,7 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */

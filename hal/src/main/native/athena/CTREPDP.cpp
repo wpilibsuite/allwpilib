@@ -110,12 +110,12 @@ struct PDP {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
+static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
                              HAL_HandleEnum::CTREPDP>* pdpHandles;
 
 namespace hal::init {
-void InitializePDP() {
-  static IndexedHandleResource<HAL_PDPHandle, PDP, kNumPDPModules,
+void InitializeCTREPDP() {
+  static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
                                HAL_HandleEnum::CTREPDP>
       pH;
   pdpHandles = &pH;
@@ -142,7 +142,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t module, const char* allocationLocation,
                                            pdp->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PDP", 0,
-                                       kNumPDPModules, module);
+                                       kNumCTREPDPModules, module);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }
@@ -166,12 +166,16 @@ void HAL_CleanPDP(HAL_PDPHandle handle) {
   pdpHandles->Free(handle);
 }
 
+int32_t HAL_GetPDPModuleNumber(HAL_PDPHandle handle, int32_t* status) {
+  return hal::getHandleIndex(handle);
+}
+
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
-  return module < kNumPDPModules && module >= 0;
+  return module < kNumCTREPDPModules && module >= 0;
 }
 
 HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
-  return channel < kNumPDPChannels && channel >= 0;
+  return channel < kNumCTREPDPChannels && channel >= 0;
 }
 
 double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {

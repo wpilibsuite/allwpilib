@@ -46,6 +46,7 @@ doxygen {
 
 doxygen {
     generate_html true
+    html_extra_stylesheet 'theme.css'
 
     cppProjectZips.each {
         dependsOn it
@@ -63,6 +64,7 @@ doxygen {
 
     extension_mapping 'inc=C++'
     project_name 'WPILibC++'
+    project_logo '../wpiutil/src/main/native/resources/wpilib-128.png'
     project_number wpilibVersioning.version.get()
     javadoc_autobrief true
     recursive true
@@ -111,6 +113,7 @@ task generateJavaDocs(type: Javadoc) {
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
+    options.linkSource(true)
     dependsOn project(':wpilibj').generateJavaVersion
     dependsOn project(':hal').generateUsageReporting
     dependsOn project(':wpimath').generateNat
@@ -129,6 +132,19 @@ task generateJavaDocs(type: Javadoc) {
 
     title = "WPILib API ${wpilibVersioning.version.get()}"
     ext.entryPoint = "$destinationDir/index.html"
+
+    if (JavaVersion.current().isJava8Compatible() && project.hasProperty('buildServer')) {
+        // Treat javadoc warnings as errors.
+        //
+        // The second argument '-quiet' is a hack. The one paramater
+        // addStringOption() doesn't work, so we add '-quiet', which is added
+        // anyway by gradle. See https://github.com/gradle/gradle/issues/2354.
+        //
+        // See JDK-8200363 (https://bugs.openjdk.java.net/browse/JDK-8200363)
+        // for information about the nonstandard -Xwerror option. JDK 15+ has
+        // -Werror.
+        options.addStringOption('Xwerror', '-quiet')
+    }
 
     if (JavaVersion.current().isJava11Compatible()) {
         if (!JavaVersion.current().isJava12Compatible()) {

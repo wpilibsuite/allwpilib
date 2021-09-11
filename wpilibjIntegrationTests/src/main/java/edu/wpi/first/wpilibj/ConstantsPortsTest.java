@@ -37,12 +37,6 @@ public class ConstantsPortsTest extends AbstractComsSetup {
     assertEquals(2, SensorUtil.kAnalogOutputChannels);
   }
 
-  /** kSolenoidChannels. */
-  @Test
-  public void testSolenoidChannels() {
-    assertEquals(8, SensorUtil.kSolenoidChannels);
-  }
-
   /** kPwmChannels. */
   @Test
   public void testPwmChannels() {
@@ -53,23 +47,5 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   @Test
   public void testRelayChannels() {
     assertEquals(4, SensorUtil.kRelayChannels);
-  }
-
-  /** kPDPChannels. */
-  @Test
-  public void testPDPChannels() {
-    assertEquals(16, SensorUtil.kPDPChannels);
-  }
-
-  /** kPDPModules. */
-  @Test
-  public void testPDPModules() {
-    assertEquals(63, SensorUtil.kPDPModules);
-  }
-
-  /** kPCMModules. */
-  @Test
-  public void testPCMModules() {
-    assertEquals(63, SensorUtil.kPCMModules);
   }
 }

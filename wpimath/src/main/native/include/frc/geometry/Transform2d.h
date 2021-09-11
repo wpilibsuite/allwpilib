@@ -82,6 +82,14 @@ class Transform2d {
   }
 
   /**
+   * Composes two transformations.
+   *
+   * @param other The transform to compose with this one.
+   * @return The composition of the two transformations.
+   */
+  Transform2d operator+(const Transform2d& other) const;
+
+  /**
    * Checks equality between this Transform2d and another object.
    *
    * @param other The other object.

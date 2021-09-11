@@ -30,7 +30,7 @@ public final class SensorUtil {
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
 
   /** Number of solenoid channels per module. */
-  public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
+  public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
@@ -39,13 +39,13 @@ public final class SensorUtil {
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
   /** Number of power distribution channels per PDP. */
-  public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
+  public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
 
   /** Number of power distribution modules per PDP. */
-  public static final int kPDPModules = PortsJNI.getNumPDPModules();
+  public static final int kCTREPDPModules = PortsJNI.getNumCTREPDPModules();
 
   /** Number of PCM Modules. */
-  public static final int kPCMModules = PortsJNI.getNumPCMModules();
+  public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the

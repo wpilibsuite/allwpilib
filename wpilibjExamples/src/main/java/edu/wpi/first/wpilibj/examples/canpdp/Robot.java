@@ -13,9 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * via CAN. The information will be displayed under variables through the SmartDashboard.
  */
 public class Robot extends TimedRobot {
-  private static final int kPDPId = 0;
-
-  private final PowerDistribution m_pdp = new PowerDistribution(kPDPId);
+  private final PowerDistribution m_pdp = new PowerDistribution();
 
   @Override
   public void robotPeriodic() {

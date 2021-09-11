@@ -33,6 +33,9 @@ class I2C {
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
 
+  Port GetPort() const;
+  int GetDeviceAddress() const;
+
   /**
    * Generic transaction.
    *

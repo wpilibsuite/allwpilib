@@ -88,10 +88,11 @@ public class PWM implements Sendable, AutoCloseable {
   }
 
   /**
-   * Optionally eliminate the deadband from a speed controller.
+   * Optionally eliminate the deadband from a motor controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the Jaguar to eliminate the deadband
-   *     in the middle of the range. Otherwise, keep the full range without modifying any values.
+   * @param eliminateDeadband If true, set the motor curve for the motor controller to eliminate the
+   *     deadband in the middle of the range. Otherwise, keep the full range without modifying any
+   *     values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
     PWMJNI.setPWMEliminateDeadband(m_handle, eliminateDeadband);
@@ -114,7 +115,7 @@ public class PWM implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
+   * Gets the bounds on the PWM pulse widths. This gets the bounds on the PWM values for a
    * particular type of controller. The values determine the upper and lower speeds as well as the
    * deadband bracket.
    *
@@ -162,9 +163,9 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Set the PWM value based on a speed.
    *
-   * <p>This is intended to be used by speed controllers.
+   * <p>This is intended to be used by motor controllers.
    *
-   * @param speed The speed to set the speed controller between -1.0 and 1.0.
+   * @param speed The speed to set the motor controller between -1.0 and 1.0.
    * @pre SetMaxPositivePwm() called.
    * @pre SetMinPositivePwm() called.
    * @pre SetCenterPwm() called.
@@ -178,7 +179,7 @@ public class PWM implements Sendable, AutoCloseable {
   /**
    * Get the PWM value in terms of speed.
    *
-   * <p>This is intended to be used by speed controllers.
+   * <p>This is intended to be used by motor controllers.
    *
    * @return The most recently set speed between -1.0 and 1.0.
    * @pre SetMaxPositivePwm() called.

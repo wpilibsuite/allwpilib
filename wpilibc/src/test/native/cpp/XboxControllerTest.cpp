@@ -10,8 +10,11 @@
 
 using namespace frc;
 
-HANDED_BUTTON_TEST(XboxController, Bumper)
-HANDED_BUTTON_TEST(XboxController, StickButton)
+BUTTON_TEST(XboxController, LeftBumper)
+BUTTON_TEST(XboxController, RightBumper)
+
+BUTTON_TEST(XboxController, LeftStickButton)
+BUTTON_TEST(XboxController, RightStickButton)
 
 BUTTON_TEST(XboxController, AButton)
 BUTTON_TEST(XboxController, BButton)
@@ -20,6 +23,10 @@ BUTTON_TEST(XboxController, YButton)
 BUTTON_TEST(XboxController, BackButton)
 BUTTON_TEST(XboxController, StartButton)
 
-HANDED_AXIS_TEST(XboxController, X)
-HANDED_AXIS_TEST(XboxController, Y)
-HANDED_AXIS_TEST(XboxController, TriggerAxis)
+AXIS_TEST(XboxController, LeftX)
+AXIS_TEST(XboxController, RightX)
+AXIS_TEST(XboxController, LeftY)
+AXIS_TEST(XboxController, RightY)
+
+AXIS_TEST(XboxController, LeftTriggerAxis)
+AXIS_TEST(XboxController, RightTriggerAxis)

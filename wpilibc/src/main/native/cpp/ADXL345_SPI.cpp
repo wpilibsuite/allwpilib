@@ -40,6 +40,10 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   wpi::SendableRegistry::AddLW(this, "ADXL345_SPI", port);
 }
 
+SPI::Port ADXL345_SPI::GetSpiPort() const {
+  return m_spi.GetPort();
+}
+
 void ADXL345_SPI::SetRange(Range range) {
   uint8_t commands[2];
 

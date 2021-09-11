@@ -18,14 +18,16 @@ DEFINE_CAPI(double, Temperature, 0)
 DEFINE_CAPI(double, Voltage, 0)
 HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(double, HALSIM, PowerDistributionCurrent, 0)
 
-void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents) {
-  for (int i = 0; i < hal::kNumPDPChannels; i++) {
+void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents,
+                                            int length) {
+  for (int i = 0; i < length; i++) {
     currents[i] = 0;
   }
 }
 
 void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
-                                            const double* currents) {}
+                                            const double* currents,
+                                            int length) {}
 
 void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(
     int32_t index, int32_t channel, HAL_NotifyCallback callback, void* param,

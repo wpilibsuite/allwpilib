@@ -46,9 +46,10 @@ double HALSIM_GetPowerDistributionCurrent(int32_t index, int32_t channel);
 void HALSIM_SetPowerDistributionCurrent(int32_t index, int32_t channel,
                                         double current);
 
-void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents);
+void HALSIM_GetPowerDistributionAllCurrents(int32_t index, double* currents,
+                                            int length);
 void HALSIM_SetPowerDistributionAllCurrents(int32_t index,
-                                            const double* currents);
+                                            const double* currents, int length);
 
 void HALSIM_RegisterPowerDistributionAllNonCurrentCallbacks(
     int32_t index, int32_t channel, HAL_NotifyCallback callback, void* param,

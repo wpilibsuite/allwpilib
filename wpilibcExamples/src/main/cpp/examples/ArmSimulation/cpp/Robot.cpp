@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
-#include <frc/GenericHID.h>
 #include <frc/Joystick.h>
 #include <frc/RobotController.h>
 #include <frc/StateSpaceUtil.h>

@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 
+#include <fmt/core.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 
@@ -27,6 +28,8 @@ static constexpr int32_t kTimerInterruptNumber = 28;
 static wpi::mutex notifierMutex;
 static std::unique_ptr<tAlarm> notifierAlarm;
 static std::thread notifierThread;
+static HAL_Bool notifierThreadRealTime = false;
+static int32_t notifierThreadPriority = 0;
 static uint64_t closestTrigger{UINT64_MAX};
 
 namespace {
@@ -147,6 +150,21 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     std::scoped_lock lock(notifierMutex);
     notifierRunning = true;
     notifierThread = std::thread(notifierThreadMain);
+
+    auto native = notifierThread.native_handle();
+    HAL_SetThreadPriority(&native, notifierThreadRealTime,
+                          notifierThreadPriority, status);
+    if (*status == HAL_THREAD_PRIORITY_ERROR) {
+      *status = 0;
+      fmt::print("{}: HAL Notifier thread\n",
+                 HAL_THREAD_PRIORITY_ERROR_MESSAGE);
+    }
+    if (*status == HAL_THREAD_PRIORITY_RANGE_ERROR) {
+      *status = 0;
+      fmt::print("{}: HAL Notifier thread\n",
+                 HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE);
+    }
+
     notifierAlarm.reset(tAlarm::create(status));
   }
 
@@ -161,8 +179,15 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
 
 HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
                                        int32_t* status) {
-  auto native = notifierThread.native_handle();
-  return HAL_SetThreadPriority(&native, realTime, priority, status);
+  std::scoped_lock lock(notifierMutex);
+  notifierThreadRealTime = realTime;
+  notifierThreadPriority = priority;
+  if (notifierThread.joinable()) {
+    auto native = notifierThread.native_handle();
+    return HAL_SetThreadPriority(&native, realTime, priority, status);
+  } else {
+    return true;
+  }
 }
 
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,

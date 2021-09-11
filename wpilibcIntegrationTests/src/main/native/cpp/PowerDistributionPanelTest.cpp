@@ -21,7 +21,7 @@ class PowerDistributionTest : public testing::Test {
 };
 
 TEST_F(PowerDistributionTest, CheckRepeatedCalls) {
-  auto numChannels = HAL_GetNumPDPChannels();
+  auto numChannels = HAL_GetNumCTREPDPChannels();
   // 1 second
   for (int i = 0; i < 50; i++) {
     for (int j = 0; j < numChannels; j++) {

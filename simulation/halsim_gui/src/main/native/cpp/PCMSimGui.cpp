@@ -95,7 +95,7 @@ class PCMSimModel : public glass::PCMModel {
   explicit PCMSimModel(int32_t index)
       : m_index{index},
         m_compressor{index},
-        m_solenoids(HAL_GetNumSolenoidChannels()) {}
+        m_solenoids(HAL_GetNumCTRESolenoidChannels()) {}
 
   void Update() override;
 

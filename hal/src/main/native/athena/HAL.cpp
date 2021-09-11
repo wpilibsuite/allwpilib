@@ -64,7 +64,8 @@ void InitializeHAL() {
   InitializeInterrupts();
   InitializeMain();
   InitializeNotifier();
-  InitializePDP();
+  InitializeCTREPDP();
+  InitializeREVPDH();
   InitializePorts();
   InitializePower();
   InitializePWM();
@@ -446,11 +447,5 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
   return FRC_NetworkCommunication_nUsageReporting_report(
       resource, instanceNumber, context, feature);
 }
-
-// TODO: HACKS
-// No need for header definitions, as we should not run from user code.
-void NumericArrayResize(void) {}
-void RTSetCleanupProc(void) {}
-void EDVR_CreateReference(void) {}
 
 }  // extern "C"

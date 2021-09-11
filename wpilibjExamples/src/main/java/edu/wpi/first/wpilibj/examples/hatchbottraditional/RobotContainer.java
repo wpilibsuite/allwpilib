@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj.examples.hatchbottraditional;
 
 import static edu.wpi.first.wpilibj.XboxController.Button;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.AutoConstants;
 import edu.wpi.first.wpilibj.examples.hatchbottraditional.Constants.OIConstants;
@@ -61,9 +60,7 @@ public class RobotContainer {
         // A split-stick arcade command, with forward/backward controlled by the left
         // hand, and turning controlled by the right.
         new DefaultDrive(
-            m_robotDrive,
-            () -> m_driverController.getY(GenericHID.Hand.kLeft),
-            () -> m_driverController.getX(GenericHID.Hand.kRight)));
+            m_robotDrive, m_driverController::getLeftY, m_driverController::getRightX));
 
     // Add commands to the autonomous command chooser
     m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
@@ -75,7 +72,7 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
@@ -87,7 +84,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kB.value)
         .whenPressed(new ReleaseHatch(m_hatchSubsystem));
     // While holding the shoulder button, drive at half speed
-    new JoystickButton(m_driverController, Button.kBumperRight.value)
+    new JoystickButton(m_driverController, Button.kRightBumper.value)
         .whenHeld(new HalveDriveSpeed(m_robotDrive));
   }
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.util.CircularBuffer;
 import java.util.Arrays;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR filters are supported.
@@ -57,8 +58,8 @@ public class LinearFilter {
   /**
    * Create a linear FIR or IIR filter.
    *
-   * @param ffGains The "feed forward" or FIR gains.
-   * @param fbGains The "feed back" or IIR gains.
+   * @param ffGains The "feedforward" or FIR gains.
+   * @param fbGains The "feedback" or IIR gains.
    */
   public LinearFilter(double[] ffGains, double[] fbGains) {
     m_inputs = new CircularBuffer(ffGains.length);
@@ -136,6 +137,85 @@ public class LinearFilter {
     return new LinearFilter(ffGains, fbGains);
   }
 
+  /**
+   * Creates a backward finite difference filter that computes the nth derivative of the input given
+   * the specified number of samples.
+   *
+   * <p>For example, a first derivative filter that uses two samples and a sample period of 20 ms
+   * would be
+   *
+   * <pre><code>
+   * LinearFilter.backwardFiniteDifference(1, 2, 0.02);
+   * </code></pre>
+   *
+   * @param derivative The order of the derivative to compute.
+   * @param samples The number of samples to use to compute the given derivative. This must be one
+   *     more than the order of derivative or higher.
+   * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
+   */
+  @SuppressWarnings("LocalVariableName")
+  public static LinearFilter backwardFiniteDifference(int derivative, int samples, double period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
+    //
+    // <p>For a given list of stencil points s of length n and the order of
+    // derivative d < n, the finite difference coefficients can be obtained by
+    // solving the following linear system for the vector a.
+    //
+    // <pre>
+    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
+    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
+    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
+    // </pre>
+    //
+    // <p>where δᵢ,ⱼ are the Kronecker delta. For backward finite difference,
+    // the stencil points are the range [-n + 1, 0]. The FIR gains are the
+    // elements of the vector a in reverse order divided by hᵈ.
+    //
+    // <p>The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+
+    if (derivative < 1) {
+      throw new IllegalArgumentException(
+          "Order of derivative must be greater than or equal to one.");
+    }
+
+    if (samples <= 0) {
+      throw new IllegalArgumentException("Number of samples must be greater than zero.");
+    }
+
+    if (derivative >= samples) {
+      throw new IllegalArgumentException(
+          "Order of derivative must be less than number of samples.");
+    }
+
+    var S = new SimpleMatrix(samples, samples);
+    for (int row = 0; row < samples; ++row) {
+      for (int col = 0; col < samples; ++col) {
+        double s = 1 - samples + col;
+        S.set(row, col, Math.pow(s, row));
+      }
+    }
+
+    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
+    var d = new SimpleMatrix(samples, 1);
+    for (int i = 0; i < samples; ++i) {
+      d.set(i, 0, (i == derivative) ? factorial(derivative) : 0.0);
+    }
+
+    var a = S.solve(d).divide(Math.pow(period, derivative));
+
+    // Reverse gains list
+    double[] ffGains = new double[samples];
+    for (int i = 0; i < samples; ++i) {
+      ffGains[i] = a.get(samples - i - 1, 0);
+    }
+
+    double[] fbGains = new double[0];
+
+    return new LinearFilter(ffGains, fbGains);
+  }
+
   /** Reset the filter state. */
   public void reset() {
     m_inputs.clear();
@@ -170,5 +250,18 @@ public class LinearFilter {
     }
 
     return retVal;
+  }
+
+  /**
+   * Factorial of n.
+   *
+   * @param n Argument of which to take factorial.
+   */
+  private static int factorial(int n) {
+    if (n < 2) {
+      return 1;
+    } else {
+      return n * factorial(n - 1);
+    }
   }
 }
