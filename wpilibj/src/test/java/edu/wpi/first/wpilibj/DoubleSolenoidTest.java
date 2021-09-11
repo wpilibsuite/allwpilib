@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 public class DoubleSolenoidTest {
   @Test
   void testValidInitialization() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3);
-        DoubleSolenoid solenoid = new DoubleSolenoid(pcm, 2, 3)) {
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.CTREPCM, 2, 3)) {
       solenoid.set(DoubleSolenoid.Value.kReverse);
       assertEquals(DoubleSolenoid.Value.kReverse, solenoid.get());
 
@@ -28,36 +27,41 @@ public class DoubleSolenoidTest {
 
   @Test
   void testThrowForwardPortAlreadyInitialized() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(5);
-        // Single solenoid that is reused for forward port
-        Solenoid solenoid = new Solenoid(pcm, 2)) {
-      assertThrows(AllocationException.class, () -> new DoubleSolenoid(pcm, 2, 3));
+    try (
+    // Single solenoid that is reused for forward port
+    Solenoid solenoid = new Solenoid(5, PneumaticsModuleType.CTREPCM, 2)) {
+      assertThrows(
+          AllocationException.class,
+          () -> new DoubleSolenoid(5, PneumaticsModuleType.CTREPCM, 2, 3));
     }
   }
 
   @Test
   void testThrowReversePortAlreadyInitialized() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(6);
-        // Single solenoid that is reused for forward port
-        Solenoid solenoid = new Solenoid(pcm, 3)) {
-      assertThrows(AllocationException.class, () -> new DoubleSolenoid(pcm, 2, 3));
+    try (
+    // Single solenoid that is reused for forward port
+    Solenoid solenoid = new Solenoid(6, PneumaticsModuleType.CTREPCM, 3)) {
+      assertThrows(
+          AllocationException.class,
+          () -> new DoubleSolenoid(6, PneumaticsModuleType.CTREPCM, 2, 3));
     }
   }
 
   @Test
   void testThrowBothPortsAlreadyInitialized() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(6);
-        // Single solenoid that is reused for forward port
-        Solenoid solenoid0 = new Solenoid(pcm, 2);
-        Solenoid solenoid1 = new Solenoid(pcm, 3)) {
-      assertThrows(AllocationException.class, () -> new DoubleSolenoid(pcm, 2, 3));
+    try (
+    // Single solenoid that is reused for forward port
+    Solenoid solenoid0 = new Solenoid(6, PneumaticsModuleType.CTREPCM, 2);
+        Solenoid solenoid1 = new Solenoid(6, PneumaticsModuleType.CTREPCM, 3)) {
+      assertThrows(
+          AllocationException.class,
+          () -> new DoubleSolenoid(6, PneumaticsModuleType.CTREPCM, 2, 3));
     }
   }
 
   @Test
   void testToggle() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(4);
-        DoubleSolenoid solenoid = new DoubleSolenoid(pcm, 2, 3)) {
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(4, PneumaticsModuleType.CTREPCM, 2, 3)) {
       // Bootstrap it into reverse
       solenoid.set(DoubleSolenoid.Value.kReverse);
 
@@ -76,15 +80,15 @@ public class DoubleSolenoidTest {
 
   @Test
   void testInvalidForwardPort() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0)) {
-      assertThrows(IllegalArgumentException.class, () -> new DoubleSolenoid(pcm, 100, 1));
-    }
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 100, 1));
   }
 
   @Test
   void testInvalidReversePort() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0)) {
-      assertThrows(IllegalArgumentException.class, () -> new DoubleSolenoid(pcm, 0, 100));
-    }
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 0, 100));
   }
 }

@@ -33,7 +33,7 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{pcm, 3, 4};
+  DoubleSolenoid doubleSolenoid{0, frc::PneumaticsModuleType::CTREPCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
