@@ -37,7 +37,6 @@ public class Compressor implements Sendable, AutoCloseable {
     boolean successfulCompletion = false;
 
     try {
-
       if (!m_module.reserveCompressor()) {
         throw new AllocationException("Compressor already allocated");
       }

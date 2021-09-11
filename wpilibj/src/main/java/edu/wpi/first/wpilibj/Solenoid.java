@@ -48,7 +48,6 @@ public class Solenoid implements Sendable, AutoCloseable {
     m_channel = channel;
 
     try {
-
       if (!m_module.checkSolenoidChannel(channel)) {
         throw new IllegalArgumentException("Channel " + channel + " out of range");
       }
