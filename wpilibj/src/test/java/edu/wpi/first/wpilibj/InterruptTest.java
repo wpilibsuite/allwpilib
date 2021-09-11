@@ -19,10 +19,13 @@ public class InterruptTest {
     AtomicInteger counter = new AtomicInteger(0);
 
     try (DigitalInput di = new DigitalInput(0);
-        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(di, (a, b) -> {
-          counter.incrementAndGet();
-          hasFired.set(true);
-        })) {
+        AsynchronousInterrupt interrupt =
+            new AsynchronousInterrupt(
+                di,
+                (a, b) -> {
+                  counter.incrementAndGet();
+                  hasFired.set(true);
+                })) {
       interrupt.enable();
       Timer.delay(0.5);
       DIOSim digitalSim = new DIOSim(di);
