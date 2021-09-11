@@ -30,13 +30,13 @@ TEST(InterruptTest, AsynchronousInterrupt) {
     frc::Wait(0.5_s);
     DIOSim digitalSim{di};
     digitalSim.SetValue(false);
-    Wait(0.01_s);
+    frc::Wait(20_ms);
     digitalSim.SetValue(true);
-    Wait(0.01_s);
+    frc::Wait(10_ms);
 
     int count = 0;
     while (!hasFired) {
-        Wait(0.005_s);
+        Wait(5_ms);
         count++;
         ASSERT_TRUE(count < 1000);
     }
