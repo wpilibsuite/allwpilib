@@ -60,9 +60,9 @@ public abstract class TrapezoidProfileSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var profile = new TrapezoidProfile(m_constraints, m_goal, m_state);
-    m_state = profile.calculate(m_period);
     if (m_enabled) {
+      var profile = new TrapezoidProfile(m_constraints, m_goal, m_state);
+      m_state = profile.calculate(m_period);
       useState(m_state);
     }
   }
