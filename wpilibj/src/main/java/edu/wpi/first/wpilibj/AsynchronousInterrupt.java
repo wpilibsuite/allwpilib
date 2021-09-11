@@ -66,6 +66,7 @@ public class AsynchronousInterrupt implements AutoCloseable {
 
     m_keepRunning.set(true);
     m_thread = new Thread(this::threadMain);
+    m_thread.start();
   }
 
   /** Disables interrupt callbacks. Does nothing if already disabled. */
