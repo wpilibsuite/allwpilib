@@ -33,6 +33,7 @@ class CTREPCMSimTest {
         PneumaticsControlModule pcm = new PneumaticsControlModule(0)) {
       assertTrue(sim.getInitialized());
     }
+    assertFalse(sim.getInitialized());
   }
 
   @Test

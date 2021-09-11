@@ -41,20 +41,36 @@ public class Solenoid implements Sendable, AutoCloseable {
    */
   public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
-
-    if (!m_module.checkSolenoidChannel(channel)) {
-      throw new IllegalArgumentException("Channel " + channel + " out of range");
-    }
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
 
     m_mask = 1 << channel;
     m_channel = channel;
 
-    if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
-      throw new AllocationException("Solenoid already allocated");
-    }
+    try {
 
-    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+      if (!m_module.checkSolenoidChannel(channel)) {
+        throw new IllegalArgumentException("Channel " + channel + " out of range");
+      }
+
+      if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
+        throw new AllocationException("Solenoid already allocated");
+      }
+
+      allocatedSolenoids = true;
+
+      HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+      SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+      successfulCompletion = true;
+
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedSolenoids) {
+          m_module.unreserveSolenoids(m_mask);
+        }
+        m_module.close();
+      }
+    }
   }
 
   @Override

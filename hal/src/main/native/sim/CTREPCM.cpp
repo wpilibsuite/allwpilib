@@ -64,6 +64,12 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
 }
 
 void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    pcmHandles->Free(handle);
+    return;
+  }
+  SimCTREPCMData[pcm->module].initialized = false;
   pcmHandles->Free(handle);
 }
 

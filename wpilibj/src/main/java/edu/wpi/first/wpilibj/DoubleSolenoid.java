@@ -59,14 +59,8 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
       final int forwardChannel,
       final int reverseChannel) {
     m_module = PneumaticsBase.getForType(module, moduleType);
-
-    if (!m_module.checkSolenoidChannel(forwardChannel)) {
-      throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
-    }
-
-    if (!m_module.checkSolenoidChannel(reverseChannel)) {
-      throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
-    }
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
 
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
@@ -75,23 +69,42 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
-    int allocMask = m_module.checkAndReserveSolenoids(m_mask);
-    if (allocMask != 0) {
-      if (allocMask == m_mask) {
-        throw new AllocationException(
-            "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
-      } else if (allocMask == m_forwardMask) {
-        throw new AllocationException("Channel " + forwardChannel + " already allocated");
-      } else {
-        throw new AllocationException("Channel " + reverseChannel + " already allocated");
+    try {
+      if (!m_module.checkSolenoidChannel(forwardChannel)) {
+        throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
+      }
+
+      if (!m_module.checkSolenoidChannel(reverseChannel)) {
+        throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
+      }
+
+      int allocMask = m_module.checkAndReserveSolenoids(m_mask);
+      if (allocMask != 0) {
+        if (allocMask == m_mask) {
+          throw new AllocationException(
+              "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
+        } else if (allocMask == m_forwardMask) {
+          throw new AllocationException("Channel " + forwardChannel + " already allocated");
+        } else {
+          throw new AllocationException("Channel " + reverseChannel + " already allocated");
+        }
+      }
+      allocatedSolenoids = true;
+
+      HAL.report(
+          tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
+      HAL.report(
+          tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
+      SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
+      successfulCompletion = true;
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedSolenoids) {
+          m_module.unreserveSolenoids(m_mask);
+        }
+        m_module.close();
       }
     }
-
-    HAL.report(
-        tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
-    HAL.report(
-        tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
   }
 
   @Override
