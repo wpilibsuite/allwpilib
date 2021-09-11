@@ -121,16 +121,18 @@ static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
     return;
   }
   bool retVal = value->data.v_boolean;
+  auto previousState = interrupt->previousState;
+  interrupt->previousState = retVal;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) {
+  if (retVal == previousState) {
     return;
   }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) {
+  if (previousState && !interrupt->fireOnDown) {
     return;
   }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) {
+  if (!previousState && !interrupt->fireOnUp) {
     return;
   }
 
@@ -174,16 +176,18 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
     // Pulse interrupt
     interruptData->waitCond.notify_all();
   }
+  auto previousState = interrupt->previousState;
+  interrupt->previousState = retVal;
   // If no change in interrupt, return;
-  if (retVal == interrupt->previousState) {
+  if (retVal == previousState) {
     return;
   }
   // If its a falling change, and we dont fire on falling return
-  if (interrupt->previousState && !interrupt->fireOnDown) {
+  if (previousState && !interrupt->fireOnDown) {
     return;
   }
   // If its a rising change, and we dont fire on rising return.
-  if (!interrupt->previousState && !interrupt->fireOnUp) {
+  if (!previousState && !interrupt->fireOnUp) {
     return;
   }
 
