@@ -6,18 +6,15 @@
 
 #include <wpi/array.h>
 
+#include "Eigen/Cholesky"
 #include "Eigen/Core"
-#include "Eigen/src/Cholesky/LLT.h"
-#include "Eigen/src/Eigenvalues/ComplexSchur.h"
-#include "Eigen/src/LU/Determinant.h"
-#include "Eigen/src/LU/InverseImpl.h"
+#include "Eigen/Eigenvalues"
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
-#include "unsupported/Eigen/src/MatrixFunctions/MatrixPower.h"
-#include "unsupported/Eigen/src/MatrixFunctions/MatrixSquareRoot.h"
+#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 namespace detail {
