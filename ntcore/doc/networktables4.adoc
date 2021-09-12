@@ -131,6 +131,8 @@ The server shall publish a standard set of topics with information about server 
 |<<meta-clients,`$clients`>>|`msgpack`|Connected clients
 |<<meta-client-sub,`$clientsub$<client>`>>|`msgpack`|Client `<client>` subscriptions
 |<<meta-sub,`$sub$<topic>`>>|`msgpack`|Subscriptions to `<topic>`
+|<<meta-client-pub,`$clientpub$<client>`>>|`msgpack`|Client `<client>` publishers
+|<<meta-pub,`$pub$<topic>`>>|`msgpack`|Publishers to `<topic>`
 |===
 
 [[meta-clients]]
@@ -211,6 +213,56 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |Integer
 |Subscription UID
 |A client-generated unique identifier for this subscription.
+|===
+
+[[meta-client-pub]]
+==== Client Publishers (`$clientpub$<client>`)
+
+The server shall update this topic when the corresponding client publishes or unpublishes to any topic.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`uid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.
+
+|`topic`
+|String
+|Topic name
+|
+|===
+
+[[meta-pub]]
+==== Publishers (`$pub$<topic>`)
+
+The server shall update this topic when a client publishes or unpublishes to `<topic>`.
+
+The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
+
+[cols="1,2,2,6",options="header"]
+|===
+|Key
+|Value type
+|Description
+|Notes
+
+|`client`
+|String
+|Client name
+|
+
+|`pubuid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.
 |===
 
 [[websockets-config]]
@@ -372,7 +424,7 @@ Clients and servers shall ignore JSON messages that:
 [[msg-publish]]
 ==== Publish Request Message (`publish`)
 
-Sent from a client to the server to indicate the client wants to start publishing values at the given topic.  The server shall respond with an <<msg-announce>>, even if the topic was previously announced.  Once the client has a topic ID (from either the `announce` response from the server to this message, or an earlier `announce` message for the same topic), it can start publishing data values via MessagePack messages.
+Sent from a client to the server to indicate the client wants to start publishing values at the given topic.  The server shall respond with a <<msg-announce>>, even if the topic was previously announced.  The client can start publishing data values via MessagePack messages immediately after sending this message, but the messages will be ignored by the server if the publisher data type does not match the topic data type.
 
 The `publish` JSON message shall contain the following parameters:
 
@@ -388,6 +440,11 @@ The `publish` JSON message shall contain the following parameters:
 |Publish name
 |The topic name being published
 
+|`pubuid`
+|Integer
+|Publisher UID
+|A client-generated unique identifier for this publisher.  Use the same UID later to unpublish.  This is also the identifier that the client will use in MessagePack messages for this topic.
+
 |`type`
 |String
 |Type of data
@@ -401,9 +458,9 @@ Implementations should indicate an error if the user tries to publish an incompa
 [[msg-unpublish]]
 ==== Publish Release Message (`unpublish`)
 
-Sent from a client to the server to indicate the client wants to stop publishing values at the given topic.  The client must stop publishing data value updates via binary MessagePack messages prior to sending this message.
+Sent from a client to the server to indicate the client wants to stop publishing values for the given topic and publisher.  The client should stop publishing data value updates via binary MessagePack messages for this publisher prior to sending this message.
 
-The server shall ignore publish releases from clients who are not currently publishing (e.g. didn’t previously send a <<msg-publish>> for the topic or have already sent a `unpublish` message for the topic).  When there are no remaining publishers for a non-persistent topic, the server shall delete the topic.
+When there are no remaining publishers for a non-persistent topic, the server shall delete the topic and send a <<msg-unannounce>>.
 
 The `unpublish` JSON message shall contain the following parameters:
 
@@ -414,10 +471,10 @@ The `unpublish` JSON message shall contain the following parameters:
 |Description
 |Notes
 
-|`name`
-|String
-|Topic name
-|The topic name to stop publishing
+|`pubuid`
+|Integer
+|Publisher UID
+|The same unique identifier passed to the `publish` message
 |===
 
 [[msg-setproperties]]
@@ -576,6 +633,11 @@ The `announce` JSON message shall contain the following parameters:
 |Data type
 |The data type for the topic (as a string)
 
+|`pubuid` (optional)
+|Integer
+|Publisher UID
+|If this message was sent in response to a `publish` message, the Publisher UID provided in that message.  Otherwise absent.
+
 |`properties`
 |Object
 |Properties
@@ -616,12 +678,14 @@ Each MessagePack message shall be a MessagePack array with 4 elements.  Implemen
 
 Messages shall consist of (in this order):
 
-* Topic ID: unsigned integer, or -1 (RTT measurement)
+* Topic/Publisher ID: unsigned integer, or -1 (RTT measurement)
 * Timestamp: unsigned integer microseconds
 * Data type: unsigned integer
 * Data value (see below)
 
-Topic IDs shall be assigned via JSON <<msg-announce,`announce`>> messages.  Implementations must ignore messages with topic IDs they do not recognize and shall not send messages with topic IDs that were not assigned previously with a JSON message.
+Topic IDs are used for server to client messages.  Topic IDs shall be assigned via JSON <<msg-announce,`announce`>> messages.  Client implementations shall ignore messages with topic IDs they do not recognize.  Server implementations shall not send messages with topic IDs that were not assigned previously with a JSON message.
+
+Publisher IDs are used for client to server messages.  Publisher IDs shall be assigned by the client and be communicated to the server via JSON <<msg-publish,`publish`>> messages.  Server implementations shall ignore messages with publisher IDs they do not recognize.  Client implementations shall not send messages with publisher IDs that were not assigned previously with a JSON message.
 
 Implementations must ignore messages with data values they cannot decode (either by ignoring the message or by terminating the connection), and shall send messages with data values consistent with the above table.
 
@@ -629,7 +693,7 @@ An example double value update would be 17 bytes:
 
 `94` (array with 4 elements)
 
-`32` (topic ID=50)
+`32` (topic/publisher ID=50)
 
 `CE 07 27 0E 00` (timestamp of exactly 2 minutes in unsigned integer microseconds)
 
