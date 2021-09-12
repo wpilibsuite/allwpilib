@@ -84,7 +84,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
   void SetPulseDuration(units::second_t duration);
 
   /**
-   * Trigger the PCM to generate a pulse of the duration set in
+   * %Trigger the PCM to generate a pulse of the duration set in
    * setPulseDuration.
    *
    * @see setPulseDuration()
