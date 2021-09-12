@@ -32,7 +32,7 @@ class DriverStation {
   static constexpr int kJoystickPorts = 6;
 
   /**
-   * The state of one joystick button. Button indexes begin at 1.
+   * The state of one joystick button. %Button indexes begin at 1.
    *
    * @param stick  The joystick to read.
    * @param button The button index, beginning at 1.
@@ -41,7 +41,7 @@ class DriverStation {
   static bool GetStickButton(int stick, int button);
 
   /**
-   * Whether one joystick button was pressed since the last check. Button
+   * Whether one joystick button was pressed since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.
@@ -51,7 +51,7 @@ class DriverStation {
   static bool GetStickButtonPressed(int stick, int button);
 
   /**
-   * Whether one joystick button was released since the last check. Button
+   * Whether one joystick button was released since the last check. %Button
    * indexes begin at 1.
    *
    * @param stick  The joystick to read.

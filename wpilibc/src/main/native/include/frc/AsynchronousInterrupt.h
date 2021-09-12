@@ -116,8 +116,8 @@ class AsynchronousInterrupt {
   /**
    * Set which edges to trigger the interrupt on.
    *
-   * @param risingEdge Trigger on rising edge
-   * @param fallingEdge Trigger on falling edge
+   * @param risingEdge %Trigger on rising edge
+   * @param fallingEdge %Trigger on falling edge
    */
   void SetInterruptEdges(bool risingEdge, bool fallingEdge);
 

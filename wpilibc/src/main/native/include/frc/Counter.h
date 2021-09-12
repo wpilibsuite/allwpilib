@@ -77,7 +77,7 @@ class Counter : public CounterBase,
    *
    * This is used if an existing digital input is to be shared by multiple other
    * objects such as encoders or if the Digital Source is not a Digital Input
-   * channel (such as an Analog Trigger).
+   * channel (such as an Analog %Trigger).
    *
    * The counter will start counting immediately.
    * @param source A pointer to the existing DigitalSource object. It will be
@@ -91,7 +91,7 @@ class Counter : public CounterBase,
    *
    * This is used if an existing digital input is to be shared by multiple other
    * objects such as encoders or if the Digital Source is not a Digital Input
-   * channel (such as an Analog Trigger).
+   * channel (such as an Analog %Trigger).
    *
    * The counter will start counting immediately.
    *

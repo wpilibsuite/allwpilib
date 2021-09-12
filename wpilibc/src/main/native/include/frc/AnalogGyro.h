@@ -40,7 +40,7 @@ class AnalogGyro : public Gyro,
   static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 
   /**
-   * Gyro constructor using the Analog Input channel number.
+   * %Gyro constructor using the Analog Input channel number.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only
    *                be used on on-board Analog Inputs 0-1.
@@ -48,7 +48,7 @@ class AnalogGyro : public Gyro,
   explicit AnalogGyro(int channel);
 
   /**
-   * Gyro constructor with a precreated AnalogInput object.
+   * @Gyro constructor with a precreated AnalogInput object.
    *
    * Use this constructor when the analog channel needs to be shared.
    * This object will not clean up the AnalogInput object when using this
@@ -62,7 +62,7 @@ class AnalogGyro : public Gyro,
   explicit AnalogGyro(AnalogInput* channel);
 
   /**
-   * Gyro constructor with a precreated AnalogInput object.
+   * %Gyro constructor with a precreated AnalogInput object.
    *
    * Use this constructor when the analog channel needs to be shared.
    * This object will not clean up the AnalogInput object when using this
@@ -74,7 +74,7 @@ class AnalogGyro : public Gyro,
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
 
   /**
-   * Gyro constructor using the Analog Input channel number with parameters for
+   * %Gyro constructor using the Analog Input channel number with parameters for
    * presetting the center and offset values. Bypasses calibration.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only
@@ -86,7 +86,7 @@ class AnalogGyro : public Gyro,
   AnalogGyro(int channel, int center, double offset);
 
   /**
-   * Gyro constructor with a precreated AnalogInput object and calibrated
+   * %Gyro constructor with a precreated AnalogInput object and calibrated
    * parameters.
    *
    * Use this constructor when the analog channel needs to be shared.

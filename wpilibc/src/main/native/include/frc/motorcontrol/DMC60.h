@@ -9,7 +9,7 @@
 namespace frc {
 
 /**
- * Digilent DMC 60 Motor Controller.
+ * Digilent DMC 60 Motor %Controller.
  *
  * Note that the DMC 60 uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users

@@ -63,7 +63,7 @@ class PWMMotorController : public MotorController,
 
  protected:
   /**
-   * Constructor for a PWM Motor Controller connected via PWM.
+   * Constructor for a PWM Motor %Controller connected via PWM.
    *
    * @param name Name to use for SendableRegistry
    * @param channel The PWM channel that the controller is attached to. 0-9 are

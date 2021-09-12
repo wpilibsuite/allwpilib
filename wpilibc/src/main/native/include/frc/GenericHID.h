@@ -66,7 +66,7 @@ class GenericHID {
   bool GetRawButton(int button) const;
 
   /**
-   * Whether the button was pressed since the last check. Button indexes begin
+   * Whether the button was pressed since the last check. %Button indexes begin
    * at 1.
    *
    * This method returns true if the button went from not pressed to held down
@@ -79,7 +79,7 @@ class GenericHID {
   bool GetRawButtonPressed(int button);
 
   /**
-   * Whether the button was released since the last check. Button indexes begin
+   * Whether the button was released since the last check. %Button indexes begin
    * at 1.
    *
    * This method returns true if the button went from held down to not pressed

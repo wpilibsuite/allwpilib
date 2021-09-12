@@ -9,14 +9,14 @@
 namespace frc {
 
 /**
- * Cross the Road Electronics (CTRE) Talon FX Motor Controller with PWM
+ * Cross the Road Electronics (CTRE) %Talon FX Motor %Controller with PWM
  * control.
  *
- * Note that the Talon FX uses the following bounds for PWM values. These
+ * Note that the %Talon FX uses the following bounds for PWM values. These
  * values should work reasonably well for most controllers, but if users
  * experience issues such as asymmetric behavior around the deadband or
  * inability to saturate the controller in either direction, calibration is
- * recommended. The calibration procedure can be found in the Talon FX User
+ * recommended. The calibration procedure can be found in the %Talon FX User
  * Manual available from Cross The Road Electronics.
  *
  * \li 2.004ms = full "forward"
@@ -28,9 +28,9 @@ namespace frc {
 class PWMTalonFX : public PWMMotorController {
  public:
   /**
-   * Construct a Talon FX connected via PWM.
+   * Construct a %Talon FX connected via PWM.
    *
-   * @param channel The PWM channel that the Talon FX is attached to. 0-9 are
+   * @param channel The PWM channel that the %Talon FX is attached to. 0-9 are
    *                on-board, 10-19 are on the MXP port
    */
   explicit PWMTalonFX(int channel);
