@@ -8,8 +8,8 @@
 
 #include <wpi/array.h>
 
+#include "Eigen/Cholesky"
 #include "Eigen/Core"
-#include "Eigen/src/Cholesky/LDLT.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/MerweScaledSigmaPoints.h"
 #include "frc/estimator/UnscentedTransform.h"

@@ -6,8 +6,8 @@
 
 #include <cmath>
 
+#include "Eigen/Cholesky"
 #include "Eigen/Core"
-#include "Eigen/src/Cholesky/LLT.h"
 
 namespace frc {
 
