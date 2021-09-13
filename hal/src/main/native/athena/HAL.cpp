@@ -232,7 +232,11 @@ const char* HAL_GetErrorMessage(int32_t code) {
 }
 
 HAL_RuntimeType HAL_GetRuntimeType(void) {
-  return HAL_Athena;
+  nLoadOut::tTargetClass targetClass = nLoadOut::getTargetClass();
+  if (targetClass == nLoadOut::kTargetClass_RoboRIO2) {
+    return HAL_Runtime_RoboRIO2;
+  }
+  return HAL_Runtime_RoboRIO;
 }
 
 int32_t HAL_GetFPGAVersion(int32_t* status) {

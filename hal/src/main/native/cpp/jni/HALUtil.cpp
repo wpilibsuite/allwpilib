@@ -30,6 +30,10 @@ using namespace wpi::java;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO == HAL_Runtime_RoboRIO);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_ROBORIO2 == HAL_Runtime_RoboRIO2);
+static_assert(edu_wpi_first_hal_HALUtil_RUNTIME_SIMULATION == HAL_Runtime_Simulation);
+
 static JavaVM* jvm = nullptr;
 static JException illegalArgExCls;
 static JException boundaryExCls;

@@ -25,6 +25,10 @@
 #include "frc/livewindow/LiveWindow.h"
 #include "frc/smartdashboard/SmartDashboard.h"
 
+static_assert(frc::RuntimeType::kRoboRIO == HAL_Runtime_RoboRIO);
+static_assert(frc::RuntimeType::kRoboRIO2 == HAL_Runtime_RoboRIO2);
+static_assert(frc::RuntimeType::kSimulation == HAL_Runtime_Simulation);
+
 using SetCameraServerSharedFP = void (*)(frc::CameraServerShared*);
 
 using namespace frc;
@@ -211,6 +215,10 @@ bool RobotBase::IsNewDataAvailable() const {
 
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
+}
+
+RuntimeType RobotBase::GetRuntimeType() {
+  return static_cast<RuntimeType>(HAL_GetRuntimeType());
 }
 
 RobotBase::RobotBase() {

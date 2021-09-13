@@ -15,7 +15,7 @@
  */
 
 // clang-format off
-HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
+HAL_ENUM(HAL_RuntimeType) { HAL_Runtime_RoboRIO, HAL_Runtime_RoboRIO2, HAL_Runtime_Simulation };
 // clang-format on
 
 #ifdef __cplusplus
@@ -64,6 +64,11 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
  */
 int64_t HAL_GetFPGARevision(int32_t* status);
 
+/**
+ * Returns the runtime type of the HAL.
+ * 
+ * @return HAL Runtime Type
+ */
 HAL_RuntimeType HAL_GetRuntimeType(void);
 
 /**

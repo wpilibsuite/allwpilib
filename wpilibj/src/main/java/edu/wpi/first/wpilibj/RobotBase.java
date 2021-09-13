@@ -161,6 +161,15 @@ public abstract class RobotBase implements AutoCloseable {
   public void close() {}
 
   /**
+   * Get the current runtime type.
+   * 
+   * @return Current runtime type.
+   */
+  public static RuntimeType getRuntimeType() {
+    return RuntimeType.getValue(HALUtil.getHALRuntimeType());
+  }
+
+  /**
    * Get if the robot is a simulation.
    *
    * @return If the robot is running in simulation.
@@ -175,7 +184,9 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in the real world.
    */
   public static boolean isReal() {
-    return HALUtil.getHALRuntimeType() == 0;
+    RuntimeType runtimeType = getRuntimeType();
+    return runtimeType == RuntimeType.kRoboRIO || 
+           runtimeType == RuntimeType.kRoboRIO2;
   }
 
   /**
