@@ -15,6 +15,7 @@
 #include <wpi/mutex.h>
 
 #include "frc/Errors.h"
+#include "frc/RuntimeType.h"
 
 namespace frc {
 
@@ -210,6 +211,13 @@ class RobotBase {
   virtual void StartCompetition() = 0;
 
   virtual void EndCompetition() = 0;
+
+  /**
+   * Get the current runtime type.
+   *
+   * @return Current runtime type.
+   */
+  static RuntimeType GetRuntimeType();
 
   /**
    * Get if the robot is real.
