@@ -6,4 +6,4 @@
 
 namespace frc {
 enum RuntimeType { kRoboRIO, kRoboRIO2, kSimulation };
-} // namespace frc
+}  // namespace frc
