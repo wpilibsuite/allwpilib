@@ -130,8 +130,10 @@ The server shall publish a standard set of topics with information about server 
 |Topic Name|Data Type|Description
 |<<meta-clients,`$clients`>>|`msgpack`|Connected clients
 |<<meta-client-sub,`$clientsub$<client>`>>|`msgpack`|Client `<client>` subscriptions
+|<<meta-server-sub,`$serversub`>>|`msgpack`|Server subscriptions
 |<<meta-sub,`$sub$<topic>`>>|`msgpack`|Subscriptions to `<topic>`
 |<<meta-client-pub,`$clientpub$<client>`>>|`msgpack`|Client `<client>` publishers
+|<<meta-server-pub,`$serverpub`>>|`msgpack`|Server publishers
 |<<meta-pub,`$pub$<topic>`>>|`msgpack`|Publishers to `<topic>`
 |===
 
@@ -190,6 +192,11 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |Subscription options, see `subscribe`
 |===
 
+[[meta-server-sub]]
+==== Server Subscriptions (`$serversub`)
+
+Same as `$clientsub`, except it's updated when the server subscribes or unsubscribes to any topic.
+
 [[meta-sub]]
 ==== Subscriptions (`$sub$<topic>`)
 
@@ -207,7 +214,7 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |`client`
 |String
 |Client name
-|
+|Empty string for server subscriptions.
 
 |`subuid`
 |Integer
@@ -218,7 +225,7 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 [[meta-client-pub]]
 ==== Client Publishers (`$clientpub$<client>`)
 
-The server shall update this topic when the corresponding client publishes or unpublishes to any topic.
+The server shall update this topic when the corresponding client publishes or unpublishes any topic.
 
 The MessagePack contents shall be an array of maps.  Each map in the array shall have the following contents:
 
@@ -240,6 +247,11 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |
 |===
 
+[[meta-server-pub]]
+==== Server Publishers (`$serverpub`)
+
+Same as `$clientpub`, except it's updated when the server publishes or unpublishes any topic.
+
 [[meta-pub]]
 ==== Publishers (`$pub$<topic>`)
 
@@ -257,7 +269,7 @@ The MessagePack contents shall be an array of maps.  Each map in the array shall
 |`client`
 |String
 |Client name
-|
+|Empty string for server publishers.
 
 |`pubuid`
 |Integer
@@ -341,12 +353,13 @@ The following data types are supported.  Note: implementations may map integer a
 [[properties]]
 == Properties
 
-Each topic may also have properties associated to it.  Properties are represented in the protocol as JSON and thus property values may be any JSON type.  Property keys must be strings.  The following properties have a defined meaning in this spec.  Servers shall support arbitrary properties being set outside of this set.  Clients shall ignore properties they do not recognize.  Properties are initially set on publish and may be changed (by any client) using <<msg-setproperties>>.
+Each published topic may also have properties associated to it.  Properties are represented in the protocol as JSON and thus property values may be any JSON type.  Property keys must be strings.  The following properties have a defined meaning in this spec.  Servers shall support arbitrary properties being set outside of this set.  Clients shall ignore properties they do not recognize.  Properties are initially set on publish and may be changed (by any client) using <<msg-setproperties>>.
 
 [cols="1,1,1,6",options="header"]
 |===
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|`hidden`|boolean|Hidden Flag|If true, the topic will not be announced to a client until the client subscribes to it.  Note the topic will still be visible via the `$clientpub` meta-topic.
 |===
 
 [[text-frames]]
@@ -453,6 +466,13 @@ The `publish` JSON message shall contain the following parameters:
 If the topic is newly created (e.g. there are no other publishers) this sets the value type.  If the topic was previously published, this is ignored.  The `announce` message contains the actual topic value type that the client shall use when publishing values.
 
 Implementations should indicate an error if the user tries to publish an incompatible type to that already set for the topic.
+
+|`properties`
+|Object
+|Properties
+|Initial topic properties.
+
+If the topic is newly created (e.g. there are no other publishers) this sets the topic properties.  If the topic was previously published, this is ignored.  The `announce` message contains the actual topic properties.  Clients can use the `setproperties` message to change properties after topic creation.
 |===
 
 [[msg-unpublish]]
@@ -480,7 +500,7 @@ The `unpublish` JSON message shall contain the following parameters:
 [[msg-setproperties]]
 ==== Set Properties Message (`setproperties`)
 
-Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>>.
+Sent from a client to the server to change properties (see <<properties>>) for a given topic.  The server will respond with an updated <<msg-announce>> (if the topic is published).  This message shall be ignored by the server if the topic is not published.
 
 The `setproperties` JSON message shall contain the following parameters:
 
