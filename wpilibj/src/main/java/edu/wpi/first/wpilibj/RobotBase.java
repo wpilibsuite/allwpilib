@@ -162,7 +162,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   /**
    * Get the current runtime type.
-   * 
+   *
    * @return Current runtime type.
    */
   public static RuntimeType getRuntimeType() {
@@ -185,8 +185,7 @@ public abstract class RobotBase implements AutoCloseable {
    */
   public static boolean isReal() {
     RuntimeType runtimeType = getRuntimeType();
-    return runtimeType == RuntimeType.kRoboRIO || 
-           runtimeType == RuntimeType.kRoboRIO2;
+    return runtimeType == RuntimeType.kRoboRIO || runtimeType == RuntimeType.kRoboRIO2;
   }
 
   /**
