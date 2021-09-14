@@ -27,7 +27,7 @@ public enum RuntimeType {
     if (type == HALUtil.RUNTIME_ROBORIO) {
       return RuntimeType.kRoboRIO;
     } else if (type == HALUtil.RUNTIME_ROBORIO2) {
-      return RuntimeType.kRoboRIO;
+      return RuntimeType.kRoboRIO2;
     }
     return RuntimeType.kSimulation;
   }

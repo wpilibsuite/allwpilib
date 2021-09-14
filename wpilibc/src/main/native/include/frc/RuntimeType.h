@@ -5,9 +5,5 @@
 #pragma once
 
 namespace frc {
-enum RuntimeType {
-  kRoboRIO,
-  kRoboRIO2,
-  kSimulation
-};
+enum RuntimeType { kRoboRIO, kRoboRIO2, kSimulation };
 }

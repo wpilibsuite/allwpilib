@@ -214,7 +214,7 @@ class RobotBase {
 
   /**
    * Get the current runtime type.
-   * 
+   *
    * @return Current runtime type.
    */
   static RuntimeType GetRuntimeType();

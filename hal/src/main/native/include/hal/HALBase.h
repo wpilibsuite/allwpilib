@@ -66,7 +66,7 @@ int64_t HAL_GetFPGARevision(int32_t* status);
 
 /**
  * Returns the runtime type of the HAL.
- * 
+ *
  * @return HAL Runtime Type
  */
 HAL_RuntimeType HAL_GetRuntimeType(void);
