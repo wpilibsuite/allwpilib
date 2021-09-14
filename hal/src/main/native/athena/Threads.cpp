@@ -31,12 +31,9 @@ class UidSetter {
   }
 
   ~UidSetter() noexcept(false) {
-    uid_t currentUid = geteuid();
-    if (currentUid != m_uid) {
-      if (seteuid(m_uid) == -1) {
-        throw std::system_error(errno, std::generic_category(),
-                                fmt::format("seteuid({}) failed", m_uid));
-      }
+    if (geteuid() != m_uid && seteuid(m_uid) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              fmt::format("seteuid({}) failed", m_uid));
     }
   }
 
