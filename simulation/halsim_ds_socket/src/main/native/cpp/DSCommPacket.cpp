@@ -239,7 +239,8 @@ void DSCommPacket::ReadJoystickDescriptionTag(wpi::span<const uint8_t> data) {
   packet.descriptor.name[nameLength] = '\0';
   int axesCount = data[0];
   packet.descriptor.axisCount = axesCount;
-  for (int i = 0; i < axesCount; i++) {
+  for (int i = 0;
+       i < std::min<int>(axesCount, sizeof(packet.descriptor.axisTypes)); i++) {
     packet.descriptor.axisTypes[i] = data[1 + i];
   }
   data = data.subspan(1 + axesCount);
