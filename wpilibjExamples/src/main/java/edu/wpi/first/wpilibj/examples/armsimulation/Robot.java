@@ -67,25 +67,27 @@ public class Robot extends TimedRobot {
           );
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-  // Create a Mechanism2d display of an Arm
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
   private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-  private final MechanismRoot2d m_armJoint = m_mech2d.getRoot("ArmPivot", 30, 30);
+  private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d m_armTower =
+      m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
   private final MechanismLigament2d m_arm =
-      new MechanismLigament2d(
-          "Arm",
-          30,
-          Units.radiansToDegrees(m_armSim.getAngleRads()),
-          5,
-          new Color8Bit(Color.kYellow));
-  private final MechanismLigament2d m_armBase =
-      new MechanismLigament2d("ArmBase", 30, -90, 5, new Color8Bit(Color.kBlue));
+      m_armPivot.append(
+          new MechanismLigament2d(
+              "Arm",
+              30,
+              Units.radiansToDegrees(m_armSim.getAngleRads()),
+              6,
+              new Color8Bit(Color.kYellow)));
 
   @Override
   public void robotInit() {
     m_encoder.setDistancePerPulse(kArmEncoderDistPerPulse);
-    m_armJoint.append(m_arm);
-    m_armJoint.append(m_armBase);
+
+    // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
+    m_armTower.setColor(new Color8Bit(Color.kBlue));
   }
 
   @Override
