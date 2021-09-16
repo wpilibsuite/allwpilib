@@ -6,6 +6,7 @@ import os
 import sys
 from jinja2 import Environment, FileSystemLoader
 
+
 def output(outPath, outfn, contents):
     if not os.path.exists(outPath):
         os.makedirs(outPath)
@@ -21,6 +22,7 @@ def output(outPath, outfn, contents):
     with open(outpathname, "w") as f:
         f.write(contents)
 
+
 def main():
     MAX_NUM = 20
 
@@ -28,7 +30,8 @@ def main():
     cmake_binary_dir = sys.argv[1]
 
     env = Environment(loader=FileSystemLoader(f"{dirname}/src/generate"),
-                      autoescape=False, keep_trailing_newline=True)
+                      autoescape=False, 
+                      keep_trailing_newline=True)
 
     template = env.get_template("GenericNumber.java.jinja")
     rootPath = f"{cmake_binary_dir}/generated/main/java/edu/wpi/first/math/numbers"
