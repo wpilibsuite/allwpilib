@@ -300,10 +300,9 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
     name[0] = '\0';
     return name;
   } else {
-    size_t len = std::strlen(joystickDesc.name);
-    char* name = static_cast<char*>(std::malloc(len + 1));
+    const size_t len = std::strlen(joystickDesc.name) + 1;
+    char* name = static_cast<char*>(std::malloc(len));
     std::memcpy(name, joystickDesc.name, len);
-    name[len] = '\0';
     return name;
   }
 }
