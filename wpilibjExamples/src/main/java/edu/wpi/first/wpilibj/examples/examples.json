@@ -710,7 +710,8 @@
       "Digital",
       "Sensors",
       "Simulation",
-      "Physics"
+      "Physics",
+      "Mechanism2d"
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
