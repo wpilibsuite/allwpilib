@@ -216,7 +216,7 @@ class CallbackManager {
       return;
     }
     poller->Terminate();
-    return thr->m_pollers.erase(poller_uid);
+    thr->m_pollers.erase(poller_uid);
   }
 
   bool WaitForQueue(double timeout) {
