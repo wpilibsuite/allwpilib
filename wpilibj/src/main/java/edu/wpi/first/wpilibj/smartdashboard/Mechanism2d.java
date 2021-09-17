@@ -13,10 +13,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Visual 2D representation of arms, elevators, and general mechanisms; through a node-based API.
+ * Visual 2D representation of arms, elevators, and general mechanisms through a node-based API.
  *
- * <p>A Mechanism2d object is published and contains at least one root node. Other nodes (such as
- * ligaments) are recursively based on other nodes.
+ * <p>A Mechanism2d object is published and contains at least one root node. A root is the anchor
+ * point of other nodes (such as ligaments). Other nodes are recursively appended based on other
+ * nodes.
  *
  * @see MechanismObject2d
  * @see MechanismLigament2d
@@ -32,6 +33,8 @@ public final class Mechanism2d implements NTSendable {
   /**
    * Create a new Mechanism2d with the given dimensions and default color (dark blue).
    *
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
+   *
    * @param width the width
    * @param height the height
    */
@@ -41,6 +44,8 @@ public final class Mechanism2d implements NTSendable {
 
   /**
    * Create a new Mechanism2d with the given dimensions.
+   *
+   * <p>The dimensions represent the canvas that all the nodes are drawn on.
    *
    * @param width the width
    * @param height the height

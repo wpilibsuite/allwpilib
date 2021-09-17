@@ -10,7 +10,8 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
- * Ligament node on a Mechanism2d.
+ * Ligament node on a Mechanism2d. A ligament can have its length changed (like an elevator) or
+ * angle changed, like an arm.
  *
  * @see Mechanism2d
  */
@@ -43,7 +44,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   /**
-   * Create a new ligament with the default color (dark blue) and thickness (6).
+   * Create a new ligament with the default color (orange) and thickness (6).
    *
    * @param name The ligament's name.
    * @param length The ligament's length.
