@@ -10,7 +10,7 @@ jobs:
         include:
           - os: ubuntu-latest
             name: Linux
-            container: wpilib/roborio-cross-ubuntu:2021-18.04
+            container: wpilib/roborio-cross-ubuntu:2021-20.04
             flags: ""
           - os: macos-latest
             name: macOS
