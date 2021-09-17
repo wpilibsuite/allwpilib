@@ -30,8 +30,7 @@ class ConnectionListenerTest : public ::testing::Test {
 };
 
 void ConnectionListenerTest::Connect(unsigned int port) {
-  nt::StartServer(server_inst, "connectionlistenertest.ini", "127.0.0.1",
-                  port);
+  nt::StartServer(server_inst, "connectionlistenertest.ini", "127.0.0.1", port);
   nt::StartClient(client_inst, "127.0.0.1", port);
 
   // wait for client to report it's started, then wait another 0.1 sec
