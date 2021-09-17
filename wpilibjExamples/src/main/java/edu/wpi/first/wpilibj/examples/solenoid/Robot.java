@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj.examples.solenoid;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -24,13 +24,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
   private final Joystick m_stick = new Joystick(0);
 
-  private final PneumaticsControlModule m_pneumaticsModule = new PneumaticsControlModule(0);
-
   // Solenoid corresponds to a single solenoid.
-  private final Solenoid m_solenoid = new Solenoid(m_pneumaticsModule, 0);
+  private final Solenoid m_solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
-  private final DoubleSolenoid m_doubleSolenoid = new DoubleSolenoid(m_pneumaticsModule, 1, 2);
+  private final DoubleSolenoid m_doubleSolenoid =
+      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
 
   private static final int kSolenoidButton = 1;
   private static final int kDoubleSolenoidForward = 2;

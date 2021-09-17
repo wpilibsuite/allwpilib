@@ -4,7 +4,6 @@
 
 package edu.wpi.first.wpilibj.examples.pacgoat;
 
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -29,8 +28,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   Command m_autonomousCommand;
   public static OI oi;
-
-  public static PneumaticsControlModule pneumaticsModule = new PneumaticsControlModule(1);
 
   // Initialize the subsystems
   public static DriveTrain drivetrain = new DriveTrain();

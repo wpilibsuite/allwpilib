@@ -4,43 +4,41 @@
 
 #pragma once
 
+#include <memory>
+
 #include <hal/Types.h>
+#include <wpi/DenseMap.h>
 #include <wpi/mutex.h>
-#include <wpi/sendable/Sendable.h>
-#include <wpi/sendable/SendableHelper.h>
 
 #include "PneumaticsBase.h"
 
 namespace frc {
-class PneumaticsControlModule
-    : public PneumaticsBase,
-      public wpi::Sendable,
-      public wpi::SendableHelper<PneumaticsControlModule> {
+class PneumaticsControlModule : public PneumaticsBase {
  public:
   PneumaticsControlModule();
   explicit PneumaticsControlModule(int module);
 
-  ~PneumaticsControlModule() override;
+  ~PneumaticsControlModule() override = default;
 
-  bool GetCompressor();
+  bool GetCompressor() const override;
 
-  void SetClosedLoopControl(bool enabled);
+  void SetClosedLoopControl(bool enabled) override;
 
-  bool GetClosedLoopControl();
+  bool GetClosedLoopControl() const override;
 
-  bool GetPressureSwitch();
+  bool GetPressureSwitch() const override;
 
-  double GetCompressorCurrent();
+  double GetCompressorCurrent() const override;
 
-  bool GetCompressorCurrentTooHighFault();
-  bool GetCompressorCurrentTooHighStickyFault();
-  bool GetCompressorShortedFault();
-  bool GetCompressorShortedStickyFault();
-  bool GetCompressorNotConnectedFault();
-  bool GetCompressorNotConnectedStickyFault();
+  bool GetCompressorCurrentTooHighFault() const;
+  bool GetCompressorCurrentTooHighStickyFault() const;
+  bool GetCompressorShortedFault() const;
+  bool GetCompressorShortedStickyFault() const;
+  bool GetCompressorNotConnectedFault() const;
+  bool GetCompressorNotConnectedStickyFault() const;
 
-  bool GetSolenoidVoltageFault();
-  bool GetSolenoidVoltageStickyFault();
+  bool GetSolenoidVoltageFault() const;
+  bool GetSolenoidVoltageStickyFault() const;
 
   void ClearAllStickyFaults();
 
@@ -62,12 +60,30 @@ class PneumaticsControlModule
 
   void UnreserveSolenoids(int mask) override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  bool ReserveCompressor() override;
+
+  void UnreserveCompressor() override;
+
+  Solenoid MakeSolenoid(int channel) override;
+  DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
+                                    int reverseChannel) override;
+  Compressor MakeCompressor() override;
 
  private:
+  class DataStore;
+  friend class DataStore;
+  friend class PneumaticsBase;
+  PneumaticsControlModule(HAL_CTREPCMHandle handle, int module);
+
+  static std::shared_ptr<PneumaticsBase> GetForModule(int module);
+
+  std::shared_ptr<DataStore> m_dataStore;
+  HAL_CTREPCMHandle m_handle;
   int m_module;
-  hal::Handle<HAL_CTREPCMHandle> m_handle;
-  uint32_t m_reservedMask{0};
-  wpi::mutex m_reservedLock;
+
+  static wpi::mutex m_handleLock;
+  static std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<DataStore>>>
+      m_handleMap;
+  static std::weak_ptr<DataStore>& GetDataStore(int module);
 };
 }  // namespace frc

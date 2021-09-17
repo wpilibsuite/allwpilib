@@ -11,12 +11,13 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
- * (PCM).
+ * on a pneumatics module.
  *
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
@@ -26,11 +27,27 @@ class DoubleSolenoid : public wpi::Sendable,
  public:
   enum Value { kOff, kForward, kReverse };
 
-  DoubleSolenoid(PneumaticsBase& module, int forwardChannel,
-                 int reverseChannel);
-  DoubleSolenoid(PneumaticsBase* module, int forwardChannel,
-                 int reverseChannel);
-  DoubleSolenoid(std::shared_ptr<PneumaticsBase> module, int forwardChannel,
+  /**
+   * Constructs a double solenoid for a specified module of a specific module
+   * type.
+   *
+   * @param module The module of the solenoid module to use.
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
+  DoubleSolenoid(int module, PneumaticsModuleType moduleType,
+                 int forwardChannel, int reverseChannel);
+
+  /**
+   * Constructs a double solenoid for a default module of a specific module
+   * type.
+   *
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
+  DoubleSolenoid(PneumaticsModuleType moduleType, int forwardChannel,
                  int reverseChannel);
 
   ~DoubleSolenoid() override;
@@ -100,12 +117,12 @@ class DoubleSolenoid : public wpi::Sendable,
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
+  std::shared_ptr<PneumaticsBase> m_module;
   int m_forwardChannel;  // The forward channel on the module to control.
   int m_reverseChannel;  // The reverse channel on the module to control.
   int m_forwardMask;     // The mask for the forward channel.
   int m_reverseMask;     // The mask for the reverse channel.
   int m_mask;
-  std::shared_ptr<PneumaticsBase> m_module;
 };
 
 }  // namespace frc

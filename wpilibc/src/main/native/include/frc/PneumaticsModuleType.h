@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <frc/PneumaticsControlModule.h>
-
-namespace pac {
-frc::PneumaticsControlModule* GetPneumatics();
-}  // namespace pac
+namespace frc {
+enum class PneumaticsModuleType { CTREPCM, REVPH };
+}  // namespace frc

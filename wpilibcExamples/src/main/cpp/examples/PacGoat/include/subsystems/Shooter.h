@@ -9,8 +9,6 @@
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
 
-#include "PneumaticsModule.h"
-
 /**
  * The Shooter subsystem handles shooting. The mechanism for shooting is
  * slightly complicated because it has to pneumatic cylinders for shooting, and
@@ -116,9 +114,9 @@ class Shooter : public frc::Subsystem {
 
  private:
   // Devices
-  frc::DoubleSolenoid m_piston1{pac::GetPneumatics(), 3, 4};
-  frc::DoubleSolenoid m_piston2{pac::GetPneumatics(), 5, 6};
-  frc::Solenoid m_latchPiston{pac::GetPneumatics(), 2};
+  frc::DoubleSolenoid m_piston1{frc::PneumaticsModuleType::CTREPCM, 3, 4};
+  frc::DoubleSolenoid m_piston2{frc::PneumaticsModuleType::CTREPCM, 5, 6};
+  frc::Solenoid m_latchPiston{1, frc::PneumaticsModuleType::CTREPCM, 2};
   frc::DigitalInput m_piston1ReedSwitchFront{9};
   frc::DigitalInput m_piston1ReedSwitchBack{11};
   frc::DigitalInput m_hotGoalSensor{

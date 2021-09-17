@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsControlModule;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ class CTREPCMSimTest {
         PneumaticsControlModule pcm = new PneumaticsControlModule(0)) {
       assertTrue(sim.getInitialized());
     }
+    assertFalse(sim.getInitialized());
   }
 
   @Test
@@ -39,8 +41,8 @@ class CTREPCMSimTest {
     HAL.initialize(500, 0);
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(pcm, 3, 4)) {
-      CTREPCMSim sim = new CTREPCMSim(pcm);
+        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(0, PneumaticsModuleType.CTREPCM, 3, 4)) {
+      CTREPCMSim sim = new CTREPCMSim(0);
       sim.resetData();
 
       BooleanCallback callback3 = new BooleanCallback();
@@ -75,11 +77,14 @@ class CTREPCMSimTest {
         // Off
         callback3.reset();
         callback4.reset();
-        doubleSolenoid.set(DoubleSolenoid.Value.kForward);
-        assertFalse(callback3.wasTriggered());
-        assertNull(callback3.getSetValue());
+        doubleSolenoid.set(DoubleSolenoid.Value.kOff);
+        assertTrue(callback3.wasTriggered());
+        assertFalse(callback3.getSetValue());
         assertFalse(callback4.wasTriggered());
         assertNull(callback4.getSetValue());
+        assertFalse(sim.getSolenoidOutput(3));
+        assertFalse(sim.getSolenoidOutput(4));
+        assertEquals(0x0, pcm.getSolenoids());
       }
     }
   }

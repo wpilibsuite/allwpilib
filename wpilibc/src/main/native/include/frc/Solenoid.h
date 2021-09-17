@@ -12,20 +12,35 @@
 #include <wpi/sendable/SendableHelper.h>
 
 #include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 
 /**
- * Solenoid class for running high voltage Digital Output (PCM).
+ * Solenoid class for running high voltage Digital Output on a pneumatics
+ * module.
  *
  * The Solenoid class is typically used for pneumatics solenoids, but could be
- * used for any device within the current spec of the PCM.
+ * used for any device within the current spec of the module.
  */
 class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
  public:
-  Solenoid(PneumaticsBase& module, int channel);
-  Solenoid(PneumaticsBase* module, int channel);
-  Solenoid(std::shared_ptr<PneumaticsBase> module, int channel);
+  /**
+   * Constructs a solenoid for a specified module and type.
+   *
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
+  Solenoid(int module, PneumaticsModuleType moduleType, int channel);
+
+  /**
+   * Constructs a solenoid for a default module and specified type.
+   *
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
+  Solenoid(PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 

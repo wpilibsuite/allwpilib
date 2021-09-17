@@ -15,8 +15,7 @@ import org.junit.jupiter.api.Test;
 public class SolenoidTest {
   @Test
   void testValidInitialization() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3);
-        Solenoid solenoid = new Solenoid(pcm, 2)) {
+    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 2)) {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
@@ -29,31 +28,29 @@ public class SolenoidTest {
 
   @Test
   void testDoubleInitialization() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3);
-        Solenoid solenoid = new Solenoid(pcm, 2)) {
-      assertThrows(AllocationException.class, () -> new Solenoid(pcm, 2));
+    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 2)) {
+      assertThrows(
+          AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.CTREPCM, 2));
     }
   }
 
   @Test
   void testDoubleInitializationFromDoubleSolenoid() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3);
-        DoubleSolenoid solenoid = new DoubleSolenoid(pcm, 2, 3)) {
-      assertThrows(AllocationException.class, () -> new Solenoid(pcm, 2));
+    try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.CTREPCM, 2, 3)) {
+      assertThrows(
+          AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.CTREPCM, 2));
     }
   }
 
   @Test
   void testInvalidChannel() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3)) {
-      assertThrows(IllegalArgumentException.class, () -> new Solenoid(pcm, 100));
-    }
+    assertThrows(
+        IllegalArgumentException.class, () -> new Solenoid(3, PneumaticsModuleType.CTREPCM, 100));
   }
 
   @Test
   void testToggle() {
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(3);
-        Solenoid solenoid = new Solenoid(pcm, 2)) {
+    try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 2)) {
       solenoid.set(true);
       assertTrue(solenoid.get());
 

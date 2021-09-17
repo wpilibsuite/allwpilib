@@ -10,8 +10,6 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "PneumaticsModule.h"
-
 DriveTrain Robot::drivetrain;
 Pivot Robot::pivot;
 Collector Robot::collector;
@@ -81,11 +79,6 @@ void Robot::Log() {
                                  drivetrain.GetLeftEncoder().GetDistance());
   frc::SmartDashboard::PutNumber("Right Distance",
                                  drivetrain.GetRightEncoder().GetDistance());
-}
-
-frc::PneumaticsControlModule* pac::GetPneumatics() {
-  static frc::PneumaticsControlModule pcm;
-  return &pcm;
 }
 
 #ifndef RUNNING_FRC_TESTS

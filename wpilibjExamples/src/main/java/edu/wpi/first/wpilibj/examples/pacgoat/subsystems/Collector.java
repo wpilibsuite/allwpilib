@@ -5,9 +5,9 @@
 package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
@@ -25,7 +25,7 @@ public class Collector extends Subsystem {
   private final MotorController m_rollerMotor = new Victor(6);
   private final DigitalInput m_ballDetector = new DigitalInput(10);
   private final DigitalInput m_openDetector = new DigitalInput(6);
-  private final Solenoid m_piston = new Solenoid(Robot.pneumaticsModule, 1);
+  private final Solenoid m_piston = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
   /** Create a new collector subsystem. */
   public Collector() {

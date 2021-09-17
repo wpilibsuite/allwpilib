@@ -7,8 +7,8 @@
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : m_hatchSolenoid{m_pneumaticsModule, kHatchSolenoidPorts[0],
-                      kHatchSolenoidPorts[1]} {}
+    : m_hatchSolenoid{frc::PneumaticsModuleType::CTREPCM,
+                      kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
 
 void HatchSubsystem::GrabHatch() {
   m_hatchSolenoid.Set(frc::DoubleSolenoid::kForward);

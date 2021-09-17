@@ -10,10 +10,10 @@ import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.Objects;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the pneumatics
+ * module.
  *
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
@@ -34,22 +34,33 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
   private final int m_reverseChannel;
 
   /**
-   * Constructor.
+   * Constructs a double solenoid for a default module of a specific module type.
+   *
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
+   */
+  public DoubleSolenoid(
+      final PneumaticsModuleType moduleType, final int forwardChannel, final int reverseChannel) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, forwardChannel, reverseChannel);
+  }
+
+  /**
+   * Constructs a double solenoid for a specified module of a specific module type.
    *
    * @param module The module of the solenoid module to use.
-   * @param forwardChannel The forward channel on the module to control (0..7).
-   * @param reverseChannel The reverse channel on the module to control (0..7).
+   * @param moduleType The module type to use.
+   * @param forwardChannel The forward channel on the module to control.
+   * @param reverseChannel The reverse channel on the module to control.
    */
-  public DoubleSolenoid(PneumaticsBase module, final int forwardChannel, final int reverseChannel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null");
-
-    if (!module.checkSolenoidChannel(forwardChannel)) {
-      throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
-    }
-
-    if (!module.checkSolenoidChannel(reverseChannel)) {
-      throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
-    }
+  public DoubleSolenoid(
+      final int module,
+      final PneumaticsModuleType moduleType,
+      final int forwardChannel,
+      final int reverseChannel) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
 
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
@@ -58,29 +69,49 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
-    int allocMask = module.checkAndReserveSolenoids(m_mask);
-    if (allocMask != 0) {
-      if (allocMask == m_mask) {
-        throw new AllocationException(
-            "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
-      } else if (allocMask == m_forwardMask) {
-        throw new AllocationException("Channel " + forwardChannel + " already allocated");
-      } else {
-        throw new AllocationException("Channel " + reverseChannel + " already allocated");
+    try {
+      if (!m_module.checkSolenoidChannel(forwardChannel)) {
+        throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");
+      }
+
+      if (!m_module.checkSolenoidChannel(reverseChannel)) {
+        throw new IllegalArgumentException("Channel " + reverseChannel + " out of range");
+      }
+
+      int allocMask = m_module.checkAndReserveSolenoids(m_mask);
+      if (allocMask != 0) {
+        if (allocMask == m_mask) {
+          throw new AllocationException(
+              "Channels " + forwardChannel + " and " + reverseChannel + " already allocated");
+        } else if (allocMask == m_forwardMask) {
+          throw new AllocationException("Channel " + forwardChannel + " already allocated");
+        } else {
+          throw new AllocationException("Channel " + reverseChannel + " already allocated");
+        }
+      }
+      allocatedSolenoids = true;
+
+      HAL.report(
+          tResourceType.kResourceType_Solenoid, forwardChannel + 1, m_module.getModuleNumber() + 1);
+      HAL.report(
+          tResourceType.kResourceType_Solenoid, reverseChannel + 1, m_module.getModuleNumber() + 1);
+      SendableRegistry.addLW(this, "DoubleSolenoid", m_module.getModuleNumber(), forwardChannel);
+      successfulCompletion = true;
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedSolenoids) {
+          m_module.unreserveSolenoids(m_mask);
+        }
+        m_module.close();
       }
     }
-
-    HAL.report(
-        tResourceType.kResourceType_Solenoid, forwardChannel + 1, module.getModuleNumber() + 1);
-    HAL.report(
-        tResourceType.kResourceType_Solenoid, reverseChannel + 1, module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "DoubleSolenoid", module.getModuleNumber(), forwardChannel);
   }
 
   @Override
   public synchronized void close() {
     SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
+    m_module.close();
     m_module = null;
   }
 

@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <frc/PneumaticsControlModule.h>
 #include <frc/TimedRobot.h>
 #include <frc/commands/Command.h>
 #include <frc/smartdashboard/SendableChooser.h>

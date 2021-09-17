@@ -66,8 +66,10 @@ TEST_F(PCMTest, PressureSwitch) {
  */
 TEST_F(PCMTest, Solenoid) {
   Reset();
-  frc::Solenoid solenoid1{m_pneumaticsModule, TestBench::kSolenoidChannel1};
-  frc::Solenoid solenoid2{m_pneumaticsModule, TestBench::kSolenoidChannel2};
+  frc::Solenoid solenoid1{frc::PneumaticsModuleType::CTREPCM,
+                          TestBench::kSolenoidChannel1};
+  frc::Solenoid solenoid2{frc::PneumaticsModuleType::CTREPCM,
+                          TestBench::kSolenoidChannel2};
 
   // Turn both solenoids off
   solenoid1.Set(false);
@@ -111,7 +113,8 @@ TEST_F(PCMTest, Solenoid) {
  * with the DoubleSolenoid class.
  */
 TEST_F(PCMTest, DoubleSolenoid) {
-  frc::DoubleSolenoid solenoid{m_pneumaticsModule, TestBench::kSolenoidChannel1,
+  frc::DoubleSolenoid solenoid{frc::PneumaticsModuleType::CTREPCM,
+                               TestBench::kSolenoidChannel1,
                                TestBench::kSolenoidChannel2};
 
   solenoid.Set(frc::DoubleSolenoid::kOff);
@@ -138,8 +141,10 @@ TEST_F(PCMTest, DoubleSolenoid) {
 
 TEST_F(PCMTest, OneShot) {
   Reset();
-  frc::Solenoid solenoid1{m_pneumaticsModule, TestBench::kSolenoidChannel1};
-  frc::Solenoid solenoid2{m_pneumaticsModule, TestBench::kSolenoidChannel2};
+  frc::Solenoid solenoid1{frc::PneumaticsModuleType::CTREPCM,
+                          TestBench::kSolenoidChannel1};
+  frc::Solenoid solenoid2{frc::PneumaticsModuleType::CTREPCM,
+                          TestBench::kSolenoidChannel2};
 
   // Turn both solenoids off
   solenoid1.Set(false);

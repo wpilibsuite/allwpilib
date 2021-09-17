@@ -6,8 +6,6 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-#include "PneumaticsModule.h"
-
 Pneumatics::Pneumatics() : frc::Subsystem("Pneumatics") {
   AddChild("Pressure Sensor", m_pressureSensor);
 }
@@ -18,7 +16,7 @@ void Pneumatics::InitDefaultCommand() {
 
 void Pneumatics::Start() {
 #ifndef SIMULATION
-  pac::GetPneumatics()->SetClosedLoopControl(true);
+  m_compressor.Start();
 #endif
 }
 

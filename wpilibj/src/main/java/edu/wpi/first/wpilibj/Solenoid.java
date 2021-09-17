@@ -10,13 +10,12 @@ import edu.wpi.first.hal.util.AllocationException;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.Objects;
 
 /**
- * Solenoid class for running high voltage Digital Output on the PCM.
+ * Solenoid class for running high voltage Digital Output on a pneumatics module.
  *
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
- * within the current spec of the PCM.
+ * within the current spec of the module.
  */
 public class Solenoid implements Sendable, AutoCloseable {
   private final int m_mask; // The channel mask
@@ -24,33 +23,60 @@ public class Solenoid implements Sendable, AutoCloseable {
   private PneumaticsBase m_module;
 
   /**
-   * Constructor.
+   * Constructs a solenoid for a default module and specified type.
    *
-   * @param module The PCM the solenoid is attached to.
-   * @param channel The channel on the PCM to control (0..7).
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
-  public Solenoid(PneumaticsBase module, final int channel) {
-    m_module = Objects.requireNonNull(module, "Module cannot be null");
+  public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
+  }
 
-    if (!module.checkSolenoidChannel(channel)) {
-      throw new IllegalArgumentException(); // TODO fix me
-    }
+  /**
+   * Constructs a solenoid for a specified module and type.
+   *
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
+   */
+  public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
 
     m_mask = 1 << channel;
     m_channel = channel;
 
-    if (module.checkAndReserveSolenoids(m_mask) != 0) {
-      throw new AllocationException("Solenoid already allocated");
-    }
+    try {
+      if (!m_module.checkSolenoidChannel(channel)) {
+        throw new IllegalArgumentException("Channel " + channel + " out of range");
+      }
 
-    HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, module.getModuleNumber() + 1);
-    SendableRegistry.addLW(this, "Solenoid", module.getModuleNumber(), channel);
+      if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
+        throw new AllocationException("Solenoid already allocated");
+      }
+
+      allocatedSolenoids = true;
+
+      HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+      SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+      successfulCompletion = true;
+
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedSolenoids) {
+          m_module.unreserveSolenoids(m_mask);
+        }
+        m_module.close();
+      }
+    }
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
     m_module.unreserveSolenoids(m_mask);
+    m_module.close();
     m_module = null;
   }
 
