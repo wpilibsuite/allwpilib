@@ -30,7 +30,7 @@ def main():
     cmake_binary_dir = sys.argv[1]
 
     env = Environment(loader=FileSystemLoader(f"{dirname}/src/generate"),
-                      autoescape=False, 
+                      autoescape=False,
                       keep_trailing_newline=True)
 
     template = env.get_template("GenericNumber.java.jinja")
