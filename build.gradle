@@ -1,5 +1,14 @@
 import edu.wpi.first.toolchain.*
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.hubspot.jinjava:jinjava:2.5.8'
+    }
+}
+
 plugins {
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
