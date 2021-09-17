@@ -286,7 +286,7 @@ class LinearFilter {
    *
    * @param n Argument of which to take factorial.
    */
-  static int Factorial(int n) {
+  static constexpr int Factorial(int n) {
     if (n < 2) {
       return 1;
     } else {
