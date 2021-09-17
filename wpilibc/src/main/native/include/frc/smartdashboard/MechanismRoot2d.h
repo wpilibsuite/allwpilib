@@ -44,6 +44,7 @@ class MechanismRoot2d : private MechanismObject2d {
   inline void Flush();
   double m_x;
   double m_y;
-  nt::NetworkTableEntry m_posEntry;
+  nt::NetworkTableEntry m_xEntry;
+  nt::NetworkTableEntry m_yEntry;
 };
 }  // namespace frc
