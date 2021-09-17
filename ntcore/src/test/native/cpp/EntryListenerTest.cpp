@@ -35,16 +35,16 @@ class EntryListenerTest : public ::testing::Test {
     nt::DestroyInstance(client_inst);
   }
 
-  void Connect();
+  void Connect(unsigned int port);
 
  protected:
   NT_Inst server_inst;
   NT_Inst client_inst;
 };
 
-void EntryListenerTest::Connect() {
-  nt::StartServer(server_inst, "entrylistenertest.ini", "127.0.0.1", 10000);
-  nt::StartClient(client_inst, "127.0.0.1", 10000);
+void EntryListenerTest::Connect(unsigned int port) {
+  nt::StartServer(server_inst, "entrylistenertest.ini", "127.0.0.1", port);
+  nt::StartClient(client_inst, "127.0.0.1", port);
 
   // Use connection listener to ensure we've connected
   NT_ConnectionListenerPoller poller =
@@ -81,7 +81,7 @@ TEST_F(EntryListenerTest, EntryNewLocal) {
 }
 
 TEST_F(EntryListenerTest, DISABLED_EntryNewRemote) {
-  Connect();
+  Connect(10010);
   if (HasFatalFailure()) {
     return;
   }
@@ -135,7 +135,7 @@ TEST_F(EntryListenerTest, PrefixNewLocal) {
 }
 
 TEST_F(EntryListenerTest, DISABLED_PrefixNewRemote) {
-  Connect();
+  Connect(10011);
   if (HasFatalFailure()) {
     return;
   }
