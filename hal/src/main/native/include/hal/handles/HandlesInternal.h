@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include <wpi/Synchronization.h>
+
 #include "hal/Types.h"
 
 /* General Handle Data Layout
@@ -43,7 +45,7 @@ constexpr int16_t InvalidHandleIndex = -1;
  */
 enum class HAL_HandleEnum {
   Undefined = 0,
-  DIO = 1,
+  DIO = wpi::kHandleTypeHALBase,
   Port = 2,
   Notifier = 3,
   Interrupt = 4,
