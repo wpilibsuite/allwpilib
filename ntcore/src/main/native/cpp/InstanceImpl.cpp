@@ -7,8 +7,7 @@
 using namespace nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
-std::atomic<InstanceImpl*> InstanceImpl::s_fast_instances[10];
-wpi::UidVector<InstanceImpl*, 10> InstanceImpl::s_instances;
+std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
 wpi::mutex InstanceImpl::s_mutex;
 
 using namespace std::placeholders;
@@ -35,36 +34,10 @@ InstanceImpl* InstanceImpl::GetDefault() {
 }
 
 InstanceImpl* InstanceImpl::Get(int inst) {
-  if (inst < 0) {
+  if (inst < 0 || inst >= kNumInstances) {
     return nullptr;
   }
-
-  // fast path, just an atomic read
-  if (static_cast<unsigned int>(inst) <
-      (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
-    InstanceImpl* ptr = s_fast_instances[inst];
-    if (ptr) {
-      return ptr;
-    }
-  }
-
-  // slow path
-  std::scoped_lock lock(s_mutex);
-
-  // static fast-path block
-  if (static_cast<unsigned int>(inst) <
-      (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
-    // double-check
-    return s_fast_instances[inst];
-  }
-
-  // vector
-  if (static_cast<unsigned int>(inst) < s_instances.size()) {
-    return s_instances[inst];
-  }
-
-  // doesn't exist
-  return nullptr;
+  return s_instances[inst];
 }
 
 int InstanceImpl::GetDefaultIndex() {
@@ -94,28 +67,23 @@ int InstanceImpl::Alloc() {
 }
 
 int InstanceImpl::AllocImpl() {
-  unsigned int inst = s_instances.emplace_back(nullptr);
-  InstanceImpl* ptr = new InstanceImpl(inst);
-  s_instances[inst] = ptr;
-
-  if (inst < (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
-    s_fast_instances[inst] = ptr;
+  int inst = 0;
+  for (; inst < kNumInstances; ++inst) {
+    if (!s_instances[inst]) {
+      s_instances[inst] = new InstanceImpl(inst);
+      return inst;
+    }
   }
-
-  return static_cast<int>(inst);
+  return -1;
 }
 
 void InstanceImpl::Destroy(int inst) {
   std::scoped_lock lock(s_mutex);
-  if (inst < 0 || static_cast<unsigned int>(inst) >= s_instances.size()) {
+  if (inst < 0 || inst >= kNumInstances) {
     return;
   }
 
-  if (static_cast<unsigned int>(inst) <
-      (sizeof(s_fast_instances) / sizeof(s_fast_instances[0]))) {
-    s_fast_instances[inst] = nullptr;
-  }
-
-  delete s_instances[inst];
-  s_instances.erase(inst);
+  InstanceImpl* ptr = nullptr;
+  s_instances[inst].exchange(ptr);
+  delete ptr;
 }

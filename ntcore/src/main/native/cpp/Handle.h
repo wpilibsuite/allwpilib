@@ -10,8 +10,8 @@
 namespace nt {
 
 // Handle data layout:
-// Bits 30-28: Type
-// Bits 27-20: Instance index
+// Bits 30-24: Type
+// Bits 23-20: Instance index
 // Bits 19-0:  Handle index (0/unused for instance handles)
 
 class Handle {
@@ -40,15 +40,15 @@ class Handle {
       m_handle = 0;
       return;
     }
-    m_handle = ((static_cast<int>(type) & 0xf) << 27) | ((inst & 0x7f) << 20) |
+    m_handle = ((static_cast<int>(type) & 0x7f) << 24) | ((inst & 0xf) << 20) |
                (index & 0xfffff);
   }
 
   int GetIndex() const { return static_cast<int>(m_handle) & 0xfffff; }
   Type GetType() const {
-    return static_cast<Type>((static_cast<int>(m_handle) >> 27) & 0xf);
+    return static_cast<Type>((static_cast<int>(m_handle) >> 24) & 0x7f);
   }
-  int GetInst() const { return (static_cast<int>(m_handle) >> 20) & 0x7f; }
+  int GetInst() const { return (static_cast<int>(m_handle) >> 20) & 0xf; }
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
   int GetTypedInst(Type type) const { return IsType(type) ? GetInst() : -1; }

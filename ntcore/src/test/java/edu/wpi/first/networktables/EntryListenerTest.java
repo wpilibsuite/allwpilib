@@ -35,8 +35,8 @@ class EntryListenerTest {
   }
 
   private void connect() {
-    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
-    m_clientInst.startClient("127.0.0.1", 10000);
+    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10010);
+    m_clientInst.startClient("127.0.0.1", 10010);
 
     // Use connection listener to ensure we've connected
     int poller = NetworkTablesJNI.createConnectionListenerPoller(m_clientInst.getHandle());
