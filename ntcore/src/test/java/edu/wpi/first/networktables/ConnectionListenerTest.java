@@ -66,7 +66,7 @@ class ConnectionListenerTest {
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
-    connect(10000);
+    connect(10020);
 
     // get the event
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
