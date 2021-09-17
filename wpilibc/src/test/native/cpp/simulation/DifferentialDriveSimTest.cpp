@@ -64,8 +64,10 @@ TEST(DifferentialDriveSim, Convergence) {
         groundTruthX, voltages, 20_ms);
   }
 
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().to<double>(), 0.01);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().to<double>(), 0.01);
+  // 2 inch tolerance is OK since our ground truth is an approximation of the
+  // ODE solution using RK4 anyway
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().to<double>(), 0.05);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().to<double>(), 0.05);
   EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().to<double>(),
               0.01);
 }
