@@ -22,17 +22,17 @@ class ConnectionListenerTest : public ::testing::Test {
     nt::DestroyInstance(client_inst);
   }
 
-  void Connect();
+  void Connect(unsigned int port);
 
  protected:
   NT_Inst server_inst;
   NT_Inst client_inst;
 };
 
-void ConnectionListenerTest::Connect() {
+void ConnectionListenerTest::Connect(unsigned int port) {
   nt::StartServer(server_inst, "connectionlistenertest.ini", "127.0.0.1",
-                  10000);
-  nt::StartClient(client_inst, "127.0.0.1", 10000);
+                  port);
+  nt::StartClient(client_inst, "127.0.0.1", port);
 
   // wait for client to report it's started, then wait another 0.1 sec
   while ((nt::GetNetworkMode(client_inst) & NT_NET_MODE_STARTING) != 0) {
@@ -50,7 +50,7 @@ TEST_F(ConnectionListenerTest, Polled) {
   ASSERT_NE(handle, 0u);
 
   // trigger a connect event
-  Connect();
+  Connect(10000);
 
   // get the event
   ASSERT_TRUE(nt::WaitForConnectionListenerQueue(server_inst, 1.0));
@@ -85,7 +85,7 @@ TEST_F(ConnectionListenerTest, Threaded) {
       false);
 
   // trigger a connect event
-  Connect();
+  Connect(10001);
 
   ASSERT_TRUE(nt::WaitForConnectionListenerQueue(server_inst, 1.0));
 
