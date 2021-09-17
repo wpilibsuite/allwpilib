@@ -171,6 +171,75 @@ endif()
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
 
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+if(isMultiConfig)
+    if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
+    endif()
+    if(NOT "Tsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES Tsan)
+    endif()
+    if(NOT "Ubsan" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES Ubsan)
+    endif()
+else()
+    set(allowedBuildTypes Asan Tsan Ubsan Debug Release RelWithDebInfo MinSizeRel)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowedBuildTypes}")
+
+    if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST allowedBuildTypes)
+        message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}")
+    endif()
+endif()
+
+set(CMAKE_C_FLAGS_ASAN
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_CXX_FLAGS_ASAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C++ compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_ASAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address" CACHE STRING
+    "Linker flags to be used to create executables for Asan build type." FORCE)
+
+set(CMAKE_SHARED_LINKER_FLAGS_ASAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address" CACHE STRING
+    "Linker lags to be used to create shared libraries for Asan build type." FORCE)
+
+set(CMAKE_C_FLAGS_TSAN
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=thread -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C compiler for Tsan build type or configuration." FORCE)
+
+set(CMAKE_CXX_FLAGS_TSAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=thread -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C++ compiler for Tsan build type or configuration." FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_TSAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=thread" CACHE STRING
+    "Linker flags to be used to create executables for Tsan build type." FORCE)
+
+set(CMAKE_SHARED_LINKER_FLAGS_TSAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=thread" CACHE STRING
+    "Linker lags to be used to create shared libraries for Tsan build type." FORCE)
+
+set(CMAKE_C_FLAGS_UBSAN
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C compiler for Ubsan build type or configuration." FORCE)
+
+set(CMAKE_CXX_FLAGS_UBSAN
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING
+    "Flags used by the C++ compiler for Ubsan build type or configuration." FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_UBSAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=undefined -fno-sanitize-recover=all" CACHE STRING
+    "Linker flags to be used to create executables for Ubsan build type." FORCE)
+
+set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=undefined" CACHE STRING
+    "Linker lags to be used to create shared libraries for Ubsan build type." FORCE)
+
 if (WITH_TESTS)
     enable_testing()
     add_subdirectory(googletest)
