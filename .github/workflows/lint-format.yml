@@ -63,8 +63,6 @@ jobs:
           sudo apt-get install -y clang-tidy-12 clang-format-12
       - name: Install wpiformat
         run: pip3 install wpiformat
-      - name: Install jinja
-        run: python -m pip install jinja2
       - name: Create compile_commands.json
         run: ./gradlew generateCompileCommands -Ptoolchain-optional-roboRio
       - name: List changed files
