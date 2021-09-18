@@ -14,7 +14,7 @@ plugins {
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '0.10.1'
+    id 'edu.wpi.first.GradleJni' version '1.0.0'
     id 'edu.wpi.first.GradleVsCode' version '1.0.0'
     id 'idea'
     id 'visual-studio'

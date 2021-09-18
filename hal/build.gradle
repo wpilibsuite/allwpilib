@@ -128,7 +128,7 @@ cppHeadersZip {
 }
 
 Action<List<String>> symbolFilter = { symbols ->
-    symbols.removeIf({ !it.startsWith('CS_') })
+    symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
 } as Action<List<String>>;
 
 nativeUtils.exportsConfigs {
