@@ -17,6 +17,10 @@ import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** This is a sample program to demonstrate the use of elevator simulation with existing code. */
 public class Robot extends TimedRobot {
@@ -30,7 +34,7 @@ public class Robot extends TimedRobot {
   private static final double kElevatorDrumRadius = Units.inchesToMeters(2.0);
   private static final double kCarriageMass = 4.0; // kg
 
-  private static final double kMinElevatorHeight = 0.0;
+  private static final double kMinElevatorHeight = Units.inchesToMeters(2);
   private static final double kMaxElevatorHeight = Units.inchesToMeters(50);
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
@@ -58,9 +62,20 @@ public class Robot extends TimedRobot {
           VecBuilder.fill(0.01));
   private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
+  // Create a Mechanism2d visualization of the elevator
+  private final Mechanism2d m_mech2d = new Mechanism2d(20, 50);
+  private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("Elevator Root", 10, 0);
+  private final MechanismLigament2d m_elevatorMech2d =
+      m_mech2dRoot.append(
+          new MechanismLigament2d(
+              "Elevator", Units.metersToInches(m_elevatorSim.getPositionMeters()), 90));
+
   @Override
   public void robotInit() {
     m_encoder.setDistancePerPulse(kElevatorEncoderDistPerPulse);
+
+    // Publish Mechanism2d to SmartDashboard
+    SmartDashboard.putData("Elevator Sim", m_mech2d);
   }
 
   @Override
@@ -77,6 +92,9 @@ public class Robot extends TimedRobot {
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps()));
+
+    // Update elevator visualization with simulated position
+    m_elevatorMech2d.setLength(Units.metersToInches(m_elevatorSim.getPositionMeters()));
   }
 
   @Override
