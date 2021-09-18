@@ -169,6 +169,9 @@ nativeUtils.exportsConfigs {
 model {
     binaries {
         all {
+            it.tasks.withType(AbstractNativeSourceCompileTask) {
+                it.dependsOn generateUsageReporting
+            }
             if (!(it instanceof NativeBinarySpec)) return
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
