@@ -31,67 +31,6 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
-// deploy {
-//     targets {
-//         target('roborio') {
-//             directory = '/home/admin'
-//             maxChannels = 4
-//             locations {
-//                 ssh {
-//                     address = "172.22.11.2"
-//                     user = 'admin'
-//                     password = ''
-//                     ipv6 = false
-//                 }
-//             }
-//         }
-//     }
-//     artifacts {
-//         all {
-//             targets << 'roborio'
-//             predeploy << { ctx ->
-//                 ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
-//             }
-//             postdeploy << { ctx ->
-//                 ctx.execute("sync")
-//                 ctx.execute("ldconfig")
-//             }
-//         }
-
-//         artifact('jre', JREArtifact) {
-//             jreDependency = 'edu.wpi.first.jdk:roborio-2021:11.0.9u11-1'
-//         }
-
-//         javaArtifact('myRobotJava') {
-//             jar = 'shadowJar'
-//             postdeploy << { ctx ->
-//                 ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
-//                 ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
-//             }
-//         }
-
-//         nativeArtifact('myRobotCpp') {
-//             component = 'myRobotCpp'
-//             targetPlatform = nativeUtils.wpi.platforms.roborio
-//             libraryDirectory = '/usr/local/frc/third-party/lib'
-//             buildType = 'debug'
-//             postdeploy << { ctx ->
-//                 ctx.execute('chmod +x myRobotCpp')
-//             }
-//         }
-
-//         nativeArtifact('myRobotCppStatic') {
-//             component = 'myRobotCppStatic'
-//             targetPlatform = nativeUtils.wpi.platforms.roborio
-//             buildType = 'debug'
-
-//             postdeploy << { ctx ->
-//                 ctx.execute('chmod +x myRobotCppStatic')
-//             }
-//         }
-//     }
-// }
-
 mainClassName = 'frc.robot.Main'
 
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -128,6 +67,12 @@ deploy {
                 }
             }
 
+            def remote = it
+
+            artifacts.registerFactory(WPIJREArtifact) {
+                return objects.newInstance(WPIJREArtifact, it, remote)
+            }
+
             artifacts {
                 all {
                     predeploy << { ctx ->
@@ -153,8 +98,8 @@ deploy {
                     }
                 }
 
-                // jre(JREArtifact) { // TODO Fix me
-                // }
+                jre(WPIJREArtifact) {
+                }
 
                 myRobotJava(JavaArtifact) {
                     jarTask = shadowJar
@@ -170,24 +115,23 @@ deploy {
 
 tasks.register('deployJava') {
     try {
-        dependsOn tasks.named('deployJreRoborio')
-        dependsOn tasks.named('deployMyRobotJavaRoborio')
-        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
+        dependsOn tasks.named('deployjreroborio')
+        dependsOn tasks.named('deploymyRobotJavaroborio')
+        dependsOn tasks.named('deploymyRobotCpproborio') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
     }
 }
 
 tasks.register('deployShared') {
     try {
-        dependsOn tasks.named('deployMyRobotCppLibrariesRoborio')
-        dependsOn tasks.named('deployMyRobotCppRoborio')
+        dependsOn tasks.named('deploymyRobotCpproborio')
     } catch (ignored) {
     }
 }
 
 tasks.register('deployStatic') {
     try {
-        dependsOn tasks.named('deployMyRobotCppStaticRoborio')
+        dependsOn tasks.named('deploymyRobotCppStaticroborio')
     } catch (ignored) {
     }
 }

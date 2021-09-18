@@ -10,7 +10,7 @@ import edu.wpi.first.deployutils.PredicateWrapper
 import java.util.function.Function
 
 @CompileStatic
-public class FRCJREArtifact extends MavenArtifact {
+public class WPIJREArtifact extends MavenArtifact {
     private final String configName;
 
     public String getConfigName() {
@@ -18,7 +18,7 @@ public class FRCJREArtifact extends MavenArtifact {
     }
 
     @Inject
-    public FRCJREArtifact(String name, RemoteTarget target) {
+    public WPIJREArtifact(String name, RemoteTarget target) {
         super(name, target);
         String configName = name + "frcjre";
         this.configName = configName;
