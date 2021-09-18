@@ -6,7 +6,7 @@
 #include "Eigen/LU"
 #include "gtest/gtest.h"
 
-TEST(EigenTest, MultiplicationTest) {
+TEST(EigenTest, Multiplication) {
   Eigen::Matrix<double, 2, 2> m1{{2, 1}, {0, 1}};
   Eigen::Matrix<double, 2, 2> m2{{3, 0}, {0, 2.5}};
 
@@ -28,7 +28,7 @@ TEST(EigenTest, MultiplicationTest) {
   EXPECT_TRUE(expectedResult2.isApprox(result2));
 }
 
-TEST(EigenTest, TransposeTest) {
+TEST(EigenTest, Transpose) {
   Eigen::Vector<double, 3> vec{1, 2, 3};
 
   const auto transpose = vec.transpose();
@@ -38,7 +38,7 @@ TEST(EigenTest, TransposeTest) {
   EXPECT_TRUE(expectedTranspose.isApprox(transpose));
 }
 
-TEST(EigenTest, InverseTest) {
+TEST(EigenTest, Inverse) {
   Eigen::Matrix<double, 3, 3> mat{
       {1.0, 3.0, 2.0}, {5.0, 2.0, 1.5}, {0.0, 1.3, 2.5}};
 

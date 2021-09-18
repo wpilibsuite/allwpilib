@@ -143,7 +143,7 @@ TEST_F(MecanumDriveKinematicsTest,
   EXPECT_NEAR(0.707, chassisSpeeds.omega.to<double>(), 0.1);
 }
 
-TEST_F(MecanumDriveKinematicsTest, NormalizeTest) {
+TEST_F(MecanumDriveKinematicsTest, Normalize) {
   MecanumDriveWheelSpeeds wheelSpeeds{5_mps, 6_mps, 4_mps, 7_mps};
   wheelSpeeds.Normalize(5.5_mps);
 

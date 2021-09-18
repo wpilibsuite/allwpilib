@@ -279,37 +279,37 @@ void TestTiming(int squelch, std::pair<int, int> param) {
   }
 }
 
-TEST_P(PWMTest, TestTiming4x) {
+TEST_P(PWMTest, Timing4x) {
   auto param = GetParam();
   TestTiming(3, param);
 }
 
-TEST_P(PWMTest, TestTiming2x) {
+TEST_P(PWMTest, Timing2x) {
   auto param = GetParam();
   TestTiming(1, param);
 }
 
-TEST_P(PWMTest, TestTiming1x) {
+TEST_P(PWMTest, Timing1x) {
   auto param = GetParam();
   TestTiming(0, param);
 }
 
-TEST_P(PWMTest, TestTimingDMA4x) {
+TEST_P(PWMTest, TimingDMA4x) {
   auto param = GetParam();
   TestTimingDMA(3, param);
 }
 
-TEST_P(PWMTest, TestTimingDMA2x) {
+TEST_P(PWMTest, TimingDMA2x) {
   auto param = GetParam();
   TestTimingDMA(1, param);
 }
 
-TEST_P(PWMTest, TestTimingDMA1x) {
+TEST_P(PWMTest, TimingDMA1x) {
   auto param = GetParam();
   TestTimingDMA(0, param);
 }
 
-TEST(PWMTest, TestAllocateAll) {
+TEST(PWMTest, AllocateAll) {
   wpi::SmallVector<PWMHandle, 21> pwmHandles;
   for (int i = 0; i < HAL_GetNumPWMChannels(); i++) {
     int32_t status = 0;
@@ -318,7 +318,7 @@ TEST(PWMTest, TestAllocateAll) {
   }
 }
 
-TEST(PWMTest, TestMultipleAllocateFails) {
+TEST(PWMTest, MultipleAllocateFails) {
   int32_t status = 0;
   PWMHandle handle(0, &status);
   ASSERT_NE(handle, HAL_kInvalidHandle);
@@ -329,21 +329,21 @@ TEST(PWMTest, TestMultipleAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-TEST(PWMTest, TestOverAllocateFails) {
+TEST(PWMTest, OverAllocateFails) {
   int32_t status = 0;
   PWMHandle handle(HAL_GetNumPWMChannels(), &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(PWMTest, TestUnderAllocateFails) {
+TEST(PWMTest, UnderAllocateFails) {
   int32_t status = 0;
   PWMHandle handle(-1, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(PWMTest, TestCrossAllocationFails) {
+TEST(PWMTest, CrossAllocationFails) {
   int32_t status = 0;
   DIOHandle dioHandle(10, true, &status);
   ASSERT_NE(dioHandle, HAL_kInvalidHandle);

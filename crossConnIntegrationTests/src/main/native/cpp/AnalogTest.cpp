@@ -14,7 +14,7 @@ using namespace hlt;
 
 class AnalogCrossTest : public ::testing::TestWithParam<std::pair<int, int>> {};
 
-TEST_P(AnalogCrossTest, TestAnalogCross) {
+TEST_P(AnalogCrossTest, AnalogCross) {
   auto param = GetParam();
 
   int32_t status = 0;
@@ -40,7 +40,7 @@ TEST_P(AnalogCrossTest, TestAnalogCross) {
   }
 }
 
-TEST(AnalogInputTest, TestAllocateAll) {
+TEST(AnalogInputTest, AllocateAll) {
   wpi::SmallVector<AnalogInputHandle, 21> analogHandles;
   for (int i = 0; i < HAL_GetNumAnalogInputs(); i++) {
     int32_t status = 0;
@@ -49,7 +49,7 @@ TEST(AnalogInputTest, TestAllocateAll) {
   }
 }
 
-TEST(AnalogInputTest, TestMultipleAllocateFails) {
+TEST(AnalogInputTest, MultipleAllocateFails) {
   int32_t status = 0;
   AnalogInputHandle handle(0, &status);
   ASSERT_NE(handle, HAL_kInvalidHandle);
@@ -60,21 +60,21 @@ TEST(AnalogInputTest, TestMultipleAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-TEST(AnalogInputTest, TestOverAllocateFails) {
+TEST(AnalogInputTest, OverAllocateFails) {
   int32_t status = 0;
   AnalogInputHandle handle(HAL_GetNumAnalogInputs(), &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(AnalogInputTest, TestUnderAllocateFails) {
+TEST(AnalogInputTest, UnderAllocateFails) {
   int32_t status = 0;
   AnalogInputHandle handle(-1, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(AnalogOutputTest, TestAllocateAll) {
+TEST(AnalogOutputTest, AllocateAll) {
   wpi::SmallVector<AnalogOutputHandle, 21> analogHandles;
   for (int i = 0; i < HAL_GetNumAnalogOutputs(); i++) {
     int32_t status = 0;
@@ -83,7 +83,7 @@ TEST(AnalogOutputTest, TestAllocateAll) {
   }
 }
 
-TEST(AnalogOutputTest, TestMultipleAllocateFails) {
+TEST(AnalogOutputTest, MultipleAllocateFails) {
   int32_t status = 0;
   AnalogOutputHandle handle(0, &status);
   ASSERT_NE(handle, HAL_kInvalidHandle);
@@ -94,14 +94,14 @@ TEST(AnalogOutputTest, TestMultipleAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-TEST(AnalogOutputTest, TestOverAllocateFails) {
+TEST(AnalogOutputTest, OverAllocateFails) {
   int32_t status = 0;
   AnalogOutputHandle handle(HAL_GetNumAnalogOutputs(), &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(AnalogOutputTest, TestUnderAllocateFails) {
+TEST(AnalogOutputTest, UnderAllocateFails) {
   int32_t status = 0;
   AnalogOutputHandle handle(-1, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);

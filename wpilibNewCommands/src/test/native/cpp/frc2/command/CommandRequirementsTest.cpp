@@ -17,7 +17,7 @@
 using namespace frc2;
 class CommandRequirementsTest : public CommandTestBase {};
 
-TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
+TEST_F(CommandRequirementsTest, RequirementInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement;
@@ -44,7 +44,7 @@ TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
   scheduler.Run();
 }
 
-TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
+TEST_F(CommandRequirementsTest, RequirementUninterruptible) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement;
@@ -71,7 +71,7 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
   scheduler.Run();
 }
 
-TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
+TEST_F(CommandRequirementsTest, DefaultCommandRequirementError) {
   TestSubsystem requirement1;
 
   MockCommand command1;

@@ -12,7 +12,7 @@
 
 namespace frc::sim {
 
-TEST(ADXL345SimTests, SetSpiAttributes) {
+TEST(ADXL345SimTest, SetSpiAttributes) {
   HAL_Initialize(500, 0);
 
   ADXL345_SPI accel(SPI::kMXP, Accelerometer::kRange_2G);
@@ -36,7 +36,7 @@ TEST(ADXL345SimTests, SetSpiAttributes) {
   EXPECT_EQ(2.29, allAccel.ZAxis);
 }
 
-TEST(ADXL345SimTests, SetI2CAttribute) {
+TEST(ADXL345SimTest, SetI2CAttribute) {
   HAL_Initialize(500, 0);
 
   ADXL345_I2C accel(I2C::kMXP);

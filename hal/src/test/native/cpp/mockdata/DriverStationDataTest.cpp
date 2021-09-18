@@ -10,7 +10,7 @@
 
 namespace hal {
 
-TEST(DriverStationTests, JoystickTests) {
+TEST(DriverStationTest, Joystick) {
   HAL_JoystickAxes axes;
   HAL_JoystickPOVs povs;
   HAL_JoystickButtons buttons;
@@ -109,7 +109,7 @@ TEST(DriverStationTests, JoystickTests) {
   }
 }
 
-TEST(DriverStationTests, EventInfoTest) {
+TEST(DriverStationTest, EventInfo) {
   std::string eventName = "UnitTest";
   std::string gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;

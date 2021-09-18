@@ -12,7 +12,7 @@ using namespace hlt;
 
 class DutyCycleTest : public ::testing::TestWithParam<std::pair<int, int>> {};
 
-TEST_P(DutyCycleTest, TestDutyCycle) {
+TEST_P(DutyCycleTest, DutyCycle) {
   auto param = GetParam();
 
   int32_t status = 0;

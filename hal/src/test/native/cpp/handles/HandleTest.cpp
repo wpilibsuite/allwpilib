@@ -13,7 +13,7 @@ class MyTestClass {};
 }  // namespace
 
 namespace hal {
-TEST(HandleTests, ClassedHandleTest) {
+TEST(HandleTest, ClassedHandle) {
   hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
                                     HAL_HandleEnum::Vendor>
       testClass;

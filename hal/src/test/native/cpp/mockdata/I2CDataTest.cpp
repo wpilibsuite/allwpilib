@@ -19,7 +19,7 @@ void TestI2CInitializationCallback(const char* name, void* param,
   gTestI2CCallbackValue = *value;
 }
 
-TEST(I2CSimTests, TestI2CInitialization) {
+TEST(I2CSimTest, I2CInitialization) {
   const int INDEX_TO_TEST = 1;
 
   int32_t status = 0;

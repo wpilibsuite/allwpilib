@@ -8,7 +8,7 @@
 using namespace frc2;
 class RunCommandTest : public CommandTestBase {};
 
-TEST_F(RunCommandTest, RunCommandScheduleTest) {
+TEST_F(RunCommandTest, RunCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;

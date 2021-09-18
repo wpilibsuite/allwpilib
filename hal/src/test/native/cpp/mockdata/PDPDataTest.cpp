@@ -19,7 +19,7 @@ void TestPdpInitializationCallback(const char* name, void* param,
   gTestPdpCallbackValue = *value;
 }
 
-TEST(PdpSimTests, TestPdpInitialization) {
+TEST(PdpSimTest, PdpInitialization) {
   const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;

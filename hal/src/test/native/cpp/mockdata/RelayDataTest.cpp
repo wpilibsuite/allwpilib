@@ -19,7 +19,7 @@ void TestRelayInitializationCallback(const char* name, void* param,
   gTestRelayCallbackValue = *value;
 }
 
-TEST(RelaySimTests, TestRelayInitialization) {
+TEST(RelaySimTest, RelayInitialization) {
   const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;

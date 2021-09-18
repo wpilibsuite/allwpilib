@@ -14,7 +14,7 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-TEST(AnalogEncoderSimTest, TestBasic) {
+TEST(AnalogEncoderSimTest, Basic) {
   frc::AnalogInput ai(0);
   frc::AnalogEncoder encoder{ai};
   frc::sim::AnalogEncoderSim encoderSim{encoder};

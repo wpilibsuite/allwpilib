@@ -19,7 +19,7 @@ void TestDigitalIoInitializationCallback(const char* name, void* param,
   gTestDigitalIoCallbackValue = *value;
 }
 
-TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
+TEST(DigitalIoSimTest, DigitalIoInitialization) {
   const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;

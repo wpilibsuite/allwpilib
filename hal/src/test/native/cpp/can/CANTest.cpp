@@ -38,7 +38,7 @@ struct CANSendCallbackStore {
   int32_t handle;
 };
 
-TEST(HALCanTests, CanIdPackingTest) {
+TEST(CANTest, CanIdPacking) {
   int32_t status = 0;
   int32_t deviceId = 12;
   CANTestStore testStore(deviceId, &status);

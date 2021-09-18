@@ -19,7 +19,7 @@ void TestPwmInitializationCallback(const char* name, void* param,
   gTestPwmCallbackValue = *value;
 }
 
-TEST(PWMSimTests, TestPwmInitialization) {
+TEST(PWMSimTest, PwmInitialization) {
   const int INDEX_TO_TEST = 7;
 
   int callbackParam = 0;

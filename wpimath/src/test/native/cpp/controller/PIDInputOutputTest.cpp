@@ -14,7 +14,7 @@ class PIDInputOutputTest : public testing::Test {
   void TearDown() override { delete controller; }
 };
 
-TEST_F(PIDInputOutputTest, ContinuousInputTest) {
+TEST_F(PIDInputOutputTest, ContinuousInput) {
   controller->SetP(1);
   controller->EnableContinuousInput(-180, 180);
   EXPECT_DOUBLE_EQ(controller->Calculate(-179, 179), -2);
@@ -23,13 +23,13 @@ TEST_F(PIDInputOutputTest, ContinuousInputTest) {
   EXPECT_DOUBLE_EQ(controller->Calculate(1, 359), -2);
 }
 
-TEST_F(PIDInputOutputTest, ProportionalGainOutputTest) {
+TEST_F(PIDInputOutputTest, ProportionalGainOutput) {
   controller->SetP(4);
 
   EXPECT_DOUBLE_EQ(-0.1, controller->Calculate(0.025, 0));
 }
 
-TEST_F(PIDInputOutputTest, IntegralGainOutputTest) {
+TEST_F(PIDInputOutputTest, IntegralGainOutput) {
   controller->SetI(4);
 
   double out = 0;
@@ -41,7 +41,7 @@ TEST_F(PIDInputOutputTest, IntegralGainOutputTest) {
   EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().to<double>(), out);
 }
 
-TEST_F(PIDInputOutputTest, DerivativeGainOutputTest) {
+TEST_F(PIDInputOutputTest, DerivativeGainOutput) {
   controller->SetD(4);
 
   controller->Calculate(0, 0);

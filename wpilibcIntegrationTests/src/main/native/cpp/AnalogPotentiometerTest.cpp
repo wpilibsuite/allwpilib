@@ -13,7 +13,7 @@
 static constexpr double kScale = 270.0;
 static constexpr double kAngle = 180.0;
 
-TEST(AnalogPotentiometerTest, TestInitialSettings) {
+TEST(AnalogPotentiometerTest, InitialSettings) {
   frc::AnalogOutput m_fakePot{TestBench::kAnalogOutputChannel};
   frc::AnalogPotentiometer m_pot{TestBench::kFakeAnalogOutputChannel, kScale};
 
@@ -23,7 +23,7 @@ TEST(AnalogPotentiometerTest, TestInitialSettings) {
       << "The potentiometer did not initialize to 0.";
 }
 
-TEST(AnalogPotentiometerTest, TestRangeValues) {
+TEST(AnalogPotentiometerTest, RangeValues) {
   frc::AnalogOutput m_fakePot{TestBench::kAnalogOutputChannel};
   frc::AnalogPotentiometer m_pot{TestBench::kFakeAnalogOutputChannel, kScale};
 

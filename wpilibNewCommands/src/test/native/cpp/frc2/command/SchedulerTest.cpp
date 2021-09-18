@@ -26,7 +26,7 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   EXPECT_EQ(counter, 3);
 }
 
-TEST_F(SchedulerTest, SchedulerLambdaInterruptTest) {
+TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   RunCommand command([] {}, {});
@@ -42,7 +42,7 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptTest) {
   EXPECT_EQ(counter, 1);
 }
 
-TEST_F(SchedulerTest, UnregisterSubsystemTest) {
+TEST_F(SchedulerTest, UnregisterSubsystem) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem system;
@@ -52,7 +52,7 @@ TEST_F(SchedulerTest, UnregisterSubsystemTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
 }
 
-TEST_F(SchedulerTest, SchedulerCancelAllTest) {
+TEST_F(SchedulerTest, SchedulerCancelAll) {
   CommandScheduler scheduler = GetScheduler();
 
   RunCommand command([] {}, {});

@@ -19,7 +19,7 @@ void TestAnalogOutInitializationCallback(const char* name, void* param,
   gTestAnalogOutCallbackValue = *value;
 }
 
-TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
+TEST(AnalogOutSimTest, AnalogOutInitialization) {
   const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;

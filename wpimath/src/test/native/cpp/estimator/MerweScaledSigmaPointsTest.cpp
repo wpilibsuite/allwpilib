@@ -8,7 +8,7 @@
 
 namespace drake::math {
 namespace {
-TEST(MerweScaledSigmaPointsTest, TestZeroMean) {
+TEST(MerweScaledSigmaPointsTest, ZeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SigmaPoints(
       Eigen::Vector<double, 2>{0.0, 0.0},
@@ -21,7 +21,7 @@ TEST(MerweScaledSigmaPointsTest, TestZeroMean) {
           .norm() < 1e-3);
 }
 
-TEST(MerweScaledSigmaPointsTest, TestNonzeroMean) {
+TEST(MerweScaledSigmaPointsTest, NonzeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SigmaPoints(
       Eigen::Vector<double, 2>{1.0, 2.0},

@@ -50,7 +50,7 @@ TEST(DriverStationTest, AutonomousMode) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(DriverStationTest, TestMode) {
+TEST(DriverStationTest, Mode) {
   HAL_Initialize(500, 0);
   DriverStationSim::ResetData();
 

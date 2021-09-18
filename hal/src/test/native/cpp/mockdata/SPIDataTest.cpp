@@ -19,7 +19,7 @@ void TestSpiInitializationCallback(const char* name, void* param,
   gTestSpiCallbackValue = *value;
 }
 
-TEST(SpiSimTests, TestSpiInitialization) {
+TEST(SpiSimTest, SpiInitialization) {
   const int INDEX_TO_TEST = 2;
 
   int32_t status = 0;

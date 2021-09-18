@@ -12,7 +12,7 @@
 using namespace frc2;
 class ProxyScheduleCommandTest : public CommandTestBase {};
 
-TEST_F(ProxyScheduleCommandTest, ProxyScheduleCommandScheduleTest) {
+TEST_F(ProxyScheduleCommandTest, ProxyScheduleCommandSchedule) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
@@ -27,7 +27,7 @@ TEST_F(ProxyScheduleCommandTest, ProxyScheduleCommandScheduleTest) {
   EXPECT_TRUE(scheduled);
 }
 
-TEST_F(ProxyScheduleCommandTest, ProxyScheduleCommandEndTest) {
+TEST_F(ProxyScheduleCommandTest, ProxyScheduleCommandEnd) {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool finished = false;
