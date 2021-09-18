@@ -19,7 +19,7 @@ void TestSolenoidInitializationCallback(const char* name, void* param,
   gTestSolenoidCallbackValue = *value;
 }
 
-TEST(SolenoidSimTests, TestPCMInitialization) {
+TEST(PCMDataTest, PCMInitialization) {
   const int MODULE_TO_TEST = 2;
 
   int callbackParam = 0;

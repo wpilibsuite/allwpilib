@@ -6,7 +6,7 @@
 #include "hal/HAL.h"
 
 namespace hal {
-TEST(HALTests, RuntimeType) {
+TEST(HALTest, RuntimeType) {
   EXPECT_EQ(HAL_RuntimeType::HAL_Runtime_Simulation, HAL_GetRuntimeType());
 }
 }  // namespace hal

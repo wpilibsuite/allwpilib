@@ -9,7 +9,7 @@
 #include "frc/Timer.h"
 #include "gtest/gtest.h"
 
-TEST(NotifierTest, TestStartPeriodicAndStop) {
+TEST(NotifierTest, StartPeriodicAndStop) {
   uint32_t counter = 0;
 
   frc::Notifier notifier{[&] { ++counter; }};
@@ -29,7 +29,7 @@ TEST(NotifierTest, TestStartPeriodicAndStop) {
   fmt::print("Received {} notifications in 3 seconds\n", counter - 10);
 }
 
-TEST(NotifierTest, TestStartSingle) {
+TEST(NotifierTest, StartSingle) {
   uint32_t counter = 0;
 
   frc::Notifier notifier{[&] { ++counter; }};

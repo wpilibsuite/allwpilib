@@ -13,7 +13,7 @@ using namespace hlt;
 
 class DIOTest : public ::testing::TestWithParam<std::pair<int, int>> {};
 
-TEST_P(DIOTest, TestDIOCross) {
+TEST_P(DIOTest, DIOCross) {
   auto param = GetParam();
   int32_t status = 0;
   DIOHandle first{param.first, false, &status};
@@ -53,7 +53,7 @@ TEST_P(DIOTest, TestDIOCross) {
   ASSERT_EQ(0, status);
 }
 
-TEST(DIOTest, TestAllocateAll) {
+TEST(DIOTest, AllocateAll) {
   wpi::SmallVector<DIOHandle, 32> dioHandles;
   for (int i = 0; i < HAL_GetNumDigitalChannels(); i++) {
     int32_t status = 0;
@@ -62,7 +62,7 @@ TEST(DIOTest, TestAllocateAll) {
   }
 }
 
-TEST(DIOTest, TestMultipleAllocateFails) {
+TEST(DIOTest, MultipleAllocateFails) {
   int32_t status = 0;
   DIOHandle handle(0, true, &status);
   ASSERT_NE(handle, HAL_kInvalidHandle);
@@ -73,21 +73,21 @@ TEST(DIOTest, TestMultipleAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-TEST(DIOTest, TestOverAllocateFails) {
+TEST(DIOTest, OverAllocateFails) {
   int32_t status = 0;
   DIOHandle handle(HAL_GetNumDigitalChannels(), true, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(DIOTest, TestUnderAllocateFails) {
+TEST(DIOTest, UnderAllocateFails) {
   int32_t status = 0;
   DIOHandle handle(-1, true, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(DIOTest, TestCrossAllocationFails) {
+TEST(DIOTest, CrossAllocationFails) {
   int32_t status = 0;
   PWMHandle pwmHandle(10, &status);
   ASSERT_NE(pwmHandle, HAL_kInvalidHandle);

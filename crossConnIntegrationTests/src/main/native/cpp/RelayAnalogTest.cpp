@@ -14,7 +14,7 @@ using namespace hlt;
 
 class RelayAnalogTest : public ::testing::TestWithParam<std::pair<int, int>> {};
 
-TEST_P(RelayAnalogTest, TestRelayAnalogCross) {
+TEST_P(RelayAnalogTest, RelayAnalogCross) {
   auto param = GetParam();
 
   int32_t status = 0;

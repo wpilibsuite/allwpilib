@@ -22,7 +22,7 @@ class ProfiledPIDInputOutputTest : public testing::Test {
   void TearDown() override { delete controller; }
 };
 
-TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest1) {
+TEST_F(ProfiledPIDInputOutputTest, ContinuousInput1) {
   controller->SetP(1);
   controller->EnableContinuousInput(-180_deg, 180_deg);
 
@@ -38,7 +38,7 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest1) {
             180_deg);
 }
 
-TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest2) {
+TEST_F(ProfiledPIDInputOutputTest, ContinuousInput2) {
   controller->SetP(1);
   controller->EnableContinuousInput(-units::radian_t{wpi::numbers::pi},
                                     units::radian_t{wpi::numbers::pi});
@@ -55,7 +55,7 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest2) {
             units::radian_t{wpi::numbers::pi});
 }
 
-TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest3) {
+TEST_F(ProfiledPIDInputOutputTest, ContinuousInput3) {
   controller->SetP(1);
   controller->EnableContinuousInput(-units::radian_t{wpi::numbers::pi},
                                     units::radian_t{wpi::numbers::pi});
@@ -72,7 +72,7 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest3) {
             units::radian_t{wpi::numbers::pi});
 }
 
-TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest4) {
+TEST_F(ProfiledPIDInputOutputTest, ContinuousInput4) {
   controller->SetP(1);
   controller->EnableContinuousInput(0_rad,
                                     units::radian_t{2.0 * wpi::numbers::pi});
@@ -89,13 +89,13 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInputTest4) {
             units::radian_t{wpi::numbers::pi});
 }
 
-TEST_F(ProfiledPIDInputOutputTest, ProportionalGainOutputTest) {
+TEST_F(ProfiledPIDInputOutputTest, ProportionalGainOutput) {
   controller->SetP(4);
 
   EXPECT_DOUBLE_EQ(-0.1, controller->Calculate(0.025_deg, 0_deg));
 }
 
-TEST_F(ProfiledPIDInputOutputTest, IntegralGainOutputTest) {
+TEST_F(ProfiledPIDInputOutputTest, IntegralGainOutput) {
   controller->SetI(4);
 
   double out = 0;
@@ -107,7 +107,7 @@ TEST_F(ProfiledPIDInputOutputTest, IntegralGainOutputTest) {
   EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().to<double>(), out);
 }
 
-TEST_F(ProfiledPIDInputOutputTest, DerivativeGainOutputTest) {
+TEST_F(ProfiledPIDInputOutputTest, DerivativeGainOutput) {
   controller->SetD(4);
 
   controller->Calculate(0_deg, 0_deg);

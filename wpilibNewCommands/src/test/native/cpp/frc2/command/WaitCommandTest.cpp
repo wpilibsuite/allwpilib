@@ -11,7 +11,7 @@
 using namespace frc2;
 class WaitCommandTest : public CommandTestBase {};
 
-TEST_F(WaitCommandTest, WaitCommandScheduleTest) {
+TEST_F(WaitCommandTest, WaitCommandSchedule) {
   frc::sim::PauseTiming();
 
   CommandScheduler scheduler = GetScheduler();

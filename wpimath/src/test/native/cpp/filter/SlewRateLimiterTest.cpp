@@ -12,7 +12,7 @@
 
 static units::second_t now = 0_s;
 
-TEST(SlewRateLimiterTest, SlewRateLimitTest) {
+TEST(SlewRateLimiterTest, SlewRateLimit) {
   WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
 
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
@@ -22,7 +22,7 @@ TEST(SlewRateLimiterTest, SlewRateLimitTest) {
   EXPECT_LT(limiter.Calculate(2_m), 2_m);
 }
 
-TEST(SlewRateLimiterTest, SlewRateNoLimitTest) {
+TEST(SlewRateLimiterTest, SlewRateNoLimit) {
   WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
 
   frc::SlewRateLimiter<units::meters> limiter(1_mps);

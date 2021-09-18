@@ -43,7 +43,7 @@ TEST_F(MecanumDriveOdometryTest, TwoIterations) {
   EXPECT_NEAR(pose.Rotation().Radians().to<double>(), 0.0, 0.01);
 }
 
-TEST_F(MecanumDriveOdometryTest, Test90DegreeTurn) {
+TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
   odometry.ResetPosition(Pose2d(), 0_rad);
   MecanumDriveWheelSpeeds speeds{-13.328_mps, 39.986_mps, -13.329_mps,
                                  39.986_mps};

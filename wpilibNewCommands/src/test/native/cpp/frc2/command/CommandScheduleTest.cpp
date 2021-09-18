@@ -7,7 +7,7 @@
 using namespace frc2;
 class CommandScheduleTest : public CommandTestBase {};
 
-TEST_F(CommandScheduleTest, InstantScheduleTest) {
+TEST_F(CommandScheduleTest, InstantSchedule) {
   CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
@@ -22,7 +22,7 @@ TEST_F(CommandScheduleTest, InstantScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
+TEST_F(CommandScheduleTest, SingleIterationSchedule) {
   CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
@@ -38,7 +38,7 @@ TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandScheduleTest, MultiScheduleTest) {
+TEST_F(CommandScheduleTest, MultiSchedule) {
   CommandScheduler scheduler = GetScheduler();
   MockCommand command1;
   MockCommand command2;
@@ -75,7 +75,7 @@ TEST_F(CommandScheduleTest, MultiScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled({&command1, &command2, &command3}));
 }
 
-TEST_F(CommandScheduleTest, SchedulerCancelTest) {
+TEST_F(CommandScheduleTest, SchedulerCancel) {
   CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 
@@ -92,7 +92,7 @@ TEST_F(CommandScheduleTest, SchedulerCancelTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(CommandScheduleTest, NotScheduledCancelTest) {
+TEST_F(CommandScheduleTest, NotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
   MockCommand command;
 

@@ -27,7 +27,7 @@
 
 using namespace frc::sim;
 
-TEST(SimInitializationTests, TestAllInitialize) {
+TEST(SimInitializationTest, AllInitialize) {
   HAL_Initialize(500, 0);
   BuiltInAccelerometerSim biacsim;
   AnalogGyroSim agsim{0};

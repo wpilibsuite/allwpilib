@@ -19,7 +19,7 @@ void TestAnalogInInitializationCallback(const char* name, void* param,
   gTestAnalogInCallbackValue = *value;
 }
 
-TEST(AnalogInSimTests, TestAnalogInInitialization) {
+TEST(AnalogInSimTest, AnalogInInitialization) {
   const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;

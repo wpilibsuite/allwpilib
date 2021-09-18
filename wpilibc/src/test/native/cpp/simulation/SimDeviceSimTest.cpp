@@ -11,7 +11,7 @@
 
 using namespace frc::sim;
 
-TEST(SimDeviceSimTests, TestBasic) {
+TEST(SimDeviceSimTest, Basic) {
   hal::SimDevice dev{"test"};
   hal::SimBoolean devBool = dev.CreateBoolean("bool", false, false);
 
@@ -22,7 +22,7 @@ TEST(SimDeviceSimTests, TestBasic) {
   EXPECT_TRUE(devBool.Get());
 }
 
-TEST(SimDeviceSimTests, TestEnumerateDevices) {
+TEST(SimDeviceSimTest, EnumerateDevices) {
   hal::SimDevice dev{"test"};
 
   bool foundit = false;

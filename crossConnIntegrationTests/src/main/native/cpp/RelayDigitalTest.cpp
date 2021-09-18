@@ -13,7 +13,7 @@ using namespace hlt;
 
 class RelayDigitalTest : public ::testing::TestWithParam<RelayCross> {};
 
-TEST_P(RelayDigitalTest, TestRelayCross) {
+TEST_P(RelayDigitalTest, RelayCross) {
   auto param = GetParam();
   int32_t status = 0;
   RelayHandle fwd{param.Relay, true, &status};
@@ -66,7 +66,7 @@ TEST_P(RelayDigitalTest, TestRelayCross) {
   ASSERT_EQ(0, status);
 }
 
-TEST(RelayDigitalTest, TestAllocateAll) {
+TEST(RelayDigitalTest, AllocateAll) {
   wpi::SmallVector<RelayHandle, 32> relayHandles;
   for (int i = 0; i < HAL_GetNumRelayChannels(); i++) {
     int32_t status = 0;
@@ -75,7 +75,7 @@ TEST(RelayDigitalTest, TestAllocateAll) {
   }
 }
 
-TEST(RelayDigitalTest, TestMultipleAllocateFails) {
+TEST(RelayDigitalTest, MultipleAllocateFails) {
   int32_t status = 0;
   RelayHandle handle(0, true, &status);
   ASSERT_NE(handle, HAL_kInvalidHandle);
@@ -86,14 +86,14 @@ TEST(RelayDigitalTest, TestMultipleAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-TEST(RelayDigitalTest, TestOverAllocateFails) {
+TEST(RelayDigitalTest, OverAllocateFails) {
   int32_t status = 0;
   RelayHandle handle(HAL_GetNumRelayChannels(), true, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-TEST(RelayDigitalTest, TestUnderAllocateFails) {
+TEST(RelayDigitalTest, UnderAllocateFails) {
   int32_t status = 0;
   RelayHandle handle(-1, true, &status);
   ASSERT_EQ(handle, HAL_kInvalidHandle);

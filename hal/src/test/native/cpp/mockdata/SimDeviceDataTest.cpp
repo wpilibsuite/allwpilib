@@ -8,7 +8,7 @@
 
 namespace hal {
 
-TEST(SimDeviceSimTests, TestEnabled) {
+TEST(SimDeviceSimTest, Enabled) {
   ASSERT_TRUE(HALSIM_IsSimDeviceEnabled("foo"));
   HALSIM_SetSimDeviceEnabled("f", false);
   HALSIM_SetSimDeviceEnabled("foob", true);

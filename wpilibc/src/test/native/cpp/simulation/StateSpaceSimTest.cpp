@@ -24,7 +24,7 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
 
-TEST(StateSpaceSimTest, TestFlywheelSim) {
+TEST(StateSpaceSimTest, FlywheelSim) {
   const frc::LinearSystem<1, 1, 1> plant =
       frc::LinearSystemId::IdentifyVelocitySystem<units::radian>(
           0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq);

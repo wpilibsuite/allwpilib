@@ -9,7 +9,7 @@
 #include "Eigen/Core"
 #include "frc/estimator/AngleStatistics.h"
 
-TEST(AngleStatisticsTest, TestMean) {
+TEST(AngleStatisticsTest, Mean) {
   Eigen::Matrix<double, 3, 3> sigmas{
       {1, 1.2, 0},
       {359 * wpi::numbers::pi / 180, 3 * wpi::numbers::pi / 180, 0},
@@ -22,7 +22,7 @@ TEST(AngleStatisticsTest, TestMean) {
                   .isApprox(frc::AngleMean<3, 1>(sigmas, weights, 1), 1e-3));
 }
 
-TEST(AngleStatisticsTest, TestResidual) {
+TEST(AngleStatisticsTest, Residual) {
   Eigen::Vector3d a{1, 1 * wpi::numbers::pi / 180, 2};
   Eigen::Vector3d b{1, 359 * wpi::numbers::pi / 180, 1};
 
@@ -30,7 +30,7 @@ TEST(AngleStatisticsTest, TestResidual) {
       Eigen::Vector3d{0, 2 * wpi::numbers::pi / 180, 1}));
 }
 
-TEST(AngleStatisticsTest, TestAdd) {
+TEST(AngleStatisticsTest, Add) {
   Eigen::Vector3d a{1, 1 * wpi::numbers::pi / 180, 2};
   Eigen::Vector3d b{1, 359 * wpi::numbers::pi / 180, 1};
 

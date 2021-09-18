@@ -64,14 +64,14 @@ class FakeEncoderTest : public testing::Test {
 /**
  * Test the encoder by reseting it to 0 and reading the value.
  */
-TEST_F(FakeEncoderTest, TestDefaultState) {
+TEST_F(FakeEncoderTest, DefaultState) {
   EXPECT_DOUBLE_EQ(0.0, m_encoder.Get()) << "The encoder did not start at 0.";
 }
 
 /**
  * Test the encoder by setting the digital outputs and reading the value.
  */
-TEST_F(FakeEncoderTest, TestCountUp) {
+TEST_F(FakeEncoderTest, CountUp) {
   m_encoder.Reset();
   Simulate100QuadratureTicks();
 
@@ -81,7 +81,7 @@ TEST_F(FakeEncoderTest, TestCountUp) {
 /**
  * Test that the encoder can stay reset while the index source is high
  */
-TEST_F(FakeEncoderTest, TestResetWhileHigh) {
+TEST_F(FakeEncoderTest, ResetWhileHigh) {
   m_encoder.SetIndexSource(*m_indexAnalogTriggerOutput,
                            frc::Encoder::IndexingType::kResetWhileHigh);
 
@@ -97,7 +97,7 @@ TEST_F(FakeEncoderTest, TestResetWhileHigh) {
 /**
  * Test that the encoder can reset when the index source goes from low to high
  */
-TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
+TEST_F(FakeEncoderTest, ResetOnRisingEdge) {
   m_encoder.SetIndexSource(*m_indexAnalogTriggerOutput,
                            frc::Encoder::IndexingType::kResetOnRisingEdge);
 
@@ -113,7 +113,7 @@ TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
 /**
  * Test that the encoder can stay reset while the index source is low
  */
-TEST_F(FakeEncoderTest, TestResetWhileLow) {
+TEST_F(FakeEncoderTest, ResetWhileLow) {
   m_encoder.SetIndexSource(*m_indexAnalogTriggerOutput,
                            frc::Encoder::IndexingType::kResetWhileLow);
 
@@ -129,7 +129,7 @@ TEST_F(FakeEncoderTest, TestResetWhileLow) {
 /**
  * Test that the encoder can reset when the index source goes from high to low
  */
-TEST_F(FakeEncoderTest, TestResetOnFallingEdge) {
+TEST_F(FakeEncoderTest, ResetOnFallingEdge) {
   m_encoder.SetIndexSource(*m_indexAnalogTriggerOutput,
                            frc::Encoder::IndexingType::kResetOnFallingEdge);
 
