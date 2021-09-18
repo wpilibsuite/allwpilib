@@ -701,7 +701,8 @@
       "Digital",
       "Sensors",
       "Simulation",
-      "Physics"
+      "Physics",
+      "Mechanism2d"
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
