@@ -6,15 +6,15 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -30,7 +30,6 @@ import java.util.function.Supplier;
  * functionality of a "smart" motor controller) may use the secondary constructor that omits the PID
  * and feedforward functionality, returning only the raw wheel speeds from the RAMSETE controller.
  */
-@SuppressWarnings("PMD.TooManyFields")
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
   private final boolean m_usePID;
@@ -68,7 +67,6 @@ public class RamseteCommand extends CommandBase {
    *     the robot drive.
    * @param requirements The subsystems to require.
    */
-  @SuppressWarnings("PMD.ExcessiveParameterList")
   public RamseteCommand(
       Trajectory trajectory,
       Supplier<Pose2d> pose,
@@ -200,6 +198,10 @@ public class RamseteCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_timer.stop();
+
+    if (interrupted) {
+      m_output.accept(0.0, 0.0);
+    }
   }
 
   @Override

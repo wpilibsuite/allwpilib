@@ -6,6 +6,8 @@
 
 #include <jni.h>
 
+#include <cstdio>
+
 #include <wpi/jni_util.h>
 
 #include "SimulatorJNI.h"
@@ -45,18 +47,38 @@ void CallbackStore::performCallback(const char* name, const HAL_Value* value) {
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
+  }
+
+  int64_t longValue = 0;
+
+  switch (value->type) {
+    case HAL_BOOLEAN:
+      longValue = value->data.v_boolean;
+      break;
+    case HAL_ENUM:
+      longValue = value->data.v_enum;
+      break;
+    case HAL_INT:
+      longValue = value->data.v_int;
+      break;
+    case HAL_LONG:
+      longValue = value->data.v_long;
+      break;
+    case HAL_DOUBLE:
+    case HAL_UNASSIGNED:
+      break;
   }
 
   env->CallVoidMethod(m_call, sim::GetNotifyCallback(), MakeJString(env, name),
                       static_cast<jint>(value->type),
-                      static_cast<jlong>(value->data.v_long),
+                      static_cast<jlong>(longValue),
                       static_cast<jdouble>(value->data.v_double));
 
   if (env->ExceptionCheck()) {

@@ -5,10 +5,10 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
 
 #include "frc/buttons/Button.h"
 
@@ -16,9 +16,9 @@ namespace frc {
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
+  NetworkButton(std::string_view tableName, std::string_view field);
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                const wpi::Twine& field);
+                std::string_view field);
   ~NetworkButton() override = default;
 
   NetworkButton(NetworkButton&&) = default;

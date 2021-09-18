@@ -9,25 +9,29 @@
 using namespace frc;
 
 bool RobotState::IsDisabled() {
-  return DriverStation::GetInstance().IsDisabled();
+  return DriverStation::IsDisabled();
 }
 
 bool RobotState::IsEnabled() {
-  return DriverStation::GetInstance().IsEnabled();
+  return DriverStation::IsEnabled();
 }
 
 bool RobotState::IsEStopped() {
-  return DriverStation::GetInstance().IsEStopped();
+  return DriverStation::IsEStopped();
 }
 
 bool RobotState::IsOperatorControl() {
-  return DriverStation::GetInstance().IsOperatorControl();
+  return IsTeleop();
+}
+
+bool RobotState::IsTeleop() {
+  return DriverStation::IsTeleop();
 }
 
 bool RobotState::IsAutonomous() {
-  return DriverStation::GetInstance().IsAutonomous();
+  return DriverStation::IsAutonomous();
 }
 
 bool RobotState::IsTest() {
-  return DriverStation::GetInstance().IsTest();
+  return DriverStation::IsTest();
 }

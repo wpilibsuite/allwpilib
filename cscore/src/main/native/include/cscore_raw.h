@@ -14,7 +14,7 @@
 /**
  * Raw Frame
  */
-typedef struct CS_RawFrame {
+typedef struct CS_RawFrame {  // NOLINT
   char* data;
   int dataLength;
   int pixelFormat;
@@ -78,11 +78,11 @@ struct RawFrame : public CS_RawFrame {
  * @{
  */
 
-CS_Source CreateRawSource(const wpi::Twine& name, const VideoMode& mode,
+CS_Source CreateRawSource(std::string_view name, const VideoMode& mode,
                           CS_Status* status);
 
-CS_Sink CreateRawSink(const wpi::Twine& name, CS_Status* status);
-CS_Sink CreateRawSinkCallback(const wpi::Twine& name,
+CS_Sink CreateRawSink(std::string_view name, CS_Status* status);
+CS_Sink CreateRawSinkCallback(std::string_view name,
                               std::function<void(uint64_t time)> processFrame,
                               CS_Status* status);
 
@@ -107,7 +107,7 @@ class RawSource : public ImageSource {
    * @param name Source name (arbitrary unique identifier)
    * @param mode Video mode being generated
    */
-  RawSource(const wpi::Twine& name, const VideoMode& mode);
+  RawSource(std::string_view name, const VideoMode& mode);
 
   /**
    * Create a raw frame source.
@@ -118,7 +118,7 @@ class RawSource : public ImageSource {
    * @param height height
    * @param fps fps
    */
-  RawSource(const wpi::Twine& name, VideoMode::PixelFormat pixelFormat,
+  RawSource(std::string_view name, VideoMode::PixelFormat pixelFormat,
             int width, int height, int fps);
 
  protected:
@@ -147,7 +147,7 @@ class RawSink : public ImageSink {
    *
    * @param name Source name (arbitrary unique identifier)
    */
-  explicit RawSink(const wpi::Twine& name);
+  explicit RawSink(std::string_view name);
 
   /**
    * Create a sink for accepting raws images in a separate thread.
@@ -161,7 +161,7 @@ class RawSink : public ImageSink {
    *        or GetError() as needed, but should not call (except in very
    *        unusual circumstances) WaitForImage().
    */
-  RawSink(const wpi::Twine& name,
+  RawSink(std::string_view name,
           std::function<void(uint64_t time)> processFrame);
 
  protected:
@@ -174,7 +174,8 @@ class RawSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  uint64_t GrabFrame(RawFrame& image, double timeout = 0.225) const;
+  [[nodiscard]] uint64_t GrabFrame(RawFrame& image,
+                                   double timeout = 0.225) const;
 
   /**
    * Wait for the next frame and get the image.  May block forever.
@@ -184,14 +185,14 @@ class RawSink : public ImageSink {
    *         message); the frame time is in the same time base as wpi::Now(),
    *         and is in 1 us increments.
    */
-  uint64_t GrabFrameNoTimeout(RawFrame& image) const;
+  [[nodiscard]] uint64_t GrabFrameNoTimeout(RawFrame& image) const;
 };
 
-inline RawSource::RawSource(const wpi::Twine& name, const VideoMode& mode) {
+inline RawSource::RawSource(std::string_view name, const VideoMode& mode) {
   m_handle = CreateRawSource(name, mode, &m_status);
 }
 
-inline RawSource::RawSource(const wpi::Twine& name,
+inline RawSource::RawSource(std::string_view name,
                             VideoMode::PixelFormat format, int width,
                             int height, int fps) {
   m_handle =
@@ -203,11 +204,11 @@ inline void RawSource::PutFrame(RawFrame& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline RawSink::RawSink(const wpi::Twine& name) {
+inline RawSink::RawSink(std::string_view name) {
   m_handle = CreateRawSink(name, &m_status);
 }
 
-inline RawSink::RawSink(const wpi::Twine& name,
+inline RawSink::RawSink(std::string_view name,
                         std::function<void(uint64_t time)> processFrame) {
   m_handle = CreateRawSinkCallback(name, processFrame, &m_status);
 }

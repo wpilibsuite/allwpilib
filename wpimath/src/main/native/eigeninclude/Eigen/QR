@@ -37,15 +37,14 @@
 #include "src/QR/CompleteOrthogonalDecomposition.h"
 #ifdef EIGEN_USE_LAPACKE
 #ifdef EIGEN_USE_MKL
-#include "mkl_lapacke.h"
+// #include "mkl_lapacke.h"
 #else
-#include "src/misc/lapacke.h"
+// #include "src/misc/lapacke.h"
 #endif
-#include "src/QR/HouseholderQR_LAPACKE.h"
-#include "src/QR/ColPivHouseholderQR_LAPACKE.h"
+// #include "src/QR/HouseholderQR_LAPACKE.h"
+// #include "src/QR/ColPivHouseholderQR_LAPACKE.h"
 #endif
 
 #include "src/Core/util/ReenableStupidWarnings.h"
 
 #endif // EIGEN_QR_MODULE_H
-/* vim: set filetype=cpp et sw=2 ts=2 ai: */

@@ -7,11 +7,9 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.AnalogJNI;
 import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.hal.DIOJNI;
-import edu.wpi.first.hal.PDPJNI;
 import edu.wpi.first.hal.PWMJNI;
 import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.RelayJNI;
-import edu.wpi.first.hal.SolenoidJNI;
 
 /**
  * Stores most recent status information as well as containing utility functions for checking
@@ -32,7 +30,7 @@ public final class SensorUtil {
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
 
   /** Number of solenoid channels per module. */
-  public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
+  public static final int kCTRESolenoidChannels = PortsJNI.getNumCTRESolenoidChannels();
 
   /** Number of PWM channels per roboRIO. */
   public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
@@ -41,29 +39,13 @@ public final class SensorUtil {
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
 
   /** Number of power distribution channels per PDP. */
-  public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
+  public static final int kCTREPDPChannels = PortsJNI.getNumCTREPDPChannels();
 
   /** Number of power distribution modules per PDP. */
-  public static final int kPDPModules = PortsJNI.getNumPDPModules();
+  public static final int kCTREPDPModules = PortsJNI.getNumCTREPDPModules();
 
   /** Number of PCM Modules. */
-  public static final int kPCMModules = PortsJNI.getNumPCMModules();
-
-  /**
-   * Verify that the solenoid module is correct.
-   *
-   * @param moduleNumber The solenoid module module number to check.
-   */
-  public static void checkSolenoidModule(final int moduleNumber) {
-    if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
-          .append(kPCMModules)
-          .append(", Requested: ")
-          .append(moduleNumber);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
+  public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
@@ -151,60 +133,12 @@ public final class SensorUtil {
   }
 
   /**
-   * Verify that the solenoid channel number is within limits. Channel numbers are 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkSolenoidChannel(final int channel) {
-    if (!SolenoidJNI.checkSolenoidChannel(channel)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
-          .append(kSolenoidChannels)
-          .append(", Requested: ")
-          .append(channel);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
-
-  /**
-   * Verify that the power distribution channel number is within limits. Channel numbers are
-   * 0-based.
-   *
-   * @param channel The channel number to check.
-   */
-  public static void checkPDPChannel(final int channel) {
-    if (!PDPJNI.checkPDPChannel(channel)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP channel is out of range. Minimum: 0, Maximum: ")
-          .append(kPDPChannels)
-          .append(", Requested: ")
-          .append(channel);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
-
-  /**
-   * Verify that the PDP module number is within limits. module numbers are 0-based.
-   *
-   * @param module The module number to check.
-   */
-  public static void checkPDPModule(final int module) {
-    if (!PDPJNI.checkPDPModule(module)) {
-      StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP module is out of range. Minimum: 0, Maximum: ")
-          .append(kPDPModules)
-          .append(", Requested: ")
-          .append(module);
-      throw new IllegalArgumentException(buf.toString());
-    }
-  }
-
-  /**
    * Get the number of the default solenoid module.
    *
    * @return The number of the default solenoid module.
    */
-  public static int getDefaultSolenoidModule() {
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static int getDefaultCTREPCMModule() {
     return 0;
   }
 

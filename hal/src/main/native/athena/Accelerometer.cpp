@@ -89,7 +89,7 @@ static uint8_t readRegister(Register reg);
  */
 static void initializeAccelerometer() {
   hal::init::CheckInit();
-  int32_t status;
+  int32_t status = 0;
 
   if (!accel) {
     accel.reset(tAccel::create(&status));

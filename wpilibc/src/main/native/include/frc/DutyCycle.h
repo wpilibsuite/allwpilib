@@ -7,10 +7,8 @@
 #include <memory>
 
 #include <hal/Types.h>
-
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 class DigitalSource;
@@ -29,9 +27,7 @@ class DMASample;
  * order to implement rollover checking.
  *
  */
-class DutyCycle : public ErrorBase,
-                  public Sendable,
-                  public SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::Sendable, public wpi::SendableHelper<DutyCycle> {
   friend class AnalogTrigger;
   friend class DMA;
   friend class DMASample;
@@ -122,7 +118,7 @@ class DutyCycle : public ErrorBase,
   int GetSourceChannel() const;
 
  protected:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   void InitDutyCycle();

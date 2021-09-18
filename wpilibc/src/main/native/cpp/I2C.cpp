@@ -9,7 +9,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/I2C.h>
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -17,7 +17,7 @@ I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
-  // wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "Port {}", port);
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
 }
@@ -26,12 +26,19 @@ I2C::~I2C() {
   HAL_CloseI2C(m_port);
 }
 
+I2C::Port I2C::GetPort() const {
+  return static_cast<Port>(static_cast<int>(m_port));
+}
+
+int I2C::GetDeviceAddress() const {
+  return m_deviceAddress;
+}
+
 bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
                       int receiveSize) {
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
-  // wpi_setHALError(status);
   return status < 0;
 }
 
@@ -56,12 +63,10 @@ bool I2C::WriteBulk(uint8_t* data, int count) {
 
 bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
   if (count < 1) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
-    return true;
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
-  if (buffer == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "buffer");
-    return true;
+  if (!buffer) {
+    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
   }
   uint8_t regAddr = registerAddress;
   return Transaction(&regAddr, sizeof(regAddr), buffer, count);
@@ -69,12 +74,10 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
 
 bool I2C::ReadOnly(int count, uint8_t* buffer) {
   if (count < 1) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
-    return true;
+    throw FRC_MakeError(err::ParameterOutOfRange, "count {}", count);
   }
-  if (buffer == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "buffer");
-    return true;
+  if (!buffer) {
+    throw FRC_MakeError(err::NullParameter, "{}", "buffer");
   }
   return HAL_ReadI2C(m_port, m_deviceAddress, buffer, count) < 0;
 }

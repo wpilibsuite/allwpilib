@@ -5,6 +5,7 @@
 #pragma once
 
 #include <wpi/MathExtras.h>
+#include <wpi/SymbolExports.h>
 
 #include "units/angle.h"
 #include "units/angular_velocity.h"
@@ -16,7 +17,7 @@ namespace frc {
  * A helper class that computes feedforward outputs for a simple arm (modeled as
  * a motor acting against the force of gravity on a beam suspended at an angle).
  */
-class ArmFeedforward {
+class WPILIB_DLLEXPORT ArmFeedforward {
  public:
   using Angle = units::radians;
   using Velocity = units::radians_per_second;

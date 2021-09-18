@@ -19,6 +19,21 @@
 
 using namespace wpi;
 
+/// HashString - Hash function for strings.
+///
+/// This is the Bernstein hash function.
+//
+// FIXME: Investigate whether a modified bernstein hash function performs
+// better: http://eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
+//   X*33+c -> X*33^c
+static inline unsigned HashString(std::string_view str,
+                                  unsigned result = 0) noexcept {
+  for (std::string_view::size_type i = 0, e = str.size(); i != e; ++i) {
+    result = result * 33 + static_cast<unsigned char>(str[i]);
+  }
+  return result;
+}
+
 /// Returns the number of buckets to allocate to ensure that the DenseMap can
 /// accommodate \p NumEntries without need to grow().
 static unsigned getMinBucketToReserveForEntries(unsigned NumEntries) {
@@ -74,7 +89,7 @@ void StringMapImpl::init(unsigned InitSize) {
 /// specified bucket will be non-null.  Otherwise, it will be null.  In either
 /// case, the FullHashValue field of the bucket will be set to the hash value
 /// of the string.
-unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
+unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
   unsigned HTSize = NumBuckets;
   if (HTSize == 0) {  // Hash table unallocated so far?
     init(16);
@@ -113,7 +128,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
       // Do the comparison like this because Name isn't necessarily
       // null-terminated!
       char *ItemStr = (char*)BucketItem+ItemSize;
-      if (Name == StringRef(ItemStr, BucketItem->getKeyLength())) {
+      if (Name == std::string_view(ItemStr, BucketItem->getKeyLength())) {
         // We found a match!
         return BucketNo;
       }
@@ -131,7 +146,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
 /// FindKey - Look up the bucket that contains the specified key. If it exists
 /// in the map, return the bucket number of the key.  Otherwise return -1.
 /// This does not modify the map.
-int StringMapImpl::FindKey(StringRef Key) const {
+int StringMapImpl::FindKey(std::string_view Key) const {
   unsigned HTSize = NumBuckets;
   if (HTSize == 0) return -1;  // Really empty table?
   unsigned FullHashValue = HashString(Key);
@@ -156,7 +171,7 @@ int StringMapImpl::FindKey(StringRef Key) const {
       // Do the comparison like this because NameStart isn't necessarily
       // null-terminated!
       char *ItemStr = (char*)BucketItem+ItemSize;
-      if (Key == StringRef(ItemStr, BucketItem->getKeyLength())) {
+      if (Key == std::string_view(ItemStr, BucketItem->getKeyLength())) {
         // We found a match!
         return BucketNo;
       }
@@ -175,14 +190,14 @@ int StringMapImpl::FindKey(StringRef Key) const {
 /// delete it.  This aborts if the value isn't in the table.
 void StringMapImpl::RemoveKey(StringMapEntryBase *V) {
   const char *VStr = (char*)V + ItemSize;
-  StringMapEntryBase *V2 = RemoveKey(StringRef(VStr, V->getKeyLength()));
+  StringMapEntryBase *V2 = RemoveKey(std::string_view(VStr, V->getKeyLength()));
   (void)V2;
   assert(V == V2 && "Didn't find key?");
 }
 
 /// RemoveKey - Remove the StringMapEntry for the specified key from the
 /// table, returning it.  If the key is not in the table, this returns null.
-StringMapEntryBase *StringMapImpl::RemoveKey(StringRef Key) {
+StringMapEntryBase *StringMapImpl::RemoveKey(std::string_view Key) {
   int Bucket = FindKey(Key);
   if (Bucket == -1) return nullptr;
 

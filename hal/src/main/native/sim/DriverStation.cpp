@@ -13,9 +13,9 @@
 #include <cstring>
 #include <string>
 
+#include <fmt/format.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "HALInitializer.h"
 #include "hal/cpp/fpga_clock.h"
@@ -83,14 +83,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
     printMsg = true;
     if (printMsg) {
+      fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
-        std::fprintf(stderr, "%s at %s: ", isError ? "Error" : "Warning",
-                     location);
+        fmt::format_to(fmt::appender{buf},
+                       "{} at {}: ", isError ? "Error" : "Warning", location);
       }
-      std::fprintf(stderr, "%s\n", details);
+      fmt::format_to(fmt::appender{buf}, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        std::fprintf(stderr, "%s\n", callStack);
+        fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
+      std::fwrite(buf.data(), buf.size(), 1, stderr);
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -114,8 +116,8 @@ int32_t HAL_SendConsoleLine(const char* line) {
   if (handler) {
     return handler(line);
   }
-  wpi::outs() << line << "\n";
-  wpi::outs().flush();
+  std::puts(line);
+  std::fflush(stdout);
   return 0;
 }
 

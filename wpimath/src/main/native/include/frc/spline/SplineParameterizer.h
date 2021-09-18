@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-#include <wpi/Twine.h>
+#include <wpi/SymbolExports.h>
 
 #include "frc/spline/Spline.h"
 #include "units/angle.h"
@@ -46,7 +46,7 @@ namespace frc {
 /**
  * Class used to parameterize a spline by its arc length.
  */
-class SplineParameterizer {
+class WPILIB_DLLEXPORT SplineParameterizer {
  public:
   using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
 

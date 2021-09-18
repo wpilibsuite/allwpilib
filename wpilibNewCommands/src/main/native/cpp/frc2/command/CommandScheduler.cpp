@@ -4,19 +4,19 @@
 
 #include "frc2/command/CommandScheduler.h"
 
+#include <cstdio>
+
 #include <frc/RobotBase.h>
 #include <frc/RobotState.h>
 #include <frc/TimedRobot.h>
-#include <frc/WPIErrors.h>
 #include <frc/livewindow/LiveWindow.h>
-#include <frc/smartdashboard/SendableBuilder.h>
-#include <frc/smartdashboard/SendableRegistry.h>
 #include <hal/FRCUsageReporting.h>
 #include <hal/HALBase.h>
+#include <networktables/NTSendableBuilder.h>
 #include <networktables/NetworkTableEntry.h>
 #include <wpi/DenseMap.h>
 #include <wpi/SmallVector.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandState.h"
@@ -66,24 +66,22 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 
 CommandScheduler::CommandScheduler()
     : m_impl(new Impl), m_watchdog(frc::TimedRobot::kDefaultPeriod, [] {
-        wpi::outs() << "CommandScheduler loop time overrun.\n";
+        std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand2_Scheduler);
-  frc::SendableRegistry::GetInstance().AddLW(this, "Scheduler");
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = [this] {
+  wpi::SendableRegistry::AddLW(this, "Scheduler");
+  frc::LiveWindow::SetEnabledCallback([this] {
     this->Disable();
     this->CancelAll();
-  };
-  scheduler->disabled = [this] { this->Enable(); };
+  });
+  frc::LiveWindow::SetDisabledCallback([this] { this->Enable(); });
 }
 
 CommandScheduler::~CommandScheduler() {
-  frc::SendableRegistry::GetInstance().Remove(this);
-  auto scheduler = frc::LiveWindow::GetInstance();
-  scheduler->enabled = nullptr;
-  scheduler->disabled = nullptr;
+  wpi::SendableRegistry::Remove(this);
+  frc::LiveWindow::SetEnabledCallback(nullptr);
+  frc::LiveWindow::SetDisabledCallback(nullptr);
 
   std::unique_ptr<Impl>().swap(m_impl);
 }
@@ -112,9 +110,9 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   }
 
   if (command->IsGrouped()) {
-    wpi_setWPIErrorWithContext(CommandIllegalUse,
-                               "A command that is part of a command group "
-                               "cannot be independently scheduled");
+    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+                        "A command that is part of a command group "
+                        "cannot be independently scheduled");
     return;
   }
   if (m_impl->disabled ||
@@ -161,7 +159,7 @@ void CommandScheduler::Schedule(Command* command) {
 }
 
 void CommandScheduler::Schedule(bool interruptible,
-                                wpi::ArrayRef<Command*> commands) {
+                                wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(interruptible, command);
   }
@@ -174,7 +172,7 @@ void CommandScheduler::Schedule(bool interruptible,
   }
 }
 
-void CommandScheduler::Schedule(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Schedule(wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Schedule(true, command);
   }
@@ -284,7 +282,8 @@ void CommandScheduler::RegisterSubsystem(
   }
 }
 
-void CommandScheduler::RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
+void CommandScheduler::RegisterSubsystem(
+    wpi::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     RegisterSubsystem(subsystem);
   }
@@ -298,7 +297,7 @@ void CommandScheduler::UnregisterSubsystem(
 }
 
 void CommandScheduler::UnregisterSubsystem(
-    wpi::ArrayRef<Subsystem*> subsystems) {
+    wpi::span<Subsystem* const> subsystems) {
   for (auto* subsystem : subsystems) {
     UnregisterSubsystem(subsystem);
   }
@@ -340,7 +339,7 @@ void CommandScheduler::Cancel(Command* command) {
   }
 }
 
-void CommandScheduler::Cancel(wpi::ArrayRef<Command*> commands) {
+void CommandScheduler::Cancel(wpi::span<Command* const> commands) {
   for (auto command : commands) {
     Cancel(command);
   }
@@ -360,16 +359,17 @@ void CommandScheduler::CancelAll() {
   Cancel(commands);
 }
 
-double CommandScheduler::TimeSinceScheduled(const Command* command) const {
+units::second_t CommandScheduler::TimeSinceScheduled(
+    const Command* command) const {
   auto find = m_impl->scheduledCommands.find(command);
   if (find != m_impl->scheduledCommands.end()) {
     return find->second.TimeSinceInitialized();
   } else {
-    return -1;
+    return -1_s;
   }
 }
 bool CommandScheduler::IsScheduled(
-    wpi::ArrayRef<const Command*> commands) const {
+    wpi::span<const Command* const> commands) const {
   for (auto command : commands) {
     if (!IsScheduled(command)) {
       return false;
@@ -426,7 +426,7 @@ void CommandScheduler::OnCommandFinish(Action action) {
   m_impl->finishActions.emplace_back(std::move(action));
 }
 
-void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
+void CommandScheduler::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Scheduler");
   auto namesEntry = builder.GetEntry("Names");
   auto idsEntry = builder.GetEntry("Ids");
@@ -443,8 +443,7 @@ void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {
           m_impl->scheduledCommands.end()) {
         Cancel(command);
       }
-      nt::NetworkTableEntry(cancelEntry)
-          .SetDoubleArray(wpi::ArrayRef<double>{});
+      nt::NetworkTableEntry(cancelEntry).SetDoubleArray({});
     }
 
     wpi::SmallVector<std::string, 8> names;

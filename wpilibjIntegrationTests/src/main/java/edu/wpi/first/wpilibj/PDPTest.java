@@ -24,18 +24,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/** Test that covers the {@link PowerDistributionPanel}. */
+/** Test that covers the {@link PowerDistribution}. */
 @RunWith(Parameterized.class)
 public class PDPTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PDPTest.class.getName());
 
-  private static PowerDistributionPanel pdp;
+  private static PowerDistribution pdp;
   private static MotorEncoderFixture<?> me;
   private final double m_expectedStoppedCurrentDraw;
 
   @BeforeClass
   public static void setUpBeforeClass() {
-    pdp = new PowerDistributionPanel();
+    pdp = new PowerDistribution();
   }
 
   @AfterClass
@@ -60,7 +60,7 @@ public class PDPTest extends AbstractComsSetup {
   @Parameters(name = "{index}: {0}, Expected Stopped Current Draw: {1}")
   public static Collection<Object[]> generateData() {
     // logger.fine("Loading the MotorList");
-    return Arrays.asList(new Object[][] {{TestBench.getInstance().getTalonPair(), 0.0}});
+    return Arrays.asList(new Object[][] {{TestBench.getTalonPair(), 0.0}});
   }
 
   @After
@@ -70,7 +70,7 @@ public class PDPTest extends AbstractComsSetup {
 
   /** Test if the current changes when the motor is driven using a talon. */
   @Test
-  public void checkStoppedCurrentForSpeedController() throws CANMessageNotFoundException {
+  public void checkStoppedCurrentForMotorController() throws CANMessageNotFoundException {
     Timer.delay(0.25);
 
     /* The Current should be 0 */
@@ -83,7 +83,7 @@ public class PDPTest extends AbstractComsSetup {
 
   /** Test if the current changes when the motor is driven using a talon. */
   @Test
-  public void checkRunningCurrentForSpeedController() throws CANMessageNotFoundException {
+  public void checkRunningCurrentForMotorController() throws CANMessageNotFoundException {
     /* Set the motor to full forward */
     me.getMotor().set(1.0);
     Timer.delay(2);

@@ -4,55 +4,76 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.CompressorJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.hal.util.AllocationException;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
- * automatically run in closed loop mode by default whenever a {@link Solenoid} object is created.
- * For most cases, a Compressor object does not need to be instantiated or used in a robot program.
- * This class is only required in cases where the robot program needs a more detailed status of the
- * compressor or to enable/disable closed loop control.
+ * Class for operating a compressor connected to a pneumatics module. The module will automatically
+ * run in closed loop mode by default whenever a {@link Solenoid} object is created. For most cases,
+ * a Compressor object does not need to be instantiated or used in a robot program. This class is
+ * only required in cases where the robot program needs a more detailed status of the compressor or
+ * to enable/disable closed loop control.
  *
  * <p>Note: you cannot operate the compressor directly from this class as doing so would circumvent
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
 public class Compressor implements Sendable, AutoCloseable {
-  private int m_compressorHandle;
-  private byte m_module;
+  private PneumaticsBase m_module;
 
   /**
-   * Makes a new instance of the compressor using the provided CAN device ID. Use this constructor
-   * when you have more than one PCM.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM CAN device ID (0 - 62 inclusive)
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
    */
-  public Compressor(int module) {
-    m_module = (byte) module;
+  public Compressor(int module, PneumaticsModuleType moduleType) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
+    boolean allocatedCompressor = false;
+    boolean successfulCompletion = false;
 
-    m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
+    try {
+      if (!m_module.reserveCompressor()) {
+        throw new AllocationException("Compressor already allocated");
+      }
 
-    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
-    SendableRegistry.addLW(this, "Compressor", module);
+      allocatedCompressor = true;
+
+      m_module.setClosedLoopControl(true);
+
+      HAL.report(tResourceType.kResourceType_Compressor, module + 1);
+      SendableRegistry.addLW(this, "Compressor", module);
+      successfulCompletion = true;
+
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedCompressor) {
+          m_module.unreserveCompressor();
+        }
+        m_module.close();
+      }
+    }
   }
 
   /**
-   * Makes a new instance of the compressor using the default PCM ID of 0.
+   * Constructs a compressor for a default module and specified type.
    *
-   * <p>Additional modules can be supported by making a new instance and {@link #Compressor(int)
-   * specifying the CAN ID.}
+   * @param moduleType The module type to use.
    */
-  public Compressor() {
-    this(SensorUtil.getDefaultSolenoidModule());
+  public Compressor(PneumaticsModuleType moduleType) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType);
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
+    m_module.unreserveCompressor();
+    m_module.close();
+    m_module = null;
   }
 
   /**
@@ -83,7 +104,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @return true if the compressor is on
    */
   public boolean enabled() {
-    return CompressorJNI.getCompressor(m_compressorHandle);
+    return m_module.getCompressor();
   }
 
   /**
@@ -92,7 +113,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @return true if the pressure is low
    */
   public boolean getPressureSwitchValue() {
-    return CompressorJNI.getCompressorPressureSwitch(m_compressorHandle);
+    return m_module.getPressureSwitch();
   }
 
   /**
@@ -101,7 +122,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @return current consumed by the compressor in amps
    */
   public double getCompressorCurrent() {
-    return CompressorJNI.getCompressorCurrent(m_compressorHandle);
+    return m_module.getCompressorCurrent();
   }
 
   /**
@@ -110,7 +131,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param on if true sets the compressor to be in closed loop control mode (default)
    */
   public void setClosedLoopControl(boolean on) {
-    CompressorJNI.setCompressorClosedLoopControl(m_compressorHandle, on);
+    m_module.setClosedLoopControl(on);
   }
 
   /**
@@ -119,101 +140,15 @@ public class Compressor implements Sendable, AutoCloseable {
    * @return true if compressor is operating on closed-loop mode
    */
   public boolean getClosedLoopControl() {
-    return CompressorJNI.getCompressorClosedLoopControl(m_compressorHandle);
-  }
-
-  /**
-   * If PCM is in fault state : Compressor Drive is disabled due to compressor current being too
-   * high.
-   *
-   * @return true if PCM is in fault state.
-   */
-  public boolean getCompressorCurrentTooHighFault() {
-    return CompressorJNI.getCompressorCurrentTooHighFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM sticky fault is set : Compressor is disabled due to compressor current being too high.
-   *
-   * @return true if PCM sticky fault is set.
-   */
-  public boolean getCompressorCurrentTooHighStickyFault() {
-    return CompressorJNI.getCompressorCurrentTooHighStickyFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM sticky fault is set : Compressor output appears to be shorted.
-   *
-   * @return true if PCM sticky fault is set.
-   */
-  public boolean getCompressorShortedStickyFault() {
-    return CompressorJNI.getCompressorShortedStickyFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM is in fault state : Compressor output appears to be shorted.
-   *
-   * @return true if PCM is in fault state.
-   */
-  public boolean getCompressorShortedFault() {
-    return CompressorJNI.getCompressorShortedFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM sticky fault is set : Compressor does not appear to be wired, i.e. compressor is not
-   * drawing enough current.
-   *
-   * @return true if PCM sticky fault is set.
-   */
-  public boolean getCompressorNotConnectedStickyFault() {
-    return CompressorJNI.getCompressorNotConnectedStickyFault(m_compressorHandle);
-  }
-
-  /**
-   * If PCM is in fault state : Compressor does not appear to be wired, i.e. compressor is not
-   * drawing enough current.
-   *
-   * @return true if PCM is in fault state.
-   */
-  public boolean getCompressorNotConnectedFault() {
-    return CompressorJNI.getCompressorNotConnectedFault(m_compressorHandle);
-  }
-
-  /**
-   * Clear ALL sticky faults inside PCM that Compressor is wired to.
-   *
-   * <p>If a sticky fault is set, then it will be persistently cleared. The compressor might
-   * momentarily disable while the flags are being cleared. Doo not call this method too frequently,
-   * otherwise normal compressor functionality may be prevented.
-   *
-   * <p>If no sticky faults are set then this call will have no effect.
-   */
-  public void clearAllPCMStickyFaults() {
-    CompressorJNI.clearAllPCMStickyFaults(m_module);
-  }
-
-  /**
-   * Gets the module number (CAN ID).
-   *
-   * @return Module number
-   */
-  public int getModule() {
-    return m_module;
+    return m_module.getClosedLoopControl();
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
     builder.addBooleanProperty(
-        "Enabled",
-        this::enabled,
-        value -> {
-          if (value) {
-            start();
-          } else {
-            stop();
-          }
-        });
+        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
+    builder.addBooleanProperty("Enabled", this::enabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }

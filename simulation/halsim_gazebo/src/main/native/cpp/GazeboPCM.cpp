@@ -4,11 +4,10 @@
 
 #include "GazeboPCM.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Value.h>
+#include <hal/simulation/CTREPCMData.h>
 #include <hal/simulation/NotifyListener.h>
-#include <hal/simulation/PCMData.h>
 
 #include "simulation/gz_msgs/msgs.h"
 
@@ -30,17 +29,15 @@ GazeboPCM::GazeboPCM(int index, int channel, HALSimGazebo* halsim) {
   m_channel = channel;
   m_halsim = halsim;
   m_pub = NULL;
-  HALSIM_RegisterPCMSolenoidInitializedCallback(index, channel, init_callback,
-                                                this, true);
-  HALSIM_RegisterPCMSolenoidOutputCallback(index, channel, output_callback,
-                                           this, true);
+  HALSIM_RegisterCTREPCMInitializedCallback(index, init_callback, this, true);
+  HALSIM_RegisterCTREPCMSolenoidOutputCallback(index, channel, output_callback,
+                                               this, true);
 }
 
 void GazeboPCM::Publish(bool value) {
   if (!m_pub) {
     m_pub = m_halsim->node.Advertise<gazebo::msgs::Bool>(
-        "~/simulator/pneumatic/" + std::to_string(m_index + 1) + "/" +
-        std::to_string(m_channel));
+        fmt::format("~/simulator/pneumatic/{}/{}", m_index + 1, m_channel));
     m_pub->WaitForConnection(gazebo::common::Time(1, 0));
   }
   gazebo::msgs::Bool msg;
@@ -50,5 +47,5 @@ void GazeboPCM::Publish(bool value) {
 }
 
 void GazeboPCM_SetPressureSwitch(int index, bool value) {
-  HALSIM_SetPCMPressureSwitch(index, value);
+  HALSIM_SetCTREPCMPressureSwitch(index, value);
 }

@@ -6,19 +6,19 @@
 
 namespace cs {
 
-CS_Source CreateUsbCameraDev(const wpi::Twine& name, int dev,
+CS_Source CreateUsbCameraDev(std::string_view name, int dev,
                              CS_Status* status) {
   *status = CS_INVALID_HANDLE;
   return 0;
 }
 
-CS_Source CreateUsbCameraPath(const wpi::Twine& name, const wpi::Twine& path,
+CS_Source CreateUsbCameraPath(std::string_view name, std::string_view path,
                               CS_Status* status) {
   *status = CS_INVALID_HANDLE;
   return 0;
 }
 
-void SetUsbCameraPath(CS_Source source, const wpi::Twine& path,
+void SetUsbCameraPath(CS_Source source, std::string_view path,
                       CS_Status* status) {
   *status = CS_INVALID_HANDLE;
 }

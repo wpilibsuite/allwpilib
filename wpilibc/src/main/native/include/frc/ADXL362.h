@@ -5,26 +5,22 @@
 #pragma once
 
 #include <hal/SimDevice.h>
+#include <networktables/NTSendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/SPI.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * ADXL362 SPI Accelerometer.
  *
  * This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
-class ADXL362 : public ErrorBase,
-                public Accelerometer,
-                public Sendable,
-                public SendableHelper<ADXL362> {
+class ADXL362 : public Accelerometer,
+                public nt::NTSendable,
+                public wpi::SendableHelper<ADXL362> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
   struct AllAxes {
@@ -54,6 +50,8 @@ class ADXL362 : public ErrorBase,
   ADXL362(ADXL362&&) = default;
   ADXL362& operator=(ADXL362&&) = default;
 
+  SPI::Port GetSpiPort() const;
+
   // Accelerometer interface
   void SetRange(Range range) final;
   double GetX() override;
@@ -76,7 +74,7 @@ class ADXL362 : public ErrorBase,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
   SPI m_spi;

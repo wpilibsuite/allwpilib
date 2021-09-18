@@ -49,7 +49,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   public void testBothHigh() {
     m_relayFixture.getRelay().setDirection(Direction.kBoth);
     m_relayFixture.getRelay().set(Value.kOn);
-    m_builder.updateTable();
+    m_builder.update();
     assertTrue(
         "Input one was not high when relay set both high", m_relayFixture.getInputOne().get());
     assertTrue(
@@ -62,7 +62,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   public void testFirstHigh() {
     m_relayFixture.getRelay().setDirection(Direction.kBoth);
     m_relayFixture.getRelay().set(Value.kForward);
-    m_builder.updateTable();
+    m_builder.update();
     assertFalse(
         "Input one was not low when relay set Value.kForward", m_relayFixture.getInputOne().get());
     assertTrue(
@@ -75,7 +75,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   public void testSecondHigh() {
     m_relayFixture.getRelay().setDirection(Direction.kBoth);
     m_relayFixture.getRelay().set(Value.kReverse);
-    m_builder.updateTable();
+    m_builder.update();
     assertTrue(
         "Input one was not high when relay set Value.kReverse", m_relayFixture.getInputOne().get());
     assertFalse(
@@ -88,7 +88,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   public void testForwardDirection() {
     m_relayFixture.getRelay().setDirection(Direction.kForward);
     m_relayFixture.getRelay().set(Value.kOn);
-    m_builder.updateTable();
+    m_builder.update();
     assertFalse(
         "Input one was not low when relay set Value.kOn in kForward Direction",
         m_relayFixture.getInputOne().get());
@@ -103,7 +103,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
   public void testReverseDirection() {
     m_relayFixture.getRelay().setDirection(Direction.kReverse);
     m_relayFixture.getRelay().set(Value.kOn);
-    m_builder.updateTable();
+    m_builder.update();
     assertTrue(
         "Input one was not high when relay set Value.kOn in kReverse Direction",
         m_relayFixture.getInputOne().get());
@@ -128,7 +128,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
 
   @Test
   public void testInitialSettings() {
-    m_builder.updateTable();
+    m_builder.update();
     assertEquals(Value.kOff, m_relayFixture.getRelay().get());
     // Initially both outputs should be off
     assertFalse(m_relayFixture.getInputOne().get());

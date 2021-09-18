@@ -4,36 +4,36 @@
 
 package edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.statespacedifferentialdrivesimulation.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final SpeedControllerGroup m_leftMotors =
-      new SpeedControllerGroup(
+  private final MotorControllerGroup m_leftMotors =
+      new MotorControllerGroup(
           new PWMSparkMax(DriveConstants.kLeftMotor1Port),
           new PWMSparkMax(DriveConstants.kLeftMotor2Port));
 
   // The motors on the right side of the drive.
-  private final SpeedControllerGroup m_rightMotors =
-      new SpeedControllerGroup(
+  private final MotorControllerGroup m_rightMotors =
+      new MotorControllerGroup(
           new PWMSparkMax(DriveConstants.kRightMotor1Port),
           new PWMSparkMax(DriveConstants.kRightMotor2Port));
 
@@ -70,6 +70,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_rightMotors.setInverted(true);
+
     // Sets the distance per pulse for the encoders
     m_leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
     m_rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);

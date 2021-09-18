@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.examples.swervecontrollercommand;
 
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -31,17 +31,17 @@ public final class Constants {
     public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
     public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
     public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {5, 6};
+    public static final int[] kRearRightTurningEncoderPorts = new int[] {6, 7};
 
     public static final boolean kFrontLeftTurningEncoderReversed = false;
     public static final boolean kRearLeftTurningEncoderReversed = true;
     public static final boolean kFrontRightTurningEncoderReversed = false;
     public static final boolean kRearRightTurningEncoderReversed = true;
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {7, 8};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {9, 10};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {11, 12};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {13, 14};
+    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {8, 9};
+    public static final int[] kRearLeftDriveEncoderPorts = new int[] {10, 11};
+    public static final int[] kFrontRightDriveEncoderPorts = new int[] {12, 13};
+    public static final int[] kRearRightDriveEncoderPorts = new int[] {14, 15};
 
     public static final boolean kFrontLeftDriveEncoderReversed = false;
     public static final boolean kRearLeftDriveEncoderReversed = true;
@@ -93,7 +93,7 @@ public final class Constants {
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 1;
+    public static final int kDriverControllerPort = 0;
   }
 
   public static final class AutoConstants {

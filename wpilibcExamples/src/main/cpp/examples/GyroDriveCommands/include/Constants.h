@@ -6,7 +6,7 @@
 
 #include <units/angle.h>
 #include <units/angular_velocity.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -32,7 +32,8 @@ constexpr int kEncoderCPR = 1024;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * wpi::math::pi) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterInches * wpi::numbers::pi) /
+    static_cast<double>(kEncoderCPR);
 
 constexpr bool kGyroReversed = true;
 
@@ -58,5 +59,5 @@ constexpr double kAutoDriveSpeed = 0.5;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

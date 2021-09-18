@@ -34,6 +34,7 @@ SOFTWARE.
 #define WPI_JSON_IMPLEMENTATION
 #include "wpi/json.h"
 
+#include "fmt/format.h"
 #include "wpi/raw_ostream.h"
 
 namespace wpi {
@@ -75,9 +76,9 @@ class json::binary_writer
                       const bool use_type, const bool add_prefix = true);
 
   private:
-    void write_cbor_string(StringRef str);
+    void write_cbor_string(std::string_view str);
 
-    void write_msgpack_string(StringRef str);
+    void write_msgpack_string(std::string_view str);
 
     /*
     @brief write a number to output input
@@ -630,7 +631,7 @@ void json::binary_writer::write_ubjson(const json& j, const bool use_count,
                 o << static_cast<CharType>('S');
             }
             write_number_with_ubjson_prefix(j.m_value.string->size(), true);
-            o << j.m_value.string;
+            o << *j.m_value.string;
             break;
         }
 
@@ -731,7 +732,7 @@ void json::binary_writer::write_ubjson(const json& j, const bool use_count,
     }
 }
 
-void json::binary_writer::write_cbor_string(StringRef str)
+void json::binary_writer::write_cbor_string(std::string_view str)
 {
     // step 1: write control byte and the string length
     const auto N = str.size();
@@ -766,7 +767,7 @@ void json::binary_writer::write_cbor_string(StringRef str)
     o << str;
 }
 
-void json::binary_writer::write_msgpack_string(StringRef str)
+void json::binary_writer::write_msgpack_string(std::string_view str)
 {
     // step 1: write control byte and the string length
     const auto N = str.size();
@@ -812,7 +813,7 @@ void json::binary_writer::write_number(const NumberType n)
         std::reverse(vec.begin(), vec.end());
     }
 
-    o << ArrayRef<uint8_t>(vec.data(), sizeof(NumberType));
+    o << span{vec.data(), sizeof(NumberType)};
 }
 
 template<typename NumberType, typename std::enable_if<
@@ -862,7 +863,7 @@ void json::binary_writer::write_number_with_ubjson_prefix(const NumberType n,
     }
     else
     {
-        JSON_THROW(out_of_range::create(407, "number overflow serializing " + Twine(n)));
+        JSON_THROW(out_of_range::create(407, fmt::format("number overflow serializing {}", n)));
     }
 }
 
@@ -915,7 +916,7 @@ void json::binary_writer::write_number_with_ubjson_prefix(const NumberType n,
     // LCOV_EXCL_START
     else
     {
-        JSON_THROW(out_of_range::create(407, "number overflow serializing " + Twine(n)));
+        JSON_THROW(out_of_range::create(407, fmt::format("number overflow serializing {}", n)));
     }
     // LCOV_EXCL_STOP
 }
@@ -1003,7 +1004,7 @@ std::vector<uint8_t> json::to_cbor(const json& j)
     return result;
 }
 
-ArrayRef<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
+span<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
 {
     buf.clear();
     raw_uvector_ostream os(buf);
@@ -1011,7 +1012,7 @@ ArrayRef<uint8_t> json::to_cbor(const json& j, std::vector<uint8_t>& buf)
     return os.array();
 }
 
-ArrayRef<uint8_t> json::to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf)
+span<uint8_t> json::to_cbor(const json& j, SmallVectorImpl<uint8_t>& buf)
 {
     buf.clear();
     raw_usvector_ostream os(buf);
@@ -1032,7 +1033,7 @@ std::vector<uint8_t> json::to_msgpack(const json& j)
     return result;
 }
 
-ArrayRef<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
+span<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
 {
     buf.clear();
     raw_uvector_ostream os(buf);
@@ -1040,7 +1041,7 @@ ArrayRef<uint8_t> json::to_msgpack(const json& j, std::vector<uint8_t>& buf)
     return os.array();
 }
 
-ArrayRef<uint8_t> json::to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf)
+span<uint8_t> json::to_msgpack(const json& j, SmallVectorImpl<uint8_t>& buf)
 {
     buf.clear();
     raw_usvector_ostream os(buf);
@@ -1063,8 +1064,8 @@ std::vector<uint8_t> json::to_ubjson(const json& j,
     return result;
 }
 
-ArrayRef<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
-                                  const bool use_size, const bool use_type)
+span<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
+                              const bool use_size, const bool use_type)
 {
     buf.clear();
     raw_uvector_ostream os(buf);
@@ -1072,8 +1073,8 @@ ArrayRef<uint8_t> json::to_ubjson(const json& j, std::vector<uint8_t>& buf,
     return os.array();
 }
 
-ArrayRef<uint8_t> json::to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
-                                  const bool use_size, const bool use_type)
+span<uint8_t> json::to_ubjson(const json& j, SmallVectorImpl<uint8_t>& buf,
+                              const bool use_size, const bool use_type)
 {
     buf.clear();
     raw_usvector_ostream os(buf);

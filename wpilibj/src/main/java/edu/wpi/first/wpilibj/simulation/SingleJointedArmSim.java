@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.NumericalIntegration;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated single jointed arm mechanism. */
 public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
@@ -282,7 +282,7 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N1> {
     // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
     // cos(theta)]]
     Matrix<N2, N1> updatedXhat =
-        NumericalIntegration.rkf45(
+        NumericalIntegration.rkdp(
             (Matrix<N2, N1> x, Matrix<N1, N1> u_) -> {
               Matrix<N2, N1> xdot = m_plant.getA().times(x).plus(m_plant.getB().times(u_));
               if (m_simulateGravity) {

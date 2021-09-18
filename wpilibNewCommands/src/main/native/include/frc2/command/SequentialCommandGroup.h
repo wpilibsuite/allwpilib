@@ -15,9 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include <frc/ErrorBase.h>
-#include <frc/WPIErrors.h>
-#include <wpi/ArrayRef.h>
+#include <wpi/span.h>
 
 #include "frc2/command/CommandGroupBase.h"
 #include "frc2/command/CommandHelper.h"
@@ -87,6 +85,16 @@ class SequentialCommandGroup
   bool IsFinished() override;
 
   bool RunsWhenDisabled() const override;
+
+  SequentialCommandGroup BeforeStarting(
+      std::function<void()> toRun,
+      wpi::span<Subsystem* const> requirements = {}) &&
+      override;
+
+  SequentialCommandGroup AndThen(
+      std::function<void()> toRun,
+      wpi::span<Subsystem* const> requirements = {}) &&
+      override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final;

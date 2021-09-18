@@ -7,7 +7,7 @@
 #include <cmath>
 
 #include <hal/FRCUsageReporting.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 using namespace frc;
 
@@ -61,11 +61,11 @@ int Joystick::GetThrottleChannel() const {
   return m_axes[Axis::kThrottle];
 }
 
-double Joystick::GetX(JoystickHand hand) const {
+double Joystick::GetX() const {
   return GetRawAxis(m_axes[Axis::kX]);
 }
 
-double Joystick::GetY(JoystickHand hand) const {
+double Joystick::GetY() const {
   return GetRawAxis(m_axes[Axis::kY]);
 }
 
@@ -114,5 +114,5 @@ double Joystick::GetDirectionRadians() const {
 }
 
 double Joystick::GetDirectionDegrees() const {
-  return (180 / wpi::math::pi) * GetDirectionRadians();
+  return (180 / wpi::numbers::pi) * GetDirectionRadians();
 }

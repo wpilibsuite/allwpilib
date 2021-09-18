@@ -4,12 +4,20 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import java.util.Arrays;
 
-/** Allows multiple {@link SpeedController} objects to be linked together. */
-public class SpeedControllerGroup implements SpeedController, Sendable, AutoCloseable {
+/**
+ * Allows multiple {@link SpeedController} objects to be linked together.
+ *
+ * @deprecated Use {@link edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup}.
+ */
+@Deprecated(since = "2022", forRemoval = true)
+@SuppressWarnings("removal")
+public class SpeedControllerGroup implements MotorController, Sendable, AutoCloseable {
   private boolean m_isInverted;
   private final SpeedController[] m_speedControllers;
   private static int instances;
@@ -17,16 +25,14 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
   /**
    * Create a new SpeedControllerGroup with the provided SpeedControllers.
    *
+   * @param speedController The first SpeedController to add.
    * @param speedControllers The SpeedControllers to add
    */
-  @SuppressWarnings("PMD.AvoidArrayLoops")
   public SpeedControllerGroup(
       SpeedController speedController, SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
-    for (int i = 0; i < speedControllers.length; i++) {
-      m_speedControllers[i + 1] = speedControllers[i];
-    }
+    System.arraycopy(speedControllers, 0, m_speedControllers, 1, speedControllers.length);
     init();
   }
 
@@ -40,7 +46,7 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
       SendableRegistry.addChild(this, controller);
     }
     instances++;
-    SendableRegistry.addLW(this, "SpeedControllerGroup", instances);
+    SendableRegistry.addLW(this, "MotorControllerGroup", instances);
   }
 
   @Override
@@ -88,13 +94,8 @@ public class SpeedControllerGroup implements SpeedController, Sendable, AutoClos
   }
 
   @Override
-  public void pidWrite(double output) {
-    set(output);
-  }
-
-  @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("Motor Controller");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Value", this::get, this::set);

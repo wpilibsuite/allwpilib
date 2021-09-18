@@ -6,11 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableValue.h>
 #include <wpi/StringMap.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardComponentBase.h"
 
@@ -26,10 +26,8 @@ class ShuffleboardContainer;
 template <typename Derived>
 class ShuffleboardComponent : public ShuffleboardComponentBase {
  public:
-  ShuffleboardComponent(ShuffleboardContainer& parent, const wpi::Twine& title,
-                        const wpi::Twine& type = "");
-
-  ~ShuffleboardComponent() override = default;
+  ShuffleboardComponent(ShuffleboardContainer& parent, std::string_view title,
+                        std::string_view type = "");
 
   /**
    * Sets custom properties for this component. Property names are

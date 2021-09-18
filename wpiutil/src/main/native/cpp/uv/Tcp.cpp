@@ -61,7 +61,7 @@ Tcp* Tcp::DoAccept() {
   return Accept().get();
 }
 
-void Tcp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
+void Tcp::Bind(std::string_view ip, unsigned int port, unsigned int flags) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -71,7 +71,7 @@ void Tcp::Bind(const Twine& ip, unsigned int port, unsigned int flags) {
   }
 }
 
-void Tcp::Bind6(const Twine& ip, unsigned int port, unsigned int flags) {
+void Tcp::Bind6(std::string_view ip, unsigned int port, unsigned int flags) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
   if (err < 0) {
@@ -123,7 +123,7 @@ void Tcp::Connect(const sockaddr& addr, std::function<void()> callback) {
   Connect(addr, req);
 }
 
-void Tcp::Connect(const Twine& ip, unsigned int port,
+void Tcp::Connect(std::string_view ip, unsigned int port,
                   const std::shared_ptr<TcpConnectReq>& req) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
@@ -134,7 +134,7 @@ void Tcp::Connect(const Twine& ip, unsigned int port,
   }
 }
 
-void Tcp::Connect(const Twine& ip, unsigned int port,
+void Tcp::Connect(std::string_view ip, unsigned int port,
                   std::function<void()> callback) {
   sockaddr_in addr;
   int err = NameToAddr(ip, port, &addr);
@@ -145,7 +145,7 @@ void Tcp::Connect(const Twine& ip, unsigned int port,
   }
 }
 
-void Tcp::Connect6(const Twine& ip, unsigned int port,
+void Tcp::Connect6(std::string_view ip, unsigned int port,
                    const std::shared_ptr<TcpConnectReq>& req) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);
@@ -156,7 +156,7 @@ void Tcp::Connect6(const Twine& ip, unsigned int port,
   }
 }
 
-void Tcp::Connect6(const Twine& ip, unsigned int port,
+void Tcp::Connect6(std::string_view ip, unsigned int port,
                    std::function<void()> callback) {
   sockaddr_in6 addr;
   int err = NameToAddr(ip, port, &addr);

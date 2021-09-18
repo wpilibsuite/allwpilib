@@ -7,9 +7,11 @@
 #include <glass/other/DeviceTree.h>
 #include <stdint.h>
 
+#include <fmt/format.h>
 #include <hal/SimDevice.h>
 #include <hal/simulation/SimDeviceData.h>
 #include <wpi/DenseMap.h>
+#include <wpi/StringExtras.h>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
@@ -21,7 +23,7 @@ class SimValueSource : public glass::DataSource {
  public:
   explicit SimValueSource(HAL_SimValueHandle handle, const char* device,
                           const char* name)
-      : DataSource(wpi::Twine{device} + wpi::Twine{'-'} + name),
+      : DataSource(fmt::format("{}-{}", device, name)),
         m_callback{HALSIM_RegisterSimValueChangedCallback(
             handle, this, CallbackFunc, true)} {}
   ~SimValueSource() override {
@@ -137,11 +139,11 @@ static void DisplaySimValue(const char* name, void* data,
 
 static void DisplaySimDevice(const char* name, void* data,
                              HAL_SimDeviceHandle handle) {
-  wpi::StringRef id{name};
+  std::string_view id{name};
   if (!gSimDevicesShowPrefix) {
     // only show "Foo" portion of "Accel:Foo"
-    wpi::StringRef type;
-    std::tie(type, id) = id.split(':');
+    std::string_view type;
+    std::tie(type, id) = wpi::split(id, ':');
     if (id.empty()) {
       id = type;
     }

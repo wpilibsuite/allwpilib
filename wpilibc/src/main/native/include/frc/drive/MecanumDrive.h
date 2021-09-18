@@ -5,14 +5,25 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include <wpi/raw_ostream.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/drive/RobotDriveBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)  // was declared deprecated
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 class SpeedController;
 
@@ -49,22 +60,29 @@ class SpeedController;
  * with SetDeadband().
  *
  * RobotDrive porting guide:
- * <br>In MecanumDrive, the right side speed controllers are automatically
- * inverted, while in RobotDrive, no speed controllers are automatically
+ * <br>In MecanumDrive, the right side motor controllers are automatically
+ * inverted, while in RobotDrive, no motor controllers are automatically
  * inverted.
  * <br>DriveCartesian(double, double, double, double) is equivalent to
- * RobotDrive#MecanumDrive_Cartesian(double, double, double, double)
+ * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
  * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted
  * compared to RobotDrive (eg DriveCartesian(xSpeed, -ySpeed, zRotation,
  * -gyroAngle).
  * <br>DrivePolar(double, double, double) is equivalent to
- * RobotDrive#MecanumDrive_Polar(double, double, double) if a
+ * RobotDrive's MecanumDrive_Polar(double, double, double) if a
  * deadband of 0 is used.
  */
 class MecanumDrive : public RobotDriveBase,
-                     public Sendable,
-                     public SendableHelper<MecanumDrive> {
+                     public wpi::Sendable,
+                     public wpi::SendableHelper<MecanumDrive> {
  public:
+  struct WheelSpeeds {
+    double frontLeft = 0.0;
+    double frontRight = 0.0;
+    double rearLeft = 0.0;
+    double rearRight = 0.0;
+  };
+
   /**
    * Construct a MecanumDrive.
    *
@@ -113,26 +131,27 @@ class MecanumDrive : public RobotDriveBase,
   void DrivePolar(double magnitude, double angle, double zRotation);
 
   /**
-   * Gets if the power sent to the right side of the drivetrain is multiplied by
-   * -1.
+   * Cartesian inverse kinematics for Mecanum platform.
    *
-   * @return true if the right side is inverted
-   */
-  bool IsRightSideInverted() const;
-
-  /**
-   * Sets if the power sent to the right side of the drivetrain should be
-   * multiplied by -1.
+   * Angles are measured clockwise from the positive X axis. The robot's speed
+   * is independent from its angle or rotation rate.
    *
-   * @param rightSideInverted true if right side power should be multiplied by
-   * -1
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+   *                  positive.
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   *                  positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+   *                  Clockwise is positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around
+   *                  the Z axis. Use this to implement field-oriented controls.
    */
-  void SetRightSideInverted(bool rightSideInverted);
+  static WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed,
+                                      double zRotation, double gyroAngle = 0.0);
 
   void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
+  std::string GetDescription() const override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   SpeedController* m_frontLeftMotor;
@@ -140,9 +159,15 @@ class MecanumDrive : public RobotDriveBase,
   SpeedController* m_frontRightMotor;
   SpeedController* m_rearRightMotor;
 
-  double m_rightSideInvertMultiplier = -1.0;
-
   bool reported = false;
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 }  // namespace frc

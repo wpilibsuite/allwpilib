@@ -5,10 +5,10 @@
 #include "frc/ADXL362.h"
 
 #include <hal/FRCUsageReporting.h>
+#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/DriverStation.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -56,7 +56,7 @@ ADXL362::ADXL362(SPI::Port port, Range range)
     commands[2] = 0;
     m_spi.Transaction(commands, commands, 3);
     if (commands[2] != 0xF2) {
-      DriverStation::ReportError("could not find ADXL362");
+      FRC_ReportError(err::Error, "{}", "could not find ADXL362");
       m_gsPerLSB = 0.0;
       return;
     }
@@ -72,7 +72,11 @@ ADXL362::ADXL362(SPI::Port port, Range range)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL362, port + 1);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL362", port);
+  wpi::SendableRegistry::AddLW(this, "ADXL362", port);
+}
+
+SPI::Port ADXL362::GetSpiPort() const {
+  return m_spi.GetPort();
 }
 
 void ADXL362::SetRange(Range range) {
@@ -178,12 +182,12 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
   return data;
 }
 
-void ADXL362::InitSendable(SendableBuilder& builder) {
+void ADXL362::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   auto x = builder.GetEntry("X").GetHandle();
   auto y = builder.GetEntry("Y").GetHandle();
   auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=]() {
+  builder.SetUpdateTable([=] {
     auto data = GetAccelerations();
     nt::NetworkTableEntry(x).SetDouble(data.XAxis);
     nt::NetworkTableEntry(y).SetDouble(data.YAxis);

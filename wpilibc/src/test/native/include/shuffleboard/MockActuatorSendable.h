@@ -4,23 +4,16 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableHelper.h"
-
-namespace frc {
+#include <wpi/sendable/Sendable.h>
 
 /**
  * A mock sendable that marks itself as an actuator.
  */
-class MockActuatorSendable : public Sendable,
-                             public SendableHelper<MockActuatorSendable> {
+class MockActuatorSendable : public wpi::Sendable {
  public:
-  explicit MockActuatorSendable(wpi::StringRef name);
+  explicit MockActuatorSendable(std::string_view name);
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
-
-}  // namespace frc

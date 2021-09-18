@@ -7,17 +7,17 @@
 #include <chrono>
 #include <thread>
 
+#include <hal/DriverStation.h>
 #include <hal/HALBase.h>
 #include <hal/Main.h>
 #include <wpi/condition_variable.h>
+#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/Base.h"
+#include "frc/Errors.h"
+#include "frc/RuntimeType.h"
 
 namespace frc {
-
-class DriverStation;
 
 int RunHALInitialization();
 
@@ -25,12 +25,26 @@ namespace impl {
 
 template <class Robot>
 void RunRobot(wpi::mutex& m, Robot** robot) {
-  static Robot theRobot;
-  {
-    std::scoped_lock lock{m};
-    *robot = &theRobot;
+  try {
+    static Robot theRobot;
+    {
+      std::scoped_lock lock{m};
+      *robot = &theRobot;
+    }
+    theRobot.StartCompetition();
+  } catch (const frc::RuntimeError& e) {
+    e.Report();
+    FRC_ReportError(
+        err::Error, "{}",
+        "The robot program quit unexpectedly."
+        " This is usually due to a code error.\n"
+        "  The above stacktrace can help determine where the error occurred.\n"
+        "  See https://wpilib.org/stacktrace for more information.\n");
+    throw;
+  } catch (const std::exception& e) {
+    HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+    throw;
   }
-  theRobot.StartCompetition();
 }
 
 }  // namespace impl
@@ -95,13 +109,6 @@ int StartRobot() {
   return 0;
 }
 
-#define START_ROBOT_CLASS(_ClassName_)                                 \
-  WPI_DEPRECATED("Call frc::StartRobot<" #_ClassName_                  \
-                 ">() in your own main() instead of using the "        \
-                 "START_ROBOT_CLASS(" #_ClassName_ ") macro.")         \
-  int StartRobotClassImpl() { return frc::StartRobot<_ClassName_>(); } \
-  int main() { return StartRobotClassImpl(); }
-
 /**
  * Implement a Robot Program framework.
  *
@@ -149,8 +156,28 @@ class RobotBase {
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the field controls.
+   * @deprecated Use IsTeleop() instead.
    */
+  WPI_DEPRECATED("Use IsTeleop() instead")
   bool IsOperatorControl() const;
+
+  /**
+   * Determine if the robot is currently in Operator Control mode.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode as
+   *         determined by the field controls.
+   */
+  bool IsTeleop() const;
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while
+   *         enabled as determined by the field-controls.
+   * @deprecated Use IsTeleopEnabled() instead.
+   */
+  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
+  bool IsOperatorControlEnabled() const;
 
   /**
    * Determine if the robot is current in Operator Control mode and enabled.
@@ -158,7 +185,7 @@ class RobotBase {
    * @return True if the robot is currently operating in Tele-Op mode while
    * wnabled as determined by the field-controls.
    */
-  bool IsOperatorControlEnabled() const;
+  bool IsTeleopEnabled() const;
 
   /**
    * Determine if the robot is currently in Test mode.
@@ -184,6 +211,13 @@ class RobotBase {
   virtual void StartCompetition() = 0;
 
   virtual void EndCompetition() = 0;
+
+  /**
+   * Get the current runtime type.
+   *
+   * @return Current runtime type.
+   */
+  static RuntimeType GetRuntimeType();
 
   /**
    * Get if the robot is real.
@@ -218,15 +252,11 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase();
+  virtual ~RobotBase() = default;
 
  protected:
-  // m_ds isn't moved in these because DriverStation is a singleton; every
-  // instance of RobotBase has a reference to the same object.
-  RobotBase(RobotBase&&) noexcept;
-  RobotBase& operator=(RobotBase&&) noexcept;
-
-  DriverStation& m_ds;
+  RobotBase(RobotBase&&) = default;
+  RobotBase& operator=(RobotBase&&) = default;
 
   static std::thread::id m_threadId;
 };

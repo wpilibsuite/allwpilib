@@ -3,21 +3,25 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/Encoder.h>
-#include <frc/GenericHID.h>
 #include <frc/Joystick.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/RobotController.h>
-#include <frc/StateSpaceUtil.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/PIDController.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/BatterySim.h>
 #include <frc/simulation/EncoderSim.h>
 #include <frc/simulation/RoboRioSim.h>
 #include <frc/simulation/SingleJointedArmSim.h>
+#include <frc/smartdashboard/Mechanism2d.h>
+#include <frc/smartdashboard/MechanismLigament2d.h>
+#include <frc/smartdashboard/MechanismRoot2d.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/system/plant/LinearSystemId.h>
+#include <frc/util/Color.h>
+#include <frc/util/Color8Bit.h>
 #include <units/angle.h>
 #include <units/moment_of_inertia.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -30,14 +34,14 @@ class Robot : public frc::TimedRobot {
   static constexpr int kJoystickPort = 0;
 
   // The P gain for the PID controller that drives this arm.
-  static constexpr double kArmKp = 5.0;
+  static constexpr double kArmKp = 50.0;
 
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
   static constexpr double kArmEncoderDistPerPulse =
-      2.0 * wpi::math::pi / 4096.0;
+      2.0 * wpi::numbers::pi / 4096.0;
 
-  // The arm gearbox represents a gerbox containing two Vex 775pro motors.
+  // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   frc::DCMotor m_armGearbox = frc::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our arm
@@ -47,31 +51,43 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_joystick{kJoystickPort};
 
   // Simulation classes help us simulate what's going on, including gravity.
-  // This sim represents an arm with 2 775s, a 100:1 reduction, a mass of 5kg,
-  // 30in overall arm length, range of motion nin [-180, 0] degrees, and noise
-  // with a standard deviation of 0.5 degrees.
+  // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
+  // 30in overall arm length, range of motion in [-75, 255] degrees, and noise
+  // with a standard deviation of 1 encoder tick.
   frc::sim::SingleJointedArmSim m_armSim{
       m_armGearbox,
-      100.0,
+      600.0,
       frc::sim::SingleJointedArmSim::EstimateMOI(30_in, 5_kg),
       30_in,
-      -180_deg,
-      0_deg,
+      -75_deg,
+      255_deg,
       5_kg,
       true,
-      {(0.5_deg).to<double>()}};
+      {kArmEncoderDistPerPulse}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
+
+  // Create a Mechanism2d display of an Arm
+  frc::Mechanism2d m_mech2d{60, 60};
+  frc::MechanismRoot2d* m_armBase = m_mech2d.GetRoot("ArmBase", 30, 30);
+  frc::MechanismLigament2d* m_armTower =
+      m_armBase->Append<frc::MechanismLigament2d>(
+          "Arm Tower", 30, -90_deg, 6, frc::Color8Bit{frc::Color::kBlue});
+  frc::MechanismLigament2d* m_arm = m_armBase->Append<frc::MechanismLigament2d>(
+      "Arm", 30, m_armSim.GetAngle(), 6, frc::Color8Bit{frc::Color::kYellow});
 
  public:
   void RobotInit() override {
     m_encoder.SetDistancePerPulse(kArmEncoderDistPerPulse);
+
+    // Put Mechanism 2d to SmartDashboard
+    frc::SmartDashboard::PutData("Arm Sim", &m_mech2d);
   }
 
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.SetInput(frc::MakeMatrix<1, 1>(
-        m_motor.Get() * frc::RobotController::GetInputVoltage()));
+    m_armSim.SetInput(Eigen::Vector<double, 1>{
+        m_motor.Get() * frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.
     m_armSim.Update(20_ms);
@@ -82,13 +98,17 @@ class Robot : public frc::TimedRobot {
     // SimBattery estimates loaded battery voltages
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
+
+    // Update the Mechanism Arm angle based on the simulated arm angle
+    m_arm->SetAngle(m_armSim.GetAngle());
   }
 
   void TeleopPeriodic() override {
     if (m_joystick.GetTrigger()) {
-      // Here, we run PID control like normal, with a constant setpoint of 30in.
-      double pidOutput =
-          m_controller.Calculate(m_encoder.GetDistance(), (30_in).to<double>());
+      // Here, we run PID control like normal, with a constant setpoint of 75
+      // degrees.
+      double pidOutput = m_controller.Calculate(
+          m_encoder.GetDistance(), (units::radian_t(75_deg)).to<double>());
       m_motor.SetVoltage(units::volt_t(pidOutput));
     } else {
       // Otherwise, we disable the motor.

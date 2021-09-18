@@ -4,11 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.arcadedrivexboxcontroller;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with split
@@ -25,7 +24,6 @@ public class Robot extends TimedRobot {
     // Drive with split arcade drive.
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
-    m_robotDrive.arcadeDrive(
-        m_driverController.getY(Hand.kLeft), m_driverController.getX(Hand.kRight));
+    m_robotDrive.arcadeDrive(m_driverController.getLeftY(), m_driverController.getRightX());
   }
 }

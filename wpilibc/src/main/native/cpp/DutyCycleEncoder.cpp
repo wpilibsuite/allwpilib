@@ -4,13 +4,14 @@
 
 #include "frc/DutyCycleEncoder.h"
 
-#include "frc/Base.h"
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+
 #include "frc/Counter.h"
 #include "frc/DigitalInput.h"
 #include "frc/DigitalSource.h"
-#include "frc/DriverStation.h"
 #include "frc/DutyCycle.h"
-#include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -21,12 +22,12 @@ DutyCycleEncoder::DutyCycleEncoder(int channel)
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle& dutyCycle)
-    : m_dutyCycle{&dutyCycle, NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{&dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
   Init();
 }
 
 DutyCycleEncoder::DutyCycleEncoder(DutyCycle* dutyCycle)
-    : m_dutyCycle{dutyCycle, NullDeleter<DutyCycle>{}} {
+    : m_dutyCycle{dutyCycle, wpi::NullDeleter<DutyCycle>{}} {
   Init();
 }
 
@@ -71,8 +72,8 @@ void DutyCycleEncoder::Init() {
         m_analogTrigger->CreateOutput(AnalogTriggerType::kFallingPulse));
   }
 
-  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                        m_dutyCycle->GetSourceChannel());
+  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
+                               m_dutyCycle->GetSourceChannel());
 }
 
 units::turn_t DutyCycleEncoder::Get() const {
@@ -94,7 +95,8 @@ units::turn_t DutyCycleEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  FRC_ReportError(
+      warn::Warning, "{}",
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;
@@ -146,7 +148,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::InitSendable(SendableBuilder& builder) {
+void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Distance", [this] { return this->GetDistance(); }, nullptr);

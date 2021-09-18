@@ -62,17 +62,15 @@ Pipe* Pipe::DoAccept() {
   return Accept().get();
 }
 
-void Pipe::Bind(const Twine& name) {
-  SmallString<128> nameBuf;
-  Invoke(&uv_pipe_bind, GetRaw(),
-         name.toNullTerminatedStringRef(nameBuf).data());
+void Pipe::Bind(std::string_view name) {
+  SmallString<128> nameBuf{name};
+  Invoke(&uv_pipe_bind, GetRaw(), nameBuf.c_str());
 }
 
-void Pipe::Connect(const Twine& name,
+void Pipe::Connect(std::string_view name,
                    const std::shared_ptr<PipeConnectReq>& req) {
-  SmallString<128> nameBuf;
-  uv_pipe_connect(req->GetRaw(), GetRaw(),
-                  name.toNullTerminatedStringRef(nameBuf).data(),
+  SmallString<128> nameBuf{name};
+  uv_pipe_connect(req->GetRaw(), GetRaw(), nameBuf.c_str(),
                   [](uv_connect_t* req, int status) {
                     auto& h = *static_cast<PipeConnectReq*>(req->data);
                     if (status < 0) {
@@ -85,7 +83,7 @@ void Pipe::Connect(const Twine& name,
   req->Keep();
 }
 
-void Pipe::Connect(const Twine& name, std::function<void()> callback) {
+void Pipe::Connect(std::string_view name, std::function<void()> callback) {
   auto req = std::make_shared<PipeConnectReq>();
   req->connected.connect(callback);
   Connect(name, req);

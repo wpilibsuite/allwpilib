@@ -23,6 +23,10 @@ public class CallbackStore implements AutoCloseable {
 
   /**
    * <b>Note: This constructor is for simulation classes only. It should not be called by teams!</b>
+   *
+   * @param index TODO
+   * @param uid TODO
+   * @param ccf TODO
    */
   public CallbackStore(int index, int uid, CancelCallbackFunc ccf) {
     this.m_cancelType = kNormalCancel;
@@ -33,6 +37,11 @@ public class CallbackStore implements AutoCloseable {
 
   /**
    * <b>Note: This constructor is for simulation classes only. It should not be called by teams!</b>
+   *
+   * @param index TODO
+   * @param channel TODO
+   * @param uid TODO
+   * @param ccf TODO
    */
   public CallbackStore(int index, int channel, int uid, CancelCallbackChannelFunc ccf) {
     this.m_cancelType = kChannelCancel;
@@ -44,6 +53,9 @@ public class CallbackStore implements AutoCloseable {
 
   /**
    * <b>Note: This constructor is for simulation classes only. It should not be called by teams!</b>
+   *
+   * @param uid TODO
+   * @param ccf TODO
    */
   public CallbackStore(int uid, CancelCallbackNoIndexFunc ccf) {
     this.m_cancelType = kNoIndexCancel;

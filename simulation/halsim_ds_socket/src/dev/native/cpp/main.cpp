@@ -6,8 +6,6 @@
 
 #include <hal/DriverStation.h>
 #include <hal/HALBase.h>
-#include <wpi/Format.h>
-#include <wpi/raw_ostream.h>
 
 extern "C" int HALSIM_InitExtension(void);
 

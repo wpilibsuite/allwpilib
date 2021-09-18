@@ -38,7 +38,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On Windows, install the JDK 11 .msi from the link above
     - On macOS, install the JDK 11 .pkg from the link above
 - C++ compiler
-    - On Linux, install GCC 7 or greater
+    - On Linux, install GCC 8 or greater
     - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - ARM compiler toolchain
@@ -95,10 +95,10 @@ If you have installed the FRC Toolchain to a directory other than the default, o
 
 ### Gazebo simulation
 
-If you also want simulation to be built, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
+If you also want to force building Gazebo simulation support, add -PforceGazebo. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 
 ```bash
-./gradlew build -PmakeSim
+./gradlew build -PforceGazebo
 ```
 
 If you prefer to use CMake directly, the you can still do so.
@@ -120,7 +120,7 @@ wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on
 
 #### Java Code Quality Tools
 
-The Java code quality tools (checkstyle, pmd, etc.) can be run with the `./gradlew javaFormat` task.
+The Java code quality tools Checkstyle and PMD can be run via `./gradlew javaFormat`. Spotless can be run via `./gradlew spotlessCheck` to preview changes, and via `./gradlew spotlessApply` to immediately apply changes. These tools will all be run automatically by the build task. To disable this behavior, pass the `-PskipJavaFormat` flag.
 
 ### CMake
 
@@ -146,6 +146,8 @@ The Simulation directory contains extra simulation tools and libraries, such as 
 The integration test directories for C++ and Java contain test code that runs on our test-system. When you submit code for review, it is tested by those programs. If you add new functionality you should make sure to write tests for it so we don't break it in the future.
 
 The hal directory contains more C++ code meant to run on the roboRIO. HAL is an acronym for "Hardware Abstraction Layer", and it interfaces with the NI Libraries. The NI Libraries contain the low-level code for controlling devices on your robot. The NI Libraries are found in the ni-libraries folder.
+
+The upstream_utils directory contains scripts for updating copies of thirdparty code in the repository.
 
 The [styleguide repository](https://github.com/wpilibsuite/styleguide) contains our style guides for C++ and Java code. Anything submitted to the WPILib project needs to follow the code style guides outlined in there. For details about the style, please see the contributors document [here](CONTRIBUTING.md#coding-guidelines).
 

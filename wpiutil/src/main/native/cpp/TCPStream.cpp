@@ -168,7 +168,7 @@ void TCPStream::close() {
   m_sd = -1;
 }
 
-StringRef TCPStream::getPeerIP() const {
+std::string_view TCPStream::getPeerIP() const {
   return m_peerIP;
 }
 

@@ -11,17 +11,15 @@
 #include <hal/Errors.h>
 #include <hal/FRCUsageReporting.h>
 
+#include "frc/Errors.h"
+
 using namespace frc;
 
 CAN::CAN(int deviceId) {
   int32_t status = 0;
   m_handle =
       HAL_InitializeCAN(kTeamManufacturer, deviceId, kTeamDeviceType, &status);
-  if (status != 0) {
-    wpi_setHALError(status);
-    m_handle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "device id {}", deviceId);
 
   HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId + 1);
 }
@@ -31,19 +29,13 @@ CAN::CAN(int deviceId, int deviceManufacturer, int deviceType) {
   m_handle = HAL_InitializeCAN(
       static_cast<HAL_CANManufacturer>(deviceManufacturer), deviceId,
       static_cast<HAL_CANDeviceType>(deviceType), &status);
-  if (status != 0) {
-    wpi_setHALError(status);
-    m_handle = HAL_kInvalidHandle;
-    return;
-  }
+  FRC_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
+                       deviceManufacturer, deviceType);
 
   HAL_Report(HALUsageReporting::kResourceType_CAN, deviceId + 1);
 }
 
 CAN::~CAN() {
-  if (StatusIsFatal()) {
-    return;
-  }
   if (m_handle != HAL_kInvalidHandle) {
     HAL_CleanCAN(m_handle);
     m_handle = HAL_kInvalidHandle;
@@ -53,20 +45,20 @@ CAN::~CAN() {
 void CAN::WritePacket(const uint8_t* data, int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANPacket(m_handle, data, length, apiId, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "WritePacket");
 }
 
 void CAN::WritePacketRepeating(const uint8_t* data, int length, int apiId,
                                int repeatMs) {
   int32_t status = 0;
   HAL_WriteCANPacketRepeating(m_handle, data, length, apiId, repeatMs, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "WritePacketRepeating");
 }
 
 void CAN::WriteRTRFrame(int length, int apiId) {
   int32_t status = 0;
   HAL_WriteCANRTRFrame(m_handle, length, apiId, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "WriteRTRFrame");
 }
 
 int CAN::WritePacketNoError(const uint8_t* data, int length, int apiId) {
@@ -91,7 +83,7 @@ int CAN::WriteRTRFrameNoError(int length, int apiId) {
 void CAN::StopPacketRepeating(int apiId) {
   int32_t status = 0;
   HAL_StopCANPacketRepeating(m_handle, apiId, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "StopPacketRepeating");
 }
 
 bool CAN::ReadPacketNew(int apiId, CANData* data) {
@@ -102,7 +94,7 @@ bool CAN::ReadPacketNew(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setHALError(status);
+    FRC_CheckErrorStatus(status, "{}", "ReadPacketNew");
     return false;
   } else {
     return true;
@@ -117,7 +109,7 @@ bool CAN::ReadPacketLatest(int apiId, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setHALError(status);
+    FRC_CheckErrorStatus(status, "{}", "ReadPacketLatest");
     return false;
   } else {
     return true;
@@ -133,7 +125,7 @@ bool CAN::ReadPacketTimeout(int apiId, int timeoutMs, CANData* data) {
     return false;
   }
   if (status != 0) {
-    wpi_setHALError(status);
+    FRC_CheckErrorStatus(status, "{}", "ReadPacketTimeout");
     return false;
   } else {
     return true;

@@ -70,15 +70,15 @@ void NetworkListener::Impl::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
-    ERROR(
-        "NetworkListener: could not create eventfd: " << std::strerror(errno));
+    ERROR("NetworkListener: could not create eventfd: {}",
+          std::strerror(errno));
     return;
   }
 
   // Create netlink socket
   int sd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
   if (sd < 0) {
-    ERROR("NetworkListener: could not create socket: " << std::strerror(errno));
+    ERROR("NetworkListener: could not create socket: {}", std::strerror(errno));
     ::close(m_command_fd);
     m_command_fd = -1;
     return;
@@ -90,7 +90,7 @@ void NetworkListener::Impl::Thread::Main() {
   addr.nl_family = AF_NETLINK;
   addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
   if (bind(sd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
-    ERROR("NetworkListener: could not create socket: " << std::strerror(errno));
+    ERROR("NetworkListener: could not create socket: {}", std::strerror(errno));
     ::close(sd);
     ::close(m_command_fd);
     m_command_fd = -1;
@@ -113,7 +113,7 @@ void NetworkListener::Impl::Thread::Main() {
     int nfds = std::max(m_command_fd, sd) + 1;
 
     if (::select(nfds, &readfds, nullptr, nullptr, &tv) < 0) {
-      ERROR("NetworkListener: select(): " << std::strerror(errno));
+      ERROR("NetworkListener: select(): {}", std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
 
@@ -134,8 +134,8 @@ void NetworkListener::Impl::Thread::Main() {
       if (errno == EWOULDBLOCK || errno == EAGAIN) {
         continue;
       }
-      ERROR(
-          "NetworkListener: could not read netlink: " << std::strerror(errno));
+      ERROR("NetworkListener: could not read netlink: {}",
+            std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
     if (len == 0) {

@@ -60,7 +60,7 @@ void glass::DisplayRelay(RelayModel* model, int index, bool outputsEnabled) {
 }
 
 void glass::DisplayRelays(RelaysModel* model, bool outputsEnabled,
-                          wpi::StringRef noneMsg) {
+                          std::string_view noneMsg) {
   bool hasAny = false;
   bool first = true;
   model->ForEachRelay([&](RelayModel& relay, int i) {
@@ -77,6 +77,6 @@ void glass::DisplayRelays(RelaysModel* model, bool outputsEnabled,
     PopID();
   });
   if (!hasAny && !noneMsg.empty()) {
-    ImGui::TextUnformatted(noneMsg.begin(), noneMsg.end());
+    ImGui::TextUnformatted(noneMsg.data(), noneMsg.data() + noneMsg.size());
   }
 }

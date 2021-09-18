@@ -6,6 +6,7 @@
 
 #include <functional>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -33,16 +34,16 @@ namespace frc {
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, theta]]^T </strong> in the
+ * <strong> x = [[x, y, theta]]ᵀ </strong> in the
  * field-coordinate system.
  *
- * <strong> u = [[vx, vy, omega]]^T </strong> in the field-coordinate system.
+ * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
  *
- * <strong> y = [[x, y, theta]]^T </strong> in field
- * coords from vision, or <strong> y = [[theta]]^T
+ * <strong> y = [[x, y, theta]]ᵀ </strong> in field
+ * coords from vision, or <strong> y = [[theta]]ᵀ
  * </strong> from the gyro.
  */
-class MecanumDrivePoseEstimator {
+class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator.
@@ -54,7 +55,7 @@ class MecanumDrivePoseEstimator {
    * @param stateStdDevs             Standard deviations of model states.
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
-   *                                 is in the form [x, y, theta]^T, with units
+   *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
    *                                 measurements. Increase these numbers to
@@ -65,7 +66,7 @@ class MecanumDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    * @param nominalDt                The time in seconds between each robot
    *                                 loop.
@@ -87,7 +88,7 @@ class MecanumDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
@@ -136,6 +137,44 @@ class MecanumDrivePoseEstimator {
                             units::second_t timestamp);
 
   /**
+   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
+   * the odometry pose estimate while still accounting for measurement noise.
+   *
+   * This method can be called as infrequently as you want, as long as you are
+   * calling Update() every loop.
+   *
+   * Note that the vision measurement standard deviations passed into this
+   * method will continue to apply to future measurements until a subsequent
+   * call to SetVisionMeasurementStdDevs() or this method.
+   *
+   * @param visionRobotPose          The pose of the robot as measured by the
+   *                                 vision camera.
+   * @param timestamp                The timestamp of the vision measurement in
+   *                                 seconds. Note that if you don't use your
+   *                                 own time source by calling
+   *                                 UpdateWithTime(), then you must use a
+   *                                 timestamp with an epoch since FPGA startup
+   *                                 (i.e. the epoch of this timestamp is the
+   *                                 same epoch as
+   *                                 frc::Timer::GetFPGATimestamp(). This means
+   *                                 that you should use
+   *                                 frc::Timer::GetFPGATimestamp() as your
+   *                                 time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]ᵀ, with units in meters and
+   *                                 radians.
+   */
+  void AddVisionMeasurement(
+      const Pose2d& visionRobotPose, units::second_t timestamp,
+      const wpi::array<double, 3>& visionMeasurementStdDevs) {
+    SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    AddVisionMeasurement(visionRobotPose, timestamp);
+  }
+
+  /**
    * Updates the the Unscented Kalman Filter using only wheel encoder
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
@@ -166,11 +205,11 @@ class MecanumDrivePoseEstimator {
   MecanumDriveKinematics m_kinematics;
   KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
       m_latencyCompensator;
-  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
-                     const Eigen::Matrix<double, 3, 1>& y)>
+  std::function<void(const Eigen::Vector<double, 3>& u,
+                     const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;
 
-  Eigen::Matrix3d m_visionDiscR;
+  Eigen::Matrix3d m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
@@ -180,7 +219,7 @@ class MecanumDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Matrix<double, Dim, 1>& vector) {
+      const Eigen::Vector<double, Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

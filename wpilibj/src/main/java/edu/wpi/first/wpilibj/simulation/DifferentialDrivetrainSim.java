@@ -4,21 +4,21 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.math.StateSpaceUtil;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.NumericalIntegration;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
-import edu.wpi.first.wpiutil.math.numbers.N7;
 
 /**
  * This class simulates the state of the drivetrain. In simulationPeriodic, users should first set
@@ -29,10 +29,10 @@ import edu.wpi.first.wpiutil.math.numbers.N7;
  *
  * <p>Our state-space system is:
  *
- * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]^T in the field coordinate system (dist_* are
+ * <p>x = [[x, y, theta, vel_l, vel_r, dist_l, dist_r]]ᵀ in the field coordinate system (dist_* are
  * wheel distances.)
  *
- * <p>u = [[voltage_l, voltage_r]]^T This is typically the control input of the last timestep from a
+ * <p>u = [[voltage_l, voltage_r]]ᵀ This is typically the control input of the last timestep from a
  * LTVDiffDriveController.
  *
  * <p>y = x
@@ -67,7 +67,7 @@ public class DifferentialDrivetrainSim {
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain.
    * @param trackWidthMeters The robot's track width, or distance between left and right wheels.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
@@ -101,9 +101,9 @@ public class DifferentialDrivetrainSim {
    *
    * @param drivetrainPlant The {@link LinearSystem} representing the robot's drivetrain. This
    *     system can be created with {@link
-   *     edu.wpi.first.wpilibj.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
+   *     edu.wpi.first.math.system.plant.LinearSystemId#createDrivetrainVelocitySystem(DCMotor,
    *     double, double, double, double, double)} or {@link
-   *     edu.wpi.first.wpilibj.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
+   *     edu.wpi.first.math.system.plant.LinearSystemId#identifyDrivetrainSystem(double, double,
    *     double, double)}.
    * @param driveMotor A {@link DCMotor} representing the drivetrain.
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
@@ -112,7 +112,7 @@ public class DifferentialDrivetrainSim {
    *     frc-characterization.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
@@ -155,7 +155,6 @@ public class DifferentialDrivetrainSim {
    */
   @SuppressWarnings("LocalVariableName")
   public void update(double dtSeconds) {
-
     // Update state estimate with RK4
     m_x = NumericalIntegration.rk4(this::getDynamics, m_x, m_u, dtSeconds);
     m_y = m_x;
@@ -187,12 +186,18 @@ public class DifferentialDrivetrainSim {
    * Returns the direction the robot is pointing.
    *
    * <p>Note that this angle is counterclockwise-positive, while most gyros are clockwise positive.
+   *
+   * @return The direction the robot is pointing.
    */
   public Rotation2d getHeading() {
     return new Rotation2d(getOutput(State.kHeading));
   }
 
-  /** Returns the current pose. */
+  /**
+   * Returns the current pose.
+   *
+   * @return The current pose.
+   */
   public Pose2d getPose() {
     return new Pose2d(getOutput(State.kX), getOutput(State.kY), getHeading());
   }
@@ -313,7 +318,6 @@ public class DifferentialDrivetrainSim {
 
   @SuppressWarnings({"DuplicatedCode", "LocalVariableName", "ParameterName"})
   protected Matrix<N7, N1> getDynamics(Matrix<N7, N1> x, Matrix<N2, N1> u) {
-
     // Because G can be factored out of B, we can divide by the old ratio and multiply
     // by the new ratio to get a new drivetrain model.
     var B = new Matrix<>(Nat.N4(), Nat.N2());
@@ -416,8 +420,15 @@ public class DifferentialDrivetrainSim {
 
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
+    kSixInch(Units.inchesToMeters(6)),
+    kEightInch(Units.inchesToMeters(8)),
+    kTenInch(Units.inchesToMeters(10)),
+
+    @Deprecated
     SixInch(Units.inchesToMeters(6)),
+    @Deprecated
     EightInch(Units.inchesToMeters(8)),
+    @Deprecated
     TenInch(Units.inchesToMeters(10));
 
     @SuppressWarnings("MemberName")
@@ -436,10 +447,11 @@ public class DifferentialDrivetrainSim {
    * @param gearing The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
+   * @return A sim for the standard FRC kitbot.
    */
   public static DifferentialDrivetrainSim createKitbotSim(
       KitbotMotor motor,
@@ -464,10 +476,11 @@ public class DifferentialDrivetrainSim {
    * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
    *     frc-characterization.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
-   *     left velocity, right velocity, left distance, right distance]^T. Can be null if no noise is
+   *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05
    *     m/s, and position measurement standard deviations of 0.005 meters are a reasonable starting
    *     point.
+   * @return A sim for the standard FRC kitbot.
    */
   @SuppressWarnings("ParameterName")
   public static DifferentialDrivetrainSim createKitbotSim(
@@ -480,7 +493,7 @@ public class DifferentialDrivetrainSim {
         motor.value,
         gearing.value,
         jKgMetersSquared,
-        25 / 2.2,
+        Units.lbsToKilograms(60),
         wheelSize.value / 2.0,
         Units.inchesToMeters(26),
         measurementStdDevs);

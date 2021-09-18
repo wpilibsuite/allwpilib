@@ -5,20 +5,23 @@
 #include "glass/networktables/NTField2D.h"
 
 #include <algorithm>
+#include <vector>
 
+#include <fmt/format.h>
 #include <ntcore_cpp.h>
+#include <wpi/Endian.h>
+#include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
-
-#include "glass/DataSource.h"
+#include <wpi/StringExtras.h>
 
 using namespace glass;
 
-class NTField2DModel::GroupModel : public FieldObjectGroupModel {
+class NTField2DModel::ObjectModel : public FieldObjectModel {
  public:
-  GroupModel(wpi::StringRef name, NT_Entry entry)
+  ObjectModel(std::string_view name, NT_Entry entry)
       : m_name{name}, m_entry{entry} {}
 
-  wpi::StringRef GetName() const { return m_name; }
+  const char* GetName() const override { return m_name.c_str(); }
   NT_Entry GetEntry() const { return m_entry; }
 
   void NTUpdate(const nt::Value& value);
@@ -31,155 +34,127 @@ class NTField2DModel::GroupModel : public FieldObjectGroupModel {
   bool Exists() override { return nt::GetEntryType(m_entry) != NT_UNASSIGNED; }
   bool IsReadOnly() override { return false; }
 
-  void ForEachFieldObject(
-      wpi::function_ref<void(FieldObjectModel& model)> func) override;
+  wpi::span<const frc::Pose2d> GetPoses() override { return m_poses; }
+  void SetPoses(wpi::span<const frc::Pose2d> poses) override;
+  void SetPose(size_t i, frc::Pose2d pose) override;
+  void SetPosition(size_t i, frc::Translation2d pos) override;
+  void SetRotation(size_t i, frc::Rotation2d rot) override;
 
  private:
+  void UpdateNT();
+
   std::string m_name;
   NT_Entry m_entry;
 
-  // keep count of objects rather than resizing vector, as there is a fair
-  // amount of overhead associated with the latter (DataSource record keeping)
-  size_t m_count = 0;
-  class ObjectModel;
-  std::vector<std::unique_ptr<ObjectModel>> m_objects;
+  std::vector<frc::Pose2d> m_poses;
 };
 
-class NTField2DModel::GroupModel::ObjectModel : public FieldObjectModel {
- public:
-  ObjectModel(wpi::StringRef name, NT_Entry entry, int index)
-      : m_entry{entry},
-        m_index{index},
-        m_x{name + "[" + wpi::Twine{index} + "]/x"},
-        m_y{name + "[" + wpi::Twine{index} + "]/y"},
-        m_rot{name + "[" + wpi::Twine{index} + "]/rot"} {}
+void NTField2DModel::ObjectModel::NTUpdate(const nt::Value& value) {
+  if (value.IsDoubleArray()) {
+    auto arr = value.GetDoubleArray();
+    auto size = arr.size();
+    if ((size % 3) != 0) {
+      return;
+    }
+    m_poses.resize(size / 3);
+    for (size_t i = 0; i < size / 3; ++i) {
+      m_poses[i] = frc::Pose2d{
+          units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
+          frc::Rotation2d{units::degree_t{arr[i * 3 + 2]}}};
+    }
+  } else if (value.IsRaw()) {
+    // treat it simply as an array of doubles
+    std::string_view data = value.GetRaw();
 
-  void SetExists(bool exists) { m_exists = exists; }
-
-  void Update() override {}
-  bool Exists() override { return m_exists; }
-  bool IsReadOnly() override { return false; }
-
-  DataSource* GetXData() override { return &m_x; }
-  DataSource* GetYData() override { return &m_y; }
-  DataSource* GetRotationData() override { return &m_rot; }
-
-  void SetPose(double x, double y, double rot) override;
-  void SetPosition(double x, double y) override;
-  void SetRotation(double rot) override;
-
- private:
-  void SetPoseImpl(double x, double y, double rot, bool setX, bool setY,
-                   bool setRot);
-
-  NT_Entry m_entry;
-  int m_index;
-  bool m_exists = true;
-
- public:
-  DataSource m_x;
-  DataSource m_y;
-  DataSource m_rot;
-};
-
-void NTField2DModel::GroupModel::NTUpdate(const nt::Value& value) {
-  if (!value.IsDoubleArray()) {
-    m_count = 0;
-    return;
-  }
-
-  auto arr = value.GetDoubleArray();
-  // must be triples
-  if ((arr.size() % 3) != 0) {
-    m_count = 0;
-    return;
-  }
-
-  m_count = arr.size() / 3;
-  if (m_count > m_objects.size()) {
-    m_objects.reserve(m_count);
-    for (size_t i = m_objects.size(); i < m_count; ++i) {
-      m_objects.emplace_back(std::make_unique<ObjectModel>(m_name, m_entry, i));
+    // must be triples of doubles
+    auto size = data.size();
+    if ((size % (3 * 8)) != 0) {
+      return;
+    }
+    m_poses.resize(size / (3 * 8));
+    const char* p = data.data();
+    for (size_t i = 0; i < size / (3 * 8); ++i) {
+      double x = wpi::BitsToDouble(
+          wpi::support::endian::readNext<uint64_t, wpi::support::big,
+                                         wpi::support::unaligned>(p));
+      double y = wpi::BitsToDouble(
+          wpi::support::endian::readNext<uint64_t, wpi::support::big,
+                                         wpi::support::unaligned>(p));
+      double rot = wpi::BitsToDouble(
+          wpi::support::endian::readNext<uint64_t, wpi::support::big,
+                                         wpi::support::unaligned>(p));
+      m_poses[i] = frc::Pose2d{units::meter_t{x}, units::meter_t{y},
+                               frc::Rotation2d{units::degree_t{rot}}};
     }
   }
-  if (m_count < m_objects.size()) {
-    for (size_t i = m_count; i < m_objects.size(); ++i) {
-      m_objects[i]->SetExists(false);
+}
+
+void NTField2DModel::ObjectModel::UpdateNT() {
+  if (m_poses.size() < (255 / 3)) {
+    wpi::SmallVector<double, 9> arr;
+    for (auto&& pose : m_poses) {
+      auto& translation = pose.Translation();
+      arr.push_back(translation.X().to<double>());
+      arr.push_back(translation.Y().to<double>());
+      arr.push_back(pose.Rotation().Degrees().to<double>());
     }
-  }
-
-  for (size_t i = 0; i < m_count; ++i) {
-    auto& obj = m_objects[i];
-    obj->SetExists(true);
-    obj->m_x.SetValue(arr[i * 3], value.last_change());
-    obj->m_y.SetValue(arr[i * 3 + 1], value.last_change());
-    obj->m_rot.SetValue(arr[i * 3 + 2], value.last_change());
+    nt::SetEntryTypeValue(m_entry, nt::Value::MakeDoubleArray(arr));
+  } else {
+    // send as raw array of doubles if too big for NT array
+    std::vector<char> arr;
+    arr.resize(m_poses.size() * 3 * 8);
+    char* p = arr.data();
+    for (auto&& pose : m_poses) {
+      auto& translation = pose.Translation();
+      wpi::support::endian::write64be(
+          p, wpi::DoubleToBits(translation.X().to<double>()));
+      p += 8;
+      wpi::support::endian::write64be(
+          p, wpi::DoubleToBits(translation.Y().to<double>()));
+      p += 8;
+      wpi::support::endian::write64be(
+          p, wpi::DoubleToBits(pose.Rotation().Degrees().to<double>()));
+      p += 8;
+    }
+    nt::SetEntryTypeValue(m_entry,
+                          nt::Value::MakeRaw({arr.data(), arr.size()}));
   }
 }
 
-void NTField2DModel::GroupModel::ForEachFieldObject(
-    wpi::function_ref<void(FieldObjectModel& model)> func) {
-  for (size_t i = 0; i < m_count; ++i) {
-    func(*m_objects[i]);
+void NTField2DModel::ObjectModel::SetPoses(wpi::span<const frc::Pose2d> poses) {
+  m_poses.assign(poses.begin(), poses.end());
+  UpdateNT();
+}
+
+void NTField2DModel::ObjectModel::SetPose(size_t i, frc::Pose2d pose) {
+  if (i < m_poses.size()) {
+    m_poses[i] = pose;
+    UpdateNT();
   }
 }
 
-void NTField2DModel::GroupModel::ObjectModel::SetPose(double x, double y,
-                                                      double rot) {
-  SetPoseImpl(x, y, rot, true, true, true);
+void NTField2DModel::ObjectModel::SetPosition(size_t i,
+                                              frc::Translation2d pos) {
+  if (i < m_poses.size()) {
+    m_poses[i] = frc::Pose2d{pos, m_poses[i].Rotation()};
+    UpdateNT();
+  }
 }
 
-void NTField2DModel::GroupModel::ObjectModel::SetPosition(double x, double y) {
-  SetPoseImpl(x, y, 0, true, true, false);
+void NTField2DModel::ObjectModel::SetRotation(size_t i, frc::Rotation2d rot) {
+  if (i < m_poses.size()) {
+    m_poses[i] = frc::Pose2d{m_poses[i].Translation(), rot};
+    UpdateNT();
+  }
 }
 
-void NTField2DModel::GroupModel::ObjectModel::SetRotation(double rot) {
-  SetPoseImpl(0, 0, rot, false, false, true);
-}
-
-void NTField2DModel::GroupModel::ObjectModel::SetPoseImpl(double x, double y,
-                                                          double rot, bool setX,
-                                                          bool setY,
-                                                          bool setRot) {
-  // get from NT, validate type and size
-  auto value = nt::GetEntryValue(m_entry);
-  if (!value || !value->IsDoubleArray()) {
-    return;
-  }
-  auto origArr = value->GetDoubleArray();
-  if (static_cast<int>(origArr.size()) < ((m_index + 1) * 3)) {
-    return;
-  }
-
-  // copy existing array
-  wpi::SmallVector<double, 8> arr;
-  arr.reserve(origArr.size());
-  for (auto&& elem : origArr) {
-    arr.emplace_back(elem);
-  }
-
-  // update value
-  if (setX) {
-    arr[m_index * 3 + 0] = x;
-  }
-  if (setY) {
-    arr[m_index * 3 + 1] = y;
-  }
-  if (setRot) {
-    arr[m_index * 3 + 2] = rot;
-  }
-
-  // set back to NT
-  nt::SetEntryValue(m_entry, nt::Value::MakeDoubleArray(arr));
-}
-
-NTField2DModel::NTField2DModel(wpi::StringRef path)
+NTField2DModel::NTField2DModel(std::string_view path)
     : NTField2DModel{nt::GetDefaultInstance(), path} {}
 
-NTField2DModel::NTField2DModel(NT_Inst inst, wpi::StringRef path)
+NTField2DModel::NTField2DModel(NT_Inst inst, std::string_view path)
     : m_nt{inst},
-      m_path{(path + "/").str()},
-      m_name{m_nt.GetEntry(path + "/.name")} {
+      m_path{fmt::format("{}/", path)},
+      m_name{m_nt.GetEntry(fmt::format("{}/.name", path))} {
   m_nt.AddListener(m_path, NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
                                NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE);
 }
@@ -199,34 +174,31 @@ void NTField2DModel::Update() {
     // common case: update of existing entry; search by entry
     if (event.flags & NT_NOTIFY_UPDATE) {
       auto it = std::find_if(
-          m_groups.begin(), m_groups.end(),
+          m_objects.begin(), m_objects.end(),
           [&](const auto& e) { return e->GetEntry() == event.entry; });
-      if (it != m_groups.end()) {
+      if (it != m_objects.end()) {
         (*it)->NTUpdate(*event.value);
         continue;
       }
     }
 
     // handle create/delete
-    if (wpi::StringRef{event.name}.startswith(m_path)) {
-      auto name = wpi::StringRef{event.name}.drop_front(m_path.size());
+    std::string_view name = event.name;
+    if (wpi::starts_with(name, m_path)) {
+      name.remove_prefix(m_path.size());
       if (name.empty() || name[0] == '.') {
         continue;
       }
-      auto it = std::lower_bound(m_groups.begin(), m_groups.end(), name,
-                                 [](const auto& e, wpi::StringRef name) {
-                                   return e->GetName() < name;
-                                 });
-      bool match = (it != m_groups.end() && (*it)->GetName() == name);
+      auto [it, match] = Find(event.name);
       if (event.flags & NT_NOTIFY_DELETE) {
         if (match) {
-          m_groups.erase(it);
+          m_objects.erase(it);
         }
         continue;
       } else if (event.flags & NT_NOTIFY_NEW) {
         if (!match) {
-          it = m_groups.emplace(
-              it, std::make_unique<GroupModel>(event.name, event.entry));
+          it = m_objects.emplace(
+              it, std::make_unique<ObjectModel>(event.name, event.entry));
         }
       } else if (!match) {
         continue;
@@ -246,12 +218,38 @@ bool NTField2DModel::IsReadOnly() {
   return false;
 }
 
-void NTField2DModel::ForEachFieldObjectGroup(
-    wpi::function_ref<void(FieldObjectGroupModel& model, wpi::StringRef name)>
+FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
+  auto fullName = fmt::format("{}{}", m_path, name);
+  auto [it, match] = Find(fullName);
+  if (!match) {
+    it = m_objects.emplace(
+        it, std::make_unique<ObjectModel>(fullName, m_nt.GetEntry(fullName)));
+  }
+  return it->get();
+}
+
+void NTField2DModel::RemoveFieldObject(std::string_view name) {
+  auto [it, match] = Find(fmt::format("{}{}", m_path, name));
+  if (match) {
+    nt::DeleteEntry((*it)->GetEntry());
+    m_objects.erase(it);
+  }
+}
+
+void NTField2DModel::ForEachFieldObject(
+    wpi::function_ref<void(FieldObjectModel& model, std::string_view name)>
         func) {
-  for (auto&& group : m_groups) {
-    if (group->Exists()) {
-      func(*group, wpi::StringRef{group->GetName()}.drop_front(m_path.size()));
+  for (auto&& obj : m_objects) {
+    if (obj->Exists()) {
+      func(*obj, wpi::drop_front(obj->GetName(), m_path.size()));
     }
   }
+}
+
+std::pair<NTField2DModel::Objects::iterator, bool> NTField2DModel::Find(
+    std::string_view fullName) {
+  auto it = std::lower_bound(
+      m_objects.begin(), m_objects.end(), fullName,
+      [](const auto& e, std::string_view name) { return e->GetName() < name; });
+  return {it, it != m_objects.end() && (*it)->GetName() == fullName};
 }

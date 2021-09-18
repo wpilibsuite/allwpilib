@@ -7,17 +7,17 @@
 
 #include <wpi/Logger.h>
 
-#define LOG(level, x) WPI_LOG(m_logger, level, x)
+#define LOG(level, format, ...) WPI_LOG(m_logger, level, format, __VA_ARGS__)
 
 #undef ERROR
-#define ERROR(x) WPI_ERROR(m_logger, x)
-#define WARNING(x) WPI_WARNING(m_logger, x)
-#define INFO(x) WPI_INFO(m_logger, x)
+#define ERROR(format, ...) WPI_ERROR(m_logger, format, __VA_ARGS__)
+#define WARNING(format, ...) WPI_WARNING(m_logger, format, __VA_ARGS__)
+#define INFO(format, ...) WPI_INFO(m_logger, format, __VA_ARGS__)
 
-#define DEBUG0(x) WPI_DEBUG(m_logger, x)
-#define DEBUG1(x) WPI_DEBUG1(m_logger, x)
-#define DEBUG2(x) WPI_DEBUG2(m_logger, x)
-#define DEBUG3(x) WPI_DEBUG3(m_logger, x)
-#define DEBUG4(x) WPI_DEBUG4(m_logger, x)
+#define DEBUG0(format, ...) WPI_DEBUG(m_logger, format, __VA_ARGS__)
+#define DEBUG1(format, ...) WPI_DEBUG1(m_logger, format, __VA_ARGS__)
+#define DEBUG2(format, ...) WPI_DEBUG2(m_logger, format, __VA_ARGS__)
+#define DEBUG3(format, ...) WPI_DEBUG3(m_logger, format, __VA_ARGS__)
+#define DEBUG4(format, ...) WPI_DEBUG4(m_logger, format, __VA_ARGS__)
 
 #endif  // NTCORE_LOG_H_

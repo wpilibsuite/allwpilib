@@ -5,9 +5,8 @@
 #include "frc/Servo.h"
 
 #include <hal/FRCUsageReporting.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -25,7 +24,7 @@ Servo::Servo(int channel) : PWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel + 1);
-  SendableRegistry::GetInstance().SetName(this, "Servo", channel);
+  wpi::SendableRegistry::SetName(this, "Servo", channel);
 }
 
 void Servo::Set(double value) {
@@ -62,10 +61,10 @@ double Servo::GetMinAngle() const {
   return kMinServoAngle;
 }
 
-void Servo::InitSendable(SendableBuilder& builder) {
+void Servo::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Servo");
   builder.AddDoubleProperty(
-      "Value", [=]() { return Get(); }, [=](double value) { Set(value); });
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }
 
 double Servo::GetServoAngleRange() const {

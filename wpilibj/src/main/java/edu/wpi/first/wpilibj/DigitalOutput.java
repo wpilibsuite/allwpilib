@@ -8,8 +8,9 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
@@ -56,7 +57,7 @@ public class DigitalOutput extends DigitalSource implements Sendable {
    * @param value true is on, off is false
    */
   public void set(boolean value) {
-    DIOJNI.setDIO(m_handle, (short) (value ? 1 : 0));
+    DIOJNI.setDIO(m_handle, value);
   }
 
   /**

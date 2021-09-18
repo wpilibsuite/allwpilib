@@ -7,9 +7,10 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
 #include "wpi/Signal.h"
 #include "wpi/SmallString.h"
-#include "wpi/StringRef.h"
 #include "wpi/http_parser.h"
 
 namespace wpi {
@@ -58,9 +59,10 @@ class HttpParser {
    * @param in input data
    * @return Trailing input data after the parse.
    */
-  StringRef Execute(StringRef in) {
-    return in.drop_front(
+  std::string_view Execute(std::string_view in) {
+    in.remove_prefix(
         http_parser_execute(&m_parser, &m_settings, in.data(), in.size()));
+    return in;
   }
 
   /**
@@ -136,7 +138,7 @@ class HttpParser {
   /**
    * Get URL.  Valid in and after the url callback has been called.
    */
-  StringRef GetUrl() const { return m_urlBuf; }
+  std::string_view GetUrl() const { return m_urlBuf.str(); }
 
   /**
    * Message begin callback.
@@ -148,7 +150,7 @@ class HttpParser {
    *
    * The parameter to the callback is the complete URL string.
    */
-  sig::Signal<StringRef> url;
+  sig::Signal<std::string_view> url;
 
   /**
    * Status callback.
@@ -156,14 +158,14 @@ class HttpParser {
    * The parameter to the callback is the complete status string.
    * GetStatusCode() can be used to get the numeric status code.
    */
-  sig::Signal<StringRef> status;
+  sig::Signal<std::string_view> status;
 
   /**
    * Header field callback.
    *
    * The parameters to the callback are the field name and field value.
    */
-  sig::Signal<StringRef, StringRef> header;
+  sig::Signal<std::string_view, std::string_view> header;
 
   /**
    * Headers complete callback.
@@ -183,7 +185,7 @@ class HttpParser {
    * multiple times arbitrarily (e.g. it's possible that it may be called with
    * just a few characters at a time).
    */
-  sig::Signal<StringRef, bool> body;
+  sig::Signal<std::string_view, bool> body;
 
   /**
    * Headers complete callback.

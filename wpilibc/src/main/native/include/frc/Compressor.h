@@ -4,22 +4,22 @@
 
 #pragma once
 
-#include <hal/Types.h>
+#include <memory>
 
-#include "frc/ErrorBase.h"
+#include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
+#include "frc/PneumaticsBase.h"
+#include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
-class SendableBuilder;
-
 /**
- * Class for operating a compressor connected to a %PCM (Pneumatic Control
- * Module).
+ * Class for operating a compressor connected to a pneumatics module.
  *
- * The PCM will automatically run in closed loop mode by default whenever a
+ * The module will automatically run in closed loop mode by default whenever a
  * Solenoid object is created. For most cases, a Compressor object does not need
  * to be instantiated or used in a robot program. This class is only required in
  * cases where the robot program needs a more detailed status of the compressor
@@ -30,18 +30,28 @@ class SendableBuilder;
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public ErrorBase,
-                   public Sendable,
-                   public SendableHelper<Compressor> {
+class Compressor : public wpi::Sendable,
+                   public wpi::SendableHelper<Compressor> {
  public:
   /**
-   * Constructor. The default PCM ID is 0.
+   * Constructs a compressor for a specified module and type.
    *
-   * @param module The PCM ID to use (0-62)
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
    */
-  explicit Compressor(int pcmID = SensorUtil::GetDefaultSolenoidModule());
+  Compressor(int module, PneumaticsModuleType moduleType);
 
-  ~Compressor() override = default;
+  /**
+   * Constructs a compressor for a default module and specified type.
+   *
+   * @param moduleType The module type to use.
+   */
+  explicit Compressor(PneumaticsModuleType moduleType);
+
+  ~Compressor() override;
+
+  Compressor(const Compressor&) = delete;
+  Compressor& operator=(const Compressor&) = delete;
 
   Compressor(Compressor&&) = default;
   Compressor& operator=(Compressor&&) = default;
@@ -97,92 +107,10 @@ class Compressor : public ErrorBase,
    */
   bool GetClosedLoopControl() const;
 
-  /**
-   * Query if the compressor output has been disabled due to high current draw.
-   *
-   * @return true if PCM is in fault state : Compressor Drive is
-   *         disabled due to compressor current being too high.
-   */
-  bool GetCompressorCurrentTooHighFault() const;
-
-  /**
-   * Query if the compressor output has been disabled due to high current draw
-   * (sticky).
-   *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
-   *
-   * @return true if PCM sticky fault is set : Compressor Drive is
-   *         disabled due to compressor current being too high.
-   */
-  bool GetCompressorCurrentTooHighStickyFault() const;
-
-  /**
-   * Query if the compressor output has been disabled due to a short circuit
-   * (sticky).
-   *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
-   *
-   * @return true if PCM sticky fault is set : Compressor output
-   *         appears to be shorted.
-   */
-  bool GetCompressorShortedStickyFault() const;
-
-  /**
-   * Query if the compressor output has been disabled due to a short circuit.
-   *
-   * @return true if PCM is in fault state : Compressor output
-   *         appears to be shorted.
-   */
-  bool GetCompressorShortedFault() const;
-
-  /**
-   * Query if the compressor output does not appear to be wired (sticky).
-   *
-   * A sticky fault will not clear on device reboot, it must be cleared through
-   * code or the webdash.
-   *
-   * @return true if PCM sticky fault is set : Compressor does not
-   *         appear to be wired, i.e. compressor is not drawing enough current.
-   */
-  bool GetCompressorNotConnectedStickyFault() const;
-
-  /**
-   * Query if the compressor output does not appear to be wired.
-   *
-   * @return true if PCM is in fault state : Compressor does not
-   *         appear to be wired, i.e. compressor is not drawing enough current.
-   */
-  bool GetCompressorNotConnectedFault() const;
-
-  /**
-   * Clear ALL sticky faults inside PCM that Compressor is wired to.
-   *
-   * If a sticky fault is set, then it will be persistently cleared.  Compressor
-   * drive maybe momentarily disable while flags are being cleared. Care should
-   * be taken to not call this too frequently, otherwise normal compressor
-   * functionality may be prevented.
-   *
-   * If no sticky faults are set then this call will have no effect.
-   */
-  void ClearAllPCMStickyFaults();
-
-  /**
-   * Gets module number (CAN ID).
-   *
-   * @return Module number
-   */
-  int GetModule() const;
-
-  void InitSendable(SendableBuilder& builder) override;
-
- protected:
-  hal::Handle<HAL_CompressorHandle> m_compressorHandle;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  void SetCompressor(bool on);
-  int m_module;
+  std::shared_ptr<PneumaticsBase> m_module;
 };
 
 }  // namespace frc

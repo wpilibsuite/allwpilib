@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/angle.h"
 
 namespace wpi {
@@ -16,7 +18,7 @@ namespace frc {
  * A rotation in a 2d coordinate frame represented a point on the unit circle
  * (cosine and sine).
  */
-class Rotation2d {
+class WPILIB_DLLEXPORT Rotation2d {
  public:
   /**
    * Constructs a Rotation2d with a default angle of 0 degrees.
@@ -60,18 +62,6 @@ class Rotation2d {
   Rotation2d operator+(const Rotation2d& other) const;
 
   /**
-   * Adds a rotation to the current rotation.
-   *
-   * This is similar to the + operator except that it mutates the current
-   * object.
-   *
-   * @param other The rotation to add.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Rotation2d& operator+=(const Rotation2d& other);
-
-  /**
    * Subtracts the new rotation from the current rotation and returns the new
    * rotation.
    *
@@ -83,18 +73,6 @@ class Rotation2d {
    * @return The difference between the two rotations.
    */
   Rotation2d operator-(const Rotation2d& other) const;
-
-  /**
-   * Subtracts the new rotation from the current rotation.
-   *
-   * This is similar to the - operator except that it mutates the current
-   * object.
-   *
-   * @param other The rotation to subtract.
-   *
-   * @return The reference to the new mutated object.
-   */
-  Rotation2d& operator-=(const Rotation2d& other);
 
   /**
    * Takes the inverse of the current rotation. This is simply the negative of
@@ -184,8 +162,10 @@ class Rotation2d {
   double m_sin = 0;
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Rotation2d& rotation);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Rotation2d& rotation);
 
 }  // namespace frc

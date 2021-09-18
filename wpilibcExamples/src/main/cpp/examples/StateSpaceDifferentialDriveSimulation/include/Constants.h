@@ -12,7 +12,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #pragma once
 
@@ -43,7 +43,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr auto kWheelDiameter = 6_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.to<double>() * wpi::math::pi) /
+    (kWheelDiameter.to<double>() * wpi::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
@@ -52,11 +52,11 @@ constexpr double kEncoderDistancePerPulse =
 // Toolsuite provides a convenient tool for obtaining these values for your
 // robot.
 constexpr auto ks = 0.22_V;
-constexpr auto kv = 1.98 * 1_V * 1_s / 1_m;
-constexpr auto ka = 0.2 * 1_V * 1_s * 1_s / 1_m;
+constexpr auto kv = 1.98 * 1_V / 1_mps;
+constexpr auto ka = 0.2 * 1_V / 1_mps_sq;
 
-constexpr auto kvAngular = 1.5 * 1_V * 1_s / 1_rad;
-constexpr auto kaAngular = 0.3 * 1_V * 1_s * 1_s / 1_rad;
+constexpr auto kvAngular = 1.5 * 1_V / 1_mps;
+constexpr auto kaAngular = 0.3 * 1_V / 1_mps_sq;
 
 extern const frc::LinearSystem<2, 2, 2> kDrivetrainPlant;
 
@@ -79,5 +79,5 @@ constexpr double kRamseteZeta = 0.7;
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

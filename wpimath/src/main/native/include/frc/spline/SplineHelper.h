@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "frc/spline/CubicHermiteSpline.h"
@@ -17,7 +18,7 @@ namespace frc {
  * Helper class that is used to generate cubic and quintic splines from user
  * provided waypoints.
  */
-class SplineHelper {
+class WPILIB_DLLEXPORT SplineHelper {
  public:
   /**
    * Returns 2 cubic control vectors from a set of exterior waypoints and

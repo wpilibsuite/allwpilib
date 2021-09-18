@@ -4,6 +4,8 @@
 
 #include "WSHalProviders.h"
 
+#include <fmt/format.h>
+
 namespace wpilibws {
 
 void HALSimWSHalProvider::OnNetworkConnected(
@@ -30,10 +32,10 @@ void HALSimWSHalProvider::ProcessHalCallback(const wpi::json& payload) {
 }
 
 HALSimWSHalChanProvider::HALSimWSHalChanProvider(int32_t channel,
-                                                 const std::string& key,
-                                                 const std::string& type)
+                                                 std::string_view key,
+                                                 std::string_view type)
     : HALSimWSHalProvider(key, type), m_channel(channel) {
-  m_deviceId = std::to_string(channel);
+  m_deviceId = fmt::format("{}", channel);
 }
 
 }  // namespace wpilibws

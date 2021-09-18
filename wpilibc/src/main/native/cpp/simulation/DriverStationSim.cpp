@@ -155,7 +155,7 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 
 void DriverStationSim::NotifyNewData() {
   HALSIM_NotifyDriverStationNewData();
-  DriverStation::GetInstance().WaitForData();
+  DriverStation::WaitForData();
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {

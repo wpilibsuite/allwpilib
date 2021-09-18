@@ -6,8 +6,10 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> implements Sendable, AutoCloseable {
+public class SendableChooser<V> implements NTSendable, AutoCloseable {
   /** The key for the default value. */
   private static final String DEFAULT = "default";
   /** The key for the selected option. */
@@ -130,7 +132,7 @@ public class SendableChooser<V> implements Sendable, AutoCloseable {
   private final ReentrantLock m_mutex = new ReentrantLock();
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("String Chooser");
     builder.getEntry(INSTANCE).setDouble(m_instance);
     builder.addStringProperty(DEFAULT, () -> m_defaultChoice, null);

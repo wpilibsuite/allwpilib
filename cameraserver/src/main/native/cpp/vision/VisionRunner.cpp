@@ -33,7 +33,7 @@ void VisionRunnerBase::RunOnce() {
   auto frameTime = m_cvSink.GrabFrame(*m_image);
   if (frameTime == 0) {
     auto error = m_cvSink.GetError();
-    csShared->ReportDriverStationError(error);
+    csShared->ReportDriverStationError(error.c_str());
   } else {
     DoProcess(*m_image);
   }

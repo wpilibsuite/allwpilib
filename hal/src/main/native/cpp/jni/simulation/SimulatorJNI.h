@@ -7,7 +7,7 @@
 #include "hal/Types.h"
 #include "jni.h"
 
-typedef HAL_Handle SIM_JniHandle;
+using SIM_JniHandle = HAL_Handle;  // NOLINT
 
 namespace hal::sim {
 JavaVM* GetJVM();

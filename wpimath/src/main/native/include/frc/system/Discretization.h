@@ -5,9 +5,8 @@
 #pragma once
 
 #include "Eigen/Core"
-#include "Eigen/src/LU/PartialPivLU.h"
 #include "units/time.h"
-#include "unsupported/Eigen/src/MatrixFunctions/MatrixExponential.h"
+#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 
@@ -125,7 +124,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
   Eigen::Matrix<double, States, States> lastTerm = Q;
   double lastCoeff = dt.to<double>();
 
-  // A^T^n
+  // Aᵀⁿ
   Eigen::Matrix<double, States, States> Atn = contA.transpose();
 
   Eigen::Matrix<double, States, States> phi12 = lastTerm * lastCoeff;

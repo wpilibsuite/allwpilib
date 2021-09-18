@@ -198,7 +198,7 @@ void WireEncoder::WriteValue(const Value& value) {
   }
 }
 
-size_t WireEncoder::GetStringSize(wpi::StringRef str) const {
+size_t WireEncoder::GetStringSize(std::string_view str) const {
   if (m_proto_rev < 0x0300u) {
     size_t len = str.size();
     if (len > 0xffff) {
@@ -209,7 +209,7 @@ size_t WireEncoder::GetStringSize(wpi::StringRef str) const {
   return wpi::SizeUleb128(str.size()) + str.size();
 }
 
-void WireEncoder::WriteString(wpi::StringRef str) {
+void WireEncoder::WriteString(std::string_view str) {
   // length
   size_t len = str.size();
   if (m_proto_rev < 0x0300u) {

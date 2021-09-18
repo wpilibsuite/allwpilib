@@ -6,10 +6,10 @@
 
 #include <hal/Accelerometer.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -18,13 +18,13 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
              "Built-in accelerometer");
-  SendableRegistry::GetInstance().AddLW(this, "BuiltInAccel");
+  wpi::SendableRegistry::AddLW(this, "BuiltInAccel");
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {
   if (range == kRange_16G) {
-    wpi_setWPIErrorWithContext(
-        ParameterOutOfRange, "16G range not supported (use k2G, k4G, or k8G)");
+    throw FRC_MakeError(err::ParameterOutOfRange, "{}",
+                        "16G range not supported (use k2G, k4G, or k8G)");
   }
 
   HAL_SetAccelerometerActive(false);
@@ -44,12 +44,12 @@ double BuiltInAccelerometer::GetZ() {
   return HAL_GetAccelerometerZ();
 }
 
-void BuiltInAccelerometer::InitSendable(SendableBuilder& builder) {
+void BuiltInAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   builder.AddDoubleProperty(
-      "X", [=]() { return GetX(); }, nullptr);
+      "X", [=] { return GetX(); }, nullptr);
   builder.AddDoubleProperty(
-      "Y", [=]() { return GetY(); }, nullptr);
+      "Y", [=] { return GetY(); }, nullptr);
   builder.AddDoubleProperty(
-      "Z", [=]() { return GetZ(); }, nullptr);
+      "Z", [=] { return GetZ(); }, nullptr);
 }

@@ -4,10 +4,10 @@
 
 package edu.wpi.first.wpilibj.examples.axiscamera;
 
-import edu.wpi.cscore.AxisCamera;
-import edu.wpi.cscore.CvSink;
-import edu.wpi.cscore.CvSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.AxisCamera;
+import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.wpilibj.TimedRobot;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -28,14 +28,14 @@ public class Robot extends TimedRobot {
         new Thread(
             () -> {
               // Get the Axis camera from CameraServer
-              AxisCamera camera = CameraServer.getInstance().addAxisCamera("axis-camera.local");
+              AxisCamera camera = CameraServer.addAxisCamera("axis-camera.local");
               // Set the resolution
               camera.setResolution(640, 480);
 
               // Get a CvSink. This will capture Mats from the camera
-              CvSink cvSink = CameraServer.getInstance().getVideo();
+              CvSink cvSink = CameraServer.getVideo();
               // Setup a CvSource. This will send images back to the Dashboard
-              CvSource outputStream = CameraServer.getInstance().putVideo("Rectangle", 640, 480);
+              CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 480);
 
               // Mats are very memory expensive. Lets reuse this Mat.
               Mat mat = new Mat();

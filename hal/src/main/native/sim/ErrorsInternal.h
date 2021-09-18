@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-typedef enum {
+enum CTR_Code {
   CTR_OKAY,       // No Error - Function executed as expected
   CTR_RxTimeout,  // CAN frame has not been received within specified period of
                   // time.
@@ -17,7 +17,7 @@ typedef enum {
   CTR_SigNotUpdated,      // Have not received an value response for signal.
   CTR_BufferFull,  // Caller attempted to insert data into a buffer that is
                    // full.
-} CTR_Code;
+};
 
 // VISA Error
 #define _VI_ERROR (-2147483647L - 1)
@@ -108,7 +108,7 @@ typedef enum {
  * Represents the resulting status of a function call through its return value.
  * 0 is success, negative values are errors, and positive values are warnings.
  */
-typedef int32_t NiFpga_Status;  // NOLINT
+using NiFpga_Status = int32_t;  // NOLINT
 
 /**
  * No errors or warnings.

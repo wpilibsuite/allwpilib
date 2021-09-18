@@ -72,12 +72,12 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(frc::MakeMatrix<1, 1>(voltage.to<double>()));
+  SetInput(Eigen::Vector<double, 1>{voltage.to<double>()});
 }
 
-Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
-    const Eigen::Matrix<double, 2, 1>& currentXhat,
-    const Eigen::Matrix<double, 1, 1>& u, units::second_t dt) {
+Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
+    const Eigen::Vector<double, 2>& currentXhat,
+    const Eigen::Vector<double, 1>& u, units::second_t dt) {
   // Horizontal case:
   // Torque = F * r = I * alpha
   // alpha = F * r / I
@@ -88,14 +88,15 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
   // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
   // std::cos(theta)]]
 
-  Eigen::Matrix<double, 2, 1> updatedXhat = RKF45(
-      [&](const auto& x, const auto& u) -> Eigen::Matrix<double, 2, 1> {
-        Eigen::Matrix<double, 2, 1> xdot = m_plant.A() * x + m_plant.B() * u;
+  Eigen::Vector<double, 2> updatedXhat = RKDP(
+      [&](const auto& x, const auto& u) -> Eigen::Vector<double, 2> {
+        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += MakeMatrix<2, 1>(0.0, (m_mass * m_r * -9.8 * 3.0 /
-                                         (m_mass * m_r * m_r) * std::cos(x(0)))
-                                            .template to<double>());
+          xdot += Eigen::Vector<double, 2>{
+              0.0, (m_mass * m_r * -9.8 * 3.0 / (m_mass * m_r * m_r) *
+                    std::cos(x(0)))
+                       .template to<double>()};
         }
         return xdot;
       },
@@ -103,9 +104,9 @@ Eigen::Matrix<double, 2, 1> SingleJointedArmSim::UpdateX(
 
   // Check for collisions.
   if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_minAngle.to<double>(), 0.0);
+    return Eigen::Vector<double, 2>{m_minAngle.to<double>(), 0.0};
   } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
-    return MakeMatrix<2, 1>(m_maxAngle.to<double>(), 0.0);
+    return Eigen::Vector<double, 2>{m_maxAngle.to<double>(), 0.0};
   }
   return updatedXhat;
 }

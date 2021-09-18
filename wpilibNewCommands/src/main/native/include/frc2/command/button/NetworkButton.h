@@ -5,16 +5,16 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
-#include <wpi/Twine.h>
 
 #include "Button.h"
 
 namespace frc2 {
 /**
- * A {@link Button} that uses a {@link NetworkTable} boolean field.
+ * A Button that uses a NetworkTable boolean field.
  */
 class NetworkButton : public Button {
  public:
@@ -32,7 +32,7 @@ class NetworkButton : public Button {
    * @param field The field that is the value.
    */
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                const wpi::Twine& field);
+                std::string_view field);
 
   /**
    * Creates a NetworkButton that commands can be bound to.
@@ -40,6 +40,6 @@ class NetworkButton : public Button {
    * @param table The table where the networktable value is located.
    * @param field The field that is the value.
    */
-  NetworkButton(const wpi::Twine& table, const wpi::Twine& field);
+  NetworkButton(std::string_view table, std::string_view field);
 };
 }  // namespace frc2

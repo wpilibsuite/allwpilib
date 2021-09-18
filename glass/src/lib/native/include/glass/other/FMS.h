@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 #include "glass/Model.h"
 
@@ -27,7 +27,7 @@ class FMSModel : public Model {
   virtual DataSource* GetEnabledData() = 0;
   virtual DataSource* GetTestData() = 0;
   virtual DataSource* GetAutonomousData() = 0;
-  virtual wpi::StringRef GetGameSpecificMessage(
+  virtual std::string_view GetGameSpecificMessage(
       wpi::SmallVectorImpl<char>& buf) = 0;
 
   virtual void SetFmsAttached(bool val) = 0;

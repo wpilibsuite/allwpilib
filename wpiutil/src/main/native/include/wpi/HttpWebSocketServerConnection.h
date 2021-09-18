@@ -8,13 +8,13 @@
 #include <initializer_list>
 #include <memory>
 #include <string>
+#include <string_view>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/HttpServerConnection.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 #include "wpi/WebSocket.h"
 #include "wpi/WebSocketServer.h"
+#include "wpi/span.h"
 #include "wpi/uv/Stream.h"
 
 namespace wpi {
@@ -36,7 +36,7 @@ class HttpWebSocketServerConnection
    * @param protocols Acceptable subprotocols
    */
   HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
-                                ArrayRef<StringRef> protocols);
+                                span<const std::string_view> protocols);
 
   /**
    * Constructor.
@@ -44,10 +44,11 @@ class HttpWebSocketServerConnection
    * @param stream network stream
    * @param protocols Acceptable subprotocols
    */
-  HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
-                                std::initializer_list<StringRef> protocols)
-      : HttpWebSocketServerConnection(
-            stream, makeArrayRef(protocols.begin(), protocols.end())) {}
+  HttpWebSocketServerConnection(
+      std::shared_ptr<uv::Stream> stream,
+      std::initializer_list<std::string_view> protocols)
+      : HttpWebSocketServerConnection(stream,
+                                      {protocols.begin(), protocols.end()}) {}
 
  protected:
   /**
@@ -59,7 +60,7 @@ class HttpWebSocketServerConnection
    *
    * @param protocol negotiated subprotocol
    */
-  virtual bool IsValidWsUpgrade(StringRef protocol) { return true; }
+  virtual bool IsValidWsUpgrade(std::string_view protocol) { return true; }
 
   /**
    * Process an incoming WebSocket upgrade.  This is called after the header
@@ -86,6 +87,6 @@ class HttpWebSocketServerConnection
 
 }  // namespace wpi
 
-#include "HttpWebSocketServerConnection.inl"
+#include "HttpWebSocketServerConnection.inc"
 
 #endif  // WPIUTIL_WPI_HTTPWEBSOCKETSERVERCONNECTION_H_

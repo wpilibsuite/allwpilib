@@ -96,7 +96,7 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnum
     if (!elem) {
       return 0;
     }
-    arr.push_back(JStringRef{env, elem}.str());
+    arr.emplace_back(JStringRef{env, elem}.str());
   }
   wpi::SmallVector<const char*, 8> carr;
   for (auto&& val : arr) {
@@ -129,7 +129,7 @@ Java_edu_wpi_first_hal_SimDeviceJNI_createSimValueEnumDouble
     if (!elem) {
       return 0;
     }
-    arr.push_back(JStringRef{env, elem}.str());
+    arr.emplace_back(JStringRef{env, elem}.str());
   }
 
   wpi::SmallVector<const char*, 8> carr;

@@ -5,15 +5,14 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include <wpi/ArrayRef.h>
-#include <wpi/raw_ostream.h>
+#include <wpi/deprecated.h>
+#include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
 
 namespace frc {
-
-class SpeedController;
 
 /**
  * Common base class for drive platforms.
@@ -44,7 +43,7 @@ class RobotDriveBase : public MotorSafety {
    *
    * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
    * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
-   * ApplyDeadband().
+   * frc::ApplyDeadband().
    *
    * @param deadband The deadband to set.
    */
@@ -68,7 +67,7 @@ class RobotDriveBase : public MotorSafety {
   void FeedWatchdog();
 
   void StopMotor() override = 0;
-  void GetDescription(wpi::raw_ostream& desc) const override = 0;
+  std::string GetDescription() const override = 0;
 
  protected:
   /**
@@ -77,14 +76,16 @@ class RobotDriveBase : public MotorSafety {
    *
    * @param value    value to clip
    * @param deadband range around zero
+   * @deprecated Use ApplyDeadband() in frc/MathUtil.h.
    */
-  double ApplyDeadband(double number, double deadband);
+  WPI_DEPRECATED("Use ApplyDeadband() in frc/MathUtil.h")
+  static double ApplyDeadband(double number, double deadband);
 
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  void Normalize(wpi::MutableArrayRef<double> wheelSpeeds);
+  static void Normalize(wpi::span<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

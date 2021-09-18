@@ -13,7 +13,7 @@
 #include "simulation/gz_msgs/msgs.h"
 
 /// \brief The axis about which to measure rotation.
-typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
+enum ROTATION { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ };
 
 /**
  * \brief Plugin for reading the speed and relative angle of a link.

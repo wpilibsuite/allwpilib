@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "Transform2d.h"
 #include "Translation2d.h"
 #include "Twist2d.h"
@@ -17,7 +19,7 @@ namespace frc {
 /**
  * Represents a 2d pose containing translational and rotational elements.
  */
-class Pose2d {
+class WPILIB_DLLEXPORT Pose2d {
  public:
   /**
    * Constructs a pose at the origin facing toward the positive X axis.
@@ -56,18 +58,6 @@ class Pose2d {
    * @return The transformed pose.
    */
   Pose2d operator+(const Transform2d& other) const;
-
-  /**
-   * Transforms the current pose by the transformation.
-   *
-   * This is similar to the + operator, except that it mutates the current
-   * object.
-   *
-   * @param other The transform to transform the pose by.
-   *
-   * @return Reference to the new mutated object.
-   */
-  Pose2d& operator+=(const Transform2d& other);
 
   /**
    * Returns the Transform2d that maps the one pose to another.
@@ -183,8 +173,10 @@ class Pose2d {
   Rotation2d m_rotation;
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Pose2d& pose);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Pose2d& pose);
 
 }  // namespace frc

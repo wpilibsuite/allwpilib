@@ -4,8 +4,7 @@
 
 #include "GazeboAnalogIn.h"
 
-#include <string>
-
+#include <fmt/format.h>
 #include <hal/Power.h>
 #include <hal/Value.h>
 #include <hal/simulation/AnalogInData.h>
@@ -30,14 +29,14 @@ GazeboAnalogIn::GazeboAnalogIn(int index, HALSimGazebo* halsim) {
 void GazeboAnalogIn::Listen() {
   if (!m_sub)
     m_sub = m_halsim->node.Subscribe<gazebo::msgs::Float64>(
-        "~/simulator/analog/" + std::to_string(m_index),
+        fmt::format("~/simulator/analog/{}", m_index),
         &GazeboAnalogIn::Callback, this);
 }
 
 void GazeboAnalogIn::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   /* This value is going to be divided by the 5V rail in the HAL, so
      we multiply by that value to make the change neutral */
-  int32_t status;
+  int32_t status = 0;
   HALSIM_SetAnalogInVoltage(m_index,
                             msg->data() * HAL_GetUserVoltage5V(&status));
 }

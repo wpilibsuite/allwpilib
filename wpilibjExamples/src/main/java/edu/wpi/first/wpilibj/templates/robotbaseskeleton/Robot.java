@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.templates.robotbaseskeleton;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -26,7 +27,6 @@ public class Robot extends RobotBase {
 
   private volatile boolean m_exit;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   @Override
   public void startCompetition() {
     robotInit();
@@ -36,36 +36,36 @@ public class Robot extends RobotBase {
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
       if (isDisabled()) {
-        m_ds.InDisabled(true);
+        DriverStation.inDisabled(true);
         disabled();
-        m_ds.InDisabled(false);
+        DriverStation.inDisabled(false);
         while (isDisabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       } else if (isAutonomous()) {
-        m_ds.InAutonomous(true);
+        DriverStation.inAutonomous(true);
         autonomous();
-        m_ds.InAutonomous(false);
+        DriverStation.inAutonomous(false);
         while (isAutonomousEnabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
       } else if (isTest()) {
         LiveWindow.setEnabled(true);
         Shuffleboard.enableActuatorWidgets();
-        m_ds.InTest(true);
+        DriverStation.inTest(true);
         test();
-        m_ds.InTest(false);
+        DriverStation.inTest(false);
         while (isTest() && isEnabled()) {
-          m_ds.waitForData();
+          DriverStation.waitForData();
         }
         LiveWindow.setEnabled(false);
         Shuffleboard.disableActuatorWidgets();
       } else {
-        m_ds.InOperatorControl(true);
+        DriverStation.inTeleop(true);
         teleop();
-        m_ds.InOperatorControl(false);
-        while (isOperatorControlEnabled()) {
-          m_ds.waitForData();
+        DriverStation.inTeleop(false);
+        while (isTeleopEnabled()) {
+          DriverStation.waitForData();
         }
       }
     }

@@ -5,9 +5,8 @@
 #include "frc/ADXL345_SPI.h"
 
 #include <hal/FRCUsageReporting.h>
-
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include <networktables/NTSendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 using namespace frc;
 
@@ -38,7 +37,11 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_SPI);
 
-  SendableRegistry::GetInstance().AddLW(this, "ADXL345_SPI", port);
+  wpi::SendableRegistry::AddLW(this, "ADXL345_SPI", port);
+}
+
+SPI::Port ADXL345_SPI::GetSpiPort() const {
+  return m_spi.GetPort();
 }
 
 void ADXL345_SPI::SetRange(Range range) {
@@ -115,12 +118,12 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   return data;
 }
 
-void ADXL345_SPI::InitSendable(SendableBuilder& builder) {
+void ADXL345_SPI::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer");
   auto x = builder.GetEntry("X").GetHandle();
   auto y = builder.GetEntry("Y").GetHandle();
   auto z = builder.GetEntry("Z").GetHandle();
-  builder.SetUpdateTable([=]() {
+  builder.SetUpdateTable([=] {
     auto data = GetAccelerations();
     nt::NetworkTableEntry(x).SetDouble(data.XAxis);
     nt::NetworkTableEntry(y).SetDouble(data.YAxis);

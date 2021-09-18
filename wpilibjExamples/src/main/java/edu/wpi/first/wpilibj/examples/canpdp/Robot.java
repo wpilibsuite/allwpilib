@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.examples.canpdp;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -13,9 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * via CAN. The information will be displayed under variables through the SmartDashboard.
  */
 public class Robot extends TimedRobot {
-  private static final int kPDPId = 0;
-
-  private final PowerDistributionPanel m_pdp = new PowerDistributionPanel(kPDPId);
+  private final PowerDistribution m_pdp = new PowerDistribution();
 
   @Override
   public void robotPeriodic() {

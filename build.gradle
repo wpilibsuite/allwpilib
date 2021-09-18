@@ -1,5 +1,14 @@
 import edu.wpi.first.toolchain.*
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.hubspot.jinjava:jinjava:2.5.8'
+    }
+}
+
 plugins {
     id 'base'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
@@ -100,6 +109,13 @@ subprojects {
         }
     }
 
+    // Enables UTF-8 support in Javadoc
+    tasks.withType(Javadoc) {
+        options.addStringOption("charset", "utf-8")
+        options.addStringOption("docencoding", "utf-8")
+        options.addStringOption("encoding", "utf-8")
+    }
+
     // Sign outputs with Developer ID
     if (project.hasProperty("developerID")) {
         tasks.withType(AbstractLinkTask) { task ->
@@ -130,6 +146,9 @@ ext.getCurrentArch = {
 }
 
 spotless {
+    if (project.hasProperty('skipJavaFormat')) {
+        enforceCheck false
+    }
     java {
         target fileTree('.') {
             include '**/*.java'

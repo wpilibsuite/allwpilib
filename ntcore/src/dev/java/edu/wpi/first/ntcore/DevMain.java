@@ -5,7 +5,7 @@
 package edu.wpi.first.ntcore;
 
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpiutil.RuntimeDetector;
+import edu.wpi.first.util.RuntimeDetector;
 
 public final class DevMain {
   /** Main method. */

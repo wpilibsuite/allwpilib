@@ -160,8 +160,8 @@ enum class BuiltInWidgets {
    */
   kVoltageView,
   /**
-   * Displays a PowerDistributionPanel. <br>Supported types: <ul> <li>
-   * PowerDistributionPanel</li>
+   * Displays a PowerDistribution. <br>Supported types: <ul> <li>
+   * PowerDistribution</li>
    * </ul>
    * <br>Custom properties:
    * <table>
@@ -170,7 +170,7 @@ enum class BuiltInWidgets {
    * <td>Whether or not to display the voltage and current draw</td></tr>
    * </table>
    */
-  kPowerDistributionPanel,
+  kPowerDistribution,
   /**
    * Displays a SendableChooser with a dropdown combo box with a list of
    * options.
@@ -200,10 +200,10 @@ enum class BuiltInWidgets {
    */
   kEncoder,
   /**
-   * Displays a SpeedController.
-   * The speed controller will be controllable from the dashboard when test mode
+   * Displays a MotorController.
+   * The motor controller will be controllable from the dashboard when test mode
    * is enabled, but will otherwise be view-only. <br>Supported types: <ul>
-   * <li>PWMSpeedController</li>
+   * <li>PWMMotorController</li>
    * <li>DMC60</li>
    * <li>Jaguar</li>
    * <li>PWMTalonSRX</li>
@@ -213,7 +213,7 @@ enum class BuiltInWidgets {
    * <li>Talon</li>
    * <li>Victor</li>
    * <li>VictorSP</li>
-   * <li>SpeedControllerGroup</li>
+   * <li>MotorControllerGroup</li>
    * <li>Any custom subclass of {@code SpeedContorller}</li>
    * </ul>
    * <br>Custom properties:
@@ -223,7 +223,7 @@ enum class BuiltInWidgets {
    * <td>One of {@code ["HORIZONTAL", "VERTICAL"]}</td></tr>
    * </table>
    */
-  kSpeedController,
+  kMotorController,
   /**
    * Displays a command with a toggle button. Pressing the button will start the
    * command, and the button will automatically release when the command

@@ -8,8 +8,6 @@
 
 #include <hal/I2CTypes.h>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 /**
@@ -18,7 +16,7 @@ namespace frc {
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
  */
-class I2C : public ErrorBase {
+class I2C {
  public:
   enum Port { kOnboard = 0, kMXP };
 
@@ -30,10 +28,13 @@ class I2C : public ErrorBase {
    */
   I2C(Port port, int deviceAddress);
 
-  ~I2C() override;
+  ~I2C();
 
   I2C(I2C&&) = default;
   I2C& operator=(I2C&&) = default;
+
+  Port GetPort() const;
+  int GetDeviceAddress() const;
 
   /**
    * Generic transaction.

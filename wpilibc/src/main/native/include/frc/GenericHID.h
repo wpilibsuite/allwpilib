@@ -8,16 +8,19 @@
 
 #include <string>
 
-#include "frc/ErrorBase.h"
-
 namespace frc {
 
 class DriverStation;
 
 /**
- * GenericHID Interface.
+ * Handle input from standard HID devices connected to the Driver Station.
+ *
+ * <p>This class handles standard input that comes from the Driver Station. Each
+ * time a value is requested the most recent value is returned. There is a
+ * single class instance for each device and the mapping of ports to hardware
+ * buttons depends on the code in the Driver Station.
  */
-class GenericHID : public ErrorBase {
+class GenericHID {
  public:
   enum RumbleType { kLeftRumble, kRightRumble };
 
@@ -41,16 +44,11 @@ class GenericHID : public ErrorBase {
     kHID1stPerson = 24
   };
 
-  enum JoystickHand { kLeftHand = 0, kRightHand = 1 };
-
   explicit GenericHID(int port);
-  ~GenericHID() override = default;
+  virtual ~GenericHID() = default;
 
   GenericHID(GenericHID&&) = default;
   GenericHID& operator=(GenericHID&&) = default;
-
-  virtual double GetX(JoystickHand hand = kRightHand) const = 0;
-  virtual double GetY(JoystickHand hand = kRightHand) const = 0;
 
   /**
    * Get the button value (starting at button 1).
@@ -68,7 +66,7 @@ class GenericHID : public ErrorBase {
   bool GetRawButton(int button) const;
 
   /**
-   * Whether the button was pressed since the last check. Button indexes begin
+   * Whether the button was pressed since the last check. %Button indexes begin
    * at 1.
    *
    * This method returns true if the button went from not pressed to held down
@@ -81,7 +79,7 @@ class GenericHID : public ErrorBase {
   bool GetRawButtonPressed(int button);
 
   /**
-   * Whether the button was released since the last check. Button indexes begin
+   * Whether the button was released since the last check. %Button indexes begin
    * at 1.
    *
    * This method returns true if the button went from held down to not pressed
@@ -194,7 +192,6 @@ class GenericHID : public ErrorBase {
   void SetRumble(RumbleType type, double value);
 
  private:
-  DriverStation* m_ds;
   int m_port;
   int m_outputs = 0;
   uint16_t m_leftRumble = 0;

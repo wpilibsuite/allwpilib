@@ -16,9 +16,7 @@ namespace wpi {
 template <class T, size_t N>
 class static_circular_buffer {
  public:
-  static_assert(N > 0, "The circular buffer size shouldn't be zero.");
-
-  constexpr static_circular_buffer() = default;
+  static_assert(N > 0, "Circular buffer size cannot be zero.");
 
   class iterator {
    public:

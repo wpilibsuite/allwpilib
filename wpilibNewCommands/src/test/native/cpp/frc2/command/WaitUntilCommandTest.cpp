@@ -8,7 +8,7 @@
 using namespace frc2;
 class WaitUntilCommandTest : public CommandTestBase {};
 
-TEST_F(WaitUntilCommandTest, WaitUntilCommandScheduleTest) {
+TEST_F(WaitUntilCommandTest, WaitUntilCommandSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;

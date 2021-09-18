@@ -24,6 +24,15 @@ ext {
                     srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                 }
             }
+            fmtlibCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/fmtlib/src'
+                    include '*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/fmtlib/include'
+                }
+            }
             resourcesCpp(CppSourceSet) {
                 source {
                     srcDirs "$buildDir/generated/main/cpp", "$rootDir/shared/singlelib"
@@ -191,6 +200,9 @@ cppHeadersZip {
     from('src/main/native/libuv/include') {
         into '/'
     }
+    from('src/main/native/fmtlib/include') {
+        into '/'
+    }
 }
 
 model {
@@ -198,7 +210,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src', 'src/main/native/fmtlib/include'
                 }
             }
         }

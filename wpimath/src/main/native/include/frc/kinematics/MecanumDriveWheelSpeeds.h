@@ -4,13 +4,15 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/velocity.h"
 
 namespace frc {
 /**
  * Represents the wheel speeds for a mecanum drive drivetrain.
  */
-struct MecanumDriveWheelSpeeds {
+struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   /**
    * Speed of the front-left wheel.
    */

@@ -6,54 +6,78 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.SolenoidJNI;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.hal.util.AllocationException;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Solenoid class for running high voltage Digital Output on the PCM.
+ * Solenoid class for running high voltage Digital Output on a pneumatics module.
  *
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any device
- * within the current spec of the PCM.
+ * within the current spec of the module.
  */
-public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
-  private final int m_channel; // The channel to control.
-  private int m_solenoidHandle;
+public class Solenoid implements Sendable, AutoCloseable {
+  private final int m_mask; // The channel mask
+  private final int m_channel;
+  private PneumaticsBase m_module;
 
   /**
-   * Constructor using the default PCM ID (defaults to 0).
+   * Constructs a solenoid for a default module and specified type.
    *
-   * @param channel The channel on the PCM to control (0..7).
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final int channel) {
-    this(SensorUtil.getDefaultSolenoidModule(), channel);
+  public Solenoid(final PneumaticsModuleType moduleType, final int channel) {
+    this(PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
   /**
-   * Constructor.
+   * Constructs a solenoid for a specified module and type.
    *
-   * @param moduleNumber The CAN ID of the PCM the solenoid is attached to.
-   * @param channel The channel on the PCM to control (0..7).
+   * @param module The module ID to use.
+   * @param moduleType The module type to use.
+   * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final int moduleNumber, final int channel) {
-    super(moduleNumber);
+  public Solenoid(final int module, final PneumaticsModuleType moduleType, final int channel) {
+    m_module = PneumaticsBase.getForType(module, moduleType);
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
+
+    m_mask = 1 << channel;
     m_channel = channel;
 
-    SensorUtil.checkSolenoidModule(m_moduleNumber);
-    SensorUtil.checkSolenoidChannel(m_channel);
+    try {
+      if (!m_module.checkSolenoidChannel(channel)) {
+        throw new IllegalArgumentException("Channel " + channel + " out of range");
+      }
 
-    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
+      if (m_module.checkAndReserveSolenoids(m_mask) != 0) {
+        throw new AllocationException("Solenoid already allocated");
+      }
 
-    HAL.report(tResourceType.kResourceType_Solenoid, m_channel + 1, m_moduleNumber + 1);
-    SendableRegistry.addLW(this, "Solenoid", m_moduleNumber, m_channel);
+      allocatedSolenoids = true;
+
+      HAL.report(tResourceType.kResourceType_Solenoid, channel + 1, m_module.getModuleNumber() + 1);
+      SendableRegistry.addLW(this, "Solenoid", m_module.getModuleNumber(), channel);
+      successfulCompletion = true;
+
+    } finally {
+      if (!successfulCompletion) {
+        if (allocatedSolenoids) {
+          m_module.unreserveSolenoids(m_mask);
+        }
+        m_module.close();
+      }
+    }
   }
 
   @Override
   public void close() {
     SendableRegistry.remove(this);
-    SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
-    m_solenoidHandle = 0;
+    m_module.unreserveSolenoids(m_mask);
+    m_module.close();
+    m_module = null;
   }
 
   /**
@@ -62,7 +86,8 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * @param on True will turn the solenoid output on. False will turn the solenoid output off.
    */
   public void set(boolean on) {
-    SolenoidJNI.setSolenoid(m_solenoidHandle, on);
+    int value = on ? (0xFFFF & m_mask) : 0;
+    m_module.setSolenoids(m_mask, value);
   }
 
   /**
@@ -71,7 +96,8 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
-    return SolenoidJNI.getSolenoid(m_solenoidHandle);
+    int currentAll = m_module.getSolenoids();
+    return (currentAll & m_mask) != 0;
   }
 
   /**
@@ -84,21 +110,23 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
     set(!get());
   }
 
-  /** Get the channel this solenoid is connected to. */
+  /**
+   * Get the channel this solenoid is connected to.
+   *
+   * @return The channel this solenoid is connected to.
+   */
   public int getChannel() {
     return m_channel;
   }
 
   /**
-   * Check if solenoid is blacklisted. If a solenoid is shorted, it is added to the blacklist and
-   * disabled until power cycle, or until faults are cleared.
+   * Check if solenoid is DisabledListed. If a solenoid is shorted, it is added to the Disabled List
+   * and disabled until power cycle, or until faults are cleared.
    *
    * @return If solenoid is disabled due to short.
-   * @see #clearAllPCMStickyFaults()
    */
-  public boolean isBlackListed() {
-    int value = getPCMSolenoidBlackList() & (1 << m_channel);
-    return value != 0;
+  public boolean isDisabled() {
+    return (m_module.getSolenoidDisabledList() & m_mask) != 0;
   }
 
   /**
@@ -111,7 +139,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    */
   public void setPulseDuration(double durationSeconds) {
     long durationMS = (long) (durationSeconds * 1000);
-    SolenoidJNI.setOneShotDuration(m_solenoidHandle, durationMS);
+    m_module.setOneShotDuration(m_channel, (int) durationMS);
   }
 
   /**
@@ -120,7 +148,7 @@ public class Solenoid extends SolenoidBase implements Sendable, AutoCloseable {
    * @see #setPulseDuration(double)
    */
   public void startPulse() {
-    SolenoidJNI.fireOneShot(m_solenoidHandle);
+    m_module.fireOneShot(m_channel);
   }
 
   @Override

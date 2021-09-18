@@ -7,13 +7,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <string>
+#include <string_view>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
+#include <fmt/format.h>
 #include <wpi/SafeThread.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
-#include <wpi/raw_ostream.h>
 
 #include "hal/DriverStation.h"
 
@@ -156,14 +158,15 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   auto curTime = std::chrono::steady_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prevMsg[i] == details)
+    if (prevMsg[i] == details) {
       break;
+    }
   }
   int retval = 0;
   if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
-    wpi::StringRef detailsRef{details};
-    wpi::StringRef locationRef{location};
-    wpi::StringRef callStackRef{callStack};
+    std::string_view detailsRef{details};
+    std::string_view locationRef{location};
+    std::string_view callStackRef{callStack};
 
     // 1 tag, 4 timestamp, 2 seqnum
     // 2 numOccur, 4 error code, 1 flags, 6 strlen
@@ -199,14 +202,16 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                                                   newCallStack.c_str());
     }
     if (printMsg) {
+      fmt::memory_buffer buf;
       if (location && location[0] != '\0') {
-        wpi::errs() << (isError ? "Error" : "Warning") << " at " << location
-                    << ": ";
+        fmt::format_to(fmt::appender{buf},
+                       "{} at {}: ", isError ? "Error" : "Warning", location);
       }
-      wpi::errs() << details << "\n";
+      fmt::format_to(fmt::appender{buf}, "{}\n", details);
       if (callStack && callStack[0] != '\0') {
-        wpi::errs() << callStack << "\n";
+        fmt::format_to(fmt::appender{buf}, "{}\n", callStack);
       }
+      std::fwrite(buf.data(), buf.size(), 1, stderr);
     }
     if (i == KEEP_MSGS) {
       // replace the oldest one
@@ -226,7 +231,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
 }
 
 int32_t HAL_SendConsoleLine(const char* line) {
-  wpi::StringRef lineRef{line};
+  std::string_view lineRef{line};
   if (lineRef.size() <= 65535) {
     // Send directly
     return FRC_NetworkCommunication_sendConsoleLine(line);
@@ -295,10 +300,9 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
     name[0] = '\0';
     return name;
   } else {
-    size_t len = std::strlen(joystickDesc.name);
-    char* name = static_cast<char*>(std::malloc(len + 1));
-    std::strncpy(name, joystickDesc.name, len);
-    name[len] = '\0';
+    const size_t len = std::strlen(joystickDesc.name) + 1;
+    char* name = static_cast<char*>(std::malloc(len));
+    std::memcpy(name, joystickDesc.name, len);
     return name;
   }
 }
@@ -368,18 +372,10 @@ HAL_Bool HAL_IsNewControlData(void) {
   return true;
 }
 
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
 void HAL_WaitForDSData(void) {
   HAL_WaitForDSDataTimeout(0);
 }
 
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed. Returns true on new data, false on timeout.
- */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock lock{*newDSDataAvailableMutex};
   int& lastCount = GetThreadLocalLastCount();

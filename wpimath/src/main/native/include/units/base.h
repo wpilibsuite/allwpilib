@@ -74,35 +74,41 @@
 #include <cmath>
 #include <limits>
 
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	#include <iostream>
-	#include <string>
 	#include <locale>
-
-	//------------------------------
-	//	STRING FORMATTER
-	//------------------------------
-
-	namespace units
-	{
-		namespace detail
-		{
-			template <typename T> std::string to_string(const T& t)
-			{
-				std::string str{ std::to_string(t) };
-				int offset{ 1 };
-
-				// remove trailing decimal points for integer value units. Locale aware!
-				struct lconv * lc;
-				lc = localeconv();
-				char decimalPoint = *lc->decimal_point;
-				if (str.find_last_not_of('0') == str.find(decimalPoint)) { offset = 0; }
-				str.erase(str.find_last_not_of('0') + offset, std::string::npos);
-				return str;
-			}
-		}
-	}
+	#include <string>
+#else
+	#include <locale>
+	#include <string>
+	#include <fmt/format.h>
 #endif
+
+#include <wpi/SymbolExports.h>
+
+//------------------------------
+//	STRING FORMATTER
+//------------------------------
+
+namespace units
+{
+  namespace detail
+  {
+    template <typename T> std::string to_string(const T& t)
+    {
+      std::string str{ std::to_string(t) };
+      int offset{ 1 };
+
+      // remove trailing decimal points for integer value units. Locale aware!
+      struct lconv * lc;
+      lc = localeconv();
+      char decimalPoint = *lc->decimal_point;
+      if (str.find_last_not_of('0') == str.find(decimalPoint)) { offset = 0; }
+      str.erase(str.find_last_not_of('0') + offset, std::string::npos);
+      return str;
+    }
+  }
+}
 
 namespace units
 {
@@ -172,10 +178,33 @@ namespace units
  * @param		namespaceName namespace in which the new units will be encapsulated.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		abbrev - abbreviated unit name, e.g. 'm'
- * @note		When UNIT_LIB_DISABLE_IOSTREAM is defined, the macro does not generate any code
+ * @note		When UNIT_LIB_ENABLE_IOSTREAM isn't defined, the macro does not generate any code
  */
-#if defined(UNIT_LIB_DISABLE_IOSTREAM)
-	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)
+#if !defined(UNIT_LIB_ENABLE_IOSTREAM)
+	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
+	}\
+	template <>\
+	struct fmt::formatter<units::namespaceName::nameSingular ## _t> \
+		: fmt::formatter<double> \
+	{\
+		template <typename FormatContext>\
+		auto format(const units::namespaceName::nameSingular ## _t& obj,\
+								FormatContext& ctx) -> decltype(ctx.out()) \
+		{\
+			auto out = ctx.out();\
+			out = fmt::formatter<double>::format(obj(), ctx);\
+			return fmt::format_to(out, " " #abbrev);\
+		}\
+	};\
+	namespace units\
+	{\
+	namespace namespaceName\
+	{\
+		inline std::string to_string(const nameSingular ## _t& obj)\
+		{\
+			return units::detail::to_string(obj()) + std::string(" "#abbrev);\
+		}\
+	}
 #else
 	#define UNIT_ADD_IO(namespaceName, nameSingular, abbrev)\
 	namespace namespaceName\
@@ -2180,7 +2209,7 @@ namespace units
 		return UnitType(value);
 	}
 
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 	template<class Units, typename T, template<typename> class NonLinearScale>
 	inline std::ostream& operator<<(std::ostream& os, const unit_t<Units, T, NonLinearScale>& obj) noexcept
 	{
@@ -2815,11 +2844,31 @@ namespace units
 	namespace dimensionless
 	{
 		typedef unit_t<scalar, UNIT_LIB_DEFAULT_TYPE, decibel_scale> dB_t;
-#if !defined(UNIT_LIB_DISABLE_IOSTREAM)
+#if defined(UNIT_LIB_ENABLE_IOSTREAM)
 		inline std::ostream& operator<<(std::ostream& os, const dB_t& obj) { os << obj() << " dB"; return os; }
-#endif
 		typedef dB_t dBi_t;
 	}
+#else
+}
+}
+template <>
+struct fmt::formatter<units::dimensionless::dB_t> : fmt::formatter<double>
+{
+	template <typename FormatContext>
+	auto format(const units::dimensionless::dB_t& obj,
+							FormatContext& ctx) -> decltype(ctx.out())
+	{
+		auto out = ctx.out();
+		out = fmt::formatter<double>::format(obj(), ctx);
+		return fmt::format_to(out, " dB");
+	}
+};
+
+namespace units {
+namespace dimensionless {
+		typedef dB_t dBi_t;
+	}
+#endif
 
 	//------------------------------
 	//	DECIBEL ARITHMETIC
@@ -3365,3 +3414,5 @@ namespace units
 namespace units::literals {}
 using namespace units::literals;
 #endif  // UNIT_HAS_LITERAL_SUPPORT
+
+#include "frc/fmt/Units.h"

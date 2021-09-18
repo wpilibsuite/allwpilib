@@ -4,12 +4,15 @@
 
 #include <jni.h>
 
-#include "edu_wpi_first_wpiutil_WPIUtilJNI.h"
+#include "edu_wpi_first_util_WPIUtilJNI.h"
 #include "wpi/PortForwarder.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
 
 using namespace wpi::java;
+
+static bool mockTimeEnabled = false;
+static uint64_t mockNow = 0;
 
 extern "C" {
 
@@ -25,24 +28,53 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {}
 
 /*
- * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    enableMockTime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
+  (JNIEnv*, jclass)
+{
+  mockTimeEnabled = true;
+  wpi::SetNowImpl([] { return mockNow; });
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    setMockTime
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_setMockTime
+  (JNIEnv*, jclass, jlong time)
+{
+  mockNow = time;
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    now
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpiutil_WPIUtilJNI_now
+Java_edu_wpi_first_util_WPIUtilJNI_now
   (JNIEnv*, jclass)
 {
-  return wpi::Now();
+  if (mockTimeEnabled) {
+    return mockNow;
+  } else {
+    return wpi::Now();
+  }
 }
 
 /*
- * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    addPortForwarder
  * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_WPIUtilJNI_addPortForwarder
+Java_edu_wpi_first_util_WPIUtilJNI_addPortForwarder
   (JNIEnv* env, jclass, jint port, jstring remoteHost, jint remotePort)
 {
   wpi::PortForwarder::GetInstance().Add(static_cast<unsigned int>(port),
@@ -51,12 +83,12 @@ Java_edu_wpi_first_wpiutil_WPIUtilJNI_addPortForwarder
 }
 
 /*
- * Class:     edu_wpi_first_wpiutil_WPIUtilJNI
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    removePortForwarder
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpiutil_WPIUtilJNI_removePortForwarder
+Java_edu_wpi_first_util_WPIUtilJNI_removePortForwarder
   (JNIEnv* env, jclass, jint port)
 {
   wpi::PortForwarder::GetInstance().Remove(port);

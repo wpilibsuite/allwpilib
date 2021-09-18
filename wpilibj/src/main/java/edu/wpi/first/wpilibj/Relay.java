@@ -9,9 +9,11 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.RelayJNI;
+import edu.wpi.first.hal.util.HalHandleException;
 import edu.wpi.first.hal.util.UncleanStatusException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -134,12 +136,12 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
     try {
       RelayJNI.setRelay(m_reverseHandle, false);
-    } catch (UncleanStatusException ignored) {
+    } catch (UncleanStatusException | HalHandleException ignored) {
       // do nothing. Ignore
     }
 
@@ -163,7 +165,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
    *
    * @param value The state to set the relay.
    */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public void set(Value value) {
     switch (value) {
       case kOff:

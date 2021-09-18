@@ -5,8 +5,8 @@
 package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
-import edu.wpi.first.hal.simulation.PDPDataJNI;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.hal.simulation.PowerDistributionDataJNI;
+import edu.wpi.first.wpilibj.PowerDistribution;
 
 /** Class to control a simulated Power Distribution Panel (PDP). */
 public class PDPSim {
@@ -27,11 +27,11 @@ public class PDPSim {
   }
 
   /**
-   * Constructs from a PowerDistributionPanel object.
+   * Constructs from a PowerDistribution object.
    *
-   * @param pdp PowerDistributionPanel to simulate
+   * @param pdp PowerDistribution to simulate
    */
-  public PDPSim(PowerDistributionPanel pdp) {
+  public PDPSim(PowerDistribution pdp) {
     m_index = pdp.getModule();
   }
 
@@ -44,8 +44,9 @@ public class PDPSim {
    *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PDPDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PDPDataJNI::cancelInitializedCallback);
+    int uid =
+        PowerDistributionDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PowerDistributionDataJNI::cancelInitializedCallback);
   }
 
   /**
@@ -54,7 +55,7 @@ public class PDPSim {
    * @return true if initialized
    */
   public boolean getInitialized() {
-    return PDPDataJNI.getInitialized(m_index);
+    return PowerDistributionDataJNI.getInitialized(m_index);
   }
 
   /**
@@ -63,7 +64,7 @@ public class PDPSim {
    * @param initialized whether this object is initialized
    */
   public void setInitialized(boolean initialized) {
-    PDPDataJNI.setInitialized(m_index, initialized);
+    PowerDistributionDataJNI.setInitialized(m_index, initialized);
   }
 
   /**
@@ -75,8 +76,9 @@ public class PDPSim {
    *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerTemperatureCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PDPDataJNI.registerTemperatureCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PDPDataJNI::cancelTemperatureCallback);
+    int uid =
+        PowerDistributionDataJNI.registerTemperatureCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PowerDistributionDataJNI::cancelTemperatureCallback);
   }
 
   /**
@@ -85,7 +87,7 @@ public class PDPSim {
    * @return the PDP temperature
    */
   public double getTemperature() {
-    return PDPDataJNI.getTemperature(m_index);
+    return PowerDistributionDataJNI.getTemperature(m_index);
   }
 
   /**
@@ -94,7 +96,7 @@ public class PDPSim {
    * @param temperature the new PDP temperature
    */
   public void setTemperature(double temperature) {
-    PDPDataJNI.setTemperature(m_index, temperature);
+    PowerDistributionDataJNI.setTemperature(m_index, temperature);
   }
 
   /**
@@ -106,8 +108,8 @@ public class PDPSim {
    *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerVoltageCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = PDPDataJNI.registerVoltageCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, PDPDataJNI::cancelVoltageCallback);
+    int uid = PowerDistributionDataJNI.registerVoltageCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, PowerDistributionDataJNI::cancelVoltageCallback);
   }
 
   /**
@@ -116,7 +118,7 @@ public class PDPSim {
    * @return the PDP voltage.
    */
   public double getVoltage() {
-    return PDPDataJNI.getVoltage(m_index);
+    return PowerDistributionDataJNI.getVoltage(m_index);
   }
 
   /**
@@ -125,7 +127,7 @@ public class PDPSim {
    * @param voltage the new PDP voltage
    */
   public void setVoltage(double voltage) {
-    PDPDataJNI.setVoltage(m_index, voltage);
+    PowerDistributionDataJNI.setVoltage(m_index, voltage);
   }
 
   /**
@@ -139,8 +141,10 @@ public class PDPSim {
    */
   public CallbackStore registerCurrentCallback(
       int channel, NotifyCallback callback, boolean initialNotify) {
-    int uid = PDPDataJNI.registerCurrentCallback(m_index, channel, callback, initialNotify);
-    return new CallbackStore(m_index, channel, uid, PDPDataJNI::cancelCurrentCallback);
+    int uid =
+        PowerDistributionDataJNI.registerCurrentCallback(m_index, channel, callback, initialNotify);
+    return new CallbackStore(
+        m_index, channel, uid, PowerDistributionDataJNI::cancelCurrentCallback);
   }
 
   /**
@@ -150,7 +154,7 @@ public class PDPSim {
    * @return the current in the given channel
    */
   public double getCurrent(int channel) {
-    return PDPDataJNI.getCurrent(m_index, channel);
+    return PowerDistributionDataJNI.getCurrent(m_index, channel);
   }
 
   /**
@@ -160,11 +164,11 @@ public class PDPSim {
    * @param current the new current for the channel
    */
   public void setCurrent(int channel, double current) {
-    PDPDataJNI.setCurrent(m_index, channel, current);
+    PowerDistributionDataJNI.setCurrent(m_index, channel, current);
   }
 
   /** Reset all PDP simulation data. */
   public void resetData() {
-    PDPDataJNI.resetData(m_index);
+    PowerDistributionDataJNI.resetData(m_index);
   }
 }

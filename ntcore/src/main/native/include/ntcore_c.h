@@ -258,7 +258,7 @@ struct NT_LogMessage {
   unsigned int level;
 
   /** The filename of the source file that generated the message. */
-  const char* filename;
+  char* filename;
 
   /** The line number in the source file that generated the message. */
   unsigned int line;

@@ -12,7 +12,7 @@
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
 
-TEST(SwerveDrivePoseEstimatorTest, TestAccuracy) {
+TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
   frc::SwerveDriveKinematics<4> kinematics{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};

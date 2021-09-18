@@ -10,13 +10,12 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
 
-#include <wpi/STLExtras.h>
 #include <wpi/SmallVector.h>
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/raw_istream.h>
@@ -33,15 +32,15 @@ class Telemetry;
 
 class UsbCameraImpl : public SourceImpl {
  public:
-  UsbCameraImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
-                Telemetry& telemetry, const wpi::Twine& path);
+  UsbCameraImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
+                Telemetry& telemetry, std::string_view path);
   ~UsbCameraImpl() override;
 
   void Start() override;
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, const wpi::Twine& value,
+  void SetStringProperty(int property, std::string_view value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -63,7 +62,7 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
-  void SetPath(const wpi::Twine& path, CS_Status* status);
+  void SetPath(std::string_view path, CS_Status* status);
   std::string GetPath() const;
 
   // Messages passed to/from camera thread
@@ -95,7 +94,7 @@ class UsbCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      const wpi::Twine& name) const override;
+      std::string_view name) const override;
 
   // Cache properties.  Immediately successful if properties are already cached.
   // If they are not, tries to connect to the camera to do so; returns false and

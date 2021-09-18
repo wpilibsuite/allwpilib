@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "units/acceleration.h"
@@ -23,12 +25,12 @@ namespace frc {
  * various States that represent the pose, curvature, time elapsed, velocity,
  * and acceleration at that point.
  */
-class Trajectory {
+class WPILIB_DLLEXPORT Trajectory {
  public:
   /**
    * Represents one point on the trajectory.
    */
-  struct State {
+  struct WPILIB_DLLEXPORT State {
     // The time elapsed since the beginning of the trajectory.
     units::second_t t = 0_s;
 
@@ -171,8 +173,10 @@ class Trajectory {
   }
 };
 
+WPILIB_DLLEXPORT
 void to_json(wpi::json& json, const Trajectory::State& state);
 
+WPILIB_DLLEXPORT
 void from_json(const wpi::json& json, Trajectory::State& state);
 
 }  // namespace frc

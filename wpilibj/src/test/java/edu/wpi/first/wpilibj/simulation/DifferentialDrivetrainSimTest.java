@@ -7,24 +7,24 @@ package edu.wpi.first.wpilibj.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import edu.wpi.first.wpilibj.controller.LinearPlantInversionFeedforward;
-import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.system.NumericalIntegration;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveKinematicsConstraint;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.Vector;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N7;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N7;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import edu.wpi.first.math.util.Units;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -79,15 +79,20 @@ class DifferentialDrivetrainSimTest {
       groundTruthX = NumericalIntegration.rk4(sim::getDynamics, groundTruthX, voltages, 0.020);
     }
 
+    // 2 inch tolerance is OK since our ground truth is an approximation of the
+    // ODE solution using RK4 anyway
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kX.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kX));
+        sim.getState(DifferentialDrivetrainSim.State.kX),
+        0.05);
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kY.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kY));
+        sim.getState(DifferentialDrivetrainSim.State.kY),
+        0.05);
     assertEquals(
         groundTruthX.get(DifferentialDrivetrainSim.State.kHeading.value, 0),
-        sim.getState(DifferentialDrivetrainSim.State.kHeading));
+        sim.getState(DifferentialDrivetrainSim.State.kHeading),
+        0.01);
   }
 
   @Test

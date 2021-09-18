@@ -19,11 +19,16 @@
 namespace frc {
 class DMASample : public HAL_DMASample {
  public:
-  HAL_DMAReadStatus Update(const DMA* dma, units::second_t timeout,
-                           int32_t* remaining, int32_t* status) {
-    units::millisecond_t ms = timeout;
-    auto timeoutMs = ms.to<int32_t>();
-    return HAL_ReadDMA(dma->dmaHandle, this, timeoutMs, remaining, status);
+  enum class DMAReadStatus {
+    kOk = HAL_DMA_OK,
+    kTimeout = HAL_DMA_TIMEOUT,
+    kError = HAL_DMA_ERROR
+  };
+
+  DMAReadStatus Update(const DMA* dma, units::second_t timeout,
+                       int32_t* remaining, int32_t* status) {
+    return static_cast<DMAReadStatus>(HAL_ReadDMA(
+        dma->dmaHandle, this, timeout.to<double>(), remaining, status));
   }
 
   uint64_t GetTime() const { return timeStamp; }

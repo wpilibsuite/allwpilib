@@ -41,6 +41,8 @@
 #define ERR_FRCSystem_NoDSConnection_MESSAGE \
   "FRCSystem: No driver station connected"
 
+#define HAL_SUCCESS 0
+
 #define SAMPLE_RATE_TOO_HIGH 1001
 #define SAMPLE_RATE_TOO_HIGH_MESSAGE \
   "HAL: Analog module sample rate is too high"
@@ -99,6 +101,10 @@
 #define HAL_INVALID_DMA_ADDITION_MESSAGE \
   "HAL_AddDMA() only works before HAL_StartDMA()"
 
+#define HAL_INVALID_DMA_STATE -1103
+#define HAL_INVALID_DMA_STATE_MESSAGE \
+  "HAL_SetPause() only works before HAL_StartDMA()"
+
 #define HAL_SERIAL_PORT_NOT_FOUND -1123
 #define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
   "HAL: The specified serial port device was not found"
@@ -113,7 +119,7 @@
 
 #define HAL_THREAD_PRIORITY_ERROR -1152
 #define HAL_THREAD_PRIORITY_ERROR_MESSAGE \
-  "HAL: Getting or setting the priority of a thread has failed";
+  "HAL: Getting or setting the priority of a thread has failed"
 
 #define HAL_THREAD_PRIORITY_RANGE_ERROR -1153
 #define HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE \
@@ -125,11 +131,18 @@
 #define HAL_SIM_NOT_SUPPORTED -1155
 #define HAL_SIM_NOT_SUPPORTED_MESSAGE "HAL: Method not supported in sim"
 
+#define HAL_USE_LAST_ERROR -1156
+#define HAL_USE_LAST_ERROR_MESSAGE \
+  "HAL: Use HAL_GetLastError(status) to get last error"
+
+#define HAL_SETUID_ERROR -1157
+#define HAL_SETUID_ERROR_MESSAGE "HAL: Setting the effective user ID has failed"
+
 #define HAL_CAN_BUFFER_OVERRUN -35007
 #define HAL_CAN_BUFFER_OVERRUN_MESSAGE \
   "HAL: CAN Output Buffer Full. Ensure a device is attached"
 
-#define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
+#define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error"
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
 #define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"
 #define VI_ERROR_RSRC_NFOUND_MESSAGE "HAL - VISA: Resource Not Found"

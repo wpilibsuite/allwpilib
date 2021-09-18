@@ -9,7 +9,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -24,7 +27,7 @@ import java.nio.ByteOrder;
  * an ADXRS Gyro is supported.
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
-public class ADXRS450_Gyro extends GyroBase {
+public class ADXRS450_Gyro implements Gyro, Sendable {
   private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
@@ -40,7 +43,6 @@ public class ADXRS450_Gyro extends GyroBase {
   private static final int kSNLowRegister = 0x10;
 
   private SPI m_spi;
-  private SPI.Port m_port;
 
   private SimDevice m_simDevice;
   private SimBoolean m_simConnected;
@@ -59,7 +61,6 @@ public class ADXRS450_Gyro extends GyroBase {
    */
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
-    m_port = port;
 
     // simulation
     m_simDevice = SimDevice.create("Gyro:ADXRS450", port.value);
@@ -129,7 +130,7 @@ public class ADXRS450_Gyro extends GyroBase {
    * @return The SPI port number.
    */
   public int getPort() {
-    return m_port.value;
+    return m_spi.getPort();
   }
 
   private boolean calcParity(int value) {
@@ -205,5 +206,11 @@ public class ADXRS450_Gyro extends GyroBase {
       return 0.0;
     }
     return m_spi.getAccumulatorLastValue() * kDegreePerSecondPerLSB;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", this::getAngle, null);
   }
 }

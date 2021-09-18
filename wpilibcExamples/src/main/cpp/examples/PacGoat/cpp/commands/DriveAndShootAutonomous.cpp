@@ -14,10 +14,10 @@
 
 DriveAndShootAutonomous::DriveAndShootAutonomous() {
   AddSequential(new CloseClaw());
-  AddSequential(new WaitForPressure(), 2);
+  AddSequential(new WaitForPressure(), 2_s);
 #ifndef SIMULATION
   // NOTE: Simulation doesn't currently have the concept of hot.
-  AddSequential(new CheckForHotGoal(2));
+  AddSequential(new CheckForHotGoal(2_s));
 #endif
   AddSequential(new SetPivotSetpoint(45));
   AddSequential(new DriveForward(8, 0.3));

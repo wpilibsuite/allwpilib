@@ -8,9 +8,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -72,9 +72,9 @@ public class PIDTest extends AbstractComsSetup {
       data.addAll(
           Arrays.asList(
               new Object[][] {
-                {kp, ki, kd, TestBench.getInstance().getTalonPair()},
-                {kp, ki, kd, TestBench.getInstance().getVictorPair()},
-                {kp, ki, kd, TestBench.getInstance().getJaguarPair()}
+                {kp, ki, kd, TestBench.getTalonPair()},
+                {kp, ki, kd, TestBench.getVictorPair()},
+                {kp, ki, kd, TestBench.getJaguarPair()}
               }));
     }
     return data;
@@ -127,7 +127,7 @@ public class PIDTest extends AbstractComsSetup {
         reference,
         m_controller.getPositionError(),
         0);
-    m_builder.updateTable();
+    m_builder.update();
     assertEquals(k_p, m_table.getEntry("Kp").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("Ki").getDouble(9999999), 0);
     assertEquals(k_d, m_table.getEntry("Kd").getDouble(9999999), 0);

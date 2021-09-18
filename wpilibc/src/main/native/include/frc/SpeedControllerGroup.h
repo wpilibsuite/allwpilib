@@ -7,15 +7,18 @@
 #include <functional>
 #include <vector>
 
-#include "frc/SpeedController.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
+
+#include "frc/motorcontrol/MotorController.h"
 
 namespace frc {
 
-class SpeedControllerGroup : public Sendable,
-                             public SpeedController,
-                             public SendableHelper<SpeedControllerGroup> {
+class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
+    : public wpi::Sendable,
+      public MotorController,
+      public wpi::SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>
   explicit SpeedControllerGroup(SpeedController& speedController,
@@ -32,9 +35,8 @@ class SpeedControllerGroup : public Sendable,
   bool GetInverted() const override;
   void Disable() override;
   void StopMotor() override;
-  void PIDWrite(double output) override;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

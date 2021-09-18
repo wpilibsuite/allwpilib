@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "units/angular_velocity.h"
 #include "units/current.h"
 #include "units/impedance.h"
@@ -15,7 +17,7 @@ namespace frc {
 /**
  * Holds the constants for a DC motor.
  */
-class DCMotor {
+class WPILIB_DLLEXPORT DCMotor {
  public:
   using radians_per_second_per_volt_t =
       units::unit_t<units::compound_unit<units::radians_per_second,
@@ -148,6 +150,14 @@ class DCMotor {
    */
   static constexpr DCMotor Falcon500(int numMotors = 1) {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Romi/TI_RSLK MAX motors.
+   */
+  static constexpr DCMotor RomiBuiltIn(int numMotors = 1) {
+    // From https://www.pololu.com/product/1520/specs
+    return DCMotor(4.5_V, 0.1765_Nm, 1.25_A, 0.13_A, 150_rpm, numMotors);
   }
 };
 

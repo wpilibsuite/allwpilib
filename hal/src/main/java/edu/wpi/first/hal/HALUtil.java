@@ -15,6 +15,10 @@ public final class HALUtil extends JNIWrapper {
   public static final int NO_AVAILABLE_RESOURCES = -104;
   public static final int PARAMETER_OUT_OF_RANGE = -1028;
 
+  public static final int RUNTIME_ROBORIO = 0;
+  public static final int RUNTIME_ROBORIO2 = 1;
+  public static final int RUNTIME_SIMULATION = 2;
+
   public static native short getFPGAVersion();
 
   public static native int getFPGARevision();

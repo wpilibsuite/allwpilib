@@ -13,6 +13,7 @@ target_include_directories(ntcore PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
 wpilib_target_warnings(ntcore)
+target_compile_features(ntcore PUBLIC cxx_std_17)
 target_link_libraries(ntcore PUBLIC wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")
@@ -35,7 +36,7 @@ if (WITH_JAVA)
     find_package(Java REQUIRED)
     find_package(JNI REQUIRED)
     include(UseJava)
-    set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
+    set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
     file(GLOB
         ntcore_jni_src src/main/native/cpp/jni/NetworkTablesJNI.cpp)

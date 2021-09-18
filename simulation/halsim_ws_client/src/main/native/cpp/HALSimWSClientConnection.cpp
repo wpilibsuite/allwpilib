@@ -4,7 +4,9 @@
 
 #include "HALSimWSClientConnection.h"
 
-#include <wpi/raw_ostream.h>
+#include <cstdio>
+
+#include <fmt/format.h>
 #include <wpi/raw_uv_ostream.h>
 
 #include "HALSimWS.h"
@@ -17,29 +19,29 @@ void HALSimWSClientConnection::Initialize() {
   // Get a shared pointer to ourselves
   auto self = this->shared_from_this();
 
-  auto ws =
-      wpi::WebSocket::CreateClient(*m_stream, m_client->GetTargetUri(),
-                                   wpi::Twine{m_client->GetTargetHost()} + ":" +
-                                       wpi::Twine{m_client->GetTargetPort()});
+  auto ws = wpi::WebSocket::CreateClient(
+      *m_stream, m_client->GetTargetUri(),
+      fmt::format("{}:{}", m_client->GetTargetHost(),
+                  m_client->GetTargetPort()));
 
   ws->SetData(self);
 
   m_websocket = ws.get();
 
   // Hook up events
-  m_websocket->open.connect_extended([this](auto conn, wpi::StringRef) {
+  m_websocket->open.connect_extended([this](auto conn, auto) {
     conn.disconnect();
 
     if (!m_client->RegisterWebsocket(shared_from_this())) {
-      wpi::errs() << "Unable to register websocket\n";
+      std::fputs("Unable to register websocket\n", stderr);
       return;
     }
 
     m_ws_connected = true;
-    wpi::outs() << "HALSimWS: WebSocket Connected\n";
+    std::puts("HALSimWS: WebSocket Connected");
   });
 
-  m_websocket->text.connect([this](wpi::StringRef msg, bool) {
+  m_websocket->text.connect([this](auto msg, bool) {
     if (!m_ws_connected) {
       return;
     }
@@ -50,7 +52,7 @@ void HALSimWSClientConnection::Initialize() {
     } catch (const wpi::json::parse_error& e) {
       std::string err("JSON parse failed: ");
       err += e.what();
-      wpi::errs() << err << "\n";
+      fmt::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;
     }
@@ -58,9 +60,9 @@ void HALSimWSClientConnection::Initialize() {
     m_client->OnNetValueChanged(j);
   });
 
-  m_websocket->closed.connect([this](uint16_t, wpi::StringRef) {
+  m_websocket->closed.connect([this](uint16_t, auto) {
     if (m_ws_connected) {
-      wpi::outs() << "HALSimWS: Websocket Disconnected\n";
+      std::puts("HALSimWS: Websocket Disconnected");
       m_ws_connected = false;
 
       m_client->CloseWebsocket(shared_from_this());
@@ -90,8 +92,8 @@ void HALSimWSClientConnection::OnSimValueChanged(const wpi::json& msg) {
                                   }
 
                                   if (err) {
-                                    wpi::errs() << err.str() << "\n";
-                                    wpi::errs().flush();
+                                    fmt::print(stderr, "{}\n", err.str());
+                                    std::fflush(stderr);
                                   }
                                 });
   });

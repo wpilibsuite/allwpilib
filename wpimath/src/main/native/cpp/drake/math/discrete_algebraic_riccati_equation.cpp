@@ -1,14 +1,11 @@
 #include "drake/math/discrete_algebraic_riccati_equation.h"
 
-#include "drake/common/drake_assert.h"
-#include "drake/common/drake_throw.h"
-#include "drake/common/is_approx_equal_abstol.h"
-
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 
-// This code has https://github.com/RobotLocomotion/drake/pull/11118 applied to
-// fix an infinite loop in reorder_eigen().
+#include "drake/common/drake_assert.h"
+#include "drake/common/drake_throw.h"
+#include "drake/common/is_approx_equal_abstol.h"
 
 namespace drake {
 namespace math {
@@ -385,12 +382,11 @@ void reorder_eigen(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
  * DiscreteAlgebraicRiccatiEquation function
  * computes the unique stabilizing solution X to the discrete-time algebraic
  * Riccati equation:
- * \f[
- * A'XA - X - A'XB(B'XB+R)^{-1}B'XA + Q = 0
- * \f]
  *
- * @throws std::runtime_error if Q is not positive semi-definite.
- * @throws std::runtime_error if R is not positive definite.
+ * AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
+ *
+ * @throws std::exception if Q is not positive semi-definite.
+ * @throws std::exception if R is not positive definite.
  *
  * Based on the Schur Vector approach outlined in this paper:
  * "On the Numerical Solution of the Discrete-Time Algebraic Riccati Equation"
@@ -399,9 +395,9 @@ void reorder_eigen(Eigen::Ref<Eigen::MatrixXd> S, Eigen::Ref<Eigen::MatrixXd> T,
  *
  * Note: When, for example, n = 100, m = 80, and entries of A, B, Q_half,
  * R_half are sampled from standard normal distributions, where
- * Q = Q_half'*Q_half and similar for R, the absolute error of the solution
- * is 10^{-6}, while the absolute error of the solution computed by Matlab is
- * 10^{-8}.
+ * Q = Q_halfᵀ Q_half and similar for R, the absolute error of the solution
+ * is 10⁻⁶, while the absolute error of the solution computed by Matlab is
+ * 10⁻⁸.
  *
  * TODO(weiqiao.han): I may overwrite the RealQZ function to improve the
  * accuracy, together with more thorough tests.
@@ -457,6 +453,22 @@ Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
   Eigen::MatrixXd X = U2 * U1.inverse();
   X = (X + X.adjoint().eval()) / 2.0;
   return X;
+}
+
+Eigen::MatrixXd DiscreteAlgebraicRiccatiEquation(
+    const Eigen::Ref<const Eigen::MatrixXd>& A,
+    const Eigen::Ref<const Eigen::MatrixXd>& B,
+    const Eigen::Ref<const Eigen::MatrixXd>& Q,
+    const Eigen::Ref<const Eigen::MatrixXd>& R,
+    const Eigen::Ref<const Eigen::MatrixXd>& N) {
+    DRAKE_DEMAND(N.rows() == B.rows() && N.cols() == B.cols());
+
+    // This is a change of variables to make the DARE that includes Q, R, and N
+    // cost matrices fit the form of the DARE that includes only Q and R cost
+    // matrices.
+    Eigen::MatrixXd A2 = A - B * R.llt().solve(N.transpose());
+    Eigen::MatrixXd Q2 = Q - N * R.llt().solve(N.transpose());
+    return DiscreteAlgebraicRiccatiEquation(A2, B, Q2, R);
 }
 
 }  // namespace math

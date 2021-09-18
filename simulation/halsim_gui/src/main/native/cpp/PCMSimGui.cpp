@@ -13,7 +13,7 @@
 
 #include <hal/Ports.h>
 #include <hal/Value.h>
-#include <hal/simulation/PCMData.h>
+#include <hal/simulation/CTREPCMData.h>
 
 #include "HALDataSource.h"
 #include "HALSimGui.h"
@@ -22,11 +22,11 @@
 using namespace halsimgui;
 
 namespace {
-HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(PCMCompressorOn, "Compressor On");
-HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(PCMClosedLoopEnabled, "Closed Loop");
-HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(PCMPressureSwitch, "Pressure Switch");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PCMCompressorCurrent, "Comp Current");
-HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(PCMSolenoidOutput, "Solenoid");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMCompressorOn, "Compressor On");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMClosedLoopEnabled, "Closed Loop");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(CTREPCMPressureSwitch, "Pressure Switch");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(CTREPCMCompressorCurrent, "Comp Current");
+HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED2(CTREPCMSolenoidOutput, "Solenoid");
 
 class CompressorSimModel : public glass::CompressorModel {
  public:
@@ -39,7 +39,7 @@ class CompressorSimModel : public glass::CompressorModel {
 
   void Update() override {}
 
-  bool Exists() override { return HALSIM_GetPCMCompressorInitialized(m_index); }
+  bool Exists() override { return HALSIM_GetCTREPCMInitialized(m_index); }
 
   glass::DataSource* GetRunningData() override { return &m_running; }
   glass::DataSource* GetEnabledData() override { return &m_enabled; }
@@ -49,24 +49,24 @@ class CompressorSimModel : public glass::CompressorModel {
   glass::DataSource* GetCurrentData() override { return &m_current; }
 
   void SetRunning(bool val) override {
-    HALSIM_SetPCMCompressorOn(m_index, val);
+    HALSIM_SetCTREPCMCompressorOn(m_index, val);
   }
   void SetEnabled(bool val) override {
-    HALSIM_SetPCMClosedLoopEnabled(m_index, val);
+    HALSIM_SetCTREPCMClosedLoopEnabled(m_index, val);
   }
   void SetPressureSwitch(bool val) override {
-    HALSIM_SetPCMPressureSwitch(m_index, val);
+    HALSIM_SetCTREPCMPressureSwitch(m_index, val);
   }
   void SetCurrent(double val) override {
-    HALSIM_SetPCMCompressorCurrent(m_index, val);
+    HALSIM_SetCTREPCMCompressorCurrent(m_index, val);
   }
 
  private:
   int32_t m_index;
-  PCMCompressorOnSource m_running;
-  PCMClosedLoopEnabledSource m_enabled;
-  PCMPressureSwitchSource m_pressureSwitch;
-  PCMCompressorCurrentSource m_current;
+  CTREPCMCompressorOnSource m_running;
+  CTREPCMClosedLoopEnabledSource m_enabled;
+  CTREPCMPressureSwitchSource m_pressureSwitch;
+  CTREPCMCompressorCurrentSource m_current;
 };
 
 class SolenoidSimModel : public glass::SolenoidModel {
@@ -76,20 +76,18 @@ class SolenoidSimModel : public glass::SolenoidModel {
 
   void Update() override {}
 
-  bool Exists() override {
-    return HALSIM_GetPCMSolenoidInitialized(m_index, m_channel);
-  }
+  bool Exists() override { return HALSIM_GetCTREPCMInitialized(m_index); }
 
   glass::DataSource* GetOutputData() override { return &m_output; }
 
   void SetOutput(bool val) override {
-    HALSIM_SetPCMSolenoidOutput(m_index, m_channel, val);
+    HALSIM_SetCTREPCMSolenoidOutput(m_index, m_channel, val);
   }
 
  private:
   int32_t m_index;
   int32_t m_channel;
-  PCMSolenoidOutputSource m_output;
+  CTREPCMSolenoidOutputSource m_output;
 };
 
 class PCMSimModel : public glass::PCMModel {
@@ -97,7 +95,7 @@ class PCMSimModel : public glass::PCMModel {
   explicit PCMSimModel(int32_t index)
       : m_index{index},
         m_compressor{index},
-        m_solenoids(HAL_GetNumSolenoidChannels()) {}
+        m_solenoids(HAL_GetNumCTRESolenoidChannels()) {}
 
   void Update() override;
 
@@ -120,7 +118,7 @@ class PCMSimModel : public glass::PCMModel {
 
 class PCMsSimModel : public glass::PCMsModel {
  public:
-  PCMsSimModel() : m_models(HAL_GetNumPCMModules()) {}
+  PCMsSimModel() : m_models(HAL_GetNumCTREPCMModules()) {}
 
   void Update() override;
 
@@ -139,7 +137,7 @@ void PCMSimModel::Update() {
   m_solenoidInitCount = 0;
   for (int32_t i = 0; i < numChannels; ++i) {
     auto& model = m_solenoids[i];
-    if (HALSIM_GetPCMSolenoidInitialized(m_index, i)) {
+    if (HALSIM_GetCTREPCMInitialized(m_index)) {
       if (!model) {
         model = std::make_unique<SolenoidSimModel>(m_index, i);
       }
@@ -167,8 +165,7 @@ void PCMsSimModel::Update() {
   for (int32_t i = 0, iend = static_cast<int32_t>(m_models.size()); i < iend;
        ++i) {
     auto& model = m_models[i];
-    if (HALSIM_GetPCMCompressorInitialized(i) ||
-        HALSIM_GetPCMAnySolenoidInitialized(i)) {
+    if (HALSIM_GetCTREPCMInitialized(i)) {
       if (!model) {
         model = std::make_unique<PCMSimModel>(i);
       }
@@ -181,8 +178,8 @@ void PCMsSimModel::Update() {
 
 void PCMsSimModel::ForEachPCM(
     wpi::function_ref<void(glass::PCMModel& model, int index)> func) {
-  int32_t numPCMs = m_models.size();
-  for (int32_t i = 0; i < numPCMs; ++i) {
+  int32_t numCTREPCMs = m_models.size();
+  for (int32_t i = 0; i < numCTREPCMs; ++i) {
     if (auto model = m_models[i].get()) {
       func(*model, i);
     }
@@ -190,10 +187,9 @@ void PCMsSimModel::ForEachPCM(
 }
 
 static bool PCMsAnyInitialized() {
-  static const int32_t num = HAL_GetNumPCMModules();
+  static const int32_t num = HAL_GetNumCTREPCMModules();
   for (int32_t i = 0; i < num; ++i) {
-    if (HALSIM_GetPCMCompressorInitialized(i) ||
-        HALSIM_GetPCMAnySolenoidInitialized(i)) {
+    if (HALSIM_GetCTREPCMInitialized(i)) {
       return true;
     }
   }
@@ -201,16 +197,16 @@ static bool PCMsAnyInitialized() {
 }
 
 void PCMSimGui::Initialize() {
-  HALSimGui::halProvider.RegisterModel("PCMs", PCMsAnyInitialized, [] {
+  HALSimGui::halProvider.RegisterModel("CTREPCMs", PCMsAnyInitialized, [] {
     return std::make_unique<PCMsSimModel>();
   });
   HALSimGui::halProvider.RegisterView(
-      "Solenoids", "PCMs",
+      "Solenoids", "CTREPCMs",
       [](glass::Model* model) {
         bool any = false;
         static_cast<PCMsSimModel*>(model)->ForEachPCM(
-            [&](glass::PCMModel& pcm, int) {
-              if (static_cast<PCMSimModel*>(&pcm)->GetNumSolenoids() > 0) {
+            [&](glass::PCMModel& CTREPCM, int) {
+              if (static_cast<PCMSimModel*>(&CTREPCM)->GetNumSolenoids() > 0) {
                 any = true;
               }
             });
@@ -227,7 +223,7 @@ void PCMSimGui::Initialize() {
       });
 
   SimDeviceGui::GetDeviceTree().Add(
-      HALSimGui::halProvider.GetModel("PCMs"), [](glass::Model* model) {
+      HALSimGui::halProvider.GetModel("CTREPCMs"), [](glass::Model* model) {
         glass::DisplayCompressorsDevice(
             static_cast<PCMsSimModel*>(model),
             HALSimGui::halProvider.AreOutputsEnabled());

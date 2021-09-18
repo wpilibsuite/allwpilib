@@ -39,7 +39,7 @@ RamseteCommand::RamseteCommand(
     std::function<frc::DifferentialDriveWheelSpeeds()> wheelSpeeds,
     frc2::PIDController leftController, frc2::PIDController rightController,
     std::function<void(volt_t, volt_t)> output,
-    wpi::ArrayRef<Subsystem*> requirements)
+    wpi::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -75,7 +75,7 @@ RamseteCommand::RamseteCommand(
     frc::DifferentialDriveKinematics kinematics,
     std::function<void(units::meters_per_second_t, units::meters_per_second_t)>
         output,
-    wpi::ArrayRef<Subsystem*> requirements)
+    wpi::span<Subsystem* const> requirements)
     : m_trajectory(std::move(trajectory)),
       m_pose(std::move(pose)),
       m_controller(controller),
@@ -146,6 +146,14 @@ void RamseteCommand::Execute() {
 
 void RamseteCommand::End(bool interrupted) {
   m_timer.Stop();
+
+  if (interrupted) {
+    if (m_usePID) {
+      m_outputVolts(0_V, 0_V);
+    } else {
+      m_outputVel(0_mps, 0_mps);
+    }
+  }
 }
 
 bool RamseteCommand::IsFinished() {

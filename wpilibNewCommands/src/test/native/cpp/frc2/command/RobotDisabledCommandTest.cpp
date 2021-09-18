@@ -13,7 +13,7 @@
 using namespace frc2;
 class RobotDisabledCommandTest : public CommandTestBase {};
 
-TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancelTest) {
+TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancel) {
   CommandScheduler scheduler = GetScheduler();
 
   MockCommand command({}, false, false);
@@ -34,7 +34,7 @@ TEST_F(RobotDisabledCommandTest, RobotDisabledCommandCancelTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(RobotDisabledCommandTest, RunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, RunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   MockCommand command1;
@@ -52,7 +52,7 @@ TEST_F(RobotDisabledCommandTest, RunWhenDisabledTest) {
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
 }
 
-TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   SequentialCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
@@ -68,7 +68,7 @@ TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabledTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }
 
-TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
@@ -84,7 +84,7 @@ TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabledTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }
 
-TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelRaceGroup runWhenDisabled{MockCommand(), MockCommand()};
@@ -100,7 +100,7 @@ TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabledTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }
 
-TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelDeadlineGroup runWhenDisabled{MockCommand(), MockCommand()};
@@ -116,7 +116,7 @@ TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabledTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }
 
-TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   ConditionalCommand runWhenDisabled{MockCommand(), MockCommand(),
@@ -133,7 +133,7 @@ TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabledTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }
 
-TEST_F(RobotDisabledCommandTest, SelectCommandRunWhenDisabledTest) {
+TEST_F(RobotDisabledCommandTest, SelectCommandRunWhenDisabled) {
   CommandScheduler scheduler = GetScheduler();
 
   SelectCommand<int> runWhenDisabled{[] { return 1; },

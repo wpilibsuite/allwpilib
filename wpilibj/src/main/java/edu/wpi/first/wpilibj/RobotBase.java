@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.cameraserver.CameraServerShared;
 import edu.wpi.first.cameraserver.CameraServerSharedStore;
+import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -41,7 +41,6 @@ public abstract class RobotBase implements AutoCloseable {
   private static void setupCameraServerShared() {
     CameraServerShared shared =
         new CameraServerShared() {
-
           @Override
           public void reportVideoServer(int id) {
             HAL.report(tResourceType.kResourceType_PCVideoServer, id + 1);
@@ -116,14 +115,18 @@ public abstract class RobotBase implements AutoCloseable {
               case kOdometry_MecanumDrive:
                 HAL.report(tResourceType.kResourceType_Odometry, tInstances.kOdometry_MecanumDrive);
                 break;
+              case kController_PIDController2:
+                HAL.report(tResourceType.kResourceType_PIDController2, count);
+                break;
+              case kController_ProfiledPIDController:
+                HAL.report(tResourceType.kResourceType_ProfiledPIDController, count);
+                break;
               default:
                 break;
             }
           }
         });
   }
-
-  protected final DriverStation m_ds;
 
   /**
    * Constructor for a generic robot program. User code should be placed in the constructor that
@@ -144,7 +147,6 @@ public abstract class RobotBase implements AutoCloseable {
     } else {
       inst.startServer();
     }
-    m_ds = DriverStation.getInstance();
     inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
@@ -157,6 +159,15 @@ public abstract class RobotBase implements AutoCloseable {
 
   @Override
   public void close() {}
+
+  /**
+   * Get the current runtime type.
+   *
+   * @return Current runtime type.
+   */
+  public static RuntimeType getRuntimeType() {
+    return RuntimeType.getValue(HALUtil.getHALRuntimeType());
+  }
 
   /**
    * Get if the robot is a simulation.
@@ -173,7 +184,8 @@ public abstract class RobotBase implements AutoCloseable {
    * @return If the robot is running in the real world.
    */
   public static boolean isReal() {
-    return HALUtil.getHALRuntimeType() == 0;
+    RuntimeType runtimeType = getRuntimeType();
+    return runtimeType == RuntimeType.kRoboRIO || runtimeType == RuntimeType.kRoboRIO2;
   }
 
   /**
@@ -182,7 +194,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently disabled by the field controls.
    */
   public boolean isDisabled() {
-    return m_ds.isDisabled();
+    return DriverStation.isDisabled();
   }
 
   /**
@@ -191,7 +203,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the Robot is currently enabled by the field controls.
    */
   public boolean isEnabled() {
-    return m_ds.isEnabled();
+    return DriverStation.isEnabled();
   }
 
   /**
@@ -200,7 +212,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating Autonomously.
    */
   public boolean isAutonomous() {
-    return m_ds.isAutonomous();
+    return DriverStation.isAutonomous();
   }
 
   /**
@@ -210,7 +222,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating autonomously while enabled.
    */
   public boolean isAutonomousEnabled() {
-    return m_ds.isAutonomousEnabled();
+    return DriverStation.isAutonomousEnabled();
   }
 
   /**
@@ -219,7 +231,19 @@ public abstract class RobotBase implements AutoCloseable {
    * @return True if the robot is currently operating in Test mode.
    */
   public boolean isTest() {
-    return m_ds.isTest();
+    return DriverStation.isTest();
+  }
+
+  /**
+   * Determine if the robot is currently in Operator Control mode as determined by the field
+   * controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode.
+   * @deprecated Use isTeleop() instead.
+   */
+  @Deprecated(since = "2022", forRemoval = true)
+  public boolean isOperatorControl() {
+    return DriverStation.isTeleop();
   }
 
   /**
@@ -228,8 +252,20 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
-  public boolean isOperatorControl() {
-    return m_ds.isOperatorControl();
+  public boolean isTeleop() {
+    return DriverStation.isTeleop();
+  }
+
+  /**
+   * Determine if the robot is current in Operator Control mode and enabled as determined by the
+   * field controls.
+   *
+   * @return True if the robot is currently operating in Tele-Op mode while enabled.
+   * @deprecated Use isTeleopEnabled() instead.
+   */
+  @Deprecated(since = "2022", forRemoval = true)
+  public boolean isOperatorControlEnabled() {
+    return DriverStation.isTeleopEnabled();
   }
 
   /**
@@ -238,8 +274,8 @@ public abstract class RobotBase implements AutoCloseable {
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.
    */
-  public boolean isOperatorControlEnabled() {
-    return m_ds.isOperatorControlEnabled();
+  public boolean isTeleopEnabled() {
+    return DriverStation.isTeleopEnabled();
   }
 
   /**
@@ -248,7 +284,7 @@ public abstract class RobotBase implements AutoCloseable {
    * @return Has new data arrived over the network since the last time this function was called?
    */
   public boolean isNewDataAvailable() {
-    return m_ds.isNewControlData();
+    return DriverStation.isNewControlData();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -277,10 +313,7 @@ public abstract class RobotBase implements AutoCloseable {
   private static boolean m_suppressExitWarning;
 
   /** Run the robot main loop. */
-  @SuppressWarnings({
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidCatchingThrowable",
-    "PMD.CyclomaticComplexity", "PMD.NPathComplexity"
-  })
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static <T extends RobotBase> void runRobot(Supplier<T> robotSupplier) {
     System.out.println("********** Robot program starting **********");
 
@@ -300,7 +333,12 @@ public abstract class RobotBase implements AutoCloseable {
       DriverStation.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable.toString(),
           elements);
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+      DriverStation.reportError(
+          "The robot program quit unexpectedly."
+              + " This is usually due to a code error.\n"
+              + "  The above stacktrace can help determine where the error occurred.\n"
+              + "  See https://wpilib.org/stacktrace for more information.\n",
+          false);
       DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       return;
     }
@@ -347,7 +385,12 @@ public abstract class RobotBase implements AutoCloseable {
       m_runMutex.unlock();
       if (!suppressExitWarning) {
         // startCompetition never returns unless exception occurs....
-        DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+        DriverStation.reportWarning(
+            "The robot program quit unexpectedly."
+                + " This is usually due to a code error.\n"
+                + "  The above stacktrace can help determine where the error occurred.\n"
+                + "  See https://wpilib.org/stacktrace for more information.",
+            false);
         if (errorOnExit) {
           DriverStation.reportError(
               "The startCompetition() method (or methods called by it) should have "
@@ -360,14 +403,23 @@ public abstract class RobotBase implements AutoCloseable {
     }
   }
 
-  /** Suppress the "Robots should not quit" message. */
+  /**
+   * Suppress the "The robot program quit unexpectedly." message.
+   *
+   * @param value True if exit warning should be suppressed.
+   */
   public static void suppressExitWarning(boolean value) {
     m_runMutex.lock();
     m_suppressExitWarning = value;
     m_runMutex.unlock();
   }
 
-  /** Starting point for the applications. */
+  /**
+   * Starting point for the applications.
+   *
+   * @param <T> Robot subclass.
+   * @param robotSupplier Function that returns an instance of the robot subclass.
+   */
   public static <T extends RobotBase> void startRobot(Supplier<T> robotSupplier) {
     if (!HAL.initialize(500, 0)) {
       throw new IllegalStateException("Failed to initialize. Terminating");
@@ -379,6 +431,10 @@ public abstract class RobotBase implements AutoCloseable {
 
     HAL.report(
         tResourceType.kResourceType_Language, tInstances.kLanguage_Java, 0, WPILibVersion.Version);
+
+    if (!Notifier.setHALThreadPriority(true, 40)) {
+      DriverStation.reportWarning("Setting HAL Notifier RT priority to 40 failed", false);
+    }
 
     if (HAL.hasMain()) {
       Thread thread =

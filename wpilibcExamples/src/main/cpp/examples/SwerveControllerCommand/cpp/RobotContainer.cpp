@@ -32,13 +32,10 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
   m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        m_drive.Drive(units::meters_per_second_t(
-                          m_driverController.GetY(frc::GenericHID::kLeftHand)),
-                      units::meters_per_second_t(
-                          m_driverController.GetY(frc::GenericHID::kRightHand)),
-                      units::radians_per_second_t(
-                          m_driverController.GetX(frc::GenericHID::kLeftHand)),
-                      false);
+        m_drive.Drive(
+            units::meters_per_second_t(m_driverController.GetLeftY()),
+            units::meters_per_second_t(m_driverController.GetRightY()),
+            units::radians_per_second_t(m_driverController.GetLeftX()), false);
       },
       {&m_drive}));
 }
@@ -67,8 +64,8 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       AutoConstants::kPThetaController, 0, 0,
       AutoConstants::kThetaControllerConstraints};
 
-  thetaController.EnableContinuousInput(units::radian_t(-wpi::math::pi),
-                                        units::radian_t(wpi::math::pi));
+  thetaController.EnableContinuousInput(units::radian_t(-wpi::numbers::pi),
+                                        units::radian_t(wpi::numbers::pi));
 
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },

@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/function_ref.h>
 
 #include "glass/Model.h"
 
@@ -30,6 +31,6 @@ class RelaysModel : public Model {
 
 void DisplayRelay(RelayModel* model, int index, bool outputsEnabled);
 void DisplayRelays(RelaysModel* model, bool outputsEnabled,
-                   wpi::StringRef noneMsg = "No relays");
+                   std::string_view noneMsg = "No relays");
 
 }  // namespace glass

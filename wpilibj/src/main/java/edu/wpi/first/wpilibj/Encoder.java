@@ -11,8 +11,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to read quadrature encoders.
@@ -27,7 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable {
+public class Encoder implements CounterBase, Sendable, AutoCloseable {
   public enum IndexingType {
     kResetWhileHigh(0),
     kResetWhileLow(1),
@@ -51,9 +52,9 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
-  private PIDSourceType m_pidSource;
+  private final EncodingType m_encodingType;
 
-  private int m_encoder; // the HAL encoder object
+  int m_encoder; // the HAL encoder object
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -72,8 +73,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
             m_bSource.getAnalogTriggerTypeForRouting(),
             reverseDirection,
             type.value);
-
-    m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
@@ -133,6 +132,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
+    m_encodingType = encodingType;
     SendableRegistry.addChild(this, m_aSource);
     SendableRegistry.addChild(this, m_bSource);
     initEncoder(reverseDirection, encodingType);
@@ -232,6 +232,7 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
+    m_encodingType = encodingType;
     m_aSource = sourceA;
     m_bSource = sourceB;
     initEncoder(reverseDirection, encodingType);
@@ -482,39 +483,6 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
   }
 
   /**
-   * Set which parameter of the encoder you are using as a process control variable. The encoder
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
-   *
-   * @return The current value of the selected source parameter.
-   */
-  @Override
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
-  }
-
-  /**
    * Set the index source for the encoder. When this source is activated, the encoder count
    * automatically resets.
    *
@@ -573,6 +541,24 @@ public class Encoder implements CounterBase, PIDSource, Sendable, AutoCloseable 
    */
   public void setSimDevice(SimDevice device) {
     EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
+  }
+
+  /**
+   * Gets the decoding scale factor for scaling raw values to full counts.
+   *
+   * @return decoding scale factor
+   */
+  public double getDecodingScaleFactor() {
+    switch (m_encodingType) {
+      case k1X:
+        return 1.0;
+      case k2X:
+        return 0.5;
+      case k4X:
+        return 0.25;
+      default:
+        return 0.0;
+    }
   }
 
   @Override

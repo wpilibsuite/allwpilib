@@ -2,13 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <iostream>
-
-#include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
-#include "wpi/hostname.h"
+#include "fmt/core.h"
+#include "wpi/SmallString.h"
 
 int main() {
-  wpi::StringRef v1("Hello");
-  std::cout << v1.lower() << std::endl;
+  wpi::SmallString<128> v1("Hello");
+  fmt::print("{}\n", v1.str());
 }

@@ -1,3 +1,6 @@
+import com.hubspot.jinjava.Jinjava;
+import com.hubspot.jinjava.JinjavaConfig;
+
 ext {
     useJava = true
     useCpp = true
@@ -5,41 +8,10 @@ ext {
     groupId = 'edu.wpi.first.wpimath'
 
     nativeName = 'wpimath'
-    devMain = 'edu.wpi.first.wpiutil.math.DevMain'
+    devMain = 'edu.wpi.first.math.DevMain'
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-
-nativeUtils.exportsConfigs {
-    wpimath {
-        x86ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
-        x64ExcludeSymbols = [
-            '_CT??_R0?AV_System_error',
-            '_CT??_R0?AVexception',
-            '_CT??_R0?AVfailure',
-            '_CT??_R0?AVruntime_error',
-            '_CT??_R0?AVsystem_error',
-            '_CTA5?AVfailure',
-            '_TI5?AVfailure',
-            '_CT??_R0?AVout_of_range',
-            '_CTA3?AVout_of_range',
-            '_TI3?AVout_of_range',
-            '_CT??_R0?AVbad_cast'
-        ]
-    }
-}
 
 cppHeadersZip {
     from('src/main/native/eigeninclude') {
@@ -66,11 +38,10 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 }
 
-def wpilibNumberFileInput = file("src/generate/GenericNumber.java.in")
-def natFileInput = file("src/generate/Nat.java.in")
-def natGetterInput = file("src/generate/NatGetter.java.in")
-def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/numbers")
-def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/wpiutil/math/Nat.java")
+def wpilibNumberFileInput = file("src/generate/GenericNumber.java.jinja")
+def natFileInput = file("src/generate/Nat.java.jinja")
+def wpilibNumberFileOutputDir = file("$buildDir/generated/java/edu/wpi/first/math/numbers")
+def wpilibNatFileOutput = file("$buildDir/generated/java/edu/wpi/first/math/Nat.java")
 def maxNum = 20
 
 task generateNumbers() {
@@ -86,10 +57,17 @@ task generateNumbers() {
         }
         wpilibNumberFileOutputDir.mkdirs()
 
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
+
+        def template = wpilibNumberFileInput.text
+
         for(i in 0..maxNum) {
             def outputFile = new File(wpilibNumberFileOutputDir, "N${i}.java")
-            def read = wpilibNumberFileInput.text.replace('${num}', i.toString())
-            outputFile.write(read)
+            def replacements = new HashMap<String,?>()
+            replacements.put("num", i)
+            def output = jinjava.render(template, replacements)
+            outputFile.write(output)
         }
     }
 }
@@ -97,7 +75,7 @@ task generateNumbers() {
 task generateNat() {
     description = "Generates Nat.java"
     group = "WPILib"
-    inputs.files([natFileInput, natGetterInput])
+    inputs.file natFileInput
     outputs.file wpilibNatFileOutput
     dependsOn generateNumbers
 
@@ -106,19 +84,16 @@ task generateNat() {
             wpilibNatFileOutput.delete()
         }
 
-        def template = natFileInput.text + "\n"
+        def config = new JinjavaConfig()
+        def jinjava = new Jinjava(config)
 
-        def importsString = "";
+        def template = natFileInput.text
 
-        for(i in 0..maxNum) {
-            importsString += "import edu.wpi.first.wpiutil.math.numbers.N${i};\n"
-            template += natGetterInput.text.replace('${num}', i.toString()) + "\n"
-        }
-        template += "}\n" // Close the class body
+        def replacements = new HashMap<String,?>()
+        replacements.put("nums", 0..maxNum)
 
-        template = template.replace('{{REPLACEWITHIMPORTS}}', importsString)
-
-        wpilibNatFileOutput.write(template)
+        def output = jinjava.render(template, replacements)
+        wpilibNatFileOutput.write(output)
     }
 }
 

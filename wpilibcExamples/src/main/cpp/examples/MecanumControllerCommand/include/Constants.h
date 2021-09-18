@@ -12,7 +12,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #pragma once
 
@@ -34,7 +34,7 @@ constexpr int kRearRightMotorPort = 3;
 constexpr int kFrontLeftEncoderPorts[]{0, 1};
 constexpr int kRearLeftEncoderPorts[]{2, 3};
 constexpr int kFrontRightEncoderPorts[]{4, 5};
-constexpr int kRearRightEncoderPorts[]{5, 6};
+constexpr int kRearRightEncoderPorts[]{6, 7};
 
 constexpr bool kFrontLeftEncoderReversed = false;
 constexpr bool kRearLeftEncoderReversed = true;
@@ -48,10 +48,11 @@ constexpr auto kWheelBase =
 extern const frc::MecanumDriveKinematics kDriveKinematics;
 
 constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterMeters = .15;
+constexpr double kWheelDiameterMeters = 0.15;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * wpi::math::pi) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterMeters * wpi::numbers::pi) /
+    static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
@@ -90,5 +91,5 @@ extern const frc::TrapezoidProfile<units::radians>::Constraints
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

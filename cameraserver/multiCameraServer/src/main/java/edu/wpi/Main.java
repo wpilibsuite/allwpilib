@@ -10,8 +10,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.VideoSource;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -94,7 +94,6 @@ public final class Main {
   }
 
   /** Read configuration file. */
-  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static boolean readConfig() {
     // parse file
     JsonElement top;
@@ -151,7 +150,7 @@ public final class Main {
   /** Start running the camera. */
   public static void startCamera(CameraConfig config) {
     System.out.println("Starting camera '" + config.name + "' on " + config.path);
-    VideoSource camera = CameraServer.getInstance().startAutomaticCapture(config.name, config.path);
+    VideoSource camera = CameraServer.startAutomaticCapture(config.name, config.path);
 
     Gson gson = new GsonBuilder().create();
 

@@ -7,26 +7,26 @@
 
 #include <cstddef>
 #include <string>
-
-#include "wpi/StringRef.h"
+#include <string_view>
 
 namespace wpi {
 template <typename T>
 class SmallVectorImpl;
 class raw_ostream;
 
-size_t Base64Decode(raw_ostream& os, StringRef encoded);
+size_t Base64Decode(raw_ostream& os, std::string_view encoded);
 
-size_t Base64Decode(StringRef encoded, std::string* plain);
+size_t Base64Decode(std::string_view encoded, std::string* plain);
 
-StringRef Base64Decode(StringRef encoded, size_t* num_read,
-                       SmallVectorImpl<char>& buf);
+std::string_view Base64Decode(std::string_view encoded, size_t* num_read,
+                              SmallVectorImpl<char>& buf);
 
-void Base64Encode(raw_ostream& os, StringRef plain);
+void Base64Encode(raw_ostream& os, std::string_view plain);
 
-void Base64Encode(StringRef plain, std::string* encoded);
+void Base64Encode(std::string_view plain, std::string* encoded);
 
-StringRef Base64Encode(StringRef plain, SmallVectorImpl<char>& buf);
+std::string_view Base64Encode(std::string_view plain,
+                              SmallVectorImpl<char>& buf);
 
 }  // namespace wpi
 

@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.MotorSafety;
 
 /** Common base class for drive platforms. */
@@ -41,7 +42,7 @@ public abstract class RobotDriveBase extends MotorSafety {
    *
    * <p>The default value is {@value #kDefaultDeadband}. Inputs smaller than the deadband are set to
    * 0.0 while inputs larger than the deadband are scaled from 0.0 to 1.0. See {@link
-   * #applyDeadband}.
+   * edu.wpi.first.math.MathUtil#applyDeadband}.
    *
    * @param deadband The deadband to set.
    */
@@ -82,21 +83,20 @@ public abstract class RobotDriveBase extends MotorSafety {
    *
    * @param value value to clip
    * @param deadband range around zero
+   * @return The value after the deadband is applied.
+   * @deprecated Use MathUtil.applyDeadband(double,double).
    */
-  protected double applyDeadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
-      if (value > 0.0) {
-        return (value - deadband) / (1.0 - deadband);
-      } else {
-        return (value + deadband) / (1.0 - deadband);
-      }
-    } else {
-      return 0.0;
-    }
+  @Deprecated(since = "2021", forRemoval = true)
+  protected static double applyDeadband(double value, double deadband) {
+    return MathUtil.applyDeadband(value, deadband);
   }
 
-  /** Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0. */
-  protected void normalize(double[] wheelSpeeds) {
+  /**
+   * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
+   *
+   * @param wheelSpeeds List of wheel speeds to normalize.
+   */
+  protected static void normalize(double[] wheelSpeeds) {
     double maxMagnitude = Math.abs(wheelSpeeds[0]);
     for (int i = 1; i < wheelSpeeds.length; i++) {
       double temp = Math.abs(wheelSpeeds[i]);

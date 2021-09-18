@@ -4,9 +4,12 @@
 
 #include "hal/Counter.h"
 
+#include <fmt/format.h>
+
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/HAL.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -146,6 +149,9 @@ void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
     // TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "Counter only
     // supports DownSource in TwoPulse and ExternalDirection modes.");
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status,
+                      "Counter only supports DownSource in TwoPulse and "
+                      "ExternalDirection mode.");
     return;
   }
 
@@ -260,6 +266,10 @@ void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
   }
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, fmt::format("Samples to average must be between "
+                                          "1 and 127 inclusive. Requested {}",
+                                          samplesToAverage));
+    return;
   }
   counter->counter->writeTimerConfig_AverageSize(samplesToAverage, status);
 }

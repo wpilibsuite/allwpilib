@@ -6,14 +6,14 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
+#include <units/time.h>
 #include <wpi/SmallPtrSet.h>
-#include <wpi/Twine.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/commands/Subsystem.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
@@ -43,9 +43,7 @@ class CommandGroup;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public ErrorBase,
-                public Sendable,
-                public SendableHelper<Command> {
+class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   friend class CommandGroup;
   friend class Scheduler;
 
@@ -62,15 +60,15 @@ class Command : public ErrorBase,
    *
    * @param name the name for this command
    */
-  explicit Command(const wpi::Twine& name);
+  explicit Command(std::string_view name);
 
   /**
    * Creates a new command with the given timeout and a default name.
    *
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    * @see IsTimedOut()
    */
-  explicit Command(double timeout);
+  explicit Command(units::second_t timeout);
 
   /**
    * Creates a new command with the given timeout and a default name.
@@ -83,10 +81,10 @@ class Command : public ErrorBase,
    * Creates a new command with the given name and timeout.
    *
    * @param name    the name of the command
-   * @param timeout the time (in seconds) before this command "times out"
+   * @param timeout the time before this command "times out"
    * @see IsTimedOut()
    */
-  Command(const wpi::Twine& name, double timeout);
+  Command(std::string_view name, units::second_t timeout);
 
   /**
    * Creates a new command with the given name and timeout.
@@ -94,24 +92,24 @@ class Command : public ErrorBase,
    * @param name      the name of the command
    * @param subsystem the subsystem that the command requires
    */
-  Command(const wpi::Twine& name, Subsystem& subsystem);
+  Command(std::string_view name, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
    *
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(double timeout, Subsystem& subsystem);
+  Command(units::second_t timeout, Subsystem& subsystem);
 
   /**
    * Creates a new command with the given name and timeout.
    *
    * @param name      the name of the command
-   * @param timeout   the time (in seconds) before this command "times out"
+   * @param timeout   the time before this command "times out"
    * @param subsystem the subsystem that the command requires @see IsTimedOut()
    */
-  Command(const wpi::Twine& name, double timeout, Subsystem& subsystem);
+  Command(std::string_view name, units::second_t timeout, Subsystem& subsystem);
 
   ~Command() override = default;
 
@@ -119,13 +117,13 @@ class Command : public ErrorBase,
   Command& operator=(Command&&) = default;
 
   /**
-   * Returns the time since this command was initialized (in seconds).
+   * Returns the time since this command was initialized.
    *
    * This function will work even if there is no specified timeout.
    *
-   * @return the time since this command was initialized (in seconds).
+   * @return the time since this command was initialized.
    */
-  double TimeSinceInitialized() const;
+  units::second_t TimeSinceInitialized() const;
 
   /**
    * This method specifies that the given Subsystem is used by this command.
@@ -274,10 +272,10 @@ class Command : public ErrorBase,
   /**
    * Sets the timeout of this command.
    *
-   * @param timeout the timeout (in seconds)
+   * @param timeout the timeout
    * @see IsTimedOut()
    */
-  void SetTimeout(double timeout);
+  void SetTimeout(units::second_t timeout);
 
   /**
    * Returns whether or not the TimeSinceInitialized() method returns a number
@@ -296,7 +294,7 @@ class Command : public ErrorBase,
    *                message)
    * @return True if assert passed, false if assert failed.
    */
-  bool AssertUnlocked(const std::string& message);
+  bool AssertUnlocked(std::string_view message);
 
   /**
    * Sets the parent of this command. No actual change is made to the group.
@@ -398,7 +396,7 @@ class Command : public ErrorBase,
    *
    * @param name name
    */
-  void SetName(const wpi::Twine& name);
+  void SetName(std::string_view name);
 
   /**
    * Gets the subsystem name of this Command.
@@ -412,7 +410,7 @@ class Command : public ErrorBase,
    *
    * @param subsystem subsystem name
    */
-  void SetSubsystem(const wpi::Twine& subsystem);
+  void SetSubsystem(std::string_view subsystem);
 
  private:
   /**
@@ -448,10 +446,10 @@ class Command : public ErrorBase,
   void StartTiming();
 
   // The time since this command was initialized
-  double m_startTime = -1;
+  units::second_t m_startTime = -1_s;
 
   // The time (in seconds) before this command "times out" (-1 if no timeout)
-  double m_timeout;
+  units::second_t m_timeout;
 
   // Whether or not this command has been initialized
   bool m_initialized = false;
@@ -484,7 +482,7 @@ class Command : public ErrorBase,
   static int m_commandCounter;
 
  public:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 };
 
 }  // namespace frc

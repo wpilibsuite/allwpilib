@@ -5,9 +5,9 @@
 #pragma once
 
 #include <frc/DigitalInput.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/Solenoid.h>
 #include <frc/commands/Subsystem.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for
@@ -68,6 +68,6 @@ class Collector : public frc::Subsystem {
   // Subsystem devices
   frc::PWMSparkMax m_rollerMotor{6};
   frc::DigitalInput m_ballDetector{10};
-  frc::Solenoid m_piston{1};
+  frc::Solenoid m_piston{frc::PneumaticsModuleType::CTREPCM, 1};
   frc::DigitalInput m_openDetector{6};
 };

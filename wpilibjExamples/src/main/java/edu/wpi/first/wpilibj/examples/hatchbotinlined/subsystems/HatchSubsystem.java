@@ -8,6 +8,7 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kForward;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.kReverse;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.examples.hatchbotinlined.Constants.HatchConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid m_hatchSolenoid =
       new DoubleSolenoid(
-          HatchConstants.kHatchSolenoidModule,
+          PneumaticsModuleType.CTREPCM,
           HatchConstants.kHatchSolenoidPorts[0],
           HatchConstants.kHatchSolenoidPorts[1]);
 

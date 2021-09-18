@@ -5,9 +5,9 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
-#include <wpi/StringRef.h>
 
 #include "frc/shuffleboard/ShuffleboardContainer.h"
 
@@ -24,7 +24,7 @@ class ShuffleboardRoot;
  */
 class ShuffleboardTab final : public ShuffleboardContainer {
  public:
-  ShuffleboardTab(ShuffleboardRoot& root, wpi::StringRef title);
+  ShuffleboardTab(ShuffleboardRoot& root, std::string_view title);
 
   ShuffleboardRoot& GetRoot();
 

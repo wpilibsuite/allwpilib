@@ -6,6 +6,7 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -20,9 +21,9 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Shooter extends Subsystem {
   // Devices
-  DoubleSolenoid m_piston1 = new DoubleSolenoid(1, 3, 4);
-  DoubleSolenoid m_piston2 = new DoubleSolenoid(1, 5, 6);
-  Solenoid m_latchPiston = new Solenoid(1, 2);
+  DoubleSolenoid m_piston1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 4);
+  DoubleSolenoid m_piston2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 5, 6);
+  Solenoid m_latchPiston = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
   DigitalInput m_piston1ReedSwitchFront = new DigitalInput(9);
   DigitalInput m_piston1ReedSwitchBack = new DigitalInput(11);
   // NOTE: currently ignored in simulation

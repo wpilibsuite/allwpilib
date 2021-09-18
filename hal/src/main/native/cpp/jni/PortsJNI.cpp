@@ -197,53 +197,79 @@ Java_edu_wpi_first_hal_PortsJNI_getNumRelayHeaders
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumPCMModules
+ * Method:    getNumCTREPCMModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumPCMModules
+Java_edu_wpi_first_hal_PortsJNI_getNumCTREPCMModules
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumPCMModules();
+  jint value = HAL_GetNumCTREPCMModules();
   return value;
 }
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumSolenoidChannels
+ * Method:    getNumCTRESolenoidChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumSolenoidChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumCTRESolenoidChannels
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumSolenoidChannels();
+  jint value = HAL_GetNumCTRESolenoidChannels();
   return value;
 }
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumPDPModules
+ * Method:    getNumCTREPDPModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumPDPModules
+Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPModules
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumPDPModules();
+  jint value = HAL_GetNumCTREPDPModules();
   return value;
 }
 
 /*
  * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumPDPChannels
+ * Method:    getNumCTREPDPChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumPDPChannels
+Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPChannels
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumPDPChannels();
+  jint value = HAL_GetNumCTREPDPChannels();
+  return value;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PortsJNI
+ * Method:    getNumREVPDHModules
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHModules
+  (JNIEnv* env, jclass)
+{
+  jint value = HAL_GetNumREVPDHModules();
+  return value;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PortsJNI
+ * Method:    getNumREVPDHChannels
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHChannels
+  (JNIEnv* env, jclass)
+{
+  jint value = HAL_GetNumREVPDHChannels();
   return value;
 }
 }  // extern "C"

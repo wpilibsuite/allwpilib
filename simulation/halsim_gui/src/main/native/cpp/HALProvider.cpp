@@ -56,7 +56,7 @@ void HALProvider::Update() {
   }
 }
 
-glass::Model* HALProvider::GetModel(wpi::StringRef name) {
+glass::Model* HALProvider::GetModel(std::string_view name) {
   auto it = FindModelEntry(name);
   if (it == m_modelEntries.end() || (*it)->name != name) {
     return nullptr;

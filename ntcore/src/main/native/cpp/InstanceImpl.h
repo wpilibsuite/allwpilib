@@ -8,7 +8,6 @@
 #include <atomic>
 #include <memory>
 
-#include <wpi/UidVector.h>
 #include <wpi/mutex.h>
 
 #include "ConnectionNotifier.h"
@@ -47,8 +46,8 @@ class InstanceImpl {
   static int AllocImpl();
 
   static std::atomic<int> s_default;
-  static std::atomic<InstanceImpl*> s_fast_instances[10];
-  static wpi::UidVector<InstanceImpl*, 10> s_instances;
+  static constexpr int kNumInstances = 16;
+  static std::atomic<InstanceImpl*> s_instances[kNumInstances];
   static wpi::mutex s_mutex;
 };
 

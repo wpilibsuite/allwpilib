@@ -53,6 +53,7 @@
 #include <cassert>
 #include <cstring>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #ifdef _WIN32
@@ -657,6 +658,11 @@ hash_code hash_value(const std::pair<T, U> &arg) {
 // infrastructure is available.
 template <typename T>
 hash_code hash_value(const std::basic_string<T> &arg) {
+  return hash_combine_range(arg.begin(), arg.end());
+}
+
+template <typename T>
+hash_code hash_value(const std::basic_string_view<T> &arg) {
   return hash_combine_range(arg.begin(), arg.end());
 }
 

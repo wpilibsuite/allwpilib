@@ -6,11 +6,12 @@
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/Encoder.h>
-#include <frc/Spark.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/romi/RomiGyro.h>
+#include <frc/motorcontrol/Spark.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
+
+#include "sensors/RomiGyro.h"
 
 class Drivetrain : public frc2::SubsystemBase {
  public:
@@ -116,6 +117,6 @@ class Drivetrain : public frc2::SubsystemBase {
 
   frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
 
-  frc::RomiGyro m_gyro;
+  RomiGyro m_gyro;
   frc::BuiltInAccelerometer m_accelerometer;
 };

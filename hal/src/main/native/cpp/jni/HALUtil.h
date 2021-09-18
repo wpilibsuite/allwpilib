@@ -8,7 +8,7 @@
 #include <jni.h>
 #include <stdint.h>
 
-#include <wpi/StringRef.h>
+#include <string_view>
 
 struct HAL_MatchInfo;
 struct HAL_Value;
@@ -51,7 +51,7 @@ inline bool CheckCANStatus(JNIEnv* env, int32_t status, int32_t message_id) {
   return status == 0;
 }
 
-void ThrowIllegalArgumentException(JNIEnv* env, wpi::StringRef msg);
+void ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg);
 void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper);
 
@@ -74,6 +74,8 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp);
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
+
+jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
 
 JavaVM* GetJVM();
 

@@ -10,7 +10,7 @@
 using namespace frc2;
 class SelectCommandTest : public CommandTestBase {};
 
-TEST_F(SelectCommandTest, SelectCommandTest) {
+TEST_F(SelectCommandTest, SelectCommand) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> mock = std::make_unique<MockCommand>();
@@ -36,7 +36,7 @@ TEST_F(SelectCommandTest, SelectCommandTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&select));
 }
 
-TEST_F(SelectCommandTest, SelectCommandRequirementTest) {
+TEST_F(SelectCommandTest, SelectCommandRequirement) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;

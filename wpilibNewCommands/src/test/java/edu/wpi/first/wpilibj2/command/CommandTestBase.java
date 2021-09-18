@@ -13,8 +13,9 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 
 /** Basic setup for all {@link Command tests}." */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandTestBase {
+  protected CommandTestBase() {}
+
   @BeforeEach
   void commandSetup() {
     CommandScheduler.getInstance().cancelAll();
@@ -30,8 +31,8 @@ public abstract class CommandTestBase {
 
     DriverStationSim.setEnabled(enabled);
     DriverStationSim.notifyNewData();
-    DriverStation.getInstance().isNewControlData();
-    while (DriverStation.getInstance().isEnabled() != enabled) {
+    DriverStation.isNewControlData();
+    while (DriverStation.isEnabled() != enabled) {
       try {
         Thread.sleep(1);
       } catch (InterruptedException exception) {

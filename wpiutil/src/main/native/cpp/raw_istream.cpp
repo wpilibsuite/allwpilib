@@ -14,10 +14,10 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string_view>
 
-#include "wpi/FileSystem.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
+#include "wpi/fs.h"
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO
@@ -33,13 +33,13 @@
 
 using namespace wpi;
 
-StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
+std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
   buf.clear();
   for (int i = 0; i < maxLen; ++i) {
     char c;
     read(c);
     if (has_error()) {
-      return StringRef{buf.data(), buf.size()};
+      return {buf.data(), buf.size()};
     }
     if (c == '\r') {
       continue;
@@ -49,7 +49,7 @@ StringRef raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
       break;
     }
   }
-  return StringRef{buf.data(), buf.size()};
+  return {buf.data(), buf.size()};
 }
 
 void raw_mem_istream::close() {}
@@ -69,27 +69,27 @@ void raw_mem_istream::read_impl(void* data, size_t len) {
   set_read_count(len);
 }
 
-static int getFD(const Twine& Filename, std::error_code& EC) {
+static int getFD(std::string_view Filename, std::error_code& EC) {
   // Handle "-" as stdin. Note that when we do this, we consider ourself
   // the owner of stdin. This means that we can do things like close the
   // file descriptor when we're done and set the "binary" flag globally.
-  if (Filename.isSingleStringRef() && Filename.getSingleStringRef() == "-") {
+  if (Filename == "-") {
     EC = std::error_code();
     return STDIN_FILENO;
   }
 
-  int FD;
-
-  EC = sys::fs::openFileForRead(Filename, FD);
+  fs::file_t F = fs::OpenFileForRead(Filename, EC);
   if (EC) {
     return -1;
   }
-
-  EC = std::error_code();
+  int FD = fs::FileToFd(F, EC, fs::OF_None);
+  if (EC) {
+    return -1;
+  }
   return FD;
 }
 
-raw_fd_istream::raw_fd_istream(const Twine& filename, std::error_code& ec,
+raw_fd_istream::raw_fd_istream(std::string_view filename, std::error_code& ec,
                                size_t bufSize)
     : raw_fd_istream(getFD(filename, ec), true, bufSize) {}
 

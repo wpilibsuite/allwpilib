@@ -57,6 +57,7 @@ struct Context : public SavedSettings {
   std::vector<GLFWimage> icons;
 
   std::string iniPath = "imgui.ini";
+  bool resetOnExit = false;
 };
 
 extern Context* gContext;

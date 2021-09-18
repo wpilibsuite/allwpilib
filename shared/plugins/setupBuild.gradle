@@ -21,10 +21,15 @@ if (!project.hasProperty('onlylinuxathena')) {
                     }
                 }
                 binaries.all {
+                    // Define a custom entry point if we are building statically to avoid symbol collision.
                     if (it instanceof StaticLibraryBinarySpec) {
-                        it.buildable = false
-                        return
+                        // These scenario is seldom used, except in sysid to build a fully static exe
+                        // with simulation modules. When building static, it is important that no two
+                        // modules have the same entry point symbolically.
+                        def name = project.name.replace("halsim_", "").toUpperCase()
+                        it.cppCompiler.define("HALSIM_InitExtension", "HALSIM_InitExtension_$name")
                     }
+
                     project(':hal').addHalDependency(it, 'shared')
                     if (project.hasProperty('includeNtCore')) {
                         lib project: ':ntcore', library: 'ntcore', linkage: 'shared'

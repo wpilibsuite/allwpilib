@@ -10,16 +10,17 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.SimEnum;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /** ADXL345 SPI Accelerometer. */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
+public class ADXL345_SPI implements Accelerometer, NTSendable, AutoCloseable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -91,6 +92,10 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
     }
     init(range);
     SendableRegistry.addLW(this, "ADXL345_SPI", port.value);
+  }
+
+  public int getPort() {
+    return m_spi.getPort();
   }
 
   @Override
@@ -229,7 +234,7 @@ public class ADXL345_SPI implements Accelerometer, Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("3AxisAccelerometer");
     NetworkTableEntry entryX = builder.getEntry("X");
     NetworkTableEntry entryY = builder.getEntry("Y");

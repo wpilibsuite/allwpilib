@@ -7,8 +7,7 @@
 
 #include <memory>
 #include <string>
-
-#include <wpi/StringRef.h>
+#include <string_view>
 
 #include "ntcore_c.h"
 
@@ -18,9 +17,9 @@ class Value;
 
 void ConvertToC(const Value& in, NT_Value* out);
 std::shared_ptr<Value> ConvertFromC(const NT_Value& value);
-void ConvertToC(wpi::StringRef in, NT_String* out);
-inline wpi::StringRef ConvertFromC(const NT_String& str) {
-  return wpi::StringRef(str.str, str.len);
+void ConvertToC(std::string_view in, NT_String* out);
+inline std::string_view ConvertFromC(const NT_String& str) {
+  return {str.str, str.len};
 }
 
 }  // namespace nt

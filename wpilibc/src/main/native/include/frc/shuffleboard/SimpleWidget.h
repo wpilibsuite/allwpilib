@@ -5,10 +5,10 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
-#include <wpi/Twine.h>
 
 #include "frc/shuffleboard/ShuffleboardWidget.h"
 
@@ -22,7 +22,7 @@ class ShuffleboardContainer;
  */
 class SimpleWidget final : public ShuffleboardWidget<SimpleWidget> {
  public:
-  SimpleWidget(ShuffleboardContainer& parent, const wpi::Twine& title);
+  SimpleWidget(ShuffleboardContainer& parent, std::string_view title);
 
   /**
    * Gets the NetworkTable entry that contains the data for this widget.

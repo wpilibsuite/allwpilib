@@ -12,7 +12,7 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
-#include <wpi/math>
+#include <wpi/numbers>
 
 #pragma once
 
@@ -39,17 +39,17 @@ constexpr int kRearRightTurningMotorPort = 7;
 constexpr int kFrontLeftTurningEncoderPorts[2]{0, 1};
 constexpr int kRearLeftTurningEncoderPorts[2]{2, 3};
 constexpr int kFrontRightTurningEncoderPorts[2]{4, 5};
-constexpr int kRearRightTurningEncoderPorts[2]{5, 6};
+constexpr int kRearRightTurningEncoderPorts[2]{6, 7};
 
 constexpr bool kFrontLeftTurningEncoderReversed = false;
 constexpr bool kRearLeftTurningEncoderReversed = true;
 constexpr bool kFrontRightTurningEncoderReversed = false;
 constexpr bool kRearRightTurningEncoderReversed = true;
 
-constexpr int kFrontLeftDriveEncoderPorts[2]{0, 1};
-constexpr int kRearLeftDriveEncoderPorts[2]{2, 3};
-constexpr int kFrontRightDriveEncoderPorts[2]{4, 5};
-constexpr int kRearRightDriveEncoderPorts[2]{5, 6};
+constexpr int kFrontLeftDriveEncoderPorts[2]{8, 9};
+constexpr int kRearLeftDriveEncoderPorts[2]{10, 11};
+constexpr int kFrontRightDriveEncoderPorts[2]{12, 13};
+constexpr int kRearRightDriveEncoderPorts[2]{14, 15};
 
 constexpr bool kFrontLeftDriveEncoderReversed = false;
 constexpr bool kRearLeftDriveEncoderReversed = true;
@@ -74,14 +74,15 @@ constexpr double kPRearRightVel = 0.5;
 
 namespace ModuleConstants {
 constexpr int kEncoderCPR = 1024;
-constexpr double kWheelDiameterMeters = .15;
+constexpr double kWheelDiameterMeters = 0.15;
 constexpr double kDriveEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterMeters * wpi::math::pi) / static_cast<double>(kEncoderCPR);
+    (kWheelDiameterMeters * wpi::numbers::pi) /
+    static_cast<double>(kEncoderCPR);
 
 constexpr double kTurningEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (wpi::math::pi * 2) / static_cast<double>(kEncoderCPR);
+    (wpi::numbers::pi * 2) / static_cast<double>(kEncoderCPR);
 
 constexpr double kPModuleTurningController = 1;
 constexpr double kPModuleDriveController = 1;
@@ -110,5 +111,5 @@ extern const frc::TrapezoidProfile<units::radians>::Constraints
 }  // namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 1;
+constexpr int kDriverControllerPort = 0;
 }  // namespace OIConstants

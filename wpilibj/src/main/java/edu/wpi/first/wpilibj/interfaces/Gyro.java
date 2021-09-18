@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj.interfaces;
 
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /** Interface for yaw rate gyros. */
 public interface Gyro extends AutoCloseable {
@@ -50,7 +50,7 @@ public interface Gyro extends AutoCloseable {
   double getRate();
 
   /**
-   * Return the heading of the robot as a {@link edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    *
    * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
    * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
@@ -61,8 +61,7 @@ public interface Gyro extends AutoCloseable {
    *
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
-   * @return the current heading of the robot as a {@link
-   *     edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   * @return the current heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    */
   default Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-getAngle());

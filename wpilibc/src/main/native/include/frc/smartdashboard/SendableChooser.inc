@@ -7,22 +7,23 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
-#include <wpi/StringRef.h>
+#include <networktables/NTSendableBuilder.h>
 
 #include "frc/smartdashboard/SendableChooser.h"
 
 namespace frc {
 
 template <class T>
-void SendableChooser<T>::AddOption(wpi::StringRef name, T object) {
+void SendableChooser<T>::AddOption(std::string_view name, T object) {
   m_choices[name] = std::move(object);
 }
 
 template <class T>
-void SendableChooser<T>::SetDefaultOption(wpi::StringRef name, T object) {
+void SendableChooser<T>::SetDefaultOption(std::string_view name, T object) {
   m_defaultChoice = name;
   AddOption(name, std::move(object));
 }
@@ -45,15 +46,15 @@ auto SendableChooser<T>::GetSelected()
 }
 
 template <class T>
-void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
+void SendableChooser<T>::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("String Chooser");
   builder.GetEntry(kInstance).SetDouble(m_instance);
   builder.AddStringArrayProperty(
       kOptions,
-      [=]() {
+      [=] {
         std::vector<std::string> keys;
         for (const auto& choice : m_choices) {
-          keys.push_back(choice.first());
+          keys.emplace_back(choice.first());
         }
 
         // Unlike std::map, wpi::StringMap elements
@@ -65,17 +66,17 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
       nullptr);
   builder.AddSmallStringProperty(
       kDefault,
-      [=](wpi::SmallVectorImpl<char>&) -> wpi::StringRef {
+      [=](wpi::SmallVectorImpl<char>&) -> std::string_view {
         return m_defaultChoice;
       },
       nullptr);
   builder.AddSmallStringProperty(
       kActive,
-      [=](wpi::SmallVectorImpl<char>& buf) -> wpi::StringRef {
+      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
         std::scoped_lock lock(m_mutex);
         if (m_haveSelected) {
           buf.assign(m_selected.begin(), m_selected.end());
-          return wpi::StringRef(buf.data(), buf.size());
+          return {buf.data(), buf.size()};
         } else {
           return m_defaultChoice;
         }
@@ -85,7 +86,7 @@ void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
     std::scoped_lock lock(m_mutex);
     m_activeEntries.emplace_back(builder.GetEntry(kActive));
   }
-  builder.AddStringProperty(kSelected, nullptr, [=](wpi::StringRef val) {
+  builder.AddStringProperty(kSelected, nullptr, [=](std::string_view val) {
     std::scoped_lock lock(m_mutex);
     m_haveSelected = true;
     m_selected = val;

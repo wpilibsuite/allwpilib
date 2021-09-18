@@ -49,7 +49,7 @@ template <typename Derived, typename TUserInfo,
           typename TNotifierData = TUserInfo>
 class CallbackThread : public wpi::SafeThread {
  public:
-  typedef TUserInfo UserInfo;
+  using UserInfo = TUserInfo;
   using NotifierData = TNotifierData;
   using ListenerData = TListenerData;
 
@@ -216,7 +216,7 @@ class CallbackManager {
       return;
     }
     poller->Terminate();
-    return thr->m_pollers.erase(poller_uid);
+    thr->m_pollers.erase(poller_uid);
   }
 
   bool WaitForQueue(double timeout) {

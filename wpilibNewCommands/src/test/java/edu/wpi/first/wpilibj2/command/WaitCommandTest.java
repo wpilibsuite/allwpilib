@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,6 +59,7 @@ class WaitCommandTest extends CommandTestBase {
       MockCommandHolder command1Holder = new MockCommandHolder(true);
       Command command1 = command1Holder.getMock();
       when(command1.withTimeout(anyDouble())).thenCallRealMethod();
+      when(command1.raceWith(notNull())).thenCallRealMethod();
 
       Command timeout = command1.withTimeout(2);
 

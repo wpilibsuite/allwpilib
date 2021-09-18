@@ -6,10 +6,11 @@
 
 #include <utility>
 
-#include "frc/Base.h"
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
+
 #include "frc/RobotController.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
 
 using namespace frc;
 
@@ -17,13 +18,13 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
                                          double offset)
     : AnalogPotentiometer(std::make_shared<AnalogInput>(channel), fullRange,
                           offset) {
-  SendableRegistry::GetInstance().AddChild(this, m_analog_input.get());
+  wpi::SendableRegistry::AddChild(this, m_analog_input.get());
 }
 
 AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
                                          double offset)
     : AnalogPotentiometer(
-          std::shared_ptr<AnalogInput>(input, NullDeleter<AnalogInput>()),
+          std::shared_ptr<AnalogInput>(input, wpi::NullDeleter<AnalogInput>()),
           fullRange, offset) {}
 
 AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
@@ -31,8 +32,8 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
     : m_analog_input(std::move(input)),
       m_fullRange(fullRange),
       m_offset(offset) {
-  SendableRegistry::GetInstance().AddLW(this, "AnalogPotentiometer",
-                                        m_analog_input->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "AnalogPotentiometer",
+                               m_analog_input->GetChannel());
 }
 
 double AnalogPotentiometer::Get() const {
@@ -42,12 +43,8 @@ double AnalogPotentiometer::Get() const {
          m_offset;
 }
 
-double AnalogPotentiometer::PIDGet() {
-  return Get();
-}
-
-void AnalogPotentiometer::InitSendable(SendableBuilder& builder) {
+void AnalogPotentiometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
-      "Value", [=]() { return Get(); }, nullptr);
+      "Value", [=] { return Get(); }, nullptr);
 }

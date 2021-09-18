@@ -6,7 +6,6 @@
 
 #include <frc/ADXRS450_Gyro.h>
 #include <frc/Encoder.h>
-#include <frc/PWMSparkMax.h>
 #include <frc/drive/MecanumDrive.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -14,6 +13,7 @@
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include "Constants.h"
@@ -51,7 +51,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ResetEncoders();
 
   /**
-   * Sets the drive SpeedControllers to a power from -1 to 1.
+   * Sets the drive MotorControllers to a power from -1 to 1.
    */
   void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
 
@@ -89,9 +89,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void ResetOdometry(frc::Pose2d pose);
 
   units::meter_t kTrackWidth =
-      .5_m;  // Distance between centers of right and left wheels on robot
+      0.5_m;  // Distance between centers of right and left wheels on robot
   units::meter_t kWheelBase =
-      .7_m;  // Distance between centers of front and back wheels on robot
+      0.7_m;  // Distance between centers of front and back wheels on robot
 
   frc::SwerveDriveKinematics<4> kDriveKinematics{
       frc::Translation2d(kWheelBase / 2, kTrackWidth / 2),

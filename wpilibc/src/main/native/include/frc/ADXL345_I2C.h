@@ -5,16 +5,13 @@
 #pragma once
 
 #include <hal/SimDevice.h>
+#include <networktables/NTSendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
-#include "frc/ErrorBase.h"
 #include "frc/I2C.h"
 #include "frc/interfaces/Accelerometer.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
-
-class SendableBuilder;
 
 /**
  * ADXL345 Accelerometer on I2C.
@@ -23,10 +20,9 @@ class SendableBuilder;
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public ErrorBase,
-                    public Accelerometer,
-                    public Sendable,
-                    public SendableHelper<ADXL345_I2C> {
+class ADXL345_I2C : public Accelerometer,
+                    public nt::NTSendable,
+                    public wpi::SendableHelper<ADXL345_I2C> {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
@@ -50,6 +46,9 @@ class ADXL345_I2C : public ErrorBase,
   ADXL345_I2C(ADXL345_I2C&&) = default;
   ADXL345_I2C& operator=(ADXL345_I2C&&) = default;
 
+  I2C::Port GetI2CPort() const;
+  int GetI2CDeviceAddress() const;
+
   // Accelerometer interface
   void SetRange(Range range) final;
   double GetX() override;
@@ -72,7 +71,7 @@ class ADXL345_I2C : public ErrorBase,
    */
   virtual AllAxes GetAccelerations();
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(nt::NTSendableBuilder& builder) override;
 
  protected:
   I2C m_i2c;

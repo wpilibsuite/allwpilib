@@ -4,8 +4,8 @@
 
 #include "frc2/command/SubsystemBase.h"
 
-#include <frc/smartdashboard/SendableBuilder.h>
-#include <frc/smartdashboard/SendableRegistry.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandScheduler.h"
@@ -13,11 +13,11 @@
 using namespace frc2;
 
 SubsystemBase::SubsystemBase() {
-  frc::SendableRegistry::GetInstance().AddLW(this, GetTypeName(*this));
+  wpi::SendableRegistry::AddLW(this, GetTypeName(*this));
   CommandScheduler::GetInstance().RegisterSubsystem({this});
 }
 
-void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
+void SubsystemBase::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Subsystem");
   builder.AddBooleanProperty(
       ".hasDefault", [this] { return GetDefaultCommand() != nullptr; },
@@ -48,22 +48,21 @@ void SubsystemBase::InitSendable(frc::SendableBuilder& builder) {
 }
 
 std::string SubsystemBase::GetName() const {
-  return frc::SendableRegistry::GetInstance().GetName(this);
+  return wpi::SendableRegistry::GetName(this);
 }
 
-void SubsystemBase::SetName(const wpi::Twine& name) {
-  frc::SendableRegistry::GetInstance().SetName(this, name);
+void SubsystemBase::SetName(std::string_view name) {
+  wpi::SendableRegistry::SetName(this, name);
 }
 
 std::string SubsystemBase::GetSubsystem() const {
-  return frc::SendableRegistry::GetInstance().GetSubsystem(this);
+  return wpi::SendableRegistry::GetSubsystem(this);
 }
 
-void SubsystemBase::SetSubsystem(const wpi::Twine& name) {
-  frc::SendableRegistry::GetInstance().SetSubsystem(this, name);
+void SubsystemBase::SetSubsystem(std::string_view name) {
+  wpi::SendableRegistry::SetSubsystem(this, name);
 }
 
-void SubsystemBase::AddChild(std::string name, frc::Sendable* child) {
-  auto& registry = frc::SendableRegistry::GetInstance();
-  registry.AddLW(child, GetSubsystem(), name);
+void SubsystemBase::AddChild(std::string name, wpi::Sendable* child) {
+  wpi::SendableRegistry::AddLW(child, GetSubsystem(), name);
 }

@@ -4,16 +4,16 @@
 
 package edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
+import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.examples.mecanumcontrollercommand.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveMotorVoltages;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -117,8 +117,8 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  /** Sets the front left drive SpeedController to a voltage. */
-  public void setDriveSpeedControllersVolts(MecanumDriveMotorVoltages volts) {
+  /** Sets the front left drive MotorController to a voltage. */
+  public void setDriveMotorControllersVolts(MecanumDriveMotorVoltages volts) {
     m_frontLeft.setVoltage(volts.frontLeftVoltage);
     m_rearLeft.setVoltage(volts.rearLeftVoltage);
     m_frontRight.setVoltage(volts.frontRightVoltage);

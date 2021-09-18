@@ -17,7 +17,7 @@
 #include "units/length.h"
 #include "units/time.h"
 
-TEST(DifferentialDrivePoseEstimatorTest, TestAccuracy) {
+TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   frc::DifferentialDrivePoseEstimator estimator{frc::Rotation2d(),
                                                 frc::Pose2d(),
                                                 {0.02, 0.02, 0.01, 0.02, 0.02},

@@ -11,7 +11,7 @@
 using namespace frc2;
 class ParallelRaceGroupTest : public CommandTestBase {};
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -47,7 +47,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -83,7 +83,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancelTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
   CommandScheduler scheduler = GetScheduler();
 
   ParallelRaceGroup group{InstantCommand(), InstantCommand()};
@@ -91,7 +91,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancelTest) {
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceCopyTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -107,7 +107,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopyTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
+TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -128,7 +128,7 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirementTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished1 = false;
@@ -152,7 +152,7 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnceTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&group2));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwiceTest) {
+TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();

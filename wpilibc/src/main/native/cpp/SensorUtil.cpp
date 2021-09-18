@@ -7,29 +7,20 @@
 #include <hal/AnalogInput.h>
 #include <hal/AnalogOutput.h>
 #include <hal/DIO.h>
-#include <hal/PDP.h>
 #include <hal/PWM.h>
 #include <hal/Ports.h>
 #include <hal/Relay.h>
-#include <hal/Solenoid.h>
 
 using namespace frc;
 
 const int SensorUtil::kDigitalChannels = HAL_GetNumDigitalChannels();
 const int SensorUtil::kAnalogInputs = HAL_GetNumAnalogInputs();
 const int SensorUtil::kAnalogOutputs = HAL_GetNumAnalogOutputs();
-const int SensorUtil::kSolenoidChannels = HAL_GetNumSolenoidChannels();
-const int SensorUtil::kSolenoidModules = HAL_GetNumPCMModules();
 const int SensorUtil::kPwmChannels = HAL_GetNumPWMChannels();
 const int SensorUtil::kRelayChannels = HAL_GetNumRelayHeaders();
-const int SensorUtil::kPDPChannels = HAL_GetNumPDPChannels();
 
-int SensorUtil::GetDefaultSolenoidModule() {
+int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;
-}
-
-bool SensorUtil::CheckSolenoidModule(int moduleNumber) {
-  return HAL_CheckSolenoidModule(moduleNumber);
 }
 
 bool SensorUtil::CheckDigitalChannel(int channel) {
@@ -50,16 +41,4 @@ bool SensorUtil::CheckAnalogInputChannel(int channel) {
 
 bool SensorUtil::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
-}
-
-bool SensorUtil::CheckSolenoidChannel(int channel) {
-  return HAL_CheckSolenoidChannel(channel);
-}
-
-bool SensorUtil::CheckPDPChannel(int channel) {
-  return HAL_CheckPDPChannel(channel);
-}
-
-bool SensorUtil::CheckPDPModule(int module) {
-  return HAL_CheckPDPModule(module);
 }

@@ -5,16 +5,16 @@
 #include "frc/Watchdog.h"
 
 #include <atomic>
+#include <thread>
 #include <utility>
 
+#include <fmt/format.h>
 #include <hal/Notifier.h>
-#include <wpi/Format.h>
-#include <wpi/SmallString.h>
+#include <wpi/mutex.h>
 #include <wpi/priority_queue.h>
-#include <wpi/raw_ostream.h>
 
-#include "frc/DriverStation.h"
-#include "frc2/Timer.h"
+#include "frc/Errors.h"
+#include "frc/Timer.h"
 
 using namespace frc;
 
@@ -47,7 +47,7 @@ class Watchdog::Impl {
 Watchdog::Impl::Impl() {
   int32_t status = 0;
   m_notifier = HAL_InitializeNotifier(&status);
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "starting watchdog notifier");
   HAL_SetNotifierName(m_notifier, "Watchdog", &status);
 
   m_thread = std::thread([=] { Main(); });
@@ -58,7 +58,7 @@ Watchdog::Impl::~Impl() {
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
   HAL_StopNotifier(handle, &status);
-  wpi_setGlobalHALError(status);
+  FRC_ReportError(status, "{}", "stopping watchdog notifier");
 
   // Join the thread to ensure the handler has exited.
   if (m_thread.joinable()) {
@@ -84,7 +84,7 @@ void Watchdog::Impl::UpdateAlarm() {
                               1e6),
         &status);
   }
-  wpi_setGlobalHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "updating watchdog notifier alarm");
 }
 
 void Watchdog::Impl::Main() {
@@ -113,11 +113,8 @@ void Watchdog::Impl::Main() {
     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
-        wpi::SmallString<128> buf;
-        wpi::raw_svector_ostream err(buf);
-        err << "Watchdog not fed within "
-            << wpi::format("%.6f", watchdog->m_timeout.to<double>()) << "s\n";
-        frc::DriverStation::ReportWarning(err.str());
+        FRC_ReportError(warn::Warning, "Watchdog not fed within {:.6f}s",
+                        watchdog->m_timeout.to<double>());
       }
     }
 
@@ -134,14 +131,15 @@ void Watchdog::Impl::Main() {
   }
 }
 
-Watchdog::Watchdog(double timeout, std::function<void()> callback)
-    : Watchdog(units::second_t{timeout}, callback) {}
-
 Watchdog::Watchdog(units::second_t timeout, std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
-  Disable();
+  try {
+    Disable();
+  } catch (const RuntimeError& e) {
+    e.Report();
+  }
 }
 
 Watchdog::Watchdog(Watchdog&& rhs) {
@@ -166,16 +164,12 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   return *this;
 }
 
-double Watchdog::GetTime() const {
-  return (frc2::Timer::GetFPGATimestamp() - m_startTime).to<double>();
-}
-
-void Watchdog::SetTimeout(double timeout) {
-  SetTimeout(units::second_t{timeout});
+units::second_t Watchdog::GetTime() const {
+  return Timer::GetFPGATimestamp() - m_startTime;
 }
 
 void Watchdog::SetTimeout(units::second_t timeout) {
-  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
@@ -188,9 +182,9 @@ void Watchdog::SetTimeout(units::second_t timeout) {
   m_impl->UpdateAlarm();
 }
 
-double Watchdog::GetTimeout() const {
+units::second_t Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
-  return m_timeout.to<double>();
+  return m_timeout;
 }
 
 bool Watchdog::IsExpired() const {
@@ -198,7 +192,7 @@ bool Watchdog::IsExpired() const {
   return m_isExpired;
 }
 
-void Watchdog::AddEpoch(wpi::StringRef epochName) {
+void Watchdog::AddEpoch(std::string_view epochName) {
   m_tracer.AddEpoch(epochName);
 }
 
@@ -211,7 +205,7 @@ void Watchdog::Reset() {
 }
 
 void Watchdog::Enable() {
-  m_startTime = frc2::Timer::GetFPGATimestamp();
+  m_startTime = Timer::GetFPGATimestamp();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);

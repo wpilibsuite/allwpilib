@@ -4,16 +4,14 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.HashSet;
 import java.util.Set;
 
 /** A {@link Sendable} base class for {@link Command}s. */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class CommandBase implements Sendable, Command {
-
   protected Set<Subsystem> m_requirements = new HashSet<>();
 
   protected CommandBase() {
@@ -45,7 +43,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
-  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
@@ -56,7 +53,7 @@ public abstract class CommandBase implements Sendable, Command {
    * @param name name
    * @return the decorated Command
    */
-  public Command withName(String name) {
+  public CommandBase withName(String name) {
     this.setName(name);
     return this;
   }
@@ -66,7 +63,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @return Subsystem name
    */
-  @Override
   public String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
@@ -76,7 +72,6 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param subsystem subsystem name
    */
-  @Override
   public void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }

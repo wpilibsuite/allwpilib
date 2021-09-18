@@ -4,23 +4,27 @@
 
 #include "frc/AnalogEncoder.h"
 
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+
 #include "frc/AnalogInput.h"
-#include "frc/Base.h"
 #include "frc/Counter.h"
-#include "frc/DriverStation.h"
-#include "frc/smartdashboard/SendableBuilder.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
+AnalogEncoder::AnalogEncoder(int channel)
+    : AnalogEncoder(std::make_shared<AnalogInput>(channel)) {}
+
 AnalogEncoder::AnalogEncoder(AnalogInput& analogInput)
-    : m_analogInput{&analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{&analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
 }
 
 AnalogEncoder::AnalogEncoder(AnalogInput* analogInput)
-    : m_analogInput{analogInput, NullDeleter<AnalogInput>{}},
+    : m_analogInput{analogInput, wpi::NullDeleter<AnalogInput>{}},
       m_analogTrigger{m_analogInput.get()},
       m_counter{} {
   Init();
@@ -46,8 +50,8 @@ void AnalogEncoder::Init() {
   m_counter.SetDownSource(
       m_analogTrigger.CreateOutput(AnalogTriggerType::kFallingPulse));
 
-  SendableRegistry::GetInstance().AddLW(this, "DutyCycle Encoder",
-                                        m_analogInput->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
+                               m_analogInput->GetChannel());
 }
 
 units::turn_t AnalogEncoder::Get() const {
@@ -69,7 +73,8 @@ units::turn_t AnalogEncoder::Get() const {
     }
   }
 
-  frc::DriverStation::GetInstance().ReportWarning(
+  FRC_ReportError(
+      warn::Warning, "{}",
       "Failed to read Analog Encoder. Potential Speed Overrun. Returning last "
       "value");
   return m_lastPosition;
@@ -100,7 +105,7 @@ int AnalogEncoder::GetChannel() const {
   return m_analogInput->GetChannel();
 }
 
-void AnalogEncoder::InitSendable(SendableBuilder& builder) {
+void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder");
   builder.AddDoubleProperty(
       "Distance", [this] { return this->GetDistance(); }, nullptr);

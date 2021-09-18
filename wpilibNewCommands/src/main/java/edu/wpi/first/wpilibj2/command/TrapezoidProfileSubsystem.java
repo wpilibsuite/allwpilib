@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * A subsystem that generates and runs trapezoidal motion profiles automatically. The user specifies

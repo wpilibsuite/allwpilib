@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-@SuppressWarnings({"PMD.SingularField"})
+@SuppressWarnings("PMD.SingularField")
 public class Robot extends TimedRobot {
   private DigitalInput m_input;
   private DutyCycle m_dutyCycle;

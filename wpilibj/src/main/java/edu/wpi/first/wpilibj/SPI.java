@@ -13,7 +13,6 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 /** Represents a SPI bus port. */
-@SuppressWarnings("PMD.CyclomaticComplexity")
 public class SPI implements AutoCloseable {
   public enum Port {
     kOnboardCS0(0),
@@ -45,6 +44,10 @@ public class SPI implements AutoCloseable {
     SPIJNI.spiInitialize(m_port);
 
     HAL.report(tResourceType.kResourceType_SPI, port.value + 1);
+  }
+
+  public int getPort() {
+    return m_port;
   }
 
   @Override
@@ -159,6 +162,10 @@ public class SPI implements AutoCloseable {
    *
    * <p>If not running in output only mode, also saves the data received on the CIPO input during
    * the transfer into the receive FIFO.
+   *
+   * @param dataToSend The buffer containing the data to send.
+   * @param size The number of bytes to send.
+   * @return Number of bytes written or -1 on error.
    */
   public int write(byte[] dataToSend, int size) {
     if (dataToSend.length < size) {
@@ -174,6 +181,8 @@ public class SPI implements AutoCloseable {
    * the transfer into the receive FIFO.
    *
    * @param dataToSend The buffer containing the data to send.
+   * @param size The number of bytes to send.
+   * @return Number of bytes written or -1 on error.
    */
   @SuppressWarnings("ByteBufferBackingArray")
   public int write(ByteBuffer dataToSend, int size) {
@@ -199,6 +208,9 @@ public class SPI implements AutoCloseable {
    * @param initiate If true, this function pushes "0" into the transmit buffer and initiates a
    *     transfer. If false, this function assumes that data is already in the receive FIFO from a
    *     previous write.
+   * @param dataReceived Buffer in which to store bytes read.
+   * @param size Number of bytes to read.
+   * @return Number of bytes read or -1 on error.
    */
   public int read(boolean initiate, byte[] dataReceived, int size) {
     if (dataReceived.length < size) {
@@ -219,6 +231,7 @@ public class SPI implements AutoCloseable {
    *     previous write.
    * @param dataReceived The buffer to be filled with the received data.
    * @param size The length of the transaction, in bytes
+   * @return Number of bytes read or -1 on error.
    */
   @SuppressWarnings("ByteBufferBackingArray")
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
@@ -240,6 +253,7 @@ public class SPI implements AutoCloseable {
    * @param dataToSend The data to be written out to the device
    * @param dataReceived Buffer to receive data from the device
    * @param size The length of the transaction, in bytes
+   * @return TODO
    */
   public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
     if (dataToSend.length < size) {
@@ -257,8 +271,9 @@ public class SPI implements AutoCloseable {
    * @param dataToSend The data to be written out to the device.
    * @param dataReceived Buffer to receive data from the device.
    * @param size The length of the transaction, in bytes
+   * @return TODO
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "ByteBufferBackingArray"})
+  @SuppressWarnings("ByteBufferBackingArray")
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
     if (dataToSend.hasArray() && dataReceived.hasArray()) {
       return transaction(dataToSend.array(), dataReceived.array(), size);
@@ -425,7 +440,6 @@ public class SPI implements AutoCloseable {
 
   private static final int kAccumulateDepth = 2048;
 
-  @SuppressWarnings("PMD.TooManyFields")
   private static class Accumulator implements AutoCloseable {
     Accumulator(
         int port,
@@ -482,7 +496,6 @@ public class SPI implements AutoCloseable {
     final boolean m_bigEndian; // is response big endian?
     final int m_port;
 
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     void update() {
       synchronized (m_mutex) {
         boolean done = false;
@@ -643,6 +656,8 @@ public class SPI implements AutoCloseable {
    * <p>The center value is subtracted from each value before it is added to the accumulator. This
    * is used for the center value of devices like gyros and accelerometers to make integration work
    * and to take the device offset into account when integrating.
+   *
+   * @param center The accumulator's center value.
    */
   public void setAccumulatorCenter(int center) {
     if (m_accum == null) {
@@ -653,7 +668,11 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  /** Set the accumulator's deadband. */
+  /**
+   * Set the accumulator's deadband.
+   *
+   * @param deadband The accumulator's deadband.
+   */
   public void setAccumulatorDeadband(int deadband) {
     if (m_accum == null) {
       return;
@@ -663,7 +682,11 @@ public class SPI implements AutoCloseable {
     }
   }
 
-  /** Read the last value read by the accumulator engine. */
+  /**
+   * Read the last value read by the accumulator engine.
+   *
+   * @return The last value read by the accumulator engine.
+   */
   public int getAccumulatorLastValue() {
     if (m_accum == null) {
       return 0;
@@ -753,6 +776,8 @@ public class SPI implements AutoCloseable {
    * <p>The center value is subtracted from each value*dt before it is added to the integrated
    * value. This is used for the center value of devices like gyros and accelerometers to take the
    * device offset into account when integrating.
+   *
+   * @param center The accumulator integrator's center value.
    */
   public void setAccumulatorIntegratedCenter(double center) {
     if (m_accum == null) {

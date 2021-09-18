@@ -12,7 +12,7 @@ if (WITH_JAVA)
   find_package(Java REQUIRED)
   find_package(JNI REQUIRED)
   include(UseJava)
-  set(CMAKE_JAVA_COMPILE_FLAGS "-Xlint:unchecked")
+  set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
   if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
@@ -90,6 +90,8 @@ list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
+file(GLOB fmtlib_native_src src/main/native/fmtlib/src/*.cpp)
+
 file(GLOB uv_native_src src/main/native/libuv/src/*.cpp)
 
 file(GLOB uv_windows_src src/main/native/libuv/src/win/*.cpp)
@@ -132,7 +134,7 @@ set(uv_linux_src
     src/main/native/libuv/src/unix/sysinfo-loadavg.cpp
 )
 
-add_library(wpiutil ${wpiutil_native_src} ${wpiutil_resources_src})
+add_library(wpiutil ${wpiutil_native_src} ${fmtlib_native_src} ${wpiutil_resources_src})
 set_target_properties(wpiutil PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
@@ -144,6 +146,17 @@ if (MSVC)
 endif()
 wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
+
+if (NOT USE_VCPKG_FMTLIB)
+    target_sources(wpiutil PRIVATE ${fmtlib_native_src})
+    install(DIRECTORY src/main/native/fmtlib/include/ DESTINATION "${include_dest}/wpiutil")
+    target_include_directories(wpiutil PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/fmtlib/include>
+                            $<INSTALL_INTERFACE:${include_dest}/wpiutil>)
+else()
+    find_package(fmt CONFIG REQUIRED)
+    target_link_libraries(wpiutil fmt::fmt)
+endif()
 
 if (NOT USE_VCPKG_LIBUV)
     target_sources(wpiutil PRIVATE ${uv_native_src})

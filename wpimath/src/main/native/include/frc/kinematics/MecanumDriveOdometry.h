@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -22,7 +23,7 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-class MecanumDriveOdometry {
+class WPILIB_DLLEXPORT MecanumDriveOdometry {
  public:
   /**
    * Constructs a MecanumDriveOdometry object.

@@ -12,8 +12,9 @@ import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +27,7 @@ import java.util.List;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
-  /** The units to return when PIDGet is called. */
-  public enum Unit {
-    /** Use inches for PIDGet. */
-    kInches,
-    /** Use millimeters for PIDGet. */
-    kMillimeters
-  }
-
+public class Ultrasonic implements Sendable, AutoCloseable {
   // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
@@ -44,14 +37,12 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
   private static volatile boolean m_automaticEnabled;
   private DigitalInput m_echoChannel;
   private DigitalOutput m_pingChannel;
-  private boolean m_allocatedChannels;
+  private final boolean m_allocatedChannels;
   private boolean m_enabled;
   private Counter m_counter;
   // task doing the round-robin automatic sensing
   private static Thread m_task;
-  private Unit m_units;
   private static int m_instances;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   private SimDevice m_simDevice;
   private SimBoolean m_simRangeValid;
@@ -120,6 +111,10 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "Ultrasonic", m_echoChannel.getChannel());
   }
 
+  public int getEchoChannel() {
+    return m_echoChannel.getChannel();
+  }
+
   /**
    * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
    * and Vex ultrasonic sensors.
@@ -128,29 +123,14 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    *     sending the ping.
    * @param echoChannel The digital input channel that receives the echo. The length of time that
    *     the echo is high represents the round trip time of the ping, and the distance.
-   * @param units The units returned in either kInches or kMilliMeters
    */
-  public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
+  public Ultrasonic(final int pingChannel, final int echoChannel) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
     SendableRegistry.addChild(this, m_pingChannel);
     SendableRegistry.addChild(this, m_echoChannel);
     m_allocatedChannels = true;
-    m_units = units;
     initialize();
-  }
-
-  /**
-   * Create an instance of the Ultrasonic Sensor. This is designed to supchannel the Daventech SRF04
-   * and Vex ultrasonic sensors. Default unit is inches.
-   *
-   * @param pingChannel The digital output channel that sends the pulse to initiate the sensor
-   *     sending the ping.
-   * @param echoChannel The digital input channel that receives the echo. The length of time that
-   *     the echo is high represents the round trip time of the ping, and the distance.
-   */
-  public Ultrasonic(final int pingChannel, final int echoChannel) {
-    this(pingChannel, echoChannel, Unit.kInches);
   }
 
   /**
@@ -160,29 +140,15 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
    *     10uS pulse to start.
    * @param echoChannel The digital input object that times the return pulse to determine the range.
-   * @param units The units returned in either kInches or kMilliMeters
    */
-  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel, Unit units) {
+  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
     requireNonNull(pingChannel, "Provided ping channel was null");
     requireNonNull(echoChannel, "Provided echo channel was null");
 
     m_allocatedChannels = false;
     m_pingChannel = pingChannel;
     m_echoChannel = echoChannel;
-    m_units = units;
     initialize();
-  }
-
-  /**
-   * Create an instance of an Ultrasonic Sensor from a DigitalInput for the echo channel and a
-   * DigitalOutput for the ping channel. Default unit is inches.
-   *
-   * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a
-   *     10uS pulse to start.
-   * @param echoChannel The digital input object that times the return pulse to determine the range.
-   */
-  public Ultrasonic(DigitalOutput pingChannel, DigitalInput echoChannel) {
-    this(pingChannel, echoChannel, Unit.kInches);
   }
 
   /**
@@ -324,54 +290,6 @@ public class Ultrasonic implements PIDSource, Sendable, AutoCloseable {
    */
   public double getRangeMM() {
     return getRangeInches() * 25.4;
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for ultrasonics.");
-    }
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the range in the current DistanceUnit for the PIDSource base object.
-   *
-   * @return The range in DistanceUnit
-   */
-  @Override
-  public double pidGet() {
-    switch (m_units) {
-      case kInches:
-        return getRangeInches();
-      case kMillimeters:
-        return getRangeMM();
-      default:
-        return 0.0;
-    }
-  }
-
-  /**
-   * Set the current DistanceUnit that should be used for the PIDSource base object.
-   *
-   * @param units The DistanceUnit that should be used.
-   */
-  public void setDistanceUnits(Unit units) {
-    m_units = units;
-  }
-
-  /**
-   * Get the current DistanceUnit that is used for the PIDSource base object.
-   *
-   * @return The type of DistanceUnit that is being used.
-   */
-  public Unit getDistanceUnits() {
-    return m_units;
   }
 
   /**

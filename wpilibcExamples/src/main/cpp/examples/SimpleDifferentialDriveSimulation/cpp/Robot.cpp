@@ -2,12 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/SlewRateLimiter.h>
 #include <frc/TimedRobot.h>
+#include <frc/Timer.h>
 #include <frc/XboxController.h>
 #include <frc/controller/RamseteController.h>
+#include <frc/filter/SlewRateLimiter.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
-#include <frc2/Timer.h>
 
 #include "Drivetrain.h"
 
@@ -41,16 +41,14 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {
     // Get the x speed. We are inverting this because Xbox controllers return
     // negative values when we push forward.
-    const auto xSpeed = -m_speedLimiter.Calculate(
-                            m_controller.GetY(frc::GenericHID::kLeftHand)) *
+    const auto xSpeed = -m_speedLimiter.Calculate(m_controller.GetLeftY()) *
                         Drivetrain::kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    auto rot = -m_rotLimiter.Calculate(
-                   m_controller.GetX(frc::GenericHID::kRightHand)) *
+    auto rot = -m_rotLimiter.Calculate(m_controller.GetRightX()) *
                Drivetrain::kMaxAngularSpeed;
 
     m_drive.Drive(xSpeed, rot);
@@ -69,7 +67,7 @@ class Robot : public frc::TimedRobot {
   Drivetrain m_drive;
   frc::Trajectory m_trajectory;
   frc::RamseteController m_ramsete;
-  frc2::Timer m_timer;
+  frc::Timer m_timer;
 };
 
 #ifndef RUNNING_FRC_TESTS

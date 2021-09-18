@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
 #include "units/math.h"
@@ -13,7 +15,7 @@ namespace frc {
 /**
  * Represents the state of one swerve module.
  */
-struct SwerveModuleState {
+struct WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */

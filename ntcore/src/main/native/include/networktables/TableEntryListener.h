@@ -7,16 +7,13 @@
 
 #include <functional>
 #include <memory>
-
-#include <wpi/StringRef.h>
+#include <string_view>
 
 namespace nt {
 
 class NetworkTable;
 class NetworkTableEntry;
 class Value;
-
-using wpi::StringRef;
 
 /**
  * A listener that listens to changes in values in a NetworkTable.
@@ -32,10 +29,9 @@ using wpi::StringRef;
  *
  * @ingroup ntcore_cpp_api
  */
-typedef std::function<void(NetworkTable* table, StringRef name,
-                           NetworkTableEntry entry,
-                           std::shared_ptr<Value> value, int flags)>
-    TableEntryListener;
+using TableEntryListener = std::function<void(
+    NetworkTable* table, std::string_view name, NetworkTableEntry entry,
+    std::shared_ptr<Value> value, int flags)>;
 
 }  // namespace nt
 

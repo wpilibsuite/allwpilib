@@ -4,6 +4,7 @@
 
 #include "wpi/uv/GetAddrInfo.h"
 
+#include "wpi/SmallString.h"
 #include "wpi/uv/Loop.h"
 #include "wpi/uv/util.h"
 
@@ -14,10 +15,10 @@ GetAddrInfoReq::GetAddrInfoReq() {
 }
 
 void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
-                 const Twine& node, const Twine& service,
+                 std::string_view node, std::string_view service,
                  const addrinfo* hints) {
-  SmallVector<char, 128> nodeStr;
-  SmallVector<char, 128> serviceStr;
+  SmallString<128> nodeStr{node};
+  SmallString<128> serviceStr{service};
   int err = uv_getaddrinfo(
       loop.GetRaw(), req->GetRaw(),
       [](uv_getaddrinfo_t* req, int status, addrinfo* res) {
@@ -30,10 +31,8 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
         uv_freeaddrinfo(res);
         h.Release();  // this is always a one-shot
       },
-      node.isNull() ? nullptr : node.toNullTerminatedStringRef(nodeStr).data(),
-      service.isNull() ? nullptr
-                       : service.toNullTerminatedStringRef(serviceStr).data(),
-      hints);
+      node.empty() ? nullptr : nodeStr.c_str(),
+      service.empty() ? nullptr : serviceStr.c_str(), hints);
   if (err < 0) {
     loop.ReportError(err);
   } else {
@@ -42,7 +41,7 @@ void GetAddrInfo(Loop& loop, const std::shared_ptr<GetAddrInfoReq>& req,
 }
 
 void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
-                 const Twine& node, const Twine& service,
+                 std::string_view node, std::string_view service,
                  const addrinfo* hints) {
   auto req = std::make_shared<GetAddrInfoReq>();
   req->resolved.connect(callback);

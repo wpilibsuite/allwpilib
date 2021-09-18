@@ -139,10 +139,10 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#giveSource()
    */
   @Override
-  InterruptableSensorBase giveInterruptableSensorBase() {
+  DigitalSource giveSource() {
     m_interruptTrigger = new AnalogTrigger(analogIO.getInput());
     m_interruptTrigger.setLimitsVoltage(2.0, 3.0);
     m_interruptTriggerOutput =
@@ -154,11 +154,10 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
    * (non-Javadoc)
    *
    * @see
-   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeInterruptableSensorBase()
+   * edu.wpi.first.wpilibj.AbstractInterruptTest#freeSource()
    */
   @Override
-  void freeInterruptableSensorBase() {
-    m_interruptTriggerOutput.cancelInterrupts();
+  void freeSource() {
     m_interruptTriggerOutput.close();
     m_interruptTriggerOutput = null;
     m_interruptTrigger.close();

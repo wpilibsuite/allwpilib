@@ -5,11 +5,12 @@
 #ifndef WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 #define WPIUTIL_WPI_RAW_UV_OSTREAM_H_
 
+#include <functional>
 #include <utility>
 
-#include "wpi/ArrayRef.h"
 #include "wpi/SmallVector.h"
 #include "wpi/raw_ostream.h"
+#include "wpi/span.h"
 #include "wpi/uv/Buffer.h"
 
 namespace wpi {
@@ -28,8 +29,7 @@ class raw_uv_ostream : public raw_ostream {
    *                  performed using Buffer::Allocate().
    */
   raw_uv_ostream(SmallVectorImpl<uv::Buffer>& bufs, size_t allocSize)
-      : m_bufs(bufs),
-        m_alloc([=]() { return uv::Buffer::Allocate(allocSize); }) {
+      : m_bufs(bufs), m_alloc([=] { return uv::Buffer::Allocate(allocSize); }) {
     SetUnbuffered();
   }
 
@@ -47,9 +47,9 @@ class raw_uv_ostream : public raw_ostream {
   ~raw_uv_ostream() override = default;
 
   /**
-   * Returns an ArrayRef to the buffers.
+   * Returns an span to the buffers.
    */
-  ArrayRef<uv::Buffer> bufs() { return m_bufs; }
+  span<uv::Buffer> bufs() { return m_bufs; }
 
   void flush() = delete;
 

@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal.simulation;
 
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.JNIWrapper;
 
 public class SimulatorJNI extends JNIWrapper {
@@ -29,48 +28,4 @@ public class SimulatorJNI extends JNIWrapper {
   public static native void stepTimingAsync(long delta);
 
   public static native void resetHandles();
-
-  public static class SimPeriodicBeforeCallback implements AutoCloseable {
-    private SimPeriodicBeforeCallback(Runnable r) {
-      m_run = r;
-    }
-
-    @Override
-    public void close() {
-      synchronized (HAL.s_simPeriodicBefore) {
-        HAL.s_simPeriodicBefore.remove(m_run);
-      }
-    }
-
-    private Runnable m_run;
-  }
-
-  public static SimPeriodicBeforeCallback registerSimPeriodicBeforeCallback(Runnable r) {
-    synchronized (HAL.s_simPeriodicBefore) {
-      HAL.s_simPeriodicBefore.add(r);
-    }
-    return new SimPeriodicBeforeCallback(r);
-  }
-
-  public static class SimPeriodicAfterCallback implements AutoCloseable {
-    private SimPeriodicAfterCallback(Runnable r) {
-      m_run = r;
-    }
-
-    @Override
-    public void close() {
-      synchronized (HAL.s_simPeriodicAfter) {
-        HAL.s_simPeriodicAfter.remove(m_run);
-      }
-    }
-
-    private Runnable m_run;
-  }
-
-  public static SimPeriodicAfterCallback registerSimPeriodicAfterCallback(Runnable r) {
-    synchronized (HAL.s_simPeriodicAfter) {
-      HAL.s_simPeriodicAfter.add(r);
-    }
-    return new SimPeriodicAfterCallback(r);
-  }
 }

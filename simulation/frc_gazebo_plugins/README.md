@@ -13,7 +13,7 @@ if those requirements are not met.
 
 This command:
 
-    `./gradlew build -PmakeSim`
+    `./gradlew build -PforceGazebo`
 
 will force it to attempt to build.
 

@@ -9,9 +9,9 @@
 
 #include <atomic>
 #include <functional>
+#include <string_view>
 #include <thread>
 
-#include <wpi/Twine.h>
 #include <wpi/condition_variable.h>
 
 #include "Frame.h"
@@ -23,9 +23,9 @@ class SourceImpl;
 
 class RawSinkImpl : public SinkImpl {
  public:
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
               Telemetry& telemetry);
-  RawSinkImpl(const wpi::Twine& name, wpi::Logger& logger, Notifier& notifier,
+  RawSinkImpl(std::string_view name, wpi::Logger& logger, Notifier& notifier,
               Telemetry& telemetry,
               std::function<void(uint64_t time)> processFrame);
   ~RawSinkImpl() override;

@@ -7,15 +7,15 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.NTSendable;
+import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Watchdog;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,8 +34,7 @@ import java.util.function.Consumer;
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
  */
-@SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields"})
-public final class CommandScheduler implements Sendable, AutoCloseable {
+public final class CommandScheduler implements NTSendable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -157,7 +156,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * @param interruptible whether this command can be interrupted
    * @param command the command to schedule
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   private void schedule(boolean interruptible, Command command) {
     if (m_inRunLoop) {
       m_toSchedule.put(command, interruptible);
@@ -239,7 +237,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    *
    * <p>Any subsystems not being used as requirements have their default methods started.
    */
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public void run() {
     if (m_disabled) {
       return;
@@ -450,7 +447,8 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    * requiring the subsystem
    *
    * @param subsystem the subsystem to be inquired about
-   * @return the command currently requiring the subsystem
+   * @return the command currently requiring the subsystem, or null if no command is currently
+   *     scheduled
    */
   public Command requiring(Subsystem subsystem) {
     return m_requirements.get(subsystem);
@@ -503,7 +501,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
+  public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Scheduler");
     final NetworkTableEntry namesEntry = builder.getEntry("Names");
     final NetworkTableEntry idsEntry = builder.getEntry("Ids");

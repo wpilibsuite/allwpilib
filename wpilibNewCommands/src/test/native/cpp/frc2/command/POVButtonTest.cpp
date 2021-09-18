@@ -15,7 +15,7 @@
 using namespace frc2;
 class POVButtonTest : public CommandTestBase {};
 
-TEST_F(POVButtonTest, SetPOVTest) {
+TEST_F(POVButtonTest, SetPOV) {
   frc::sim::JoystickSim joysim(1);
   joysim.SetPOV(0);
   joysim.NotifyNewData();

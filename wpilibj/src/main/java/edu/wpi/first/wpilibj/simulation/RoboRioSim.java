@@ -7,9 +7,12 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 
-/** Class to control a simulated RoboRIO. */
-@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.UseUtilityClass"})
-public class RoboRioSim {
+/** A utility class to control a simulated RoboRIO. */
+public final class RoboRioSim {
+  private RoboRioSim() {
+    // Utility class
+  }
+
   /**
    * Register a callback to be run when the FPGA button state changes.
    *

@@ -41,10 +41,9 @@ class ConnectionListenerTest {
   }
 
   /** Connect to the server. */
-  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-  private void connect() {
-    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", 10000);
-    m_clientInst.startClient("127.0.0.1", 10000);
+  private void connect(int port) {
+    m_serverInst.startServer("connectionlistenertest.ini", "127.0.0.1", port);
+    m_clientInst.startClient("127.0.0.1", port);
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {
@@ -67,7 +66,7 @@ class ConnectionListenerTest {
     assertNotSame(handle, 0, "bad listener handle");
 
     // trigger a connect event
-    connect();
+    connect(10020);
 
     // get the event
     assertTrue(m_serverInst.waitForConnectionListenerQueue(1.0));
@@ -107,17 +106,19 @@ class ConnectionListenerTest {
     assertFalse(events[0].connected);
   }
 
+  private static int threadedPort = 10001;
+
   @ParameterizedTest
   @DisabledOnOs(OS.WINDOWS)
-  @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
   @ValueSource(strings = {"127.0.0.1", "127.0.0.1 ", " 127.0.0.1 "})
   void testThreaded(String address) {
-    m_serverInst.startServer("connectionlistenertest.ini", address, 10000);
+    m_serverInst.startServer("connectionlistenertest.ini", address, threadedPort);
     List<ConnectionNotification> events = new ArrayList<>();
     final int handle = m_serverInst.addConnectionListener(events::add, false);
 
     // trigger a connect event
-    m_clientInst.startClient(address, 10000);
+    m_clientInst.startClient(address, threadedPort);
+    threadedPort++;
 
     // wait for client to report it's started, then wait another 0.1 sec
     try {

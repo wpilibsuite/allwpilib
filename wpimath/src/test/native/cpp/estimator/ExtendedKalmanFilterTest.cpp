@@ -18,8 +18,8 @@
 
 namespace {
 
-Eigen::Matrix<double, 5, 1> Dynamics(const Eigen::Matrix<double, 5, 1>& x,
-                                     const Eigen::Matrix<double, 2, 1>& u) {
+Eigen::Vector<double, 5> Dynamics(const Eigen::Vector<double, 5>& x,
+                                  const Eigen::Vector<double, 2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
@@ -40,36 +40,26 @@ Eigen::Matrix<double, 5, 1> Dynamics(const Eigen::Matrix<double, 5, 1>& x,
   units::volt_t Vl{u(0)};
   units::volt_t Vr{u(1)};
 
-  Eigen::Matrix<double, 5, 1> result;
   auto v = 0.5 * (vl + vr);
-  result(0) = v.to<double>() * std::cos(x(2));
-  result(1) = v.to<double>() * std::sin(x(2));
-  result(2) = ((vr - vl) / (2.0 * rb)).to<double>();
-  result(3) =
+  return Eigen::Vector<double, 5>{
+      v.to<double>() * std::cos(x(2)), v.to<double>() * std::sin(x(2)),
+      ((vr - vl) / (2.0 * rb)).to<double>(),
       k1.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-      k2.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
-  result(4) =
+          k2.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>()),
       k2.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-      k1.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>());
-  return result;
+          k1.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>())};
 }
 
-Eigen::Matrix<double, 3, 1> LocalMeasurementModel(
-    const Eigen::Matrix<double, 5, 1>& x,
-    const Eigen::Matrix<double, 2, 1>& u) {
+Eigen::Vector<double, 3> LocalMeasurementModel(
+    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 2>& u) {
   static_cast<void>(u);
-  Eigen::Matrix<double, 3, 1> y;
-  y << x(2), x(3), x(4);
-  return y;
+  return Eigen::Vector<double, 3>{x(2), x(3), x(4)};
 }
 
-Eigen::Matrix<double, 5, 1> GlobalMeasurementModel(
-    const Eigen::Matrix<double, 5, 1>& x,
-    const Eigen::Matrix<double, 2, 1>& u) {
+Eigen::Vector<double, 5> GlobalMeasurementModel(
+    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 2>& u) {
   static_cast<void>(u);
-  Eigen::Matrix<double, 5, 1> y;
-  y << x(0), x(1), x(2), x(3), x(4);
-  return y;
+  return Eigen::Vector<double, 5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace
 
@@ -81,8 +71,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
                                               {0.5, 0.5, 10.0, 1.0, 1.0},
                                               {0.0001, 0.01, 0.01},
                                               dt};
-  Eigen::Matrix<double, 2, 1> u;
-  u << 12.0, 12.0;
+  Eigen::Vector<double, 2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
   auto localY = LocalMeasurementModel(observer.Xhat(), u);
@@ -109,19 +98,17 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  Eigen::Matrix<double, 5, 1> r = Eigen::Matrix<double, 5, 1>::Zero();
+  Eigen::Vector<double, 5> r = Eigen::Vector<double, 5>::Zero();
+  Eigen::Vector<double, 2> u = Eigen::Vector<double, 2>::Zero();
 
-  Eigen::Matrix<double, 5, 1> nextR;
-  Eigen::Matrix<double, 2, 1> u = Eigen::Matrix<double, 2, 1>::Zero();
+  auto B = frc::NumericalJacobianU<5, 5, 2>(Dynamics,
+                                            Eigen::Vector<double, 5>::Zero(),
+                                            Eigen::Vector<double, 2>::Zero());
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(
-      Dynamics, Eigen::Matrix<double, 5, 1>::Zero(),
-      Eigen::Matrix<double, 2, 1>::Zero());
-
-  observer.SetXhat(frc::MakeMatrix<5, 1>(
+  observer.SetXhat(Eigen::Vector<double, 5>{
       trajectory.InitialPose().Translation().X().to<double>(),
       trajectory.InitialPose().Translation().Y().to<double>(),
-      trajectory.InitialPose().Rotation().Radians().to<double>(), 0.0, 0.0));
+      trajectory.InitialPose().Rotation().Radians().to<double>(), 0.0, 0.0});
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / dt).to<double>(); ++i) {
@@ -131,19 +118,18 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
     units::meters_per_second_t vr =
         ref.velocity * (1 + (ref.curvature * rb).to<double>());
 
-    nextR(0) = ref.pose.Translation().X().to<double>();
-    nextR(1) = ref.pose.Translation().Y().to<double>();
-    nextR(2) = ref.pose.Rotation().Radians().to<double>();
-    nextR(3) = vl.to<double>();
-    nextR(4) = vr.to<double>();
+    Eigen::Vector<double, 5> nextR{ref.pose.Translation().X().to<double>(),
+                                   ref.pose.Translation().Y().to<double>(),
+                                   ref.pose.Rotation().Radians().to<double>(),
+                                   vl.to<double>(), vr.to<double>()};
 
     auto localY =
-        LocalMeasurementModel(nextR, Eigen::Matrix<double, 2, 1>::Zero());
+        LocalMeasurementModel(nextR, Eigen::Vector<double, 2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    Eigen::Matrix<double, 5, 1> rdot = (nextR - r) / dt.to<double>();
-    u = B.householderQr().solve(
-        rdot - Dynamics(r, Eigen::Matrix<double, 2, 1>::Zero()));
+    Eigen::Vector<double, 5> rdot = (nextR - r) / dt.to<double>();
+    u = B.householderQr().solve(rdot -
+                                Dynamics(r, Eigen::Vector<double, 2>::Zero()));
 
     observer.Predict(u, dt);
 

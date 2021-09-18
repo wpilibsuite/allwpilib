@@ -10,73 +10,72 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
-import org.junit.jupiter.api.Test;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class XboxControllerTest {
-  @Test
-  void testGetX() {
+  @ParameterizedTest
+  @EnumSource(value = XboxController.Button.class)
+  @SuppressWarnings({"VariableDeclarationUsageDistance"})
+  public void testButtons(XboxController.Button button)
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    joysim.setX(XboxController.Hand.kLeft, 0.35);
-    joysim.setX(XboxController.Hand.kRight, 0.45);
+    var buttonName = button.toString();
+
+    String simSetMethodName = "set" + buttonName;
+    String joyGetMethodName = "get" + buttonName;
+    String joyPressedMethodName = "get" + buttonName + "Pressed";
+    String joyReleasedMethodName = "get" + buttonName + "Released";
+
+    Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, boolean.class);
+    Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
+    Method joyPressedMethod = joy.getClass().getMethod(joyPressedMethodName);
+    Method joyReleasedMethod = joy.getClass().getMethod(joyReleasedMethodName);
+
+    simSetMethod.invoke(joysim, false);
     joysim.notifyNewData();
-    assertEquals(0.35, joy.getX(XboxController.Hand.kLeft), 0.001);
-    assertEquals(0.45, joy.getX(XboxController.Hand.kRight), 0.001);
+    assertFalse((Boolean) joyGetMethod.invoke(joy));
+    // need to call pressed and released to clear flags
+    joyPressedMethod.invoke(joy);
+    joyReleasedMethod.invoke(joy);
+
+    simSetMethod.invoke(joysim, true);
+    joysim.notifyNewData();
+    assertTrue((Boolean) joyGetMethod.invoke(joy));
+    assertTrue((Boolean) joyPressedMethod.invoke(joy));
+    assertFalse((Boolean) joyReleasedMethod.invoke(joy));
+
+    simSetMethod.invoke(joysim, false);
+    joysim.notifyNewData();
+    assertFalse((Boolean) joyGetMethod.invoke(joy));
+    assertFalse((Boolean) joyPressedMethod.invoke(joy));
+    assertTrue((Boolean) joyReleasedMethod.invoke(joy));
   }
 
-  @Test
-  void testGetBumper() {
+  @ParameterizedTest
+  @EnumSource(value = XboxController.Axis.class)
+  @SuppressWarnings({"VariableDeclarationUsageDistance"})
+  public void testAxes(XboxController.Axis axis)
+      throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);
     XboxControllerSim joysim = new XboxControllerSim(joy);
 
-    joysim.setBumper(XboxController.Hand.kLeft, false);
-    joysim.setBumper(XboxController.Hand.kRight, true);
-    joysim.notifyNewData();
-    assertFalse(joy.getBumper(XboxController.Hand.kLeft));
-    assertTrue(joy.getBumper(XboxController.Hand.kRight));
-    // need to call pressed and released to clear flags
-    joy.getBumperPressed(XboxController.Hand.kLeft);
-    joy.getBumperReleased(XboxController.Hand.kLeft);
-    joy.getBumperPressed(XboxController.Hand.kRight);
-    joy.getBumperReleased(XboxController.Hand.kRight);
+    var axisName = axis.toString();
 
-    joysim.setBumper(XboxController.Hand.kLeft, true);
-    joysim.setBumper(XboxController.Hand.kRight, false);
-    joysim.notifyNewData();
-    assertTrue(joy.getBumper(XboxController.Hand.kLeft));
-    assertTrue(joy.getBumperPressed(XboxController.Hand.kLeft));
-    assertFalse(joy.getBumperReleased(XboxController.Hand.kLeft));
-    assertFalse(joy.getBumper(XboxController.Hand.kRight));
-    assertFalse(joy.getBumperPressed(XboxController.Hand.kRight));
-    assertTrue(joy.getBumperReleased(XboxController.Hand.kRight));
-  }
+    String simSetMethodName = "set" + axisName;
+    String joyGetMethodName = "get" + axisName;
 
-  @Test
-  void testGetAButton() {
-    HAL.initialize(500, 0);
-    XboxController joy = new XboxController(2);
-    XboxControllerSim joysim = new XboxControllerSim(joy);
+    Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, double.class);
+    Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
 
-    joysim.setAButton(false);
+    simSetMethod.invoke(joysim, 0.35);
     joysim.notifyNewData();
-    assertFalse(joy.getAButton());
-    // need to call pressed and released to clear flags
-    joy.getAButtonPressed();
-    joy.getAButtonReleased();
-
-    joysim.setAButton(true);
-    joysim.notifyNewData();
-    assertTrue(joy.getAButton());
-    assertTrue(joy.getAButtonPressed());
-    assertFalse(joy.getAButtonReleased());
-
-    joysim.setAButton(false);
-    joysim.notifyNewData();
-    assertFalse(joy.getAButton());
-    assertFalse(joy.getAButtonPressed());
-    assertTrue(joy.getAButtonReleased());
+    assertEquals(0.35, (Double) joyGetMethod.invoke(joy), 0.001);
   }
 }

@@ -4,8 +4,7 @@
 
 #include "hal/SimDevice.h"
 
-#include <wpi/SmallString.h>
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "HALInitializer.h"
 #include "mockdata/SimDeviceDataInternal.h"
@@ -66,19 +65,12 @@ void HAL_ResetSimValue(HAL_SimValueHandle handle) {
 }
 
 hal::SimDevice::SimDevice(const char* name, int index) {
-  wpi::SmallString<128> fullname;
-  wpi::raw_svector_ostream os(fullname);
-  os << name << '[' << index << ']';
-
-  m_handle = HAL_CreateSimDevice(fullname.c_str());
+  m_handle = HAL_CreateSimDevice(fmt::format("{}[{}]", name, index).c_str());
 }
 
 hal::SimDevice::SimDevice(const char* name, int index, int channel) {
-  wpi::SmallString<128> fullname;
-  wpi::raw_svector_ostream os(fullname);
-  os << name << '[' << index << ',' << channel << ']';
-
-  m_handle = HAL_CreateSimDevice(fullname.c_str());
+  m_handle = HAL_CreateSimDevice(
+      fmt::format("{}[{},{}]", name, index, channel).c_str());
 }
 
 }  // extern "C"

@@ -10,7 +10,6 @@ import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Class to control a simulated driver station. */
-@SuppressWarnings({"PMD.UseUtilityClass", "PMD.GodClass", "PMD.ExcessivePublicCount"})
 public final class DriverStationSim {
   private DriverStationSim() {
     throw new UnsupportedOperationException("This is a utility class!");
@@ -313,7 +312,7 @@ public final class DriverStationSim {
   /** Updates DriverStation data so that new values are visible to the user program. */
   public static void notifyNewData() {
     DriverStationDataJNI.notifyNewData();
-    DriverStation.getInstance().waitForData();
+    DriverStation.waitForData();
   }
 
   /**

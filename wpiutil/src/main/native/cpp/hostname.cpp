@@ -6,10 +6,10 @@
 
 #include <cstdlib>
 #include <string>
+#include <string_view>
 
 #include "uv.h"
 #include "wpi/SmallVector.h"
-#include "wpi/StringRef.h"
 
 namespace wpi {
 
@@ -33,7 +33,7 @@ std::string GetHostname() {
   return rv;
 }
 
-StringRef GetHostname(SmallVectorImpl<char>& name) {
+std::string_view GetHostname(SmallVectorImpl<char>& name) {
   // Use a tmp array to not require the SmallVector to be too large.
   char tmpName[256];
   size_t size = sizeof(tmpName);
@@ -51,7 +51,7 @@ StringRef GetHostname(SmallVectorImpl<char>& name) {
     }
   }
 
-  return StringRef{name.data(), size};
+  return {name.data(), size};
 }
 
 }  // namespace wpi

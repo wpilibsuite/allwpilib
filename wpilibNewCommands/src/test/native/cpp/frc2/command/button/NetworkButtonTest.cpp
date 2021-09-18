@@ -22,7 +22,7 @@ class NetworkButtonTest : public CommandTestBase {
   }
 };
 
-TEST_F(NetworkButtonTest, SetNetworkButtonTest) {
+TEST_F(NetworkButtonTest, SetNetworkButton) {
   auto& scheduler = CommandScheduler::GetInstance();
   auto entry = nt::NetworkTableInstance::GetDefault()
                    .GetTable("TestTable")

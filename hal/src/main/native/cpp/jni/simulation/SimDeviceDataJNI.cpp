@@ -6,6 +6,7 @@
 
 #include <jni.h>
 
+#include <cstdio>
 #include <utility>
 
 #include <wpi/jni_util.h>
@@ -109,8 +110,6 @@ class DeviceCallbackStore {
 
 class ValueCallbackStore {
  public:
-  explicit ValueCallbackStore(bool dirCallback) : m_dirCallback{dirCallback} {}
-
   void create(JNIEnv* env, jobject obj) { m_call = JGlobal<jobject>(env, obj); }
   void performCallback(const char* name, HAL_SimValueHandle handle,
                        int32_t direction, const HAL_Value& value);
@@ -121,7 +120,6 @@ class ValueCallbackStore {
  private:
   wpi::java::JGlobal<jobject> m_call;
   int32_t m_callbackId;
-  bool m_dirCallback;
 };
 
 }  // namespace
@@ -137,13 +135,13 @@ void DeviceCallbackStore::performCallback(const char* name,
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
   }
 
   env->CallVoidMethod(m_call, simDeviceCallbackCallback, MakeJString(env, name),
@@ -171,27 +169,19 @@ void ValueCallbackStore::performCallback(const char* name,
     didAttachThread = true;
     if (vm->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr) != 0) {
       // Failed to attach, log and return
-      wpi::outs() << "Failed to attach\n";
-      wpi::outs().flush();
+      std::puts("Failed to attach");
+      std::fflush(stdout);
       return;
     }
   } else if (tryGetEnv == JNI_EVERSION) {
-    wpi::outs() << "Invalid JVM Version requested\n";
-    wpi::outs().flush();
+    std::puts("Invalid JVM Version requested");
+    std::fflush(stdout);
   }
 
   auto [value1, value2] = ToValue12(value);
-  if (m_dirCallback) {
-    env->CallVoidMethod(m_call, simValueCallbackCallback,
-                        MakeJString(env, name), static_cast<jint>(handle),
-                        static_cast<jint>(direction),
-                        static_cast<jint>(value.type), value1, value2);
-  } else {
-    env->CallVoidMethod(m_call, simValueCallbackCallback,
-                        MakeJString(env, name), static_cast<jint>(handle),
-                        static_cast<jboolean>(direction == HAL_SimValueOutput),
-                        static_cast<jint>(value.type), value1, value2);
-  }
+  env->CallVoidMethod(m_call, simValueCallbackCallback, MakeJString(env, name),
+                      static_cast<jint>(handle), static_cast<jint>(direction),
+                      static_cast<jint>(value.type), value1, value2);
 
   if (env->ExceptionCheck()) {
     env->ExceptionDescribe();
@@ -266,12 +256,11 @@ using FreeValueCallbackFunc = void (*)(int32_t uid);
 
 template <typename THandle>
 static SIM_JniHandle AllocateValueCallback(
-    JNIEnv* env, THandle h, jobject callback, bool dirCallback,
-    jboolean initialNotify,
+    JNIEnv* env, THandle h, jobject callback, jboolean initialNotify,
     int32_t (*createCallback)(THandle handle, void* param,
                               HALSIM_SimValueCallback callback,
                               HAL_Bool initialNotify)) {
-  auto callbackStore = std::make_shared<ValueCallbackStore>(dirCallback);
+  auto callbackStore = std::make_shared<ValueCallbackStore>();
 
   auto handle = valueCallbackHandles->Allocate(callbackStore);
 
@@ -345,7 +334,7 @@ bool InitializeSimDeviceDataJNI(JNIEnv* env) {
   }
 
   simValueCallbackCallback = env->GetMethodID(
-      simValueCallbackCls, "callbackNative", "(Ljava/lang/String;IZIJD)V");
+      simValueCallbackCls, "callbackNative", "(Ljava/lang/String;IIIJD)V");
   if (!simValueCallbackCallback) {
     return false;
   }
@@ -530,21 +519,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallba
   (JNIEnv* env, jclass, jint device, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimDeviceHandle>(device),
-                               callback, false, initialNotify,
-                               &HALSIM_RegisterSimValueCreatedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
- * Method:    registerSimValueCreatedCallback2
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueCreatedCallback2
-  (JNIEnv* env, jclass, jint device, jobject callback, jboolean initialNotify)
-{
-  return AllocateValueCallback(env, static_cast<HAL_SimDeviceHandle>(device),
-                               callback, true, initialNotify,
+                               callback, initialNotify,
                                &HALSIM_RegisterSimValueCreatedCallback);
 }
 
@@ -570,21 +545,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallba
   (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
-                               callback, false, initialNotify,
-                               &HALSIM_RegisterSimValueChangedCallback);
-}
-
-/*
- * Class:     edu_wpi_first_hal_simulation_SimDeviceDataJNI
- * Method:    registerSimValueChangedCallback2
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueChangedCallback2
-  (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
-{
-  return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
-                               callback, true, initialNotify,
+                               callback, initialNotify,
                                &HALSIM_RegisterSimValueChangedCallback);
 }
 
@@ -610,7 +571,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_registerSimValueResetCallback
   (JNIEnv* env, jclass, jint handle, jobject callback, jboolean initialNotify)
 {
   return AllocateValueCallback(env, static_cast<HAL_SimValueHandle>(handle),
-                               callback, true, initialNotify,
+                               callback, initialNotify,
                                &HALSIM_RegisterSimValueResetCallback);
 }
 
@@ -707,7 +668,7 @@ Java_edu_wpi_first_hal_simulation_SimDeviceDataJNI_getSimValueEnumDoubleValues
 {
   int32_t numElems = 0;
   const double* elems = HALSIM_GetSimValueEnumDoubleValues(handle, &numElems);
-  return MakeJDoubleArray(env, wpi::makeArrayRef(elems, numElems));
+  return MakeJDoubleArray(env, wpi::span(elems, numElems));
 }
 
 /*

@@ -9,7 +9,8 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,6 @@ import java.util.Set;
  * <p>When a value is put into the SmartDashboard here, it pops up on the SmartDashboard on the
  * laptop. Users can put values into and get values from the SmartDashboard.
  */
-@SuppressWarnings("PMD.GodClass")
 public final class SmartDashboard {
   /** The {@link NetworkTable} used by {@link SmartDashboard}. */
   private static final NetworkTable table =
@@ -59,7 +59,10 @@ public final class SmartDashboard {
     if (sddata == null || sddata != data) {
       tablesToData.put(key, data);
       NetworkTable dataTable = table.getSubTable(key);
-      SendableRegistry.publish(data, dataTable);
+      SendableBuilderImpl builder = new SendableBuilderImpl();
+      builder.setTable(dataTable);
+      SendableRegistry.publish(data, builder);
+      builder.startListeners();
       dataTable.getEntry(".name").setString(key);
     }
   }

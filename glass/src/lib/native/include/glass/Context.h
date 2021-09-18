@@ -6,12 +6,11 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include <imgui.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 namespace glass {
 
@@ -48,7 +47,7 @@ class Storage {
  public:
   struct Value {
     Value() = default;
-    explicit Value(const wpi::Twine& str) : stringVal{str.str()} {}
+    explicit Value(std::string_view str) : stringVal{str} {}
 
     enum Type { kNone, kInt, kInt64, kBool, kFloat, kDouble, kString };
     Type type = kNone;
@@ -62,29 +61,30 @@ class Storage {
     std::string stringVal;
   };
 
-  int GetInt(wpi::StringRef key, int defaultVal = 0) const;
-  int64_t GetInt64(wpi::StringRef key, int64_t defaultVal = 0) const;
-  bool GetBool(wpi::StringRef key, bool defaultVal = false) const;
-  float GetFloat(wpi::StringRef key, float defaultVal = 0.0f) const;
-  double GetDouble(wpi::StringRef key, double defaultVal = 0.0) const;
-  std::string GetString(wpi::StringRef key,
-                        const std::string& defaultVal = {}) const;
+  int GetInt(std::string_view key, int defaultVal = 0) const;
+  int64_t GetInt64(std::string_view key, int64_t defaultVal = 0) const;
+  bool GetBool(std::string_view key, bool defaultVal = false) const;
+  float GetFloat(std::string_view key, float defaultVal = 0.0f) const;
+  double GetDouble(std::string_view key, double defaultVal = 0.0) const;
+  std::string GetString(std::string_view key,
+                        std::string_view defaultVal = {}) const;
 
-  void SetInt(wpi::StringRef key, int val);
-  void SetInt64(wpi::StringRef key, int64_t val);
-  void SetBool(wpi::StringRef key, bool val);
-  void SetFloat(wpi::StringRef key, float val);
-  void SetDouble(wpi::StringRef key, double val);
-  void SetString(wpi::StringRef key, const wpi::Twine& val);
+  void SetInt(std::string_view key, int val);
+  void SetInt64(std::string_view key, int64_t val);
+  void SetBool(std::string_view key, bool val);
+  void SetFloat(std::string_view key, float val);
+  void SetDouble(std::string_view key, double val);
+  void SetString(std::string_view key, std::string_view val);
 
-  int* GetIntRef(wpi::StringRef key, int defaultVal = 0);
-  int64_t* GetInt64Ref(wpi::StringRef key, int64_t defaultVal = 0);
-  bool* GetBoolRef(wpi::StringRef key, bool defaultVal = false);
-  float* GetFloatRef(wpi::StringRef key, float defaultVal = 0.0f);
-  double* GetDoubleRef(wpi::StringRef key, double defaultVal = 0.0);
-  std::string* GetStringRef(wpi::StringRef key, wpi::StringRef defaultVal = {});
+  int* GetIntRef(std::string_view key, int defaultVal = 0);
+  int64_t* GetInt64Ref(std::string_view key, int64_t defaultVal = 0);
+  bool* GetBoolRef(std::string_view key, bool defaultVal = false);
+  float* GetFloatRef(std::string_view key, float defaultVal = 0.0f);
+  double* GetDoubleRef(std::string_view key, double defaultVal = 0.0);
+  std::string* GetStringRef(std::string_view key,
+                            std::string_view defaultVal = {});
 
-  Value& GetValue(wpi::StringRef key);
+  Value& GetValue(std::string_view key);
 
   void SetData(std::shared_ptr<void>&& data) { m_data = std::move(data); }
 
@@ -111,7 +111,7 @@ class Storage {
 };
 
 Storage& GetStorage();
-Storage& GetStorage(wpi::StringRef id);
+Storage& GetStorage(std::string_view id);
 
 bool Begin(const char* name, bool* p_open = nullptr,
            ImGuiWindowFlags flags = 0);
@@ -141,8 +141,8 @@ void PushID(const char* str_id);
 void PushID(const char* str_id_begin, const char* str_id_end);
 
 // push string into the ID stack (will hash string).
-inline void PushID(wpi::StringRef str) {
-  PushID(str.begin(), str.end());
+inline void PushID(std::string_view str) {
+  PushID(str.data(), str.data() + str.size());
 }
 
 // push integer into the ID stack (will hash integer).

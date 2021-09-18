@@ -24,7 +24,7 @@ using namespace wpi;
 #endif
 
 std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
-    ArrayRef<std::pair<const char*, int>> servers, Logger& logger,
+    span<const std::pair<const char*, int>> servers, Logger& logger,
     int timeout) {
   if (servers.empty()) {
     return nullptr;
@@ -82,7 +82,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     ++num_workers;
 
     // start the worker
-    std::thread([=]() {
+    std::thread([=] {
       if (!result->done) {
         // add to global state
         {

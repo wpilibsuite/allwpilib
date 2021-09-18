@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <wpi/STLExtras.h>
-#include <wpi/StringRef.h>
+#include <string_view>
+
+#include <wpi/function_ref.h>
 
 #include "glass/Model.h"
 
@@ -31,6 +32,6 @@ class AnalogInputsModel : public Model {
 
 void DisplayAnalogInput(AnalogInputModel* model, int index);
 void DisplayAnalogInputs(AnalogInputsModel* model,
-                         wpi::StringRef noneMsg = "No analog inputs");
+                         std::string_view noneMsg = "No analog inputs");
 
 }  // namespace glass

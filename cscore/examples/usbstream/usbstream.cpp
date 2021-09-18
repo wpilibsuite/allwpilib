@@ -4,15 +4,15 @@
 
 #include <cstdio>
 
-#include <wpi/raw_ostream.h>
+#include <fmt/format.h>
 
 #include "cscore.h"
 
 int main() {
-  wpi::outs() << "hostname: " << cs::GetHostname() << '\n';
-  wpi::outs() << "IPv4 network addresses:\n";
+  fmt::print("hostname: {}\n", cs::GetHostname());
+  std::puts("IPv4 network addresses:");
   for (const auto& addr : cs::GetNetworkInterfaces()) {
-    wpi::outs() << "  " << addr << '\n';
+    fmt::print("  {}\n", addr);
   }
   cs::UsbCamera camera{"usbcam", 0};
   camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
@@ -22,9 +22,8 @@ int main() {
   CS_Status status = 0;
   cs::AddListener(
       [&](const cs::RawEvent& event) {
-        wpi::outs() << "FPS=" << camera.GetActualFPS()
-                    << " MBPS=" << (camera.GetActualDataRate() / 1000000.0)
-                    << '\n';
+        fmt::print("FPS={} MBPS={}\n", camera.GetActualFPS(),
+                   (camera.GetActualDataRate() / 1000000.0));
       },
       cs::RawEvent::kTelemetryUpdated, false, &status);
   cs::SetTelemetryPeriod(1.0);

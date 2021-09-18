@@ -18,31 +18,55 @@ static const std::array<double, 8> pushFrontOut = {
 static const std::array<double, 8> pushBackOut = {
     {342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913}};
 
-TEST(CircularBufferTest, PushFrontTest) {
+TEST(CircularBufferTest, PushFront) {
   wpi::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.push_front(value);
   }
 
-  for (size_t i = 0; i < pushFrontOut.size(); i++) {
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
     EXPECT_EQ(pushFrontOut[i], queue[i]);
   }
 }
 
-TEST(CircularBufferTest, PushBackTest) {
+TEST(CircularBufferTest, PushBack) {
   wpi::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
     queue.push_back(value);
   }
 
-  for (size_t i = 0; i < pushBackOut.size(); i++) {
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
     EXPECT_EQ(pushBackOut[i], queue[i]);
   }
 }
 
-TEST(CircularBufferTest, PushPopTest) {
+TEST(CircularBufferTest, EmplaceFront) {
+  wpi::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_front(value);
+  }
+
+  for (size_t i = 0; i < pushFrontOut.size(); ++i) {
+    EXPECT_EQ(pushFrontOut[i], queue[i]);
+  }
+}
+
+TEST(CircularBufferTest, EmplaceBack) {
+  wpi::circular_buffer<double> queue(8);
+
+  for (auto& value : values) {
+    queue.emplace_back(value);
+  }
+
+  for (size_t i = 0; i < pushBackOut.size(); ++i) {
+    EXPECT_EQ(pushBackOut[i], queue[i]);
+  }
+}
+
+TEST(CircularBufferTest, PushPop) {
   wpi::circular_buffer<double> queue(3);
 
   // Insert three elements into the buffer
@@ -85,21 +109,19 @@ TEST(CircularBufferTest, PushPopTest) {
   EXPECT_EQ(4.0, queue[0]);
 }
 
-TEST(CircularBufferTest, ResetTest) {
+TEST(CircularBufferTest, Reset) {
   wpi::circular_buffer<double> queue(5);
 
-  for (size_t i = 1; i < 6; i++) {
+  for (size_t i = 1; i < 6; ++i) {
     queue.push_back(i);
   }
 
   queue.reset();
 
-  for (size_t i = 0; i < 5; i++) {
-    EXPECT_EQ(0.0, queue[i]);
-  }
+  EXPECT_EQ(queue.size(), size_t{0});
 }
 
-TEST(CircularBufferTest, ResizeTest) {
+TEST(CircularBufferTest, Resize) {
   wpi::circular_buffer<double> queue(5);
 
   /* Buffer contains {1, 2, 3, _, _}
@@ -203,4 +225,30 @@ TEST(CircularBufferTest, ResizeTest) {
   EXPECT_EQ(1.0, queue[1]);
   EXPECT_EQ(2.0, queue[2]);
   EXPECT_EQ(3.0, queue[3]);
+}
+
+TEST(CircularBufferTest, Iterator) {
+  wpi::circular_buffer<double> queue(3);
+
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.push_back(4.0);  // Overwrite 1 with 4
+
+  // The buffer now contains 2, 3 and 4
+  const std::array<double, 3> values = {2.0, 3.0, 4.0};
+
+  // iterator
+  int i = 0;
+  for (auto& elem : queue) {
+    EXPECT_EQ(values[i], elem);
+    ++i;
+  }
+
+  // const_iterator
+  i = 0;
+  for (const auto& elem : queue) {
+    EXPECT_EQ(values[i], elem);
+    ++i;
+  }
 }

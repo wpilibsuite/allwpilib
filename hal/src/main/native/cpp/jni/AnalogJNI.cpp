@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#include <wpi/jni_util.h>
+
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_AnalogJNI.h"
 #include "hal/AnalogAccumulator.h"
@@ -29,9 +31,10 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogInputPort
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  auto analog = HAL_InitializeAnalogInputPort((HAL_PortHandle)id, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumAnalogInputs(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto analog =
+      HAL_InitializeAnalogInputPort((HAL_PortHandle)id, stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jint)analog;
 }
 
@@ -57,10 +60,10 @@ Java_edu_wpi_first_hal_AnalogJNI_initializeAnalogOutputPort
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  HAL_AnalogOutputHandle analog =
-      HAL_InitializeAnalogOutputPort((HAL_PortHandle)id, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumAnalogOutputs(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  HAL_AnalogOutputHandle analog = HAL_InitializeAnalogOutputPort(
+      (HAL_PortHandle)id, stack.c_str(), &status);
+  CheckStatusForceThrow(env, status);
   return (jlong)analog;
 }
 
@@ -289,6 +292,22 @@ Java_edu_wpi_first_hal_AnalogJNI_getAnalogVoltsToValue
   int32_t status = 0;
   jint returnValue = HAL_GetAnalogVoltsToValue((HAL_AnalogInputHandle)id,
                                                voltageValue, &status);
+  CheckStatus(env, status);
+  return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_AnalogJNI
+ * Method:    getAnalogValueToVolts
+ * Signature: (II)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_AnalogJNI_getAnalogValueToVolts
+  (JNIEnv* env, jclass, jint id, jint rawValue)
+{
+  int32_t status = 0;
+  jdouble returnValue =
+      HAL_GetAnalogValueToVolts((HAL_AnalogInputHandle)id, rawValue, &status);
   CheckStatus(env, status);
   return returnValue;
 }

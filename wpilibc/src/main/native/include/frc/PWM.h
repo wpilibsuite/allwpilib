@@ -7,15 +7,12 @@
 #include <stdint.h>
 
 #include <hal/Types.h>
-#include <wpi/raw_ostream.h>
-
-#include "frc/MotorSafety.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 namespace frc {
 class AddressableLED;
-class SendableBuilder;
+class DMA;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -34,9 +31,10 @@ class SendableBuilder;
  *   - 1 = minimum pulse width (currently 0.5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
+class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
  public:
   friend class AddressableLED;
+  friend class DMA;
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
@@ -64,8 +62,10 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
    *                MXP port
+   * @param registerSendable If true, adds this instance to SendableRegistry
+   *                         and LiveWindow
    */
-  explicit PWM(int channel);
+  explicit PWM(int channel, bool registerSendable = true);
 
   /**
    * Free the PWM channel.
@@ -76,10 +76,6 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
 
   PWM(PWM&&) = default;
   PWM& operator=(PWM&&) = default;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  void GetDescription(wpi::raw_ostream& desc) const override;
 
   /**
    * Set the PWM value directly to the hardware.
@@ -126,7 +122,7 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
   /**
    * Set the PWM value based on a speed.
    *
-   * This is intended to be used by speed controllers.
+   * This is intended to be used by motor controllers.
    *
    * @pre SetMaxPositivePwm() called.
    * @pre SetMinPositivePwm() called.
@@ -134,14 +130,14 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
    * @pre SetMaxNegativePwm() called.
    * @pre SetMinNegativePwm() called.
    *
-   * @param speed The speed to set the speed controller between -1.0 and 1.0.
+   * @param speed The speed to set the motor controller between -1.0 and 1.0.
    */
   virtual void SetSpeed(double speed);
 
   /**
    * Get the PWM value in terms of speed.
    *
-   * This is intended to be used by speed controllers.
+   * This is intended to be used by motor controllers.
    *
    * @pre SetMaxPositivePwm() called.
    * @pre SetMinPositivePwm() called.
@@ -168,12 +164,12 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
   void SetZeroLatch();
 
   /**
-   * Optionally eliminate the deadband from a speed controller.
+   * Optionally eliminate the deadband from a motor controller.
    *
-   * @param eliminateDeadband If true, set the motor curve on the Jaguar to
-   *                          eliminate the deadband in the middle of the range.
-   *                          Otherwise, keep the full range without modifying
-   *                          any values.
+   * @param eliminateDeadband If true, set the motor curve on the speed
+   *                          controller to eliminate the deadband in the middle
+   *                          of the range. Otherwise, keep the full range
+   *                          without modifying any values.
    */
   void EnableDeadbandElimination(bool eliminateDeadband);
 
@@ -228,7 +224,7 @@ class PWM : public MotorSafety, public Sendable, public SendableHelper<PWM> {
   int GetChannel() const;
 
  protected:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   int m_channel;

@@ -8,8 +8,9 @@ import edu.wpi.first.hal.DIOJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -40,9 +41,6 @@ public class DigitalInput extends DigitalSource implements Sendable {
   public void close() {
     super.close();
     SendableRegistry.remove(this);
-    if (m_interrupt != 0) {
-      cancelInterrupts();
-    }
     DIOJNI.freeDIOPort(m_handle);
     m_handle = 0;
   }

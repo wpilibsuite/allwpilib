@@ -7,9 +7,10 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements Sendable, AutoCloseable {
@@ -22,6 +23,15 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+
+  /**
+   * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
+   *
+   * @param channel the analog input channel to attach to
+   */
+  public AnalogEncoder(int channel) {
+    this(new AnalogInput(channel));
+  }
 
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogInput.

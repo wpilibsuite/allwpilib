@@ -6,6 +6,8 @@
 
 #include <limits>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/geometry/Pose2d.h"
 #include "frc/spline/Spline.h"
 #include "units/acceleration.h"
@@ -17,7 +19,7 @@ namespace frc {
  * An interface for defining user-defined velocity and acceleration constraints
  * while generating trajectories.
  */
-class TrajectoryConstraint {
+class WPILIB_DLLEXPORT TrajectoryConstraint {
  public:
   TrajectoryConstraint() = default;
 

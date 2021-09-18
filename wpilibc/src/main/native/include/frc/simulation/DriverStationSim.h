@@ -257,7 +257,7 @@ class DriverStationSim {
   static int GetJoystickRumble(int stick, int rumbleNum);
 
   /**
-   * Sets the state of one joystick button. Button indexes begin at 1.
+   * Sets the state of one joystick button. %Button indexes begin at 1.
    *
    * @param stick The joystick number
    * @param button The button index, beginning at 1

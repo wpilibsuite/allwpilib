@@ -10,8 +10,9 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.util.AllocationException;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * Analog channel class.
@@ -25,13 +26,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
+public class AnalogInput implements Sendable, AutoCloseable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
-  protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
    * Construct an analog channel.
@@ -228,6 +228,8 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
    * <p>This center value is based on the output of the oversampled and averaged source the
    * accumulator channel. Because of this, any non-zero oversample bits will affect the size of the
    * value for this field.
+   *
+   * @param center The accumulator's center value.
    */
   public void setAccumulatorCenter(int center) {
     AnalogJNI.setAccumulatorCenter(m_port, center);
@@ -320,26 +322,6 @@ public class AnalogInput implements PIDSource, Sendable, AutoCloseable {
    */
   public static double getGlobalSampleRate() {
     return AnalogJNI.getAnalogSampleRate();
-  }
-
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Get the average voltage for use with PIDController.
-   *
-   * @return the average voltage
-   */
-  @Override
-  public double pidGet() {
-    return getAverageVoltage();
   }
 
   /**

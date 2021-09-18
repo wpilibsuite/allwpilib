@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <units/time.h>
+
 namespace frc2 {
 /**
  * Class that holds scheduling state for a command.  Used internally by the
@@ -18,10 +20,10 @@ class CommandState final {
   bool IsInterruptible() const { return m_interruptible; }
 
   // The time since this command was initialized.
-  double TimeSinceInitialized() const;
+  units::second_t TimeSinceInitialized() const;
 
  private:
-  double m_startTime = -1;
+  units::second_t m_startTime = -1_s;
   bool m_interruptible;
 
   void StartTiming();

@@ -6,12 +6,11 @@
 
 #include <functional>
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <ntcore_cpp.h>
 #include <wpi/StringMap.h>
-#include <wpi/StringRef.h>
-#include <wpi/Twine.h>
 
 #include "glass/Model.h"
 #include "glass/Provider.h"
@@ -42,8 +41,8 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   using Provider::CreateModelFunc;
   using Provider::CreateViewFunc;
 
-  explicit NetworkTablesProvider(const wpi::Twine& iniName);
-  NetworkTablesProvider(const wpi::Twine& iniName, NT_Inst inst);
+  explicit NetworkTablesProvider(std::string_view iniName);
+  NetworkTablesProvider(std::string_view iniName, NT_Inst inst);
 
   /**
    * Get the NetworkTables instance being used for this provider.
@@ -70,7 +69,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
    * @param createModel functor to create model
    * @param createView functor to create view
    */
-  void Register(wpi::StringRef typeName, CreateModelFunc createModel,
+  void Register(std::string_view typeName, CreateModelFunc createModel,
                 CreateViewFunc createView);
 
   using WindowManager::AddWindow;
@@ -92,7 +91,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   wpi::StringMap<Builder> m_typeMap;
 
   struct Entry : public ModelEntry {
-    Entry(NT_Entry typeEntry, wpi::StringRef name, const Builder& builder)
+    Entry(NT_Entry typeEntry, std::string_view name, const Builder& builder)
         : ModelEntry{name, [](NT_Inst, const char*) { return true; },
                      builder.createModel},
           typeEntry{typeEntry} {}
@@ -102,7 +101,7 @@ class NetworkTablesProvider : private Provider<detail::NTProviderFunctions> {
   void Show(ViewEntry* entry, Window* window) override;
 
   ViewEntry* GetOrCreateView(const Builder& builder, NT_Entry typeEntry,
-                             wpi::StringRef name);
+                             std::string_view name);
 };
 
 /**

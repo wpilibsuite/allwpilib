@@ -6,6 +6,7 @@
 
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
+#include "HALInternal.h"
 #include "PortsInternal.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
@@ -31,29 +32,33 @@ void InitializeDIO() {
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
-                                        HAL_Bool input, int32_t* status) {
+                                        HAL_Bool input,
+                                        const char* allocationLocation,
+                                        int32_t* status) {
   hal::init::CheckInit();
-  if (*status != 0) {
-    return HAL_kInvalidHandle;
-  }
 
   int16_t channel = getPortHandleChannel(portHandle);
   if (channel == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
+    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                     kNumDigitalChannels, channel);
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
+  HAL_DigitalHandle handle;
+
+  auto port = digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO,
+                                              &handle, status);
 
   if (*status != 0) {
+    if (port) {
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+                                           port->previousAllocation);
+    } else {
+      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
+                                       kNumDigitalChannels, channel);
+    }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
-  }
-
-  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_kInvalidHandle;
   }
 
   port->channel = static_cast<uint8_t>(channel);
@@ -61,6 +66,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   SimDIOData[channel].initialized = true;
   SimDIOData[channel].isInput = input;
   SimDIOData[channel].simDevice = 0;
+  port->previousAllocation = allocationLocation ? allocationLocation : "";
 
   return handle;
 }
@@ -167,6 +173,11 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     if (value != 0) {
       value = 1;
     }
+  }
+  if (SimDIOData[port->channel].isInput) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    hal::SetLastError(status, "Cannot set output of an input channel");
+    return;
   }
   SimDIOData[port->channel].value = value;
 }

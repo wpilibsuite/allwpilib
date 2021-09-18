@@ -21,10 +21,12 @@ constexpr int32_t kNumEncoders = 8;
 constexpr int32_t kNumInterrupts = 8;
 constexpr int32_t kNumRelayChannels = 8;
 constexpr int32_t kNumRelayHeaders = kNumRelayChannels / 2;
-constexpr int32_t kNumPCMModules = 63;
-constexpr int32_t kNumSolenoidChannels = 8;
-constexpr int32_t kNumPDPModules = 63;
-constexpr int32_t kNumPDPChannels = 16;
+constexpr int32_t kNumCTREPCMModules = 63;
+constexpr int32_t kNumCTRESolenoidChannels = 8;
+constexpr int32_t kNumCTREPDPModules = 63;
+constexpr int32_t kNumCTREPDPChannels = 16;
+constexpr int32_t kNumREVPDHModules = 63;
+constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumDutyCycles = 8;
 constexpr int32_t kNumAddressableLEDs = 1;
 }  // namespace hal

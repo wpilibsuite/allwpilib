@@ -56,17 +56,23 @@ int32_t HAL_GetNumRelayChannels(void) {
 int32_t HAL_GetNumRelayHeaders(void) {
   return kNumRelayHeaders;
 }
-int32_t HAL_GetNumPCMModules(void) {
-  return kNumPCMModules;
+int32_t HAL_GetNumCTREPCMModules(void) {
+  return kNumCTREPCMModules;
 }
-int32_t HAL_GetNumSolenoidChannels(void) {
-  return kNumSolenoidChannels;
+int32_t HAL_GetNumCTRESolenoidChannels(void) {
+  return kNumCTRESolenoidChannels;
 }
-int32_t HAL_GetNumPDPModules(void) {
-  return kNumPDPModules;
+int32_t HAL_GetNumCTREPDPModules(void) {
+  return kNumCTREPDPModules;
 }
-int32_t HAL_GetNumPDPChannels(void) {
-  return kNumPDPChannels;
+int32_t HAL_GetNumCTREPDPChannels(void) {
+  return kNumCTREPDPChannels;
+}
+int32_t HAL_GetNumREVPDHModules(void) {
+  return kNumREVPDHModules;
+}
+int32_t HAL_GetNumREVPDHChannels(void) {
+  return kNumREVPDHChannels;
 }
 int32_t HAL_GetNumDutyCycles(void) {
   return kNumDutyCycles;

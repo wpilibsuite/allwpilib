@@ -114,7 +114,7 @@ public final class RobotController {
   /**
    * Get the current output of the 3.3V rail.
    *
-   * @return The controller 3.3V rail output current value in Volts
+   * @return The controller 3.3V rail output current value in Amps
    */
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();

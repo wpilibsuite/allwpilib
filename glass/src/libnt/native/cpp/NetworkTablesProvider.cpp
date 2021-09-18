@@ -6,18 +6,22 @@
 
 #include <algorithm>
 
+#include <fmt/format.h>
 #include <ntcore_cpp.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 #include <wpigui.h>
 
 using namespace glass;
 
-NetworkTablesProvider::NetworkTablesProvider(const wpi::Twine& iniName)
+NetworkTablesProvider::NetworkTablesProvider(std::string_view iniName)
     : NetworkTablesProvider{iniName, nt::GetDefaultInstance()} {}
 
-NetworkTablesProvider::NetworkTablesProvider(const wpi::Twine& iniName,
+NetworkTablesProvider::NetworkTablesProvider(std::string_view iniName,
                                              NT_Inst inst)
-    : Provider{iniName + "Window"}, m_nt{inst}, m_typeCache{iniName} {
+    : Provider{fmt::format("{}Window", iniName)},
+      m_nt{inst},
+      m_typeCache{iniName} {
   m_nt.AddListener("", NT_NOTIFY_LOCAL | NT_NOTIFY_NEW | NT_NOTIFY_DELETE |
                            NT_NOTIFY_IMMEDIATE);
 }
@@ -28,11 +32,11 @@ void NetworkTablesProvider::GlobalInit() {
 }
 
 void NetworkTablesProvider::DisplayMenu() {
-  wpi::SmallVector<wpi::StringRef, 6> path;
+  wpi::SmallVector<std::string_view, 6> path;
   wpi::SmallString<64> name;
   for (auto&& entry : m_viewEntries) {
     path.clear();
-    wpi::StringRef{entry->name}.split(path, '/', -1, false);
+    wpi::split(entry->name, path, '/', -1, false);
 
     bool fullDepth = true;
     int depth = 0;
@@ -69,12 +73,12 @@ void NetworkTablesProvider::Update() {
   // add/remove entries from NT changes
   for (auto&& event : m_nt.PollListener()) {
     // look for .type fields
-    wpi::StringRef eventName{event.name};
-    if (!eventName.endswith("/.type") || !event.value ||
+    std::string_view eventName{event.name};
+    if (!wpi::ends_with(eventName, "/.type") || !event.value ||
         !event.value->IsString()) {
       continue;
     }
-    auto tableName = eventName.drop_back(6);
+    auto tableName = wpi::drop_back(eventName, 6);
 
     // only handle ones where we have a builder
     auto builderIt = m_typeMap.find(event.value->GetString());
@@ -117,14 +121,15 @@ void NetworkTablesProvider::Update() {
     }
 
     auto entry = GetOrCreateView(
-        builderIt->second, nt::GetEntry(m_nt.GetInstance(), id + "/.type"), id);
+        builderIt->second,
+        nt::GetEntry(m_nt.GetInstance(), fmt::format("{}/.type", id)), id);
     if (entry) {
       Show(entry, window.get());
     }
   }
 }
 
-void NetworkTablesProvider::Register(wpi::StringRef typeName,
+void NetworkTablesProvider::Register(std::string_view typeName,
                                      CreateModelFunc createModel,
                                      CreateViewFunc createView) {
   m_typeMap[typeName] = Builder{std::move(createModel), std::move(createView)};
@@ -153,9 +158,9 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
   if (!window) {
     return;
   }
-  if (wpi::StringRef{entry->name}.startswith("/SmartDashboard/")) {
-    window->SetDefaultName(wpi::StringRef{entry->name}.drop_front(16) +
-                           " (SmartDashboard)");
+  if (wpi::starts_with(entry->name, "/SmartDashboard/")) {
+    window->SetDefaultName(
+        fmt::format("{} (SmartDashboard)", wpi::drop_front(entry->name, 16)));
   }
   entry->window = window;
 
@@ -171,7 +176,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 }
 
 NetworkTablesProvider::ViewEntry* NetworkTablesProvider::GetOrCreateView(
-    const Builder& builder, NT_Entry typeEntry, wpi::StringRef name) {
+    const Builder& builder, NT_Entry typeEntry, std::string_view name) {
   // get view entry if it already exists
   auto viewIt = FindViewEntry(name);
   if (viewIt != m_viewEntries.end() && (*viewIt)->name == name) {

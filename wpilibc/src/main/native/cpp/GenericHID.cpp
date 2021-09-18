@@ -7,63 +7,63 @@
 #include <hal/DriverStation.h>
 
 #include "frc/DriverStation.h"
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
-GenericHID::GenericHID(int port) : m_ds(&DriverStation::GetInstance()) {
-  if (port >= DriverStation::kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
+GenericHID::GenericHID(int port) {
+  if (port < 0 || port >= DriverStation::kJoystickPorts) {
+    throw FRC_MakeError(warn::BadJoystickIndex, "port {} out of range", port);
   }
   m_port = port;
 }
 
 bool GenericHID::GetRawButton(int button) const {
-  return m_ds->GetStickButton(m_port, button);
+  return DriverStation::GetStickButton(m_port, button);
 }
 
 bool GenericHID::GetRawButtonPressed(int button) {
-  return m_ds->GetStickButtonPressed(m_port, button);
+  return DriverStation::GetStickButtonPressed(m_port, button);
 }
 
 bool GenericHID::GetRawButtonReleased(int button) {
-  return m_ds->GetStickButtonReleased(m_port, button);
+  return DriverStation::GetStickButtonReleased(m_port, button);
 }
 
 double GenericHID::GetRawAxis(int axis) const {
-  return m_ds->GetStickAxis(m_port, axis);
+  return DriverStation::GetStickAxis(m_port, axis);
 }
 
 int GenericHID::GetPOV(int pov) const {
-  return m_ds->GetStickPOV(m_port, pov);
+  return DriverStation::GetStickPOV(m_port, pov);
 }
 
 int GenericHID::GetAxisCount() const {
-  return m_ds->GetStickAxisCount(m_port);
+  return DriverStation::GetStickAxisCount(m_port);
 }
 
 int GenericHID::GetPOVCount() const {
-  return m_ds->GetStickPOVCount(m_port);
+  return DriverStation::GetStickPOVCount(m_port);
 }
 
 int GenericHID::GetButtonCount() const {
-  return m_ds->GetStickButtonCount(m_port);
+  return DriverStation::GetStickButtonCount(m_port);
 }
 
 bool GenericHID::IsConnected() const {
-  return m_ds->IsJoystickConnected(m_port);
+  return DriverStation::IsJoystickConnected(m_port);
 }
 
 GenericHID::HIDType GenericHID::GetType() const {
-  return static_cast<HIDType>(m_ds->GetJoystickType(m_port));
+  return static_cast<HIDType>(DriverStation::GetJoystickType(m_port));
 }
 
 std::string GenericHID::GetName() const {
-  return m_ds->GetJoystickName(m_port);
+  return DriverStation::GetJoystickName(m_port);
 }
 
 int GenericHID::GetAxisType(int axis) const {
-  return m_ds->GetJoystickAxisType(m_port, axis);
+  return DriverStation::GetJoystickAxisType(m_port, axis);
 }
 
 int GenericHID::GetPort() const {

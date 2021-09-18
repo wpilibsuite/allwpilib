@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
 #include "units/velocity.h"
@@ -17,7 +19,8 @@ namespace frc {
  * commanded velocities for wheels of the drivetrain stay below a certain
  * limit.
  */
-class MecanumDriveKinematicsConstraint : public TrajectoryConstraint {
+class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
+    : public TrajectoryConstraint {
  public:
   MecanumDriveKinematicsConstraint(const MecanumDriveKinematics& kinematics,
                                    units::meters_per_second_t maxSpeed);

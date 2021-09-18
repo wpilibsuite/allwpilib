@@ -5,12 +5,11 @@
 package edu.wpi.first.wpilibj.shuffleboard;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 
 /**
- * A Shuffleboard widget that handles a {@link Sendable} object such as a speed controller or
+ * A Shuffleboard widget that handles a {@link Sendable} object such as a motor controller or
  * sensor.
  */
 public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
@@ -31,7 +30,7 @@ public final class ComplexWidget extends ShuffleboardWidget<ComplexWidget> {
       m_sendable.initSendable(m_builder);
       m_builder.startListeners();
     }
-    m_builder.updateTable();
+    m_builder.update();
   }
 
   /**

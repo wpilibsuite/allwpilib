@@ -4,9 +4,9 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.Collections;
 
 /**
@@ -187,7 +187,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
    *
    * @return Name
    */
-  @Override
   public String getName() {
     return SendableRegistry.getName(this);
   }
@@ -197,7 +196,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
    *
    * @param name name
    */
-  @Override
   public void setName(String name) {
     SendableRegistry.setName(this, name);
   }
@@ -207,7 +205,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
    *
    * @return Subsystem name
    */
-  @Override
   public String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
@@ -217,7 +214,6 @@ public abstract class Subsystem implements Sendable, AutoCloseable {
    *
    * @param subsystem subsystem name
    */
-  @Override
   public void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }

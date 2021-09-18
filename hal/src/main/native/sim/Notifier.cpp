@@ -174,6 +174,11 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
   return handle;
 }
 
+HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
+                                       int32_t* status) {
+  return true;
+}
+
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
                          int32_t* status) {
   auto notifier = notifierHandles->Get(notifierHandle);

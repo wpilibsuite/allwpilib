@@ -36,13 +36,12 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/StringRef.h"
-#include "wpi/Twine.h"
 #include "wpi/Chrono.h"
 #include "wpi/Compiler.h"
 #include "wpi/VersionTuple.h"
 #include <cassert>
 #include <string>
+#include <string_view>
 #include <system_error>
 #define WIN32_NO_STATUS
 #include <windows.h>

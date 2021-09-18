@@ -4,14 +4,14 @@
 
 package edu.wpi.first.wpilibj.simulation;
 
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.NumericalIntegration;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.NumericalIntegration;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 
 /** Represents a simulated elevator mechanism. */
 public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
@@ -221,7 +221,7 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N1> {
   protected Matrix<N2, N1> updateX(Matrix<N2, N1> currentXhat, Matrix<N1, N1> u, double dtSeconds) {
     // Calculate updated x-hat from Runge-Kutta.
     var updatedXhat =
-        NumericalIntegration.rkf45(
+        NumericalIntegration.rkdp(
             (x, u_) ->
                 (m_plant.getA().times(x))
                     .plus(m_plant.getB().times(u_))

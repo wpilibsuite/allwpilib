@@ -15,12 +15,25 @@
  */
 
 // clang-format off
-HAL_ENUM(HAL_RuntimeType) { HAL_Athena, HAL_Mock };
+HAL_ENUM(HAL_RuntimeType) { HAL_Runtime_RoboRIO, HAL_Runtime_RoboRIO2, HAL_Runtime_Simulation };
 // clang-format on
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Gets the last error set on this thread, or the message for the status code.
+ *
+ * If passed HAL_USE_LAST_ERROR, the last error set on the thread will be
+ * returned.
+ *
+ * @param code  the status code, set to the error status code if input is
+ * HAL_USE_LAST_ERROR
+ * @return      the error message for the code. This does not need to be freed,
+ * but can be overwritten by another hal call on the same thread.
+ */
+const char* HAL_GetLastError(int32_t* status);
 
 /**
  * Gets the error message for a specific status code.
@@ -51,6 +64,11 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
  */
 int64_t HAL_GetFPGARevision(int32_t* status);
 
+/**
+ * Returns the runtime type of the HAL.
+ *
+ * @return HAL Runtime Type
+ */
 HAL_RuntimeType HAL_GetRuntimeType(void);
 
 /**

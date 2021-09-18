@@ -4,16 +4,15 @@
 
 #include "frc/commands/CommandGroup.h"
 
-#include "frc/WPIErrors.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
-CommandGroup::CommandGroup(const wpi::Twine& name) : Command(name) {}
+CommandGroup::CommandGroup(std::string_view name) : Command(name) {}
 
 void CommandGroup::AddSequential(Command* command) {
-  if (command == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "command");
-    return;
+  if (!command) {
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
@@ -30,17 +29,16 @@ void CommandGroup::AddSequential(Command* command) {
   }
 }
 
-void CommandGroup::AddSequential(Command* command, double timeout) {
-  if (command == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "command");
-    return;
+void CommandGroup::AddSequential(Command* command, units::second_t timeout) {
+  if (!command) {
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
-  if (timeout < 0.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-    return;
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence,
@@ -56,8 +54,8 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
 }
 
 void CommandGroup::AddParallel(Command* command) {
-  if (command == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "command");
+  if (!command) {
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
     return;
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
@@ -75,17 +73,16 @@ void CommandGroup::AddParallel(Command* command) {
   }
 }
 
-void CommandGroup::AddParallel(Command* command, double timeout) {
-  if (command == nullptr) {
-    wpi_setWPIErrorWithContext(NullParameter, "command");
-    return;
+void CommandGroup::AddParallel(Command* command, units::second_t timeout) {
+  if (!command) {
+    throw FRC_MakeError(err::NullParameter, "{}", "command");
   }
   if (!AssertUnlocked("Cannot add new command to command group")) {
     return;
   }
-  if (timeout < 0.0) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
-    return;
+  if (timeout < 0_s) {
+    throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
+                        timeout.to<double>());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild,

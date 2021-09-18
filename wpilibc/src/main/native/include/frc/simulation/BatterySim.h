@@ -12,6 +12,9 @@
 
 namespace frc::sim {
 
+/**
+ * A utility class to simulate the robot battery.
+ */
 class BatterySim {
  public:
   /**

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -32,19 +33,19 @@ namespace frc {
  *
  * Our state-space system is:
  *
- * <strong> x = [[x, y, theta, dist_l, dist_r]]^T </strong> in the field
+ * <strong> x = [[x, y, theta, dist_l, dist_r]]ᵀ </strong> in the field
  * coordinate system.
  *
- * <strong> u = [[d_l, d_r, dtheta]]^T </strong> (robot-relative velocities) --
+ * <strong> u = [[d_l, d_r, dtheta]]ᵀ </strong> (robot-relative velocities) --
  * NB: using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we
  * suspect that it's easier for teams to get good encoder data than it is for
  * them to perform system identification well enough to get a good model
  *
- * <strong>y = [[x, y, theta]]^T </strong> from vision,
+ * <strong>y = [[x, y, theta]]ᵀ </strong> from vision,
  * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
  */
-class DifferentialDrivePoseEstimator {
+class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator.
@@ -55,20 +56,20 @@ class DifferentialDrivePoseEstimator {
    *                                 Increase these numbers to trust your
    *                                 model's state estimates less. This matrix
    *                                 is in the form
-   *                                 [x, y, theta, dist_l, dist_r]^T,
+   *                                 [x, y, theta, dist_l, dist_r]ᵀ,
    *                                 with units in meters and radians.
    * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
    *                                 measurements. Increase these numbers to
    *                                 trust sensor readings from
    *                                 encoders and gyros less.
    *                                 This matrix is in the form
-   *                                 [dist_l, dist_r, theta]^T, with units in
+   *                                 [dist_l, dist_r, theta]ᵀ, with units in
    *                                 meters and radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from
    *                                 vision less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    * @param nominalDt                The period of the loop calling Update().
    */
@@ -88,7 +89,7 @@ class DifferentialDrivePoseEstimator {
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
    *                                 less. This matrix is in the form
-   *                                 [x, y, theta]^T, with units in meters and
+   *                                 [x, y, theta]ᵀ, with units in meters and
    *                                 radians.
    */
   void SetVisionMeasurementStdDevs(
@@ -128,12 +129,50 @@ class DifferentialDrivePoseEstimator {
    *                        calling UpdateWithTime(), then you must use a
    *                        timestamp with an epoch since FPGA startup (i.e. the
    *                        epoch of this timestamp is the same epoch as
-   *                        frc2::Timer::GetFPGATimestamp(). This means that
-   *                        you should use frc2::Timer::GetFPGATimestamp() as
+   *                        frc::Timer::GetFPGATimestamp(). This means that
+   *                        you should use frc::Timer::GetFPGATimestamp() as
    *                        your time source in this case.
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp);
+
+  /**
+   * Adds a vision measurement to the Unscented Kalman Filter. This will correct
+   * the odometry pose estimate while still accounting for measurement noise.
+   *
+   * This method can be called as infrequently as you want, as long as you are
+   * calling Update() every loop.
+   *
+   * Note that the vision measurement standard deviations passed into this
+   * method will continue to apply to future measurements until a subsequent
+   * call to SetVisionMeasurementStdDevs() or this method.
+   *
+   * @param visionRobotPose          The pose of the robot as measured by the
+   *                                 vision camera.
+   * @param timestamp                The timestamp of the vision measurement in
+   *                                 seconds. Note that if you don't use your
+   *                                 own time source by calling
+   *                                 UpdateWithTime(), then you must use a
+   *                                 timestamp with an epoch since FPGA startup
+   *                                 (i.e. the epoch of this timestamp is the
+   *                                 same epoch as
+   *                                 frc::Timer::GetFPGATimestamp(). This means
+   *                                 that you should use
+   *                                 frc::Timer::GetFPGATimestamp() as your
+   *                                 time source in this case.
+   * @param visionMeasurementStdDevs Standard deviations of the vision
+   *                                 measurements. Increase these numbers to
+   *                                 trust global measurements from vision
+   *                                 less. This matrix is in the form
+   *                                 [x, y, theta]ᵀ, with units in meters and
+   *                                 radians.
+   */
+  void AddVisionMeasurement(
+      const Pose2d& visionRobotPose, units::second_t timestamp,
+      const wpi::array<double, 3>& visionMeasurementStdDevs) {
+    SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
+    AddVisionMeasurement(visionRobotPose, timestamp);
+  }
 
   /**
    * Updates the Unscented Kalman Filter using only wheel encoder information.
@@ -170,11 +209,11 @@ class DifferentialDrivePoseEstimator {
   UnscentedKalmanFilter<5, 3, 3> m_observer;
   KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
       m_latencyCompensator;
-  std::function<void(const Eigen::Matrix<double, 3, 1>& u,
-                     const Eigen::Matrix<double, 3, 1>& y)>
+  std::function<void(const Eigen::Vector<double, 3>& u,
+                     const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;
 
-  Eigen::Matrix<double, 3, 3> m_visionDiscR;
+  Eigen::Matrix<double, 3, 3> m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
@@ -184,13 +223,13 @@ class DifferentialDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Matrix<double, Dim, 1>& stdDevs);
+      const Eigen::Vector<double, Dim>& stdDevs);
 
-  static Eigen::Matrix<double, 5, 1> F(const Eigen::Matrix<double, 5, 1>& x,
-                                       const Eigen::Matrix<double, 3, 1>& u);
-  static Eigen::Matrix<double, 5, 1> FillStateVector(
-      const Pose2d& pose, units::meter_t leftDistance,
-      units::meter_t rightDistance);
+  static Eigen::Vector<double, 5> F(const Eigen::Vector<double, 5>& x,
+                                    const Eigen::Vector<double, 3>& u);
+  static Eigen::Vector<double, 5> FillStateVector(const Pose2d& pose,
+                                                  units::meter_t leftDistance,
+                                                  units::meter_t rightDistance);
 };
 
 }  // namespace frc

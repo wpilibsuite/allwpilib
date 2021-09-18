@@ -8,27 +8,23 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
+import edu.wpi.first.wpilibj.motorcontrol.Jaguar;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * This class provides access to all of the elements on the test bench, for use in fixtures. This
- * class is a singleton, you should use {@link #getInstance()} to obtain a reference to the {@code
- * TestBench}.
- */
+/** This class provides access to all of the elements on the test bench, for use in fixtures. */
 public final class TestBench {
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
@@ -45,7 +41,7 @@ public final class TestBench {
   public static final int kTiltServoChannel = 9;
   public static final int kPanServoChannel = 8;
 
-  /* PowerDistributionPanel channels */
+  /* PowerDistribution channels */
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
   public static final int kTalonPDPChannel = 10;
@@ -71,10 +67,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Talon, Encoder pair
    */
-  public MotorEncoderFixture<Talon> getTalonPair() {
+  public static MotorEncoderFixture<Talon> getTalonPair() {
     return new MotorEncoderFixture<Talon>() {
       @Override
-      protected Talon giveSpeedController() {
+      protected Talon giveMotorController() {
         return new Talon(kTalonChannel);
       }
 
@@ -101,10 +97,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Victor, Encoder pair
    */
-  public MotorEncoderFixture<Victor> getVictorPair() {
+  public static MotorEncoderFixture<Victor> getVictorPair() {
     return new MotorEncoderFixture<Victor>() {
       @Override
-      protected Victor giveSpeedController() {
+      protected Victor giveMotorController() {
         return new Victor(kVictorChannel);
       }
 
@@ -131,10 +127,10 @@ public final class TestBench {
    *
    * @return a freshly allocated Jaguar, Encoder pair
    */
-  public MotorEncoderFixture<Jaguar> getJaguarPair() {
+  public static MotorEncoderFixture<Jaguar> getJaguarPair() {
     return new MotorEncoderFixture<Jaguar>() {
       @Override
-      protected Jaguar giveSpeedController() {
+      protected Jaguar giveMotorController() {
         return new Jaguar(kJaguarChannel);
       }
 
@@ -160,8 +156,7 @@ public final class TestBench {
    *
    * @return a freshly allocated Servo's and a freshly allocated Gyroscope
    */
-  public TiltPanCameraFixture getTiltPanCam() {
-
+  public static TiltPanCameraFixture getTiltPanCam() {
     return new TiltPanCameraFixture() {
       @Override
       protected AnalogGyro giveGyro() {
@@ -189,12 +184,12 @@ public final class TestBench {
     };
   }
 
-  public DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
+  public static DIOCrossConnectFixture getDIOCrossConnectFixture(int inputPort, int outputPort) {
     return new DIOCrossConnectFixture(inputPort, outputPort);
   }
 
   /** Gets two lists of possible DIO pairs for the two pairs. */
-  private List<List<Integer[]>> getDIOCrossConnect() {
+  private static List<List<Integer[]>> getDIOCrossConnect() {
     List<List<Integer[]>> pairs = new ArrayList<List<Integer[]>>();
     List<Integer[]> setA =
         Arrays.asList(
@@ -256,7 +251,7 @@ public final class TestBench {
    *
    * @return pairs of DIOCrossConnectFixtures
    */
-  public Collection<Integer[]> getDIOCrossConnectCollection() {
+  public static Collection<Integer[]> getDIOCrossConnectCollection() {
     Collection<Integer[]> pairs = new ArrayList<Integer[]>();
     for (Collection<Integer[]> collection : getDIOCrossConnect()) {
       pairs.addAll(collection);
@@ -270,7 +265,7 @@ public final class TestBench {
    * @param flip whether this encoder needs to be flipped
    * @return A list of different inputs to use for the tests
    */
-  private Collection<Integer[]> getPairArray(
+  private static Collection<Integer[]> getPairArray(
       List<Integer[]> listA, List<Integer[]> listB, boolean flip) {
     Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
     for (Integer[] portPairsA : listA) {
@@ -304,7 +299,7 @@ public final class TestBench {
    *
    * @return A collection of different input pairs to use for the encoder
    */
-  public Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
+  public static Collection<Integer[]> getEncoderDIOCrossConnectCollection() {
     Collection<Integer[]> encoderPortPairs = new ArrayList<Integer[]>();
     assert getDIOCrossConnect().size() == 2;
     encoderPortPairs.addAll(
@@ -320,7 +315,9 @@ public final class TestBench {
    * new instance of it. Otherwise it returns the existing instance.
    *
    * @return The Singleton instance of the TestBench
+   * @deprecated Use the static methods instead
    */
+  @Deprecated
   public static TestBench getInstance() {
     if (instance == null) {
       instance = new TestBench();

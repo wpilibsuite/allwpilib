@@ -28,7 +28,7 @@ class WebSocketServerTest : public WebSocketTest {
     clientPipe->Connect(pipeName, [this]() {
       clientPipe->StartRead();
       clientPipe->data.connect([this](uv::Buffer& buf, size_t size) {
-        StringRef data{buf.base, size};
+        std::string_view data{buf.base, size};
         if (!headersDone) {
           data = resp.Execute(data);
           if (resp.HasError()) {
@@ -40,7 +40,7 @@ class WebSocketServerTest : public WebSocketTest {
             return;
           }
         }
-        wireData.insert(wireData.end(), data.bytes_begin(), data.bytes_end());
+        wireData.insert(wireData.end(), data.begin(), data.end());
         if (handleData) {
           handleData(data);
         }
@@ -50,7 +50,7 @@ class WebSocketServerTest : public WebSocketTest {
   }
 
   std::function<void()> setupWebSocket;
-  std::function<void(StringRef)> handleData;
+  std::function<void(std::string_view)> handleData;
   std::vector<uint8_t> wireData;
   std::shared_ptr<WebSocket> ws;
   HttpParser resp{HttpParser::kResponse};
@@ -64,8 +64,8 @@ class WebSocketServerTest : public WebSocketTest {
 TEST_F(WebSocketServerTest, Terminate) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Terminate(); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Terminate(); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1006) << "reason: " << reason;
     });
@@ -80,8 +80,8 @@ TEST_F(WebSocketServerTest, Terminate) {
 TEST_F(WebSocketServerTest, TerminateCode) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Terminate(1000); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Terminate(1000); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000) << "reason: " << reason;
     });
@@ -96,8 +96,8 @@ TEST_F(WebSocketServerTest, TerminateCode) {
 TEST_F(WebSocketServerTest, TerminateReason) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Terminate(1000, "reason"); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Terminate(1000, "reason"); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
       ASSERT_EQ(reason, "reason");
@@ -117,16 +117,16 @@ TEST_F(WebSocketServerTest, TerminateReason) {
 TEST_F(WebSocketServerTest, CloseBasic) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Close(); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Close(); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1005) << "reason: " << reason;
     });
   };
   // need to respond with close for server to finish shutdown
   auto message = BuildMessage(0x08, true, true, {});
-  handleData = [&](StringRef) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+  handleData = [&](std::string_view) {
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
@@ -139,8 +139,8 @@ TEST_F(WebSocketServerTest, CloseBasic) {
 TEST_F(WebSocketServerTest, CloseCode) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Close(1000); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Close(1000); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000) << "reason: " << reason;
     });
@@ -148,8 +148,8 @@ TEST_F(WebSocketServerTest, CloseCode) {
   // need to respond with close for server to finish shutdown
   const uint8_t contents[] = {0x03u, 0xe8u};
   auto message = BuildMessage(0x08, true, true, contents);
-  handleData = [&](StringRef) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+  handleData = [&](std::string_view) {
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
@@ -162,8 +162,8 @@ TEST_F(WebSocketServerTest, CloseCode) {
 TEST_F(WebSocketServerTest, CloseReason) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) { ws->Close(1000, "hangup"); });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->open.connect([&](std::string_view) { ws->Close(1000, "hangup"); });
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
       ASSERT_EQ(reason, "hangup");
@@ -172,8 +172,8 @@ TEST_F(WebSocketServerTest, CloseReason) {
   // need to respond with close for server to finish shutdown
   const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
   auto message = BuildMessage(0x08, true, true, contents);
-  handleData = [&](StringRef) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+  handleData = [&](std::string_view) {
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   };
 
   loop->Run();
@@ -190,14 +190,14 @@ TEST_F(WebSocketServerTest, CloseReason) {
 TEST_F(WebSocketServerTest, ReceiveCloseBasic) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1005) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(0x08, true, true, {});
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -211,7 +211,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseBasic) {
 TEST_F(WebSocketServerTest, ReceiveCloseCode) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000) << "reason: " << reason;
     });
@@ -219,7 +219,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
   const uint8_t contents[] = {0x03u, 0xe8u};
   auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -233,7 +233,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseCode) {
 TEST_F(WebSocketServerTest, ReceiveCloseReason) {
   int gotClosed = 0;
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotClosed;
       ASSERT_EQ(code, 1000);
       ASSERT_EQ(reason, "hangup");
@@ -242,7 +242,7 @@ TEST_F(WebSocketServerTest, ReceiveCloseReason) {
   const uint8_t contents[] = {0x03u, 0xe8u, 'h', 'a', 'n', 'g', 'u', 'p'};
   auto message = BuildMessage(0x08, true, true, contents);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -271,14 +271,14 @@ TEST_P(WebSocketServerBadOpcodeTest, Receive) {
   int gotCallback = 0;
   std::vector<uint8_t> data(4, 0x03);
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(GetParam(), true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -302,14 +302,14 @@ TEST_P(WebSocketServerControlFrameTest, ReceiveFragment) {
   int gotCallback = 0;
   std::vector<uint8_t> data(4, 0x03);
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(GetParam(), false, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -329,14 +329,14 @@ TEST_F(WebSocketServerTest, ReceiveFragmentInvalidNoPrevFrame) {
   int gotCallback = 0;
   std::vector<uint8_t> data(4, 0x03);
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(0x00, false, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -349,7 +349,7 @@ TEST_F(WebSocketServerTest, ReceiveFragmentInvalidNoPrevFragment) {
   int gotCallback = 0;
   std::vector<uint8_t> data(4, 0x03);
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
@@ -357,8 +357,7 @@ TEST_F(WebSocketServerTest, ReceiveFragmentInvalidNoPrevFragment) {
   auto message = BuildMessage(0x01, true, true, {});  // FIN=1
   auto message2 = BuildMessage(0x00, false, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write({uv::Buffer(message), uv::Buffer(message2)},
-                      [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}, {message2}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -370,7 +369,7 @@ TEST_F(WebSocketServerTest, ReceiveFragmentInvalidNoPrevFragment) {
 TEST_F(WebSocketServerTest, ReceiveFragmentInvalidIncomplete) {
   int gotCallback = 0;
   setupWebSocket = [&] {
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
@@ -379,9 +378,8 @@ TEST_F(WebSocketServerTest, ReceiveFragmentInvalidIncomplete) {
   auto message2 = BuildMessage(0x00, false, true, {});
   auto message3 = BuildMessage(0x01, true, true, {});
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(
-        {uv::Buffer(message), uv::Buffer(message2), uv::Buffer(message3)},
-        [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}, {message2}, {message3}},
+                      [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -401,7 +399,7 @@ TEST_F(WebSocketServerTest, ReceiveFragment) {
   combData.insert(combData.end(), data3.begin(), data3.end());
 
   setupWebSocket = [&] {
-    ws->binary.connect([&](ArrayRef<uint8_t> inData, bool fin) {
+    ws->binary.connect([&](auto inData, bool fin) {
       ++gotCallback;
       ws->Terminate();
       ASSERT_TRUE(fin);
@@ -414,9 +412,8 @@ TEST_F(WebSocketServerTest, ReceiveFragment) {
   auto message2 = BuildMessage(0x00, false, true, data2);
   auto message3 = BuildMessage(0x00, true, true, data3);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(
-        {uv::Buffer(message), uv::Buffer(message2), uv::Buffer(message3)},
-        [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}, {message2}, {message3}},
+                      [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -437,7 +434,7 @@ TEST_F(WebSocketServerTest, ReceiveFragmentSeparate) {
 
   setupWebSocket = [&] {
     ws->SetCombineFragments(false);
-    ws->binary.connect([&](ArrayRef<uint8_t> inData, bool fin) {
+    ws->binary.connect([&](auto inData, bool fin) {
       std::vector<uint8_t> recvData{inData.begin(), inData.end()};
       switch (++gotCallback) {
         case 1:
@@ -464,9 +461,8 @@ TEST_F(WebSocketServerTest, ReceiveFragmentSeparate) {
   auto message2 = BuildMessage(0x00, false, true, data2);
   auto message3 = BuildMessage(0x00, true, true, data3);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(
-        {uv::Buffer(message), uv::Buffer(message2), uv::Buffer(message3)},
-        [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}, {message2}, {message3}},
+                      [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -488,14 +484,14 @@ TEST_F(WebSocketServerTest, ReceiveTooLarge) {
       ws->Terminate();
       FAIL() << "Should not have gotten unmasked message";
     });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1009) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(0x01, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -513,7 +509,7 @@ TEST_F(WebSocketServerTest, ReceiveTooLargeFragmented) {
       ws->Terminate();
       FAIL() << "Should not have gotten unmasked message";
     });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1009) << "reason: " << reason;
     });
@@ -521,8 +517,7 @@ TEST_F(WebSocketServerTest, ReceiveTooLargeFragmented) {
   auto message = BuildMessage(0x01, false, true, data);
   auto message2 = BuildMessage(0x00, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write({uv::Buffer(message), uv::Buffer(message2)},
-                      [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}, {message2}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -544,8 +539,8 @@ TEST_P(WebSocketServerDataTest, SendText) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), ' ');
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) {
-      ws->SendText(uv::Buffer(data), [&](auto bufs, uv::Error) {
+    ws->open.connect([&](std::string_view) {
+      ws->SendText({{data}}, [&](auto bufs, uv::Error) {
         ++gotCallback;
         ws->Terminate();
         ASSERT_FALSE(bufs.empty());
@@ -565,8 +560,8 @@ TEST_P(WebSocketServerDataTest, SendBinary) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) {
-      ws->SendBinary(uv::Buffer(data), [&](auto bufs, uv::Error) {
+    ws->open.connect([&](std::string_view) {
+      ws->SendBinary({{data}}, [&](auto bufs, uv::Error) {
         ++gotCallback;
         ws->Terminate();
         ASSERT_FALSE(bufs.empty());
@@ -586,8 +581,8 @@ TEST_P(WebSocketServerDataTest, SendPing) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) {
-      ws->SendPing(uv::Buffer(data), [&](auto bufs, uv::Error) {
+    ws->open.connect([&](std::string_view) {
+      ws->SendPing({{data}}, [&](auto bufs, uv::Error) {
         ++gotCallback;
         ws->Terminate();
         ASSERT_FALSE(bufs.empty());
@@ -607,8 +602,8 @@ TEST_P(WebSocketServerDataTest, SendPong) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->open.connect([&](StringRef) {
-      ws->SendPong(uv::Buffer(data), [&](auto bufs, uv::Error) {
+    ws->open.connect([&](std::string_view) {
+      ws->SendPong({{data}}, [&](auto bufs, uv::Error) {
         ++gotCallback;
         ws->Terminate();
         ASSERT_FALSE(bufs.empty());
@@ -628,18 +623,18 @@ TEST_P(WebSocketServerDataTest, ReceiveText) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), ' ');
   setupWebSocket = [&] {
-    ws->text.connect([&](StringRef inData, bool fin) {
+    ws->text.connect([&](std::string_view inData, bool fin) {
       ++gotCallback;
       ws->Terminate();
       ASSERT_TRUE(fin);
       std::vector<uint8_t> recvData;
-      recvData.insert(recvData.end(), inData.bytes_begin(), inData.bytes_end());
+      recvData.insert(recvData.end(), inData.begin(), inData.end());
       ASSERT_EQ(data, recvData);
     });
   };
   auto message = BuildMessage(0x01, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -651,7 +646,7 @@ TEST_P(WebSocketServerDataTest, ReceiveBinary) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->binary.connect([&](ArrayRef<uint8_t> inData, bool fin) {
+    ws->binary.connect([&](auto inData, bool fin) {
       ++gotCallback;
       ws->Terminate();
       ASSERT_TRUE(fin);
@@ -661,7 +656,7 @@ TEST_P(WebSocketServerDataTest, ReceiveBinary) {
   };
   auto message = BuildMessage(0x02, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -673,7 +668,7 @@ TEST_P(WebSocketServerDataTest, ReceivePing) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->ping.connect([&](ArrayRef<uint8_t> inData) {
+    ws->ping.connect([&](auto inData) {
       ++gotCallback;
       ws->Terminate();
       std::vector<uint8_t> recvData{inData.begin(), inData.end()};
@@ -682,7 +677,7 @@ TEST_P(WebSocketServerDataTest, ReceivePing) {
   };
   auto message = BuildMessage(0x09, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -694,7 +689,7 @@ TEST_P(WebSocketServerDataTest, ReceivePong) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), 0x03u);
   setupWebSocket = [&] {
-    ws->pong.connect([&](ArrayRef<uint8_t> inData) {
+    ws->pong.connect([&](auto inData) {
       ++gotCallback;
       ws->Terminate();
       std::vector<uint8_t> recvData{inData.begin(), inData.end()};
@@ -703,7 +698,7 @@ TEST_P(WebSocketServerDataTest, ReceivePong) {
   };
   auto message = BuildMessage(0x0a, true, true, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();
@@ -719,18 +714,18 @@ TEST_P(WebSocketServerDataTest, ReceiveUnmasked) {
   int gotCallback = 0;
   std::vector<uint8_t> data(GetParam(), ' ');
   setupWebSocket = [&] {
-    ws->text.connect([&](StringRef, bool) {
+    ws->text.connect([&](std::string_view, bool) {
       ws->Terminate();
       FAIL() << "Should not have gotten unmasked message";
     });
-    ws->closed.connect([&](uint16_t code, StringRef reason) {
+    ws->closed.connect([&](uint16_t code, std::string_view reason) {
       ++gotCallback;
       ASSERT_EQ(code, 1002) << "reason: " << reason;
     });
   };
   auto message = BuildMessage(0x01, true, false, data);
   resp.headersComplete.connect([&](bool) {
-    clientPipe->Write(uv::Buffer(message), [&](auto bufs, uv::Error) {});
+    clientPipe->Write({{message}}, [&](auto bufs, uv::Error) {});
   });
 
   loop->Run();

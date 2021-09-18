@@ -11,23 +11,24 @@ class DSCommPacketTest : public ::testing::Test {
 
   void SendJoysticks() { commPacket.SendJoysticks(); }
 
-  halsim::DSCommJoystickPacket& ReadJoystickTag(wpi::ArrayRef<uint8_t> data,
+  halsim::DSCommJoystickPacket& ReadJoystickTag(wpi::span<const uint8_t> data,
                                                 int index) {
     commPacket.ReadJoystickTag(data, index);
     return commPacket.m_joystick_packets[index];
   }
 
-  halsim::DSCommJoystickPacket& ReadDescriptorTag(wpi::ArrayRef<uint8_t> data) {
+  halsim::DSCommJoystickPacket& ReadDescriptorTag(
+      wpi::span<const uint8_t> data) {
     commPacket.ReadJoystickDescriptionTag(data);
     return commPacket.m_joystick_packets[data[3]];
   }
 
-  HAL_MatchInfo& ReadNewMatchInfoTag(wpi::ArrayRef<uint8_t> data) {
+  HAL_MatchInfo& ReadNewMatchInfoTag(wpi::span<const uint8_t> data) {
     commPacket.ReadNewMatchInfoTag(data);
     return commPacket.matchInfo;
   }
 
-  HAL_MatchInfo& ReadGameSpecificTag(wpi::ArrayRef<uint8_t> data) {
+  HAL_MatchInfo& ReadGameSpecificTag(wpi::span<const uint8_t> data) {
     commPacket.ReadGameSpecificMessageTag(data);
     return commPacket.matchInfo;
   }
