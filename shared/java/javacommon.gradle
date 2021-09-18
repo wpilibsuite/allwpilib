@@ -118,7 +118,7 @@ dependencies {
 task run(type: JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
-    main = project.devMain
+    mainClass = project.devMain
 }
 
 build.dependsOn devClasses

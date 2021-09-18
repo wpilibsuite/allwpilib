@@ -1,5 +1,6 @@
-import jaci.gradle.toolchains.*
-import jaci.gradle.nativedeps.*
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget
+import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
+import edu.wpi.first.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,7 +11,7 @@ plugins {
 }
 
 apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'jaci.gradle.EmbeddedTools'
+apply plugin: 'edu.wpi.first.DeployUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -30,62 +31,138 @@ ext {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+// deploy {
+//     targets {
+//         target('roborio') {
+//             directory = '/home/admin'
+//             maxChannels = 4
+//             locations {
+//                 ssh {
+//                     address = "172.22.11.2"
+//                     user = 'admin'
+//                     password = ''
+//                     ipv6 = false
+//                 }
+//             }
+//         }
+//     }
+//     artifacts {
+//         all {
+//             targets << 'roborio'
+//             predeploy << { ctx ->
+//                 ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+//             }
+//             postdeploy << { ctx ->
+//                 ctx.execute("sync")
+//                 ctx.execute("ldconfig")
+//             }
+//         }
+
+//         artifact('jre', JREArtifact) {
+//             jreDependency = 'edu.wpi.first.jdk:roborio-2021:11.0.9u11-1'
+//         }
+
+//         javaArtifact('myRobotJava') {
+//             jar = 'shadowJar'
+//             postdeploy << { ctx ->
+//                 ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
+//                 ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
+//             }
+//         }
+
+//         nativeArtifact('myRobotCpp') {
+//             component = 'myRobotCpp'
+//             targetPlatform = nativeUtils.wpi.platforms.roborio
+//             libraryDirectory = '/usr/local/frc/third-party/lib'
+//             buildType = 'debug'
+//             postdeploy << { ctx ->
+//                 ctx.execute('chmod +x myRobotCpp')
+//             }
+//         }
+
+//         nativeArtifact('myRobotCppStatic') {
+//             component = 'myRobotCppStatic'
+//             targetPlatform = nativeUtils.wpi.platforms.roborio
+//             buildType = 'debug'
+
+//             postdeploy << { ctx ->
+//                 ctx.execute('chmod +x myRobotCppStatic')
+//             }
+//         }
+//     }
+// }
+
+mainClassName = 'frc.robot.Main'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':wpilibj')
+    implementation project(':wpimath')
+    implementation project(':hal')
+    implementation project(':wpiutil')
+    implementation project(':ntcore')
+    implementation project(':cscore')
+    implementation project(':cameraserver')
+    implementation project(':wpilibOldCommands')
+    implementation project(':wpilibNewCommands')
+}
+
+def simProjects = ['halsim_gui']
+
 deploy {
     targets {
-        target('roborio') {
+        roborio(RemoteTarget) {
             directory = '/home/admin'
             maxChannels = 4
             locations {
-                ssh {
+                ssh(SshDeployLocation) {
                     address = "172.22.11.2"
                     user = 'admin'
                     password = ''
                     ipv6 = false
                 }
             }
-        }
-    }
-    artifacts {
-        all {
-            targets << 'roborio'
-            predeploy << { ctx ->
-                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
-            }
-            postdeploy << { ctx ->
-                ctx.execute("sync")
-                ctx.execute("ldconfig")
-            }
-        }
 
-        artifact('jre', JREArtifact) {
-            jreDependency = 'edu.wpi.first.jdk:roborio-2021:11.0.9u11-1'
-        }
+            artifacts {
+                all {
+                    predeploy << { ctx ->
+                        ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+                    }
+                    postdeploy << { ctx ->
+                        ctx.execute("sync")
+                        ctx.execute("ldconfig")
+                    }
+                }
 
-        javaArtifact('myRobotJava') {
-            jar = 'shadowJar'
-            postdeploy << { ctx ->
-                ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
-                ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
-            }
-        }
+                myRobotCpp(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    postdeploy << { ctx ->
+                        ctx.execute('chmod +x myRobotCpp')
+                    }
+                }
 
-        nativeArtifact('myRobotCpp') {
-            component = 'myRobotCpp'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            libraryDirectory = '/usr/local/frc/third-party/lib'
-            buildType = 'debug'
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x myRobotCpp')
-            }
-        }
+                myRobotCppStatic(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    postdeploy << { ctx ->
+                        ctx.execute('chmod +x myRobotCppStatic')
+                    }
+                }
 
-        nativeArtifact('myRobotCppStatic') {
-            component = 'myRobotCppStatic'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            buildType = 'debug'
+                // jre(JREArtifact) { // TODO Fix me
+                // }
 
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x myRobotCppStatic')
+                myRobotJava(JavaArtifact) {
+                    jarTask = shadowJar
+                    postdeploy << { ctx ->
+                        ctx.execute("echo '/usr/local/frc/JRE/bin/java -XX:+UseConcMarkSweepGC -Djava.library.path=/usr/local/frc/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/admin/myRobot-all.jar' > /home/admin/myRobotJavaRun")
+                        ctx.execute("chmod +x /home/admin/myRobotJavaRun; chown lvuser /home/admin/myRobotJavaRun")
+                    }
+                }
             }
         }
     }
@@ -115,28 +192,6 @@ tasks.register('deployStatic') {
     }
 }
 
-mainClassName = 'frc.robot.Main'
-
-apply plugin: 'com.github.johnrengelman.shadow'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation project(':wpilibj')
-    implementation project(':wpimath')
-    implementation project(':hal')
-    implementation project(':wpiutil')
-    implementation project(':ntcore')
-    implementation project(':cscore')
-    implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
-    implementation project(':wpilibNewCommands')
-}
-
-def simProjects = ['halsim_gui']
-
 model {
     components {
         myRobotCpp(NativeExecutableSpec) {
@@ -154,6 +209,11 @@ model {
                 }
             }
             binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
+                    }
+                }
                 lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
@@ -167,7 +227,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 } else {
                     def systemArch = getCurrentArch()
                     if (binary.targetPlatform.name == systemArch) {
@@ -194,6 +254,11 @@ model {
                 }
             }
             binaries.all { binary ->
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
+                    }
+                }
                 lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
@@ -204,7 +269,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 }
             }
         }

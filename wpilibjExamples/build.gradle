@@ -122,7 +122,7 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNI', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                    nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                    nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 } else {
                     def systemArch = getCurrentArch()
                     if (binary.targetPlatform.name == systemArch) {
@@ -173,7 +173,7 @@ model {
 
                             new groovy.json.JsonSlurper().parseText(exampleFile.text).each { entry ->
                                 project.tasks.create("run${entry.foldername}", JavaExec) { run ->
-                                    main = "edu.wpi.first.wpilibj.examples." + entry.foldername + ".Main"
+                                    mainClass = "edu.wpi.first.wpilibj.examples." + entry.foldername + ".Main"
                                     classpath = sourceSets.main.runtimeClasspath
                                     run.dependsOn it.tasks.install
                                     run.systemProperty 'java.library.path', filePath

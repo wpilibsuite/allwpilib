@@ -46,7 +46,7 @@ import org.gradle.platform.base.ComponentType;
 import org.gradle.platform.base.TypeBuilder;
 import org.gradle.nativeplatform.tasks.ObjectFilesToBinary;
 import groovy.transform.CompileStatic;
-import edu.wpi.first.nativeutils.tasks.ExportsGenerationTask
+import edu.wpi.first.nativeutils.exports.ExportsGenerationTask
 
 @CompileStatic
 class SingleNativeBuild implements Plugin<Project> {

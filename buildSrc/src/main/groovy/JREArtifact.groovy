@@ -1,48 +1,48 @@
 import groovy.transform.CompileStatic
 import javax.inject.Inject
-import jaci.gradle.deploy.artifact.MavenArtifact
-import jaci.gradle.deploy.context.DeployContext
+import edu.wpi.first.deployutils.deploy.artifact.MavenArtifact
+import edu.wpi.first.deployutils.deploy.context.DeployContext
 import org.gradle.api.Project
-import jaci.gradle.ActionWrapper
+import edu.wpi.first.deployutils.ActionWrapper
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget
+import edu.wpi.first.deployutils.PredicateWrapper
 
 import java.util.function.Function
 
 @CompileStatic
-class JREArtifact extends MavenArtifact {
-    Function<DeployContext, Boolean> buildRequiresJre = (Function<DeployContext, Boolean>){ true }
+public class FRCJREArtifact extends MavenArtifact {
+    private final String configName;
 
-    void setJreDependency(String dep) {
-      dependency = project.dependencies.add(configuration(), dep)
+    public String getConfigName() {
+        return configName;
     }
 
     @Inject
-    JREArtifact(String name, Project project) {
-        super(name, project)
-        configuration = project.configurations.create(configuration())
+    public FRCJREArtifact(String name, RemoteTarget target) {
+        super(name, target);
+        String configName = name + "frcjre";
+        this.configName = configName;
+        Project project = target.getProject();
+        getConfiguration().set(project.getConfigurations().create(configName));
+        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2021:11.0.9u11-1"));
 
-        onlyIf = { DeployContext ctx ->
-            (buildRequiresJre.apply(ctx) && jreMissing(ctx)) || project.hasProperty("force-redeploy-jre")
-        }
+        setOnlyIf(new PredicateWrapper({ DeployContext ctx ->
+            return jreMissing(ctx) || project.hasProperty("force-redeploy-jre");
+        }));
 
-        predeploy << new ActionWrapper({ DeployContext ctx ->
-            ctx.logger.log('Deploying RoboRIO JRE (this will take a while)...')
-        })
+        getDirectory().set("/tmp");
+        getFilename().set("frcjre.ipk");
 
-        directory = '/tmp'
-        filename = 'frcjre.ipk'
-
-        postdeploy << new ActionWrapper({ DeployContext ctx ->
-            ctx.logger.log('Installing JRE...')
-            ctx.execute('opkg remove frc2020-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk')
-            ctx.logger.log('JRE Deployed!')
-        })
+        getPostdeploy().add(new ActionWrapper({ DeployContext ctx ->
+            ctx.getLogger().log("Installing JRE...");
+            ctx.execute("opkg remove frc2020-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk");
+            ctx.getLogger().log("JRE Deployed!");
+        }));
     }
 
-    String configuration() {
-        return name + 'frcjre'
+    private boolean jreMissing(DeployContext ctx) {
+        return ctx.execute("if [[ -f \"/usr/local/frc/JRE/bin/java\" ]]; then echo OK; else echo MISSING; fi").getResult().contains("MISSING");
     }
 
-    boolean jreMissing(DeployContext ctx) {
-        return ctx.execute('if [[ -f "/usr/local/frc/JRE/bin/java" ]]; then echo OK; else echo MISSING; fi').result.contains("MISSING")
-    }
+
 }
