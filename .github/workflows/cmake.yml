@@ -61,5 +61,5 @@ jobs:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           useVcpkgToolchainFile: true
       - name: Run Tests
-        run: ctest -C "Debug"
+        run: ctest -C "Debug" --output-on-failure
         working-directory: ${{ runner.workspace }}/build
