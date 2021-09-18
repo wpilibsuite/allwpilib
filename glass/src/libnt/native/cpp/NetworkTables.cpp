@@ -256,8 +256,8 @@ static std::shared_ptr<nt::Value> StringToBooleanArray(std::string_view in) {
 static std::shared_ptr<nt::Value> StringToDoubleArray(std::string_view in) {
   in = wpi::trim(in);
   if (in.empty()) {
-    return nt::NetworkTableValue::MakeBooleanArray(
-        std::initializer_list<bool>{});
+    return nt::NetworkTableValue::MakeDoubleArray(
+        std::initializer_list<double>{});
   }
   if (in.front() == '[') {
     in.remove_prefix(1);
