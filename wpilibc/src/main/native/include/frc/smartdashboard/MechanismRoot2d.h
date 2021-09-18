@@ -16,8 +16,12 @@ namespace frc {
 /**
  * Root Mechanism2d node.
  *
+ * A root is the anchor point of other nodes (such as ligaments).
+ *
  * Do not create objects of this class directly! Obtain pointers from the
  * Mechanism2d.GetRoot() factory method.
+ *
+ * <p>Append other nodes by using Append().
  */
 class MechanismRoot2d : private MechanismObject2d {
   friend class Mechanism2d;

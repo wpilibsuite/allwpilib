@@ -19,11 +19,12 @@
 namespace frc {
 
 /**
- * Visual 2D representation of arms, elevators, and general mechanisms; through
+ * Visual 2D representation of arms, elevators, and general mechanisms through
  * a node-based API.
  *
- * A Mechanism2d object is published and contains at least one root node. Other
- * nodes (such as ligaments) are recursively based on other nodes.
+ * A Mechanism2d object is published and contains at least one root node. A root
+ * is the anchor point of other nodes (such as ligaments). Other nodes are
+ * recursively appended based on other nodes.
  *
  * Except for the Mechanism2d container object, none of the objects should be
  * passed or interacted with by value! Obtain pointers from factory methods such
@@ -41,6 +42,9 @@ class Mechanism2d : public nt::NTSendable,
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
+   *
+   * The dimensions represent the canvas that all the nodes are drawn on. The
+   * default color is dark blue.
    *
    * @param width the width
    * @param height the height

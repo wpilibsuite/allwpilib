@@ -12,6 +12,8 @@ import java.util.Map;
 /**
  * Root Mechanism2d node.
  *
+ * <p>A root is the anchor point of other nodes (such as ligaments).
+ *
  * <p>Do not create objects of this class directly! Obtain instances from the {@link
  * Mechanism2d#getRoot(String, double, double)} factory method.
  *

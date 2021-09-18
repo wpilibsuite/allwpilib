@@ -18,6 +18,9 @@ namespace frc {
 /**
  * Ligament node on a Mechanism2d.
  *
+ * A ligament can have its length changed (like an elevator) or angle changed,
+ * like an arm.
+ *
  * @see Mechanism2d
  */
 class MechanismLigament2d : public MechanismObject2d {
