@@ -56,7 +56,7 @@
     "foldername":"Mechanism2d",
     "gradlebase":"cpp",
     "description":"An example usage of Mechanism2d to display mechanism states on a dashboard.",
-    "tags":[],
+    "tags":["Mechanism2d"],
     "commandversion": 2
   },
   {
