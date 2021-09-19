@@ -11,6 +11,8 @@
 #include <frc/smartdashboard/Mechanism2d.h>
 #include <frc/smartdashboard/MechanismLigament2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/util/Color.h>
+#include <frc/util/Color8Bit.h>
 #include <units/angle.h>
 
 /**
@@ -57,13 +59,14 @@ class Robot : public frc::TimedRobot {
   // the main mechanism object
   frc::Mechanism2d m_mech{3, 3};
   // the mechanism root node
-  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 3, 3);
+  frc::MechanismRoot2d* m_root = m_mech.GetRoot("climber", 2, 0);
   // MechanismLigament2d objects represent each "section"/"stage" of the
   // mechanism, and are based off the root node or another ligament object
   frc::MechanismLigament2d* m_elevator =
       m_root->Append<frc::MechanismLigament2d>("elevator", 1, 90_deg);
   frc::MechanismLigament2d* m_wrist =
-      m_elevator->Append<frc::MechanismLigament2d>("wrist", 0.5, 90_deg);
+      m_elevator->Append<frc::MechanismLigament2d>(
+          "wrist", 0.5, 90_deg, 6, frc::Color8Bit{frc::Color::kPurple});
 };
 
 #ifndef RUNNING_FRC_TESTS
