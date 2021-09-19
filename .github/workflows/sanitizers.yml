@@ -8,12 +8,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- name: asan
-          #  flags: "-DCMAKE_BUILD_TYPE=Asan"
-          #- name: tsan
-          #  flags: "-DCMAKE_BUILD_TYPE=Tsan"
+          - name: asan
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Asan"
+            ctest-env: ""
+            ctest-flags: "-E 'wpiutil|ntcore|wpilibc'"
+          - name: tsan
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Tsan"
+            ctest-env: "TSAN_OPTIONS=second_deadlock_stack=1"
+            ctest-flags: "-E 'ntcore|cscore|cameraserver|wpilibc|wpilibNewCommands'"
           - name: ubsan
-            flags: "-DCMAKE_BUILD_TYPE=Ubsan"
+            cmake-flags: "-DCMAKE_BUILD_TYPE=Ubsan"
+            ctest-env: ""
+            ctest-flags: ""
     name: "${{ matrix.name }}"
     runs-on: ubuntu-latest
     container: wpilib/roborio-cross-ubuntu:2021-20.04
@@ -34,10 +40,10 @@ jobs:
       - name: Install jinja
         run: python -m pip install jinja2
       - name: configure
-        run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+        run: mkdir build && cd build && cmake ${{ matrix.cmake-flags }} ..
       - name: build
         working-directory: build
-        run: make -j3
+        run: cmake --build . -j$(nproc)
       - name: test
         working-directory: build
-        run: ctest --output-on-failure
+        run: ${{ matrix.ctest-env }} ctest --output-on-failure ${{ matrix.ctest-flags }}
