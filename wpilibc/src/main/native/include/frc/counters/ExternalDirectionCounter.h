@@ -3,20 +3,19 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "EdgeConfiguration.h"
-#include "frc/ErrorBase.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 class DigitalSource;
 
-class ExternalDirectionCounter : public ErrorBase, public Sendable, public SendableHelper<ExternalDirectionCounter> {
+class ExternalDirectionCounter : public wpi::Sendable, public wpi::SendableHelper<ExternalDirectionCounter> {
   public:
-    explicit ExternalDirectionCounter(DigitalSource& countSource, DigitalSource& directionSource);
-    explicit ExternalDirectionCounter(DigitalSource* countSource, DigitalSource* directionSource);
-    explicit ExternalDirectionCounter(std::shared_ptr<DigitalSource> countSource, std::shared_ptr<DigitalSource> directionSource);
+    ExternalDirectionCounter(DigitalSource& countSource, DigitalSource& directionSource);
+    ExternalDirectionCounter(DigitalSource* countSource, DigitalSource* directionSource);
+    ExternalDirectionCounter(std::shared_ptr<DigitalSource> countSource, std::shared_ptr<DigitalSource> directionSource);
 
     ~ExternalDirectionCounter() override;
 
@@ -31,7 +30,7 @@ class ExternalDirectionCounter : public ErrorBase, public Sendable, public Senda
     void SetEdgeConfiguration(EdgeConfiguration configuration);
 
  protected:
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
    private:
   void InitExternalDirectionCounter();

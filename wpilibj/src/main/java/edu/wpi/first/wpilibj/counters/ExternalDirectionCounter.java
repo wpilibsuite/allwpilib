@@ -1,8 +1,6 @@
 package edu.wpi.first.wpilibj.counters;
 
 import edu.wpi.first.wpilibj.DigitalSource;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -10,6 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.CounterJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   private DigitalSource m_countSource;
@@ -34,6 +37,10 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
         directionSource.getAnalogTriggerTypeForRouting());
     CounterJNI.setCounterDownSourceEdge(m_handle, false, true);
     CounterJNI.resetCounter(m_handle);
+
+    int intIndex = index.getInt();
+    HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
+    SendableRegistry.addLW(this, "External Direction Counter", intIndex);
   }
 
   public int getCount() {
@@ -66,11 +73,14 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
 
   @Override
   public void close() throws Exception {
+    SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("External Direction Counter");
+    builder.addDoubleProperty("Count", this::getCount, null);
   }
 
 
