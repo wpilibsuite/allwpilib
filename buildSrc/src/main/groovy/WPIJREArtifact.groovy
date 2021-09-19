@@ -24,7 +24,7 @@ public class WPIJREArtifact extends MavenArtifact {
         this.configName = configName;
         Project project = target.getProject();
         getConfiguration().set(project.getConfigurations().create(configName));
-        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2021:11.0.9u11-1"));
+        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2022:11.0.9u12-1"));
 
         setOnlyIf(new PredicateWrapper({ DeployContext ctx ->
             return jreMissing(ctx) || project.hasProperty("force-redeploy-jre");
@@ -35,7 +35,7 @@ public class WPIJREArtifact extends MavenArtifact {
 
         getPostdeploy().add(new ActionWrapper({ DeployContext ctx ->
             ctx.getLogger().log("Installing JRE...");
-            ctx.execute("opkg remove frc2021-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk");
+            ctx.execute("opkg remove frc2022-openjdk*; opkg install /tmp/frcjre.ipk; rm /tmp/frcjre.ipk");
             ctx.getLogger().log("JRE Deployed!");
         }));
     }
