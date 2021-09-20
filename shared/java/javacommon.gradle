@@ -118,7 +118,7 @@ dependencies {
 task run(type: JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
-    main = project.devMain
+    mainClass = project.devMain
 }
 
 build.dependsOn devClasses
@@ -129,7 +129,7 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
