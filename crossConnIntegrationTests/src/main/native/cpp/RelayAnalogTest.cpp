@@ -46,5 +46,5 @@ TEST_P(RelayAnalogTest, RelayAnalogCross) {
   ASSERT_EQ(0, status);
 }
 
-INSTANTIATE_TEST_SUITE_P(RelayAnalogCrossConnectsTest, RelayAnalogTest,
+INSTANTIATE_TEST_SUITE_P(RelayAnalogCrossConnectsTests, RelayAnalogTest,
                          ::testing::ValuesIn(RelayAnalogCrossConnects));

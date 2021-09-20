@@ -83,7 +83,8 @@ static Base64TestParam sample[] = {
      "mQgc28gb24uLi4K"},
 };
 
-INSTANTIATE_TEST_SUITE_P(Base64Sample, Base64Test, ::testing::ValuesIn(sample));
+INSTANTIATE_TEST_SUITE_P(Base64SampleTests, Base64Test,
+                         ::testing::ValuesIn(sample));
 
 static Base64TestParam standard[] = {
     {0, "", ""},
@@ -96,7 +97,7 @@ static Base64TestParam standard[] = {
     {2, "\xff\xef", "/+8="},
 };
 
-INSTANTIATE_TEST_SUITE_P(Base64Standard, Base64Test,
+INSTANTIATE_TEST_SUITE_P(Base64StandardTests, Base64Test,
                          ::testing::ValuesIn(standard));
 
 }  // namespace wpi

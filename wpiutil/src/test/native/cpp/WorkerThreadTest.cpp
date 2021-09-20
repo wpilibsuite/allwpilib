@@ -12,14 +12,14 @@
 
 namespace wpi {
 
-TEST(WorkerThread, Future) {
+TEST(WorkerThreadTest, Future) {
   WorkerThread<int(bool)> worker;
   future<int> f =
       worker.QueueWork([](bool v) -> int { return v ? 1 : 2; }, true);
   ASSERT_EQ(f.get(), 1);
 }
 
-TEST(WorkerThread, FutureVoid) {
+TEST(WorkerThreadTest, FutureVoid) {
   int callbacks = 0;
   WorkerThread<void(int)> worker;
   future<void> f = worker.QueueWork(
@@ -32,7 +32,7 @@ TEST(WorkerThread, FutureVoid) {
   ASSERT_EQ(callbacks, 1);
 }
 
-TEST(WorkerThread, Loop) {
+TEST(WorkerThreadTest, Loop) {
   int callbacks = 0;
   WorkerThread<int(bool)> worker;
   auto loop = uv::Loop::Create();
@@ -50,7 +50,7 @@ TEST(WorkerThread, Loop) {
   ASSERT_EQ(callbacks, 1);
 }
 
-TEST(WorkerThread, LoopVoid) {
+TEST(WorkerThreadTest, LoopVoid) {
   int callbacks = 0;
   WorkerThread<void(bool)> worker;
   auto loop = uv::Loop::Create();

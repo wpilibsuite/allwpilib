@@ -11,10 +11,10 @@
 #include "frc/simulation/SimHooks.h"
 #include "gtest/gtest.h"
 
-class IsJoystickConnectedParametersTests
+class IsJoystickConnectedParametersTest
     : public ::testing::TestWithParam<std::tuple<int, int, int, bool>> {};
 
-TEST_P(IsJoystickConnectedParametersTests, IsJoystickConnected) {
+TEST_P(IsJoystickConnectedParametersTest, IsJoystickConnected) {
   frc::sim::DriverStationSim::SetJoystickAxisCount(1, std::get<0>(GetParam()));
   frc::sim::DriverStationSim::SetJoystickButtonCount(1,
                                                      std::get<1>(GetParam()));
@@ -25,18 +25,18 @@ TEST_P(IsJoystickConnectedParametersTests, IsJoystickConnected) {
             frc::DriverStation::IsJoystickConnected(1));
 }
 
-INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTests,
+INSTANTIATE_TEST_SUITE_P(IsConnectedTests, IsJoystickConnectedParametersTest,
                          ::testing::Values(std::make_tuple(0, 0, 0, false),
                                            std::make_tuple(1, 0, 0, true),
                                            std::make_tuple(0, 1, 0, true),
                                            std::make_tuple(0, 0, 1, true),
                                            std::make_tuple(1, 1, 1, true),
                                            std::make_tuple(4, 10, 1, true)));
-class JoystickConnectionWarningTests
+class JoystickConnectionWarningTest
     : public ::testing::TestWithParam<
           std::tuple<bool, bool, bool, std::string>> {};
 
-TEST_P(JoystickConnectionWarningTests, JoystickConnectionWarnings) {
+TEST_P(JoystickConnectionWarningTest, JoystickConnectionWarnings) {
   // Capture all output to stderr.
   ::testing::internal::CaptureStderr();
 
@@ -58,7 +58,7 @@ TEST_P(JoystickConnectionWarningTests, JoystickConnectionWarnings) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    DriverStation, JoystickConnectionWarningTests,
+    DriverStationTests, JoystickConnectionWarningTest,
     ::testing::Values(
         std::make_tuple(false, true, true, ""),
         std::make_tuple(

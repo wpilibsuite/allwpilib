@@ -22,7 +22,7 @@ namespace frc {
 constexpr double kPositionStddev = 0.0001;
 constexpr auto kDt = 0.00505_s;
 
-class StateSpace : public testing::Test {
+class StateSpaceTest : public testing::Test {
  public:
   LinearSystem<2, 1, 1> plant = [] {
     auto motors = DCMotor::Vex775Pro(2);
@@ -51,7 +51,7 @@ void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
   loop.Predict(kDt);
 }
 
-TEST_F(StateSpace, CorrectPredictLoop) {
+TEST_F(StateSpaceTest, CorrectPredictLoop) {
   std::default_random_engine generator;
   std::normal_distribution<double> dist{0.0, kPositionStddev};
 

@@ -128,7 +128,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void disabledTest() {
+  void disabledModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -215,7 +215,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void autonomousTest() {
+  void autonomousModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -304,7 +304,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void teleopTest() {
+  void teleopModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -393,7 +393,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void testTest() {
+  void testModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
