@@ -78,7 +78,7 @@ class MockRobot : public TimedRobot {
 };
 }  // namespace
 
-TEST_F(TimedRobotTest, Disabled) {
+TEST_F(TimedRobotTest, DisabledMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -152,7 +152,7 @@ TEST_F(TimedRobotTest, Disabled) {
   robotThread.join();
 }
 
-TEST_F(TimedRobotTest, Autonomous) {
+TEST_F(TimedRobotTest, AutonomousMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -228,7 +228,7 @@ TEST_F(TimedRobotTest, Autonomous) {
   robotThread.join();
 }
 
-TEST_F(TimedRobotTest, Teleop) {
+TEST_F(TimedRobotTest, TeleopMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -304,7 +304,7 @@ TEST_F(TimedRobotTest, Teleop) {
   robotThread.join();
 }
 
-TEST_F(TimedRobotTest, Test) {
+TEST_F(TimedRobotTest, TestMode) {
   MockRobot robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};

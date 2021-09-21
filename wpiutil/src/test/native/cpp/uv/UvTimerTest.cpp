@@ -8,7 +8,7 @@
 
 namespace wpi::uv {
 
-TEST(UvTimer, StartAndStop) {
+TEST(UvTimerTest, StartAndStop) {
   auto loop = Loop::Create();
   auto handleNoRepeat = Timer::Create(loop);
   auto handleRepeat = Timer::Create(loop);
@@ -55,7 +55,7 @@ TEST(UvTimer, StartAndStop) {
   ASSERT_TRUE(checkTimerRepeatEvent);
 }
 
-TEST(UvTimer, Repeat) {
+TEST(UvTimerTest, Repeat) {
   auto loop = Loop::Create();
   auto handle = Timer::Create(loop);
 

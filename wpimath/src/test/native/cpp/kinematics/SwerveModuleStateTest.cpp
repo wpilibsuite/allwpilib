@@ -8,7 +8,7 @@
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(SwerveModuleState, Optimize) {
+TEST(SwerveModuleStateTest, Optimize) {
   frc::Rotation2d angleA{45_deg};
   frc::SwerveModuleState refA{-2_mps, 180_deg};
   auto optimizedA = frc::SwerveModuleState::Optimize(refA, angleA);
@@ -24,7 +24,7 @@ TEST(SwerveModuleState, Optimize) {
   EXPECT_NEAR(optimizedB.angle.Degrees().to<double>(), -139.0, kEpsilon);
 }
 
-TEST(SwerveModuleState, NoOptimize) {
+TEST(SwerveModuleStateTest, NoOptimize) {
   frc::Rotation2d angleA{0_deg};
   frc::SwerveModuleState refA{2_mps, 89_deg};
   auto optimizedA = frc::SwerveModuleState::Optimize(refA, angleA);

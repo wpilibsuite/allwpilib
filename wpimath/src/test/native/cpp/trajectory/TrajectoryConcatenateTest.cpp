@@ -6,7 +6,7 @@
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
 
-TEST(TrajectoryConcatenate, States) {
+TEST(TrajectoryConcatenateTest, States) {
   auto t1 = frc::TrajectoryGenerator::GenerateTrajectory(
       {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
   auto t2 = frc::TrajectoryGenerator::GenerateTrajectory(

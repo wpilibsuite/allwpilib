@@ -15,7 +15,7 @@ using namespace frc;
 
 static constexpr double kEpsilon = 1E-9;
 
-TEST(DifferentialDriveKinematics, InverseKinematicsFromZero) {
+TEST(DifferentialDriveKinematicsTest, InverseKinematicsFromZero) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisSpeeds chassisSpeeds;
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
@@ -24,7 +24,7 @@ TEST(DifferentialDriveKinematics, InverseKinematicsFromZero) {
   EXPECT_NEAR(wheelSpeeds.right.to<double>(), 0, kEpsilon);
 }
 
-TEST(DifferentialDriveKinematics, ForwardKinematicsFromZero) {
+TEST(DifferentialDriveKinematicsTest, ForwardKinematicsFromZero) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelSpeeds wheelSpeeds;
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
@@ -34,7 +34,7 @@ TEST(DifferentialDriveKinematics, ForwardKinematicsFromZero) {
   EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 0, kEpsilon);
 }
 
-TEST(DifferentialDriveKinematics, InverseKinematicsForStraightLine) {
+TEST(DifferentialDriveKinematicsTest, InverseKinematicsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisSpeeds chassisSpeeds{3.0_mps, 0_mps, 0_rad_per_s};
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
@@ -43,7 +43,7 @@ TEST(DifferentialDriveKinematics, InverseKinematicsForStraightLine) {
   EXPECT_NEAR(wheelSpeeds.right.to<double>(), 3, kEpsilon);
 }
 
-TEST(DifferentialDriveKinematics, ForwardKinematicsForStraightLine) {
+TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelSpeeds wheelSpeeds{3.0_mps, 3.0_mps};
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
@@ -53,7 +53,7 @@ TEST(DifferentialDriveKinematics, ForwardKinematicsForStraightLine) {
   EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 0, kEpsilon);
 }
 
-TEST(DifferentialDriveKinematics, InverseKinematicsForRotateInPlace) {
+TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisSpeeds chassisSpeeds{
       0.0_mps, 0.0_mps, units::radians_per_second_t{wpi::numbers::pi}};
@@ -65,7 +65,7 @@ TEST(DifferentialDriveKinematics, InverseKinematicsForRotateInPlace) {
               kEpsilon);
 }
 
-TEST(DifferentialDriveKinematics, ForwardKinematicsForRotateInPlace) {
+TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelSpeeds wheelSpeeds{
       units::meters_per_second_t(+0.381 * wpi::numbers::pi),
