@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 
 /**
- * The DriveTrain subsystem controls the robot's chassis and reads in information about it's speed
+ * The Drivetrain subsystem controls the robot's chassis and reads in information about it's speed
  * and position.
  */
-public class DriveTrain extends Subsystem {
+public class Drivetrain extends Subsystem {
   // Subsystem devices
   private final MotorController m_frontLeftCIM = new Victor(1);
   private final MotorController m_frontRightCIM = new Victor(2);
@@ -35,8 +35,8 @@ public class DriveTrain extends Subsystem {
   private final Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
   private final AnalogGyro m_gyro = new AnalogGyro(0);
 
-  /** Create a new drive train subsystem. */
-  public DriveTrain() {
+  /** Create a new drivetrain subsystem. */
+  public Drivetrain() {
     // Configure drive motors
     addChild("Front Left CIM", (Victor) m_frontLeftCIM);
     addChild("Front Right CIM", (Victor) m_frontRightCIM);
