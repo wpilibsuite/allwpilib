@@ -132,6 +132,18 @@ public class Timer {
    * This is useful to decide if it's time to do periodic work without drifting later by the time it
    * took to get around to checking.
    *
+   * @param period The period to check for (in seconds).
+   * @return Whether the period has passed.
+   */
+  public boolean hasPeriodPassed(double period) {
+    return advanceIfElapsed(period);
+  }
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start time by that period.
+   * This is useful to decide if it's time to do periodic work without drifting later by the time it
+   * took to get around to checking.
+   *
    * @param seconds The period to check.
    * @return Whether the period has passed.
    */

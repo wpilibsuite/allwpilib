@@ -98,6 +98,16 @@ class Timer {
    * @param period The period to check for.
    * @return       True if the period has passed.
    */
+  bool HasPeriodPassed(units::second_t period);
+
+  /**
+   * Check if the period specified has passed and if it has, advance the start
+   * time by that period. This is useful to decide if it's time to do periodic
+   * work without drifting later by the time it took to get around to checking.
+   *
+   * @param period The period to check for.
+   * @return       True if the period has passed.
+   */
   bool AdvanceIfElapsed(units::second_t period);
 
   /**
