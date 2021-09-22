@@ -123,20 +123,8 @@ public class Timer {
    */
   public boolean hasElapsed(double seconds) {
     synchronized (m_lock) {
-      return get() > seconds;
+      return get() >= seconds;
     }
-  }
-
-  /**
-   * Check if the period specified has passed and if it has, advance the start time by that period.
-   * This is useful to decide if it's time to do periodic work without drifting later by the time it
-   * took to get around to checking.
-   *
-   * @param period The period to check for (in seconds).
-   * @return Whether the period has passed.
-   */
-  public boolean hasPeriodPassed(double period) {
-    return advanceIfElapsed(period);
   }
 
   /**
@@ -149,7 +137,7 @@ public class Timer {
    */
   public boolean advanceIfElapsed(double seconds) {
     synchronized (m_lock) {
-      if (get() > seconds) {
+      if (get() >= seconds) {
         // Advance the start time by the period.
         // Don't set it to the current time... we want to avoid drift.
         m_startTime += seconds * 1000;
