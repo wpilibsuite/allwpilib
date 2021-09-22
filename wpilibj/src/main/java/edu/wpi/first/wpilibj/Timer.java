@@ -123,7 +123,7 @@ public class Timer {
    */
   public boolean hasElapsed(double seconds) {
     synchronized (m_lock) {
-      return get() > seconds;
+      return get() >= seconds;
     }
   }
 
@@ -151,7 +151,7 @@ public class Timer {
    */
   public boolean advanceIfElapsed(double seconds) {
     synchronized (m_lock) {
-      if (get() > seconds) {
+      if (get() >= seconds) {
         // Advance the start time by the period.
         // Don't set it to the current time... we want to avoid drift.
         m_startTime += seconds * 1000;
