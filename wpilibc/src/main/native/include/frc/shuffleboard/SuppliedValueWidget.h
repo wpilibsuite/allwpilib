@@ -20,13 +20,13 @@ namespace frc {
 class ShuffleboardContainer;
 
 template <typename T>
-class SuppliedValueWidget : public ShuffleboardWidget<SuppliedValueWidget<T> > {
+class SuppliedValueWidget : public ShuffleboardWidget<SuppliedValueWidget<T>> {
  public:
   SuppliedValueWidget(ShuffleboardContainer& parent, std::string_view title,
                       std::function<T()> supplier,
                       std::function<void(nt::NetworkTableEntry, T)> setter)
       : ShuffleboardValue(title),
-        ShuffleboardWidget<SuppliedValueWidget<T> >(parent, title),
+        ShuffleboardWidget<SuppliedValueWidget<T>>(parent, title),
         m_supplier(supplier),
         m_setter(setter) {}
 
