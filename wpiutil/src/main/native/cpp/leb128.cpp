@@ -4,7 +4,10 @@
 
 #include "wpi/leb128.h"
 
+#include "wpi/SpanExtras.h"
 #include "wpi/raw_istream.h"
+#include "wpi/raw_ostream.h"
+#include "wpi/span.h"
 
 namespace wpi {
 
@@ -21,7 +24,7 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
   size_t count = 0;
 
   do {
-    unsigned char byte = val & 0x7f;
+    uint8_t byte = val & 0x7f;
     val >>= 7;
 
     if (val != 0) {
@@ -33,6 +36,22 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
   } while (val != 0);
 
   return count;
+}
+
+void WriteUleb128(raw_ostream& os, uint64_t val) {
+  size_t count = 0;
+
+  do {
+    uint8_t byte = val & 0x7f;
+    val >>= 7;
+
+    if (val != 0) {
+      byte |= 0x80;  // mark this byte to show that more bytes will follow
+    }
+
+    os << byte;
+    count++;
+  } while (val != 0);
 }
 
 uint64_t ReadUleb128(const char* addr, uint64_t* ret) {
@@ -80,6 +99,24 @@ bool ReadUleb128(raw_istream& is, uint64_t* ret) {
   *ret = result;
 
   return true;
+}
+
+std::optional<uint64_t> Uleb128Reader::ReadOne(span<const uint8_t>* in) {
+  while (!in->empty()) {
+    uint8_t byte = in->front();
+    *in = wpi::drop_front(*in);
+
+    m_result |= (byte & 0x7fULL) << m_shift;
+    m_shift += 7;
+
+    if (!(byte & 0x80)) {
+      uint64_t result = m_result;
+      m_result = 0;
+      m_shift = 0;
+      return result;
+    }
+  }
+  return std::nullopt;
 }
 
 }  // namespace wpi
