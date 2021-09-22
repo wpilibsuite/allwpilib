@@ -134,7 +134,9 @@ public class Timer {
    *
    * @param period The period to check for (in seconds).
    * @return Whether the period has passed.
+   * @deprecated Use advanceIfElapsed() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public boolean hasPeriodPassed(double period) {
     return advanceIfElapsed(period);
   }
