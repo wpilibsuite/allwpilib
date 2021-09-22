@@ -5,14 +5,13 @@
 #pragma once
 
 #include <units/voltage.h>
-#include <wpi/deprecated.h>
 
 namespace frc {
 
 /**
  * Interface for speed controlling devices.
  */
-class WPI_DEPRECATED("use MotorController") SpeedController {
+class [[deprecated("use MotorController")]] SpeedController {
  public:
   virtual ~SpeedController() = default;
 

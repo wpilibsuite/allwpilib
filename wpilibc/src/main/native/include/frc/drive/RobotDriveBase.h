@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
@@ -78,8 +77,8 @@ class RobotDriveBase : public MotorSafety {
    * @param deadband range around zero
    * @deprecated Use ApplyDeadband() in frc/MathUtil.h.
    */
-  WPI_DEPRECATED("Use ApplyDeadband() in frc/MathUtil.h")
-  static double ApplyDeadband(double number, double deadband);
+  [[deprecated("Use ApplyDeadband() in frc/MathUtil.h")]] static double
+  ApplyDeadband(double number, double deadband);
 
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than

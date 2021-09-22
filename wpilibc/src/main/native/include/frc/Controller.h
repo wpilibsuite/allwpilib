@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 namespace frc {
 
 /**
@@ -19,8 +17,8 @@ namespace frc {
  */
 class Controller {
  public:
-  WPI_DEPRECATED("Only used by the deprecated PIDController")
-  Controller() = default;
+  [[deprecated("Only used by the deprecated PIDController")]] Controller() =
+      default;
   virtual ~Controller() = default;
 
   Controller(Controller&&) = default;

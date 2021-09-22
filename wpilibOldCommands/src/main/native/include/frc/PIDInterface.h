@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <wpi/deprecated.h>
-
 namespace frc {
 
 /**
@@ -15,8 +13,9 @@ namespace frc {
  */
 class PIDInterface {
  public:
-  WPI_DEPRECATED("All APIs which use this have been deprecated.")
-  PIDInterface() = default;
+  [[deprecated(
+      "All APIs which use this have been deprecated.")]] PIDInterface() =
+      default;
   PIDInterface(PIDInterface&&) = default;
   PIDInterface& operator=(PIDInterface&&) = default;
 

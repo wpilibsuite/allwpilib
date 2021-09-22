@@ -7,7 +7,6 @@
 #include <string>
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -26,8 +25,7 @@ class DriverStation {
    * @return Reference to the DS instance
    * @deprecated Use the static methods
    */
-  WPI_DEPRECATED("Use static methods")
-  static DriverStation& GetInstance();
+  [[deprecated("Use static methods")]] static DriverStation& GetInstance();
 
   static constexpr int kJoystickPorts = 6;
 
@@ -197,8 +195,7 @@ class DriverStation {
    * @return True if the robot is being commanded to be in teleop mode
    * @deprecated Use IsTeleop() instead.
    */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  static bool IsOperatorControl();
+  [[deprecated("Use IsTeleop() instead")]] static bool IsOperatorControl();
 
   /**
    * Check if the DS is commanding teleop mode.
@@ -214,8 +211,8 @@ class DriverStation {
    * enabled.
    * @deprecated Use IsTeleopEnabled() instead.
    */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  static bool IsOperatorControlEnabled();
+  [[deprecated("Use IsTeleopEnabled() instead")]] static bool
+  IsOperatorControlEnabled();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -398,8 +395,8 @@ class DriverStation {
    *                 code.
    * @deprecated Use InTeleop() instead.
    */
-  WPI_DEPRECATED("Use InTeleop() instead")
-  static void InOperatorControl(bool entering);
+  [[deprecated("Use InTeleop() instead")]] static void InOperatorControl(
+      bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be

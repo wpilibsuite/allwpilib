@@ -7,7 +7,6 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -15,18 +14,18 @@
 
 namespace frc {
 
-class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
+class [[deprecated("use MotorControllerGroup")]] SpeedControllerGroup
     : public wpi::Sendable,
       public MotorController,
       public wpi::SendableHelper<SpeedControllerGroup> {
  public:
   template <class... SpeedControllers>
-  explicit SpeedControllerGroup(SpeedController& speedController,
-                                SpeedControllers&... speedControllers);
+  explicit SpeedControllerGroup(SpeedController & speedController,
+                                SpeedControllers & ... speedControllers);
   explicit SpeedControllerGroup(
-      std::vector<std::reference_wrapper<SpeedController>>&& speedControllers);
+      std::vector<std::reference_wrapper<SpeedController>> && speedControllers);
 
-  SpeedControllerGroup(SpeedControllerGroup&&) = default;
+  SpeedControllerGroup(SpeedControllerGroup &&) = default;
   SpeedControllerGroup& operator=(SpeedControllerGroup&&) = default;
 
   void Set(double speed) override;
@@ -36,7 +35,7 @@ class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
   void Disable() override;
   void StopMotor() override;
 
-  void InitSendable(wpi::SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder & builder) override;
 
  private:
   bool m_isInverted = false;

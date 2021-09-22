@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 
 #include "frc/Controller.h"
@@ -46,9 +45,9 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differential terms. The default is 0.05 (50ms).
    */
-  WPI_DEPRECATED("Use frc2::PIDController class instead.")
-  PIDController(double p, double i, double d, PIDSource* source,
-                PIDOutput* output, double period = 0.05);
+  [[deprecated("Use frc2::PIDController class instead.")]] PIDController(
+      double p, double i, double d, PIDSource* source, PIDOutput* output,
+      double period = 0.05);
 
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -62,9 +61,9 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differential terms. The default is 0.05 (50ms).
    */
-  WPI_DEPRECATED("Use frc2::PIDController class instead.")
-  PIDController(double p, double i, double d, double f, PIDSource* source,
-                PIDOutput* output, double period = 0.05);
+  [[deprecated("Use frc2::PIDController class instead.")]] PIDController(
+      double p, double i, double d, double f, PIDSource* source,
+      PIDOutput* output, double period = 0.05);
 
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -78,9 +77,9 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differential terms. The default is 0.05 (50ms).
    */
-  WPI_DEPRECATED("Use frc2::PIDController class instead.")
-  PIDController(double p, double i, double d, PIDSource& source,
-                PIDOutput& output, double period = 0.05);
+  [[deprecated("Use frc2::PIDController class instead.")]] PIDController(
+      double p, double i, double d, PIDSource& source, PIDOutput& output,
+      double period = 0.05);
 
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -94,9 +93,9 @@ class PIDController : public PIDBase, public Controller {
    *               particularly affects calculations of the integral and
    *               differential terms. The default is 0.05 (50ms).
    */
-  WPI_DEPRECATED("Use frc2::PIDController class instead.")
-  PIDController(double p, double i, double d, double f, PIDSource& source,
-                PIDOutput& output, double period = 0.05);
+  [[deprecated("Use frc2::PIDController class instead.")]] PIDController(
+      double p, double i, double d, double f, PIDSource& source,
+      PIDOutput& output, double period = 0.05);
 
   ~PIDController() override;
 

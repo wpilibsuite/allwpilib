@@ -6,8 +6,6 @@
 
 #include <functional>
 
-#include <wpi/deprecated.h>
-
 namespace wpi {
 class Sendable;
 }  // namespace wpi
@@ -28,8 +26,7 @@ class LiveWindow {
    * @deprecated Use the static methods unless guaranteeing LiveWindow is
    * instantiated
    */
-  WPI_DEPRECATED("Use static methods")
-  static LiveWindow* GetInstance();
+  [[deprecated("Use static methods")]] static LiveWindow* GetInstance();
 
   /**
    * Set function to be called when LiveWindow is enabled.

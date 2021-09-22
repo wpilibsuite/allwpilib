@@ -8,7 +8,6 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/deprecated.h"
 #include "wpi/sendable/SendableRegistry.h"
 
 namespace wpi {
@@ -55,8 +54,8 @@ class SendableHelper {
    *
    * @return Name
    */
-  WPI_DEPRECATED("use SendableRegistry::GetName()")
-  std::string GetName() const {
+  [[deprecated("use SendableRegistry::GetName()")]] std::string GetName()
+      const {
     return SendableRegistry::GetName(static_cast<const Derived*>(this));
   }
 
@@ -67,8 +66,8 @@ class SendableHelper {
    *
    * @param name name
    */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view name) {
+  [[deprecated("use SendableRegistry::SetName()")]] void SetName(
+      std::string_view name) {
     SendableRegistry::SetName(static_cast<Derived*>(this), name);
   }
 
@@ -80,8 +79,8 @@ class SendableHelper {
    * @param subsystem subsystem name
    * @param name device name
    */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view subsystem, std::string_view name) {
+  [[deprecated("use SendableRegistry::SetName()")]] void SetName(
+      std::string_view subsystem, std::string_view name) {
     SendableRegistry::SetName(static_cast<Derived*>(this), subsystem, name);
   }
 
@@ -92,8 +91,8 @@ class SendableHelper {
    *
    * @return Subsystem name
    */
-  WPI_DEPRECATED("use SendableRegistry::GetSubsystem()")
-  std::string GetSubsystem() const {
+  [[deprecated("use SendableRegistry::GetSubsystem()")]] std::string
+  GetSubsystem() const {
     return SendableRegistry::GetSubsystem(static_cast<const Derived*>(this));
   }
 
@@ -104,8 +103,8 @@ class SendableHelper {
    *
    * @param subsystem subsystem name
    */
-  WPI_DEPRECATED("use SendableRegistry::SetSubsystem()")
-  void SetSubsystem(std::string_view subsystem) {
+  [[deprecated("use SendableRegistry::SetSubsystem()")]] void SetSubsystem(
+      std::string_view subsystem) {
     SendableRegistry::SetSubsystem(static_cast<Derived*>(this), subsystem);
   }
 
@@ -117,8 +116,8 @@ class SendableHelper {
    *
    * @param child child component
    */
-  WPI_DEPRECATED("use SendableRegistry::AddChild()")
-  void AddChild(std::shared_ptr<Sendable> child) {
+  [[deprecated("use SendableRegistry::AddChild()")]] void AddChild(
+      std::shared_ptr<Sendable> child) {
     SendableRegistry::AddChild(static_cast<Derived*>(this), child.get());
   }
 
@@ -129,8 +128,8 @@ class SendableHelper {
    *
    * @param child child component
    */
-  WPI_DEPRECATED("use SendableRegistry::AddChild()")
-  void AddChild(void* child) {
+  [[deprecated("use SendableRegistry::AddChild()")]] void AddChild(
+      void* child) {
     SendableRegistry::AddChild(static_cast<Derived*>(this), child);
   }
 
@@ -143,8 +142,8 @@ class SendableHelper {
    *                   the value
    * @param channel    The channel number the device is plugged into
    */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view moduleType, int channel) {
+  [[deprecated("use SendableRegistry::SetName()")]] void SetName(
+      std::string_view moduleType, int channel) {
     SendableRegistry::SetName(static_cast<Derived*>(this), moduleType, channel);
   }
 
@@ -159,8 +158,8 @@ class SendableHelper {
    * @param channel      The channel number the device is plugged into (usually
    * PWM)
    */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view moduleType, int moduleNumber, int channel) {
+  [[deprecated("use SendableRegistry::SetName()")]] void SetName(
+      std::string_view moduleType, int moduleNumber, int channel) {
     SendableRegistry::SetName(static_cast<Derived*>(this), moduleType,
                               moduleNumber, channel);
   }

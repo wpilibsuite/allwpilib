@@ -10,7 +10,6 @@
 
 #include <hal/SPITypes.h>
 #include <units/time.h>
-#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 namespace frc {
@@ -83,8 +82,8 @@ class SPI {
    * @deprecated Use SetSampleDataOnTrailingEdge() instead.
    *
    */
-  WPI_DEPRECATED("Use SetSampleDataOnTrailingEdge instead.")
-  void SetSampleDataOnFalling();
+  [[deprecated("Use SetSampleDataOnTrailingEdge instead.")]] void
+  SetSampleDataOnFalling();
 
   /**
    * Configure that the data is stable on the rising edge and the data
@@ -93,8 +92,8 @@ class SPI {
    * @deprecated Use SetSampleDataOnLeadingEdge() instead.
    *
    */
-  WPI_DEPRECATED("Use SetSampleDataOnLeadingEdge instead")
-  void SetSampleDataOnRising();
+  [[deprecated("Use SetSampleDataOnLeadingEdge instead")]] void
+  SetSampleDataOnRising();
 
   /**
    * Configure the clock output line to be active low.
@@ -197,8 +196,8 @@ class SPI {
    *
    * @param period period between transfers, in seconds (us resolution)
    */
-  WPI_DEPRECATED("Use StartAutoRate with unit-safety instead")
-  void StartAutoRate(double period);
+  [[deprecated("Use StartAutoRate with unit-safety instead")]] void
+  StartAutoRate(double period);
 
   /**
    * Start running the automatic SPI transfer engine when a trigger occurs.
@@ -304,10 +303,10 @@ class SPI {
    * @param isSigned  Is data field signed?
    * @param bigEndian Is device big endian?
    */
-  WPI_DEPRECATED("Use InitAccumulator with unit-safety instead")
-  void InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                       int validValue, int dataShift, int dataSize,
-                       bool isSigned, bool bigEndian);
+  [[deprecated("Use InitAccumulator with unit-safety instead")]] void
+  InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                  int validValue, int dataShift, int dataSize, bool isSigned,
+                  bool bigEndian);
 
   /**
    * Frees the accumulator.

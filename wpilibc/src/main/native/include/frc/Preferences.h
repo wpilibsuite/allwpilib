@@ -10,8 +10,6 @@
 #include <string_view>
 #include <vector>
 
-#include <wpi/deprecated.h>
-
 namespace frc {
 
 /**
@@ -36,8 +34,7 @@ class Preferences {
    * @return pointer to the {@link Preferences}
    * @deprecated Use the static methods
    */
-  WPI_DEPRECATED("Use static methods")
-  static Preferences* GetInstance();
+  [[deprecated("Use static methods")]] static Preferences* GetInstance();
 
   /**
    * Returns a vector of all the keys.
@@ -128,8 +125,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetString instead.")
-  static void PutString(std::string_view key, std::string_view value);
+  [[deprecated("Use SetString instead.")]] static void PutString(
+      std::string_view key, std::string_view value);
 
   /**
    * Puts the given string into the preferences table if it doesn't
@@ -155,8 +152,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetInt instead.")
-  static void PutInt(std::string_view key, int value);
+  [[deprecated("Use SetInt instead.")]] static void PutInt(std::string_view key,
+                                                           int value);
 
   /**
    * Puts the given int into the preferences table if it doesn't
@@ -182,8 +179,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetDouble instead.")
-  static void PutDouble(std::string_view key, double value);
+  [[deprecated("Use SetDouble instead.")]] static void PutDouble(
+      std::string_view key, double value);
 
   /**
    * Puts the given double into the preferences table if it doesn't
@@ -209,8 +206,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetFloat instead.")
-  static void PutFloat(std::string_view key, float value);
+  [[deprecated("Use SetFloat instead.")]] static void PutFloat(
+      std::string_view key, float value);
 
   /**
    * Puts the given float into the preferences table if it doesn't
@@ -236,8 +233,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetBoolean instead.")
-  static void PutBoolean(std::string_view key, bool value);
+  [[deprecated("Use SetBoolean instead.")]] static void PutBoolean(
+      std::string_view key, bool value);
 
   /**
    * Puts the given boolean into the preferences table if it doesn't
@@ -263,8 +260,8 @@ class Preferences {
    * @param key   the key
    * @param value the value
    */
-  WPI_DEPRECATED("Use SetLong instead.")
-  static void PutLong(std::string_view key, int64_t value);
+  [[deprecated("Use SetLong instead.")]] static void PutLong(
+      std::string_view key, int64_t value);
 
   /**
    * Puts the given long into the preferences table if it doesn't

@@ -10,7 +10,6 @@
 #include <type_traits>
 
 #include <wpi/SymbolExports.h>
-#include <wpi/deprecated.h>
 
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
@@ -100,9 +99,10 @@ bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
 template <int Rows, int Cols, typename... Ts,
           typename =
               std::enable_if_t<std::conjunction_v<std::is_same<double, Ts>...>>>
-WPI_DEPRECATED(
-    "Use Eigen::Matrix or Eigen::Vector initializer list constructor")
-Eigen::Matrix<double, Rows, Cols> MakeMatrix(Ts... elems) {
+[[deprecated(
+    "Use Eigen::Matrix or Eigen::Vector initializer list constructor")]] Eigen::
+    Matrix<double, Rows, Cols>
+    MakeMatrix(Ts... elems) {
   static_assert(
       sizeof...(elems) == Rows * Cols,
       "Number of provided elements doesn't match matrix dimensionality");

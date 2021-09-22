@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/deprecated.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
@@ -46,8 +45,8 @@ class PIDBase : public PIDInterface,
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
-  WPI_DEPRECATED("All APIs which use this have been deprecated.")
-  PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output);
+  [[deprecated("All APIs which use this have been deprecated.")]] PIDBase(
+      double p, double i, double d, PIDSource& source, PIDOutput& output);
 
   /**
    * Allocate a PID object with the given constants for P, I, D.
@@ -58,9 +57,9 @@ class PIDBase : public PIDInterface,
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
-  WPI_DEPRECATED("All APIs which use this have been deprecated.")
-  PIDBase(double p, double i, double d, double f, PIDSource& source,
-          PIDOutput& output);
+  [[deprecated("All APIs which use this have been deprecated.")]] PIDBase(
+      double p, double i, double d, double f, PIDSource& source,
+      PIDOutput& output);
 
   ~PIDBase() override = default;
 
@@ -216,8 +215,9 @@ class PIDBase : public PIDInterface,
    *
    * @return the average error
    */
-  WPI_DEPRECATED("Use a LinearFilter as the input and GetError().")
-  virtual double GetAvgError() const;
+  [[deprecated(
+      "Use a LinearFilter as the input and GetError().")]] virtual double
+  GetAvgError() const;
 
   /**
    * Sets what type of input the PID controller will use.
@@ -237,8 +237,8 @@ class PIDBase : public PIDInterface,
    *
    * @param percentage error which is tolerable
    */
-  WPI_DEPRECATED("Use SetPercentTolerance() instead.")
-  virtual void SetTolerance(double percent);
+  [[deprecated("Use SetPercentTolerance() instead.")]] virtual void
+  SetTolerance(double percent);
 
   /**
    * Set the absolute error which is considered tolerable for use with
@@ -266,8 +266,8 @@ class PIDBase : public PIDInterface,
    *
    * @param bufLength Number of previous cycles to average. Defaults to 1.
    */
-  WPI_DEPRECATED("Use a LinearDigitalFilter as the input.")
-  virtual void SetToleranceBuffer(int buf = 1);
+  [[deprecated("Use a LinearDigitalFilter as the input.")]] virtual void
+  SetToleranceBuffer(int buf = 1);
 
   /**
    * Return true if the error is within the percentage of the total input range,

@@ -184,10 +184,10 @@ class Encoder : public CounterBase,
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
    */
-  WPI_DEPRECATED(
+  [[deprecated(
       "Use SetMinRate() in favor of this method.  This takes unscaled periods "
-      "and SetMinRate() scales using value from SetDistancePerPulse().")
-  void SetMaxPeriod(units::second_t maxPeriod) override;
+      "and SetMinRate() scales using value from SetDistancePerPulse().")]] void
+  SetMaxPeriod(units::second_t maxPeriod) override;
 
   /**
    * Determine if the encoder is stopped.

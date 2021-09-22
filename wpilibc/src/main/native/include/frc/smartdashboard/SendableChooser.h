@@ -8,7 +8,6 @@
 #include <string_view>
 
 #include <wpi/StringMap.h>
-#include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
@@ -79,8 +78,10 @@ class SendableChooser : public SendableChooserBase {
    * @param name   the name of the option
    * @param object the option
    */
-  WPI_DEPRECATED("use AddOption() instead")
-  void AddObject(std::string_view name, T object) { AddOption(name, object); }
+  [[deprecated("use AddOption() instead")]] void AddObject(
+      std::string_view name, T object) {
+    AddOption(name, object);
+  }
 
   /**
    * Add the given object to the list of options and marks it as the default.
@@ -93,8 +94,8 @@ class SendableChooser : public SendableChooserBase {
    * @param name   the name of the option
    * @param object the option
    */
-  WPI_DEPRECATED("use SetDefaultOption() instead")
-  void AddDefault(std::string_view name, T object) {
+  [[deprecated("use SetDefaultOption() instead")]] void AddDefault(
+      std::string_view name, T object) {
     SetDefaultOption(name, object);
   }
 

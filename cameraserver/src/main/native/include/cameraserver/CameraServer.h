@@ -9,7 +9,6 @@
 #include <string>
 #include <string_view>
 
-#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "cscore.h"
@@ -33,8 +32,7 @@ class CameraServer {
    * Get the CameraServer instance.
    * @deprecated Use the static methods
    */
-  WPI_DEPRECATED("Use static methods")
-  static CameraServer* GetInstance();
+  [[deprecated("Use static methods")]] static CameraServer* GetInstance();
 
   /**
    * Start automatically capturing images to send to the dashboard.
