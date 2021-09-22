@@ -10,7 +10,7 @@
 #include <frc/livewindow/LiveWindow.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-DriveTrain Robot::drivetrain;
+Drivetrain Robot::drivetrain;
 Pivot Robot::pivot;
 Collector Robot::collector;
 Shooter Robot::shooter;

@@ -15,7 +15,7 @@
 #include "commands/SetWristSetpoint.h"
 
 Autonomous::Autonomous(Claw* claw, Wrist* wrist, Elevator* elevator,
-                       DriveTrain* drivetrain) {
+                       Drivetrain* drivetrain) {
   SetName("Autonomous");
   AddCommands(
       // clang-format off

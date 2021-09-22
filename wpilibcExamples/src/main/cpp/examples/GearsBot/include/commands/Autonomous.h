@@ -8,7 +8,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 
 #include "subsystems/Claw.h"
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 #include "subsystems/Elevator.h"
 #include "subsystems/Wrist.h"
 
@@ -19,5 +19,5 @@ class Autonomous
     : public frc2::CommandHelper<frc2::SequentialCommandGroup, Autonomous> {
  public:
   Autonomous(Claw* claw, Wrist* wrist, Elevator* elevator,
-             DriveTrain* drivetrain);
+             Drivetrain* drivetrain);
 };

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 
 #include <frc/Joystick.h>
 #include <units/length.h>
@@ -10,7 +10,7 @@
 
 #include "commands/DriveWithJoystick.h"
 
-DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
+Drivetrain::Drivetrain() : frc::Subsystem("Drivetrain") {
   // AddChild("Front Left CIM", m_frontLeftCIM);
   // AddChild("Front Right CIM", m_frontRightCIM);
   // AddChild("Back Left CIM", m_backLeftCIM);
@@ -46,26 +46,26 @@ DriveTrain::DriveTrain() : frc::Subsystem("DriveTrain") {
   AddChild("Gyro", m_gyro);
 }
 
-void DriveTrain::InitDefaultCommand() {
+void Drivetrain::InitDefaultCommand() {
   SetDefaultCommand(new DriveWithJoystick());
 }
 
-void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
+void Drivetrain::TankDrive(double leftAxis, double rightAxis) {
   m_robotDrive.TankDrive(leftAxis, rightAxis);
 }
 
-void DriveTrain::Stop() {
+void Drivetrain::Stop() {
   m_robotDrive.TankDrive(0.0, 0.0);
 }
 
-frc::Encoder& DriveTrain::GetLeftEncoder() {
+frc::Encoder& Drivetrain::GetLeftEncoder() {
   return m_leftEncoder;
 }
 
-frc::Encoder& DriveTrain::GetRightEncoder() {
+frc::Encoder& Drivetrain::GetRightEncoder() {
   return m_rightEncoder;
 }
 
-double DriveTrain::GetAngle() {
+double Drivetrain::GetAngle() {
   return m_gyro.GetAngle();
 }

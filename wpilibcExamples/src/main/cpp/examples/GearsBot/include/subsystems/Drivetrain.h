@@ -17,13 +17,13 @@ class Joystick;
 }  // namespace frc
 
 /**
- * The DriveTrain subsystem incorporates the sensors and actuators attached to
+ * The Drivetrain subsystem incorporates the sensors and actuators attached to
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class DriveTrain : public frc2::SubsystemBase {
+class Drivetrain : public frc2::SubsystemBase {
  public:
-  DriveTrain();
+  Drivetrain();
 
   /**
    * The log method puts interesting information to the SmartDashboard.
@@ -31,7 +31,7 @@ class DriveTrain : public frc2::SubsystemBase {
   void Log();
 
   /**
-   * Tank style driving for the DriveTrain.
+   * Tank style driving for the Drivetrain.
    * @param left Speed in range [-1,1]
    * @param right Speed in range [-1,1]
    */

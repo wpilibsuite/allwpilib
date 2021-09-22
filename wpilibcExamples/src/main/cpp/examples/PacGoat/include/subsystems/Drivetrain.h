@@ -16,12 +16,12 @@ class Joystick;
 }  // namespace frc
 
 /**
- * The DriveTrain subsystem controls the robot's chassis and reads in
+ * The Drivetrain subsystem controls the robot's chassis and reads in
  * information about it's speed and position.
  */
-class DriveTrain : public frc::Subsystem {
+class Drivetrain : public frc::Subsystem {
  public:
-  DriveTrain();
+  Drivetrain();
 
   /**
    * When other commands aren't using the drivetrain, allow tank drive

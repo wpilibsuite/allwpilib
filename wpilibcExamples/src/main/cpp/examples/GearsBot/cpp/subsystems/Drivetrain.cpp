@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <units/length.h>
 #include <wpi/numbers>
 
-DriveTrain::DriveTrain() {
+Drivetrain::Drivetrain() {
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
@@ -30,7 +30,7 @@ DriveTrain::DriveTrain() {
   m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
                                      wpi::numbers::pi / 360.0);
 #endif
-  SetName("DriveTrain");
+  SetName("Drivetrain");
   // Let's show everything on the LiveWindow
   AddChild("Front_Left Motor", &m_frontLeft);
   AddChild("Rear Left Motor", &m_rearLeft);
@@ -42,7 +42,7 @@ DriveTrain::DriveTrain() {
   AddChild("Gyro", &m_gyro);
 }
 
-void DriveTrain::Log() {
+void Drivetrain::Log() {
   frc::SmartDashboard::PutNumber("Left Distance", m_leftEncoder.GetDistance());
   frc::SmartDashboard::PutNumber("Right Distance",
                                  m_rightEncoder.GetDistance());
@@ -51,29 +51,29 @@ void DriveTrain::Log() {
   frc::SmartDashboard::PutNumber("Gyro", m_gyro.GetAngle());
 }
 
-void DriveTrain::Drive(double left, double right) {
+void Drivetrain::Drive(double left, double right) {
   m_robotDrive.TankDrive(left, right);
 }
 
-double DriveTrain::GetHeading() {
+double Drivetrain::GetHeading() {
   return m_gyro.GetAngle();
 }
 
-void DriveTrain::Reset() {
+void Drivetrain::Reset() {
   m_gyro.Reset();
   m_leftEncoder.Reset();
   m_rightEncoder.Reset();
 }
 
-double DriveTrain::GetDistance() {
+double Drivetrain::GetDistance() {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-double DriveTrain::GetDistanceToObstacle() {
+double Drivetrain::GetDistanceToObstacle() {
   // Really meters in simulation since it's a rangefinder...
   return m_rangefinder.GetAverageVoltage();
 }
 
-void DriveTrain::Periodic() {
+void Drivetrain::Periodic() {
   Log();
 }
