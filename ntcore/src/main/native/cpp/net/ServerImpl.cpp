@@ -758,7 +758,7 @@ void ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
 }
 
 void ClientDataLocal::HandleLocal(std::span<const ClientMessage> msgs) {
-  DEBUG4("{}", "HandleLocal()");
+  DEBUG4("HandleLocal()");
   // just map as a normal client into client=0 calls
   for (const auto& elem : msgs) {  // NOLINT
     // common case is value, so check that first
@@ -2145,7 +2145,7 @@ void SImpl::UpdateMetaClients(const std::vector<ConnectionInfo>& conns) {
   if (mpack_writer_destroy(&w) == mpack_ok) {
     SetValue(nullptr, m_metaClients, Value::MakeRaw(std::move(w.bytes)));
   } else {
-    DEBUG4("{}", "failed to encode $clients");
+    DEBUG4("failed to encode $clients");
   }
 }
 

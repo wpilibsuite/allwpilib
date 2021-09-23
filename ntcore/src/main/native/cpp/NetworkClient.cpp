@@ -131,7 +131,7 @@ NCImpl::NCImpl(int inst, std::string_view id, net::ILocalStorage& localStorage,
       m_loop{*m_loopRunner.GetLoop()} {
   m_localMsgs.reserve(net::NetworkLoopQueue::kInitialQueueSize);
 
-  INFO("{}", "starting network client");
+  INFO("starting network client");
 }
 
 void NCImpl::SetServers(
@@ -285,13 +285,13 @@ void NCImpl3::TcpConnected(uv::Tcp& tcp) {
           }
         });
         tcp.end.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP read ended");
+          DEBUG3("NT3 TCP read ended");
           if (!tcp.IsLoopClosing()) {
             Disconnect("remote end closed connection");
           }
         });
         tcp.closed.connect([this, &tcp] {
-          DEBUG3("{}", "NT3 TCP connection closed");
+          DEBUG3("NT3 TCP connection closed");
           if (!tcp.IsLoopClosing()) {
             Disconnect(m_wire->GetDisconnectReason());
           }

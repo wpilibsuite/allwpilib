@@ -119,7 +119,7 @@ void CommandScheduler::Schedule(Command* command) {
   }
 
   if (command->IsGrouped()) {
-    throw FRC_MakeError(frc::err::CommandIllegalUse, "{}",
+    throw FRC_MakeError(frc::err::CommandIllegalUse,
                         "A command that is part of a command group "
                         "cannot be independently scheduled");
     return;

@@ -360,7 +360,7 @@ void NSImpl::LoadPersistent() {
   is.readinto(m_persistentData, size);
   DEBUG4("read data: {}", m_persistentData);
   if (is.has_error()) {
-    WARNING("{}", "error reading persistent file");
+    WARNING("error reading persistent file");
     return;
   }
 }
@@ -453,7 +453,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT3 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT3 connection from unknown");
+        INFO("Got a NT3 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection3>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -485,7 +485,7 @@ void NSImpl::Init() {
       if (uv::AddrToName(tcp->GetPeer(), &peerAddr, &peerPort) == 0) {
         INFO("Got a NT4 connection from {} port {}", peerAddr, peerPort);
       } else {
-        INFO("{}", "Got a NT4 connection from unknown");
+        INFO("Got a NT4 connection from unknown");
       }
       auto conn = std::make_shared<ServerConnection4>(tcp, *this, peerAddr,
                                                       peerPort, m_logger);
@@ -496,7 +496,7 @@ void NSImpl::Init() {
   }
 
   if (m_initDone) {
-    DEBUG4("{}", "NetworkServer initDone()");
+    DEBUG4("NetworkServer initDone()");
     m_initDone();
     m_initDone = nullptr;
   }

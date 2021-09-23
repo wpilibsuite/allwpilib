@@ -49,7 +49,7 @@ index ec1a1633a..8de7b726d 100644
 -    dbgs() << " at " << file << ":" << line;
 -  dbgs() << "!\n";
 +    fmt::print(stderr, " at {}:{}", file, line);
-+  fmt::print(stderr, "{}", "!\n");
++  fmt::print(stderr, "!\n");
    abort();
  #ifdef LLVM_BUILTIN_UNREACHABLE
    // Windows systems and possibly others don't declare abort() to be noreturn,

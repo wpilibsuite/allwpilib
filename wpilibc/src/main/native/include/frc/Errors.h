@@ -122,18 +122,24 @@ namespace warn {
 }  // namespace warn
 }  // namespace frc
 
+// C++20 relaxed the number of arguments to variadics, but Apple Clang's
+// warnings haven't caught up yet: https://stackoverflow.com/a/67996331
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#endif
+
 /**
  * Reports an error to the driver station (using HAL_SendError).
  *
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define FRC_ReportError(status, format, ...)                       \
-  do {                                                             \
-    if ((status) != 0) {                                           \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__, \
-                         FMT_STRING(format), __VA_ARGS__);         \
-    }                                                              \
+#define FRC_ReportError(status, format, ...)                             \
+  do {                                                                   \
+    if ((status) != 0) {                                                 \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,       \
+                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
+    }                                                                    \
   } while (0)
 
 /**
@@ -146,7 +152,7 @@ namespace warn {
  */
 #define FRC_MakeError(status, format, ...)                   \
   ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
-                   FMT_STRING(format), __VA_ARGS__)
+                   FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__)
 
 /**
  * Checks a status code and depending on its value, either throws a
@@ -155,23 +161,24 @@ namespace warn {
  * @param[out] status error code
  * @param[in]  format error message format
  */
-#define FRC_CheckErrorStatus(status, format, ...)                      \
-  do {                                                                 \
-    if ((status) < 0) {                                                \
-      throw ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__, \
-                             FMT_STRING(format), __VA_ARGS__);         \
-    } else if ((status) > 0) {                                         \
-      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,     \
-                         FMT_STRING(format), __VA_ARGS__);             \
-    }                                                                  \
+#define FRC_CheckErrorStatus(status, format, ...)                            \
+  do {                                                                       \
+    if ((status) < 0) {                                                      \
+      throw ::frc::MakeError(status, __FILE__, __LINE__, __FUNCTION__,       \
+                             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
+    } else if ((status) > 0) {                                               \
+      ::frc::ReportError(status, __FILE__, __LINE__, __FUNCTION__,           \
+                         FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);     \
+    }                                                                        \
   } while (0)
 
 #define FRC_AssertMessage(condition, format, ...)                            \
   do {                                                                       \
     if (!(condition)) {                                                      \
       throw ::frc::MakeError(err::AssertionFailure, __FILE__, __LINE__,      \
-                             __FUNCTION__, FMT_STRING(format), __VA_ARGS__); \
+                             __FUNCTION__,                                   \
+                             FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__); \
     }                                                                        \
   } while (0)
 
-#define FRC_Assert(condition) FRC_AssertMessage(condition, "{}", #condition)
+#define FRC_Assert(condition) FRC_AssertMessage(condition, #condition)
