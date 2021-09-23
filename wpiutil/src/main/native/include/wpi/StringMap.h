@@ -20,7 +20,6 @@
 #include "wpi/MemAlloc.h"
 #include "wpi/PointerLikeTypeTraits.h"
 #include "wpi/ErrorHandling.h"
-#include "wpi/deprecated.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>

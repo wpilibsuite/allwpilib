@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
