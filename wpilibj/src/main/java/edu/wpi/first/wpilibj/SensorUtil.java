@@ -47,6 +47,10 @@ public final class SensorUtil {
   /** Number of PCM Modules. */
   public static final int kCTREPCMModules = PortsJNI.getNumCTREPCMModules();
 
+  public static final int kREVPHChannels = PortsJNI.getNumREVPHChannels();
+
+  public static final int kREVPHModules = PortsJNI.getNumREVPHModules();
+
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
    * legal channel numbers. Channel numbers are 0-based.
@@ -140,6 +144,16 @@ public final class SensorUtil {
   @SuppressWarnings("AbbreviationAsWordInName")
   public static int getDefaultCTREPCMModule() {
     return 0;
+  }
+
+  /**
+   * Get the number of the default solenoid module.
+   *
+   * @return The number of the default solenoid module.
+   */
+  @SuppressWarnings("AbbreviationAsWordInName")
+  public static int getDefaultREVPHModule() {
+    return 1;
   }
 
   private SensorUtil() {}

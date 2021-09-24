@@ -68,7 +68,8 @@ enum class HAL_HandleEnum {
   AddressableLED = 23,
   CTREPCM = 24,
   CTREPDP = 25,
-  REVPDH = 26
+  REVPDH = 26,
+  REVPH = 27,
 };
 
 /**

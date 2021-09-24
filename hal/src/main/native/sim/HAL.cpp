@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeEncoderData();
   InitializeI2CData();
   InitializeCTREPCMData();
+  InitializeREVPHData();
   InitializePowerDistributionData();
   InitializePWMData();
   InitializeRelayData();
@@ -107,6 +108,7 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializeCTREPCM();
+  InitializeREVPH();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();

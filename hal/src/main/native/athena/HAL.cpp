@@ -41,6 +41,7 @@ namespace hal {
 namespace init {
 void InitializeHAL() {
   InitializeCTREPCM();
+  InitializeREVPH();
   InitializeAddressableLED();
   InitializeAccelerometer();
   InitializeAnalogAccumulator();

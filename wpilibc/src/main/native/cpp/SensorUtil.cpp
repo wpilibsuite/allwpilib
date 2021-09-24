@@ -23,6 +23,10 @@ int SensorUtil::GetDefaultCTREPCMModule() {
   return 0;
 }
 
+int SensorUtil::GetDefaultREVPHModule() {
+  return 1;
+}
+
 bool SensorUtil::CheckDigitalChannel(int channel) {
   return HAL_CheckDIOChannel(channel);
 }

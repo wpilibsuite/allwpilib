@@ -10,8 +10,8 @@
 #include "gtest/gtest.h"
 
 namespace frc {
-TEST(SolenoidTest, ValidInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
+TEST(SolenoidTestREV, ValidInitialization) {
+  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
   EXPECT_EQ(2, solenoid.GetChannel());
 
   solenoid.Set(true);
@@ -21,25 +21,25 @@ TEST(SolenoidTest, ValidInitialization) {
   EXPECT_FALSE(solenoid.Get());
 }
 
-TEST(SolenoidTest, DoubleInitialization) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
+TEST(SolenoidTestREV, DoubleInitialization) {
+  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
+  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 2),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, DoubleInitializationFromDoubleSolenoid) {
-  DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
+TEST(SolenoidTestREV, DoubleInitializationFromDoubleSolenoid) {
+  DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2, 3};
+  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 2),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, InvalidChannel) {
-  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 100),
+TEST(SolenoidTestREV, InvalidChannel) {
+  EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::REVPH, 100),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, Toggle) {
-  Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
+TEST(SolenoidTestREV, Toggle) {
+  Solenoid solenoid{3, frc::PneumaticsModuleType::REVPH, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());
 
