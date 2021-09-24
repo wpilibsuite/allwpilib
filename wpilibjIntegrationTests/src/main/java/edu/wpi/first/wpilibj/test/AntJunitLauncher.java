@@ -16,7 +16,7 @@ import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
  * Provides an entry point for tests to run with ANT. This allows ant to output JUnit XML test
  * results for Jenkins.
  */
-public class AntJunitLanucher {
+public class AntJunitLauncher {
   /**
    * Main entry point for jenkins.
    *

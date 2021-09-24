@@ -76,7 +76,7 @@ public class Field2d implements NTSendable {
    */
   public synchronized FieldObject2d getObject(String name) {
     for (FieldObject2d obj : m_objects) {
-      if (obj.m_name == name) {
+      if (obj.m_name.equals(name)) {
         return obj;
       }
     }
@@ -102,9 +102,9 @@ public class Field2d implements NTSendable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Field2d");
-    m_table = builder.getTable();
 
     synchronized (this) {
+      m_table = builder.getTable();
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {
           obj.m_entry = m_table.getEntry(obj.m_name);

@@ -267,21 +267,18 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
 
       // Ensures m_enabled check and pidWrite() call occur atomically
       m_pidWriteMutex.lock();
+      m_thisMutex.lock();
       try {
-        m_thisMutex.lock();
-        try {
-          if (m_enabled) {
-            // Don't block other PIDController operations on pidWrite()
-            m_thisMutex.unlock();
+        if (m_enabled) {
+          // Don't block other PIDController operations on pidWrite()
+          m_thisMutex.unlock();
 
-            m_pidOutput.pidWrite(result);
-          }
-        } finally {
-          if (m_thisMutex.isHeldByCurrentThread()) {
-            m_thisMutex.unlock();
-          }
+          m_pidOutput.pidWrite(result);
         }
       } finally {
+        if (!m_enabled) {
+          m_thisMutex.unlock();
+        }
         m_pidWriteMutex.unlock();
       }
 

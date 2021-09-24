@@ -21,7 +21,7 @@ import org.junit.jupiter.api.condition.OS;
 class UsbCameraTest {
   @Nested
   @EnabledOnOs(OS.LINUX)
-  class ConnectVerbose {
+  static class ConnectVerbose {
     @Test
     void setConnectVerboseEnabledTest() {
       try (UsbCamera camera = new UsbCamera("Nonexistant Camera", getNonexistentCameraDev())) {

@@ -68,9 +68,7 @@ public class FakeEncoderFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#setup()
    */
   @Override
-  public boolean setup() {
-    return true;
-  }
+  public void setup() {}
 
   /*
    * (non-Javadoc)
@@ -78,11 +76,10 @@ public class FakeEncoderFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#reset()
    */
   @Override
-  public boolean reset() {
+  public void reset() {
     m_dio1.reset();
     m_dio2.reset();
     m_encoder.reset();
-    return true;
   }
 
   /*
@@ -91,7 +88,7 @@ public class FakeEncoderFixture implements ITestFixture {
    * @see edu.wpi.first.wpilibj.fixtures.ITestFixture#teardown()
    */
   @Override
-  public boolean teardown() {
+  public void teardown() {
     logger.fine("Beginning teardown");
     m_source.close();
     logger.finer("Source freed " + m_sourcePort[0] + ",  " + m_sourcePort[1]);
@@ -101,6 +98,5 @@ public class FakeEncoderFixture implements ITestFixture {
       m_dio1.teardown();
       m_dio2.teardown();
     }
-    return true;
   }
 }

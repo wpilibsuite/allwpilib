@@ -7,52 +7,27 @@ package edu.wpi.first.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
 public class LinearQuadraticRegulatorTest {
-  public static LinearSystem<N2, N1, N1> elevatorPlant;
-  static LinearSystem<N2, N1, N1> armPlant;
-
-  static {
-    createArm();
-    createElevator();
-  }
-
+  @Test
   @SuppressWarnings("LocalVariableName")
-  public static void createArm() {
-    var motors = DCMotor.getVex775Pro(2);
-
-    var m = 4.0;
-    var r = 0.4;
-    var J = 1d / 3d * m * r * r;
-    var G = 100.0;
-
-    armPlant = LinearSystemId.createSingleJointedArmSystem(motors, J, G);
-  }
-
-  @SuppressWarnings("LocalVariableName")
-  public static void createElevator() {
+  public void testLQROnElevator() {
     var motors = DCMotor.getVex775Pro(2);
 
     var m = 5.0;
     var r = 0.0181864;
     var G = 1.0;
-    elevatorPlant = LinearSystemId.createElevatorSystem(motors, m, r, G);
-  }
 
-  @Test
-  @SuppressWarnings("LocalVariableName")
-  public void testLQROnElevator() {
+    var plant = LinearSystemId.createElevatorSystem(motors, m, r, G);
+
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
     var dt = 0.00505;
 
-    var controller = new LinearQuadraticRegulator<>(elevatorPlant, qElms, rElms, dt);
+    var controller = new LinearQuadraticRegulator<>(plant, qElms, rElms, dt);
 
     var k = controller.getK();
 

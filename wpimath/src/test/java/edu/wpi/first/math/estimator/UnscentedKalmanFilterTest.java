@@ -25,7 +25,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -109,22 +108,6 @@ public class UnscentedKalmanFilterTest {
     double dtSeconds = 0.00505;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
-    List<Double> trajXs = new ArrayList<>();
-    List<Double> trajYs = new ArrayList<>();
-
-    List<Double> observerXs = new ArrayList<>();
-    List<Double> observerYs = new ArrayList<>();
-    List<Double> observerC = new ArrayList<>();
-    List<Double> observerS = new ArrayList<>();
-    List<Double> observervl = new ArrayList<>();
-    List<Double> observervr = new ArrayList<>();
-
-    List<Double> inputVl = new ArrayList<>();
-    List<Double> inputVr = new ArrayList<>();
-
-    List<Double> timeData = new ArrayList<>();
-    List<Matrix<?, ?>> rdots = new ArrayList<>();
-
     UnscentedKalmanFilter<N6, N2, N4> observer =
         new UnscentedKalmanFilter<>(
             Nat.N6(),
@@ -190,25 +173,6 @@ public class UnscentedKalmanFilterTest {
       var rdot = nextR.minus(r).div(dtSeconds);
       u = new Matrix<>(B.solve(rdot.minus(getDynamics(r, new Matrix<>(Nat.N2(), Nat.N1())))));
 
-      rdots.add(rdot);
-
-      trajXs.add(ref.poseMeters.getTranslation().getX());
-      trajYs.add(ref.poseMeters.getTranslation().getY());
-
-      observerXs.add(observer.getXhat().get(0, 0));
-      observerYs.add(observer.getXhat().get(1, 0));
-
-      observerC.add(observer.getXhat(2));
-      observerS.add(observer.getXhat(3));
-
-      observervl.add(observer.getXhat(4));
-      observervr.add(observer.getXhat(5));
-
-      inputVl.add(u.get(0, 0));
-      inputVr.add(u.get(1, 0));
-
-      timeData.add(i * dtSeconds);
-
       r = nextR;
       observer.predict(u, dtSeconds);
       trueXhat =
@@ -233,53 +197,6 @@ public class UnscentedKalmanFilterTest {
 
     final var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    //     var chartBuilder = new XYChartBuilder();
-    //     chartBuilder.title = "The Magic of Sensor Fusion, now with a "
-    //           + observer.getClass().getSimpleName();
-    //     var xyPosChart = chartBuilder.build();
-
-    //     xyPosChart.setXAxisTitle("X pos, meters");
-    //     xyPosChart.setYAxisTitle("Y pos, meters");
-    //     xyPosChart.addSeries("Trajectory", trajXs, trajYs);
-    //     xyPosChart.addSeries("xHat", observerXs, observerYs);
-
-    //     var stateChart = new XYChartBuilder()
-    //           .title("States (x-hat)").build();
-    //     stateChart.addSeries("Cos", timeData, observerC);
-    //     stateChart.addSeries("Sin", timeData, observerS);
-    //     stateChart.addSeries("vl, m/s", timeData, observervl);
-    //     stateChart.addSeries("vr, m/s", timeData, observervr);
-
-    //     var inputChart = new XYChartBuilder().title("Inputs").build();
-    //     inputChart.addSeries("Left voltage", timeData, inputVl);
-    //     inputChart.addSeries("Right voltage", timeData, inputVr);
-
-    //     var rdotChart = new XYChartBuilder().title("Rdot").build();
-    //     rdotChart.addSeries("xdot, or vx", timeData, rdots.stream().map(it -> it.get(0, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("ydot, or vy", timeData, rdots.stream().map(it -> it.get(1, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("cos dot", timeData, rdots.stream().map(it -> it.get(2, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("sin dot", timeData, rdots.stream().map(it -> it.get(3, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("vl dot, or al", timeData, rdots.stream().map(it -> it.get(4, 0))
-    //           .collect(Collectors.toList()));
-    //     rdotChart.addSeries("vr dot, or ar", timeData, rdots.stream().map(it -> it.get(5, 0))
-    //           .collect(Collectors.toList()));
-
-    //     List<XYChart> charts = new ArrayList<>();
-    //     charts.add(xyPosChart);
-    //     charts.add(stateChart);
-    //     charts.add(inputChart);
-    //     charts.add(rdotChart);
-    //     new SwingWrapper<>(charts).displayChartMatrix();
-    //     try {
-    //       Thread.sleep(1000000000);
-    //     } catch (InterruptedException ex) {
-    //       ex.printStackTrace();
-    //     }
-
     assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 0.25);
     assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 0.25);
     assertEquals(finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 1.0);
@@ -302,12 +219,6 @@ public class UnscentedKalmanFilterTest {
             VecBuilder.fill(1.0),
             dt);
 
-    var time = new ArrayList<Double>();
-    var refData = new ArrayList<Double>();
-    var xhat = new ArrayList<Double>();
-    var udata = new ArrayList<Double>();
-    var xdotData = new ArrayList<Double>();
-
     var discABPair = Discretization.discretizeAB(plant.getA(), plant.getB(), dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
@@ -315,35 +226,11 @@ public class UnscentedKalmanFilterTest {
     Matrix<N1, N1> ref = VecBuilder.fill(100);
     Matrix<N1, N1> u = VecBuilder.fill(0);
 
-    Matrix<N1, N1> xdot;
     for (int i = 0; i < (2.0 / dt); i++) {
       observer.predict(u, dt);
 
       u = discB.solve(ref.minus(discA.times(ref)));
-
-      xdot = plant.getA().times(observer.getXhat()).plus(plant.getB().times(u));
-
-      time.add(i * dt);
-      refData.add(ref.get(0, 0));
-      xhat.add(observer.getXhat(0));
-      udata.add(u.get(0, 0));
-      xdotData.add(xdot.get(0, 0));
     }
-
-    //    var chartBuilder = new XYChartBuilder();
-    //    chartBuilder.title = "The Magic of Sensor Fusion";
-    //    var chart = chartBuilder.build();
-
-    //    chart.addSeries("Ref", time, refData);
-    //    chart.addSeries("xHat", time, xhat);
-    //    chart.addSeries("input", time, udata);
-    ////    chart.addSeries("xdot", time, xdotData);
-
-    //    new SwingWrapper<>(chart).displayChart();
-    //    try {
-    //      Thread.sleep(1000000000);
-    //    } catch (InterruptedException e) {
-    //    }
 
     assertEquals(ref.get(0, 0), observer.getXhat(0), 5);
   }

@@ -30,11 +30,11 @@ public class Robot extends TimedRobot {
   public static OI oi;
 
   // Initialize the subsystems
-  public static Drivetrain drivetrain = new Drivetrain();
-  public static Collector collector = new Collector();
-  public static Shooter shooter = new Shooter();
-  public static Pneumatics pneumatics = new Pneumatics();
-  public static Pivot pivot = new Pivot();
+  public static final Drivetrain drivetrain = new Drivetrain();
+  public static final Collector collector = new Collector();
+  public static final Shooter shooter = new Shooter();
+  public static final Pneumatics pneumatics = new Pneumatics();
+  public static final Pivot pivot = new Pivot();
 
   public SendableChooser<Command> m_autoChooser;
 

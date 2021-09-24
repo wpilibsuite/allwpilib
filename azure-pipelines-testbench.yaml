@@ -29,7 +29,7 @@ stages:
               publishJUnitResults: false
               testResultsFiles: "**/TEST-*.xml"
               tasks: "copyWpilibJIntegrationTestJarToOutput copyWpilibCTestLibrariesToOutput"
-              options: "-Ponlylinuxathena -PbuildServer"
+              options: "-Ponlylinuxathena -PbuildServer -PskipJavaFormat"
 
           - task: PublishPipelineArtifact@0
             inputs:
