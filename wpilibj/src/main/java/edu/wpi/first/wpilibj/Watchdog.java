@@ -248,7 +248,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
           watchdog.m_lastTimeoutPrintSeconds = now;
           if (!watchdog.m_suppressTimeoutMessage) {
             DriverStation.reportWarning(
-                String.format("Watchdog not fed within %.6fs%n", watchdog.m_timeoutSeconds), false);
+                String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeoutSeconds), false);
           }
         }
 
