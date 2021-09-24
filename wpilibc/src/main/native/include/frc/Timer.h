@@ -29,7 +29,10 @@ void Wait(units::second_t seconds);
 units::second_t GetTime();
 
 /**
- * A wrapper for the frc::Timer class that returns unit-typed values.
+ * A timer class.
+ *
+ * Note that if the user calls frc::sim::RestartTiming(), they should also reset
+ * the timer so Get() won't return a negative duration.
  */
 class Timer {
  public:
