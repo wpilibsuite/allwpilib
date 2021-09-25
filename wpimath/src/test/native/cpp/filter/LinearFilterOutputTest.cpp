@@ -115,7 +115,7 @@ TEST_P(LinearFilterOutputTest, Output) {
       << "Filter output didn't match expected value";
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, LinearFilterOutputTest,
+INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                          testing::Values(kTestSinglePoleIIR, kTestHighPass,
                                          kTestMovAvg, kTestPulse));
 

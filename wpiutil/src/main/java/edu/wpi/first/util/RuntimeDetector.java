@@ -135,6 +135,9 @@ public final class RuntimeDetector {
   public static boolean isRaspbian() {
     try (BufferedReader reader = Files.newBufferedReader(Paths.get("/etc/os-release"))) {
       String value = reader.readLine();
+      if (value == null) {
+        return false;
+      }
       return value.contains("Raspbian");
     } catch (IOException ex) {
       return false;

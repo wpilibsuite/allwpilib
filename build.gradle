@@ -14,13 +14,14 @@ plugins {
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '4.1.0'
     id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
     id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '0.10.1'
-    id 'edu.wpi.first.GradleVsCode' version '0.11.0'
+    id 'edu.wpi.first.GradleJni' version '1.0.0'
+    id 'edu.wpi.first.GradleVsCode' version '1.0.0'
     id 'idea'
     id 'visual-studio'
     id 'net.ltgt.errorprone' version '1.1.1' apply false
     id 'com.github.johnrengelman.shadow' version '5.2.0' apply false
-    id 'com.diffplug.spotless' version '5.5.0'
+    id 'com.diffplug.spotless' version '5.5.0' apply false
+    id 'com.github.spotbugs' version '5.0.0-beta.1' apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -145,52 +146,6 @@ ext.getCurrentArch = {
     return NativePlatforms.desktop
 }
 
-spotless {
-    if (project.hasProperty('skipJavaFormat')) {
-        enforceCheck false
-    }
-    java {
-        target fileTree('.') {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree('.') {
-            include '**/*.gradle'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    format 'xml', {
-        target fileTree('.') {
-            include '**/*.xml'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        eclipseWtp('xml')
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-    format 'misc', {
-        target fileTree('.') {
-            include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-}
-
 wrapper {
-    gradleVersion = '6.0.1'
+    gradleVersion = '7.1.1'
 }

@@ -43,12 +43,11 @@ void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
 
 void Mechanism2d::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("Mechanism2d");
-  m_table = builder.GetTable();
-
-  m_table->GetEntry(kDims).SetDoubleArray({m_width, m_height});
-  m_table->GetEntry(kBackgroundColor).SetString(m_color);
 
   std::scoped_lock lock(m_mutex);
+  m_table = builder.GetTable();
+  m_table->GetEntry(kDims).SetDoubleArray({m_width, m_height});
+  m_table->GetEntry(kBackgroundColor).SetString(m_color);
   for (const auto& entry : m_roots) {
     const auto& root = entry.getValue().get();
     root->Update(m_table->GetSubTable(entry.getKey()));

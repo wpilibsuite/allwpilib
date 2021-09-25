@@ -2,7 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "CommandTestBase.h"
+#include <frc/simulation/SimHooks.h>
+
+#include "../CommandTestBase.h"
 #include "frc2/command/CommandScheduler.h"
 #include "frc2/command/RunCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -189,4 +191,20 @@ TEST_F(ButtonTest, RValueButton) {
   pressed = true;
   scheduler.Run();
   EXPECT_EQ(counter, 1);
+}
+
+TEST_F(ButtonTest, Debounce) {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool pressed = false;
+  RunCommand command([] {});
+
+  Trigger([&pressed] { return pressed; }).Debounce(100_ms).WhenActive(&command);
+  pressed = true;
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+
+  frc::sim::StepTiming(300_ms);
+
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
 }

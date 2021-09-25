@@ -18,7 +18,7 @@ public abstract class AbstractCommandTest {
     Scheduler.getInstance().enable();
   }
 
-  public class ASubsystem extends Subsystem {
+  public static class ASubsystem extends Subsystem {
     Command m_command;
 
     @Override

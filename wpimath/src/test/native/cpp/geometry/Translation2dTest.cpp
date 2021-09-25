@@ -47,7 +47,7 @@ TEST(Translation2dTest, Multiplication) {
   EXPECT_NEAR(mult.Y().to<double>(), 15.0, kEpsilon);
 }
 
-TEST(Translation2d, Division) {
+TEST(Translation2dTest, Division) {
   const Translation2d original{3.0_m, 5.0_m};
   const auto div = original / 2;
 

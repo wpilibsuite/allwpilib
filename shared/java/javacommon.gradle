@@ -1,6 +1,5 @@
 apply plugin: 'maven-publish'
 apply plugin: 'java-library'
-//apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'jacoco'
 
 def baseArtifactId = project.baseId
@@ -110,15 +109,12 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
 
     devImplementation sourceSets.main.output
-
-    //errorprone 'com.google.errorprone:error_prone_core:2.3.2-SNAPSHOT'
-    //errorproneJavac 'com.google.errorprone:error_prone_core:2.3.1'
 }
 
 task run(type: JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
-    main = project.devMain
+    mainClass = project.devMain
 }
 
 build.dependsOn devClasses
@@ -129,7 +125,7 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }

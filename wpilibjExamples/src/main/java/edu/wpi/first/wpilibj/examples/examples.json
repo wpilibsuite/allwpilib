@@ -211,7 +211,7 @@
   },
   {"name": "Mechanism2d",
     "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
-    "tags": [],
+    "tags": ["Mechanism2d"],
     "foldername": "mechanism2d",
     "gradlebase": "java",
     "mainclass": "Main",
@@ -694,7 +694,8 @@
       "Digital",
       "Sensors",
       "Simulation",
-      "Physics"
+      "Physics",
+      "Mechanism2d"
     ],
     "foldername": "elevatorsimulation",
     "gradlebase": "java",

@@ -72,7 +72,7 @@ static_assert(trait::is_callable_v<trait::typelist<int>, decltype(&s::f1),
 
 namespace wpi {
 
-TEST(Signal, TrackShared) {
+TEST(SignalTest, TrackShared) {
   sum = 0;
   Signal<int> sig;
 
@@ -95,7 +95,7 @@ TEST(Signal, TrackShared) {
   ASSERT_EQ(sum, 5);
 }
 
-TEST(Signal, TrackOther) {
+TEST(SignalTest, TrackOther) {
   sum = 0;
   Signal<int> sig;
 
@@ -118,7 +118,7 @@ TEST(Signal, TrackOther) {
   ASSERT_EQ(sum, 5);
 }
 
-TEST(Signal, TrackOverloadedFunctionObject) {
+TEST(SignalTest, TrackOverloadedFunctionObject) {
   sum = 0;
   Signal<int> sig;
   Signal<double> sig1;
@@ -143,7 +143,7 @@ TEST(Signal, TrackOverloadedFunctionObject) {
   ASSERT_EQ(sum, 5);
 }
 
-TEST(Signal, TrackGenericLambda) {
+TEST(SignalTest, TrackGenericLambda) {
   std::stringstream s;
 
   auto f = [&](auto a, auto... args) {

@@ -8,7 +8,7 @@
 
 #include "Robot.h"
 
-SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
+SetDistanceToBox::SetDistanceToBox(double distance, Drivetrain* drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox>(
           frc2::PIDController(-2, 0, 0),
           [drivetrain] { return drivetrain->GetDistanceToObstacle(); },

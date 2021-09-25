@@ -10,7 +10,7 @@ jobs:
   wpiformat:
     name: "wpiformat"
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2021-20.04
+    container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
@@ -44,7 +44,7 @@ jobs:
   tidy:
     name: "clang-tidy"
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2021-20.04
+    container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
@@ -69,29 +69,8 @@ jobs:
         run: wpiformat -list-changed-files
       - name: Run clang-tidy
         run: wpiformat -clang 12 -no-format -tidy-changed -compile-commands=build/compile_commands/linuxx86-64 -vv
-  spotless:
-    name: "Spotless"
-    runs-on: ubuntu-latest
-    container: wpilib/ubuntu-base:18.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Run spotless
-        run: ./gradlew spotlessCheck
-      - name: Apply Spotless
-        run: ./gradlew :spotlessApply
-        if: ${{ failure() }}
-      - name: Generate diff
-        run: git diff HEAD > spotless-fixes.patch
-        if: ${{ failure() }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: spotless fixes
-          path: spotless-fixes.patch
-        if: ${{ failure() }}
   javaformat:
-    name: "Checkstyle and PMD"
+    name: "Java format"
     runs-on: ubuntu-latest
     container: wpilib/ubuntu-base:18.04
     steps:
@@ -99,4 +78,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Java format
-        run: ./gradlew javaFormat
+        run: ./gradlew javaFormat spotbugsMain spotbugsTest spotbugsDev
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+      - name: Generate diff
+        run: git diff HEAD > javaformat-fixes.patch
+        if: ${{ failure() }}

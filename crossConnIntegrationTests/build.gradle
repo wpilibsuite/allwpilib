@@ -1,6 +1,7 @@
 import org.gradle.language.base.internal.ProjectLayout
-import jaci.gradle.toolchains.*
-import jaci.gradle.nativedeps.*
+import edu.wpi.first.deployutils.deploy.target.RemoteTarget
+import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
+import edu.wpi.first.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'cpp'
@@ -8,8 +9,7 @@ apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: ExtraTasks
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'jaci.gradle.EmbeddedTools'
+apply plugin: 'edu.wpi.first.DeployUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -25,6 +25,42 @@ apply from: "${rootDir}/shared/opencv.gradle"
 
 apply from: "${rootDir}/shared/googletest.gradle"
 
+deploy {
+    targets {
+        roborio(RemoteTarget) {
+            directory = '/home/admin'
+            maxChannels = 4
+            locations {
+                ssh(SshDeployLocation) {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = ''
+                    ipv6 = false
+                }
+            }
+
+            artifacts {
+                all {
+                    predeploy << { ctx ->
+                        ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+                    }
+                    postdeploy << { ctx ->
+                        ctx.execute("sync")
+                        ctx.execute("ldconfig")
+                    }
+                }
+
+                crossConnIntegrationTests(NativeExecutableArtifact) {
+                    libraryDirectory = '/usr/local/frc/third-party/lib'
+                    postdeploy << { ctx ->
+                        ctx.execute('chmod +x crossConnIntegrationTests')
+                    }
+                }
+            }
+        }
+    }
+}
+
 model {
     components {
         crossConnIntegrationTests(NativeExecutableSpec) {
@@ -32,6 +68,10 @@ model {
             nativeUtils.useRequiredLibrary(it, 'googletest_static')
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    if (binary.buildType.name == 'debug') {
+                        deploy.targets.roborio.artifacts.crossConnIntegrationTests.binary = binary
+                    }
+
                     binary.sources {
                         athenaCpp(CppSourceSet) {
                             source {
@@ -53,7 +93,7 @@ model {
                     project(':hal').addHalJniDependency(binary)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
-                        nativeUtils.useRequiredLibrary(binary, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                        nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                     }
                 } else {
                     binary.sources {
@@ -65,45 +105,6 @@ model {
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-deploy {
-    targets {
-        target('roborio') {
-            directory = '/home/admin'
-            maxChannels = 4
-            locations {
-                ssh {
-                    address = "172.22.11.2"
-                    user = 'admin'
-                    password = ''
-                    ipv6 = false
-                }
-            }
-        }
-    }
-    artifacts {
-        all {
-            targets << 'roborio'
-            predeploy << { ctx ->
-                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
-            }
-            postdeploy << { ctx ->
-                ctx.execute("sync")
-                ctx.execute("ldconfig")
-            }
-        }
-
-        nativeArtifact('crossConnIntegrationTests') {
-            component = 'crossConnIntegrationTests'
-            targetPlatform = nativeUtils.wpi.platforms.roborio
-            libraryDirectory = '/usr/local/frc/third-party/lib'
-            buildType = 'debug'
-            postdeploy << { ctx ->
-                ctx.execute('chmod +x crossConnIntegrationTests')
             }
         }
     }

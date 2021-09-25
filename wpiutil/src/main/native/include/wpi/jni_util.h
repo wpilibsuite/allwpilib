@@ -19,7 +19,6 @@
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
-#include "wpi/deprecated.h"
 #include "wpi/mutex.h"
 #include "wpi/raw_ostream.h"
 #include "wpi/span.h"

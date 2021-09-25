@@ -97,5 +97,5 @@ TEST(DIOTest, CrossAllocationFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_IS_ALLOCATED);
 }
 
-INSTANTIATE_TEST_SUITE_P(DIOCrossConnectsTest, DIOTest,
+INSTANTIATE_TEST_SUITE_P(DIOCrossConnectsTests, DIOTest,
                          ::testing::ValuesIn(DIOCrossConnects));

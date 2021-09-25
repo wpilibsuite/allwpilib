@@ -35,7 +35,7 @@ public class AbstractTestSuiteTest {
     ExampleSubSuite.class,
     EmptySuite.class
   })
-  class TestForAbstractTestSuite extends AbstractTestSuite {}
+  static class TestForAbstractTestSuite extends AbstractTestSuite {}
 
   TestForAbstractTestSuite m_testSuite;
 

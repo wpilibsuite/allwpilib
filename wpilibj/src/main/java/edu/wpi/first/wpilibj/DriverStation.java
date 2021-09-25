@@ -188,12 +188,15 @@ public class DriverStation {
       int currentReplayNumber;
       int currentMatchType;
       int currentControlWord;
-      synchronized (DriverStation.m_cacheDataMutex) {
+      m_cacheDataMutex.lock();
+      try {
         currentEventName = DriverStation.m_matchInfo.eventName;
         currentGameSpecificMessage = DriverStation.m_matchInfo.gameSpecificMessage;
         currentMatchNumber = DriverStation.m_matchInfo.matchNumber;
         currentReplayNumber = DriverStation.m_matchInfo.replayNumber;
         currentMatchType = DriverStation.m_matchInfo.matchType;
+      } finally {
+        m_cacheDataMutex.unlock();
       }
       currentControlWord = HAL.nativeGetControlWord();
 
@@ -1178,9 +1181,12 @@ public class DriverStation {
   /** Forces waitForData() to return immediately. */
   public static void wakeupWaitForData() {
     m_waitForDataMutex.lock();
-    m_waitForDataCount++;
-    m_waitForDataCond.signalAll();
-    m_waitForDataMutex.unlock();
+    try {
+      m_waitForDataCount++;
+      m_waitForDataCond.signalAll();
+    } finally {
+      m_waitForDataMutex.unlock();
+    }
   }
 
   /**

@@ -47,5 +47,5 @@ TEST_P(DutyCycleTest, DutyCycle) {
   // TODO measure output
 }
 
-INSTANTIATE_TEST_SUITE_P(DutyCycleCrossConnTest, DutyCycleTest,
+INSTANTIATE_TEST_SUITE_P(DutyCycleCrossConnTests, DutyCycleTest,
                          ::testing::ValuesIn(PWMCrossConnects));
