@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.counters;
+package edu.wpi.first.wpilibj.counter;
 
 import edu.wpi.first.wpilibj.DigitalSource;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -38,7 +38,11 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   public double getFrequency() {
-    return 1 / getPeriod();
+    double period = getPeriod();
+    if (period == 0) {
+      return 0;
+    }
+    return period;
   }
 
   public int getEdgesPerRevolution() {
@@ -52,9 +56,13 @@ public class Tachometer implements Sendable, AutoCloseable {
   public double getRevolutionsPerMinute() {
     double period = getPeriod();
     if (period == 0) {
-      return Double.MAX_VALUE;
+      return 0;
     }
-    return ((1.0 / getEdgesPerRevolution()) / period) * 60;
+    int edgesPerRevolution = getEdgesPerRevolution();
+    if (edgesPerRevolution == 0) {
+      return 0;
+    }
+    return ((1.0 / edgesPerRevolution) / period) * 60;
   }
 
   public boolean getStopped() {

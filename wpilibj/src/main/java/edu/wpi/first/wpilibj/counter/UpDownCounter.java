@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.wpilibj.counters;
+package edu.wpi.first.wpilibj.counter;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -11,8 +11,8 @@ import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.wpilibj.DigitalSource;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class UpDownCounter implements Sendable, AutoCloseable {
   private DigitalSource m_upSource;
@@ -32,7 +32,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
       CounterJNI.clearCounterUpSource(m_handle);
       m_upSource = null;
     } else {
-      m_upSource = source;
+      m_upSource = requireNonNullParam(source, "source", "setUpSource");
       CounterJNI.setCounterUpSource(m_handle, source.getPortHandleForRouting(),
           source.getAnalogTriggerTypeForRouting());
       CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
@@ -44,7 +44,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
       CounterJNI.clearCounterDownSource(m_handle);
       m_downSource = null;
     } else {
-      m_downSource = source;
+      m_downSource = requireNonNullParam(source, "source", "setDownSource");;
       CounterJNI.setCounterDownSource(m_handle, source.getPortHandleForRouting(),
           source.getAnalogTriggerTypeForRouting());
       CounterJNI.setCounterDownSourceEdge(m_handle, true, false);
