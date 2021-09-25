@@ -173,9 +173,8 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerClosedLoopEnabledCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterREVPHClosedLoopEnabledCallback);
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterREVPHClosedLoopEnabledCallback);
 }
 
 /*
@@ -274,9 +273,8 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorCurrentCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(
-      env, index, callback, initialNotify,
-      &HALSIM_RegisterREVPHCompressorCurrentCallback);
+  return sim::AllocateCallback(env, index, callback, initialNotify,
+                               &HALSIM_RegisterREVPHCompressorCurrentCallback);
 }
 
 /*
@@ -347,8 +345,7 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerAllSolenoidCallbacks
       env, index, channel, callback, initialNotify,
       [](int32_t index, int32_t channel, HAL_NotifyCallback cb, void* param,
          HAL_Bool in) {
-        HALSIM_RegisterREVPHAllSolenoidCallbacks(index, channel, cb, param,
-                                                   in);
+        HALSIM_RegisterREVPHAllSolenoidCallbacks(index, channel, cb, param, in);
         return 0;
       });
 }

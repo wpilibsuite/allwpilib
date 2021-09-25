@@ -17,17 +17,16 @@
 using namespace frc;
 
 wpi::mutex PneumaticsHub::m_handleLock;
-std::unique_ptr<
-    wpi::DenseMap<int, std::weak_ptr<PneumaticsHub::DataStore>>>
+std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<PneumaticsHub::DataStore>>>
     PneumaticsHub::m_handleMap = nullptr;
 
 // Always called under lock, so we can avoid the double lock from the magic
 // static
-std::weak_ptr<PneumaticsHub::DataStore>&
-PneumaticsHub::GetDataStore(int module) {
+std::weak_ptr<PneumaticsHub::DataStore>& PneumaticsHub::GetDataStore(
+    int module) {
   if (!m_handleMap) {
-    m_handleMap = std::make_unique<wpi::DenseMap<
-        int, std::weak_ptr<PneumaticsHub::DataStore>>>();
+    m_handleMap = std::make_unique<
+        wpi::DenseMap<int, std::weak_ptr<PneumaticsHub::DataStore>>>();
   }
   return (*m_handleMap)[module];
 }
@@ -36,8 +35,7 @@ class PneumaticsHub::DataStore {
  public:
   explicit DataStore(int module, const char* stackTrace) {
     int32_t status = 0;
-    HAL_REVPHHandle handle =
-        HAL_InitializeREVPH(module, stackTrace, &status);
+    HAL_REVPHHandle handle = HAL_InitializeREVPH(module, stackTrace, &status);
     FRC_CheckErrorStatus(status, "Module {}", module);
     m_moduleObject = PneumaticsHub{handle, module};
     m_moduleObject.m_dataStore =
@@ -73,8 +71,7 @@ PneumaticsHub::PneumaticsHub(int module) {
   m_module = module;
 }
 
-PneumaticsHub::PneumaticsHub(HAL_REVPHHandle handle,
-                                                 int module)
+PneumaticsHub::PneumaticsHub(HAL_REVPHHandle handle, int module)
     : m_handle{handle}, m_module{module} {}
 
 bool PneumaticsHub::GetCompressor() const {
@@ -144,13 +141,12 @@ void PneumaticsHub::FireOneShot(int index) {
   // FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsHub::SetOneShotDuration(int index,
-                                                 units::second_t duration) {
+void PneumaticsHub::SetOneShotDuration(int index, units::second_t duration) {
   // TODO Fix me
   // int32_t status = 0;
   // units::millisecond_t millis = duration;
-  // HAL_SetREVPHOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
-  // FRC_CheckErrorStatus(status, "Module {}", m_module);
+  // HAL_SetREVPHOneShotDuration(m_handle, index, millis.to<int32_t>(),
+  // &status); FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 bool PneumaticsHub::CheckSolenoidChannel(int channel) const {
@@ -191,7 +187,7 @@ Solenoid PneumaticsHub::MakeSolenoid(int channel) {
 }
 
 DoubleSolenoid PneumaticsHub::MakeDoubleSolenoid(int forwardChannel,
-                                                           int reverseChannel) {
+                                                 int reverseChannel) {
   return DoubleSolenoid{m_module, PneumaticsModuleType::REVPH, forwardChannel,
                         reverseChannel};
 }
@@ -200,8 +196,7 @@ Compressor PneumaticsHub::MakeCompressor() {
   return Compressor{m_module, PneumaticsModuleType::REVPH};
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticsHub::GetForModule(
-    int module) {
+std::shared_ptr<PneumaticsBase> PneumaticsHub::GetForModule(int module) {
   std::string stackTrace = wpi::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(module);

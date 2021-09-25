@@ -8,8 +8,8 @@
 
 #include "HALUtil.h"
 #include "edu_wpi_first_hal_REVPHJNI.h"
-#include "hal/REVPH.h"
 #include "hal/Ports.h"
+#include "hal/REVPH.h"
 #include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
@@ -188,4 +188,4 @@ Java_edu_wpi_first_hal_REVPHJNI_fireOneShot
   CheckStatus(env, status, false);
 }
 
-}
+}  // extern "C"

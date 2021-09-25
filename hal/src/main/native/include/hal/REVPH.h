@@ -41,7 +41,7 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
                            int32_t* status);
 
 void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
-                            int32_t* status);
+                          int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

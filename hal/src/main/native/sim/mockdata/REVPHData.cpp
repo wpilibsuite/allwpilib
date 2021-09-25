@@ -31,9 +31,9 @@ void HALSIM_ResetREVPHData(int32_t index) {
   SimREVPHData[index].ResetData();
 }
 
-#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                  \
-  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, REVPH##CAPINAME, \
-                               SimREVPHData, LOWERNAME)
+#define DEFINE_CAPI(TYPE, CAPINAME, LOWERNAME)                              \
+  HAL_SIMDATAVALUE_DEFINE_CAPI(TYPE, HALSIM, REVPH##CAPINAME, SimREVPHData, \
+                               LOWERNAME)
 
 HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, REVPHSolenoidOutput,
                                      SimREVPHData, solenoidOutput)
@@ -64,9 +64,9 @@ void HALSIM_SetREVPHAllSolenoids(int32_t index, uint8_t values) {
   SimREVPHData[index].NAME.RegisterCallback(callback, param, initialNotify)
 
 void HALSIM_RegisterREVPHAllNonSolenoidCallbacks(int32_t index,
-                                                   HAL_NotifyCallback callback,
-                                                   void* param,
-                                                   HAL_Bool initialNotify) {
+                                                 HAL_NotifyCallback callback,
+                                                 void* param,
+                                                 HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(compressorOn);
   REGISTER(closedLoopEnabled);
@@ -75,9 +75,9 @@ void HALSIM_RegisterREVPHAllNonSolenoidCallbacks(int32_t index,
 }
 
 void HALSIM_RegisterREVPHAllSolenoidCallbacks(int32_t index, int32_t channel,
-                                                HAL_NotifyCallback callback,
-                                                void* param,
-                                                HAL_Bool initialNotify) {
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify) {
   REGISTER(solenoidOutput[channel]);
 }
 }  // extern "C"
