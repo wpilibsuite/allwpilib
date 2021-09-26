@@ -38,7 +38,7 @@ SOFTWARE.
 #include "wpi/SmallString.h"
 #include "wpi/raw_os_ostream.h"
 
-#include "json_serializer.h"
+#include "wpi/json_serializer.h"
 
 namespace wpi {
 

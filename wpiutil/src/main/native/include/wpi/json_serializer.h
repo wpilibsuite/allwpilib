@@ -75,6 +75,7 @@ class json::serializer
 
     @param[in] val             value to serialize
     @param[in] pretty_print    whether the output shall be pretty-printed
+    @param[in] ensure_ascii    whether the output shall only use ASCII chars
     @param[in] indent_step     the indent level
     @param[in] current_indent  the current indent level (only used internally)
     */
@@ -83,7 +84,6 @@ class json::serializer
               const unsigned int indent_step,
               const unsigned int current_indent = 0);
 
-  private:
     /*!
     @brief dump escaped string
 
@@ -94,9 +94,9 @@ class json::serializer
 
     @param[in] s  the string to escape
     @param[in] ensure_ascii  whether to escape non-ASCII characters with
-                             \uXXXX sequences
+                             "\uXXXX" sequences
 
-    @complexity Linear in the length of string @a s.
+    Complexity: Linear in the length of string @a s.
     */
     void dump_escaped(std::string_view s, const bool ensure_ascii);
 

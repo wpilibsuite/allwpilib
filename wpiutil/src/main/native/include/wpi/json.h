@@ -2678,9 +2678,10 @@ class json
     class binary_writer;
     class lexer;
     class parser;
-    class serializer;
 
   public:
+    class serializer;
+
     using value_t = detail::value_t;
     /// @copydoc wpi::json_pointer
     using json_pointer = ::wpi::json_pointer;
