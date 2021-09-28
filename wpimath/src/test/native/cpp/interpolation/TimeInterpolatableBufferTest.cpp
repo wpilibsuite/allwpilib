@@ -6,11 +6,11 @@
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "frc/interpolatable/TimeInterpolatableBuffer.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "gtest/gtest.h"
 #include "units/time.h"
 
-TEST(TimeInterpolatableBufferTest, TestInterpolation) {
+TEST(TimeInterpolatableBufferTest, Interpolation) {
   frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
 
   buffer.AddSample(0_s, frc::Rotation2d(0_rad));
@@ -25,7 +25,7 @@ TEST(TimeInterpolatableBufferTest, TestInterpolation) {
   EXPECT_TRUE(buffer.Sample(0_s) == frc::Rotation2d(1_rad));
 }
 
-TEST(TimeInterpolatableBufferTest, TestPose2d) {
+TEST(TimeInterpolatableBufferTest, Pose2d) {
   frc::TimeInterpolatableBuffer<frc::Pose2d> buffer{10_s};
   // We expect to be at (1 - 1/std::sqrt(2), 1/std::sqrt(2), 45deg) at t=0.5
   buffer.AddSample(0_s, frc::Pose2d{0_m, 0_m, 90_deg});

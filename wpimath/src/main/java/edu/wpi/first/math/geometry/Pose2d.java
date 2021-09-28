@@ -8,13 +8,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
-import edu.wpi.first.math.interpolation.Interpolatable;
-
-/**
- * Represents a 2d pose containing translational and rotational elements.
- */
+/** Represents a 2d pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose2d implements Interpolatable<Pose2d> {

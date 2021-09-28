@@ -60,16 +60,18 @@ class TimeInterpolatableBuffer {
    */
   void AddSample(units::second_t time, T sample) {
     // Add the new state into the vector.
-    if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first)
+    if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
-    else
+    } else {
       m_pastSnapshots.insert(
           std::upper_bound(
               m_pastSnapshots.begin(), m_pastSnapshots.end(), time,
               [](auto t, const auto& pair) { return t < pair.first; }),
           std::pair(time, sample));
-    while (time - m_pastSnapshots[0].first > m_historySize)
+    }
+    while (time - m_pastSnapshots[0].first > m_historySize) {
       m_pastSnapshots.erase(m_pastSnapshots.begin());
+    }
   }
 
   void Clear() { m_pastSnapshots.clear(); }
@@ -83,12 +85,15 @@ class TimeInterpolatableBuffer {
     // vector that has a timestamp that is equal to or greater than the vision
     // measurement timestamp.
 
-    if (time <= m_pastSnapshots.front().first)
+    if (time <= m_pastSnapshots.front().first) {
       return m_pastSnapshots.front().second;
-    if (time > m_pastSnapshots.back().first)
+    }
+    if (time > m_pastSnapshots.back().first) {
       return m_pastSnapshots.back().second;
-    if (m_pastSnapshots.size() < 2)
+    }
+    if (m_pastSnapshots.size() < 2) {
       return m_pastSnapshots[0].second;
+    }
 
     // Get the iterator which has a key no less than the requested key.
     auto upper_bound = std::lower_bound(
@@ -112,18 +117,6 @@ class TimeInterpolatableBuffer {
 // Template specialization to ensure that Pose2d uses pose exponential
 template <>
 TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
-    units::second_t historySize)
-    : m_historySize(historySize),
-      m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {
-        if (t < 0) {
-          return start;
-        } else if (t >= 1) {
-          return end;
-        } else {
-          Twist2d twist = start.Log(end);
-          Twist2d scaledTwist = twist * t;
-          return start.Exp(scaledTwist);
-        }
-      }) {}
+    units::second_t historySize);
 
 }  // namespace frc

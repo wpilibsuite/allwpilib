@@ -8,10 +8,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
-
-import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.Interpolatable;
+import java.util.Objects;
 
 /**
  * Represents a translation in 2d space. This object can be used to represent a point or a vector.
@@ -202,7 +201,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
 
   @Override
   public Translation2d interpolate(Translation2d endValue, double t) {
-    return new Translation2d(MathUtil.interpolate(this.getX(), endValue.getX(), t),
+    return new Translation2d(
+        MathUtil.interpolate(this.getX(), endValue.getX(), t),
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 }

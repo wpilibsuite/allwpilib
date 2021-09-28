@@ -8,15 +8,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
-import edu.wpi.first.math.interpolation.Interpolatable;
-import edu.wpi.first.math.MathUtil;
-
-/**
- * A rotation in a 2d coordinate frame represented a point on the unit circle
- * (cosine and sine).
- */
+/** A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine). */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Rotation2d implements Interpolatable<Rotation2d> {
