@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <wpi/MathExtras.h>
+#include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "units/time.h"
@@ -116,7 +117,7 @@ class TimeInterpolatableBuffer {
 
 // Template specialization to ensure that Pose2d uses pose exponential
 template <>
-TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
+WPILIB_DLLEXPORT TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
     units::second_t historySize);
 
 }  // namespace frc
