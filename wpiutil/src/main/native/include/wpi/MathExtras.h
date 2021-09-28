@@ -855,7 +855,7 @@ constexpr int sgn(T val) {
  * @return The interpolated value.
  */
 template <typename T>
-static T Lerp(const T& startValue, const T& endValue, const double t) {
+constexpr T Lerp(const T& startValue, const T& endValue, double t) {
   return startValue + (endValue - startValue) * t;
 }
 
