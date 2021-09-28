@@ -24,6 +24,9 @@ namespace frc {
  * DifferentialDrivePoseEstimator, where knowledge of the robot pose at the time
  * when vision or other global measurement were recorded is necessary, or for
  * recording the past angles of mechanisms as measured by encoders.
+ * 
+ * When sampling this buffer, a user-provided function or wpi::Lerp can be
+ * used. For Pose2ds, we use Twists.
  *
  * @tparam T The type stored in this buffer.
  */
@@ -42,7 +45,7 @@ class TimeInterpolatableBuffer {
 
   /**
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
-   * function is wpi::Lerp except for Pose2d, which uses pose exponentials.
+   * function is wpi::Lerp except for Pose2d, which uses the pose exponential.
    *
    * @param historySizeSeconds  The history size of the buffer.
    * @param interpolateFunction The function used to interpolate between values.
