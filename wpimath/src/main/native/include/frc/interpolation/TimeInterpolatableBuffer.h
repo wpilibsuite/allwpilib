@@ -25,7 +25,7 @@ namespace frc {
  * when vision or other global measurement were recorded is necessary, or for
  * recording the past angles of mechanisms as measured by encoders.
  *
- * @param <T> The type stored in this buffer.
+ * @tparam T The type stored in this buffer.
  */
 template <typename T>
 class TimeInterpolatableBuffer {
