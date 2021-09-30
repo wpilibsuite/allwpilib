@@ -16,10 +16,10 @@ import java.util.function.Consumer;
  * it than to inline it.
  */
 public class FunctionalCommand extends CommandBase {
-  protected final Runnable m_onInit;
-  protected final Runnable m_onExecute;
-  protected final Consumer<Boolean> m_onEnd;
-  protected final BooleanSupplier m_isFinished;
+  private final Runnable m_onInit;
+  private final Runnable m_onExecute;
+  private final Consumer<Boolean> m_onEnd;
+  private final BooleanSupplier m_isFinished;
 
   /**
    * Creates a new FunctionalCommand.
@@ -45,22 +45,22 @@ public class FunctionalCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_onInit.run();
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_onExecute.run();
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_onEnd.accept(interrupted);
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_isFinished.getAsBoolean();
   }
 }

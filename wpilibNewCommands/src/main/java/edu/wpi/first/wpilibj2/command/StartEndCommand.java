@@ -13,8 +13,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * Command#withInterrupt(java.util.function.BooleanSupplier)} to give it one.
  */
 public class StartEndCommand extends CommandBase {
-  protected final Runnable m_onInit;
-  protected final Runnable m_onEnd;
+  private final Runnable m_onInit;
+  private final Runnable m_onEnd;
 
   /**
    * Creates a new StartEndCommand. Will run the given runnables when the command starts and when it
@@ -32,12 +32,12 @@ public class StartEndCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_onInit.run();
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_onEnd.run();
   }
 }

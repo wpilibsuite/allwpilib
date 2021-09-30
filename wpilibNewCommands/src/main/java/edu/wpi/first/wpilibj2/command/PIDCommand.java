@@ -7,7 +7,6 @@ package edu.wpi.first.wpilibj2.command;
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
 import edu.wpi.first.math.controller.PIDController;
-import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -17,10 +16,10 @@ import java.util.function.DoubleSupplier;
  * are performed synchronously in the command's execute() method.
  */
 public class PIDCommand extends CommandBase {
-  protected final PIDController m_controller;
-  protected DoubleSupplier m_measurement;
-  protected DoubleSupplier m_setpoint;
-  protected DoubleConsumer m_useOutput;
+  private final PIDController m_controller;
+  private final DoubleSupplier m_measurement;
+  private final DoubleSupplier m_setpoint;
+  private final DoubleConsumer m_useOutput;
 
   /**
    * Creates a new PIDCommand, which controls the given output with a PIDController.
@@ -46,7 +45,7 @@ public class PIDCommand extends CommandBase {
     m_useOutput = useOutput;
     m_measurement = measurementSource;
     m_setpoint = setpointSource;
-    m_requirements.addAll(Set.of(requirements));
+    addRequirements(requirements);
   }
 
   /**
@@ -73,13 +72,13 @@ public class PIDCommand extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_useOutput.accept(
         m_controller.calculate(m_measurement.getAsDouble(), m_setpoint.getAsDouble()));
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_useOutput.accept(0);
   }
 
@@ -88,7 +87,7 @@ public class PIDCommand extends CommandBase {
    *
    * @return The PIDController
    */
-  public PIDController getController() {
+  public final PIDController getController() {
     return m_controller;
   }
 }

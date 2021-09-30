@@ -136,14 +136,14 @@ public class SwerveControllerCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_timer.reset();
     m_timer.start();
   }
 
   @Override
   @SuppressWarnings("LocalVariableName")
-  public void execute() {
+  public final void execute() {
     double curTime = m_timer.get();
     var desiredState = m_trajectory.sample(curTime);
 
@@ -155,12 +155,12 @@ public class SwerveControllerCommand extends CommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_timer.stop();
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
   }
 }

@@ -130,7 +130,7 @@ public class RamseteCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_prevTime = -1;
     var initialState = m_trajectory.sample(0);
     m_prevSpeeds =
@@ -148,7 +148,7 @@ public class RamseteCommand extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
 
@@ -196,7 +196,7 @@ public class RamseteCommand extends CommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_timer.stop();
 
     if (interrupted) {
@@ -205,7 +205,7 @@ public class RamseteCommand extends CommandBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
   }
 }

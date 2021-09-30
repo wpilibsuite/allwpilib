@@ -26,14 +26,14 @@ public class ProxyScheduleCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Command command : m_toSchedule) {
       command.schedule();
     }
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted) {
       for (Command command : m_toSchedule) {
         command.cancel();
@@ -42,7 +42,7 @@ public class ProxyScheduleCommand extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_finished = true;
     for (Command command : m_toSchedule) {
       m_finished &= !command.isScheduled();
@@ -50,7 +50,7 @@ public class ProxyScheduleCommand extends CommandBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_finished;
   }
 }

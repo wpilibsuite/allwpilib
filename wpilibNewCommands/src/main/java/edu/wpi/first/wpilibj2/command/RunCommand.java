@@ -14,7 +14,7 @@ import java.util.function.BooleanSupplier;
  * it one. If you only wish to execute a Runnable once, use {@link InstantCommand}.
  */
 public class RunCommand extends CommandBase {
-  protected final Runnable m_toRun;
+  private final Runnable m_toRun;
 
   /**
    * Creates a new RunCommand. The Runnable will be run continuously until the command ends. Does
@@ -29,7 +29,7 @@ public class RunCommand extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_toRun.run();
   }
 }

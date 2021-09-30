@@ -117,11 +117,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController =
         requireNonNullParam(frontLeftController, "frontLeftController", "MecanumControllerCommand");
@@ -260,11 +256,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
 
-    m_maxWheelVelocityMetersPerSecond =
-        requireNonNullParam(
-            maxWheelVelocityMetersPerSecond,
-            "maxWheelVelocityMetersPerSecond",
-            "MecanumControllerCommand");
+    m_maxWheelVelocityMetersPerSecond = maxWheelVelocityMetersPerSecond;
 
     m_frontLeftController = null;
     m_rearLeftController = null;
@@ -332,7 +324,7 @@ public class MecanumControllerCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     var initialState = m_trajectory.sample(0);
 
     var initialXVelocity =
@@ -349,7 +341,7 @@ public class MecanumControllerCommand extends CommandBase {
 
   @Override
   @SuppressWarnings("LocalVariableName")
-  public void execute() {
+  public final void execute() {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
 
@@ -430,12 +422,12 @@ public class MecanumControllerCommand extends CommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_timer.stop();
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
   }
 }

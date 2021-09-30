@@ -36,23 +36,23 @@ public class TrapezoidProfileCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_timer.reset();
     m_timer.start();
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_output.accept(m_profile.calculate(m_timer.get()));
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_timer.stop();
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_timer.hasElapsed(m_profile.totalTime());
   }
 }

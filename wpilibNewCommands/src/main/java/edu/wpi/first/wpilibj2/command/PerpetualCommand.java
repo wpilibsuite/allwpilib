@@ -16,7 +16,7 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  */
 public class PerpetualCommand extends CommandBase {
-  protected final Command m_command;
+  private final Command m_command;
 
   /**
    * Creates a new PerpetualCommand. Will run another command in perpetuity, ignoring that command's
@@ -32,27 +32,27 @@ public class PerpetualCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_command.initialize();
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_command.execute();
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_command.end(interrupted);
   }
 
   @Override
-  public boolean runsWhenDisabled() {
+  public final boolean runsWhenDisabled() {
     return m_command.runsWhenDisabled();
   }
 
   @Override
-  public PerpetualCommand perpetually() {
+  public final PerpetualCommand perpetually() {
     return this;
   }
 }

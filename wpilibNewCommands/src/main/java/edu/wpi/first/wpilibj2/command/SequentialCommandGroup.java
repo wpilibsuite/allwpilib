@@ -46,7 +46,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_currentCommandIndex = 0;
 
     if (!m_commands.isEmpty()) {
@@ -55,7 +55,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     if (m_commands.isEmpty()) {
       return;
     }
@@ -73,7 +73,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     if (interrupted
         && !m_commands.isEmpty()
         && m_currentCommandIndex > -1
@@ -84,17 +84,17 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_currentCommandIndex == m_commands.size();
   }
 
   @Override
-  public boolean runsWhenDisabled() {
+  public final boolean runsWhenDisabled() {
     return m_runWhenDisabled;
   }
 
   @Override
-  public SequentialCommandGroup beforeStarting(Command before) {
+  public final SequentialCommandGroup beforeStarting(Command before) {
     // store all the commands
     var commands = new ArrayList<Command>();
     commands.add(before);
@@ -112,7 +112,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
   }
 
   @Override
-  public SequentialCommandGroup andThen(Command... next) {
+  public final SequentialCommandGroup andThen(Command... next) {
     addCommands(next);
     return this;
   }

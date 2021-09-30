@@ -33,12 +33,12 @@ public class NotifierCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_notifier.startPeriodic(m_period);
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_notifier.stop();
   }
 }

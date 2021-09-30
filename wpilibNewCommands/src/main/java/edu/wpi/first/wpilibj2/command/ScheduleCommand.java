@@ -24,19 +24,19 @@ public class ScheduleCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     for (Command command : m_toSchedule) {
       command.schedule();
     }
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return true;
   }
 
   @Override
-  public boolean runsWhenDisabled() {
+  public final boolean runsWhenDisabled() {
     return true;
   }
 }

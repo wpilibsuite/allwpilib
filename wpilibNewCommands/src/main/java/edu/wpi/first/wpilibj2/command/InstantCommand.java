@@ -6,10 +6,12 @@ package edu.wpi.first.wpilibj2.command;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 /**
  * A Command that runs instantly; it will initialize, execute once, and end on the same iteration of
  * the scheduler. Users can either pass in a Runnable and a set of requirements, or else subclass
- * this command if desired.
+ * this command if desired. If you wish to execute a Runnable repeatedly, use {@link RunCommand}.
  */
 public class InstantCommand extends CommandBase {
   private final Runnable m_toRun;
@@ -35,12 +37,20 @@ public class InstantCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     m_toRun.run();
   }
 
   @Override
   public final boolean isFinished() {
     return true;
+  }
+
+  @Override
+  public PerpetualCommand perpetually() {
+    DriverStation.reportWarning("Called InstantCommand.perpetually(). A perpetuated InstantCommand"
+                                + " will do nothing. If you want to execute a Runnable repeatedly,"
+                                + " use RunCommand.", false);
+    return super.perpetually();
   }
 }

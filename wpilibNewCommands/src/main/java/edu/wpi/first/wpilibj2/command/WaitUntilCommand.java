@@ -39,7 +39,7 @@ public class WaitUntilCommand extends CommandBase {
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_condition.getAsBoolean();
   }
 

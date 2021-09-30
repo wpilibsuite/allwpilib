@@ -12,7 +12,7 @@ import java.util.Set;
 
 /** A {@link Sendable} base class for {@link Command}s. */
 public abstract class CommandBase implements Sendable, Command {
-  protected Set<Subsystem> m_requirements = new HashSet<>();
+  protected final Set<Subsystem> m_requirements = new HashSet<>();
 
   protected CommandBase() {
     String name = getClass().getName();
@@ -29,12 +29,17 @@ public abstract class CommandBase implements Sendable, Command {
   }
 
   @Override
-  public Set<Subsystem> getRequirements() {
+  public final boolean hasRequirement(Subsystem requirement) {
+    return m_requirements.contains(requirement);
+  }
+
+  @Override
+  public final Set<Subsystem> getRequirements() {
     return m_requirements;
   }
 
   @Override
-  public String getName() {
+  public final String getName() {
     return SendableRegistry.getName(this);
   }
 
@@ -43,7 +48,7 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param name name
    */
-  public void setName(String name) {
+  public final void setName(String name) {
     SendableRegistry.setName(this, name);
   }
 
@@ -53,7 +58,7 @@ public abstract class CommandBase implements Sendable, Command {
    * @param name name
    * @return the decorated Command
    */
-  public CommandBase withName(String name) {
+  public final CommandBase withName(String name) {
     this.setName(name);
     return this;
   }
@@ -63,7 +68,7 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @return Subsystem name
    */
-  public String getSubsystem() {
+  public final String getSubsystem() {
     return SendableRegistry.getSubsystem(this);
   }
 
@@ -72,7 +77,7 @@ public abstract class CommandBase implements Sendable, Command {
    *
    * @param subsystem subsystem name
    */
-  public void setSubsystem(String subsystem) {
+  public final void setSubsystem(String subsystem) {
     SendableRegistry.setSubsystem(this, subsystem);
   }
 
@@ -101,5 +106,29 @@ public abstract class CommandBase implements Sendable, Command {
         });
     builder.addBooleanProperty(
         ".isParented", () -> CommandGroupBase.getGroupedCommands().contains(this), null);
+  }
+
+  /*
+      Stubs to mark utility functions as final.
+   */
+
+  @Override
+  public final void schedule(boolean interruptible) {
+    Command.super.schedule(interruptible);
+  }
+
+  @Override
+  public final void schedule() {
+    Command.super.schedule();
+  }
+
+  @Override
+  public final void cancel() {
+    Command.super.cancel();
+  }
+
+  @Override
+  public final boolean isScheduled() {
+    return Command.super.isScheduled();
   }
 }

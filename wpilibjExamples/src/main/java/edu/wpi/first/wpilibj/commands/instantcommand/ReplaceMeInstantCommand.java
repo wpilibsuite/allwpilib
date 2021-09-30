@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMeInstantCommand extends InstantCommand {
   public ReplaceMeInstantCommand() {
-    // Use addRequirements() here to declare subsystem dependencies.
+    super(() -> {
+      // this block will be executed when the command is scheduled.
+    });
+    // Use addRequirements() here to declare subsystem dependencies, or add them as parameters to
+    // the super() call.
   }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
 }

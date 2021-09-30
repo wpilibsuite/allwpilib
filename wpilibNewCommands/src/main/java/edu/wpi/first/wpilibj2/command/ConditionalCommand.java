@@ -48,7 +48,7 @@ public class ConditionalCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
+  public final void initialize() {
     if (m_condition.getAsBoolean()) {
       m_selectedCommand = m_onTrue;
     } else {
@@ -58,22 +58,22 @@ public class ConditionalCommand extends CommandBase {
   }
 
   @Override
-  public void execute() {
+  public final void execute() {
     m_selectedCommand.execute();
   }
 
   @Override
-  public void end(boolean interrupted) {
+  public final void end(boolean interrupted) {
     m_selectedCommand.end(interrupted);
   }
 
   @Override
-  public boolean isFinished() {
+  public final boolean isFinished() {
     return m_selectedCommand.isFinished();
   }
 
   @Override
-  public boolean runsWhenDisabled() {
+  public final boolean runsWhenDisabled() {
     return m_onTrue.runsWhenDisabled() && m_onFalse.runsWhenDisabled();
   }
 }
