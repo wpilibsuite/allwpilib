@@ -109,8 +109,8 @@ public abstract class CommandBase implements Sendable, Command {
   }
 
   /*
-      Stubs to mark utility functions as final.
-   */
+     Stubs to mark utility functions as final.
+  */
 
   @Override
   public final void schedule(boolean interruptible) {

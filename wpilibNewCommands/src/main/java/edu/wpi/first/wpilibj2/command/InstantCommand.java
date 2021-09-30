@@ -48,9 +48,11 @@ public class InstantCommand extends CommandBase {
 
   @Override
   public PerpetualCommand perpetually() {
-    DriverStation.reportWarning("Called InstantCommand.perpetually(). A perpetuated InstantCommand"
-                                + " will do nothing. If you want to execute a Runnable repeatedly,"
-                                + " use RunCommand.", false);
+    DriverStation.reportWarning(
+        "Called InstantCommand.perpetually(). A perpetuated InstantCommand"
+            + " will do nothing. If you want to execute a Runnable repeatedly,"
+            + " use RunCommand.",
+        false);
     return super.perpetually();
   }
 }
