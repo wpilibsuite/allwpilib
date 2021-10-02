@@ -74,15 +74,15 @@ Servers shall keep a retained value for each topic for the purposes of both <<ms
 
 Clients may similarly keep a retained value for each topic for ease of use by user code.  If this is done, this retained value shall be updated by both locally published values and received messages for that topic with greater-than/equal-to timestamps, and the retained value shall be deleted when a <<msg-unannounce>> is received.
 
-Clients should support a "set default" operation for a topic.  This is a "weak" value update that sends a message with a timestamp of 0 (thereby not causing the retained value of the server or other clients to be updated if they have a current value update with a timestamp > 0).
+Clients should support a "set default" operation for a topic.  This is a "weak" value update that publishes a value with a timestamp of 0 (thereby not causing the retained value of the server or other clients to be updated if they have a current value update with a timestamp > 0).  Typically the "set default" operation should also result in the retained property being set on the topic.
 
 Clients may accept application commands to publish and subscribe while disconnected.  If a client does so, in addition to maintaining a retained value as described above, it must keep track for each application-published topic whether any of the locally published values were "strong" (via a "set" operation), or all of them were "weak" (via a "set default" operation).  While disconnected, there is no reference clock; "strong" timestamps shall be set to 1 and "weak" timestamps shall be set to 0.
 
-When the client disconnects, the client shall delete any topics that are not published by the application and shall reset the remaining (application-published) retained value timestamps to 0 and 1 as per the previous paragraph.
+When the client disconnects, the client shall delete any topics that are not published by the application and do not have the retained or persistent properties set.  The client shall also reset the application-published retained value timestamps to 0 and 1 as per the previous paragraph.
 
 When the connection to the server is established (either reconnect or initial connection), the client shall publish and send _only_ the retained values to the server that are in application-published topics (those with timestamps of 0 and 1, per above).  Only the values with timestamp 0 may be sent immediately upon reconnection.  The values with timestamp 1 must wait until the client clock is synchronized with the server clock; the timestamps for these values when sent to the server must be either the current server time or, if possible, an estimation of server time when the values were actually written.
 
-Note: the previous paragraphs enable offline, multi-publisher operation under network/server reboot conditions without creating zombie topics, assuming clients use "set default" appropriately.  This is achieved mainly via the use of timestamps 0 and 1 to enable tie breaks such that normally-set values (timestamp X) are used in preference to retained values (timestamp 1), and retained values are used in preference to weakly set values (timestamp 0).  An example use case is as follows:
+Note: the previous paragraphs enable offline, multi-publisher operation under network/server reboot conditions without creating zombie topics, assuming clients use "set default" and the retained property appropriately.  This is achieved mainly via the use of timestamps 0 and 1 to enable tie breaks such that normally-set values (timestamp X) are used in preference to retained values (timestamp 1), and retained values are used in preference to weakly set values (timestamp 0).  An example use case is as follows:
 
 * Server starts
 * Dashboard client connects
@@ -102,6 +102,17 @@ Note: the previous paragraphs enable offline, multi-publisher operation under ne
 ** If the dashboard reconnects, it sends a message with timestamp 1 ("strong" set).  This propagates but does not change the value (it’s the same user-set as before).
 * If the dashboard updates the value while offline, it’s still a "strong set" and wins the tie
 
+A second use case:
+
+* Server starts
+* Dashboard client connects
+* Dashboard client publishes configuration value with the retained property set, and publishes an initial value
+* Dashboard client disconnects.  The topic is *not* deleted on the server because the retained property is set.
+* Coprocessor client connects
+* Server sends announce message for topic and sends retained value (with timestamp 1)
+* Coprocessor client publishes, uses "set default", and subscribes to the topic.  Since "set default" uses a timestamp of 0, it loses to the retained value with timestamp 1, and the coprocessor subscriber will see the value previously set by the dashboard.
+* Dashboard client reconnects
+
 [[server]]
 === Server Behavior
 
@@ -109,7 +120,7 @@ Topic IDs may be common across all client connections or be connection-specific.
 
 When a client initially connects, the server shall send it <<msg-announce,`announce`>> messages for each existing topic.
 
-The server shall keep a publisher count for each topic.  Persistent topics have an additional implicit publisher.  When the publisher count reaches zero (which only happens for non-persistent topics), the server shall delete the topic (including its retained value).  When a client connection is lost, the server shall handle that as an implicit <<msg-unpublish,`unpublish`>> for all topics currently published by that client.
+The server shall keep a publisher count for each topic.  Persistent and retained topics have an additional implicit publisher.  When the publisher count reaches zero (which only happens for non-persistent and non-retained topics), the server shall delete the topic (including its retained value).  When a client connection is lost, the server shall handle that as an implicit <<msg-unpublish,`unpublish`>> for all topics currently published by that client.
 
 The server may operate in-process to an application (e.g. a robot program).  In this case, the application operationally behaves like a client (e.g. it sends publish requests and receives topic announcements), but of course does not need to estimate delta time, create JSON/MessagePack messages, etc, as all of the necessary operations can be performed programmatically within the same process.
 
@@ -359,6 +370,7 @@ Each published topic may also have properties associated to it.  Properties are 
 |===
 |Property|Type|Description|Notes
 |`persistent`|boolean|Persistent Flag|If true, the last set value will be periodically saved to persistent storage on the server and be restored during server startup.  Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
+|`retained`|boolean|Retained Flag|Topics with this property set to true will not be deleted by the server when the last publisher stops publishing.
 |`hidden`|boolean|Hidden Flag|If true, the topic will not be announced to a client until the client subscribes to it.  Note the topic will still be visible via the `$clientpub` meta-topic.
 |===
 
