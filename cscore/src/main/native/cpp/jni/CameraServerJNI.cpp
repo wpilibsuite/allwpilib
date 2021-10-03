@@ -272,7 +272,7 @@ static jobject MakeJObject(JNIEnv* env, const cs::VideoMode& videoMode) {
 static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
   static jmethodID constructor =
       env->GetMethodID(videoEventCls, "<init>",
-                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;I)V");
+                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;)V");
   JLocal<jstring> name(env, MakeJString(env, event.name));
   JLocal<jstring> valueStr(env, MakeJString(env, event.valueStr));
   // clang-format off
@@ -290,8 +290,7 @@ static jobject MakeJObject(JNIEnv* env, const cs::RawEvent& event) {
       static_cast<jint>(event.propertyHandle),
       static_cast<jint>(event.propertyKind),
       static_cast<jint>(event.value),
-      valueStr.obj(),
-      static_cast<jint>(event.listener));
+      valueStr.obj());
   // clang-format on
 }
 

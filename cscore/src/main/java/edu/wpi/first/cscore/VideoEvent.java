@@ -103,8 +103,7 @@ public class VideoEvent {
       int property,
       int propertyKind,
       int value,
-      String valueStr,
-      int listener) {
+      String valueStr) {
     this.kind = getKindFromInt(kind);
     this.sourceHandle = source;
     this.sinkHandle = sink;
@@ -114,7 +113,6 @@ public class VideoEvent {
     this.propertyKind = VideoProperty.getKindFromInt(propertyKind);
     this.value = value;
     this.valueStr = valueStr;
-    this.listener = listener;
   }
 
   @SuppressWarnings("MemberName")
@@ -147,10 +145,6 @@ public class VideoEvent {
 
   @SuppressWarnings("MemberName")
   public String valueStr;
-
-  // Listener that was triggered
-  @SuppressWarnings("MemberName")
-  public int listener;
 
   public VideoSource getSource() {
     return new VideoSource(CameraServerJNI.copySource(sourceHandle));
