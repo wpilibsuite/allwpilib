@@ -118,6 +118,9 @@ doxygen {
         // json
         exclude 'wpi/json.h'
 
+        // mpack
+        exclude 'wpi/mpack.h'
+
         // units
         exclude 'units/**'
     }
