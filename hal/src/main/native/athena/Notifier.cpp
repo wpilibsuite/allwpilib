@@ -164,6 +164,10 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
       fmt::print("{}: HAL Notifier thread\n",
                  HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE);
     }
+    if (*status == HAL_SETUID_ERROR) {
+      *status = 0;
+      fmt::print("{}: HAL Notifier thread\n", HAL_SETUID_ERROR);
+    }
 
     notifierAlarm.reset(tAlarm::create(status));
   }
