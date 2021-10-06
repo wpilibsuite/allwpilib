@@ -1044,7 +1044,11 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   auto poses = gPopupState.GetInsertModel() == &model
                    ? gPopupState.GetInsertPoses()
                    : model.GetPoses();
+  auto spline = gPopupState.GetInsertModel() == &model
+                    ? gPopupState.GetInsertPoses()
+                    : model.GetSpline();
   size_t i = 0;
+  size_t j = 0;
   for (auto&& pose : poses) {
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
@@ -1068,6 +1072,15 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
     ++i;
   }
+  if (i > 1) {
+    for (auto&& pose : spline) {
+      PoseFrameData pfd{pose, model, j, m_ffd, displayOptions};
+
+      // draw
+      pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+      ++j;
+    }
+  }
 
   m_drawSplit.SetCurrentChannel(m_drawList, 0);
   obj->DrawLine(m_drawList, m_centerLine);
@@ -1076,6 +1089,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   m_drawSplit.Merge(m_drawList);
 
   PopID();
+
 }
 
 void PopupState::Open(SelectedTargetInfo* target,

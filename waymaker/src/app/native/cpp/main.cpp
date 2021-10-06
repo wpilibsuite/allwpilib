@@ -9,11 +9,13 @@
 #include <imgui.h>
 #include <wpigui.h>
 #include <string_view>
+#include <iostream>
 #include "glass/Context.h"
 #include "glass/Model.h"
 #include "glass/View.h"
 #include "glass/other/Log.h"
 #include "glass/other/Field2D.h"
+#include "glass/other/WMField2D.h"
 
 namespace gui = wpi::gui;
 
@@ -29,7 +31,8 @@ int main() {
 #endif
   gui::CreateContext();
   glass::CreateContext();
-
+  glass::WMField2DModel* fieldModel = new glass::WMField2DModel("Test Field");
+  glass::Field2DView* fieldView = new glass::Field2DView(fieldModel);
 
   gui::ConfigurePlatformSaveFile("waymaker.ini");
 
@@ -37,7 +40,7 @@ int main() {
 
 
 
-  gui::AddLateExecute([] {
+  gui::AddLateExecute([&] {
     ImGui::BeginMainMenuBar();
     gui::EmitViewMenu();
     if (ImGui::BeginMenu("View")) {
@@ -70,9 +73,31 @@ int main() {
       }
       ImGui::EndPopup();
     }
+    ImGui::Begin("Field");
+    fieldView->Display();
+    ImGui::End();
+    ImGui::Begin("Exporter");
+      fieldModel->ForEachFieldObject([&](auto& objModel, auto name) {
+        if (!objModel.Exists()) {
+          return;
+        } else {
+          ImGui::Text(name.data());
+          auto poseList = objModel.GetPoses();
+          for (int i = 0; i < poseList.size();
+                i++) {
+            ImGui::Text(fmt::format("pose: {}, {}, {}\n", poseList[i].X(),
+                                   poseList[i].Y(),
+                                   poseList[i].Rotation().Radians()).data());
+          }
+          
+        }
+      }
+      );
+    ImGui::End();
+    
   });
 
-  gui::Initialize("Glass - DISCONNECTED", 1024, 768);
+  gui::Initialize("WayMaker", 1024, 768);
   gui::Main();
 
   glass::DestroyContext();
