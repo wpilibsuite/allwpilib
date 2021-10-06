@@ -113,6 +113,7 @@ struct DisplayOptions {
   enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
 
   static constexpr Style kDefaultStyle = kBoxImage;
+  static constexpr Style kDefaultSplineStyle = kLine;
   static constexpr float kDefaultWeight = 4.0f;
   static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
   static constexpr auto kDefaultWidth = 0.6858_m;
@@ -124,6 +125,7 @@ struct DisplayOptions {
   static constexpr bool kDefaultSelectable = true;
 
   Style style = kDefaultStyle;
+  Style splineStyle = kDefaultSplineStyle;
   float weight = kDefaultWeight;
   int color = kDefaultColor;
 
@@ -183,12 +185,13 @@ class ObjectInfo {
   ObjectInfo();
 
   DisplayOptions GetDisplayOptions() const;
+  DisplayOptions GetSplineDisplayOptions() const;
   void DisplaySettings();
   void DrawLine(ImDrawList* drawList, wpi::span<const ImVec2> points) const;
 
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
-
+  int* m_pSplineType;
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -200,6 +203,7 @@ class ObjectInfo {
   float* m_pLength;
 
   int* m_pStyle;  // DisplayOptions::Style
+  int* m_pSplineStyle; //DisplayOptions::Style
   float* m_pWeight;
   int* m_pColor;
 
@@ -211,6 +215,7 @@ class ObjectInfo {
   bool* m_pSelectable;
 
   std::string* m_pFilename;
+  
   gui::Texture m_texture;
 };
 
@@ -545,6 +550,7 @@ ObjectInfo::ObjectInfo() {
   m_pLength =
       storage.GetFloatRef("length", DisplayOptions::kDefaultLength.to<float>());
   m_pStyle = storage.GetIntRef("style", DisplayOptions::kDefaultStyle);
+  m_pSplineStyle = storage.GetIntRef("splineStyle", DisplayOptions::kDefaultSplineStyle);
   m_pWeight = storage.GetFloatRef("weight", DisplayOptions::kDefaultWeight);
   m_pColor = storage.GetIntRef("color", DisplayOptions::kDefaultColor);
   m_pArrows = storage.GetBoolRef("arrows", DisplayOptions::kDefaultArrows);
@@ -556,6 +562,7 @@ ObjectInfo::ObjectInfo() {
       storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
   m_pSelectable =
       storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
+  m_pSplineType = storage.GetIntRef("splineType", FieldObjectModel::SplineType::kCubic);
 }
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -573,15 +580,54 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   return rv;
 }
 
+DisplayOptions ObjectInfo::GetSplineDisplayOptions() const {
+  DisplayOptions rv{m_texture};
+  rv.style = static_cast<DisplayOptions::Style>(*m_pSplineStyle);
+  rv.weight = *m_pWeight;
+  rv.color = *m_pColor;
+  rv.width = units::meter_t{*m_pWidth};
+  rv.length = units::meter_t{*m_pLength};
+  rv.arrows = *m_pArrows;
+  rv.arrowSize = *m_pArrowSize;
+  rv.arrowWeight = *m_pArrowWeight;
+  rv.arrowColor = *m_pArrowColor;
+  rv.selectable = *m_pSelectable;
+  return rv;
+}
+
 void ObjectInfo::DisplaySettings() {
   static const char* styleChoices[] = {"Box/Image", "Line", "Line (Closed)",
                                        "Track"};
+  static const char* splineTypeChoices[] = {"Cubic", "Quintic"};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
-  if (ImGui::Button("Export...")) {
-    
-  }
+  ImGui::Combo("Spline Type", m_pSplineType, splineTypeChoices,
+               IM_ARRAYSIZE(splineTypeChoices));
   ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
   switch (*m_pStyle) {
+    case DisplayOptions::kBoxImage:
+      if (ImGui::Button("Choose image...")) {
+        m_fileOpener = std::make_unique<pfd::open_file>(
+            "Choose object image", "",
+            std::vector<std::string>{
+                "Image File",
+                "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
+                "*.hdr *.pic *.ppm *.pgm"});
+      }
+      if (ImGui::Button("Reset image")) {
+        Reset();
+      }
+      InputFloatLength("Width", m_pWidth);
+      InputFloatLength("Length", m_pLength);
+      break;
+    case DisplayOptions::kTrack:
+      InputFloatLength("Width", m_pWidth);
+      break;
+    default:
+      break;
+  }
+
+  ImGui::Combo("Spline Style", m_pSplineStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
+  switch (*m_pSplineStyle) {
     case DisplayOptions::kBoxImage:
       if (ImGui::Button("Choose image...")) {
         m_fileOpener = std::make_unique<pfd::open_file>(
@@ -1034,7 +1080,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   obj->LoadImage();
 
   auto displayOptions = obj->GetDisplayOptions();
-
+  auto splineDisplayOptions = obj->GetSplineDisplayOptions();
   m_centerLine.resize(0);
   m_leftLine.resize(0);
   m_rightLine.resize(0);
@@ -1044,6 +1090,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   auto poses = gPopupState.GetInsertModel() == &model
                    ? gPopupState.GetInsertPoses()
                    : model.GetPoses();
+  model.SetSplineType(* obj->m_pSplineType);
   auto spline = gPopupState.GetInsertModel() == &model
                     ? gPopupState.GetInsertPoses()
                     : model.GetSpline();
@@ -1073,8 +1120,10 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     ++i;
   }
   if (i > 1) {
+    splineDisplayOptions.arrows = false;
     for (auto&& pose : spline) {
-      PoseFrameData pfd{pose, model, j, m_ffd, displayOptions};
+
+      PoseFrameData pfd{pose, model, j, m_ffd, splineDisplayOptions};
 
       // draw
       pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
@@ -1235,9 +1284,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 }
 
 void Field2DView::Display() {
-  if (ImGui::BeginPopupContextItem()) {
+  if (ImGui::Begin("Settings")) {
     DisplayField2DSettings(m_model);
-    ImGui::EndPopup();
+    ImGui::End();
   }
   DisplayField2D(m_model, ImGui::GetWindowContentRegionMax() -
                               ImGui::GetWindowContentRegionMin());

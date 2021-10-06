@@ -21,6 +21,7 @@ using namespace glass;
 
 class WMField2DModel::ObjectModel : public FieldObjectModel {
  public:
+  
   ObjectModel(std::string_view name) : m_name{name} {}
 
   const char* GetName() const override { return m_name.c_str(); }
@@ -35,14 +36,21 @@ class WMField2DModel::ObjectModel : public FieldObjectModel {
   void SetPosition(size_t i, frc::Translation2d pos) override;
   void SetRotation(size_t i, frc::Rotation2d rot) override;
   wpi::span<const frc::Pose2d> GetSpline();
- private:
+  void SetSplineType(int type) override;
+  int GetSplineType() override { return m_splineType; }
+   private:
   void UpdateSpline();
+    int m_splineType;
   std::vector<frc::Pose2d> m_spline;
   std::string m_name;
   bool exists;
   std::vector<frc::Pose2d> m_poses;
 };
 
+void WMField2DModel::ObjectModel::SetSplineType(
+    int type) {
+  m_splineType = type;
+}
 
 wpi::span<const frc::Pose2d> WMField2DModel::ObjectModel::GetPoses() {
   return m_poses;
@@ -127,8 +135,33 @@ void WMField2DModel::ObjectModel::UpdateSpline() {
   std::vector<frc::Pose2d> returnedPoints;
   if (m_poses.size() > 1) {
     try {
-      points = frc::TrajectoryGenerator::SplinePointsFromSplines(
-          frc::SplineHelper::QuinticSplinesFromWaypoints(m_poses));
+        switch (m_splineType) { case SplineType::kQuintic:
+            points = frc::TrajectoryGenerator::SplinePointsFromSplines(
+                frc::SplineHelper::QuinticSplinesFromWaypoints(m_poses));
+            break;
+          case SplineType::kCubic:
+          default:
+            frc::Pose2d start = m_poses[0];
+            frc::Pose2d end =
+                m_poses[m_poses.size() - 1];
+            std::vector<frc::Translation2d> waypoints;
+            if (m_poses.size() >= 3) {
+              waypoints.resize(m_poses.size() - 2);
+              std::transform(m_poses.begin() + 1, m_poses.end()-1,
+                             waypoints.begin(),
+                             [&](auto& point) { return point.Translation(); });
+            }
+           
+            
+            auto [startCV, endCV] =
+                frc::SplineHelper::CubicControlVectorsFromWaypoints(
+                    start, waypoints, end);
+            points = frc::TrajectoryGenerator::SplinePointsFromSplines(
+                frc::SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV));
+            break;
+
+      }
+      
     } catch (frc::SplineParameterizer::MalformedSplineException& e) {
       printf(e.what());
     }

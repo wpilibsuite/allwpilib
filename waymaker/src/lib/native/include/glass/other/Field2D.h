@@ -21,13 +21,15 @@ namespace glass {
 class FieldObjectModel : public Model {
  public:
   virtual const char* GetName() const = 0;
-
+  enum SplineType { kCubic = 0, kQuintic };
   virtual wpi::span<const frc::Pose2d> GetPoses() = 0;
   virtual void SetPoses(wpi::span<const frc::Pose2d> poses) = 0;
   virtual void SetPose(size_t i, frc::Pose2d pose) = 0;
   virtual void SetPosition(size_t i, frc::Translation2d pos) = 0;
   virtual void SetRotation(size_t i, frc::Rotation2d rot) = 0;
   virtual wpi::span<const frc::Pose2d> GetSpline() = 0;
+  virtual void SetSplineType(int type) = 0;
+  virtual int GetSplineType() = 0;
 };
 
 class Field2DModel : public Model {
