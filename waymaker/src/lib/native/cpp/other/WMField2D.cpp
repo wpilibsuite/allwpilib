@@ -38,14 +38,22 @@ class WMField2DModel::ObjectModel : public FieldObjectModel {
   wpi::span<const frc::Pose2d> GetSpline();
   void SetSplineType(int type) override;
   int GetSplineType() override { return m_splineType; }
+  bool IsReversed() override { return isReversed; }
+  void SetReversed(bool reversed) override; 
    private:
   void UpdateSpline();
     int m_splineType;
   std::vector<frc::Pose2d> m_spline;
+    bool isReversed;
   std::string m_name;
   bool exists;
   std::vector<frc::Pose2d> m_poses;
 };
+
+void WMField2DModel::ObjectModel::SetReversed(
+    bool reversed) {
+  isReversed = reversed;
+}
 
 void WMField2DModel::ObjectModel::SetSplineType(
     int type) {
@@ -131,36 +139,59 @@ wpi::span<const frc::Pose2d> WMField2DModel::ObjectModel::GetSpline() {
 }
 
 void WMField2DModel::ObjectModel::UpdateSpline() {
+  std::vector<frc::Pose2d> waypoints = m_poses;
   std::vector<frc::SplineParameterizer::PoseWithCurvature> points;
   std::vector<frc::Pose2d> returnedPoints;
-  if (m_poses.size() > 1) {
+  const frc::Transform2d flip{frc::Translation2d(), frc::Rotation2d(180_deg)};
+  if (waypoints.size() > 1) {
     try {
+
         switch (m_splineType) { case SplineType::kQuintic:
+            
+                  if (isReversed) {
+              for (auto& waypoint : waypoints) {
+                waypoint = waypoint + flip;
+              }
+            }
+
             points = frc::TrajectoryGenerator::SplinePointsFromSplines(
-                frc::SplineHelper::QuinticSplinesFromWaypoints(m_poses));
+                frc::SplineHelper::QuinticSplinesFromWaypoints(waypoints));
+
             break;
           case SplineType::kCubic:
           default:
-            frc::Pose2d start = m_poses[0];
+            frc::Pose2d start = waypoints[0];
             frc::Pose2d end =
-                m_poses[m_poses.size() - 1];
-            std::vector<frc::Translation2d> waypoints;
-            if (m_poses.size() >= 3) {
-              waypoints.resize(m_poses.size() - 2);
+                waypoints[waypoints.size() - 1];
+
+            std::vector<frc::Translation2d> interiorWaypoints;
+            if (waypoints.size() >= 3) {
+              interiorWaypoints.resize(m_poses.size() - 2);
               std::transform(m_poses.begin() + 1, m_poses.end()-1,
-                             waypoints.begin(),
+                             interiorWaypoints.begin(),
                              [&](auto& point) { return point.Translation(); });
             }
            
             
             auto [startCV, endCV] =
                 frc::SplineHelper::CubicControlVectorsFromWaypoints(
-                    start, waypoints, end);
+                    start, interiorWaypoints, end);
+            if (isReversed) {
+              startCV.x[1] *= -1;
+              startCV.y[1] *= -1;
+              endCV.x[1] *= -1;
+              endCV.y[1] *= -1;
+            }
             points = frc::TrajectoryGenerator::SplinePointsFromSplines(
-                frc::SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV));
+                frc::SplineHelper::CubicSplinesFromControlVectors(startCV, interiorWaypoints, endCV));
             break;
 
       }
+        if (isReversed) {
+          for (auto& point : points) {
+            point = {point.first + flip, -point.second};
+          }
+        }
       
     } catch (frc::SplineParameterizer::MalformedSplineException& e) {
       printf(e.what());

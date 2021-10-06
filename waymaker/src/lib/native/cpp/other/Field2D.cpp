@@ -192,6 +192,7 @@ class ObjectInfo {
   void LoadImage();
   const gui::Texture& GetTexture() const { return m_texture; }
   int* m_pSplineType;
+  bool* m_pReversed;
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -563,6 +564,8 @@ ObjectInfo::ObjectInfo() {
   m_pSelectable =
       storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
   m_pSplineType = storage.GetIntRef("splineType", FieldObjectModel::SplineType::kCubic);
+  m_pReversed =
+      storage.GetBoolRef("reversed", false);
 }
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -602,6 +605,7 @@ void ObjectInfo::DisplaySettings() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   ImGui::Combo("Spline Type", m_pSplineType, splineTypeChoices,
                IM_ARRAYSIZE(splineTypeChoices));
+  ImGui::Checkbox("Reversed", m_pReversed);
   ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
   switch (*m_pStyle) {
     case DisplayOptions::kBoxImage:
@@ -1087,6 +1091,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
 
   m_drawSplit.Split(m_drawList, 2);
   m_drawSplit.SetCurrentChannel(m_drawList, 1);
+  model.SetReversed(*obj->m_pReversed);
   auto poses = gPopupState.GetInsertModel() == &model
                    ? gPopupState.GetInsertPoses()
                    : model.GetPoses();

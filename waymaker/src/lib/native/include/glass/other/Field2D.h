@@ -30,6 +30,9 @@ class FieldObjectModel : public Model {
   virtual wpi::span<const frc::Pose2d> GetSpline() = 0;
   virtual void SetSplineType(int type) = 0;
   virtual int GetSplineType() = 0;
+  virtual void SetReversed(bool reversed) = 0;
+  virtual bool IsReversed() = 0;
+  
 };
 
 class Field2DModel : public Model {
