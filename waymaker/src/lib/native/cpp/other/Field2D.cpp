@@ -110,7 +110,7 @@ class PopupState {
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
-  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack };
+  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack, kCircle };
 
   static constexpr Style kDefaultStyle = kBoxImage;
   static constexpr Style kDefaultSplineStyle = kLine;
@@ -142,6 +142,8 @@ struct DisplayOptions {
   const gui::Texture& texture;
 };
 
+
+
 // Per-frame pose data (not persistent)
 class PoseFrameData {
  public:
@@ -158,6 +160,8 @@ class PoseFrameData {
   SelectedTargetInfo GetDragTarget(int corner, float dist) const;
   void HandleDrag(const ImVec2& cursor);
   void Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
+            std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
+  void DrawInterior(ImDrawList* drawList, std::vector<ImVec2>* center,
             std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
 
   // in window coordinates
@@ -888,6 +892,15 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
       drawList->AddQuad(m_corners[0], m_corners[1], m_corners[2], m_corners[3],
                         m_displayOptions.color, m_displayOptions.weight);
       break;
+    case DisplayOptions::kCircle:
+      if (m_displayOptions.texture) {
+        drawList->AddImageQuad(m_displayOptions.texture, m_corners[0],
+                               m_corners[1], m_corners[2], m_corners[3]);
+        return;
+      }
+      drawList->AddCircle(m_center, m_width2, m_displayOptions.color, 16,
+                          m_displayOptions.weight);
+      break;
     case DisplayOptions::kLine:
     case DisplayOptions::kLineClosed:
       center->emplace_back(m_center);
@@ -900,11 +913,23 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
   }
 
   if (m_displayOptions.arrows) {
-    drawList->AddTriangle(m_arrow[0], m_arrow[1], m_arrow[2],
-                          m_displayOptions.arrowColor,
+    if (m_displayOptions.style == DisplayOptions::kCircle) {
+      drawList->AddCircle(m_center, m_displayOptions.arrowWeight,
+                          m_displayOptions.arrowColor, 16,
                           m_displayOptions.arrowWeight);
+    } else {
+      drawList->AddTriangle(m_arrow[0], m_arrow[1], m_arrow[2],
+                            m_displayOptions.arrowColor,
+                            m_displayOptions.arrowWeight);
+    }
+
+
   }
 }
+
+
+
+  
 
 void glass::DisplayField2DSettings(Field2DModel* model) {
   auto& storage = GetStorage();
@@ -1099,9 +1124,17 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   auto spline = gPopupState.GetInsertModel() == &model
                     ? gPopupState.GetInsertPoses()
                     : model.GetSpline();
+  auto style = displayOptions.style;
   size_t i = 0;
   size_t j = 0;
   for (auto&& pose : poses) {
+    if (*obj->m_pSplineType == (int)FieldObjectModel::SplineType::kCubic &&
+        i != 0 && i != (poses.size() - 1)) {
+      displayOptions.style = DisplayOptions::kCircle;
+    }
+    else {
+      displayOptions.style = style;
+    }
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
     // check for potential drag targets
@@ -1119,9 +1152,8 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     if (gDragState.target.objModel == &model && gDragState.target.index == i) {
       pfd.HandleDrag(m_mousePos);
     }
-
-    // draw
-    pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+      pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+    
     ++i;
   }
   if (i > 1) {
