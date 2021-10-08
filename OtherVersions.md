@@ -12,8 +12,8 @@ In order to build a project using a development build, find the build.gradle fil
 
 ```groovy
 wpi.maven.useDevelopment = true
-wpi.wpilibVersion = 'YEAR.+'
-wpi.wpimathVersion = 'YEAR.+
+wpi.versions.wpilibVersion = 'YEAR.+'
+wpi.versions.wpimathVersion = 'YEAR.+
 ```
 
 The top of your ``build.gradle`` file should now look similar to the code below. Ignore any differences in versions.
@@ -22,12 +22,12 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2020.3.2"
+  id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
 wpi.maven.useDevelopment = true
-wpi.wpilibVersion = '2021.+'
-wpi.wpimathVersion = '2021.+'
+wpi.versions.wpilibVersion = '2022.+'
+wpi.versions.wpimathVersion = '2022.+'
 ```
 
 C++
@@ -35,12 +35,12 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2020.3.2"
+  id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
 wpi.maven.useDevelopment = true
-wpi.wpilibVersion = '2021.+'
-wpi.wpimathVersion = '2021.+'
+wpi.versions.wpilibVersion = '2022.+'
+wpi.versions.wpimathVersion = '2022.+'
 ```
 
 ## Local Build
@@ -51,12 +51,12 @@ Java
 ```groovy
 plugins {
   id "java"
-  id "edu.wpi.first.GradleRIO" version "2020.3.2"
+  id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
 wpi.maven.useFrcMavenLocalDevelopment = true
-wpi.wpilibVersion = 'YEAR.424242.+'
-wpi.wpimathVersion = 'YEAR.424242.+'
+wpi.versions.wpilibVersion = 'YEAR.424242.+'
+wpi.versions.wpimathVersion = 'YEAR.424242.+'
 ```
 
 C++
@@ -64,12 +64,12 @@ C++
 plugins {
   id "cpp"
   id "google-test-test-suite"
-  id "edu.wpi.first.GradleRIO" version "2020.3.2"
+  id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
 wpi.maven.useFrcMavenLocalDevelopment = true
-wpi.wpilibVersion = 'YEAR.424242.+'
-wpi.wpimathVersion = 'YEAR.424242.+'
+wpi.versions.wpilibVersion = 'YEAR.424242.+'
+wpi.versions.wpimathVersion = 'YEAR.424242.+'
 ```
 
 # roboRIO Development
