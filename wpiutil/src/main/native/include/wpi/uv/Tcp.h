@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "wpi/uv/NetworkStream.h"
 
@@ -258,11 +259,11 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   void Connect(const sockaddr& addr, std::function<void()> callback);
 
   void Connect(const sockaddr_in& addr, std::function<void()> callback) {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 
   void Connect(const sockaddr_in6& addr, std::function<void()> callback) {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 
   /**

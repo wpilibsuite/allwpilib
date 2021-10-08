@@ -24,8 +24,8 @@ void Timer::SingleShot(Loop& loop, Time timeout, std::function<void()> func) {
   if (!h) {
     return;
   }
-  h->timeout.connect([theTimer = h.get(), func]() {
-    func();
+  h->timeout.connect([theTimer = h.get(), f = std::move(func)]() {
+    f();
     theTimer->Close();
   });
   h->Start(timeout);
