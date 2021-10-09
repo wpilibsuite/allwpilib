@@ -104,17 +104,17 @@ class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {
 
   SelectCommand(SelectCommand&& other) = default;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override { m_selectedCommand->Execute(); }
+  void Execute() final { m_selectedCommand->Execute(); }
 
-  void End(bool interrupted) override {
+  void End(bool interrupted) final {
     return m_selectedCommand->End(interrupted);
   }
 
-  bool IsFinished() override { return m_selectedCommand->IsFinished(); }
+  bool IsFinished() final { return m_selectedCommand->IsFinished(); }
 
-  bool RunsWhenDisabled() const override { return m_runsWhenDisabled; }
+  bool RunsWhenDisabled() const final { return m_runsWhenDisabled; }
 
  protected:
   std::unique_ptr<Command> TransferOwnership() && override {

@@ -200,14 +200,14 @@ class ProfiledPIDCommand
 
   ProfiledPIDCommand(const ProfiledPIDCommand& other) = default;
 
-  void Initialize() override { m_controller.Reset(m_measurement()); }
+  void Initialize() final { m_controller.Reset(m_measurement()); }
 
-  void Execute() override {
+  void Execute() final {
     m_useOutput(m_controller.Calculate(m_measurement(), m_goal()),
                 m_controller.GetSetpoint());
   }
 
-  void End(bool interrupted) override {
+  void End(bool interrupted) final {
     m_useOutput(0, State{Distance_t(0), Velocity_t(0)});
   }
 
@@ -218,7 +218,7 @@ class ProfiledPIDCommand
    */
   frc::ProfiledPIDController<Distance>& GetController() { return m_controller; }
 
- protected:
+ private:
   frc::ProfiledPIDController<Distance> m_controller;
   std::function<Distance_t()> m_measurement;
   std::function<State()> m_goal;

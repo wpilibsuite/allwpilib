@@ -42,7 +42,7 @@ class WaitUntilCommand : public CommandHelper<CommandBase, WaitUntilCommand> {
 
   WaitUntilCommand(const WaitUntilCommand& other) = default;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
   bool RunsWhenDisabled() const override;
 

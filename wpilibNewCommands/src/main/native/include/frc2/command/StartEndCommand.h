@@ -48,11 +48,11 @@ class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
 
   StartEndCommand(const StartEndCommand& other);
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
- protected:
+ private:
   std::function<void()> m_onInit;
   std::function<void()> m_onEnd;
 };

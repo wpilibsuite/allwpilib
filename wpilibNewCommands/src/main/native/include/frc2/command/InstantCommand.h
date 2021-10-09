@@ -50,9 +50,11 @@ class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
    */
   InstantCommand();
 
-  void Initialize() override;
+  void Initialize() final;
 
   bool IsFinished() final;
+
+  PerpetualCommand Perpetually() && override;
 
  private:
   std::function<void()> m_toRun;

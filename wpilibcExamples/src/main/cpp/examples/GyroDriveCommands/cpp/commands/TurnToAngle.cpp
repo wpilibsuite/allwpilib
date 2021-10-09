@@ -20,12 +20,12 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
           // Require the drive
           {drive}) {
   // Set the controller to be continuous (because it is an angle controller)
-  m_controller.EnableContinuousInput(-180, 180);
+  GetController().EnableContinuousInput(-180, 180);
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetTolerance(kTurnTolerance.to<double>(),
-                            kTurnRateTolerance.to<double>());
+  GetController().SetTolerance(kTurnTolerance.to<double>(),
+                               kTurnRateTolerance.to<double>());
 
   AddRequirements({drive});
 }

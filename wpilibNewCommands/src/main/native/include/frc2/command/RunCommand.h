@@ -45,9 +45,9 @@ class RunCommand : public CommandHelper<CommandBase, RunCommand> {
 
   RunCommand(const RunCommand& other) = default;
 
-  void Execute() override;
+  void Execute() final;
 
- protected:
+ private:
   std::function<void()> m_toRun;
 };
 }  // namespace frc2

@@ -4,6 +4,10 @@
 
 #include "frc2/command/InstantCommand.h"
 
+#include <frc/Errors.h>
+
+#include "frc2/command/PerpetualCommand.h"
+
 using namespace frc2;
 
 InstantCommand::InstantCommand(std::function<void()> toRun,
@@ -26,4 +30,14 @@ void InstantCommand::Initialize() {
 
 bool InstantCommand::IsFinished() {
   return true;
+}
+
+PerpetualCommand InstantCommand::Perpetually() && {
+  FRC_ReportError(
+      frc::warn::Warning, "{}",
+      "Called InstantCommand.Perpetually(). A perpetuated InstantCommand"
+      " will do nothing. If you want to execute a Runnable repeatedly, use "
+      "RunCommand.");
+
+  return PerpetualCommand(std::move(*this).TransferOwnership());
 }

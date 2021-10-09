@@ -207,13 +207,13 @@ class SwerveControllerCommand
           output,
       wpi::span<Subsystem* const> requirements = {});
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
  private:
   frc::Trajectory m_trajectory;

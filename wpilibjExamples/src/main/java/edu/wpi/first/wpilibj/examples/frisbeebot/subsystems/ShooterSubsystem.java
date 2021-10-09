@@ -42,7 +42,7 @@ public class ShooterSubsystem extends PIDSubsystem {
   }
 
   public boolean atSetpoint() {
-    return m_controller.atSetpoint();
+    return getController().atSetpoint();
   }
 
   public void runFeeder() {

@@ -34,11 +34,11 @@ class ScheduleCommand : public CommandHelper<CommandBase, ScheduleCommand> {
 
   ScheduleCommand(const ScheduleCommand& other) = default;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
-  bool RunsWhenDisabled() const override;
+  bool RunsWhenDisabled() const final;
 
  private:
   wpi::SmallVector<Command*, 4> m_toSchedule;

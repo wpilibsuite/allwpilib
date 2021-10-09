@@ -58,13 +58,13 @@ class FunctionalCommand : public CommandHelper<CommandBase, FunctionalCommand> {
 
   FunctionalCommand(const FunctionalCommand& other) = default;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
  private:
   std::function<void()> m_onInit;

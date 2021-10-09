@@ -39,7 +39,7 @@ class CommandBase : public Command,
 
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
 
-  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
+  wpi::SmallSet<Subsystem*, 4> GetRequirements() const final;
 
   /**
    * Sets the name of this Command.

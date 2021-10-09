@@ -69,15 +69,15 @@ class ConditionalCommand
   // No copy constructors for command groups
   ConditionalCommand(const ConditionalCommand& other) = delete;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
-  bool RunsWhenDisabled() const override;
+  bool RunsWhenDisabled() const final;
 
  private:
   std::unique_ptr<Command> m_onTrue;

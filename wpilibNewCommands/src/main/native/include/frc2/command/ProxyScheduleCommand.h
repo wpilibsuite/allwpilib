@@ -35,13 +35,13 @@ class ProxyScheduleCommand
 
   ProxyScheduleCommand(const ProxyScheduleCommand& other) = default;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  void Execute() override;
+  void Execute() final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
  private:
   wpi::SmallVector<Command*, 4> m_toSchedule;

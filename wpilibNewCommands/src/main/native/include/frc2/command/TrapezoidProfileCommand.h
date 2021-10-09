@@ -59,18 +59,16 @@ class TrapezoidProfileCommand
     this->AddRequirements(requirements);
   }
 
-  void Initialize() override {
+  void Initialize() final {
     m_timer.Reset();
     m_timer.Start();
   }
 
-  void Execute() override { m_output(m_profile.Calculate(m_timer.Get())); }
+  void Execute() final { m_output(m_profile.Calculate(m_timer.Get())); }
 
-  void End(bool interrupted) override { m_timer.Stop(); }
+  void End(bool interrupted) final { m_timer.Stop(); }
 
-  bool IsFinished() override {
-    return m_timer.HasElapsed(m_profile.TotalTime());
-  }
+  bool IsFinished() final { return m_timer.HasElapsed(m_profile.TotalTime()); }
 
  private:
   frc::TrapezoidProfile<Distance> m_profile;

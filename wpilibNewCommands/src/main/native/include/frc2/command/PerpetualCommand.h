@@ -59,11 +59,11 @@ class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
   // Prevent template expansion from emulating copy ctor
   PerpetualCommand(PerpetualCommand&) = delete;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
   PerpetualCommand Perpetually() && override;
 

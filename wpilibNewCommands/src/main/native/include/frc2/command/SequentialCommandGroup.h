@@ -76,15 +76,15 @@ class SequentialCommandGroup
     AddCommands(std::move(foo));
   }
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
-  bool IsFinished() override;
+  bool IsFinished() final;
 
-  bool RunsWhenDisabled() const override;
+  bool RunsWhenDisabled() const final;
 
   SequentialCommandGroup BeforeStarting(
       std::function<void()> toRun,

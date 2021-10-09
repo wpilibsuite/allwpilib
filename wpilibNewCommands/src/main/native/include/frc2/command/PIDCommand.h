@@ -90,11 +90,11 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
 
   PIDCommand(const PIDCommand& other) = default;
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void Execute() override;
+  void Execute() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
   /**
    * Returns the PIDController used by the command.
@@ -103,7 +103,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    */
   PIDController& GetController();
 
- protected:
+ private:
   PIDController m_controller;
   std::function<double()> m_measurement;
   std::function<double()> m_setpoint;

@@ -186,20 +186,15 @@ class Command {
    * Schedules this command.
    *
    * @param interruptible whether this command can be interrupted by another
-   * command that shares one of its requirements
+   * command that shares one of its requirements. Defaults to true.
    */
-  void Schedule(bool interruptible);
+  virtual void Schedule(bool interruptible = true) final;
 
   /**
-   * Schedules this command, defaulting to interruptible.
-   */
-  void Schedule() { Schedule(true); }
-
-  /**
-   * Cancels this command.  Will call the command's interrupted() method.
+   * Cancels this command.  Will call the command's End(true) method.
    * Commands will be canceled even if they are not marked as interruptible.
    */
-  void Cancel();
+  virtual void Cancel() final;
 
   /**
    * Whether or not the command is currently scheduled.  Note that this does not
@@ -208,7 +203,7 @@ class Command {
    *
    * @return Whether the command is scheduled.
    */
-  bool IsScheduled() const;
+  virtual bool IsScheduled() const final;
 
   /**
    * Whether the command requires a given subsystem.  Named "hasRequirement"
@@ -220,7 +215,7 @@ class Command {
    * @param requirement the subsystem to inquire about
    * @return whether the subsystem is required
    */
-  bool HasRequirement(Subsystem* requirement) const;
+  virtual bool HasRequirement(Subsystem* requirement) const final;
 
   /**
    * Whether the command is currently grouped in a command group.  Used as extra

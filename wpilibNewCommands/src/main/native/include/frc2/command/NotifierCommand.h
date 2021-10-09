@@ -51,9 +51,9 @@ class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
 
   NotifierCommand(const NotifierCommand& other);
 
-  void Initialize() override;
+  void Initialize() final;
 
-  void End(bool interrupted) override;
+  void End(bool interrupted) final;
 
  private:
   std::function<void()> m_toRun;

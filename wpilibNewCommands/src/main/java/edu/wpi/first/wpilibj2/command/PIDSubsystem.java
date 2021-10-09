@@ -13,8 +13,8 @@ import edu.wpi.first.math.controller.PIDController;
  * synchronously from the subsystem's periodic() method.
  */
 public abstract class PIDSubsystem extends SubsystemBase {
-  protected final PIDController m_controller;
-  protected boolean m_enabled;
+  private final PIDController m_controller;
+  private boolean m_enabled;
 
   private double m_setpoint;
 
@@ -84,13 +84,13 @@ public abstract class PIDSubsystem extends SubsystemBase {
   protected abstract double getMeasurement();
 
   /** Enables the PID control. Resets the controller. */
-  public void enable() {
+  public final void enable() {
     m_enabled = true;
     m_controller.reset();
   }
 
   /** Disables the PID control. Sets output to zero. */
-  public void disable() {
+  public final void disable() {
     m_enabled = false;
     useOutput(0, 0);
   }
@@ -100,7 +100,7 @@ public abstract class PIDSubsystem extends SubsystemBase {
    *
    * @return Whether the controller is enabled.
    */
-  public boolean isEnabled() {
+  public final boolean isEnabled() {
     return m_enabled;
   }
 }

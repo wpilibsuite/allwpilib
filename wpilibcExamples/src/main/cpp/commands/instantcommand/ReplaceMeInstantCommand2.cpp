@@ -7,9 +7,9 @@
 // NOTE:  Consider using this command inline, rather than writing a subclass.
 // For more information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-ReplaceMeInstantCommand2::ReplaceMeInstantCommand2() {
+ReplaceMeInstantCommand2::ReplaceMeInstantCommand2()
+    : CommandHelper([=] {
+        // this block will be executed when the command is scheduled.
+      }) {
   // Use addRequirements() here to declare subsystem dependencies.
 }
-
-// Called when the command is initially scheduled.
-void ReplaceMeInstantCommand2::Initialize() {}

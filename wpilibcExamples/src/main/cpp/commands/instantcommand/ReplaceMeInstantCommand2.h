@@ -12,6 +12,4 @@ class ReplaceMeInstantCommand2
                                  ReplaceMeInstantCommand2> {
  public:
   ReplaceMeInstantCommand2();
-
-  void Initialize() override;
 };
