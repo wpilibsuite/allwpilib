@@ -7,7 +7,7 @@
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/PIDCommand.h>
 
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 
 /**
  * Drive the given distance straight (negative values go backwards).
@@ -18,10 +18,10 @@
 class DriveStraight
     : public frc2::CommandHelper<frc2::PIDCommand, DriveStraight> {
  public:
-  explicit DriveStraight(double distance, DriveTrain* drivetrain);
+  explicit DriveStraight(double distance, Drivetrain* drivetrain);
   void Initialize() override;
   bool IsFinished() override;
 
  private:
-  DriveTrain* m_drivetrain;
+  Drivetrain* m_drivetrain;
 };

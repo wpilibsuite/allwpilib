@@ -19,7 +19,7 @@ import java.util.PriorityQueue;
  */
 public class TimedRobot extends IterativeRobotBase {
   @SuppressWarnings("MemberName")
-  class Callback implements Comparable<Callback> {
+  static class Callback implements Comparable<Callback> {
     public Runnable func;
     public double period;
     public double expirationTime;
@@ -41,6 +41,19 @@ public class TimedRobot extends IterativeRobotBase {
               + Math.floor((Timer.getFPGATimestamp() - startTimeSeconds) / this.period)
                   * this.period
               + this.period;
+    }
+
+    @Override
+    public boolean equals(Object rhs) {
+      if (rhs instanceof Callback) {
+        return Double.compare(expirationTime, ((Callback) rhs).expirationTime) == 0;
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Double.hashCode(expirationTime);
     }
 
     @Override

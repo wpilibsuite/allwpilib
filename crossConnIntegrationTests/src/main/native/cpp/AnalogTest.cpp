@@ -108,5 +108,5 @@ TEST(AnalogOutputTest, UnderAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-INSTANTIATE_TEST_SUITE_P(AnalogCrossConnectsTest, AnalogCrossTest,
+INSTANTIATE_TEST_SUITE_P(AnalogCrossConnectsTests, AnalogCrossTest,
                          ::testing::ValuesIn(AnalogCrossConnects));

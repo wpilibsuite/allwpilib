@@ -1,8 +1,20 @@
+<<<<<<< HEAD:wpilibj/src/main/java/edu/wpi/first/wpilibj/counters/Tachometer.java
 package edu.wpi.first.wpilibj.counters;
 
 import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+=======
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package edu.wpi.first.wpilibj.counter;
+
+import edu.wpi.first.wpilibj.DigitalSource;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+>>>>>>> b2cf6d866f5e2166c1b0478274a3315a008015e6:wpilibj/src/main/java/edu/wpi/first/wpilibj/counter/Tachometer.java
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -34,7 +46,15 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   public double getFrequency() {
+<<<<<<< HEAD:wpilibj/src/main/java/edu/wpi/first/wpilibj/counters/Tachometer.java
     return 1 / getPeriod();
+=======
+    double period = getPeriod();
+    if (period == 0) {
+      return 0;
+    }
+    return period;
+>>>>>>> b2cf6d866f5e2166c1b0478274a3315a008015e6:wpilibj/src/main/java/edu/wpi/first/wpilibj/counter/Tachometer.java
   }
 
   public int getEdgesPerRevolution() {
@@ -48,9 +68,19 @@ public class Tachometer implements Sendable, AutoCloseable {
   public double getRevolutionsPerMinute() {
     double period = getPeriod();
     if (period == 0) {
+<<<<<<< HEAD:wpilibj/src/main/java/edu/wpi/first/wpilibj/counters/Tachometer.java
       return Double.MAX_VALUE;
     }
     return ((1.0 / getEdgesPerRevolution()) / period) * 60;
+=======
+      return 0;
+    }
+    int edgesPerRevolution = getEdgesPerRevolution();
+    if (edgesPerRevolution == 0) {
+      return 0;
+    }
+    return ((1.0 / edgesPerRevolution) / period) * 60;
+>>>>>>> b2cf6d866f5e2166c1b0478274a3315a008015e6:wpilibj/src/main/java/edu/wpi/first/wpilibj/counter/Tachometer.java
   }
 
   public boolean getStopped() {

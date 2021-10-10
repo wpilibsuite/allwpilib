@@ -21,7 +21,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
@@ -84,11 +83,6 @@ public class KalmanFilterTest {
             VecBuilder.fill(2, 2, 2), // measurement weights
             0.020);
 
-    List<Double> xhatsX = new ArrayList<>();
-    List<Double> measurementsX = new ArrayList<>();
-    List<Double> xhatsY = new ArrayList<>();
-    List<Double> measurementsY = new ArrayList<>();
-
     Matrix<N3, N1> measurement;
     for (int i = 0; i < 100; i++) {
       // the robot is at [0, 0, 0] so we just park here
@@ -98,21 +92,8 @@ public class KalmanFilterTest {
 
       // we continue to not accelerate
       filter.predict(VecBuilder.fill(0.0, 0.0, 0.0), 0.020);
-
-      measurementsX.add(measurement.get(0, 0));
-      measurementsY.add(measurement.get(1, 0));
-      xhatsX.add(filter.getXhat(0));
-      xhatsY.add(filter.getXhat(1));
     }
 
-    // var chart = new XYChartBuilder().build();
-    // chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-    // chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-    // try {
-    //  new SwingWrapper<>(chart).displayChart();
-    //  Thread.sleep(10000000);
-    // } catch (Exception ign) {
-    // }
     assertEquals(0.0, filter.getXhat(0), 0.3);
     assertEquals(0.0, filter.getXhat(0), 0.3);
   }
@@ -131,11 +112,6 @@ public class KalmanFilterTest {
             VecBuilder.fill(4, 4, 4), // measurement weights
             0.020);
 
-    List<Double> xhatsX = new ArrayList<>();
-    List<Double> measurementsX = new ArrayList<>();
-    List<Double> xhatsY = new ArrayList<>();
-    List<Double> measurementsY = new ArrayList<>();
-
     // we set the velocity of the robot so that it's moving forward slowly
     filter.setXhat(0, 0.5);
     filter.setXhat(1, 0.5);
@@ -153,20 +129,7 @@ public class KalmanFilterTest {
 
       // we continue to not accelerate
       filter.predict(VecBuilder.fill(0.0, 0.0, 0.0), 0.020);
-
-      measurementsX.add(measurement.get(0, 0));
-      measurementsY.add(measurement.get(1, 0));
-      xhatsX.add(filter.getXhat(0));
-      xhatsY.add(filter.getXhat(1));
     }
-
-    // var chart = new XYChartBuilder().build();
-    // chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-    // chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-    // try {
-    //  new SwingWrapper<>(chart).displayChart();
-    //  Thread.sleep(10000000);
-    // } catch (Exception ign) {}
 
     assertEquals(0.0, filter.getXhat(0), 0.2);
     assertEquals(0.0, filter.getXhat(1), 0.2);
@@ -186,11 +149,6 @@ public class KalmanFilterTest {
             // weights
             VecBuilder.fill(4, 4, 4), // measurement weights
             0.020);
-
-    List<Double> xhatsX = new ArrayList<>();
-    List<Double> measurementsX = new ArrayList<>();
-    List<Double> xhatsY = new ArrayList<>();
-    List<Double> measurementsY = new ArrayList<>();
 
     var trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -218,22 +176,8 @@ public class KalmanFilterTest {
       filter.correct(u, measurement);
       filter.predict(u, 0.020);
 
-      measurementsX.add(measurement.get(0, 0));
-      measurementsY.add(measurement.get(1, 0));
-      xhatsX.add(filter.getXhat(0));
-      xhatsY.add(filter.getXhat(1));
-
       time += 0.020;
     }
-
-    // var chart = new XYChartBuilder().build();
-    // chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
-    // chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
-    // try {
-    //        new SwingWrapper<>(chart).displayChart();
-    //        Thread.sleep(10000000);
-    // } catch (Exception ign) {
-    // }
 
     assertEquals(
         trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getX(),

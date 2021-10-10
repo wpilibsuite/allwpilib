@@ -13,7 +13,7 @@
 
 namespace wpi::uv {
 
-TEST(UvAsyncFunction, Test) {
+TEST(UvAsyncFunctionTest, Basic) {
   int prepare_cb_called = 0;
   int async_cb_called[2] = {0, 0};
   int close_cb_called = 0;
@@ -62,7 +62,7 @@ TEST(UvAsyncFunction, Test) {
   }
 }
 
-TEST(UvAsyncFunction, Ref) {
+TEST(UvAsyncFunctionTest, Ref) {
   int prepare_cb_called = 0;
   int val = 0;
 
@@ -96,7 +96,7 @@ TEST(UvAsyncFunction, Ref) {
   }
 }
 
-TEST(UvAsyncFunction, Movable) {
+TEST(UvAsyncFunctionTest, Movable) {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -133,7 +133,7 @@ TEST(UvAsyncFunction, Movable) {
   }
 }
 
-TEST(UvAsyncFunction, CallIgnoreResult) {
+TEST(UvAsyncFunctionTest, CallIgnoreResult) {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -165,7 +165,7 @@ TEST(UvAsyncFunction, CallIgnoreResult) {
   }
 }
 
-TEST(UvAsyncFunction, VoidCall) {
+TEST(UvAsyncFunctionTest, VoidCall) {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -195,7 +195,7 @@ TEST(UvAsyncFunction, VoidCall) {
   }
 }
 
-TEST(UvAsyncFunction, WaitFor) {
+TEST(UvAsyncFunctionTest, WaitFor) {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -228,7 +228,7 @@ TEST(UvAsyncFunction, WaitFor) {
   }
 }
 
-TEST(UvAsyncFunction, VoidWaitFor) {
+TEST(UvAsyncFunctionTest, VoidWaitFor) {
   int prepare_cb_called = 0;
 
   std::thread theThread;

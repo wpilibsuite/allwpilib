@@ -120,7 +120,9 @@ wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on
 
 #### Java Code Quality Tools
 
-The Java code quality tools Checkstyle and PMD can be run via `./gradlew javaFormat`. Spotless can be run via `./gradlew spotlessCheck` to preview changes, and via `./gradlew spotlessApply` to immediately apply changes. These tools will all be run automatically by the build task. To disable this behavior, pass the `-PskipJavaFormat` flag.
+The Java code quality tools Checkstyle, PMD, and Spotless can be run via `./gradlew javaFormat`. SpotBugs can be run via the `spotbugsMain`, `spotbugsTest`, and `spotbugsDev` tasks. These tools will all be run automatically by the `build` task. To disable this behavior, pass the `-PskipJavaFormat` flag.
+
+If you only want to run the Java autoformatter, run `./gradlew spotlessApply`.
 
 ### CMake
 

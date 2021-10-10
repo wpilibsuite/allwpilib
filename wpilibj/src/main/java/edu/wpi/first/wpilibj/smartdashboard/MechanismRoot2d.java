@@ -72,7 +72,7 @@ public final class MechanismRoot2d {
     m_y = y;
   }
 
-  void update(NetworkTable table) {
+  synchronized void update(NetworkTable table) {
     m_table = table;
     m_xEntry = m_table.getEntry("x");
     m_yEntry = m_table.getEntry("y");
@@ -86,7 +86,7 @@ public final class MechanismRoot2d {
     return m_name;
   }
 
-  private void flush() {
+  private synchronized void flush() {
     if (m_xEntry != null) {
       m_xEntry.setDouble(m_x);
     }

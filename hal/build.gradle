@@ -127,6 +127,10 @@ cppHeadersZip {
     }
 }
 
+Action<List<String>> symbolFilter = { symbols ->
+    symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
+} as Action<List<String>>;
+
 nativeUtils.exportsConfigs {
     hal {
         x86ExcludeSymbols = [
@@ -157,22 +161,21 @@ nativeUtils.exportsConfigs {
         ]
     }
     halJNI {
-        x86SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
-        }
-        x64SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('HAL_') && !it.startsWith('HALSIM_') })
-        }
+        x86SymbolFilter = symbolFilter
+        x64SymbolFilter = symbolFilter
     }
 }
 
 model {
     binaries {
         all {
+            it.tasks.withType(AbstractNativeSourceCompileTask) {
+                it.dependsOn generateUsageReporting
+            }
             if (!(it instanceof NativeBinarySpec)) return
                 if (it.component.name != 'hal' && it.component.name != 'halBase') return
                 if (it.targetPlatform.name != nativeUtils.wpi.platforms.roborio) return
-                nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared')
+                nativeUtils.useRequiredLibrary(it, 'ni_link_libraries')
         }
     }
 }

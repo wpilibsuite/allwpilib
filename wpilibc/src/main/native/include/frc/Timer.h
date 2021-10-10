@@ -5,6 +5,7 @@
 #pragma once
 
 #include <units/time.h>
+#include <wpi/deprecated.h>
 
 namespace frc {
 
@@ -28,7 +29,10 @@ void Wait(units::second_t seconds);
 units::second_t GetTime();
 
 /**
- * A wrapper for the frc::Timer class that returns unit-typed values.
+ * A timer class.
+ *
+ * Note that if the user calls frc::sim::RestartTiming(), they should also reset
+ * the timer so Get() won't return a negative duration.
  */
 class Timer {
  public:
@@ -97,7 +101,9 @@ class Timer {
    *
    * @param period The period to check for.
    * @return       True if the period has passed.
+   * @deprecated Use AdvanceIfElapsed() instead.
    */
+  WPI_DEPRECATED("Use AdvanceIfElapsed() instead.")
   bool HasPeriodPassed(units::second_t period);
 
   /**

@@ -33,7 +33,7 @@
 
 namespace wpi::uv {
 
-TEST(UvGetAddrInfo, BothNull) {
+TEST(UvGetAddrInfoTest, BothNull) {
   int fail_cb_called = 0;
 
   auto loop = Loop::Create();
@@ -48,7 +48,7 @@ TEST(UvGetAddrInfo, BothNull) {
   ASSERT_EQ(fail_cb_called, 1);
 }
 
-TEST(UvGetAddrInfo, FailedLookup) {
+TEST(UvGetAddrInfoTest, FailedLookup) {
   int fail_cb_called = 0;
 
   auto loop = Loop::Create();
@@ -65,7 +65,7 @@ TEST(UvGetAddrInfo, FailedLookup) {
   ASSERT_EQ(fail_cb_called, 1);
 }
 
-TEST(UvGetAddrInfo, Basic) {
+TEST(UvGetAddrInfoTest, Basic) {
   int getaddrinfo_cbs = 0;
 
   auto loop = Loop::Create();
@@ -80,7 +80,7 @@ TEST(UvGetAddrInfo, Basic) {
 }
 
 #ifndef _WIN32
-TEST(UvGetAddrInfo, Concurrent) {
+TEST(UvGetAddrInfoTest, Concurrent) {
   int getaddrinfo_cbs = 0;
   int callback_counts[CONCURRENT_COUNT];
 

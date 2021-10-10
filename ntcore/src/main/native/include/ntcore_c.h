@@ -13,8 +13,6 @@
 #include <stddef.h>
 #endif
 
-#include <wpi/deprecated.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

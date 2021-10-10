@@ -138,6 +138,10 @@ examplesTree.list(new FilenameFilter() {
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+Action<List<String>> symbolFilter = { symbols ->
+    symbols.removeIf({ !it.startsWith('CS_') })
+} as Action<List<String>>;
+
 nativeUtils.exportsConfigs {
     cscore {
         x86ExcludeSymbols = [
@@ -168,20 +172,12 @@ nativeUtils.exportsConfigs {
         ]
     }
     cscoreJNI {
-        x86SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('CS_') })
-        }
-        x64SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('CS_') })
-        }
+        x86SymbolFilter = symbolFilter
+        x64SymbolFilter = symbolFilter
     }
     cscoreJNICvStatic {
-        x86SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('CS_') })
-        }
-        x64SymbolFilter = { symbols ->
-            symbols.removeIf({ !it.startsWith('CS_') })
-        }
+        x86SymbolFilter = symbolFilter
+        x64SymbolFilter = symbolFilter
     }
 }
 

@@ -18,8 +18,6 @@ import edu.wpi.first.math.system.LinearSystemLoop;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
@@ -103,12 +101,6 @@ public class LinearSystemLoopTest {
 
     loop.setNextR(references);
 
-    List<Double> timeData = new ArrayList<>();
-    List<Double> xHat = new ArrayList<>();
-    List<Double> volt = new ArrayList<>();
-    List<Double> reference = new ArrayList<>();
-    List<Double> error = new ArrayList<>();
-
     var time = 0.0;
     while (time < 10) {
       if (time > 10) {
@@ -128,26 +120,8 @@ public class LinearSystemLoopTest {
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);
 
-      xHat.add(loop.getXHat(0) / 2d / Math.PI * 60);
-      volt.add(u);
-      timeData.add(time);
-      reference.add(references.get(0, 0) / 2d / Math.PI * 60);
-      error.add(loop.getError(0) / 2d / Math.PI * 60);
       time += kDt;
     }
-
-    //    XYChart bigChart = new XYChartBuilder().build();
-    //    bigChart.addSeries("Xhat, RPM", timeData, xHat);
-    //    bigChart.addSeries("Reference, RPM", timeData, reference);
-    //    bigChart.addSeries("Error, RPM", timeData, error);
-
-    //    XYChart smolChart = new XYChartBuilder().build();
-    //    smolChart.addSeries("Volts, V", timeData, volt);
-
-    //  try {
-    //      new SwingWrapper<>(List.of(bigChart, smolChart)).displayChartMatrix();
-    //      Thread.sleep(10000000);
-    //    } catch (InterruptedException e) { e.printStackTrace(); }
 
     assertEquals(0.0, loop.getError(0), 0.1);
   }

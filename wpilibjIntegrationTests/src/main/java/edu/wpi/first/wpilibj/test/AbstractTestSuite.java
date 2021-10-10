@@ -59,7 +59,7 @@ public abstract class AbstractTestSuite {
    * Stores a method name and method class pair. Used when searching for methods matching a given
    * regex text.
    */
-  protected class ClassMethodPair {
+  protected static class ClassMethodPair {
     public final Class<?> m_methodClass;
     public final String m_methodName;
 

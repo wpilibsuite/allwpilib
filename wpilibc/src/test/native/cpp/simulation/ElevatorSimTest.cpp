@@ -17,7 +17,7 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
 
-TEST(ElevatorSim, StateSpaceSim) {
+TEST(ElevatorSimTest, StateSpaceSim) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 3_m,
                             {0.01});
@@ -44,7 +44,7 @@ TEST(ElevatorSim, StateSpaceSim) {
   EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().to<double>(), 0.2);
 }
 
-TEST(ElevatorSim, MinMax) {
+TEST(ElevatorSimTest, MinMax) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 1_m,
                             {0.01});
@@ -65,7 +65,7 @@ TEST(ElevatorSim, MinMax) {
   }
 }
 
-TEST(ElevatorSim, Stability) {
+TEST(ElevatorSimTest, Stability) {
   static constexpr double kElevatorGearing = 100.0;
   static constexpr units::meter_t kElevatorDrumRadius = 0.5_in;
   static constexpr units::kilogram_t kCarriageMass = 4.0_kg;

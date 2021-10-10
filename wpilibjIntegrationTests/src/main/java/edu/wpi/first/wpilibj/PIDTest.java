@@ -183,6 +183,6 @@ public class PIDTest extends AbstractComsSetup {
   @Test(expected = RuntimeException.class)
   public void testOnTargetNoToleranceSet() {
     setupIntegratorRange();
-    m_controller.atSetpoint();
+    assertFalse(m_controller.atSetpoint());
   }
 }

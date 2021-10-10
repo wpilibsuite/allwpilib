@@ -105,7 +105,13 @@ public final class RuntimeLoader<T> {
               if (resIs == null) {
                 throw new IOException(getLoadErrorMessage(ule));
               }
-              jniLibrary.getParentFile().mkdirs();
+
+              var parentFile = jniLibrary.getParentFile();
+              if (parentFile == null) {
+                throw new IOException("JNI library has no parent file");
+              }
+              parentFile.mkdirs();
+
               try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
                 byte[] buffer = new byte[0xFFFF]; // 64K copy buffer
                 int readBytes;
@@ -171,7 +177,13 @@ public final class RuntimeLoader<T> {
           if (resIs == null) {
             throw new IOException(getLoadErrorMessage(ule));
           }
-          jniLibrary.getParentFile().mkdirs();
+
+          var parentFile = jniLibrary.getParentFile();
+          if (parentFile == null) {
+            throw new IOException("JNI library has no parent file");
+          }
+          parentFile.mkdirs();
+
           try (OutputStream os = Files.newOutputStream(jniLibrary.toPath())) {
             byte[] buffer = new byte[0xFFFF]; // 64K copy buffer
             int readBytes;

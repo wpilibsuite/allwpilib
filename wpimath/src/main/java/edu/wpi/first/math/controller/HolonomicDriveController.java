@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 
 /**
- * This holonomic drive controller can be used to follow trajectories using a holonomic drive train
+ * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
  * (i.e. swerve or mecanum). Holonomic trajectory following is a much simpler problem to solve
  * compared to skid-steer style drivetrains because it is possible to individually control forward,
  * sideways, and angular velocity.

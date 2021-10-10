@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <Match>
+    <Bug pattern="DM_DEFAULT_ENCODING" />
+  </Match>
+  <Match>
+    <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
+  </Match>
+  <Match>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+  </Match>
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP" />
+  </Match>
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
+    <Bug pattern="MS_CANNOT_BE_FINAL" />
+    <Class name="edu.wpi.first.wpilibj.examples.pacgoat.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="MS_EXPOSE_REP" />
+  </Match>
+  <Match>
+    <Bug pattern="MS_MUTABLE_ARRAY" />
+  </Match>
+  <Match>
+    <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
+    <Source name="FRCNetComm.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="ParallelCommandGroup.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="ParallelDeadlineGroup.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="ParallelRaceGroup.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="ProxyScheduleCommand.java" />
+  </Match>
+  <Match>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT" />
+    <Source name="SequentialCommandGroup.java" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    <Source name="AntJunitLauncher.java" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    <Source name="CombinedRuntimeLoader.java" />
+  </Match>
+  <Match>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    <Source name="RuntimeLoader.java" />
+  </Match>
+  <Match>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.romitimed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="UC_USELESS_VOID_METHOD" />
+    <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+  </Match>
+  <Match>
+    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE" />
+  </Match>
+</FindBugsFilter>

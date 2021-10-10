@@ -8,7 +8,7 @@
 
 #include "Robot.h"
 
-DriveStraight::DriveStraight(double distance, DriveTrain* drivetrain)
+DriveStraight::DriveStraight(double distance, Drivetrain* drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>(
           frc2::PIDController(4, 0, 0),
           [drivetrain] { return drivetrain->GetDistance(); }, distance,

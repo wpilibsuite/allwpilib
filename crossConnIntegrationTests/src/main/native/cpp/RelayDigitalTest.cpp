@@ -100,5 +100,5 @@ TEST(RelayDigitalTest, UnderAllocateFails) {
   ASSERT_LAST_ERROR_STATUS(status, RESOURCE_OUT_OF_RANGE);
 }
 
-INSTANTIATE_TEST_SUITE_P(RelayDigitalCrossConnectsTest, RelayDigitalTest,
+INSTANTIATE_TEST_SUITE_P(RelayDigitalCrossConnectsTests, RelayDigitalTest,
                          ::testing::ValuesIn(RelayCrossConnects));

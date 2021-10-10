@@ -13,6 +13,8 @@ import org.ejml.simple.SimpleMatrix;
 
 @SuppressWarnings("ParameterName")
 public final class StateSpaceUtil {
+  private static Random rand = new Random();
+
   private StateSpaceUtil() {
     // Utility class
   }
@@ -49,8 +51,6 @@ public final class StateSpaceUtil {
    * @return White noise vector.
    */
   public static <N extends Num> Matrix<N, N1> makeWhiteNoiseVector(Matrix<N, N1> stdDevs) {
-    var rand = new Random();
-
     Matrix<N, N1> result = new Matrix<>(new SimpleMatrix(stdDevs.getNumRows(), 1));
     for (int i = 0; i < stdDevs.getNumRows(); i++) {
       result.set(i, 0, rand.nextGaussian() * stdDevs.get(i, 0));

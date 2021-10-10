@@ -26,5 +26,5 @@ public class CANJNI extends JNIWrapper {
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
 
   @SuppressWarnings("MethodName")
-  public static native void GetCANStatus(CANStatus status);
+  public static native void getCANStatus(CANStatus status);
 }

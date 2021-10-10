@@ -116,7 +116,7 @@ static_assert(is_callable_v<t, o8>, "");
 
 namespace wpi {
 
-TEST(Signal, FunctionTraits) {
+TEST(SignalTest, FunctionTraits) {
   auto l1 = [](int, char, float) {};
   auto l2 = [&](int, char, float) mutable {};
   auto l3 = [&](auto...) mutable {};

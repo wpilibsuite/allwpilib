@@ -12,7 +12,8 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
   <property name="charset" value="UTF-8" />
   <property name="severity" value="error" />
   <module name="SuppressionFilter">
-    <property name="file" value="${config_loc}/suppressions.xml" />
+    <property name="file"
+      value="${config_loc}/checkstyle-suppressions.xml" />
   </module>
   <property name="fileExtensions" value="java, properties, xml" />
   <!-- Checks for whitespace -->

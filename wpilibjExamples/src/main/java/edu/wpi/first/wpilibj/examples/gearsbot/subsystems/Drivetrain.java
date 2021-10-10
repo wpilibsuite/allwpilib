@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveTrain extends SubsystemBase {
+public class Drivetrain extends SubsystemBase {
   /**
-   * The DriveTrain subsystem incorporates the sensors and actuators attached to the robots chassis.
+   * The Drivetrain subsystem incorporates the sensors and actuators attached to the robots chassis.
    * These include four drive motors, a left and right encoder and a gyro.
    */
   private final MotorController m_leftMotor =
@@ -33,8 +33,8 @@ public class DriveTrain extends SubsystemBase {
   private final AnalogInput m_rangefinder = new AnalogInput(6);
   private final AnalogGyro m_gyro = new AnalogGyro(1);
 
-  /** Create a new drive train subsystem. */
-  public DriveTrain() {
+  /** Create a new drivetrain subsystem. */
+  public Drivetrain() {
     super();
 
     // We need to invert one side of the drivetrain so that positive voltages
@@ -74,7 +74,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   /**
-   * Tank style driving for the DriveTrain.
+   * Tank style driving for the Drivetrain.
    *
    * @param left Speed in range [-1,1]
    * @param right Speed in range [-1,1]

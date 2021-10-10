@@ -100,7 +100,11 @@ public final class CombinedRuntimeLoader {
         if (outputFile.toFile().exists()) {
           continue;
         }
-        outputFile.getParent().toFile().mkdirs();
+        var parent = outputFile.getParent();
+        if (parent == null) {
+          throw new IOException("Output file has no parent");
+        }
+        parent.toFile().mkdirs();
 
         try (var os = Files.newOutputStream(outputFile)) {
           int readBytes;

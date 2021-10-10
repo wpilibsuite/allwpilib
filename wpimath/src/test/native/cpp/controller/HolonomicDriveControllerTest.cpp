@@ -8,6 +8,7 @@
 #include "frc/controller/HolonomicDriveController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
 #include "gtest/gtest.h"
+#include "units/angular_acceleration.h"
 #include "units/math.h"
 #include "units/time.h"
 
@@ -24,7 +25,8 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
       frc::ProfiledPIDController<units::radian>{
           1.0, 0.0, 0.0,
           frc::TrapezoidProfile<units::radian>::Constraints{
-              6.28_rad_per_s, 3.14_rad_per_s / 1_s}}};
+              units::radians_per_second_t{2.0 * wpi::numbers::pi},
+              units::radians_per_second_squared_t{wpi::numbers::pi}}}};
 
   frc::Pose2d robotPose{2.7_m, 23_m, frc::Rotation2d{0_deg}};
 

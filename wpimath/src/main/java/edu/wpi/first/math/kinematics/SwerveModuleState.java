@@ -5,6 +5,7 @@
 package edu.wpi.first.math.kinematics;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.Objects;
 
 /** Represents the state of one swerve module. */
 @SuppressWarnings("MemberName")
@@ -29,17 +30,30 @@ public class SwerveModuleState implements Comparable<SwerveModuleState> {
     this.angle = angle;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof SwerveModuleState) {
+      return Double.compare(speedMetersPerSecond, ((SwerveModuleState) obj).speedMetersPerSecond)
+          == 0;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(speedMetersPerSecond);
+  }
+
   /**
    * Compares two swerve module states. One swerve module is "greater" than the other if its speed
    * is higher than the other.
    *
-   * @param o The other swerve module.
+   * @param other The other swerve module.
    * @return 1 if this is greater, 0 if both are equal, -1 if other is greater.
    */
   @Override
-  @SuppressWarnings("ParameterName")
-  public int compareTo(SwerveModuleState o) {
-    return Double.compare(this.speedMetersPerSecond, o.speedMetersPerSecond);
+  public int compareTo(SwerveModuleState other) {
+    return Double.compare(this.speedMetersPerSecond, other.speedMetersPerSecond);
   }
 
   @Override

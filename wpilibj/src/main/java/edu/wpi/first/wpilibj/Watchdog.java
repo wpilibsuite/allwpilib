@@ -61,24 +61,23 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   @Override
-  public int compareTo(Watchdog rhs) {
-    // Elements with sooner expiration times are sorted as lesser. The head of
-    // Java's PriorityQueue is the least element.
-    return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
-  }
-
-  @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Watchdog)) {
-      return false;
+    if (obj instanceof Watchdog) {
+      return Double.compare(m_expirationTimeSeconds, ((Watchdog) obj).m_expirationTimeSeconds) == 0;
     }
-    Watchdog oth = (Watchdog) obj;
-    return oth.m_expirationTimeSeconds == m_expirationTimeSeconds;
+    return false;
   }
 
   @Override
   public int hashCode() {
     return Double.hashCode(m_expirationTimeSeconds);
+  }
+
+  @Override
+  public int compareTo(Watchdog rhs) {
+    // Elements with sooner expiration times are sorted as lesser. The head of
+    // Java's PriorityQueue is the least element.
+    return Double.compare(m_expirationTimeSeconds, rhs.m_expirationTimeSeconds);
   }
 
   /**

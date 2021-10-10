@@ -36,7 +36,7 @@
 
 namespace wpi::uv {
 
-TEST(UvAsync, Test) {
+TEST(UvAsyncTest, CallbackOnly) {
   std::atomic_int async_cb_called{0};
   int prepare_cb_called = 0;
   int close_cb_called = 0;
@@ -101,7 +101,7 @@ TEST(UvAsync, Test) {
   }
 }
 
-TEST(UvAsync, Data) {
+TEST(UvAsyncTest, Data) {
   int prepare_cb_called = 0;
   int async_cb_called[2] = {0, 0};
   int close_cb_called = 0;
@@ -149,7 +149,7 @@ TEST(UvAsync, Data) {
   }
 }
 
-TEST(UvAsync, DataRef) {
+TEST(UvAsyncTest, DataRef) {
   int prepare_cb_called = 0;
   int val = 0;
 
