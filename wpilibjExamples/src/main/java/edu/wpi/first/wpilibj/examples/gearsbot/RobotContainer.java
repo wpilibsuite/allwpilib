@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetElevatorSetpoint;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.SetWristSetpoint;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Claw;
-import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain m_drivetrain = new DriveTrain();
+  private final Drivetrain m_drivetrain = new Drivetrain();
   private final Elevator m_elevator = new Elevator();
   private final Wrist m_wrist = new Wrist();
   private final Claw m_claw = new Claw();

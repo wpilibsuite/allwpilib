@@ -65,5 +65,5 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
       << "Filter should have reduced noise accumulation but failed";
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, LinearFilterNoiseTest,
+INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterNoiseTest,
                          testing::Values(kTestSinglePoleIIR, kTestMovAvg));

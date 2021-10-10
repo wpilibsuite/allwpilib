@@ -193,7 +193,7 @@ TEST_F(ButtonTest, RValueButton) {
   EXPECT_EQ(counter, 1);
 }
 
-TEST_F(ButtonTest, DebounceTest) {
+TEST_F(ButtonTest, Debounce) {
   auto& scheduler = CommandScheduler::GetInstance();
   bool pressed = false;
   RunCommand command([] {});

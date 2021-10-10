@@ -17,7 +17,6 @@ class ConditionalCommandTest extends AbstractCommandTest {
   MockCommand m_onTrue;
   MockCommand m_onFalse;
   MockSubsystem m_subsys;
-  Boolean m_condition;
 
   @BeforeEach
   void initCommands() {

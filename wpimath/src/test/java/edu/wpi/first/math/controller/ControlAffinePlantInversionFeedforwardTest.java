@@ -38,23 +38,14 @@ class ControlAffinePlantInversionFeedforwardTest {
 
   @SuppressWarnings("ParameterName")
   protected Matrix<N2, N1> getDynamics(Matrix<N2, N1> x, Matrix<N1, N1> u) {
-    var result = new Matrix<>(Nat.N2(), Nat.N1());
-
-    result =
-        Matrix.mat(Nat.N2(), Nat.N2())
-            .fill(1.000, 0, 0, 1.000)
-            .times(x)
-            .plus(VecBuilder.fill(0, 1).times(u));
-
-    return result;
+    return Matrix.mat(Nat.N2(), Nat.N2())
+        .fill(1.000, 0, 0, 1.000)
+        .times(x)
+        .plus(VecBuilder.fill(0, 1).times(u));
   }
 
   @SuppressWarnings("ParameterName")
   protected Matrix<N2, N1> getStateDynamics(Matrix<N2, N1> x) {
-    var result = new Matrix<>(Nat.N2(), Nat.N1());
-
-    result = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.000, 0, 0, 1.000).times(x);
-
-    return result;
+    return Matrix.mat(Nat.N2(), Nat.N2()).fill(1.000, 0, 0, 1.000).times(x);
   }
 }

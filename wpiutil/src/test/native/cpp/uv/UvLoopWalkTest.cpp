@@ -31,7 +31,7 @@
 
 namespace wpi::uv {
 
-TEST(UvLoop, Walk) {
+TEST(UvLoopTest, Walk) {
   int seen_timer_handle = 0;
 
   auto loop = Loop::Create();

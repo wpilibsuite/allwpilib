@@ -97,10 +97,10 @@ public final class Mechanism2d implements NTSendable {
   @Override
   public void initSendable(NTSendableBuilder builder) {
     builder.setSmartDashboardType("Mechanism2d");
-    m_table = builder.getTable();
-    m_table.getEntry("dims").setDoubleArray(m_dims);
-    m_table.getEntry(kBackgroundColor).setString(m_color);
     synchronized (this) {
+      m_table = builder.getTable();
+      m_table.getEntry("dims").setDoubleArray(m_dims);
+      m_table.getEntry(kBackgroundColor).setString(m_color);
       for (Entry<String, MechanismRoot2d> entry : m_roots.entrySet()) {
         String name = entry.getKey();
         MechanismRoot2d root = entry.getValue();

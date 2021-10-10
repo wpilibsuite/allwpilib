@@ -28,7 +28,7 @@ void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
   }
 }
 
-TEST(TrajectoryTransforms, TransformBy) {
+TEST(TrajectoryTransformsTest, TransformBy) {
   frc::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       frc::Pose2d{}, {}, frc::Pose2d{1_m, 1_m, frc::Rotation2d(90_deg)},
@@ -46,7 +46,7 @@ TEST(TrajectoryTransforms, TransformBy) {
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }
 
-TEST(TrajectoryTransforms, RelativeTo) {
+TEST(TrajectoryTransformsTest, RelativeTo) {
   frc::TrajectoryConfig config{3_mps, 3_mps_sq};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       frc::Pose2d{1_m, 2_m, frc::Rotation2d(30_deg)}, {},

@@ -17,7 +17,7 @@
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "gtest/gtest.h"
 
-TEST(DifferentialDriveSim, Convergence) {
+TEST(DifferentialDriveSimTest, Convergence) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -71,7 +71,7 @@ TEST(DifferentialDriveSim, Convergence) {
               0.01);
 }
 
-TEST(DifferentialDriveSim, Current) {
+TEST(DifferentialDriveSimTest, Current) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -98,7 +98,7 @@ TEST(DifferentialDriveSim, Current) {
   EXPECT_TRUE(sim.GetCurrentDraw() > 0_A);
 }
 
-TEST(DifferentialDriveSim, ModelStability) {
+TEST(DifferentialDriveSimTest, ModelStability) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);

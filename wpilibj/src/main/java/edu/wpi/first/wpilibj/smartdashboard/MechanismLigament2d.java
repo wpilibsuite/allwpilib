@@ -128,7 +128,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   @Override
-  protected void updateEntries(NetworkTable table) {
+  protected synchronized void updateEntries(NetworkTable table) {
     table.getEntry(".type").setString("line");
     m_angleEntry = table.getEntry("angle");
     m_lengthEntry = table.getEntry("length");

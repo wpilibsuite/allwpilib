@@ -57,13 +57,13 @@ public class MedianFilter {
     // and remove from ordered list
     if (curSize > m_size) {
       m_orderedValues.remove(m_valueBuffer.removeLast());
-      curSize = curSize - 1;
+      --curSize;
     }
 
     // Add next value to circular buffer
     m_valueBuffer.addFirst(next);
 
-    if (curSize % 2 == 1) {
+    if (curSize % 2 != 0) {
       // If size is odd, return middle element of sorted list
       return m_orderedValues.get(curSize / 2);
     } else {

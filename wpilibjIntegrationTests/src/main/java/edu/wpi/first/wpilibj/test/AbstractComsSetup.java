@@ -201,7 +201,7 @@ public abstract class AbstractComsSetup {
    * Provided as a replacement to lambda functions to allow for repeatable checks to see if a
    * correct state is reached.
    */
-  public abstract class BooleanCheck {
+  public abstract static class BooleanCheck {
     public BooleanCheck() {}
 
     /**

@@ -9,7 +9,7 @@
 
 #include "commands/Autonomous.h"
 #include "subsystems/Claw.h"
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 #include "subsystems/Elevator.h"
 #include "subsystems/Wrist.h"
 
@@ -33,7 +33,7 @@ class RobotContainer {
   Claw m_claw;
   Wrist m_wrist;
   Elevator m_elevator;
-  DriveTrain m_drivetrain;
+  Drivetrain m_drivetrain;
 
   Autonomous m_autonomousCommand;
 

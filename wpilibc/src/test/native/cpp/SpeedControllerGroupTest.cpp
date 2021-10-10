@@ -121,5 +121,5 @@ TEST_P(MotorControllerGroupTest, StopMotor) {
   }
 }
 
-INSTANTIATE_TEST_SUITE_P(Test, MotorControllerGroupTest,
+INSTANTIATE_TEST_SUITE_P(Tests, MotorControllerGroupTest,
                          testing::Values(TEST_ONE, TEST_TWO, TEST_THREE));

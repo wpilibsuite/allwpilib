@@ -30,7 +30,8 @@ class HolonomicDriveControllerTest {
         new HolonomicDriveController(
             new PIDController(1.0, 0.0, 0.0),
             new PIDController(1.0, 0.0, 0.0),
-            new ProfiledPIDController(1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(6.28, 3.14)));
+            new ProfiledPIDController(
+                1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.0 * Math.PI, Math.PI)));
     Pose2d robotPose = new Pose2d(2.7, 23.0, Rotation2d.fromDegrees(0.0));
 
     List<Pose2d> waypoints = new ArrayList<>();

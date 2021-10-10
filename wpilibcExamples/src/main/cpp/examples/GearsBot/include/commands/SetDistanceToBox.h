@@ -7,7 +7,7 @@
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/PIDCommand.h>
 
-#include "subsystems/DriveTrain.h"
+#include "subsystems/Drivetrain.h"
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -18,10 +18,10 @@
 class SetDistanceToBox
     : public frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox> {
  public:
-  explicit SetDistanceToBox(double distance, DriveTrain* drivetrain);
+  explicit SetDistanceToBox(double distance, Drivetrain* drivetrain);
   void Initialize() override;
   bool IsFinished() override;
 
  private:
-  DriveTrain* m_drivetrain;
+  Drivetrain* m_drivetrain;
 };

@@ -41,9 +41,9 @@ public abstract class CommandTestBase {
     }
   }
 
-  public class TestSubsystem extends SubsystemBase {}
+  public static class TestSubsystem extends SubsystemBase {}
 
-  public class MockCommandHolder {
+  public static class MockCommandHolder {
     private final Command m_mockCommand = mock(Command.class);
 
     public MockCommandHolder(boolean runWhenDisabled, Subsystem... requirements) {
@@ -61,7 +61,7 @@ public abstract class CommandTestBase {
     }
   }
 
-  public class Counter {
+  public static class Counter {
     public int m_counter;
 
     public void increment() {
@@ -69,7 +69,7 @@ public abstract class CommandTestBase {
     }
   }
 
-  public class ConditionHolder {
+  public static class ConditionHolder {
     private boolean m_condition;
 
     public void setCondition(boolean condition) {

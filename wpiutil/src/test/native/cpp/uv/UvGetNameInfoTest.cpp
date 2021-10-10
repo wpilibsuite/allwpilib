@@ -31,7 +31,7 @@
 
 namespace wpi::uv {
 
-TEST(UvGetNameInfo, BasicIp4) {
+TEST(UvGetNameInfoTest, BasicIp4) {
   int getnameinfo_cbs = 0;
 
   auto loop = Loop::Create();
@@ -51,7 +51,7 @@ TEST(UvGetNameInfo, BasicIp4) {
   ASSERT_EQ(getnameinfo_cbs, 1);
 }
 
-TEST(UvGetNameInfo, BasicIp6) {
+TEST(UvGetNameInfoTest, BasicIp6) {
   int getnameinfo_cbs = 0;
 
   auto loop = Loop::Create();

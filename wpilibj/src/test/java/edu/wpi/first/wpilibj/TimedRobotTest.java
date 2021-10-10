@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 class TimedRobotTest {
-  class MockRobot extends TimedRobot {
+  static class MockRobot extends TimedRobot {
     public final AtomicInteger m_robotInitCount = new AtomicInteger(0);
     public final AtomicInteger m_simulationInitCount = new AtomicInteger(0);
     public final AtomicInteger m_disabledInitCount = new AtomicInteger(0);
@@ -128,7 +128,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void disabledTest() {
+  void disabledModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -215,7 +215,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void autonomousTest() {
+  void autonomousModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -304,7 +304,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void teleopTest() {
+  void teleopModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
@@ -393,7 +393,7 @@ class TimedRobotTest {
 
   @Test
   @ResourceLock("timing")
-  void testTest() {
+  void testModeTest() {
     MockRobot robot = new MockRobot();
 
     Thread robotThread =
