@@ -64,16 +64,14 @@ struct REV_PHObj {
 static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
                              HAL_HandleEnum::REVPH>* REVPHHandles;
 
-namespace hal {
-namespace init {
+namespace hal::init {
 void InitializeREVPH() {
   static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
                                HAL_HandleEnum::REVPH>
       rH;
   REVPHHandles = &rH;
 }
-}  // namespace init
-}  // namespace hal
+}  // namespace hal::init
 
 static PH_status0_t HAL_REV_ReadPHStatus0(HAL_CANHandle hcan, int32_t* status) {
   uint8_t packedData[8] = {0};

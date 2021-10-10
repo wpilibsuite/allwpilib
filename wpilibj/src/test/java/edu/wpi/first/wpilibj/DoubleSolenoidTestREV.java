@@ -52,8 +52,7 @@ public class DoubleSolenoidTestREV {
     Solenoid solenoid0 = new Solenoid(6, PneumaticsModuleType.REVPH, 2);
         Solenoid solenoid1 = new Solenoid(6, PneumaticsModuleType.REVPH, 3)) {
       assertThrows(
-          AllocationException.class,
-          () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class, () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 
