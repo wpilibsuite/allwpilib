@@ -136,7 +136,7 @@
   "HAL: Use HAL_GetLastError(status) to get last error"
 
 #define HAL_CONSOLE_OUT_ENABLED_ERROR -1157
-#define HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE \
+#define HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE                           \
   "HAL: Onboard serial port is requested, but Console Out is enabled. " \
   "Disable Console Out using imaging tool"
 
