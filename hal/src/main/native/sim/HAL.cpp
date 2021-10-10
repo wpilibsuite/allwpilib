@@ -251,6 +251,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_LED_CHANNEL_ERROR_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
+    case HAL_CONSOLE_OUT_ENABLED_ERROR:
+      return HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
