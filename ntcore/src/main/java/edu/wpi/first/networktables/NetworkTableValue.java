@@ -478,27 +478,41 @@ public final class NetworkTableValue {
     return Objects.hash(m_type, m_value);
   }
 
+  // arraycopy() doesn't know how to unwrap boxed values; this is a false positive in PMD
+  // (see https://sourceforge.net/p/pmd/bugs/804/)
+  @SuppressWarnings("PMD.AvoidArrayLoops")
   static boolean[] toNative(Boolean[] arr) {
     boolean[] out = new boolean[arr.length];
-    System.arraycopy(arr, 0, out, 0, arr.length);
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
     return out;
   }
 
+  @SuppressWarnings("PMD.AvoidArrayLoops")
   static double[] toNative(Number[] arr) {
     double[] out = new double[arr.length];
-    System.arraycopy(arr, 0, out, 0, arr.length);
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i].doubleValue();
+    }
     return out;
   }
 
+  @SuppressWarnings("PMD.AvoidArrayLoops")
   static Boolean[] fromNative(boolean[] arr) {
     Boolean[] out = new Boolean[arr.length];
-    System.arraycopy(arr, 0, out, 0, arr.length);
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
     return out;
   }
 
+  @SuppressWarnings("PMD.AvoidArrayLoops")
   static Double[] fromNative(double[] arr) {
     Double[] out = new Double[arr.length];
-    System.arraycopy(arr, 0, out, 0, arr.length);
+    for (int i = 0; i < arr.length; i++) {
+      out[i] = arr[i];
+    }
     return out;
   }
 
