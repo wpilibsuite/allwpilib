@@ -31,8 +31,7 @@ public class DoubleSolenoidTestREV {
     // Single solenoid that is reused for forward port
     Solenoid solenoid = new Solenoid(5, PneumaticsModuleType.REVPH, 2)) {
       assertThrows(
-          AllocationException.class,
-          () -> new DoubleSolenoid(5, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class, () -> new DoubleSolenoid(5, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 
@@ -42,8 +41,7 @@ public class DoubleSolenoidTestREV {
     // Single solenoid that is reused for forward port
     Solenoid solenoid = new Solenoid(6, PneumaticsModuleType.REVPH, 3)) {
       assertThrows(
-          AllocationException.class,
-          () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
+          AllocationException.class, () -> new DoubleSolenoid(6, PneumaticsModuleType.REVPH, 2, 3));
     }
   }
 

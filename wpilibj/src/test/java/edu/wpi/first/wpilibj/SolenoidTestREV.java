@@ -29,16 +29,14 @@ public class SolenoidTestREV {
   @Test
   void testDoubleInitialization() {
     try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.REVPH, 2)) {
-      assertThrows(
-          AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
+      assertThrows(AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
     }
   }
 
   @Test
   void testDoubleInitializationFromDoubleSolenoid() {
     try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.REVPH, 2, 3)) {
-      assertThrows(
-          AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
+      assertThrows(AllocationException.class, () -> new Solenoid(3, PneumaticsModuleType.REVPH, 2));
     }
   }
 

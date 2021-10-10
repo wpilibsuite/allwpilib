@@ -129,13 +129,13 @@ public class PneumaticsHub implements PneumaticsBase {
   @Override
   public void fireOneShot(int index) {
     // TODO Combine APIs
-    //REVPHJNI.fireOneShot(m_handle, index, durMs);
+    // REVPHJNI.fireOneShot(m_handle, index, durMs);
   }
 
   @Override
   public void setOneShotDuration(int index, int durMs) {
     // TODO Combine APIs
-    //REVPHJNI.setOneShotDuration(m_handle, index, durMs);
+    // REVPHJNI.setOneShotDuration(m_handle, index, durMs);
   }
 
   @Override
