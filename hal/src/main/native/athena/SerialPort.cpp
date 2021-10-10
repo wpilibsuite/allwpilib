@@ -84,6 +84,9 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
   if (serialPort->portId < 0) {
     *status = errno;
+    if (*status == EACCES) {
+      *status = HAL_CONSOLE_OUT_ENABLED_ERROR;
+    }
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
