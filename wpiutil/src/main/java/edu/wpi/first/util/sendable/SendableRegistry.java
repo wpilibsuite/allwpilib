@@ -494,7 +494,7 @@ public class SendableRegistry {
           if (cause != null) {
             throwable = cause;
           }
-          System.out.println("Unhandled exception calling LiveWindow for " + comp.m_name + ": ");
+          System.err.println("Unhandled exception calling LiveWindow for " + comp.m_name + ": ");
           throwable.printStackTrace();
           comp.m_liveWindow = false;
         }
