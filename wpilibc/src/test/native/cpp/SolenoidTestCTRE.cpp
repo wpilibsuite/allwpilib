@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 
 namespace frc {
-TEST(SolenoidTest, ValidInitialization) {
+TEST(SolenoidCTRETest, ValidInitialization) {
   Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
   EXPECT_EQ(2, solenoid.GetChannel());
 
@@ -21,24 +21,24 @@ TEST(SolenoidTest, ValidInitialization) {
   EXPECT_FALSE(solenoid.Get());
 }
 
-TEST(SolenoidTest, DoubleInitialization) {
+TEST(SolenoidCTRETest, DoubleInitialization) {
   Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
   EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, DoubleInitializationFromDoubleSolenoid) {
+TEST(SolenoidCTRETest, DoubleInitializationFromDoubleSolenoid) {
   DoubleSolenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2, 3};
   EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 2),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, InvalidChannel) {
+TEST(SolenoidCTRETest, InvalidChannel) {
   EXPECT_THROW(Solenoid(3, frc::PneumaticsModuleType::CTREPCM, 100),
                std::runtime_error);
 }
 
-TEST(SolenoidTest, Toggle) {
+TEST(SolenoidCTRETest, Toggle) {
   Solenoid solenoid{3, frc::PneumaticsModuleType::CTREPCM, 2};
   solenoid.Set(true);
   EXPECT_TRUE(solenoid.Get());

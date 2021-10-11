@@ -45,4 +45,8 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumREVPDHModules();
 
   public static native int getNumREVPDHChannels();
+
+  public static native int getNumREVPHModules();
+
+  public static native int getNumREVPHChannels();
 }

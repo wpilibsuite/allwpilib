@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.hal.util.AllocationException;
 import org.junit.jupiter.api.Test;
 
-public class SolenoidTest {
+public class SolenoidTestCTRE {
   @Test
   void testValidInitialization() {
     try (Solenoid solenoid = new Solenoid(3, PneumaticsModuleType.CTREPCM, 2)) {

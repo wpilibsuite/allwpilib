@@ -73,6 +73,12 @@ int32_t HAL_GetNumREVPDHModules(void) {
 int32_t HAL_GetNumREVPDHChannels(void) {
   return kNumREVPDHChannels;
 }
+int32_t HAL_GetNumREVPHModules(void) {
+  return kNumREVPHModules;
+}
+int32_t HAL_GetNumREVPHChannels(void) {
+  return kNumREVPHChannels;
+}
 int32_t HAL_GetNumDutyCycles(void) {
   return kNumDutyCycles;
 }
