@@ -35,7 +35,12 @@ nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
+        it.cppCompiler.args.remove("/std:c++17")
+        it.cppCompiler.args.add("/std:c++20")
         return
+    } else if (it.name == 'linuxx86-64' || it.name == 'osxx86-64' || it.name == 'osxarm64') {
+        it.cppCompiler.args.remove("-std=c++17")
+        it.cppCompiler.args.add("-std=c++20")
     }
     if (it.name.contains('osx')) {
         it.linker.args << '-Wl,-rpath,\'@loader_path\''

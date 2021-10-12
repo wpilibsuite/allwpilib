@@ -113,14 +113,14 @@ std::string KilloughDrive::GetDescription() const {
 void KilloughDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("KilloughDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { StopMotor(); });
+  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Left Motor Speed", [=] { return m_leftMotor->Get(); },
-      [=](double value) { m_leftMotor->Set(value); });
+      "Left Motor Speed", [=, this] { return m_leftMotor->Get(); },
+      [=, this](double value) { m_leftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Right Motor Speed", [=] { return m_rightMotor->Get(); },
-      [=](double value) { m_rightMotor->Set(value); });
+      "Right Motor Speed", [=, this] { return m_rightMotor->Get(); },
+      [=, this](double value) { m_rightMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Back Motor Speed", [=] { return m_backMotor->Get(); },
-      [=](double value) { m_backMotor->Set(value); });
+      "Back Motor Speed", [=, this] { return m_backMotor->Get(); },
+      [=, this](double value) { m_backMotor->Set(value); });
 }

@@ -874,5 +874,5 @@ int ADIS16448_IMU::GetPort() const {
 void ADIS16448_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16448 IMU");
   builder.AddDoubleProperty(
-      "Yaw Angle", [=] { return GetAngle().value(); }, nullptr);
+      "Yaw Angle", [=, this] { return GetAngle().value(); }, nullptr);
 }

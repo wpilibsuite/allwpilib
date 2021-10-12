@@ -381,7 +381,7 @@ Instance::Instance() {
 
   // Listener for video events
   m_videoListener = cs::VideoListener{
-      [=](const cs::VideoEvent& event) {
+      [=, this](const cs::VideoEvent& event) {
         std::scoped_lock lock(m_mutex);
         CS_Status status = 0;
         switch (event.kind) {

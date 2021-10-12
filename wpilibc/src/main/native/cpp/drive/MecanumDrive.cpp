@@ -108,17 +108,17 @@ std::string MecanumDrive::GetDescription() const {
 void MecanumDrive::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("MecanumDrive");
   builder.SetActuator(true);
-  builder.SetSafeState([=] { StopMotor(); });
+  builder.SetSafeState([=, this] { StopMotor(); });
   builder.AddDoubleProperty(
-      "Front Left Motor Speed", [=] { return m_frontLeftMotor->Get(); },
-      [=](double value) { m_frontLeftMotor->Set(value); });
+      "Front Left Motor Speed", [=, this] { return m_frontLeftMotor->Get(); },
+      [=, this](double value) { m_frontLeftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Front Right Motor Speed", [=] { return m_frontRightMotor->Get(); },
-      [=](double value) { m_frontRightMotor->Set(value); });
+      "Front Right Motor Speed", [=, this] { return m_frontRightMotor->Get(); },
+      [=, this](double value) { m_frontRightMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Rear Left Motor Speed", [=] { return m_rearLeftMotor->Get(); },
-      [=](double value) { m_rearLeftMotor->Set(value); });
+      "Rear Left Motor Speed", [=, this] { return m_rearLeftMotor->Get(); },
+      [=, this](double value) { m_rearLeftMotor->Set(value); });
   builder.AddDoubleProperty(
-      "Rear Right Motor Speed", [=] { return m_rearRightMotor->Get(); },
-      [=](double value) { m_rearRightMotor->Set(value); });
+      "Rear Right Motor Speed", [=, this] { return m_rearRightMotor->Get(); },
+      [=, this](double value) { m_rearRightMotor->Set(value); });
 }

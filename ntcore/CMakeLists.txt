@@ -28,7 +28,7 @@ target_include_directories(ntcore
                 $<BUILD_INTERFACE:${WPILIB_BINARY_DIR}/ntcore/generated/main/native/include>
                             $<INSTALL_INTERFACE:${include_dest}/ntcore>)
 wpilib_target_warnings(ntcore)
-target_compile_features(ntcore PUBLIC cxx_std_17)
+target_compile_features(ntcore PUBLIC cxx_std_20)
 target_link_libraries(ntcore PUBLIC wpinet wpiutil)
 
 set_property(TARGET ntcore PROPERTY FOLDER "libraries")

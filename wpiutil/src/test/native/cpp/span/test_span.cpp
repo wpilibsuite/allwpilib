@@ -112,6 +112,7 @@ TEST(Span, PointerPointerConstruction)
     }
 }
 
+#if __cplusplus < 202002L || !__has_include(<span>)
 TEST(Span, CArrayConstruction)
 {
     using int_array_t = int[3];
@@ -489,6 +490,7 @@ TEST(Span, ConstructionFromSpansOfDifferentSize)
     ASSERT_EQ(d.begin(), d.end());
 #endif
 }
+#endif  // __cplusplus < 202002L || !__has_include(<span>)
 
 TEST(Span, MemberSubviewOperations)
 {

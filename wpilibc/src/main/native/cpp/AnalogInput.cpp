@@ -197,5 +197,5 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
 void AnalogInput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Analog Input");
   builder.AddDoubleProperty(
-      "Value", [=] { return GetAverageVoltage(); }, nullptr);
+      "Value", [=, this] { return GetAverageVoltage(); }, nullptr);
 }

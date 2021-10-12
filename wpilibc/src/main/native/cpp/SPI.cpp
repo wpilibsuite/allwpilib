@@ -25,7 +25,7 @@ class SPI::Accumulator {
  public:
   Accumulator(HAL_SPIPort port, int xferSize, int validMask, int validValue,
               int dataShift, int dataSize, bool isSigned, bool bigEndian)
-      : m_notifier([=] {
+      : m_notifier([=, this] {
           std::scoped_lock lock(m_mutex);
           Update();
         }),

@@ -75,7 +75,7 @@ void HttpCameraImpl::MonitorThreadMain() {
     std::unique_lock lock(m_mutex);
     // sleep for 1 second between checks
     m_monitorCond.wait_for(lock, std::chrono::seconds(1),
-                           [=] { return !m_active; });
+                           [=, this] { return !m_active; });
 
     if (!m_active) {
       break;
@@ -110,7 +110,8 @@ void HttpCameraImpl::StreamThreadMain() {
         m_streamConn->stream->close();
       }
       // Wait for enable
-      m_sinkEnabledCond.wait(lock, [=] { return !m_active || IsEnabled(); });
+      m_sinkEnabledCond.wait(lock,
+                             [=, this] { return !m_active || IsEnabled(); });
       if (!m_active) {
         return;
       }
@@ -329,7 +330,7 @@ void HttpCameraImpl::SettingsThreadMain() {
     wpi::HttpRequest req;
     {
       std::unique_lock lock(m_mutex);
-      m_settingsCond.wait(lock, [=] {
+      m_settingsCond.wait(lock, [=, this] {
         return !m_active || (m_prefLocation != -1 && !m_settings.empty());
       });
       if (!m_active) {

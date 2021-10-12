@@ -154,7 +154,7 @@ void NCImpl::SetServers(
 }
 
 void NCImpl::StartDSClient(unsigned int port) {
-  m_loopRunner.ExecAsync([=](uv::Loop& loop) {
+  m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     if (m_dsClient) {
       return;
     }

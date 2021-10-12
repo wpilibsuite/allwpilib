@@ -217,11 +217,12 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
   }
 
   builder.AddDoubleProperty(
-      "Speed", [=] { return GetRate(); }, nullptr);
+      "Speed", [=, this] { return GetRate(); }, nullptr);
   builder.AddDoubleProperty(
-      "Distance", [=] { return GetDistance(); }, nullptr);
+      "Distance", [=, this] { return GetDistance(); }, nullptr);
   builder.AddDoubleProperty(
-      "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr);
+      "Distance per Tick", [=, this] { return GetDistancePerPulse(); },
+      nullptr);
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
