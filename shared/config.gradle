@@ -27,8 +27,11 @@ nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
-    if (it.name.contains('windows')) return
-        it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
+    if (it.name.contains('windows')) {
+        it.cppCompiler.args.add("/Zc:__cplusplus")
+        return
+    }
+    it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
     if (it.name == 'osxx86-64') {
         it.linker.args << "-headerpad_max_install_names"
     }
