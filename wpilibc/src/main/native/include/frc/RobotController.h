@@ -190,14 +190,14 @@ class RobotController {
 
   /**
    * Get the current brownout voltage seting.
-   * 
+   *
    * @return The brownout voltage
    */
   static units::volt_t GetBrownoutVoltage();
-  
+
   /**
    * Set the voltage the roborio will brownout and disable all outputs.
-   * 
+   *
    * @param brownoutVoltage The brownout voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);

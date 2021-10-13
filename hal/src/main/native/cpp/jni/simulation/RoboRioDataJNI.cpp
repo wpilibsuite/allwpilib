@@ -784,7 +784,8 @@ Java_edu_wpi_first_hal_simulation_RoboRioDataJNI_registerBrownoutVoltageCallback
   (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallbackNoIndex(
-      env, callback, initialNotify, &HALSIM_RegisterRoboRioBrownoutVoltageCallback);
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioBrownoutVoltageCallback);
 }
 
 /*

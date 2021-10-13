@@ -111,7 +111,8 @@ void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
   if (voltage > 50) {
     voltage = 50;
   }
-  power->writeBrownoutVoltage250mV(static_cast<unsigned char>(voltage * 4), status);
+  power->writeBrownoutVoltage250mV(static_cast<unsigned char>(voltage * 4),
+                                   status);
 }
 
 double HAL_GetBrownoutVoltage(int32_t* status) {

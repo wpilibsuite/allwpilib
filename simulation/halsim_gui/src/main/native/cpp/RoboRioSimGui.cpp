@@ -109,12 +109,16 @@ class RoboRioSimModel : public glass::RoboRioModel {
   glass::DataSource* GetUserButton() override { return &m_userButton; }
   glass::DataSource* GetVInVoltageData() override { return &m_vInVoltage; }
   glass::DataSource* GetVInCurrentData() override { return &m_vInCurrent; }
-  glass::DataSource* GetBrownoutVoltage() override { return &m_brownoutVoltage; }
+  glass::DataSource* GetBrownoutVoltage() override {
+    return &m_brownoutVoltage;
+  }
 
   void SetUserButton(bool val) override { HALSIM_SetRoboRioFPGAButton(val); }
   void SetVInVoltage(double val) override { HALSIM_SetRoboRioVInVoltage(val); }
   void SetVInCurrent(double val) override { HALSIM_SetRoboRioVInCurrent(val); }
-  void SetBrownoutVoltage(double val) override { HALSIM_SetRoboRioBrownoutVoltage(val); }
+  void SetBrownoutVoltage(double val) override {
+    HALSIM_SetRoboRioBrownoutVoltage(val);
+  }
 
  private:
   RoboRioFPGAButtonSource m_userButton;
