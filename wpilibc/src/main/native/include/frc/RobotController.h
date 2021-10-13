@@ -198,6 +198,9 @@ class RobotController {
   /**
    * Set the voltage the roborio will brownout and disable all outputs.
    *
+   * Note that this only does anything on the roboRIO 2.
+   * On the roboRIO it is a no-op.
+   *
    * @param brownoutVoltage The brownout voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
