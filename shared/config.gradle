@@ -28,7 +28,6 @@ nativeUtils.enableSourceLink()
 
 nativeUtils.platformConfigs.each {
     if (it.name.contains('windows')) {
-        it.cppCompiler.args.add("/Zc:__cplusplus")
         return
     }
     it.linker.args << '-Wl,-rpath,\'$ORIGIN\''
