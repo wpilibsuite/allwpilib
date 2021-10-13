@@ -25,6 +25,7 @@ plugins {
   id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
+wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = '2022.+'
 wpi.versions.wpimathVersion = '2022.+'
@@ -38,6 +39,7 @@ plugins {
   id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
+wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = '2022.+'
 wpi.versions.wpimathVersion = '2022.+'
@@ -54,6 +56,7 @@ plugins {
   id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
+wpi.maven.useLocal = false
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
 wpi.versions.wpimathVersion = 'YEAR.424242.+'
@@ -67,6 +70,7 @@ plugins {
   id "edu.wpi.first.GradleRIO" version "2022.1.1"
 }
 
+wpi.maven.useLocal = false
 wpi.maven.useFrcMavenLocalDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.424242.+'
 wpi.versions.wpimathVersion = 'YEAR.424242.+'
