@@ -10,9 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ReplaceMeInstantCommand extends InstantCommand {
-  /**
-   * Create a new ReplaceMeInstantCommand.
-   */
+  /** Create a new ReplaceMeInstantCommand. */
   public ReplaceMeInstantCommand() {
     super(
         () -> {
