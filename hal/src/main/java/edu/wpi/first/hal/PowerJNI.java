@@ -32,4 +32,8 @@ public class PowerJNI extends JNIWrapper {
   public static native boolean getUserActive3V3();
 
   public static native int getUserCurrentFaults3V3();
+
+  public static native void setBrownoutVoltage(double voltage);
+
+  public static native double getBrownoutVoltage();
 }

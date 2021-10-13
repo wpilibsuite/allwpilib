@@ -31,6 +31,7 @@ void RoboRioData::ResetData() {
   userFaults6V.Reset(0);
   userFaults5V.Reset(0);
   userFaults3V3.Reset(0);
+  brownoutVoltage.Reset(6.75);
 }
 
 extern "C" {
@@ -57,6 +58,7 @@ DEFINE_CAPI(HAL_Bool, UserActive3V3, userActive3V3)
 DEFINE_CAPI(int32_t, UserFaults6V, userFaults6V)
 DEFINE_CAPI(int32_t, UserFaults5V, userFaults5V)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
+DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
 
 #define REGISTER(NAME) \
   SimRoboRioData->NAME.RegisterCallback(callback, param, initialNotify)
@@ -78,5 +80,6 @@ void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
   REGISTER(userFaults6V);
   REGISTER(userFaults5V);
   REGISTER(userFaults3V3);
+  REGISTER(brownoutVoltage);
 }
 }  // extern "C"

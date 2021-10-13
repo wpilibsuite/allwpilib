@@ -146,5 +146,14 @@ public class RoboRioDataJNI extends JNIWrapper {
 
   public static native void setUserFaults3V3(int userFaults3V3);
 
+  public static native int registerBrownoutVoltageCallback(
+      NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelBrownoutVoltageCallback(int uid);
+
+  public static native double getBrownoutVoltage();
+
+  public static native void setBrownoutVoltage(double brownoutVoltage);
+
   public static native void resetData();
 }

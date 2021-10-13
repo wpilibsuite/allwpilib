@@ -222,4 +222,33 @@ Java_edu_wpi_first_hal_PowerJNI_getUserCurrentFaults3V3
   return val;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    setBrownoutVoltage
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerJNI_setBrownoutVoltage
+  (JNIEnv* env, jclass, jdouble brownoutVoltage)
+{
+  int32_t status = 0;
+  HAL_SetBrownoutVoltage(brownoutVoltage, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerJNI
+ * Method:    getBrownoutVoltage
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_PowerJNI_getBrownoutVoltage
+  (JNIEnv* env, jclass)
+{
+  int32_t status = 0;
+  double val = HAL_GetBrownoutVoltage(&status);
+  CheckStatus(env, status);
+  return val;
+}
+
 }  // extern "C"

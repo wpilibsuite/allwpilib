@@ -115,6 +115,21 @@ HAL_Bool HAL_GetUserActive3V3(int32_t* status);
  * @return the number of 3V3 fault counts
  */
 int32_t HAL_GetUserCurrentFaults3V3(int32_t* status);
+
+/**
+ * Get the current brownout voltage seting.
+ * 
+ * @return The brownout voltage
+ */
+double HAL_GetBrownoutVoltage(int32_t* status);
+
+/**
+ * Set the voltage the roborio will brownout and disable all outputs.
+ * 
+ * @param brownoutVoltage The brownout voltage
+ */
+void HAL_SetBrownoutVoltage(double voltage, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

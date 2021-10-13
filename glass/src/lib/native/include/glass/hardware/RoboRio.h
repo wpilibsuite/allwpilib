@@ -32,10 +32,12 @@ class RoboRioModel : public Model {
   virtual DataSource* GetUserButton() = 0;
   virtual DataSource* GetVInVoltageData() = 0;
   virtual DataSource* GetVInCurrentData() = 0;
+  virtual DataSource* GetBrownoutVoltage() = 0;
 
   virtual void SetUserButton(bool val) = 0;
   virtual void SetVInVoltage(double val) = 0;
   virtual void SetVInCurrent(double val) = 0;
+  virtual void SetBrownoutVoltage(double val) = 0;
 };
 
 void DisplayRoboRio(RoboRioModel* model);
