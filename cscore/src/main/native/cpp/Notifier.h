@@ -35,8 +35,11 @@ struct ListenerData : public wpi::CallbackListenerData<
 class NotifierThread
     : public wpi::CallbackThread<NotifierThread, RawEvent, ListenerData> {
  public:
-  bool Matches(const ListenerData& /*listener*/, const RawEvent& /*data*/) {
-    return true;
+  NotifierThread(std::function<void()> on_start, std::function<void()> on_exit)
+      : CallbackThread(std::move(on_start), std::move(on_exit)) {}
+
+  bool Matches(const ListenerData& listener, const RawEvent& data) {
+    return (data.kind & listener.eventMask) != 0;
   }
 
   void SetListener(RawEvent* data, unsigned int listener_uid) {

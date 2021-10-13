@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <wpi/CallbackManager.h>
 
@@ -52,7 +53,9 @@ class EntryNotifierThread
     : public wpi::CallbackThread<EntryNotifierThread, EntryNotification,
                                  EntryListenerData> {
  public:
-  explicit EntryNotifierThread(int inst) : m_inst(inst) {}
+  EntryNotifierThread(std::function<void()> on_start,
+                      std::function<void()> on_exit, int inst)
+      : CallbackThread(std::move(on_start), std::move(on_exit)), m_inst(inst) {}
 
   bool Matches(const EntryListenerData& listener,
                const EntryNotification& data);
