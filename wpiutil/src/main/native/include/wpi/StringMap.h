@@ -439,7 +439,13 @@ public:
     return static_cast<DerivedTy &>(*this);
   }
 
+#if __cplusplus < 202002L
   bool operator==(const DerivedTy &RHS) const { return Ptr == RHS.Ptr; }
+#else
+  friend bool operator==(const DerivedTy &LHS, const DerivedTy &RHS) {
+    return LHS.Ptr == RHS.Ptr;
+  }
+#endif
 
   DerivedTy &operator++() { // Preincrement
     ++Ptr;
