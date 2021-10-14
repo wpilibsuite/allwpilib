@@ -28,9 +28,9 @@ extern "C" {
  * If passed HAL_USE_LAST_ERROR, the last error set on the thread will be
  * returned.
  *
- * @param status the status code, set to the error status code if input is
+ * @param[out] status the status code, set to the error status code if input is
  *               HAL_USE_LAST_ERROR
- * @return       the error message for the code. This does not need to be freed,
+ * @return the error message for the code. This does not need to be freed,
  *               but can be overwritten by another hal call on the same thread.
  */
 const char* HAL_GetLastError(int32_t* status);
@@ -39,7 +39,7 @@ const char* HAL_GetLastError(int32_t* status);
  * Gets the error message for a specific status code.
  *
  * @param code the status code
- * @return     the error message for the code. This does not need to be freed.
+ * @return the error message for the code. This does not need to be freed.
  */
 const char* HAL_GetErrorMessage(int32_t code);
 
@@ -48,7 +48,7 @@ const char* HAL_GetErrorMessage(int32_t code);
  *
  * For now, expect this to be competition year.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return FPGA Version number.
  */
 int32_t HAL_GetFPGAVersion(int32_t* status);
@@ -61,7 +61,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
  * the next 8 bits are the Minor Revision.
  * The 12 least significant bits are the Build Number.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return FPGA Revision number.
  */
 int64_t HAL_GetFPGARevision(int32_t* status);
@@ -76,7 +76,7 @@ HAL_RuntimeType HAL_GetRuntimeType(void);
 /**
  * Gets the state of the "USER" button on the roboRIO.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return true if the button is currently pressed down
  */
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
@@ -84,7 +84,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status);
 /**
  * Gets if the system outputs are currently active
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return true if the system outputs are active, false if disabled
  */
 HAL_Bool HAL_GetSystemActive(int32_t* status);
@@ -92,7 +92,7 @@ HAL_Bool HAL_GetSystemActive(int32_t* status);
 /**
  * Gets if the system is in a browned out state.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return true if the system is in a low voltage brown out, false otherwise
  */
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
@@ -103,7 +103,7 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status);
  * The created handle does not need to be freed.
  *
  * @param channel the channel number
- * @return        the created port
+ * @return the created port
  */
 HAL_PortHandle HAL_GetPort(int32_t channel);
 
@@ -117,14 +117,14 @@ HAL_PortHandle HAL_GetPort(int32_t channel);
  *
  * @param module  the module number
  * @param channel the channel number
- * @return        the created port
+ * @return the created port
  */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 
 /**
  * Reads the microsecond-resolution timer on the FPGA.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return The current time in microseconds according to the FPGA (since FPGA
  * reset).
  */
@@ -139,8 +139,8 @@ uint64_t HAL_GetFPGATime(int32_t* status);
  * bottom 32 bits of the timestamp and expanding it, you will be off by
  * multiples of 1<<32 microseconds.
  *
- * @param unexpandedLower 32 bit FPGA time
- * @param status the error code, or 0 for success
+ * @param[in] unexpandedLower 32 bit FPGA time
+ * @param[out] status the error code, or 0 for success
  * @return The current time in microseconds according to the FPGA (since FPGA
  *         reset) as a 64 bit number.
  */
@@ -168,7 +168,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status);
  *
  * @param timeout the initialization timeout (ms)
  * @param mode    the initialization mode (see remarks)
- * @return        true if initialization was successful, otherwise false.
+ * @return true if initialization was successful, otherwise false.
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 

@@ -30,7 +30,7 @@ extern "C" {
  * Initializes a REV Power Distribution Hub (PDH) device.
  *
  * @param module       the device CAN ID (1 .. 63)
- * @return             the created PDH handle
+ * @return the created PDH handle
  */
 HAL_REVPDHHandle HAL_REV_InitializePDH(int32_t module,
                                        const char* allocationLocation,
@@ -54,7 +54,7 @@ int32_t HAL_REV_GetPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status);
  * Does not check if a PDH device with this module has been initialized.
  *
  * @param module        module number (1 .. 63)
- * @return              1 if the module number is valid; 0 otherwise
+ * @return 1 if the module number is valid; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHModuleNumber(int32_t module);
 
@@ -62,7 +62,7 @@ HAL_Bool HAL_REV_CheckPDHModuleNumber(int32_t module);
  * Checks if a PDH channel number is valid.
  *
  * @param module        channel number (0 .. HAL_REV_PDH_NUM_CHANNELS)
- * @return              1 if the channel number is valid; 0 otherwise
+ * @return 1 if the channel number is valid; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHChannelNumber(int32_t channel);
 
@@ -73,7 +73,7 @@ HAL_Bool HAL_REV_CheckPDHChannelNumber(int32_t channel);
  * @param channel       the channel to retrieve the current of (0 ..
  * HAL_REV_PDH_NUM_CHANNELS)
  *
- * @return              the current of the PDH channel in Amps
+ * @return the current of the PDH channel in Amps
  */
 double HAL_REV_GetPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
                                     int32_t* status);
@@ -91,7 +91,7 @@ void HAL_REV_GetPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
  *
  * @param handle        PDH handle
  *
- * @return              the total current of the PDH in Amps
+ * @return the total current of the PDH in Amps
  */
 uint16_t HAL_REV_GetPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status);
 
@@ -112,7 +112,7 @@ void HAL_REV_SetPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
  * fresh as the last packet received.
  *
  * @param handle        PDH handle
- * @return              1 if the switchable channel is enabled; 0 otherwise
+ * @return 1 if the switchable channel is enabled; 0 otherwise
  */
 HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
                                               int32_t* status);
@@ -125,7 +125,7 @@ HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
  * @param handle        PDH handle
  * @param channel       the channel to retrieve the brownout status of
  *
- * @return              1 if the channel is experiencing a brownout; 0 otherwise
+ * @return 1 if the channel is experiencing a brownout; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHChannelBrownout(HAL_REVPDHHandle handle,
                                          int32_t channel, int32_t* status);
@@ -135,7 +135,7 @@ HAL_Bool HAL_REV_CheckPDHChannelBrownout(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              the voltage at the input of the PDH in Volts
+ * @return the voltage at the input of the PDH in Volts
  */
 double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status);
 
@@ -144,7 +144,7 @@ double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @param handle        PDH handle
  *
- * @return              1 if the PDH is enabled; 0 otherwise
+ * @return 1 if the PDH is enabled; 0 otherwise
  */
 HAL_Bool HAL_REV_IsPDHEnabled(HAL_REVPDHHandle handle, int32_t* status);
 
@@ -156,7 +156,7 @@ HAL_Bool HAL_REV_IsPDHEnabled(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @param handle        PDH handle
  *
- * @return              1 if the PDH is experiencing a brownout; 0 otherwise
+ * @return 1 if the PDH is experiencing a brownout; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHBrownout(HAL_REVPDHHandle handle, int32_t* status);
 
@@ -168,7 +168,7 @@ HAL_Bool HAL_REV_CheckPDHBrownout(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has exceeded the warning threshold; 0
+ * @return 1 if the device has exceeded the warning threshold; 0
  * otherwise
  */
 HAL_Bool HAL_REV_CheckPDHCANWarning(HAL_REVPDHHandle handle, int32_t* status);
@@ -180,7 +180,7 @@ HAL_Bool HAL_REV_CheckPDHCANWarning(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device is in a hardware fault state; 0
+ * @return 1 if the device is in a hardware fault state; 0
  * otherwise
  */
 HAL_Bool HAL_REV_CheckPDHHardwareFault(HAL_REVPDHHandle handle,
@@ -194,7 +194,7 @@ HAL_Bool HAL_REV_CheckPDHHardwareFault(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has had a brownout; 0 otherwise
+ * @return 1 if the device has had a brownout; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyBrownout(HAL_REVPDHHandle handle,
                                         int32_t* status);
@@ -207,7 +207,7 @@ HAL_Bool HAL_REV_CheckPDHStickyBrownout(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has exceeded the CAN warning threshold;
+ * @return 1 if the device has exceeded the CAN warning threshold;
  * 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyCANWarning(HAL_REVPDHHandle handle,
@@ -221,7 +221,7 @@ HAL_Bool HAL_REV_CheckPDHStickyCANWarning(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has experienced a 'Bus Off' event; 0
+ * @return 1 if the device has experienced a 'Bus Off' event; 0
  * otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyCANBusOff(HAL_REVPDHHandle handle,
@@ -234,7 +234,7 @@ HAL_Bool HAL_REV_CheckPDHStickyCANBusOff(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has had a malfunction; 0 otherwise
+ * @return 1 if the device has had a malfunction; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyHardwareFault(HAL_REVPDHHandle handle,
                                              int32_t* status);
@@ -247,7 +247,7 @@ HAL_Bool HAL_REV_CheckPDHStickyHardwareFault(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has had a malfunction and reset; 0
+ * @return 1 if the device has had a malfunction and reset; 0
  * otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyFirmwareFault(HAL_REVPDHHandle handle,
@@ -264,7 +264,7 @@ HAL_Bool HAL_REV_CheckPDHStickyFirmwareFault(HAL_REVPDHHandle handle,
  * 23)
  *
  *
- * @return              1 if the channel has had a brownout; 0 otherwise
+ * @return 1 if the channel has had a brownout; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyChannelBrownout(HAL_REVPDHHandle handle,
                                                int32_t channel,
@@ -277,7 +277,7 @@ HAL_Bool HAL_REV_CheckPDHStickyChannelBrownout(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              1 if the device has reset; 0 otherwise
+ * @return 1 if the device has reset; 0 otherwise
  */
 HAL_Bool HAL_REV_CheckPDHStickyHasReset(HAL_REVPDHHandle handle,
                                         int32_t* status);
@@ -287,7 +287,7 @@ HAL_Bool HAL_REV_CheckPDHStickyHasReset(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  *
- * @return              version information
+ * @return version information
  */
 REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
 

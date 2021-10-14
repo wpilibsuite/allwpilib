@@ -21,12 +21,12 @@ extern "C" {
 /**
  * Creates a new instance of a digital port.
  *
- * @param portHandle            the port handle to create from
- * @param input                 true for input, false for output
- * @param allocationLocation    the location where the allocation is occuring
- *                              (can be null)
- * @param status                Error status variable. 0 on success.
- * @return                      the created digital handle
+ * @param[in] portHandle         the port handle to create from
+ * @param[in] input              true for input, false for output
+ * @param[in] allocationLocation the location where the allocation is occuring
+ *                               (can be null)
+ * @param[out] status            Error status variable. 0 on success.
+ * @return the created digital handle
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input,
@@ -37,7 +37,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
  * Checks if a DIO channel is valid.
  *
  * @param channel the channel number to check
- * @return        true if the channel is correct, otherwise false
+ * @return true if the channel is correct, otherwise false
  */
 HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 
@@ -59,7 +59,7 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device);
 /**
  * Allocates a DO PWM Generator.
  *
- * @param status Error status variable. 0 on success.
+ * @param[out] status Error status variable. 0 on success.
  * @return the allocated digital PWM handle
  */
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
@@ -67,8 +67,8 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
 /**
  * Frees the resource associated with a DO PWM generator.
  *
- * @param pwmGenerator the digital PWM handle
- * @param status Error status variable. 0 on success.
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
 
@@ -79,17 +79,17 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
  *
  *  The frequency resolution is logarithmic.
  *
- * @param rate the frequency to output all digital output PWM signals
- * @param status Error status variable. 0 on success.
+ * @param[in] rate the frequency to output all digital output PWM signals
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetDigitalPWMRate(double rate, int32_t* status);
 
 /**
  * Configures the duty-cycle of the PWM generator.
  *
- * @param pwmGenerator the digital PWM handle
- * @param dutyCycle    the percent duty cycle to output [0..1]
- * @param status       Error status variable. 0 on success.
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] dutyCycle    the percent duty cycle to output [0..1]
+ * @param[out] status      Error status variable. 0 on success.
  */
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status);
@@ -97,9 +97,9 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
 /**
  * Configures which DO channel the PWM signal is output on.
  *
- * @param pwmGenerator the digital PWM handle
- * @param channel      the channel to output on
- * @param status       Error status variable. 0 on success.
+ * @param[in] pwmGenerator the digital PWM handle
+ * @param[in] channel      the channel to output on
+ * @param[out] status      Error status variable. 0 on success.
  */
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status);
@@ -107,10 +107,10 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
 /**
  * Writes a digital value to a DIO channel.
  *
- * @param dioPortHandle the digital port handle
- * @param value         the state to set the digital channel (if it is
- *                      configured as an output)
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[in] value         the state to set the digital channel (if it is
+ *                          configured as an output)
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status);
@@ -118,9 +118,9 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
 /**
  * Sets the direction of a DIO channel.
  *
- * @param dioPortHandle the digital port handle
- * @param input         true to set input, false for output
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[in] input         true to set input, false for output
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
                          int32_t* status);
@@ -128,18 +128,18 @@ void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
 /**
  * Reads a digital value from a DIO channel.
  *
- * @param dioPortHandle the digital port handle
- * @param status        Error status variable. 0 on success.
- * @return              the state of the specified channel
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status       Error status variable. 0 on success.
+ * @return the state of the specified channel
  */
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
 /**
  * Reads the direction of a DIO channel.
  *
- * @param dioPortHandle the digital port handle
- * @param status        Error status variable. 0 on success.
- * @return              true for input, false for output
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status       Error status variable. 0 on success.
+ * @return true for input, false for output
  */
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
 
@@ -149,9 +149,9 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * Write a pulse to the specified digital output channel. There can only be a
  * single pulse going at any time.
  *
- * @param dioPortHandle the digital port handle
- * @param pulseLength   the active length of the pulse (in seconds)
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[in] pulseLength   the active length of the pulse (in seconds)
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status);
@@ -159,8 +159,8 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
 /**
  * Checks a DIO line to see if it is currently generating a pulse.
  *
- * @param dioPortHandle the digital port handle
- * @param status Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status Error status variable. 0 on success.
  * @return true if a pulse is in progress, otherwise false
  */
 HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status);
@@ -168,7 +168,7 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status);
 /**
  * Checks if any DIO line is currently generating a pulse.
  *
- * @param status Error status variable. 0 on success.
+ * @param[out] status Error status variable. 0 on success.
  * @return true if a pulse on some line is in progress
  */
 HAL_Bool HAL_IsAnyPulsing(int32_t* status);
@@ -178,10 +178,11 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status);
  *
  * Set the filter index used to filter out short pulses.
  *
- * @param dioPortHandle the digital port handle
- * @param filterIndex   the filter index (Must be in the range 0 - 3, where 0
- *                      means "none" and 1 - 3 means filter # filterIndex - 1)
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[in] filterIndex   the filter index (Must be in the range 0 - 3, where
+ *                          0 means "none" and 1 - 3 means filter # filterIndex
+ *                          - 1)
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
                          int32_t* status);
@@ -191,8 +192,8 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
  *
  * Gets the filter index used to filter out short pulses.
  *
- * @param dioPortHandle the digital port handle
- * @param status        Error status variable. 0 on success.
+ * @param[in] dioPortHandle the digital port handle
+ * @param[out] status       Error status variable. 0 on success.
  * @return filterIndex  the filter index (Must be in the range 0 - 3, where 0
  *                      means "none" and 1 - 3 means filter # filterIndex - 1)
  */
@@ -205,10 +206,10 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
  * filter index domains (MXP vs HDR), ignore that distinction for now since it
  * compilicates the interface.  That can be changed later.
  *
- * @param filterIndex the filter index, 0 - 2
- * @param value       the number of cycles that the signal must not transition
- *                    to be counted as a transition.
- * @param status      Error status variable. 0 on success.
+ * @param[in] filterIndex the filter index, 0 - 2
+ * @param[in] value       the number of cycles that the signal must not
+ *                        transition to be counted as a transition.
+ * @param[out] status     Error status variable. 0 on success.
  */
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
 
@@ -220,8 +221,8 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
  * compilicates the interface.  Set status to NiFpga_Status_SoftwareFault if the
  * filter values miss-match.
  *
- * @param filterIndex the filter index, 0 - 2
- * @param status      Error status variable. 0 on success.
+ * @param[in] filterIndex the filter index, 0 - 2
+ * @param[out] status     Error status variable. 0 on success.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus

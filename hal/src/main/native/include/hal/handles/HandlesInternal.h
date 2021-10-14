@@ -76,7 +76,7 @@ enum class HAL_HandleEnum {
  * Get the handle index from a handle.
  *
  * @param handle the handle
- * @return       the index
+ * @return the index
  */
 static inline int16_t getHandleIndex(HAL_Handle handle) {
   // mask and return last 16 bits
@@ -87,7 +87,7 @@ static inline int16_t getHandleIndex(HAL_Handle handle) {
  * Get the handle type from a handle.
  *
  * @param handle the handle
- * @return       the type
+ * @return the type
  */
 static inline HAL_HandleEnum getHandleType(HAL_Handle handle) {
   // mask first 8 bits and cast to enum
@@ -99,7 +99,7 @@ static inline HAL_HandleEnum getHandleType(HAL_Handle handle) {
  *
  * @param handle     the handle
  * @param handleType the type to check
- * @return           true if the type is correct, otherwise false
+ * @return true if the type is correct, otherwise false
  */
 static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
   return handleType == getHandleType(handle);
@@ -112,7 +112,7 @@ static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
  *
  * @param handle  the handle
  * @param version the handle version to check
- * @return        true if the handle is the right version, otherwise false
+ * @return true if the handle is the right version, otherwise false
  */
 static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
   return (((handle & 0xFF0000) >> 16) & version) == version;
@@ -126,8 +126,8 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
  * @param handle     the handle
  * @param enumType   the type to check
  * @param version    the handle version to check
- * @return           true if the handle is proper version and type, otherwise
- * false.
+ * @return true if the handle is proper version and type, otherwise
+ *         false.
  */
 inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
                                    int16_t version) {
@@ -156,7 +156,7 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
  * Gets the port channel of a port handle.
  *
  * @param handle the port handle
- * @return       the port channel
+ * @return the port channel
  */
 inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
   if (!isHandleType(handle, HAL_HandleEnum::Port)) {
@@ -170,7 +170,7 @@ inline int16_t getPortHandleChannel(HAL_PortHandle handle) {
  * Gets the port module of a port handle.
  *
  * @param handle the port handle
- * @return       the port module
+ * @return the port module
  */
 inline int16_t getPortHandleModule(HAL_PortHandle handle) {
   if (!isHandleType(handle, HAL_HandleEnum::Port)) {
@@ -184,7 +184,7 @@ inline int16_t getPortHandleModule(HAL_PortHandle handle) {
  * Gets the SPI channel of a port handle.
  *
  * @param handle the port handle
- * @return       the port SPI channel
+ * @return the port SPI channel
  */
 inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
   if (!isHandleType(handle, HAL_HandleEnum::Port)) {
@@ -198,7 +198,7 @@ inline int16_t getPortHandleSPIEnable(HAL_PortHandle handle) {
  *
  * @param channel the channel
  * @param module  the module
- * @return        port handle for the module and channel
+ * @return port handle for the module and channel
  */
 HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
 
@@ -206,7 +206,7 @@ HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
  * Create a port handle for SPI.
  *
  * @param channel the SPI channel
- * @return        port handle for the channel
+ * @return port handle for the channel
  */
 HAL_PortHandle createPortHandleForSPI(uint8_t channel);
 
@@ -218,7 +218,7 @@ HAL_PortHandle createPortHandleForSPI(uint8_t channel);
  * @param index      the index
  * @param handleType the handle type
  * @param version    the handle version
- * @return           the created handle
+ * @return the created handle
  */
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version);

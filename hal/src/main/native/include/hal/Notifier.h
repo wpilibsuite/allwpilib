@@ -26,7 +26,7 @@ extern "C" {
  * A notifier is an FPGA controller timer that triggers at requested intervals
  * based on the FPGA time. This can be used to make precise control loops.
  *
- * @param status Error status variable. 0 on success.
+ * @param[out] status Error status variable. 0 on success.
  * @return the created notifier
  */
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
@@ -39,13 +39,13 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status);
  * Giving the HAL notifier thread real-time priority helps ensure the user's
  * real-time Notifiers, if any, are notified to run in a timely manner.
  *
- * @param realTime Set to true to set a real-time priority, false for standard
- *                 priority.
- * @param priority Priority to set the thread to. For real-time, this is 1-99
- *                 with 99 being highest. For non-real-time, this is forced to
- *                 0. See "man 7 sched" for more details.
- * @param status   Error status variable. 0 on success.
- * @return         True on success.
+ * @param[in] realTime Set to true to set a real-time priority, false for
+ *                     standard priority.
+ * @param[in] priority Priority to set the thread to. For real-time, this is
+ *                     1-99 with 99 being highest. For non-real-time, this is
+ *                     forced to 0. See "man 7 sched" for more details.
+ * @param[out] status  Error status variable. 0 on success.
+ * @return True on success.
  */
 HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
                                        int32_t* status);
@@ -53,9 +53,9 @@ HAL_Bool HAL_SetNotifierThreadPriority(HAL_Bool realTime, int32_t priority,
 /**
  * Sets the name of a notifier.
  *
- * @param notifierHandle the notifier handle
- * @param name name
- * @param status Error status variable. 0 on success.
+ * @param[in] notifierHandle the notifier handle
+ * @param[in] name name
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
                          int32_t* status);
@@ -65,8 +65,8 @@ void HAL_SetNotifierName(HAL_NotifierHandle notifierHandle, const char* name,
  *
  * This will cause any call into HAL_WaitForNotifierAlarm to return.
  *
- * @param notifierHandle the notifier handle
- * @param status Error status variable. 0 on success.
+ * @param[in] notifierHandle the notifier handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
 
@@ -75,8 +75,8 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
  *
  * Note this also stops a notifier if it is already running.
  *
- * @param notifierHandle the notifier handle
- * @param status Error status variable. 0 on success.
+ * @param[in] notifierHandle the notifier handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
 
@@ -85,9 +85,9 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
  *
  * Note that this time is an absolute time relative to HAL_GetFPGATime()
  *
- * @param notifierHandle the notifier handle
- * @param triggerTime    the updated trigger time
- * @param status         Error status variable. 0 on success.
+ * @param[in] notifierHandle the notifier handle
+ * @param[in] triggerTime    the updated trigger time
+ * @param[out] status        Error status variable. 0 on success.
  */
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status);
@@ -97,8 +97,8 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
  *
  * This does not cause HAL_WaitForNotifierAlarm to return.
  *
- * @param notifierHandle the notifier handle
- * @param status Error status variable. 0 on success.
+ * @param[in] notifierHandle the notifier handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status);
@@ -111,9 +111,9 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
  * loops using this function should exit. Failing to do so can lead to
  * use-after-frees.
  *
- * @param notifierHandle the notifier handle
- * @param status         Error status variable. 0 on success.
- * @return               the FPGA time the notifier returned
+ * @param[in] notifierHandle the notifier handle
+ * @param[out] status        Error status variable. 0 on success.
+ * @return the FPGA time the notifier returned
  */
 WPI_NODISCARD
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,

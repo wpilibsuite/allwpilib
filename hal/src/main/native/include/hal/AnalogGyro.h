@@ -21,11 +21,11 @@ extern "C" {
 /**
  * Initializes an analog gyro.
  *
- * @param handle handle to the analog port
- * @param allocationLocation the location where the allocation is occuring
- *                           (can be null)
- * @param status the error code, or 0 for success
- * @return       the initialized gyro handle
+ * @param[in] handle handle to the analog port
+ * @param[in] allocationLocation the location where the allocation is occuring
+ *                                (can be null)
+ * @param[out] status the error code, or 0 for success
+ * @return the initialized gyro handle
  */
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
                                         const char* allocationLocation,
@@ -35,8 +35,8 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
  * Sets up an analog gyro with the proper offsets and settings for the KOP
  * analog gyro.
  *
- * @param handle the gyro handle
- * @param status the error code, or 0 for success
+ * @param[in] handle the gyro handle
+ * @param[out] status the error code, or 0 for success
  */
 void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status);
 
@@ -53,11 +53,11 @@ void HAL_FreeAnalogGyro(HAL_GyroHandle handle);
  * This is meant to be used if you want to reuse the values from a previous
  * calibration.
  *
- * @param handle                  the gyro handle
- * @param voltsPerDegreePerSecond the gyro volts scaling
- * @param offset                  the gyro offset
- * @param center                  the gyro center
- * @param status                  the error code, or 0 for success
+ * @param[in] handle                  the gyro handle
+ * @param[in] voltsPerDegreePerSecond the gyro volts scaling
+ * @param[in] offset                  the gyro offset
+ * @param[in] center                  the gyro center
+ * @param[out] status                  the error code, or 0 for success
  */
 void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
                                  double voltsPerDegreePerSecond, double offset,
@@ -66,9 +66,9 @@ void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
 /**
  * Sets the analog gyro volts per degrees per second scaling.
  *
- * @param handle                  the gyro handle
- * @param voltsPerDegreePerSecond the gyro volts scaling
- * @param status                  the error code, or 0 for success
+ * @param[in] handle                  the gyro handle
+ * @param[in] voltsPerDegreePerSecond the gyro volts scaling
+ * @param[out] status                  the error code, or 0 for success
  */
 void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle,
                                               double voltsPerDegreePerSecond,
@@ -77,8 +77,8 @@ void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle,
 /**
  * Resets the analog gyro value to 0.
  *
- * @param handle the gyro handle
- * @param status the error code, or 0 for success
+ * @param[in] handle the gyro handle
+ * @param[out] status the error code, or 0 for success
  */
 void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status);
 
@@ -89,17 +89,17 @@ void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status);
  * setting that as the center. Note that this call blocks for 5 seconds to
  * perform this.
  *
- * @param handle the gyro handle
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status);
 
 /**
  * Sets the deadband of the analog gyro.
  *
- * @param handle the gyro handle
- * @param volts  the voltage deadband
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[in] volts  the voltage deadband
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
                                int32_t* status);
@@ -107,8 +107,8 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
 /**
  * Gets the gyro angle in degrees.
  *
- * @param handle the gyro handle
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the gyro angle in degrees
  */
 double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status);
@@ -116,8 +116,8 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status);
 /**
  * Gets the gyro rate in degrees/second.
  *
- * @param handle the gyro handle
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the gyro rate in degrees/second
  */
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
@@ -127,8 +127,8 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
  *
  * Can be used to not repeat a calibration but reconstruct the gyro object.
  *
- * @param handle the gyro handle
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the gryo offset
  */
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status);
@@ -138,8 +138,8 @@ double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status);
  *
  * Can be used to not repeat a calibration but reconstruct the gyro object.
  *
- * @param handle the gyro handle
- * @param status Error status variable. 0 on success.
+ * @param[in] handle the gyro handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the gyro center
  */
 int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status);

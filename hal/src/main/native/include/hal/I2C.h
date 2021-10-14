@@ -24,8 +24,8 @@ extern "C" {
  * Opens the port if necessary and saves the handle.
  * If opening the MXP port, also sets up the channel functions appropriately.
  *
- * @param port The port to open, 0 for the on-board, 1 for the MXP.
- * @param status Error status variable. 0 on success.
+ * @param[in] port    The port to open, 0 for the on-board, 1 for the MXP.
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status);
 

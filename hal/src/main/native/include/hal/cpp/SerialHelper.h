@@ -26,34 +26,34 @@ class SerialHelper {
   /**
    * Get the VISA name of a serial port.
    *
-   * @param port   the serial port index
-   * @param status status check
-   * @return       the VISA name
+   * @param[in] port    the serial port index
+   * @param[out] status status check
+   * @return the VISA name
    */
   std::string GetVISASerialPortName(HAL_SerialPort port, int32_t* status);
 
   /**
    * Get the OS name of a serial port.
    *
-   * @param port   the serial port index
-   * @param status status check
-   * @return       the OS name
+   * @param[in] port    the serial port index
+   * @param[out] status status check
+   * @return the OS name
    */
   std::string GetOSSerialPortName(HAL_SerialPort port, int32_t* status);
 
   /**
    * Get a vector of all serial port VISA names.
    *
-   * @param status status check
-   * @return       vector of serial port VISA names
+   * @param[out] status status check
+   * @return vector of serial port VISA names
    */
   std::vector<std::string> GetVISASerialPortList(int32_t* status);
 
   /**
    * Get a vector of all serial port OS names.
    *
-   * @param status status check
-   * @return       vector of serial port OS names
+   * @param[out] status status check
+   * @return vector of serial port OS names
    */
   std::vector<std::string> GetOSSerialPortList(int32_t* status);
 
