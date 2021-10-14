@@ -60,6 +60,21 @@ TEST(RoboRioSimTest, SetVin) {
   EXPECT_EQ(kTestCurrent, RobotController::GetInputCurrent());
 }
 
+TEST(RoboRioSimTest, SetBrownout) {
+  RoboRioSim::ResetData();
+
+  DoubleCallback voltageCallback;
+  auto voltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
+      voltageCallback.GetCallback(), false);
+  constexpr double kTestVoltage = 1.91;
+
+  RoboRioSim::SetBrownoutVoltage(units::volt_t{kTestVoltage});
+  EXPECT_TRUE(voltageCallback.WasTriggered());
+  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().to<double>());
+  EXPECT_EQ(kTestVoltage, RobotController::GetBrownoutVoltage().to<double>());
+}
+
 TEST(RoboRioSimTest, Set6V) {
   RoboRioSim::ResetData();
 

@@ -267,6 +267,23 @@ void RoboRioSim::SetUserFaults3V3(int userFaults3V3) {
   HALSIM_SetRoboRioUserFaults3V3(userFaults3V3);
 }
 
+std::unique_ptr<CallbackStore> RoboRioSim::RegisterBrownoutVoltageCallback(
+    NotifyCallback callback, bool initialNotify) {
+  auto store = std::make_unique<CallbackStore>(
+      -1, callback, &HALSIM_CancelRoboRioBrownoutVoltageCallback);
+  store->SetUid(HALSIM_RegisterRoboRioBrownoutVoltageCallback(
+      &CallbackStoreThunk, store.get(), initialNotify));
+  return store;
+}
+
+units::volt_t RoboRioSim::GetBrownoutVoltage() {
+  return units::volt_t(HALSIM_GetRoboRioBrownoutVoltage());
+}
+
+void RoboRioSim::SetBrownoutVoltage(units::volt_t vInVoltage) {
+  HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.to<double>());
+}
+
 void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }

@@ -159,6 +159,19 @@ int RobotController::GetFaultCount6V() {
   return retVal;
 }
 
+units::volt_t RobotController::GetBrownoutVoltage() {
+  int32_t status = 0;
+  double retVal = HAL_GetBrownoutVoltage(&status);
+  FRC_CheckErrorStatus(status, "{}", "GetBrownoutVoltage");
+  return units::volt_t(retVal);
+}
+
+void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
+  int32_t status = 0;
+  HAL_SetBrownoutVoltage(brownoutVoltage.to<double>(), &status);
+  FRC_CheckErrorStatus(status, "{}", "SetBrownoutVoltage");
+}
+
 CANStatus RobotController::GetCANStatus() {
   int32_t status = 0;
   float percentBusUtilization = 0;

@@ -63,6 +63,23 @@ public class RoboRioSimTest {
   }
 
   @Test
+  void testSetBrownout() {
+    RoboRioSim.resetData();
+
+    DoubleCallback voltageCallback = new DoubleCallback();
+    try (CallbackStore voltageCb =
+        RoboRioSim.registerBrownoutVoltageCallback(voltageCallback, false)) {
+      final double kTestVoltage = 1.91;
+
+      RoboRioSim.setBrownoutVoltage(kTestVoltage);
+      assertTrue(voltageCallback.wasTriggered());
+      assertEquals(kTestVoltage, voltageCallback.getSetValue());
+      assertEquals(kTestVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kTestVoltage, RobotController.getBrownoutVoltage());
+    }
+  }
+
+  @Test
   void test6V() {
     RoboRioSim.resetData();
 

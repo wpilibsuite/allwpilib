@@ -103,4 +103,22 @@ int32_t HAL_GetUserCurrentFaults3V3(int32_t* status) {
       power->readFaultCounts_OverCurrentFaultCount3V3(status));
 }
 
+void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
+  initializePower(status);
+  if (voltage < 0) {
+    voltage = 0;
+  }
+  if (voltage > 50) {
+    voltage = 50;
+  }
+  power->writeBrownoutVoltage250mV(static_cast<unsigned char>(voltage * 4),
+                                   status);
+}
+
+double HAL_GetBrownoutVoltage(int32_t* status) {
+  initializePower(status);
+  auto brownout = power->readBrownoutVoltage250mV(status);
+  return brownout / 4.0;
+}
+
 }  // extern "C"

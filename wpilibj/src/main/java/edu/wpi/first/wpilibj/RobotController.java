@@ -214,6 +214,26 @@ public final class RobotController {
   }
 
   /**
+   * Get the current brownout voltage seting.
+   *
+   * @return The brownout voltage
+   */
+  public static double getBrownoutVoltage() {
+    return PowerJNI.getBrownoutVoltage();
+  }
+
+  /**
+   * Set the voltage the roborio will brownout and disable all outputs.
+   *
+   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
+   *
+   * @param brownoutVoltage The brownout voltage
+   */
+  public static void setBrownoutVoltage(double brownoutVoltage) {
+    PowerJNI.setBrownoutVoltage(brownoutVoltage);
+  }
+
+  /**
    * Get the current status of the CAN bus.
    *
    * @return The status of the CAN bus
