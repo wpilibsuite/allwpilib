@@ -214,7 +214,7 @@ public final class RobotController {
   }
 
   /**
-   * Get the current brownout voltage seting.
+   * Get the current brownout voltage setting.
    *
    * @return The brownout voltage
    */
@@ -223,7 +223,7 @@ public final class RobotController {
   }
 
   /**
-   * Set the voltage the roborio will brownout and disable all outputs.
+   * Set the voltage the roboRIO will brownout and disable all outputs.
    *
    * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
    *
