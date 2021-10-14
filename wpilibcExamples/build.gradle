@@ -86,7 +86,6 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
-                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -134,7 +133,6 @@ model {
             "${key}"(NativeExecutableSpec) {
                 targetBuildTypes 'debug'
                 binaries.all { binary ->
-                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -206,7 +204,6 @@ model {
     }
     binaries {
         withType(GoogleTestTestSuiteBinarySpec) {
-            lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
             lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

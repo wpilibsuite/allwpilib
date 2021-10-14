@@ -283,17 +283,6 @@
     "commandversion": 2
   },
   {
-    "name": "PacGoat",
-    "description": "A fully functional example CommandBased program for FRC Team 190&#39;s 2014 robot. This code can run on your computer if it supports simulation.",
-    "tags": [
-      "CommandBased Robot",
-      "Complete List"
-    ],
-    "foldername": "PacGoat",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
     "name": "HAL",
     "description": "A program created using the HAL exclusively. This example is for advanced users",
     "tags": [
