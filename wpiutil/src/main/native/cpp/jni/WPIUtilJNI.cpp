@@ -247,7 +247,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjects
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 
@@ -271,7 +271,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   JIntArrayRef handlesArr{env, handles};
   wpi::SmallVector<WPI_Handle, 8> signaledBuf;
   signaledBuf.resize(handlesArr.size());
-  wpi::span<const WPI_Handle> handlesArr2{
+  std::span<const WPI_Handle> handlesArr2{
       reinterpret_cast<const WPI_Handle*>(handlesArr.array().data()),
       handlesArr.size()};
 

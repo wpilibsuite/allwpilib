@@ -1384,7 +1384,7 @@ json json::from_cbor(raw_istream& is, const bool strict)
     return binary_reader(is).parse_cbor(strict);
 }
 
-json json::from_cbor(span<const uint8_t> arr, const bool strict)
+json json::from_cbor(std::span<const uint8_t> arr, const bool strict)
 {
     raw_mem_istream is(arr);
     return from_cbor(is, strict);
@@ -1395,7 +1395,7 @@ json json::from_msgpack(raw_istream& is, const bool strict)
     return binary_reader(is).parse_msgpack(strict);
 }
 
-json json::from_msgpack(span<const uint8_t> arr, const bool strict)
+json json::from_msgpack(std::span<const uint8_t> arr, const bool strict)
 {
     raw_mem_istream is(arr);
     return from_msgpack(is, strict);
@@ -1406,7 +1406,7 @@ json json::from_ubjson(raw_istream& is, const bool strict)
     return binary_reader(is).parse_ubjson(strict);
 }
 
-json json::from_ubjson(span<const uint8_t> arr, const bool strict)
+json json::from_ubjson(std::span<const uint8_t> arr, const bool strict)
 {
     raw_mem_istream is(arr);
     return from_ubjson(is, strict);

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -43,32 +44,32 @@ inline std::string GenericSubscriber::GetString(
 }
 
 inline std::vector<uint8_t> GenericSubscriber::GetRaw(
-    wpi::span<const uint8_t> defaultValue) const {
+    std::span<const uint8_t> defaultValue) const {
   return ::nt::GetRaw(m_subHandle, defaultValue);
 }
 
 inline std::vector<int> GenericSubscriber::GetBooleanArray(
-    wpi::span<const int> defaultValue) const {
+    std::span<const int> defaultValue) const {
   return ::nt::GetBooleanArray(m_subHandle, defaultValue);
 }
 
 inline std::vector<int64_t> GenericSubscriber::GetIntegerArray(
-    wpi::span<const int64_t> defaultValue) const {
+    std::span<const int64_t> defaultValue) const {
   return ::nt::GetIntegerArray(m_subHandle, defaultValue);
 }
 
 inline std::vector<float> GenericSubscriber::GetFloatArray(
-    wpi::span<const float> defaultValue) const {
+    std::span<const float> defaultValue) const {
   return ::nt::GetFloatArray(m_subHandle, defaultValue);
 }
 
 inline std::vector<double> GenericSubscriber::GetDoubleArray(
-    wpi::span<const double> defaultValue) const {
+    std::span<const double> defaultValue) const {
   return ::nt::GetDoubleArray(m_subHandle, defaultValue);
 }
 
 inline std::vector<std::string> GenericSubscriber::GetStringArray(
-    wpi::span<const std::string> defaultValue) const {
+    std::span<const std::string> defaultValue) const {
   return ::nt::GetStringArray(m_subHandle, defaultValue);
 }
 
@@ -107,37 +108,37 @@ inline bool GenericPublisher::SetString(std::string_view value, int64_t time) {
   return nt::SetString(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetRaw(wpi::span<const uint8_t> value,
+inline bool GenericPublisher::SetRaw(std::span<const uint8_t> value,
                                      int64_t time) {
   return nt::SetRaw(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetBooleanArray(wpi::span<const bool> value,
+inline bool GenericPublisher::SetBooleanArray(std::span<const bool> value,
                                               int64_t time) {
   return SetEntryValue(m_pubHandle, Value::MakeBooleanArray(value, time));
 }
 
-inline bool GenericPublisher::SetBooleanArray(wpi::span<const int> value,
+inline bool GenericPublisher::SetBooleanArray(std::span<const int> value,
                                               int64_t time) {
   return nt::SetBooleanArray(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetIntegerArray(wpi::span<const int64_t> value,
+inline bool GenericPublisher::SetIntegerArray(std::span<const int64_t> value,
                                               int64_t time) {
   return nt::SetIntegerArray(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetFloatArray(wpi::span<const float> value,
+inline bool GenericPublisher::SetFloatArray(std::span<const float> value,
                                             int64_t time) {
   return nt::SetFloatArray(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetDoubleArray(wpi::span<const double> value,
+inline bool GenericPublisher::SetDoubleArray(std::span<const double> value,
                                              int64_t time) {
   return nt::SetDoubleArray(m_pubHandle, value, time);
 }
 
-inline bool GenericPublisher::SetStringArray(wpi::span<const std::string> value,
+inline bool GenericPublisher::SetStringArray(std::span<const std::string> value,
                                              int64_t time) {
   return nt::SetStringArray(m_pubHandle, value, time);
 }
@@ -167,32 +168,32 @@ inline bool GenericPublisher::SetDefaultString(std::string_view defaultValue) {
 }
 
 inline bool GenericPublisher::SetDefaultRaw(
-    wpi::span<const uint8_t> defaultValue) {
+    std::span<const uint8_t> defaultValue) {
   return nt::SetDefaultRaw(m_pubHandle, defaultValue);
 }
 
 inline bool GenericPublisher::SetDefaultBooleanArray(
-    wpi::span<const int> defaultValue) {
+    std::span<const int> defaultValue) {
   return nt::SetDefaultBooleanArray(m_pubHandle, defaultValue);
 }
 
 inline bool GenericPublisher::SetDefaultIntegerArray(
-    wpi::span<const int64_t> defaultValue) {
+    std::span<const int64_t> defaultValue) {
   return nt::SetDefaultIntegerArray(m_pubHandle, defaultValue);
 }
 
 inline bool GenericPublisher::SetDefaultFloatArray(
-    wpi::span<const float> defaultValue) {
+    std::span<const float> defaultValue) {
   return nt::SetDefaultFloatArray(m_pubHandle, defaultValue);
 }
 
 inline bool GenericPublisher::SetDefaultDoubleArray(
-    wpi::span<const double> defaultValue) {
+    std::span<const double> defaultValue) {
   return nt::SetDefaultDoubleArray(m_pubHandle, defaultValue);
 }
 
 inline bool GenericPublisher::SetDefaultStringArray(
-    wpi::span<const std::string> defaultValue) {
+    std::span<const std::string> defaultValue) {
   return nt::SetDefaultStringArray(m_pubHandle, defaultValue);
 }
 

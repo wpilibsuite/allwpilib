@@ -23,10 +23,10 @@ namespace {
 
 class SimpleValueReader {
  public:
-  std::optional<uint16_t> Read16(wpi::span<const uint8_t>* in);
-  std::optional<uint32_t> Read32(wpi::span<const uint8_t>* in);
-  std::optional<uint64_t> Read64(wpi::span<const uint8_t>* in);
-  std::optional<double> ReadDouble(wpi::span<const uint8_t>* in);
+  std::optional<uint16_t> Read16(std::span<const uint8_t>* in);
+  std::optional<uint32_t> Read32(std::span<const uint8_t>* in);
+  std::optional<uint64_t> Read64(std::span<const uint8_t>* in);
+  std::optional<double> ReadDouble(std::span<const uint8_t>* in);
 
  private:
   uint64_t m_value = 0;
@@ -123,7 +123,7 @@ struct WDImpl {
   unsigned int m_flags{0};
   unsigned int m_seq_num_uid{0};
 
-  void Execute(wpi::span<const uint8_t>* in);
+  void Execute(std::span<const uint8_t>* in);
 
   std::nullopt_t EmitError(std::string_view msg) {
     m_state = kError;
@@ -131,22 +131,22 @@ struct WDImpl {
     return std::nullopt;
   }
 
-  std::optional<std::string> ReadString(wpi::span<const uint8_t>* in);
-  std::optional<std::vector<uint8_t>> ReadRaw(wpi::span<const uint8_t>* in);
-  std::optional<NT_Type> ReadType(wpi::span<const uint8_t>* in);
-  std::optional<Value> ReadValue(wpi::span<const uint8_t>* in);
+  std::optional<std::string> ReadString(std::span<const uint8_t>* in);
+  std::optional<std::vector<uint8_t>> ReadRaw(std::span<const uint8_t>* in);
+  std::optional<NT_Type> ReadType(std::span<const uint8_t>* in);
+  std::optional<Value> ReadValue(std::span<const uint8_t>* in);
 };
 
 }  // namespace
 
-static uint8_t Read8(wpi::span<const uint8_t>* in) {
+static uint8_t Read8(std::span<const uint8_t>* in) {
   uint8_t val = in->front();
   *in = wpi::drop_front(*in);
   return val;
 }
 
 std::optional<uint16_t> SimpleValueReader::Read16(
-    wpi::span<const uint8_t>* in) {
+    std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
     m_value |= in->front() & 0xff;
@@ -162,7 +162,7 @@ std::optional<uint16_t> SimpleValueReader::Read16(
 }
 
 std::optional<uint32_t> SimpleValueReader::Read32(
-    wpi::span<const uint8_t>* in) {
+    std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
     m_value |= in->front() & 0xff;
@@ -178,7 +178,7 @@ std::optional<uint32_t> SimpleValueReader::Read32(
 }
 
 std::optional<uint64_t> SimpleValueReader::Read64(
-    wpi::span<const uint8_t>* in) {
+    std::span<const uint8_t>* in) {
   while (!in->empty()) {
     m_value <<= 8;
     m_value |= in->front() & 0xff;
@@ -194,7 +194,7 @@ std::optional<uint64_t> SimpleValueReader::Read64(
 }
 
 std::optional<double> SimpleValueReader::ReadDouble(
-    wpi::span<const uint8_t>* in) {
+    std::span<const uint8_t>* in) {
   if (auto val = Read64(in)) {
     return wpi::BitsToDouble(val.value());
   } else {
@@ -202,7 +202,7 @@ std::optional<double> SimpleValueReader::ReadDouble(
   }
 }
 
-void WDImpl::Execute(wpi::span<const uint8_t>* in) {
+void WDImpl::Execute(std::span<const uint8_t>* in) {
   while (!in->empty()) {
     switch (m_state) {
       case kStart: {
@@ -417,7 +417,7 @@ void WDImpl::Execute(wpi::span<const uint8_t>* in) {
   }
 }
 
-std::optional<std::string> WDImpl::ReadString(wpi::span<const uint8_t>* in) {
+std::optional<std::string> WDImpl::ReadString(std::span<const uint8_t>* in) {
   // string length
   if (!m_stringReader.len) {
     if (auto val = m_ulebReader.ReadOne(in)) {
@@ -443,7 +443,7 @@ std::optional<std::string> WDImpl::ReadString(wpi::span<const uint8_t>* in) {
 }
 
 std::optional<std::vector<uint8_t>> WDImpl::ReadRaw(
-    wpi::span<const uint8_t>* in) {
+    std::span<const uint8_t>* in) {
   // string length
   if (!m_rawReader.len) {
     if (auto val = m_ulebReader.ReadOne(in)) {
@@ -468,7 +468,7 @@ std::optional<std::vector<uint8_t>> WDImpl::ReadRaw(
   return std::nullopt;
 }
 
-std::optional<NT_Type> WDImpl::ReadType(wpi::span<const uint8_t>* in) {
+std::optional<NT_Type> WDImpl::ReadType(std::span<const uint8_t>* in) {
   // Convert from byte value to enum
   switch (Read8(in)) {
     case Message3::kBoolean:
@@ -492,7 +492,7 @@ std::optional<NT_Type> WDImpl::ReadType(wpi::span<const uint8_t>* in) {
   }
 }
 
-std::optional<Value> WDImpl::ReadValue(wpi::span<const uint8_t>* in) {
+std::optional<Value> WDImpl::ReadValue(std::span<const uint8_t>* in) {
   while (!in->empty()) {
     switch (m_valueReader.type) {
       case NT_BOOLEAN:
@@ -586,7 +586,7 @@ WireDecoder3::WireDecoder3(MessageHandler3& out) : m_impl{new Impl{out}} {}
 
 WireDecoder3::~WireDecoder3() = default;
 
-bool WireDecoder3::Execute(wpi::span<const uint8_t>* in) {
+bool WireDecoder3::Execute(std::span<const uint8_t>* in) {
   m_impl->Execute(in);
   return m_impl->m_state != Impl::kError;
 }

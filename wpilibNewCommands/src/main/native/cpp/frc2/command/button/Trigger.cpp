@@ -30,7 +30,7 @@ Trigger Trigger::WhenActive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhenActive(std::function<void()> toRun,
-                            wpi::span<Subsystem* const> requirements) {
+                            std::span<Subsystem* const> requirements) {
   return WhenActive(InstantCommand(std::move(toRun), requirements));
 }
 
@@ -55,7 +55,7 @@ Trigger Trigger::WhileActiveContinous(
 }
 
 Trigger Trigger::WhileActiveContinous(
-    std::function<void()> toRun, wpi::span<Subsystem* const> requirements) {
+    std::function<void()> toRun, std::span<Subsystem* const> requirements) {
   return WhileActiveContinous(InstantCommand(std::move(toRun), requirements));
 }
 
@@ -90,7 +90,7 @@ Trigger Trigger::WhenInactive(std::function<void()> toRun,
 }
 
 Trigger Trigger::WhenInactive(std::function<void()> toRun,
-                              wpi::span<Subsystem* const> requirements) {
+                              std::span<Subsystem* const> requirements) {
   return WhenInactive(InstantCommand(std::move(toRun), requirements));
 }
 

@@ -8,11 +8,10 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "SourceImpl.h"
 
@@ -42,7 +41,7 @@ class ConfigurableSourceImpl : public SourceImpl {
                      int maximum, int step, int defaultValue, int value,
                      std::function<void(CS_Property property)> onChange);
   void SetEnumPropertyChoices(int property,
-                              wpi::span<const std::string> choices,
+                              std::span<const std::string> choices,
                               CS_Status* status);
 
  private:

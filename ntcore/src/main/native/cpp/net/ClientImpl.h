@@ -8,11 +8,10 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "NetworkInterface.h"
 #include "WireConnection.h"
@@ -42,7 +41,7 @@ class ClientImpl {
   ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
-  void ProcessIncomingBinary(wpi::span<const uint8_t> data);
+  void ProcessIncomingBinary(std::span<const uint8_t> data);
   void HandleLocal(std::vector<ClientMessage>&& msgs);
 
   void SendControl(uint64_t curTimeMs);
@@ -66,7 +65,7 @@ class ClientStartup final : public NetworkStartupInterface {
   void Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
                std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptions& options) final;
-  void Subscribe(NT_Subscriber subHandle, wpi::span<const std::string> prefixes,
+  void Subscribe(NT_Subscriber subHandle, std::span<const std::string> prefixes,
                  const PubSubOptions& options) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;
 

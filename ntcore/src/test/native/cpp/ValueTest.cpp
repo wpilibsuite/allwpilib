@@ -12,15 +12,15 @@
 
 using namespace std::string_view_literals;
 
-namespace wpi {
+namespace std {  // NOLINT (clang-tidy.cert-dcl58-cpp)
 template <typename T, typename U>
-inline bool operator==(span<T> lhs, span<U> rhs) {
+inline bool operator==(std::span<T> lhs, std::span<U> rhs) {
   if (lhs.size() != rhs.size()) {
     return false;
   }
   return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
-}  // namespace wpi
+}  // namespace std
 
 namespace nt {
 
@@ -102,25 +102,25 @@ TEST_F(ValueTest, Raw) {
   std::vector<uint8_t> arr{5, 4, 3, 2, 1};
   auto v = Value::MakeRaw(arr);
   ASSERT_EQ(NT_RAW, v.type());
-  ASSERT_EQ(wpi::span<const uint8_t>(arr), v.GetRaw());
+  ASSERT_EQ(std::span<const uint8_t>(arr), v.GetRaw());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_RAW, cv.type);
   ASSERT_EQ(5u, cv.data.v_raw.size);
-  ASSERT_EQ(wpi::span(reinterpret_cast<const uint8_t*>("\5\4\3\2\1"), 5),
-            wpi::span(cv.data.v_raw.data, 5));
+  ASSERT_EQ(std::span(reinterpret_cast<const uint8_t*>("\5\4\3\2\1"), 5),
+            std::span(cv.data.v_raw.data, 5));
 
   std::vector<uint8_t> arr2{1, 2, 3, 4, 5, 6};
   v = Value::MakeRaw(arr2);
   ASSERT_EQ(NT_RAW, v.type());
-  ASSERT_EQ(wpi::span<const uint8_t>(arr2), v.GetRaw());
+  ASSERT_EQ(std::span<const uint8_t>(arr2), v.GetRaw());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_RAW, cv.type);
   ASSERT_EQ(6u, cv.data.v_raw.size);
-  ASSERT_EQ(wpi::span(reinterpret_cast<const uint8_t*>("\1\2\3\4\5\6"), 6),
-            wpi::span(cv.data.v_raw.data, 6));
+  ASSERT_EQ(std::span(reinterpret_cast<const uint8_t*>("\1\2\3\4\5\6"), 6),
+            std::span(cv.data.v_raw.data, 6));
 
   NT_DisposeValue(&cv);
 }
@@ -129,7 +129,7 @@ TEST_F(ValueTest, BooleanArray) {
   std::vector<int> vec{1, 0, 1};
   auto v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const int>(vec), v.GetBooleanArray());
+  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
@@ -143,7 +143,7 @@ TEST_F(ValueTest, BooleanArray) {
   vec = {0, 1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const int>(vec), v.GetBooleanArray());
+  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
@@ -156,7 +156,7 @@ TEST_F(ValueTest, BooleanArray) {
   vec = {1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const int>(vec), v.GetBooleanArray());
+  ASSERT_EQ(std::span<const int>(vec), v.GetBooleanArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, cv.type);
@@ -171,7 +171,7 @@ TEST_F(ValueTest, DoubleArray) {
   std::vector<double> vec{0.5, 0.25, 0.5};
   auto v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const double>(vec), v.GetDoubleArray());
+  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
   NT_Value cv;
   NT_InitValue(&cv);
   ConvertToC(v, &cv);
@@ -185,7 +185,7 @@ TEST_F(ValueTest, DoubleArray) {
   vec = {0.25, 0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const double>(vec), v.GetDoubleArray());
+  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);
@@ -198,7 +198,7 @@ TEST_F(ValueTest, DoubleArray) {
   vec = {0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v.type());
-  ASSERT_EQ(wpi::span<const double>(vec), v.GetDoubleArray());
+  ASSERT_EQ(std::span<const double>(vec), v.GetDoubleArray());
   NT_DisposeValue(&cv);
   ConvertToC(v, &cv);
   ASSERT_EQ(NT_DOUBLE_ARRAY, cv.type);

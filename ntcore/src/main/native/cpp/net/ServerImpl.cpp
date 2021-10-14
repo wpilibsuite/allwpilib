@@ -91,7 +91,7 @@ class ClientData {
   virtual ~ClientData() = default;
 
   virtual void ProcessIncomingText(std::string_view data) = 0;
-  virtual void ProcessIncomingBinary(wpi::span<const uint8_t> data) = 0;
+  virtual void ProcessIncomingBinary(std::span<const uint8_t> data) = 0;
 
   enum SendMode { kSendDisabled = 0, kSendAll, kSendNormal, kSendImmNoFlush };
 
@@ -151,7 +151,7 @@ class ClientData4Base : public ClientData, protected ClientMessageHandler {
   void ClientUnpublish(int64_t pubuid) final;
   void ClientSetProperties(std::string_view name,
                            const wpi::json& update) final;
-  void ClientSubscribe(int64_t subuid, wpi::span<const std::string> topicNames,
+  void ClientSubscribe(int64_t subuid, std::span<const std::string> topicNames,
                        const PubSubOptions& options) final;
   void ClientUnsubscribe(int64_t subuid) final;
 
@@ -168,7 +168,7 @@ class ClientDataLocal final : public ClientData4Base {
       : ClientData4Base{"", "", true, [](uint32_t) {}, server, id, logger} {}
 
   void ProcessIncomingText(std::string_view data) final {}
-  void ProcessIncomingBinary(wpi::span<const uint8_t> data) final {}
+  void ProcessIncomingBinary(std::span<const uint8_t> data) final {}
 
   void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
   void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
@@ -178,7 +178,7 @@ class ClientDataLocal final : public ClientData4Base {
   void SendOutgoing(uint64_t curTimeMs) final {}
   void Flush() final {}
 
-  void HandleLocal(wpi::span<const ClientMessage> msgs);
+  void HandleLocal(std::span<const ClientMessage> msgs);
 };
 
 class ClientData4 final : public ClientData4Base {
@@ -190,7 +190,7 @@ class ClientData4 final : public ClientData4Base {
         m_wire{wire} {}
 
   void ProcessIncomingText(std::string_view data) final;
-  void ProcessIncomingBinary(wpi::span<const uint8_t> data) final;
+  void ProcessIncomingBinary(std::span<const uint8_t> data) final;
 
   void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
   void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
@@ -245,7 +245,7 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
         m_decoder{*this} {}
 
   void ProcessIncomingText(std::string_view data) final {}
-  void ProcessIncomingBinary(wpi::span<const uint8_t> data) final;
+  void ProcessIncomingBinary(std::span<const uint8_t> data) final;
 
   void SendValue(TopicData* topic, const Value& value, SendMode mode) final;
   void SendAnnounce(TopicData* topic, std::optional<int64_t> pubuid) final;
@@ -272,9 +272,9 @@ class ClientData3 final : public ClientData, private net3::MessageHandler3 {
   void FlagsUpdate(unsigned int id, unsigned int flags) final;
   void EntryDelete(unsigned int id) final;
   void ExecuteRpc(unsigned int id, unsigned int uid,
-                  wpi::span<const uint8_t> params) final {}
+                  std::span<const uint8_t> params) final {}
   void RpcResponse(unsigned int id, unsigned int uid,
-                   wpi::span<const uint8_t> result) final {}
+                   std::span<const uint8_t> result) final {}
 
   ServerImpl::Connected3Func m_connected;
   net3::WireConnection3& m_wire;
@@ -350,7 +350,7 @@ struct PublisherData {
 };
 
 struct SubscriberData {
-  SubscriberData(ClientData* client, wpi::span<const std::string> topicNames,
+  SubscriberData(ClientData* client, std::span<const std::string> topicNames,
                  int64_t subuid, const PubSubOptions& options)
       : client{client},
         topicNames{topicNames.begin(), topicNames.end()},
@@ -362,7 +362,7 @@ struct SubscriberData {
     }
   }
 
-  void Update(wpi::span<const std::string> topicNames_,
+  void Update(std::span<const std::string> topicNames_,
               const PubSubOptions& options_) {
     topicNames = {topicNames_.begin(), topicNames_.end()};
     options = options_;
@@ -599,7 +599,7 @@ void ClientData4Base::ClientSetProperties(std::string_view name,
 }
 
 void ClientData4Base::ClientSubscribe(int64_t subuid,
-                                      wpi::span<const std::string> topicNames,
+                                      std::span<const std::string> topicNames,
                                       const PubSubOptions& options) {
   DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
          subuid);
@@ -757,7 +757,7 @@ void ClientDataLocal::SendPropertiesUpdate(TopicData* topic,
   }
 }
 
-void ClientDataLocal::HandleLocal(wpi::span<const ClientMessage> msgs) {
+void ClientDataLocal::HandleLocal(std::span<const ClientMessage> msgs) {
   DEBUG4("{}", "HandleLocal()");
   // just map as a normal client into client=0 calls
   for (const auto& elem : msgs) {  // NOLINT
@@ -782,7 +782,7 @@ void ClientData4::ProcessIncomingText(std::string_view data) {
   WireDecodeText(data, *this, m_logger);
 }
 
-void ClientData4::ProcessIncomingBinary(wpi::span<const uint8_t> data) {
+void ClientData4::ProcessIncomingBinary(std::span<const uint8_t> data) {
   for (;;) {
     if (data.empty()) {
       break;
@@ -947,7 +947,7 @@ bool ClientData3::TopicData3::UpdateFlags(TopicData* topic) {
   return updated;
 }
 
-void ClientData3::ProcessIncomingBinary(wpi::span<const uint8_t> data) {
+void ClientData3::ProcessIncomingBinary(std::span<const uint8_t> data) {
   if (!m_decoder.Execute(&data)) {
     m_wire.Disconnect(m_decoder.GetError());
   }
@@ -1199,7 +1199,7 @@ void ClientData3::ClientHello(std::string_view self_id,
   PubSubOptions options;
   options.prefixMatch = true;
   sub = std::make_unique<SubscriberData>(
-      this, wpi::span<const std::string>{{prefix}}, 0, options);
+      this, std::span<const std::string>{{prefix}}, 0, options);
   m_periodMs = std::gcd(m_periodMs, sub->periodMs);
   if (m_periodMs < kMinPeriodMs) {
     m_periodMs = kMinPeriodMs;
@@ -2253,7 +2253,7 @@ void ServerImpl::SendValues(int clientId, uint64_t curTimeMs) {
   client->Flush();
 }
 
-void ServerImpl::HandleLocal(wpi::span<const ClientMessage> msgs) {
+void ServerImpl::HandleLocal(std::span<const ClientMessage> msgs) {
   // just map as a normal client into client=0 calls
   m_impl->m_localClient->HandleLocal(msgs);
 }
@@ -2278,7 +2278,7 @@ void ServerImpl::ProcessIncomingText(int clientId, std::string_view data) {
 }
 
 void ServerImpl::ProcessIncomingBinary(int clientId,
-                                       wpi::span<const uint8_t> data) {
+                                       std::span<const uint8_t> data) {
   m_impl->m_clients[clientId]->ProcessIncomingBinary(data);
 }
 
@@ -2329,7 +2329,7 @@ void ServerStartup::Publish(NT_Publisher pubHandle, NT_Topic topicHandle,
 }
 
 void ServerStartup::Subscribe(NT_Subscriber subHandle,
-                              wpi::span<const std::string> topicNames,
+                              std::span<const std::string> topicNames,
                               const PubSubOptions& options) {
   m_server.m_impl->m_localClient->ClientSubscribe(subHandle, topicNames,
                                                   options);

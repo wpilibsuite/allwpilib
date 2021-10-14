@@ -6,8 +6,7 @@
 
 #include <functional>
 #include <initializer_list>
-
-#include <wpi/span.h>
+#include <span>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/FunctionalCommand.h"
@@ -41,7 +40,7 @@ class RunCommand : public CommandHelper<FunctionalCommand, RunCommand> {
    * @param requirements the subsystems to require
    */
   explicit RunCommand(std::function<void()> toRun,
-                      wpi::span<Subsystem* const> requirements = {});
+                      std::span<Subsystem* const> requirements = {});
 
   RunCommand(RunCommand&& other) = default;
 

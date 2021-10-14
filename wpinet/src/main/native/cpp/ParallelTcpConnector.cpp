@@ -40,7 +40,7 @@ void ParallelTcpConnector::Close() {
 }
 
 void ParallelTcpConnector::SetServers(
-    wpi::span<const std::pair<std::string, unsigned int>> servers) {
+    std::span<const std::pair<std::string, unsigned int>> servers) {
   m_servers.assign(servers.begin(), servers.end());
   if (!IsConnected()) {
     Connect();

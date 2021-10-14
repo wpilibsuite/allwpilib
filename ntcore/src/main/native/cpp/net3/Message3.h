@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <span>
 #include <string>
 
 #include "networktables/NetworkTableValue.h"
@@ -57,7 +58,7 @@ class Message3 {
   // Message data accessors.  Callers are responsible for knowing what data is
   // actually provided for a particular message.
   std::string_view str() const { return m_str; }
-  wpi::span<const uint8_t> bytes() const {
+  std::span<const uint8_t> bytes() const {
     return {reinterpret_cast<const uint8_t*>(m_str.data()), m_str.size()};
   }
   const Value& value() const { return m_value; }
@@ -123,7 +124,7 @@ class Message3 {
     return msg;
   }
   static Message3 ExecuteRpc(unsigned int id, unsigned int uid,
-                             wpi::span<const uint8_t> params) {
+                             std::span<const uint8_t> params) {
     Message3 msg{kExecuteRpc, {}};
     msg.m_str.assign(reinterpret_cast<const char*>(params.data()),
                      params.size());
@@ -132,7 +133,7 @@ class Message3 {
     return msg;
   }
   static Message3 RpcResponse(unsigned int id, unsigned int uid,
-                              wpi::span<const uint8_t> result) {
+                              std::span<const uint8_t> result) {
     Message3 msg{kRpcResponse, {}};
     msg.m_str.assign(reinterpret_cast<const char*>(result.data()),
                      result.size());

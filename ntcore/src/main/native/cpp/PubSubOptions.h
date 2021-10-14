@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <wpi/span.h>
+#include <span>
 
 #include "ntcore_cpp.h"
 
@@ -14,7 +14,7 @@ namespace nt {
 class PubSubOptions {
  public:
   PubSubOptions() = default;
-  explicit PubSubOptions(wpi::span<const PubSubOption> options);
+  explicit PubSubOptions(std::span<const PubSubOption> options);
 
   double periodic = 0.1;
   size_t pollStorageSize = 1;

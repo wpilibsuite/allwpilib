@@ -11,7 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/SmallVector.h"
-#include "wpi/span.h"
+#include <span>
 #include "wpi/Compiler.h"
 #include "gtest/gtest.h"
 #include <list>

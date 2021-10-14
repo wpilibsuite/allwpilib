@@ -6,12 +6,11 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -283,7 +282,7 @@ class NetworkTableInstance final {
    * @return Array of topic handles.
    */
   std::vector<Topic> GetTopics(std::string_view prefix,
-                               wpi::span<std::string_view> types);
+                               std::span<std::string_view> types);
 
   /**
    * Get Topic Information about multiple topics.
@@ -336,7 +335,7 @@ class NetworkTableInstance final {
    * @return Array of topic information.
    */
   std::vector<TopicInfo> GetTopicInfo(std::string_view prefix,
-                                      wpi::span<std::string_view> types);
+                                      std::span<std::string_view> types);
 
   /**
    * Gets the entry for a key.
@@ -466,7 +465,7 @@ class NetworkTableInstance final {
    * @param servers   array of server address and port pairs
    */
   void SetServer(
-      wpi::span<const std::pair<std::string_view, unsigned int>> servers);
+      std::span<const std::pair<std::string_view, unsigned int>> servers);
 
   /**
    * Sets server addresses and port for client (without restarting client).
@@ -475,7 +474,7 @@ class NetworkTableInstance final {
    * @param servers   array of server names
    * @param port      port to communicate over (0 = default)
    */
-  void SetServer(wpi::span<const std::string_view> servers,
+  void SetServer(std::span<const std::string_view> servers,
                  unsigned int port = 0);
 
   /**

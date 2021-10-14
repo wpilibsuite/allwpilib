@@ -4,6 +4,8 @@
 
 #include "WebSocketConnection.h"
 
+#include <span>
+
 #include <wpi/SpanExtras.h>
 #include <wpinet/WebSocket.h>
 
@@ -37,7 +39,7 @@ void WebSocketConnection::Flush() {
   m_ws_frames.reserve(m_frames.size());
   for (auto&& frame : m_frames) {
     m_ws_frames.emplace_back(frame.opcode,
-                             wpi::span{frame.bufs->begin() + frame.start,
+                             std::span{frame.bufs->begin() + frame.start,
                                        frame.bufs->begin() + frame.end});
   }
 

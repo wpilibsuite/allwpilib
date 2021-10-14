@@ -5,21 +5,22 @@
 #pragma once
 
 #include <cassert>
-
-#include "wpi/span.h"
+#include <span>
 
 namespace wpi {
 
 /// Drop the first \p N elements of the array.
 template <typename T>
-constexpr span<T> drop_front(span<T> in, typename span<T>::size_type n = 1) {
+constexpr std::span<T> drop_front(std::span<T> in,
+                                  typename std::span<T>::size_type n = 1) {
   assert(in.size() >= n && "Dropping more elements than exist");
   return in.subspan(n, in.size() - n);
 }
 
 /// Drop the last \p N elements of the array.
 template <typename T>
-constexpr span<T> drop_back(span<T> in, typename span<T>::size_type n = 1) {
+constexpr std::span<T> drop_back(std::span<T> in,
+                                 typename std::span<T>::size_type n = 1) {
   assert(in.size() >= n && "Dropping more elements than exist");
   return in.subspan(0, in.size() - n);
 }

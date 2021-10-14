@@ -4,11 +4,10 @@
 
 #pragma once
 
+#include <span>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "networktables/MultiSubscriber.h"
 #include "networktables/NetworkTableEntry.h"
@@ -20,7 +19,7 @@
 namespace nt {
 
 inline TopicListener::TopicListener(
-    NetworkTableInstance inst, wpi::span<const std::string_view> prefixes,
+    NetworkTableInstance inst, std::span<const std::string_view> prefixes,
     unsigned int mask, std::function<void(const TopicNotification&)> listener)
     : m_handle{AddTopicListener(inst.GetHandle(), prefixes, mask, listener)} {}
 
@@ -81,7 +80,7 @@ inline TopicListenerPoller::~TopicListenerPoller() {
 }
 
 inline NT_TopicListener TopicListenerPoller::Add(
-    wpi::span<const std::string_view> prefixes, unsigned int mask) {
+    std::span<const std::string_view> prefixes, unsigned int mask) {
   return nt::AddPolledTopicListener(m_handle, prefixes, mask);
 }
 

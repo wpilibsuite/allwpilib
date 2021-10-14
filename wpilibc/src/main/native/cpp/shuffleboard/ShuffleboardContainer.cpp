@@ -118,27 +118,27 @@ SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
 }
 
 SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
-                                         wpi::span<const bool> defaultValue) {
+                                         std::span<const bool> defaultValue) {
   return Add(title, nt::Value::MakeBooleanArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
-                                         wpi::span<const double> defaultValue) {
+                                         std::span<const double> defaultValue) {
   return Add(title, nt::Value::MakeDoubleArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::Add(std::string_view title,
-                                         wpi::span<const float> defaultValue) {
+                                         std::span<const float> defaultValue) {
   return Add(title, nt::Value::MakeFloatArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::Add(
-    std::string_view title, wpi::span<const int64_t> defaultValue) {
+    std::string_view title, std::span<const int64_t> defaultValue) {
   return Add(title, nt::Value::MakeIntegerArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::Add(
-    std::string_view title, wpi::span<const std::string> defaultValue) {
+    std::string_view title, std::span<const std::string> defaultValue) {
   return Add(title, nt::Value::MakeStringArray(defaultValue));
 }
 
@@ -353,27 +353,27 @@ SimpleWidget& ShuffleboardContainer::AddPersistent(
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    std::string_view title, wpi::span<const bool> defaultValue) {
+    std::string_view title, std::span<const bool> defaultValue) {
   return AddPersistent(title, nt::Value::MakeBooleanArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    std::string_view title, wpi::span<const double> defaultValue) {
+    std::string_view title, std::span<const double> defaultValue) {
   return AddPersistent(title, nt::Value::MakeDoubleArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    std::string_view title, wpi::span<const float> defaultValue) {
+    std::string_view title, std::span<const float> defaultValue) {
   return AddPersistent(title, nt::Value::MakeFloatArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    std::string_view title, wpi::span<const int64_t> defaultValue) {
+    std::string_view title, std::span<const int64_t> defaultValue) {
   return AddPersistent(title, nt::Value::MakeIntegerArray(defaultValue));
 }
 
 SimpleWidget& ShuffleboardContainer::AddPersistent(
-    std::string_view title, wpi::span<const std::string> defaultValue) {
+    std::string_view title, std::span<const std::string> defaultValue) {
   return AddPersistent(title, nt::Value::MakeStringArray(defaultValue));
 }
 

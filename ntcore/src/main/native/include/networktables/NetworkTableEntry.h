@@ -8,12 +8,12 @@
 
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <wpi/deprecated.h>
-#include <wpi/span.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
@@ -170,7 +170,7 @@ class NetworkTableEntry final {
    * @param defaultValue the value to be returned if no value is found
    * @return the entry's value or the given default value
    */
-  std::vector<uint8_t> GetRaw(wpi::span<const uint8_t> defaultValue) const;
+  std::vector<uint8_t> GetRaw(std::span<const uint8_t> defaultValue) const;
 
   /**
    * Gets the entry's value as a boolean array. If the entry does not exist
@@ -186,7 +186,7 @@ class NetworkTableEntry final {
    *       because std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  std::vector<int> GetBooleanArray(wpi::span<const int> defaultValue) const;
+  std::vector<int> GetBooleanArray(std::span<const int> defaultValue) const;
 
   /**
    * Gets the entry's value as a integer array. If the entry does not exist
@@ -199,7 +199,7 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<int64_t> GetIntegerArray(
-      wpi::span<const int64_t> defaultValue) const;
+      std::span<const int64_t> defaultValue) const;
 
   /**
    * Gets the entry's value as a float array. If the entry does not exist
@@ -211,7 +211,7 @@ class NetworkTableEntry final {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  std::vector<float> GetFloatArray(wpi::span<const float> defaultValue) const;
+  std::vector<float> GetFloatArray(std::span<const float> defaultValue) const;
 
   /**
    * Gets the entry's value as a double array. If the entry does not exist
@@ -224,7 +224,7 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<double> GetDoubleArray(
-      wpi::span<const double> defaultValue) const;
+      std::span<const double> defaultValue) const;
 
   /**
    * Gets the entry's value as a string array. If the entry does not exist
@@ -237,7 +237,7 @@ class NetworkTableEntry final {
    *       concern, use GetValue() instead.
    */
   std::vector<std::string> GetStringArray(
-      wpi::span<const std::string> defaultValue) const;
+      std::span<const std::string> defaultValue) const;
 
   /**
    * Get an array of all value changes since the last call to ReadQueue.
@@ -303,7 +303,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultRaw(wpi::span<const uint8_t> defaultValue);
+  bool SetDefaultRaw(std::span<const uint8_t> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -311,7 +311,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultBooleanArray(wpi::span<const int> defaultValue);
+  bool SetDefaultBooleanArray(std::span<const int> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -319,7 +319,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultIntegerArray(wpi::span<const int64_t> defaultValue);
+  bool SetDefaultIntegerArray(std::span<const int64_t> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -327,7 +327,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultFloatArray(wpi::span<const float> defaultValue);
+  bool SetDefaultFloatArray(std::span<const float> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -335,7 +335,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultDoubleArray(wpi::span<const double> defaultValue);
+  bool SetDefaultDoubleArray(std::span<const double> defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -343,7 +343,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultStringArray(wpi::span<const std::string> defaultValue);
+  bool SetDefaultStringArray(std::span<const std::string> defaultValue);
 
   /**
    * Sets the entry's value.
@@ -405,7 +405,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetRaw(wpi::span<const uint8_t> value, int64_t time = 0);
+  bool SetRaw(std::span<const uint8_t> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -414,7 +414,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(wpi::span<const bool> value, int64_t time = 0);
+  bool SetBooleanArray(std::span<const bool> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -423,7 +423,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetBooleanArray(wpi::span<const int> value, int64_t time = 0);
+  bool SetBooleanArray(std::span<const int> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -432,7 +432,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetIntegerArray(wpi::span<const int64_t> value, int64_t time = 0);
+  bool SetIntegerArray(std::span<const int64_t> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -441,7 +441,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetFloatArray(wpi::span<const float> value, int64_t time = 0);
+  bool SetFloatArray(std::span<const float> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -450,7 +450,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetDoubleArray(wpi::span<const double> value, int64_t time = 0);
+  bool SetDoubleArray(std::span<const double> value, int64_t time = 0);
 
   /**
    * Sets the entry's value.
@@ -459,7 +459,7 @@ class NetworkTableEntry final {
    * @param time the timestamp to set (0 = nt::Now())
    * @return False if the entry exists with a different type
    */
-  bool SetStringArray(wpi::span<const std::string> value, int64_t time = 0);
+  bool SetStringArray(std::span<const std::string> value, int64_t time = 0);
 
   /**
    * Sets flags.

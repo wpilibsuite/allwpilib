@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <span>
 #include <system_error>
 #include <vector>
 
@@ -256,7 +257,7 @@ void ServerConnection4::ProcessWsUpgrade() {
     m_websocket->text.connect([this](std::string_view data, bool) {
       m_server.m_serverImpl.ProcessIncomingText(m_clientId, data);
     });
-    m_websocket->binary.connect([this](wpi::span<const uint8_t> data, bool) {
+    m_websocket->binary.connect([this](std::span<const uint8_t> data, bool) {
       m_server.m_serverImpl.ProcessIncomingBinary(m_clientId, data);
     });
 

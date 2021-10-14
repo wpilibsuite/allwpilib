@@ -8,11 +8,10 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include <wpi/span.h>
 
 #include "NetworkInterface.h"
 #include "net3/WireConnection3.h"
@@ -46,11 +45,11 @@ class ServerImpl final {
   void SendControl(uint64_t curTimeMs);
   void SendValues(int clientId, uint64_t curTimeMs);
 
-  void HandleLocal(wpi::span<const ClientMessage> msgs);
+  void HandleLocal(std::span<const ClientMessage> msgs);
   void SetLocal(LocalInterface* local);
 
   void ProcessIncomingText(int clientId, std::string_view data);
-  void ProcessIncomingBinary(int clientId, wpi::span<const uint8_t> data);
+  void ProcessIncomingBinary(int clientId, std::span<const uint8_t> data);
 
   // Returns -1 if cannot add client (e.g. due to duplicate name).
   // Caller must ensure WireConnection lifetime lasts until RemoveClient() call.
@@ -83,7 +82,7 @@ class ServerStartup final : public NetworkStartupInterface {
                std::string_view name, std::string_view typeStr,
                const wpi::json& properties, const PubSubOptions& options) final;
   void Subscribe(NT_Subscriber subHandle,
-                 wpi::span<const std::string> topicNames,
+                 std::span<const std::string> topicNames,
                  const PubSubOptions& options) final;
   void SetValue(NT_Publisher pubHandle, const Value& value) final;
 

@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <cmath>
 #include <initializer_list>
+#include <span>
 #include <stdexcept>
 #include <vector>
 
 #include <wpi/array.h>
 #include <wpi/circular_buffer.h>
-#include <wpi/span.h>
 
 #include "Eigen/QR"
 #include "frc/EigenCore.h"
@@ -80,7 +80,7 @@ class LinearFilter {
    * @param ffGains The "feedforward" or FIR gains.
    * @param fbGains The "feedback" or IIR gains.
    */
-  LinearFilter(wpi::span<const double> ffGains, wpi::span<const double> fbGains)
+  LinearFilter(std::span<const double> ffGains, std::span<const double> fbGains)
       : m_inputs(ffGains.size()),
         m_outputs(fbGains.size()),
         m_inputGains(ffGains.begin(), ffGains.end()),

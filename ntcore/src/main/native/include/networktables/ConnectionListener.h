@@ -7,8 +7,6 @@
 #include <functional>
 #include <vector>
 
-#include <wpi/span.h>
-
 #include "ntcore_cpp.h"
 
 namespace nt {
