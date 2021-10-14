@@ -189,14 +189,14 @@ class RobotController {
   static int GetFaultCount6V();
 
   /**
-   * Get the current brownout voltage seting.
+   * Get the current brownout voltage setting.
    *
    * @return The brownout voltage
    */
   static units::volt_t GetBrownoutVoltage();
 
   /**
-   * Set the voltage the roborio will brownout and disable all outputs.
+   * Set the voltage the roboRIO will brownout and disable all outputs.
    *
    * Note that this only does anything on the roboRIO 2.
    * On the roboRIO it is a no-op.
