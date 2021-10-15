@@ -125,6 +125,7 @@ doxygen {
     extension_mapping 'inc=C++'
     extract_static true
     full_path_names true
+    case_sense_names false
     generate_html true
     generate_latex false
     generate_treeview true
