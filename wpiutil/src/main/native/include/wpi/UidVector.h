@@ -60,12 +60,15 @@ class UidVectorIterator {
 };
 }  // namespace impl
 
-// Vector which provides an integrated freelist for removal and reuse of
-// individual elements.
-// @tparam T element type; must be default-constructible and evaluate in
-//           boolean context to false when "empty"
-// @tparam reuse_threshold how many free elements to store up before starting
-//                         to recycle them
+/**
+ * Vector which provides an integrated freelist for removal and reuse of
+ * individual elements.
+ *
+ * @tparam T element type; must be default-constructible and evaluate in
+ *           boolean context to false when "empty"
+ * @tparam reuse_threshold how many free elements to store up before starting
+ *                         to recycle them
+ */
 template <typename T, typename std::vector<T>::size_type reuse_threshold>
 class UidVector {
  public:
@@ -103,8 +106,10 @@ class UidVector {
     return uid;
   }
 
-  // Removes the identified element by replacing it with a default-constructed
-  // one.  The element is added to the freelist for later reuse.
+  /**
+   * Removes the identified element by replacing it with a default-constructed
+   * one. The element is added to the freelist for later reuse.
+   */
   T erase(size_type uid) {
     if (uid >= m_vector.size() || !m_vector[uid]) {
       return T();
@@ -116,7 +121,9 @@ class UidVector {
     return rv;
   }
 
-  // Removes all elements.
+  /**
+   * Removes all elements.
+   */
   void clear() noexcept {
     m_vector.clear();
     m_free.clear();

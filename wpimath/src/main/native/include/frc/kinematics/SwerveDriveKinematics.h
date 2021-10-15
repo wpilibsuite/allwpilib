@@ -51,8 +51,10 @@ class SwerveDriveKinematics {
    * pass in the module states in the same order when calling the forward
    * kinematics methods.
    *
-   * @param wheels The locations of the wheels relative to the physical center
-   * of the robot.
+   * @param wheel  The location of the first wheel relative to the physical
+   *               center of the robot.
+   * @param wheels The locations of the other wheels relative to the physical
+   *               center of the robot.
    */
   template <typename... Wheels>
   explicit SwerveDriveKinematics(Translation2d wheel, Wheels&&... wheels)
@@ -112,8 +114,9 @@ class SwerveDriveKinematics {
    * @return An array containing the module states. Use caution because these
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
-   * <NormalizeWheelSpeeds> function to rectify this issue. In addition, you can
-   * leverage the power of C++17 to directly assign the module states to
+   * NormalizeWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
+   * units::meters_per_second_t) function to rectify this issue. In addition,
+   * you can leverage the power of C++17 to directly assign the module states to
    * variables:
    *
    * @code{.cpp}

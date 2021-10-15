@@ -84,3 +84,17 @@ jobs:
       - name: Generate diff
         run: git diff HEAD > javaformat-fixes.patch
         if: ${{ failure() }}
+  documentation:
+    name: "Documentation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - name: Install libclang-9
+        run: sudo apt update && sudo apt install -y libclang-cpp9 libclang1-9
+      - name: Build with Gradle
+        run: ./gradlew docs:zipDocs -PbuildServer -PdocWarningsAsErrors ${{ env.EXTRA_GRADLE_ARGS }}

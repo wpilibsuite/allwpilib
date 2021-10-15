@@ -353,7 +353,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the given voltage. If any does, the
+   * Clamp the input vector such that no element exceeds the battery voltage. If any does, the
    * relative magnitudes of the input will be maintained.
    *
    * @param u The input vector.

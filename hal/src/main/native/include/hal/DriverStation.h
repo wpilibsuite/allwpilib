@@ -27,7 +27,7 @@ extern "C" {
  * @param isLVCode  true for a LV error code, false for a standard error code
  * @param details   the details of the error
  * @param location  the file location of the errror
- * @param callstack the callstack of the error
+ * @param callStack the callstack of the error
  * @param printMsg  true to print the error message to stdout as well as to the
  * DS
  */
@@ -47,15 +47,15 @@ int32_t HAL_SendConsoleLine(const char* line);
  * The control work contains the robot state.
  *
  * @param controlWord the control word (out)
- * @return            the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 
 /**
  * Gets the current alliance station ID.
  *
- * @param status the error code, or 0 for success
- * @return       the alliance station ID
+ * @param[out] status the error code, or 0 for success
+ * @return the alliance station ID
  */
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
 
@@ -64,7 +64,7 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
  *
  * @param joystickNum the joystick number
  * @param axes        the axes values (output)
- * @return            the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
 
@@ -73,7 +73,7 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
  *
  * @param joystickNum the joystick number
  * @param povs        the POV values (output)
- * @return            the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
 
@@ -82,7 +82,7 @@ int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
  *
  * @param joystickNum the joystick number
  * @param buttons     the button values (output)
- * @return            the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons);
@@ -90,14 +90,15 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
 /**
  * Retrieves the Joystick Descriptor for particular slot.
  *
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
- *
+ * @param joystickNum the joystick number
+ * @param[out] desc   descriptor (data transfer object) to fill in. desc is
+ *                    filled in regardless of success. In other words, if
+ *                    descriptor is not available, desc is filled in with
+ *                    default values matching the init-values in Java and C++
+ *                    Driver Station for when caller requests a too-large
+ *                    joystick index.
  * @return error code reported from Network Comm back-end.  Zero is good,
- * nonzero is bad.
+ *         nonzero is bad.
  */
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc);
@@ -106,7 +107,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
  * Gets is a specific joystick is considered to be an XBox controller.
  *
  * @param joystickNum the joystick number
- * @return            true if xbox, false otherwise
+ * @return true if xbox, false otherwise
  */
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
 
@@ -117,7 +118,7 @@ HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
  * the joystick uses.
  *
  * @param joystickNum the joystick number
- * @return            the enumerated joystick type
+ * @return the enumerated joystick type
  */
 int32_t HAL_GetJoystickType(int32_t joystickNum);
 
@@ -129,7 +130,7 @@ int32_t HAL_GetJoystickType(int32_t joystickNum);
  * Will be null terminated.
  *
  * @param joystickNum the joystick number
- * @return            the joystick name
+ * @return the joystick name
  */
 char* HAL_GetJoystickName(int32_t joystickNum);
 
@@ -148,7 +149,7 @@ void HAL_FreeJoystickName(char* name);
  *
  * @param joystickNum the joystick number
  * @param axis        the axis number
- * @return            the enumerated axis type
+ * @return the enumerated axis type
  */
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
 
@@ -159,7 +160,7 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
  * @param outputs     bitmask of outputs, 1 for on 0 for off
  * @param leftRumble  the left rumble value (0-FFFF)
  * @param rightRumble the right rumble value (0-FFFF)
- * @return            the error code, or 0 for success
+ * @return the error code, or 0 for success
  */
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
@@ -177,7 +178,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
  * The Practice Match function of the DS approximates the behavior seen on
  * the field.
  *
- * @param status the error code, or 0 for success
+ * @param[out] status the error code, or 0 for success
  * @return time remaining in current match period (auto or teleop)
  */
 double HAL_GetMatchTime(int32_t* status);
@@ -185,8 +186,8 @@ double HAL_GetMatchTime(int32_t* status);
 /**
  * Gets info about a specific match.
  *
- * @param info the match info (output)
- * @return     the error code, or 0 for success
+ * @param[in] info the match info (output)
+ * @return the error code, or 0 for success
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
@@ -217,8 +218,8 @@ void HAL_WaitForDSData(void);
  * forever. Otherwise, it will wait until either a new packet, or the timeout
  * time has passed.
  *
- * @param timeout timeout in seconds
- * @return        true for new data, false for timeout
+ * @param[in] timeout timeout in seconds
+ * @return true for new data, false for timeout
  */
 HAL_Bool HAL_WaitForDSDataTimeout(double timeout);
 

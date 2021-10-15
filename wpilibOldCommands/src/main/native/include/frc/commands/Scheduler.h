@@ -42,7 +42,7 @@ class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
    *
    * All Subsystems should call this.
    *
-   * @param system the system
+   * @param subsystem the system
    */
   void RegisterSubsystem(Subsystem* subsystem);
 

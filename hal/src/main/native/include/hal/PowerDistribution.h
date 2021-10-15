@@ -35,8 +35,10 @@ extern "C" {
 /**
  * Initializes a Power Distribution Panel.
  *
- * @param  module the module number to initialize
- * @param  type   the type of module to intialize
+ * @param[in] moduleNumber       the module number to initialize
+ * @param[in] type               the type of module to intialize
+ * @param[in] allocationLocation the location where the allocation is occuring
+ * @param[out] status            Error status variable. 0 on success.
  * @return the created PowerDistribution
  */
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
@@ -46,7 +48,8 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
 /**
  * Gets the module number for a specific handle.
  *
- * @param handle the module handle
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the module number
  */
 int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
@@ -62,9 +65,9 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle);
 /**
  * Checks if a PowerDistribution channel is valid.
  *
- * @param handle the module handle
+ * @param handle  the module handle
  * @param channel the channel to check
- * @return        true if the channel is valid, otherwise false
+ * @return true if the channel is valid, otherwise false
  */
 HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
                                            int32_t channel);
@@ -72,8 +75,9 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
 /**
  * Checks if a PowerDistribution module is valid.
  *
- * @param channel the module to check
- * @return        true if the module is valid, otherwise false
+ * @param module the module to check
+ * @param type   the type of module
+ * @return true if the module is valid, otherwise false
  */
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type);
@@ -81,6 +85,8 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
 /**
  * Gets the type of PowerDistribution module.
  *
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
  * @return the type of module
  */
 HAL_PowerDistributionType HAL_GetPowerDistributionType(
@@ -89,7 +95,8 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(
 /**
  * Gets the number of channels for this handle.
  *
- * @param handle the handle
+ * @param[in] handle the handle
+ * @param[out] status Error status variable. 0 on success.
  * @return number of channels
  */
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
@@ -98,8 +105,9 @@ int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
 /**
  * Gets the temperature of the PowerDistribution.
  *
- * @param handle the module handle
- * @return       the module temperature (celsius)
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the module temperature (celsius)
  */
 double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
                                            int32_t* status);
@@ -107,8 +115,9 @@ double HAL_GetPowerDistributionTemperature(HAL_PowerDistributionHandle handle,
 /**
  * Gets the PowerDistribution input voltage.
  *
- * @param handle the module handle
- * @return       the input voltage (volts)
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the input voltage (volts)
  */
 double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
                                        int32_t* status);
@@ -116,9 +125,10 @@ double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
 /**
  * Gets the current of a specific PowerDistribution channel.
  *
- * @param module  the module
- * @param channel the channel
- * @return        the channel current (amps)
+ * @param[in] handle   the module handle
+ * @param[in] channel  the channel
+ * @param[out] status  Error status variable. 0 on success.
+ * @return the channel current (amps)
  */
 double HAL_GetPowerDistributionChannelCurrent(
     HAL_PowerDistributionHandle handle, int32_t channel, int32_t* status);
@@ -128,9 +138,10 @@ double HAL_GetPowerDistributionChannelCurrent(
  *
  * The array must be large enough to hold all channels.
  *
- * @param handle the module handle
- * @param currents the currents (output)
- * @param currentsLength the length of the currents array
+ * @param[in] handle         the module handle
+ * @param[out] currents      the currents
+ * @param[in] currentsLength the length of the currents array
+ * @param[out] status        Error status variable. 0 on success.
  */
 void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
@@ -139,8 +150,9 @@ void HAL_GetPowerDistributionAllChannelCurrents(
 /**
  * Gets the total current of the PowerDistribution.
  *
- * @param handle the module handle
- * @return       the total current (amps)
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the total current (amps)
  */
 double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
@@ -148,8 +160,9 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
 /**
  * Gets the total power of the PowerDistribution.
  *
- * @param handle the module handle
- * @return       the total power (watts)
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the total power (watts)
  */
 double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
                                           int32_t* status);
@@ -157,8 +170,9 @@ double HAL_GetPowerDistributionTotalPower(HAL_PowerDistributionHandle handle,
 /**
  * Gets the total energy of the PowerDistribution.
  *
- * @param handle the module handle
- * @return       the total energy (joules)
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the total energy (joules)
  */
 double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
                                            int32_t* status);
@@ -166,7 +180,8 @@ double HAL_GetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
 /**
  * Resets the PowerDistribution accumulated energy.
  *
- * @param handle the module handle
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
                                            int32_t* status);
@@ -174,15 +189,32 @@ void HAL_ResetPowerDistributionTotalEnergy(HAL_PowerDistributionHandle handle,
 /**
  * Clears any PowerDistribution sticky faults.
  *
- * @param handle the module handle
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
                                             int32_t* status);
 
-// REV PDH Specific functions. This functions will no-op on CTRE PDP
+/**
+ * Power on/off switchable channel.
+ *
+ * This is a REV PDH-specific function. This function will no-op on CTRE PDP.
+ *
+ * @param[in] handle the module handle
+ * @param[in] enabled true to turn on switchable channel
+ * @param[out] status Error status variable. 0 on success.
+ */
 void HAL_SetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, HAL_Bool enabled, int32_t* status);
 
+/**
+ * Returns true if switchable channel is powered on.
+ *
+ * This is a REV PDH-specific function. This function will no-op on CTRE PDP.
+ *
+ * @param[in] handle the module handle
+ * @param[out] status Error status variable. 0 on success.
+ */
 HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status);
 

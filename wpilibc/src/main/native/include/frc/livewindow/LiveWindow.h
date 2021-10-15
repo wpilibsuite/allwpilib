@@ -48,14 +48,14 @@ class LiveWindow {
   /**
    * Enable telemetry for a single component.
    *
-   * @param sendable component
+   * @param component sendable
    */
   static void EnableTelemetry(wpi::Sendable* component);
 
   /**
    * Disable telemetry for a single component.
    *
-   * @param sendable component
+   * @param component sendable
    */
   static void DisableTelemetry(wpi::Sendable* component);
 

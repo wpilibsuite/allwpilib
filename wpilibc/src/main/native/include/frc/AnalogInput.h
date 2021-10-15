@@ -198,8 +198,7 @@ class AnalogInput : public wpi::Sendable,
    *
    * This will be added to all values returned to the user.
    *
-   * @param initialValue The value that the accumulator should start from when
-   *                     reset.
+   * @param value The value that the accumulator should start from when reset.
    */
   void SetAccumulatorInitialValue(int64_t value);
 

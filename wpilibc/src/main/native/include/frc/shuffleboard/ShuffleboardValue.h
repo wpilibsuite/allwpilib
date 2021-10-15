@@ -47,7 +47,7 @@ class ShuffleboardValue {
    *
    * This method is package-private to prevent users from enabling control
    * themselves. Has no effect if the sendable is not marked as an actuator with
-   * {@link SendableBuilder#setActuator}.
+   * SendableBuilder::SetActuator().
    */
   virtual void EnableIfActuator() {}
 
@@ -56,7 +56,7 @@ class ShuffleboardValue {
    *
    * This method is package-private to prevent users from enabling control
    * themselves. Has no effect if the sendable is not marked as an actuator with
-   * {@link SendableBuilder#setActuator}.
+   * SendableBuilder::SetActuator().
    */
   virtual void DisableIfActuator() {}
 

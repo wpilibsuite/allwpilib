@@ -570,7 +570,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, std::string_view host);
 
@@ -579,7 +578,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, const char* host);
 
@@ -588,7 +586,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, const std::string& host);
 
@@ -597,7 +594,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
-   * @param kind Camera kind (e.g. kAxis)
    */
   AxisCamera(std::string_view name, wpi::span<const std::string> hosts);
 
@@ -606,7 +602,6 @@ class AxisCamera : public HttpCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param hosts Array of Camera host IPs/DNS names
-   * @param kind Camera kind (e.g. kAxis)
    */
   template <typename T>
   AxisCamera(std::string_view name, std::initializer_list<T> hosts);
@@ -623,6 +618,8 @@ class ImageSource : public VideoSource {
   /**
    * Signal sinks that an error has occurred.  This should be called instead
    * of NotifyFrame when an error occurs.
+   *
+   * @param msg Notification message.
    */
   void NotifyError(std::string_view msg);
 
@@ -686,7 +683,6 @@ class ImageSource : public VideoSource {
    * Create a string property.
    *
    * @param name Property name
-   * @param defaultValue Default value
    * @param value Current value
    * @return Property
    */

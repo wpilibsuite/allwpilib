@@ -40,9 +40,9 @@ class PIDBase : public PIDInterface,
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
@@ -52,9 +52,10 @@ class PIDBase : public PIDInterface,
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
+   * @param f      the feedforward coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    */
@@ -235,7 +236,7 @@ class PIDBase : public PIDInterface,
    * Set the percentage error which is considered tolerable for use with
    * OnTarget.
    *
-   * @param percentage error which is tolerable
+   * @param percent error which is tolerable
    */
   WPI_DEPRECATED("Use SetPercentTolerance() instead.")
   virtual void SetTolerance(double percent);
@@ -244,17 +245,17 @@ class PIDBase : public PIDInterface,
    * Set the absolute error which is considered tolerable for use with
    * OnTarget.
    *
-   * @param percentage error which is tolerable
+   * @param absTolerance error which is tolerable
    */
-  virtual void SetAbsoluteTolerance(double absValue);
+  virtual void SetAbsoluteTolerance(double absTolerance);
 
   /**
    * Set the percentage error which is considered tolerable for use with
    * OnTarget.
    *
-   * @param percentage error which is tolerable
+   * @param percent error which is tolerable
    */
-  virtual void SetPercentTolerance(double percentValue);
+  virtual void SetPercentTolerance(double percent);
 
   /**
    * Set the number of previous error samples to average for tolerancing. When
@@ -267,7 +268,7 @@ class PIDBase : public PIDInterface,
    * @param bufLength Number of previous cycles to average. Defaults to 1.
    */
   WPI_DEPRECATED("Use a LinearDigitalFilter as the input.")
-  virtual void SetToleranceBuffer(int buf = 1);
+  virtual void SetToleranceBuffer(int bufLength = 1);
 
   /**
    * Return true if the error is within the percentage of the total input range,

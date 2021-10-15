@@ -38,7 +38,7 @@ class RoboRioSim {
   /**
    * Define the state of the FPGA button.
    *
-   * @param fpgaButton the new state
+   * @param fPGAButton the new state
    */
   static void SetFPGAButton(bool fPGAButton);
 
@@ -414,7 +414,7 @@ class RoboRioSim {
   /**
    * Define the brownout voltage.
    *
-   * @param vInVoltage the new voltage
+   * @param brownoutVoltage the new voltage
    */
   static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
 

@@ -17,7 +17,6 @@ class WaitCommand : public TimedCommand {
   /**
    * Creates a new WaitCommand with the given name and timeout.
    *
-   * @param name    the name of the command
    * @param timeout the time before this command "times out"
    */
   explicit WaitCommand(units::second_t timeout);
@@ -25,6 +24,7 @@ class WaitCommand : public TimedCommand {
   /**
    * Creates a new WaitCommand with the given timeout.
    *
+   * @param name    the name of the command
    * @param timeout the time before this command "times out"
    */
   WaitCommand(std::string_view name, units::second_t timeout);

@@ -51,7 +51,7 @@ class SwerveDrivePoseEstimator {
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPoseMeters        The starting pose estimate.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.

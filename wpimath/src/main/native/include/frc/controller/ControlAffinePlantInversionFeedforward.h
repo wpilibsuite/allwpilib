@@ -97,7 +97,7 @@ class ControlAffinePlantInversionFeedforward {
   /**
    * Returns an element of the previously calculated feedforward.
    *
-   * @param row Row of uff.
+   * @param i Row of uff.
    *
    * @return The row of the calculated feedforward.
    */

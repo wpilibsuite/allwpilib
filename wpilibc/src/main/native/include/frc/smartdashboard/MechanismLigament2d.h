@@ -53,7 +53,7 @@ class MechanismLigament2d : public MechanismObject2d {
   /**
    * Set the ligament's angle relative to its parent.
    *
-   * @param degrees the angle
+   * @param angle the angle
    */
   void SetAngle(units::degree_t angle);
 
@@ -67,7 +67,7 @@ class MechanismLigament2d : public MechanismObject2d {
   /**
    * Set the line thickness.
    *
-   * @param weight the line thickness
+   * @param lineWidth the line thickness
    */
   void SetLineWeight(double lineWidth);
 

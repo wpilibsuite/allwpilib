@@ -148,21 +148,21 @@ class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
   void AddChild(std::string_view name, wpi::Sendable& child);
 
   /**
-   * Associate a {@link Sendable} with this Subsystem.
+   * Associate a Sendable with this Subsystem.
    *
    * @param child sendable
    */
   void AddChild(std::shared_ptr<wpi::Sendable> child);
 
   /**
-   * Associate a {@link Sendable} with this Subsystem.
+   * Associate a Sendable with this Subsystem.
    *
    * @param child sendable
    */
   void AddChild(wpi::Sendable* child);
 
   /**
-   * Associate a {@link Sendable} with this Subsystem.
+   * Associate a Sendable with this Subsystem.
    *
    * @param child sendable
    */
