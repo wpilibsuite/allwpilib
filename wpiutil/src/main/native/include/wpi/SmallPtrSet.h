@@ -1,9 +1,8 @@
 //===- llvm/ADT/SmallPtrSet.h - 'Normally small' pointer set ----*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -15,12 +14,12 @@
 #ifndef WPIUTIL_WPI_SMALLPTRSET_H
 #define WPIUTIL_WPI_SMALLPTRSET_H
 
+#include "wpi/EpochTracker.h"
 #include "wpi/Compiler.h"
-#include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/ReverseIteration.h"
 #include "wpi/type_traits.h"
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
@@ -47,7 +46,7 @@ namespace wpi {
 /// (-2), to allow deletion.  The hash table is resized when the table is 3/4 or
 /// more.  When this happens, the table is doubled in size.
 ///
-class SmallPtrSetImplBase {
+class SmallPtrSetImplBase : public DebugEpochBase {
   friend class SmallPtrSetIteratorImpl;
 
 protected:
@@ -93,6 +92,7 @@ public:
   size_type size() const { return NumNonEmpty - NumTombstones; }
 
   void clear() {
+    incrementEpoch();
     // If the capacity of the array is huge, and the # elements used is small,
     // shrink the array.
     if (!isSmall()) {
@@ -139,12 +139,14 @@ protected:
       if (LastTombstone != nullptr) {
         *LastTombstone = Ptr;
         --NumTombstones;
+        incrementEpoch();
         return std::make_pair(LastTombstone, true);
       }
 
       // Nope, there isn't.  If we stay small, just 'pushback' now.
       if (NumNonEmpty < CurArraySize) {
         SmallArray[NumNonEmpty++] = Ptr;
+        incrementEpoch();
         return std::make_pair(SmallArray + (NumNonEmpty - 1), true);
       }
       // Otherwise, hit the big set case, which will call grow.
@@ -224,6 +226,10 @@ protected:
 public:
   explicit SmallPtrSetIteratorImpl(const void *const *BP, const void*const *E)
     : Bucket(BP), End(E) {
+    if (shouldReverseIterate()) {
+      RetreatIfNotValid();
+      return;
+    }
     AdvanceIfNotValid();
   }
 
@@ -257,7 +263,8 @@ protected:
 
 /// SmallPtrSetIterator - This implements a const_iterator for SmallPtrSet.
 template <typename PtrTy>
-class SmallPtrSetIterator : public SmallPtrSetIteratorImpl {
+class SmallPtrSetIterator : public SmallPtrSetIteratorImpl,
+                            DebugEpochBase::HandleBase {
   using PtrTraits = PointerLikeTypeTraits<PtrTy>;
 
 public:
@@ -267,17 +274,29 @@ public:
   using difference_type = std::ptrdiff_t;
   using iterator_category = std::forward_iterator_tag;
 
-  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E)
-      : SmallPtrSetIteratorImpl(BP, E) {}
+  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E,
+                               const DebugEpochBase &Epoch)
+      : SmallPtrSetIteratorImpl(BP, E), DebugEpochBase::HandleBase(&Epoch) {}
 
-  // Most methods provided by baseclass.
+  // Most methods are provided by the base class.
 
   const PtrTy operator*() const {
+    assert(isHandleInSync() && "invalid iterator access!");
+    if (shouldReverseIterate()) {
+      assert(Bucket > End);
+      return PtrTraits::getFromVoidPointer(const_cast<void *>(Bucket[-1]));
+    }
     assert(Bucket < End);
     return PtrTraits::getFromVoidPointer(const_cast<void*>(*Bucket));
   }
 
   inline SmallPtrSetIterator& operator++() {          // Preincrement
+    assert(isHandleInSync() && "invalid iterator access!");
+    if (shouldReverseIterate()) {
+      --Bucket;
+      RetreatIfNotValid();
+      return *this;
+    }
     ++Bucket;
     AdvanceIfNotValid();
     return *this;
@@ -327,14 +346,8 @@ class SmallPtrSetImpl : public SmallPtrSetImplBase {
   using ConstPtrTraits = PointerLikeTypeTraits<ConstPtrType>;
 
 protected:
-  // Constructors that forward to the base.
-  SmallPtrSetImpl(const void **SmallStorage, const SmallPtrSetImpl &that)
-      : SmallPtrSetImplBase(SmallStorage, that) {}
-  SmallPtrSetImpl(const void **SmallStorage, unsigned SmallSize,
-                  SmallPtrSetImpl &&that)
-      : SmallPtrSetImplBase(SmallStorage, SmallSize, std::move(that)) {}
-  explicit SmallPtrSetImpl(const void **SmallStorage, unsigned SmallSize)
-      : SmallPtrSetImplBase(SmallStorage, SmallSize) {}
+  // Forward constructors to the base.
+  using SmallPtrSetImplBase::SmallPtrSetImplBase;
 
 public:
   using iterator = SmallPtrSetIterator<PtrType>;
@@ -353,16 +366,27 @@ public:
     return std::make_pair(makeIterator(p.first), p.second);
   }
 
+  /// Insert the given pointer with an iterator hint that is ignored. This is
+  /// identical to calling insert(Ptr), but allows SmallPtrSet to be used by
+  /// std::insert_iterator and std::inserter().
+  iterator insert(iterator, PtrType Ptr) {
+    return insert(Ptr).first;
+  }
+
   /// erase - If the set contains the specified pointer, remove it and return
   /// true, otherwise return false.
   bool erase(PtrType Ptr) {
     return erase_imp(PtrTraits::getAsVoidPointer(Ptr));
   }
-
   /// count - Return 1 if the specified pointer is in the set, 0 otherwise.
-  size_type count(ConstPtrType Ptr) const { return find(Ptr) != end() ? 1 : 0; }
+  size_type count(ConstPtrType Ptr) const {
+    return find_imp(ConstPtrTraits::getAsVoidPointer(Ptr)) != EndPointer();
+  }
   iterator find(ConstPtrType Ptr) const {
     return makeIterator(find_imp(ConstPtrTraits::getAsVoidPointer(Ptr)));
+  }
+  bool contains(ConstPtrType Ptr) const {
+    return find_imp(ConstPtrTraits::getAsVoidPointer(Ptr)) != EndPointer();
   }
 
   template <typename IterT>
@@ -376,6 +400,8 @@ public:
   }
 
   iterator begin() const {
+    if (shouldReverseIterate())
+      return makeIterator(EndPointer() - 1);
     return makeIterator(CurArray);
   }
   iterator end() const { return makeIterator(EndPointer()); }
@@ -383,9 +409,37 @@ public:
 private:
   /// Create an iterator that dereferences to same place as the given pointer.
   iterator makeIterator(const void *const *P) const {
-    return iterator(P, EndPointer());
+    if (shouldReverseIterate())
+      return iterator(P == EndPointer() ? CurArray : P + 1, CurArray, *this);
+    return iterator(P, EndPointer(), *this);
   }
 };
+
+/// Equality comparison for SmallPtrSet.
+///
+/// Iterates over elements of LHS confirming that each value from LHS is also in
+/// RHS, and that no additional values are in RHS.
+template <typename PtrType>
+bool operator==(const SmallPtrSetImpl<PtrType> &LHS,
+                const SmallPtrSetImpl<PtrType> &RHS) {
+  if (LHS.size() != RHS.size())
+    return false;
+
+  for (const auto *KV : LHS)
+    if (!RHS.count(KV))
+      return false;
+
+  return true;
+}
+
+/// Inequality comparison for SmallPtrSet.
+///
+/// Equivalent to !(LHS == RHS).
+template <typename PtrType>
+bool operator!=(const SmallPtrSetImpl<PtrType> &LHS,
+                const SmallPtrSetImpl<PtrType> &RHS) {
+  return !(LHS == RHS);
+}
 
 /// SmallPtrSet - This class implements a set which is optimized for holding
 /// SmallSize or less elements.  This internally rounds up SmallSize to the next
@@ -460,4 +514,4 @@ namespace std {
 
 } // end namespace std
 
-#endif // LLVM_ADT_SMALLPTRSET_H
+#endif // WPIUTIL_WPI_SMALLPTRSET_H

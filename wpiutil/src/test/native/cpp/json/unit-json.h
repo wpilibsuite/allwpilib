@@ -3,7 +3,8 @@
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
-/*----------------------------------------------------------------------------*/#ifndef UNIT_JSON_H_
+/*----------------------------------------------------------------------------*/
+#ifndef UNIT_JSON_H_
 #define UNIT_JSON_H_
 
 #include <ostream>

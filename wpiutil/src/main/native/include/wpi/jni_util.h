@@ -16,7 +16,6 @@
 
 #include "wpi/ConvertUTF.h"
 #include "wpi/SafeThread.h"
-#include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
@@ -166,13 +165,13 @@ class JStringRef {
     m_str.pop_back();
   }
 
-  operator std::string_view() const { return m_str.str(); }  // NOLINT
-  std::string_view str() const { return m_str.str(); }
+  operator std::string_view() const { return m_str; }  // NOLINT
+  std::string_view str() const { return m_str; }
   const char* c_str() const { return m_str.data(); }
   size_t size() const { return m_str.size(); }
 
  private:
-  SmallString<128> m_str;
+  std::string m_str;
 };
 
 // Details for J*ArrayRef and CriticalJ*ArrayRef

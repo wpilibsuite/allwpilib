@@ -1,9 +1,8 @@
 //===- llvm/ADT/SmallString.h - 'Normally small' strings --------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -15,8 +14,8 @@
 #define WPIUTIL_WPI_SMALLSTRING_H
 
 #include "wpi/SmallVector.h"
-#include <cstddef>
 #include <string_view>
+#include <cstddef>
 
 namespace wpi {
 
@@ -29,76 +28,104 @@ public:
   SmallString() = default;
 
   /// Initialize from a std::string_view.
-  SmallString(std::string_view S)
-    : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+  SmallString(std::string_view S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+
+  /// Initialize by concatenating a list of StringRefs.
+  SmallString(std::initializer_list<std::string_view> Refs)
+      : SmallVector<char, InternalLen>() {
+    this->append(Refs);
+  }
 
   /// Initialize with a range.
   template<typename ItTy>
   SmallString(ItTy S, ItTy E) : SmallVector<char, InternalLen>(S, E) {}
 
-  // Note that in order to add new overloads for append & assign, we have to
-  // duplicate the inherited versions so as not to inadvertently hide them.
-
   /// @}
   /// @name String Assignment
   /// @{
 
-  /// Assign from a repeated element.
-  void assign(size_t NumElts, char Elt) {
-    this->SmallVectorImpl<char>::assign(NumElts, Elt);
-  }
-
-  /// Assign from an iterator pair.
-  template<typename in_iter>
-  void assign(in_iter S, in_iter E) {
-    this->clear();
-    SmallVectorImpl<char>::append(S, E);
-  }
+  using SmallVector<char, InternalLen>::assign;
 
   /// Assign from a std::string_view.
   void assign(std::string_view RHS) {
-    this->clear();
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+    SmallVectorImpl<char>::assign(RHS.begin(), RHS.end());
   }
 
-  /// Assign from a SmallVector.
-  void assign(const SmallVectorImpl<char> &RHS) {
+  /// Assign from a list of StringRefs.
+  void assign(std::initializer_list<std::string_view> Refs) {
     this->clear();
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+    append(Refs);
   }
 
   /// @}
   /// @name String Concatenation
   /// @{
 
-  /// Append from an iterator pair.
-  template<typename in_iter>
-  void append(in_iter S, in_iter E) {
-    SmallVectorImpl<char>::append(S, E);
-  }
-
-  void append(size_t NumInputs, char Elt) {
-    SmallVectorImpl<char>::append(NumInputs, Elt);
-  }
+  using SmallVector<char, InternalLen>::append;
 
   /// Append from a std::string_view.
   void append(std::string_view RHS) {
     SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
   }
 
-  /// Append from a SmallVector.
-  void append(const SmallVectorImpl<char> &RHS) {
-    SmallVectorImpl<char>::append(RHS.begin(), RHS.end());
+  /// Append from a list of StringRefs.
+  void append(std::initializer_list<std::string_view> Refs) {
+    size_t SizeNeeded = this->size();
+    for (const std::string_view &Ref : Refs)
+      SizeNeeded += Ref.size();
+    this->reserve(SizeNeeded);
+    auto CurEnd = this->end();
+    for (const std::string_view &Ref : Refs) {
+      this->uninitialized_copy(Ref.begin(), Ref.end(), CurEnd);
+      CurEnd += Ref.size();
+    }
+    this->set_size(SizeNeeded);
   }
 
   /// @}
   /// @name String Comparison
   /// @{
 
+  /// Check for string equality.  This is more efficient than compare() when
+  /// the relative ordering of inequal strings isn't needed.
+  bool equals(std::string_view RHS) const {
+    return str().equals(RHS);
+  }
+
+  /// Check for string equality, ignoring case.
+  bool equals_insensitive(std::string_view RHS) const {
+    return str().equals_insensitive(RHS);
+  }
+
   /// Compare two strings; the result is -1, 0, or 1 if this string is
   /// lexicographically less than, equal to, or greater than the \p RHS.
   int compare(std::string_view RHS) const {
     return str().compare(RHS);
+  }
+
+  /// compare_insensitive - Compare two strings, ignoring case.
+  int compare_insensitive(std::string_view RHS) const {
+    return str().compare_insensitive(RHS);
+  }
+
+  /// compare_numeric - Compare two strings, treating sequences of digits as
+  /// numbers.
+  int compare_numeric(std::string_view RHS) const {
+    return str().compare_numeric(RHS);
+  }
+
+  /// @}
+  /// @name String Predicates
+  /// @{
+
+  /// startswith - Check if this string starts with the given \p Prefix.
+  bool startswith(std::string_view Prefix) const {
+    return str().startswith(Prefix);
+  }
+
+  /// endswith - Check if this string ends with the given \p Suffix.
+  bool endswith(std::string_view Suffix) const {
+    return str().endswith(Suffix);
   }
 
   /// @}
@@ -181,14 +208,55 @@ public:
   }
 
   /// @}
+  /// @name Helpful Algorithms
+  /// @{
+
+  /// Return the number of occurrences of \p C in the string.
+  size_t count(char C) const {
+    return str().count(C);
+  }
+
+  /// Return the number of non-overlapped occurrences of \p Str in the
+  /// string.
+  size_t count(std::string_view Str) const {
+    return str().count(Str);
+  }
+
+  /// @}
+  /// @name Substring Operations
+  /// @{
+
+  /// Return a reference to the substring from [Start, Start + N).
+  ///
+  /// \param Start The index of the starting character in the substring; if
+  /// the index is npos or greater than the length of the string then the
+  /// empty substring will be returned.
+  ///
+  /// \param N The number of characters to included in the substring. If \p N
+  /// exceeds the number of characters remaining in the string, the string
+  /// suffix (starting with \p Start) will be returned.
+  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
+    return str().substr(Start, N);
+  }
+
+  /// Return a reference to the substring from [Start, End).
+  ///
+  /// \param Start The index of the starting character in the substring; if
+  /// the index is npos or greater than the length of the string then the
+  /// empty substring will be returned.
+  ///
+  /// \param End The index following the last character to include in the
+  /// substring. If this is npos, or less than \p Start, or exceeds the
+  /// number of characters remaining in the string, the string suffix
+  /// (starting with \p Start) will be returned.
+  std::string_view slice(size_t Start, size_t End) const {
+    return str().slice(Start, End);
+  }
 
   // Extra methods.
 
   /// Explicit conversion to std::string_view.
-  std::string_view str() const { return {this->begin(), this->size()}; }
-
-  /// Explicit conversion to std::string.
-  std::string string() const { return {this->begin(), this->size()}; }
+  std::string_view str() const { return std::string_view(this->data(), this->size()); }
 
   // TODO: Make this const, if it's safe...
   const char* c_str() {
@@ -200,13 +268,14 @@ public:
   /// Implicit conversion to std::string_view.
   operator std::string_view() const { return str(); }
 
-  /// Implicit conversion to std::string.
-  operator std::string() const { return string(); }
+  explicit operator std::string() const {
+    return std::string(this->data(), this->size());
+  }
 
   // Extra operators.
-  const SmallString &operator=(std::string_view RHS) {
-    this->clear();
-    return *this += RHS;
+  SmallString &operator=(std::string_view RHS) {
+    this->assign(RHS);
+    return *this;
   }
 
   SmallString &operator+=(std::string_view RHS) {
@@ -221,4 +290,4 @@ public:
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_SMALLSTRING_H
+#endif // WPIUTIL_WPI_SMALLSTRING_H

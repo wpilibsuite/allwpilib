@@ -1,9 +1,8 @@
 //===- WindowsSupport.h - Common Windows Include File -----------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -19,8 +18,8 @@
 //===          is guaranteed to work on *all* Win32 variants.
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_WINDOWSSUPPORT_H
-#define LLVM_SUPPORT_WINDOWSSUPPORT_H
+#ifndef WPIUTIL_WPI_WINDOWSSUPPORT_H
+#define WPIUTIL_WPI_WINDOWSSUPPORT_H
 
 // mingw-w64 tends to define it as 0x0502 in its headers.
 #undef _WIN32_WINNT
@@ -36,68 +35,42 @@
 
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include <string_view>
+#include "wpi/llvm-config.h" // Get build system configuration settings
+#include "wpi/Allocator.h"
 #include "wpi/Chrono.h"
 #include "wpi/Compiler.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/VersionTuple.h"
 #include <cassert>
 #include <string>
-#include <string_view>
 #include <system_error>
-#define WIN32_NO_STATUS
 #include <windows.h>
-#undef WIN32_NO_STATUS
-#include <winternl.h>
-#include <ntstatus.h>
+
+// Must be included after windows.h
+#include <wincrypt.h>
 
 namespace wpi {
-
-/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
-/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-/// GetVersionEx is deprecated, but this API exposes the build number which can
-/// be useful for working around certain kernel bugs.
-inline wpi::VersionTuple GetWindowsOSVersion() {
-  typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
-  HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
-  if (hMod) {
-    auto getVer = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
-    if (getVer) {
-      RTL_OSVERSIONINFOEXW info{};
-      info.dwOSVersionInfoSize = sizeof(info);
-      if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
-        return wpi::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
-                                  info.dwBuildNumber);
-      }
-    }
-  }
-  return wpi::VersionTuple(0, 0, 0, 0);
-}
 
 /// Determines if the program is running on Windows 8 or newer. This
 /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
 /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
 /// yet have VersionHelpers.h, so we have our own helper.
-inline bool RunningWindows8OrGreater() {
-  // Windows 8 is version 6.2, service pack 0.
-  return GetWindowsOSVersion() >= wpi::VersionTuple(6, 2, 0, 0);
-}
+bool RunningWindows8OrGreater();
 
-inline bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix) {
-  if (!ErrMsg)
-    return true;
-  char *buffer = NULL;
-  DWORD LastError = GetLastError();
-  DWORD R = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                               FORMAT_MESSAGE_FROM_SYSTEM |
-                               FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                           NULL, LastError, 0, (LPSTR)&buffer, 1, NULL);
-  if (R)
-    *ErrMsg = prefix + ": " + buffer;
-  else
-    *ErrMsg = prefix + ": Unknown error";
-  *ErrMsg += " (0x" + wpi::utohexstr(LastError) + ")";
+/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
+/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
+/// GetVersionEx is deprecated, but this API exposes the build number which can
+/// be useful for working around certain kernel bugs.
+wpi::VersionTuple GetWindowsOSVersion();
 
-  LocalFree(buffer);
-  return R != 0;
+bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
+
+// Include GetLastError() in a fatal error message.
+LLVM_ATTRIBUTE_NORETURN inline void ReportLastErrorFatal(const char *Msg) {
+  std::string ErrMsg;
+  MakeErrMsg(&ErrMsg, Msg);
+  wpi::report_fatal_error(ErrMsg);
 }
 
 template <typename HandleTraits>
@@ -164,6 +137,22 @@ struct JobHandleTraits : CommonHandleTraits {
   }
 };
 
+struct CryptContextTraits : CommonHandleTraits {
+  typedef HCRYPTPROV handle_type;
+
+  static handle_type GetInvalid() {
+    return 0;
+  }
+
+  static void Close(handle_type h) {
+    ::CryptReleaseContext(h, 0);
+  }
+
+  static bool IsValid(handle_type h) {
+    return h != GetInvalid();
+  }
+};
+
 struct RegTraits : CommonHandleTraits {
   typedef HKEY handle_type;
 
@@ -190,6 +179,7 @@ struct FileHandleTraits : CommonHandleTraits {};
 
 typedef ScopedHandle<CommonHandleTraits> ScopedCommonHandle;
 typedef ScopedHandle<FileHandleTraits>   ScopedFileHandle;
+typedef ScopedHandle<CryptContextTraits> ScopedCryptContext;
 typedef ScopedHandle<RegTraits>          ScopedRegHandle;
 typedef ScopedHandle<FindHandleTraits>   ScopedFindHandle;
 typedef ScopedHandle<JobHandleTraits>    ScopedJobHandle;
@@ -239,6 +229,19 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
   return Time;
 }
 
+namespace windows {
+// Returns command line arguments. Unlike arguments given to main(),
+// this function guarantees that the returned arguments are encoded in
+// UTF-8 regardless of the current code page setting.
+std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
+                                        BumpPtrAllocator &Alloc);
+
+/// Convert UTF-8 path to a suitable UTF-16 path for use with the Win32 Unicode
+/// File API.
+std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16,
+                          size_t MaxPathLen = MAX_PATH);
+
+} // end namespace windows
 } // end namespace sys
 } // end namespace wpi.
 

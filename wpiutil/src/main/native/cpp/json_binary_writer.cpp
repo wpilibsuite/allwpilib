@@ -39,6 +39,110 @@ SOFTWARE.
 
 namespace wpi {
 
+/// A raw_ostream that writes to an SmallVector or SmallString.  This is a
+/// simple adaptor class. This class does not encounter output errors.
+/// raw_svector_ostream operates without a buffer, delegating all memory
+/// management to the SmallString. Thus the SmallString is always up-to-date,
+/// may be used directly and there is no need to call flush().
+class raw_usvector_ostream : public raw_pwrite_stream {
+  SmallVectorImpl<uint8_t> &OS;
+
+  /// See raw_ostream::write_impl.
+  void write_impl(const char *Ptr, size_t Size) override;
+
+  void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) override;
+
+  /// Return the current position within the stream.
+  uint64_t current_pos() const override;
+
+public:
+  /// Construct a new raw_svector_ostream.
+  ///
+  /// \param O The vector to write to; this should generally have at least 128
+  /// bytes free to avoid any extraneous memory overhead.
+  explicit raw_usvector_ostream(SmallVectorImpl<uint8_t> &O) : OS(O) {
+    SetUnbuffered();
+  }
+
+  ~raw_usvector_ostream() override = default;
+
+  void flush() = delete;
+
+  /// Return an span for the vector contents.
+  span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
+};
+
+/// A raw_ostream that writes to a vector.  This is a
+/// simple adaptor class. This class does not encounter output errors.
+/// raw_vector_ostream operates without a buffer, delegating all memory
+/// management to the vector. Thus the vector is always up-to-date,
+/// may be used directly and there is no need to call flush().
+class raw_uvector_ostream : public raw_pwrite_stream {
+  std::vector<uint8_t> &OS;
+
+  /// See raw_ostream::write_impl.
+  void write_impl(const char *Ptr, size_t Size) override;
+
+  void pwrite_impl(const char *Ptr, size_t Size, uint64_t Offset) override;
+
+  /// Return the current position within the stream.
+  uint64_t current_pos() const override;
+
+public:
+  /// Construct a new raw_svector_ostream.
+  ///
+  /// \param O The vector to write to; this should generally have at least 128
+  /// bytes free to avoid any extraneous memory overhead.
+  explicit raw_uvector_ostream(std::vector<uint8_t> &O) : OS(O) {
+    SetUnbuffered();
+  }
+
+  ~raw_uvector_ostream() override = default;
+
+  void flush() = delete;
+
+  /// Return a span for the vector contents.
+  span<uint8_t> array() { return {OS.data(), OS.size()}; }
+  span<const uint8_t> array() const { return {OS.data(), OS.size()}; }
+};
+
+//===----------------------------------------------------------------------===//
+//  raw_usvector_ostream
+//===----------------------------------------------------------------------===//
+
+uint64_t raw_usvector_ostream::current_pos() const { return OS.size(); }
+
+void raw_usvector_ostream::write_impl(const char *Ptr, size_t Size) {
+  OS.append(reinterpret_cast<const uint8_t *>(Ptr),
+            reinterpret_cast<const uint8_t *>(Ptr) + Size);
+}
+
+void raw_usvector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                       uint64_t Offset) {
+  memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+//===----------------------------------------------------------------------===//
+//  raw_uvector_ostream
+//===----------------------------------------------------------------------===//
+
+uint64_t raw_uvector_ostream::current_pos() const { return OS.size(); }
+
+void raw_uvector_ostream::write_impl(const char *Ptr, size_t Size) {
+  OS.insert(OS.end(), reinterpret_cast<const uint8_t *>(Ptr),
+            reinterpret_cast<const uint8_t *>(Ptr) + Size);
+}
+
+void raw_uvector_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                      uint64_t Offset) {
+  memcpy(OS.data() + Offset, Ptr, Size);
+}
+
+}  // namespace wpi
+
+namespace wpi {
+
 /*!
 @brief serialization to CBOR and MessagePack values
 */

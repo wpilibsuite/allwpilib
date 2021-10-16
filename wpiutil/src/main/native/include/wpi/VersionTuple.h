@@ -1,24 +1,27 @@
 //===- VersionTuple.h - Version Number Handling -----------------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// Defines the llvm::VersionTuple class, which represents a version in
+/// Defines the wpi::VersionTuple class, which represents a version in
 /// the form major[.minor[.subminor]].
 ///
 //===----------------------------------------------------------------------===//
 #ifndef WPIUTIL_WPI_VERSIONTUPLE_H
 #define WPIUTIL_WPI_VERSIONTUPLE_H
 
-#include <optional>
+#include "wpi/DenseMapInfo.h"
+#include "wpi/Hashing.h"
+#include "wpi/Optional.h"
 #include <string>
+#include <tuple>
 
 namespace wpi {
+class raw_ostream;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].
 class VersionTuple {
@@ -85,6 +88,27 @@ public:
     return Build;
   }
 
+  /// Return a version tuple that contains only the first 3 version components.
+  VersionTuple withoutBuild() const {
+    if (HasBuild)
+      return VersionTuple(Major, Minor, Subminor);
+    return *this;
+  }
+
+  /// Return a version tuple that contains only components that are non-zero.
+  VersionTuple normalize() const {
+    VersionTuple Result = *this;
+    if (Result.Build == 0) {
+      Result.HasBuild = false;
+      if (Result.Subminor == 0) {
+        Result.HasSubminor = false;
+        if (Result.Minor == 0)
+          Result.HasMinor = false;
+      }
+    }
+    return Result;
+  }
+
   /// Determine if two version numbers are equivalent. If not
   /// provided, minor and subminor version numbers are considered to be zero.
   friend bool operator==(const VersionTuple &X, const VersionTuple &Y) {
@@ -133,6 +157,44 @@ public:
   /// zero.
   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
     return !(X < Y);
+  }
+
+  friend wpi::hash_code hash_value(const VersionTuple &VT) {
+    return wpi::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+  }
+
+  /// Retrieve a string representation of the version number.
+  std::string getAsString() const;
+
+  /// Try to parse the given string as a version number.
+  /// \returns \c true if the string does not match the regular expression
+  ///   [0-9]+(\.[0-9]+){0,3}
+  bool tryParse(std::string_view string);
+};
+
+/// Print a version number.
+raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
+
+// Provide DenseMapInfo for version tuples.
+template <> struct DenseMapInfo<VersionTuple> {
+  static inline VersionTuple getEmptyKey() { return VersionTuple(0x7FFFFFFF); }
+  static inline VersionTuple getTombstoneKey() {
+    return VersionTuple(0x7FFFFFFE);
+  }
+  static unsigned getHashValue(const VersionTuple &Value) {
+    unsigned Result = Value.getMajor();
+    if (auto Minor = Value.getMinor())
+      Result = detail::combineHashValue(Result, *Minor);
+    if (auto Subminor = Value.getSubminor())
+      Result = detail::combineHashValue(Result, *Subminor);
+    if (auto Build = Value.getBuild())
+      Result = detail::combineHashValue(Result, *Build);
+
+    return Result;
+  }
+
+  static bool isEqual(const VersionTuple &LHS, const VersionTuple &RHS) {
+    return LHS == RHS;
   }
 };
 

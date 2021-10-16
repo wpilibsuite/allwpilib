@@ -37,6 +37,8 @@ SOFTWARE.
 #include "unit-json.h"
 using wpi::json;
 
+#include <cmath>
+
 TEST(JsonPointerTest, TypesCreate)
 {
     // create a JSON value with different types

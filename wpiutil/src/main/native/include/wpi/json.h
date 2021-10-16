@@ -60,6 +60,7 @@ SOFTWARE.
 #include <utility>
 #include <vector> // vector
 
+#include "wpi/SmallVector.h"
 #include "wpi/StringMap.h"
 #include "wpi/span.h"
 
@@ -5169,7 +5170,6 @@ class json
     reference back()
     {
         auto tmp = end();
-        --tmp;
         return *tmp;
     }
 
@@ -5179,7 +5179,6 @@ class json
     const_reference back() const
     {
         auto tmp = cend();
-        --tmp;
         return *tmp;
     }
 

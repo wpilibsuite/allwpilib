@@ -1,9 +1,8 @@
 //===-- llvm/Support/MathExtras.h - Useful math functions -------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -15,14 +14,17 @@
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
 #include "wpi/Compiler.h"
-#include <cstdint>
-#include <algorithm>
 #include <cassert>
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <limits>
 #include <type_traits>
+
+#ifdef __ANDROID_NDK__
+#include <android/api-level.h>
+#endif
 
 #ifdef _MSC_VER
 // Declare these intrinsics manually rather including intrin.h. It's very
@@ -37,6 +39,7 @@ unsigned char _BitScanReverse64(unsigned long *_Index, unsigned __int64 _Mask);
 #endif
 
 namespace wpi {
+
 /// The behavior an operation has on an input of 0.
 enum ZeroBehavior {
   /// The returned value is undefined.
@@ -49,16 +52,16 @@ enum ZeroBehavior {
 
 namespace detail {
 template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
-  static std::size_t count(T Val, ZeroBehavior) {
+  static unsigned count(T Val, ZeroBehavior) {
     if (!Val)
       return std::numeric_limits<T>::digits;
     if (Val & 0x1)
       return 0;
 
     // Bisection method.
-    std::size_t ZeroBits = 0;
+    unsigned ZeroBits = 0;
     T Shift = std::numeric_limits<T>::digits >> 1;
-    T Mask = (std::numeric_limits<T>::max)() >> Shift;
+    T Mask = std::numeric_limits<T>::max() >> Shift;
     while (Shift) {
       if ((Val & Mask) == 0) {
         Val >>= Shift;
@@ -71,13 +74,13 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
   }
 };
 
-#if __GNUC__ >= 4 || defined(_MSC_VER)
+#if defined(__GNUC__) || defined(_MSC_VER)
 template <typename T> struct TrailingZerosCounter<T, 4> {
-  static std::size_t count(T Val, ZeroBehavior ZB) {
+  static unsigned count(T Val, ZeroBehavior ZB) {
     if (ZB != ZB_Undefined && Val == 0)
       return 32;
 
-#if __has_builtin(__builtin_ctz) || LLVM_GNUC_PREREQ(4, 0, 0)
+#if __has_builtin(__builtin_ctz) || defined(__GNUC__)
     return __builtin_ctz(Val);
 #elif defined(_MSC_VER)
     unsigned long Index;
@@ -89,11 +92,11 @@ template <typename T> struct TrailingZerosCounter<T, 4> {
 
 #if !defined(_MSC_VER) || defined(_M_X64)
 template <typename T> struct TrailingZerosCounter<T, 8> {
-  static std::size_t count(T Val, ZeroBehavior ZB) {
+  static unsigned count(T Val, ZeroBehavior ZB) {
     if (ZB != ZB_Undefined && Val == 0)
       return 64;
 
-#if __has_builtin(__builtin_ctzll) || LLVM_GNUC_PREREQ(4, 0, 0)
+#if __has_builtin(__builtin_ctzll) || defined(__GNUC__)
     return __builtin_ctzll(Val);
 #elif defined(_MSC_VER)
     unsigned long Index;
@@ -114,7 +117,7 @@ template <typename T> struct TrailingZerosCounter<T, 8> {
 /// \param ZB the behavior on an input of 0. Only ZB_Width and ZB_Undefined are
 ///   valid arguments.
 template <typename T>
-std::size_t countTrailingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+unsigned countTrailingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
   static_assert(std::numeric_limits<T>::is_integer &&
                     !std::numeric_limits<T>::is_signed,
                 "Only unsigned integral types are allowed.");
@@ -123,12 +126,12 @@ std::size_t countTrailingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
 
 namespace detail {
 template <typename T, std::size_t SizeOfT> struct LeadingZerosCounter {
-  static std::size_t count(T Val, ZeroBehavior) {
+  static unsigned count(T Val, ZeroBehavior) {
     if (!Val)
       return std::numeric_limits<T>::digits;
 
     // Bisection method.
-    std::size_t ZeroBits = 0;
+    unsigned ZeroBits = 0;
     for (T Shift = std::numeric_limits<T>::digits >> 1; Shift; Shift >>= 1) {
       T Tmp = Val >> Shift;
       if (Tmp)
@@ -140,13 +143,13 @@ template <typename T, std::size_t SizeOfT> struct LeadingZerosCounter {
   }
 };
 
-#if __GNUC__ >= 4 || defined(_MSC_VER)
+#if defined(__GNUC__) || defined(_MSC_VER)
 template <typename T> struct LeadingZerosCounter<T, 4> {
-  static std::size_t count(T Val, ZeroBehavior ZB) {
+  static unsigned count(T Val, ZeroBehavior ZB) {
     if (ZB != ZB_Undefined && Val == 0)
       return 32;
 
-#if __has_builtin(__builtin_clz) || LLVM_GNUC_PREREQ(4, 0, 0)
+#if __has_builtin(__builtin_clz) || defined(__GNUC__)
     return __builtin_clz(Val);
 #elif defined(_MSC_VER)
     unsigned long Index;
@@ -158,11 +161,11 @@ template <typename T> struct LeadingZerosCounter<T, 4> {
 
 #if !defined(_MSC_VER) || defined(_M_X64)
 template <typename T> struct LeadingZerosCounter<T, 8> {
-  static std::size_t count(T Val, ZeroBehavior ZB) {
+  static unsigned count(T Val, ZeroBehavior ZB) {
     if (ZB != ZB_Undefined && Val == 0)
       return 64;
 
-#if __has_builtin(__builtin_clzll) || LLVM_GNUC_PREREQ(4, 0, 0)
+#if __has_builtin(__builtin_clzll) || defined(__GNUC__)
     return __builtin_clzll(Val);
 #elif defined(_MSC_VER)
     unsigned long Index;
@@ -183,7 +186,7 @@ template <typename T> struct LeadingZerosCounter<T, 8> {
 /// \param ZB the behavior on an input of 0. Only ZB_Width and ZB_Undefined are
 ///   valid arguments.
 template <typename T>
-std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
   static_assert(std::numeric_limits<T>::is_integer &&
                     !std::numeric_limits<T>::is_signed,
                 "Only unsigned integral types are allowed.");
@@ -199,7 +202,7 @@ std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
 ///   valid arguments.
 template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return (std::numeric_limits<T>::max)();
+    return std::numeric_limits<T>::max();
 
   return countTrailingZeros(Val, ZB_Undefined);
 }
@@ -240,7 +243,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
 ///   valid arguments.
 template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
   if (ZB == ZB_Max && Val == 0)
-    return (std::numeric_limits<T>::max)();
+    return std::numeric_limits<T>::max();
 
   // Use ^ instead of - because both gcc and llvm can remove the associated ^
   // in the __builtin_clz intrinsic on x86.
@@ -272,6 +275,34 @@ T reverseBits(T Val) {
   std::memcpy(&Val, out, sizeof(Val));
   return Val;
 }
+
+#if __has_builtin(__builtin_bitreverse8)
+template<>
+inline uint8_t reverseBits<uint8_t>(uint8_t Val) {
+  return __builtin_bitreverse8(Val);
+}
+#endif
+
+#if __has_builtin(__builtin_bitreverse16)
+template<>
+inline uint16_t reverseBits<uint16_t>(uint16_t Val) {
+  return __builtin_bitreverse16(Val);
+}
+#endif
+
+#if __has_builtin(__builtin_bitreverse32)
+template<>
+inline uint32_t reverseBits<uint32_t>(uint32_t Val) {
+  return __builtin_bitreverse32(Val);
+}
+#endif
+
+#if __has_builtin(__builtin_bitreverse64)
+template<>
+inline uint64_t reverseBits<uint64_t>(uint64_t Val) {
+  return __builtin_bitreverse64(Val);
+}
+#endif
 
 // NOTE: The following support functions use the _32/_64 extensions instead of
 // type overloading so that signed and unsigned integers can be used without
@@ -325,14 +356,12 @@ constexpr inline bool isShiftedInt(int64_t x) {
 /// to keep MSVC from (incorrectly) warning on isUInt<64> that we're shifting
 /// left too many places.
 template <unsigned N>
-constexpr inline typename std::enable_if<(N < 64), bool>::type
-isUInt(uint64_t X) {
+constexpr inline std::enable_if_t<(N < 64), bool> isUInt(uint64_t X) {
   static_assert(N > 0, "isUInt<0> doesn't make sense");
   return X < (UINT64_C(1) << (N));
 }
 template <unsigned N>
-constexpr inline typename std::enable_if<N >= 64, bool>::type
-isUInt(uint64_t X) {
+constexpr inline std::enable_if_t<N >= 64, bool> isUInt(uint64_t) {
   return true;
 }
 
@@ -370,21 +399,12 @@ inline uint64_t maxUIntN(uint64_t N) {
   return UINT64_MAX >> (64 - N);
 }
 
-#ifdef _WIN32
-#pragma warning(push)
-#pragma warning(disable : 4146)
-#endif
-
 /// Gets the minimum value for a N-bit signed integer.
 inline int64_t minIntN(int64_t N) {
   assert(N > 0 && N <= 64 && "integer width out of range");
 
-  return -(UINT64_C(1)<<(N-1));
+  return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
 }
-
-#ifdef _WIN32
-#pragma warning(pop)
-#endif
 
 /// Gets the maximum value for a N-bit signed integer.
 inline int64_t maxIntN(int64_t N) {
@@ -450,7 +470,7 @@ constexpr inline bool isPowerOf2_64(uint64_t Value) {
 /// \param ZB the behavior on an input of all ones. Only ZB_Width and
 /// ZB_Undefined are valid arguments.
 template <typename T>
-std::size_t countLeadingOnes(T Value, ZeroBehavior ZB = ZB_Width) {
+unsigned countLeadingOnes(T Value, ZeroBehavior ZB = ZB_Width) {
   static_assert(std::numeric_limits<T>::is_integer &&
                     !std::numeric_limits<T>::is_signed,
                 "Only unsigned integral types are allowed.");
@@ -466,7 +486,7 @@ std::size_t countLeadingOnes(T Value, ZeroBehavior ZB = ZB_Width) {
 /// \param ZB the behavior on an input of all ones. Only ZB_Width and
 /// ZB_Undefined are valid arguments.
 template <typename T>
-std::size_t countTrailingOnes(T Value, ZeroBehavior ZB = ZB_Width) {
+unsigned countTrailingOnes(T Value, ZeroBehavior ZB = ZB_Width) {
   static_assert(std::numeric_limits<T>::is_integer &&
                     !std::numeric_limits<T>::is_signed,
                 "Only unsigned integral types are allowed.");
@@ -478,7 +498,7 @@ template <typename T, std::size_t SizeOfT> struct PopulationCounter {
   static unsigned count(T Value) {
     // Generic version, forward to 32 bits.
     static_assert(SizeOfT <= 4, "Not implemented!");
-#if __GNUC__ >= 4
+#if defined(__GNUC__)
     return __builtin_popcount(Value);
 #else
     uint32_t v = Value;
@@ -491,7 +511,7 @@ template <typename T, std::size_t SizeOfT> struct PopulationCounter {
 
 template <typename T> struct PopulationCounter<T, 8> {
   static unsigned count(T Value) {
-#if __GNUC__ >= 4
+#if defined(__GNUC__)
     return __builtin_popcountll(Value);
 #else
     uint64_t v = Value;
@@ -515,12 +535,22 @@ inline unsigned countPopulation(T Value) {
   return detail::PopulationCounter<T, sizeof(T)>::count(Value);
 }
 
+/// Compile time Log2.
+/// Valid only for positive powers of two.
+template <size_t kValue> constexpr inline size_t CTLog2() {
+  static_assert(kValue > 0 && wpi::isPowerOf2_64(kValue),
+                "Value is not a valid power of 2");
+  return 1 + CTLog2<kValue / 2>();
+}
+
+template <> constexpr inline size_t CTLog2<1>() { return 0; }
+
 /// Return the log base 2 of the specified value.
 inline double Log2(double Value) {
 #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
   return __builtin_log(Value) / __builtin_log(2.0);
 #else
-  return std::log2(Value);
+  return log2(Value);
 #endif
 }
 
@@ -528,36 +558,41 @@ inline double Log2(double Value) {
 /// (32 bit edition.)
 /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
 inline unsigned Log2_32(uint32_t Value) {
-  return static_cast<unsigned>(31 - countLeadingZeros(Value));
+  return 31 - countLeadingZeros(Value);
 }
 
 /// Return the floor log base 2 of the specified value, -1 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64(uint64_t Value) {
-  return static_cast<unsigned>(63 - countLeadingZeros(Value));
+  return 63 - countLeadingZeros(Value);
 }
 
 /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
 /// (32 bit edition).
 /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
 inline unsigned Log2_32_Ceil(uint32_t Value) {
-  return static_cast<unsigned>(32 - countLeadingZeros(Value - 1));
+  return 32 - countLeadingZeros(Value - 1);
 }
 
 /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
 /// (64 bit edition.)
 inline unsigned Log2_64_Ceil(uint64_t Value) {
-  return static_cast<unsigned>(64 - countLeadingZeros(Value - 1));
+  return 64 - countLeadingZeros(Value - 1);
 }
 
 /// Return the greatest common divisor of the values using Euclid's algorithm.
-inline uint64_t GreatestCommonDivisor64(uint64_t A, uint64_t B) {
+template <typename T>
+inline T greatestCommonDivisor(T A, T B) {
   while (B) {
-    uint64_t T = B;
+    T Tmp = B;
     B = A % B;
-    A = T;
+    A = Tmp;
   }
   return A;
+}
+
+inline uint64_t GreatestCommonDivisor64(uint64_t A, uint64_t B) {
+  return greatestCommonDivisor<uint64_t>(A, B);
 }
 
 /// This function takes a 64-bit integer and returns the bit equivalent double.
@@ -605,25 +640,6 @@ constexpr inline uint64_t MinAlign(uint64_t A, uint64_t B) {
   // MSVC warning C4146
   //    return (A | B) & -(A | B);
   return (A | B) & (1 + ~(A | B));
-}
-
-/// Aligns \c Addr to \c Alignment bytes, rounding up.
-///
-/// Alignment should be a power of two.  This method rounds up, so
-/// alignAddr(7, 4) == 8 and alignAddr(8, 4) == 8.
-inline uintptr_t alignAddr(const void *Addr, size_t Alignment) {
-  assert(Alignment && isPowerOf2_64((uint64_t)Alignment) &&
-         "Alignment is not a power of two!");
-
-  assert((uintptr_t)Addr + Alignment - 1 >= (uintptr_t)Addr);
-
-  return (((uintptr_t)Addr + Alignment - 1) & ~(uintptr_t)(Alignment - 1));
-}
-
-/// Returns the necessary adjustment for aligning \c Ptr to \c Alignment
-/// bytes, rounding up.
-inline size_t alignmentAdjustment(const void *Ptr, size_t Alignment) {
-  return alignAddr(Ptr, Alignment) - (uintptr_t)Ptr;
 }
 
 /// Returns the next power of two (in 64-bits) that is strictly greater than A.
@@ -691,18 +707,10 @@ inline uint64_t divideCeil(uint64_t Numerator, uint64_t Denominator) {
   return alignTo(Numerator, Denominator) / Denominator;
 }
 
-/// \c alignTo for contexts where a constant expression is required.
-/// \sa alignTo
-///
-/// \todo FIXME: remove when \c constexpr becomes really \c constexpr
-template <uint64_t Align>
-struct AlignTo {
-  static_assert(Align != 0u, "Align must be non-zero");
-  template <uint64_t Value>
-  struct from_value {
-    static const uint64_t value = (Value + Align - 1) / Align * Align;
-  };
-};
+/// Returns the integer nearest(Numerator / Denominator).
+inline uint64_t divideNearest(uint64_t Numerator, uint64_t Denominator) {
+  return (Numerator + (Denominator / 2)) / Denominator;
+}
 
 /// Returns the largest uint64_t less than or equal to \p Value and is
 /// \p Skew mod \p Align. \p Align must be non-zero
@@ -710,13 +718,6 @@ inline uint64_t alignDown(uint64_t Value, uint64_t Align, uint64_t Skew = 0) {
   assert(Align != 0u && "Align can't be 0.");
   Skew %= Align;
   return (Value - Skew) / Align * Align + Skew;
-}
-
-/// Returns the offset to the next integer (mod 2**64) that is greater than
-/// or equal to \p Value and is a multiple of \p Align. \p Align must be
-/// non-zero.
-inline uint64_t OffsetToAlignment(uint64_t Value, uint64_t Align) {
-  return alignTo(Value, Align) - Value;
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 32-bit integer.
@@ -728,7 +729,7 @@ template <unsigned B> constexpr inline int32_t SignExtend32(uint32_t X) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 32-bit integer.
-/// Requires 0 < B < 32.
+/// Requires 0 < B <= 32.
 inline int32_t SignExtend32(uint32_t X, unsigned B) {
   assert(B > 0 && "Bit width can't be 0.");
   assert(B <= 32 && "Bit width out of range.");
@@ -736,7 +737,7 @@ inline int32_t SignExtend32(uint32_t X, unsigned B) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 64-bit integer.
-/// Requires 0 < B < 64.
+/// Requires 0 < B <= 64.
 template <unsigned B> constexpr inline int64_t SignExtend64(uint64_t x) {
   static_assert(B > 0, "Bit width can't be 0.");
   static_assert(B <= 64, "Bit width out of range.");
@@ -744,7 +745,7 @@ template <unsigned B> constexpr inline int64_t SignExtend64(uint64_t x) {
 }
 
 /// Sign-extend the number in the bottom B bits of X to a 64-bit integer.
-/// Requires 0 < B < 64.
+/// Requires 0 < B <= 64.
 inline int64_t SignExtend64(uint64_t X, unsigned B) {
   assert(B > 0 && "Bit width can't be 0.");
   assert(B <= 64 && "Bit width out of range.");
@@ -754,16 +755,15 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
 /// Subtract two unsigned integers, X and Y, of type T and return the absolute
 /// value of the result.
 template <typename T>
-typename std::enable_if<std::is_unsigned<T>::value, T>::type
-AbsoluteDifference(T X, T Y) {
-  return (std::max)(X, Y) - (std::min)(X, Y);
+std::enable_if_t<std::is_unsigned<T>::value, T> AbsoluteDifference(T X, T Y) {
+  return X > Y ? (X - Y) : (Y - X);
 }
 
 /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
 /// maximum representable value of T on overflow.  ResultOverflowed indicates if
 /// the result is larger than the maximum representable value of type T.
 template <typename T>
-typename std::enable_if<std::is_unsigned<T>::value, T>::type
+std::enable_if_t<std::is_unsigned<T>::value, T>
 SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
   bool Dummy;
   bool &Overflowed = ResultOverflowed ? *ResultOverflowed : Dummy;
@@ -771,7 +771,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
   T Z = X + Y;
   Overflowed = (Z < X || Z < Y);
   if (Overflowed)
-    return (std::numeric_limits<T>::max)();
+    return std::numeric_limits<T>::max();
   else
     return Z;
 }
@@ -780,7 +780,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
 /// maximum representable value of T on overflow.  ResultOverflowed indicates if
 /// the result is larger than the maximum representable value of type T.
 template <typename T>
-typename std::enable_if<std::is_unsigned<T>::value, T>::type
+std::enable_if_t<std::is_unsigned<T>::value, T>
 SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
   bool Dummy;
   bool &Overflowed = ResultOverflowed ? *ResultOverflowed : Dummy;
@@ -796,7 +796,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
   // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
   // will necessarily be less than Log2Max as desired.
   int Log2Z = Log2_64(X) + Log2_64(Y);
-  const T Max = (std::numeric_limits<T>::max)();
+  const T Max = std::numeric_limits<T>::max();
   int Log2Max = Log2_64(Max);
   if (Log2Z < Log2Max) {
     return X * Y;
@@ -826,7 +826,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
 /// overflow. ResultOverflowed indicates if the result is larger than the
 /// maximum representable value of type T.
 template <typename T>
-typename std::enable_if<std::is_unsigned<T>::value, T>::type
+std::enable_if_t<std::is_unsigned<T>::value, T>
 SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
   bool Dummy;
   bool &Overflowed = ResultOverflowed ? *ResultOverflowed : Dummy;
@@ -836,6 +836,89 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
     return Product;
 
   return SaturatingAdd(A, Product, &Overflowed);
+}
+
+/// Use this rather than HUGE_VALF; the latter causes warnings on MSVC.
+extern const float huge_valf;
+
+
+/// Add two signed integers, computing the two's complement truncated result,
+/// returning true if overflow occured.
+template <typename T>
+std::enable_if_t<std::is_signed<T>::value, T> AddOverflow(T X, T Y, T &Result) {
+#if __has_builtin(__builtin_add_overflow)
+  return __builtin_add_overflow(X, Y, &Result);
+#else
+  // Perform the unsigned addition.
+  using U = std::make_unsigned_t<T>;
+  const U UX = static_cast<U>(X);
+  const U UY = static_cast<U>(Y);
+  const U UResult = UX + UY;
+
+  // Convert to signed.
+  Result = static_cast<T>(UResult);
+
+  // Adding two positive numbers should result in a positive number.
+  if (X > 0 && Y > 0)
+    return Result <= 0;
+  // Adding two negatives should result in a negative number.
+  if (X < 0 && Y < 0)
+    return Result >= 0;
+  return false;
+#endif
+}
+
+/// Subtract two signed integers, computing the two's complement truncated
+/// result, returning true if an overflow ocurred.
+template <typename T>
+std::enable_if_t<std::is_signed<T>::value, T> SubOverflow(T X, T Y, T &Result) {
+#if __has_builtin(__builtin_sub_overflow)
+  return __builtin_sub_overflow(X, Y, &Result);
+#else
+  // Perform the unsigned addition.
+  using U = std::make_unsigned_t<T>;
+  const U UX = static_cast<U>(X);
+  const U UY = static_cast<U>(Y);
+  const U UResult = UX - UY;
+
+  // Convert to signed.
+  Result = static_cast<T>(UResult);
+
+  // Subtracting a positive number from a negative results in a negative number.
+  if (X <= 0 && Y > 0)
+    return Result >= 0;
+  // Subtracting a negative number from a positive results in a positive number.
+  if (X >= 0 && Y < 0)
+    return Result <= 0;
+  return false;
+#endif
+}
+
+/// Multiply two signed integers, computing the two's complement truncated
+/// result, returning true if an overflow ocurred.
+template <typename T>
+std::enable_if_t<std::is_signed<T>::value, T> MulOverflow(T X, T Y, T &Result) {
+  // Perform the unsigned multiplication on absolute values.
+  using U = std::make_unsigned_t<T>;
+  const U UX = X < 0 ? (0 - static_cast<U>(X)) : static_cast<U>(X);
+  const U UY = Y < 0 ? (0 - static_cast<U>(Y)) : static_cast<U>(Y);
+  const U UResult = UX * UY;
+
+  // Convert to signed.
+  const bool IsNegative = (X < 0) ^ (Y < 0);
+  Result = IsNegative ? (0 - UResult) : UResult;
+
+  // If any of the args was 0, result is 0 and no overflow occurs.
+  if (UX == 0 || UY == 0)
+    return false;
+
+  // UX and UY are in [1, 2^n], where n is the number of digits.
+  // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
+  // positive) divided by an argument compares to the other.
+  if (IsNegative)
+    return UX > (static_cast<U>(std::numeric_limits<T>::max()) + U(1)) / UY;
+  else
+    return UX > (static_cast<U>(std::numeric_limits<T>::max())) / UY;
 }
 
 // Typesafe implementation of the signum function.
@@ -859,6 +942,6 @@ constexpr T Lerp(const T& startValue, const T& endValue, double t) {
   return startValue + (endValue - startValue) * t;
 }
 
-} // namespace wpi
+} // End llvm namespace
 
 #endif

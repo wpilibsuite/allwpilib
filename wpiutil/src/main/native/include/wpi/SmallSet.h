@@ -1,9 +1,8 @@
 //===- llvm/ADT/SmallSet.h - 'Normally small' sets --------------*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -14,14 +13,14 @@
 #ifndef WPIUTIL_WPI_SMALLSET_H
 #define WPIUTIL_WPI_SMALLSET_H
 
+#include <optional>
 #include "wpi/SmallPtrSet.h"
 #include "wpi/SmallVector.h"
-#include "wpi/Compiler.h"
 #include "wpi/iterator.h"
+#include "wpi/Compiler.h"
 #include "wpi/type_traits.h"
 #include <cstddef>
 #include <functional>
-#include <optional>
 #include <set>
 #include <type_traits>
 #include <utility>
@@ -233,6 +232,13 @@ public:
     return {Set.end()};
   }
 
+  /// Check if the SmallSet contains the given element.
+  bool contains(const T &V) const {
+    if (isSmall())
+      return vfind(V) != Vector.end();
+    return Set.find(V) != Set.end();
+  }
+
 private:
   bool isSmall() const { return Set.empty(); }
 
@@ -249,6 +255,31 @@ private:
 template <typename PointeeType, unsigned N>
 class SmallSet<PointeeType*, N> : public SmallPtrSet<PointeeType*, N> {};
 
+/// Equality comparison for SmallSet.
+///
+/// Iterates over elements of LHS confirming that each element is also a member
+/// of RHS, and that RHS contains no additional values.
+/// Equivalent to N calls to RHS.count.
+/// For small-set mode amortized complexity is O(N^2)
+/// For large-set mode amortized complexity is linear, worst case is O(N^2) (if
+/// every hash collides).
+template <typename T, unsigned LN, unsigned RN, typename C>
+bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+  if (LHS.size() != RHS.size())
+    return false;
+
+  // All elements in LHS must also be in RHS
+  return all_of(LHS, [&RHS](const T &E) { return RHS.count(E); });
+}
+
+/// Inequality comparison for SmallSet.
+///
+/// Equivalent to !(LHS == RHS). See operator== for performance notes.
+template <typename T, unsigned LN, unsigned RN, typename C>
+bool operator!=(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+  return !(LHS == RHS);
+}
+
 } // end namespace wpi
 
-#endif // LLVM_ADT_SMALLSET_H
+#endif // WPIUTIL_WPI_SMALLSET_H

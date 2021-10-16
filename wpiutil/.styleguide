@@ -13,12 +13,14 @@ cppSrcFileInclude {
 generatedFileExclude {
   src/main/native/cpp/http_parser\.cpp$
   src/main/native/cpp/llvm/
-  src/main/native/include/llvm/
   src/main/native/include/wpi/AlignOf\.h$
+  src/main/native/include/wpi/AllocatorBase\.h$
   src/main/native/include/wpi/ArrayRef\.h$
   src/main/native/include/wpi/Chrono\.h$
   src/main/native/include/wpi/Compiler\.h$
   src/main/native/include/wpi/ConvertUTF\.h$
+  src/main/native/include/wpi/DJB\.h$
+  src/main/native/include/wpi/DataTypes\.h$
   src/main/native/include/wpi/DenseMap\.h$
   src/main/native/include/wpi/DenseMapInfo\.h$
   src/main/native/include/wpi/EpochTracker\.h$
@@ -42,21 +44,28 @@ generatedFileExclude {
   src/main/native/include/wpi/PointerIntPair\.h$
   src/main/native/include/wpi/PointerLikeTypeTraits\.h$
   src/main/native/include/wpi/PointerUnion\.h$
+  src/main/native/include/wpi/ReverseIteration\.h$
   src/main/native/include/wpi/STLExtras\.h$
+  src/main/native/include/wpi/STLForwardCompat\.h$
   src/main/native/include/wpi/Signal\.h$
   src/main/native/include/wpi/SmallPtrSet\.h$
   src/main/native/include/wpi/SmallSet\.h$
   src/main/native/include/wpi/SmallString\.h$
   src/main/native/include/wpi/SmallVector\.h$
   src/main/native/include/wpi/StringMap\.h$
+  src/main/native/include/wpi/StringMapEntry\.h$
   src/main/native/include/wpi/StringRef\.h$
   src/main/native/include/wpi/SwapByteOrder\.h$
   src/main/native/include/wpi/Twine\.h$
+  src/main/native/include/wpi/Unicode\.h$
   src/main/native/include/wpi/VersionTuple\.h$
   src/main/native/include/wpi/WindowsError\.h$
+  src/main/native/include/wpi/abi-breaking\.h$
+  src/main/native/include/wpi/config\.h$
   src/main/native/include/wpi/http_parser\.h$
   src/main/native/include/wpi/iterator\.h$
   src/main/native/include/wpi/iterator_range\.h$
+  src/main/native/include/wpi/llvm-config\.h$
   src/main/native/include/wpi/raw_os_ostream\.h$
   src/main/native/include/wpi/raw_ostream\.h$
   src/main/native/include/wpi/span\.h$

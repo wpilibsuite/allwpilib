@@ -21,6 +21,11 @@
 #include "networktables/TableListener.h"
 #include "ntcore_c.h"
 
+namespace wpi {
+template <typename T>
+class SmallVectorImpl;
+}  // namespace wpi
+
 namespace nt {
 
 class NetworkTableInstance;

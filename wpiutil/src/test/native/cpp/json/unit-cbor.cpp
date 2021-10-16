@@ -37,6 +37,7 @@ SOFTWARE.
 #include "unit-json.h"
 using wpi::json;
 
+#include <cmath>
 #include <fstream>
 
 TEST(CborDiscardedTest, Case)

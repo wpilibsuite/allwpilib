@@ -37,6 +37,8 @@ SOFTWARE.
 #include "unit-json.h"
 using wpi::json;
 
+#include <cmath>
+
 class JsonElementObjectAccessTestBase {
  public:
     JsonElementObjectAccessTestBase() : j_const(j) {}
