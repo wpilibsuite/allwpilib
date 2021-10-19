@@ -122,10 +122,10 @@ doxygen {
         exclude 'units/**'
     }
 
+    case_sense_names false
     extension_mapping 'inc=C++'
     extract_static true
     full_path_names true
-    case_sense_names false
     generate_html true
     generate_latex false
     generate_treeview true
@@ -144,6 +144,12 @@ doxygen {
     warn_if_incomplete_doc true
     warn_if_undocumented false
     warn_no_paramdoc true
+
+    //enable doxygen preprocessor expansion of WPI_DEPRECATED to fix SpeedController docs
+    enable_preprocessing true
+    macro_expansion true
+    expand_only_predef true
+    predefined "WPI_DEPRECATED(x)=[[deprecated(x)]]"
 
     if (project.hasProperty('docWarningsAsErrors')) {
         warn_as_error 'FAIL_ON_WARNINGS'
