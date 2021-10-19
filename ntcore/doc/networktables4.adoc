@@ -129,7 +129,7 @@ The server may operate in-process to an application (e.g. a robot program).  In 
 
 Clients are responsible for keeping server connections established (e.g. via retries when a connection is lost).  Topic IDs must be treated as connection-specific; if the connection to the server is lost, the client is responsible for sending new <<msg-publish,`publish`>> and <<msg-subscribe,`subscribe`>> messages as required for the application when a new connection is established, and not using old topic IDs, but rather waiting for new <<msg-announce,`announce`>> messages to be received.
 
-Except for offline-published values with timestamps of 0 and 1, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
+Except for offline-published values with timestamps of 0, the client shall not send any other published values to the server until its clock is synchronized with the server per the <<timestamps>> section.
 
 [[meta-topics]]
 === Server-Published Meta Topics
@@ -639,7 +639,7 @@ The `unsubscribe` JSON message shall contain the following parameters:
 [[msg-announce]]
 ==== Topic Announcement Message (`announce`)
 
-The server shall send this message to all clients upon initial connection for each existing topic, when a topic is created, or when any topic properties are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
+The server shall send this message for each existing topic to a client when it initially connects.  It shall also send this message to all clients when a topic is created, or when any topic properties are changed.  Additionally the server shall send this message to a client in response to an `publish` message.
 
 The `announce` JSON message shall contain the following parameters:
 
