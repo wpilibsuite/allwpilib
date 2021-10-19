@@ -137,6 +137,7 @@ doxygen {
     project_number wpilibVersioning.version.get()
     quiet true
     recursive true
+    strip_code_comments false
     strip_from_inc_path cppIncludeRoots as String[]
     strip_from_path cppIncludeRoots as String[]
     use_mathjax true
