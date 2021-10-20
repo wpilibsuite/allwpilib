@@ -93,7 +93,7 @@ void ParallelTcpConnector::Connect() {
                 [this, tcp = tcp.get()] {
                   if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
                     std::string ip;
-                    unsigned int port;
+                    unsigned int port = 0;
                     uv::AddrToName(tcp->GetPeer(), &ip, &port);
                     WPI_DEBUG4(m_logger,
                                "successful connection ({}) to {} port {}",
@@ -119,7 +119,7 @@ void ParallelTcpConnector::Connect() {
 
             if (m_logger.min_level() <= wpi::WPI_LOG_DEBUG4) {
               std::string ip;
-              unsigned int port;
+              unsigned int port = 0;
               uv::AddrToName(*reinterpret_cast<sockaddr_storage*>(ai->ai_addr),
                              &ip, &port);
               WPI_DEBUG4(
