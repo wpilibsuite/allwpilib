@@ -112,7 +112,7 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   void Open(uv_os_sock_t sock) { Invoke(&uv_tcp_open, GetRaw(), sock); }
 
   /**
-   * Enable/Disable Nagle's algorithm.
+   * Enable no delay operation (turns off Nagle's algorithm).
    * @param enable True to enable it, false otherwise.
    * @return True in case of success, false otherwise.
    */
