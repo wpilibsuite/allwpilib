@@ -225,6 +225,10 @@ public final class RobotController {
   /**
    * Set the voltage the roboRIO will brownout and disable all outputs.
    *
+   * <p>Excessive operation at low voltages will cause permanent damage to batteries and degrade
+   * their performance irreversibly. Ensure you have other brownout voltage mitigation techniques in
+   * place before changing this value.
+   *
    * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
    *
    * @param brownoutVoltage The brownout voltage

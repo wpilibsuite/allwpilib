@@ -196,7 +196,11 @@ class RobotController {
   static units::volt_t GetBrownoutVoltage();
 
   /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
+   * Set the voltage at which the roboRIO will brownout and disable all outputs.
+   *
+   * Excessive operation at low voltages will cause permanent damage to
+   * batteries and degrade their performance irreversibly. Ensure you have other
+   * brownout voltage mitigation techniques in place before changing this value.
    *
    * Note that this only does anything on the roboRIO 2.
    * On the roboRIO it is a no-op.
