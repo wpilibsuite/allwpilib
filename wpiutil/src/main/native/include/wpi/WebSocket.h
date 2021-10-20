@@ -388,6 +388,11 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SetData(std::shared_ptr<void> data) { m_data = std::move(data); }
 
   /**
+   * Shuts down and closes the underlying stream.
+   */
+  void Shutdown();
+
+  /**
    * Open event.  Emitted when the connection is open and ready to communicate.
    * The parameter is the selected subprotocol.
    */
@@ -462,7 +467,6 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
                    std::string_view protocol);
   void SendClose(uint16_t code, std::string_view reason);
   void SetClosed(uint16_t code, std::string_view reason, bool failed = false);
-  void Shutdown();
   void HandleIncoming(uv::Buffer& buf, size_t size);
   void Send(uint8_t opcode, span<const uv::Buffer> data,
             std::function<void(span<uv::Buffer>, uv::Error)> callback);
