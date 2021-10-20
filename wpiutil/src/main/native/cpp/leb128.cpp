@@ -39,8 +39,6 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val) {
 }
 
 void WriteUleb128(raw_ostream& os, uint64_t val) {
-  size_t count = 0;
-
   do {
     uint8_t byte = val & 0x7f;
     val >>= 7;
@@ -50,7 +48,6 @@ void WriteUleb128(raw_ostream& os, uint64_t val) {
     }
 
     os << byte;
-    count++;
   } while (val != 0);
 }
 
