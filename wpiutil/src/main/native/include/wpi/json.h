@@ -2122,7 +2122,7 @@ template<typename IteratorType> class iteration_proxy
 
                 // use key from the object
                 case value_t::object:
-                    return anchor.key();
+                    return std::string{anchor.key()};
 
                 // use an empty key for all primitive types
                 default:
