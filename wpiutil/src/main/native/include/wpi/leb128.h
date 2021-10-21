@@ -5,13 +5,18 @@
 #ifndef WPIUTIL_WPI_LEB128_H_
 #define WPIUTIL_WPI_LEB128_H_
 
-#include <cstddef>
+#include <stdint.h>
 
-#include "wpi/SmallVector.h"
+#include <optional>
+
+#include "wpi/span.h"
 
 namespace wpi {
 
+template <typename T>
+class SmallVectorImpl;
 class raw_istream;
+class raw_ostream;
 
 /**
  * Get size of unsigned LEB128 data
@@ -26,7 +31,7 @@ uint64_t SizeUleb128(uint64_t val);
 
 /**
  * Write unsigned LEB128 data
- * @addr: the address where the ULEB128 data is to be stored
+ * @dest: the address where the ULEB128 data is to be stored
  * @val: value to be stored
  *
  * Encode an unsigned LEB128 encoded datum. The algorithm is taken
@@ -35,6 +40,18 @@ uint64_t SizeUleb128(uint64_t val);
  * the number of bytes written.
  */
 uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val);
+
+/**
+ * Write unsigned LEB128 data.
+ *
+ * Encode an unsigned LEB128 encoded datum. The algorithm is taken
+ * from Appendix C of the DWARF 3 spec. For information on the
+ * encodings refer to section "7.6 - Variable Length Data".
+ *
+ * @param os output stream
+ * @param val value to be stored
+ */
+void WriteUleb128(raw_ostream& os, uint64_t val);
 
 /**
  * Read unsigned LEB128 data
@@ -59,6 +76,32 @@ uint64_t ReadUleb128(const char* addr, uint64_t* ret);
  * false on stream error, true on success.
  */
 bool ReadUleb128(raw_istream& is, uint64_t* ret);
+
+/**
+ * Unsigned LEB128 streaming reader.
+ *
+ * Decode an unsigned LEB128 encoded datum. The algorithm is taken
+ * from Appendix C of the DWARF 3 spec. For information on the
+ * encodings refer to section "7.6 - Variable Length Data".
+ */
+class Uleb128Reader {
+ public:
+  /**
+   * Decode a single ULEB128 value.  Returns after a single ULEB128 value has
+   * been read or insufficient input (call in a loop to get multiple values).
+   * If a value is returned, internal state is reset so it's safe to immediately
+   * call this function again to decode another value.
+   *
+   * @param in input data; modified as data is consumed (any unconsumed data
+   *           is left when function returns)
+   * @return value (in std::optional)
+   */
+  std::optional<uint64_t> ReadOne(span<const uint8_t>* in);
+
+ private:
+  uint64_t m_result = 0;
+  int m_shift = 0;
+};
 
 }  // namespace wpi
 
