@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "wpi/Signal.h"
 #include "wpi/span.h"
@@ -274,12 +275,12 @@ class Udp final : public HandleImpl<Udp, uv_udp_t> {
 
   void Send(const sockaddr_in& addr, span<const Buffer> bufs,
             std::function<void(span<Buffer>, Error)> callback) {
-    Send(reinterpret_cast<const sockaddr&>(addr), bufs, callback);
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, std::move(callback));
   }
 
   void Send(const sockaddr_in6& addr, span<const Buffer> bufs,
             std::function<void(span<Buffer>, Error)> callback) {
-    Send(reinterpret_cast<const sockaddr&>(addr), bufs, callback);
+    Send(reinterpret_cast<const sockaddr&>(addr), bufs, std::move(callback));
   }
 
   /**

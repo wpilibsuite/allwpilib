@@ -38,7 +38,7 @@ class AsyncFunction<R(T...)> final
  public:
   AsyncFunction(const std::shared_ptr<Loop>& loop,
                 std::function<void(promise<R>, T...)> func, const private_init&)
-      : wakeup{func}, m_loop{loop} {}
+      : wakeup{std::move(func)}, m_loop{loop} {}
   ~AsyncFunction() noexcept override {
     if (auto loop = m_loop.lock()) {
       this->Close();

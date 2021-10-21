@@ -39,7 +39,7 @@ void GetNameInfo(Loop& loop,
                  std::function<void(const char*, const char*)> callback,
                  const sockaddr& addr, int flags) {
   auto req = std::make_shared<GetNameInfoReq>();
-  req->resolved.connect(callback);
+  req->resolved.connect(std::move(callback));
   GetNameInfo(loop, req, addr, flags);
 }
 
@@ -62,7 +62,8 @@ void GetNameInfo4(Loop& loop,
   if (err < 0) {
     loop.ReportError(err);
   } else {
-    GetNameInfo(loop, callback, reinterpret_cast<const sockaddr&>(addr), flags);
+    GetNameInfo(loop, std::move(callback),
+                reinterpret_cast<const sockaddr&>(addr), flags);
   }
 }
 
@@ -85,7 +86,8 @@ void GetNameInfo6(Loop& loop,
   if (err < 0) {
     loop.ReportError(err);
   } else {
-    GetNameInfo(loop, callback, reinterpret_cast<const sockaddr&>(addr), flags);
+    GetNameInfo(loop, std::move(callback),
+                reinterpret_cast<const sockaddr&>(addr), flags);
   }
 }
 

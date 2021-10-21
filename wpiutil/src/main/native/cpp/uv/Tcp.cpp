@@ -28,7 +28,7 @@ void Tcp::Reuse(std::function<void()> callback, unsigned int flags) {
   if (!m_reuseData) {
     m_reuseData = std::make_unique<ReuseData>();
   }
-  m_reuseData->callback = callback;
+  m_reuseData->callback = std::move(callback);
   m_reuseData->flags = flags;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Tcp& h = *static_cast<Tcp*>(handle->data);
@@ -119,7 +119,7 @@ void Tcp::Connect(const sockaddr& addr,
 
 void Tcp::Connect(const sockaddr& addr, std::function<void()> callback) {
   auto req = std::make_shared<TcpConnectReq>();
-  req->connected.connect(callback);
+  req->connected.connect(std::move(callback));
   Connect(addr, req);
 }
 
@@ -141,7 +141,7 @@ void Tcp::Connect(std::string_view ip, unsigned int port,
   if (err < 0) {
     ReportError(err);
   } else {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 }
 
@@ -163,7 +163,7 @@ void Tcp::Connect6(std::string_view ip, unsigned int port,
   if (err < 0) {
     ReportError(err);
   } else {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 }
 
