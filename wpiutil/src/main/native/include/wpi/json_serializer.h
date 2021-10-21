@@ -35,7 +35,6 @@ SOFTWARE.
 
 #include <clocale> // lconv, localeconv
 #include <cmath>  // labs, isfinite, isnan, signbit, ldexp
-#include <locale> // locale
 #include <type_traits>
 
 #include "wpi/raw_ostream.h"
@@ -51,10 +50,11 @@ class json::serializer
     /*!
     @param[in] s  output stream to serialize to
     @param[in] ichar  indentation character to use
+    @param[in] indent_init_len  initial length of indentation string buffer
     */
-    serializer(raw_ostream& s, const char ichar)
-        : o(s), loc(std::localeconv()), indent_char(ichar),
-          indent_string(512, indent_char)
+    serializer(raw_ostream& s, const char ichar, size_t indent_init_len = 512)
+        : o(s), indent_char(ichar),
+          indent_string(indent_init_len, indent_char)
     {}
 
     // delete because of pointer members
@@ -197,9 +197,6 @@ class json::serializer
 
     /// a (hopefully) large enough character buffer
     std::array<char, 64> number_buffer{{}};
-
-    /// the locale
-    const std::lconv* loc = nullptr;
 
     /// the indentation character
     const char indent_char;
