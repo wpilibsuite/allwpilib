@@ -156,7 +156,7 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
 /**
  * Set joystick outputs.
  *
- * @param joystickNum the joystick numer
+ * @param joystickNum the joystick number
  * @param outputs     bitmask of outputs, 1 for on 0 for off
  * @param leftRumble  the left rumble value (0-FFFF)
  * @param rightRumble the right rumble value (0-FFFF)
