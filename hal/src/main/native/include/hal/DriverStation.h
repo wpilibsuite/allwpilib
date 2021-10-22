@@ -241,7 +241,7 @@ void HAL_ObserveUserProgramStarting(void);
  * Sets the disabled flag in the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this get called about every 50ms, or the robot will be
+ * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramDisabled(void);
@@ -250,7 +250,7 @@ void HAL_ObserveUserProgramDisabled(void);
  * Sets the autonomous enabled flag in the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this get called about every 50ms, or the robot will be
+ * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramAutonomous(void);
@@ -259,7 +259,7 @@ void HAL_ObserveUserProgramAutonomous(void);
  * Sets the teleoperated enabled flag in the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this get called about every 50ms, or the robot will be
+ * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramTeleop(void);
@@ -268,7 +268,7 @@ void HAL_ObserveUserProgramTeleop(void);
  * Sets the test mode flag in the DS.
  *
  * This is used for the DS to ensure the robot is properly responding to its
- * state request. Ensure this get called about every 50ms, or the robot will be
+ * state request. Ensure this gets called about every 50ms, or the robot will be
  * disabled by the DS.
  */
 void HAL_ObserveUserProgramTest(void);
