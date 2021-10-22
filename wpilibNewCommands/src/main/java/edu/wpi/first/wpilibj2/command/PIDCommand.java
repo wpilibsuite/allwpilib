@@ -66,9 +66,7 @@ public class PIDCommand extends CommandBase {
     this(controller, measurementSource, () -> setpoint, useOutput, requirements);
   }
 
-  /**
-   * Resets the controller. If you override this, make sure that you call super.
-   */
+  /** Resets the controller. If you override this, make sure that you call super. */
   @Override
   public void initialize() {
     m_controller.reset();

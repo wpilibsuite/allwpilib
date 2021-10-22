@@ -94,7 +94,7 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
    * Resets the controller. If you override this, make sure that you call
    * PIDCommand's implementation as well.
    */
-  void Initialize();
+  void Initialize() override;
 
   void Execute() final;
 
