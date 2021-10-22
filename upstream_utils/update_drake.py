@@ -8,7 +8,7 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/RobotLocomotion/drake",
-                                     "v0.34.0")
+                                     "v0.35.0")
     wpimath = os.path.join(root, "wpimath")
 
     # Delete old install
@@ -62,8 +62,8 @@ def main():
         ])
 
     apply_patches(root, [
-        "upstream_utils/drake-dllexport-dare.patch",
-        "upstream_utils/drake-replace-dense-with-core.patch"
+        "upstream_utils/drake-replace-dense-with-core.patch",
+        "upstream_utils/drake-dllexport-dare.patch"
     ])
 
 
