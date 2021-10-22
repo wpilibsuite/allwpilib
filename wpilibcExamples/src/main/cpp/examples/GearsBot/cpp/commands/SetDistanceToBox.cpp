@@ -16,7 +16,7 @@ SetDistanceToBox::SetDistanceToBox(double distance, DriveTrain* drivetrain)
           [drivetrain](double output) { drivetrain->Drive(output, output); },
           {drivetrain}),
       m_drivetrain(drivetrain) {
-  m_controller.SetTolerance(0.01);
+  GetController().SetTolerance(0.01);
 }
 
 // Called just before this Command runs the first time
@@ -27,5 +27,5 @@ void SetDistanceToBox::Initialize() {
 }
 
 bool SetDistanceToBox::IsFinished() {
-  return m_controller.AtSetpoint();
+  return GetController().AtSetpoint();
 }

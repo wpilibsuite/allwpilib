@@ -90,7 +90,11 @@ class PIDCommand : public CommandHelper<CommandBase, PIDCommand> {
 
   PIDCommand(const PIDCommand& other) = default;
 
-  void Initialize() final;
+  /**
+   * Resets the controller. If you override this, make sure that you call
+   * PIDCommand's implementation as well.
+   */
+  void Initialize();
 
   void Execute() final;
 
