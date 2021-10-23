@@ -8,11 +8,12 @@
 
 #include <hal/Encoder.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/NullDeleter.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/DigitalInput.h"
-#include "frc/WPIErrors.h"
-#include "frc/smartdashboard/SendableBuilder.h"
-#include "frc/smartdashboard/SendableRegistry.h"
+#include "frc/Errors.h"
 
 using namespace frc;
 
@@ -22,29 +23,31 @@ QuadratureEncoder::QuadratureEncoder(int aChannel, int bChannel,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
-  auto& registry = SendableRegistry::GetInstance();
-  registry.AddChild(this, m_aSource.get());
-  registry.AddChild(this, m_bSource.get());
+  wpi::SendableRegistry::AddChild(this, m_aSource.get());
+  wpi::SendableRegistry::AddChild(this, m_bSource.get());
 }
 
 QuadratureEncoder::QuadratureEncoder(DigitalSource* aSource,
                                      DigitalSource* bSource,
                                      bool reverseDirection,
                                      EncodingType encodingType)
-    : m_aSource(aSource, NullDeleter<DigitalSource>()),
-      m_bSource(bSource, NullDeleter<DigitalSource>()) {
-  if (m_aSource == nullptr || m_bSource == nullptr)
-    wpi_setWPIError(NullParameter);
-  else
-    InitEncoder(reverseDirection, encodingType);
+    : m_aSource(aSource, wpi::NullDeleter<DigitalSource>()),
+      m_bSource(bSource, wpi::NullDeleter<DigitalSource>()) {
+  if (!m_aSource) {
+    throw FRC_MakeError(err::NullParameter, "{}", "aSource");
+  }
+  if (!m_bSource) {
+    throw FRC_MakeError(err::NullParameter, "{}", "bSource");
+  }
+  InitEncoder(reverseDirection, encodingType);
 }
 
 QuadratureEncoder::QuadratureEncoder(DigitalSource& aSource,
                                      DigitalSource& bSource,
                                      bool reverseDirection,
                                      EncodingType encodingType)
-    : m_aSource(&aSource, NullDeleter<DigitalSource>()),
-      m_bSource(&bSource, NullDeleter<DigitalSource>()) {
+    : m_aSource(&aSource, wpi::NullDeleter<DigitalSource>()),
+      m_bSource(&bSource, wpi::NullDeleter<DigitalSource>()) {
   InitEncoder(reverseDirection, encodingType);
 }
 
@@ -52,172 +55,151 @@ QuadratureEncoder::QuadratureEncoder(std::shared_ptr<DigitalSource> aSource,
                                      std::shared_ptr<DigitalSource> bSource,
                                      bool reverseDirection,
                                      EncodingType encodingType)
-    : m_aSource(aSource), m_bSource(bSource) {
-  if (m_aSource == nullptr || m_bSource == nullptr)
-    wpi_setWPIError(NullParameter);
-  else
-    InitEncoder(reverseDirection, encodingType);
+    : m_aSource(std::move(aSource)), m_bSource(std::move(bSource)) {
+  if (!m_aSource) {
+    throw FRC_MakeError(err::NullParameter, "{}", "aSource");
+  }
+  if (!m_bSource) {
+    throw FRC_MakeError(err::NullParameter, "{}", "bSource");
+  }
+  InitEncoder(reverseDirection, encodingType);
 }
 
 QuadratureEncoder::~QuadratureEncoder() {
   int32_t status = 0;
   HAL_FreeEncoder(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_ReportError(status, "{}", "FreeEncoder");
 }
 
 int QuadratureEncoder::Get() const {
-  if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "Get");
   return value;
 }
 
 void QuadratureEncoder::Reset() {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "Reset");
 }
 
-double QuadratureEncoder::GetPeriod() const {
-  if (StatusIsFatal()) return 0.0;
+units::second_t QuadratureEncoder::GetPeriod() const {
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
-  wpi_setHALError(status);
-  return value;
+  FRC_CheckErrorStatus(status, "{}", "GetPeriod");
+  return units::second_t{value};
 }
 
-void QuadratureEncoder::SetMaxPeriod(double maxPeriod) {
-  if (StatusIsFatal()) return;
+void QuadratureEncoder::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
-  wpi_setHALError(status);
+  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.to<double>(), &status);
+  FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
 
 bool QuadratureEncoder::GetStopped() const {
-  if (StatusIsFatal()) return true;
   int32_t status = 0;
   bool value = HAL_GetEncoderStopped(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetStopped");
   return value;
 }
 
 bool QuadratureEncoder::GetDirection() const {
-  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetEncoderDirection(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetDirection");
   return value;
 }
 
 int QuadratureEncoder::GetRaw() const {
-  if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoderRaw(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetRaw");
   return value;
 }
 
 int QuadratureEncoder::GetEncodingScale() const {
   int32_t status = 0;
   int val = HAL_GetEncoderEncodingScale(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetEncodingScale");
   return val;
 }
 
 double QuadratureEncoder::GetDistance() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderDistance(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetDistance");
   return value;
 }
 
 double QuadratureEncoder::GetRate() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderRate(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetRate");
   return value;
 }
 
 void QuadratureEncoder::SetMinRate(double minRate) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMinRate(m_encoder, minRate, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "SetMinRate");
 }
 
 void QuadratureEncoder::SetDistancePerPulse(double distancePerPulse) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "SetDistancePerPulse");
 }
 
 double QuadratureEncoder::GetDistancePerPulse() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double distancePerPulse = HAL_GetEncoderDistancePerPulse(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetDistancePerPulse");
   return distancePerPulse;
 }
 
 void QuadratureEncoder::SetReverseDirection(bool reverseDirection) {
-  if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "SetReverseDirection");
 }
 
 void QuadratureEncoder::SetSamplesToAverage(int samplesToAverage) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
-    wpi_setWPIErrorWithContext(
-        ParameterOutOfRange,
-        "Average counter values must be between 1 and 127");
-    return;
+    throw FRC_MakeError(
+        err::ParameterOutOfRange,
+        "Average counter values must be between 1 and 127, got {}",
+        samplesToAverage);
   }
   int32_t status = 0;
   HAL_SetEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "SetSamplesToAverage");
 }
 
 int QuadratureEncoder::GetSamplesToAverage() const {
   int32_t status = 0;
   int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetSamplesToAverage");
   return result;
-}
-
-double QuadratureEncoder::PIDGet() {
-  if (StatusIsFatal()) return 0.0;
-  switch (GetPIDSourceType()) {
-    case PIDSourceType::kDisplacement:
-      return GetDistance();
-    case PIDSourceType::kRate:
-      return GetRate();
-    default:
-      return 0.0;
-  }
 }
 
 void QuadratureEncoder::SetIndexSource(int channel,
                                        QuadratureEncoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_shared<DigitalInput>(channel);
-  SendableRegistry::GetInstance().AddChild(this, m_indexSource.get());
+  wpi::SendableRegistry::AddChild(this, m_indexSource.get());
   SetIndexSource(*m_indexSource.get(), type);
 }
 
 void QuadratureEncoder::SetIndexSource(const DigitalSource& source,
                                        QuadratureEncoder::IndexingType type) {
   int32_t status = 0;
-  HAL_SetEncoderIndexSource(
-      m_encoder, source.GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(),
-      (HAL_EncoderIndexingType)type, &status);
-  wpi_setHALError(status);
+  HAL_SetEncoderIndexSource(m_encoder, source.GetPortHandleForRouting(),
+                            static_cast<HAL_AnalogTriggerType>(
+                                source.GetAnalogTriggerTypeForRouting()),
+                            static_cast<HAL_EncoderIndexingType>(type),
+                            &status);
+  FRC_CheckErrorStatus(status, "{}", "SetIndexSource");
 }
 
 void QuadratureEncoder::SetSimDevice(HAL_SimDeviceHandle device) {
@@ -227,24 +209,26 @@ void QuadratureEncoder::SetSimDevice(HAL_SimDeviceHandle device) {
 int QuadratureEncoder::GetFPGAIndex() const {
   int32_t status = 0;
   int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "GetFPGAIndex");
   return val;
 }
 
-void QuadratureEncoder::InitSendable(SendableBuilder& builder) {
+void QuadratureEncoder::InitSendable(wpi::SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
-  wpi_setHALError(status);
-  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X)
-    builder.SetSmartDashboardType("Quadrature Encoder");
-  else
-    builder.SetSmartDashboardType("Encoder");
+  FRC_CheckErrorStatus(status, "{}", "GetEncodingType");
+  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X) {
+    builder.SetSmartDashboardType("Quadrature QuadratureEncoder");
+  } else {
+    builder.SetSmartDashboardType("QuadratureEncoder");
+  }
 
-  builder.AddDoubleProperty("Speed", [=]() { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty("Distance", [=]() { return GetDistance(); },
-                            nullptr);
-  builder.AddDoubleProperty("Distance per Tick",
-                            [=]() { return GetDistancePerPulse(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Speed", [=] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance", [=] { return GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr);
 }
 
 void QuadratureEncoder::InitEncoder(bool reverseDirection,
@@ -252,22 +236,24 @@ void QuadratureEncoder::InitEncoder(bool reverseDirection,
   int32_t status = 0;
   m_encoder = HAL_InitializeEncoder(
       m_aSource->GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)m_aSource->GetAnalogTriggerTypeForRouting(),
+      static_cast<HAL_AnalogTriggerType>(
+          m_aSource->GetAnalogTriggerTypeForRouting()),
       m_bSource->GetPortHandleForRouting(),
-      (HAL_AnalogTriggerType)m_bSource->GetAnalogTriggerTypeForRouting(),
-      reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
-  wpi_setHALError(status);
+      static_cast<HAL_AnalogTriggerType>(
+          m_bSource->GetAnalogTriggerTypeForRouting()),
+      reverseDirection, static_cast<HAL_EncoderEncodingType>(encodingType),
+      &status);
+  FRC_CheckErrorStatus(status, "{}", "InitEncoder");
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex() + 1,
              encodingType);
-  SendableRegistry::GetInstance().AddLW(this, "QuadratureEncoder",
-                                        m_aSource->GetChannel());
+  wpi::SendableRegistry::AddLW(this, "QuadratureEncoder",
+                               m_aSource->GetChannel());
 }
 
 double QuadratureEncoder::DecodingScaleFactor() const {
-  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
-  wpi_setHALError(status);
+  FRC_CheckErrorStatus(status, "{}", "DecodingScaleFactor");
   return val;
 }

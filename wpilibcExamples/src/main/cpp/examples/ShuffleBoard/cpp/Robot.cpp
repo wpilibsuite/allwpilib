@@ -4,8 +4,8 @@
 
 #include <frc/AnalogPotentiometer.h>
 #include <frc/Joystick.h>
-#include <frc/TimedRobot.h>
 #include <frc/QuadratureEncoder.h>
+#include <frc/TimedRobot.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/shuffleboard/Shuffleboard.h>

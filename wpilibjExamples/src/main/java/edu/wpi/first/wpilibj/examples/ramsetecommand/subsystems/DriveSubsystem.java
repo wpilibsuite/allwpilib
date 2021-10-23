@@ -34,13 +34,17 @@ public class DriveSubsystem extends SubsystemBase {
 
   // The left-side drive encoder
   private final QuadratureEncoder m_leftEncoder =
-      new QuadratureEncoder(DriveConstants.kLeftEncoderPorts[0],
-              DriveConstants.kLeftEncoderPorts[1], DriveConstants.kLeftEncoderReversed);
+      new QuadratureEncoder(
+          DriveConstants.kLeftEncoderPorts[0],
+          DriveConstants.kLeftEncoderPorts[1],
+          DriveConstants.kLeftEncoderReversed);
 
   // The right-side drive encoder
   private final QuadratureEncoder m_rightEncoder =
-      new QuadratureEncoder(DriveConstants.kRightEncoderPorts[0],
-              DriveConstants.kRightEncoderPorts[1], DriveConstants.kRightEncoderReversed);
+      new QuadratureEncoder(
+          DriveConstants.kRightEncoderPorts[0],
+          DriveConstants.kRightEncoderPorts[1],
+          DriveConstants.kRightEncoderReversed);
 
   // The gyro sensor
   private final Gyro m_gyro = new ADXRS450_Gyro();

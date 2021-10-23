@@ -7,19 +7,17 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/Counter.h"
 #include "frc/CounterBase.h"
-#include "frc/ErrorBase.h"
-#include "frc/PIDSource.h"
-#include "frc/smartdashboard/Sendable.h"
-#include "frc/smartdashboard/SendableHelper.h"
 
 namespace frc {
 
 class DigitalSource;
 class DigitalGlitchFilter;
-class SendableBuilder;
 class DMA;
 class DMASample;
 
@@ -38,11 +36,9 @@ class DMASample;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class QuadratureEncoder : public ErrorBase,
-                public CounterBase,
-                public PIDSource,
-                public Sendable,
-                public SendableHelper<QuadratureEncoder> {
+class QuadratureEncoder : public CounterBase,
+                          public wpi::Sendable,
+                          public wpi::SendableHelper<QuadratureEncoder> {
   friend class DMA;
   friend class DMASample;
 
@@ -176,7 +172,7 @@ class QuadratureEncoder : public ErrorBase,
    *
    * @return Period in seconds of the most recent pulse.
    */
-  double GetPeriod() const override;
+  units::second_t GetPeriod() const override;
 
   /**
    * Sets the maximum period for stopped detection.
@@ -194,7 +190,10 @@ class QuadratureEncoder : public ErrorBase,
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
    */
-  void SetMaxPeriod(double maxPeriod) override;
+  WPI_DEPRECATED(
+      "Use SetMinRate() in favor of this method.  This takes unscaled periods "
+      "and SetMinRate() scales using value from SetDistancePerPulse().")
+  void SetMaxPeriod(units::second_t maxPeriod) override;
 
   /**
    * Determine if the encoder is stopped.
@@ -316,8 +315,6 @@ class QuadratureEncoder : public ErrorBase,
    */
   int GetSamplesToAverage() const;
 
-  double PIDGet() override;
-
   /**
    * Set the index source for the encoder.
    *
@@ -333,8 +330,8 @@ class QuadratureEncoder : public ErrorBase,
    *
    * When this source is activated, the encoder count automatically resets.
    *
-   * @param channel A digital source to set as the encoder index
-   * @param type    The state that will cause the encoder to reset
+   * @param source A digital source to set as the encoder index
+   * @param type   The state that will cause the encoder to reset
    */
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);
@@ -348,13 +345,13 @@ class QuadratureEncoder : public ErrorBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   /**
-   * Common initialization code for QuadratureEncoders.
+   * Common initialization code for Encoders.
    *
-   * This code allocates resources for QuadratureEncoders and is common to all
+   * This code allocates resources for Encoders and is common to all
    * constructors. The counter will start counting immediately.
    *
    * @param reverseDirection If true, counts down instead of up (this is all

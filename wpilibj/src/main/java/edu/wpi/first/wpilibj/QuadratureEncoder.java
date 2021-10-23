@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
 import edu.wpi.first.hal.EncoderJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -13,27 +15,26 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
 /**
  * Class to read quadrature encoders.
  *
  * <p>Quadrature encoders are devices that count shaft rotation and can sense direction. The output
- * of the QuadratureEncoder class is an integer that can count either up or down,
- * and can go negative for reverse direction counting.
- * When creating Encoders, a direction can be supplied that inverts the
- * sense of the output to make code more readable if the encoder is mounted such that forward
- * movement generates negative values. Quadrature encoders have two digital outputs, an A Channel
- * and a B Channel, that are out of phase with each other for direction sensing.
+ * of the QuadratureEncoder class is an integer that can count either up or down, and can go
+ * negative for reverse direction counting. When creating Encoders, a direction can be supplied that
+ * inverts the sense of the output to make code more readable if the encoder is mounted such that
+ * forward movement generates negative values. Quadrature encoders have two digital outputs, an A
+ * Channel and a B Channel, that are out of phase with each other for direction sensing.
  *
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
 public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   public enum IndexingType {
-    kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
+    kResetWhileHigh(0),
+    kResetWhileLow(1),
+    kResetOnFallingEdge(2),
+    kResetOnRisingEdge(3);
 
-    @SuppressWarnings("MemberName")
     public final int value;
 
     IndexingType(int value) {
@@ -41,26 +42,19 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
     }
   }
 
-  /**
-   * The a source.
-   */
-  @SuppressWarnings("MemberName")
+  /** The a source. */
   protected DigitalSource m_aSource; // the A phase of the quad encoder
-  /**
-   * The b source.
-   */
-  @SuppressWarnings("MemberName")
+  /** The b source. */
   protected DigitalSource m_bSource; // the B phase of the quad encoder
-  /**
-   * The index source.
-   */
+  /** The index source. */
   protected DigitalSource m_indexSource; // Index on some encoders
+
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
+  private final EncodingType m_encodingType;
 
-  private int m_encoder; // the HAL encoder object
-
+  int m_encoder; // the HAL encoder object
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -71,9 +65,14 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(),
-        m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
-        m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
+    m_encoder =
+        EncoderJNI.initializeEncoder(
+            m_aSource.getPortHandleForRouting(),
+            m_aSource.getAnalogTriggerTypeForRouting(),
+            m_bSource.getPortHandleForRouting(),
+            m_bSource.getAnalogTriggerTypeForRouting(),
+            reverseDirection,
+            type.value);
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex + 1, type.value + 1);
@@ -85,10 +84,10 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
-   * @param channelB         The b channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelA The a channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
+   * @param channelB The b channel DIO channel. 0-9 are on-board, 10-25 are on the MXP port
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
   public QuadratureEncoder(final int channelA, final int channelB, boolean reverseDirection) {
     this(channelA, channelB, reverseDirection, EncodingType.k4X);
@@ -111,19 +110,21 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel digital input channel.
-   * @param channelB         The b channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
-   *                         selected, then an encoder FPGA object is used and the returned counts
-   *                         will be 4x the encoder spec'd value since all rising and falling edges
-   *                         are counted. If 1X or 2X are selected then a m_counter object will be
-   *                         used and the returned value will either exactly match the spec'd count
-   *                         or be double (2x) the spec'd count.
+   *     if necessary so forward represents positive values.
+   * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+   *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
+   *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
+   *     selected then a m_counter object will be used and the returned value will either exactly
+   *     match the spec'd count or be double (2x) the spec'd count.
    */
-  public QuadratureEncoder(final int channelA, final int channelB, boolean reverseDirection,
-                 final EncodingType encodingType) {
+  public QuadratureEncoder(
+      final int channelA,
+      final int channelB,
+      boolean reverseDirection,
+      final EncodingType encodingType) {
     requireNonNullParam(encodingType, "encodingType", "QuadratureEncoder");
 
     m_allocatedA = true;
@@ -131,25 +132,26 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
+    m_encodingType = encodingType;
     SendableRegistry.addChild(this, m_aSource);
     SendableRegistry.addChild(this, m_bSource);
     initEncoder(reverseDirection, encodingType);
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels.
-   * Using an index pulse forces 4x encoding
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels. Using an
+   * index pulse forces 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA         The a channel digital input channel.
-   * @param channelB         The b channel digital input channel.
-   * @param indexChannel     The index channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
+   * @param indexChannel The index channel digital input channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
-  public QuadratureEncoder(final int channelA, final int channelB, final int indexChannel,
-                 boolean reverseDirection) {
+  public QuadratureEncoder(
+      final int channelA, final int channelB, final int indexChannel, boolean reverseDirection) {
     this(channelA, channelB, reverseDirection);
     m_allocatedI = true;
     m_indexSource = new DigitalInput(indexChannel);
@@ -158,13 +160,13 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels.
-   * Using an index pulse forces 4x encoding
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels. Using an
+   * index pulse forces 4x encoding
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param channelA     The a channel digital input channel.
-   * @param channelB     The b channel digital input channel.
+   * @param channelA The a channel digital input channel.
+   * @param channelB The b channel digital input channel.
    * @param indexChannel The index channel digital input channel.
    */
   public QuadratureEncoder(final int channelA, final int channelB, final int indexChannel) {
@@ -172,29 +174,25 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * QuadratureEncoder constructor.
-   * Construct a QuadratureEncoder given a and b channels as digital inputs.
-   * This is used in the case where the digital inputs are shared.
-   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
-   * already are counted.
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital
+   * inputs. This is used in the case where the digital inputs are shared. The QuadratureEncoder
+   * class will not allocate the digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the a channel.
+   * @param sourceB the source that should be used for the b channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
   public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection) {
     this(sourceA, sourceB, reverseDirection, EncodingType.k4X);
   }
 
   /**
-   * QuadratureEncoder constructor.
-   * Construct a QuadratureEncoder given a and b channels as digital inputs.
-   * This is used in the case where the digital inputs are shared.
-   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
-   * already are counted.
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital
+   * inputs. This is used in the case where the digital inputs are shared. The QuadratureEncoder
+   * class will not allocate the digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
@@ -206,27 +204,27 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * QuadratureEncoder constructor.
-   * Construct a QuadratureEncoder given a and b channels as digital inputs.
-   * This is used in the case where the digital inputs are shared.
-   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
-   * already are counted.
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a and b channels as digital
+   * inputs. This is used in the case where the digital inputs are shared. The QuadratureEncoder
+   * class will not allocate the digital inputs and assume that they already are counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the a channel.
+   * @param sourceB the source that should be used for the b channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
-   * @param encodingType     either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
-   *                         selected, then an encoder FPGA object is used and the returned counts
-   *                         will be 4x the encoder spec'd value since all rising and falling edges
-   *                         are counted. If 1X or 2X are selected then a m_counter object will be
-   *                         used and the returned value will either exactly match the spec'd count
-   *                         or be double (2x) the spec'd count.
+   *     if necessary so forward represents positive values.
+   * @param encodingType either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is
+   *     selected, then an encoder FPGA object is used and the returned counts will be 4x the
+   *     encoder spec'd value since all rising and falling edges are counted. If 1X or 2X are
+   *     selected then a m_counter object will be used and the returned value will either exactly
+   *     match the spec'd count or be double (2x) the spec'd count.
    */
-  public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
-                 final EncodingType encodingType) {
+  public QuadratureEncoder(
+      DigitalSource sourceA,
+      DigitalSource sourceB,
+      boolean reverseDirection,
+      final EncodingType encodingType) {
     requireNonNullParam(sourceA, "sourceA", "QuadratureEncoder");
     requireNonNullParam(sourceB, "sourceB", "QuadratureEncoder");
     requireNonNullParam(encodingType, "encodingType", "QuadratureEncoder");
@@ -234,28 +232,31 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
+    m_encodingType = encodingType;
     m_aSource = sourceA;
     m_bSource = sourceB;
     initEncoder(reverseDirection, encodingType);
   }
 
   /**
-   * QuadratureEncoder constructor.
-   * Construct a QuadratureEncoder given a and b channels as digital inputs.
-   * This is used in the case where the digital inputs are shared.
-   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
-   * already are counted.
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a, b and index channels as
+   * digital inputs. This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume that they already are
+   * counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA          The source that should be used for the a channel.
-   * @param sourceB          the source that should be used for the b channel.
-   * @param indexSource      the source that should be used for the index channel.
+   * @param sourceA The source that should be used for the a channel.
+   * @param sourceB the source that should be used for the b channel.
+   * @param indexSource the source that should be used for the index channel.
    * @param reverseDirection represents the orientation of the encoder and inverts the output values
-   *                         if necessary so forward represents positive values.
+   *     if necessary so forward represents positive values.
    */
-  public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
-                 boolean reverseDirection) {
+  public QuadratureEncoder(
+      DigitalSource sourceA,
+      DigitalSource sourceB,
+      DigitalSource indexSource,
+      boolean reverseDirection) {
     this(sourceA, sourceB, reverseDirection);
     m_allocatedI = false;
     m_indexSource = indexSource;
@@ -263,20 +264,19 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * QuadratureEncoder constructor.
-   * Construct a QuadratureEncoder given a and b channels as digital inputs.
-   * This is used in the case where the digital inputs are shared.
-   * The QuadratureEncoder class will not allocate the digital inputs and assume that they
-   * already are counted.
+   * QuadratureEncoder constructor. Construct a QuadratureEncoder given a, b and index channels as
+   * digital inputs. This is used in the case where the digital inputs are shared. The
+   * QuadratureEncoder class will not allocate the digital inputs and assume that they already are
+   * counted.
    *
    * <p>The encoder will start counting immediately.
    *
-   * @param sourceA     The source that should be used for the a channel.
-   * @param sourceB     the source that should be used for the b channel.
+   * @param sourceA The source that should be used for the a channel.
+   * @param sourceB the source that should be used for the b channel.
    * @param indexSource the source that should be used for the index channel.
    */
-  public QuadratureEncoder(DigitalSource sourceA, DigitalSource sourceB,
-                            DigitalSource indexSource) {
+  public QuadratureEncoder(
+      DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource) {
     this(sourceA, sourceB, indexSource, false);
   }
 
@@ -333,10 +333,10 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the current count. Returns the current count on the QuadratureEncoder.
-   * This method compensates for the decoding type.
+   * Gets the current count. Returns the current count on the QuadratureEncoder. This method
+   * compensates for the decoding type.
    *
-   * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
+   * @return Current count from the QuadratureEncoder adjusted for the 1x, 2x, or 4x scale factor.
    */
   @Override
   public int get() {
@@ -344,7 +344,7 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Reset the Encoder distance to zero. Resets the current count to zero on the encoder.
+   * Reset the QuadratureEncoder distance to zero. Resets the current count to zero on the encoder.
    */
   @Override
   public void reset() {
@@ -352,8 +352,8 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
   }
 
   /**
-   * Returns the period of the most recent pulse. Returns the period of the most recent Encoder
-   * pulse in seconds. This method compensates for the decoding type.
+   * Returns the period of the most recent pulse. Returns the period of the most recent
+   * QuadratureEncoder pulse in seconds. This method compensates for the decoding type.
    *
    * <p><b>Warning:</b> This returns unscaled periods. Use getRate() for rates that are scaled using
    * the value from setDistancePerPulse().
@@ -369,12 +369,12 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
 
   /**
    * Sets the maximum period for stopped detection. Sets the value that represents the maximum
-   * period of the Encoder before it will assume that the attached device is stopped. This timeout
-   * allows users to determine if the wheels or other shaft has stopped rotating. This method
-   * compensates for the decoding type.
+   * period of the QuadratureEncoder before it will assume that the attached device is stopped. This
+   * timeout allows users to determine if the wheels or other shaft has stopped rotating. This
+   * method compensates for the decoding type.
    *
    * @param maxPeriod The maximum time between rising and falling edges before the FPGA will report
-   *                  the device stopped. This is expressed in seconds.
+   *     the device stopped. This is expressed in seconds.
    */
   @Override
   public void setMaxPeriod(double maxPeriod) {
@@ -427,7 +427,7 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    * Set the minimum rate of the device before the hardware reports it stopped.
    *
    * @param minRate The minimum rate. The units are in distance per second as scaled by the value
-   *                from setDistancePerPulse().
+   *     from setDistancePerPulse().
    */
   public void setMinRate(double minRate) {
     EncoderJNI.setEncoderMinRate(m_encoder, minRate);
@@ -512,7 +512,7 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    * resets.
    *
    * @param channel A DIO channel to set as the encoder index
-   * @param type    The state that will cause the encoder to reset
+   * @param type The state that will cause the encoder to reset
    */
   public void setIndexSource(int channel, IndexingType type) {
     if (m_allocatedI) {
@@ -529,11 +529,14 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
    * resets.
    *
    * @param source A digital source to set as the encoder index
-   * @param type   The state that will cause the encoder to reset
+   * @param type The state that will cause the encoder to reset
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
-    EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting(), type.value);
+    EncoderJNI.setEncoderIndexSource(
+        m_encoder,
+        source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting(),
+        type.value);
   }
 
   /**
@@ -545,12 +548,30 @@ public class QuadratureEncoder implements CounterBase, Sendable, AutoCloseable {
     EncoderJNI.setEncoderSimDevice(m_encoder, device.getNativeHandle());
   }
 
+  /**
+   * Gets the decoding scale factor for scaling raw values to full counts.
+   *
+   * @return decoding scale factor
+   */
+  public double getDecodingScaleFactor() {
+    switch (m_encodingType) {
+      case k1X:
+        return 1.0;
+      case k2X:
+        return 0.5;
+      case k4X:
+        return 0.25;
+      default:
+        return 0.0;
+    }
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
       builder.setSmartDashboardType("Quadrature Encoder");
     } else {
-      builder.setSmartDashboardType("Encoder");
+      builder.setSmartDashboardType("QuadratureEncoder");
     }
 
     builder.addDoubleProperty("Speed", this::getRate, null);
