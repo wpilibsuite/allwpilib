@@ -64,7 +64,7 @@ Rotation2d Rotation2d::RotateBy(const Rotation2d& other) const {
 }
 
 void frc::to_json(wpi::json& json, const Rotation2d& rotation) {
-  json = wpi::json{{"radians", rotation.Radians().to<double>()}};
+  json = wpi::json{{"radians", rotation.Radians().value()}};
 }
 
 void frc::from_json(const wpi::json& json, Rotation2d& rotation) {

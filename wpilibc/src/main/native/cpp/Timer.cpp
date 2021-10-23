@@ -13,8 +13,7 @@
 namespace frc {
 
 void Wait(units::second_t seconds) {
-  std::this_thread::sleep_for(
-      std::chrono::duration<double>(seconds.to<double>()));
+  std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
 units::second_t GetTime() {

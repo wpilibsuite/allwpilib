@@ -47,9 +47,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt /
                (motor.R * units::math::pow<2>(r) * m * motor.Kv))
-                  .to<double>()}};
-    Eigen::Matrix<double, 2, 1> B{
-        0.0, (G * motor.Kt / (motor.R * r * m)).to<double>()};
+                  .value()}};
+    Eigen::Matrix<double, 2, 1> B{0.0,
+                                  (G * motor.Kt / (motor.R * r * m)).value()};
     Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
     Eigen::Matrix<double, 1, 1> D{0.0};
 
@@ -71,10 +71,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
       DCMotor motor, units::kilogram_square_meter_t J, double G) {
     Eigen::Matrix<double, 2, 2> A{
         {0.0, 1.0},
-        {0.0,
-         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>()}};
-    Eigen::Matrix<double, 2, 1> B{0.0,
-                                  (G * motor.Kt / (motor.R * J)).to<double>()};
+        {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
+    Eigen::Matrix<double, 2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
     Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
     Eigen::Matrix<double, 1, 1> D{0.0};
 
@@ -107,9 +105,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    Eigen::Matrix<double, 1, 1> A{-kV.template to<double>() /
-                                  kA.template to<double>()};
-    Eigen::Matrix<double, 1, 1> B{1.0 / kA.template to<double>()};
+    Eigen::Matrix<double, 1, 1> A{-kV.value() / kA.value()};
+    Eigen::Matrix<double, 1, 1> B{1.0 / kA.value()};
     Eigen::Matrix<double, 1, 1> C{1.0};
     Eigen::Matrix<double, 1, 1> D{0.0};
 
@@ -142,10 +139,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    Eigen::Matrix<double, 2, 2> A{
-        {0.0, 1.0},
-        {0.0, -kV.template to<double>() / kA.template to<double>()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.template to<double>()};
+    Eigen::Matrix<double, 2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.value()};
     Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
     Eigen::Matrix<double, 1, 1> D{0.0};
 
@@ -170,12 +165,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
       decltype(1_V / 1_mps) kVangular, decltype(1_V / 1_mps_sq) kAangular) {
-    double A1 = -(kVlinear.to<double>() / kAlinear.to<double>() +
-                  kVangular.to<double>() / kAangular.to<double>());
-    double A2 = -(kVlinear.to<double>() / kAlinear.to<double>() -
-                  kVangular.to<double>() / kAangular.to<double>());
-    double B1 = 1.0 / kAlinear.to<double>() + 1.0 / kAangular.to<double>();
-    double B2 = 1.0 / kAlinear.to<double>() - 1.0 / kAangular.to<double>();
+    double A1 = -(kVlinear.value() / kAlinear.value() +
+                  kVangular.value() / kAangular.value());
+    double A2 = -(kVlinear.value() / kAlinear.value() -
+                  kVangular.value() / kAangular.value());
+    double B1 = 1.0 / kAlinear.value() + 1.0 / kAangular.value();
+    double B2 = 1.0 / kAlinear.value() - 1.0 / kAangular.value();
 
     Eigen::Matrix<double, 2, 2> A =
         0.5 * Eigen::Matrix<double, 2, 2>{{A1, A2}, {A2, A1}};
@@ -239,8 +234,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
                                               units::kilogram_square_meter_t J,
                                               double G) {
     Eigen::Matrix<double, 1, 1> A{
-        (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).to<double>()};
-    Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).to<double>()};
+        (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()};
+    Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
     Eigen::Matrix<double, 1, 1> C{1.0};
     Eigen::Matrix<double, 1, 1> D{0.0};
 
@@ -269,15 +264,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
     auto C2 = G * motor.Kt / (motor.R * r);
 
     Eigen::Matrix<double, 2, 2> A{
-        {((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C1).to<double>(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C1).to<double>()}};
+        {((1 / m + units::math::pow<2>(rb) / J) * C1).value(),
+         ((1 / m - units::math::pow<2>(rb) / J) * C1).value()},
+        {((1 / m - units::math::pow<2>(rb) / J) * C1).value(),
+         ((1 / m + units::math::pow<2>(rb) / J) * C1).value()}};
     Eigen::Matrix<double, 2, 2> B{
-        {((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C2).to<double>(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C2).to<double>()}};
+        {((1 / m + units::math::pow<2>(rb) / J) * C2).value(),
+         ((1 / m - units::math::pow<2>(rb) / J) * C2).value()},
+        {((1 / m - units::math::pow<2>(rb) / J) * C2).value(),
+         ((1 / m + units::math::pow<2>(rb) / J) * C2).value()}};
     Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 

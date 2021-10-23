@@ -261,17 +261,17 @@ static DisplayUnits gDisplayUnits = kDisplayMeters;
 static double ConvertDisplayLength(units::meter_t v) {
   switch (gDisplayUnits) {
     case kDisplayFeet:
-      return v.convert<units::feet>().to<double>();
+      return v.convert<units::feet>().value();
     case kDisplayInches:
-      return v.convert<units::inches>().to<double>();
+      return v.convert<units::inches>().value();
     case kDisplayMeters:
     default:
-      return v.to<double>();
+      return v.value();
   }
 }
 
 static double ConvertDisplayAngle(units::degree_t v) {
-  return v.to<double>();
+  return v.value();
 }
 
 static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,

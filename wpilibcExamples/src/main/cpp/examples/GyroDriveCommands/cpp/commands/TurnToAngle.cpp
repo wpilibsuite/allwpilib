@@ -12,9 +12,9 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
     : CommandHelper(
           frc2::PIDController(kTurnP, kTurnI, kTurnD),
           // Close loop on heading
-          [drive] { return drive->GetHeading().to<double>(); },
+          [drive] { return drive->GetHeading().value(); },
           // Set reference to target
-          target.to<double>(),
+          target.value(),
           // Pipe output to turn robot
           [drive](double output) { drive->ArcadeDrive(0, output); },
           // Require the drive
@@ -24,8 +24,7 @@ TurnToAngle::TurnToAngle(units::degree_t target, DriveSubsystem* drive)
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  m_controller.SetTolerance(kTurnTolerance.to<double>(),
-                            kTurnRateTolerance.to<double>());
+  m_controller.SetTolerance(kTurnTolerance.value(), kTurnRateTolerance.value());
 
   AddRequirements({drive});
 }

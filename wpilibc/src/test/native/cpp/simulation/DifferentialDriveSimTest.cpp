@@ -43,13 +43,13 @@ TEST(DifferentialDriveSimTest, Convergence) {
       frc::Pose2d(), {}, frc::Pose2d(2_m, 2_m, 0_rad), config);
 
   // NOLINTNEXTLINE
-  for (double t = 0; t < trajectory.TotalTime().to<double>(); t += 0.02) {
+  for (double t = 0; t < trajectory.TotalTime().value(); t += 0.02) {
     auto state = trajectory.Sample(20_ms);
     auto ramseteOut = ramsete.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelSpeeds(ramseteOut);
-    auto voltages = feedforward.Calculate(
-        Eigen::Vector<double, 2>{l.to<double>(), r.to<double>()});
+    auto voltages =
+        feedforward.Calculate(Eigen::Vector<double, 2>{l.value(), r.value()});
 
     // Sim periodic code.
     sim.SetInputs(units::volt_t(voltages(0, 0)), units::volt_t(voltages(1, 0)));
@@ -65,10 +65,9 @@ TEST(DifferentialDriveSimTest, Convergence) {
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
   // ODE solution using RK4 anyway
-  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().to<double>(), 0.05);
-  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().to<double>(), 0.05);
-  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().to<double>(),
-              0.01);
+  EXPECT_NEAR(groundTruthX(0, 0), sim.GetPose().X().value(), 0.05);
+  EXPECT_NEAR(groundTruthX(1, 0), sim.GetPose().Y().value(), 0.05);
+  EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);
 }
 
 TEST(DifferentialDriveSimTest, Current) {

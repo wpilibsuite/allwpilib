@@ -26,9 +26,9 @@ TEST_F(MecanumDriveOdometryTest, MultipleConsecutiveUpdates) {
   odometry.UpdateWithTime(0_s, Rotation2d(), wheelSpeeds);
   auto secondPose = odometry.UpdateWithTime(0.0_s, Rotation2d(), wheelSpeeds);
 
-  EXPECT_NEAR(secondPose.X().to<double>(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Y().to<double>(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().Radians().to<double>(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
+  EXPECT_NEAR(secondPose.Rotation().Radians().value(), 0.0, 0.01);
 }
 
 TEST_F(MecanumDriveOdometryTest, TwoIterations) {
@@ -38,9 +38,9 @@ TEST_F(MecanumDriveOdometryTest, TwoIterations) {
   odometry.UpdateWithTime(0_s, Rotation2d(), MecanumDriveWheelSpeeds{});
   auto pose = odometry.UpdateWithTime(0.10_s, Rotation2d(), speeds);
 
-  EXPECT_NEAR(pose.X().to<double>(), 0.3536, 0.01);
-  EXPECT_NEAR(pose.Y().to<double>(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().to<double>(), 0.0, 0.01);
+  EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
+  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
 }
 
 TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
@@ -50,9 +50,9 @@ TEST_F(MecanumDriveOdometryTest, 90DegreeTurn) {
   odometry.UpdateWithTime(0_s, Rotation2d(), MecanumDriveWheelSpeeds{});
   auto pose = odometry.UpdateWithTime(1_s, Rotation2d(90_deg), speeds);
 
-  EXPECT_NEAR(pose.X().to<double>(), 8.4855, 0.01);
-  EXPECT_NEAR(pose.Y().to<double>(), 8.4855, 0.01);
-  EXPECT_NEAR(pose.Rotation().Degrees().to<double>(), 90.0, 0.01);
+  EXPECT_NEAR(pose.X().value(), 8.4855, 0.01);
+  EXPECT_NEAR(pose.Y().value(), 8.4855, 0.01);
+  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, 0.01);
 }
 
 TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
@@ -63,7 +63,7 @@ TEST_F(MecanumDriveOdometryTest, GyroAngleReset) {
   odometry.UpdateWithTime(0_s, Rotation2d(90_deg), MecanumDriveWheelSpeeds{});
   auto pose = odometry.UpdateWithTime(0.10_s, Rotation2d(90_deg), speeds);
 
-  EXPECT_NEAR(pose.X().to<double>(), 0.3536, 0.01);
-  EXPECT_NEAR(pose.Y().to<double>(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().to<double>(), 0.0, 0.01);
+  EXPECT_NEAR(pose.X().value(), 0.3536, 0.01);
+  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
+  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
 }

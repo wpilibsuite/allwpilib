@@ -125,7 +125,7 @@ class LinearFilter {
    */
   static LinearFilter<T> SinglePoleIIR(double timeConstant,
                                        units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
 
@@ -144,7 +144,7 @@ class LinearFilter {
    *                     user.
    */
   static LinearFilter<T> HighPass(double timeConstant, units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
 
@@ -225,7 +225,7 @@ class LinearFilter {
     }
 
     Eigen::Vector<double, Samples> a =
-        S.householderQr().solve(d) / std::pow(period.to<double>(), Derivative);
+        S.householderQr().solve(d) / std::pow(period.value(), Derivative);
 
     // Reverse gains list
     std::vector<double> gains;

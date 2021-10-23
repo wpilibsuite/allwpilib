@@ -87,7 +87,7 @@ units::second_t Encoder::GetPeriod() const {
 
 void Encoder::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.to<double>(), &status);
+  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
 

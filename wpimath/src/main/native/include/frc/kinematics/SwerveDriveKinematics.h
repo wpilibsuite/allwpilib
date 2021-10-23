@@ -65,8 +65,8 @@ class SwerveDriveKinematics {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).template to<double>(),
-        0, 1, (+m_modules[i].X()).template to<double>();
+        1, 0, (-m_modules[i].Y()).value(),
+        0, 1, (+m_modules[i].X()).value();
       // clang-format on
     }
 
@@ -82,8 +82,8 @@ class SwerveDriveKinematics {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).template to<double>(),
-        0, 1, (+m_modules[i].X()).template to<double>();
+        1, 0, (-m_modules[i].Y()).value(),
+        0, 1, (+m_modules[i].X()).value();
       // clang-format on
     }
 

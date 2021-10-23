@@ -19,8 +19,8 @@ TEST(TrajectoryConcatenateTest, States) {
     const auto& state = t.States()[i];
 
     // Make sure that the timestamps are strictly increasing.
-    EXPECT_GT(state.t.to<double>(), time);
-    time = state.t.to<double>();
+    EXPECT_GT(state.t.value(), time);
+    time = state.t.value();
 
     // Ensure that the states in t are the same as those in t1 and t2.
     if (i < t1.States().size()) {

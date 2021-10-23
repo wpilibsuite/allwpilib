@@ -25,7 +25,7 @@ Eigen::Vector<double, States> AngleResidual(
     const Eigen::Vector<double, States>& b, int angleStateIdx) {
   Eigen::Vector<double, States> ret = a - b;
   ret[angleStateIdx] =
-      AngleModulus(units::radian_t{ret[angleStateIdx]}).to<double>();
+      AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
   return ret;
 }
 

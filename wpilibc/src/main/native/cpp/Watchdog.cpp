@@ -80,7 +80,7 @@ void Watchdog::Impl::UpdateAlarm() {
   } else {
     HAL_UpdateNotifierAlarm(
         notifier,
-        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.to<double>() *
+        static_cast<uint64_t>(m_watchdogs.top()->m_expirationTime.value() *
                               1e6),
         &status);
   }
@@ -114,7 +114,7 @@ void Watchdog::Impl::Main() {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
         FRC_ReportError(warn::Warning, "Watchdog not fed within {:.6f}s",
-                        watchdog->m_timeout.to<double>());
+                        watchdog->m_timeout.value());
       }
     }
 

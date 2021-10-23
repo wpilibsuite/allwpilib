@@ -66,8 +66,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
       Eigen::Matrix<double, 2, 2>>(
       [&](units::second_t t, const Eigen::Matrix<double, 2, 2>&) {
         return Eigen::Matrix<double, 2, 2>(
-            (contA * t.to<double>()).exp() * contQ *
-            (contA.transpose() * t.to<double>()).exp());
+            (contA * t.value()).exp() * contQ *
+            (contA.transpose() * t.value()).exp());
       },
       0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
@@ -96,8 +96,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
       Eigen::Matrix<double, 2, 2>>(
       [&](units::second_t t, const Eigen::Matrix<double, 2, 2>&) {
         return Eigen::Matrix<double, 2, 2>(
-            (contA * t.to<double>()).exp() * contQ *
-            (contA.transpose() * t.to<double>()).exp());
+            (contA * t.value()).exp() * contQ *
+            (contA.transpose() * t.value()).exp());
       },
       0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
@@ -134,8 +134,8 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQTaylor) {
       Eigen::Matrix<double, 2, 2>>(
       [&](units::second_t t, const Eigen::Matrix<double, 2, 2>&) {
         return Eigen::Matrix<double, 2, 2>(
-            (contA * t.to<double>()).exp() * contQ *
-            (contA.transpose() * t.to<double>()).exp());
+            (contA * t.value()).exp() * contQ *
+            (contA.transpose() * t.value()).exp());
       },
       0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 
@@ -178,8 +178,8 @@ TEST(DiscretizationTest, DiscretizeFastModelAQTaylor) {
       Eigen::Matrix<double, 2, 2>>(
       [&](units::second_t t, const Eigen::Matrix<double, 2, 2>&) {
         return Eigen::Matrix<double, 2, 2>(
-            (contA * t.to<double>()).exp() * contQ *
-            (contA.transpose() * t.to<double>()).exp());
+            (contA * t.value()).exp() * contQ *
+            (contA.transpose() * t.value()).exp());
       },
       0_s, Eigen::Matrix<double, 2, 2>::Zero(), dt);
 

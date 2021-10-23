@@ -106,7 +106,7 @@ class LinearFilterOutputTest
 TEST_P(LinearFilterOutputTest, Output) {
   double filterOutput = 0.0;
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    filterOutput = m_filter.Calculate(m_data(t.to<double>()));
+    filterOutput = m_filter.Calculate(m_data(t.value()));
   }
 
   RecordProperty("LinearFilterOutput", filterOutput);
@@ -126,18 +126,17 @@ void AssertResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
       frc::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
           h);
 
-  for (int i = min / h.to<double>(); i < max / h.to<double>(); ++i) {
+  for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize
-    if (i < static_cast<int>(min / h.to<double>()) + Samples) {
-      filter.Calculate(f(i * h.to<double>()));
+    if (i < static_cast<int>(min / h.value()) + Samples) {
+      filter.Calculate(f(i * h.value()));
       continue;
     }
 
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx(i * h.to<double>()),
-                filter.Calculate(f(i * h.to<double>())),
-                10.0 * std::pow(h.to<double>(), Samples - Derivative));
+    EXPECT_NEAR(dfdx(i * h.value()), filter.Calculate(f(i * h.value())),
+                10.0 * std::pow(h.value(), Samples - Derivative));
   }
 }
 

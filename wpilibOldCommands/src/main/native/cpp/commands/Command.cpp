@@ -34,7 +34,7 @@ Command::Command(std::string_view name, units::second_t timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0_s && timeout != -1_s) {
     throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
-                        timeout.to<double>());
+                        timeout.value());
   }
 
   m_timeout = timeout;
@@ -177,7 +177,7 @@ int Command::GetID() const {
 void Command::SetTimeout(units::second_t timeout) {
   if (timeout < 0_s) {
     throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
-                        timeout.to<double>());
+                        timeout.value());
   } else {
     m_timeout = timeout;
   }
