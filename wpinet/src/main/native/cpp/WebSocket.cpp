@@ -11,6 +11,7 @@
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
+#include <wpi/raw_ostream.h>
 #include <wpi/sha1.h>
 
 #include "wpinet/HttpParser.h"
@@ -502,6 +503,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               return Fail(1002, "incomplete fragment");
             }
             if (!m_combineFragments || fin) {
+              fmt::print(
+                  "WS RecvText({})\n",
+                  std::string_view{reinterpret_cast<char*>(m_payload.data()),
+                                   m_payload.size()});
               text(std::string_view{reinterpret_cast<char*>(m_payload.data()),
                                     m_payload.size()},
                    fin);
@@ -515,6 +520,13 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
               return Fail(1002, "incomplete fragment");
             }
             if (!m_combineFragments || fin) {
+              SmallString<128> str;
+              raw_svector_ostream stros{str};
+              for (auto ch : m_payload) {
+                stros << fmt::format("{:02x},",
+                                     static_cast<unsigned int>(ch) & 0xff);
+              }
+              fmt::print("WS RecvBinary({})\n", str.str());
               binary(m_payload, fin);
             }
             if (!fin) {
@@ -590,6 +602,22 @@ void WebSocket::Send(
     SmallVector<uv::Buffer, 4> bufs{data.begin(), data.end()};
     callback(bufs, uv::Error{err});
     return;
+  }
+  if (opcode & kOpText) {
+    SmallString<128> str;
+    for (auto&& d : data) {
+      str.append(std::string_view(d.base, d.len));
+    }
+    fmt::print("WS SendText({})\n", str.str());
+  } else {
+    SmallString<128> str;
+    raw_svector_ostream stros{str};
+    for (auto&& d : data) {
+      for (auto ch : d.data()) {
+        stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+      }
+    }
+    fmt::print("WS SendBinary({})\n", str.str());
   }
 
   auto req = std::make_shared<WebSocketWriteReq>(std::move(callback));
