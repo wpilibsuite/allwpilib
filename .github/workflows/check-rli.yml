@@ -1,0 +1,26 @@
+name: Check RLIs
+on: [pull_request]
+
+jobs:
+  check-rlis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frc-docs
+        uses: actions/checkout@v2
+        with:
+          repository: wpilibsuite/frc-docs
+
+      - name: Inspect RLIs
+        uses: Starlight220/Inspector@v1.6
+        id: inspector
+        with:
+          root: ${{ github.workspace }}
+          baseUrl: 'https://raw.githubusercontent.com/wpilibsuite/allwpilib/'
+          versionScheme: 'v\d{4}\.\d\.\d(?:-(?:alpha|beta)-\d)?|[0-9a-f]{40}'
+          latestVersion: ${{ github.event.pull_request.head.sha }}
+          ignoredFiles: '["source/docs/software/pathplanning/trajectory-tutorial/"]'
+
+      # Error if RLIs can't be automatically updated
+      - name: Set exit code
+        if: ${{ steps.inspector.outputs.needs-manual == 'true' }}
+        run: exit 1
