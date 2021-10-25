@@ -37,10 +37,10 @@ void DriveSubsystem::SetDriveStates(
     frc::TrapezoidProfile<units::meters>::State left,
     frc::TrapezoidProfile<units::meters>::State right) {
   m_leftLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                           left.position.to<double>(),
+                           left.position.value(),
                            m_feedforward.Calculate(left.velocity) / 12_V);
   m_rightLeader.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                            right.position.to<double>(),
+                            right.position.value(),
                             m_feedforward.Calculate(right.velocity) / 12_V);
 }
 

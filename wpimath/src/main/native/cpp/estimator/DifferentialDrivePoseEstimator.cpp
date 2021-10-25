@@ -96,14 +96,12 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   auto omega = (gyroAngle - m_previousAngle).Radians() / dt;
 
   auto u = Eigen::Vector<double, 3>{
-      (wheelSpeeds.left + wheelSpeeds.right).to<double>() / 2.0, 0.0,
-      omega.to<double>()};
+      (wheelSpeeds.left + wheelSpeeds.right).value() / 2.0, 0.0, omega.value()};
 
   m_previousAngle = angle;
 
-  auto localY = Eigen::Vector<double, 3>{leftDistance.to<double>(),
-                                         rightDistance.to<double>(),
-                                         angle.Radians().to<double>()};
+  auto localY = Eigen::Vector<double, 3>{
+      leftDistance.value(), rightDistance.value(), angle.Radians().value()};
 
   m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
   m_observer.Predict(u, dt);
@@ -140,8 +138,8 @@ wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
 Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::FillStateVector(
     const Pose2d& pose, units::meter_t leftDistance,
     units::meter_t rightDistance) {
-  return Eigen::Vector<double, 5>{
-      pose.Translation().X().to<double>(), pose.Translation().Y().to<double>(),
-      pose.Rotation().Radians().to<double>(), leftDistance.to<double>(),
-      rightDistance.to<double>()};
+  return Eigen::Vector<double, 5>{pose.Translation().X().value(),
+                                  pose.Translation().Y().value(),
+                                  pose.Rotation().Radians().value(),
+                                  leftDistance.value(), rightDistance.value()};
 }

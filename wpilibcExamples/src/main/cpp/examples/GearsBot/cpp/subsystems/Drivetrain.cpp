@@ -25,9 +25,9 @@ Drivetrain::Drivetrain() {
   m_rightEncoder.SetDistancePerPulse(0.042);
 #else
   // Circumference = diameter * pi. 360 tick simulated encoders.
-  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+  m_leftEncoder.SetDistancePerPulse(units::foot_t{4_in}.value() *
                                     wpi::numbers::pi / 360.0);
-  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.to<double>() *
+  m_rightEncoder.SetDistancePerPulse(units::foot_t{4_in}.value() *
                                      wpi::numbers::pi / 360.0);
 #endif
   SetName("Drivetrain");

@@ -104,7 +104,7 @@ TEST_F(ProfiledPIDInputOutputTest, IntegralGainOutput) {
     out = controller->Calculate(0.025_deg, 0_deg);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().to<double>(), out);
+  EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().value(), out);
 }
 
 TEST_F(ProfiledPIDInputOutputTest, DerivativeGainOutput) {

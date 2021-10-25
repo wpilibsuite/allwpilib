@@ -50,8 +50,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const Eigen::Vector<double, Inputs>& u) {
-              return frc::NormalizeInputVector<Inputs>(
-                  u, maxVoltage.template to<double>());
+              return frc::NormalizeInputVector<Inputs>(u, maxVoltage.value());
             },
             dt) {}
 
@@ -97,7 +96,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(controller, feedforward, observer,
                          [=](const Eigen::Vector<double, Inputs>& u) {
                            return frc::NormalizeInputVector<Inputs>(
-                               u, maxVoltage.template to<double>());
+                               u, maxVoltage.value());
                          }) {}
 
   /**

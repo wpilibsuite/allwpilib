@@ -17,9 +17,9 @@ TEST(Pose2dTest, TransformBy) {
 
   const auto transformed = initial + transform;
 
-  EXPECT_NEAR(transformed.X().to<double>(), 1 + 5 / std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transformed.Y().to<double>(), 2 + 5 / std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transformed.Rotation().Degrees().to<double>(), 50.0, kEpsilon);
+  EXPECT_NEAR(transformed.X().value(), 1 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.Y().value(), 2 + 5 / std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transformed.Rotation().Degrees().value(), 50.0, kEpsilon);
 }
 
 TEST(Pose2dTest, RelativeTo) {
@@ -28,10 +28,10 @@ TEST(Pose2dTest, RelativeTo) {
 
   const auto finalRelativeToInitial = final.RelativeTo(initial);
 
-  EXPECT_NEAR(finalRelativeToInitial.X().to<double>(), 5.0 * std::sqrt(2.0),
+  EXPECT_NEAR(finalRelativeToInitial.X().value(), 5.0 * std::sqrt(2.0),
               kEpsilon);
-  EXPECT_NEAR(finalRelativeToInitial.Y().to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().to<double>(), 0.0,
+  EXPECT_NEAR(finalRelativeToInitial.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(finalRelativeToInitial.Rotation().Degrees().value(), 0.0,
               kEpsilon);
 }
 
@@ -53,7 +53,7 @@ TEST(Pose2dTest, Minus) {
 
   const auto transform = final - initial;
 
-  EXPECT_NEAR(transform.X().to<double>(), 5.0 * std::sqrt(2.0), kEpsilon);
-  EXPECT_NEAR(transform.Y().to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(transform.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(transform.X().value(), 5.0 * std::sqrt(2.0), kEpsilon);
+  EXPECT_NEAR(transform.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(transform.Rotation().Degrees().value(), 0.0, kEpsilon);
 }

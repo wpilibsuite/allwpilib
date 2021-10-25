@@ -269,11 +269,10 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().template to<double>(),
-                               fieldRelativeSpeeds.Y().template to<double>(),
-                               omega.template to<double>()};
+    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().value(),
+                               fieldRelativeSpeeds.Y().value(), omega.value()};
 
-    Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
+    Eigen::Vector<double, 1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
     m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);

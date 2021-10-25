@@ -21,7 +21,7 @@ template <int States>
 void DiscretizeA(const Eigen::Matrix<double, States, States>& contA,
                  units::second_t dt,
                  Eigen::Matrix<double, States, States>* discA) {
-  *discA = (contA * dt.to<double>()).exp();
+  *discA = (contA * dt.value()).exp();
 }
 
 /**
@@ -42,8 +42,8 @@ void DiscretizeAB(const Eigen::Matrix<double, States, States>& contA,
   // Matrices are blocked here to minimize matrix exponentiation calculations
   Eigen::Matrix<double, States + Inputs, States + Inputs> Mcont;
   Mcont.setZero();
-  Mcont.template block<States, States>(0, 0) = contA * dt.to<double>();
-  Mcont.template block<States, Inputs>(0, States) = contB * dt.to<double>();
+  Mcont.template block<States, States>(0, 0) = contA * dt.value();
+  Mcont.template block<States, Inputs>(0, States) = contB * dt.value();
 
   // Discretize A and B with the given timestep
   Eigen::Matrix<double, States + Inputs, States + Inputs> Mdisc = Mcont.exp();
@@ -76,8 +76,7 @@ void DiscretizeAQ(const Eigen::Matrix<double, States, States>& contA,
   M.template block<States, States>(States, 0).setZero();
   M.template block<States, States>(States, States) = contA.transpose();
 
-  Eigen::Matrix<double, 2 * States, 2 * States> phi =
-      (M * dt.to<double>()).exp();
+  Eigen::Matrix<double, 2 * States, 2 * States> phi = (M * dt.value()).exp();
 
   // Phi12 = phi[0:States,        States:2*States]
   // Phi22 = phi[States:2*States, States:2*States]
@@ -122,7 +121,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
   Eigen::Matrix<double, States, States> Q = (contQ + contQ.transpose()) / 2.0;
 
   Eigen::Matrix<double, States, States> lastTerm = Q;
-  double lastCoeff = dt.to<double>();
+  double lastCoeff = dt.value();
 
   // Aᵀⁿ
   Eigen::Matrix<double, States, States> Atn = contA.transpose();
@@ -132,7 +131,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
   // i = 6 i.e. 5th order should be enough precision
   for (int i = 2; i < 6; ++i) {
     lastTerm = -contA * lastTerm + Q * Atn;
-    lastCoeff *= dt.to<double>() / static_cast<double>(i);
+    lastCoeff *= dt.value() / static_cast<double>(i);
 
     phi12 += lastTerm * lastCoeff;
 
@@ -156,7 +155,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
 template <int Outputs>
 Eigen::Matrix<double, Outputs, Outputs> DiscretizeR(
     const Eigen::Matrix<double, Outputs, Outputs>& R, units::second_t dt) {
-  return R / dt.to<double>();
+  return R / dt.value();
 }
 
 }  // namespace frc

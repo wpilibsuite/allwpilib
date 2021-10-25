@@ -19,7 +19,7 @@ void AnalogEncoderSim::SetPosition(frc::Rotation2d angle) {
 }
 
 void AnalogEncoderSim::SetTurns(units::turn_t turns) {
-  m_positionSim.Set(turns.to<double>());
+  m_positionSim.Set(turns.value());
 }
 
 units::turn_t AnalogEncoderSim::GetTurns() {

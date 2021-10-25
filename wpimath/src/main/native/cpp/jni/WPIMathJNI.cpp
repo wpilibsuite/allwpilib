@@ -50,13 +50,13 @@ std::vector<double> GetElementsFromTrajectory(
   elements.reserve(trajectory.States().size() * 7);
 
   for (auto&& state : trajectory.States()) {
-    elements.push_back(state.t.to<double>());
-    elements.push_back(state.velocity.to<double>());
-    elements.push_back(state.acceleration.to<double>());
-    elements.push_back(state.pose.X().to<double>());
-    elements.push_back(state.pose.Y().to<double>());
-    elements.push_back(state.pose.Rotation().Radians().to<double>());
-    elements.push_back(state.curvature.to<double>());
+    elements.push_back(state.t.value());
+    elements.push_back(state.velocity.value());
+    elements.push_back(state.acceleration.value());
+    elements.push_back(state.pose.X().value());
+    elements.push_back(state.pose.Y().value());
+    elements.push_back(state.pose.Rotation().Radians().value());
+    elements.push_back(state.curvature.value());
   }
 
   return elements;

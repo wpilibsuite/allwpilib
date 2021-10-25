@@ -124,7 +124,7 @@ int SerialPort::Write(std::string_view buffer) {
 
 void SerialPort::SetTimeout(units::second_t timeout) {
   int32_t status = 0;
-  HAL_SetSerialTimeout(m_portHandle, timeout.to<double>(), &status);
+  HAL_SetSerialTimeout(m_portHandle, timeout.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetTimeout");
 }
 

@@ -34,9 +34,9 @@ class Drivetrain {
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
     m_leftEncoder.SetDistancePerPulse(
-        2 * wpi::numbers::pi * kWheelRadius.to<double>() / kEncoderResolution);
+        2 * wpi::numbers::pi * kWheelRadius.value() / kEncoderResolution);
     m_rightEncoder.SetDistancePerPulse(
-        2 * wpi::numbers::pi * kWheelRadius.to<double>() / kEncoderResolution);
+        2 * wpi::numbers::pi * kWheelRadius.value() / kEncoderResolution);
 
     m_leftEncoder.Reset();
     m_rightEncoder.Reset();

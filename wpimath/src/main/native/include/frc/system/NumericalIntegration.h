@@ -23,7 +23,7 @@ namespace frc {
  */
 template <typename F, typename T>
 T RK4(F&& f, T x, units::second_t dt) {
-  const auto h = dt.to<double>();
+  const auto h = dt.value();
 
   T k1 = f(x);
   T k2 = f(x + h * 0.5 * k1);
@@ -43,7 +43,7 @@ T RK4(F&& f, T x, units::second_t dt) {
  */
 template <typename F, typename T, typename U>
 T RK4(F&& f, T x, U u, units::second_t dt) {
-  const auto h = dt.to<double>();
+  const auto h = dt.value();
 
   T k1 = f(x, u);
   T k2 = f(x + h * 0.5 * k1, u);
@@ -91,13 +91,13 @@ T RKF45(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double truncationError;
 
   double dtElapsed = 0.0;
-  double h = dt.to<double>();
+  double h = dt.value();
 
   // Loop until we've gotten to our desired dt
-  while (dtElapsed < dt.to<double>()) {
+  while (dtElapsed < dt.value()) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.to<double>() - dtElapsed);
+      h = std::min(h, dt.value() - dtElapsed);
 
       // Notice how the derivative in the Wikipedia notation is dy/dx.
       // That means their y is our x and their x is our t
@@ -167,13 +167,13 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double truncationError;
 
   double dtElapsed = 0.0;
-  double h = dt.to<double>();
+  double h = dt.value();
 
   // Loop until we've gotten to our desired dt
-  while (dtElapsed < dt.to<double>()) {
+  while (dtElapsed < dt.value()) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.to<double>() - dtElapsed);
+      h = std::min(h, dt.value() - dtElapsed);
 
       // clang-format off
       T k1 = f(x, u);

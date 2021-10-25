@@ -91,7 +91,7 @@ TEST(EncoderSimTest, Period) {
   auto cb = sim.RegisterPeriodCallback(callback.GetCallback(), false);
   sim.SetPeriod(123.456);
   EXPECT_EQ(123.456, sim.GetPeriod());
-  EXPECT_EQ(123.456, encoder.GetPeriod().to<double>());
+  EXPECT_EQ(123.456, encoder.GetPeriod().value());
   EXPECT_EQ(kDefaultDistancePerPulse / 123.456, encoder.GetRate());
 
   EXPECT_TRUE(callback.WasTriggered());
