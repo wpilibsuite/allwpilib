@@ -51,6 +51,8 @@ public class Robot extends TimedRobot {
             new Pose2d(3, 0, Rotation2d.fromDegrees(0)),
             new TrajectoryConfig(Units.feetToMeters(3.0), Units.feetToMeters(3.0)));
 
+    // spooky scary skeletons
+
     // Create and push Field2d to SmartDashboard.
     m_field = new Field2d();
     SmartDashboard.putData(m_field);
