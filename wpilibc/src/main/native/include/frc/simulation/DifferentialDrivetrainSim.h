@@ -268,7 +268,7 @@ class DifferentialDrivetrainSim {
    * @param gearing   The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param J         The moment of inertia of the drivebase. This can be
-   * calculated using frc-characterization.
+   * calculated using SysId.
    * @param measurementStdDevs Standard deviations for measurements, in the form
    * [x, y, heading, left velocity, right velocity, left distance, right
    * distance]ᵀ. Can be omitted if no noise is desired. Gyro standard
