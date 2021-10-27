@@ -5,6 +5,7 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.Drake;
+import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Num;
@@ -90,7 +91,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
    */
-  @SuppressWarnings({"ParameterName", "LocalVariableName"})
+  @SuppressWarnings({"LocalVariableName", "ParameterName"})
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -100,6 +101,18 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
+
+    if (!StateSpaceUtil.isStabilizable(discA, discB)) {
+      var builder = new StringBuilder("The system passed to the LQR is uncontrollable!\n\nA =\n");
+      builder.append(discA.getStorage().toString());
+      builder.append("\nB =\n");
+      builder.append(discB.getStorage().toString());
+      builder.append("\n");
+
+      var msg = builder.toString();
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
+    }
 
     var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 

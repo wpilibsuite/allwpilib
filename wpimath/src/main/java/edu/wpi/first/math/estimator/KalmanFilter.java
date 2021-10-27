@@ -76,14 +76,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     var C = plant.getC();
 
-    // isStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    var isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
-    if (!isObservable) {
-      MathSharedStore.reportError(
-          "The system passed to the Kalman filter is not observable!",
-          Thread.currentThread().getStackTrace());
-      throw new IllegalArgumentException(
-          "The system passed to the Kalman filter is not observable!");
+    if (!StateSpaceUtil.isDetectable(discA, C)) {
+      var builder =
+          new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
+      builder.append(discA.getStorage().toString());
+      builder.append("\nC =\n");
+      builder.append(C.getStorage().toString());
+      builder.append("\n");
+
+      var msg = builder.toString();
+      MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());
+      throw new IllegalArgumentException(msg);
     }
 
     var P =

@@ -78,6 +78,33 @@ public class StateSpaceUtilTest {
   }
 
   @Test
+  @SuppressWarnings("LocalVariableName")
+  public void testIsDetectable() {
+    Matrix<N2, N2> A;
+    Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(0, 1);
+
+    // First eigenvalue is unobservable and unstable.
+    // Second eigenvalue is observable and stable.
+    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1.2, 0, 0, 0.5);
+    assertFalse(StateSpaceUtil.isDetectable(A, C));
+
+    // First eigenvalue is unobservable and marginally stable.
+    // Second eigenvalue is observable and stable.
+    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(1, 0, 0, 0.5);
+    assertFalse(StateSpaceUtil.isDetectable(A, C));
+
+    // First eigenvalue is unobservable and stable.
+    // Second eigenvalue is observable and stable.
+    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 0.5);
+    assertTrue(StateSpaceUtil.isDetectable(A, C));
+
+    // First eigenvalue is unobservable and stable.
+    // Second eigenvalue is observable and unstable.
+    A = Matrix.mat(Nat.N2(), Nat.N2()).fill(0.2, 0, 0, 1.2);
+    assertTrue(StateSpaceUtil.isDetectable(A, C));
+  }
+
+  @Test
   public void testMakeWhiteNoiseVector() {
     var firstData = new ArrayList<Double>();
     var secondData = new ArrayList<Double>();

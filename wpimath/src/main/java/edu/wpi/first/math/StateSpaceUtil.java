@@ -87,9 +87,9 @@ public final class StateSpaceUtil {
   /**
    * Returns true if (A, B) is a stabilizable pair.
    *
-   * <p>(A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
+   * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
    * absolute values less than one, where an eigenvalue is uncontrollable if rank(λI - A, B) %3C n
-   * where n is number of states.
+   * where n is the number of states.
    *
    * @param <States> Num representing the size of A.
    * @param <Inputs> Num representing the columns of B.
@@ -101,6 +101,26 @@ public final class StateSpaceUtil {
   public static <States extends Num, Inputs extends Num> boolean isStabilizable(
       Matrix<States, States> A, Matrix<States, Inputs> B) {
     return WPIMathJNI.isStabilizable(A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
+  }
+
+  /**
+   * Returns true if (A, C) is a detectable pair.
+   *
+   * <p>(A, C) is detectable if and only if the unobservable eigenvalues of A, if any, have absolute
+   * values less than one, where an eigenvalue is unobservable if rank(λI - A; C) %3C n where n is
+   * the number of states.
+   *
+   * @param <States> Num representing the size of A.
+   * @param <Outputs> Num representing the rows of C.
+   * @param A System matrix.
+   * @param C Output matrix.
+   * @return If the system is detectable.
+   */
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num, Outputs extends Num> boolean isDetectable(
+      Matrix<States, States> A, Matrix<Outputs, States> C) {
+    return WPIMathJNI.isStabilizable(
+        A.getNumRows(), C.getNumRows(), A.transpose().getData(), C.transpose().getData());
   }
 
   /**
