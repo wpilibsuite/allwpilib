@@ -46,6 +46,29 @@
     "commandversion": 2
   },
   {
+    "name": "Timesice Robot",
+    "description": "Timeslice style",
+    "tags": [
+      "Timeslice"
+    ],
+    "foldername": "timeslice",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Timeslice Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimesliceRobot",
+    "tags": [
+      "Timeslice",
+      "Skeleton"
+    ],
+    "foldername": "timesliceskeleton",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "RobotBase Skeleton (Advanced)",
     "description": "Skeleton (stub) code for RobotBase - Not recommended for competition use",
     "tags": [
