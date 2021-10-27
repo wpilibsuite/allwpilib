@@ -92,6 +92,18 @@ public final class WPIMathJNI {
   public static native boolean isStabilizable(int states, int inputs, double[] A, double[] B);
 
   /**
+   * Returns the 0-based indices of the uncontrollable states in the given (A, B) pair.
+   *
+   * @param states the number of states of the system.
+   * @param inputs the number of inputs to the system.
+   * @param A System matrix.
+   * @param B Input matrix.
+   * @return List of 0-based indices of the uncontrollable states.
+   */
+  public static native int[] getUncontrollableStates(
+      int states, int inputs, double[] A, double[] B);
+
+  /**
    * Loads a Pathweaver JSON.
    *
    * @param path The path to the JSON.

@@ -9,6 +9,7 @@
 #include <random>
 #include <type_traits>
 
+#include <wpi/SmallVector.h>
 #include <wpi/SymbolExports.h>
 #include <wpi/deprecated.h>
 
@@ -84,6 +85,30 @@ bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
     }
   }
   return true;
+}
+
+template <int States, int Inputs>
+wpi::SmallVector<int, States> GetUncontrollableStatesImpl(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, States, Inputs>& B) {
+  wpi::SmallVector<int, States> uncontrollableStates;
+
+  Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es{A};
+  for (int i = 0; i < States; ++i) {
+    Eigen::Matrix<std::complex<double>, States, States + Inputs> E;
+    E << es.eigenvalues()[i] * Eigen::Matrix<std::complex<double>, States,
+                                             States>::Identity() -
+             A,
+        B;
+    Eigen::ColPivHouseholderQR<
+        Eigen::Matrix<std::complex<double>, States, States + Inputs>>
+        qr{E};
+    if (qr.rank() < States) {
+      uncontrollableStates.push_back(i);
+    }
+  }
+
+  return uncontrollableStates;
 }
 
 }  // namespace detail
@@ -292,6 +317,39 @@ bool IsDetectable(const Eigen::Matrix<double, States, States>& A,
                                                      C.transpose());
 }
 
+/**
+ * Returns the 0-based indices of the uncontrollable states in the given (A, B)
+ * pair.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @param A System matrix.
+ * @param B Input matrix.
+ */
+template <int States, int Inputs>
+wpi::SmallVector<int, States> GetUncontrollableStates(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, States, Inputs>& B) {
+  return detail::GetUncontrollableStatesImpl<States, Inputs>(A, B);
+}
+
+/**
+ * Returns the 0-based indices of the unobservable states in the given (A, C)
+ * pair.
+ *
+ * @tparam States The number of states.
+ * @tparam Outputs The number of outputs.
+ * @param A System matrix.
+ * @param C Output matrix.
+ */
+template <int States, int Outputs>
+wpi::SmallVector<int, States> GetUnobservableStates(
+    const Eigen::Matrix<double, States, States>& A,
+    const Eigen::Matrix<double, Outputs, States>& C) {
+  return detail::GetUncontrollableStatesImpl<States, Outputs>(A.transpose(),
+                                                              C.transpose());
+}
+
 // Template specializations are used here to make common state-input pairs
 // compile faster.
 template <>
@@ -303,6 +361,24 @@ WPILIB_DLLEXPORT bool IsStabilizable<1, 1>(
 template <>
 WPILIB_DLLEXPORT bool IsStabilizable<2, 1>(
     const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B);
+
+// Template specializations are used here to make common state-input pairs
+// compile faster.
+template <>
+WPILIB_DLLEXPORT wpi::SmallVector<int, 1> GetUncontrollableStates<1, 1>(
+    const Eigen::Matrix<double, 1, 1>& A, const Eigen::Matrix<double, 1, 1>& B);
+
+// Template specializations are used here to make common state-input pairs
+// compile faster.
+template <>
+WPILIB_DLLEXPORT wpi::SmallVector<int, 2> GetUncontrollableStates<2, 1>(
+    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 1>& B);
+
+// Template specializations are used here to make common state-input pairs
+// compile faster.
+template <>
+WPILIB_DLLEXPORT wpi::SmallVector<int, 2> GetUncontrollableStates<2, 2>(
+    const Eigen::Matrix<double, 2, 2>& A, const Eigen::Matrix<double, 2, 2>& B);
 
 /**
  * Converts a Pose2d into a vector of [x, y, theta].

@@ -91,7 +91,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @param R The input cost matrix.
    * @param dtSeconds Discretization timestep.
    */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
+  @SuppressWarnings({"LocalVariableName", "PMD.AvoidDeeplyNestedIfStmts", "ParameterName"})
   public LinearQuadraticRegulator(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
@@ -103,11 +103,23 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discB = discABPair.getSecond();
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
+      final var uncontrollableStates = StateSpaceUtil.getUncontrollableStates(discA, discB);
+
       var builder = new StringBuilder("The system passed to the LQR is uncontrollable!\n\nA =\n");
       builder.append(discA.getStorage().toString());
       builder.append("\nB =\n");
       builder.append(discB.getStorage().toString());
       builder.append("\n");
+      if (uncontrollableStates.length > 0) {
+        builder.append("\n0-based indices of uncontrollable states: ");
+        for (int i = 0; i < uncontrollableStates.length; ++i) {
+          builder.append(uncontrollableStates[i]);
+          if (i < uncontrollableStates.length - 1) {
+            builder.append(", ");
+          }
+        }
+        builder.append("\n");
+      }
 
       var msg = builder.toString();
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());

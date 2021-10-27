@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <array>
@@ -157,4 +158,62 @@ TEST(StateSpaceUtilTest, IsDetectable) {
   // Second eigenvalue is observable and unstable.
   EXPECT_TRUE((frc::IsDetectable<2, 1>(
       Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 1.2}}, C)));
+}
+
+TEST(StateSpaceUtilTest, GetUncontrollableStates) {
+  Eigen::Matrix<double, 2, 1> B1{0, 1};
+  Eigen::Matrix<double, 2, 1> B2{1, 0};
+
+  Eigen::Matrix<double, 2, 2> A1{{1.2, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A1, B1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A1, B2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A2{{1, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A2, B1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A2, B2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A3{{0.2, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A3, B1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A3, B2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A4{{0.2, 0}, {0, 1.2}};
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A4, B1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUncontrollableStates<2, 1>(A4, B2)),
+              testing::ElementsAre(1));
+}
+
+TEST(StateSpaceUtilTest, GetUnobservableStates) {
+  Eigen::Matrix<double, 1, 2> C1{0, 1};
+  Eigen::Matrix<double, 1, 2> C2{1, 0};
+
+  Eigen::Matrix<double, 2, 2> A1{{1.2, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A1, C1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A1, C2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A2{{1, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A2, C1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A2, C2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A3{{0.2, 0}, {0, 0.5}};
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A3, C1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A3, C2)),
+              testing::ElementsAre(1));
+
+  Eigen::Matrix<double, 2, 2> A4{{0.2, 0}, {0, 1.2}};
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A4, C1)),
+              testing::ElementsAre(0));
+  EXPECT_THAT((frc::GetUnobservableStates<2, 1>(A4, C2)),
+              testing::ElementsAre(1));
 }

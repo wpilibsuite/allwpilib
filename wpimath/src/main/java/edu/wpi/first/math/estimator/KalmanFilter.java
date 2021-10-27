@@ -53,7 +53,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("LocalVariableName")
+  @SuppressWarnings({"LocalVariableName", "PMD.AvoidDeeplyNestedIfStmts"})
   public KalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -77,12 +77,24 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var C = plant.getC();
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
+      final var unobservableStates = StateSpaceUtil.getUnobservableStates(discA, C);
+
       var builder =
           new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
       builder.append(discA.getStorage().toString());
       builder.append("\nC =\n");
       builder.append(C.getStorage().toString());
       builder.append("\n");
+      if (unobservableStates.length > 0) {
+        builder.append("\n0-based indices of unobservable states: ");
+        for (int i = 0; i < unobservableStates.length; ++i) {
+          builder.append(unobservableStates[i]);
+          if (i < unobservableStates.length - 1) {
+            builder.append(", ");
+          }
+        }
+        builder.append("\n");
+      }
 
       var msg = builder.toString();
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());

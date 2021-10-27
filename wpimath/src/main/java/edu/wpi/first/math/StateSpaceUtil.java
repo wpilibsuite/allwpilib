@@ -124,6 +124,37 @@ public final class StateSpaceUtil {
   }
 
   /**
+   * Returns the 0-based indices of the uncontrollable states in the given (A, B) pair.
+   *
+   * @param <States> Num representing the size of A.
+   * @param <Inputs> Num representing the columns of B.
+   * @param A System matrix.
+   * @param B Input matrix.
+   * @return List of 0-based indices of the uncontrollable states.
+   */
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num, Inputs extends Num> int[] getUncontrollableStates(
+      Matrix<States, States> A, Matrix<States, Inputs> B) {
+    return WPIMathJNI.getUncontrollableStates(
+        A.getNumRows(), B.getNumCols(), A.getData(), B.getData());
+  }
+
+  /**
+   * Returns the 0-based indices of the unobservable states in the given (A, C) pair.
+   *
+   * @param <States> Num representing the size of A.
+   * @param <Outputs> Num representing the rows of C.
+   * @param A System matrix.
+   * @param C Output matrix.
+   * @return List of 0-based indices of the unobservable states.
+   */
+  @SuppressWarnings("MethodTypeParameterName")
+  public static <States extends Num, Outputs extends Num> int[] getUnobservableStates(
+      Matrix<States, States> A, Matrix<Outputs, States> C) {
+    return getUncontrollableStates(A.transpose(), C.transpose());
+  }
+
+  /**
    * Convert a {@link Pose2d} to a vector of [x, y, theta], where theta is in radians.
    *
    * @param pose A pose to convert to a vector.

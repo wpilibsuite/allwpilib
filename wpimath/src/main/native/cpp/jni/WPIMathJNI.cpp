@@ -52,6 +52,34 @@ bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
   return true;
 }
 
+/**
+ * Returns the 0-based indices of the uncontrollable states in the given (A, B)
+ * pair.
+ *
+ * @param A System matrix.
+ * @param B Input matrix.
+ */
+std::vector<int> get_uncontrollable_states(
+    const Eigen::Ref<const Eigen::MatrixXd>& A,
+    const Eigen::Ref<const Eigen::MatrixXd>& B) {
+  std::vector<int> uncontrollableStates;
+
+  int states = B.rows();
+  int inputs = B.cols();
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
+  for (int i = 0; i < states; ++i) {
+    Eigen::MatrixXcd E{states, states + inputs};
+    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(states, states) - A,
+        B;
+    Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
+    if (qr.rank() < states) {
+      uncontrollableStates.push_back(i);
+    }
+  }
+
+  return uncontrollableStates;
+}
+
 std::vector<double> GetElementsFromTrajectory(
     const frc::Trajectory& trajectory) {
   std::vector<double> elements;
@@ -210,6 +238,32 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
 
   return isStabilizable;
+}
+
+/*
+ * Class:     edu_wpi_first_math_WPIMathJNI
+ * Method:    getUncontrollableStates
+ * Signature: (II[D[D)[I
+ */
+JNIEXPORT jintArray JNICALL
+Java_edu_wpi_first_math_WPIMathJNI_getUncontrollableStates
+  (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc,
+   jdoubleArray bSrc)
+{
+  jdouble* nativeA = env->GetDoubleArrayElements(aSrc, nullptr);
+  jdouble* nativeB = env->GetDoubleArrayElements(bSrc, nullptr);
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      A{nativeA, states, states};
+
+  Eigen::Map<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+      B{nativeB, states, inputs};
+
+  auto uncontrollableStates = get_uncontrollable_states(A, B);
+
+  return MakeJIntArray(env, uncontrollableStates);
 }
 
 /*
