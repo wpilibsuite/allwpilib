@@ -12,10 +12,4 @@ KalmanFilter<1, 1, 1>::KalmanFilter(
     : detail::KalmanFilterImpl<1, 1, 1>{plant, stateStdDevs, measurementStdDevs,
                                         dt} {}
 
-KalmanFilter<2, 1, 1>::KalmanFilter(
-    LinearSystem<2, 1, 1>& plant, const wpi::array<double, 2>& stateStdDevs,
-    const wpi::array<double, 1>& measurementStdDevs, units::second_t dt)
-    : detail::KalmanFilterImpl<2, 1, 1>{plant, stateStdDevs, measurementStdDevs,
-                                        dt} {}
-
 }  // namespace frc
