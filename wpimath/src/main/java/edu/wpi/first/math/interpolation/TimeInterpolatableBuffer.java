@@ -74,8 +74,8 @@ public class TimeInterpolatableBuffer<T> {
   }
 
   /**
-   * Removes samples older than our current history size
-   * 
+   * Removes samples older than our current history size.
+   *
    * @param time The current timestamp.
    */
   private void cleanUp(double time) {
