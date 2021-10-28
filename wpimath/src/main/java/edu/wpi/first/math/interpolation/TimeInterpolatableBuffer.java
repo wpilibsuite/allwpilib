@@ -73,6 +73,11 @@ public class TimeInterpolatableBuffer<T> {
     m_buffer.put(timeSeconds, sample);
   }
 
+  /**
+   * Removes samples older than our current history size
+   * 
+   * @param time The current timestamp.
+   */
   private void cleanUp(double time) {
     while (!m_buffer.isEmpty()) {
       var entry = m_buffer.firstEntry();

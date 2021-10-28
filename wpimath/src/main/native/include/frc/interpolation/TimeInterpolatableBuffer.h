@@ -24,7 +24,7 @@ namespace frc {
  * DifferentialDrivePoseEstimator, where knowledge of the robot pose at the time
  * when vision or other global measurement were recorded is necessary, or for
  * recording the past angles of mechanisms as measured by encoders.
- * 
+ *
  * When sampling this buffer, a user-provided function or wpi::Lerp can be
  * used. For Pose2ds, we use Twists.
  *
@@ -36,8 +36,8 @@ class TimeInterpolatableBuffer {
   /**
    * Create a new TimeInterpolatableBuffer.
    *
-   * @param historySizeSeconds  The history size of the buffer.
-   * @param interpolateFunction The function used to interpolate between values.
+   * @param historySize  The history size of the buffer.
+   * @param func The function used to interpolate between values.
    */
   TimeInterpolatableBuffer(units::second_t historySize,
                            std::function<T(const T&, const T&, double)> func)
@@ -47,8 +47,7 @@ class TimeInterpolatableBuffer {
    * Create a new TimeInterpolatableBuffer. By default, the interpolation
    * function is wpi::Lerp except for Pose2d, which uses the pose exponential.
    *
-   * @param historySizeSeconds  The history size of the buffer.
-   * @param interpolateFunction The function used to interpolate between values.
+   * @param historySize  The history size of the buffer.
    */
   explicit TimeInterpolatableBuffer(units::second_t historySize)
       : m_historySize(historySize),
@@ -78,11 +77,14 @@ class TimeInterpolatableBuffer {
     }
   }
 
+  /** Clear all old samples. */
   void Clear() { m_pastSnapshots.clear(); }
 
   /**
    * Sample the buffer at the given time. If there are no elements in the
    * buffer, calling this function results in undefined behavior.
+   * 
+   * @param time The time at which to sample the buffer.
    */
   T Sample(units::second_t time) {
     // We will perform a binary search to find the index of the element in the
