@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.Discretization;
 import java.util.ArrayList;
 import java.util.List;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -106,38 +105,6 @@ public class StateSpaceUtilTest {
     }
 
     return Math.sqrt(standardDeviation / length);
-  }
-
-  @Test
-  public void testDiscretizeA() {
-    var contA = Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    var x0 = VecBuilder.fill(1, 1);
-    var discA = Discretization.discretizeA(contA, 1.0);
-    var x1Discrete = discA.times(x0);
-
-    // We now have pos = vel = 1 and accel = 0, which should give us:
-    var x1Truth = VecBuilder.fill(x0.get(0, 0) + 1.0 * x0.get(1, 0), x0.get(1, 0));
-    assertTrue(x1Truth.isEqual(x1Discrete, 1E-4));
-  }
-
-  @SuppressWarnings("LocalVariableName")
-  @Test
-  public void testDiscretizeAB() {
-    var contA = Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, 0);
-    var contB = VecBuilder.fill(0, 1);
-    var x0 = VecBuilder.fill(1, 1);
-    var u = VecBuilder.fill(1);
-
-    var abPair = Discretization.discretizeAB(contA, contB, 1.0);
-
-    var x1Discrete = abPair.getFirst().times(x0).plus(abPair.getSecond().times(u));
-
-    // We now have pos = vel = accel = 1, which should give us:
-    var x1Truth =
-        VecBuilder.fill(
-            x0.get(0, 0) + x0.get(1, 0) + 0.5 * u.get(0, 0), x0.get(0, 0) + u.get(0, 0));
-
-    assertTrue(x1Truth.isEqual(x1Discrete, 1E-4));
   }
 
   @Test
