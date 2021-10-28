@@ -57,10 +57,6 @@ public class TrapezoidProfile {
     @SuppressWarnings("MemberName")
     public final double maxAcceleration;
 
-    public Constraints() {
-      MathSharedStore.reportUsage(MathUsageId.kTrajectory_TrapezoidProfile, 1);
-    }
-
     /**
      * Construct constraints for a TrapezoidProfile.
      *
