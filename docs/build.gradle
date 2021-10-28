@@ -84,7 +84,6 @@ doxygen {
         exclude 'wpi/FunctionExtras.h'
         exclude 'wpi/function_ref.h'
         exclude 'wpi/Hashing.h'
-        exclude 'wpi/IntrusiveRefCntPtr.h'
         exclude 'wpi/iterator.h'
         exclude 'wpi/iterator_range.h'
         exclude 'wpi/ManagedStatic.h'
