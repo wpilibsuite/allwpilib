@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdexcept>
+
 #include <wpi/SymbolExports.h>
 
 #include "frc/system/LinearSystem.h"
@@ -39,10 +41,21 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param m Carriage mass.
    * @param r Pulley radius.
    * @param G Gear ratio from motor to carriage.
+   * @throws std::domain_error if m <= 0, r <= 0, or G <= 0.
    */
   static LinearSystem<2, 1, 1> ElevatorSystem(DCMotor motor,
                                               units::kilogram_t m,
                                               units::meter_t r, double G) {
+    if (m <= 0_kg) {
+      throw std::domain_error("m must be greater than zero.");
+    }
+    if (r <= 0_m) {
+      throw std::domain_error("r must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
     Eigen::Matrix<double, 2, 2> A{
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt /
@@ -66,9 +79,17 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param motor Instance of DCMotor.
    * @param J Moment of inertia.
    * @param G Gear ratio from motor to carriage.
+   * @throws std::domain_error if J <= 0 or G <= 0.
    */
   static LinearSystem<2, 1, 1> SingleJointedArmSystem(
       DCMotor motor, units::kilogram_square_meter_t J, double G) {
+    if (J <= 0_kg_sq_m) {
+      throw std::domain_error("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
     Eigen::Matrix<double, 2, 2> A{
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
@@ -98,6 +119,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<
                                    std::is_same_v<units::meter, Distance> ||
@@ -105,6 +127,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+    if (kV <= decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than zero.");
+    }
+    if (kA <= decltype(kA){0}) {
+      throw std::domain_error("Ka must be greater than zero.");
+    }
+
     Eigen::Matrix<double, 1, 1> A{-kV.value() / kA.value()};
     Eigen::Matrix<double, 1, 1> B{1.0 / kA.value()};
     Eigen::Matrix<double, 1, 1> C{1.0};
@@ -132,6 +161,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
+   * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
   template <typename Distance, typename = std::enable_if_t<
                                    std::is_same_v<units::meter, Distance> ||
@@ -139,6 +169,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
+    if (kV <= decltype(kV){0}) {
+      throw std::domain_error("Kv must be greater than zero.");
+    }
+    if (kA <= decltype(kA){0}) {
+      throw std::domain_error("Ka must be greater than zero.");
+    }
+
     Eigen::Matrix<double, 2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
     Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.value()};
     Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
@@ -161,10 +198,25 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kVangular The angular velocity gain in volts per (meter per second).
    * @param kAangular The angular acceleration gain in volts per (meter per
    *                  second squared).
+   * @throws domain_error if kVlinear <= 0, kAlinear <= 0, kVangular <= 0,
+   *         or kAangular <= 0.
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
       decltype(1_V / 1_mps) kVangular, decltype(1_V / 1_mps_sq) kAangular) {
+    if (kVlinear <= decltype(kVlinear){0}) {
+      throw std::domain_error("Kv,linear must be greater than zero.");
+    }
+    if (kAlinear <= decltype(kAlinear){0}) {
+      throw std::domain_error("Ka,linear must be greater than zero.");
+    }
+    if (kVangular <= decltype(kVangular){0}) {
+      throw std::domain_error("Kv,angular must be greater than zero.");
+    }
+    if (kAangular <= decltype(kAangular){0}) {
+      throw std::domain_error("Ka,angular must be greater than zero.");
+    }
+
     double A1 = -(kVlinear.value() / kAlinear.value() +
                   kVangular.value() / kAangular.value());
     double A2 = -(kVlinear.value() / kAlinear.value() -
@@ -198,11 +250,29 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kAangular  The angular acceleration gain in volts per (radian per
    *                   second squared).
    * @param trackwidth The width of the drivetrain.
+   * @throws domain_error if kVlinear <= 0, kAlinear <= 0, kVangular <= 0,
+   *         kAangular <= 0, or trackwidth <= 0.
    */
   static LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
       decltype(1_V / 1_mps) kVlinear, decltype(1_V / 1_mps_sq) kAlinear,
       decltype(1_V / 1_rad_per_s) kVangular,
       decltype(1_V / 1_rad_per_s_sq) kAangular, units::meter_t trackwidth) {
+    if (kVlinear <= decltype(kVlinear){0}) {
+      throw std::domain_error("Kv,linear must be greater than zero.");
+    }
+    if (kAlinear <= decltype(kAlinear){0}) {
+      throw std::domain_error("Ka,linear must be greater than zero.");
+    }
+    if (kVangular <= decltype(kVangular){0}) {
+      throw std::domain_error("Kv,angular must be greater than zero.");
+    }
+    if (kAangular <= decltype(kAangular){0}) {
+      throw std::domain_error("Ka,angular must be greater than zero.");
+    }
+    if (trackwidth <= 0_m) {
+      throw std::domain_error("r must be greater than zero.");
+    }
+
     // We want to find a factor to include in Kv,angular that will convert
     // `u = Kv,angular omega` to `u = Kv,angular v`.
     //
@@ -229,10 +299,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param motor Instance of DCMotor.
    * @param J Moment of inertia.
    * @param G Gear ratio from motor to carriage.
+   * @throws std::domain_error if J <= 0 or G <= 0.
    */
   static LinearSystem<1, 1, 1> FlywheelSystem(DCMotor motor,
                                               units::kilogram_square_meter_t J,
                                               double G) {
+    if (J <= 0_kg_sq_m) {
+      throw std::domain_error("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
     Eigen::Matrix<double, 1, 1> A{
         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()};
     Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
@@ -253,12 +331,30 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param m Drivetrain mass.
    * @param r Wheel radius.
    * @param rb Robot radius.
-   * @param G Gear ratio from motor to wheel.
    * @param J Moment of inertia.
+   * @param G Gear ratio from motor to wheel.
+   * @throws std::domain_error if m <= 0, r <= 0, rb <= 0, J <= 0, or
+   *         G <= 0.
    */
   static LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
       const DCMotor& motor, units::kilogram_t m, units::meter_t r,
       units::meter_t rb, units::kilogram_square_meter_t J, double G) {
+    if (m <= 0_kg) {
+      throw std::domain_error("m must be greater than zero.");
+    }
+    if (r <= 0_m) {
+      throw std::domain_error("r must be greater than zero.");
+    }
+    if (rb <= 0_m) {
+      throw std::domain_error("rb must be greater than zero.");
+    }
+    if (J <= 0_kg_sq_m) {
+      throw std::domain_error("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
     auto C1 = -std::pow(G, 2) * motor.Kt /
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
