@@ -8,8 +8,8 @@ import edu.wpi.first.hal.REVPHJNI;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Module class for controlling a REV Robotics Pneumatics Hub. */
-public class PneumaticsHub implements PneumaticsBase {
+/** Module class for controlling a REV Robotics Pneumatic Hub. */
+public class PneumaticHub implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     public final int m_module;
     public final int m_handle;
@@ -66,17 +66,17 @@ public class PneumaticsHub implements PneumaticsBase {
   private final DataStore m_dataStore;
   private final int m_handle;
 
-  /** Constructs a PneumaticsHub with the default id (1). */
-  public PneumaticsHub() {
+  /** Constructs a PneumaticHub with the default id (1). */
+  public PneumaticHub() {
     this(SensorUtil.getDefaultREVPHModule());
   }
 
   /**
-   * Constructs a PneumaticsHub.
+   * Constructs a PneumaticHub.
    *
    * @param module module number to construct
    */
-  public PneumaticsHub(int module) {
+  public PneumaticHub(int module) {
     m_dataStore = getForModule(module);
     m_handle = m_dataStore.m_handle;
   }
