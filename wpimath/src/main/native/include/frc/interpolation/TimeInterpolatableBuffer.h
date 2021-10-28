@@ -83,7 +83,7 @@ class TimeInterpolatableBuffer {
   /**
    * Sample the buffer at the given time. If there are no elements in the
    * buffer, calling this function results in undefined behavior.
-   * 
+   *
    * @param time The time at which to sample the buffer.
    */
   T Sample(units::second_t time) {
