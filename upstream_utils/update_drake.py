@@ -63,7 +63,8 @@ def main():
 
     apply_patches(root, [
         "upstream_utils/drake-replace-dense-with-core.patch",
-        "upstream_utils/drake-dllexport-dare.patch"
+        "upstream_utils/drake-dllexport-dare.patch",
+        "upstream_utils/drake-fix-doxygen.patch"
     ])
 
 

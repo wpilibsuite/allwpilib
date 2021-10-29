@@ -314,6 +314,8 @@ Eigen::Vector<double, 3> PoseToVector(const Pose2d& pose);
  * Clamps input vector between system's minimum and maximum allowable input.
  *
  * @param u Input vector to clamp.
+ * @param umin The minimum input magnitude.
+ * @param umax The maximum input magnitude.
  * @return Clamped input vector.
  */
 template <int Inputs>
@@ -334,7 +336,6 @@ Eigen::Vector<double, Inputs> ClampInputMaxMagnitude(
  *
  * @param u            The input vector.
  * @param maxMagnitude The maximum magnitude any input can have.
- * @param <I>          The number of inputs.
  * @return The normalizedInput
  */
 template <int Inputs>

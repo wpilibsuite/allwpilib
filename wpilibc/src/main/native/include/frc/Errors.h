@@ -87,10 +87,11 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  * instead.
  *
  * @param[out] status error code
- * @param[in]  message error message details
  * @param[in]  fileName source file name
  * @param[in]  lineNumber source line number
  * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  * @return runtime error object
  */
 [[nodiscard]] RuntimeError MakeErrorV(int32_t status, const char* fileName,

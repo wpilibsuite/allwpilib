@@ -81,7 +81,7 @@ AngleAdd(int angleStateIdx) {
  *
  * @param sigmas Sigma points.
  * @param Wm Weights for the mean.
- * @param angleStateIdx The row containing the angles.
+ * @param angleStatesIdx The row containing the angles.
  */
 template <int CovDim, int States>
 Eigen::Vector<double, CovDim> AngleMean(
