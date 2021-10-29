@@ -141,9 +141,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
-    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
-    if (isObservable && outputs.getNum() <= states.getNum()) {
+    if (StateSpaceUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
       m_initP =
           Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR);
     } else {

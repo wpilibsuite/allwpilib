@@ -134,3 +134,27 @@ TEST(StateSpaceUtilTest, IsStabilizable) {
   EXPECT_TRUE((frc::IsStabilizable<2, 1>(
       Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 1.2}}, B)));
 }
+
+TEST(StateSpaceUtilTest, IsDetectable) {
+  Eigen::Matrix<double, 1, 2> C{0, 1};
+
+  // First eigenvalue is unobservable and unstable.
+  // Second eigenvalue is observable and stable.
+  EXPECT_FALSE((frc::IsDetectable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{1.2, 0}, {0, 0.5}}, C)));
+
+  // First eigenvalue is unobservable and marginally stable.
+  // Second eigenvalue is observable and stable.
+  EXPECT_FALSE((frc::IsDetectable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{1, 0}, {0, 0.5}}, C)));
+
+  // First eigenvalue is unobservable and stable.
+  // Second eigenvalue is observable and stable.
+  EXPECT_TRUE((frc::IsDetectable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 0.5}}, C)));
+
+  // First eigenvalue is unobservable and stable.
+  // Second eigenvalue is observable and unstable.
+  EXPECT_TRUE((frc::IsDetectable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 1.2}}, C)));
+}

@@ -78,7 +78,7 @@ bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
 
     Eigen::ColPivHouseholderQR<
         Eigen::Matrix<std::complex<double>, States, States + Inputs>>
-        qr(E);
+        qr{E};
     if (qr.rank() < States) {
       return false;
     }
@@ -258,9 +258,9 @@ Eigen::Vector<double, 4> PoseTo4dVector(const Pose2d& pose);
 /**
  * Returns true if (A, B) is a stabilizable pair.
  *
- * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+ * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is number of states.
+ * uncontrollable if rank(λI - A, B) < n where n is the number of states.
  *
  * @param A System matrix.
  * @param B Input matrix.
@@ -269,6 +269,23 @@ template <int States, int Inputs>
 bool IsStabilizable(const Eigen::Matrix<double, States, States>& A,
                     const Eigen::Matrix<double, States, Inputs>& B) {
   return detail::IsStabilizableImpl<States, Inputs>(A, B);
+}
+
+/**
+ * Returns true if (A, C) is a detectable pair.
+ *
+ * (A, C) is detectable if and only if the unobservable eigenvalues of A, if
+ * any, have absolute values less than one, where an eigenvalue is unobservable
+ * if rank(λI - A; C) < n where n is the number of states.
+ *
+ * @param A System matrix.
+ * @param C Output matrix.
+ */
+template <int States, int Outputs>
+bool IsDetectable(const Eigen::Matrix<double, States, States>& A,
+                  const Eigen::Matrix<double, Outputs, States>& C) {
+  return detail::IsStabilizableImpl<States, Outputs>(A.transpose(),
+                                                     C.transpose());
 }
 
 // Template specializations are used here to make common state-input pairs

@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <frc/fmt/Eigen.h>
+
+#include <string>
+
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
@@ -16,6 +20,7 @@
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
 #include "unsupported/Eigen/MatrixFunctions"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 namespace detail {
@@ -81,6 +86,16 @@ class LinearQuadraticRegulatorImpl {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
+
+    if (!IsStabilizable<States, Inputs>(discA, discB)) {
+      std::string msg = fmt::format(
+          "The system passed to the LQR is uncontrollable!\n\nA =\n{}\nB "
+          "=\n{}\n",
+          discA, discB);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
 
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);

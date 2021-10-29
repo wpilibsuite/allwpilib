@@ -71,10 +71,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, Outputs, Outputs> discR =
         DiscretizeR<Outputs>(m_contR, dt);
 
-    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    bool isObservable =
-        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
-    if (isObservable && Outputs <= States) {
+    if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
       m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
           discA.transpose(), C.transpose(), discQ, discR);
     } else {
@@ -137,10 +134,7 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, Outputs, Outputs> discR =
         DiscretizeR<Outputs>(m_contR, dt);
 
-    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    bool isObservable =
-        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
-    if (isObservable && Outputs <= States) {
+    if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
       m_initP = drake::math::DiscreteAlgebraicRiccatiEquation(
           discA.transpose(), C.transpose(), discQ, discR);
     } else {
