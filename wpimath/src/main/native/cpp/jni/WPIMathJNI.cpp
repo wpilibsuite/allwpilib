@@ -273,7 +273,7 @@ Java_edu_wpi_first_math_WPIMathJNI_deserializeTrajectory
     return MakeJDoubleArray(env, elements);
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "edu/wpi/first/math/trajectory/TrajectoryUtil$"
         "TrajectorySerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
@@ -298,7 +298,7 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
                        frc::TrajectoryUtil::SerializeTrajectory(trajectory));
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "edu/wpi/first/math/trajectory/TrajectoryUtil$"
         "TrajectorySerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
