@@ -16,9 +16,9 @@ namespace frc {
  *
  * This works in conjunction with the UnscentedKalmanFilter class.
  *
- * @tparam States      Number of states.
  * @tparam CovDim      Dimension of covariance of sigma points after passing
  *                     through the transform.
+ * @tparam States      Number of states.
  * @param sigmas       List of sigma points.
  * @param Wm           Weights for the mean.
  * @param Wc           Weights for the covariance.
@@ -30,7 +30,7 @@ namespace frc {
  * @return Tuple of x, mean of sigma points; P, covariance of sigma points after
  *         passing through the transform.
  */
-template <int States, int CovDim>
+template <int CovDim, int States>
 std::tuple<Eigen::Vector<double, CovDim>, Eigen::Matrix<double, CovDim, CovDim>>
 UnscentedTransform(const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
                    const Eigen::Vector<double, 2 * States + 1>& Wm,

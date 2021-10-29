@@ -19,11 +19,35 @@
 
 namespace frc {
 
+/**
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
+ *
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
+ *
+ * An extended Kalman filter supports nonlinear state and measurement models. It
+ * propagates the error covariance by linearizing the models around the state
+ * estimate, then applying the linear Kalman filter equations.
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
+ */
 template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
  public:
   /**
-   * Constructs an Extended Kalman filter.
+   * Constructs an extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.
@@ -81,7 +105,7 @@ class ExtendedKalmanFilter {
   }
 
   /**
-   * Constructs an Extended Kalman filter.
+   * Constructs an extended Kalman filter.
    *
    * @param f                  A vector-valued function of x and u that returns
    *                           the derivative of the state vector.

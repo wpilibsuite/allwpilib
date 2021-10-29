@@ -18,13 +18,21 @@ import org.ejml.simple.SimpleMatrix;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
- * true ystem state. This is useful because many states cannot be measured directly as a result of
+ * true system state. This is useful because many states cannot be measured directly as a result of
  * sensor noise, or because the state is "hidden".
  *
- * <p>The Unscented Kalman filter is similar to the {@link KalmanFilter Kalman filter}, except that
- * it propagates carefully chosen points called sigma points through the non-linear model to obtain
- * an estimate of the true covariance (as opposed to a linearized version of it). This means that
- * the UKF works with nonlinear systems.
+ * <p>Kalman filters use a K gain matrix to determine whether to trust the model or measurements
+ * more. Kalman filter theory uses statistics to compute an optimal K gain which minimizes the sum
+ * of squares error in the state estimate. This K gain is used to correct the state estimate by some
+ * amount of the difference between the actual measurements and the measurements predicted by the
+ * model.
+ *
+ * <p>An unscented Kalman filter uses nonlinear state and measurement models. It propagates the
+ * error covariance using sigma points chosen to approximate the true probability distribution.
+ *
+ * <p>For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
+ * theory".
  */
 @SuppressWarnings({"MemberName", "ClassTypeParameterName"})
 public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>

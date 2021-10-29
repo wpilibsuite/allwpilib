@@ -24,6 +24,9 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
  */
 template <int States, int Inputs>
 class LinearPlantInversionFeedforward {
@@ -31,6 +34,7 @@ class LinearPlantInversionFeedforward {
   /**
    * Constructs a feedforward with the given plant.
    *
+   * @tparam Outputs The number of outputs.
    * @param plant The plant being controlled.
    * @param dt    Discretization timestep.
    */
