@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsHub;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
@@ -30,7 +30,7 @@ class REVPHSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PneumaticsHub ph = new PneumaticsHub(1)) {
+        PneumaticHub ph = new PneumaticHub(1)) {
       assertTrue(sim.getInitialized());
     }
     assertFalse(sim.getInitialized());
@@ -40,7 +40,7 @@ class REVPHSimTest {
   void solenoidOutputTest() {
     HAL.initialize(500, 0);
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
@@ -96,7 +96,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorOnCallback(callback, false)) {
       assertFalse(ph.getCompressor());
       assertFalse(sim.getCompressorOn());
@@ -115,7 +115,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
       ph.setClosedLoopControl(false);
       assertFalse(ph.getClosedLoopControl());
@@ -135,7 +135,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerPressureSwitchCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 
@@ -154,7 +154,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     DoubleCallback callback = new DoubleCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorCurrentCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 

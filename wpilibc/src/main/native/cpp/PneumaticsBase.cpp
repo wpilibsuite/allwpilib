@@ -5,8 +5,8 @@
 #include "frc/PneumaticsBase.h"
 
 #include "frc/Errors.h"
+#include "frc/PneumaticHub.h"
 #include "frc/PneumaticsControlModule.h"
-#include "frc/PneumaticsHub.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;
@@ -16,7 +16,7 @@ std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
   if (moduleType == PneumaticsModuleType::CTREPCM) {
     return PneumaticsControlModule::GetForModule(module);
   } else if (moduleType == PneumaticsModuleType::REVPH) {
-    return PneumaticsHub::GetForModule(module);
+    return PneumaticHub::GetForModule(module);
   }
   throw FRC_MakeError(err::InvalidParameter, "{}", moduleType);
 }
