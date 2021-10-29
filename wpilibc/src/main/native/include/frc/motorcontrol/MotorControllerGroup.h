@@ -14,6 +14,9 @@
 
 namespace frc {
 
+/**
+ * Allows multiple MotorController objects to be linked together.
+ */
 class MotorControllerGroup : public wpi::Sendable,
                              public MotorController,
                              public wpi::SendableHelper<MotorControllerGroup> {
