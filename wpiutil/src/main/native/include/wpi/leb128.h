@@ -19,25 +19,27 @@ class raw_istream;
 class raw_ostream;
 
 /**
- * Get size of unsigned LEB128 data
- * @val: value
+ * Get size of unsigned LEB128 data.
  *
  * Determine the number of bytes required to encode an unsigned LEB128 datum.
  * The algorithm is taken from Appendix C of the DWARF 3 spec. For information
  * on the encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes required.
+ *
+ * @param val LEB128 data.
  */
 uint64_t SizeUleb128(uint64_t val);
 
 /**
- * Write unsigned LEB128 data
- * @dest: the address where the ULEB128 data is to be stored
- * @val: value to be stored
+ * Write unsigned LEB128 data.
  *
  * Encode an unsigned LEB128 encoded datum. The algorithm is taken
  * from Appendix C of the DWARF 3 spec. For information on the
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes written.
+ *
+ * @param dest The address where the ULEB128 data is to be stored.
+ * @param val Value to be stored.
  */
 uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val);
 
@@ -48,32 +50,34 @@ uint64_t WriteUleb128(SmallVectorImpl<char>& dest, uint64_t val);
  * from Appendix C of the DWARF 3 spec. For information on the
  * encodings refer to section "7.6 - Variable Length Data".
  *
- * @param os output stream
- * @param val value to be stored
+ * @param os Output stream.
+ * @param val Value to be stored.
  */
 void WriteUleb128(raw_ostream& os, uint64_t val);
 
 /**
- * Read unsigned LEB128 data
- * @addr: the address where the ULEB128 data is stored
- * @ret: address to store the result
+ * Read unsigned LEB128 data.
  *
  * Decode an unsigned LEB128 encoded datum. The algorithm is taken
  * from Appendix C of the DWARF 3 spec. For information on the
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes read.
+ *
+ * @param addr The address where the ULEB128 data is stored.
+ * @param ret Address to store the result.
  */
 uint64_t ReadUleb128(const char* addr, uint64_t* ret);
 
 /**
- * Read unsigned LEB128 data from a stream
- * @is: the input stream where the ULEB128 data is to be read from
- * @ret: address to store the result
+ * Read unsigned LEB128 data from a stream.
  *
  * Decode an unsigned LEB128 encoded datum. The algorithm is taken
  * from Appendix C of the DWARF 3 spec. For information on the
  * encodings refer to section "7.6 - Variable Length Data". Return
  * false on stream error, true on success.
+ *
+ * @param is The input stream where the ULEB128 data is to be read from.
+ * @param ret Address to store the result.
  */
 bool ReadUleb128(raw_istream& is, uint64_t* ret);
 
@@ -92,8 +96,8 @@ class Uleb128Reader {
    * If a value is returned, internal state is reset so it's safe to immediately
    * call this function again to decode another value.
    *
-   * @param in input data; modified as data is consumed (any unconsumed data
-   *           is left when function returns)
+   * @param in Input data; modified as data is consumed (any unconsumed data
+   *           is left when function returns).
    * @return value (in std::optional)
    */
   std::optional<uint64_t> ReadOne(span<const uint8_t>* in);

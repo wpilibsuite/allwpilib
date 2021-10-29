@@ -580,7 +580,6 @@ int WPI_WaitForObjectsTimeout(const WPI_Handle* handles, int handles_count,
  * @param handle handle
  * @param manual_reset true for manual reset, false for automatic reset
  * @param initial_state true to make the handle initially in signaled state
- * @return Event handle
  */
 void WPI_CreateSignalObject(WPI_Handle handle, int manual_reset,
                             int initial_state);

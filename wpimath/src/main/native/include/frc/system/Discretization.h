@@ -13,6 +13,7 @@ namespace frc {
 /**
  * Discretizes the given continuous A matrix.
  *
+ * @tparam States Number of states.
  * @param contA Continuous system matrix.
  * @param dt    Discretization timestep.
  * @param discA Storage for discrete system matrix.
@@ -27,6 +28,8 @@ void DiscretizeA(const Eigen::Matrix<double, States, States>& contA,
 /**
  * Discretizes the given continuous A and B matrices.
  *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  * @param contA Continuous system matrix.
  * @param contB Continuous input matrix.
  * @param dt    Discretization timestep.
@@ -54,6 +57,7 @@ void DiscretizeAB(const Eigen::Matrix<double, States, States>& contA,
 /**
  * Discretizes the given continuous A and Q matrices.
  *
+ * @tparam States Number of states.
  * @param contA Continuous system matrix.
  * @param contQ Continuous process noise covariance matrix.
  * @param dt    Discretization timestep.
@@ -105,6 +109,7 @@ void DiscretizeAQ(const Eigen::Matrix<double, States, States>& contA,
  *    using a taylor series to several terms and still be substantially cheaper
  *    than taking the big exponential.
  *
+ * @tparam States Number of states.
  * @param contA Continuous system matrix.
  * @param contQ Continuous process noise covariance matrix.
  * @param dt    Discretization timestep.
@@ -149,6 +154,7 @@ void DiscretizeAQTaylor(const Eigen::Matrix<double, States, States>& contA,
  * Returns a discretized version of the provided continuous measurement noise
  * covariance matrix.
  *
+ * @tparam Outputs Number of outputs.
  * @param R  Continuous measurement noise covariance matrix.
  * @param dt Discretization timestep.
  */
