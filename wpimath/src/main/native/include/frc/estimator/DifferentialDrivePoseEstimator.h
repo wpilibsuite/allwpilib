@@ -31,19 +31,24 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta, dist_l, dist_r]]ᵀ </strong> in the field
- * coordinate system.
+ * <strong> x = [x, y, theta, dist_l, dist_r]ᵀ </strong> in the field coordinate
+ * system containing x position, y position, heading, left encoder distance,
+ * and right encoder distance.
  *
- * <strong> u = [[d_l, d_r, dtheta]]ᵀ </strong> (robot-relative velocities) --
- * NB: using velocities make things considerably easier, because it means that
+ * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
+ * right wheel velocity, and change in gyro heading.
+ *
+ * NB: Using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we
  * suspect that it's easier for teams to get good encoder data than it is for
- * them to perform system identification well enough to get a good model
+ * them to perform system identification well enough to get a good model.
  *
- * <strong>y = [[x, y, theta]]ᵀ </strong> from vision,
- * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong>y = [dist_l, dist_r, theta] </strong>
+ * containing left encoder position, right encoder position, and gyro heading.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
