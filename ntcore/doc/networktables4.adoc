@@ -711,7 +711,7 @@ Each MessagePack message shall be a MessagePack array with 4 elements.  Implemen
 Messages shall consist of (in this order):
 
 * Topic/Publisher ID: unsigned integer, or -1 (RTT measurement)
-* Timestamp: unsigned integer microseconds
+* Timestamp: integer microseconds
 * Data type: unsigned integer
 * Data value (see below)
 
@@ -727,7 +727,7 @@ An example double value update would be 17 bytes:
 
 `32` (topic/publisher ID=50)
 
-`CE 07 27 0E 00` (timestamp of exactly 2 minutes in unsigned integer microseconds)
+`D2 07 27 0E 00` (timestamp of exactly 2 minutes in integer microseconds)
 
 `01` (data type: double-precision float)
 
@@ -791,4 +791,3 @@ The spec uses integer microseconds.  This seems to be a reasonable enough resolu
 
 [[unresolved-questions]]
 == Unresolved Questions
-
