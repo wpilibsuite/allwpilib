@@ -183,7 +183,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendText(span<const uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpText, data, callback);
+    Send(kFlagFin | kOpText, data, std::move(callback));
   }
 
   /**
@@ -193,7 +193,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendText(std::initializer_list<uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendText({data.begin(), data.end()}, callback);
+    SendText({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
@@ -203,7 +203,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendBinary(span<const uv::Buffer> data,
                   std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpBinary, data, callback);
+    Send(kFlagFin | kOpBinary, data, std::move(callback));
   }
 
   /**
@@ -213,7 +213,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendBinary(std::initializer_list<uv::Buffer> data,
                   std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendBinary({data.begin(), data.end()}, callback);
+    SendBinary({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
@@ -226,7 +226,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendTextFragment(
       span<const uv::Buffer> data,
       std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpText, data, callback);
+    Send(kOpText, data, std::move(callback));
   }
 
   /**
@@ -239,7 +239,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendTextFragment(
       std::initializer_list<uv::Buffer> data,
       std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendTextFragment({data.begin(), data.end()}, callback);
+    SendTextFragment({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
@@ -252,7 +252,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendBinaryFragment(
       span<const uv::Buffer> data,
       std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpBinary, data, callback);
+    Send(kOpBinary, data, std::move(callback));
   }
 
   /**
@@ -265,7 +265,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
   void SendBinaryFragment(
       std::initializer_list<uv::Buffer> data,
       std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendBinaryFragment({data.begin(), data.end()}, callback);
+    SendBinaryFragment({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
@@ -277,7 +277,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendFragment(span<const uv::Buffer> data, bool fin,
                     std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kOpCont | (fin ? kFlagFin : 0), data, callback);
+    Send(kOpCont | (fin ? kFlagFin : 0), data, std::move(callback));
   }
 
   /**
@@ -289,7 +289,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendFragment(std::initializer_list<uv::Buffer> data, bool fin,
                     std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendFragment({data.begin(), data.end()}, fin, callback);
+    SendFragment({data.begin(), data.end()}, fin, std::move(callback));
   }
 
   /**
@@ -298,9 +298,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    *                 write completes.
    */
   void SendPing(std::function<void(uv::Error)> callback = nullptr) {
-    SendPing({}, [callback](auto bufs, uv::Error err) {
-      if (callback) {
-        callback(err);
+    SendPing({}, [f = std::move(callback)](auto bufs, uv::Error err) {
+      if (f) {
+        f(err);
       }
     });
   }
@@ -313,7 +313,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPing(span<const uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpPing, data, callback);
+    Send(kFlagFin | kOpPing, data, std::move(callback));
   }
 
   /**
@@ -324,7 +324,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPing(std::initializer_list<uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendPing({data.begin(), data.end()}, callback);
+    SendPing({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
@@ -333,9 +333,9 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    *                 write completes.
    */
   void SendPong(std::function<void(uv::Error)> callback = nullptr) {
-    SendPong({}, [callback](auto bufs, uv::Error err) {
-      if (callback) {
-        callback(err);
+    SendPong({}, [f = std::move(callback)](auto bufs, uv::Error err) {
+      if (f) {
+        f(err);
       }
     });
   }
@@ -348,7 +348,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPong(span<const uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    Send(kFlagFin | kOpPong, data, callback);
+    Send(kFlagFin | kOpPong, data, std::move(callback));
   }
 
   /**
@@ -359,7 +359,7 @@ class WebSocket : public std::enable_shared_from_this<WebSocket> {
    */
   void SendPong(std::initializer_list<uv::Buffer> data,
                 std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    SendPong({data.begin(), data.end()}, callback);
+    SendPong({data.begin(), data.end()}, std::move(callback));
   }
 
   /**
