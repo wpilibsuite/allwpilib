@@ -120,7 +120,7 @@ public class BangBangController implements Sendable {
    *
    * @param measurement The most recent measurement of the process variable.
    * @param setpoint The setpoint for the process variable.
-   * @return The calculated motor output (-1, 0, or 1).
+   * @return The calculated motor output (0 or 1).
    */
   public double calculate(double measurement, double setpoint) {
     m_measurement = measurement;
