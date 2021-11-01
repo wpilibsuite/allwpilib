@@ -168,6 +168,6 @@ public class BangBangController implements Sendable {
         builder.setSmartDashboardType("BangBangController");
         builder.addDoubleProperty("tolerance", this::getTolerance, this::setTolerance);
         builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-        builder.addDoubleProperty("measurement", this::getMeasurement, (double m) -> {});
+        builder.addDoubleProperty("measurement", this::getMeasurement, null);
     }
 }
