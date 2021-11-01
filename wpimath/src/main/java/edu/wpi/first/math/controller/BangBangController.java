@@ -48,6 +48,16 @@ public class BangBangController implements Sendable {
   }
 
   /**
+   * Creates a new bang-bang controller.
+   *
+   * <p>Always ensure that your motor controllers are set to "coast" before attempting to control
+   * them with a bang-bang controller.
+   */
+  public BangBangController() {
+    this(Double.POSITIVE_INFINITY);
+  }
+
+  /**
    * Sets the setpoint for the bang-bang controller.
    *
    * @param setpoint The desired setpoint.
