@@ -28,14 +28,11 @@ public class BangBangController implements Sendable {
         kReverse
     }
 
-    private static int instances = 0;
+    private static int instances;
 
-    private Direction m_direction;
+    private final Direction m_direction;
 
     private double m_tolerance;
-
-    private double m_maximumInput;
-    private double m_minimumInput;
 
     private double m_setpoint;
     private double m_measurement;
