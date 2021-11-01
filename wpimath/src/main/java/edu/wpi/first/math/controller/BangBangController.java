@@ -16,8 +16,8 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  * works very well for velocity control of high-inertia mechanisms,
  * and poorly on most other things.
  *
- * <p>Note that this is an *asymmetric* bang-bang controller - it will not exert any control effort in
- * the reverse direction (e.g. it won't try to slow down an over-speeding shooter wheel).  This
+ * <p>Note that this is an *asymmetric* bang-bang controller - it will not exert any control effort
+ * in the reverse direction (e.g. it won't try to slow down an over-speeding shooter wheel).  This
  * asymmetry is *extremely important.*  Bang-bang control is extremely simple, but also
  * potentially hazardous.  Always ensure that your motor controllers are set to "coast" before
  * attempting to control them with a bang-bang controller.
