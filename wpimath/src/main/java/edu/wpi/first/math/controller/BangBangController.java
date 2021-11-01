@@ -6,38 +6,34 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Implements a bang-bang controller, which outputs 0, 1, or -1.
+ * Implements a bang-bang controller, which outputs either 0 or 1 depending on whether
+ * the measurement is less than the setpoint.  This maximally-aggressive control approach
+ * works very well for velocity control of high-inertia mechanisms,
+ * and poorly on most other things.
  *
- * <p>Bang-bang control is extremely simple, but also potentially hazardous.
- * Always ensure that your motor controllers are set to "coast" before
+ * <p>Note that this is an *asymmetric* bang-bang controller - it will not exert any control effort in
+ * the reverse direction (e.g. it won't try to slow down an over-speeding shooter wheel).  This
+ * asymmetry is *extremely important.*  Bang-bang control is extremely simple, but also
+ * potentially hazardous.  Always ensure that your motor controllers are set to "coast" before
  * attempting to control them with a bang-bang controller.
  */
 public class BangBangController implements Sendable {
-    /**
-     * The type of bang-bang control.  A symmetric controller will
-     * control the motor in both directions, while the forward/reverse
-     * controllers will output zero in other direction. Symmetric controllers
-     * should *never* be used on high-inertia mechanisms.
-     */
-    public enum ControlType {
+    public enum Direction {
         kForward,
-        kReverse,
-        kSymmetric
+        kReverse
     }
 
     private static int instances = 0;
 
-    private ControlType m_type;
+    private Direction m_direction;
 
     private double m_tolerance;
 
-    private boolean m_continuous;
     private double m_maximumInput;
     private double m_minimumInput;
 
@@ -47,19 +43,21 @@ public class BangBangController implements Sendable {
     /**
      * Creates a new bang-bang controller.
      *
+     * <p>Always ensure that your motor controllers are set to "coast" before
+     * attempting to control them with a bang-bang controller.
+     *
      * @param tolerance The controller's error tolerance, within which the controller
      *                  will output zero.
-     * @param type The type of bang-bang controller. *Never* use a symmetric controller
-     *             on a high-inertia mechanism.
+     * @param direction The direction of the bang-bang controller.
      */
     public BangBangController(
         double tolerance,
-        ControlType type
+        Direction direction
     ) {
         instances++;
 
         m_tolerance = tolerance;
-        m_type = type;
+        m_direction = direction;
 
         SendableRegistry.addLW(this, "BangBangController", instances);
 
@@ -119,44 +117,7 @@ public class BangBangController implements Sendable {
      * @return Whether the error is within the acceptable bounds.
      */
     public boolean atSetpoint() {
-        double positionError;
-        if (m_continuous) {
-            double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-            positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-        } else {
-            positionError = m_setpoint - m_measurement;
-        }
-
-        return Math.abs(positionError) < m_tolerance;
-    }
-
-    /**
-     * Enables continuous input.
-     *
-     * <p>Rather then using the max and min input range as constraints, it considers them to be the
-     * same point and automatically calculates the shortest route to the setpoint.
-     *
-     * @param minimumInput The minimum value expected from the input.
-     * @param maximumInput The maximum value expected from the input.
-     */
-    public void enableContinuousInput(double minimumInput, double maximumInput) {
-        m_continuous = true;
-        m_minimumInput = minimumInput;
-        m_maximumInput = maximumInput;
-    }
-
-    /** Disables continuous input. */
-    public void disableContinuousInput() {
-        m_continuous = false;
-    }
-
-    /**
-     * Returns true if continuous input is enabled.
-     *
-     * @return True if continuous input is enabled.
-     */
-    public boolean isContinuousInputEnabled() {
-        return m_continuous;
+        return Math.abs(m_setpoint - m_measurement) < m_tolerance;
     }
 
     /**
@@ -171,6 +132,9 @@ public class BangBangController implements Sendable {
     /**
      * Returns the calculated control output.
      *
+     * <p>Always ensure that your motor controllers are set to "coast" before
+     * attempting to control them with a bang-bang controller.
+     *
      * @param measurement The most recent measurement of the process variable.
      * @param setpoint The setpoint for the process variable.
      * @return The calculated motor output (-1, 0, or 1).
@@ -179,13 +143,11 @@ public class BangBangController implements Sendable {
         m_measurement = measurement;
         m_setpoint = setpoint;
 
-        switch (m_type) {
+        switch (m_direction) {
             case kForward:
                 return !atSetpoint() && measurement < setpoint ? 1 : 0;
             case kReverse:
                 return !atSetpoint() && measurement > setpoint ? -1 : 0;
-            case kSymmetric:
-                return !atSetpoint() ? Math.signum(setpoint - measurement) : 0;
             default:
                 return 0;
         }
