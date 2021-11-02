@@ -59,8 +59,6 @@ public class SwerveModuleSimTest {
     
     azmthEncoder = new Encoder(6, 7);
     azmthEncoder.setDistancePerPulse(1.0/4096.0);
-
-
   }
 
   private void closeHardware(){

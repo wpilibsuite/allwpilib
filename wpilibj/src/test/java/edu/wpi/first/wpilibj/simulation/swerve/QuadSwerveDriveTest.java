@@ -96,12 +96,10 @@ public class QuadSwerveDriveTest {
   }
 
   private void closeHardware(){
-    for(int idx = 0; idx < NUM_MOD; idx++){
-      wheelMotors.get(idx).close();
-      azmthMotors.get(idx).close();
-      wheelEncoders.get(idx).close();
-      azmthEncoders.get(idx).close();
-    }
+    wheelMotors.forEach(m -> {m.close();});
+    azmthMotors.forEach(m -> {m.close();});
+    wheelEncoders.forEach(m -> {m.close();});
+    azmthEncoders.forEach(m -> {m.close();});
   }
 
   @Test
