@@ -105,8 +105,6 @@ public class BangBangController implements Sendable {
   /**
    * Returns true if the error is within the tolerance of the setpoint.
    *
-   * <p>This will return false until at least one input value has been computed.
-   *
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
@@ -154,7 +152,8 @@ public class BangBangController implements Sendable {
     builder.setSmartDashboardType("BangBangController");
     builder.addDoubleProperty("tolerance", this::getTolerance, this::setTolerance);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
     builder.addDoubleProperty("measurement", this::getMeasurement, null);
+    builder.addDoubleProperty("error", this::getError, null);
+    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
   }
 }
