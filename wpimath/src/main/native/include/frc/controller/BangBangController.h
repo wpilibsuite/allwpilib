@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT BangBangController
    *
    * @param tolerance Tolerance for atSetpoint.
    */
-  BangBangController(
+  explicit BangBangController(
       double tolerance = std::numeric_limits<double>::infinity());
 
   void SetTolerance(double tolerance);
