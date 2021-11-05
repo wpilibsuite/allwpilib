@@ -11,13 +11,13 @@
 #include "DigitalInternal.h"
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "InterruptManager.h"
 #include "PortsInternal.h"
 #include "hal/ChipObject.h"
 #include "hal/Errors.h"
 #include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
-#include "InterruptManager.h"
 
 using namespace hal;
 
@@ -84,7 +84,9 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
     return 0;
   }
 
-  result = anInterrupt->manager.WaitForInterrupt(anInterrupt->irqContext, anInterrupt->mask, ignorePrevious, static_cast<uint32_t>(timeout * 1e3), status);
+  result = anInterrupt->manager.WaitForInterrupt(
+      anInterrupt->irqContext, anInterrupt->mask, ignorePrevious,
+      static_cast<uint32_t>(timeout * 1e3), status);
 
   // Don't report a timeout as an error - the return code is enough to tell
   // that a timeout happened.

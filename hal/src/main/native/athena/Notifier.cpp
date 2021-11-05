@@ -114,7 +114,8 @@ static void notifierThreadMain() {
 
   while (notifierRunning) {
     status = 0;
-    auto triggeredMask = manager.WaitForInterrupt(context, mask, false, 10000, &status);
+    auto triggeredMask =
+        manager.WaitForInterrupt(context, mask, false, 10000, &status);
     if (!notifierRunning) {
       break;
     }

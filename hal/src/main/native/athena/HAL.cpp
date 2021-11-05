@@ -21,10 +21,9 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
-#include "InterruptManager.h"
-
 #include "HALInitializer.h"
 #include "HALInternal.h"
+#include "InterruptManager.h"
 #include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
 #include "hal/Errors.h"

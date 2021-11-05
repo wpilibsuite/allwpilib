@@ -1,8 +1,14 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "InterruptManager.h"
-#include "hal/Errors.h"
+
+#include <fmt/format.h>
+
 #include "HALInternal.h"
-#include "fmt/format.h"
 #include "dlfcn.h"
+#include "hal/Errors.h"
 
 // Low level FPGA calls
 typedef NiFpga_Status (*HAL_NiFpga_ReserveIrqContextFunc)(
