@@ -21,6 +21,8 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
+#include "InterruptManager.h"
+
 #include "HALInitializer.h"
 #include "HALInternal.h"
 #include "hal/ChipObject.h"
@@ -413,6 +415,12 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   int32_t status = 0;
   global.reset(tGlobal::create(&status));
   watchdog.reset(tSysWatchdog::create(&status));
+
+  if (status != 0) {
+    return false;
+  }
+
+  status = InterruptManager::Initialize(global->getSystemInterface());
 
   if (status != 0) {
     return false;
