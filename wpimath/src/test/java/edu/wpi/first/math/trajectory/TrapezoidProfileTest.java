@@ -77,7 +77,7 @@ class TrapezoidProfileTest {
     double lastPos = state.position;
     for (int i = 0; i < 1600; ++i) {
       if (i == 400) {
-        constraints.maxVelocity = 0.75;
+        constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
       }
 
       profile = new TrapezoidProfile(constraints, goal, state);

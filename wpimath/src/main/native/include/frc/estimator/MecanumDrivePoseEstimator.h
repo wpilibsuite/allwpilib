@@ -32,16 +32,18 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta]]ᵀ </strong> in the
- * field-coordinate system.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading.
  *
- * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
+ * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
+ * right wheel velocity, and change in gyro heading.
  *
- * <strong> y = [[x, y, theta]]ᵀ </strong> in field
- * coords from vision, or <strong> y = [[theta]]ᵀ
- * </strong> from the gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
+ * heading.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:

@@ -168,7 +168,7 @@ units::volt_t RobotController::GetBrownoutVoltage() {
 
 void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
   int32_t status = 0;
-  HAL_SetBrownoutVoltage(brownoutVoltage.to<double>(), &status);
+  HAL_SetBrownoutVoltage(brownoutVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetBrownoutVoltage");
 }
 

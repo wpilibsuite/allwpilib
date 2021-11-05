@@ -17,9 +17,9 @@ TEST(Twist2dTest, Straight) {
   const Twist2d straight{5.0_m, 0.0_m, 0.0_rad};
   const auto straightPose = Pose2d().Exp(straight);
 
-  EXPECT_NEAR(straightPose.X().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(straightPose.Y().to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(straightPose.Rotation().Radians().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(straightPose.X().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(straightPose.Y().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(straightPose.Rotation().Radians().value(), 0.0, kEpsilon);
 }
 
 TEST(Twist2dTest, QuarterCircle) {
@@ -27,19 +27,18 @@ TEST(Twist2dTest, QuarterCircle) {
                               units::radian_t(wpi::numbers::pi / 2.0)};
   const auto quarterCirclePose = Pose2d().Exp(quarterCircle);
 
-  EXPECT_NEAR(quarterCirclePose.X().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(quarterCirclePose.Y().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(quarterCirclePose.Rotation().Degrees().to<double>(), 90.0,
-              kEpsilon);
+  EXPECT_NEAR(quarterCirclePose.X().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(quarterCirclePose.Y().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(quarterCirclePose.Rotation().Degrees().value(), 90.0, kEpsilon);
 }
 
 TEST(Twist2dTest, DiagonalNoDtheta) {
   const Twist2d diagonal{2.0_m, 2.0_m, 0.0_deg};
   const auto diagonalPose = Pose2d().Exp(diagonal);
 
-  EXPECT_NEAR(diagonalPose.X().to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(diagonalPose.Y().to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(diagonalPose.Rotation().Degrees().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(diagonalPose.X().value(), 2.0, kEpsilon);
+  EXPECT_NEAR(diagonalPose.Y().value(), 2.0, kEpsilon);
+  EXPECT_NEAR(diagonalPose.Rotation().Degrees().value(), 0.0, kEpsilon);
 }
 
 TEST(Twist2dTest, Equality) {
@@ -60,7 +59,7 @@ TEST(Twist2dTest, Pose2dLog) {
 
   const auto twist = start.Log(end);
 
-  EXPECT_NEAR(twist.dx.to<double>(), 5 / 2.0 * wpi::numbers::pi, kEpsilon);
-  EXPECT_NEAR(twist.dy.to<double>(), 0.0, kEpsilon);
-  EXPECT_NEAR(twist.dtheta.to<double>(), wpi::numbers::pi / 2.0, kEpsilon);
+  EXPECT_NEAR(twist.dx.value(), 5 / 2.0 * wpi::numbers::pi, kEpsilon);
+  EXPECT_NEAR(twist.dy.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(twist.dtheta.value(), wpi::numbers::pi / 2.0, kEpsilon);
 }

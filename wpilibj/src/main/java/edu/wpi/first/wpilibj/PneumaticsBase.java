@@ -16,7 +16,7 @@ public interface PneumaticsBase extends AutoCloseable {
     if (type == PneumaticsModuleType.CTREPCM) {
       return new PneumaticsControlModule(module);
     } else if (type == PneumaticsModuleType.REVPH) {
-      return new PneumaticsHub(module);
+      return new PneumaticHub(module);
     }
     throw new IllegalArgumentException("Unknown module type");
   }

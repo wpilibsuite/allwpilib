@@ -44,12 +44,12 @@ Eigen::Vector<double, 5> Dynamics(const Eigen::Vector<double, 5>& x,
 
   auto v = 0.5 * (vl + vr);
   return Eigen::Vector<double, 5>{
-      v.to<double>() * std::cos(x(2)), v.to<double>() * std::sin(x(2)),
-      ((vr - vl) / (2.0 * rb)).to<double>(),
-      k1.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-          k2.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>()),
-      k2.to<double>() * ((C1 * vl).to<double>() + (C2 * Vl).to<double>()) +
-          k1.to<double>() * ((C1 * vr).to<double>() + (C2 * Vr).to<double>())};
+      v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
+      ((vr - vl) / (2.0 * rb)).value(),
+      k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
+          k2.value() * ((C1 * vr).value() + (C2 * Vr).value()),
+      k2.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
+          k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
 Eigen::Vector<double, 3> LocalMeasurementModel(
@@ -110,30 +110,29 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
                                             Eigen::Vector<double, 2>::Zero());
 
   observer.SetXhat(Eigen::Vector<double, 5>{
-      trajectory.InitialPose().Translation().X().to<double>(),
-      trajectory.InitialPose().Translation().Y().to<double>(),
-      trajectory.InitialPose().Rotation().Radians().to<double>(), 0.0, 0.0});
+      trajectory.InitialPose().Translation().X().value(),
+      trajectory.InitialPose().Translation().Y().value(),
+      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
 
   auto trueXhat = observer.Xhat();
 
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).to<double>(); ++i) {
+  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
     auto ref = trajectory.Sample(dt * i);
     units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).to<double>());
+        ref.velocity * (1 - (ref.curvature * rb).value());
     units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).to<double>());
+        ref.velocity * (1 + (ref.curvature * rb).value());
 
-    Eigen::Vector<double, 5> nextR{ref.pose.Translation().X().to<double>(),
-                                   ref.pose.Translation().Y().to<double>(),
-                                   ref.pose.Rotation().Radians().to<double>(),
-                                   vl.to<double>(), vr.to<double>()};
+    Eigen::Vector<double, 5> nextR{
+        ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
+        ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
     auto localY =
         LocalMeasurementModel(trueXhat, Eigen::Vector<double, 2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    Eigen::Vector<double, 5> rdot = (nextR - r) / dt.to<double>();
+    Eigen::Vector<double, 5> rdot = (nextR - r) / dt.value();
     u = B.householderQr().solve(rdot -
                                 Dynamics(r, Eigen::Vector<double, 2>::Zero()));
 
@@ -155,12 +154,12 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().template to<double>(),
-              observer.Xhat(0), 1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().template to<double>(),
-              observer.Xhat(1), 1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().template to<double>(),
-              observer.Xhat(2), 1.0);
+  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+              1.0);
+  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+              1.0);
+  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
+              1.0);
   ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
   ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
 }

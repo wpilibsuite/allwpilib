@@ -32,6 +32,9 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs the number of inputs.
  */
 template <int States, int Inputs>
 class ControlAffinePlantInversionFeedforward {
@@ -166,7 +169,7 @@ class ControlAffinePlantInversionFeedforward {
   Eigen::Vector<double, Inputs> Calculate(
       const Eigen::Vector<double, States>& r,
       const Eigen::Vector<double, States>& nextR) {
-    Eigen::Vector<double, States> rDot = (nextR - r) / m_dt.to<double>();
+    Eigen::Vector<double, States> rDot = (nextR - r) / m_dt.value();
 
     m_uff = m_B.householderQr().solve(
         rDot - m_f(r, Eigen::Vector<double, Inputs>::Zero()));

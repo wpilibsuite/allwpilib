@@ -216,7 +216,8 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
   hph->hcan = hcan;
   hph->controlPeriod = kDefaultControlPeriod;
 
-  // TODO any other things
+  // Start closed-loop compressor control by starting solenoid state updates
+  HAL_REV_SendSolenoidsState(hph.get(), status);
 
   return handle;
 }

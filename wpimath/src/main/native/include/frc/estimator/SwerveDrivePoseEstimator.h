@@ -34,15 +34,18 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta]]ᵀ </strong> in the
- * field-coordinate system.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading.
  *
- * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
+ * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
+ * right wheel velocity, and change in gyro heading.
  *
- * <strong> y = [[x, y, theta]]ᵀ </strong> in field coords from vision,
- * or <strong> y = [[theta]]ᵀ </strong> from the gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
+ * heading.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
@@ -269,11 +272,10 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().template to<double>(),
-                               fieldRelativeSpeeds.Y().template to<double>(),
-                               omega.template to<double>()};
+    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().value(),
+                               fieldRelativeSpeeds.Y().value(), omega.value()};
 
-    Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
+    Eigen::Vector<double, 1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
     m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);

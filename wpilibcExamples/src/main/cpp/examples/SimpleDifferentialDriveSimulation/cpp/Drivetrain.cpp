@@ -10,9 +10,9 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   auto leftFeedforward = m_feedforward.Calculate(speeds.left);
   auto rightFeedforward = m_feedforward.Calculate(speeds.right);
   double leftOutput = m_leftPIDController.Calculate(m_leftEncoder.GetRate(),
-                                                    speeds.left.to<double>());
-  double rightOutput = m_rightPIDController.Calculate(
-      m_rightEncoder.GetRate(), speeds.right.to<double>());
+                                                    speeds.left.value());
+  double rightOutput = m_rightPIDController.Calculate(m_rightEncoder.GetRate(),
+                                                      speeds.right.value());
 
   m_leftGroup.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
   m_rightGroup.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
@@ -47,16 +47,12 @@ void Drivetrain::SimulationPeriodic() {
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
-  m_leftEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetLeftPosition().to<double>());
-  m_leftEncoderSim.SetRate(
-      m_drivetrainSimulator.GetLeftVelocity().to<double>());
+  m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftPosition().value());
+  m_leftEncoderSim.SetRate(m_drivetrainSimulator.GetLeftVelocity().value());
   m_rightEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetRightPosition().to<double>());
-  m_rightEncoderSim.SetRate(
-      m_drivetrainSimulator.GetRightVelocity().to<double>());
-  m_gyroSim.SetAngle(
-      -m_drivetrainSimulator.GetHeading().Degrees().to<double>());
+      m_drivetrainSimulator.GetRightPosition().value());
+  m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity().value());
+  m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees().value());
 }
 
 void Drivetrain::Periodic() {

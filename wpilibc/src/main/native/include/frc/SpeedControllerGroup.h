@@ -15,6 +15,11 @@
 
 namespace frc {
 
+/**
+ * Allows multiple SpeedController objects to be linked together.
+ *
+ * @deprecated Use MotorControllerGroup.
+ */
 class WPI_DEPRECATED("use MotorControllerGroup") SpeedControllerGroup
     : public wpi::Sendable,
       public MotorController,

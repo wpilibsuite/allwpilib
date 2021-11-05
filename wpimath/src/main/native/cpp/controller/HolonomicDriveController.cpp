@@ -56,10 +56,10 @@ ChassisSpeeds HolonomicDriveController::Calculate(
   }
 
   // Calculate feedback velocities (based on position error).
-  auto xFeedback = units::meters_per_second_t(m_xController.Calculate(
-      currentPose.X().to<double>(), poseRef.X().to<double>()));
-  auto yFeedback = units::meters_per_second_t(m_yController.Calculate(
-      currentPose.Y().to<double>(), poseRef.Y().to<double>()));
+  auto xFeedback = units::meters_per_second_t(
+      m_xController.Calculate(currentPose.X().value(), poseRef.X().value()));
+  auto yFeedback = units::meters_per_second_t(
+      m_yController.Calculate(currentPose.Y().value(), poseRef.Y().value()));
 
   // Return next output.
   return ChassisSpeeds::FromFieldRelativeSpeeds(

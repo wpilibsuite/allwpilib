@@ -94,7 +94,7 @@ class Robot : public frc::TimedRobot {
     // setpoint of a PID controller.
     if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(Eigen::Vector<double, 1>{kSpinup.to<double>()});
+      m_loop.SetNextR(Eigen::Vector<double, 1>{kSpinup.value()});
     } else {
       // We released the bumper, so let's spin down
       m_loop.SetNextR(Eigen::Vector<double, 1>{0.0});

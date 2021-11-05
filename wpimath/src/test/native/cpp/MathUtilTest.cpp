@@ -6,11 +6,9 @@
 #include "gtest/gtest.h"
 #include "units/angle.h"
 
-#define EXPECT_UNITS_EQ(a, b) \
-  EXPECT_DOUBLE_EQ((a).to<double>(), (b).to<double>())
+#define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 
-#define EXPECT_UNITS_NEAR(a, b, c) \
-  EXPECT_NEAR((a).to<double>(), (b).to<double>(), c)
+#define EXPECT_UNITS_NEAR(a, b, c) EXPECT_NEAR((a).value(), (b).value(), c)
 
 TEST(MathUtilTest, ApplyDeadband) {
   // < 0

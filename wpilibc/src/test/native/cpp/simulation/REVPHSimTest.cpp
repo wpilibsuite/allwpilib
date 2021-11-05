@@ -8,7 +8,7 @@
 
 #include "callback_helpers/TestCallbackHelpers.h"
 #include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsHub.h"
+#include "frc/PneumaticHub.h"
 #include "gtest/gtest.h"
 
 namespace frc::sim {
@@ -22,14 +22,14 @@ TEST(REVPHSimTest, InitializedCallback) {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticsHub ph;
+  PneumaticHub ph;
   EXPECT_TRUE(sim.GetInitialized());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_TRUE(callback.GetLastValue());
 }
 
 TEST(REVPHSimTest, SolenoidOutput) {
-  PneumaticsHub ph;
+  PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -80,7 +80,7 @@ TEST(REVPHSimTest, SolenoidOutput) {
 }
 
 TEST(REVPHSimTest, SetCompressorOn) {
-  PneumaticsHub ph;
+  PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -97,7 +97,7 @@ TEST(REVPHSimTest, SetCompressorOn) {
 }
 
 TEST(REVPHSimTest, SetClosedLoopEnabled) {
-  PneumaticsHub ph;
+  PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -116,7 +116,7 @@ TEST(REVPHSimTest, SetClosedLoopEnabled) {
 }
 
 TEST(REVPHSimTest, SetPressureSwitchEnabled) {
-  PneumaticsHub ph;
+  PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -133,7 +133,7 @@ TEST(REVPHSimTest, SetPressureSwitchEnabled) {
 }
 
 TEST(REVPHSimTest, SetCompressorCurrent) {
-  PneumaticsHub ph;
+  PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 

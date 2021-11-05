@@ -94,9 +94,9 @@ void NTField2DModel::ObjectModel::UpdateNT() {
     wpi::SmallVector<double, 9> arr;
     for (auto&& pose : m_poses) {
       auto& translation = pose.Translation();
-      arr.push_back(translation.X().to<double>());
-      arr.push_back(translation.Y().to<double>());
-      arr.push_back(pose.Rotation().Degrees().to<double>());
+      arr.push_back(translation.X().value());
+      arr.push_back(translation.Y().value());
+      arr.push_back(pose.Rotation().Degrees().value());
     }
     nt::SetEntryTypeValue(m_entry, nt::Value::MakeDoubleArray(arr));
   } else {
@@ -107,13 +107,13 @@ void NTField2DModel::ObjectModel::UpdateNT() {
     for (auto&& pose : m_poses) {
       auto& translation = pose.Translation();
       wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.X().to<double>()));
+          p, wpi::DoubleToBits(translation.X().value()));
       p += 8;
       wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(translation.Y().to<double>()));
+          p, wpi::DoubleToBits(translation.Y().value()));
       p += 8;
       wpi::support::endian::write64be(
-          p, wpi::DoubleToBits(pose.Rotation().Degrees().to<double>()));
+          p, wpi::DoubleToBits(pose.Rotation().Degrees().value()));
       p += 8;
     }
     nt::SetEntryTypeValue(m_entry,

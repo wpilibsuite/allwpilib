@@ -16,7 +16,7 @@
 
 namespace frc {
 /**
- * Class for handling asynchronous interrupts.
+ * Class for handling asynchronous interrupts using a callback thread.
  *
  * <p> By default, interrupts will occur on rising edge. Callbacks are disabled
  * by default, and Enable() must be called before they will occur.
@@ -24,7 +24,8 @@ namespace frc {
  * <p> Both rising and falling edges can be indicated in one callback if both a
  * rising and falling edge occurred since the previous callback.
  *
- * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
+ * <p>Synchronous (blocking) interrupts are handled by the SynchronousInterrupt
+ * class.
  */
 class AsynchronousInterrupt {
  public:
@@ -33,7 +34,12 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the second is falling.
+   * <p> The first bool in the callback indicates the rising edge triggered the
+   * interrupt, the second bool is falling edge.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param callback the callback function to call when the interrupt is
+   * triggered
    */
   AsynchronousInterrupt(DigitalSource& source,
                         std::function<void(bool, bool)> callback);
@@ -43,7 +49,12 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * <p> The first bool in the callback indicates the rising edge triggered the
+   * interrupt, the second bool is falling edge.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param callback the callback function to call when the interrupt is
+   * triggered
    */
   AsynchronousInterrupt(DigitalSource* source,
                         std::function<void(bool, bool)> callback);
@@ -53,7 +64,12 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * <p> The first bool in the callback indicates the rising edge triggered the
+   * interrupt, the second bool is falling edge.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param callback the callback function to call when the interrupt is
+   * triggered
    */
   AsynchronousInterrupt(std::shared_ptr<DigitalSource> source,
                         std::function<void(bool, bool)> callback);
@@ -63,7 +79,10 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param f the callback function to call when the interrupt is triggered
+   * @param arg the first argument, interrupt was triggered on rising edge
+   * @param args the remaing arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(DigitalSource& source, Callable&& f, Arg&& arg,
@@ -77,7 +96,10 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param f the callback function to call when the interrupt is triggered
+   * @param arg the first argument, interrupt was triggered on rising edge
+   * @param args the remaing arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(DigitalSource* source, Callable&& f, Arg&& arg,
@@ -91,7 +113,10 @@ class AsynchronousInterrupt {
    *
    * <p> At construction, the interrupt will trigger on the rising edge.
    *
-   * <p> The first bool in the callback is rising, the 2nd is falling.
+   * @param source the DigitalSource the interrupts are triggered from
+   * @param f the callback function to call when the interrupt is triggered
+   * @param arg the first argument, interrupt was triggered on rising edge
+   * @param args the remaing arguments, interrupt was triggered on falling edge
    */
   template <typename Callable, typename Arg, typename... Args>
   AsynchronousInterrupt(std::shared_ptr<DigitalSource> source, Callable&& f,
@@ -127,7 +152,7 @@ class AsynchronousInterrupt {
    * <p>This function does not require the interrupt to be enabled to work.
    *
    * <p>This only works if rising edge was configured using SetInterruptEdges.
-   * @return the timestamp in seconds relative to getFPGATime
+   * @return the timestamp in seconds relative to GetFPGATime
    */
   units::second_t GetRisingTimestamp();
 
@@ -137,7 +162,7 @@ class AsynchronousInterrupt {
    * <p>This function does not require the interrupt to be enabled to work.
    *
    * <p>This only works if falling edge was configured using SetInterruptEdges.
-   * @return the timestamp in seconds relative to getFPGATime
+   * @return the timestamp in seconds relative to GetFPGATime
    */
   units::second_t GetFallingTimestamp();
 

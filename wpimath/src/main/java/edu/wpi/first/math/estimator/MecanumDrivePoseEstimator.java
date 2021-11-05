@@ -32,14 +32,17 @@ import java.util.function.BiConsumer;
  * <p>{@link MecanumDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
  * want; if you never call it, then this class will behave mostly like regular encoder odometry.
  *
- * <p>Our state-space system is:
+ * <p>The state-space system used internally has the following states (x), inputs (u), and outputs
+ * (y):
  *
- * <p><strong> x = [[x, y, theta]]ᵀ </strong> in the field-coordinate system.
+ * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
+ * position, and heading.
  *
- * <p><strong> u = [[vx, vy, theta]]ᵀ </strong> in the field-coordinate system.
+ * <p><strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity, right wheel
+ * velocity, and change in gyro heading.
  *
- * <p><strong> y = [[x, y, theta]]ᵀ </strong> in field coords from vision, or <strong> y =
- * [[theta]]ᵀ </strong> from the gyro.
+ * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
+ * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
  */
 public class MecanumDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;

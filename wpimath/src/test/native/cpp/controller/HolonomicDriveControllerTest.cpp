@@ -37,7 +37,7 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
 
   constexpr auto kDt = 0.02_s;
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).to<double>(); ++i) {
+  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state, 0_rad);
 
@@ -62,5 +62,5 @@ TEST(HolonomicDriveControllerTest, DoesNotRotateUnnecessarily) {
   frc::ChassisSpeeds speeds = controller.Calculate(
       frc::Pose2d(0_m, 0_m, 1.57_rad), frc::Pose2d(), 0_mps, 1.57_rad);
 
-  EXPECT_EQ(0, speeds.omega.to<double>());
+  EXPECT_EQ(0, speeds.omega.value());
 }

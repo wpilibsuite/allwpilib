@@ -33,14 +33,14 @@ TEST(SimpleMotorFeedforwardTest, Calculate) {
   Eigen::Vector<double, 1> nextR{3.0};
 
   EXPECT_NEAR(37.524995834325161 + Ks,
-              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+              simpleMotor.Calculate(2_mps, 3_mps, dt).value(), 0.002);
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
-              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+              simpleMotor.Calculate(2_mps, 3_mps, dt).value(), 0.002);
 
   // These won't match exactly. It's just an approximation to make sure they're
   // in the same ballpark.
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
-              simpleMotor.Calculate(2_mps, 1_mps / dt).to<double>(), 2.0);
+              simpleMotor.Calculate(2_mps, 1_mps / dt).value(), 2.0);
 }
 
 }  // namespace frc

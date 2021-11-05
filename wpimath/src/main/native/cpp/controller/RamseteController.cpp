@@ -51,11 +51,11 @@ ChassisSpeeds RamseteController::Calculate(
   m_poseError = poseRef.RelativeTo(currentPose);
 
   // Aliases for equation readability
-  double eX = m_poseError.X().to<double>();
-  double eY = m_poseError.Y().to<double>();
-  double eTheta = m_poseError.Rotation().Radians().to<double>();
-  double vRef = linearVelocityRef.to<double>();
-  double omegaRef = angularVelocityRef.to<double>();
+  double eX = m_poseError.X().value();
+  double eY = m_poseError.Y().value();
+  double eTheta = m_poseError.Rotation().Radians().value();
+  double vRef = linearVelocityRef.value();
+  double omegaRef = angularVelocityRef.value();
 
   double k =
       2.0 * m_zeta * std::sqrt(std::pow(omegaRef, 2) + m_b * std::pow(vRef, 2));

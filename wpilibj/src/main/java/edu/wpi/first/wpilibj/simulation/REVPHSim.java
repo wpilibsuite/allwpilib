@@ -9,7 +9,7 @@ import edu.wpi.first.hal.simulation.REVPHDataJNI;
 import edu.wpi.first.wpilibj.PneumaticsBase;
 import edu.wpi.first.wpilibj.SensorUtil;
 
-/** Class to control a simulated PneumaticsHub (PH). */
+/** Class to control a simulated PneumaticHub (PH). */
 @SuppressWarnings("AbbreviationAsWordInName")
 public class REVPHSim {
   private final int m_index;

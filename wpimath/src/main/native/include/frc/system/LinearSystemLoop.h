@@ -27,6 +27,10 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystemLoop {
@@ -50,8 +54,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const Eigen::Vector<double, Inputs>& u) {
-              return frc::NormalizeInputVector<Inputs>(
-                  u, maxVoltage.template to<double>());
+              return frc::NormalizeInputVector<Inputs>(u, maxVoltage.value());
             },
             dt) {}
 
@@ -97,7 +100,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(controller, feedforward, observer,
                          [=](const Eigen::Vector<double, Inputs>& u) {
                            return frc::NormalizeInputVector<Inputs>(
-                               u, maxVoltage.template to<double>());
+                               u, maxVoltage.value());
                          }) {}
 
   /**

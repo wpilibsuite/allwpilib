@@ -185,9 +185,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Curvature drive method for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds. Also handles the robot's
-   * quick turn functionality - "quick turn" overrides constant-curvature turning for turn-in-place
-   * maneuvers.
+   * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
@@ -312,9 +310,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Curvature drive inverse kinematics for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds. Also handles the robot's
-   * quick turn functionality - "quick turn" overrides constant-curvature turning for turn-in-place
-   * maneuvers.
+   * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is

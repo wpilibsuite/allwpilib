@@ -13,12 +13,12 @@
 #include "PneumaticsBase.h"
 
 namespace frc {
-class PneumaticsHub : public PneumaticsBase {
+class PneumaticHub : public PneumaticsBase {
  public:
-  PneumaticsHub();
-  explicit PneumaticsHub(int module);
+  PneumaticHub();
+  explicit PneumaticHub(int module);
 
-  ~PneumaticsHub() override = default;
+  ~PneumaticHub() override = default;
 
   bool GetCompressor() const override;
 
@@ -61,7 +61,7 @@ class PneumaticsHub : public PneumaticsBase {
   class DataStore;
   friend class DataStore;
   friend class PneumaticsBase;
-  PneumaticsHub(HAL_REVPHHandle handle, int module);
+  PneumaticHub(HAL_REVPHHandle handle, int module);
 
   static std::shared_ptr<PneumaticsBase> GetForModule(int module);
 

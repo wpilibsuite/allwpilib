@@ -74,7 +74,7 @@ TEST(MecanumDrivePoseEstimatorTest, Accuracy) {
         wheelSpeeds);
     double error = groundTruthState.pose.Translation()
                        .Distance(xhat.Translation())
-                       .to<double>();
+                       .value();
 
     if (error > maxError) {
       maxError = error;
@@ -84,7 +84,6 @@ TEST(MecanumDrivePoseEstimatorTest, Accuracy) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().to<double>() / dt.to<double>()),
-            0.2);
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.2);
   EXPECT_LT(maxError, 0.4);
 }

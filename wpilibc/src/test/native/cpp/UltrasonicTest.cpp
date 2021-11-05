@@ -12,15 +12,15 @@ TEST(UltrasonicTest, SimDevices) {
   Ultrasonic ultrasonic{0, 1};
   sim::UltrasonicSim sim{ultrasonic};
 
-  EXPECT_EQ(0, ultrasonic.GetRange().to<double>());
+  EXPECT_EQ(0, ultrasonic.GetRange().value());
   EXPECT_TRUE(ultrasonic.IsRangeValid());
 
   sim.SetRange(units::meter_t{35.04});
-  EXPECT_EQ(35.04, ultrasonic.GetRange().to<double>());
+  EXPECT_EQ(35.04, ultrasonic.GetRange().value());
 
   sim.SetRangeValid(false);
   EXPECT_FALSE(ultrasonic.IsRangeValid());
-  EXPECT_EQ(0, ultrasonic.GetRange().to<double>());
+  EXPECT_EQ(0, ultrasonic.GetRange().value());
 }
 
 }  // namespace frc

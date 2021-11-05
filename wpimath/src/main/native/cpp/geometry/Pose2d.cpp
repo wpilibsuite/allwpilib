@@ -46,7 +46,7 @@ Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
 Pose2d Pose2d::Exp(const Twist2d& twist) const {
   const auto dx = twist.dx;
   const auto dy = twist.dy;
-  const auto dtheta = twist.dtheta.to<double>();
+  const auto dtheta = twist.dtheta.value();
 
   const auto sinTheta = std::sin(dtheta);
   const auto cosTheta = std::cos(dtheta);
@@ -68,7 +68,7 @@ Pose2d Pose2d::Exp(const Twist2d& twist) const {
 
 Twist2d Pose2d::Log(const Pose2d& end) const {
   const auto transform = end.RelativeTo(*this);
-  const auto dtheta = transform.Rotation().Radians().to<double>();
+  const auto dtheta = transform.Rotation().Radians().value();
   const auto halfDtheta = dtheta / 2.0;
 
   const auto cosMinusOne = transform.Rotation().Cos() - 1;

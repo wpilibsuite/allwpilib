@@ -49,14 +49,14 @@ bool IsTimingPaused();
 /**
  * Advance the simulator time and wait for all notifiers to run.
  *
- * @param deltaSeconds the amount to advance (in seconds)
+ * @param delta the amount to advance (in seconds)
  */
 void StepTiming(units::second_t delta);
 
 /**
  * Advance the simulator time and return immediately.
  *
- * @param deltaSeconds the amount to advance (in seconds)
+ * @param delta the amount to advance (in seconds)
  */
 void StepTimingAsync(units::second_t delta);
 

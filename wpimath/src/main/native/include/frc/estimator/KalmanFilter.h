@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <frc/fmt/Eigen.h>
+
 #include <cmath>
+#include <string>
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
@@ -36,6 +39,10 @@ namespace detail {
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class KalmanFilterImpl {
@@ -65,14 +72,14 @@ class KalmanFilterImpl {
 
     const auto& C = plant.C();
 
-    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    bool isObservable =
-        IsStabilizable<States, Outputs>(discA.transpose(), C.transpose());
-    if (!isObservable) {
-      wpi::math::MathSharedStore::ReportError(
-          "The system passed to the Kalman filter is not observable!");
-      throw std::invalid_argument(
-          "The system passed to the Kalman filter is not observable!");
+    if (!IsDetectable<States, Outputs>(discA, C)) {
+      std::string msg = fmt::format(
+          "The system passed to the Kalman filter is "
+          "unobservable!\n\nA =\n{}\nC =\n{}\n",
+          discA, C);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
     }
 
     Eigen::Matrix<double, States, States> P =

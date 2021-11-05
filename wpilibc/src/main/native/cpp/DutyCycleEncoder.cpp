@@ -112,7 +112,7 @@ double DutyCycleEncoder::GetDistancePerRotation() const {
 }
 
 double DutyCycleEncoder::GetDistance() const {
-  return Get().to<double>() * GetDistancePerRotation();
+  return Get().value() * GetDistancePerRotation();
 }
 
 int DutyCycleEncoder::GetFrequency() const {

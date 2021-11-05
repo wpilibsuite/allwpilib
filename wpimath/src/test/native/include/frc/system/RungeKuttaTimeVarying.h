@@ -21,7 +21,7 @@ namespace frc {
  */
 template <typename F, typename T>
 T RungeKuttaTimeVarying(F&& f, units::second_t t, T y, units::second_t dt) {
-  const auto h = dt.to<double>();
+  const auto h = dt.value();
 
   T k1 = f(t, y);
   T k2 = f(t + dt * 0.5, y + h * k1 * 0.5);

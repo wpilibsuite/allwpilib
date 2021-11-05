@@ -94,7 +94,7 @@ class Robot : public frc::TimedRobot {
 
     // Finally, we set our simulated encoder's readings and simulated battery
     // voltage
-    m_encoderSim.SetDistance(m_armSim.GetAngle().to<double>());
+    m_encoderSim.SetDistance(m_armSim.GetAngle().value());
     // SimBattery estimates loaded battery voltages
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({m_armSim.GetCurrentDraw()}));
@@ -108,7 +108,7 @@ class Robot : public frc::TimedRobot {
       // Here, we run PID control like normal, with a constant setpoint of 75
       // degrees.
       double pidOutput = m_controller.Calculate(
-          m_encoder.GetDistance(), (units::radian_t(75_deg)).to<double>());
+          m_encoder.GetDistance(), (units::radian_t(75_deg)).value());
       m_motor.SetVoltage(units::volt_t(pidOutput));
     } else {
       // Otherwise, we disable the motor.

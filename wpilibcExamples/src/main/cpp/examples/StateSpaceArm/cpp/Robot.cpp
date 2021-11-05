@@ -122,9 +122,9 @@ class Robot : public frc::TimedRobot {
                                                m_lastProfiledReference))
             .Calculate(20_ms);
 
-    m_loop.SetNextR(Eigen::Vector<double, 2>{
-        m_lastProfiledReference.position.to<double>(),
-        m_lastProfiledReference.velocity.to<double>()});
+    m_loop.SetNextR(
+        Eigen::Vector<double, 2>{m_lastProfiledReference.position.value(),
+                                 m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});

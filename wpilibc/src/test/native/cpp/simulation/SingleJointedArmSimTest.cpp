@@ -18,5 +18,5 @@ TEST(SingleJointedArmTest, Disabled) {
   }
 
   // The arm should swing down.
-  EXPECT_NEAR(sim.GetAngle().to<double>(), -wpi::numbers::pi / 2, 0.01);
+  EXPECT_NEAR(sim.GetAngle().value(), -wpi::numbers::pi / 2, 0.01);
 }
