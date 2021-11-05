@@ -11,24 +11,24 @@
 #include "hal/Errors.h"
 
 // Low level FPGA calls
-typedef NiFpga_Status (*HAL_NiFpga_ReserveIrqContextFunc)(
-    NiFpga_Session session, NiFpga_IrqContext* context);
+using HAL_NiFpga_ReserveIrqContextFunc =
+    NiFpga_Status (*)(NiFpga_Session session, NiFpga_IrqContext* context);
 
 static HAL_NiFpga_ReserveIrqContextFunc HAL_NiFpga_ReserveIrqContext;
 
-typedef NiFpga_Status (*HAL_NiFpga_UnreserveIrqContextFunc)(
-    NiFpga_Session session, NiFpga_IrqContext context);
+using HAL_NiFpga_UnreserveIrqContextFunc =
+    NiFpga_Status (*)(NiFpga_Session session, NiFpga_IrqContext context);
 
 static HAL_NiFpga_UnreserveIrqContextFunc HAL_NiFpga_UnreserveIrqContext;
 
-typedef NiFpga_Status (*HAL_NiFpga_WaitOnIrqsFunc)(
+using HAL_NiFpga_WaitOnIrqsFunc = NiFpga_Status (*)(
     NiFpga_Session session, NiFpga_IrqContext context, uint32_t irqs,
     uint32_t timeout, uint32_t* irqsAsserted, NiFpga_Bool* timedOut);
 
 static HAL_NiFpga_WaitOnIrqsFunc HAL_NiFpga_WaitOnIrqs;
 
-typedef NiFpga_Status (*HAL_NiFpga_AcknowledgeIrqsFunc)(NiFpga_Session session,
-                                                        uint32_t irqs);
+using HAL_NiFpga_AcknowledgeIrqsFunc = NiFpga_Status (*)(NiFpga_Session session,
+                                                         uint32_t irqs);
 
 static HAL_NiFpga_AcknowledgeIrqsFunc HAL_NiFpga_AcknowledgeIrqs;
 
@@ -52,14 +52,15 @@ int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
-  HAL_NiFpga_ReserveIrqContext = (HAL_NiFpga_ReserveIrqContextFunc)dlsym(
-      NiFpgaLibrary, "NiFpgaDll_ReserveIrqContext");
-  HAL_NiFpga_UnreserveIrqContext = (HAL_NiFpga_UnreserveIrqContextFunc)dlsym(
-      NiFpgaLibrary, "NiFpgaDll_UnreserveIrqContext");
-  HAL_NiFpga_WaitOnIrqs =
-      (HAL_NiFpga_WaitOnIrqsFunc)dlsym(NiFpgaLibrary, "NiFpgaDll_WaitOnIrqs");
-  HAL_NiFpga_AcknowledgeIrqs = (HAL_NiFpga_AcknowledgeIrqsFunc)dlsym(
-      NiFpgaLibrary, "NiFpgaDll_AcknowledgeIrqs");
+  HAL_NiFpga_ReserveIrqContext = static_cast<HAL_NiFpga_ReserveIrqContextFunc>(
+      dlsym(NiFpgaLibrary, "NiFpgaDll_ReserveIrqContext"));
+  HAL_NiFpga_UnreserveIrqContext =
+      static_cast<HAL_NiFpga_UnreserveIrqContextFunc>(
+          dlsym(NiFpgaLibrary, "NiFpgaDll_UnreserveIrqContext"));
+  HAL_NiFpga_WaitOnIrqs = static_cast<HAL_NiFpga_WaitOnIrqsFunc>(
+      dlsym(NiFpgaLibrary, "NiFpgaDll_WaitOnIrqs"));
+  HAL_NiFpga_AcknowledgeIrqs = static_cast<HAL_NiFpga_AcknowledgeIrqsFunc>(
+      dlsym(NiFpgaLibrary, "NiFpgaDll_AcknowledgeIrqs"));
 #pragma GCC diagnostic pop
 
   // TODO Actually return errors
