@@ -4,15 +4,15 @@
 
 #include "hal/PowerDistribution.h"
 
+#include <thread>
+
 #include "CTREPDP.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "REVPDH.h"
 #include "hal/Errors.h"
-#include "hal/handles/HandlesInternal.h"
 #include "hal/HALBase.h"
-
-#include <thread>
+#include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
 
@@ -40,7 +40,8 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       if (currentTime >= waitTime) {
         break;
       }
-      std::this_thread::sleep_for(std::chrono::microseconds(waitTime - currentTime));
+      std::this_thread::sleep_for(
+          std::chrono::microseconds(waitTime - currentTime));
     } while (true);
 
     // Try PDP first
