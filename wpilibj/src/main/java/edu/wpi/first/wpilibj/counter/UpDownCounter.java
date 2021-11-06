@@ -29,8 +29,20 @@ public class UpDownCounter implements Sendable, AutoCloseable {
     index.order(ByteOrder.LITTLE_ENDIAN);
     m_handle = CounterJNI.initializeCounter(0, index.asIntBuffer());
 
-    setUpSource(upSource);
-    setDownSource(downSource);
+    if (upSource != null) {
+      m_upSource = upSource;
+      CounterJNI.setCounterUpSource(m_handle, upSource.getPortHandleForRouting(),
+          upSource.getAnalogTriggerTypeForRouting());
+      CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
+    }
+
+    if (downSource != null) {
+      m_downSource = downSource;
+      CounterJNI.setCounterDownSource(m_handle, downSource.getPortHandleForRouting(),
+      downSource.getAnalogTriggerTypeForRouting());
+      CounterJNI.setCounterDownSourceEdge(m_handle, true, false);
+    }
+
     reset();
 
     int intIndex = index.getInt();
@@ -42,30 +54,6 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   public void close() throws Exception {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
-  }
-
-  public void setUpSource(DigitalSource source) {
-    if (source == null) {
-      CounterJNI.clearCounterUpSource(m_handle);
-      m_upSource = null;
-    } else {
-      m_upSource = requireNonNullParam(source, "source", "setUpSource");
-      CounterJNI.setCounterUpSource(m_handle, source.getPortHandleForRouting(),
-          source.getAnalogTriggerTypeForRouting());
-      CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
-    }
-  }
-
-  public void setDownSource(DigitalSource source) {
-    if (source == null) {
-      CounterJNI.clearCounterDownSource(m_handle);
-      m_downSource = null;
-    } else {
-      m_downSource = requireNonNullParam(source, "source", "setDownSource");;
-      CounterJNI.setCounterDownSource(m_handle, source.getPortHandleForRouting(),
-          source.getAnalogTriggerTypeForRouting());
-      CounterJNI.setCounterDownSourceEdge(m_handle, true, false);
-    }
   }
 
   public void setUpEdgeConfiguration(EdgeConfiguration configuration) {

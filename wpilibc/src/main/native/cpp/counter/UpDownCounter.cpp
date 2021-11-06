@@ -14,45 +14,40 @@
 
 using namespace frc;
 
-UpDownCounter::UpDownCounter(
-    DigitalSource& upSource, DigitalSource& downSource)
-    : UpDownCounter(
-          {&upSource, wpi::NullDeleter<DigitalSource>()},
-          {&downSource, wpi::NullDeleter<DigitalSource>()}) {}
+UpDownCounter::UpDownCounter(DigitalSource& upSource, DigitalSource& downSource)
+    : UpDownCounter({&upSource, wpi::NullDeleter<DigitalSource>()},
+                    {&downSource, wpi::NullDeleter<DigitalSource>()}) {}
 
-UpDownCounter::UpDownCounter(
-    std::shared_ptr<DigitalSource> upSource,
-    std::shared_ptr<DigitalSource> downSource) {
-  if (upSource == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "{}", "upSource");
-  }
-  if (downSource == nullptr) {
-    throw FRC_MakeError(err::NullParameter, "{}", "downSource");
-  }
+UpDownCounter::UpDownCounter(std::shared_ptr<DigitalSource> upSource,
+                             std::shared_ptr<DigitalSource> downSource) {
   m_upSource = upSource;
   m_downSource = downSource;
 
   int32_t status = 0;
-  m_handle = HAL_InitializeCounter(
-      HAL_Counter_Mode::HAL_Counter_kTwoPulse, &m_index, &status);
+  m_handle = HAL_InitializeCounter(HAL_Counter_Mode::HAL_Counter_kTwoPulse,
+                                   &m_index, &status);
   FRC_CheckErrorStatus(status, "{}", m_index);
 
-  HAL_SetCounterUpSource(m_handle, m_upSource->GetPortHandleForRouting(),
-                         static_cast<HAL_AnalogTriggerType>(
-                             m_upSource->GetAnalogTriggerTypeForRouting()),
-                         &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
-  HAL_SetCounterUpSourceEdge(m_handle, true, false, &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
+  if (m_upSource) {
+    HAL_SetCounterUpSource(m_handle, m_upSource->GetPortHandleForRouting(),
+                           static_cast<HAL_AnalogTriggerType>(
+                               m_upSource->GetAnalogTriggerTypeForRouting()),
+                           &status);
+    FRC_CheckErrorStatus(status, "{}", m_index);
+    HAL_SetCounterUpSourceEdge(m_handle, true, false, &status);
+    FRC_CheckErrorStatus(status, "{}", m_index);
+  }
 
-  HAL_SetCounterDownSource(
-      m_handle, m_downSource->GetPortHandleForRouting(),
-      static_cast<HAL_AnalogTriggerType>(
-          m_downSource->GetAnalogTriggerTypeForRouting()),
-      &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
-  HAL_SetCounterDownSourceEdge(m_handle, true, false, &status);
-  FRC_CheckErrorStatus(status, "{}", m_index);
+  if (m_downSource) {
+    HAL_SetCounterDownSource(
+        m_handle, m_downSource->GetPortHandleForRouting(),
+        static_cast<HAL_AnalogTriggerType>(
+            m_downSource->GetAnalogTriggerTypeForRouting()),
+        &status);
+    FRC_CheckErrorStatus(status, "{}", m_index);
+    HAL_SetCounterDownSourceEdge(m_handle, true, false, &status);
+    FRC_CheckErrorStatus(status, "{}", m_index);
+  }
 
   Reset();
 
@@ -84,8 +79,7 @@ void UpDownCounter::Reset() {
   FRC_CheckErrorStatus(status, "{}", m_index);
 }
 
-void UpDownCounter::SetUpEdgeConfiguration(
-    EdgeConfiguration configuration) {
+void UpDownCounter::SetUpEdgeConfiguration(EdgeConfiguration configuration) {
   int32_t status = 0;
   bool rising = configuration == EdgeConfiguration::kRisingEdge ||
                 configuration == EdgeConfiguration::kBoth;
@@ -95,8 +89,7 @@ void UpDownCounter::SetUpEdgeConfiguration(
   FRC_CheckErrorStatus(status, "{}", m_index);
 }
 
-void UpDownCounter::SetDownEdgeConfiguration(
-    EdgeConfiguration configuration) {
+void UpDownCounter::SetDownEdgeConfiguration(EdgeConfiguration configuration) {
   int32_t status = 0;
   bool rising = configuration == EdgeConfiguration::kRisingEdge ||
                 configuration == EdgeConfiguration::kBoth;

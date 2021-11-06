@@ -15,14 +15,12 @@
 namespace frc {
 class DigitalSource;
 
-class UpDownCounter
-    : public wpi::Sendable,
-      public wpi::SendableHelper<UpDownCounter> {
+class UpDownCounter : public wpi::Sendable,
+                      public wpi::SendableHelper<UpDownCounter> {
  public:
-  UpDownCounter(DigitalSource& upSource,
-                           DigitalSource& downSource);
+  UpDownCounter(DigitalSource& upSource, DigitalSource& downSource);
   UpDownCounter(std::shared_ptr<DigitalSource> countSource,
-                           std::shared_ptr<DigitalSource> directionSource);
+                std::shared_ptr<DigitalSource> directionSource);
 
   ~UpDownCounter() override;
 
