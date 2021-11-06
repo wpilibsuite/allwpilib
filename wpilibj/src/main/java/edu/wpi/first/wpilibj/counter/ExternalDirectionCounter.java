@@ -4,40 +4,50 @@
 
 package edu.wpi.first.wpilibj.counter;
 
-import edu.wpi.first.wpilibj.DigitalSource;
-
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.hal.CounterJNI;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.DigitalSource;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
+/** Counter using external direction. */
 public class ExternalDirectionCounter implements Sendable, AutoCloseable {
-  private DigitalSource m_countSource;
-  private DigitalSource m_directionSource;
+  private final DigitalSource m_countSource;
+  private final DigitalSource m_directionSource;
 
   private final int m_handle;
 
+  /**
+   * Constructs a new ExternalDirectionCounter.
+   *
+   * @param countSource The source for counting.
+   * @param directionSource The source for selecting count direction.
+   */
   public ExternalDirectionCounter(DigitalSource countSource, DigitalSource directionSource) {
     m_countSource = requireNonNullParam(countSource, "countSource", "ExternalDirectionCounter");
-    m_directionSource = requireNonNullParam(directionSource, "directionSource", "ExternalDirectionCounter");
+    m_directionSource =
+        requireNonNullParam(directionSource, "directionSource", "ExternalDirectionCounter");
 
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
     index.order(ByteOrder.LITTLE_ENDIAN);
-    m_handle = CounterJNI.initializeCounter(3, index.asIntBuffer());
+    m_handle = CounterJNI.initializeCounter(CounterJNI.EXTERNAL_DIRECTION, index.asIntBuffer());
 
-    CounterJNI.setCounterUpSource(m_handle, countSource.getPortHandleForRouting(),
+    CounterJNI.setCounterUpSource(
+        m_handle,
+        countSource.getPortHandleForRouting(),
         countSource.getAnalogTriggerTypeForRouting());
     CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
 
-    CounterJNI.setCounterDownSource(m_handle, directionSource.getPortHandleForRouting(),
+    CounterJNI.setCounterDownSource(
+        m_handle,
+        directionSource.getPortHandleForRouting(),
         directionSource.getAnalogTriggerTypeForRouting());
     CounterJNI.setCounterDownSourceEdge(m_handle, false, true);
     CounterJNI.resetCounter(m_handle);
@@ -47,18 +57,34 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
     SendableRegistry.addLW(this, "External Direction Counter", intIndex);
   }
 
+  /**
+   * Gets the current count.
+   *
+   * @return The current count.
+   */
   public int getCount() {
     return CounterJNI.getCounter(m_handle);
   }
 
+  /**
+   * Sets to revert the counter direction.
+   *
+   * @param reverseDirection True to reverse counting direction.
+   */
   public void setReverseDirection(boolean reverseDirection) {
     CounterJNI.setCounterReverseDirection(m_handle, reverseDirection);
   }
 
+  /** Resets the current count. */
   public void reset() {
     CounterJNI.resetCounter(m_handle);
   }
 
+  /**
+   * Sets the edge configuration for counting.
+   *
+   * @param configuration The counting edge configuration.
+   */
   public void setEdgeConfiguration(EdgeConfiguration configuration) {
     CounterJNI.setCounterUpSourceEdge(m_handle, configuration.rising, configuration.falling);
   }
@@ -67,6 +93,8 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   public void close() throws Exception {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
+    CounterJNI.suppressUnused(m_countSource);
+    CounterJNI.suppressUnused(m_directionSource);
   }
 
   @Override
@@ -74,6 +102,4 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
     builder.setSmartDashboardType("External Direction Counter");
     builder.addDoubleProperty("Count", this::getCount, null);
   }
-
-
 }

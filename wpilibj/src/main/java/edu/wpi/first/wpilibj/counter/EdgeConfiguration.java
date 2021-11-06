@@ -13,7 +13,6 @@ public enum EdgeConfiguration {
   @SuppressWarnings("MemberName")
   public final boolean rising;
 
-
   @SuppressWarnings("MemberName")
   public final boolean falling;
 

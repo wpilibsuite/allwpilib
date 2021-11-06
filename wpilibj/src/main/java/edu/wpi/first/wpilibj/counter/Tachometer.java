@@ -4,35 +4,39 @@
 
 package edu.wpi.first.wpilibj.counter;
 
-import edu.wpi.first.wpilibj.DigitalSource;
+import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
+
+import edu.wpi.first.hal.CounterJNI;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-
-import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
-
+import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.hal.CounterJNI;
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-
+/** Tachometer. */
 public class Tachometer implements Sendable, AutoCloseable {
   private final DigitalSource m_source;
   private final int m_handle;
   private int m_edgesPerRevolution = 1;
 
+  /**
+   * Constructs a new tachometer.
+   *
+   * @param source The source.
+   */
   public Tachometer(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "Tachometer");
 
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
     index.order(ByteOrder.LITTLE_ENDIAN);
-    m_handle = CounterJNI.initializeCounter(0, index.asIntBuffer());
+    m_handle = CounterJNI.initializeCounter(CounterJNI.TWO_PULSE, index.asIntBuffer());
 
-    CounterJNI.setCounterUpSource(m_handle, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
+    CounterJNI.setCounterUpSource(
+        m_handle, source.getPortHandleForRouting(), source.getAnalogTriggerTypeForRouting());
     CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
 
     int intIndex = index.getInt();
@@ -44,12 +48,23 @@ public class Tachometer implements Sendable, AutoCloseable {
   public void close() throws Exception {
     SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
+    CounterJNI.suppressUnused(m_source);
   }
 
+  /**
+   * Get the tachometer period.
+   *
+   * @return Current period (in seconds).
+   */
   public double getPeriod() {
     return CounterJNI.getCounterPeriod(m_handle);
   }
 
+  /**
+   * Get the tachometer frequency.
+   *
+   * @return Current frequency (in hertz).
+   */
   public double getFrequency() {
     double period = getPeriod();
     if (period == 0) {
@@ -58,14 +73,31 @@ public class Tachometer implements Sendable, AutoCloseable {
     return period;
   }
 
+  /**
+   * Gets the number of edges per revolution.
+   *
+   * @return Edges per revolution.
+   */
   public int getEdgesPerRevolution() {
     return m_edgesPerRevolution;
   }
 
+  /**
+   * Sets the number of edges per revolution.
+   *
+   * @param edgesPerRevolution Edges per revolution.
+   */
   public void setEdgesPerRevolution(int edgesPerRevolution) {
     m_edgesPerRevolution = edgesPerRevolution;
   }
 
+  /**
+   * Gets the current tachometer revolution per minute.
+   *
+   * <p>setEdgesPerRevolution must be set with a non 0 value for this to return valid values.
+   *
+   * @return Current RPM.
+   */
   public double getRevolutionsPerMinute() {
     double period = getPeriod();
     if (period == 0) {
@@ -78,22 +110,47 @@ public class Tachometer implements Sendable, AutoCloseable {
     return ((1.0 / edgesPerRevolution) / period) * 60;
   }
 
+  /**
+   * Gets if the tachometer is stopped.
+   *
+   * @return True if the tachometer is stopped.
+   */
   public boolean getStopped() {
     return CounterJNI.getCounterStopped(m_handle);
   }
 
+  /**
+   * Gets the number of samples to average.
+   *
+   * @return Samples to average.
+   */
   public int getSamplesToAverage() {
     return CounterJNI.getCounterSamplesToAverage(m_handle);
   }
 
+  /**
+   * Sets the number of samples to average.
+   *
+   * @param samplesToAverage Samples to average.
+   */
   public void setSamplesToAverage(int samplesToAverage) {
     CounterJNI.setCounterSamplesToAverage(m_handle, samplesToAverage);
   }
 
+  /**
+   * Sets the maximum period before the tachometer is considered stopped.
+   *
+   * @param maxPeriod The max period (in seconds).
+   */
   public void setMaxPeriod(double maxPeriod) {
     CounterJNI.setCounterMaxPeriod(m_handle, maxPeriod);
   }
 
+  /**
+   * Sets if to update when empty.
+   *
+   * @param updateWhenEmpty Update when empty if true.
+   */
   public void setUpdateWhenEmpty(boolean updateWhenEmpty) {
     CounterJNI.setCounterUpdateWhenEmpty(m_handle, updateWhenEmpty);
   }
