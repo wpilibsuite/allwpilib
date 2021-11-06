@@ -52,14 +52,15 @@ int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
-  HAL_NiFpga_ReserveIrqContext = static_cast<HAL_NiFpga_ReserveIrqContextFunc>(
-      dlsym(NiFpgaLibrary, "NiFpgaDll_ReserveIrqContext"));
+  HAL_NiFpga_ReserveIrqContext =
+      reinterpret_cast<HAL_NiFpga_ReserveIrqContextFunc>(
+          dlsym(NiFpgaLibrary, "NiFpgaDll_ReserveIrqContext"));
   HAL_NiFpga_UnreserveIrqContext =
-      static_cast<HAL_NiFpga_UnreserveIrqContextFunc>(
+      reinterpret_cast<HAL_NiFpga_UnreserveIrqContextFunc>(
           dlsym(NiFpgaLibrary, "NiFpgaDll_UnreserveIrqContext"));
-  HAL_NiFpga_WaitOnIrqs = static_cast<HAL_NiFpga_WaitOnIrqsFunc>(
+  HAL_NiFpga_WaitOnIrqs = reinterpret_cast<HAL_NiFpga_WaitOnIrqsFunc>(
       dlsym(NiFpgaLibrary, "NiFpgaDll_WaitOnIrqs"));
-  HAL_NiFpga_AcknowledgeIrqs = static_cast<HAL_NiFpga_AcknowledgeIrqsFunc>(
+  HAL_NiFpga_AcknowledgeIrqs = reinterpret_cast<HAL_NiFpga_AcknowledgeIrqsFunc>(
       dlsym(NiFpgaLibrary, "NiFpgaDll_AcknowledgeIrqs"));
 #pragma GCC diagnostic pop
 
