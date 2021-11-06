@@ -45,7 +45,7 @@ int32_t InterruptManager::Initialize(tSystemInterface* baseSystem) {
   auto& manager = Get();
   manager.fpgaSession = baseSystem->getHandle();
 
-  NiFpgaLibrary = dlopen("libNiFpga.so", 0);
+  NiFpgaLibrary = dlopen("libNiFpga.so", RTLD_LAZY);
   if (!NiFpgaLibrary) {
     return errno;
   }
