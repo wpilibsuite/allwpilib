@@ -132,15 +132,38 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   int32_t status = 0;
   int numChannels = HAL_GetPowerDistributionNumChannels(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
+  // Use manual reads to avoid printing errors
   for (int i = 0; i < numChannels; ++i) {
     builder.AddDoubleProperty(
-        fmt::format("Chan{}", i), [=] { return GetCurrent(i); }, nullptr);
+        fmt::format("Chan{}", i),
+        [=] {
+          int32_t lStatus = 0;
+          return HAL_GetPowerDistributionChannelCurrent(m_handle, i, &lStatus);
+        },
+        nullptr);
   }
   builder.AddDoubleProperty(
-      "Voltage", [=] { return GetVoltage(); }, nullptr);
+      "Voltage",
+      [=] {
+        int32_t lStatus = 0;
+        return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
+      },
+      nullptr);
   builder.AddDoubleProperty(
-      "TotalCurrent", [=] { return GetTotalCurrent(); }, nullptr);
+      "TotalCurrent",
+      [=] {
+        int32_t lStatus = 0;
+        return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
+      },
+      nullptr);
   builder.AddBooleanProperty(
-      "SwitchableChannel", [=] { return GetSwitchableChannel(); },
-      [=](bool value) { SetSwitchableChannel(value); });
+      "SwitchableChannel",
+      [=] {
+        int32_t lStatus = 0;
+        return HAL_GetPowerDistributionSwitchableChannel(m_handle, &lStatus);
+      },
+      [=](bool value) {
+        int32_t lStatus = 0;
+        HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
+      });
 }
