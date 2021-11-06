@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.counter;
 import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
@@ -14,6 +15,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.CounterJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 public class Tachometer implements Sendable, AutoCloseable {
   private final DigitalSource m_source;
@@ -31,6 +34,16 @@ public class Tachometer implements Sendable, AutoCloseable {
     CounterJNI.setCounterUpSource(m_handle, source.getPortHandleForRouting(),
         source.getAnalogTriggerTypeForRouting());
     CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
+
+    int intIndex = index.getInt();
+    HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
+    SendableRegistry.addLW(this, "Tachometer", intIndex);
+  }
+
+  @Override
+  public void close() throws Exception {
+    SendableRegistry.remove(this);
+    CounterJNI.freeCounter(m_handle);
   }
 
   public double getPeriod() {
@@ -86,11 +99,8 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
-    CounterJNI.freeCounter(m_handle);
-  }
-
-  @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Tachometer");
+    builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
   }
 }

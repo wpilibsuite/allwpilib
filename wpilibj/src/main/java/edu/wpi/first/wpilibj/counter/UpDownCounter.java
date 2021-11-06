@@ -10,9 +10,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.hal.CounterJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.DigitalSource;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 public class UpDownCounter implements Sendable, AutoCloseable {
   private DigitalSource m_upSource;
@@ -20,11 +23,25 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
   private final int m_handle;
 
-  public UpDownCounter() {
+  public UpDownCounter(DigitalSource upSource, DigitalSource downSource) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
     index.order(ByteOrder.LITTLE_ENDIAN);
     m_handle = CounterJNI.initializeCounter(0, index.asIntBuffer());
+
+    setUpSource(upSource);
+    setDownSource(downSource);
+    reset();
+
+    int intIndex = index.getInt();
+    HAL.report(tResourceType.kResourceType_Counter, intIndex + 1);
+    SendableRegistry.addLW(this, "UpDown Counter", intIndex);
+  }
+
+  @Override
+  public void close() throws Exception {
+    SendableRegistry.remove(this);
+    CounterJNI.freeCounter(m_handle);
   }
 
   public void setUpSource(DigitalSource source) {
@@ -72,11 +89,8 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void close() throws Exception {
-    CounterJNI.freeCounter(m_handle);
-  }
-
-  @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("UpDown Counter");
+    builder.addDoubleProperty("Count", this::getCount, null);
   }
 }

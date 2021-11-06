@@ -15,33 +15,35 @@
 namespace frc {
 class DigitalSource;
 
-class ExternalDirectionCounter
+class UpDownCounter
     : public wpi::Sendable,
-      public wpi::SendableHelper<ExternalDirectionCounter> {
+      public wpi::SendableHelper<UpDownCounter> {
  public:
-  ExternalDirectionCounter(DigitalSource& countSource,
-                           DigitalSource& directionSource);
-  ExternalDirectionCounter(std::shared_ptr<DigitalSource> countSource,
+  UpDownCounter(DigitalSource& upSource,
+                           DigitalSource& downSource);
+  UpDownCounter(std::shared_ptr<DigitalSource> countSource,
                            std::shared_ptr<DigitalSource> directionSource);
 
-  ~ExternalDirectionCounter() override;
+  ~UpDownCounter() override;
 
-  ExternalDirectionCounter(ExternalDirectionCounter&&) = default;
-  ExternalDirectionCounter& operator=(ExternalDirectionCounter&&) = default;
+  UpDownCounter(UpDownCounter&&) = default;
+  UpDownCounter& operator=(UpDownCounter&&) = default;
 
   int GetCount() const;
 
   void SetReverseDirection(bool reverseDirection);
   void Reset();
 
-  void SetEdgeConfiguration(EdgeConfiguration configuration);
+  void SetUpEdgeConfiguration(EdgeConfiguration configuration);
+  void SetDownEdgeConfiguration(EdgeConfiguration configuration);
 
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
-  std::shared_ptr<DigitalSource> m_countSource;
-  std::shared_ptr<DigitalSource> m_directionSource;
+  void InitUpDownCounter();
+  std::shared_ptr<DigitalSource> m_upSource;
+  std::shared_ptr<DigitalSource> m_downSource;
   hal::Handle<HAL_CounterHandle> m_handle;
   int32_t m_index = 0;
 };

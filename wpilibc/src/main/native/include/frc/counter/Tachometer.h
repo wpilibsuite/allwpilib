@@ -17,7 +17,6 @@ class Tachometer
       public wpi::SendableHelper<Tachometer> {
  public:
   Tachometer(DigitalSource& source);
-  Tachometer(DigitalSource* source);
   Tachometer(std::shared_ptr<DigitalSource> source);
 
   ~Tachometer() override;

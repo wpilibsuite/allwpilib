@@ -59,18 +59,6 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
     CounterJNI.resetCounter(m_handle);
   }
 
-  public void setDirectionSource(DigitalSource source) {
-    m_directionSource = requireNonNullParam(source, "source", "setDirectionSource");
-    CounterJNI.setCounterDownSource(m_handle, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
-  }
-
-  public void setCountSource(DigitalSource source) {
-    m_countSource = requireNonNullParam(source, "source", "setCountSource");
-    CounterJNI.setCounterUpSource(m_handle, source.getPortHandleForRouting(),
-        source.getAnalogTriggerTypeForRouting());
-  }
-
   public void setEdgeConfiguration(EdgeConfiguration configuration) {
     CounterJNI.setCounterUpSourceEdge(m_handle, configuration.rising, configuration.falling);
   }
