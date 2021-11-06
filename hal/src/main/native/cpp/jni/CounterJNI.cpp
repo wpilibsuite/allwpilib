@@ -32,8 +32,10 @@ extern "C" {
  * Method:    initializeCounter
  * Signature: (ILjava/lang/Object;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_CounterJNI_initializeCounter(
-    JNIEnv* env, jclass, jint mode, jobject index) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CounterJNI_initializeCounter
+  (JNIEnv* env, jclass, jint mode, jobject index)
+{
   jint* indexPtr = reinterpret_cast<jint*>(env->GetDirectBufferAddress(index));
   int32_t status = 0;
   auto counter = HAL_InitializeCounter(
@@ -48,7 +50,9 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_CounterJNI_initializeCounter(
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_freeCounter(JNIEnv* env, jclass, jint id) {
+Java_edu_wpi_first_hal_CounterJNI_freeCounter
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_FreeCounter((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -59,8 +63,10 @@ Java_edu_wpi_first_hal_CounterJNI_freeCounter(JNIEnv* env, jclass, jint id) {
  * Method:    setCounterAverageSize
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterAverageSize(
-    JNIEnv* env, jclass, jint id, jint value) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterAverageSize
+  (JNIEnv* env, jclass, jint id, jint value)
+{
   int32_t status = 0;
   HAL_SetCounterAverageSize((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -71,9 +77,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterAverageSize(
  * Method:    setCounterUpSource
  * Signature: (III)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpSource(
-    JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
-    jint analogTriggerType) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpSource
+  (JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
+   jint analogTriggerType)
+{
   int32_t status = 0;
   HAL_SetCounterUpSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle,
                          (HAL_AnalogTriggerType)analogTriggerType, &status);
@@ -85,8 +93,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpSource(
  * Method:    setCounterUpSourceEdge
  * Signature: (IZZ)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpSourceEdge(
-    JNIEnv* env, jclass, jint id, jboolean valueRise, jboolean valueFall) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpSourceEdge
+  (JNIEnv* env, jclass, jint id, jboolean valueRise, jboolean valueFall)
+{
   int32_t status = 0;
   HAL_SetCounterUpSourceEdge((HAL_CounterHandle)id, valueRise, valueFall,
                              &status);
@@ -98,8 +108,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpSourceEdge(
  * Method:    clearCounterUpSource
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_clearCounterUpSource(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_clearCounterUpSource
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_ClearCounterUpSource((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -110,9 +122,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_clearCounterUpSource(
  * Method:    setCounterDownSource
  * Signature: (III)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterDownSource(
-    JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
-    jint analogTriggerType) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterDownSource
+  (JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
+   jint analogTriggerType)
+{
   int32_t status = 0;
   HAL_SetCounterDownSource((HAL_CounterHandle)id,
                            (HAL_Handle)digitalSourceHandle,
@@ -126,10 +140,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterDownSource(
  * Signature: (IZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterDownSourceEdge(JNIEnv* env, jclass,
-                                                           jint id,
-                                                           jboolean valueRise,
-                                                           jboolean valueFall) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterDownSourceEdge
+  (JNIEnv* env, jclass, jint id, jboolean valueRise, jboolean valueFall)
+{
   int32_t status = 0;
   HAL_SetCounterDownSourceEdge((HAL_CounterHandle)id, valueRise, valueFall,
                                &status);
@@ -141,8 +154,10 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterDownSourceEdge(JNIEnv* env, jclass,
  * Method:    clearCounterDownSource
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_clearCounterDownSource(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_clearCounterDownSource
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_ClearCounterDownSource((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -153,8 +168,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_clearCounterDownSource(
  * Method:    setCounterUpDownMode
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpDownMode(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpDownMode
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_SetCounterUpDownMode((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -166,9 +183,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterUpDownMode(
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterExternalDirectionMode(JNIEnv* env,
-                                                                  jclass,
-                                                                  jint id) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterExternalDirectionMode
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_SetCounterExternalDirectionMode((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -180,9 +197,9 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterExternalDirectionMode(JNIEnv* env,
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterSemiPeriodMode(JNIEnv* env, jclass,
-                                                           jint id,
-                                                           jboolean value) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterSemiPeriodMode
+  (JNIEnv* env, jclass, jint id, jboolean value)
+{
   int32_t status = 0;
   HAL_SetCounterSemiPeriodMode((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -194,9 +211,9 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterSemiPeriodMode(JNIEnv* env, jclass,
  * Signature: (ID)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterPulseLengthMode(JNIEnv* env, jclass,
-                                                            jint id,
-                                                            jdouble value) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterPulseLengthMode
+  (JNIEnv* env, jclass, jint id, jdouble value)
+{
   int32_t status = 0;
   HAL_SetCounterPulseLengthMode((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -208,8 +225,9 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterPulseLengthMode(JNIEnv* env, jclass,
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CounterJNI_getCounterSamplesToAverage(JNIEnv* env,
-                                                             jclass, jint id) {
+Java_edu_wpi_first_hal_CounterJNI_getCounterSamplesToAverage
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jint returnValue =
       HAL_GetCounterSamplesToAverage((HAL_CounterHandle)id, &status);
@@ -223,9 +241,9 @@ Java_edu_wpi_first_hal_CounterJNI_getCounterSamplesToAverage(JNIEnv* env,
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterSamplesToAverage(JNIEnv* env,
-                                                             jclass, jint id,
-                                                             jint value) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterSamplesToAverage
+  (JNIEnv* env, jclass, jint id, jint value)
+{
   int32_t status = 0;
   HAL_SetCounterSamplesToAverage((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -237,7 +255,9 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterSamplesToAverage(JNIEnv* env,
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_resetCounter(JNIEnv* env, jclass, jint id) {
+Java_edu_wpi_first_hal_CounterJNI_resetCounter
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   HAL_ResetCounter((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -248,9 +268,10 @@ Java_edu_wpi_first_hal_CounterJNI_resetCounter(JNIEnv* env, jclass, jint id) {
  * Method:    getCounter
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounter(JNIEnv* env,
-                                                                    jclass,
-                                                                    jint id) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_CounterJNI_getCounter
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jint returnValue = HAL_GetCounter((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -262,8 +283,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounter(JNIEnv* env,
  * Method:    getCounterPeriod
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounterPeriod(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_CounterJNI_getCounterPeriod
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jdouble returnValue = HAL_GetCounterPeriod((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -275,8 +298,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounterPeriod(
  * Method:    setCounterMaxPeriod
  * Signature: (ID)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterMaxPeriod(
-    JNIEnv* env, jclass, jint id, jdouble value) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_CounterJNI_setCounterMaxPeriod
+  (JNIEnv* env, jclass, jint id, jdouble value)
+{
   int32_t status = 0;
   HAL_SetCounterMaxPeriod((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -288,9 +313,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_hal_CounterJNI_setCounterMaxPeriod(
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterUpdateWhenEmpty(JNIEnv* env, jclass,
-                                                            jint id,
-                                                            jboolean value) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterUpdateWhenEmpty
+  (JNIEnv* env, jclass, jint id, jboolean value)
+{
   int32_t status = 0;
   HAL_SetCounterUpdateWhenEmpty((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
@@ -301,8 +326,10 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterUpdateWhenEmpty(JNIEnv* env, jclass,
  * Method:    getCounterStopped
  * Signature: (I)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounterStopped(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_CounterJNI_getCounterStopped
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jboolean returnValue = HAL_GetCounterStopped((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
@@ -315,8 +342,9 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_hal_CounterJNI_getCounterStopped(
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CounterJNI_getCounterDirection(JNIEnv* env, jclass,
-                                                      jint id) {
+Java_edu_wpi_first_hal_CounterJNI_getCounterDirection
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
   jboolean returnValue =
       HAL_GetCounterDirection((HAL_CounterHandle)id, &status);
@@ -330,9 +358,9 @@ Java_edu_wpi_first_hal_CounterJNI_getCounterDirection(JNIEnv* env, jclass,
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterReverseDirection(JNIEnv* env,
-                                                             jclass, jint id,
-                                                             jboolean value) {
+Java_edu_wpi_first_hal_CounterJNI_setCounterReverseDirection
+  (JNIEnv* env, jclass, jint id, jboolean value)
+{
   int32_t status = 0;
   HAL_SetCounterReverseDirection((HAL_CounterHandle)id, value, &status);
   CheckStatus(env, status);
