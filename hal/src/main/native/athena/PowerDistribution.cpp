@@ -10,6 +10,9 @@
 #include "REVPDH.h"
 #include "hal/Errors.h"
 #include "hal/handles/HandlesInternal.h"
+#include "hal/HALBase.h"
+
+#include <thread>
 
 using namespace hal;
 
@@ -25,6 +28,20 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
           status, "Automatic PowerDistributionType must have default module");
       return HAL_kInvalidHandle;
     }
+
+    uint64_t waitTime = hal::GetDSInitializeTime() + 400000;
+
+    // Ensure we have been alive for long enough to receive a few Power packets.
+    do {
+      uint64_t currentTime = HAL_GetFPGATime(status);
+      if (*status != 0) {
+        return HAL_kInvalidHandle;
+      }
+      if (currentTime >= waitTime) {
+        break;
+      }
+      std::this_thread::sleep_for(std::chrono::microseconds(waitTime - currentTime));
+    } while (true);
 
     // Try PDP first
     auto pdpHandle = HAL_InitializePDP(0, allocationLocation, status);
