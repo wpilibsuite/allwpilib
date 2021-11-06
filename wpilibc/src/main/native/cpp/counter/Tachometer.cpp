@@ -73,8 +73,8 @@ units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
   if (edgesPerRevolution == 0) {
     return units::revolutions_per_minute_t{0.0};
   }
-  return units::revolutions_per_minute_t{((1.0 / edgesPerRevolution) / period) *
-                                         60};
+  auto rotationHz = ((1.0 / edgesPerRevolution) / period);
+  return units::revolutions_per_minute_t{rotationHz.to<double>() * 60};
 }
 
 bool Tachometer::GetStopped() const {
