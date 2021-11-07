@@ -4,11 +4,14 @@
 
 #include "hal/PowerDistribution.h"
 
+#include <thread>
+
 #include "CTREPDP.h"
 #include "HALInternal.h"
 #include "PortsInternal.h"
 #include "REVPDH.h"
 #include "hal/Errors.h"
+#include "hal/HALBase.h"
 #include "hal/handles/HandlesInternal.h"
 
 using namespace hal;
@@ -19,7 +22,41 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t moduleNumber, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic) {
-    type = HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE;
+    if (moduleNumber != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(
+          status, "Automatic PowerDistributionType must have default module");
+      return HAL_kInvalidHandle;
+    }
+
+    uint64_t waitTime = hal::GetDSInitializeTime() + 400000;
+
+    // Ensure we have been alive for long enough to receive a few Power packets.
+    do {
+      uint64_t currentTime = HAL_GetFPGATime(status);
+      if (*status != 0) {
+        return HAL_kInvalidHandle;
+      }
+      if (currentTime >= waitTime) {
+        break;
+      }
+      std::this_thread::sleep_for(
+          std::chrono::microseconds(waitTime - currentTime));
+    } while (true);
+
+    // Try PDP first
+    auto pdpHandle = HAL_InitializePDP(0, allocationLocation, status);
+    if (pdpHandle != HAL_kInvalidHandle) {
+      *status = 0;
+      HAL_GetPDPVoltage(pdpHandle, status);
+      if (*status == 0 || *status == HAL_CAN_TIMEOUT) {
+        return static_cast<HAL_PowerDistributionHandle>(pdpHandle);
+      }
+      HAL_CleanPDP(pdpHandle);
+    }
+    *status = 0;
+    auto pdhHandle = HAL_REV_InitializePDH(1, allocationLocation, status);
+    return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
@@ -27,7 +64,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       moduleNumber = 0;
     }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_InitializePDP(moduleNumber, allocationLocation, status));  // TODO
+        HAL_InitializePDP(moduleNumber, allocationLocation, status));
   } else {
     if (moduleNumber == HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
       moduleNumber = 1;
