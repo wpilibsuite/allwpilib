@@ -6,6 +6,7 @@ package edu.wpi.first.math.interpolation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.Test;
 
@@ -24,5 +25,19 @@ public class TimeInterpolatableBufferTest {
 
     buffer.addSample(10.5, new Rotation2d(2));
     assertEquals(new Rotation2d(1), buffer.getSample(0));
+  }
+
+  @Test
+  public void testPose2dInterpolation() {
+    TimeInterpolatableBuffer<Pose2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
+
+    // We expect to be at (1 - 1/Math.sqrt(2), 1/Math.sqrt(2), 45deg) at t=0.5
+    buffer.addSample(0, new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
+    buffer.addSample(1, new Pose2d(1, 1, Rotation2d.fromDegrees(0)));
+    Pose2d sample = buffer.getSample(0.5);
+
+    assertEquals(1 - 1 / Math.sqrt(2), sample.getTranslation().getX(), 0.01);
+    assertEquals(1 / Math.sqrt(2), sample.getTranslation().getY(), 0.01);
+    assertEquals(45, sample.getRotation().getDegrees(), 0.01);
   }
 }
