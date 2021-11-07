@@ -56,15 +56,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     }
     *status = 0;
     auto pdhHandle = HAL_REV_InitializePDH(1, allocationLocation, status);
-    if (pdhHandle != HAL_kInvalidHandle) {
-      *status = 0;
-      HAL_REV_GetPDHSupplyVoltage(pdhHandle, status);
-      if (*status == 0 || *status == HAL_CAN_TIMEOUT) {
-        return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
-      }
-      HAL_REV_FreePDH(pdhHandle);
-    }
-    return HAL_kInvalidHandle;
+    return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
