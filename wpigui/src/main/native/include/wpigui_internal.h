@@ -40,6 +40,9 @@ struct Context : public SavedSettings {
 
   GLFWwindow* window = nullptr;
 
+  std::function<void()> loadSettings;
+  std::function<void()> loadIniSettings;
+  std::function<void(bool exiting)> saveSettings;
   std::vector<std::function<void()>> initializers;
   std::vector<std::function<void(float scale)>> windowScalers;
   std::vector<std::pair<
