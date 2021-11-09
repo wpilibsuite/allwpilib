@@ -239,6 +239,7 @@ if (WITH_TESTS)
     include(GoogleTest)
 endif()
 
+add_subdirectory(fieldImages)
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
