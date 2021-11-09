@@ -16,5 +16,5 @@
  */
 class Place : public frc2::CommandHelper<frc2::SequentialCommandGroup, Place> {
  public:
-  Place(Claw* claw, Wrist* wrist, Elevator* elevator);
+  Place(Claw& claw, Wrist& wrist, Elevator& elevator);
 };

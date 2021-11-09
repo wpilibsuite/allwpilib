@@ -6,7 +6,7 @@
 
 #include "Robot.h"
 
-CloseClaw::CloseClaw(Claw* claw) : m_claw(claw) {
+CloseClaw::CloseClaw(Claw& claw) : m_claw(&claw) {
   SetName("CloseClaw");
   AddRequirements({m_claw});
 }
