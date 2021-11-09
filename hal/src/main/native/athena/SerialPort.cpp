@@ -83,7 +83,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
 
   serialPort->portId = open(portName, O_RDWR | O_NOCTTY);
   if (serialPort->portId < 0) {
-    *status = errno;
+    *status = -errno;
     if (*status == EACCES) {
       *status = HAL_CONSOLE_OUT_ENABLED_ERROR;
     }
@@ -96,14 +96,14 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   serialPort->baudRate = B9600;
   if (cfsetospeed(&serialPort->tty,
                   static_cast<speed_t>(serialPort->baudRate)) != 0) {
-    *status = errno;
+    *status = -errno;
     close(serialPort->portId);
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
   if (cfsetispeed(&serialPort->tty,
                   static_cast<speed_t>(serialPort->baudRate)) != 0) {
-    *status = errno;
+    *status = -errno;
     close(serialPort->portId);
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
@@ -128,13 +128,13 @@ HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
   serialPort->tty.c_oflag = ~OPOST;
 
   if (tcflush(serialPort->portId, TCIOFLUSH) != 0) {
-    *status = errno;
+    *status = -errno;
     close(serialPort->portId);
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
   }
   if (tcsetattr(serialPort->portId, TCSANOW, &serialPort->tty) != 0) {
-    *status = errno;
+    *status = -errno;
     close(serialPort->portId);
     serialPortHandles->Free(handle);
     return HAL_kInvalidHandle;
