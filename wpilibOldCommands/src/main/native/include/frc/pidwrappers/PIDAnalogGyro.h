@@ -9,7 +9,7 @@
 
 namespace frc {
 
-class PIDGyro : public PIDSource, public AnalogGyro {
+class PIDAnalogGyro : public PIDSource, public AnalogGyro {
  public:
   /**
    * Get the PIDOutput for the PIDSource base object. Can be set to return

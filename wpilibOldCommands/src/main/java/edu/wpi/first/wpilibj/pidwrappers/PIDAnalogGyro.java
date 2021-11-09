@@ -9,22 +9,22 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 
-public class PIDGyro extends AnalogGyro implements PIDSource {
+public class PIDAnalogGyro extends AnalogGyro implements PIDSource {
   private PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
-  public PIDGyro(int channel) {
+  public PIDAnalogGyro(int channel) {
     super(channel);
   }
 
-  public PIDGyro(AnalogInput channel) {
+  public PIDAnalogGyro(AnalogInput channel) {
     super(channel);
   }
 
-  public PIDGyro(int channel, int center, double offset) {
+  public PIDAnalogGyro(int channel, int center, double offset) {
     super(channel, center, offset);
   }
 
-  public PIDGyro(AnalogInput channel, int center, double offset) {
+  public PIDAnalogGyro(AnalogInput channel, int center, double offset) {
     super(channel, center, offset);
   }
 

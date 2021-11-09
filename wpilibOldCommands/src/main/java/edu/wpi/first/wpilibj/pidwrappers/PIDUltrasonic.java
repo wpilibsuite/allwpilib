@@ -35,9 +35,9 @@ public class PIDUltrasonic extends Ultrasonic implements PIDSource {
   }
 
   /**
-   * Get the range in the current DistanceUnit for the PIDSource base object.
+   * Get the range in the inches for the PIDSource base object.
    *
-   * @return The range in DistanceUnit
+   * @return The range in inches
    */
   @Override
   public double pidGet() {
