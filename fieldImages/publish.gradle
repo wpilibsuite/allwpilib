@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 
-def baseArtifactId = 'field-images'
-def artifactGroupId = 'edu.wpi.first.field_images'
+def baseArtifactId = 'fieldImages'
+def artifactGroupId = 'edu.wpi.first.fieldImages'
 def zipBaseName = '_GROUP_edu_wpi_first_field_images_ID_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
@@ -51,7 +51,7 @@ addTaskToCopyAllOutputs(cppSourcesZip)
 
 model {
     publishing {
-        def wpilibCTaskList = createComponentZipTasks($.components, ['field_images'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def wpilibCTaskList = createComponentZipTasks($.components, ['fieldImages'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {

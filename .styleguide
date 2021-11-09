@@ -16,7 +16,7 @@ modifiableFileExclude {
 generatedFileExclude {
   FRCNetComm\.java$
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs\.h$
-  field_images/src/main/native/resources/
+  fieldImages/src/main/native/resources/
 }
 
 repoRootNameOverride {
