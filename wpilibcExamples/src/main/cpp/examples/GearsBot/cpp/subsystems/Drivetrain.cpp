@@ -55,7 +55,7 @@ void Drivetrain::Drive(double left, double right) {
   m_robotDrive.TankDrive(left, right);
 }
 
-double Drivetrain::GetHeading() {
+double Drivetrain::GetHeading() const {
   return m_gyro.GetAngle();
 }
 
@@ -65,11 +65,11 @@ void Drivetrain::Reset() {
   m_rightEncoder.Reset();
 }
 
-double Drivetrain::GetDistance() {
+double Drivetrain::GetDistance() const {
   return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance()) / 2.0;
 }
 
-double Drivetrain::GetDistanceToObstacle() {
+double Drivetrain::GetDistanceToObstacle() const {
   // Really meters in simulation since it's a rangefinder...
   return m_rangefinder.GetAverageVoltage();
 }

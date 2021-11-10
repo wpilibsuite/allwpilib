@@ -8,13 +8,13 @@
 
 #include "Robot.h"
 
-DriveStraight::DriveStraight(double distance, Drivetrain* drivetrain)
+DriveStraight::DriveStraight(double distance, Drivetrain& drivetrain)
     : frc2::CommandHelper<frc2::PIDCommand, DriveStraight>(
           frc2::PIDController(4, 0, 0),
-          [drivetrain] { return drivetrain->GetDistance(); }, distance,
-          [drivetrain](double output) { drivetrain->Drive(output, output); },
-          {drivetrain}),
-      m_drivetrain(drivetrain) {
+          [&drivetrain] { return drivetrain.GetDistance(); }, distance,
+          [&drivetrain](double output) { drivetrain.Drive(output, output); },
+          {&drivetrain}),
+      m_drivetrain(&drivetrain) {
   m_controller.SetTolerance(0.01);
 }
 
