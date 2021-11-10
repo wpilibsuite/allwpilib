@@ -319,7 +319,7 @@ double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
     return 0;
   }
 
-  if (channel == 1) {
+  if (channel == 0) {
     return PH_status0_analog_0_decode(status0.analog_0);
   }
   return PH_status0_analog_1_decode(status0.analog_1);
