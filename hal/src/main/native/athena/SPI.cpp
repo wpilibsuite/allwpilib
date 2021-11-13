@@ -496,7 +496,8 @@ void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status) {
   }
 
   // configure DMA
-  spiAutoDMA = std::make_unique<tDMAManager>(g_SpiAutoData_index, bufferSize, status);
+  spiAutoDMA = 
+      std::make_unique<tDMAManager>(g_SpiAutoData_index, bufferSize, status);
 }
 
 void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status) {
