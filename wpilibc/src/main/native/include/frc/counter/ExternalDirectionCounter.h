@@ -15,12 +15,27 @@
 namespace frc {
 class DigitalSource;
 
+/** Counter using external direction. */
 class ExternalDirectionCounter
     : public wpi::Sendable,
       public wpi::SendableHelper<ExternalDirectionCounter> {
  public:
+  
+  /**
+   * Constructs a new ExternalDirectionCounter.
+   *
+   * @param countSource The source for counting.
+   * @param directionSource The source for selecting count direction.
+   */
   ExternalDirectionCounter(DigitalSource& countSource,
                            DigitalSource& directionSource);
+  
+/**
+   * Constructs a new ExternalDirectionCounter.
+   *
+   * @param countSource The source for counting.
+   * @param directionSource The source for selecting count direction.
+   */
   ExternalDirectionCounter(std::shared_ptr<DigitalSource> countSource,
                            std::shared_ptr<DigitalSource> directionSource);
 
@@ -29,11 +44,28 @@ class ExternalDirectionCounter
   ExternalDirectionCounter(ExternalDirectionCounter&&) = default;
   ExternalDirectionCounter& operator=(ExternalDirectionCounter&&) = default;
 
+  /**
+   * Gets the current count.
+   *
+   * @return The current count.
+   */
   int GetCount() const;
 
+  /**
+   * Sets to revert the counter direction.
+   *
+   * @param reverseDirection True to reverse counting direction.
+   */
   void SetReverseDirection(bool reverseDirection);
+
+  /** Resets the current count. */
   void Reset();
 
+  /**
+   * Sets the edge configuration for counting.
+   *
+   * @param configuration The counting edge configuration.
+   */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
  protected:

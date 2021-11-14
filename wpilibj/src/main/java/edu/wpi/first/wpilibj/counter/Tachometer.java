@@ -52,7 +52,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the tachometer period.
+   * Gets the tachometer period.
    *
    * @return Current period (in seconds).
    */
@@ -61,7 +61,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the tachometer frequency.
+   * Gets the tachometer frequency.
    *
    * @return Current frequency (in hertz).
    */

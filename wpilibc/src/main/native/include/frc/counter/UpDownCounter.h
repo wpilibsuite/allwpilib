@@ -15,10 +15,25 @@
 namespace frc {
 class DigitalSource;
 
+/** Up Down Counter. */
 class UpDownCounter : public wpi::Sendable,
                       public wpi::SendableHelper<UpDownCounter> {
  public:
+
+  /**
+   * Constructs a new UpDown Counter.
+   *
+   * @param upSource The up count source (can be null).
+   * @param downSource The down count source (can be null).
+   */
   UpDownCounter(DigitalSource& upSource, DigitalSource& downSource);
+  
+  /**
+   * Constructs a new UpDown Counter.
+   *
+   * @param upSource The up count source (can be null).
+   * @param downSource The down count source (can be null).
+   */
   UpDownCounter(std::shared_ptr<DigitalSource> countSource,
                 std::shared_ptr<DigitalSource> directionSource);
 
@@ -27,12 +42,35 @@ class UpDownCounter : public wpi::Sendable,
   UpDownCounter(UpDownCounter&&) = default;
   UpDownCounter& operator=(UpDownCounter&&) = default;
 
+  /**
+   * Gets the current count.
+   *
+   * @return The current count.
+   */
   int GetCount() const;
 
+  /**
+   * Sets to revert the counter direction.
+   *
+   * @param reverseDirection True to reverse counting direction.
+   */
   void SetReverseDirection(bool reverseDirection);
+
+  /** Resets the current count. */
   void Reset();
 
+  /**
+   * Sets the configuration for the up source.
+   *
+   * @param configuration The up source configuration.
+   */
   void SetUpEdgeConfiguration(EdgeConfiguration configuration);
+  
+  /**
+   * Sets the configuration for the down source.
+   *
+   * @param configuration The down source configuration.
+   */
   void SetDownEdgeConfiguration(EdgeConfiguration configuration);
 
  protected:
