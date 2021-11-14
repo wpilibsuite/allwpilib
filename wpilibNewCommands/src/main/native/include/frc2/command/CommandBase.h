@@ -24,21 +24,38 @@ class CommandBase : public Command,
                     public wpi::SendableHelper<CommandBase> {
  public:
   /**
-   * Adds the specified requirements to the command.
+   * Adds the specified Subsystem requirements to the command.
    *
-   * @param requirements the requirements to add
+   * @param requirements the Subsystem requirements to add
    */
   void AddRequirements(std::initializer_list<Subsystem*> requirements);
 
   /**
-   * Adds the specified requirements to the command.
+   * Adds the specified Subsystem requirements to the command.
    *
-   * @param requirements the requirements to add
+   * @param requirements the Subsystem requirements to add
    */
   void AddRequirements(wpi::span<Subsystem* const> requirements);
 
+  /**
+   * Adds the specified Subsystem requirements to the command.
+   *
+   * @param requirements the Subsystem requirements to add
+   */
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
 
+  /**
+   * Adds the specified Subsystem requirement to the command.
+   *
+   * @param requirement the Subsystem requirement to add
+   */
+  void AddRequirements(Subsystem* requirement);
+
+  /**
+   * Gets the Subsystem requirements of the command.
+   *
+   * @return the Command's Subsystem requirements
+   */
   wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
   /**

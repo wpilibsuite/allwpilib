@@ -48,7 +48,7 @@ class AnalogGyro : public Gyro,
   explicit AnalogGyro(int channel);
 
   /**
-   * @Gyro constructor with a precreated AnalogInput object.
+   * Gyro constructor with a precreated AnalogInput object.
    *
    * Use this constructor when the analog channel needs to be shared.
    * This object will not clean up the AnalogInput object when using this

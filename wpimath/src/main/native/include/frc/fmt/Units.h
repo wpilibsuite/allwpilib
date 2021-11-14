@@ -8,9 +8,28 @@
 
 #include "units/base.h"
 
+/**
+ * Formatter for unit types.
+ *
+ * @tparam Units Unit tag for which type of units the `unit_t` represents (e.g.
+ *               meters).
+ * @tparam T Underlying type of the storage. Defaults to double.
+ * @tparam NonLinearScale Optional scale class for the units. Defaults to linear
+ *                        (i.e. does not scale the unit value). Examples of
+ *                        non-linear scales could be logarithmic, decibel, or
+ *                        richter scales. Non-linear scales must adhere to the
+ *                        non-linear-scale concept.
+ */
 template <class Units, typename T, template <typename> class NonLinearScale>
 struct fmt::formatter<units::unit_t<Units, T, NonLinearScale>>
     : fmt::formatter<double> {
+  /**
+   * Writes out a formatted unit.
+   *
+   * @tparam FormatContext Format string context type.
+   * @param obj Unit instance.
+   * @param ctx Format string context.
+   */
   template <typename FormatContext>
   auto format(const units::unit_t<Units, T, NonLinearScale>& obj,
               FormatContext& ctx) {

@@ -21,10 +21,10 @@ class Debouncer {
   /**
    * Creates a new Debouncer.
    *
-   * @param debounce The number of seconds the value must change from
-   *                 baseline for the filtered value to change.
-   * @param type     Which type of state change the debouncing will be performed
-   *                 on.
+   * @param debounceTime The number of seconds the value must change from
+   *                     baseline for the filtered value to change.
+   * @param type         Which type of state change the debouncing will be
+   *                     performed on.
    */
   explicit Debouncer(units::second_t debounceTime,
                      DebounceType type = DebounceType::kRising);

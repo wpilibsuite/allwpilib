@@ -37,9 +37,9 @@ class PIDController : public PIDBase, public Controller {
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
@@ -53,9 +53,10 @@ class PIDController : public PIDBase, public Controller {
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
+   * @param f      the feedforward coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
@@ -69,9 +70,9 @@ class PIDController : public PIDBase, public Controller {
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This
@@ -85,9 +86,10 @@ class PIDController : public PIDBase, public Controller {
   /**
    * Allocate a PID object with the given constants for P, I, D.
    *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
+   * @param p      the proportional coefficient
+   * @param i      the integral coefficient
+   * @param d      the derivative coefficient
+   * @param f      the feedforward coefficient
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output value
    * @param period the loop time for doing calculations in seconds. This

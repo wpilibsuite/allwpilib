@@ -27,6 +27,7 @@ DEFINE_CAPI(HAL_Bool, UserActive3V3, false)
 DEFINE_CAPI(int32_t, UserFaults6V, 0)
 DEFINE_CAPI(int32_t, UserFaults5V, 0)
 DEFINE_CAPI(int32_t, UserFaults3V3, 0)
+DEFINE_CAPI(double, BrownoutVoltage, 6.75)
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify) {}

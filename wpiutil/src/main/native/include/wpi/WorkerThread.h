@@ -225,6 +225,7 @@ class WorkerThread<R(T...)> final {
    * destroyed while waiting for a result.
    *
    * @param work Work function (called on worker thread)
+   * @param u Arguments to work function
    */
   template <typename... U>
   future<R> QueueWork(WorkFunction work, U&&... u) {
@@ -260,6 +261,7 @@ class WorkerThread<R(T...)> final {
    *
    * @param work Work function (called on worker thread)
    * @param afterWork After work function (called on loop thread)
+   * @param u Arguments to work function
    */
   template <typename... U>
   void QueueWorkThen(WorkFunction work, AfterWorkFunction afterWork, U&&... u) {

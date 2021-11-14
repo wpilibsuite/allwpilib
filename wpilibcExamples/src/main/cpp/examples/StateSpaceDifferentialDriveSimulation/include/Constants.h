@@ -43,7 +43,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr auto kWheelDiameter = 6_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.to<double>() * wpi::numbers::pi) /
+    (kWheelDiameter.value() * wpi::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

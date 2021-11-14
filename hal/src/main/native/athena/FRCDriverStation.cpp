@@ -69,15 +69,15 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
       joystickNum, &buttons->buttons, &buttons->count);
 }
 /**
- * Retrieve the Joystick Descriptor for particular slot
- * @param desc [out] descriptor (data transfer object) to fill in.  desc is
- * filled in regardless of success. In other words, if descriptor is not
- * available, desc is filled in with default values matching the init-values in
- * Java and C++ Driverstation for when caller requests a too-large joystick
- * index.
+ * Retrieve the Joystick Descriptor for particular slot.
  *
+ * @param[out] desc descriptor (data transfer object) to fill in. desc is filled
+ *                  in regardless of success. In other words, if descriptor is
+ *                  not available, desc is filled in with default values
+ *                  matching the init-values in Java and C++ Driverstation for
+ *                  when caller requests a too-large joystick index.
  * @return error code reported from Network Comm back-end.  Zero is good,
- * nonzero is bad.
+ *         nonzero is bad.
  */
 static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
                                                  HAL_JoystickDescriptor* desc) {

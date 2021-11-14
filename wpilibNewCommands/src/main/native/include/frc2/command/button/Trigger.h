@@ -90,7 +90,7 @@ class Trigger {
    * Binds a runnable to execute when the trigger becomes active.
    *
    * @param toRun the runnable to execute.
-   * @paaram requirements the required subsystems.
+   * @param requirements the required subsystems.
    */
   Trigger WhenActive(std::function<void()> toRun,
                      std::initializer_list<Subsystem*> requirements);
@@ -99,7 +99,7 @@ class Trigger {
    * Binds a runnable to execute when the trigger becomes active.
    *
    * @param toRun the runnable to execute.
-   * @paaram requirements the required subsystems.
+   * @param requirements the required subsystems.
    */
   Trigger WhenActive(std::function<void()> toRun,
                      wpi::span<Subsystem* const> requirements = {});

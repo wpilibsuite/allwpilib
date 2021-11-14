@@ -7,14 +7,14 @@
 namespace frc {
 
 Eigen::Vector<double, 3> PoseTo3dVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 3>{pose.Translation().X().to<double>(),
-                                  pose.Translation().Y().to<double>(),
-                                  pose.Rotation().Radians().to<double>()};
+  return Eigen::Vector<double, 3>{pose.Translation().X().value(),
+                                  pose.Translation().Y().value(),
+                                  pose.Rotation().Radians().value()};
 }
 
 Eigen::Vector<double, 4> PoseTo4dVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 4>{pose.Translation().X().to<double>(),
-                                  pose.Translation().Y().to<double>(),
+  return Eigen::Vector<double, 4>{pose.Translation().X().value(),
+                                  pose.Translation().Y().value(),
                                   pose.Rotation().Cos(), pose.Rotation().Sin()};
 }
 
@@ -31,8 +31,8 @@ bool IsStabilizable<2, 1>(const Eigen::Matrix<double, 2, 2>& A,
 }
 
 Eigen::Vector<double, 3> PoseToVector(const Pose2d& pose) {
-  return Eigen::Vector<double, 3>{pose.X().to<double>(), pose.Y().to<double>(),
-                                  pose.Rotation().Radians().to<double>()};
+  return Eigen::Vector<double, 3>{pose.X().value(), pose.Y().value(),
+                                  pose.Rotation().Radians().value()};
 }
 
 }  // namespace frc

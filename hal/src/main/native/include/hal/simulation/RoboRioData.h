@@ -115,6 +115,12 @@ void HALSIM_CancelRoboRioUserFaults3V3Callback(int32_t uid);
 int32_t HALSIM_GetRoboRioUserFaults3V3(void);
 void HALSIM_SetRoboRioUserFaults3V3(int32_t userFaults3V3);
 
+int32_t HALSIM_RegisterRoboRioBrownoutVoltageCallback(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_CancelRoboRioBrownoutVoltageCallback(int32_t uid);
+double HALSIM_GetRoboRioBrownoutVoltage(void);
+void HALSIM_SetRoboRioBrownoutVoltage(double brownoutVoltage);
+
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
 

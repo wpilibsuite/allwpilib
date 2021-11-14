@@ -23,7 +23,7 @@ void NetworkStream::Listen(int backlog) {
 }
 
 void NetworkStream::Listen(std::function<void()> callback, int backlog) {
-  connection.connect(callback);
+  connection.connect(std::move(callback));
   Listen(backlog);
 }
 

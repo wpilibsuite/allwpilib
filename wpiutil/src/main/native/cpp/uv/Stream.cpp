@@ -15,7 +15,8 @@ class CallbackWriteReq : public WriteReq {
   CallbackWriteReq(span<const Buffer> bufs,
                    std::function<void(span<Buffer>, Error)> callback)
       : m_bufs{bufs.begin(), bufs.end()} {
-    finish.connect([=](Error err) { callback(m_bufs, err); });
+    finish.connect(
+        [this, f = std::move(callback)](Error err) { f(m_bufs, err); });
   }
 
  private:
@@ -51,7 +52,7 @@ void Stream::Shutdown(const std::shared_ptr<ShutdownReq>& req) {
 void Stream::Shutdown(std::function<void()> callback) {
   auto req = std::make_shared<ShutdownReq>();
   if (callback) {
-    req->complete.connect(callback);
+    req->complete.connect(std::move(callback));
   }
   Shutdown(req);
 }
@@ -93,7 +94,7 @@ void Stream::Write(span<const Buffer> bufs,
 
 void Stream::Write(span<const Buffer> bufs,
                    std::function<void(span<Buffer>, Error)> callback) {
-  Write(bufs, std::make_shared<CallbackWriteReq>(bufs, callback));
+  Write(bufs, std::make_shared<CallbackWriteReq>(bufs, std::move(callback)));
 }
 
 int Stream::TryWrite(span<const Buffer> bufs) {

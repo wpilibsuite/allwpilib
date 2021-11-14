@@ -48,7 +48,7 @@ void SwerveModule::SetDesiredState(
 
   // Calculate the drive output from the drive PID controller.
   const auto driveOutput = m_drivePIDController.Calculate(
-      m_driveEncoder.GetRate(), state.speed.to<double>());
+      m_driveEncoder.GetRate(), state.speed.value());
 
   const auto driveFeedforward = m_driveFeedforward.Calculate(state.speed);
 

@@ -139,6 +139,7 @@ class DriverStation {
    * Returns the types of Axes on a given joystick port.
    *
    * @param stick The joystick port number and the target axis
+   * @param axis  The analog axis value to read from the joystick.
    * @return What type of axis the axis is reporting to be
    */
   static int GetJoystickAxisType(int stick, int axis);

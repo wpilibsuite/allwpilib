@@ -743,9 +743,9 @@ class Color {
   /**
    * Constructs a Color.
    *
-   * @param red Red value (0-1)
-   * @param green Green value (0-1)
-   * @param blue Blue value (0-1)
+   * @param r Red value (0-1)
+   * @param g Green value (0-1)
+   * @param b Blue value (0-1)
    */
   constexpr Color(double r, double g, double b)
       : red(roundAndClamp(r)),

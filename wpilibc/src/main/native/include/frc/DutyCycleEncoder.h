@@ -58,21 +58,21 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
-   * @param source the digital source to attach to
+   * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource& digitalSource);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
-   * @param source the digital source to attach to
+   * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(DigitalSource* digitalSource);
 
   /**
    * Construct a new DutyCycleEncoder attached to a DigitalSource object.
    *
-   * @param source the digital source to attach to
+   * @param digitalSource the digital source to attach to
    */
   explicit DutyCycleEncoder(std::shared_ptr<DigitalSource> digitalSource);
 

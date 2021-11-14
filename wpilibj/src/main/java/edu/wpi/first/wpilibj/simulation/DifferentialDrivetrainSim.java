@@ -109,7 +109,7 @@ public class DifferentialDrivetrainSim {
    * @param gearing The gearingRatio ratio of the robot, as output over input. This must be the same
    *     ratio as the ratio used to identify or create the drivetrainPlant.
    * @param trackWidthMeters The distance between the two sides of the drivetrian. Can be found with
-   *     frc-characterization.
+   *     SysId.
    * @param wheelRadiusMeters The radius of the wheels on the drivetrain, in meters.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
@@ -353,7 +353,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /**
-   * Clamp the input vector such that no element exceeds the given voltage. If any does, the
+   * Clamp the input vector such that no element exceeds the battery voltage. If any does, the
    * relative magnitudes of the input will be maintained.
    *
    * @param u The input vector.
@@ -474,7 +474,7 @@ public class DifferentialDrivetrainSim {
    * @param gearing The gearing reduction used.
    * @param wheelSize The wheel size.
    * @param jKgMetersSquared The moment of inertia of the drivebase. This can be calculated using
-   *     frc-characterization.
+   *     SysId.
    * @param measurementStdDevs Standard deviations for measurements, in the form [x, y, heading,
    *     left velocity, right velocity, left distance, right distance]ᵀ. Can be null if no noise is
    *     desired. Gyro standard deviations of 0.0001 radians, velocity standard deviations of 0.05

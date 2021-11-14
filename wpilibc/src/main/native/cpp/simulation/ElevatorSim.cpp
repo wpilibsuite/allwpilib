@@ -78,7 +78,7 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 }
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.to<double>()});
+  SetInput(Eigen::Vector<double, 1>{voltage.value()});
 }
 
 Eigen::Vector<double, 2> ElevatorSim::UpdateX(
@@ -93,10 +93,10 @@ Eigen::Vector<double, 2> ElevatorSim::UpdateX(
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
   if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minHeight.to<double>(), 0.0};
+    return Eigen::Vector<double, 2>{m_minHeight.value(), 0.0};
   }
   if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxHeight.to<double>(), 0.0};
+    return Eigen::Vector<double, 2>{m_maxHeight.value(), 0.0};
   }
   return updatedXhat;
 }

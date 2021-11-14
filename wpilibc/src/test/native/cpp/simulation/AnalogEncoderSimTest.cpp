@@ -20,8 +20,8 @@ TEST(AnalogEncoderSimTest, Basic) {
   frc::sim::AnalogEncoderSim encoderSim{encoder};
 
   encoderSim.SetPosition(180_deg);
-  EXPECT_NEAR(encoder.Get().to<double>(), 0.5, 1E-8);
-  EXPECT_NEAR(encoderSim.GetTurns().to<double>(), 0.5, 1E-8);
-  EXPECT_NEAR(encoderSim.GetPosition().Radians().to<double>(), wpi::numbers::pi,
+  EXPECT_NEAR(encoder.Get().value(), 0.5, 1E-8);
+  EXPECT_NEAR(encoderSim.GetTurns().value(), 0.5, 1E-8);
+  EXPECT_NEAR(encoderSim.GetPosition().Radians().value(), wpi::numbers::pi,
               1E-8);
 }

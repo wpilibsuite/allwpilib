@@ -24,7 +24,7 @@ public class WPIJREArtifact extends MavenArtifact {
         this.configName = configName;
         Project project = target.getProject();
         getConfiguration().set(project.getConfigurations().create(configName));
-        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2022:11.0.9u12-1"));
+        getDependency().set(project.getDependencies().add(configName, "edu.wpi.first.jdk:roborio-2022:11.0.12u5-1"));
 
         setOnlyIf(new PredicateWrapper({ DeployContext ctx ->
             return jreMissing(ctx) || project.hasProperty("force-redeploy-jre");

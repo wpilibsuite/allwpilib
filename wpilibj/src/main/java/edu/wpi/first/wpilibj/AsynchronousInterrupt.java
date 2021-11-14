@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 /**
- * Class for handling asynchrounous interrupts.
+ * Class for handling asynchronous interrupts using a callback thread.
  *
  * <p>By default, interrupts will occur on rising edge. Callbacks are disabled by default, and
  * enable() must be called before they will occur.
@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
  * <p>Both rising and falling edges can be indicated in one callback if both a rising and falling
  * edge occurred since the previous callback.
  *
- * <p>Synchronous interrupts are handled by the SynchronousInterrupt class.
+ * <p>Synchronous (blocking) interrupts are handled by the SynchronousInterrupt class.
  */
 public class AsynchronousInterrupt implements AutoCloseable {
   private final BiConsumer<Boolean, Boolean> m_callback;
@@ -33,6 +33,9 @@ public class AsynchronousInterrupt implements AutoCloseable {
    * <p>At construction, the interrupt will trigger on the rising edge.
    *
    * <p>Callbacks will not be triggered until enable() is called.
+   *
+   * <p>The first bool in the callback indicates the rising edge triggered the interrupt, the second
+   * bool is falling edge.
    *
    * @param source The digital source to use.
    * @param callback The callback to call on an interrupt

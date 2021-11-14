@@ -26,7 +26,7 @@ TEST(RamseteControllerTest, ReachesReference) {
 
   constexpr auto kDt = 0.02_s;
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).to<double>(); ++i) {
+  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);

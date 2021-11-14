@@ -2122,7 +2122,7 @@ template<typename IteratorType> class iteration_proxy
 
                 // use key from the object
                 case value_t::object:
-                    return anchor.key();
+                    return std::string{anchor.key()};
 
                 // use an empty key for all primitive types
                 default:
@@ -2678,9 +2678,10 @@ class json
     class binary_writer;
     class lexer;
     class parser;
-    class serializer;
 
   public:
+    class serializer;
+
     using value_t = detail::value_t;
     /// @copydoc wpi::json_pointer
     using json_pointer = ::wpi::json_pointer;

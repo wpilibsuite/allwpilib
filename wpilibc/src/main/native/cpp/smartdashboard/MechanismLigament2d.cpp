@@ -14,7 +14,7 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
                                          const frc::Color8Bit& color)
     : MechanismObject2d(name),
       m_length{length},
-      m_angle{angle.to<double>()},
+      m_angle{angle.value()},
       m_weight{lineWeight} {
   SetColor(color);
 }
@@ -40,7 +40,7 @@ void MechanismLigament2d::SetColor(const Color8Bit& color) {
 
 void MechanismLigament2d::SetAngle(units::degree_t angle) {
   std::scoped_lock lock(m_mutex);
-  m_angle = angle.to<double>();
+  m_angle = angle.value();
   Flush();
 }
 

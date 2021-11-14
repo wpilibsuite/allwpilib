@@ -28,7 +28,7 @@ TEST(RungeKuttaTimeVaryingTest, RungeKuttaTimeVarying) {
   Eigen::Vector<double, 1> y1 = frc::RungeKuttaTimeVarying(
       [](units::second_t t, const Eigen::Vector<double, 1>& x) {
         return Eigen::Vector<double, 1>{
-            x(0) * (2.0 / (std::exp(t.to<double>()) + 1.0) - 1.0)};
+            x(0) * (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
       5_s, y0, 1_s);
   EXPECT_NEAR(y1(0), RungeKuttaTimeVaryingSolution(6.0)(0), 1e-3);

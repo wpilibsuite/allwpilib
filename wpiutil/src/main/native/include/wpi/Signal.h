@@ -565,7 +565,7 @@ public:
      *         signal object, it does not cover thread safety of potentially
      *         shared state used in slot functions.
      *
-     * @param a... arguments to emit
+     * @param a arguments to emit
      */
     template <typename... A>
     void operator()(A && ... a) const {
@@ -581,7 +581,6 @@ public:
      * Safety: Thread-safety depends on locking policy.
      *
      * @param c a callable
-     * @return a Connection object that can be used to interact with the slot
      */
     template <typename Callable>
     void connect(Callable && c) {

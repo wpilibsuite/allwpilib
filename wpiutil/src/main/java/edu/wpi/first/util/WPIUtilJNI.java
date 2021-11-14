@@ -63,4 +63,63 @@ public final class WPIUtilJNI {
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
 
   public static native void removePortForwarder(int port);
+
+  public static native int createEvent(boolean manualReset, boolean initialState);
+
+  public static native void destroyEvent(int eventHandle);
+
+  public static native void setEvent(int eventHandle);
+
+  public static native void resetEvent(int eventHandle);
+
+  public static native int createSemaphore(int initialCount, int maximumCount);
+
+  public static native void destroySemaphore(int semHandle);
+
+  public static native boolean releaseSemaphore(int semHandle, int releaseCount);
+
+  /**
+   * Waits for an handle to be signaled.
+   *
+   * @param handle handle to wait on
+   * @throws InterruptedException on failure (e.g. object was destroyed)
+   */
+  public static native void waitForObject(int handle) throws InterruptedException;
+
+  /**
+   * Waits for an handle to be signaled, with timeout.
+   *
+   * @param handle handle to wait on
+   * @param timeout timeout in seconds
+   * @return True if timeout reached without handle being signaled
+   * @throws InterruptedException on failure (e.g. object was destroyed)
+   */
+  public static native boolean waitForObjectTimeout(int handle, double timeout)
+      throws InterruptedException;
+
+  /**
+   * Waits for one or more handles to be signaled.
+   *
+   * <p>Invalid handles are treated as signaled; the returned array will have the handle error bit
+   * set for any invalid handles.
+   *
+   * @param handles array of handles to wait on
+   * @return array of signaled handles
+   * @throws InterruptedException on failure (e.g. no objects were signaled)
+   */
+  public static native int[] waitForObjects(int[] handles) throws InterruptedException;
+
+  /**
+   * Waits for one or more handles to be signaled, with timeout.
+   *
+   * <p>Invalid handles are treated as signaled; the returned array will have the handle error bit
+   * set for any invalid handles.
+   *
+   * @param handles array of handles to wait on
+   * @param timeout timeout in seconds
+   * @return array of signaled handles; empty if timeout reached without any handle being signaled
+   * @throws InterruptedException on failure (e.g. no objects were signaled and no timeout)
+   */
+  public static native int[] waitForObjectsTimeout(int[] handles, double timeout)
+      throws InterruptedException;
 }

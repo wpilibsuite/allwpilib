@@ -100,11 +100,11 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
       Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
           .RotateBy(angle);
 
-  Eigen::Vector<double, 3> u{fieldRelativeVelocities.X().to<double>(),
-                             fieldRelativeVelocities.Y().to<double>(),
-                             omega.to<double>()};
+  Eigen::Vector<double, 3> u{fieldRelativeVelocities.X().value(),
+                             fieldRelativeVelocities.Y().value(),
+                             omega.value()};
 
-  Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
+  Eigen::Vector<double, 1> localY{angle.Radians().value()};
   m_previousAngle = angle;
 
   m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);

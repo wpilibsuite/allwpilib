@@ -322,7 +322,7 @@
   },
   {
     "name": "TrapezoidProfileSubsystem (New)",
-    "description": "A command that executes a trapezoidal motion profile.",
+    "description": "A subsystem that executes a trapezoidal motion profile.",
     "tags": [
       "trapezoidprofilesubsystem"
     ],

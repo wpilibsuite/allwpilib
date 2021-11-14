@@ -52,7 +52,7 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::normal_distribution<double> distr{0.0, 10.0};
 
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    double theory = GetData(t.to<double>());
+    double theory = GetData(t.value());
     double noise = distr(gen);
     filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);

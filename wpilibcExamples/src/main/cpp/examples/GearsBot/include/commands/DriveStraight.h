@@ -18,7 +18,7 @@
 class DriveStraight
     : public frc2::CommandHelper<frc2::PIDCommand, DriveStraight> {
  public:
-  explicit DriveStraight(double distance, Drivetrain* drivetrain);
+  explicit DriveStraight(double distance, Drivetrain& drivetrain);
   void Initialize() override;
   bool IsFinished() override;
 

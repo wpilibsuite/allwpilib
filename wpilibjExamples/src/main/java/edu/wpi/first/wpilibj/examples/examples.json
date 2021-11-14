@@ -258,17 +258,6 @@
     "commandversion": 2
   },
   {
-    "name": "PacGoat",
-    "description": "A fully functional example CommandBased program for FRC Team 190's 2014 robot. This code can run on your computer if it supports simulation.",
-    "tags": [
-      "Complete Robot"
-    ],
-    "foldername": "pacgoat",
-    "gradlebase": "java",
-    "mainclass": "Main",
-    "commandversion": 1
-  },
-  {
     "name": "Simple Vision",
     "description": "Demonstrate the use of the CameraServer class to stream from a USB Webcam without processing the images.",
     "tags": [
@@ -282,7 +271,7 @@
   },
   {
     "name": "Intermediate Vision",
-    "description": "Demonstrate the use of the NIVision class to capture image from a Webcam, process them, and then send them to the dashboard.",
+    "description": "An example program that acquires images from an attached USB camera and adds some annotation to the image as you might do for showing operators the result of some image recognition, and sends it to the dashboard for display.",
     "tags": [
       "Vision",
       "Complete List"

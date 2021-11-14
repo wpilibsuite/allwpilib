@@ -17,4 +17,5 @@ void SetLastErrorIndexOutOfRange(int32_t* status, std::string_view message,
 void SetLastErrorPreviouslyAllocated(int32_t* status, std::string_view message,
                                      int32_t channel,
                                      std::string_view previousAllocation);
+uint64_t GetDSInitializeTime();
 }  // namespace hal

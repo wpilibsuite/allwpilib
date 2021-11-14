@@ -79,7 +79,7 @@ class RobotDriveBase : public MotorSafety {
    * @deprecated Use ApplyDeadband() in frc/MathUtil.h.
    */
   WPI_DEPRECATED("Use ApplyDeadband() in frc/MathUtil.h")
-  static double ApplyDeadband(double number, double deadband);
+  static double ApplyDeadband(double value, double deadband);
 
   /**
    * Normalize all wheel speeds if the magnitude of any wheel is greater than

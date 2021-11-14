@@ -159,7 +159,7 @@ class WPILIB_DLLEXPORT PIDController
    * Sets the error which is considered tolerable for use with AtSetpoint().
    *
    * @param positionTolerance Position error which is tolerable.
-   * @param velociytTolerance Velocity error which is tolerable.
+   * @param velocityTolerance Velocity error which is tolerable.
    */
   void SetTolerance(
       double positionTolerance,

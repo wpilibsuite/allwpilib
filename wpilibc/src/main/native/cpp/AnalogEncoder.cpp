@@ -93,7 +93,7 @@ double AnalogEncoder::GetDistancePerRotation() const {
 }
 
 double AnalogEncoder::GetDistance() const {
-  return Get().to<double>() * GetDistancePerRotation();
+  return Get().value() * GetDistancePerRotation();
 }
 
 void AnalogEncoder::Reset() {

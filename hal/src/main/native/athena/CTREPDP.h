@@ -44,7 +44,7 @@ int32_t HAL_GetPDPModuleNumber(HAL_PDPHandle handle, int32_t* status);
  * Checks if a PDP channel is valid.
  *
  * @param channel the channel to check
- * @return        true if the channel is valid, otherwise false
+ * @return true if the channel is valid, otherwise false
  */
 HAL_Bool HAL_CheckPDPChannel(int32_t channel);
 
@@ -52,7 +52,7 @@ HAL_Bool HAL_CheckPDPChannel(int32_t channel);
  * Checks if a PDP module is valid.
  *
  * @param channel the module to check
- * @return        true if the module is valid, otherwise false
+ * @return true if the module is valid, otherwise false
  */
 HAL_Bool HAL_CheckPDPModule(int32_t module);
 
@@ -60,7 +60,7 @@ HAL_Bool HAL_CheckPDPModule(int32_t module);
  * Gets the temperature of the PDP.
  *
  * @param handle the module handle
- * @return       the module temperature (celsius)
+ * @return the module temperature (celsius)
  */
 double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status);
 
@@ -68,7 +68,7 @@ double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status);
  * Gets the PDP input voltage.
  *
  * @param handle the module handle
- * @return       the input voltage (volts)
+ * @return the input voltage (volts)
  */
 double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status);
 
@@ -77,7 +77,7 @@ double HAL_GetPDPVoltage(HAL_PDPHandle handle, int32_t* status);
  *
  * @param module  the module
  * @param channel the channel
- * @return        the channel current (amps)
+ * @return the channel current (amps)
  */
 double HAL_GetPDPChannelCurrent(HAL_PDPHandle handle, int32_t channel,
                                 int32_t* status);
@@ -97,7 +97,7 @@ void HAL_GetPDPAllChannelCurrents(HAL_PDPHandle handle, double* currents,
  * Gets the total current of the PDP.
  *
  * @param handle the module handle
- * @return       the total current (amps)
+ * @return the total current (amps)
  */
 double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status);
 
@@ -105,7 +105,7 @@ double HAL_GetPDPTotalCurrent(HAL_PDPHandle handle, int32_t* status);
  * Gets the total power of the PDP.
  *
  * @param handle the module handle
- * @return       the total power (watts)
+ * @return the total power (watts)
  */
 double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status);
 
@@ -113,7 +113,7 @@ double HAL_GetPDPTotalPower(HAL_PDPHandle handle, int32_t* status);
  * Gets the total energy of the PDP.
  *
  * @param handle the module handle
- * @return       the total energy (joules)
+ * @return the total energy (joules)
  */
 double HAL_GetPDPTotalEnergy(HAL_PDPHandle handle, int32_t* status);
 

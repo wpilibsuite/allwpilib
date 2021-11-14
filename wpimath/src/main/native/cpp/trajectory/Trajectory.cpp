@@ -146,11 +146,11 @@ Trajectory Trajectory::operator+(const Trajectory& other) const {
 }
 
 void frc::to_json(wpi::json& json, const Trajectory::State& state) {
-  json = wpi::json{{"time", state.t.to<double>()},
-                   {"velocity", state.velocity.to<double>()},
-                   {"acceleration", state.acceleration.to<double>()},
+  json = wpi::json{{"time", state.t.value()},
+                   {"velocity", state.velocity.value()},
+                   {"acceleration", state.acceleration.value()},
                    {"pose", state.pose},
-                   {"curvature", state.curvature.to<double>()}};
+                   {"curvature", state.curvature.value()}};
 }
 
 void frc::from_json(const wpi::json& json, Trajectory::State& state) {

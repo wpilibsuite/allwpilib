@@ -20,9 +20,9 @@ class Color8Bit {
   /**
    * Constructs a Color8Bit.
    *
-   * @param red Red value (0-255)
-   * @param green Green value (0-255)
-   * @param blue Blue value (0-255)
+   * @param r Red value (0-255)
+   * @param g Green value (0-255)
+   * @param b Blue value (0-255)
    */
   constexpr Color8Bit(int r, int g, int b)
       : red(std::clamp(r, 0, 255)),

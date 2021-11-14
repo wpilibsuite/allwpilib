@@ -147,7 +147,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public int getModuleNumber() {
-    return m_dataStore.m_handle;
+    return m_dataStore.m_module;
   }
 
   @Override

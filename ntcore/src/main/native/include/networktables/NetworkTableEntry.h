@@ -242,7 +242,7 @@ class NetworkTableEntry final {
   /**
    * Sets the entry's value if it does not exist.
    *
-   * @param defaultValue the default value to set
+   * @param value the default value to set
    * @return False if the entry exists with a different type
    */
   bool SetDefaultValue(std::shared_ptr<Value> value);

@@ -21,29 +21,35 @@ class ADXL345Sim {
   /**
    * Constructs from a ADXL345_I2C object.
    *
-   * @param ADXL345 accel to simulate
+   * @param accel ADXL345 accel to simulate
    */
   explicit ADXL345Sim(const ADXL345_I2C& accel);
 
   /**
    * Constructs from a ADXL345_SPI object.
    *
-   * @param ADXL345 accel to simulate
+   * @param accel ADXL345 accel to simulate
    */
   explicit ADXL345Sim(const ADXL345_SPI& accel);
 
   /**
    * Sets the X acceleration.
+   *
+   * @param accel The X acceleration.
    */
   void SetX(double accel);
 
   /**
    * Sets the Y acceleration.
+   *
+   * @param accel The Y acceleration.
    */
   void SetY(double accel);
 
   /**
    * Sets the Z acceleration.
+   *
+   * @param accel The Z acceleration.
    */
   void SetZ(double accel);
 

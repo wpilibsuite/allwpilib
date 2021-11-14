@@ -17,7 +17,7 @@ DutyCycleEncoderSim::DutyCycleEncoderSim(const frc::DutyCycleEncoder& encoder) {
 }
 
 void DutyCycleEncoderSim::Set(units::turn_t turns) {
-  m_simPosition.Set(turns.to<double>());
+  m_simPosition.Set(turns.value());
 }
 
 void DutyCycleEncoderSim::SetDistance(double distance) {

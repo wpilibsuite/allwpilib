@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 
 #include "Eigen/Core"
 #include "frc/StateSpaceUtil.h"
@@ -21,6 +22,10 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystem {
@@ -32,11 +37,33 @@ class LinearSystem {
    * @param B    Input matrix.
    * @param C    Output matrix.
    * @param D    Feedthrough matrix.
+   * @throws std::domain_error if any matrix element isn't finite.
    */
   LinearSystem(const Eigen::Matrix<double, States, States>& A,
                const Eigen::Matrix<double, States, Inputs>& B,
                const Eigen::Matrix<double, Outputs, States>& C,
                const Eigen::Matrix<double, Outputs, Inputs>& D) {
+    if (!A.allFinite()) {
+      throw std::domain_error(
+          "Elements of A aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!B.allFinite()) {
+      throw std::domain_error(
+          "Elements of B aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!C.allFinite()) {
+      throw std::domain_error(
+          "Elements of C aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!D.allFinite()) {
+      throw std::domain_error(
+          "Elements of D aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+
     m_A = A;
     m_B = B;
     m_C = C;
@@ -106,9 +133,9 @@ class LinearSystem {
    * This is used by state observers directly to run updates based on state
    * estimate.
    *
-   * @param x  The current state.
-   * @param u  The control input.
-   * @param dt Timestep for model update.
+   * @param x        The current state.
+   * @param clampedU The control input.
+   * @param dt       Timestep for model update.
    */
   Eigen::Vector<double, States> CalculateX(
       const Eigen::Vector<double, States>& x,

@@ -42,6 +42,7 @@ extern "C" {
 /**
  * Initializes an object for peforming DMA transfers.
  *
+ * @param[out] status Error status variable. 0 on success.
  * @return the created dma handle
  */
 HAL_DMAHandle HAL_InitializeDMA(int32_t* status);
@@ -58,8 +59,9 @@ void HAL_FreeDMA(HAL_DMAHandle handle);
  *
  * This can only be called while DMA is running.
  *
- * @param handle the dma handle
- * @param pause true to pause transfers, false to resume.
+ * @param[in] handle  the dma handle
+ * @param[in] pause   true to pause transfers, false to resume.
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status);
 
@@ -72,8 +74,9 @@ void HAL_SetDMAPause(HAL_DMAHandle handle, HAL_Bool pause, int32_t* status);
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param periodSeconds the period to trigger in seconds
+ * @param[in] handle        the dma handle
+ * @param[in] periodSeconds the period to trigger in seconds
+ * @param[out] status       Error status variable. 0 on success.
  */
 void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double periodSeconds,
                             int32_t* status);
@@ -91,8 +94,9 @@ void HAL_SetDMATimedTrigger(HAL_DMAHandle handle, double periodSeconds,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param cycles the period to trigger in FPGA cycles
+ * @param[in] handle the dma handle
+ * @param[in] cycles the period to trigger in FPGA cycles
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles,
                                   int32_t* status);
@@ -102,8 +106,9 @@ void HAL_SetDMATimedTriggerCycles(HAL_DMAHandle handle, uint32_t cycles,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param encoderHandle the encoder to add
+ * @param[in] handle the dma handle
+ * @param[in] encoderHandle the encoder to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
                        int32_t* status);
@@ -113,8 +118,9 @@ void HAL_AddDMAEncoder(HAL_DMAHandle handle, HAL_EncoderHandle encoderHandle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param encoderHandle the encoder to add
+ * @param[in] handle the dma handle
+ * @param[in] encoderHandle the encoder to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMAEncoderPeriod(HAL_DMAHandle handle,
                              HAL_EncoderHandle encoderHandle, int32_t* status);
@@ -124,8 +130,9 @@ void HAL_AddDMAEncoderPeriod(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param counterHandle the counter to add
+ * @param[in] handle the dma handle
+ * @param[in] counterHandle the counter to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
                        int32_t* status);
@@ -133,8 +140,9 @@ void HAL_AddDMACounter(HAL_DMAHandle handle, HAL_CounterHandle counterHandle,
 /**
  * Adds timer data for an counter to be collected by DMA.
  *
- * @param handle the dma handle
- * @param counterHandle the counter to add
+ * @param[in] handle the dma handle
+ * @param[in] counterHandle the counter to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMACounterPeriod(HAL_DMAHandle handle,
                              HAL_CounterHandle counterHandle, int32_t* status);
@@ -144,8 +152,9 @@ void HAL_AddDMACounterPeriod(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param digitalSourceHandle the digital source to add
+ * @param[in] handle the dma handle
+ * @param[in] digitalSourceHandle the digital source to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMADigitalSource(HAL_DMAHandle handle,
                              HAL_Handle digitalSourceHandle, int32_t* status);
@@ -155,8 +164,9 @@ void HAL_AddDMADigitalSource(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param aInHandle the analog input to add
+ * @param[in] handle the dma handle
+ * @param[in] aInHandle the analog input to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
                            HAL_AnalogInputHandle aInHandle, int32_t* status);
@@ -166,8 +176,9 @@ void HAL_AddDMAAnalogInput(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param aInHandle the analog input to add
+ * @param[in] handle the dma handle
+ * @param[in] aInHandle the analog input to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
                                    HAL_AnalogInputHandle aInHandle,
@@ -178,8 +189,9 @@ void HAL_AddDMAAveragedAnalogInput(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param aInHandle the analog input to add
+ * @param[in] handle the dma handle
+ * @param[in] aInHandle the analog input to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
                                  HAL_AnalogInputHandle aInHandle,
@@ -190,8 +202,9 @@ void HAL_AddDMAAnalogAccumulator(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param dutyCycleHandle the duty cycle input to add
+ * @param[in] handle the dma handle
+ * @param[in] dutyCycleHandle the duty cycle input to add
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_AddDMADutyCycle(HAL_DMAHandle handle,
                          HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
@@ -205,13 +218,15 @@ void HAL_AddDMADutyCycle(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
- * @param digitalSourceHandle the digital source handle (either a
- * HAL_AnalogTriggerHandle or a HAL_DigitalHandle)
- * @param analogTriggerType   the analog trigger type if the source is an analog
- * trigger
- * @param risingEdge    true to trigger on rising
- * @param fallingEdge   true to trigger on falling
+ * @param[in] handle              the dma handle
+ * @param[in] digitalSourceHandle the digital source handle (either a
+ *                                HAL_AnalogTriggerHandle or a
+ *                                HAL_DigitalHandle)
+ * @param[in] analogTriggerType   the analog trigger type if the source is an
+ *                                analog trigger
+ * @param[in] rising              true to trigger on rising edge
+ * @param[in] falling             true to trigger on falling edge
+ * @param[out] status             Error status variable. 0 on success.
  * @return the index of the trigger
  */
 int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
@@ -225,7 +240,8 @@ int32_t HAL_SetDMAExternalTrigger(HAL_DMAHandle handle,
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
+ * @param[in] handle the dma handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status);
 
@@ -234,22 +250,25 @@ void HAL_ClearDMASensors(HAL_DMAHandle handle, int32_t* status);
  *
  * This can only be called if DMA is not started.
  *
- * @param handle the dma handle
+ * @param[in] handle the dma handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_ClearDMAExternalTriggers(HAL_DMAHandle handle, int32_t* status);
 
 /**
  * Starts DMA Collection.
  *
- * @param handle the dma handle
- * @param queueDepth the number of objects to be able to queue
+ * @param[in] handle the dma handle
+ * @param[in] queueDepth the number of objects to be able to queue
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_StartDMA(HAL_DMAHandle handle, int32_t queueDepth, int32_t* status);
 
 /**
  * Stops DMA Collection.
  *
- * @param handle the dma handle
+ * @param[in] handle the dma handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_StopDMA(HAL_DMAHandle handle, int32_t* status);
 
@@ -268,7 +287,12 @@ void* HAL_GetDMADirectPointer(HAL_DMAHandle handle);
  *
  * See HAL_ReadDMA for full documentation.
  *
- * @param handle the dma handle
+ * @param[in] dmaPointer     direct DMA pointer
+ * @param[in] dmaSample      the sample object to place data into
+ * @param[in] timeoutSeconds the time to wait for data to be queued before
+ *                           timing out
+ * @param[in] remainingOut   the number of samples remaining in the queue
+ * @param[out] status        Error status variable. 0 on success.
  */
 enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
                                          HAL_DMASample* dmaSample,
@@ -280,11 +304,12 @@ enum HAL_DMAReadStatus HAL_ReadDMADirect(void* dmaPointer,
  * Reads a DMA sample from the queue.
  *
  *
- * @param handle the dma handle
- * @param dmaSample the sample object to place data into
- * @param timeoutSeconds the time to wait for data to be queued before timing
- * out
- * @param remainingOut the number of samples remaining in the queue
+ * @param[in] handle         the dma handle
+ * @param[in] dmaSample      the sample object to place data into
+ * @param[in] timeoutSeconds the time to wait for data to be queued before
+ *                           timing out
+ * @param[in] remainingOut   the number of samples remaining in the queue
+ * @param[out] status        Error status variable. 0 on success.
  * @return the succes result of the sample read
  */
 enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
@@ -298,7 +323,8 @@ enum HAL_DMAReadStatus HAL_ReadDMA(HAL_DMAHandle handle,
  * Returns the timestamp of the sample.
  * This is in the same time domain as HAL_GetFPGATime().
  *
- * @param dmaSample the sample to read from
+ * @param[in] dmaSample the sample to read from
+ * @param[out] status Error status variable. 0 on success.
  * @return timestamp in microseconds since FPGA Initialization
  */
 uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample, int32_t* status);
@@ -309,8 +335,9 @@ uint64_t HAL_GetDMASampleTime(const HAL_DMASample* dmaSample, int32_t* status);
  * This can be scaled with DistancePerPulse and DecodingScaleFactor to match the
  * result of GetDistance()
  *
- * @param dmaSample the sample to read from
- * @param encoderHandle the encoder handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] encoderHandle the encoder handle
+ * @param[out] status Error status variable. 0 on success.
  * @return raw encoder ticks
  */
 int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
@@ -320,8 +347,9 @@ int32_t HAL_GetDMASampleEncoderRaw(const HAL_DMASample* dmaSample,
 /**
  * Returns the distance data for an counter from the sample.
  *
- * @param dmaSample the sample to read from
- * @param counterHandle the counter handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] counterHandle the counter handle
+ * @param[out] status Error status variable. 0 on success.
  * @return counter ticks
  */
 int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
@@ -334,8 +362,9 @@ int32_t HAL_GetDMASampleCounter(const HAL_DMASample* dmaSample,
  * This can be scaled with DistancePerPulse and DecodingScaleFactor to match the
  * result of GetRate()
  *
- * @param dmaSample the sample to read from
- * @param encoderHandle the encoder handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] encoderHandle the encoder handle
+ * @param[out] status Error status variable. 0 on success.
  * @return raw encoder period
  */
 int32_t HAL_GetDMASampleEncoderPeriodRaw(const HAL_DMASample* dmaSample,
@@ -345,8 +374,9 @@ int32_t HAL_GetDMASampleEncoderPeriodRaw(const HAL_DMASample* dmaSample,
 /**
  * Returns the period data for an counter from the sample.
  *
- * @param dmaSample the sample to read from
- * @param counterHandle the counter handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] counterHandle the counter handle
+ * @param[out] status Error status variable. 0 on success.
  * @return counter period
  */
 int32_t HAL_GetDMASampleCounterPeriod(const HAL_DMASample* dmaSample,
@@ -356,8 +386,9 @@ int32_t HAL_GetDMASampleCounterPeriod(const HAL_DMASample* dmaSample,
 /**
  * Returns the state of a digital source from the sample.
  *
- * @param dmaSample the sample to read from
- * @param dSourceHandle the digital source handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] dSourceHandle the digital source handle
+ * @param[out] status Error status variable. 0 on success.
  * @return digital source state
  */
 HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
@@ -369,8 +400,9 @@ HAL_Bool HAL_GetDMASampleDigitalSource(const HAL_DMASample* dmaSample,
  *
  * This can be scaled with HAL_GetAnalogValueToVolts to match GetVoltage().
  *
- * @param dmaSample the sample to read from
- * @param aInHandle the analog input handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] aInHandle the analog input handle
+ * @param[out] status Error status variable. 0 on success.
  * @return raw analog data
  */
 int32_t HAL_GetDMASampleAnalogInputRaw(const HAL_DMASample* dmaSample,
@@ -383,8 +415,9 @@ int32_t HAL_GetDMASampleAnalogInputRaw(const HAL_DMASample* dmaSample,
  * This can be scaled with HAL_GetAnalogValueToVolts to match
  * GetAveragedVoltage().
  *
- * @param dmaSample the sample to read from
- * @param aInHandle the analog input handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] aInHandle the analog input handle
+ * @param[out] status Error status variable. 0 on success.
  * @return raw averaged analog data
  */
 int32_t HAL_GetDMASampleAveragedAnalogInputRaw(const HAL_DMASample* dmaSample,
@@ -394,10 +427,11 @@ int32_t HAL_GetDMASampleAveragedAnalogInputRaw(const HAL_DMASample* dmaSample,
 /**
  * Returns the analog accumulator data for an analog input from the sample.
  *
- * @param dmaSample the sample to read from
- * @param aInHandle the analog input handle
- * @param count the accumulator count
- * @param value the accumulator value
+ * @param[in] dmaSample the sample to read from
+ * @param[in] aInHandle the analog input handle
+ * @param[in] count the accumulator count
+ * @param[in] value the accumulator value
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
                                        HAL_AnalogInputHandle aInHandle,
@@ -409,8 +443,9 @@ void HAL_GetDMASampleAnalogAccumulator(const HAL_DMASample* dmaSample,
  *
  * Use HAL_GetDutyCycleOutputScaleFactor to scale this to a percentage.
  *
- * @param dmaSample the sample to read from
- * @param dutyCycleHandle the duty cycle handle
+ * @param[in] dmaSample the sample to read from
+ * @param[in] dutyCycleHandle the duty cycle handle
+ * @param[out] status Error status variable. 0 on success.
  * @return raw duty cycle input data
  */
 int32_t HAL_GetDMASampleDutyCycleOutputRaw(const HAL_DMASample* dmaSample,

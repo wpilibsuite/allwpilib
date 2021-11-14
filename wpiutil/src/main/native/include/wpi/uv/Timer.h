@@ -10,6 +10,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <utility>
 
 #include "wpi/Signal.h"
 #include "wpi/uv/Handle.h"
@@ -65,7 +66,7 @@ class Timer final : public HandleImpl<Timer, uv_timer_t> {
    */
   static void SingleShot(const std::shared_ptr<Loop>& loop, Time timeout,
                          std::function<void()> func) {
-    return SingleShot(*loop, timeout, func);
+    return SingleShot(*loop, timeout, std::move(func));
   }
 
   /**

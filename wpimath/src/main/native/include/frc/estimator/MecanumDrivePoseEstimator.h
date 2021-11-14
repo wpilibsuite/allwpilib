@@ -32,16 +32,18 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta]]ᵀ </strong> in the
- * field-coordinate system.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading.
  *
- * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
+ * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
+ * right wheel velocity, and change in gyro heading.
  *
- * <strong> y = [[x, y, theta]]ᵀ </strong> in field
- * coords from vision, or <strong> y = [[theta]]ᵀ
- * </strong> from the gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
+ * heading.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  public:
@@ -49,7 +51,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * Constructs a MecanumDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPoseMeters        The starting pose estimate.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
@@ -102,8 +104,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * <p>The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
-   * @param poseMeters The position on the field that your robot is at.
-   * @param gyroAngle  The angle reported by the gyroscope.
+   * @param pose      The position on the field that your robot is at.
+   * @param gyroAngle The angle reported by the gyroscope.
    */
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle);
 
@@ -191,9 +193,9 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * information. This should be called every loop, and the correct loop period
    * must be passed into the constructor of this class.
    *
-   * @param currentTimeSeconds Time at which this method was called, in seconds.
-   * @param gyroAngle          The current gyroscope angle.
-   * @param wheelSpeeds        The current speeds of the mecanum drive wheels.
+   * @param currentTime Time at which this method was called, in seconds.
+   * @param gyroAngle   The current gyroscope angle.
+   * @param wheelSpeeds The current speeds of the mecanum drive wheels.
    * @return The estimated pose of the robot in meters.
    */
   Pose2d UpdateWithTime(units::second_t currentTime,

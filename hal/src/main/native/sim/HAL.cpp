@@ -74,6 +74,7 @@ void InitializeHAL() {
   InitializeEncoderData();
   InitializeI2CData();
   InitializeCTREPCMData();
+  InitializeREVPHData();
   InitializePowerDistributionData();
   InitializePWMData();
   InitializeRelayData();
@@ -107,6 +108,7 @@ void InitializeHAL() {
   InitializePorts();
   InitializePower();
   InitializeCTREPCM();
+  InitializeREVPH();
   InitializePWM();
   InitializeRelay();
   InitializeSerialPort();
@@ -251,6 +253,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_LED_CHANNEL_ERROR_MESSAGE;
     case HAL_USE_LAST_ERROR:
       return HAL_USE_LAST_ERROR_MESSAGE;
+    case HAL_CONSOLE_OUT_ENABLED_ERROR:
+      return HAL_CONSOLE_OUT_ENABLED_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
@@ -276,10 +280,10 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   return hal::GetFPGATime();
 }
 
-uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
+uint64_t HAL_ExpandFPGATime(uint32_t unexpandedLower, int32_t* status) {
   // Capture the current FPGA time.  This will give us the upper half of the
   // clock.
-  uint64_t fpga_time = HAL_GetFPGATime(status);
+  uint64_t fpgaTime = HAL_GetFPGATime(status);
   if (*status != 0) {
     return 0;
   }
@@ -289,15 +293,15 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
   // be.
 
   // Break it into lower and upper portions.
-  uint32_t lower = fpga_time & 0xffffffffull;
-  uint64_t upper = (fpga_time >> 32) & 0xffffffff;
+  uint32_t lower = fpgaTime & 0xffffffffull;
+  uint64_t upper = (fpgaTime >> 32) & 0xffffffff;
 
   // The time was sampled *before* the current time, so roll it back.
-  if (lower < unexpanded_lower) {
+  if (lower < unexpandedLower) {
     --upper;
   }
 
-  return (upper << 32) + static_cast<uint64_t>(unexpanded_lower);
+  return (upper << 32) + static_cast<uint64_t>(unexpandedLower);
 }
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {

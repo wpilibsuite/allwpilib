@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "wpi/Signal.h"
 #include "wpi/uv/Request.h"
@@ -90,7 +91,7 @@ void GetNameInfo(Loop& loop,
 inline void GetNameInfo(const std::shared_ptr<Loop>& loop,
                         std::function<void(const char*, const char*)> callback,
                         const sockaddr& addr, int flags = 0) {
-  GetNameInfo(*loop, callback, addr, flags);
+  GetNameInfo(*loop, std::move(callback), addr, flags);
 }
 
 /**
@@ -154,7 +155,7 @@ inline void GetNameInfo4(const std::shared_ptr<Loop>& loop,
                          std::function<void(const char*, const char*)> callback,
                          std::string_view ip, unsigned int port,
                          int flags = 0) {
-  return GetNameInfo4(*loop, callback, ip, port, flags);
+  return GetNameInfo4(*loop, std::move(callback), ip, port, flags);
 }
 
 /**
@@ -219,7 +220,7 @@ inline void GetNameInfo6(const std::shared_ptr<Loop>& loop,
                          std::function<void(const char*, const char*)> callback,
                          std::string_view ip, unsigned int port,
                          int flags = 0) {
-  return GetNameInfo6(*loop, callback, ip, port, flags);
+  return GetNameInfo6(*loop, std::move(callback), ip, port, flags);
 }
 
 }  // namespace wpi::uv

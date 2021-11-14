@@ -25,7 +25,7 @@ class Button : public Trigger {
   /**
    * Create a new button that is pressed when the given condition is true.
    *
-   * @param isActive Whether the button is pressed.
+   * @param isPressed Whether the button is pressed.
    */
   explicit Button(std::function<bool()> isPressed);
 

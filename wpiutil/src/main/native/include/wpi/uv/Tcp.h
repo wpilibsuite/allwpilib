@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "wpi/uv/NetworkStream.h"
 
@@ -112,7 +113,7 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   void Open(uv_os_sock_t sock) { Invoke(&uv_tcp_open, GetRaw(), sock); }
 
   /**
-   * Enable/Disable Nagle's algorithm.
+   * Enable no delay operation (turns off Nagle's algorithm).
    * @param enable True to enable it, false otherwise.
    * @return True in case of success, false otherwise.
    */
@@ -258,11 +259,11 @@ class Tcp final : public NetworkStreamImpl<Tcp, uv_tcp_t> {
   void Connect(const sockaddr& addr, std::function<void()> callback);
 
   void Connect(const sockaddr_in& addr, std::function<void()> callback) {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 
   void Connect(const sockaddr_in6& addr, std::function<void()> callback) {
-    Connect(reinterpret_cast<const sockaddr&>(addr), callback);
+    Connect(reinterpret_cast<const sockaddr&>(addr), std::move(callback));
   }
 
   /**
