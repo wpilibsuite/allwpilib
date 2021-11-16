@@ -125,9 +125,10 @@ doxygen {
     }
 
     case_sense_names false
-    extension_mapping 'inc=C++'
+    extension_mapping 'inc=C++', 'no_extension=C++'
     extract_all true
     extract_static true
+    file_patterns '*'
     full_path_names true
     generate_html true
     generate_latex false
