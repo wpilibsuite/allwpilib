@@ -80,6 +80,106 @@ static inline uint16_t unpack_right_shift_u16(
     return (uint16_t)((uint16_t)(value & mask) >> shift);
 }
 
+int PH_compressor_config_pack(
+    uint8_t *dst_p,
+    const struct PH_compressor_config_t *src_p,
+    size_t size)
+{
+    if (size < 5u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 5);
+
+    dst_p[0] |= pack_left_shift_u16(src_p->minimum_tank_pressure, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u16(src_p->minimum_tank_pressure, 8u, 0xffu);
+    dst_p[2] |= pack_left_shift_u16(src_p->maximum_tank_pressure, 0u, 0xffu);
+    dst_p[3] |= pack_right_shift_u16(src_p->maximum_tank_pressure, 8u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->force_disable, 0u, 0x01u);
+    dst_p[4] |= pack_left_shift_u8(src_p->use_digital, 1u, 0x02u);
+
+    return (5);
+}
+
+int PH_compressor_config_unpack(
+    struct PH_compressor_config_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 5u) {
+        return (-EINVAL);
+    }
+
+    dst_p->minimum_tank_pressure = unpack_right_shift_u16(src_p[0], 0u, 0xffu);
+    dst_p->minimum_tank_pressure |= unpack_left_shift_u16(src_p[1], 8u, 0xffu);
+    dst_p->maximum_tank_pressure = unpack_right_shift_u16(src_p[2], 0u, 0xffu);
+    dst_p->maximum_tank_pressure |= unpack_left_shift_u16(src_p[3], 8u, 0xffu);
+    dst_p->force_disable = unpack_right_shift_u8(src_p[4], 0u, 0x01u);
+    dst_p->use_digital = unpack_right_shift_u8(src_p[4], 1u, 0x02u);
+
+    return (0);
+}
+
+uint16_t PH_compressor_config_minimum_tank_pressure_encode(double value)
+{
+    return (uint16_t)(value / 0.001);
+}
+
+double PH_compressor_config_minimum_tank_pressure_decode(uint16_t value)
+{
+    return ((double)value * 0.001);
+}
+
+bool PH_compressor_config_minimum_tank_pressure_is_in_range(uint16_t value)
+{
+    return (value <= 5000u);
+}
+
+uint16_t PH_compressor_config_maximum_tank_pressure_encode(double value)
+{
+    return (uint16_t)(value / 0.001);
+}
+
+double PH_compressor_config_maximum_tank_pressure_decode(uint16_t value)
+{
+    return ((double)value * 0.001);
+}
+
+bool PH_compressor_config_maximum_tank_pressure_is_in_range(uint16_t value)
+{
+    return (value <= 5000u);
+}
+
+uint8_t PH_compressor_config_force_disable_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_compressor_config_force_disable_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_compressor_config_force_disable_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PH_compressor_config_use_digital_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_compressor_config_use_digital_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_compressor_config_use_digital_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
 int PH_set_all_pack(
     uint8_t *dst_p,
     const struct PH_set_all_t *src_p,
@@ -755,6 +855,8 @@ int PH_status0_pack(
     dst_p[6] |= pack_left_shift_u8(src_p->channel_15_fault, 7u, 0x80u);
     dst_p[7] |= pack_left_shift_u8(src_p->compressor_on, 0u, 0x01u);
     dst_p[7] |= pack_left_shift_u8(src_p->system_enabled, 1u, 0x02u);
+    dst_p[7] |= pack_left_shift_u8(src_p->robo_rio_present, 2u, 0x04u);
+    dst_p[7] |= pack_left_shift_u8(src_p->compressor_config, 3u, 0x18u);
 
     return (8);
 }
@@ -811,6 +913,8 @@ int PH_status0_unpack(
     dst_p->channel_15_fault = unpack_right_shift_u8(src_p[6], 7u, 0x80u);
     dst_p->compressor_on = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
     dst_p->system_enabled = unpack_right_shift_u8(src_p[7], 1u, 0x02u);
+    dst_p->robo_rio_present = unpack_right_shift_u8(src_p[7], 2u, 0x04u);
+    dst_p->compressor_config = unpack_right_shift_u8(src_p[7], 3u, 0x18u);
 
     return (0);
 }
@@ -1464,6 +1568,36 @@ bool PH_status0_system_enabled_is_in_range(uint8_t value)
     return (value <= 1u);
 }
 
+uint8_t PH_status0_robo_rio_present_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_status0_robo_rio_present_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_status0_robo_rio_present_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PH_status0_compressor_config_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_status0_compressor_config_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_status0_compressor_config_is_in_range(uint8_t value)
+{
+    return (value <= 3u);
+}
+
 int PH_status1_pack(
     uint8_t *dst_p,
     const struct PH_status1_t *src_p,
@@ -1717,4 +1851,28 @@ double PH_status1_sticky_has_reset_decode(uint8_t value)
 bool PH_status1_sticky_has_reset_is_in_range(uint8_t value)
 {
     return (value <= 1u);
+}
+
+int PH_clear_faults_pack(
+    uint8_t *dst_p,
+    const struct PH_clear_faults_t *src_p,
+    size_t size)
+{
+    (void)dst_p;
+    (void)src_p;
+    (void)size;
+
+    return (0);
+}
+
+int PH_clear_faults_unpack(
+    struct PH_clear_faults_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    (void)dst_p;
+    (void)src_p;
+    (void)size;
+
+    return (0);
 }

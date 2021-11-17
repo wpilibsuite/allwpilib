@@ -41,6 +41,8 @@ static constexpr uint32_t PH_SET_ALL_FRAME_API =
     APIFromExtId(PH_SET_ALL_FRAME_ID);
 static constexpr uint32_t PH_PULSE_ONCE_FRAME_API =
     APIFromExtId(PH_PULSE_ONCE_FRAME_ID);
+static constexpr uint32_t PH_COMPRESSOR_CONFIG_API =
+    APIFromExtId(PH_COMPRESSOR_CONFIG_FRAME_ID);
 static constexpr uint32_t PH_STATUS0_FRAME_API =
     APIFromExtId(PH_STATUS0_FRAME_ID);
 static constexpr uint32_t PH_STATUS1_FRAME_API =
@@ -258,12 +260,38 @@ HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
 
 void HAL_SetREVPHClosedLoopControl(HAL_REVPHHandle handle, HAL_Bool enabled,
                                    int32_t* status) {
-  // TODO
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  PH_compressor_config_t compressorConfig = {0, 0, 0, 0};
+  compressorConfig.force_disable = !enabled;
+  compressorConfig.use_digital = enabled;
+
+  uint8_t packedData[PH_COMPRESSOR_CONFIG_LENGTH] = {0};
+  PH_compressor_config_pack(packedData, &compressorConfig,
+                            PH_COMPRESSOR_CONFIG_LENGTH);
+  HAL_WriteCANPacket(ph->hcan, packedData, PH_COMPRESSOR_CONFIG_LENGTH,
+                     PH_COMPRESSOR_CONFIG_API, status);
 }
 
 HAL_Bool HAL_GetREVPHClosedLoopControl(HAL_REVPHHandle handle,
                                        int32_t* status) {
-  return false;  // TODO
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return false;
+  }
+
+  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+
+  if (*status != 0) {
+    return false;
+  }
+
+  return (status0.compressor_config == 1);
 }
 
 HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status) {
