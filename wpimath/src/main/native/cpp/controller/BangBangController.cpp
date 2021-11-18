@@ -16,6 +16,18 @@ BangBangController::BangBangController(double tolerance)
   instances++;
 }
 
+void BangBangController::SetSetpoint(double setpoint) {
+  m_setpoint = setpoint;
+}
+
+double BangBangController::GetSetpoint() const {
+  return m_setpoint;
+}
+
+bool BangBangController::AtSetpoint() const {
+  return std::abs(m_setpoint - m_measurement) < m_tolerance;
+}
+
 void BangBangController::SetTolerance(double tolerance) {
   m_tolerance = tolerance;
 }
@@ -24,20 +36,8 @@ double BangBangController::GetTolerance() const {
   return m_tolerance;
 }
 
-bool BangBangController::AtSetpoint() const {
-  return std::abs(m_setpoint - m_measurement) < m_tolerance;
-}
-
 double BangBangController::GetMeasurement() const {
   return m_measurement;
-}
-
-void BangBangController::SetSetpoint(double setpoint) {
-  m_setpoint = setpoint;
-}
-
-double BangBangController::GetSetpoint() const {
-  return m_setpoint;
 }
 
 double BangBangController::GetError() const {

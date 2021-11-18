@@ -76,7 +76,16 @@ public class BangBangController implements Sendable {
   }
 
   /**
-   * Sets the error within which the controller will not output.
+   * Returns true if the error is within the tolerance of the setpoint.
+   *
+   * @return Whether the error is within the acceptable bounds.
+   */
+  public boolean atSetpoint() {
+    return Math.abs(m_setpoint - m_measurement) < m_tolerance;
+  }
+
+  /**
+   * Sets the error within which atSetpoint will return true.
    *
    * @param tolerance Position error which is tolerable.
    */
@@ -100,15 +109,6 @@ public class BangBangController implements Sendable {
    */
   public double getMeasurement() {
     return m_measurement;
-  }
-
-  /**
-   * Returns true if the error is within the tolerance of the setpoint.
-   *
-   * @return Whether the error is within the acceptable bounds.
-   */
-  public boolean atSetpoint() {
-    return Math.abs(m_setpoint - m_measurement) < m_tolerance;
   }
 
   /**

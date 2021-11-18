@@ -40,22 +40,6 @@ class WPILIB_DLLEXPORT BangBangController
   explicit BangBangController(
       double tolerance = std::numeric_limits<double>::infinity());
 
-  void SetTolerance(double tolerance);
-
-  /**
-   * Returns the current tolerance of the controller.
-   *
-   * @return The current tolerance.
-   */
-  double GetTolerance() const;
-
-  /**
-   * Returns the current measurement of the process variable.
-   *
-   * @return The current measurement of the process variable.
-   */
-  double GetMeasurement() const;
-
   /**
    * Sets the setpoint for the bang-bang controller.
    *
@@ -76,6 +60,27 @@ class WPILIB_DLLEXPORT BangBangController
    * @return Whether the error is within the acceptable bounds.
    */
   bool AtSetpoint() const;
+
+  /**
+   * Sets the error within which AtSetpoint will return true.
+   *
+   * @param tolerance Position error which is tolerable.
+   */
+  void SetTolerance(double tolerance);
+
+  /**
+   * Returns the current tolerance of the controller.
+   *
+   * @return The current tolerance.
+   */
+  double GetTolerance() const;
+
+  /**
+   * Returns the current measurement of the process variable.
+   *
+   * @return The current measurement of the process variable.
+   */
+  double GetMeasurement() const;
 
   /**
    * Returns the current error.
