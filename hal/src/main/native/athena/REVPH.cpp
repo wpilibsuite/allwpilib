@@ -284,7 +284,8 @@ void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
   frameData.use_digital = config.useDigital;
 
   uint8_t packedData[PH_COMPRESSOR_CONFIG_LENGTH] = {0};
-  PH_compressor_config_pack(packedData, &frameData, PH_COMPRESSOR_CONFIG_LENGTH);
+  PH_compressor_config_pack(packedData, &frameData,
+                            PH_COMPRESSOR_CONFIG_LENGTH);
   HAL_WriteCANPacket(ph->hcan, packedData, PH_COMPRESSOR_CONFIG_LENGTH,
                      PH_COMPRESSOR_CONFIG_API, status);
 }
@@ -332,8 +333,8 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
   HAL_SetREVPHCompressorConfig(handle, config, status);
 }
 
-HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(HAL_REVPHHandle handle,
-                                                       int32_t* status) {
+HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
+    HAL_REVPHHandle handle, int32_t* status) {
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;

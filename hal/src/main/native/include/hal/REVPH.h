@@ -66,8 +66,8 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
                                          double minAnalogVoltage,
                                          double maxAnalogVoltage,
                                          int32_t* status);
-HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(HAL_REVPHHandle handle,
-                                                       int32_t* status);
+HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
+    HAL_REVPHHandle handle, int32_t* status);
 HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
