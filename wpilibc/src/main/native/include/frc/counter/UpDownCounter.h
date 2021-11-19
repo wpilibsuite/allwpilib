@@ -19,7 +19,6 @@ class DigitalSource;
 class UpDownCounter : public wpi::Sendable,
                       public wpi::SendableHelper<UpDownCounter> {
  public:
-
   /**
    * Constructs a new UpDown Counter.
    *
@@ -27,7 +26,7 @@ class UpDownCounter : public wpi::Sendable,
    * @param downSource The down count source (can be null).
    */
   UpDownCounter(DigitalSource& upSource, DigitalSource& downSource);
-  
+
   /**
    * Constructs a new UpDown Counter.
    *
@@ -65,7 +64,7 @@ class UpDownCounter : public wpi::Sendable,
    * @param configuration The up source configuration.
    */
   void SetUpEdgeConfiguration(EdgeConfiguration configuration);
-  
+
   /**
    * Sets the configuration for the down source.
    *

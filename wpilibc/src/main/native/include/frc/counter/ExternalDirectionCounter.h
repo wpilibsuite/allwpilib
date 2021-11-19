@@ -20,7 +20,6 @@ class ExternalDirectionCounter
     : public wpi::Sendable,
       public wpi::SendableHelper<ExternalDirectionCounter> {
  public:
-  
   /**
    * Constructs a new ExternalDirectionCounter.
    *
@@ -29,8 +28,8 @@ class ExternalDirectionCounter
    */
   ExternalDirectionCounter(DigitalSource& countSource,
                            DigitalSource& directionSource);
-  
-/**
+
+  /**
    * Constructs a new ExternalDirectionCounter.
    *
    * @param countSource The source for counting.
