@@ -44,28 +44,71 @@ extern "C" {
 #endif
 
 /* Frame ids. */
+#define PH_COMPRESSOR_CONFIG_FRAME_ID (0x9050840u)
 #define PH_SET_ALL_FRAME_ID (0x9050c00u)
 #define PH_PULSE_ONCE_FRAME_ID (0x9050c40u)
 #define PH_STATUS0_FRAME_ID (0x9051800u)
 #define PH_STATUS1_FRAME_ID (0x9051840u)
+#define PH_CLEAR_FAULTS_FRAME_ID (0x9051b80u)
 
 /* Frame lengths in bytes. */
+#define PH_COMPRESSOR_CONFIG_LENGTH (5u)
 #define PH_SET_ALL_LENGTH (4u)
 #define PH_PULSE_ONCE_LENGTH (4u)
 #define PH_STATUS0_LENGTH (8u)
 #define PH_STATUS1_LENGTH (8u)
+#define PH_CLEAR_FAULTS_LENGTH (0u)
 
 /* Extended or standard frame types. */
+#define PH_COMPRESSOR_CONFIG_IS_EXTENDED (1)
 #define PH_SET_ALL_IS_EXTENDED (1)
 #define PH_PULSE_ONCE_IS_EXTENDED (1)
 #define PH_STATUS0_IS_EXTENDED (1)
 #define PH_STATUS1_IS_EXTENDED (1)
+#define PH_CLEAR_FAULTS_IS_EXTENDED (1)
 
 /* Frame cycle times in milliseconds. */
 
 
 /* Signal choices. */
 
+
+/**
+ * Signals in message Compressor_Config.
+ *
+ * Configures compressor to use digitial/analog sensors
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct PH_compressor_config_t {
+    /**
+     * Range: 0..5000 (0..5 V)
+     * Scale: 0.001
+     * Offset: 0
+     */
+    uint16_t minimum_tank_pressure : 16;
+
+    /**
+     * Range: 0..5000 (0..5 V)
+     * Scale: 0.001
+     * Offset: 0
+     */
+    uint16_t maximum_tank_pressure : 16;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t force_disable : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t use_digital : 1;
+};
 
 /**
  * Signals in message SetAll.
@@ -624,6 +667,20 @@ struct PH_status0_t {
      * Offset: 0
      */
     uint8_t system_enabled : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t robo_rio_present : 1;
+
+    /**
+     * Range: 0..3 (0..3 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t compressor_config : 2;
 };
 
 /**
@@ -725,6 +782,156 @@ struct PH_status1_t {
      */
     uint8_t sticky_has_reset : 1;
 };
+
+/**
+ * Signals in message ClearFaults.
+ *
+ * Clear sticky faults on the device
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct PH_clear_faults_t {
+    /**
+     * Dummy signal in empty message.
+     */
+    uint8_t dummy;
+};
+
+/**
+ * Pack message Compressor_Config.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int PH_compressor_config_pack(
+    uint8_t *dst_p,
+    const struct PH_compressor_config_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message Compressor_Config.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int PH_compressor_config_unpack(
+    struct PH_compressor_config_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t PH_compressor_config_minimum_tank_pressure_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_compressor_config_minimum_tank_pressure_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_compressor_config_minimum_tank_pressure_is_in_range(uint16_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t PH_compressor_config_maximum_tank_pressure_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_compressor_config_maximum_tank_pressure_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_compressor_config_maximum_tank_pressure_is_in_range(uint16_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_compressor_config_force_disable_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_compressor_config_force_disable_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_compressor_config_force_disable_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_compressor_config_use_digital_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_compressor_config_use_digital_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_compressor_config_use_digital_is_in_range(uint8_t value);
 
 /**
  * Pack message SetAll.
@@ -2863,6 +3070,60 @@ double PH_status0_system_enabled_decode(uint8_t value);
 bool PH_status0_system_enabled_is_in_range(uint8_t value);
 
 /**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_status0_robo_rio_present_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_status0_robo_rio_present_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_status0_robo_rio_present_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_status0_compressor_config_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_status0_compressor_config_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_status0_compressor_config_is_in_range(uint8_t value);
+
+/**
  * Pack message Status1.
  *
  * @param[out] dst_p Buffer to pack the message into.
@@ -3240,6 +3501,34 @@ double PH_status1_sticky_has_reset_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool PH_status1_sticky_has_reset_is_in_range(uint8_t value);
+
+/**
+ * Pack message ClearFaults.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int PH_clear_faults_pack(
+    uint8_t *dst_p,
+    const struct PH_clear_faults_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message ClearFaults.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int PH_clear_faults_unpack(
+    struct PH_clear_faults_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
 
 
 #ifdef __cplusplus
