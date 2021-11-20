@@ -35,7 +35,7 @@ class SPI {
    */
   explicit SPI(Port port);
 
-  ~SPI();
+  virtual ~SPI();
 
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
