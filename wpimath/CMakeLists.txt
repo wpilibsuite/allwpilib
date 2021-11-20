@@ -13,26 +13,26 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.38.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml/ejml-simple-0.41.jar")
       set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
       set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpimath/thirdparty/ejml")
 
       message(STATUS "Downloading EJML jarfiles...")
 
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.38/ejml-cdense-0.38.jar"
-          "${JAR_ROOT}/ejml-cdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.38/ejml-core-0.38.jar"
-          "${JAR_ROOT}/ejml-core-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.38/ejml-ddense-0.38.jar"
-          "${JAR_ROOT}/ejml-ddense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.38/ejml-dsparse-0.38.jar"
-          "${JAR_ROOT}/ejml-dsparse-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.38/ejml-fdense-0.38.jar"
-          "${JAR_ROOT}/ejml-fdense-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.38/ejml-simple-0.38.jar"
-          "${JAR_ROOT}/ejml-simple-0.38.jar")
-      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.38/ejml-zdense-0.38.jar"
-          "${JAR_ROOT}/ejml-zdense-0.38.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-cdense/0.41/ejml-cdense-0.41.jar"
+          "${JAR_ROOT}/ejml-cdense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-core/0.41/ejml-core-0.41.jar"
+          "${JAR_ROOT}/ejml-core-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-ddense/0.41/ejml-ddense-0.41.jar"
+          "${JAR_ROOT}/ejml-ddense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-dsparse/0.41/ejml-dsparse-0.41.jar"
+          "${JAR_ROOT}/ejml-dsparse-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-fdense/0.41/ejml-fdense-0.41.jar"
+          "${JAR_ROOT}/ejml-fdense-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-simple/0.41/ejml-simple-0.41.jar"
+          "${JAR_ROOT}/ejml-simple-0.41.jar")
+      file(DOWNLOAD "${BASE_URL}org/ejml/ejml-zdense/0.41/ejml-zdense-0.41.jar"
+          "${JAR_ROOT}/ejml-zdense-0.41.jar")
 
       message(STATUS "All files downloaded.")
   endif()
