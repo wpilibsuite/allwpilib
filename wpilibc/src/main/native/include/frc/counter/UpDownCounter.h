@@ -33,8 +33,8 @@ class UpDownCounter : public wpi::Sendable,
    * @param upSource The up count source (can be null).
    * @param downSource The down count source (can be null).
    */
-  UpDownCounter(std::shared_ptr<DigitalSource> countSource,
-                std::shared_ptr<DigitalSource> directionSource);
+  UpDownCounter(std::shared_ptr<DigitalSource> upSource,
+                std::shared_ptr<DigitalSource> downSource);
 
   ~UpDownCounter() override;
 
