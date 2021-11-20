@@ -28,10 +28,10 @@ HAL_ENUM(HAL_REVPHCompressorConfigType){
  * Storage for compressor config
  */
 struct HAL_REVPHCompressorConfig {
-    double minAnalogVoltage;
-    double maxAnalogVoltage;
-    HAL_Bool forceDisable;
-    HAL_Bool useDigital;
+  double minAnalogVoltage;
+  double maxAnalogVoltage;
+  HAL_Bool forceDisable;
+  HAL_Bool useDigital;
 };
 
 #ifdef __cplusplus
