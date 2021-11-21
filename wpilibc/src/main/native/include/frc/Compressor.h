@@ -10,6 +10,7 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/CompressorControlType.h"
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
@@ -57,18 +58,6 @@ class Compressor : public wpi::Sendable,
   Compressor& operator=(Compressor&&) = default;
 
   /**
-   * Starts closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Start();
-
-  /**
-   * Stops closed-loop control. Note that closed loop control is enabled by
-   * default.
-   */
-  void Stop();
-
-  /**
    * Check if compressor output is active.
    *
    * @return true if the compressor is on
@@ -87,25 +76,17 @@ class Compressor : public wpi::Sendable,
    *
    * @return The current through the compressor, in amps
    */
-  double GetCompressorCurrent() const;
+  double GetCurrent() const;
 
-  /**
-   * Enables or disables automatically turning the compressor on when the
-   * pressure is low.
-   *
-   * @param on Set to true to enable closed loop control of the compressor.
-   *           False to disable.
-   */
-  void SetClosedLoopControl(bool on);
+  void Disable();
 
-  /**
-   * Returns true if the compressor will automatically turn on when the
-   * pressure is low.
-   *
-   * @return True if closed loop control of the compressor is enabled. False if
-   *         disabled.
-   */
-  bool GetClosedLoopControl() const;
+  void EnableDigital();
+
+  void EnableAnalog(double minAnalogVoltage, double maxAnalogVoltage);
+
+  void EnableHybrid(double minAnalogVoltage, double maxAnalogVoltage);
+
+  CompressorControlType GetControlType() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
