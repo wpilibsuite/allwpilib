@@ -96,6 +96,7 @@ public class PneumaticHub implements PneumaticsBase {
     return CompressorControlType.getValue(REVPHJNI.getCompressorConfig(m_handle));
   }
 
+  @Override
   public boolean getPressureSwitch() {
     return REVPHJNI.getPressureSwitch(m_handle);
   }

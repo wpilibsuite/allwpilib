@@ -20,7 +20,7 @@ public enum CompressorControlType {
 
     /**
      * Gets a type from an int value.
-     * 
+     *
      * @param value int value
      * @return type
      */
