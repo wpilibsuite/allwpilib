@@ -64,7 +64,8 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
 
   SimREVPHData[module].initialized = true;
   // Enable closed loop
-  SimREVPHData[module].closedLoopEnabled = true;
+  SimREVPHData[module].compressorConfigType =
+      HAL_REVPHCompressorConfigType_kDigital;
 
   return handle;
 }
@@ -97,26 +98,73 @@ HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
   return SimREVPHData[pcm->module].compressorOn;
 }
 
-void HAL_SetREVPHClosedLoopControl(HAL_REVPHHandle handle, HAL_Bool enabled,
-                                   int32_t* status) {
+void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
+                                  const HAL_REVPHCompressorConfig* config,
+                                  int32_t* status) {
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-
-  SimREVPHData[pcm->module].closedLoopEnabled = enabled;
+  // TODO
+  // SimREVPHData[pcm->module].compressorConfigType = config.
 }
-
-HAL_Bool HAL_GetREVPHClosedLoopControl(HAL_REVPHHandle handle,
-                                       int32_t* status) {
+void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
+                                           int32_t* status) {
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return false;
+    return;
   }
+  SimREVPHData[pcm->module].compressorConfigType =
+      HAL_REVPHCompressorConfigType_kDisabled;
+}
 
-  return SimREVPHData[pcm->module].closedLoopEnabled;
+void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
+                                          int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  SimREVPHData[pcm->module].compressorConfigType =
+      HAL_REVPHCompressorConfigType_kDigital;
+}
+
+void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
+                                         double minAnalogVoltage,
+                                         double maxAnalogVoltage,
+                                         int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  SimREVPHData[pcm->module].compressorConfigType =
+      HAL_REVPHCompressorConfigType_kAnalog;
+}
+
+void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
+                                         double minAnalogVoltage,
+                                         double maxAnalogVoltage,
+                                         int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  SimREVPHData[pcm->module].compressorConfigType =
+      HAL_REVPHCompressorConfigType_kHybrid;
+}
+
+HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
+    HAL_REVPHHandle handle, int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return HAL_REVPHCompressorConfigType_kDisabled;
+  }
+  return SimREVPHData[pcm->module].compressorConfigType;
 }
 
 HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status) {

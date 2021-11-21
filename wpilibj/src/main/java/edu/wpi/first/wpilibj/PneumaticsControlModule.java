@@ -92,16 +92,6 @@ public class PneumaticsControlModule implements PneumaticsBase {
   }
 
   @Override
-  public void setClosedLoopControl(boolean enabled) {
-    CTREPCMJNI.setClosedLoopControl(m_handle, enabled);
-  }
-
-  @Override
-  public boolean getClosedLoopControl() {
-    return CTREPCMJNI.getClosedLoopControl(m_handle);
-  }
-
-  @Override
   public boolean getPressureSwitch() {
     return CTREPCMJNI.getPressureSwitch(m_handle);
   }
@@ -232,5 +222,30 @@ public class PneumaticsControlModule implements PneumaticsBase {
     synchronized (m_dataStore.m_reserveLock) {
       m_dataStore.m_compressorReserved = false;
     }
+  }
+
+  @Override
+  public void disableCompressor() {
+    CTREPCMJNI.setClosedLoopControl(m_handle, false);
+  }
+
+  @Override
+  public void enableCompressorDigital() {
+    CTREPCMJNI.setClosedLoopControl(m_handle, true);
+  }
+
+  @Override
+  public void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+    CTREPCMJNI.setClosedLoopControl(m_handle, false);
+  }
+
+  @Override
+  public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+    CTREPCMJNI.setClosedLoopControl(m_handle, false);
+  }
+
+  @Override
+  public CompressorControlType getCompressorControlType() {
+    return CTREPCMJNI.getClosedLoopControl(m_handle) ? CompressorControlType.Digital : CompressorControlType.Disabled;
   }
 }

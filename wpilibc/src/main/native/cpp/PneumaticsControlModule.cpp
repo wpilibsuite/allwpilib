@@ -84,17 +84,37 @@ bool PneumaticsControlModule::GetCompressor() const {
   return result;
 }
 
-void PneumaticsControlModule::SetClosedLoopControl(bool enabled) {
+void PneumaticsControlModule::DiableCompressor() {
   int32_t status = 0;
-  HAL_SetCTREPCMClosedLoopControl(m_handle, enabled, &status);
+  HAL_SetCTREPCMClosedLoopControl(m_handle, false, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-bool PneumaticsControlModule::GetClosedLoopControl() const {
+void PneumaticsControlModule::EnableCompressorDigital() {
+  int32_t status = 0;
+  HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+void PneumaticsControlModule::EnableCompressorAnalog(double minAnalogVoltage,
+                                          double maxAnalogVoltage) {
+  int32_t status = 0;
+  HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+void PneumaticsControlModule::EnableCompressorHybrid(double minAnalogVoltage,
+                                          double maxAnalogVoltage) {
+  int32_t status = 0;
+  HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+CompressorControlType PneumaticsControlModule::GetCompressorControlType() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return result;
+  return result ? CompressorControlType::Digital : CompressorControlType::Disabled;
 }
 
 bool PneumaticsControlModule::GetPressureSwitch() const {

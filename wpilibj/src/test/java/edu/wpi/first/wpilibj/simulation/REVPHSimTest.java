@@ -108,25 +108,25 @@ class REVPHSimTest {
     }
   }
 
-  @Test
-  void setClosedLoopEnabled() {
-    HAL.initialize(500, 0);
+  // @Test
+  // void setClosedLoopEnabled() {
+  //   HAL.initialize(500, 0);
 
-    REVPHSim sim = new REVPHSim(1);
-    BooleanCallback callback = new BooleanCallback();
+  //   REVPHSim sim = new REVPHSim(1);
+  //   BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
-        CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
-      ph.setClosedLoopControl(false);
-      assertFalse(ph.getClosedLoopControl());
+  //   try (PneumaticHub ph = new PneumaticHub(1);
+  //       CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
+  //     ph.setClosedLoopControl(false);
+  //     assertFalse(ph.getClosedLoopControl());
 
-      ph.setClosedLoopControl(true);
-      assertTrue(sim.getClosedLoopEnabled());
-      assertTrue(ph.getClosedLoopControl());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-    }
-  }
+  //     ph.setClosedLoopControl(true);
+  //     assertTrue(sim.getClosedLoopEnabled());
+  //     assertTrue(ph.getClosedLoopControl());
+  //     assertTrue(callback.wasTriggered());
+  //     assertTrue(callback.getSetValue());
+  //   }
+  // }
 
   @Test
   void setPressureSwitchEnabledTest() {

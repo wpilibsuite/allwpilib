@@ -96,24 +96,24 @@ TEST(REVPHSimTest, SetCompressorOn) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(REVPHSimTest, SetClosedLoopEnabled) {
-  PneumaticHub ph;
-  REVPHSim sim(ph);
-  sim.ResetData();
+// TEST(REVPHSimTest, SetClosedLoopEnabled) {
+//   PneumaticHub ph;
+//   REVPHSim sim(ph);
+//   sim.ResetData();
 
-  BooleanCallback callback;
-  auto cb =
-      sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
+//   BooleanCallback callback;
+//   auto cb =
+//       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
-  ph.SetClosedLoopControl(false);
-  EXPECT_FALSE(ph.GetClosedLoopControl());
+//   ph.SetClosedLoopControl(false);
+//   EXPECT_FALSE(ph.GetClosedLoopControl());
 
-  ph.SetClosedLoopControl(true);
-  EXPECT_TRUE(sim.GetClosedLoopEnabled());
-  EXPECT_TRUE(ph.GetClosedLoopControl());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
-}
+//   ph.SetClosedLoopControl(true);
+//   EXPECT_TRUE(sim.GetClosedLoopEnabled());
+//   EXPECT_TRUE(ph.GetClosedLoopControl());
+//   EXPECT_TRUE(callback.WasTriggered());
+//   EXPECT_TRUE(callback.GetLastValue());
+// }
 
 TEST(REVPHSimTest, SetPressureSwitchEnabled) {
   PneumaticHub ph;

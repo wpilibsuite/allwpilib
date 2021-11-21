@@ -80,17 +80,39 @@ bool PneumaticHub::GetCompressor() const {
   return result;
 }
 
-void PneumaticHub::SetClosedLoopControl(bool enabled) {
+void PneumaticHub::DiableCompressor() {
   int32_t status = 0;
-  HAL_SetREVPHClosedLoopControl(m_handle, enabled, &status);
+  HAL_SetREVPHClosedLoopControlDisabled(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-bool PneumaticHub::GetClosedLoopControl() const {
+void PneumaticHub::EnableCompressorDigital() {
   int32_t status = 0;
-  auto result = HAL_GetREVPHClosedLoopControl(m_handle, &status);
+  HAL_SetREVPHClosedLoopControlDigital(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return result;
+}
+
+void PneumaticHub::EnableCompressorAnalog(double minAnalogVoltage,
+                                          double maxAnalogVoltage) {
+  int32_t status = 0;
+  HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage,
+                                      maxAnalogVoltage, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+void PneumaticHub::EnableCompressorHybrid(double minAnalogVoltage,
+                                          double maxAnalogVoltage) {
+  int32_t status = 0;
+  HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage,
+                                      maxAnalogVoltage, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+CompressorControlType PneumaticHub::GetCompressorControlType() const {
+  int32_t status = 0;
+  auto result = HAL_GetREVPHCompressorConfig(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return static_cast<CompressorControlType>(result);
 }
 
 bool PneumaticHub::GetPressureSwitch() const {

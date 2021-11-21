@@ -86,9 +86,15 @@ public interface PneumaticsBase extends AutoCloseable {
 
   double getCompressorCurrent();
 
-  void setClosedLoopControl(boolean on);
+  void disableCompressor();
 
-  boolean getClosedLoopControl();
+  void enableCompressorDigital();
+
+  void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage);
+
+  void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage);
+
+  CompressorControlType getCompressorControlType();
 
   /**
    * Check if a solenoid channel is valid.

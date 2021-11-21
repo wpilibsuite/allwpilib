@@ -92,16 +92,10 @@ public class PneumaticHub implements PneumaticsBase {
   }
 
   @Override
-  public void setClosedLoopControl(boolean enabled) {
-    REVPHJNI.setClosedLoopControl(m_handle, enabled);
+  public CompressorControlType getCompressorControlType() {
+    return CompressorControlType.getValue(REVPHJNI.getCompressorConfig(m_handle));
   }
 
-  @Override
-  public boolean getClosedLoopControl() {
-    return REVPHJNI.getClosedLoopControl(m_handle);
-  }
-
-  @Override
   public boolean getPressureSwitch() {
     return REVPHJNI.getPressureSwitch(m_handle);
   }
@@ -199,5 +193,26 @@ public class PneumaticHub implements PneumaticsBase {
   public int getSolenoidDisabledList() {
     // TODO Get this working
     return 0;
+  }
+
+  @Override
+  public void disableCompressor() {
+    REVPHJNI.setClosedLoopControlDisabled(m_handle);
+  }
+
+  @Override
+  public void enableCompressorDigital() {
+    REVPHJNI.setClosedLoopControlDigital(m_handle);
+    
+  }
+
+  @Override
+  public void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+    REVPHJNI.setClosedLoopControlAnalog(m_handle, minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  @Override
+  public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+    REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 }

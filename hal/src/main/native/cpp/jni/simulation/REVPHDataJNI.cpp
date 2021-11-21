@@ -166,52 +166,52 @@ Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorOn
 
 /*
  * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
- * Method:    registerClosedLoopEnabledCallback
+ * Method:    registerCompressorConfigTypeCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerClosedLoopEnabledCallback
+Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorConfigTypeCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
   return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterREVPHClosedLoopEnabledCallback);
+                               &HALSIM_RegisterREVPHCompressorConfigTypeCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
- * Method:    cancelClosedLoopEnabledCallback
+ * Method:    cancelCompressorConfigTypeCallback
  * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelClosedLoopEnabledCallback
+Java_edu_wpi_first_hal_simulation_REVPHDataJNI_cancelCompressorConfigTypeCallback
   (JNIEnv* env, jclass, jint index, jint handle)
 {
   return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelREVPHClosedLoopEnabledCallback);
+                           &HALSIM_CancelREVPHCompressorConfigTypeCallback);
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
- * Method:    getClosedLoopEnabled
- * Signature: (I)Z
+ * Method:    getCompressorConfigType
+ * Signature: (I)I
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getClosedLoopEnabled
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_simulation_REVPHDataJNI_getCompressorConfigType
   (JNIEnv*, jclass, jint index)
 {
-  return HALSIM_GetREVPHClosedLoopEnabled(index);
+  return static_cast<jint>(HALSIM_GetREVPHCompressorConfigType(index));
 }
 
 /*
  * Class:     edu_wpi_first_hal_simulation_REVPHDataJNI
- * Method:    setClosedLoopEnabled
- * Signature: (IZ)V
+ * Method:    setCompressorConfigType
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setClosedLoopEnabled
-  (JNIEnv*, jclass, jint index, jboolean value)
+Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorConfigType
+  (JNIEnv*, jclass, jint index, jint value)
 {
-  HALSIM_SetREVPHClosedLoopEnabled(index, value);
+  HALSIM_SetREVPHCompressorConfigType(index, static_cast<HAL_REVPHCompressorConfigType>(value));
 }
 
 /*

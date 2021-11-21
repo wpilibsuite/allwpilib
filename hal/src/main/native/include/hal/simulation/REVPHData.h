@@ -6,6 +6,7 @@
 
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
+#include "hal/REVPH.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,13 +40,13 @@ void HALSIM_CancelREVPHCompressorOnCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetREVPHCompressorOn(int32_t index);
 void HALSIM_SetREVPHCompressorOn(int32_t index, HAL_Bool compressorOn);
 
-int32_t HALSIM_RegisterREVPHClosedLoopEnabledCallback(
+int32_t HALSIM_RegisterREVPHCompressorConfigTypeCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);
-void HALSIM_CancelREVPHClosedLoopEnabledCallback(int32_t index, int32_t uid);
-HAL_Bool HALSIM_GetREVPHClosedLoopEnabled(int32_t index);
-void HALSIM_SetREVPHClosedLoopEnabled(int32_t index,
-                                      HAL_Bool closedLoopEnabled);
+void HALSIM_CancelREVPHCompressorConfigTypeCallback(int32_t index, int32_t uid);
+HAL_REVPHCompressorConfigType HALSIM_GetREVPHCompressorConfigType(int32_t index);
+void HALSIM_SetREVPHCompressorConfigType(int32_t index,
+                                      HAL_REVPHCompressorConfigType configType);
 
 int32_t HALSIM_RegisterREVPHPressureSwitchCallback(int32_t index,
                                                    HAL_NotifyCallback callback,

@@ -108,25 +108,25 @@ class CTREPCMSimTest {
     }
   }
 
-  @Test
-  void setClosedLoopEnabled() {
-    HAL.initialize(500, 0);
+  // @Test
+  // void setClosedLoopEnabled() {
+  //   HAL.initialize(500, 0);
 
-    CTREPCMSim sim = new CTREPCMSim(0);
-    BooleanCallback callback = new BooleanCallback();
+  //   CTREPCMSim sim = new CTREPCMSim(0);
+  //   BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
-        CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
-      pcm.setClosedLoopControl(false);
-      assertFalse(pcm.getClosedLoopControl());
+  //   try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+  //       CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
+  //     pcm.setClosedLoopControl(false);
+  //     assertFalse(pcm.getClosedLoopControl());
 
-      pcm.setClosedLoopControl(true);
-      assertTrue(sim.getClosedLoopEnabled());
-      assertTrue(pcm.getClosedLoopControl());
-      assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
-    }
-  }
+  //     pcm.setClosedLoopControl(true);
+  //     assertTrue(sim.getClosedLoopEnabled());
+  //     assertTrue(pcm.getClosedLoopControl());
+  //     assertTrue(callback.wasTriggered());
+  //     assertTrue(callback.getSetValue());
+  //   }
+  // }
 
   @Test
   void setPressureSwitchEnabledTest() {
