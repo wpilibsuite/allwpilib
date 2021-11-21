@@ -247,6 +247,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
   @Override
   public CompressorControlType getCompressorControlType() {
     return CTREPCMJNI.getClosedLoopControl(m_handle)
-        ? CompressorControlType.Digital : CompressorControlType.Disabled;
+        ? CompressorControlType.Digital
+        : CompressorControlType.Disabled;
   }
 }

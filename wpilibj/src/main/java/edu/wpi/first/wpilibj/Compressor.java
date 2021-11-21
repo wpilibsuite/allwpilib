@@ -103,16 +103,12 @@ public class Compressor implements Sendable, AutoCloseable {
     return m_module.getCompressorCurrent();
   }
 
-  /**
-   * Disable the compressor.
-   */
+  /** Disable the compressor. */
   public void disable() {
     m_module.disableCompressor();
   }
 
-  /**
-   * Enable compressor closed loop control using digital input.
-   */
+  /** Enable compressor closed loop control using digital input. */
   public void enableDigital() {
     m_module.enableCompressorDigital();
   }
