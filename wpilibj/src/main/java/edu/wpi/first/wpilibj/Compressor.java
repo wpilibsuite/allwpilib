@@ -103,18 +103,40 @@ public class Compressor implements Sendable, AutoCloseable {
     return m_module.getCompressorCurrent();
   }
 
+  /**
+   * Disable the compressor.
+   */
   public void disable() {
     m_module.disableCompressor();
   }
 
+  /**
+   * Enable compressor closed loop control using digital input.
+   */
   public void enableDigital() {
     m_module.enableCompressorDigital();
   }
 
+  /**
+   * Enable compressor closed loop control using analog input.
+   * 
+   * <p>On CTRE PCM, this will enable digital control.
+   * 
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
   public void enableAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
     m_module.enableCompressorAnalog(minAnalogVoltage, maxAnalogVoltage);
   }
 
+  /**
+   * Enable compressor closed loop control using hybrid input.
+   * 
+   * <p>On CTRE PCM, this will enable digital control.
+   * 
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
   public void enableHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
     m_module.enableCompressorHybrid(minAnalogVoltage, maxAnalogVoltage);
   }
