@@ -4,10 +4,12 @@
 
 package edu.wpi.first.wpilibj.pidwrappers;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
-public class PIDMotorController implements PIDOutput, MotorController {
+public class PIDMotorController implements PIDOutput, MotorController, Sendable {
   private final MotorController m_motorController;
 
   public PIDMotorController(MotorController motorController) {
@@ -80,9 +82,7 @@ public class PIDMotorController implements PIDOutput, MotorController {
     return m_motorController.getInverted();
   }
 
-  /**
-   * Disable the motor controller.
-   */
+  /** Disable the motor controller. */
   @Override
   public void disable() {
     m_motorController.disable();
@@ -95,5 +95,13 @@ public class PIDMotorController implements PIDOutput, MotorController {
   @Override
   public void stopMotor() {
     m_motorController.stopMotor();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Motor Controller");
+    builder.setActuator(true);
+    builder.setSafeState(this::disable);
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }
