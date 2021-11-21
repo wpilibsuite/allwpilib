@@ -90,9 +90,9 @@ class Compressor : public wpi::Sendable,
 
   /**
    * Enable compressor closed loop control using analog input.
-   * 
+   *
    * <p>On CTRE PCM, this will enable digital control.
-   * 
+   *
    * @param minAnalogVoltage The minimum voltage to enable compressor
    * @param maxAnalogVoltage The maximum voltage to disable compressor
    */
@@ -100,9 +100,9 @@ class Compressor : public wpi::Sendable,
 
   /**
    * Enable compressor closed loop control using hybrid input.
-   * 
+   *
    * On CTRE PCM, this will enable digital control.
-   * 
+   *
    * @param minAnalogVoltage The minimum voltage to enable compressor
    * @param maxAnalogVoltage The maximum voltage to disable compressor
    */
