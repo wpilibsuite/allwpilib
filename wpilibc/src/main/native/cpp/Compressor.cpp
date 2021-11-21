@@ -45,7 +45,7 @@ double Compressor::GetCurrent() const {
 }
 
 void Compressor::Disable() {
-  m_module->DiableCompressor();
+  m_module->DisableCompressor();
 }
 
 void Compressor::EnableDigital() {

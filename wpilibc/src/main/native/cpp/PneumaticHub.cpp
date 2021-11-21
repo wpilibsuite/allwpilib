@@ -80,7 +80,7 @@ bool PneumaticHub::GetCompressor() const {
   return result;
 }
 
-void PneumaticHub::DiableCompressor() {
+void PneumaticHub::DisableCompressor() {
   int32_t status = 0;
   HAL_SetREVPHClosedLoopControlDisabled(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);

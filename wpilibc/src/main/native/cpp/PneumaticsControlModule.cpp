@@ -84,7 +84,7 @@ bool PneumaticsControlModule::GetCompressor() const {
   return result;
 }
 
-void PneumaticsControlModule::DiableCompressor() {
+void PneumaticsControlModule::DisableCompressor() {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, false, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);

@@ -25,7 +25,7 @@ class PneumaticsBase {
 
   virtual double GetCompressorCurrent() const = 0;
 
-  virtual void DiableCompressor() = 0;
+  virtual void DisableCompressor() = 0;
 
   virtual void EnableCompressorDigital() = 0;
 

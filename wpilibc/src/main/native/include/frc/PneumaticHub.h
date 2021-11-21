@@ -22,7 +22,7 @@ class PneumaticHub : public PneumaticsBase {
 
   bool GetCompressor() const override;
 
-  void DiableCompressor() override;
+  void DisableCompressor() override;
 
   void EnableCompressorDigital() override;
 
