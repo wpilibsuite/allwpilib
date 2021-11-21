@@ -22,15 +22,17 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   bool GetCompressor() const override;
 
-   void DiableCompressor() override;
+  void DiableCompressor() override;
 
-   void EnableCompressorDigital() override;
+  void EnableCompressorDigital() override;
 
-   void EnableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) override;
+  void EnableCompressorAnalog(double minAnalogVoltage,
+                              double maxAnalogVoltage) override;
 
-   void EnableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) override;
+  void EnableCompressorHybrid(double minAnalogVoltage,
+                              double maxAnalogVoltage) override;
 
-   CompressorControlType GetCompressorControlType() const override;
+  CompressorControlType GetCompressorControlType() const override;
 
   bool GetPressureSwitch() const override;
 

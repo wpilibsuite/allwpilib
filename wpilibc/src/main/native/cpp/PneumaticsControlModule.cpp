@@ -97,24 +97,26 @@ void PneumaticsControlModule::EnableCompressorDigital() {
 }
 
 void PneumaticsControlModule::EnableCompressorAnalog(double minAnalogVoltage,
-                                          double maxAnalogVoltage) {
+                                                     double maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorHybrid(double minAnalogVoltage,
-                                          double maxAnalogVoltage) {
+                                                     double maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-CompressorControlType PneumaticsControlModule::GetCompressorControlType() const {
+CompressorControlType PneumaticsControlModule::GetCompressorControlType()
+    const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return result ? CompressorControlType::Digital : CompressorControlType::Disabled;
+  return result ? CompressorControlType::Digital
+                : CompressorControlType::Disabled;
 }
 
 bool PneumaticsControlModule::GetPressureSwitch() const {

@@ -4,9 +4,9 @@
 
 #pragma once
 
+#include "hal/REVPH.h"
 #include "hal/Types.h"
 #include "hal/simulation/NotifyListener.h"
-#include "hal/REVPH.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,9 +44,10 @@ int32_t HALSIM_RegisterREVPHCompressorConfigTypeCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,
     HAL_Bool initialNotify);
 void HALSIM_CancelREVPHCompressorConfigTypeCallback(int32_t index, int32_t uid);
-HAL_REVPHCompressorConfigType HALSIM_GetREVPHCompressorConfigType(int32_t index);
-void HALSIM_SetREVPHCompressorConfigType(int32_t index,
-                                      HAL_REVPHCompressorConfigType configType);
+HAL_REVPHCompressorConfigType HALSIM_GetREVPHCompressorConfigType(
+    int32_t index);
+void HALSIM_SetREVPHCompressorConfigType(
+    int32_t index, HAL_REVPHCompressorConfigType configType);
 
 int32_t HALSIM_RegisterREVPHPressureSwitchCallback(int32_t index,
                                                    HAL_NotifyCallback callback,

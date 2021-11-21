@@ -120,7 +120,7 @@ class REVPHSim {
    */
   [[nodiscard]] std::unique_ptr<CallbackStore>
   RegisterCompressorConfigTypeCallback(NotifyCallback callback,
-                                    bool initialNotify);
+                                       bool initialNotify);
 
   /**
    * Check whether the closed loop compressor control is active.

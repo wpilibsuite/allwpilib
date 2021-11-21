@@ -173,8 +173,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_hal_simulation_REVPHDataJNI_registerCompressorConfigTypeCallback
   (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
 {
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterREVPHCompressorConfigTypeCallback);
+  return sim::AllocateCallback(
+      env, index, callback, initialNotify,
+      &HALSIM_RegisterREVPHCompressorConfigTypeCallback);
 }
 
 /*
@@ -211,7 +212,8 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_simulation_REVPHDataJNI_setCompressorConfigType
   (JNIEnv*, jclass, jint index, jint value)
 {
-  HALSIM_SetREVPHCompressorConfigType(index, static_cast<HAL_REVPHCompressorConfigType>(value));
+  HALSIM_SetREVPHCompressorConfigType(
+      index, static_cast<HAL_REVPHCompressorConfigType>(value));
 }
 
 /*

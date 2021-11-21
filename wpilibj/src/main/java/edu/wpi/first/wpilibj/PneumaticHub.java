@@ -203,7 +203,6 @@ public class PneumaticHub implements PneumaticsBase {
   @Override
   public void enableCompressorDigital() {
     REVPHJNI.setClosedLoopControlDigital(m_handle);
-    
   }
 
   @Override

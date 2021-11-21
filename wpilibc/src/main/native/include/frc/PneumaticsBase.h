@@ -8,8 +8,8 @@
 
 #include <units/time.h>
 
-#include "frc/PneumaticsModuleType.h"
 #include "frc/CompressorControlType.h"
+#include "frc/PneumaticsModuleType.h"
 
 namespace frc {
 class Solenoid;
@@ -29,9 +29,11 @@ class PneumaticsBase {
 
   virtual void EnableCompressorDigital() = 0;
 
-  virtual void EnableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) = 0;
+  virtual void EnableCompressorAnalog(double minAnalogVoltage,
+                                      double maxAnalogVoltage) = 0;
 
-  virtual void EnableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) = 0;
+  virtual void EnableCompressorHybrid(double minAnalogVoltage,
+                                      double maxAnalogVoltage) = 0;
 
   virtual CompressorControlType GetCompressorControlType() const = 0;
 

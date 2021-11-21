@@ -87,7 +87,9 @@ int REVPHSim::GetCompressorConfigType() const {
 }
 
 void REVPHSim::SetCompressorConfigType(int compressorConfigType) {
-  HALSIM_SetREVPHCompressorConfigType(m_index, static_cast<HAL_REVPHCompressorConfigType>(compressorConfigType));
+  HALSIM_SetREVPHCompressorConfigType(
+      m_index,
+      static_cast<HAL_REVPHCompressorConfigType>(compressorConfigType));
 }
 
 std::unique_ptr<CallbackStore> REVPHSim::RegisterPressureSwitchCallback(

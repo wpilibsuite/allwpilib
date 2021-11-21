@@ -22,7 +22,8 @@ class REVPHData {
     return false;
   }
 
-  static inline HAL_Value MakeCompressorConfigTypeValue(HAL_REVPHCompressorConfigType value) {
+  static inline HAL_Value MakeCompressorConfigTypeValue(
+      HAL_REVPHCompressorConfigType value) {
     return HAL_MakeEnum(value);
   }
 
@@ -34,8 +35,10 @@ class REVPHData {
       solenoidOutput[kNumREVPHChannels];
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
-  SimDataValue<HAL_REVPHCompressorConfigType, MakeCompressorConfigTypeValue, GetCompressorConfigTypeName>
-      compressorConfigType{HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled};
+  SimDataValue<HAL_REVPHCompressorConfigType, MakeCompressorConfigTypeValue,
+               GetCompressorConfigTypeName>
+      compressorConfigType{HAL_REVPHCompressorConfigType::
+                               HAL_REVPHCompressorConfigType_kDisabled};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetPressureSwitchName> pressureSwitch{
       false};
   SimDataValue<double, HAL_MakeDouble, GetCompressorCurrentName>

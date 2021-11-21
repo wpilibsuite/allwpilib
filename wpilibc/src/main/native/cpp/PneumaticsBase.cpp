@@ -4,19 +4,27 @@
 
 #include "frc/PneumaticsBase.h"
 
+#include <hal/REVPH.h>
+
 #include "frc/Errors.h"
 #include "frc/PneumaticHub.h"
 #include "frc/PneumaticsControlModule.h"
 #include "frc/SensorUtil.h"
 
-#include "hal/REVPH.h"
-
 using namespace frc;
 
-static_assert(static_cast<int>(CompressorControlType::Disabled) == HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
-static_assert(static_cast<int>(CompressorControlType::Digital) == HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
-static_assert(static_cast<int>(CompressorControlType::Analog) == HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
-static_assert(static_cast<int>(CompressorControlType::Hybrid) == HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
+static_assert(
+    static_cast<int>(CompressorControlType::Disabled) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+static_assert(
+    static_cast<int>(CompressorControlType::Digital) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+static_assert(
+    static_cast<int>(CompressorControlType::Analog) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+static_assert(
+    static_cast<int>(CompressorControlType::Hybrid) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
     int module, PneumaticsModuleType moduleType) {
