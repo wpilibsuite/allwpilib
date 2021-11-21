@@ -64,7 +64,7 @@ public class PCMTest extends AbstractComsSetup {
 
   @Before
   public void reset() {
-    pcm.setClosedLoopControl(false);
+    pcm.disableCompressor();
     fakePressureSwitch.set(false);
   }
 
@@ -73,7 +73,7 @@ public class PCMTest extends AbstractComsSetup {
   public void testPressureSwitch() throws Exception {
     final double range = 0.5;
     reset();
-    pcm.setClosedLoopControl(true);
+    pcm.enableCompressorDigital();
 
     // Turn on the compressor
     fakePressureSwitch.set(true);
