@@ -14,10 +14,16 @@ public enum CompressorControlType {
 
     public final int value;
 
-    private CompressorControlType(int value) {
+    CompressorControlType(int value) {
         this.value = value;
     }
 
+    /**
+     * Gets a type from an int value.
+     * 
+     * @param value int value
+     * @return type
+     */
     public static CompressorControlType getValue(int value) {
         switch (value) {
         case REVPHJNI.COMPRESSOR_CONFIG_TYPE_HYBRID:
