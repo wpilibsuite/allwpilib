@@ -34,6 +34,47 @@ struct HAL_REVPHCompressorConfig {
   HAL_Bool useDigital;
 };
 
+/**
+ * Storage for REV PH Faults
+ */
+struct HAL_REVPHFaults {
+  uint32_t channel0Fault : 1;
+  uint32_t channel1Fault : 1;
+  uint32_t channel2Fault : 1;
+  uint32_t channel3Fault : 1;
+  uint32_t channel4Fault : 1;
+  uint32_t channel5Fault : 1;
+  uint32_t channel6Fault : 1;
+  uint32_t channel7Fault : 1;
+  uint32_t channel8Fault : 1;
+  uint32_t channel9Fault : 1;
+  uint32_t channel10Fault : 1;
+  uint32_t channel11Fault : 1;
+  uint32_t channel12Fault : 1;
+  uint32_t channel13Fault : 1;
+  uint32_t channel14Fault : 1;
+  uint32_t channel15Fault : 1;
+  uint32_t compressorOverCurrent : 1;
+  uint32_t compressorOpen : 1;
+  uint32_t solenoidOverCurrent : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t hardwareFault : 1;
+};
+
+/**
+ * Storage for REV PH Sticky Faults
+ */
+struct HAL_REVPHStickyFaults {
+  uint32_t compressorOverCurrent : 1;
+  uint32_t compressorOpen : 1;
+  uint32_t solenoidOverCurrent : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t canBusOff : 1;
+  uint32_t hasReset : 1;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,6 +120,11 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
 
 void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
                           int32_t* status);
+
+HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status);
+
+HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
+                                               int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

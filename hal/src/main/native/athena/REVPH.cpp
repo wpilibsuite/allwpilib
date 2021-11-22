@@ -562,3 +562,59 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
   HAL_WriteCANPacket(ph->hcan, packedData, PH_PULSE_ONCE_LENGTH,
                      PH_PULSE_ONCE_FRAME_API, status);
 }
+
+HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status) {
+  HAL_REVPHFaults faults = {};
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return faults;
+  }
+
+  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  faults.channel0Fault = status0.channel_0_fault;
+  faults.channel1Fault = status0.channel_1_fault;
+  faults.channel2Fault = status0.channel_2_fault;
+  faults.channel3Fault = status0.channel_3_fault;
+  faults.channel4Fault = status0.channel_4_fault;
+  faults.channel5Fault = status0.channel_5_fault;
+  faults.channel6Fault = status0.channel_6_fault;
+  faults.channel7Fault = status0.channel_7_fault;
+  faults.channel8Fault = status0.channel_8_fault;
+  faults.channel9Fault = status0.channel_9_fault;
+  faults.channel10Fault = status0.channel_10_fault;
+  faults.channel11Fault = status0.channel_11_fault;
+  faults.channel12Fault = status0.channel_12_fault;
+  faults.channel13Fault = status0.channel_13_fault;
+  faults.channel14Fault = status0.channel_14_fault;
+  faults.channel15Fault = status0.channel_15_fault;
+  faults.compressorOverCurrent = status0.compressor_oc;
+  faults.compressorOpen = status0.compressor_open;
+  faults.solenoidOverCurrent = status0.solenoid_oc;
+  faults.brownout = status0.brownout;
+  faults.canWarning = status0.can_warning;
+  faults.hardwareFault = status0.hardware_fault;
+
+  return faults;
+}
+
+HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
+                                               int32_t* status) {
+  HAL_REVPHStickyFaults stickyFaults = {};
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return stickyFaults;
+  }
+
+  PH_status1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
+  stickyFaults.compressorOverCurrent = status1.sticky_compressor_over_current;
+  stickyFaults.compressorOpen = status1.sticky_compressor_not_present;
+  stickyFaults.solenoidOverCurrent = status1.sticky_solenoid_over_current;
+  stickyFaults.brownout = status1.sticky_brownout;
+  stickyFaults.canWarning = status1.sticky_can_warning;
+  stickyFaults.canBusOff = status1.sticky_can_bus_off;
+  stickyFaults.hasReset = status1.sticky_has_reset;
+
+  return stickyFaults;
+}
