@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
 /**
- * Wrapper so that PIDSource is implemented for Ultrasonic for old PIDController
+ * Wrapper so that PIDSource is implemented for Ultrasonic for old PIDController.
  */
 public class PIDUltrasonic extends Ultrasonic implements PIDSource {
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
