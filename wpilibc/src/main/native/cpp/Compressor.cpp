@@ -32,6 +32,14 @@ Compressor::~Compressor() {
   m_module->UnreserveCompressor();
 }
 
+void Compressor::Start() {
+  EnableDigital();
+}
+
+void Compressor::Stop() {
+  Disable();
+}
+
 bool Compressor::Enabled() const {
   return m_module->GetCompressor();
 }
@@ -62,8 +70,8 @@ void Compressor::EnableHybrid(double minAnalogVoltage,
   m_module->EnableCompressorHybrid(minAnalogVoltage, maxAnalogVoltage);
 }
 
-CompressorControlType Compressor::GetControlType() const {
-  return m_module->GetCompressorControlType();
+CompressorConfigType Compressor::GetConfigType() const {
+  return m_module->GetCompressorConfigType();
 }
 
 void Compressor::InitSendable(wpi::SendableBuilder& builder) {

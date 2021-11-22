@@ -5,7 +5,7 @@
 #pragma once
 
 namespace frc {
-enum class CompressorControlType {
+enum class CompressorConfigType {
   Disabled = 0,
   Digital = 1,
   Analog = 2,

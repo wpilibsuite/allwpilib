@@ -14,16 +14,16 @@
 using namespace frc;
 
 static_assert(
-    static_cast<int>(CompressorControlType::Disabled) ==
+    static_cast<int>(CompressorConfigType::Disabled) ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
 static_assert(
-    static_cast<int>(CompressorControlType::Digital) ==
+    static_cast<int>(CompressorConfigType::Digital) ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
 static_assert(
-    static_cast<int>(CompressorControlType::Analog) ==
+    static_cast<int>(CompressorConfigType::Analog) ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
 static_assert(
-    static_cast<int>(CompressorControlType::Hybrid) ==
+    static_cast<int>(CompressorConfigType::Hybrid) ==
     HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(

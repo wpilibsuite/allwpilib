@@ -32,7 +32,7 @@ class PneumaticsControlModule : public PneumaticsBase {
   void EnableCompressorHybrid(double minAnalogVoltage,
                               double maxAnalogVoltage) override;
 
-  CompressorControlType GetCompressorControlType() const override;
+  CompressorConfigType GetCompressorConfigType() const override;
 
   bool GetPressureSwitch() const override;
 

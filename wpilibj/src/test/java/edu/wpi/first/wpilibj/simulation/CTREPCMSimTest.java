@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.CompressorConfigType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -108,25 +109,25 @@ class CTREPCMSimTest {
     }
   }
 
-  // @Test
-  // void setClosedLoopEnabled() {
-  //   HAL.initialize(500, 0);
+  @Test
+  void setEnableDigital() {
+    HAL.initialize(500, 0);
 
-  //   CTREPCMSim sim = new CTREPCMSim(0);
-  //   BooleanCallback callback = new BooleanCallback();
+    CTREPCMSim sim = new CTREPCMSim(0);
+    BooleanCallback callback = new BooleanCallback();
 
-  //   try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
-  //       CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
-  //     pcm.setClosedLoopControl(false);
-  //     assertFalse(pcm.getClosedLoopControl());
+    try (PneumaticsControlModule pcm = new PneumaticsControlModule(0);
+        CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
+      pcm.disableCompressor();
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Disabled);
 
-  //     pcm.setClosedLoopControl(true);
-  //     assertTrue(sim.getClosedLoopEnabled());
-  //     assertTrue(pcm.getClosedLoopControl());
-  //     assertTrue(callback.wasTriggered());
-  //     assertTrue(callback.getSetValue());
-  //   }
-  // }
+      pcm.enableCompressorDigital();
+      assertTrue(sim.getClosedLoopEnabled());
+      assertEquals(pcm.getCompressorConfigType(), CompressorConfigType.Digital);
+      assertTrue(callback.wasTriggered());
+      assertTrue(callback.getSetValue());
+    }
+  }
 
   @Test
   void setPressureSwitchEnabledTest() {

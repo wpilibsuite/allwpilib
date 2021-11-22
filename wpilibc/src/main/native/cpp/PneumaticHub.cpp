@@ -108,11 +108,11 @@ void PneumaticHub::EnableCompressorHybrid(double minAnalogVoltage,
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-CompressorControlType PneumaticHub::GetCompressorControlType() const {
+CompressorConfigType PneumaticHub::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorConfig(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return static_cast<CompressorControlType>(result);
+  return static_cast<CompressorConfigType>(result);
 }
 
 bool PneumaticHub::GetPressureSwitch() const {

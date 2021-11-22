@@ -8,7 +8,7 @@
 
 #include <units/time.h>
 
-#include "frc/CompressorControlType.h"
+#include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsModuleType.h"
 
 namespace frc {
@@ -35,7 +35,7 @@ class PneumaticsBase {
   virtual void EnableCompressorHybrid(double minAnalogVoltage,
                                       double maxAnalogVoltage) = 0;
 
-  virtual CompressorControlType GetCompressorControlType() const = 0;
+  virtual CompressorConfigType GetCompressorConfigType() const = 0;
 
   virtual void SetSolenoids(int mask, int values) = 0;
 

@@ -96,24 +96,24 @@ TEST(CTREPCMSimTest, SetCompressorOn) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-// TEST(CTREPCMSimTest, SetClosedLoopEnabled) {
-//   PneumaticsControlModule pcm;
-//   CTREPCMSim sim(pcm);
-//   sim.ResetData();
+TEST(CTREPCMSimTest, SetEnableDigital) {
+  PneumaticsControlModule pcm;
+  CTREPCMSim sim(pcm);
+  sim.ResetData();
 
-//   BooleanCallback callback;
-//   auto cb =
-//       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
+  BooleanCallback callback;
+  auto cb =
+      sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
-//   pcm.SetClosedLoopControl(false);
-//   EXPECT_FALSE(pcm.GetClosedLoopControl());
+  pcm.DisableCompressor();
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Disabled);
 
-//   pcm.SetClosedLoopControl(true);
-//   EXPECT_TRUE(sim.GetClosedLoopEnabled());
-//   EXPECT_TRUE(pcm.GetClosedLoopControl());
-//   EXPECT_TRUE(callback.WasTriggered());
-//   EXPECT_TRUE(callback.GetLastValue());
-// }
+  pcm.EnableCompressorDigital();
+  EXPECT_TRUE(sim.GetClosedLoopEnabled());
+  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Digital);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_TRUE(callback.GetLastValue());
+}
 
 TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
   PneumaticsControlModule pcm;

@@ -7,10 +7,11 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
-#include "frc/CompressorControlType.h"
+#include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
@@ -56,6 +57,24 @@ class Compressor : public wpi::Sendable,
 
   Compressor(Compressor&&) = default;
   Compressor& operator=(Compressor&&) = default;
+
+  /**
+   * Starts closed-loop control. Note that closed loop control is enabled by
+   * default.
+   * 
+   * @deprecated Use EnableDigital() instead.
+   */
+  WPI_DEPRECATED("Use EnableDigital() instead")
+  void Start();
+
+  /**
+   * Stops closed-loop control. Note that closed loop control is enabled by
+   * default.
+   * 
+   * @deprecated Use Disable() instead.
+   */
+  WPI_DEPRECATED("Use Disable() instead")
+  void Stop();
 
   /**
    * Check if compressor output is active.
@@ -108,7 +127,7 @@ class Compressor : public wpi::Sendable,
    */
   void EnableHybrid(double minAnalogVoltage, double maxAnalogVoltage);
 
-  CompressorControlType GetControlType() const;
+  CompressorConfigType GetConfigType() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
