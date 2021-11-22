@@ -9,6 +9,9 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for Ultrasonic for old PIDController
+ */
 class PIDUltrasonic : public PIDSource, public Ultrasonic {
   using Ultrasonic::Ultrasonic;
 

@@ -9,6 +9,10 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for AnalogAccelerometer for old
+ * PIDController
+ */
 class PIDAnalogAccelerometer : public PIDSource, public AnalogAccelerometer {
   using AnalogAccelerometer::AnalogAccelerometer;
 

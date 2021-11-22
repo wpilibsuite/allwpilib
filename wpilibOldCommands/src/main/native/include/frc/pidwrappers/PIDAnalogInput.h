@@ -9,6 +9,10 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for AnalogInput for old
+ * PIDController
+ */
 class PIDAnalogInput : public PIDSource, public AnalogInput {
   using AnalogInput::AnalogInput;
 

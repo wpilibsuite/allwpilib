@@ -9,6 +9,9 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for AnalogGyro for old PIDController
+ */
 class PIDAnalogGyro : public PIDSource, public AnalogGyro {
   using AnalogGyro::AnalogGyro;
 

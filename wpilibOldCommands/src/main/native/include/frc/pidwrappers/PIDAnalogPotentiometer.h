@@ -9,6 +9,10 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for AnalogPotentiometer for old
+ * PIDController
+ */
 class PIDAnalogPotentiometer : public PIDSource, public AnalogPotentiometer {
   using AnalogPotentiometer::AnalogPotentiometer;
 

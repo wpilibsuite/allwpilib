@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 
+/**
+ * Wrapper so that PIDSource is implemented for AnalogInput for old PIDController
+ */
 public class PIDAnalogInput extends AnalogInput implements PIDSource {
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 

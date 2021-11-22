@@ -9,6 +9,9 @@
 
 namespace frc {
 
+/**
+ * Wrapper so that PIDSource is implemented for Encoder for old PIDController
+ */
 class PIDEncoder : public PIDSource, public Encoder {
   using Encoder::Encoder;
 
