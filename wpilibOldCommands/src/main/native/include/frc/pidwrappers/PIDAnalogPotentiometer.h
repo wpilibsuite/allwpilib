@@ -10,6 +10,8 @@
 namespace frc {
 
 class PIDAnalogPotentiometer : public PIDSource, public AnalogPotentiometer {
+  using AnalogPotentiometer::AnalogPotentiometer;
+
  public:
   /**
    * Implement the PIDSource interface.

@@ -10,6 +10,8 @@
 namespace frc {
 
 class PIDEncoder : public PIDSource, public Encoder {
+  using Encoder::Encoder;
+
  public:
   /**
    * Get the PIDOutput for the PIDSource base object. Can be set to return

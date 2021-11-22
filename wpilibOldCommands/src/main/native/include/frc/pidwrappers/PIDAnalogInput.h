@@ -10,6 +10,8 @@
 namespace frc {
 
 class PIDAnalogInput : public PIDSource, public AnalogInput {
+  using AnalogInput::AnalogInput;
+
  public:
   /**
    * Get the Average value for the PID Source base object.

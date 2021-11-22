@@ -10,6 +10,8 @@
 namespace frc {
 
 class PIDUltrasonic : public PIDSource, public Ultrasonic {
+  using Ultrasonic::Ultrasonic;
+
  public:
   /**
    * Get the range for the PIDSource base object.

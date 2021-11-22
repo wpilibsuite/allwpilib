@@ -10,6 +10,8 @@
 namespace frc {
 
 class PIDAnalogAccelerometer : public PIDSource, public AnalogAccelerometer {
+  using AnalogAccelerometer::AnalogAccelerometer;
+
  public:
   /**
    * Get the Acceleration for the PID Source parent.
