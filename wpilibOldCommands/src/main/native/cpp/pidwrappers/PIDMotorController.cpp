@@ -10,9 +10,8 @@
 
 using namespace frc;
 
-PIDMotorController::PIDMotorController(MotorController& motorController) {
-  m_motorController = motorController;
-}
+PIDMotorController::PIDMotorController(MotorController& motorController)
+    : m_motorController(motorController) {}
 
 void PIDMotorController::Set(double speed) {
   m_motorController.Set(m_isInverted ? -speed : speed);

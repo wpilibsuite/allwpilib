@@ -18,12 +18,9 @@ namespace frc {
  */
 class PIDMotorController : public PIDOutput,
                            public MotorController,
-                           public wpi::Sendable,
-                           public wpi::SendableHelper<MotorController> {
+                           public wpi::Sendable {
  public:
-  friend class DMA;
-
-  PIDMotorController(MotorController& motorController);
+  explicit PIDMotorController(MotorController& motorController);
 
   /**
    * Set the PWM value.
