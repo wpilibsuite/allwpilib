@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 
-/**
- * Wrapper so that PIDSource is implemented for AnalogPotentiometer for old PIDController.
- */
+/** Wrapper so that PIDSource is implemented for AnalogPotentiometer for old PIDController. */
 public class PIDAnalogPotentiometer extends AnalogPotentiometer implements PIDSource {
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
