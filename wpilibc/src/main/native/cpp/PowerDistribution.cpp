@@ -31,8 +31,9 @@ PowerDistribution::PowerDistribution() {
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      kDefaultModule, HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic, stack.c_str(),
-      &status);
+      kDefaultModule,
+      HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic,
+      stack.c_str(), &status);
   FRC_CheckErrorStatus(status, "Module {}", kDefaultModule);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
