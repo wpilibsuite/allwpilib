@@ -33,6 +33,14 @@ void PIDMotorController::Disable() {
   m_motorController.Disable();
 }
 
+void PIDMotorController::StopMotor() {
+  Disable();
+}
+
+void PIDMotorController::PIDWrite(double output) {
+  m_motorController.Set(output);
+}
+
 void PIDMotorController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Motor Controller");
   builder.SetActuator(true);

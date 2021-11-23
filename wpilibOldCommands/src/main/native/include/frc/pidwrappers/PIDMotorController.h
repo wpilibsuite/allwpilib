@@ -47,6 +47,10 @@ class PIDMotorController : public PIDOutput,
 
   void Disable() override;
 
+  void StopMotor() override;
+
+  void PIDWrite(double output) override;
+
  protected:
   void InitSendable(wpi::SendableBuilder& builder) override;
 
