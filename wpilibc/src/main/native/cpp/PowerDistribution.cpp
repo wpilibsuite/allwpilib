@@ -16,9 +16,6 @@
 #include "frc/SensorUtil.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
-                  frc::PowerDistribution::ModuleType::kAutomatic) ==
-              HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic);
-static_assert(static_cast<HAL_PowerDistributionType>(
                   frc::PowerDistribution::ModuleType::kCTRE) ==
               HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE);
 static_assert(static_cast<HAL_PowerDistributionType>(
@@ -29,8 +26,20 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution()
-    : PowerDistribution(-1, ModuleType::kAutomatic) {}
+PowerDistribution::PowerDistribution() {
+  auto stack = wpi::GetStackTrace(1);
+
+  int32_t status = 0;
+  m_handle = HAL_InitializePowerDistribution(
+      kDefaultModule, HAL_PowerDistributionType::HAL_PowerDistributionType_kAutomatic, stack.c_str(),
+      &status);
+  FRC_CheckErrorStatus(status, "Module {}", kDefaultModule);
+  m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+
+  HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
+  wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+}
 
 PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
   auto stack = wpi::GetStackTrace(1);
