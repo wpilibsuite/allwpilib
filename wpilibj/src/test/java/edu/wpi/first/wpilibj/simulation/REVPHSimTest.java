@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
-import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
+import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("AbbreviationAsWordInName")

@@ -61,7 +61,7 @@ class Compressor : public wpi::Sendable,
   /**
    * Starts closed-loop control. Note that closed loop control is enabled by
    * default.
-   * 
+   *
    * @deprecated Use EnableDigital() instead.
    */
   WPI_DEPRECATED("Use EnableDigital() instead")
@@ -70,7 +70,7 @@ class Compressor : public wpi::Sendable,
   /**
    * Stops closed-loop control. Note that closed loop control is enabled by
    * default.
-   * 
+   *
    * @deprecated Use Disable() instead.
    */
   WPI_DEPRECATED("Use Disable() instead")

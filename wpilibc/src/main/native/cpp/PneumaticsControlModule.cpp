@@ -110,8 +110,7 @@ void PneumaticsControlModule::EnableCompressorHybrid(double minAnalogVoltage,
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-CompressorConfigType PneumaticsControlModule::GetCompressorConfigType()
-    const {
+CompressorConfigType PneumaticsControlModule::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);

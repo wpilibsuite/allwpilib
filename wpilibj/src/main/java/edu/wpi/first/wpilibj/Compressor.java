@@ -82,7 +82,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * <p>Use the method in cases where you would like to manually stop and start the compressor for
    * applications such as conserving battery or making sure that the compressor motor doesn't start
    * during critical operations.
-   * 
+   *
    * @deprecated Use enableDigital() instead.
    */
   @Deprecated(since = "2022", forRemoval = true)
@@ -96,7 +96,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * <p>Use the method in cases where you would like to manually stop and start the compressor for
    * applications such as conserving battery or making sure that the compressor motor doesn't start
    * during critical operations.
-   * 
+   *
    * @deprecated Use disable() instead.
    */
   @Deprecated(since = "2022", forRemoval = true)
