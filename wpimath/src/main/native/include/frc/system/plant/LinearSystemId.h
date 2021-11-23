@@ -283,7 +283,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     // omega = 2/trackwidth v
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
-    // to V/m/s).
+    // to V/(m/s).
     return IdentifyDrivetrainSystem(kVlinear, kAlinear,
                                     kVangular * 2.0 / trackwidth * 1_rad,
                                     kAangular * 2.0 / trackwidth * 1_rad);

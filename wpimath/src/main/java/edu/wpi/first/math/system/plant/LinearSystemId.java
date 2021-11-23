@@ -324,7 +324,7 @@ public final class LinearSystemId {
     // omega = 2/trackwidth v
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
-    // to V/m/s).
+    // to V/(m/s).
     return identifyDrivetrainSystem(
         kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
   }
