@@ -23,7 +23,7 @@ class PowerDistribution : public wpi::Sendable,
   /**
    * Constructs a PowerDistribution.
    *
-   * Uses the default CAN ID.
+   * Uses the default CAN ID (0 for CTRE and 1 for REV).
    */
   PowerDistribution();
 

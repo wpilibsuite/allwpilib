@@ -49,7 +49,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution.
    *
-   * <p>Uses the default CAN ID.
+   * <p>Uses the default CAN ID (0 for CTRE and 1 for REV).
    */
   public PowerDistribution() {
     m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
