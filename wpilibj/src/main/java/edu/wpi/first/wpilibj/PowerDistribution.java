@@ -22,7 +22,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
   public enum ModuleType {
-    kAutomatic(PowerDistributionJNI.AUTOMATIC_TYPE),
     kCTRE(PowerDistributionJNI.CTRE_TYPE),
     kRev(PowerDistributionJNI.REV_TYPE);
 
@@ -37,7 +36,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * Constructs a PowerDistribution.
    *
    * @param module The CAN ID of the PDP.
-   * @param moduleType Module type (automatic, CTRE, or REV).
+   * @param moduleType Module type (CTRE or REV).
    */
   public PowerDistribution(int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(module, moduleType.value);
@@ -50,10 +49,14 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution.
    *
-   * <p>Uses the default CAN ID.
+   * <p>Uses the default CAN ID (0 for CTRE and 1 for REV).
    */
   public PowerDistribution() {
-    this(kDefaultModule, ModuleType.kAutomatic);
+    m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+    m_module = PowerDistributionJNI.getModuleNumber(m_handle);
+
+    HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
+    SendableRegistry.addLW(this, "PowerDistribution", m_module);
   }
 
   @Override

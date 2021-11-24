@@ -18,12 +18,12 @@ class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
   static constexpr int kDefaultModule = -1;
-  enum class ModuleType { kAutomatic = 0, kCTRE = 1, kRev = 2 };
+  enum class ModuleType { kCTRE = 1, kRev = 2 };
 
   /**
    * Constructs a PowerDistribution.
    *
-   * Uses the default CAN ID.
+   * Uses the default CAN ID (0 for CTRE and 1 for REV).
    */
   PowerDistribution();
 
