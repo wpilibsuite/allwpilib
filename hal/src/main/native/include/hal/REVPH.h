@@ -89,11 +89,8 @@ HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel);
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module);
 
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status);
-void HAL_SetREVPHClosedLoopControl(HAL_REVPHHandle handle, HAL_Bool enabled,
-                                   int32_t* status);
-HAL_Bool HAL_GetREVPHClosedLoopControl(HAL_REVPHHandle handle, int32_t* status);
 void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
-                                  HAL_REVPHCompressorConfig config,
+                                  const HAL_REVPHCompressorConfig* config,
                                   int32_t* status);
 void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
                                            int32_t* status);

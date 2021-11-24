@@ -73,21 +73,23 @@ void REVPHSim::SetCompressorOn(bool compressorOn) {
   HALSIM_SetREVPHCompressorOn(m_index, compressorOn);
 }
 
-std::unique_ptr<CallbackStore> REVPHSim::RegisterClosedLoopEnabledCallback(
+std::unique_ptr<CallbackStore> REVPHSim::RegisterCompressorConfigTypeCallback(
     NotifyCallback callback, bool initialNotify) {
   auto store = std::make_unique<CallbackStore>(
-      m_index, -1, callback, &HALSIM_CancelREVPHClosedLoopEnabledCallback);
-  store->SetUid(HALSIM_RegisterREVPHClosedLoopEnabledCallback(
+      m_index, -1, callback, &HALSIM_CancelREVPHCompressorConfigTypeCallback);
+  store->SetUid(HALSIM_RegisterREVPHCompressorConfigTypeCallback(
       m_index, &CallbackStoreThunk, store.get(), initialNotify));
   return store;
 }
 
-bool REVPHSim::GetClosedLoopEnabled() const {
-  return HALSIM_GetREVPHClosedLoopEnabled(m_index);
+int REVPHSim::GetCompressorConfigType() const {
+  return HALSIM_GetREVPHCompressorConfigType(m_index);
 }
 
-void REVPHSim::SetClosedLoopEnabled(bool closedLoopEnabled) {
-  HALSIM_SetREVPHClosedLoopEnabled(m_index, closedLoopEnabled);
+void REVPHSim::SetCompressorConfigType(int compressorConfigType) {
+  HALSIM_SetREVPHCompressorConfigType(
+      m_index,
+      static_cast<HAL_REVPHCompressorConfigType>(compressorConfigType));
 }
 
 std::unique_ptr<CallbackStore> REVPHSim::RegisterPressureSwitchCallback(

@@ -7,9 +7,11 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
@@ -59,13 +61,19 @@ class Compressor : public wpi::Sendable,
   /**
    * Starts closed-loop control. Note that closed loop control is enabled by
    * default.
+   *
+   * @deprecated Use EnableDigital() instead.
    */
+  WPI_DEPRECATED("Use EnableDigital() instead")
   void Start();
 
   /**
    * Stops closed-loop control. Note that closed loop control is enabled by
    * default.
+   *
+   * @deprecated Use Disable() instead.
    */
+  WPI_DEPRECATED("Use Disable() instead")
   void Stop();
 
   /**
@@ -87,25 +95,39 @@ class Compressor : public wpi::Sendable,
    *
    * @return The current through the compressor, in amps
    */
-  double GetCompressorCurrent() const;
+  double GetCurrent() const;
 
   /**
-   * Enables or disables automatically turning the compressor on when the
-   * pressure is low.
-   *
-   * @param on Set to true to enable closed loop control of the compressor.
-   *           False to disable.
+   * Disable the compressor.
    */
-  void SetClosedLoopControl(bool on);
+  void Disable();
 
   /**
-   * Returns true if the compressor will automatically turn on when the
-   * pressure is low.
-   *
-   * @return True if closed loop control of the compressor is enabled. False if
-   *         disabled.
+   * Enable compressor closed loop control using digital input.
    */
-  bool GetClosedLoopControl() const;
+  void EnableDigital();
+
+  /**
+   * Enable compressor closed loop control using analog input.
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
+  void EnableAnalog(double minAnalogVoltage, double maxAnalogVoltage);
+
+  /**
+   * Enable compressor closed loop control using hybrid input.
+   *
+   * On CTRE PCM, this will enable digital control.
+   *
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
+  void EnableHybrid(double minAnalogVoltage, double maxAnalogVoltage);
+
+  CompressorConfigType GetConfigType() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 

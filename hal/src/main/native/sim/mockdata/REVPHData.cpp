@@ -21,7 +21,7 @@ void REVPHData::ResetData() {
   }
   initialized.Reset(false);
   compressorOn.Reset(false);
-  closedLoopEnabled.Reset(true);
+  compressorConfigType.Reset(HAL_REVPHCompressorConfigType_kDisabled);
   pressureSwitch.Reset(false);
   compressorCurrent.Reset(0.0);
 }
@@ -39,7 +39,8 @@ HAL_SIMDATAVALUE_DEFINE_CAPI_CHANNEL(HAL_Bool, HALSIM, REVPHSolenoidOutput,
                                      SimREVPHData, solenoidOutput)
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(HAL_Bool, CompressorOn, compressorOn)
-DEFINE_CAPI(HAL_Bool, ClosedLoopEnabled, closedLoopEnabled)
+DEFINE_CAPI(HAL_REVPHCompressorConfigType, CompressorConfigType,
+            compressorConfigType)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, pressureSwitch)
 DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 
@@ -69,7 +70,7 @@ void HALSIM_RegisterREVPHAllNonSolenoidCallbacks(int32_t index,
                                                  HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(compressorOn);
-  REGISTER(closedLoopEnabled);
+  REGISTER(compressorConfigType);
   REGISTER(pressureSwitch);
   REGISTER(compressorCurrent);
 }

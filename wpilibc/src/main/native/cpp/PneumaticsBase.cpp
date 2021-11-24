@@ -4,12 +4,27 @@
 
 #include "frc/PneumaticsBase.h"
 
+#include <hal/REVPH.h>
+
 #include "frc/Errors.h"
 #include "frc/PneumaticHub.h"
 #include "frc/PneumaticsControlModule.h"
 #include "frc/SensorUtil.h"
 
 using namespace frc;
+
+static_assert(
+    static_cast<int>(CompressorConfigType::Disabled) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+static_assert(
+    static_cast<int>(CompressorConfigType::Digital) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+static_assert(
+    static_cast<int>(CompressorConfigType::Analog) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+static_assert(
+    static_cast<int>(CompressorConfigType::Hybrid) ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
     int module, PneumaticsModuleType moduleType) {

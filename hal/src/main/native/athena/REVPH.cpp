@@ -258,18 +258,8 @@ HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
   return status0.compressor_on;
 }
 
-void HAL_SetREVPHClosedLoopControl(HAL_REVPHHandle handle, HAL_Bool enabled,
-                                   int32_t* status) {
-  // TODO
-}
-
-HAL_Bool HAL_GetREVPHClosedLoopControl(HAL_REVPHHandle handle,
-                                       int32_t* status) {
-  return false;  // TODO
-}
-
 void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
-                                  HAL_REVPHCompressorConfig config,
+                                  const HAL_REVPHCompressorConfig* config,
                                   int32_t* status) {
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
@@ -278,10 +268,14 @@ void HAL_SetREVPHCompressorConfig(HAL_REVPHHandle handle,
   }
 
   PH_compressor_config_t frameData;
-  frameData.minimum_tank_pressure = config.minAnalogVoltage;
-  frameData.maximum_tank_pressure = config.maxAnalogVoltage;
-  frameData.force_disable = config.forceDisable;
-  frameData.use_digital = config.useDigital;
+  frameData.minimum_tank_pressure =
+      PH_compressor_config_minimum_tank_pressure_encode(
+          config->minAnalogVoltage);
+  frameData.maximum_tank_pressure =
+      PH_compressor_config_maximum_tank_pressure_encode(
+          config->maxAnalogVoltage);
+  frameData.force_disable = config->forceDisable;
+  frameData.use_digital = config->useDigital;
 
   uint8_t packedData[PH_COMPRESSOR_CONFIG_LENGTH] = {0};
   PH_compressor_config_pack(packedData, &frameData,
@@ -295,7 +289,7 @@ void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
   HAL_REVPHCompressorConfig config = {0, 0, 0, 0};
   config.forceDisable = true;
 
-  HAL_SetREVPHCompressorConfig(handle, config, status);
+  HAL_SetREVPHCompressorConfig(handle, &config, status);
 }
 
 void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
@@ -303,7 +297,7 @@ void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
   HAL_REVPHCompressorConfig config = {0, 0, 0, 0};
   config.useDigital = true;
 
-  HAL_SetREVPHCompressorConfig(handle, config, status);
+  HAL_SetREVPHCompressorConfig(handle, &config, status);
 }
 
 void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
@@ -311,12 +305,10 @@ void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
                                          double maxAnalogVoltage,
                                          int32_t* status) {
   HAL_REVPHCompressorConfig config = {0, 0, 0, 0};
-  config.minAnalogVoltage =
-      PH_compressor_config_minimum_tank_pressure_encode(minAnalogVoltage);
-  config.maxAnalogVoltage =
-      PH_compressor_config_maximum_tank_pressure_encode(maxAnalogVoltage);
+  config.minAnalogVoltage = minAnalogVoltage;
+  config.maxAnalogVoltage = maxAnalogVoltage;
 
-  HAL_SetREVPHCompressorConfig(handle, config, status);
+  HAL_SetREVPHCompressorConfig(handle, &config, status);
 }
 
 void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
@@ -324,13 +316,11 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
                                          double maxAnalogVoltage,
                                          int32_t* status) {
   HAL_REVPHCompressorConfig config = {0, 0, 0, 0};
-  config.minAnalogVoltage =
-      PH_compressor_config_minimum_tank_pressure_encode(minAnalogVoltage);
-  config.maxAnalogVoltage =
-      PH_compressor_config_maximum_tank_pressure_encode(maxAnalogVoltage);
+  config.minAnalogVoltage = minAnalogVoltage;
+  config.maxAnalogVoltage = maxAnalogVoltage;
   config.useDigital = true;
 
-  HAL_SetREVPHCompressorConfig(handle, config, status);
+  HAL_SetREVPHCompressorConfig(handle, &config, status);
 }
 
 HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(

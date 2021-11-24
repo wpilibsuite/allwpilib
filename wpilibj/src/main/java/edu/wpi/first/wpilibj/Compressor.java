@@ -43,7 +43,7 @@ public class Compressor implements Sendable, AutoCloseable {
 
       allocatedCompressor = true;
 
-      m_module.setClosedLoopControl(true);
+      m_module.enableCompressorDigital();
 
       HAL.report(tResourceType.kResourceType_Compressor, module + 1);
       SendableRegistry.addLW(this, "Compressor", module);
@@ -82,9 +82,12 @@ public class Compressor implements Sendable, AutoCloseable {
    * <p>Use the method in cases where you would like to manually stop and start the compressor for
    * applications such as conserving battery or making sure that the compressor motor doesn't start
    * during critical operations.
+   *
+   * @deprecated Use enableDigital() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public void start() {
-    setClosedLoopControl(true);
+    enableDigital();
   }
 
   /**
@@ -93,9 +96,12 @@ public class Compressor implements Sendable, AutoCloseable {
    * <p>Use the method in cases where you would like to manually stop and start the compressor for
    * applications such as conserving battery or making sure that the compressor motor doesn't start
    * during critical operations.
+   *
+   * @deprecated Use disable() instead.
    */
+  @Deprecated(since = "2022", forRemoval = true)
   public void stop() {
-    setClosedLoopControl(false);
+    disable();
   }
 
   /**
@@ -121,33 +127,56 @@ public class Compressor implements Sendable, AutoCloseable {
    *
    * @return current consumed by the compressor in amps
    */
-  public double getCompressorCurrent() {
+  public double getCurrent() {
     return m_module.getCompressorCurrent();
   }
 
-  /**
-   * Set the PCM in closed loop control mode.
-   *
-   * @param on if true sets the compressor to be in closed loop control mode (default)
-   */
-  public void setClosedLoopControl(boolean on) {
-    m_module.setClosedLoopControl(on);
+  /** Disable the compressor. */
+  public void disable() {
+    m_module.disableCompressor();
+  }
+
+  /** Enable compressor closed loop control using digital input. */
+  public void enableDigital() {
+    m_module.enableCompressorDigital();
   }
 
   /**
-   * Gets the current operating mode of the PCM.
+   * Enable compressor closed loop control using analog input.
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
+  public void enableAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+    m_module.enableCompressorAnalog(minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  /**
+   * Enable compressor closed loop control using hybrid input.
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minAnalogVoltage The minimum voltage to enable compressor
+   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   */
+  public void enableHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+    m_module.enableCompressorHybrid(minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  /**
+   * Gets the current operating mode of the Compressor.
    *
    * @return true if compressor is operating on closed-loop mode
    */
-  public boolean getClosedLoopControl() {
-    return m_module.getClosedLoopControl();
+  public CompressorConfigType getConfigType() {
+    return m_module.getCompressorConfigType();
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Compressor");
-    builder.addBooleanProperty(
-        "Closed Loop Control", this::getClosedLoopControl, this::setClosedLoopControl);
     builder.addBooleanProperty("Enabled", this::enabled, null);
     builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }

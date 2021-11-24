@@ -144,28 +144,28 @@ public class REVPHSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public CallbackStore registerClosedLoopEnabledCallback(
+  public CallbackStore registerCompressorConfigTypeCallback(
       NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelClosedLoopEnabledCallback);
+    int uid = REVPHDataJNI.registerCompressorConfigTypeCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorConfigTypeCallback);
   }
 
   /**
    * Check whether the closed loop compressor control is active.
    *
-   * @return true if active
+   * @return config type
    */
-  public boolean getClosedLoopEnabled() {
-    return REVPHDataJNI.getClosedLoopEnabled(m_index);
+  public int getCompressorConfigType() {
+    return REVPHDataJNI.getCompressorConfigType(m_index);
   }
 
   /**
    * Turn on/off the closed loop control of the compressor.
    *
-   * @param closedLoopEnabled whether the control loop is active
+   * @param compressorConfigType compressor config type
    */
-  public void setClosedLoopEnabled(boolean closedLoopEnabled) {
-    REVPHDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
+  public void setCompressorConfigType(int compressorConfigType) {
+    REVPHDataJNI.setCompressorConfigType(m_index, compressorConfigType);
   }
 
   /**

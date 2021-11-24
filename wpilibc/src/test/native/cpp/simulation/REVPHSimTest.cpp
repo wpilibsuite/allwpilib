@@ -96,23 +96,67 @@ TEST(REVPHSimTest, SetCompressorOn) {
   EXPECT_TRUE(callback.GetLastValue());
 }
 
-TEST(REVPHSimTest, SetClosedLoopEnabled) {
+TEST(REVPHSimTest, SetEnableDigital) {
   PneumaticHub ph;
   REVPHSim sim(ph);
   sim.ResetData();
 
-  BooleanCallback callback;
+  EnumCallback callback;
   auto cb =
-      sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
+      sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
 
-  ph.SetClosedLoopControl(false);
-  EXPECT_FALSE(ph.GetClosedLoopControl());
+  ph.DisableCompressor();
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
 
-  ph.SetClosedLoopControl(true);
-  EXPECT_TRUE(sim.GetClosedLoopEnabled());
-  EXPECT_TRUE(ph.GetClosedLoopControl());
+  ph.EnableCompressorDigital();
+  EXPECT_EQ(sim.GetCompressorConfigType(),
+            static_cast<int>(CompressorConfigType::Digital));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Digital);
   EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  EXPECT_EQ(callback.GetLastValue(),
+            static_cast<int>(CompressorConfigType::Digital));
+}
+
+TEST(REVPHSimTest, SetEnableAnalog) {
+  PneumaticHub ph;
+  REVPHSim sim(ph);
+  sim.ResetData();
+
+  EnumCallback callback;
+  auto cb =
+      sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
+
+  ph.DisableCompressor();
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+
+  ph.EnableCompressorAnalog(1, 2);
+  EXPECT_EQ(sim.GetCompressorConfigType(),
+            static_cast<int>(CompressorConfigType::Analog));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Analog);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(callback.GetLastValue(),
+            static_cast<int>(CompressorConfigType::Analog));
+}
+
+TEST(REVPHSimTest, SetEnableHybrid) {
+  PneumaticHub ph;
+  REVPHSim sim(ph);
+  sim.ResetData();
+
+  EnumCallback callback;
+  auto cb =
+      sim.RegisterCompressorConfigTypeCallback(callback.GetCallback(), false);
+
+  ph.DisableCompressor();
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
+
+  ph.EnableCompressorHybrid(1, 2);
+  EXPECT_EQ(sim.GetCompressorConfigType(),
+            static_cast<int>(CompressorConfigType::Hybrid));
+  EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Hybrid);
+  EXPECT_TRUE(callback.WasTriggered());
+  EXPECT_EQ(callback.GetLastValue(),
+            static_cast<int>(CompressorConfigType::Hybrid));
 }
 
 TEST(REVPHSimTest, SetPressureSwitchEnabled) {

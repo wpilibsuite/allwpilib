@@ -12,6 +12,19 @@
 #include "hal/REVPH.h"
 #include "hal/handles/HandlesInternal.h"
 
+static_assert(
+    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DISABLED ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDisabled);
+static_assert(
+    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_DIGITAL ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kDigital);
+static_assert(
+    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_ANALOG ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kAnalog);
+static_assert(
+    edu_wpi_first_hal_REVPHJNI_COMPRESSOR_CONFIG_TYPE_HYBRID ==
+    HAL_REVPHCompressorConfigType::HAL_REVPHCompressorConfigType_kHybrid);
+
 using namespace hal;
 
 extern "C" {
@@ -73,31 +86,97 @@ Java_edu_wpi_first_hal_REVPHJNI_getCompressor
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
- * Method:    setClosedLoopControl
- * Signature: (IZ)V
+ * Method:    setCompressorConfig
+ * Signature: (IDDZZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControl
-  (JNIEnv* env, jclass, jint handle, jboolean enabled)
+Java_edu_wpi_first_hal_REVPHJNI_setCompressorConfig
+  (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
+   jdouble maxAnalogVoltage, jboolean forceDisable, jboolean useDigital)
 {
   int32_t status = 0;
-  HAL_SetREVPHClosedLoopControl(handle, enabled, &status);
+  HAL_REVPHCompressorConfig config;
+  config.minAnalogVoltage = minAnalogVoltage;
+  config.maxAnalogVoltage = maxAnalogVoltage;
+  config.useDigital = useDigital;
+  config.forceDisable = forceDisable;
+  HAL_SetREVPHCompressorConfig(handle, &config, &status);
   CheckStatus(env, status, false);
 }
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
- * Method:    getClosedLoopControl
- * Signature: (I)Z
+ * Method:    setClosedLoopControlDisabled
+ * Signature: (I)V
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getClosedLoopControl
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDisabled
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
-  auto result = HAL_GetREVPHClosedLoopControl(handle, &status);
+  HAL_SetREVPHClosedLoopControlDisabled(handle, &status);
   CheckStatus(env, status, false);
-  return result;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    setClosedLoopControlDigital
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlDigital
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_SetREVPHClosedLoopControlDigital(handle, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    setClosedLoopControlAnalog
+ * Signature: (IDD)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlAnalog
+  (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
+   jdouble maxAnalogVoltage)
+{
+  int32_t status = 0;
+  HAL_SetREVPHClosedLoopControlAnalog(handle, minAnalogVoltage,
+                                      maxAnalogVoltage, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    setClosedLoopControlHybrid
+ * Signature: (IDD)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_setClosedLoopControlHybrid
+  (JNIEnv* env, jclass, jint handle, jdouble minAnalogVoltage,
+   jdouble maxAnalogVoltage)
+{
+  int32_t status = 0;
+  HAL_SetREVPHClosedLoopControlHybrid(handle, minAnalogVoltage,
+                                      maxAnalogVoltage, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getCompressorConfig
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_REVPHJNI_getCompressorConfig
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto config = HAL_GetREVPHCompressorConfig(handle, &status);
+  CheckStatus(env, status, false);
+  return static_cast<jint>(config);
 }
 
 /*

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <limits.h>  // NOLINT
+#include <climits>  // NOLINT
 
 #ifdef __cplusplus
 #include <initializer_list>
