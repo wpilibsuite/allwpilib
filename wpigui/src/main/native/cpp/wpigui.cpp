@@ -96,8 +96,8 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
       "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\n\n",
-      gContext->width, gContext->height, gContext->maximized, gContext->xPos,
-      gContext->yPos, gContext->userScale, gContext->style);
+      gContext->width, gContext->height, gContext->maximized ? 1 : 0,
+      gContext->xPos, gContext->yPos, gContext->userScale, gContext->style);
 }
 
 void gui::CreateContext() {
