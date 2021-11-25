@@ -12,6 +12,15 @@ struct mDNSAnnouncer::Impl {
   std::string serviceName;
   std::string serviceType;
   DNSServiceRef serviceRef{nullptr};
+  TXTRecordRef txtRecord;
+
+  Impl() {
+    TXTRecordCreate(&txtRecord, 0, nullptr);
+  }
+
+  ~Impl() noexcept {
+    TXTRecordDeallocate(&txtRecord);
+  }
 };
 
 mDNSAnnouncer::mDNSAnnouncer(
@@ -20,6 +29,10 @@ mDNSAnnouncer::mDNSAnnouncer(
   pImpl = std::make_unique<Impl>();
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;
+
+  for (auto&& i : txt) {
+    TXTRecordSetValue(&pImpl->txtRecord, i.first.c_str(), i.second.length(), i.second.c_str());
+  }
 }
 
 mDNSAnnouncer::~mDNSAnnouncer() noexcept {
@@ -31,9 +44,12 @@ void mDNSAnnouncer::Start() {
     return;
   }
 
+  uint16_t len = TXTRecordGetLength(&pImpl->txtRecord);
+  const void* ptr = TXTRecordGetBytesPtr(&pImpl->txtRecord);
+
   (void)DNSServiceRegister(&pImpl->serviceRef, 0, 0, pImpl->serviceName.c_str(),
-                           pImpl->serviceType.c_str(), "local", nullptr, 5000,
-                           0, nullptr, nullptr, nullptr);
+                           pImpl->serviceType.c_str(), "local", nullptr, htons(5000),
+                           len, ptr, nullptr, nullptr);
 }
 
 void mDNSAnnouncer::Stop() {
