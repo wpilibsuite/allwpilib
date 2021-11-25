@@ -14,13 +14,9 @@ struct mDNSAnnouncer::Impl {
   DNSServiceRef serviceRef{nullptr};
   TXTRecordRef txtRecord;
 
-  Impl() {
-    TXTRecordCreate(&txtRecord, 0, nullptr);
-  }
+  Impl() { TXTRecordCreate(&txtRecord, 0, nullptr); }
 
-  ~Impl() noexcept {
-    TXTRecordDeallocate(&txtRecord);
-  }
+  ~Impl() noexcept { TXTRecordDeallocate(&txtRecord); }
 };
 
 mDNSAnnouncer::mDNSAnnouncer(
@@ -31,7 +27,8 @@ mDNSAnnouncer::mDNSAnnouncer(
   pImpl->serviceType = serviceType;
 
   for (auto&& i : txt) {
-    TXTRecordSetValue(&pImpl->txtRecord, i.first.c_str(), i.second.length(), i.second.c_str());
+    TXTRecordSetValue(&pImpl->txtRecord, i.first.c_str(), i.second.length(),
+                      i.second.c_str());
   }
 }
 
@@ -48,8 +45,8 @@ void mDNSAnnouncer::Start() {
   const void* ptr = TXTRecordGetBytesPtr(&pImpl->txtRecord);
 
   (void)DNSServiceRegister(&pImpl->serviceRef, 0, 0, pImpl->serviceName.c_str(),
-                           pImpl->serviceType.c_str(), "local", nullptr, htons(5000),
-                           len, ptr, nullptr, nullptr);
+                           pImpl->serviceType.c_str(), "local", nullptr,
+                           htons(5000), len, ptr, nullptr, nullptr);
 }
 
 void mDNSAnnouncer::Stop() {
