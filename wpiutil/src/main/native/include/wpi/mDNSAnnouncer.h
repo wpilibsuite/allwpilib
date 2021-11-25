@@ -14,7 +14,8 @@
 namespace wpi {
 class mDNSAnnouncer {
  public:
-  mDNSAnnouncer(std::string_view serviceName, std::string_view serviceType, int port,
+  mDNSAnnouncer(std::string_view serviceName, std::string_view serviceType,
+                int port,
                 wpi::span<const std::pair<std::string, std::string>> txt);
   ~mDNSAnnouncer() noexcept;
 

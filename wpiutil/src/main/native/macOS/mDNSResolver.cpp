@@ -103,7 +103,8 @@ void ServiceGetAddrInfoReply(DNSServiceRef sdRef, DNSServiceFlags flags,
 
   resolveState->pImpl->onFound(
       reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr,
-      resolveState->serviceName, hostname, resolveState->txts);
+      resolveState->port, resolveState->serviceName, hostname,
+      resolveState->txts);
 
   resolveState->pImpl->ResolveStates.erase(std::find_if(
       resolveState->pImpl->ResolveStates.begin(),
@@ -125,7 +126,7 @@ void ServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags,
   DNSServiceRefDeallocate(resolveState->ResolveRef);
   resolveState->ResolveRef = nullptr;
   resolveState->ResolveSocket = 0;
-  resolveState->port = port;
+  resolveState->port = ntohs(port);
 
   int txtCount = TXTRecordGetCount(txtLen, txtRecord);
   char keyBuf[256];
