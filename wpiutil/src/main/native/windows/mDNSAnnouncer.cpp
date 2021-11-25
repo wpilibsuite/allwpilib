@@ -30,6 +30,7 @@ struct mDNSAnnouncer::Impl : ImplBase {
   std::wstring serviceType;
   std::wstring serviceInstanceName;
   std::wstring hostName;
+  int port;
   std::vector<std::wstring> keys;
   std::vector<PCWSTR> keyPtrs;
   std::vector<std::wstring> values;
@@ -37,13 +38,15 @@ struct mDNSAnnouncer::Impl : ImplBase {
 };
 
 mDNSAnnouncer::mDNSAnnouncer(
-    std::string_view serviceName, std::string_view serviceType,
+    std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
 
   if (!pImpl->dynamicDns.CanDnsAnnounce) {
     return;
   }
+
+  pImpl->port = port;
 
   wpi::SmallVector<wpi::UTF16, 128> wideStorage;
   std::string hostName = wpi::GetHostname() + ".local";
@@ -126,7 +129,7 @@ void mDNSAnnouncer::Start() {
   PDNS_SERVICE_INSTANCE serviceInst =
       pImpl->dynamicDns.DnsServiceConstructInstancePtr(
           pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(), nullptr,
-          nullptr, 5000, 0, 0, static_cast<DWORD>(pImpl->keyPtrs.size()),
+          nullptr, pImpl->port, 0, 0, static_cast<DWORD>(pImpl->keyPtrs.size()),
           pImpl->keyPtrs.data(), pImpl->valuePtrs.data());
   if (serviceInst == nullptr) {
     return;

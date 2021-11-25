@@ -16,7 +16,7 @@ namespace wpi {
 class mDNSResolver {
  public:
   using mDnsRevolveCompletion =
-      void(unsigned int ipv4Address, std::string_view serviceName,
+      void(unsigned int ipv4Address, int port, std::string_view serviceName,
            std::string_view hostName,
            wpi::span<const std::pair<std::string, std::string>> txt);
   using mDnsRevolveCompletionFunc = std::function<mDnsRevolveCompletion>;

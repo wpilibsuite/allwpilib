@@ -11,6 +11,7 @@ using namespace wpi;
 struct mDNSAnnouncer::Impl {
   std::string serviceName;
   std::string serviceType;
+  int port;
   DNSServiceRef serviceRef{nullptr};
   TXTRecordRef txtRecord;
 
@@ -20,11 +21,12 @@ struct mDNSAnnouncer::Impl {
 };
 
 mDNSAnnouncer::mDNSAnnouncer(
-    std::string_view serviceName, std::string_view serviceType,
+    std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;
+  pImpl->port = port;
 
   for (auto&& i : txt) {
     TXTRecordSetValue(&pImpl->txtRecord, i.first.c_str(), i.second.length(),
@@ -46,7 +48,7 @@ void mDNSAnnouncer::Start() {
 
   (void)DNSServiceRegister(&pImpl->serviceRef, 0, 0, pImpl->serviceName.c_str(),
                            pImpl->serviceType.c_str(), "local", nullptr,
-                           htons(5000), len, ptr, nullptr, nullptr);
+                           htons(pImpl->port), len, ptr, nullptr, nullptr);
 }
 
 void mDNSAnnouncer::Stop() {

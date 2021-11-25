@@ -154,7 +154,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         }
         wpi::convertUTF16ToUTF8String(wideServiceName, serviceName);
 
-        impl->onFound(A->Data.A.IpAddress, serviceName.str(), hostName.str(),
+        impl->onFound(A->Data.A.IpAddress, foundSrv->Data.Srv.wPort, serviceName.str(), hostName.str(),
                       extraTxt);
       }
     }

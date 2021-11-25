@@ -19,6 +19,7 @@ struct mDNSAnnouncer::Impl {
   AvahiEntryGroup* group = nullptr;
   std::string serviceName;
   std::string serviceType;
+  int port;
   AvahiStringList* stringList = nullptr;
 
   ~Impl() noexcept {
@@ -40,7 +41,7 @@ static void RegisterService(AvahiClient* client, mDNSAnnouncer::Impl* impl) {
     impl->table.entry_group_add_service_strlst(
         impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, AVAHI_PUBLISH_ALL,
         impl->serviceName.c_str(), impl->serviceType.c_str(), "local", nullptr,
-        5000, impl->stringList);
+        impl->port, impl->stringList);
     impl->table.entry_group_commit(impl->group);
   }
 }
@@ -60,7 +61,7 @@ static void ClientCallback(AvahiClient* client, AvahiClientState state,
 }
 
 mDNSAnnouncer::mDNSAnnouncer(
-    std::string_view serviceName, std::string_view serviceType,
+    std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
 
@@ -70,6 +71,7 @@ mDNSAnnouncer::mDNSAnnouncer(
 
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;
+  pImpl->port = port;
 
   std::vector<std::string> txts;
   for (auto&& i : txt) {

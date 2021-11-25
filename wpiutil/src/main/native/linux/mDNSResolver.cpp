@@ -67,7 +67,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      impl->onFound(address->data.ipv4.address, name, outputHostName.str(),
+      impl->onFound(address->data.ipv4.address, port, name, outputHostName.str(),
                     txtArr);
     }
   }

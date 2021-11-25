@@ -28,6 +28,7 @@ struct DnsResolveState {
   dnssd_sock_t ResolveSocket;
   mDNSResolver::Impl* pImpl;
 
+  int port;
   std::string serviceName;
   std::vector<std::pair<std::string, std::string>> txts;
 };
@@ -124,6 +125,7 @@ void ServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags,
   DNSServiceRefDeallocate(resolveState->ResolveRef);
   resolveState->ResolveRef = nullptr;
   resolveState->ResolveSocket = 0;
+  resolveState->port = port;
 
   int txtCount = TXTRecordGetCount(txtLen, txtRecord);
   char keyBuf[256];
