@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "wpi/span.h"
-
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
+
+#include "wpi/span.h"
 
 namespace wpi {
 class mDNSResolver {
