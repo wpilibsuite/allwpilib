@@ -4,17 +4,20 @@
 
 #include "wpi/mDNSResolver.h"
 
-#include "dns_sd.h"
+#include <netinet/in.h>
+#include <poll.h>
+
+#include <atomic>
 #include <thread>
 #include <vector>
-#include <poll.h>
-#include <atomic>
-#include <netinet/in.h>
+
+#include "dns_sd.h"
 
 using namespace wpi;
 
 struct DnsResolveState {
-  DnsResolveState(mDNSResolver::Impl* impl, std::string_view serviceNameView) : pImpl{impl}, serviceName{serviceNameView} {}
+  DnsResolveState(mDNSResolver::Impl* impl, std::string_view serviceNameView)
+      : pImpl{impl}, serviceName{serviceNameView} {}
   ~DnsResolveState() {
     if (ResolveRef != nullptr) {
       DNSServiceRefDeallocate(ResolveRef);
@@ -97,7 +100,9 @@ void ServiceGetAddrInfoReply(DNSServiceRef sdRef, DNSServiceFlags flags,
 
   DnsResolveState* resolveState = static_cast<DnsResolveState*>(context);
 
-  resolveState->pImpl->onFound(reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr, resolveState->serviceName, hostname, resolveState->txts);
+  resolveState->pImpl->onFound(
+      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr,
+      resolveState->serviceName, hostname, resolveState->txts);
 
   resolveState->pImpl->ResolveStates.erase(std::find_if(
       resolveState->pImpl->ResolveStates.begin(),
@@ -167,10 +172,9 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
     return;
   }
 
-
   mDNSResolver::Impl* impl = static_cast<mDNSResolver::Impl*>(context);
-  auto& resolveState =
-      impl->ResolveStates.emplace_back(std::make_unique<DnsResolveState>(impl, serviceName));
+  auto& resolveState = impl->ResolveStates.emplace_back(
+      std::make_unique<DnsResolveState>(impl, serviceName));
 
   errorCode = DNSServiceResolve(&resolveState->ResolveRef, 0, interfaceIndex,
                                 serviceName, regtype, replyDomain,
