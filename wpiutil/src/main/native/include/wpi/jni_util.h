@@ -567,6 +567,28 @@ inline jobjectArray MakeJStringArray(JNIEnv* env, span<const std::string> arr) {
 }
 
 /**
+ * Convert an array of std::string into a jarray of jstring.
+ *
+ * @param env JRE environment.
+ * @param arr Array to convert.
+ */
+inline jobjectArray MakeJStringArray(JNIEnv* env, span<std::string_view> arr) {
+  static JClass stringCls{env, "java/lang/String"};
+  if (!stringCls) {
+    return nullptr;
+  }
+  jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
+  if (!jarr) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jstring> elem{env, MakeJString(env, arr[i])};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
+  }
+  return jarr;
+}
+
+/**
  * Generic callback thread implementation.
  *
  * JNI's AttachCurrentThread() creates a Java Thread object on every
