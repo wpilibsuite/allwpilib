@@ -8,6 +8,10 @@
 #define UNICODE
 #endif
 
+#ifndef WINAPI_PARTITION_DESKTOP
+#define WINAPI_PARTITION_DESKTOP
+#endif
+
 #include <windows.h>
 
 #include <WinDNS.h>

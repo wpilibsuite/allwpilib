@@ -11,6 +11,8 @@ project(allwpilib)
 cmake_minimum_required(VERSION 3.3.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
+message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 INCLUDE(CPack)
