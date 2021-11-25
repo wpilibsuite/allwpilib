@@ -246,7 +246,7 @@ static bool EncodersAnyInitialized() {
 }
 
 void EncoderSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Encoders", EncodersAnyInitialized,
       [] { return std::make_unique<EncodersSimModel>(); },
       [](glass::Window* win, glass::Model* model) {
@@ -258,7 +258,7 @@ void EncoderSimGui::Initialize() {
 }
 
 glass::EncodersModel& EncoderSimGui::GetEncodersModel() {
-  static auto model = HALSimGui::halProvider.GetModel("Encoders");
+  static auto model = HALSimGui::halProvider->GetModel("Encoders");
   assert(model);
   return *static_cast<glass::EncodersModel*>(model);
 }

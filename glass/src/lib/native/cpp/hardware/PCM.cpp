@@ -12,9 +12,10 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
+#include "glass/Storage.h"
 #include "glass/other/DeviceTree.h"
 #include "glass/support/ExtraGuiWidgets.h"
-#include "glass/support/IniSaverInfo.h"
+#include "glass/support/NameSetting.h"
 
 using namespace glass;
 
@@ -42,10 +43,10 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   }
 
   // build header label
-  std::string* name = GetStorage().GetStringRef("name");
+  std::string& name = GetStorage().GetString("name");
   char label[128];
-  if (!name->empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d]###name", name->c_str(), index);
+  if (!name.empty()) {
+    std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), index);
   } else {
     std::snprintf(label, sizeof(label), "PCM[%d]###name", index);
   }
@@ -53,7 +54,7 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   // header
   bool open = CollapsingHeader(label);
 
-  PopupEditName("name", name);
+  PopupEditName("name", &name);
 
   ImGui::SetItemAllowOverlap();
   ImGui::SameLine();
@@ -68,11 +69,11 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
     model->ForEachSolenoid([&](SolenoidModel& solenoid, int j) {
       if (auto data = solenoid.GetOutputData()) {
         PushID(j);
-        char solenoidName[64];
-        auto& info = data->GetNameInfo();
-        info.GetLabel(solenoidName, sizeof(solenoidName), "Solenoid", j);
-        data->LabelText(solenoidName, "%s", channels[j] == 1 ? "On" : "Off");
-        info.PopupEditName(j);
+        char label[64];
+        NameSetting name{data->GetName()};
+        name.GetLabel(label, sizeof(label), "Solenoid", j);
+        data->LabelText(label, "%s", channels[j] == 1 ? "On" : "Off");
+        name.PopupEditName(j);
         PopID();
       }
     });

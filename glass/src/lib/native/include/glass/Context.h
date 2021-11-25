@@ -4,17 +4,16 @@
 
 #pragma once
 
-#include <memory>
+#include <functional>
 #include <string>
 #include <string_view>
-#include <utility>
-#include <vector>
 
 #include <imgui.h>
 
 namespace glass {
 
-struct Context;
+class Context;
+class Storage;
 
 Context* CreateContext();
 void DestroyContext(Context* ctx = nullptr);
@@ -32,86 +31,135 @@ void ResetTime();
 uint64_t GetZeroTime();
 
 /**
- * Storage provides both persistent and non-persistent key/value storage for
- * widgets.
- *
- * Keys are always strings.  The storage also provides non-persistent arbitrary
- * data storage (via std::shared_ptr<void>).
- *
- * Storage is automatically indexed internally by the ID stack.  Note it is
- * necessary to use the glass wrappers for PushID et al to preserve naming in
- * the save file (unnamed values are still stored, but this is non-ideal for
- * users trying to hand-edit the save file).
+ * Resets the workspace (all storage except window storage).
+ * Operates effectively like calling LoadStorage() on a path with no existing
+ * storage files. Note this will result in auto-saving of the reset state to
+ * storage.
  */
-class Storage {
- public:
-  struct Value {
-    Value() = default;
-    explicit Value(std::string_view str) : stringVal{str} {}
+void WorkspaceReset();
 
-    enum Type { kNone, kInt, kInt64, kBool, kFloat, kDouble, kString };
-    Type type = kNone;
-    union {
-      int intVal;
-      int64_t int64Val;
-      bool boolVal;
-      float floatVal;
-      double doubleVal;
-    };
-    std::string stringVal;
-  };
+/**
+ * Adds function to be called during workspace (storage) initialization/load.
+ * This should set up any initial default state, restore stored
+ * settings/windows, etc. This will be called after the storage is initialized.
+ * This must be called prior to WorkspaceInit() for proper automatic startup
+ * loading.
+ *
+ * @param init initialization function
+ */
+void AddWorkspaceInit(std::function<void()> init);
 
-  int GetInt(std::string_view key, int defaultVal = 0) const;
-  int64_t GetInt64(std::string_view key, int64_t defaultVal = 0) const;
-  bool GetBool(std::string_view key, bool defaultVal = false) const;
-  float GetFloat(std::string_view key, float defaultVal = 0.0f) const;
-  double GetDouble(std::string_view key, double defaultVal = 0.0) const;
-  std::string GetString(std::string_view key,
-                        std::string_view defaultVal = {}) const;
+/**
+ * Adds function to be called during workspace (storage) reset.  This should
+ * bring back the state to startup state (e.g. remove any storage references,
+ * destroy windows, etc). This will be called prior to the storage being
+ * destroyed.
+ *
+ * @param reset reset function
+ */
+void AddWorkspaceReset(std::function<void()> reset);
 
-  void SetInt(std::string_view key, int val);
-  void SetInt64(std::string_view key, int64_t val);
-  void SetBool(std::string_view key, bool val);
-  void SetFloat(std::string_view key, float val);
-  void SetDouble(std::string_view key, double val);
-  void SetString(std::string_view key, std::string_view val);
+/**
+ * Sets storage load and auto-save name.
+ * Call this prior to calling wpi::gui::Initialize() for automatic startup
+ * loading.
+ *
+ * @param name base name, suffix will be generated
+ */
+void SetStorageName(std::string_view name);
 
-  int* GetIntRef(std::string_view key, int defaultVal = 0);
-  int64_t* GetInt64Ref(std::string_view key, int64_t defaultVal = 0);
-  bool* GetBoolRef(std::string_view key, bool defaultVal = false);
-  float* GetFloatRef(std::string_view key, float defaultVal = 0.0f);
-  double* GetDoubleRef(std::string_view key, double defaultVal = 0.0);
-  std::string* GetStringRef(std::string_view key,
-                            std::string_view defaultVal = {});
+/**
+ * Sets storage load and auto-save directory. For more customized behavior, set
+ * Context::storageLoadPath and Context::storageAutoSavePath directly.
+ * Call this prior to calling wpi::gui::Initialize() for automatic startup
+ * loading.
+ *
+ * @param dir path to directory
+ */
+void SetStorageDir(std::string_view dir);
 
-  Value& GetValue(std::string_view key);
+/**
+ * Gets storage auto-save directory.
+ *
+ * @return Path to directory
+ */
+std::string GetStorageDir();
 
-  void SetData(std::shared_ptr<void>&& data) { m_data = std::move(data); }
+/**
+ * Explicitly load storage. Set Context::storageLoadDir prior to calling
+ * wpi::gui::Initialize() for automatic startup loading.
+ *
+ * Non-empty root names are not loaded unless GetStorageRoot() is called during
+ * initialization (or before this function is called).
+ *
+ * @param dir path to directory
+ */
+bool LoadStorage(std::string_view dir);
 
-  template <typename T>
-  T* GetData() const {
-    return static_cast<T*>(m_data.get());
-  }
+/**
+ * Save storage to automatic on-change save location.
+ */
+bool SaveStorage();
 
-  Storage() = default;
-  Storage(const Storage&) = delete;
-  Storage& operator=(const Storage&) = delete;
+/**
+ * Explicitly save storage. Set Context::storageAutoSaveDir prior to calling
+ * wpi::gui::Initialize() for automatic on-change saving.
+ *
+ * @param dir path to directory
+ */
+bool SaveStorage(std::string_view dir);
 
-  std::vector<std::string>& GetKeys() { return m_keys; }
-  const std::vector<std::string>& GetKeys() const { return m_keys; }
-  std::vector<std::unique_ptr<Value>>& GetValues() { return m_values; }
-  const std::vector<std::unique_ptr<Value>>& GetValues() const {
-    return m_values;
-  }
+/**
+ * Gets the storage root for the current ID stack (e.g. the last call to
+ * ResetStorageStack).
+ *
+ * @return Storage object
+ */
+Storage& GetCurStorageRoot();
 
- private:
-  mutable std::vector<std::string> m_keys;
-  mutable std::vector<std::unique_ptr<Value>> m_values;
-  std::shared_ptr<void> m_data;
-};
+/**
+ * Gets an arbitrary storage root.
+ *
+ * Non-empty root names are saved but not loaded unless GetStorageRoot()
+ * is called during initialization (or before LoadStorage is called).
+ *
+ * @param rootName root name
+ * @return Storage object
+ */
+Storage& GetStorageRoot(std::string_view rootName = {});
 
+/**
+ * Resets storage stack.  Should only be called at top level.
+ *
+ * @param rootName root name
+ */
+void ResetStorageStack(std::string_view rootName = {});
+
+/**
+ * Gets the storage object for the current point in the ID stack.
+ *
+ * @return Storage object
+ */
 Storage& GetStorage();
-Storage& GetStorage(std::string_view id);
+
+/**
+ * Pushes label/ID onto the storage stack, without pushing the imgui ID stack.
+ *
+ * @param label_id label or label###id
+ */
+void PushStorageStack(std::string_view label_id);
+
+/**
+ * Pushes specific storage onto the storage stack.
+ *
+ * @param storage storage
+ */
+void PushStorageStack(Storage& storage);
+
+/**
+ * Pops storage stack, without popping the imgui ID stack.
+ */
+void PopStorageStack();
 
 bool Begin(const char* name, bool* p_open = nullptr,
            ImGuiWindowFlags flags = 0);
