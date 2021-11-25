@@ -24,13 +24,18 @@ struct MulticastServiceResolver::Impl {
   wpi::DynamicDns& dynamicDns = wpi::DynamicDns::GetDynamicDns();
   std::wstring serviceType;
   DNS_SERVICE_CANCEL serviceCancel{nullptr};
-  mDnsRevolveCompletionFunc onFound;
+
+  MulticastServiceResolver* resolver;
+
+  void onFound(ServiceData&& data) {
+    resolver->eventQueue.push(std::move(data));
+    resolver->event.Set();
+  }
 };
 
-MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
-                           mDnsRevolveCompletionFunc onFound) {
+MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType) {
   pImpl = std::make_unique<Impl>();
-  pImpl->onFound = std::move(onFound);
+  pImpl->resolver = this;
 
   if (!pImpl->dynamicDns.CanDnsResolve) {
     return;
@@ -104,12 +109,12 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
       continue;
     }
 
-    wpi::SmallVector<std::pair<std::string, std::string>, 4> extraTxt;
 
     for (DNS_RECORDW* A : ARecords) {
       if (std::wstring_view{A->pName} ==
           std::wstring_view{foundSrv->Data.Srv.pNameTarget}) {
-        extraTxt.clear();
+        MulticastServiceResolver::ServiceData data;
+        wpi::SmallString<128> storage;
         for (DNS_RECORDW* Txt : TxtRecords) {
           if (std::wstring_view{Txt->pName} == nameHost) {
             for (DWORD i = 0; i < Txt->Data.Txt.dwStringCount; i++) {
@@ -119,32 +124,32 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
                 // Todo make this just do key
                 continue;
               }
-              std::string key;
-              wpi::SmallString<64> str;
+              storage.clear();
               wpi::span<const wpi::UTF16> wideStr{
                   reinterpret_cast<const wpi::UTF16*>(wideView.data()),
                   splitIndex};
-              wpi::convertUTF16ToUTF8String(wideStr, str);
-              key = str.string();
-              str.clear();
+              wpi::convertUTF16ToUTF8String(wideStr, storage);
+              auto& pair = data.txt.emplace_back(std::pair<std::string, std::string>{storage.string(), {}});
+              storage.clear();
               wideStr = wpi::span<const wpi::UTF16>{
                   reinterpret_cast<const wpi::UTF16*>(wideView.data() +
                                                       splitIndex + 1),
                   wideView.size() - splitIndex - 1};
-              wpi::convertUTF16ToUTF8String(wideStr, str);
-              extraTxt.emplace_back(std::pair<std::string, std::string>{
-                  std::move(key), str.string()});
+              wpi::convertUTF16ToUTF8String(wideStr, storage);
+              pair.second = storage.string();
             }
           }
         }
 
-        wpi::SmallString<128> hostName;
+        storage.clear();
         wpi::span<const wpi::UTF16> wideHostName{
             reinterpret_cast<const wpi::UTF16*>(A->pName), wcslen(A->pName)};
-        wpi::convertUTF16ToUTF8String(wideHostName, hostName);
-        hostName.append(".");
+        wpi::convertUTF16ToUTF8String(wideHostName, storage);
+        storage.append(".");
 
-        wpi::SmallString<128> serviceName;
+        data.hostName = storage.string();
+        storage.clear();
+
         int len = nameHost.find(impl->serviceType.c_str());
         wpi::span<const wpi::UTF16> wideServiceName{
             reinterpret_cast<const wpi::UTF16*>(nameHost.data()),
@@ -152,10 +157,13 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         if (len != nameHost.npos) {
           wideServiceName = wideServiceName.subspan(0, len - 1);
         }
-        wpi::convertUTF16ToUTF8String(wideServiceName, serviceName);
+        wpi::convertUTF16ToUTF8String(wideServiceName, storage);
 
-        impl->onFound(A->Data.A.IpAddress, foundSrv->Data.Srv.wPort,
-                      serviceName.str(), hostName.str(), extraTxt);
+        data.serviceName = storage.string();
+        data.port = foundSrv->Data.Srv.wPort;
+        data.ipv4Address = A->Data.A.IpAddress;
+
+        impl->onFound(std::move(data));
       }
     }
   }

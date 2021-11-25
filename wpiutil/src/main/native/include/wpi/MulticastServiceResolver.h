@@ -10,26 +10,41 @@
 #include <string_view>
 #include <utility>
 
+#include "wpi/ConcurrentQueue.h"
+#include "wpi/Synchronization.h"
 #include "wpi/span.h"
 
 namespace wpi {
 class MulticastServiceResolver {
  public:
-  using mDnsRevolveCompletion =
-      void(unsigned int ipv4Address, int port, std::string_view serviceName,
-           std::string_view hostName,
-           wpi::span<const std::pair<std::string, std::string>> txt);
-  using mDnsRevolveCompletionFunc = std::function<mDnsRevolveCompletion>;
-
-  MulticastServiceResolver(std::string_view serviceType, mDnsRevolveCompletionFunc onFound);
+  MulticastServiceResolver(std::string_view serviceType);
   ~MulticastServiceResolver() noexcept;
+
+  struct ServiceData {
+    unsigned int ipv4Address;
+    int port;
+    std::string serviceName;
+    std::string hostName;
+    std::vector<std::pair<std::string, std::string>> txt;
+  };
 
   void Start();
   void Stop();
 
+  WPI_EventHandle GetEventHandle() {
+    return event.GetHandle();
+  }
+
+  ServiceData GetData() {
+    return eventQueue.pop();
+  }
+
   struct Impl;
 
  private:
+  wpi::Event event;
+  wpi::ConcurrentQueue<ServiceData> eventQueue;
+
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi

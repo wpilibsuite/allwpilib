@@ -16,14 +16,18 @@ struct MulticastServiceResolver::Impl {
   AvahiClient* client;
   AvahiServiceBrowser* browser;
   std::string serviceType;
-  mDnsRevolveCompletionFunc onFound;
+  MulticastServiceResolver* resolver;
+
+  void onFound(ServiceData&& data) {
+    resolver->eventQueue.push(std::move(data));
+    resolver->event.Set();
+  }
 };
 
-MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
-                           mDnsRevolveCompletionFunc onFound) {
+MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceType = serviceType;
-  pImpl->onFound = std::move(onFound);
+  pImpl->resolver = this;
 }
 
 MulticastServiceResolver::~MulticastServiceResolver() noexcept {
@@ -42,7 +46,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
   if (event == AVAHI_RESOLVER_FOUND) {
     if (address->proto == AVAHI_PROTO_INET) {
       AvahiStringList* strLst = txt;
-      std::vector<std::pair<std::string, std::string>> txtArr;
+      MulticastServiceResolver::ServiceData data;
       while (strLst != nullptr) {
         std::string_view value{reinterpret_cast<const char*>(strLst->text),
                                strLst->size};
@@ -54,7 +58,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         }
         std::string_view key = value.substr(0, splitIndex);
         value = value.substr(splitIndex + 1, value.size() - splitIndex - 1);
-        txtArr.emplace_back(std::pair<std::string, std::string>{key, value});
+        data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
       wpi::SmallString<256> outputHostName;
       char label[256];
@@ -67,8 +71,12 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      impl->onFound(address->data.ipv4.address, port, name,
-                    outputHostName.str(), txtArr);
+      data.ipv4Address = address->data.ipv4.address;
+      data.port = port;
+      data.serviceName = name;
+      data.hostName = outputHostName.string();
+
+      impl->onFound(std::move(data));
     }
   }
 
