@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+
 #include <memory>
 #include <string>
 #include <string_view>
@@ -30,3 +34,26 @@ class MulticastServiceAnnouncer {
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
+
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef unsigned int WPI_MulticastServiceAnnouncerHandle;
+
+WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
+  const char* serviceName, const char* serviceType, int32_t port, int32_t txtCount, const char** keys, const char** values);
+
+void WPI_FreeMulticastServiceAnnouncer(WPI_MulticastServiceAnnouncerHandle handle);
+
+void WPI_StartMulticastServiceAnnouncer(WPI_MulticastServiceAnnouncerHandle handle);
+
+void WPI_StopMulticastServiceAnnouncer(WPI_MulticastServiceAnnouncerHandle handle);
+
+int32_t WPI_GetMulticastServiceAnnouncerHasImplementation(WPI_MulticastServiceAnnouncerHandle handle);
+
+#ifdef __cplusplus
+}
+#endif
