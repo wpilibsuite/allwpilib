@@ -24,161 +24,101 @@
   USA.
 ***/
 
-/** An event polling abstraction object */
 typedef struct AvahiPoll AvahiPoll;
 
-/** States of a server object */
 typedef enum {
-  AVAHI_SERVER_INVALID,     /**< Invalid state (initial) */
-  AVAHI_SERVER_REGISTERING, /**< Host RRs are being registered */
-  AVAHI_SERVER_RUNNING,     /**< All host RRs have been established */
-  AVAHI_SERVER_COLLISION, /**< There is a collision with a host RR. All host RRs
-                             have been withdrawn, the user should set a new host
-                             name via avahi_server_set_host_name() */
-  AVAHI_SERVER_FAILURE /**< Some fatal failure happened, the server is unable to
-                          proceed */
+  AVAHI_SERVER_INVALID,
+  AVAHI_SERVER_REGISTERING,
+  AVAHI_SERVER_RUNNING,
+  AVAHI_SERVER_COLLISION,
+  AVAHI_SERVER_FAILURE
 } AvahiServerState;
 
-/** A connection context */
 typedef struct AvahiClient AvahiClient;
 
-/** States of a client object, a superset of AvahiServerState */
 typedef enum {
-  AVAHI_CLIENT_S_REGISTERING =
-      AVAHI_SERVER_REGISTERING, /**< Server state: REGISTERING */
-  AVAHI_CLIENT_S_RUNNING = AVAHI_SERVER_RUNNING, /**< Server state: RUNNING */
-  AVAHI_CLIENT_S_COLLISION =
-      AVAHI_SERVER_COLLISION, /**< Server state: COLLISION */
-  AVAHI_CLIENT_FAILURE =
-      100, /**< Some kind of error happened on the client side */
-  AVAHI_CLIENT_CONNECTING =
-      101 /**< We're still connecting. This state is only entered when
-             AVAHI_CLIENT_NO_FAIL has been passed to avahi_client_new() and the
-             daemon is not yet available. */
+  AVAHI_CLIENT_S_REGISTERING = AVAHI_SERVER_REGISTERING,
+  AVAHI_CLIENT_S_RUNNING = AVAHI_SERVER_RUNNING,
+  AVAHI_CLIENT_S_COLLISION = AVAHI_SERVER_COLLISION,
+  AVAHI_CLIENT_FAILURE = 100,
+  AVAHI_CLIENT_CONNECTING = 101
 } AvahiClientState;
 
 typedef enum {
-  AVAHI_CLIENT_IGNORE_USER_CONFIG = 1, /**< Don't read user configuration */
-  AVAHI_CLIENT_NO_FAIL =
-      2 /**< Don't fail if the daemon is not available when avahi_client_new()
-           is called, instead enter AVAHI_CLIENT_CONNECTING state and wait for
-           the daemon to appear */
+  AVAHI_CLIENT_IGNORE_USER_CONFIG = 1,
+  AVAHI_CLIENT_NO_FAIL = 2
 } AvahiClientFlags;
 
-/** The function prototype for the callback of an AvahiClient */
-typedef void (*AvahiClientCallback)(
-    AvahiClient* s, AvahiClientState state /**< The new state of the client */,
-    void* userdata /**< The user data that was passed to avahi_client_new() */);
+typedef void (*AvahiClientCallback)(AvahiClient* s, AvahiClientState state,
+                                    void* userdata);
 
 typedef struct AvahiServiceBrowser AvahiServiceBrowser;
 
-/** Protocol family specification, takes the values AVAHI_PROTO_INET,
- * AVAHI_PROTO_INET6, AVAHI_PROTO_UNSPEC */
 typedef int AvahiProtocol;
 
-/** Numeric network interface index. Takes OS dependent values and the special
- * constant AVAHI_IF_UNSPEC  */
 typedef int AvahiIfIndex;
 
-/** Type of callback event when browsing */
 typedef enum {
-  AVAHI_BROWSER_NEW,    /**< The object is new on the network */
-  AVAHI_BROWSER_REMOVE, /**< The object has been removed from the network */
-  AVAHI_BROWSER_CACHE_EXHAUSTED, /**< One-time event, to notify the user that
-                                    all entries from the caches have been sent
-                                  */
-  AVAHI_BROWSER_ALL_FOR_NOW, /**< One-time event, to notify the user that more
-                                records will probably not show up in the near
-                                future, i.e. all cache entries have been read
-                                and all static servers been queried */
-  AVAHI_BROWSER_FAILURE /**< Browsing failed due to some reason which can be
-                           retrieved using
-                           avahi_server_errno()/avahi_client_errno() */
+  AVAHI_BROWSER_NEW,
+  AVAHI_BROWSER_REMOVE,
+  AVAHI_BROWSER_CACHE_EXHAUSTED,
+  AVAHI_BROWSER_ALL_FOR_NOW,
+  AVAHI_BROWSER_FAILURE
 } AvahiBrowserEvent;
 
-/** Some flags for lookup callback functions */
 typedef enum {
-  AVAHI_LOOKUP_RESULT_CACHED =
-      1, /**< This response originates from the cache */
-  AVAHI_LOOKUP_RESULT_WIDE_AREA =
-      2, /**< This response originates from wide area DNS */
-  AVAHI_LOOKUP_RESULT_MULTICAST =
-      4, /**< This response originates from multicast DNS */
-  AVAHI_LOOKUP_RESULT_LOCAL =
-      8, /**< This record/service resides on and was announced by the local
-            host. Only available in service and record browsers and only on
-            AVAHI_BROWSER_NEW. */
-  AVAHI_LOOKUP_RESULT_OUR_OWN =
-      16, /**< This service belongs to the same local client as the browser
-             object. Only available in avahi-client, and only for service
-             browsers and only on AVAHI_BROWSER_NEW. */
-  AVAHI_LOOKUP_RESULT_STATIC = 32 /**< The returned data has been defined
-                                     statically by some configuration option */
+  AVAHI_LOOKUP_RESULT_CACHED = 1,
+  AVAHI_LOOKUP_RESULT_WIDE_AREA = 2,
+  AVAHI_LOOKUP_RESULT_MULTICAST = 4,
+  AVAHI_LOOKUP_RESULT_LOCAL = 8,
+  AVAHI_LOOKUP_RESULT_OUR_OWN = 16,
+  AVAHI_LOOKUP_RESULT_STATIC = 32
 } AvahiLookupResultFlags;
 
-/** The function prototype for the callback of an AvahiServiceBrowser */
 typedef void (*AvahiServiceBrowserCallback)(
     AvahiServiceBrowser* b, AvahiIfIndex interface, AvahiProtocol protocol,
     AvahiBrowserEvent event, const char* name, const char* type,
     const char* domain, AvahiLookupResultFlags flags, void* userdata);
 
-/** Some flags for lookup functions */
 typedef enum {
-  /** \cond fulldocs */
-  AVAHI_LOOKUP_USE_WIDE_AREA = 1, /**< Force lookup via wide area DNS */
-  AVAHI_LOOKUP_USE_MULTICAST = 2, /**< Force lookup via multicast DNS */
-                                  /** \endcond */
-  AVAHI_LOOKUP_NO_TXT =
-      4, /**< When doing service resolving, don't lookup TXT record */
-  AVAHI_LOOKUP_NO_ADDRESS =
-      8 /**< When doing service resolving, don't lookup A/AAAA record */
+  AVAHI_LOOKUP_USE_WIDE_AREA = 1,
+  AVAHI_LOOKUP_USE_MULTICAST = 2,
+
+  AVAHI_LOOKUP_NO_TXT = 4,
+  AVAHI_LOOKUP_NO_ADDRESS = 8
 } AvahiLookupFlags;
 
-/** A service resolver object */
 typedef struct AvahiServiceResolver AvahiServiceResolver;
 
-/** Type of callback event when resolving */
 typedef enum {
-  AVAHI_RESOLVER_FOUND,  /**< RR found, resolving successful */
-  AVAHI_RESOLVER_FAILURE /**< Resolving failed due to some reason which can be
-                            retrieved using
-                            avahi_server_errno()/avahi_client_errno() */
+  AVAHI_RESOLVER_FOUND,
+  AVAHI_RESOLVER_FAILURE
 } AvahiResolverEvent;
 
-/** An IPv4 address */
 typedef struct AvahiIPv4Address {
-  uint32_t address; /**< Address data in network byte order. */
+  uint32_t address;
 } AvahiIPv4Address;
 
-/** An IPv6 address */
 typedef struct AvahiIPv6Address {
-  uint8_t address[16]; /**< Address data */
+  uint8_t address[16];
 } AvahiIPv6Address;
 
-/** Protocol (address family) independent address structure */
 typedef struct AvahiAddress {
-  AvahiProtocol proto; /**< Address family */
+  AvahiProtocol proto;
 
   union {
-    AvahiIPv6Address ipv6; /**< Address when IPv6 */
-    AvahiIPv4Address ipv4; /**< Address when IPv4 */
-    uint8_t data[1];       /**< Type-independent data field */
+    AvahiIPv6Address ipv6;
+    AvahiIPv4Address ipv4;
+    uint8_t data[1];
   } data;
 } AvahiAddress;
 
-/** Linked list of strings that can contain any number of binary
- * characters, including NUL bytes. An empty list is created by
- * assigning a NULL to a pointer to AvahiStringList. The string list
- * is stored in reverse order, so that appending to the string list is
- * effectively a prepending to the linked list.  This object is used
- * primarily for storing DNS TXT record data. */
 typedef struct AvahiStringList {
-  struct AvahiStringList* next; /**< Pointer to the next linked list element */
-  size_t size;                  /**< Size of text[] */
-  uint8_t text[1];              /**< Character data */
+  struct AvahiStringList* next;
+  size_t size;
+  uint8_t text[1];
 } AvahiStringList;
 
-/** The function prototype for the callback of an AvahiServiceResolver */
 typedef void (*AvahiServiceResolverCallback)(
     AvahiServiceResolver* r, AvahiIfIndex interface, AvahiProtocol protocol,
     AvahiResolverEvent event, const char* name, const char* type,
@@ -190,66 +130,34 @@ typedef struct AvahiThreadedPoll AvahiThreadedPoll;
 
 typedef struct AvahiEntryGroup AvahiEntryGroup;
 
-/** States of an entry group object */
 typedef enum {
-  AVAHI_ENTRY_GROUP_UNCOMMITED,  /**< The group has not yet been commited, the
-                                    user must still call
-                                    avahi_entry_group_commit() */
-  AVAHI_ENTRY_GROUP_REGISTERING, /**< The entries of the group are currently
-                                    being registered */
-  AVAHI_ENTRY_GROUP_ESTABLISHED, /**< The entries have successfully been
-                                    established */
-  AVAHI_ENTRY_GROUP_COLLISION,   /**< A name collision for one of the entries in
-                                    the group has been detected, the entries have
-                                    been withdrawn */
-  AVAHI_ENTRY_GROUP_FAILURE /**< Some kind of failure happened, the entries have
-                               been withdrawn */
+  AVAHI_ENTRY_GROUP_UNCOMMITED,
+  AVAHI_ENTRY_GROUP_REGISTERING,
+  AVAHI_ENTRY_GROUP_ESTABLISHED,
+  AVAHI_ENTRY_GROUP_COLLISION,
+  AVAHI_ENTRY_GROUP_FAILURE
 } AvahiEntryGroupState;
 
-/** The function prototype for the callback of an AvahiEntryGroup */
-typedef void (*AvahiEntryGroupCallback)(
-    AvahiEntryGroup* g,
-    AvahiEntryGroupState state /**< The new state of the entry group */, void* userdata /* The arbitrary user data pointer originally passed to avahi_entry_group_new()*/);
+typedef void (*AvahiEntryGroupCallback)(AvahiEntryGroup* g,
+                                        AvahiEntryGroupState state,
+                                        void* userdata);
 
-/** Some flags for publishing functions */
 typedef enum {
-  AVAHI_PUBLISH_ALL = 0,
-  AVAHI_PUBLISH_UNIQUE =
-      1, /**< For raw records: The RRset is intended to be unique */
-  AVAHI_PUBLISH_NO_PROBE = 2, /**< For raw records: Though the RRset is intended
-                                 to be unique no probes shall be sent */
-  AVAHI_PUBLISH_NO_ANNOUNCE =
-      4, /**< For raw records: Do not announce this RR to other hosts */
-  AVAHI_PUBLISH_ALLOW_MULTIPLE =
-      8, /**< For raw records: Allow multiple local records of this type, even
-            if they are intended to be unique */
-         /** \cond fulldocs */
-  AVAHI_PUBLISH_NO_REVERSE =
-      16, /**< For address records: don't create a reverse (PTR) entry */
-  AVAHI_PUBLISH_NO_COOKIE = 32, /**< For service records: do not implicitly add
-                                   the local service cookie to TXT data */
-                                /** \endcond */
-  AVAHI_PUBLISH_UPDATE =
-      64, /**< Update existing records instead of adding new ones */
-          /** \cond fulldocs */
-  AVAHI_PUBLISH_USE_WIDE_AREA = 128, /**< Register the record using wide area
-                                        DNS (i.e. unicast DNS update) */
-  AVAHI_PUBLISH_USE_MULTICAST =
-      256 /**< Register the record using multicast DNS */
-  /** \endcond */
+  AVAHI_PUBLISH_UNIQUE = 1,
+  AVAHI_PUBLISH_NO_PROBE = 2,
+  AVAHI_PUBLISH_NO_ANNOUNCE = 4,
+  AVAHI_PUBLISH_ALLOW_MULTIPLE = 8,
+
+  AVAHI_PUBLISH_NO_REVERSE = 16,
+  AVAHI_PUBLISH_NO_COOKIE = 32,
+  AVAHI_PUBLISH_UPDATE = 64,
+  AVAHI_PUBLISH_USE_WIDE_AREA = 128,
+  AVAHI_PUBLISH_USE_MULTICAST = 256
 } AvahiPublishFlags;
 
-/** Special values for AvahiIfIndex */
-enum {
-  AVAHI_IF_UNSPEC = -1 /**< Unspecified/all interface(s) */
-};
+enum { AVAHI_IF_UNSPEC = -1 };
 
-/** Values for AvahiProtocol */
-enum {
-  AVAHI_PROTO_INET = 0,   /**< IPv4 */
-  AVAHI_PROTO_INET6 = 1,  /**< IPv6 */
-  AVAHI_PROTO_UNSPEC = -1 /**< Unspecified/all protocol(s) */
-};
+enum { AVAHI_PROTO_INET = 0, AVAHI_PROTO_INET6 = 1, AVAHI_PROTO_UNSPEC = -1 };
 
 #define AvahiFunction(CapName, RetType, Parameters) \
   using CapName##_func = RetType(*) Parameters;     \
@@ -291,37 +199,11 @@ class AvahiFunctionTable {
                 (AvahiClient*, AvahiEntryGroupCallback, void*));
   AvahiFunction(entry_group_free, int, (AvahiEntryGroup*));
 
-  AvahiFunction(
-      entry_group_add_service_strlst, int,
-      (AvahiEntryGroup * group,
-       AvahiIfIndex interface /**< The interface this service shall be announced
-                                 on. We recommend to pass AVAHI_IF_UNSPEC here,
-                                 to announce on all interfaces. */
-       ,
-       AvahiProtocol
-           protocol /**< The protocol this service shall be announced with, i.e.
-                       MDNS over IPV4 or MDNS over IPV6. We recommend to pass
-                       AVAHI_PROTO_UNSPEC here, to announce this service on all
-                       protocols the daemon supports. */
-       ,
-       AvahiPublishFlags flags /**< Usually 0, unless you know what you do */,
-       const char* name /**< The name for the new service. Must be valid service
-                           name. i.e. a string shorter than 63 characters and
-                           valid UTF-8. May not be NULL. */
-       ,
-       const char* type /**< The service type for the new service, such as
-                           _http._tcp. May not be NULL. */
-       ,
-       const char*
-           domain /**< The domain to register this domain in. We recommend to
-                     pass NULL here, to let the daemon decide */
-       ,
-       const char* host /**< The host this services is residing on. We recommend
-                           to pass NULL here, the daemon will than automatically
-                           insert the local host name in that case */
-       ,
-       uint16_t port /**< The IP port number of this service */,
-       AvahiStringList*));
+  AvahiFunction(entry_group_add_service_strlst, int,
+                (AvahiEntryGroup * group, AvahiIfIndex interface,
+                 AvahiProtocol protocol, AvahiPublishFlags flags,
+                 const char* name, const char* type, const char* domain,
+                 const char* host, uint16_t port, AvahiStringList*));
 
   AvahiFunction(entry_group_reset, int, (AvahiEntryGroup*));
   AvahiFunction(entry_group_is_empty, int, (AvahiEntryGroup*));

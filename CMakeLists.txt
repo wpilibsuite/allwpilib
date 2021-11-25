@@ -6,6 +6,10 @@ FATAL: In-source builds are not allowed.
 ")
 endif()
 
+if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+endif()
 
 project(allwpilib)
 cmake_minimum_required(VERSION 3.3.0)
