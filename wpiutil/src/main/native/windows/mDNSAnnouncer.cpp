@@ -16,6 +16,7 @@
 #include "wpi/SmallString.h"
 #include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
+#include "wpi/hostname.h"
 
 using namespace wpi;
 
@@ -37,7 +38,6 @@ struct mDNSAnnouncer::Impl : ImplBase {
 
 mDNSAnnouncer::mDNSAnnouncer(
     std::string_view serviceName, std::string_view serviceType,
-    std::string_view hostName,
     wpi::span<std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
 
@@ -46,6 +46,7 @@ mDNSAnnouncer::mDNSAnnouncer(
   }
 
   wpi::SmallVector<wpi::UTF16, 128> wideStorage;
+  std::string hostName = wpi::GetHostname() + ".local";
 
   for (auto&& i : txt) {
     wideStorage.clear();
@@ -68,13 +69,7 @@ mDNSAnnouncer::mDNSAnnouncer(
   wpi::SmallString<128> storage;
 
   wideStorage.clear();
-  if (wpi::ends_with_lower(hostName, ".local")) {
-    wpi::convertUTF8ToUTF16String(hostName, wideStorage);
-  } else {
-    storage.append(hostName);
-    storage.append(".local");
-    wpi::convertUTF8ToUTF16String(storage.str(), wideStorage);
-  }
+  wpi::convertUTF8ToUTF16String(hostName, wideStorage);
 
   pImpl->hostName = std::wstring{
       reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};

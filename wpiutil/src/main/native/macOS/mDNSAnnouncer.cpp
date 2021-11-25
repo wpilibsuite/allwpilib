@@ -16,14 +16,15 @@ struct mDNSAnnouncer::Impl {
 
 mDNSAnnouncer::mDNSAnnouncer(
     std::string_view serviceName, std::string_view serviceType,
-    std::string_view hostName,
     wpi::span<std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceName = serviceName;
   pImpl->serviceType = serviceType;
 }
 
-mDNSAnnouncer::~mDNSAnnouncer() noexcept {}
+mDNSAnnouncer::~mDNSAnnouncer() noexcept {
+  Stop();
+}
 
 void mDNSAnnouncer::Start() {
   if (pImpl->serviceRef) {
