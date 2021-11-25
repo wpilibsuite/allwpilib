@@ -139,6 +139,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
         wpi::span<const wpi::UTF16> wideHostName{
             reinterpret_cast<const wpi::UTF16*>(A->pName), wcslen(A->pName)};
         wpi::convertUTF16ToUTF8String(wideHostName, hostName);
+        hostName.append(".");
 
         wpi::SmallString<128> serviceName;
         int len = nameHost.find(impl->serviceType.c_str());
