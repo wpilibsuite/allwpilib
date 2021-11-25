@@ -4,19 +4,21 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include <imgui.h>
 
 namespace glass {
 
-class NameInfo {
+class NameSetting {
  public:
-  NameInfo() { m_name[0] = '\0'; }
+  explicit NameSetting(std::string& str) : m_name{str} {}
 
-  bool HasName() const { return m_name[0] != '\0'; }
-  void SetName(std::string_view name);
-  const char* GetName() const { return m_name; }
+  bool HasName() const { return !m_name.empty(); }
+  void SetName(std::string_view name) { m_name = name; }
+  std::string& GetName() { return m_name; }
+  const std::string& GetName() const { return m_name; }
   void GetName(char* buf, size_t size, const char* defaultName) const;
   void GetName(char* buf, size_t size, const char* defaultName,
                int index) const;
@@ -28,8 +30,6 @@ class NameInfo {
   void GetLabel(char* buf, size_t size, const char* defaultName, int index,
                 int index2) const;
 
-  bool ReadIni(std::string_view name, std::string_view value);
-  void WriteIni(ImGuiTextBuffer* out);
   void PushEditNameId(int index);
   void PushEditNameId(const char* name);
   bool PopupEditName(int index);
@@ -37,27 +37,7 @@ class NameInfo {
   bool InputTextName(const char* label_id, ImGuiInputTextFlags flags = 0);
 
  private:
-  char m_name[64];
-};
-
-class OpenInfo {
- public:
-  OpenInfo() = default;
-  explicit OpenInfo(bool open) : m_open(open) {}
-
-  bool IsOpen() const { return m_open; }
-  void SetOpen(bool open) { m_open = open; }
-  bool ReadIni(std::string_view name, std::string_view value);
-  void WriteIni(ImGuiTextBuffer* out);
-
- private:
-  bool m_open = false;
-};
-
-class NameOpenInfo : public NameInfo, public OpenInfo {
- public:
-  bool ReadIni(std::string_view name, std::string_view value);
-  void WriteIni(ImGuiTextBuffer* out);
+  std::string& m_name;
 };
 
 }  // namespace glass

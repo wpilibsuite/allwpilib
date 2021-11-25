@@ -16,8 +16,6 @@
 
 namespace glass {
 
-class NameInfo;
-
 /**
  * A data source for numeric/boolean data.
  */
@@ -33,15 +31,9 @@ class DataSource {
 
   const char* GetId() const { return m_id.c_str(); }
 
-  void SetName(std::string_view name);
-  const char* GetName() const;
-  NameInfo& GetNameInfo() { return *m_name; }
-
-  void PushEditNameId(int index);
-  void PushEditNameId(const char* name);
-  bool PopupEditName(int index);
-  bool PopupEditName(const char* name);
-  bool InputTextName(const char* label_id, ImGuiInputTextFlags flags = 0);
+  void SetName(std::string_view name) { m_name = name; }
+  std::string& GetName() { return m_name; }
+  const std::string& GetName() const { return m_name; }
 
   void SetDigital(bool digital) { m_digital = digital; }
   bool IsDigital() const { return m_digital; }
@@ -53,8 +45,9 @@ class DataSource {
   double GetValue() const { return m_value; }
 
   // drag source helpers
-  void LabelText(const char* label, const char* fmt, ...) const;
-  void LabelTextV(const char* label, const char* fmt, va_list args) const;
+  void LabelText(const char* label, const char* fmt, ...) const IM_FMTARGS(3);
+  void LabelTextV(const char* label, const char* fmt, va_list args) const
+      IM_FMTLIST(3);
   bool Combo(const char* label, int* current_item, const char* const items[],
              int items_count, int popup_max_height_in_items = -1) const;
   bool SliderFloat(const char* label, float* v, float v_min, float v_max,
@@ -74,7 +67,7 @@ class DataSource {
 
  private:
   std::string m_id;
-  NameInfo* m_name;
+  std::string& m_name;
   bool m_digital = false;
   std::atomic<double> m_value = 0;
 };

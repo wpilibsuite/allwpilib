@@ -132,7 +132,7 @@ class RoboRioSimModel : public glass::RoboRioModel {
 }  // namespace
 
 void RoboRioSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "RoboRIO", [] { return true; },
       [] { return std::make_unique<RoboRioSimModel>(); },
       [](glass::Window* win, glass::Model* model) {

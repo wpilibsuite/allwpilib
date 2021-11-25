@@ -4,6 +4,8 @@
 
 #include "NetworkTablesSimGui.h"
 
+#include <glass/Context.h>
+#include <glass/Storage.h>
 #include <glass/networktables/NetworkTables.h>
 
 #include <wpigui.h>
@@ -13,21 +15,24 @@
 using namespace halsimgui;
 
 static std::unique_ptr<glass::NetworkTablesModel> gNetworkTablesModel;
-static std::unique_ptr<glass::NetworkTablesView> gNetworkTablesView;
-static glass::Window* gNetworkTablesWindow;
+static std::unique_ptr<glass::Window> gNetworkTablesWindow;
 
 void NetworkTablesSimGui::Initialize() {
   gNetworkTablesModel = std::make_unique<glass::NetworkTablesModel>();
-  gNetworkTablesView =
-      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get());
   wpi::gui::AddEarlyExecute([] { gNetworkTablesModel->Update(); });
-  gNetworkTablesWindow = HALSimGui::ntProvider.AddWindow(
-      "NetworkTables", [] { gNetworkTablesView->Display(); });
-  if (gNetworkTablesWindow) {
-    gNetworkTablesWindow->SetDefaultPos(250, 277);
-    gNetworkTablesWindow->SetDefaultSize(750, 185);
-    gNetworkTablesWindow->DisableRenamePopup();
-  }
+  gNetworkTablesWindow = std::make_unique<glass::Window>(
+      glass::GetStorageRoot().GetChild("NetworkTables View"), "NetworkTables");
+  gNetworkTablesWindow->SetView(
+      std::make_unique<glass::NetworkTablesView>(gNetworkTablesModel.get()));
+  gNetworkTablesWindow->SetDefaultPos(250, 277);
+  gNetworkTablesWindow->SetDefaultSize(750, 185);
+  gNetworkTablesWindow->DisableRenamePopup();
+  wpi::gui::AddLateExecute([] { gNetworkTablesWindow->Display(); });
+
+  wpi::gui::AddWindowScaler([](float scale) {
+    // scale default window positions
+    gNetworkTablesWindow->ScaleDefault(scale);
+  });
 }
 
 void NetworkTablesSimGui::DisplayMenu() {

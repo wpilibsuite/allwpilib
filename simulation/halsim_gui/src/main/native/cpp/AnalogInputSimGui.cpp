@@ -109,7 +109,7 @@ static bool AnalogInputsAnyInitialized() {
 }
 
 void AnalogInputSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Analog Inputs", AnalogInputsAnyInitialized,
       [] { return std::make_unique<AnalogInputsSimModel>(); },
       [](glass::Window* win, glass::Model* model) {

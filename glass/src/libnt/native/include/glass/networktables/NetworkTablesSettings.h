@@ -9,6 +9,8 @@
 #include <ntcore_cpp.h>
 #include <wpi/SafeThread.h>
 
+#include "glass/support/EnumSetting.h"
+
 namespace wpi {
 template <typename T>
 class SmallVectorImpl;
@@ -16,11 +18,12 @@ class SmallVectorImpl;
 
 namespace glass {
 
+class Storage;
+
 class NetworkTablesSettings {
  public:
-  explicit NetworkTablesSettings(
-      NT_Inst inst = nt::GetDefaultInstance(),
-      const char* storageName = "NetworkTables Settings");
+  explicit NetworkTablesSettings(Storage& storage,
+                                 NT_Inst inst = nt::GetDefaultInstance());
 
   /**
    * Enables or disables the server option.  Default is enabled.
@@ -33,11 +36,11 @@ class NetworkTablesSettings {
  private:
   bool m_restart = true;
   bool m_serverOption = true;
-  int* m_pMode;
-  std::string* m_pIniName;
-  std::string* m_pServerTeam;
-  std::string* m_pListenAddress;
-  bool* m_pDsClient;
+  EnumSetting m_mode;
+  std::string& m_iniName;
+  std::string& m_serverTeam;
+  std::string& m_listenAddress;
+  bool& m_dsClient;
 
   class Thread : public wpi::SafeThread {
    public:
