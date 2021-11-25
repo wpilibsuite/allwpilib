@@ -16,8 +16,11 @@
 using namespace wpi;
 
 struct DnsResolveState {
-  DnsResolveState(MulticastServiceResolver::Impl* impl, std::string_view serviceNameView)
-      : pImpl{impl}, serviceName{serviceNameView} {}
+  DnsResolveState(MulticastServiceResolver::Impl* impl,
+                  std::string_view serviceNameView)
+      : pImpl{impl} {
+    data.serviceName = serviceNameView;
+  }
   ~DnsResolveState() {
     if (ResolveRef != nullptr) {
       DNSServiceRefDeallocate(ResolveRef);
@@ -28,19 +31,22 @@ struct DnsResolveState {
   dnssd_sock_t ResolveSocket;
   MulticastServiceResolver::Impl* pImpl;
 
-  int port;
-  std::string serviceName;
-  std::vector<std::pair<std::string, std::string>> txts;
+  MulticastServiceResolver::ServiceData data;
 };
 
 struct MulticastServiceResolver::Impl {
   std::string serviceType;
-  mDnsRevolveCompletionFunc onFound;
+  MulticastServiceResolver* resolver;
   DNSServiceRef ServiceRef = nullptr;
   dnssd_sock_t ServiceQuerySocket;
   std::vector<std::unique_ptr<DnsResolveState>> ResolveStates;
   std::thread Thread;
   std::atomic_bool running;
+
+  void onFound(ServiceData&& data) {
+    resolver->eventQueue.push(std::move(data));
+    resolver->event.Set();
+  }
 
   void ThreadMain() {
     std::vector<pollfd> readSockets;
@@ -78,11 +84,11 @@ struct MulticastServiceResolver::Impl {
   }
 };
 
-MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
-                           mDnsRevolveCompletionFunc onFound) {
+MulticastServiceResolver::MulticastServiceResolver(
+    std::string_view serviceType) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceType = serviceType;
-  pImpl->onFound = std::move(onFound);
+  pImpl->resolver = this;
 }
 
 MulticastServiceResolver::~MulticastServiceResolver() noexcept {
@@ -101,10 +107,11 @@ void ServiceGetAddrInfoReply(DNSServiceRef sdRef, DNSServiceFlags flags,
 
   DnsResolveState* resolveState = static_cast<DnsResolveState*>(context);
 
-  resolveState->pImpl->onFound(
-      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr,
-      resolveState->port, resolveState->serviceName, hostname,
-      resolveState->txts);
+  resolveState->data.hostName = hostname;
+  resolveState->data.ipv4Address =
+      reinterpret_cast<const struct sockaddr_in*>(address)->sin_addr.s_addr;
+
+  resolveState->pImpl->onFound(std::move(resolveState->data));
 
   resolveState->pImpl->ResolveStates.erase(std::find_if(
       resolveState->pImpl->ResolveStates.begin(),
@@ -126,7 +133,7 @@ void ServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags,
   DNSServiceRefDeallocate(resolveState->ResolveRef);
   resolveState->ResolveRef = nullptr;
   resolveState->ResolveSocket = 0;
-  resolveState->port = ntohs(port);
+  resolveState->data.port = ntohs(port);
 
   int txtCount = TXTRecordGetCount(txtLen, txtRecord);
   char keyBuf[256];
@@ -139,10 +146,10 @@ void ServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags,
     if (errorCode == kDNSServiceErr_NoError) {
       if (valueLen == 0) {
         // No value
-        resolveState->txts.emplace_back(
+        resolveState->data.txt.emplace_back(
             std::pair<std::string, std::string>{std::string{keyBuf}, {}});
       } else {
-        resolveState->txts.emplace_back(std::pair<std::string, std::string>{
+        resolveState->data.txt.emplace_back(std::pair<std::string, std::string>{
             std::string{keyBuf},
             std::string{reinterpret_cast<const char*>(value), valueLen}});
       }
@@ -175,7 +182,8 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
     return;
   }
 
-  MulticastServiceResolver::Impl* impl = static_cast<MulticastServiceResolver::Impl*>(context);
+  MulticastServiceResolver::Impl* impl =
+      static_cast<MulticastServiceResolver::Impl*>(context);
   auto& resolveState = impl->ResolveStates.emplace_back(
       std::make_unique<DnsResolveState>(impl, serviceName));
 

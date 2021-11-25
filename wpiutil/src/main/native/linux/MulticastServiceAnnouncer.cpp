@@ -31,7 +31,8 @@ struct MulticastServiceAnnouncer::Impl {
 
 static void EntryGroupCallback(AvahiEntryGroup*, AvahiEntryGroupState, void*) {}
 
-static void RegisterService(AvahiClient* client, MulticastServiceAnnouncer::Impl* impl) {
+static void RegisterService(AvahiClient* client,
+                            MulticastServiceAnnouncer::Impl* impl) {
   if (impl->group == nullptr) {
     impl->group =
         impl->table.entry_group_new(client, EntryGroupCallback, nullptr);
@@ -39,16 +40,18 @@ static void RegisterService(AvahiClient* client, MulticastServiceAnnouncer::Impl
 
   if (impl->table.entry_group_is_empty(impl->group)) {
     impl->table.entry_group_add_service_strlst(
-        impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, AVAHI_PUBLISH_USE_MULTICAST,
-        impl->serviceName.c_str(), impl->serviceType.c_str(), "local", nullptr,
-        impl->port, impl->stringList);
+        impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
+        AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
+        impl->serviceType.c_str(), "local", nullptr, impl->port,
+        impl->stringList);
     impl->table.entry_group_commit(impl->group);
   }
 }
 
 static void ClientCallback(AvahiClient* client, AvahiClientState state,
                            void* userdata) {
-  MulticastServiceAnnouncer::Impl* impl = reinterpret_cast<MulticastServiceAnnouncer::Impl*>(userdata);
+  MulticastServiceAnnouncer::Impl* impl =
+      reinterpret_cast<MulticastServiceAnnouncer::Impl*>(userdata);
 
   if (state == AVAHI_CLIENT_S_RUNNING) {
     RegisterService(client, impl);

@@ -33,7 +33,8 @@ struct MulticastServiceResolver::Impl {
   }
 };
 
-MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType) {
+MulticastServiceResolver::MulticastServiceResolver(
+    std::string_view serviceType) {
   pImpl = std::make_unique<Impl>();
   pImpl->resolver = this;
 
@@ -109,7 +110,6 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
       continue;
     }
 
-
     for (DNS_RECORDW* A : ARecords) {
       if (std::wstring_view{A->pName} ==
           std::wstring_view{foundSrv->Data.Srv.pNameTarget}) {
@@ -129,7 +129,8 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
                   reinterpret_cast<const wpi::UTF16*>(wideView.data()),
                   splitIndex};
               wpi::convertUTF16ToUTF8String(wideStr, storage);
-              auto& pair = data.txt.emplace_back(std::pair<std::string, std::string>{storage.string(), {}});
+              auto& pair = data.txt.emplace_back(
+                  std::pair<std::string, std::string>{storage.string(), {}});
               storage.clear();
               wideStr = wpi::span<const wpi::UTF16>{
                   reinterpret_cast<const wpi::UTF16*>(wideView.data() +

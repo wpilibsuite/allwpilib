@@ -14,9 +14,9 @@
 namespace wpi {
 class MulticastServiceAnnouncer {
  public:
-  MulticastServiceAnnouncer(std::string_view serviceName, std::string_view serviceType,
-                int port,
-                wpi::span<const std::pair<std::string, std::string>> txt);
+  MulticastServiceAnnouncer(
+      std::string_view serviceName, std::string_view serviceType, int port,
+      wpi::span<const std::pair<std::string, std::string>> txt);
   ~MulticastServiceAnnouncer() noexcept;
 
   void Start();

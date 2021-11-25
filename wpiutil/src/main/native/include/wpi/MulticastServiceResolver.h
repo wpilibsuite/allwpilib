@@ -31,13 +31,9 @@ class MulticastServiceResolver {
   void Start();
   void Stop();
 
-  WPI_EventHandle GetEventHandle() {
-    return event.GetHandle();
-  }
+  WPI_EventHandle GetEventHandle() { return event.GetHandle(); }
 
-  ServiceData GetData() {
-    return eventQueue.pop();
-  }
+  ServiceData GetData() { return eventQueue.pop(); }
 
   struct Impl;
 
