@@ -1,15 +1,19 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #ifndef UNICODE
 #define UNICODE
 #endif
 
 #include "wpi/mDNSResolver.h"
 
-#include "DynamicDns.h"
-
 #include <string>
+
+#include "DynamicDns.h"
 #include "wpi/ConvertUTF.h"
-#include "wpi/SmallVector.h"
 #include "wpi/SmallString.h"
+#include "wpi/SmallVector.h"
 #include "wpi/StringExtras.h"
 
 #pragma comment(lib, "dnsapi")
@@ -35,8 +39,8 @@ mDNSResolver::mDNSResolver(std::string_view serviceType,
   wpi::SmallVector<wpi::UTF16, 128> wideStorage;
 
   wpi::convertUTF8ToUTF16String(serviceType, wideStorage);
-  pImpl->serviceType =
-      std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()};
+  pImpl->serviceType = std::wstring{
+      reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 }
 
 mDNSResolver::~mDNSResolver() noexcept {}

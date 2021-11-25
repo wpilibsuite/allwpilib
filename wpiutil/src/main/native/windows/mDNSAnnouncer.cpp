@@ -1,17 +1,21 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #ifndef UNICODE
 #define UNICODE
 #endif
 
 #include "wpi/mDNSAnnouncer.h"
 
-#include "DynamicDns.h"
-
 #include <string>
-#include "wpi/ConvertUTF.h"
-#include "wpi/SmallVector.h"
-#include "wpi/SmallString.h"
-#include "wpi/StringExtras.h"
 #include <vector>
+
+#include "DynamicDns.h"
+#include "wpi/ConvertUTF.h"
+#include "wpi/SmallString.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringExtras.h"
 
 using namespace wpi;
 
@@ -47,11 +51,11 @@ mDNSAnnouncer::mDNSAnnouncer(
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.first, wideStorage);
     pImpl->keys.emplace_back(
-        std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()});
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.second, wideStorage);
     pImpl->values.emplace_back(
-        std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()});
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
   }
 
   for (size_t i = 0; i < pImpl->keys.size(); i++) {
@@ -70,13 +74,13 @@ mDNSAnnouncer::mDNSAnnouncer(
     wpi::convertUTF8ToUTF16String(storage.str(), wideStorage);
   }
 
-  pImpl->machineName =
-      std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()};
+  pImpl->machineName = std::wstring{
+      reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 
   wideStorage.clear();
   wpi::convertUTF8ToUTF16String(serviceType, wideStorage);
-  pImpl->serviceType =
-      std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()};
+  pImpl->serviceType = std::wstring{
+      reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 
   wideStorage.clear();
   storage.clear();
@@ -85,8 +89,8 @@ mDNSAnnouncer::mDNSAnnouncer(
   storage.append(serviceType);
 
   wpi::convertUTF8ToUTF16String(storage.str(), wideStorage);
-  pImpl->serviceInstanceName =
-      std::wstring{(const wchar_t*)wideStorage.data(), wideStorage.size()};
+  pImpl->serviceInstanceName = std::wstring{
+      reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 }
 
 mDNSAnnouncer::~mDNSAnnouncer() noexcept {

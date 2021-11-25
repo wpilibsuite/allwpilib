@@ -1,15 +1,22 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
+
 #include "wpi/span.h"
 
 namespace wpi {
 class mDNSAnnouncer {
  public:
   mDNSAnnouncer(std::string_view serviceName, std::string_view serviceType,
-                std::string_view machineName, wpi::span<std::pair<std::string, std::string>> txt);
+                std::string_view machineName,
+                wpi::span<std::pair<std::string, std::string>> txt);
   ~mDNSAnnouncer() noexcept;
 
   void Start();
