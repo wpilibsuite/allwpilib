@@ -19,7 +19,7 @@ struct SavedSettings {
   bool loadedWidthHeight = false;
   int width;
   int height;
-  int maximized = 0;
+  bool maximized = false;
   int xPos = -1;
   int yPos = -1;
   int userScale = 2;
