@@ -92,7 +92,7 @@ AvahiThread::AvahiThread(const private_init&) {
 }
 
 AvahiThread::~AvahiThread() noexcept {
-    if (!table.IsValid()) {
+  if (!table.IsValid()) {
     return;
   }
 

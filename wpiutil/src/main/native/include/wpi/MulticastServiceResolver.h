@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "wpi/ConcurrentQueue.h"
 #include "wpi/Synchronization.h"
@@ -17,7 +18,7 @@
 namespace wpi {
 class MulticastServiceResolver {
  public:
-  MulticastServiceResolver(std::string_view serviceType);
+  explicit MulticastServiceResolver(std::string_view serviceType);
   ~MulticastServiceResolver() noexcept;
 
   struct ServiceData {

@@ -159,13 +159,13 @@ enum { AVAHI_IF_UNSPEC = -1 };
 
 enum { AVAHI_PROTO_INET = 0, AVAHI_PROTO_INET6 = 1, AVAHI_PROTO_UNSPEC = -1 };
 
+namespace wpi {
+class AvahiFunctionTable {
+ public:
 #define AvahiFunction(CapName, RetType, Parameters) \
   using CapName##_func = RetType(*) Parameters;     \
   CapName##_func CapName = nullptr
 
-namespace wpi {
-class AvahiFunctionTable {
- public:
   AvahiFunction(threaded_poll_new, AvahiThreadedPoll*, (void));
   AvahiFunction(threaded_poll_free, void, (AvahiThreadedPoll*));
   AvahiFunction(threaded_poll_get, const AvahiPoll*, (AvahiThreadedPoll*));
@@ -232,7 +232,7 @@ class AvahiThread {
   struct private_init {};
 
  public:
-  AvahiThread(const private_init&);
+  explicit AvahiThread(const private_init&);
   ~AvahiThread() noexcept;
 
   void lock();
