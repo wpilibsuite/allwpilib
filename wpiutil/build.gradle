@@ -164,7 +164,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/fmtlib/include'
                         include '**/*.h'
                     }
                 }

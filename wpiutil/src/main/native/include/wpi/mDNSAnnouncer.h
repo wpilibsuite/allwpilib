@@ -21,8 +21,9 @@ class mDNSAnnouncer {
   void Start();
   void Stop();
 
- private:
   struct Impl;
+
+ private:
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
