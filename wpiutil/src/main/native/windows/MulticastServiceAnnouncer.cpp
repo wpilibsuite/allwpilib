@@ -6,7 +6,7 @@
 #define UNICODE
 #endif
 
-#include "wpi/mDNSAnnouncer.h"
+#include "wpi/MulticastServiceAnnouncer.h"
 
 #include <string>
 #include <vector>
@@ -26,7 +26,7 @@ struct ImplBase {
   HANDLE event = nullptr;
 };
 
-struct mDNSAnnouncer::Impl : ImplBase {
+struct MulticastServiceAnnouncer::Impl : ImplBase {
   std::wstring serviceType;
   std::wstring serviceInstanceName;
   std::wstring hostName;
@@ -37,7 +37,7 @@ struct mDNSAnnouncer::Impl : ImplBase {
   std::vector<PCWSTR> valuePtrs;
 };
 
-mDNSAnnouncer::mDNSAnnouncer(
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
@@ -103,7 +103,7 @@ mDNSAnnouncer::mDNSAnnouncer(
       reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 }
 
-mDNSAnnouncer::~mDNSAnnouncer() noexcept {
+MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
 }
 
@@ -117,7 +117,7 @@ static void WINAPI DnsServiceRegisterCallback(DWORD /*Status*/,
   SetEvent(impl->event);
 }
 
-void mDNSAnnouncer::Start() {
+void MulticastServiceAnnouncer::Start() {
   if (pImpl->serviceInstance) {
     return;
   }
@@ -167,7 +167,7 @@ static void WINAPI DnsServiceDeRegisterCallback(
   SetEvent(impl->event);
 }
 
-void mDNSAnnouncer::Stop() {
+void MulticastServiceAnnouncer::Stop() {
   if (!pImpl->dynamicDns.CanDnsAnnounce) {
     return;
   }

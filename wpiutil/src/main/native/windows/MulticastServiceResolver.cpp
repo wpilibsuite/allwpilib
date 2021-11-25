@@ -6,7 +6,7 @@
 #define UNICODE
 #endif
 
-#include "wpi/mDNSResolver.h"
+#include "wpi/MulticastServiceResolver.h"
 
 #include <string>
 
@@ -20,14 +20,14 @@
 
 using namespace wpi;
 
-struct mDNSResolver::Impl {
+struct MulticastServiceResolver::Impl {
   wpi::DynamicDns& dynamicDns = wpi::DynamicDns::GetDynamicDns();
   std::wstring serviceType;
   DNS_SERVICE_CANCEL serviceCancel{nullptr};
   mDnsRevolveCompletionFunc onFound;
 };
 
-mDNSResolver::mDNSResolver(std::string_view serviceType,
+MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
                            mDnsRevolveCompletionFunc onFound) {
   pImpl = std::make_unique<Impl>();
   pImpl->onFound = std::move(onFound);
@@ -50,15 +50,15 @@ mDNSResolver::mDNSResolver(std::string_view serviceType,
       reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 }
 
-mDNSResolver::~mDNSResolver() noexcept {
+MulticastServiceResolver::~MulticastServiceResolver() noexcept {
   Stop();
 }
 
 static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
     DnsCompletion(_In_ PVOID pQueryContext,
                   _Inout_ PDNS_QUERY_RESULT pQueryResults) {
-  mDNSResolver::Impl* impl =
-      reinterpret_cast<mDNSResolver::Impl*>(pQueryContext);
+  MulticastServiceResolver::Impl* impl =
+      reinterpret_cast<MulticastServiceResolver::Impl*>(pQueryContext);
 
   wpi::SmallVector<DNS_RECORDW*, 4> PtrRecords;
   wpi::SmallVector<DNS_RECORDW*, 4> SrvRecords;
@@ -162,7 +162,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
   DnsFree(pQueryResults->pQueryRecords, DNS_FREE_TYPE::DnsFreeRecordList);
 }
 
-void mDNSResolver::Start() {
+void MulticastServiceResolver::Start() {
   if (pImpl->serviceCancel.reserved != nullptr) {
     return;
   }
@@ -180,7 +180,7 @@ void mDNSResolver::Start() {
   pImpl->dynamicDns.DnsServiceBrowsePtr(&request, &pImpl->serviceCancel);
 }
 
-void mDNSResolver::Stop() {
+void MulticastServiceResolver::Stop() {
   if (!pImpl->dynamicDns.CanDnsResolve) {
     return;
   }

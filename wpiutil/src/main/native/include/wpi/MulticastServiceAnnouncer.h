@@ -12,12 +12,12 @@
 #include "wpi/span.h"
 
 namespace wpi {
-class mDNSAnnouncer {
+class MulticastServiceAnnouncer {
  public:
-  mDNSAnnouncer(std::string_view serviceName, std::string_view serviceType,
+  MulticastServiceAnnouncer(std::string_view serviceName, std::string_view serviceType,
                 int port,
                 wpi::span<const std::pair<std::string, std::string>> txt);
-  ~mDNSAnnouncer() noexcept;
+  ~MulticastServiceAnnouncer() noexcept;
 
   void Start();
   void Stop();

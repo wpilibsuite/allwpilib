@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/mDNSResolver.h"
+#include "wpi/MulticastServiceResolver.h"
 
 #include <netinet/in.h>
 #include <poll.h>
@@ -16,7 +16,7 @@
 using namespace wpi;
 
 struct DnsResolveState {
-  DnsResolveState(mDNSResolver::Impl* impl, std::string_view serviceNameView)
+  DnsResolveState(MulticastServiceResolver::Impl* impl, std::string_view serviceNameView)
       : pImpl{impl}, serviceName{serviceNameView} {}
   ~DnsResolveState() {
     if (ResolveRef != nullptr) {
@@ -26,14 +26,14 @@ struct DnsResolveState {
 
   DNSServiceRef ResolveRef = nullptr;
   dnssd_sock_t ResolveSocket;
-  mDNSResolver::Impl* pImpl;
+  MulticastServiceResolver::Impl* pImpl;
 
   int port;
   std::string serviceName;
   std::vector<std::pair<std::string, std::string>> txts;
 };
 
-struct mDNSResolver::Impl {
+struct MulticastServiceResolver::Impl {
   std::string serviceType;
   mDnsRevolveCompletionFunc onFound;
   DNSServiceRef ServiceRef = nullptr;
@@ -78,14 +78,14 @@ struct mDNSResolver::Impl {
   }
 };
 
-mDNSResolver::mDNSResolver(std::string_view serviceType,
+MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
                            mDnsRevolveCompletionFunc onFound) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceType = serviceType;
   pImpl->onFound = std::move(onFound);
 }
 
-mDNSResolver::~mDNSResolver() noexcept {
+MulticastServiceResolver::~MulticastServiceResolver() noexcept {
   Stop();
 }
 
@@ -175,7 +175,7 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
     return;
   }
 
-  mDNSResolver::Impl* impl = static_cast<mDNSResolver::Impl*>(context);
+  MulticastServiceResolver::Impl* impl = static_cast<MulticastServiceResolver::Impl*>(context);
   auto& resolveState = impl->ResolveStates.emplace_back(
       std::make_unique<DnsResolveState>(impl, serviceName));
 
@@ -193,7 +193,7 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
   }
 }
 
-void mDNSResolver::Start() {
+void MulticastServiceResolver::Start() {
   if (pImpl->ServiceRef) {
     return;
   }
@@ -208,7 +208,7 @@ void mDNSResolver::Start() {
   }
 }
 
-void mDNSResolver::Stop() {
+void MulticastServiceResolver::Stop() {
   if (!pImpl->ServiceRef) {
     return;
   }

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/mDNSAnnouncer.h"
+#include "wpi/MulticastServiceAnnouncer.h"
 
 #include "dns_sd.h"
 
 using namespace wpi;
 
-struct mDNSAnnouncer::Impl {
+struct MulticastServiceAnnouncer::Impl {
   std::string serviceName;
   std::string serviceType;
   int port;
@@ -20,7 +20,7 @@ struct mDNSAnnouncer::Impl {
   ~Impl() noexcept { TXTRecordDeallocate(&txtRecord); }
 };
 
-mDNSAnnouncer::mDNSAnnouncer(
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
@@ -34,11 +34,11 @@ mDNSAnnouncer::mDNSAnnouncer(
   }
 }
 
-mDNSAnnouncer::~mDNSAnnouncer() noexcept {
+MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
 }
 
-void mDNSAnnouncer::Start() {
+void MulticastServiceAnnouncer::Start() {
   if (pImpl->serviceRef) {
     return;
   }
@@ -51,7 +51,7 @@ void mDNSAnnouncer::Start() {
                            htons(pImpl->port), len, ptr, nullptr, nullptr);
 }
 
-void mDNSAnnouncer::Stop() {
+void MulticastServiceAnnouncer::Stop() {
   if (!pImpl->serviceRef) {
     return;
   }

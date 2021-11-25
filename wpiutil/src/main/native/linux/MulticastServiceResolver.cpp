@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/mDNSResolver.h"
+#include "wpi/MulticastServiceResolver.h"
 
 #include "AvahiClient.h"
 #include "wpi/SmallString.h"
@@ -10,7 +10,7 @@
 
 using namespace wpi;
 
-struct mDNSResolver::Impl {
+struct MulticastServiceResolver::Impl {
   AvahiFunctionTable& table = AvahiFunctionTable::Get();
   std::shared_ptr<AvahiThread> thread = AvahiThread::Get();
   AvahiClient* client;
@@ -19,14 +19,14 @@ struct mDNSResolver::Impl {
   mDnsRevolveCompletionFunc onFound;
 };
 
-mDNSResolver::mDNSResolver(std::string_view serviceType,
+MulticastServiceResolver::MulticastServiceResolver(std::string_view serviceType,
                            mDnsRevolveCompletionFunc onFound) {
   pImpl = std::make_unique<Impl>();
   pImpl->serviceType = serviceType;
   pImpl->onFound = std::move(onFound);
 }
 
-mDNSResolver::~mDNSResolver() noexcept {
+MulticastServiceResolver::~MulticastServiceResolver() noexcept {
   Stop();
 }
 
@@ -37,7 +37,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
                             const AvahiAddress* address, uint16_t port,
                             AvahiStringList* txt, AvahiLookupResultFlags flags,
                             void* userdata) {
-  mDNSResolver::Impl* impl = reinterpret_cast<mDNSResolver::Impl*>(userdata);
+  MulticastServiceResolver::Impl* impl = reinterpret_cast<MulticastServiceResolver::Impl*>(userdata);
 
   if (event == AVAHI_RESOLVER_FOUND) {
     if (address->proto == AVAHI_PROTO_INET) {
@@ -80,7 +80,7 @@ static void BrowseCallback(AvahiServiceBrowser* b, AvahiIfIndex interface,
                            const char* name, const char* type,
                            const char* domain, AvahiLookupResultFlags flags,
                            void* userdata) {
-  mDNSResolver::Impl* impl = reinterpret_cast<mDNSResolver::Impl*>(userdata);
+  MulticastServiceResolver::Impl* impl = reinterpret_cast<MulticastServiceResolver::Impl*>(userdata);
 
   if (event == AVAHI_BROWSER_NEW) {
     impl->table.service_resolver_new(
@@ -92,7 +92,7 @@ static void BrowseCallback(AvahiServiceBrowser* b, AvahiIfIndex interface,
 
 static void ClientCallback(AvahiClient* client, AvahiClientState state,
                            void* userdata) {
-  mDNSResolver::Impl* impl = reinterpret_cast<mDNSResolver::Impl*>(userdata);
+  MulticastServiceResolver::Impl* impl = reinterpret_cast<MulticastServiceResolver::Impl*>(userdata);
 
   if (state == AVAHI_CLIENT_S_RUNNING) {
     impl->browser = impl->table.service_browser_new(
@@ -103,7 +103,7 @@ static void ClientCallback(AvahiClient* client, AvahiClientState state,
   }
 }
 
-void mDNSResolver::Start() {
+void MulticastServiceResolver::Start() {
   if (!pImpl->table.IsValid()) {
     return;
   }
@@ -117,7 +117,7 @@ void mDNSResolver::Start() {
                               ClientCallback, pImpl.get(), nullptr);
 }
 
-void mDNSResolver::Stop() {
+void MulticastServiceResolver::Stop() {
   if (!pImpl->table.IsValid()) {
     return;
   }
