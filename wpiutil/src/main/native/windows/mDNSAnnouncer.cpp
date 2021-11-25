@@ -51,11 +51,13 @@ mDNSAnnouncer::mDNSAnnouncer(
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.first, wideStorage);
     pImpl->keys.emplace_back(
-        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()});
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()),
+                     wideStorage.size()});
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.second, wideStorage);
     pImpl->values.emplace_back(
-        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()});
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()),
+                     wideStorage.size()});
   }
 
   for (size_t i = 0; i < pImpl->keys.size(); i++) {
@@ -128,10 +130,9 @@ void mDNSAnnouncer::Start() {
 
   PDNS_SERVICE_INSTANCE serviceInst =
       pImpl->dynamicDns.DnsServiceConstructInstancePtr(
-          pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(),
-          nullptr, nullptr, 5000, 0, 0,
-          static_cast<DWORD>(pImpl->keyPtrs.size()), pImpl->keyPtrs.data(),
-          pImpl->valuePtrs.data());
+          pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(), nullptr,
+          nullptr, 5000, 0, 0, static_cast<DWORD>(pImpl->keyPtrs.size()),
+          pImpl->keyPtrs.data(), pImpl->valuePtrs.data());
   if (serviceInst == nullptr) {
     return;
   }
