@@ -50,7 +50,9 @@ mDNSResolver::mDNSResolver(std::string_view serviceType,
       reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 }
 
-mDNSResolver::~mDNSResolver() noexcept {}
+mDNSResolver::~mDNSResolver() noexcept {
+  Stop();
+}
 
 static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
     DnsCompletion(_In_ PVOID pQueryContext,

@@ -15,11 +15,12 @@
 namespace wpi {
 class mDNSResolver {
  public:
+
   typedef void mDnsRevolveCompletion(
       unsigned int ipv4Address, std::string_view serviceName,
       std::string_view hostName,
-      wpi::span<std::pair<std::string, std::string>> txt);
-  typedef mDnsRevolveCompletion* mDnsRevolveCompletionFunc;
+      wpi::span<const std::pair<std::string, std::string>> txt);
+  using mDnsRevolveCompletionFunc = std::function<mDnsRevolveCompletion>;
 
   mDNSResolver(std::string_view serviceType, mDnsRevolveCompletionFunc onFound);
   ~mDNSResolver() noexcept;

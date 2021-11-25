@@ -38,7 +38,7 @@ struct mDNSAnnouncer::Impl : ImplBase {
 
 mDNSAnnouncer::mDNSAnnouncer(
     std::string_view serviceName, std::string_view serviceType,
-    wpi::span<std::pair<std::string, std::string>> txt) {
+    wpi::span<const std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
 
   if (!pImpl->dynamicDns.CanDnsAnnounce) {

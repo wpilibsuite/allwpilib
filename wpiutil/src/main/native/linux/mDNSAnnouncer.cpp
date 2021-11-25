@@ -10,7 +10,7 @@ struct mDNSAnnouncer::Impl {};
 
 mDNSAnnouncer::mDNSAnnouncer(
     std::string_view serviceName, std::string_view serviceType,
-    wpi::span<std::pair<std::string, std::string>> txt) {}
+    wpi::span<const std::pair<std::string, std::string>> txt) {}
 
 mDNSAnnouncer::~mDNSAnnouncer() noexcept {}
 
