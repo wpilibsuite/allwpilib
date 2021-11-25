@@ -12,12 +12,23 @@
 
 using namespace wpi;
 
-#define AvahiFunctionLoad(snake_name) \
-  snake_name =                        \
-      reinterpret_cast<snake_name##_func>(dlsym(lib, "avahi_" #snake_name))
+#define AvahiFunctionLoad(snake_name)                                          \
+  do {                                                                         \
+    snake_name =                                                               \
+        reinterpret_cast<snake_name##_func>(dlsym(lib, "avahi_" #snake_name)); \
+    if (!snake_name) {                                                         \
+      return;                                                                  \
+    }                                                                          \
+  } while (false)
 
 AvahiFunctionTable::AvahiFunctionTable() {
   void* lib = dlopen("libavahi-common.so.3", RTLD_LAZY);
+
+  valid = false;
+
+  if (lib == nullptr) {
+    return;
+  }
 
   AvahiFunctionLoad(threaded_poll_new);
   AvahiFunctionLoad(threaded_poll_free);
@@ -31,6 +42,10 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(unescape_label);
 
   lib = dlopen("libavahi-client.so.3", RTLD_LAZY);
+
+  if (lib == nullptr) {
+    return;
+  }
 
   AvahiFunctionLoad(client_new);
   AvahiFunctionLoad(client_free);
@@ -46,8 +61,7 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(entry_group_is_empty);
   AvahiFunctionLoad(entry_group_commit);
 
-  // TODO make this better
-  valid = entry_group_add_service_strlst != nullptr;
+  valid = true;
 }
 
 AvahiFunctionTable& AvahiFunctionTable::Get() {
