@@ -90,6 +90,19 @@ static void BrowseCallback(AvahiServiceBrowser* b, AvahiIfIndex interface,
   }
 }
 
+static void ClientCallback(AvahiClient* client, AvahiClientState state,
+                           void* userdata) {
+  mDNSResolver::Impl* impl = reinterpret_cast<mDNSResolver::Impl*>(userdata);
+
+  if (state == AVAHI_CLIENT_S_RUNNING) {
+    impl->browser = impl->table.service_browser_new(
+      client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
+      impl->serviceType.c_str(), "local",
+      AvahiLookupFlags::AVAHI_LOOKUP_USE_MULTICAST, BrowseCallback,
+      userdata);
+  }
+}
+
 void mDNSResolver::Start() {
   if (!pImpl->table.IsValid()) {
     return;
@@ -101,13 +114,7 @@ void mDNSResolver::Start() {
 
   pImpl->client =
       pImpl->table.client_new(pImpl->thread->GetPoll(), AVAHI_CLIENT_NO_FAIL,
-                              nullptr, nullptr, nullptr);
-
-  pImpl->browser = pImpl->table.service_browser_new(
-      pImpl->client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
-      pImpl->serviceType.c_str(), "local",
-      AvahiLookupFlags::AVAHI_LOOKUP_USE_MULTICAST, BrowseCallback,
-      pImpl.get());
+                              ClientCallback, pImpl.get(), nullptr);
 }
 
 void mDNSResolver::Stop() {
@@ -116,6 +123,10 @@ void mDNSResolver::Stop() {
   }
   std::scoped_lock lock{*pImpl->thread};
   if (pImpl->client) {
+    if (pImpl->browser) {
+      pImpl->table.service_browser_free(pImpl->browser);
+      pImpl->browser = nullptr;
+    }
     pImpl->table.client_free(pImpl->client);
     pImpl->client = nullptr;
   }

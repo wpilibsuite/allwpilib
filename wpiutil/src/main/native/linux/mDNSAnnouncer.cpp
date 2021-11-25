@@ -110,6 +110,10 @@ void mDNSAnnouncer::Stop() {
   }
   std::scoped_lock lock{*pImpl->thread};
   if (pImpl->client) {
+    if (pImpl->group) {
+      pImpl->table.entry_group_free(pImpl->group);
+      pImpl->group = nullptr;
+    }
     pImpl->table.client_free(pImpl->client);
     pImpl->client = nullptr;
   }
