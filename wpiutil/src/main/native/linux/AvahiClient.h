@@ -327,6 +327,10 @@ class AvahiFunctionTable {
                 (const char** array, int len));
   AvahiFunction(string_list_free, void, (AvahiStringList*));
 
+  AvahiFunction(service_browser_get_client, AvahiClient*, (AvahiServiceBrowser*));
+
+  AvahiFunction(unescape_label, char*, (const char**, char*, size_t));
+
   bool IsValid() const {
       return valid;
   }

@@ -21,12 +21,14 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(threaded_poll_unlock);
   AvahiFunctionLoad(string_list_new_from_array);
   AvahiFunctionLoad(string_list_free);
+  AvahiFunctionLoad(unescape_label);
 
   lib = dlopen("libavahi-client.so.3", RTLD_LAZY);
 
   AvahiFunctionLoad(client_new);
   AvahiFunctionLoad(client_free);
   AvahiFunctionLoad(service_browser_new);
+  AvahiFunctionLoad(service_browser_get_client);
   AvahiFunctionLoad(service_browser_free);
   AvahiFunctionLoad(service_resolver_new);
   AvahiFunctionLoad(service_resolver_free);

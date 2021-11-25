@@ -89,13 +89,22 @@ mDNSAnnouncer::~mDNSAnnouncer() noexcept {
 }
 
 void mDNSAnnouncer::Start() {
+  if (!pImpl->table.IsValid()) {
+    return;
+  }
   std::scoped_lock lock{*pImpl->thread};
+  if (pImpl->client) {
+    return;
+  }
   pImpl->client =
       pImpl->table.client_new(pImpl->thread->GetPoll(), AVAHI_CLIENT_NO_FAIL,
                               ClientCallback, pImpl.get(), nullptr);
 }
 
 void mDNSAnnouncer::Stop() {
+  if (!pImpl->table.IsValid()) {
+    return;
+  }
   std::scoped_lock lock{*pImpl->thread};
   if (pImpl->client) {
     pImpl->table.client_free(pImpl->client);

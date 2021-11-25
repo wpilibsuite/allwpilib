@@ -30,7 +30,7 @@ struct mDNSResolver::Impl {
 mDNSResolver::mDNSResolver(std::string_view serviceType,
                            mDnsRevolveCompletionFunc onFound) {
   pImpl = std::make_unique<Impl>();
-  pImpl->onFound = onFound;
+  pImpl->onFound = std::move(onFound);
 
   if (!pImpl->dynamicDns.CanDnsResolve) {
     return;
@@ -116,6 +116,7 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
               std::wstring_view wideView = Txt->Data.TXT.pStringArray[i];
               size_t splitIndex = wideView.find(L'=');
               if (splitIndex == wideView.npos) {
+                // Todo make this just do key
                 continue;
               }
               std::string key;
