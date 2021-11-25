@@ -23,7 +23,7 @@ struct MulticastServiceAnnouncer::Impl {
   AvahiStringList* stringList = nullptr;
 
   ~Impl() noexcept {
-    if (stringList != nullptr) {
+    if (stringList != nullptr && table.IsValid()) {
       table.string_list_free(stringList);
     }
   }
@@ -92,6 +92,10 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
 
 MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
+}
+
+bool MulticastServiceAnnouncer::HasImplementation() const {
+  return pImpl->table.IsValid();
 }
 
 void MulticastServiceAnnouncer::Start() {

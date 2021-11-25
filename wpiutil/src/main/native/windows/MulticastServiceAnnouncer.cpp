@@ -107,6 +107,10 @@ MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
 }
 
+bool MulticastServiceAnnouncer::HasImplementation() const {
+  return pImpl->dynamicDns.CanDnsAnnounce;
+}
+
 static void WINAPI DnsServiceRegisterCallback(DWORD /*Status*/,
                                               PVOID pQueryContext,
                                               PDNS_SERVICE_INSTANCE pInstance) {

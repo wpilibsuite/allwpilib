@@ -35,6 +35,8 @@ class MulticastServiceResolver {
 
   ServiceData GetData() { return eventQueue.pop(); }
 
+  bool HasImplementation() const;
+
   struct Impl;
 
  private:

@@ -60,6 +60,10 @@ MulticastServiceResolver::~MulticastServiceResolver() noexcept {
   Stop();
 }
 
+bool MulticastServiceResolver::HasImplementation() const {
+  return pImpl->dynamicDns.CanDnsResolve;
+}
+
 static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
     DnsCompletion(_In_ PVOID pQueryContext,
                   _Inout_ PDNS_QUERY_RESULT pQueryResults) {

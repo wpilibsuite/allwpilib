@@ -22,6 +22,8 @@ class MulticastServiceAnnouncer {
   void Start();
   void Stop();
 
+  bool HasImplementation() const;
+
   struct Impl;
 
  private:

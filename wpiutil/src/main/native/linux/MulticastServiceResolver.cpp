@@ -35,6 +35,10 @@ MulticastServiceResolver::~MulticastServiceResolver() noexcept {
   Stop();
 }
 
+bool MulticastServiceResolver::HasImplementation() const {
+  return pImpl->table.IsValid();
+}
+
 static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
                             AvahiProtocol protocol, AvahiResolverEvent event,
                             const char* name, const char* type,

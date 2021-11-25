@@ -201,6 +201,10 @@ static void DnsCompletion(DNSServiceRef sdRef, DNSServiceFlags flags,
   }
 }
 
+bool MulticastServiceResolver::HasImplementation() const {
+  return true;
+}
+
 void MulticastServiceResolver::Start() {
   if (pImpl->ServiceRef) {
     return;

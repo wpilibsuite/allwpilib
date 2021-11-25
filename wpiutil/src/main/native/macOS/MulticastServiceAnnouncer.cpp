@@ -38,6 +38,10 @@ MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
 }
 
+bool MulticastServiceAnnouncer::HasImplementation() const {
+  return true;
+}
+
 void MulticastServiceAnnouncer::Start() {
   if (pImpl->serviceRef) {
     return;

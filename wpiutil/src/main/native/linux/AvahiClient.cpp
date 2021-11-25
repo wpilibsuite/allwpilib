@@ -83,13 +83,23 @@ std::shared_ptr<AvahiThread> AvahiThread::Get() {
 }
 
 AvahiThread::AvahiThread(const private_init&) {
+  if (!table.IsValid()) {
+    return;
+  }
+
   threadedPoll = table.threaded_poll_new();
   table.threaded_poll_start(threadedPoll);
 }
 
 AvahiThread::~AvahiThread() noexcept {
-  table.threaded_poll_stop(threadedPoll);
-  table.threaded_poll_free(threadedPoll);
+    if (!table.IsValid()) {
+    return;
+  }
+
+  if (threadedPoll) {
+    table.threaded_poll_stop(threadedPoll);
+    table.threaded_poll_free(threadedPoll);
+  }
 }
 
 void AvahiThread::lock() {
