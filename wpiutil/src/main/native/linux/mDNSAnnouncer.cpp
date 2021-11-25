@@ -4,10 +4,11 @@
 
 #include "wpi/mDNSAnnouncer.h"
 
-#include "AvahiClient.h"
-#include "wpi/mutex.h"
 #include <vector>
+
+#include "AvahiClient.h"
 #include "fmt/format.h"
+#include "wpi/mutex.h"
 
 using namespace wpi;
 

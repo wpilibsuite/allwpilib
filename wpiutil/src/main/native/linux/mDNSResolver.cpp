@@ -3,9 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/mDNSResolver.h"
+
 #include "AvahiClient.h"
-#include "wpi/mutex.h"
 #include "wpi/SmallString.h"
+#include "wpi/mutex.h"
 
 using namespace wpi;
 
@@ -66,7 +67,8 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
         outputHostName.append(".");
       } while (true);
 
-      impl->onFound(address->data.ipv4.address, name, outputHostName.str(), txtArr);
+      impl->onFound(address->data.ipv4.address, name, outputHostName.str(),
+                    txtArr);
     }
   }
 

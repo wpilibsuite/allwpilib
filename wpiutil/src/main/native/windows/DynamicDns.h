@@ -11,6 +11,7 @@
 #ifdef WINAPI_FAMILY
 #undef WINAPI_FAMILY
 #endif
+
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
 
 #include <windows.h>

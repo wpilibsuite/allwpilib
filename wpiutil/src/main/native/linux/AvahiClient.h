@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #pragma once
 
 #include <stdint.h>
@@ -327,13 +331,12 @@ class AvahiFunctionTable {
                 (const char** array, int len));
   AvahiFunction(string_list_free, void, (AvahiStringList*));
 
-  AvahiFunction(service_browser_get_client, AvahiClient*, (AvahiServiceBrowser*));
+  AvahiFunction(service_browser_get_client, AvahiClient*,
+                (AvahiServiceBrowser*));
 
   AvahiFunction(unescape_label, char*, (const char**, char*, size_t));
 
-  bool IsValid() const {
-      return valid;
-  }
+  bool IsValid() const { return valid; }
 
   static AvahiFunctionTable& Get();
 
