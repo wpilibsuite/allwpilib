@@ -7,43 +7,61 @@ package edu.wpi.first.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Service data for MulticastServiceResolver. */
 public class ServiceData {
-  public ServiceData(long ipv4Address, int port, String serviceName, String hostName, String[] keys, String[] values) {
-    this.serviceName = serviceName;
-    this.hostName = hostName;
-    this.port = port;
-    this.ipv4Address = ipv4Address;
 
-    txt = new HashMap<>();
+  /**
+   * Constructs a ServiceData.
+   *
+   * @param ipv4Address ipv4Address
+   * @param port port
+   * @param serviceName found service name
+   * @param hostName found host name
+   * @param keys txt keys
+   * @param values txt values
+   */
+  public ServiceData(
+      long ipv4Address,
+      int port,
+      String serviceName,
+      String hostName,
+      String[] keys,
+      String[] values) {
+    this.m_serviceName = serviceName;
+    this.m_hostName = hostName;
+    this.m_port = port;
+    this.m_ipv4Address = ipv4Address;
 
-    for(int i = 0; i < keys.length; i++) {
-      txt.put(keys[i], values[i]);
+    m_txt = new HashMap<>();
+
+    for (int i = 0; i < keys.length; i++) {
+      m_txt.put(keys[i], values[i]);
     }
   }
 
   public Map<String, String> getTxt() {
-    return txt;
+    return m_txt;
   }
 
   public String getHostName() {
-    return hostName;
+    return m_hostName;
   }
 
   public String getServiceName() {
-    return serviceName;
+    return m_serviceName;
   }
 
   public int getPort() {
-    return port;
+    return m_port;
   }
 
   public long getIpv4Address() {
-    return ipv4Address;
+    return m_ipv4Address;
   }
 
-  private final Map<String, String> txt;
-  private final long ipv4Address;
-  private final int port;
-  private final String serviceName;
-  private final String hostName;
+  private final Map<String, String> m_txt;
+  private final long m_ipv4Address;
+  private final int m_port;
+  private final String m_serviceName;
+  private final String m_hostName;
 }

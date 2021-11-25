@@ -6,29 +6,40 @@ package edu.wpi.first.util;
 
 import java.util.Map;
 
+/** Class to announce over mDNS that a service is available. */
 public class MulticastServiceAnnouncer implements AutoCloseable {
-  private final int handle;
+  private final int m_handle;
 
-  public MulticastServiceAnnouncer(String serviceName, String serviceType, int port, Map<String, String> txt) {
+  /**
+   * Creates a MulticastServiceAnnouncer.
+   *
+   * @param serviceName service name
+   * @param serviceType service type
+   * @param port port
+   * @param txt txt
+   */
+  public MulticastServiceAnnouncer(
+      String serviceName, String serviceType, int port, Map<String, String> txt) {
     String[] keys = txt.keySet().toArray(String[]::new);
     String[] values = txt.values().toArray(String[]::new);
-    handle = WPIUtilJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
+    m_handle =
+        WPIUtilJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
   }
 
   @Override
   public void close() {
-    WPIUtilJNI.freeMulticastServiceAnnouncer(handle);
+    WPIUtilJNI.freeMulticastServiceAnnouncer(m_handle);
   }
 
   public void start() {
-    WPIUtilJNI.startMulticastServiceAnnouncer(handle);
+    WPIUtilJNI.startMulticastServiceAnnouncer(m_handle);
   }
 
   public void stop() {
-    WPIUtilJNI.stopMulticastServiceAnnouncer(handle);
+    WPIUtilJNI.stopMulticastServiceAnnouncer(m_handle);
   }
 
   public boolean hasImplementation() {
-    return WPIUtilJNI.getMulticastServiceAnnouncerHasImplementation(handle);
+    return WPIUtilJNI.getMulticastServiceAnnouncerHasImplementation(m_handle);
   }
 }

@@ -4,35 +4,41 @@
 
 package edu.wpi.first.util;
 
+/** Class to resolve a service over mDNS. */
 public class MulticastServiceResolver implements AutoCloseable {
-    private final int handle;
+  private final int m_handle;
 
-    public MulticastServiceResolver(String serviceType) {
-      handle = WPIUtilJNI.createMulticastServiceResolver(serviceType);
-    }
+  /**
+   * Creates a MulticastServiceResolver.
+   *
+   * @param serviceType service type to look for
+   */
+  public MulticastServiceResolver(String serviceType) {
+    m_handle = WPIUtilJNI.createMulticastServiceResolver(serviceType);
+  }
 
-    @Override
-    public void close() {
-      WPIUtilJNI.freeMulticastServiceResolver(handle);
-    }
+  @Override
+  public void close() {
+    WPIUtilJNI.freeMulticastServiceResolver(m_handle);
+  }
 
-    public void start() {
-      WPIUtilJNI.startMulticastServiceResolver(handle);
-    }
+  public void start() {
+    WPIUtilJNI.startMulticastServiceResolver(m_handle);
+  }
 
-    public void stop() {
-      WPIUtilJNI.stopMulticastServiceResolver(handle);
-    }
+  public void stop() {
+    WPIUtilJNI.stopMulticastServiceResolver(m_handle);
+  }
 
-    public boolean hasImplementation() {
-      return WPIUtilJNI.getMulticastServiceResolverHasImplementation(handle);
-    }
+  public boolean hasImplementation() {
+    return WPIUtilJNI.getMulticastServiceResolverHasImplementation(m_handle);
+  }
 
-    public int getEventHandle() {
-        return WPIUtilJNI.getMulticastServiceResolverEventHandle(handle);
-    }
+  public int getEventHandle() {
+    return WPIUtilJNI.getMulticastServiceResolverEventHandle(m_handle);
+  }
 
-    public ServiceData getData() {
-        return WPIUtilJNI.getMulticastServiceResolverData(handle);
-    }
+  public ServiceData getData() {
+    return WPIUtilJNI.getMulticastServiceResolverData(m_handle);
+  }
 }
