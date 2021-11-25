@@ -128,12 +128,23 @@ static _Function_class_(DNS_QUERY_COMPLETION_ROUTINE) VOID WINAPI
           }
         }
 
-        wpi::SmallString<128> name;
-        wpi::span<const wpi::UTF16> wideName{
+        wpi::SmallString<128> hostName;
+        wpi::span<const wpi::UTF16> wideHostName{
             reinterpret_cast<const wpi::UTF16*>(A->pName), wcslen(A->pName)};
-        wpi::convertUTF16ToUTF8String(wideName, name);
+        wpi::convertUTF16ToUTF8String(wideHostName, hostName);
 
-        impl->onFound(A->Data.A.IpAddress, name.str(), extraTxt);
+        wpi::SmallString<128> serviceName;
+        int len = nameHost.find(impl->serviceType.c_str());
+        wpi::span<const wpi::UTF16> wideServiceName{
+            reinterpret_cast<const wpi::UTF16*>(nameHost.data()),
+            nameHost.size()};
+        if (len != nameHost.npos) {
+          wideServiceName = wideServiceName.subspan(0, len - 1);
+        }
+        wpi::convertUTF16ToUTF8String(wideServiceName, serviceName);
+
+        impl->onFound(A->Data.A.IpAddress, serviceName.str(), hostName.str(),
+                      extraTxt);
       }
     }
   }

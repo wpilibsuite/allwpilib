@@ -28,7 +28,7 @@ struct ImplBase {
 struct mDNSAnnouncer::Impl : ImplBase {
   std::wstring serviceType;
   std::wstring serviceInstanceName;
-  std::wstring machineName;
+  std::wstring hostName;
   std::vector<std::wstring> keys;
   std::vector<PCWSTR> keyPtrs;
   std::vector<std::wstring> values;
@@ -37,7 +37,7 @@ struct mDNSAnnouncer::Impl : ImplBase {
 
 mDNSAnnouncer::mDNSAnnouncer(
     std::string_view serviceName, std::string_view serviceType,
-    std::string_view machineName,
+    std::string_view hostName,
     wpi::span<std::pair<std::string, std::string>> txt) {
   pImpl = std::make_unique<Impl>();
 
@@ -51,11 +51,11 @@ mDNSAnnouncer::mDNSAnnouncer(
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.first, wideStorage);
     pImpl->keys.emplace_back(
-        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()});
     wideStorage.clear();
     wpi::convertUTF8ToUTF16String(i.second, wideStorage);
     pImpl->values.emplace_back(
-        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
+        std::wstring{reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()});
   }
 
   for (size_t i = 0; i < pImpl->keys.size(); i++) {
@@ -66,15 +66,15 @@ mDNSAnnouncer::mDNSAnnouncer(
   wpi::SmallString<128> storage;
 
   wideStorage.clear();
-  if (wpi::ends_with_lower(machineName, ".local")) {
-    wpi::convertUTF8ToUTF16String(machineName, wideStorage);
+  if (wpi::ends_with_lower(hostName, ".local")) {
+    wpi::convertUTF8ToUTF16String(hostName, wideStorage);
   } else {
-    storage.append(machineName);
+    storage.append(hostName);
     storage.append(".local");
     wpi::convertUTF8ToUTF16String(storage.str(), wideStorage);
   }
 
-  pImpl->machineName = std::wstring{
+  pImpl->hostName = std::wstring{
       reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
 
   wideStorage.clear();
@@ -118,7 +118,7 @@ void mDNSAnnouncer::Start() {
 
   PDNS_SERVICE_INSTANCE serviceInst =
       pImpl->dynamicDns.DnsServiceConstructInstancePtr(
-          pImpl->serviceInstanceName.c_str(), pImpl->machineName.c_str(),
+          pImpl->serviceInstanceName.c_str(), pImpl->hostName.c_str(),
           nullptr, nullptr, 5000, 0, 0,
           static_cast<DWORD>(pImpl->keyPtrs.size()), pImpl->keyPtrs.data(),
           pImpl->valuePtrs.data());
