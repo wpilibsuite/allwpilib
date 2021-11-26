@@ -38,7 +38,7 @@ class MulticastServiceAnnouncer {
 extern "C" {
 #endif
 
-typedef unsigned int WPI_MulticastServiceAnnouncerHandle;
+typedef unsigned int WPI_MulticastServiceAnnouncerHandle; // NOLINT
 
 WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
     const char* serviceName, const char* serviceType, int32_t port,
