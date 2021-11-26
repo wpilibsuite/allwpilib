@@ -194,7 +194,7 @@ else ()
     if (APPLE)
         target_sources(wpiutil PRIVATE ${wpiutil_macos_src})
     else()
-        target_sources(wpiutil PRIVATE ${wpiutil_linuxs_src})
+        target_sources(wpiutil PRIVATE ${wpiutil_linux_src})
     endif()
 endif()
 
