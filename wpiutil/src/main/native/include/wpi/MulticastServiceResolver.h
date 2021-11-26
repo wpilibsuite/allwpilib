@@ -47,7 +47,7 @@ class MulticastServiceResolver {
 extern "C" {
 #endif
 
-typedef unsigned int WPI_MulticastServiceResolverHandle; // NOLINT
+typedef unsigned int WPI_MulticastServiceResolverHandle;  // NOLINT
 
 WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
     const char* serviceType);
@@ -67,8 +67,7 @@ int32_t WPI_GetMulticastServiceResolverHasImplementation(
 WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
     WPI_MulticastServiceResolverHandle handle);
 
-// NOLINTBEGIN
-typedef struct WPI_ServiceData {
+typedef struct WPI_ServiceData {  // NOLINT
   uint32_t ipv4Address;
   int32_t port;
   const char* serviceName;
@@ -76,8 +75,7 @@ typedef struct WPI_ServiceData {
   int32_t txtCount;
   const char** txtKeys;
   const char** txtValues;
-} WPI_ServiceData; 
-// NOLINTEND
+} WPI_ServiceData;
 
 WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle);
