@@ -4,6 +4,7 @@
 
 #include <jni.h>
 
+#include "../MulticastHandleManager.h"
 #include "edu_wpi_first_util_WPIUtilJNI.h"
 #include "wpi/DenseMap.h"
 #include "wpi/MulticastServiceAnnouncer.h"
@@ -284,20 +285,6 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
   return MakeJIntArray(env, signaled);
 }
 
-struct HandleManager {
-  wpi::mutex mutex;
-  wpi::UidVector<int, 8> handleIds;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceResolver>>
-      resolvers;
-  wpi::DenseMap<size_t, std::unique_ptr<wpi::MulticastServiceAnnouncer>>
-      announcers;
-};
-
-static HandleManager& GetManager() {
-  static HandleManager manager;
-  return manager;
-}
-
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    createMulticastServiceAnnouncer
@@ -308,7 +295,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jstring serviceName, jstring serviceType, jint port,
    jobjectArray keys, jobjectArray values)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
   JStringRef serviceNameRef{env, serviceName};
@@ -346,7 +333,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   manager.announcers[handle] = nullptr;
   manager.handleIds.erase(handle);
@@ -361,7 +348,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   announcer->Start();
@@ -376,7 +363,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceAnnouncer
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   announcer->Stop();
@@ -391,7 +378,7 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceAnnouncerHasImplementation
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& announcer = manager.announcers[handle];
   return announcer->HasImplementation();
@@ -406,7 +393,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceResolver
   (JNIEnv* env, jclass, jstring serviceType)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   JStringRef serviceTypeRef{env, serviceType};
 
@@ -429,7 +416,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   manager.resolvers[handle] = nullptr;
   manager.handleIds.erase(handle);
@@ -444,7 +431,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   resolver->Start();
@@ -459,7 +446,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceResolver
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   resolver->Stop();
@@ -474,7 +461,7 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverHasImplementation
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   return resolver->HasImplementation();
@@ -489,7 +476,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
   (JNIEnv* env, jclass, jint handle)
 {
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   return resolver->GetEventHandle();
@@ -508,7 +495,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
       env->GetMethodID(serviceDataCls, "<init>",
                        "(JILjava/lang/String;Ljava/lang/String;[Ljava/lang/"
                        "String;[Ljava/lang/String;)V");
-  auto& manager = GetManager();
+  auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
   auto& resolver = manager.resolvers[handle];
   auto data = resolver->GetData();

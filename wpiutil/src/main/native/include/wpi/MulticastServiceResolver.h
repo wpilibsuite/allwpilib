@@ -7,7 +7,6 @@
 #include "wpi/Synchronization.h"
 
 #ifdef __cplusplus
-
 #include <functional>
 #include <memory>
 #include <string>
@@ -17,13 +16,11 @@
 
 #include "wpi/ConcurrentQueue.h"
 #include "wpi/span.h"
-
 namespace wpi {
 class MulticastServiceResolver {
  public:
   explicit MulticastServiceResolver(std::string_view serviceType);
   ~MulticastServiceResolver() noexcept;
-
   struct ServiceData {
     unsigned int ipv4Address;
     int port;
@@ -31,28 +28,20 @@ class MulticastServiceResolver {
     std::string hostName;
     std::vector<std::pair<std::string, std::string>> txt;
   };
-
   void Start();
   void Stop();
-
   WPI_EventHandle GetEventHandle() { return event.GetHandle(); }
-
   ServiceData GetData() { return eventQueue.pop(); }
-
   bool HasImplementation() const;
-
   struct Impl;
 
  private:
   wpi::Event event;
   wpi::ConcurrentQueue<ServiceData> eventQueue;
-
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
-
 #endif
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,17 +50,27 @@ extern "C" {
 typedef unsigned int WPI_MulticastServiceResolverHandle;
 
 WPI_MulticastServiceResolverHandle WPI_CreateMulticastServiceResolver(
-  const char* serviceType);
+    const char* serviceType);
 
-void WPI_FreeMulticastServiceResolver(WPI_MulticastServiceResolverHandle handle);
+void WPI_FreeMulticastServiceResolver(
+    WPI_MulticastServiceResolverHandle handle);
 
-void WPI_StartMulticastServiceResolver(WPI_MulticastServiceResolverHandle handle);
+void WPI_StartMulticastServiceResolver(
+    WPI_MulticastServiceResolverHandle handle);
 
-void WPI_StopMulticastServiceResolver(WPI_MulticastServiceResolverHandle handle);
+void WPI_StopMulticastServiceResolver(
+    WPI_MulticastServiceResolverHandle handle);
 
-int32_t WPI_GetMulticastServiceResolverHasImplementation(WPI_MulticastServiceResolverHandle handle);
+int32_t WPI_GetMulticastServiceResolverHasImplementation(
+    WPI_MulticastServiceResolverHandle handle);
 
-WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(WPI_MulticastServiceResolverHandle handle);
+WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
+    WPI_MulticastServiceResolverHandle handle);
+
+typedef struct WPI_ServiceValue {
+  uint8_t* data;
+  uint16_t length;
+} WPI_ServiceValue;
 
 typedef struct WPI_ServiceData {
   uint32_t ipv4Address;
@@ -80,13 +79,14 @@ typedef struct WPI_ServiceData {
   const char* hostName;
   int32_t txtCount;
   const char** txtKeys;
-  const char** txtValues;
+  WPI_ServiceValue* txtValues;
 } WPI_ServiceData;
 
-WPI_ServiceData* WPI_GetMulticastServiceResolverData(WPI_MulticastServiceResolverHandle handle);
+WPI_ServiceData* WPI_GetMulticastServiceResolverData(
+    WPI_MulticastServiceResolverHandle handle);
 
-void WPI_FreeServiceData(WPI_MulticastServiceResolverHandle handle, WPI_ServiceData* serviceData);
+void WPI_FreeServiceData(WPI_ServiceData* serviceData);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

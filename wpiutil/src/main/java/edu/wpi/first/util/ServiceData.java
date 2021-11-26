@@ -9,7 +9,6 @@ import java.util.Map;
 
 /** Service data for MulticastServiceResolver. */
 public class ServiceData {
-
   /**
    * Constructs a ServiceData.
    *
