@@ -4,9 +4,14 @@
 
 #include <jni.h>
 
+#include "../MulticastHandleManager.h"
 #include "edu_wpi_first_util_WPIUtilJNI.h"
+#include "wpi/DenseMap.h"
+#include "wpi/MulticastServiceAnnouncer.h"
+#include "wpi/MulticastServiceResolver.h"
 #include "wpi/PortForwarder.h"
 #include "wpi/Synchronization.h"
+#include "wpi/UidVector.h"
 #include "wpi/jni_util.h"
 #include "wpi/timestamp.h"
 
@@ -16,6 +21,7 @@ static bool mockTimeEnabled = false;
 static uint64_t mockNow = 0;
 
 static JException interruptedEx;
+static JClass serviceDataCls;
 
 extern "C" {
 
@@ -30,6 +36,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
+  serviceDataCls = JClass{env, "edu/wpi/first/util/ServiceData"};
+  if (!serviceDataCls) {
+    return JNI_ERR;
+  }
+
   return JNI_VERSION_1_6;
 }
 
@@ -39,6 +50,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
     return;
   }
   interruptedEx.free(env);
+  serviceDataCls.free(env);
 }
 
 /*
@@ -271,6 +283,240 @@ Java_edu_wpi_first_util_WPIUtilJNI_waitForObjectsTimeout
     return nullptr;
   }
   return MakeJIntArray(env, signaled);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    createMulticastServiceAnnouncer
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/Object;[Ljava/lang/Object;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
+  (JNIEnv* env, jclass, jstring serviceName, jstring serviceType, jint port,
+   jobjectArray keys, jobjectArray values)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+
+  JStringRef serviceNameRef{env, serviceName};
+  JStringRef serviceTypeRef{env, serviceType};
+
+  size_t keysLen = env->GetArrayLength(keys);
+  wpi::SmallVector<std::pair<std::string, std::string>, 8> txtVec;
+  txtVec.reserve(keysLen);
+  for (size_t i = 0; i < keysLen; i++) {
+    JLocal<jstring> key{
+        env, static_cast<jstring>(env->GetObjectArrayElement(keys, i))};
+    JLocal<jstring> value{
+        env, static_cast<jstring>(env->GetObjectArrayElement(values, i))};
+
+    txtVec.emplace_back(std::pair<std::string, std::string>{
+        JStringRef{env, key}.str(), JStringRef{env, value}.str()});
+  }
+
+  auto announcer = std::make_unique<wpi::MulticastServiceAnnouncer>(
+      serviceNameRef.str(), serviceTypeRef.str(), port, txtVec);
+
+  size_t index = manager.handleIds.emplace_back(1);
+
+  manager.announcers[index] = std::move(announcer);
+
+  return static_cast<jint>(index);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeMulticastServiceAnnouncer
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceAnnouncer
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  manager.announcers[handle] = nullptr;
+  manager.handleIds.erase(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    startMulticastServiceAnnouncer
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceAnnouncer
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& announcer = manager.announcers[handle];
+  announcer->Start();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    stopMulticastServiceAnnouncer
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceAnnouncer
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& announcer = manager.announcers[handle];
+  announcer->Stop();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getMulticastServiceAnnouncerHasImplementation
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceAnnouncerHasImplementation
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& announcer = manager.announcers[handle];
+  return announcer->HasImplementation();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    createMulticastServiceResolver
+ * Signature: (Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceResolver
+  (JNIEnv* env, jclass, jstring serviceType)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  JStringRef serviceTypeRef{env, serviceType};
+
+  auto resolver =
+      std::make_unique<wpi::MulticastServiceResolver>(serviceTypeRef.str());
+
+  size_t index = manager.handleIds.emplace_back(2);
+
+  manager.resolvers[index] = std::move(resolver);
+
+  return static_cast<jint>(index);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    freeMulticastServiceResolver
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_freeMulticastServiceResolver
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  manager.resolvers[handle] = nullptr;
+  manager.handleIds.erase(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    startMulticastServiceResolver
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_startMulticastServiceResolver
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& resolver = manager.resolvers[handle];
+  resolver->Start();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    stopMulticastServiceResolver
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_stopMulticastServiceResolver
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& resolver = manager.resolvers[handle];
+  resolver->Stop();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getMulticastServiceResolverHasImplementation
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverHasImplementation
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& resolver = manager.resolvers[handle];
+  return resolver->HasImplementation();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getMulticastServiceResolverEventHandle
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
+  (JNIEnv* env, jclass, jint handle)
+{
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& resolver = manager.resolvers[handle];
+  return resolver->GetEventHandle();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getMulticastServiceResolverData
+ * Signature: (I)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
+  (JNIEnv* env, jclass, jint handle)
+{
+  static jmethodID constructor =
+      env->GetMethodID(serviceDataCls, "<init>",
+                       "(JILjava/lang/String;Ljava/lang/String;[Ljava/lang/"
+                       "String;[Ljava/lang/String;)V");
+  auto& manager = wpi::GetMulticastManager();
+  std::scoped_lock lock{manager.mutex};
+  auto& resolver = manager.resolvers[handle];
+  auto data = resolver->GetData();
+  JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
+  JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
+
+  wpi::SmallVector<std::string_view, 8> keysRef;
+  wpi::SmallVector<std::string_view, 8> valuesRef;
+
+  for (auto&& txt : data.txt) {
+    keysRef.emplace_back(txt.first);
+    valuesRef.emplace_back(txt.second);
+  }
+
+  JLocal<jobjectArray> keys{env, MakeJStringArray(env, keysRef)};
+  JLocal<jobjectArray> values{env, MakeJStringArray(env, valuesRef)};
+
+  return env->NewObject(serviceDataCls, constructor,
+                        static_cast<jlong>(data.ipv4Address),
+                        static_cast<jint>(data.port), serviceName.obj(),
+                        hostName.obj(), keys.obj(), values.obj());
 }
 
 }  // extern "C"
