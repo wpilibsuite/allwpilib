@@ -82,8 +82,8 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
   for (auto&& t : data.txt) {
     allocSize += sizeof(const char*);
     keysTotalLength += (t.first.size() + 1);
-    allocSize += sizeof(WPI_ServiceValue);
-    valuesTotalLength += t.second.size();
+    allocSize += sizeof(const char*);
+    valuesTotalLength += (t.second.size() + 1);
   }
   allocSize += keysTotalLength;
   allocSize += valuesTotalLength;
@@ -105,14 +105,13 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
   cData->serviceName = reinterpret_cast<const char*>(cDataRaw);
   cDataRaw += data.serviceName.size() + 1;
 
-  WPI_ServiceValue* valuesPtrArr =
-      reinterpret_cast<WPI_ServiceValue*>(cDataRaw);
-  cDataRaw += (sizeof(WPI_ServiceValue) * data.txt.size());
+  char** valuesPtrArr = reinterpret_cast<char**>(cDataRaw);
+  cDataRaw += (sizeof(char**) * data.txt.size());
   char** keysPtrArr = reinterpret_cast<char**>(cDataRaw);
   cDataRaw += (sizeof(char**) * data.txt.size());
 
   cData->txtKeys = const_cast<const char**>(keysPtrArr);
-  cData->txtValues = valuesPtrArr;
+  cData->txtValues = const_cast<const char**>(valuesPtrArr);
 
   for (size_t i = 0; i < data.txt.size(); i++) {
     keysPtrArr[i] = reinterpret_cast<char*>(cDataRaw);
@@ -120,11 +119,10 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
                 data.txt[i].first.size() + 1);
     cDataRaw += (data.txt[i].first.size() + 1);
 
-    valuesPtrArr[i].data = reinterpret_cast<uint8_t*>(cDataRaw);
-    valuesPtrArr[i].length = data.txt[i].second.size();
-    std::memcpy(valuesPtrArr[i].data, data.txt[i].second.data(),
-                data.txt[i].second.size());
-    cDataRaw += data.txt[i].second.size();
+    valuesPtrArr[i] = reinterpret_cast<char*>(cDataRaw);
+    std::memcpy(valuesPtrArr[i], data.txt[i].second.c_str(),
+                data.txt[i].second.size() + 1);
+    cDataRaw += (data.txt[i].second.size() + 1);
   }
 
   return cData;

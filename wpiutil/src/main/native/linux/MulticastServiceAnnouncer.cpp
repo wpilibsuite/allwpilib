@@ -90,6 +90,33 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
       pImpl->table.string_list_new_from_array(txtArr.data(), txtArr.size());
 }
 
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
+    std::string_view serviceName, std::string_view serviceType, int port,
+    wpi::span<const std::pair<std::string_view, std::string_view>> txt) {
+  pImpl = std::make_unique<Impl>();
+
+  if (!pImpl->table.IsValid()) {
+    return;
+  }
+
+  pImpl->serviceName = serviceName;
+  pImpl->serviceType = serviceType;
+  pImpl->port = port;
+
+  std::vector<std::string> txts;
+  for (auto&& i : txt) {
+    txts.push_back(fmt::format("{}={}", i.first, i.second));
+  }
+
+  std::vector<const char*> txtArr;
+  for (auto&& i : txts) {
+    txtArr.push_back(i.c_str());
+  }
+
+  pImpl->stringList =
+      pImpl->table.string_list_new_from_array(txtArr.data(), txtArr.size());
+}
+
 MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
   Stop();
 }

@@ -67,11 +67,6 @@ int32_t WPI_GetMulticastServiceResolverHasImplementation(
 WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
     WPI_MulticastServiceResolverHandle handle);
 
-typedef struct WPI_ServiceValue {
-  uint8_t* data;
-  uint16_t length;
-} WPI_ServiceValue;
-
 typedef struct WPI_ServiceData {
   uint32_t ipv4Address;
   int32_t port;
@@ -79,7 +74,7 @@ typedef struct WPI_ServiceData {
   const char* hostName;
   int32_t txtCount;
   const char** txtKeys;
-  WPI_ServiceValue* txtValues;
+  const char** txtValues;
 } WPI_ServiceData;
 
 WPI_ServiceData* WPI_GetMulticastServiceResolverData(

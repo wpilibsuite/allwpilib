@@ -4,18 +4,28 @@
 
 #include "wpi/MulticastServiceAnnouncer.h"
 
+#include <wpi/SmallVector.h>
+
 #include "MulticastHandleManager.h"
 
 extern "C" {
 WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
-    const char* serviceType)
+    const char* serviceName, const char* serviceType, int32_t port,
+    int32_t txtCount, const char** keys, const char** values)
 
 {
   auto& manager = wpi::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  auto announcer =
-      std::make_unique<wpi::MulticastServiceAnnouncer>(serviceType);
+  wpi::SmallVector<std::pair<std::string_view, std::string_view>, 8> txts;
+
+  for (int32_t i = 0; i < txtCount; i++) {
+    txts.emplace_back(
+        std::pair<std::string_view, std::string_view>{keys[i], values[i]});
+  }
+
+  auto announcer = std::make_unique<wpi::MulticastServiceAnnouncer>(
+      serviceName, serviceType, port, txts);
 
   size_t index = manager.handleIds.emplace_back(3);
   manager.announcers[index] = std::move(announcer);
