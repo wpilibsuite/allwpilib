@@ -18,7 +18,6 @@
 
 #include "wpi/mutex.h"
 #include "wpi/span.h"
-
 namespace wpi {
 class MulticastServiceResolver {
  public:
@@ -33,7 +32,6 @@ class MulticastServiceResolver {
   };
   void Start();
   void Stop();
-
   WPI_EventHandle GetEventHandle() const { return event.GetHandle(); }
   ServiceData GetData() {
     std::scoped_lock lock{mutex};
@@ -44,7 +42,6 @@ class MulticastServiceResolver {
     }
     return item;
   }
-
   bool HasImplementation() const;
   struct Impl;
 
@@ -54,7 +51,6 @@ class MulticastServiceResolver {
     queue.push(std::forward<ServiceData>(data));
     event.Set();
   }
-
   wpi::Event event{true};
   std::queue<ServiceData> queue;
   mutable wpi::mutex mutex;

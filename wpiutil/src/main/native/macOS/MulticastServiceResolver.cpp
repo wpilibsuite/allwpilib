@@ -37,9 +37,7 @@ struct MulticastServiceResolver::Impl {
   std::vector<std::unique_ptr<DnsResolveState>> ResolveStates;
   DNSServiceRef serviceRef = nullptr;
 
-  void onFound(ServiceData&& data) {
-    resolver->PushData(std::move(data));
-  }
+  void onFound(ServiceData&& data) { resolver->PushData(std::move(data)); }
 };
 
 MulticastServiceResolver::MulticastServiceResolver(

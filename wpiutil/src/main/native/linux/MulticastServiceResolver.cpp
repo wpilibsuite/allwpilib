@@ -18,9 +18,7 @@ struct MulticastServiceResolver::Impl {
   std::string serviceType;
   MulticastServiceResolver* resolver;
 
-  void onFound(ServiceData&& data) {
-    resolver->PushData(std::move(data));
-  }
+  void onFound(ServiceData&& data) { resolver->PushData(std::move(data)); }
 };
 
 MulticastServiceResolver::MulticastServiceResolver(
