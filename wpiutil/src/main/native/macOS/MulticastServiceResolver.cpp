@@ -38,8 +38,7 @@ struct MulticastServiceResolver::Impl {
   DNSServiceRef serviceRef = nullptr;
 
   void onFound(ServiceData&& data) {
-    resolver->eventQueue.push(std::move(data));
-    resolver->event.Set();
+    resolver->PushData(std::forward<ServiceData>(data));
   }
 };
 

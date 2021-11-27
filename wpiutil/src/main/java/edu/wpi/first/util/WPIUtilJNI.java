@@ -146,5 +146,5 @@ public final class WPIUtilJNI {
 
   public static native int getMulticastServiceResolverEventHandle(int handle);
 
-  public static native ServiceData getMulticastServiceResolverData(int handle);
+  public static native ServiceData[] getMulticastServiceResolverData(int handle);
 }

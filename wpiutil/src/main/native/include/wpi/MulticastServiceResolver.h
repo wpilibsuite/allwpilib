@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/ConcurrentQueue.h"
+#include "wpi/mutex.h"
 #include "wpi/span.h"
 namespace wpi {
 class MulticastServiceResolver {
@@ -30,14 +30,29 @@ class MulticastServiceResolver {
   };
   void Start();
   void Stop();
-  WPI_EventHandle GetEventHandle() { return event.GetHandle(); }
-  ServiceData GetData() { return eventQueue.pop(); }
+  WPI_EventHandle GetEventHandle() const { return event.GetHandle(); }
+  std::vector<ServiceData> GetData() {
+    std::scoped_lock lock{mutex};
+    event.Reset();
+    if (queue.empty()) {
+      return {};
+    }
+    std::vector<ServiceData> ret;
+    queue.swap(ret);
+    return ret;
+  }
   bool HasImplementation() const;
   struct Impl;
 
  private:
-  wpi::Event event;
-  wpi::ConcurrentQueue<ServiceData> eventQueue;
+  void PushData(ServiceData&& data) {
+    std::scoped_lock lock{mutex};
+    queue.emplace_back(std::forward<ServiceData>(data));
+    event.Set();
+  }
+  wpi::Event event{true};
+  std::vector<ServiceData> queue;
+  wpi::mutex mutex;
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi
@@ -77,10 +92,10 @@ typedef struct WPI_ServiceData {  // NOLINT
   const char** txtValues;
 } WPI_ServiceData;
 
-WPI_ServiceData* WPI_GetMulticastServiceResolverData(
-    WPI_MulticastServiceResolverHandle handle);
+WPI_ServiceData** WPI_GetMulticastServiceResolverData(
+    WPI_MulticastServiceResolverHandle handle, int32_t* dataCount);
 
-void WPI_FreeServiceData(WPI_ServiceData* serviceData);
+void WPI_FreeServiceData(WPI_ServiceData** serviceData);
 
 #ifdef __cplusplus
 }  // extern "C"
