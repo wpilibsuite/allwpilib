@@ -29,6 +29,9 @@ struct MulticastServiceAnnouncer::Impl {
   }
 };
 
+void RegisterService(AvahiClient* client,
+                     MulticastServiceAnnouncer::Impl* impl);
+
 static void EntryGroupCallback(AvahiEntryGroup* group,
                                AvahiEntryGroupState state, void* userdata) {
   if (state == AVAHI_ENTRY_GROUP_COLLISION) {
