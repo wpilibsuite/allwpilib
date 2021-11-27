@@ -50,7 +50,7 @@ static void RegisterService(AvahiClient* client,
                             MulticastServiceAnnouncer::Impl* impl) {
   if (impl->group == nullptr) {
     impl->group =
-        impl->table.entry_group_new(client, EntryGroupCallback, nullptr);
+        impl->table.entry_group_new(client, EntryGroupCallback, impl);
   }
 
   while (true) {
@@ -67,7 +67,7 @@ static void RegisterService(AvahiClient* client,
         impl->serviceName = newName;
         impl->table.free(newName);
         continue;
-      } else {
+      } else if (ret != AVAHI_OK) {
         break;
       }
       impl->table.entry_group_commit(impl->group);
