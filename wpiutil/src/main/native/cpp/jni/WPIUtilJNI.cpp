@@ -42,7 +42,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
-  serviceDataEmptyArray = JGlobal<jobjectArray>{env, env->NewObjectArray(0, serviceDataCls, nullptr)};
+  serviceDataEmptyArray = JGlobal<jobjectArray>{
+      env, env->NewObjectArray(0, serviceDataCls, nullptr)};
   if (serviceDataEmptyArray == nullptr) {
     return JNI_ERR;
   }
@@ -493,7 +494,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    getMulticastServiceResolverData
- * (I)[Ledu/wpi/first/util/ServiceData;
+ * Signature: (I)[Ljava/lang/Object;
  */
 JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
@@ -514,29 +515,30 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
     return serviceDataEmptyArray;
   }
 
-  JLocal<jobjectArray> returnData{env, env->NewObjectArray(allData.size(), serviceDataCls, nullptr)};
+  JLocal<jobjectArray> returnData{
+      env, env->NewObjectArray(allData.size(), serviceDataCls, nullptr)};
 
   for (auto&& data : allData) {
+    JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
+    JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
 
-  JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
-  JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
+    wpi::SmallVector<std::string_view, 8> keysRef;
+    wpi::SmallVector<std::string_view, 8> valuesRef;
 
-  wpi::SmallVector<std::string_view, 8> keysRef;
-  wpi::SmallVector<std::string_view, 8> valuesRef;
+    size_t index = 0;
+    for (auto&& txt : data.txt) {
+      keysRef.emplace_back(txt.first);
+      valuesRef.emplace_back(txt.second);
+    }
 
-  size_t index = 0;
-  for (auto&& txt : data.txt) {
-    keysRef.emplace_back(txt.first);
-    valuesRef.emplace_back(txt.second);
-  }
+    JLocal<jobjectArray> keys{env, MakeJStringArray(env, keysRef)};
+    JLocal<jobjectArray> values{env, MakeJStringArray(env, valuesRef)};
 
-  JLocal<jobjectArray> keys{env, MakeJStringArray(env, keysRef)};
-  JLocal<jobjectArray> values{env, MakeJStringArray(env, valuesRef)};
-
-  JLocal<jobject> dataItem{env, env->NewObject(serviceDataCls, constructor,
-                        static_cast<jlong>(data.ipv4Address),
-                        static_cast<jint>(data.port), serviceName.obj(),
-                        hostName.obj(), keys.obj(), values.obj())};
+    JLocal<jobject> dataItem{
+        env, env->NewObject(serviceDataCls, constructor,
+                            static_cast<jlong>(data.ipv4Address),
+                            static_cast<jint>(data.port), serviceName.obj(),
+                            hostName.obj(), keys.obj(), values.obj())};
 
     env->SetObjectArrayElement(returnData, index, dataItem);
     index++;

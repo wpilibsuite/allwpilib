@@ -80,7 +80,7 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
   allocSize += sizeof(WPI_ServiceData*) * allData.size();
 
   for (auto&& data : allData) {
-      // Include space for hostName and serviceType (+ terminators)
+    // Include space for hostName and serviceType (+ terminators)
     allocSize += data.hostName.size() + data.serviceName.size() + 2;
 
     size_t keysTotalLength = 0;
@@ -117,7 +117,8 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
     cData->hostName = reinterpret_cast<const char*>(cDataRaw);
     cDataRaw += data.hostName.size() + 1;
 
-    std::memcpy(cDataRaw, data.serviceName.c_str(), data.serviceName.size() + 1);
+    std::memcpy(cDataRaw, data.serviceName.c_str(),
+                data.serviceName.size() + 1);
     cData->serviceName = reinterpret_cast<const char*>(cDataRaw);
     cDataRaw += data.serviceName.size() + 1;
 
