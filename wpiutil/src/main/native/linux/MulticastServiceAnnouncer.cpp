@@ -49,8 +49,7 @@ static void EntryGroupCallback(AvahiEntryGroup* group,
 static void RegisterService(AvahiClient* client,
                             MulticastServiceAnnouncer::Impl* impl) {
   if (impl->group == nullptr) {
-    impl->group =
-        impl->table.entry_group_new(client, EntryGroupCallback, impl);
+    impl->group = impl->table.entry_group_new(client, EntryGroupCallback, impl);
   }
 
   while (true) {
