@@ -90,11 +90,20 @@ void glass::DisplayDrive(DriveModel* m) {
     double a1 = 0.0;
     double a2 = wpi::numbers::pi / 2 * rotation;
 
-    draw->PathArcTo(center, radius, a1, a2, 20);
-    draw->PathStroke(color, false);
-    draw->PathArcTo(center, radius, a1 + wpi::numbers::pi,
-                    a2 + wpi::numbers::pi, 20);
-    draw->PathStroke(color, false);
+    // PathArcTo requires a_min <= a_max, and rotation can be negative
+    if (a1 > a2) {
+      draw->PathArcTo(center, radius, a2, a1, 20);
+      draw->PathStroke(color, false);
+      draw->PathArcTo(center, radius, a2 + wpi::numbers::pi,
+                      a1 + wpi::numbers::pi, 20);
+      draw->PathStroke(color, false);
+    } else {
+      draw->PathArcTo(center, radius, a1, a2, 20);
+      draw->PathStroke(color, false);
+      draw->PathArcTo(center, radius, a1 + wpi::numbers::pi,
+                      a2 + wpi::numbers::pi, 20);
+      draw->PathStroke(color, false);
+    }
 
     double adder = rotation < 0 ? wpi::numbers::pi : 0;
 
