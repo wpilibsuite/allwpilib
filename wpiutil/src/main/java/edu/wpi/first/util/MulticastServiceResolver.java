@@ -38,7 +38,7 @@ public class MulticastServiceResolver implements AutoCloseable {
     return WPIUtilJNI.getMulticastServiceResolverEventHandle(m_handle);
   }
 
-  public ServiceData getData() {
+  public ServiceData[] getData() {
     return WPIUtilJNI.getMulticastServiceResolverData(m_handle);
   }
 }

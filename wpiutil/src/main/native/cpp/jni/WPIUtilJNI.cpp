@@ -22,6 +22,7 @@ static uint64_t mockNow = 0;
 
 static JException interruptedEx;
 static JClass serviceDataCls;
+static JGlobal<jobjectArray> serviceDataEmptyArray;
 
 extern "C" {
 
@@ -41,6 +42,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_ERR;
   }
 
+  serviceDataEmptyArray = JGlobal<jobjectArray>{env, env->NewObjectArray(0, serviceDataCls, nullptr)};
+  if (serviceDataEmptyArray == nullptr) {
+    return JNI_ERR;
+  }
+
   return JNI_VERSION_1_6;
 }
 
@@ -49,8 +55,10 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
   if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
   }
-  interruptedEx.free(env);
+
+  serviceDataEmptyArray.free(env);
   serviceDataCls.free(env);
+  interruptedEx.free(env);
 }
 
 /*
@@ -485,9 +493,9 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverEventHandle
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    getMulticastServiceResolverData
- * Signature: (I)Ljava/lang/Object;
+ * (I)[Ledu/wpi/first/util/ServiceData;
  */
-JNIEXPORT jobject JNICALL
+JNIEXPORT jobjectArray JNICALL
 Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
   (JNIEnv* env, jclass, jint handle)
 {
@@ -496,12 +504,19 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
                        "(JILjava/lang/String;Ljava/lang/String;[Ljava/lang/"
                        "String;[Ljava/lang/String;)V");
   auto& manager = wpi::GetMulticastManager();
-  wpi::MulticastServiceResolver::ServiceData data;
+  std::vector<wpi::MulticastServiceResolver::ServiceData> allData;
   {
     std::scoped_lock lock{manager.mutex};
     auto& resolver = manager.resolvers[handle];
-    data = resolver->GetData();
+    allData = resolver->GetData();
   }
+  if (allData.empty()) {
+    return serviceDataEmptyArray;
+  }
+
+  JLocal<jobjectArray> returnData{env, env->NewObjectArray(allData.size(), serviceDataCls, nullptr)};
+
+  for (auto&& data : allData) {
 
   JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
   JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
@@ -509,6 +524,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
   wpi::SmallVector<std::string_view, 8> keysRef;
   wpi::SmallVector<std::string_view, 8> valuesRef;
 
+  size_t index = 0;
   for (auto&& txt : data.txt) {
     keysRef.emplace_back(txt.first);
     valuesRef.emplace_back(txt.second);
@@ -517,10 +533,16 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
   JLocal<jobjectArray> keys{env, MakeJStringArray(env, keysRef)};
   JLocal<jobjectArray> values{env, MakeJStringArray(env, valuesRef)};
 
-  return env->NewObject(serviceDataCls, constructor,
+  JLocal<jobject> dataItem{env, env->NewObject(serviceDataCls, constructor,
                         static_cast<jlong>(data.ipv4Address),
                         static_cast<jint>(data.port), serviceName.obj(),
-                        hostName.obj(), keys.obj(), values.obj());
+                        hostName.obj(), keys.obj(), values.obj())};
+
+    env->SetObjectArrayElement(returnData, index, dataItem);
+    index++;
+  }
+
+  return returnData;
 }
 
 }  // extern "C"
