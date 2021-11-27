@@ -29,7 +29,19 @@ struct MulticastServiceAnnouncer::Impl {
   }
 };
 
-static void EntryGroupCallback(AvahiEntryGroup*, AvahiEntryGroupState, void*) {}
+static void EntryGroupCallback(AvahiEntryGroup* group,
+                               AvahiEntryGroupState state, void* userdata) {
+  if (state == AVAHI_ENTRY_GROUP_COLLISION) {
+    // Remote collision
+    MulticastServiceAnnouncer::Impl* impl =
+        reinterpret_cast<MulticastServiceAnnouncer::Impl*>(userdata);
+    char* newName =
+        impl->table.alternative_service_name(impl->serviceName.c_str());
+    impl->serviceName = newName;
+    impl->table.free(newName);
+    RegisterService(impl->table.entry_group_get_client(group), impl);
+  }
+}
 
 static void RegisterService(AvahiClient* client,
                             MulticastServiceAnnouncer::Impl* impl) {
@@ -38,13 +50,26 @@ static void RegisterService(AvahiClient* client,
         impl->table.entry_group_new(client, EntryGroupCallback, nullptr);
   }
 
-  if (impl->table.entry_group_is_empty(impl->group)) {
-    impl->table.entry_group_add_service_strlst(
-        impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
-        AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
-        impl->serviceType.c_str(), "local", nullptr, impl->port,
-        impl->stringList);
-    impl->table.entry_group_commit(impl->group);
+  while (true) {
+    if (impl->table.entry_group_is_empty(impl->group)) {
+      auto ret = impl->table.entry_group_add_service_strlst(
+          impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
+          AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
+          impl->serviceType.c_str(), "local", nullptr, impl->port,
+          impl->stringList);
+      if (ret == AVAHI_ERR_COLLISION) {
+        // Local collision
+        char* newName =
+            impl->table.alternative_service_name(impl->serviceName.c_str());
+        impl->serviceName = newName;
+        impl->table.free(newName);
+        continue;
+      } else {
+        break;
+      }
+      impl->table.entry_group_commit(impl->group);
+      break;
+    }
   }
 }
 
