@@ -29,8 +29,8 @@ struct MulticastServiceAnnouncer::Impl {
   }
 };
 
-void RegisterService(AvahiClient* client,
-                     MulticastServiceAnnouncer::Impl* impl);
+static void RegisterService(AvahiClient* client,
+                            MulticastServiceAnnouncer::Impl* impl);
 
 static void EntryGroupCallback(AvahiEntryGroup* group,
                                AvahiEntryGroupState state, void* userdata) {
