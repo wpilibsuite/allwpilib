@@ -221,4 +221,6 @@ int main() {
 
   glass::DestroyContext();
   gui::DestroyContext();
+
+  return 0;
 }
