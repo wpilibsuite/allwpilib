@@ -9,13 +9,16 @@
 #ifdef __cplusplus
 #include <functional>
 #include <memory>
+#include <optional>
+#include <queue>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "wpi/ConcurrentQueue.h"
+#include "wpi/mutex.h"
 #include "wpi/span.h"
+
 namespace wpi {
 class MulticastServiceResolver {
  public:
@@ -30,14 +33,31 @@ class MulticastServiceResolver {
   };
   void Start();
   void Stop();
-  WPI_EventHandle GetEventHandle() { return event.GetHandle(); }
-  ServiceData GetData() { return eventQueue.pop(); }
+
+  WPI_EventHandle GetEventHandle() const { return event.GetHandle(); }
+  ServiceData GetData() {
+    std::scoped_lock lock{mutex};
+    auto item = std::move(queue.front());
+    queue.pop();
+    if (queue.empty()) {
+      event.Reset();
+    }
+    return item;
+  }
+
   bool HasImplementation() const;
   struct Impl;
 
  private:
-  wpi::Event event;
-  wpi::ConcurrentQueue<ServiceData> eventQueue;
+  void PushData(ServiceData&& data) {
+    std::scoped_lock lock{mutex};
+    queue.push(std::forward<ServiceData>(data));
+    event.Set();
+  }
+
+  wpi::Event event{true};
+  std::queue<ServiceData> queue;
+  mutable wpi::mutex mutex;
   std::unique_ptr<Impl> pImpl;
 };
 }  // namespace wpi

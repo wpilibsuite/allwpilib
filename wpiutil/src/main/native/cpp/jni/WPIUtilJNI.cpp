@@ -496,9 +496,13 @@ Java_edu_wpi_first_util_WPIUtilJNI_getMulticastServiceResolverData
                        "(JILjava/lang/String;Ljava/lang/String;[Ljava/lang/"
                        "String;[Ljava/lang/String;)V");
   auto& manager = wpi::GetMulticastManager();
-  std::scoped_lock lock{manager.mutex};
-  auto& resolver = manager.resolvers[handle];
-  auto data = resolver->GetData();
+  wpi::MulticastServiceResolver::ServiceData data;
+  {
+    std::scoped_lock lock{manager.mutex};
+    auto& resolver = manager.resolvers[handle];
+    data = resolver->GetData();
+  }
+
   JLocal<jstring> serviceName{env, MakeJString(env, data.serviceName)};
   JLocal<jstring> hostName{env, MakeJString(env, data.hostName)};
 
