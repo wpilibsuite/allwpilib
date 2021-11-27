@@ -159,6 +159,70 @@ enum { AVAHI_IF_UNSPEC = -1 };
 
 enum { AVAHI_PROTO_INET = 0, AVAHI_PROTO_INET6 = 1, AVAHI_PROTO_UNSPEC = -1 };
 
+enum {
+  AVAHI_OK = 0,
+  AVAHI_ERR_FAILURE = -1,
+  AVAHI_ERR_BAD_STATE = -2,
+  AVAHI_ERR_INVALID_HOST_NAME = -3,
+  AVAHI_ERR_INVALID_DOMAIN_NAME = -4,
+  AVAHI_ERR_NO_NETWORK = -5,
+  AVAHI_ERR_INVALID_TTL = -6,
+  AVAHI_ERR_IS_PATTERN = -7,
+  AVAHI_ERR_COLLISION = -8,
+  AVAHI_ERR_INVALID_RECORD = -9,
+
+  AVAHI_ERR_INVALID_SERVICE_NAME = -10,
+  AVAHI_ERR_INVALID_SERVICE_TYPE = -11,
+  AVAHI_ERR_INVALID_PORT = -12,
+  AVAHI_ERR_INVALID_KEY = -13,
+  AVAHI_ERR_INVALID_ADDRESS = -14,
+  AVAHI_ERR_TIMEOUT = -15,
+  AVAHI_ERR_TOO_MANY_CLIENTS = -16,
+  AVAHI_ERR_TOO_MANY_OBJECTS = -17,
+  AVAHI_ERR_TOO_MANY_ENTRIES = -18,
+  AVAHI_ERR_OS = -19,
+
+  AVAHI_ERR_ACCESS_DENIED = -20,
+  AVAHI_ERR_INVALID_OPERATION = -21,
+  AVAHI_ERR_DBUS_ERROR = -22,
+  AVAHI_ERR_DISCONNECTED = -23,
+  AVAHI_ERR_NO_MEMORY = -24,
+  AVAHI_ERR_INVALID_OBJECT = -25,
+  AVAHI_ERR_NO_DAEMON = -26,
+  AVAHI_ERR_INVALID_INTERFACE = -27,
+  AVAHI_ERR_INVALID_PROTOCOL = -28,
+  AVAHI_ERR_INVALID_FLAGS = -29,
+
+  AVAHI_ERR_NOT_FOUND = -30,
+  AVAHI_ERR_INVALID_CONFIG = -31,
+  AVAHI_ERR_VERSION_MISMATCH = -32,
+  AVAHI_ERR_INVALID_SERVICE_SUBTYPE = -33,
+  AVAHI_ERR_INVALID_PACKET = -34,
+  AVAHI_ERR_INVALID_DNS_ERROR = -35,
+  AVAHI_ERR_DNS_FORMERR = -36,
+  AVAHI_ERR_DNS_SERVFAIL = -37,
+  AVAHI_ERR_DNS_NXDOMAIN = -38,
+  AVAHI_ERR_DNS_NOTIMP = -39,
+
+  AVAHI_ERR_DNS_REFUSED = -40,
+  AVAHI_ERR_DNS_YXDOMAIN = -41,
+  AVAHI_ERR_DNS_YXRRSET = -42,
+  AVAHI_ERR_DNS_NXRRSET = -43,
+  AVAHI_ERR_DNS_NOTAUTH = -44,
+  AVAHI_ERR_DNS_NOTZONE = -45,
+  AVAHI_ERR_INVALID_RDATA = -46,
+  AVAHI_ERR_INVALID_DNS_CLASS = -47,
+  AVAHI_ERR_INVALID_DNS_TYPE = -48,
+  AVAHI_ERR_NOT_SUPPORTED = -49,
+
+  AVAHI_ERR_NOT_PERMITTED = -50,
+  AVAHI_ERR_INVALID_ARGUMENT = -51,
+  AVAHI_ERR_IS_EMPTY = -52,
+  AVAHI_ERR_NO_CHANGE = -53,
+
+  AVAHI_ERR_MAX = -54
+};
+
 namespace wpi {
 class AvahiFunctionTable {
  public:
@@ -208,6 +272,7 @@ class AvahiFunctionTable {
   AvahiFunction(entry_group_reset, int, (AvahiEntryGroup*));
   AvahiFunction(entry_group_is_empty, int, (AvahiEntryGroup*));
   AvahiFunction(entry_group_commit, int, (AvahiEntryGroup*));
+  AvahiFunction(entry_group_get_client, AvahiClient*, (AvahiEntryGroup*));
 
   AvahiFunction(string_list_new_from_array, AvahiStringList*,
                 (const char** array, int len));
@@ -217,6 +282,8 @@ class AvahiFunctionTable {
                 (AvahiServiceBrowser*));
 
   AvahiFunction(unescape_label, char*, (const char**, char*, size_t));
+  AvahiFunction(alternative_service_name, char*, (const char*));
+  AvahiFunction(free, void, (void*));
 
   bool IsValid() const { return valid; }
 

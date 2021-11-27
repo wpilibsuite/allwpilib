@@ -40,6 +40,8 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(string_list_new_from_array);
   AvahiFunctionLoad(string_list_free);
   AvahiFunctionLoad(unescape_label);
+  AvahiFunctionLoad(alternative_service_name);
+  AvahiFunctionLoad(free);
 
   lib = dlopen("libavahi-client.so.3", RTLD_LAZY);
 
@@ -60,6 +62,7 @@ AvahiFunctionTable::AvahiFunctionTable() {
   AvahiFunctionLoad(entry_group_reset);
   AvahiFunctionLoad(entry_group_is_empty);
   AvahiFunctionLoad(entry_group_commit);
+  AvahiFunctionLoad(entry_group_get_client);
 
   valid = true;
 }
