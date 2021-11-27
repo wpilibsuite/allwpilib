@@ -9,8 +9,6 @@
 #ifdef __cplusplus
 #include <functional>
 #include <memory>
-#include <optional>
-#include <queue>
 #include <string>
 #include <string_view>
 #include <utility>
