@@ -450,9 +450,9 @@ Instance::Instance() {
           entry.SetString(VideoModeToString(sourceIt->second.GetVideoMode()));
           return;
         } else if (wpi::starts_with(relativeKey, "Property/")) {
-          propName = relativeKey.substr(9);
+          propName = wpi::substr(relativeKey, 9);
         } else if (wpi::starts_with(relativeKey, "RawProperty/")) {
-          propName = relativeKey.substr(12);
+          propName = wpi::substr(relativeKey, 12);
         } else {
           return;  // ignore
         }

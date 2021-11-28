@@ -269,7 +269,7 @@ void UsbCameraImpl::DeviceDisconnect() {
 
 static bool IsPercentageProperty(std::string_view name) {
   if (wpi::starts_with(name, "raw_"))
-    name = name.substr(4);
+    name = wpi::substr(name, 4);
   return name == "Brightness" || name == "Contrast" || name == "Saturation" ||
          name == "Hue" || name == "Sharpness" || name == "Gain" ||
          name == "Exposure";

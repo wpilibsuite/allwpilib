@@ -6,6 +6,7 @@
 
 #include "AvahiClient.h"
 #include "wpi/SmallString.h"
+#include "wpi/StringExtras.h"
 #include "wpi/mutex.h"
 
 using namespace wpi;
@@ -61,8 +62,9 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
           // Todo make this just do key
           continue;
         }
-        std::string_view key = value.substr(0, splitIndex);
-        value = value.substr(splitIndex + 1, value.size() - splitIndex - 1);
+        std::string_view key = wpi::substr(value, 0, splitIndex);
+        value =
+            wpi::substr(value, splitIndex + 1, value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
       wpi::SmallString<256> outputHostName;
