@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
 
 #include "UsbUtil.h"
 
@@ -93,7 +94,7 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
                               std::string_view value) {
-  wpi::SmallString<64> str{value.substr(0, maximum)};
+  wpi::SmallString<64> str{wpi::substr(value, 0, maximum)};
 
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;

@@ -7,6 +7,7 @@
 
 #include <string_view>
 
+#include "wpi/StringExtras.h"
 #include "wpi/http_parser.h"
 
 namespace wpi {
@@ -52,35 +53,35 @@ class UrlParser {
   }
 
   std::string_view GetSchema() const {
-    return m_data.substr(m_url.field_data[UF_SCHEMA].off,
-                         m_url.field_data[UF_SCHEMA].len);
+    return wpi::substr(m_data, m_url.field_data[UF_SCHEMA].off,
+                       m_url.field_data[UF_SCHEMA].len);
   }
 
   std::string_view GetHost() const {
-    return m_data.substr(m_url.field_data[UF_HOST].off,
-                         m_url.field_data[UF_HOST].len);
+    return wpi::substr(m_data, m_url.field_data[UF_HOST].off,
+                       m_url.field_data[UF_HOST].len);
   }
 
   unsigned int GetPort() const { return m_url.port; }
 
   std::string_view GetPath() const {
-    return m_data.substr(m_url.field_data[UF_PATH].off,
-                         m_url.field_data[UF_PATH].len);
+    return wpi::substr(m_data, m_url.field_data[UF_PATH].off,
+                       m_url.field_data[UF_PATH].len);
   }
 
   std::string_view GetQuery() const {
-    return m_data.substr(m_url.field_data[UF_QUERY].off,
-                         m_url.field_data[UF_QUERY].len);
+    return wpi::substr(m_data, m_url.field_data[UF_QUERY].off,
+                       m_url.field_data[UF_QUERY].len);
   }
 
   std::string_view GetFragment() const {
-    return m_data.substr(m_url.field_data[UF_FRAGMENT].off,
-                         m_url.field_data[UF_FRAGMENT].len);
+    return wpi::substr(m_data, m_url.field_data[UF_FRAGMENT].off,
+                       m_url.field_data[UF_FRAGMENT].len);
   }
 
   std::string_view GetUserInfo() const {
-    return m_data.substr(m_url.field_data[UF_USERINFO].off,
-                         m_url.field_data[UF_USERINFO].len);
+    return wpi::substr(m_data, m_url.field_data[UF_USERINFO].off,
+                       m_url.field_data[UF_USERINFO].len);
   }
 
  private:

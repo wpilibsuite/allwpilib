@@ -22,7 +22,7 @@ std::string_view NetworkTable::BasenameKey(std::string_view key) {
   if (slash == std::string_view::npos) {
     return key;
   }
-  return key.substr(slash + 1);
+  return wpi::substr(key, slash + 1);
 }
 
 std::string NetworkTable::NormalizeKey(std::string_view key,
@@ -105,7 +105,7 @@ NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
   return nt::AddEntryListener(
       m_inst, fmt::format("{}/", m_path),
       [=](const EntryNotification& event) {
-        auto relative_key = std::string_view{event.name}.substr(prefix_len);
+        auto relative_key = wpi::substr(event.name, prefix_len);
         if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
           return;
         }
@@ -124,8 +124,8 @@ NT_EntryListener NetworkTable::AddEntryListener(std::string_view key,
       entry.GetHandle(),
       [=](const EntryNotification& event) {
         listener(const_cast<NetworkTable*>(this),
-                 std::string_view{event.name}.substr(prefix_len), entry,
-                 event.value, event.flags);
+                 wpi::substr(event.name, prefix_len), entry, event.value,
+                 event.flags);
       },
       flags);
 }
@@ -149,12 +149,12 @@ NT_EntryListener NetworkTable::AddSubTableListener(TableListener listener,
   NT_EntryListener id = nt::AddEntryListener(
       m_inst, fmt::format("{}/", m_path),
       [=](const EntryNotification& event) {
-        auto relative_key = std::string_view{event.name}.substr(prefix_len);
+        auto relative_key = wpi::substr(event.name, prefix_len);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
         if (end_sub_table == std::string_view::npos) {
           return;
         }
-        auto sub_table_key = relative_key.substr(0, end_sub_table);
+        auto sub_table_key = wpi::substr(relative_key, 0, end_sub_table);
         if (notified_tables->find(sub_table_key) == notified_tables->end()) {
           return;
         }
@@ -196,7 +196,7 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   auto infos = GetEntryInfo(m_inst, fmt::format("{}/", m_path), types);
   std::scoped_lock lock(m_mutex);
   for (auto& info : infos) {
-    auto relative_key = std::string_view{info.name}.substr(prefix_len);
+    auto relative_key = wpi::substr(info.name, prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != std::string_view::npos) {
       continue;
     }
@@ -210,12 +210,12 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
   size_t prefix_len = m_path.size() + 1;
   for (auto& entry : GetEntryInfo(m_inst, fmt::format("{}/", m_path), 0)) {
-    auto relative_key = std::string_view{entry.name}.substr(prefix_len);
+    auto relative_key = wpi::substr(entry.name, prefix_len);
     size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == std::string_view::npos) {
       continue;
     }
-    keys.emplace_back(relative_key.substr(0, end_subtable));
+    keys.emplace_back(wpi::substr(relative_key, 0, end_subtable));
   }
   return keys;
 }

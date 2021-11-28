@@ -65,7 +65,7 @@ std::string_view::size_type wpi::find_lower(
 std::string_view::size_type wpi::find_lower(
     std::string_view str, std::string_view other,
     std::string_view::size_type from) noexcept {
-  auto s = str.substr(from);
+  auto s = substr(str, from);
   while (s.size() >= other.size()) {
     if (starts_with_lower(s, other)) {
       return from;
@@ -98,7 +98,7 @@ std::string_view::size_type wpi::rfind_lower(std::string_view str,
   }
   for (size_t i = str.size() - n + 1, e = 0; i != e;) {
     --i;
-    if (equals_lower(str.substr(i, n), other)) {
+    if (equals_lower(substr(str, i, n), other)) {
       return i;
     }
   }

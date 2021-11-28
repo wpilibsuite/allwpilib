@@ -208,11 +208,30 @@ inline std::string_view::size_type rfind_lower(std::string_view str,
 }
 
 /**
+ * Returns the substring of @p str from [start, start + n).
+ *
+ * @param start The index of the starting character in the substring; if
+ * the index is npos or greater than the length of the string then the
+ * empty substring will be returned.
+ *
+ * @param n The number of characters to included in the substring. If n
+ * exceeds the number of characters remaining in the string, the string
+ * suffix (starting with @p start) will be returned.
+ */
+constexpr std::string_view substr(
+    std::string_view str, std::string_view::size_type start,
+    std::string_view::size_type n = std::string_view::npos) noexcept {
+  auto length = str.size();
+  start = (std::min)(start, length);
+  return {str.data() + start, (std::min)(n, length - start)};
+}
+
+/**
  * Checks if @p str starts with the given @p prefix.
  */
 constexpr bool starts_with(std::string_view str,
                            std::string_view prefix) noexcept {
-  return str.substr(0, prefix.size()) == prefix;
+  return substr(str, 0, prefix.size()) == prefix;
 }
 
 /**
@@ -352,6 +371,34 @@ constexpr std::string_view drop_back(
     std::string_view str, std::string_view::size_type n = 1) noexcept {
   str.remove_suffix(n);
   return str;
+}
+
+/**
+ * Returns a view equal to @p str but with only the first @p n
+ * elements remaining.  If @p n is greater than the length of the
+ * string, the entire string is returned.
+ */
+constexpr std::string_view take_front(
+    std::string_view str, std::string_view::size_type n = 1) noexcept {
+  auto length = str.size();
+  if (n >= length) {
+    return str;
+  }
+  return drop_back(str, length - n);
+}
+
+/**
+ * Returns a view equal to @p str but with only the last @p n
+ * elements remaining.  If @p n is greater than the length of the
+ * string, the entire string is returned.
+ */
+constexpr std::string_view take_back(
+    std::string_view str, std::string_view::size_type n = 1) noexcept {
+  auto length = str.size();
+  if (n >= length) {
+    return str;
+  }
+  return drop_front(str, length - n);
 }
 
 /**
