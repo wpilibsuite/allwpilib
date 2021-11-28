@@ -48,7 +48,6 @@ struct TeamNumberRefHolder {
 static std::unique_ptr<TeamNumberRefHolder> teamNumberRef;
 static std::unordered_map<std::string, std::pair<unsigned int, std::string>>
     foundDevices;
-static std::mutex devicesLock;
 static wpi::Logger logger;
 static sysid::DeploySession deploySession{logger};
 static std::unique_ptr<wpi::MulticastServiceResolver> multicastResolver;
@@ -109,7 +108,6 @@ static void DisplayGui() {
 
   if (about) {
     ImGui::OpenPopup("About");
-    about = false;
   }
   if (ImGui::BeginPopupModal("About")) {
     ImGui::Text("roboRIO Team Number Setter");
