@@ -180,15 +180,25 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
     return false;
   }
   std::string_view readStr{readBuf};
-  if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('v')).substr(1, 4), 16)) {
-    *vendor = v.value();
+  size_t vendorIdx = readStr.find('v');
+  if (vendorIdx != std::string_view::npos) {
+    if (auto v = wpi::parse_integer<int>(readStr.substr(vendorIdx).substr(1, 4),
+                                         16)) {
+      *vendor = v.value();
+    } else {
+      return false;
+    }
   } else {
     return false;
   }
-  if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('p')).substr(1, 4), 16)) {
-    *product = v.value();
+  size_t productIdx = readStr.find('p');
+  if (productIdx != std::string_view::npos) {
+    if (auto v = wpi::parse_integer<int>(
+            readStr.substr(productIdx).substr(1, 4), 16)) {
+      *product = v.value();
+    } else {
+      return false;
+    }
   } else {
     return false;
   }
