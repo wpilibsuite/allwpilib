@@ -37,6 +37,7 @@ struct Context : public SavedSettings {
   std::string title;
   int defaultWidth;
   int defaultHeight;
+  bool isPlatformRendering{false};
 
   GLFWwindow* window = nullptr;
 

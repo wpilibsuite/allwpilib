@@ -34,7 +34,9 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
     gContext->width = width;
     gContext->height = height;
   }
-  PlatformRenderFrame();
+  if (!gContext->isPlatformRendering) {
+    PlatformRenderFrame();
+  }
 }
 
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -291,7 +293,9 @@ void gui::Main() {
   while (!glfwWindowShouldClose(gContext->window) && !gContext->exit) {
     // Poll and handle events (inputs, window resize, etc.)
     glfwPollEvents();
+    gContext->isPlatformRendering = true;
     PlatformRenderFrame();
+    gContext->isPlatformRendering = false;
 
     // custom saving
     if (gContext->saveSettings) {
