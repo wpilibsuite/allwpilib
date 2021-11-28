@@ -5,11 +5,11 @@
 #pragma once
 
 #include <atomic>
+#include <future>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
-#include <future>
-#include <optional>
 
 #include <wpi/Logger.h>
 
@@ -39,12 +39,13 @@ class DeploySession {
    * @param config The generation configuration file to be sent to the roboRIO.
    * @param logger A reference to a logger where log messages should be sent.
    */
-  DeploySession(wpi::Logger& logger);
+  explicit DeploySession(wpi::Logger& logger);
 
   /**
    * Executes the deploy. This can be called from any thread.
    */
-  bool ChangeTeamNumber(const std::string& macAddress, int team, unsigned int ipAddress);
+  bool ChangeTeamNumber(const std::string& macAddress, int team,
+                        unsigned int ipAddress);
 
   bool Blink(const std::string& macAddress, unsigned int ipAddress);
 
@@ -59,7 +60,6 @@ class DeploySession {
   Status GetStatus() const;
 
  private:
-
   // Logger reference where log messages will be sent.
   wpi::Logger& m_logger;
 

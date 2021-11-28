@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 #include "DeploySession.h"
 
 #include <memory>
@@ -38,7 +42,7 @@ DeploySession::DeploySession(wpi::Logger& logger) : m_logger{logger} {}
 
 template <typename T>
 struct SafeDeleter {
-  SafeDeleter(T d) : deleter(d) {}
+  explicit SafeDeleter(T d) : deleter(d) {}
   ~SafeDeleter() noexcept { deleter(); }
   T deleter;
 };
@@ -122,8 +126,7 @@ bool DeploySession::Reboot(const std::string& macAddress,
           SUCCESS("{}", "roboRIO Connected!");
 
           try {
-            session.Execute(fmt::format(
-                "sync ; shutdown -r now"));
+            session.Execute(fmt::format("sync ; shutdown -r now"));
           } catch (const SshSession::SshException& e) {
             ERROR("An exception occurred: {}", e.what());
             throw e;

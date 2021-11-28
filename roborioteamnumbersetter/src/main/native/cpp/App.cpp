@@ -40,7 +40,7 @@ GLFWAPI void glfwSetWindowSizeLimits(GLFWwindow* window, int minwidth,
 GLFWAPI void glfwSetWindowSize(GLFWwindow* window, int width, int height);
 
 struct TeamNumberRefHolder {
-  TeamNumberRefHolder(glass::Storage& storage)
+  explicit TeamNumberRefHolder(glass::Storage& storage)
       : teamNumber{storage.GetInt("TeamNumber", 0)} {}
   int& teamNumber;
 };
@@ -220,7 +220,6 @@ static void DisplayGui() {
     ImGui::Text("mDNS Implementation is missing.");
 #ifdef _WIN32
     ImGui::Text("Windows 10 1809 or newer is required for this tool");
-    ;
 #else
     ImGui::Text("avahi-client 3 and avahi-core 3 are required for this tool");
     ImGui::Text(
@@ -232,7 +231,7 @@ static void DisplayGui() {
   ImGui::End();
 
   glfwSetWindowSizeLimits(gui::GetSystemWindow(), minWidth, 200, GLFW_DONT_CARE,
-                           GLFW_DONT_CARE);
+                          GLFW_DONT_CARE);
   if (width < minWidth) {
     width = minWidth;
     glfwSetWindowSize(gui::GetSystemWindow(), width, height);
