@@ -10,12 +10,12 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   src/main/native/resources/
-  src/main/native/win/outlineviewer.ico
-  src/main/native/mac/ov.icns
+  src/main/native/win/roborioteamnumbersetter.ico
+  src/main/native/mac/rtns.icns
 }
 
 repoRootNameOverride {
-  outlineviewer
+  roborioteamnumbersetter
 }
 
 includeOtherLibs {
