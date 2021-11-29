@@ -1,3 +1,7 @@
+# Summary
+
+WayMaker is a tool to allow FRC teams to create, visualize, and edit paths on a field for their robots to follow during a match. WayMaker works in conjunction with the WPILib Trajectory features to separate creation of a path from generation of its corresponding trajectory on the robot. It is intended to replace the PathWeaver tool.
+
 # Authors
 
 Jeremiah Shue
@@ -19,9 +23,6 @@ GitHub: https://github.com/wpilibsuite/allwpilib/discussions/3611
 
 FRC Discord: #programming-discussion
 
-# Summary
-
-WayMaker is a tool to allow FRC teams to create, visualize, and edit paths on a field for their robots to follow during a match. WayMaker works in conjunction with the WPILib Trajectory features to separate creation of a path from generation of its corresponding trajectory on the robot. It is intended to replace the PathWeaver tool.
 
 # Motivation
 ## Why Replace PathWeaver?
@@ -94,9 +95,9 @@ Each segment has the following properties.
 |---|---|---|
 |Index|The index of the segment’s start point|Integer
 |Interpolation Type|A string representing the algorithm for interpolating the segment.|CubicHermite\|QuinticHermite\|Clothoid\|etc...|
-|Reversal|Whether the robot should have forward velocity (false) or reverse velocity (true) as defined by the encoders.|Boolean
+|Drive Direction|Whether the robot should have positive velocity (false) or negative velocity (true) when traversing this segment.|Boolean
 
-(Note on the reversal flag. Reversal’s representation in the UI is currently TBD. One option is that reversal is done by setting a flag on the point at which the robot should reverse direction. Outside the UI, when the generator breaks up the path into strings of segments with the same direction and interpolation type, it makes sense to have a flag on the segment for direction. For storage and export of the path file, location of the reversal flag is on the segment. Therefore, the UI reversal will internally be flipping the reversal flag on segments, no matter how reversal is actually displayed to the user)
+)
 
 ### What Reversal Means
 Reversal being true on a segment means that velocity is negative. 
@@ -108,6 +109,8 @@ If a waypoint is between two identically-reversed segments, the robot will pass 
 >**NOTE**: This is different from the PathWeaver operation of reversal, in which the robot would move in the opposite direction of the heading. Checking "Reverse Spline" in PathWeaver would produce a different path shape.
 
 Roughly speaking, if the reversal flags are the same on both sides of a waypoint, the tangent vectors pointing in the direction of robot travel either side of the point should be nearly parallel. If the reversal flags are not the same, the tangent vectors should be pointing in opposite directions. The tangent on the "approach", that is, the segment before the reversal point in the path, should match the heading angle of the waypoint.
+
+Reversal’s representation in the UI is currently TBD. From the user's perspective, it might be setting a flag on the waypoint where drive direction should switch
 ## Framework
 
 WayMaker is written in C++, using the ImGUI framework. This framework and language is chosen to match the ecosystem of current WPILib tooling, to minimize additional burden of maintenance. 
