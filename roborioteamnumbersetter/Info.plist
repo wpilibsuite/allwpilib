@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>edu.wpi.first.tools.roboRIOTeamNumberSetter</string>
 	<key>CFBundleIconFile</key>
-	<string>ov.icns</string>
+	<string>rtns.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSupportedPlatforms</key>
