@@ -1325,7 +1325,7 @@ public class DriverStation {
   }
 
   /**
-   * Forces a control word cache update, and update the passed in control work.
+   * Forces a control word cache update, and update the passed in control word.
    *
    * @param word Word to update.
    */
