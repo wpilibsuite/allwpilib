@@ -28,6 +28,11 @@ public class ControlWord {
     m_dsAttached = dsAttached;
   }
 
+  /**
+   * Updates from an existing word.
+   *
+   * @param word word to update from
+   */
   public void update(ControlWord word) {
     m_enabled = word.m_enabled;
     m_autonomous = word.m_autonomous;
