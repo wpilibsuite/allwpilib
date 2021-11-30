@@ -758,7 +758,7 @@ public class DriverStation {
    */
   public static boolean isEnabled() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getEnabled() && m_controlWordCache.getDSAttached();
     }
   }
@@ -779,7 +779,7 @@ public class DriverStation {
    */
   public static boolean isEStopped() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getEStop();
     }
   }
@@ -792,7 +792,7 @@ public class DriverStation {
    */
   public static boolean isAutonomous() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getAutonomous();
     }
   }
@@ -805,7 +805,7 @@ public class DriverStation {
    */
   public static boolean isAutonomousEnabled() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getAutonomous() && m_controlWordCache.getEnabled();
     }
   }
@@ -852,7 +852,7 @@ public class DriverStation {
    */
   public static boolean isTeleopEnabled() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return !m_controlWordCache.getAutonomous()
           && !m_controlWordCache.getTest()
           && m_controlWordCache.getEnabled();
@@ -867,7 +867,7 @@ public class DriverStation {
    */
   public static boolean isTest() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getTest();
     }
   }
@@ -879,7 +879,7 @@ public class DriverStation {
    */
   public static boolean isDSAttached() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getDSAttached();
     }
   }
@@ -911,7 +911,7 @@ public class DriverStation {
    */
   public static boolean isFMSAttached() {
     synchronized (m_controlWordMutex) {
-      updateControlWord(false);
+      updateControlWord(false, null);
       return m_controlWordCache.getFMSAttached();
     }
   }
@@ -1228,7 +1228,7 @@ public class DriverStation {
     HAL.getMatchInfo(m_matchInfoCache);
 
     // Force a control word update, to make sure the data is the newest.
-    updateControlWord(true);
+    updateControlWord(true, null);
 
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
@@ -1324,18 +1324,25 @@ public class DriverStation {
     }
   }
 
+  public static void updateControlWordFromCache(ControlWord word) {
+    updateControlWord(true, word);
+  }
+
   /**
    * Updates the data in the control word cache. Updates if the force parameter is set, or if 50ms
    * have passed since the last update.
    *
    * @param force True to force an update to the cache, otherwise update if 50ms have passed.
    */
-  private static void updateControlWord(boolean force) {
+  private static void updateControlWord(boolean force, ControlWord wordToUpdate) {
     long now = System.currentTimeMillis();
     synchronized (m_controlWordMutex) {
       if (now - m_lastControlWordUpdate > 50 || force) {
         HAL.getControlWord(m_controlWordCache);
         m_lastControlWordUpdate = now;
+        if (wordToUpdate != null) {
+          wordToUpdate.update(m_controlWordCache);
+        }
       }
     }
   }

@@ -28,6 +28,15 @@ public class ControlWord {
     m_dsAttached = dsAttached;
   }
 
+  public void update(ControlWord word) {
+    m_enabled = word.m_enabled;
+    m_autonomous = word.m_autonomous;
+    m_test = word.m_test;
+    m_emergencyStop = word.m_emergencyStop;
+    m_fmsAttached = word.m_fmsAttached;
+    m_dsAttached = word.m_dsAttached;
+  }
+
   public boolean getEnabled() {
     return m_enabled;
   }
