@@ -1325,6 +1325,18 @@ public class DriverStation {
   }
 
   /**
+   * Forces a control word cache update, and update the passed in control word.
+   *
+   * @param word Word to update.
+   */
+  public static void updateControlWordFromCache(ControlWord word) {
+    synchronized (m_controlWordMutex) {
+      updateControlWord(true);
+      word.update(m_controlWordCache);
+    }
+  }
+
+  /**
    * Updates the data in the control word cache. Updates if the force parameter is set, or if 50ms
    * have passed since the last update.
    *
