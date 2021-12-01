@@ -197,6 +197,7 @@ class ObjectInfo {
   const gui::Texture& GetTexture() const { return m_texture; }
   int* m_pSplineType;
   bool* m_pReversed;
+  bool* m_pSelected;
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -218,6 +219,7 @@ class ObjectInfo {
   int* m_pArrowColor;
 
   bool* m_pSelectable;
+  
 
   std::string* m_pFilename;
   
@@ -238,7 +240,7 @@ class FieldInfo {
   void Draw(ImDrawList* drawList, const FieldFrameData& frameData) const;
 
   wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
-
+  std::string* m_pSelectedName;
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -252,6 +254,9 @@ class FieldInfo {
   // in meters
   float* m_pWidth;
   float* m_pHeight;
+  float* m_pRobotWidth;
+  float* m_pRobotLength;
+  
 
   // in image pixels
   int m_imageWidth;
@@ -353,6 +358,11 @@ FieldInfo::FieldInfo() {
   m_pRight = storage.GetIntRef("right", -1);
   m_pWidth = storage.GetFloatRef("width", kDefaultWidth.to<float>());
   m_pHeight = storage.GetFloatRef("height", kDefaultHeight.to<float>());
+  m_pRobotWidth = storage.GetFloatRef(
+      "robotWidth", DisplayOptions::kDefaultWidth.to<float>());
+  m_pRobotLength = storage.GetFloatRef(
+      "robotHeight", DisplayOptions::kDefaultLength.to<float>());
+  m_pSelectedName = storage.getStringRef("selected", "");
 }
 
 void FieldInfo::DisplaySettings() {
@@ -369,6 +379,11 @@ void FieldInfo::DisplaySettings() {
   }
   InputFloatLength("Field Width", m_pWidth);
   InputFloatLength("Field Height", m_pHeight);
+  InputFloatLength("Robot Width", m_pRobotWidth);
+  InputFloatLength("Robot Length", m_pRobotLength);
+  ImGui::BeginCombo("Selected Object");
+
+  ImGui::EndCombo();
   // ImGui::InputInt("Field Top", m_pTop);
   // ImGui::InputInt("Field Left", m_pLeft);
   // ImGui::InputInt("Field Right", m_pRight);
@@ -570,6 +585,7 @@ ObjectInfo::ObjectInfo() {
   m_pSplineType = storage.GetIntRef("splineType", FieldObjectModel::SplineType::kCubic);
   m_pReversed =
       storage.GetBoolRef("reversed", false);
+  m_pSelected = storage.GetBoolRef("selected", false);
 }
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -603,80 +619,12 @@ DisplayOptions ObjectInfo::GetSplineDisplayOptions() const {
 }
 
 void ObjectInfo::DisplaySettings() {
-  static const char* styleChoices[] = {"Box/Image", "Line", "Line (Closed)",
-                                       "Track"};
   static const char* splineTypeChoices[] = {"Cubic", "Quintic"};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   ImGui::Combo("Spline Type", m_pSplineType, splineTypeChoices,
                IM_ARRAYSIZE(splineTypeChoices));
   ImGui::Checkbox("Reversed", m_pReversed);
-  ImGui::Combo("Style", m_pStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
-  switch (*m_pStyle) {
-    case DisplayOptions::kBoxImage:
-      if (ImGui::Button("Choose image...")) {
-        m_fileOpener = std::make_unique<pfd::open_file>(
-            "Choose object image", "",
-            std::vector<std::string>{
-                "Image File",
-                "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                "*.hdr *.pic *.ppm *.pgm"});
-      }
-      if (ImGui::Button("Reset image")) {
-        Reset();
-      }
-      InputFloatLength("Width", m_pWidth);
-      InputFloatLength("Length", m_pLength);
-      break;
-    case DisplayOptions::kTrack:
-      InputFloatLength("Width", m_pWidth);
-      break;
-    default:
-      break;
-  }
 
-  ImGui::Combo("Spline Style", m_pSplineStyle, styleChoices, IM_ARRAYSIZE(styleChoices));
-  switch (*m_pSplineStyle) {
-    case DisplayOptions::kBoxImage:
-      if (ImGui::Button("Choose image...")) {
-        m_fileOpener = std::make_unique<pfd::open_file>(
-            "Choose object image", "",
-            std::vector<std::string>{
-                "Image File",
-                "*.jpg *.jpeg *.png *.bmp *.psd *.tga *.gif "
-                "*.hdr *.pic *.ppm *.pgm"});
-      }
-      if (ImGui::Button("Reset image")) {
-        Reset();
-      }
-      InputFloatLength("Width", m_pWidth);
-      InputFloatLength("Length", m_pLength);
-      break;
-    case DisplayOptions::kTrack:
-      InputFloatLength("Width", m_pWidth);
-      break;
-    default:
-      break;
-  }
-
-  ImGui::InputFloat("Line Weight", m_pWeight);
-  ImColor col(*m_pColor);
-  if (ImGui::ColorEdit3("Line Color", &col.Value.x,
-                        ImGuiColorEditFlags_NoInputs)) {
-    *m_pColor = col;
-  }
-  ImGui::Checkbox("Arrows", m_pArrows);
-  if (*m_pArrows) {
-    ImGui::SliderInt("Arrow Size", m_pArrowSize, 0, 100, "%d%%",
-                     ImGuiSliderFlags_AlwaysClamp);
-    ImGui::InputFloat("Arrow Weight", m_pArrowWeight);
-    ImColor col(*m_pArrowColor);
-    if (ImGui::ColorEdit3("Arrow Color", &col.Value.x,
-                          ImGuiColorEditFlags_NoInputs)) {
-      *m_pArrowColor = col;
-    }
-  }
-
-  ImGui::Checkbox("Selectable", m_pSelectable);
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
@@ -1323,8 +1271,9 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 void Field2DView::Display() {
   if (ImGui::Begin("Settings")) {
     DisplayField2DSettings(m_model);
-    ImGui::End();
+    
   }
+  ImGui::End();
   DisplayField2D(m_model, ImGui::GetWindowContentRegionMax() -
                               ImGui::GetWindowContentRegionMin());
 }

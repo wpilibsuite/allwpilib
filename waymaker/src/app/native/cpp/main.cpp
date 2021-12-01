@@ -36,17 +36,21 @@ int main() {
 
   gui::ConfigurePlatformSaveFile("waymaker.ini");
 
-  gui::AddInit([] { glass::ResetTime(); });
+  gui::AddInit([] {
+    glass::ResetTime();
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+  });
 
 
 
   gui::AddLateExecute([&] {
+      ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),
+                                   ImGuiDockNodeFlags_PassthruCentralNode);
+      ImGui::Begin("Test");
+      ImGui::End();
     ImGui::BeginMainMenuBar();
     gui::EmitViewMenu();
     if (ImGui::BeginMenu("View")) {
-      if (ImGui::MenuItem("Reset Time")) {
-        glass::ResetTime();
-      }
       ImGui::EndMenu();
     }
  
@@ -76,6 +80,7 @@ int main() {
     ImGui::Begin("Field");
     fieldView->Display();
     ImGui::End();
+    ImGui::ShowMetricsWindow();
     ImGui::Begin("Exporter");
       fieldModel->ForEachFieldObject([&](auto& objModel, auto name) {
         if (!objModel.Exists()) {
