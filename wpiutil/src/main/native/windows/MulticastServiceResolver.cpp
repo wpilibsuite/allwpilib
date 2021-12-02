@@ -41,18 +41,17 @@ MulticastServiceResolver::MulticastServiceResolver(
     return;
   }
 
-  wpi::SmallVector<wpi::UTF16, 128> wideStorage;
+  wpi::SmallVector<wchar_t, 128> wideStorage;
 
   if (wpi::ends_with_lower(serviceType, ".local")) {
-    wpi::convertUTF8ToUTF16String(serviceType, wideStorage);
+    wpi::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
     wpi::SmallString<128> storage;
     storage.append(serviceType);
     storage.append(".local");
-    wpi::convertUTF8ToUTF16String(storage.str(), wideStorage);
+    wpi::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
   }
-  pImpl->serviceType = std::wstring{
-      reinterpret_cast<const wchar_t*>(wideStorage.data()), wideStorage.size()};
+  pImpl->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 }
 
 MulticastServiceResolver::~MulticastServiceResolver() noexcept {
