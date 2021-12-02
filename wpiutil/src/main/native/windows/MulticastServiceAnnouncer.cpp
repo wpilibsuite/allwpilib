@@ -37,14 +37,14 @@ struct MulticastServiceAnnouncer::Impl : ImplBase {
   std::vector<PCWSTR> valuePtrs;
 
   template <typename T>
-  Impl(std::string_view serviceName, std::string_view serviceType,
-                 int port, wpi::span<const std::pair<T, T>> txt);
+  Impl(std::string_view serviceName, std::string_view serviceType, int port,
+       wpi::span<const std::pair<T, T>> txt);
 };
 
 template <typename T>
-MulticastServiceAnnouncer::Impl::Impl(
-    std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<T, T>> txt) {
+MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
+                                      std::string_view serviceType, int port,
+                                      wpi::span<const std::pair<T, T>> txt) {
   if (!dynamicDns.CanDnsAnnounce) {
     return;
   }
