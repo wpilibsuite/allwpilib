@@ -47,24 +47,24 @@ extern "C" {
 #define PH_COMPRESSOR_CONFIG_FRAME_ID (0x9050840u)
 #define PH_SET_ALL_FRAME_ID (0x9050c00u)
 #define PH_PULSE_ONCE_FRAME_ID (0x9050c40u)
-#define PH_STATUS0_FRAME_ID (0x9051800u)
-#define PH_STATUS1_FRAME_ID (0x9051840u)
+#define PH_STATUS_0_FRAME_ID (0x9051800u)
+#define PH_STATUS_1_FRAME_ID (0x9051840u)
 #define PH_CLEAR_FAULTS_FRAME_ID (0x9051b80u)
 
 /* Frame lengths in bytes. */
 #define PH_COMPRESSOR_CONFIG_LENGTH (5u)
 #define PH_SET_ALL_LENGTH (4u)
 #define PH_PULSE_ONCE_LENGTH (4u)
-#define PH_STATUS0_LENGTH (8u)
-#define PH_STATUS1_LENGTH (8u)
+#define PH_STATUS_0_LENGTH (8u)
+#define PH_STATUS_1_LENGTH (8u)
 #define PH_CLEAR_FAULTS_LENGTH (0u)
 
 /* Extended or standard frame types. */
 #define PH_COMPRESSOR_CONFIG_IS_EXTENDED (1)
 #define PH_SET_ALL_IS_EXTENDED (1)
 #define PH_PULSE_ONCE_IS_EXTENDED (1)
-#define PH_STATUS0_IS_EXTENDED (1)
-#define PH_STATUS1_IS_EXTENDED (1)
+#define PH_STATUS_0_IS_EXTENDED (1)
+#define PH_STATUS_1_IS_EXTENDED (1)
 #define PH_CLEAR_FAULTS_IS_EXTENDED (1)
 
 /* Frame cycle times in milliseconds. */
@@ -111,7 +111,7 @@ struct PH_compressor_config_t {
 };
 
 /**
- * Signals in message SetAll.
+ * Signals in message Set_All.
  *
  * Set state of all channels
  *
@@ -232,7 +232,7 @@ struct PH_set_all_t {
 };
 
 /**
- * Signals in message PulseOnce.
+ * Signals in message Pulse_Once.
  *
  * Pulse selected channels once
  *
@@ -360,13 +360,13 @@ struct PH_pulse_once_t {
 };
 
 /**
- * Signals in message Status0.
+ * Signals in message Status_0.
  *
  * Periodic status frame 0
  *
  * All signal values are as on the CAN bus.
  */
-struct PH_status0_t {
+struct PH_status_0_t {
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
@@ -505,35 +505,35 @@ struct PH_status0_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t brownout : 1;
+    uint8_t brownout_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t compressor_oc : 1;
+    uint8_t compressor_oc_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t compressor_open : 1;
+    uint8_t compressor_open_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t solenoid_oc : 1;
+    uint8_t solenoid_oc_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t can_warning : 1;
+    uint8_t can_warning_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -684,13 +684,13 @@ struct PH_status0_t {
 };
 
 /**
- * Signals in message Status1.
+ * Signals in message Status_1.
  *
  * Periodic status frame 1
  *
  * All signal values are as on the CAN bus.
  */
-struct PH_status1_t {
+struct PH_status_1_t {
     /**
      * Range: 0..192 (4..16 V)
      * Scale: 0.0625
@@ -724,42 +724,42 @@ struct PH_status1_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_brownout : 1;
+    uint8_t sticky_brownout_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_compressor_over_current : 1;
+    uint8_t sticky_compressor_oc_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_compressor_not_present : 1;
+    uint8_t sticky_compressor_open_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_solenoid_over_current : 1;
+    uint8_t sticky_solenoid_oc_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_can_warning : 1;
+    uint8_t sticky_can_warning_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_can_bus_off : 1;
+    uint8_t sticky_can_bus_off_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -780,11 +780,11 @@ struct PH_status1_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_has_reset : 1;
+    uint8_t sticky_has_reset_fault : 1;
 };
 
 /**
- * Signals in message ClearFaults.
+ * Signals in message Clear_Faults.
  *
  * Clear sticky faults on the device
  *
@@ -934,7 +934,7 @@ double PH_compressor_config_use_digital_decode(uint8_t value);
 bool PH_compressor_config_use_digital_is_in_range(uint8_t value);
 
 /**
- * Pack message SetAll.
+ * Pack message Set_All.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -948,7 +948,7 @@ int PH_set_all_pack(
     size_t size);
 
 /**
- * Unpack message SetAll.
+ * Unpack message Set_All.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1394,7 +1394,7 @@ double PH_set_all_channel_15_decode(uint8_t value);
 bool PH_set_all_channel_15_is_in_range(uint8_t value);
 
 /**
- * Pack message PulseOnce.
+ * Pack message Pulse_Once.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -1408,7 +1408,7 @@ int PH_pulse_once_pack(
     size_t size);
 
 /**
- * Unpack message PulseOnce.
+ * Unpack message Pulse_Once.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1881,7 +1881,7 @@ double PH_pulse_once_pulse_length_ms_decode(uint16_t value);
 bool PH_pulse_once_pulse_length_ms_is_in_range(uint16_t value);
 
 /**
- * Pack message Status0.
+ * Pack message Status_0.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -1889,13 +1889,13 @@ bool PH_pulse_once_pulse_length_ms_is_in_range(uint16_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PH_status0_pack(
+int PH_status_0_pack(
     uint8_t *dst_p,
-    const struct PH_status0_t *src_p,
+    const struct PH_status_0_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status0.
+ * Unpack message Status_0.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1903,8 +1903,8 @@ int PH_status0_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PH_status0_unpack(
-    struct PH_status0_t *dst_p,
+int PH_status_0_unpack(
+    struct PH_status_0_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -1915,7 +1915,7 @@ int PH_status0_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_0_encode(double value);
+uint8_t PH_status_0_channel_0_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1924,7 +1924,7 @@ uint8_t PH_status0_channel_0_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_0_decode(uint8_t value);
+double PH_status_0_channel_0_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1933,7 +1933,7 @@ double PH_status0_channel_0_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_0_is_in_range(uint8_t value);
+bool PH_status_0_channel_0_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1942,7 +1942,7 @@ bool PH_status0_channel_0_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_1_encode(double value);
+uint8_t PH_status_0_channel_1_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1951,7 +1951,7 @@ uint8_t PH_status0_channel_1_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_1_decode(uint8_t value);
+double PH_status_0_channel_1_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1960,7 +1960,7 @@ double PH_status0_channel_1_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_1_is_in_range(uint8_t value);
+bool PH_status_0_channel_1_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1969,7 +1969,7 @@ bool PH_status0_channel_1_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_2_encode(double value);
+uint8_t PH_status_0_channel_2_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1978,7 +1978,7 @@ uint8_t PH_status0_channel_2_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_2_decode(uint8_t value);
+double PH_status_0_channel_2_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1987,7 +1987,7 @@ double PH_status0_channel_2_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_2_is_in_range(uint8_t value);
+bool PH_status_0_channel_2_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1996,7 +1996,7 @@ bool PH_status0_channel_2_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_3_encode(double value);
+uint8_t PH_status_0_channel_3_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2005,7 +2005,7 @@ uint8_t PH_status0_channel_3_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_3_decode(uint8_t value);
+double PH_status_0_channel_3_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2014,7 +2014,7 @@ double PH_status0_channel_3_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_3_is_in_range(uint8_t value);
+bool PH_status_0_channel_3_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2023,7 +2023,7 @@ bool PH_status0_channel_3_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_4_encode(double value);
+uint8_t PH_status_0_channel_4_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2032,7 +2032,7 @@ uint8_t PH_status0_channel_4_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_4_decode(uint8_t value);
+double PH_status_0_channel_4_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2041,7 +2041,7 @@ double PH_status0_channel_4_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_4_is_in_range(uint8_t value);
+bool PH_status_0_channel_4_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2050,7 +2050,7 @@ bool PH_status0_channel_4_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_5_encode(double value);
+uint8_t PH_status_0_channel_5_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2059,7 +2059,7 @@ uint8_t PH_status0_channel_5_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_5_decode(uint8_t value);
+double PH_status_0_channel_5_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2068,7 +2068,7 @@ double PH_status0_channel_5_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_5_is_in_range(uint8_t value);
+bool PH_status_0_channel_5_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2077,7 +2077,7 @@ bool PH_status0_channel_5_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_6_encode(double value);
+uint8_t PH_status_0_channel_6_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2086,7 +2086,7 @@ uint8_t PH_status0_channel_6_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_6_decode(uint8_t value);
+double PH_status_0_channel_6_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2095,7 +2095,7 @@ double PH_status0_channel_6_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_6_is_in_range(uint8_t value);
+bool PH_status_0_channel_6_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2104,7 +2104,7 @@ bool PH_status0_channel_6_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_7_encode(double value);
+uint8_t PH_status_0_channel_7_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2113,7 +2113,7 @@ uint8_t PH_status0_channel_7_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_7_decode(uint8_t value);
+double PH_status_0_channel_7_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2122,7 +2122,7 @@ double PH_status0_channel_7_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_7_is_in_range(uint8_t value);
+bool PH_status_0_channel_7_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2131,7 +2131,7 @@ bool PH_status0_channel_7_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_8_encode(double value);
+uint8_t PH_status_0_channel_8_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2140,7 +2140,7 @@ uint8_t PH_status0_channel_8_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_8_decode(uint8_t value);
+double PH_status_0_channel_8_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2149,7 +2149,7 @@ double PH_status0_channel_8_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_8_is_in_range(uint8_t value);
+bool PH_status_0_channel_8_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2158,7 +2158,7 @@ bool PH_status0_channel_8_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_9_encode(double value);
+uint8_t PH_status_0_channel_9_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2167,7 +2167,7 @@ uint8_t PH_status0_channel_9_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_9_decode(uint8_t value);
+double PH_status_0_channel_9_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2176,7 +2176,7 @@ double PH_status0_channel_9_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_9_is_in_range(uint8_t value);
+bool PH_status_0_channel_9_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2185,7 +2185,7 @@ bool PH_status0_channel_9_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_10_encode(double value);
+uint8_t PH_status_0_channel_10_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2194,7 +2194,7 @@ uint8_t PH_status0_channel_10_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_10_decode(uint8_t value);
+double PH_status_0_channel_10_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2203,7 +2203,7 @@ double PH_status0_channel_10_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_10_is_in_range(uint8_t value);
+bool PH_status_0_channel_10_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2212,7 +2212,7 @@ bool PH_status0_channel_10_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_11_encode(double value);
+uint8_t PH_status_0_channel_11_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2221,7 +2221,7 @@ uint8_t PH_status0_channel_11_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_11_decode(uint8_t value);
+double PH_status_0_channel_11_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2230,7 +2230,7 @@ double PH_status0_channel_11_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_11_is_in_range(uint8_t value);
+bool PH_status_0_channel_11_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2239,7 +2239,7 @@ bool PH_status0_channel_11_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_12_encode(double value);
+uint8_t PH_status_0_channel_12_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2248,7 +2248,7 @@ uint8_t PH_status0_channel_12_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_12_decode(uint8_t value);
+double PH_status_0_channel_12_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2257,7 +2257,7 @@ double PH_status0_channel_12_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_12_is_in_range(uint8_t value);
+bool PH_status_0_channel_12_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2266,7 +2266,7 @@ bool PH_status0_channel_12_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_13_encode(double value);
+uint8_t PH_status_0_channel_13_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2275,7 +2275,7 @@ uint8_t PH_status0_channel_13_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_13_decode(uint8_t value);
+double PH_status_0_channel_13_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2284,7 +2284,7 @@ double PH_status0_channel_13_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_13_is_in_range(uint8_t value);
+bool PH_status_0_channel_13_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2293,7 +2293,7 @@ bool PH_status0_channel_13_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_14_encode(double value);
+uint8_t PH_status_0_channel_14_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2302,7 +2302,7 @@ uint8_t PH_status0_channel_14_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_14_decode(uint8_t value);
+double PH_status_0_channel_14_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2311,7 +2311,7 @@ double PH_status0_channel_14_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_14_is_in_range(uint8_t value);
+bool PH_status_0_channel_14_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2320,7 +2320,7 @@ bool PH_status0_channel_14_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_15_encode(double value);
+uint8_t PH_status_0_channel_15_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2329,7 +2329,7 @@ uint8_t PH_status0_channel_15_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_15_decode(uint8_t value);
+double PH_status_0_channel_15_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2338,7 +2338,7 @@ double PH_status0_channel_15_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_15_is_in_range(uint8_t value);
+bool PH_status_0_channel_15_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2347,7 +2347,7 @@ bool PH_status0_channel_15_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_analog_0_encode(double value);
+uint8_t PH_status_0_analog_0_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2356,7 +2356,7 @@ uint8_t PH_status0_analog_0_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_analog_0_decode(uint8_t value);
+double PH_status_0_analog_0_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2365,7 +2365,7 @@ double PH_status0_analog_0_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_analog_0_is_in_range(uint8_t value);
+bool PH_status_0_analog_0_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2374,7 +2374,7 @@ bool PH_status0_analog_0_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_analog_1_encode(double value);
+uint8_t PH_status_0_analog_1_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2383,7 +2383,7 @@ uint8_t PH_status0_analog_1_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_analog_1_decode(uint8_t value);
+double PH_status_0_analog_1_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2392,7 +2392,7 @@ double PH_status0_analog_1_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_analog_1_is_in_range(uint8_t value);
+bool PH_status_0_analog_1_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2401,7 +2401,7 @@ bool PH_status0_analog_1_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_digital_sensor_encode(double value);
+uint8_t PH_status_0_digital_sensor_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2410,7 +2410,7 @@ uint8_t PH_status0_digital_sensor_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_digital_sensor_decode(uint8_t value);
+double PH_status_0_digital_sensor_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2419,7 +2419,7 @@ double PH_status0_digital_sensor_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_digital_sensor_is_in_range(uint8_t value);
+bool PH_status_0_digital_sensor_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2428,7 +2428,7 @@ bool PH_status0_digital_sensor_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_brownout_encode(double value);
+uint8_t PH_status_0_brownout_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2437,7 +2437,7 @@ uint8_t PH_status0_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_brownout_decode(uint8_t value);
+double PH_status_0_brownout_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2446,7 +2446,7 @@ double PH_status0_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_brownout_is_in_range(uint8_t value);
+bool PH_status_0_brownout_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2455,7 +2455,7 @@ bool PH_status0_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_compressor_oc_encode(double value);
+uint8_t PH_status_0_compressor_oc_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2464,7 +2464,7 @@ uint8_t PH_status0_compressor_oc_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_compressor_oc_decode(uint8_t value);
+double PH_status_0_compressor_oc_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2473,7 +2473,7 @@ double PH_status0_compressor_oc_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_compressor_oc_is_in_range(uint8_t value);
+bool PH_status_0_compressor_oc_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2482,7 +2482,7 @@ bool PH_status0_compressor_oc_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_compressor_open_encode(double value);
+uint8_t PH_status_0_compressor_open_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2491,7 +2491,7 @@ uint8_t PH_status0_compressor_open_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_compressor_open_decode(uint8_t value);
+double PH_status_0_compressor_open_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2500,7 +2500,7 @@ double PH_status0_compressor_open_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_compressor_open_is_in_range(uint8_t value);
+bool PH_status_0_compressor_open_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2509,7 +2509,7 @@ bool PH_status0_compressor_open_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_solenoid_oc_encode(double value);
+uint8_t PH_status_0_solenoid_oc_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2518,7 +2518,7 @@ uint8_t PH_status0_solenoid_oc_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_solenoid_oc_decode(uint8_t value);
+double PH_status_0_solenoid_oc_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2527,7 +2527,7 @@ double PH_status0_solenoid_oc_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_solenoid_oc_is_in_range(uint8_t value);
+bool PH_status_0_solenoid_oc_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2536,7 +2536,7 @@ bool PH_status0_solenoid_oc_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_can_warning_encode(double value);
+uint8_t PH_status_0_can_warning_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2545,7 +2545,7 @@ uint8_t PH_status0_can_warning_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_can_warning_decode(uint8_t value);
+double PH_status_0_can_warning_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2554,7 +2554,7 @@ double PH_status0_can_warning_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_can_warning_is_in_range(uint8_t value);
+bool PH_status_0_can_warning_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2563,7 +2563,7 @@ bool PH_status0_can_warning_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_hardware_fault_encode(double value);
+uint8_t PH_status_0_hardware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2572,7 +2572,7 @@ uint8_t PH_status0_hardware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_hardware_fault_decode(uint8_t value);
+double PH_status_0_hardware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2581,7 +2581,7 @@ double PH_status0_hardware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_hardware_fault_is_in_range(uint8_t value);
+bool PH_status_0_hardware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2590,7 +2590,7 @@ bool PH_status0_hardware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_0_fault_encode(double value);
+uint8_t PH_status_0_channel_0_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2599,7 +2599,7 @@ uint8_t PH_status0_channel_0_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_0_fault_decode(uint8_t value);
+double PH_status_0_channel_0_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2608,7 +2608,7 @@ double PH_status0_channel_0_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_0_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_0_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2617,7 +2617,7 @@ bool PH_status0_channel_0_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_1_fault_encode(double value);
+uint8_t PH_status_0_channel_1_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2626,7 +2626,7 @@ uint8_t PH_status0_channel_1_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_1_fault_decode(uint8_t value);
+double PH_status_0_channel_1_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2635,7 +2635,7 @@ double PH_status0_channel_1_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_1_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_1_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2644,7 +2644,7 @@ bool PH_status0_channel_1_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_2_fault_encode(double value);
+uint8_t PH_status_0_channel_2_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2653,7 +2653,7 @@ uint8_t PH_status0_channel_2_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_2_fault_decode(uint8_t value);
+double PH_status_0_channel_2_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2662,7 +2662,7 @@ double PH_status0_channel_2_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_2_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_2_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2671,7 +2671,7 @@ bool PH_status0_channel_2_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_3_fault_encode(double value);
+uint8_t PH_status_0_channel_3_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2680,7 +2680,7 @@ uint8_t PH_status0_channel_3_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_3_fault_decode(uint8_t value);
+double PH_status_0_channel_3_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2689,7 +2689,7 @@ double PH_status0_channel_3_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_3_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_3_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2698,7 +2698,7 @@ bool PH_status0_channel_3_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_4_fault_encode(double value);
+uint8_t PH_status_0_channel_4_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2707,7 +2707,7 @@ uint8_t PH_status0_channel_4_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_4_fault_decode(uint8_t value);
+double PH_status_0_channel_4_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2716,7 +2716,7 @@ double PH_status0_channel_4_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_4_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_4_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2725,7 +2725,7 @@ bool PH_status0_channel_4_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_5_fault_encode(double value);
+uint8_t PH_status_0_channel_5_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2734,7 +2734,7 @@ uint8_t PH_status0_channel_5_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_5_fault_decode(uint8_t value);
+double PH_status_0_channel_5_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2743,7 +2743,7 @@ double PH_status0_channel_5_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_5_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_5_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2752,7 +2752,7 @@ bool PH_status0_channel_5_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_6_fault_encode(double value);
+uint8_t PH_status_0_channel_6_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2761,7 +2761,7 @@ uint8_t PH_status0_channel_6_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_6_fault_decode(uint8_t value);
+double PH_status_0_channel_6_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2770,7 +2770,7 @@ double PH_status0_channel_6_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_6_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_6_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2779,7 +2779,7 @@ bool PH_status0_channel_6_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_7_fault_encode(double value);
+uint8_t PH_status_0_channel_7_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2788,7 +2788,7 @@ uint8_t PH_status0_channel_7_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_7_fault_decode(uint8_t value);
+double PH_status_0_channel_7_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2797,7 +2797,7 @@ double PH_status0_channel_7_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_7_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_7_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2806,7 +2806,7 @@ bool PH_status0_channel_7_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_8_fault_encode(double value);
+uint8_t PH_status_0_channel_8_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2815,7 +2815,7 @@ uint8_t PH_status0_channel_8_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_8_fault_decode(uint8_t value);
+double PH_status_0_channel_8_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2824,7 +2824,7 @@ double PH_status0_channel_8_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_8_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_8_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2833,7 +2833,7 @@ bool PH_status0_channel_8_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_9_fault_encode(double value);
+uint8_t PH_status_0_channel_9_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2842,7 +2842,7 @@ uint8_t PH_status0_channel_9_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_9_fault_decode(uint8_t value);
+double PH_status_0_channel_9_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2851,7 +2851,7 @@ double PH_status0_channel_9_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_9_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_9_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2860,7 +2860,7 @@ bool PH_status0_channel_9_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_10_fault_encode(double value);
+uint8_t PH_status_0_channel_10_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2869,7 +2869,7 @@ uint8_t PH_status0_channel_10_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_10_fault_decode(uint8_t value);
+double PH_status_0_channel_10_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2878,7 +2878,7 @@ double PH_status0_channel_10_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_10_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_10_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2887,7 +2887,7 @@ bool PH_status0_channel_10_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_11_fault_encode(double value);
+uint8_t PH_status_0_channel_11_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2896,7 +2896,7 @@ uint8_t PH_status0_channel_11_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_11_fault_decode(uint8_t value);
+double PH_status_0_channel_11_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2905,7 +2905,7 @@ double PH_status0_channel_11_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_11_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_11_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2914,7 +2914,7 @@ bool PH_status0_channel_11_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_12_fault_encode(double value);
+uint8_t PH_status_0_channel_12_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2923,7 +2923,7 @@ uint8_t PH_status0_channel_12_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_12_fault_decode(uint8_t value);
+double PH_status_0_channel_12_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2932,7 +2932,7 @@ double PH_status0_channel_12_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_12_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_12_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2941,7 +2941,7 @@ bool PH_status0_channel_12_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_13_fault_encode(double value);
+uint8_t PH_status_0_channel_13_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2950,7 +2950,7 @@ uint8_t PH_status0_channel_13_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_13_fault_decode(uint8_t value);
+double PH_status_0_channel_13_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2959,7 +2959,7 @@ double PH_status0_channel_13_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_13_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_13_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2968,7 +2968,7 @@ bool PH_status0_channel_13_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_14_fault_encode(double value);
+uint8_t PH_status_0_channel_14_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2977,7 +2977,7 @@ uint8_t PH_status0_channel_14_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_14_fault_decode(uint8_t value);
+double PH_status_0_channel_14_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2986,7 +2986,7 @@ double PH_status0_channel_14_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_14_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_14_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2995,7 +2995,7 @@ bool PH_status0_channel_14_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_channel_15_fault_encode(double value);
+uint8_t PH_status_0_channel_15_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3004,7 +3004,7 @@ uint8_t PH_status0_channel_15_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_channel_15_fault_decode(uint8_t value);
+double PH_status_0_channel_15_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3013,7 +3013,7 @@ double PH_status0_channel_15_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_channel_15_fault_is_in_range(uint8_t value);
+bool PH_status_0_channel_15_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3022,7 +3022,7 @@ bool PH_status0_channel_15_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_compressor_on_encode(double value);
+uint8_t PH_status_0_compressor_on_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3031,7 +3031,7 @@ uint8_t PH_status0_compressor_on_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_compressor_on_decode(uint8_t value);
+double PH_status_0_compressor_on_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3040,7 +3040,7 @@ double PH_status0_compressor_on_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_compressor_on_is_in_range(uint8_t value);
+bool PH_status_0_compressor_on_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3049,7 +3049,7 @@ bool PH_status0_compressor_on_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_system_enabled_encode(double value);
+uint8_t PH_status_0_system_enabled_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3058,7 +3058,7 @@ uint8_t PH_status0_system_enabled_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_system_enabled_decode(uint8_t value);
+double PH_status_0_system_enabled_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3067,7 +3067,7 @@ double PH_status0_system_enabled_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_system_enabled_is_in_range(uint8_t value);
+bool PH_status_0_system_enabled_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3076,7 +3076,7 @@ bool PH_status0_system_enabled_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_robo_rio_present_encode(double value);
+uint8_t PH_status_0_robo_rio_present_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3085,7 +3085,7 @@ uint8_t PH_status0_robo_rio_present_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_robo_rio_present_decode(uint8_t value);
+double PH_status_0_robo_rio_present_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3094,7 +3094,7 @@ double PH_status0_robo_rio_present_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_robo_rio_present_is_in_range(uint8_t value);
+bool PH_status_0_robo_rio_present_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3103,7 +3103,7 @@ bool PH_status0_robo_rio_present_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status0_compressor_config_encode(double value);
+uint8_t PH_status_0_compressor_config_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3112,7 +3112,7 @@ uint8_t PH_status0_compressor_config_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status0_compressor_config_decode(uint8_t value);
+double PH_status_0_compressor_config_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3121,10 +3121,10 @@ double PH_status0_compressor_config_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status0_compressor_config_is_in_range(uint8_t value);
+bool PH_status_0_compressor_config_is_in_range(uint8_t value);
 
 /**
- * Pack message Status1.
+ * Pack message Status_1.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -3132,13 +3132,13 @@ bool PH_status0_compressor_config_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PH_status1_pack(
+int PH_status_1_pack(
     uint8_t *dst_p,
-    const struct PH_status1_t *src_p,
+    const struct PH_status_1_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status1.
+ * Unpack message Status_1.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -3146,8 +3146,8 @@ int PH_status1_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PH_status1_unpack(
-    struct PH_status1_t *dst_p,
+int PH_status_1_unpack(
+    struct PH_status_1_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -3158,7 +3158,7 @@ int PH_status1_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_v_bus_encode(double value);
+uint8_t PH_status_1_v_bus_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3167,7 +3167,7 @@ uint8_t PH_status1_v_bus_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_v_bus_decode(uint8_t value);
+double PH_status_1_v_bus_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3176,7 +3176,7 @@ double PH_status1_v_bus_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_v_bus_is_in_range(uint8_t value);
+bool PH_status_1_v_bus_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3185,7 +3185,7 @@ bool PH_status1_v_bus_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PH_status1_solenoid_voltage_encode(double value);
+uint16_t PH_status_1_solenoid_voltage_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3194,7 +3194,7 @@ uint16_t PH_status1_solenoid_voltage_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_solenoid_voltage_decode(uint16_t value);
+double PH_status_1_solenoid_voltage_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3203,7 +3203,7 @@ double PH_status1_solenoid_voltage_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_solenoid_voltage_is_in_range(uint16_t value);
+bool PH_status_1_solenoid_voltage_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3212,7 +3212,7 @@ bool PH_status1_solenoid_voltage_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_compressor_current_encode(double value);
+uint8_t PH_status_1_compressor_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3221,7 +3221,7 @@ uint8_t PH_status1_compressor_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_compressor_current_decode(uint8_t value);
+double PH_status_1_compressor_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3230,7 +3230,7 @@ double PH_status1_compressor_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_compressor_current_is_in_range(uint8_t value);
+bool PH_status_1_compressor_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3239,7 +3239,7 @@ bool PH_status1_compressor_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_solenoid_current_encode(double value);
+uint8_t PH_status_1_solenoid_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3248,7 +3248,7 @@ uint8_t PH_status1_solenoid_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_solenoid_current_decode(uint8_t value);
+double PH_status_1_solenoid_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3257,7 +3257,7 @@ double PH_status1_solenoid_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_solenoid_current_is_in_range(uint8_t value);
+bool PH_status_1_solenoid_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3266,7 +3266,7 @@ bool PH_status1_solenoid_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_brownout_encode(double value);
+uint8_t PH_status_1_sticky_brownout_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3275,7 +3275,7 @@ uint8_t PH_status1_sticky_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_brownout_decode(uint8_t value);
+double PH_status_1_sticky_brownout_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3284,7 +3284,7 @@ double PH_status1_sticky_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_brownout_is_in_range(uint8_t value);
+bool PH_status_1_sticky_brownout_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3293,7 +3293,7 @@ bool PH_status1_sticky_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_compressor_over_current_encode(double value);
+uint8_t PH_status_1_sticky_compressor_oc_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3302,7 +3302,7 @@ uint8_t PH_status1_sticky_compressor_over_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_compressor_over_current_decode(uint8_t value);
+double PH_status_1_sticky_compressor_oc_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3311,7 +3311,7 @@ double PH_status1_sticky_compressor_over_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_compressor_over_current_is_in_range(uint8_t value);
+bool PH_status_1_sticky_compressor_oc_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3320,7 +3320,7 @@ bool PH_status1_sticky_compressor_over_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_compressor_not_present_encode(double value);
+uint8_t PH_status_1_sticky_compressor_open_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3329,7 +3329,7 @@ uint8_t PH_status1_sticky_compressor_not_present_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_compressor_not_present_decode(uint8_t value);
+double PH_status_1_sticky_compressor_open_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3338,7 +3338,7 @@ double PH_status1_sticky_compressor_not_present_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_compressor_not_present_is_in_range(uint8_t value);
+bool PH_status_1_sticky_compressor_open_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3347,7 +3347,7 @@ bool PH_status1_sticky_compressor_not_present_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_solenoid_over_current_encode(double value);
+uint8_t PH_status_1_sticky_solenoid_oc_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3356,7 +3356,7 @@ uint8_t PH_status1_sticky_solenoid_over_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_solenoid_over_current_decode(uint8_t value);
+double PH_status_1_sticky_solenoid_oc_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3365,7 +3365,7 @@ double PH_status1_sticky_solenoid_over_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_solenoid_over_current_is_in_range(uint8_t value);
+bool PH_status_1_sticky_solenoid_oc_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3374,7 +3374,7 @@ bool PH_status1_sticky_solenoid_over_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_can_warning_encode(double value);
+uint8_t PH_status_1_sticky_can_warning_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3383,7 +3383,7 @@ uint8_t PH_status1_sticky_can_warning_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_can_warning_decode(uint8_t value);
+double PH_status_1_sticky_can_warning_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3392,7 +3392,7 @@ double PH_status1_sticky_can_warning_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_can_warning_is_in_range(uint8_t value);
+bool PH_status_1_sticky_can_warning_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3401,7 +3401,7 @@ bool PH_status1_sticky_can_warning_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_can_bus_off_encode(double value);
+uint8_t PH_status_1_sticky_can_bus_off_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3410,7 +3410,7 @@ uint8_t PH_status1_sticky_can_bus_off_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_can_bus_off_decode(uint8_t value);
+double PH_status_1_sticky_can_bus_off_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3419,7 +3419,7 @@ double PH_status1_sticky_can_bus_off_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_can_bus_off_is_in_range(uint8_t value);
+bool PH_status_1_sticky_can_bus_off_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3428,7 +3428,7 @@ bool PH_status1_sticky_can_bus_off_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_hardware_fault_encode(double value);
+uint8_t PH_status_1_sticky_hardware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3437,7 +3437,7 @@ uint8_t PH_status1_sticky_hardware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_hardware_fault_decode(uint8_t value);
+double PH_status_1_sticky_hardware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3446,7 +3446,7 @@ double PH_status1_sticky_hardware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_hardware_fault_is_in_range(uint8_t value);
+bool PH_status_1_sticky_hardware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3455,7 +3455,7 @@ bool PH_status1_sticky_hardware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_firmware_fault_encode(double value);
+uint8_t PH_status_1_sticky_firmware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3464,7 +3464,7 @@ uint8_t PH_status1_sticky_firmware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_firmware_fault_decode(uint8_t value);
+double PH_status_1_sticky_firmware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3473,7 +3473,7 @@ double PH_status1_sticky_firmware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_firmware_fault_is_in_range(uint8_t value);
+bool PH_status_1_sticky_firmware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3482,7 +3482,7 @@ bool PH_status1_sticky_firmware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PH_status1_sticky_has_reset_encode(double value);
+uint8_t PH_status_1_sticky_has_reset_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -3491,7 +3491,7 @@ uint8_t PH_status1_sticky_has_reset_encode(double value);
  *
  * @return Decoded signal.
  */
-double PH_status1_sticky_has_reset_decode(uint8_t value);
+double PH_status_1_sticky_has_reset_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -3500,10 +3500,10 @@ double PH_status1_sticky_has_reset_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PH_status1_sticky_has_reset_is_in_range(uint8_t value);
+bool PH_status_1_sticky_has_reset_fault_is_in_range(uint8_t value);
 
 /**
- * Pack message ClearFaults.
+ * Pack message Clear_Faults.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -3517,7 +3517,7 @@ int PH_clear_faults_pack(
     size_t size);
 
 /**
- * Unpack message ClearFaults.
+ * Unpack message Clear_Faults.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
