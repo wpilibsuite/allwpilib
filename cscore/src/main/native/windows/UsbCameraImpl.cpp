@@ -14,7 +14,6 @@
 #include <windowsx.h>
 
 #include <cmath>
-#include <codecvt>
 #include <memory>
 #include <string>
 #include <vector>
@@ -25,7 +24,9 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/ConvertUTF.h>
 #include <wpi/MemAlloc.h>
+#include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
@@ -72,8 +73,9 @@ UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::Logger& logger,
                              Notifier& notifier, Telemetry& telemetry,
                              std::string_view path)
     : SourceImpl{name, logger, notifier, telemetry}, m_path{path} {
-  std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
-  m_widePath = utf8_conv.from_bytes(m_path.c_str());
+  wpi::SmallVector<wchar_t, 128> wideStorage;
+  wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+  m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
   m_deviceId = -1;
   StartMessagePump();
 }
@@ -227,7 +229,7 @@ void UsbCameraImpl::PostRequestNewFrame() {
 
 bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
                                       bool* connected) {
-  DEV_BROADCAST_DEVICEINTERFACE* pDi = NULL;
+  DEV_BROADCAST_DEVICEINTERFACE_A* pDi = NULL;
 
   *connected = false;
 
@@ -240,9 +242,9 @@ bool UsbCameraImpl::CheckDeviceChange(WPARAM wParam, DEV_BROADCAST_HDR* pHdr,
 
   // Compare the device name with the symbolic link.
 
-  pDi = reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE*>(pHdr);
+  pDi = reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE_A*>(pHdr);
 
-  if (_stricmp(m_path.c_str(), pDi->dbcc_name) == 0) {
+  if (wpi::equals_lower(m_path, pDi->dbcc_name)) {
     if (wParam == DBT_DEVICEARRIVAL) {
       *connected = true;
       return true;
@@ -411,11 +413,12 @@ LRESULT UsbCameraImpl::PumpMain(HWND hwnd, UINT uiMsg, WPARAM wParam,
           // If has device ID, use the device ID from the event
           // because of windows bug
           auto&& device = devices[m_deviceId];
-          DEV_BROADCAST_DEVICEINTERFACE* pDi =
-              reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE*>(parameter);
+          DEV_BROADCAST_DEVICEINTERFACE_A* pDi =
+              reinterpret_cast<DEV_BROADCAST_DEVICEINTERFACE_A*>(parameter);
           m_path = pDi->dbcc_name;
-          std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
-          m_widePath = utf8_conv.from_bytes(m_path.c_str());
+          wpi::SmallVector<wchar_t, 128> wideStorage;
+          wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+          m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
         } else {
           // This device not found
           break;
@@ -747,8 +750,9 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     {
       std::scoped_lock lock(m_mutex);
       m_path = msg->dataStr;
-      std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
-      m_widePath = utf8_conv.from_bytes(m_path.c_str());
+      wpi::SmallVector<wchar_t, 128> wideStorage;
+      wpi::sys::windows::UTF8ToUTF16(m_path, wideStorage);
+      m_widePath = std::wstring{wideStorage.data(), wideStorage.size()};
     }
     DeviceDisconnect();
     DeviceConnect();
@@ -1048,7 +1052,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   // Ensure we are initialized by grabbing the message pump
   // GetMessagePump();
 
-  std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+  wpi::SmallString<128> storage;
+  WCHAR buf[512];
   ComPtr<IMFAttributes> pAttributes;
   IMFActivate** ppDevices = nullptr;
   UINT32 count = 0;
@@ -1080,14 +1085,19 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
   for (UINT32 i = 0; i < count; i++) {
     UsbCameraInfo info;
     info.dev = i;
-    WCHAR buf[512];
+
+    UINT32 characters = 0;
     ppDevices[i]->GetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, buf,
-                            sizeof(buf) / sizeof(WCHAR), NULL);
-    info.name = utf8_conv.to_bytes(buf);
+                            sizeof(buf) / sizeof(WCHAR), &characters);
+    storage.clear();
+    wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
+    info.name = storage.string();
     ppDevices[i]->GetString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, buf,
-        sizeof(buf) / sizeof(WCHAR), NULL);
-    info.path = utf8_conv.to_bytes(buf);
+        sizeof(buf) / sizeof(WCHAR), &characters);
+    storage.clear();
+    wpi::sys::windows::UTF16ToUTF8(buf, characters, storage);
+    info.path = storage.string();
 
     // Try to parse path from symbolic link
     ParseVidAndPid(info.path, &info.productId, &info.vendorId);
