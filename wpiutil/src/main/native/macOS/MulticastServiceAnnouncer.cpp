@@ -17,38 +17,43 @@ struct MulticastServiceAnnouncer::Impl {
   DNSServiceRef serviceRef{nullptr};
   TXTRecordRef txtRecord;
 
-  template <typename T>
-  Impl(std::string_view serviceName, std::string_view serviceType, int port,
-       wpi::span<const std::pair<T, T>> txt) {}
+  Impl() { TXTRecordCreate(&txtRecord, 0, nullptr); }
 
   ~Impl() noexcept { TXTRecordDeallocate(&txtRecord); }
 };
 
-template <typename T>
-MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
-                                      std::string_view serviceType, int port,
-                                      wpi::span<const std::pair<T, T>> txt) {
-  this->serviceName = serviceName;
-  this->serviceType = serviceType;
-  this->port = port;
-  TXTRecordCreate(&txtRecord, 0, nullptr);
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
+    std::string_view serviceName, std::string_view serviceType, int port,
+    wpi::span<const std::pair<std::string, std::string>> txt) {
+  pImpl = std::make_unique<Impl>();
+  pImpl->serviceName = serviceName;
+  pImpl->serviceType = serviceType;
+  pImpl->port = port;
 
   for (auto&& i : txt) {
-    TXTRecordSetValue(&this->txtRecord, i.first.c_str(), i.second.length(),
+    TXTRecordSetValue(&pImpl->txtRecord, i.first.c_str(), i.second.length(),
                       i.second.c_str());
   }
 }
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
     std::string_view serviceName, std::string_view serviceType, int port,
-    wpi::span<const std::pair<std::string, std::string>> txt) {
-  pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
-}
-
-MulticastServiceAnnouncer::MulticastServiceAnnouncer(
-    std::string_view serviceName, std::string_view serviceType, int port,
     wpi::span<const std::pair<std::string_view, std::string_view>> txt) {
-  pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
+  pImpl = std::make_unique<Impl>();
+  pImpl->serviceName = serviceName;
+  pImpl->serviceType = serviceType;
+  pImpl->port = port;
+
+  wpi::SmallString<64> key;
+
+  for (auto&& i : txt) {
+    key.clear();
+    key.append(i.first);
+    key.emplace_back('\0');
+
+    TXTRecordSetValue(&pImpl->txtRecord, key.data(), i.second.length(),
+                      i.second.data());
+  }
 }
 
 MulticastServiceAnnouncer::~MulticastServiceAnnouncer() noexcept {
