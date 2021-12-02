@@ -110,8 +110,8 @@ void WindowsMessagePump::ThreadMain(HANDLE eventHandle) {
   MFStartup(MF_VERSION);
 
   auto classHolder = GetClassHolder();
-  hwnd = CreateWindowExA(0, classHolder->class_name, "dummy_name", 0, 0, 0, 0, 0,
-                        HWND_MESSAGE, NULL, NULL, this);
+  hwnd = CreateWindowExA(0, classHolder->class_name, "dummy_name", 0, 0, 0, 0,
+                         0, HWND_MESSAGE, NULL, NULL, this);
 
   // Register for device notifications
   HDEVNOTIFY g_hdevnotify = NULL;
