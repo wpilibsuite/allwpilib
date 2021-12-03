@@ -6,6 +6,7 @@
 
 #include <cmath>
 
+#include "units/angle.h"
 #include "units/math.h"
 
 using namespace frc;
@@ -15,16 +16,25 @@ using namespace frc;
  *
  * @param x Value of which to take sinc(x).
  */
-static double Sinc(double x) {
-  if (std::abs(x) < 1e-9) {
-    return 1.0 - 1.0 / 6.0 * x * x;
+static decltype(1 / 1_rad) Sinc(units::radian_t x) {
+  if (units::math::abs(x) < 1e-9_rad) {
+    return decltype(1 / 1_rad){1.0 - 1.0 / 6.0 * x.value() * x.value()};
   } else {
-    return std::sin(x) / x;
+    return units::math::sin(x) / x;
   }
 }
 
 RamseteController::RamseteController(double b, double zeta)
+    : RamseteController(units::unit_t<b_unit>{b},
+                        units::unit_t<zeta_unit>{zeta}) {}
+
+RamseteController::RamseteController(units::unit_t<b_unit> b,
+                                     units::unit_t<zeta_unit> zeta)
     : m_b{b}, m_zeta{zeta} {}
+
+RamseteController::RamseteController()
+    : RamseteController(units::unit_t<b_unit>{2.0},
+                        units::unit_t<zeta_unit>{0.7}) {}
 
 bool RamseteController::AtReference() const {
   const auto& eTranslate = m_poseError.Translation();
@@ -51,14 +61,15 @@ ChassisSpeeds RamseteController::Calculate(
   m_poseError = poseRef.RelativeTo(currentPose);
 
   // Aliases for equation readability
-  double eX = m_poseError.X().value();
-  double eY = m_poseError.Y().value();
-  double eTheta = m_poseError.Rotation().Radians().value();
-  double vRef = linearVelocityRef.value();
-  double omegaRef = angularVelocityRef.value();
+  const auto& eX = m_poseError.X();
+  const auto& eY = m_poseError.Y();
+  const auto& eTheta = m_poseError.Rotation().Radians();
+  const auto& vRef = linearVelocityRef;
+  const auto& omegaRef = angularVelocityRef;
 
-  double k =
-      2.0 * m_zeta * std::sqrt(std::pow(omegaRef, 2) + m_b * std::pow(vRef, 2));
+  auto k = 2.0 * m_zeta *
+           units::math::sqrt(units::math::pow<2>(omegaRef) +
+                             m_b * units::math::pow<2>(vRef));
 
   units::meters_per_second_t v{vRef * m_poseError.Rotation().Cos() + k * eX};
   units::radians_per_second_t omega{omegaRef + k * eTheta +
