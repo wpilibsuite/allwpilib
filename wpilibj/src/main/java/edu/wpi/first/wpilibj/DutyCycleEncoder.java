@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -26,6 +27,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   private double m_positionOffset;
   private double m_distancePerRotation = 1.0;
   private double m_lastPosition;
+  private double m_sensorMin;
+  private double m_sensorMax = 1.0;
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
@@ -105,6 +108,14 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       double counter2 = m_counter.get();
       double pos2 = m_dutyCycle.getOutput();
       if (counter == counter2 && pos == pos2) {
+        // map sensor range
+        if (pos < m_sensorMin) {
+          pos = m_sensorMin;
+        }
+        if (pos > m_sensorMax) {
+          pos = m_sensorMax;
+        }
+        pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
         double position = counter + pos - m_positionOffset;
         m_lastPosition = position;
         return position;
@@ -127,6 +138,22 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
    */
   public double getPositionOffset() {
     return m_positionOffset;
+  }
+
+  /**
+   * Set the encoder duty cycle range. As the encoder needs to maintain a duty cycle, the duty cycle
+   * cannot go all the way to 0% or all the way to 100%. For example, an encoder with a 4096 us
+   * period might have a minimum duty cycle of 1 us / 4096 us and a maximum duty cycle of 4095 /
+   * 4096 us. Setting the range will result in an encoder duty cycle less than or equal to the
+   * minimum being output as 0 rotation, the duty cycle greater than or equal to the maximum being
+   * output as 1 rotation, and values in between linearly scaled from 0 to 1.
+   *
+   * @param min minimum duty cycle (0-1 range)
+   * @param max maximum duty cycle (0-1 range)
+   */
+  public void setDutyCycleRange(double min, double max) {
+    m_sensorMin = MathUtil.clamp(min, 0.0, 1.0);
+    m_sensorMax = MathUtil.clamp(max, 0.0, 1.0);
   }
 
   /**

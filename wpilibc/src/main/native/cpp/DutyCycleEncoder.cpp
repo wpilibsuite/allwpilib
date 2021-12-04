@@ -89,6 +89,14 @@ units::turn_t DutyCycleEncoder::Get() const {
     auto counter2 = m_counter->Get();
     auto pos2 = m_dutyCycle->GetOutput();
     if (counter == counter2 && pos == pos2) {
+      // map sensor range
+      if (pos < m_sensorMin) {
+        pos = m_sensorMin;
+      }
+      if (pos > m_sensorMax) {
+        pos = m_sensorMax;
+      }
+      pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
       units::turn_t turns{counter + pos - m_positionOffset};
       m_lastPosition = turns;
       return turns;
@@ -100,6 +108,11 @@ units::turn_t DutyCycleEncoder::Get() const {
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;
+}
+
+void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
+  m_sensorMin = std::clamp(min, 0.0, 1.0);
+  m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
 void DutyCycleEncoder::SetDistancePerRotation(double distancePerRotation) {
