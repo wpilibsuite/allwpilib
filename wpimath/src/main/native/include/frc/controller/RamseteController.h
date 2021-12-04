@@ -5,11 +5,13 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/deprecated.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
 #include "units/angular_velocity.h"
+#include "units/length.h"
 #include "units/velocity.h"
 
 namespace frc {
@@ -43,22 +45,38 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT RamseteController {
  public:
+  using b_unit =
+      units::compound_unit<units::squared<units::radians>,
+                           units::inverse<units::squared<units::meters>>>;
+  using zeta_unit = units::inverse<units::radians>;
+
   /**
    * Construct a Ramsete unicycle controller.
    *
-   * @param b    Tuning parameter (b > 0) for which larger values make
+   * @param b    Tuning parameter (b > 0 rad²/m²) for which larger values make
    *             convergence more aggressive like a proportional term.
-   * @param zeta Tuning parameter (0 < zeta < 1) for which larger values provide
-   *             more damping in response.
+   * @param zeta Tuning parameter (0 rad⁻¹ < zeta < 1 rad⁻¹) for which larger
+   *             values provide more damping in response.
    */
+  WPI_DEPRECATED("Use unit-safe constructor instead")
   RamseteController(double b, double zeta);
 
   /**
-   * Construct a Ramsete unicycle controller. The default arguments for
-   * b and zeta of 2.0 and 0.7 have been well-tested to produce desirable
-   * results.
+   * Construct a Ramsete unicycle controller.
+   *
+   * @param b    Tuning parameter (b > 0 rad²/m²) for which larger values make
+   *             convergence more aggressive like a proportional term.
+   * @param zeta Tuning parameter (0 rad⁻¹ < zeta < 1 rad⁻¹) for which larger
+   *             values provide more damping in response.
    */
-  RamseteController() : RamseteController(2.0, 0.7) {}
+  RamseteController(units::unit_t<b_unit> b, units::unit_t<zeta_unit> zeta);
+
+  /**
+   * Construct a Ramsete unicycle controller. The default arguments for
+   * b and zeta of 2.0 rad²/m² and 0.7 rad⁻¹ have been well-tested to produce
+   * desirable results.
+   */
+  RamseteController();
 
   /**
    * Returns true if the pose error is within tolerance of the reference.
@@ -109,8 +127,8 @@ class WPILIB_DLLEXPORT RamseteController {
   void SetEnabled(bool enabled);
 
  private:
-  double m_b;
-  double m_zeta;
+  units::unit_t<b_unit> m_b;
+  units::unit_t<zeta_unit> m_zeta;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;
