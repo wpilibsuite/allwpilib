@@ -160,17 +160,17 @@ bool DeleteButton(ImGuiID id, const ImVec2& pos) {
 bool HeaderDeleteButton(const char* label) {
   ImGuiWindow* window = ImGui::GetCurrentWindow();
   ImGuiContext& g = *GImGui;
-  ImGuiLastItemDataBackup last_item_backup;
+  ImGuiLastItemData last_item_backup = g.LastItemData;
   ImGuiID id = window->GetID(label);
   float button_size = g.FontSize;
-  float button_x = ImMax(window->DC.LastItemRect.Min.x,
-                         window->DC.LastItemRect.Max.x -
-                             g.Style.FramePadding.x * 2.0f - button_size);
-  float button_y = window->DC.LastItemRect.Min.y;
+  float button_x = ImMax(
+      g.LastItemData.Rect.Min.x,
+      g.LastItemData.Rect.Max.x - g.Style.FramePadding.x * 2.0f - button_size);
+  float button_y = g.LastItemData.Rect.Min.y;
   bool rv = DeleteButton(
       window->GetID(reinterpret_cast<void*>(static_cast<intptr_t>(id) + 1)),
       ImVec2(button_x, button_y));
-  last_item_backup.Restore();
+  g.LastItemData = last_item_backup;
   return rv;
 }
 

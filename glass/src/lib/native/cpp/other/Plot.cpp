@@ -17,10 +17,15 @@
 
 #include <fmt/format.h>
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <implot.h>
+#include <implot_internal.h>
 #include <wpi/Signal.h>
 #include <wpi/SmallString.h>
 #include <wpi/SmallVector.h>
@@ -35,6 +40,8 @@
 #include "glass/support/ExtraGuiWidgets.h"
 
 using namespace glass;
+
+static constexpr int kAxisCount = 3;
 
 namespace {
 class PlotView;
@@ -129,6 +136,7 @@ class Plot {
 
  private:
   void EmitSettingsLimits(int axis);
+  void DragDropAccept(PlotView& view, size_t i, int yAxis);
 
   bool m_paused = false;
 
@@ -137,13 +145,19 @@ class Plot {
   bool& m_showPause;
   bool& m_lockPrevX;
   bool& m_legend;
+  bool& m_legendOutside;
+  bool& m_legendHorizontal;
+  int& m_legendLocation;
+  bool& m_crosshairs;
+  bool& m_antialiased;
+  bool& m_mousePosition;
   bool& m_yAxis2;
   bool& m_yAxis3;
   float& m_viewTime;
   bool& m_autoHeight;
   int& m_height;
-  struct PlotRange {
-    explicit PlotRange(Storage& storage);
+  struct PlotAxis {
+    PlotAxis(Storage& storage, int num);
 
     std::string& label;
     double& min;
@@ -151,8 +165,15 @@ class Plot {
     bool& lockMin;
     bool& lockMax;
     bool apply = false;
+    bool& autoFit;
+    bool& logScale;
+    bool& invert;
+    bool& opposite;
+    bool& gridLines;
+    bool& tickMarks;
+    bool& tickLabels;
   };
-  std::vector<PlotRange> m_axis;
+  std::vector<PlotAxis> m_axis;
   ImPlotRange m_xaxisRange;  // read from plot, used for lockPrevX
 };
 
@@ -178,7 +199,7 @@ class PlotView : public View {
 PlotSeries::PlotSeries(Storage& storage, int yAxis)
     : m_id{storage.GetString("id")},
       m_name{storage.GetString("name")},
-      m_yAxis{storage.GetInt("yAxis", yAxis)},
+      m_yAxis{storage.GetInt("yAxis", 0)},
       m_color{storage.GetFloatArray("color", kDefaultColor)},
       m_marker{storage.GetString("marker"),
                0,
@@ -188,7 +209,9 @@ PlotSeries::PlotSeries(Storage& storage, int yAxis)
       m_digital{
           storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
       m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
-      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {}
+      m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {
+  m_yAxis = yAxis;
+}
 
 PlotSeries::PlotSeries(Storage& storage, std::string_view id)
     : PlotSeries{storage, 0} {
@@ -288,7 +311,8 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###name", GetName());
+  std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
+                static_cast<int>(i), static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -330,7 +354,11 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImPlot::PopStyleVar();
     ImPlot::PopStyleVar();
   } else {
-    ImPlot::SetPlotYAxis(m_yAxis);
+    if (ImPlot::GetCurrentPlot()->YAxis(m_yAxis).Enabled) {
+      ImPlot::SetAxis(ImAxis_Y1 + m_yAxis);
+    } else {
+      ImPlot::SetAxis(ImAxis_Y1);
+    }
     ImPlot::SetNextMarkerStyle(m_marker.GetValue() - 1);
     ImPlot::PlotLineG(label, getter, &getterData, size + 1);
   }
@@ -433,12 +461,19 @@ void PlotSeries::EmitSettings(size_t i) {
   }
 }
 
-Plot::PlotRange::PlotRange(Storage& storage)
+Plot::PlotAxis::PlotAxis(Storage& storage, int num)
     : label{storage.GetString("label")},
       min{storage.GetDouble("min", 0)},
       max{storage.GetDouble("max", 1)},
       lockMin{storage.GetBool("lockMin", false)},
-      lockMax{storage.GetBool("lockMax", false)} {}
+      lockMax{storage.GetBool("lockMax", false)},
+      autoFit{storage.GetBool("autoFit", false)},
+      logScale{storage.GetBool("logScale", false)},
+      invert{storage.GetBool("invert", false)},
+      opposite{storage.GetBool("opposite", num != 0)},
+      gridLines{storage.GetBool("gridLines", num == 0)},
+      tickMarks{storage.GetBool("tickMarks", true)},
+      tickLabels{storage.GetBool("tickLabels", true)} {}
 
 Plot::Plot(Storage& storage)
     : m_seriesStorage{storage.GetChildArray("series")},
@@ -447,18 +482,25 @@ Plot::Plot(Storage& storage)
       m_showPause{storage.GetBool("showPause", true)},
       m_lockPrevX{storage.GetBool("lockPrevX", false)},
       m_legend{storage.GetBool("legend", true)},
+      m_legendOutside{storage.GetBool("legendOutside", false)},
+      m_legendHorizontal{storage.GetBool("legendHorizontal", false)},
+      m_legendLocation{
+          storage.GetInt("legendLocation", ImPlotLocation_NorthWest)},
+      m_crosshairs{storage.GetBool("crosshairs", false)},
+      m_antialiased{storage.GetBool("antialiased", false)},
+      m_mousePosition{storage.GetBool("mousePosition", true)},
       m_yAxis2{storage.GetBool("yaxis2", false)},
       m_yAxis3{storage.GetBool("yaxis3", false)},
       m_viewTime{storage.GetFloat("viewTime", 10)},
       m_autoHeight{storage.GetBool("autoHeight", true)},
       m_height{storage.GetInt("height", 300)} {
   auto& axesStorage = storage.GetChildArray("axis");
-  axesStorage.resize(3);
-  for (auto&& axisStorage : axesStorage) {
-    if (!axisStorage) {
-      axisStorage = std::make_unique<Storage>();
+  axesStorage.resize(kAxisCount);
+  for (int i = 0; i < kAxisCount; ++i) {
+    if (!axesStorage[i]) {
+      axesStorage[i] = std::make_unique<Storage>();
     }
-    m_axis.emplace_back(*axisStorage);
+    m_axis.emplace_back(*axesStorage[i], i);
   }
 
   // loop over series
@@ -468,20 +510,7 @@ Plot::Plot(Storage& storage)
   }
 }
 
-void Plot::DragDropTarget(PlotView& view, size_t i, bool inPlot) {
-  if (!ImGui::BeginDragDropTarget()) {
-    return;
-  }
-  // handle dragging onto a specific Y axis
-  int yAxis = -1;
-  if (inPlot) {
-    for (int y = 0; y < 3; ++y) {
-      if (ImPlot::IsPlotYAxisHovered(y)) {
-        yAxis = y;
-        break;
-      }
-    }
-  }
+void Plot::DragDropAccept(PlotView& view, size_t i, int yAxis) {
   if (const ImGuiPayload* payload =
           ImGui::AcceptDragDropPayload("DataSource")) {
     auto source = *static_cast<DataSource**>(payload->Data);
@@ -508,6 +537,26 @@ void Plot::DragDropTarget(PlotView& view, size_t i, bool inPlot) {
   }
 }
 
+void Plot::DragDropTarget(PlotView& view, size_t i, bool inPlot) {
+  if (inPlot) {
+    if (ImPlot::BeginDragDropTargetPlot() ||
+        ImPlot::BeginDragDropTargetLegend()) {
+      DragDropAccept(view, i, -1);
+      ImPlot::EndDragDropTarget();
+    }
+    for (int y = 0; y < kAxisCount; ++y) {
+      if (ImPlot::GetCurrentPlot()->YAxis(y).Enabled &&
+          ImPlot::BeginDragDropTargetAxis(ImAxis_Y1 + y)) {
+        DragDropAccept(view, i, y);
+        ImPlot::EndDragDropTarget();
+      }
+    }
+  } else if (ImGui::BeginDragDropTarget()) {
+    DragDropAccept(view, i, -1);
+    ImGui::EndDragDropTarget();
+  }
+}
+
 void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   if (!m_visible) {
     return;
@@ -520,49 +569,63 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s##plot", m_name.c_str());
-
-  if (lockX) {
-    ImPlot::SetNextPlotLimitsX(view.m_plots[i - 1]->m_xaxisRange.Min,
-                               view.m_plots[i - 1]->m_xaxisRange.Max,
-                               ImGuiCond_Always);
-  } else {
-    // also force-pause plots if overall timing is paused
-    double zeroTime = GetZeroTime() * 1.0e-6;
-    ImPlot::SetNextPlotLimitsX(
-        now - zeroTime - m_viewTime, now - zeroTime,
-        (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
-  }
-
-  ImPlotAxisFlags yFlags[3] = {ImPlotAxisFlags_None,
-                               ImPlotAxisFlags_NoGridLines,
-                               ImPlotAxisFlags_NoGridLines};
-  for (int i = 0; i < 3; ++i) {
-    ImPlot::SetNextPlotLimitsY(
-        m_axis[i].min, m_axis[i].max,
-        m_axis[i].apply ? ImGuiCond_Always : ImGuiCond_Once, i);
-    m_axis[i].apply = false;
-    if (m_axis[i].lockMin) {
-      yFlags[i] |= ImPlotAxisFlags_LockMin;
-    }
-    if (m_axis[i].lockMax) {
-      yFlags[i] |= ImPlotAxisFlags_LockMax;
-    }
-  }
-
+  std::snprintf(label, sizeof(label), "%s###plot%d", m_name.c_str(),
+                static_cast<int>(i));
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
-                          (m_yAxis2 ? ImPlotFlags_YAxis2 : 0) |
-                          (m_yAxis3 ? ImPlotFlags_YAxis3 : 0);
+                          (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
+                          (m_antialiased ? ImPlotFlags_AntiAliased : 0) |
+                          (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
 
-  if (ImPlot::BeginPlot(
-          label, nullptr,
-          m_axis[0].label.empty() ? nullptr : m_axis[0].label.c_str(),
-          ImVec2(-1, m_height), plotFlags, ImPlotAxisFlags_None, yFlags[0],
-          yFlags[1], yFlags[2],
-          m_axis[1].label.empty() ? nullptr : m_axis[1].label.c_str(),
-          m_axis[2].label.empty() ? nullptr : m_axis[2].label.c_str())) {
+  if (ImPlot::BeginPlot(label, ImVec2(-1, m_height), plotFlags)) {
+    // setup legend
+    if (m_legend) {
+      ImPlotLegendFlags legendFlags =
+          (m_legendOutside ? ImPlotLegendFlags_Outside : 0) |
+          (m_legendHorizontal ? ImPlotLegendFlags_Horizontal : 0);
+      ImPlot::SetupLegend(m_legendLocation, legendFlags);
+    }
+
+    // setup x axis
+    ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoMenus);
+    if (lockX) {
+      ImPlot::SetupAxisLimits(ImAxis_X1, view.m_plots[i - 1]->m_xaxisRange.Min,
+                              view.m_plots[i - 1]->m_xaxisRange.Max,
+                              ImGuiCond_Always);
+    } else {
+      // also force-pause plots if overall timing is paused
+      double zeroTime = GetZeroTime() * 1.0e-6;
+      ImPlot::SetupAxisLimits(
+          ImAxis_X1, now - zeroTime - m_viewTime, now - zeroTime,
+          (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
+    }
+
+    // setup y axes
+    for (int i = 0; i < kAxisCount; ++i) {
+      if ((i == 1 && !m_yAxis2) || (i == 2 && !m_yAxis3)) {
+        continue;
+      }
+      ImPlotAxisFlags flags =
+          (m_axis[i].lockMin ? ImPlotAxisFlags_LockMin : 0) |
+          (m_axis[i].lockMax ? ImPlotAxisFlags_LockMax : 0) |
+          (m_axis[i].autoFit ? ImPlotAxisFlags_AutoFit : 0) |
+          (m_axis[i].logScale ? ImPlotAxisFlags_AutoFit : 0) |
+          (m_axis[i].invert ? ImPlotAxisFlags_Invert : 0) |
+          (m_axis[i].opposite ? ImPlotAxisFlags_Opposite : 0) |
+          (m_axis[i].gridLines ? 0 : ImPlotAxisFlags_NoGridLines) |
+          (m_axis[i].tickMarks ? 0 : ImPlotAxisFlags_NoTickMarks) |
+          (m_axis[i].tickLabels ? 0 : ImPlotAxisFlags_NoTickLabels);
+      ImPlot::SetupAxis(
+          ImAxis_Y1 + i,
+          m_axis[i].label.empty() ? nullptr : m_axis[i].label.c_str(), flags);
+      ImPlot::SetupAxisLimits(
+          ImAxis_Y1 + i, m_axis[i].min, m_axis[i].max,
+          m_axis[i].apply ? ImGuiCond_Always : ImGuiCond_Once);
+      m_axis[i].apply = false;
+    }
+
+    ImPlot::SetupFinish();
+
     for (size_t j = 0; j < m_series.size(); ++j) {
-      ImGui::PushID(j);
       switch (m_series[j]->EmitPlot(view, now, j, i)) {
         case PlotSeries::kMoveUp:
           if (j > 0) {
@@ -583,11 +646,38 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
         default:
           break;
       }
-      ImGui::PopID();
     }
     DragDropTarget(view, i, true);
     m_xaxisRange = ImPlot::GetPlotLimits().X;
+
+    ImPlotPlot* plot = ImPlot::GetCurrentPlot();
     ImPlot::EndPlot();
+
+    // copy plot settings back to storage
+    m_legend = (plot->Flags & ImPlotFlags_NoLegend) == 0;
+    m_crosshairs = (plot->Flags & ImPlotFlags_Crosshairs) != 0;
+    m_antialiased = (plot->Flags & ImPlotFlags_AntiAliased) != 0;
+    m_legendOutside =
+        (plot->Items.Legend.Flags & ImPlotLegendFlags_Outside) != 0;
+    m_legendHorizontal =
+        (plot->Items.Legend.Flags & ImPlotLegendFlags_Horizontal) != 0;
+    m_legendLocation = plot->Items.Legend.Location;
+
+    for (int i = 0; i < kAxisCount; ++i) {
+      if ((i == 1 && !m_yAxis2) || (i == 2 && !m_yAxis3)) {
+        continue;
+      }
+      auto flags = plot->Axes[ImAxis_Y1 + i].Flags;
+      m_axis[i].lockMin = (flags & ImPlotAxisFlags_LockMin) != 0;
+      m_axis[i].lockMax = (flags & ImPlotAxisFlags_LockMax) != 0;
+      m_axis[i].autoFit = (flags & ImPlotAxisFlags_AutoFit) != 0;
+      m_axis[i].logScale = (flags & ImPlotAxisFlags_LogScale) != 0;
+      m_axis[i].invert = (flags & ImPlotAxisFlags_Invert) != 0;
+      m_axis[i].opposite = (flags & ImPlotAxisFlags_Opposite) != 0;
+      m_axis[i].gridLines = (flags & ImPlotAxisFlags_NoGridLines) == 0;
+      m_axis[i].tickMarks = (flags & ImPlotAxisFlags_NoTickMarks) == 0;
+      m_axis[i].tickLabels = (flags & ImPlotAxisFlags_NoTickLabels) == 0;
+    }
   }
 }
 
@@ -622,7 +712,6 @@ void Plot::EmitSettings(size_t i) {
   ImGui::InputText("##editname", &m_name);
   ImGui::Checkbox("Visible", &m_visible);
   ImGui::Checkbox("Show Pause Button", &m_showPause);
-  ImGui::Checkbox("Show Legend", &m_legend);
   if (i != 0) {
     ImGui::Checkbox("Lock X-axis to previous plot", &m_lockPrevX);
   }
