@@ -9,7 +9,7 @@ on:
 jobs:
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
         if: ${{ failure() }}
   tidy:
     name: "clang-tidy"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - uses: actions/checkout@v2
@@ -71,7 +71,7 @@ jobs:
         run: wpiformat -clang 12 -no-format -tidy-changed -compile-commands=build/compile_commands/linuxx86-64 -vv
   javaformat:
     name: "Java format"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: wpilib/ubuntu-base:18.04
     steps:
       - uses: actions/checkout@v2
@@ -86,7 +86,7 @@ jobs:
         if: ${{ failure() }}
   documentation:
     name: "Documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:

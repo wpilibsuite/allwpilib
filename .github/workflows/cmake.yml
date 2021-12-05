@@ -8,11 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             name: Linux
             container: wpilib/roborio-cross-ubuntu:2022-20.04
             flags: ""
-          - os: macos-latest
+          - os: macOS-11
             name: macOS
             container: ""
             flags: "-DWITH_JAVA=OFF"
@@ -43,7 +43,7 @@ jobs:
 
   build-vcpkg:
     name: "Build - Windows"
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
       - name: Prepare vcpkg

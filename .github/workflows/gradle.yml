@@ -21,7 +21,7 @@ jobs:
             artifact-name: Linux
             build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
@@ -44,13 +44,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - os: windows-2019
             artifact-name: Win64
             architecture: x64
-          - os: windows-latest
+          - os: windows-2019
             artifact-name: Win32
             architecture: x86
-          - os: macos-latest
+          - os: macOS-11
             artifact-name: macOS
             architecture: x64
     name: "Build - ${{ matrix.artifact-name }}"
@@ -95,7 +95,7 @@ jobs:
 
   build-documentation:
     name: "Build - Documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -118,7 +118,7 @@ jobs:
   combine:
     name: Combine
     needs: [build-docker, build-host, build-documentation]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:

@@ -21,7 +21,7 @@ jobs:
             ctest-env: ""
             ctest-flags: ""
     name: "${{ matrix.name }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - uses: actions/checkout@v2
