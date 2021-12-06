@@ -71,10 +71,8 @@ ChassisSpeeds RamseteController::Calculate(
            units::math::sqrt(units::math::pow<2>(omegaRef) +
                              m_b * units::math::pow<2>(vRef));
 
-  units::meters_per_second_t v{vRef * m_poseError.Rotation().Cos() + k * eX};
-  units::radians_per_second_t omega{omegaRef + k * eTheta +
-                                    m_b * vRef * Sinc(eTheta) * eY};
-  return ChassisSpeeds{v, 0_mps, omega};
+  return ChassisSpeeds{vRef * m_poseError.Rotation().Cos() + k * eX, 0_mps,
+                       omegaRef + k * eTheta + m_b * vRef * Sinc(eTheta) * eY};
 }
 
 ChassisSpeeds RamseteController::Calculate(
