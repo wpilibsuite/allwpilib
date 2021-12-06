@@ -16,6 +16,10 @@
     <Bug pattern="EI_EXPOSE_REP2" />
   </Match>
   <Match>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+    <Source name="MechanismLigament2d.java" />
+  </Match>
+  <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
     <Class name="edu.wpi.first.wpilibj.examples.pacgoat.Robot" />
   </Match>

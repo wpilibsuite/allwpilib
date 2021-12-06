@@ -128,7 +128,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   @Override
-  protected synchronized void updateEntries(NetworkTable table) {
+  protected void updateEntries(NetworkTable table) {
     table.getEntry(".type").setString("line");
     m_angleEntry = table.getEntry("angle");
     m_lengthEntry = table.getEntry("length");
@@ -138,7 +138,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   /** Flush latest data to NT. */
-  private synchronized void flush() {
+  private void flush() {
     if (m_angleEntry != null) {
       m_angleEntry.setDouble(m_angle);
     }

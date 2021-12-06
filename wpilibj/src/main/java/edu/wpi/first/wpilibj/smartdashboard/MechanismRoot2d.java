@@ -86,7 +86,7 @@ public final class MechanismRoot2d {
     return m_name;
   }
 
-  private synchronized void flush() {
+  private void flush() {
     if (m_xEntry != null) {
       m_xEntry.setDouble(m_x);
     }
