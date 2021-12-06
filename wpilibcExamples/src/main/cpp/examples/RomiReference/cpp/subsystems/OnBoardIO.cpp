@@ -17,6 +17,7 @@ OnBoardIO::OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2) {
   }
   if (dio2 == ChannelMode::INPUT) {
     m_buttonC = std::make_unique<frc::DigitalInput>(2);
+  } else {
     m_redLed = std::make_unique<frc::DigitalOutput>(2);
   }
 }
