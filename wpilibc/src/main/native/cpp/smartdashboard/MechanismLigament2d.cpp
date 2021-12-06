@@ -21,7 +21,6 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
 
 void MechanismLigament2d::UpdateEntries(
     std::shared_ptr<nt::NetworkTable> table) {
-  std::scoped_lock lock(m_mutex);
   table->GetEntry(".type").SetString("line");
 
   m_colorEntry = table->GetEntry("color");
