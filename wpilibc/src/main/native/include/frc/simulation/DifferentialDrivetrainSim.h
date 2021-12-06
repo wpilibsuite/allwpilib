@@ -225,8 +225,10 @@ class DifferentialDrivetrainSim {
     static constexpr frc::DCMotor SingleMiniCIMPerSide =
         frc::DCMotor::MiniCIM(1);
     static constexpr frc::DCMotor DualMiniCIMPerSide = frc::DCMotor::MiniCIM(2);
-    static constexpr frc::DCMotor SingleFalcon500PerSide = frc::DCMotor::Falcon500(1);
-    static constexpr frc::DCMotor DualFalcon500PerSide = frc::DCMotor::Falcon500(2);
+    static constexpr frc::DCMotor SingleFalcon500PerSide =
+        frc::DCMotor::Falcon500(1);
+    static constexpr frc::DCMotor DualFalcon500PerSide =
+        frc::DCMotor::Falcon500(2);
     static constexpr frc::DCMotor SingleNEOPerSide = frc::DCMotor::NEO(1);
     static constexpr frc::DCMotor DualNEOPerSide = frc::DCMotor::NEO(2);
   };
