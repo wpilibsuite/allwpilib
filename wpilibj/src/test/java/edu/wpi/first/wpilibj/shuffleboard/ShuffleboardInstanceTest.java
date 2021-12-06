@@ -15,7 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ShuffleboardInstanceTest {
+class ShuffleboardInstanceTest {
   private NetworkTableInstance m_ntInstance;
   private ShuffleboardInstance m_shuffleboardInstance;
 

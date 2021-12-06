@@ -79,10 +79,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     if (!StateSpaceUtil.isDetectable(discA, C)) {
       var builder =
           new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
-      builder.append(discA.getStorage().toString());
-      builder.append("\nC =\n");
-      builder.append(C.getStorage().toString());
-      builder.append("\n");
+      builder
+          .append(discA.getStorage().toString())
+          .append("\nC =\n")
+          .append(C.getStorage().toString())
+          .append('\n');
 
       var msg = builder.toString();
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());

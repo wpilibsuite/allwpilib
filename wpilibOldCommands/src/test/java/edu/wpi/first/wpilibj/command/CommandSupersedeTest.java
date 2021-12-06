@@ -60,12 +60,8 @@ class CommandSupersedeTest extends AbstractCommandTest {
   void commandFailingSupersedingBecauseFirstCanNotBeInterruptedTest() {
     final ASubsystem subsystem = new ASubsystem();
 
-    final MockCommand command1 =
-        new MockCommand(subsystem) {
-          {
-            setInterruptible(false);
-          }
-        };
+    final MockCommand command1 = new MockCommand(subsystem);
+    command1.setInterruptible(false);
 
     final MockCommand command2 = new MockCommand(subsystem);
 

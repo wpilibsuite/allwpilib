@@ -19,7 +19,7 @@ class XboxControllerTest {
   @ParameterizedTest
   @EnumSource(value = XboxController.Button.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testButtons(XboxController.Button button)
+  void testButtons(XboxController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);
@@ -60,7 +60,7 @@ class XboxControllerTest {
   @ParameterizedTest
   @EnumSource(value = XboxController.Axis.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testAxes(XboxController.Axis axis)
+  void testAxes(XboxController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     XboxController joy = new XboxController(2);

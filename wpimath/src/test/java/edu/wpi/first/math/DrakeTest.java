@@ -11,7 +11,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({"ParameterName", "LocalVariableName"})
-public class DrakeTest {
+class DrakeTest {
   public static void assertMatrixEqual(SimpleMatrix A, SimpleMatrix B) {
     for (int i = 0; i < A.numRows(); i++) {
       for (int j = 0; j < A.numCols(); j++) {
@@ -49,7 +49,7 @@ public class DrakeTest {
   }
 
   @Test
-  public void testDiscreteAlgebraicRicattiEquation() {
+  void testDiscreteAlgebraicRicattiEquation() {
     int n1 = 4;
     int m1 = 1;
 

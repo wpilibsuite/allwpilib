@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class BangBangInputOutputTest {
+class BangBangInputOutputTest {
   private BangBangController m_controller;
 
   @BeforeEach

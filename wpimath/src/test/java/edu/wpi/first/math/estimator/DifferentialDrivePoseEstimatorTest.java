@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class DifferentialDrivePoseEstimatorTest {
+class DifferentialDrivePoseEstimatorTest {
   @SuppressWarnings("LocalVariableName")
   @Test
-  public void testAccuracy() {
+  void testAccuracy() {
     var estimator =
         new DifferentialDrivePoseEstimator(
             new Rotation2d(),

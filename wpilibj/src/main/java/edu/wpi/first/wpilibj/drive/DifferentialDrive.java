@@ -325,8 +325,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
 
-    double leftSpeed = 0.0;
-    double rightSpeed = 0.0;
+    double leftSpeed;
+    double rightSpeed;
 
     if (allowTurnInPlace) {
       leftSpeed = xSpeed + zRotation;

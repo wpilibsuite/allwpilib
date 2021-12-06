@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import edu.wpi.first.hal.util.AllocationException;
 import org.junit.jupiter.api.Test;
 
-public class DoubleSolenoidTestCTRE {
+class DoubleSolenoidTestCTRE {
   @Test
   void testValidInitialization() {
     try (DoubleSolenoid solenoid = new DoubleSolenoid(3, PneumaticsModuleType.CTREPCM, 2, 3)) {

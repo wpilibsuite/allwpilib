@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.util.WPIUtilJNI;
 import org.junit.jupiter.api.Test;
 
-public class SlewRateLimiterTest {
+class SlewRateLimiterTest {
   @Test
   void slewRateLimitTest() {
     WPIUtilJNI.enableMockTime();
