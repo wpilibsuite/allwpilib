@@ -90,7 +90,7 @@ public class RobotContainer {
                 Constants.DriveConstants.kvVoltSecondsPerMeter,
                 Constants.DriveConstants.kaVoltSecondsSquaredPerMeter),
             Constants.DriveConstants.kDriveKinematics,
-            7);
+            12);
 
     // Create config for trajectory
     TrajectoryConfig config =
