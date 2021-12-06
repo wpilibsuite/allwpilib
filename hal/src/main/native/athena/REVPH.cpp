@@ -43,10 +43,10 @@ static constexpr uint32_t PH_PULSE_ONCE_FRAME_API =
     APIFromExtId(PH_PULSE_ONCE_FRAME_ID);
 static constexpr uint32_t PH_COMPRESSOR_CONFIG_API =
     APIFromExtId(PH_COMPRESSOR_CONFIG_FRAME_ID);
-static constexpr uint32_t PH_STATUS0_FRAME_API =
-    APIFromExtId(PH_STATUS0_FRAME_ID);
-static constexpr uint32_t PH_STATUS1_FRAME_API =
-    APIFromExtId(PH_STATUS1_FRAME_ID);
+static constexpr uint32_t PH_STATUS_0_FRAME_API =
+    APIFromExtId(PH_STATUS_0_FRAME_ID);
+static constexpr uint32_t PH_STATUS_1_FRAME_API =
+    APIFromExtId(PH_STATUS_1_FRAME_ID);
 
 static constexpr int32_t kPHFrameStatus0Timeout = 50;
 static constexpr int32_t kPHFrameStatus1Timeout = 50;
@@ -75,38 +75,40 @@ void InitializeREVPH() {
 }
 }  // namespace hal::init
 
-static PH_status0_t HAL_REV_ReadPHStatus0(HAL_CANHandle hcan, int32_t* status) {
+static PH_status_0_t HAL_REV_ReadPHStatus0(HAL_CANHandle hcan,
+                                           int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
-  PH_status0_t result = {};
+  PH_status_0_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PH_STATUS0_FRAME_API, packedData, &length,
+  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_0_FRAME_API, packedData, &length,
                            &timestamp, kPHFrameStatus0Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PH_status0_unpack(&result, packedData, PH_STATUS0_LENGTH);
+  PH_status_0_unpack(&result, packedData, PH_STATUS_0_LENGTH);
 
   return result;
 }
 
-static PH_status1_t HAL_REV_ReadPHStatus1(HAL_CANHandle hcan, int32_t* status) {
+static PH_status_1_t HAL_REV_ReadPHStatus1(HAL_CANHandle hcan,
+                                           int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
-  PH_status1_t result = {};
+  PH_status_1_t result = {};
 
-  HAL_ReadCANPacketTimeout(hcan, PH_STATUS1_FRAME_API, packedData, &length,
+  HAL_ReadCANPacketTimeout(hcan, PH_STATUS_1_FRAME_API, packedData, &length,
                            &timestamp, kPHFrameStatus1Timeout * 2, status);
 
   if (*status != 0) {
     return result;
   }
 
-  PH_status1_unpack(&result, packedData, PH_STATUS1_LENGTH);
+  PH_status_1_unpack(&result, packedData, PH_STATUS_1_LENGTH);
 
   return result;
 }
@@ -249,7 +251,7 @@ HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
     return false;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return false;
@@ -331,7 +333,7 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
     return HAL_REVPHCompressorConfigType_kDisabled;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return HAL_REVPHCompressorConfigType_kDisabled;
@@ -347,7 +349,7 @@ HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status) {
     return false;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return false;
@@ -363,13 +365,13 @@ double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status) {
     return 0;
   }
 
-  PH_status1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
+  PH_status_1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
   }
 
-  return PH_status1_compressor_current_decode(status1.compressor_current);
+  return PH_status_1_compressor_current_decode(status1.compressor_current);
 }
 
 double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
@@ -387,16 +389,16 @@ double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
     return 0;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
   }
 
   if (channel == 0) {
-    return PH_status0_analog_0_decode(status0.analog_0);
+    return PH_status_0_analog_0_decode(status0.analog_0);
   }
-  return PH_status0_analog_1_decode(status0.analog_1);
+  return PH_status_0_analog_1_decode(status0.analog_1);
 }
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
@@ -406,7 +408,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
     return 0;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
@@ -561,7 +563,7 @@ HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status) {
     return faults;
   }
 
-  PH_status0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
   faults.channel0Fault = status0.channel_0_fault;
   faults.channel1Fault = status0.channel_1_fault;
   faults.channel2Fault = status0.channel_2_fault;
@@ -578,11 +580,11 @@ HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status) {
   faults.channel13Fault = status0.channel_13_fault;
   faults.channel14Fault = status0.channel_14_fault;
   faults.channel15Fault = status0.channel_15_fault;
-  faults.compressorOverCurrent = status0.compressor_oc;
-  faults.compressorOpen = status0.compressor_open;
-  faults.solenoidOverCurrent = status0.solenoid_oc;
-  faults.brownout = status0.brownout;
-  faults.canWarning = status0.can_warning;
+  faults.compressorOverCurrent = status0.compressor_oc_fault;
+  faults.compressorOpen = status0.compressor_open_fault;
+  faults.solenoidOverCurrent = status0.solenoid_oc_fault;
+  faults.brownout = status0.brownout_fault;
+  faults.canWarning = status0.can_warning_fault;
   faults.hardwareFault = status0.hardware_fault;
 
   return faults;
@@ -597,14 +599,14 @@ HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
     return stickyFaults;
   }
 
-  PH_status1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
-  stickyFaults.compressorOverCurrent = status1.sticky_compressor_over_current;
-  stickyFaults.compressorOpen = status1.sticky_compressor_not_present;
-  stickyFaults.solenoidOverCurrent = status1.sticky_solenoid_over_current;
-  stickyFaults.brownout = status1.sticky_brownout;
-  stickyFaults.canWarning = status1.sticky_can_warning;
-  stickyFaults.canBusOff = status1.sticky_can_bus_off;
-  stickyFaults.hasReset = status1.sticky_has_reset;
+  PH_status_1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
+  stickyFaults.compressorOverCurrent = status1.sticky_compressor_oc_fault;
+  stickyFaults.compressorOpen = status1.sticky_compressor_open_fault;
+  stickyFaults.solenoidOverCurrent = status1.sticky_solenoid_oc_fault;
+  stickyFaults.brownout = status1.sticky_brownout_fault;
+  stickyFaults.canWarning = status1.sticky_can_warning_fault;
+  stickyFaults.canBusOff = status1.sticky_can_bus_off_fault;
+  stickyFaults.hasReset = status1.sticky_has_reset_fault;
 
   return stickyFaults;
 }
