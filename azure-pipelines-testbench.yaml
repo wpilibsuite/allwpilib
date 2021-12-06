@@ -12,7 +12,7 @@ stages:
       - job: IntegrationTests
         displayName: Integration Tests
         pool:
-          vmImage: 'ubuntu-20.04'
+          vmImage: 'ubuntu-latest'
 
         container:
           image: wpilib/roborio-cross-ubuntu:2022-18.04

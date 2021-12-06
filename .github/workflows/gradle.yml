@@ -21,7 +21,7 @@ jobs:
             artifact-name: Linux
             build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
     name: "Build - ${{ matrix.artifact-name }}"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
@@ -95,7 +95,7 @@ jobs:
 
   build-documentation:
     name: "Build - Documentation"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -118,7 +118,7 @@ jobs:
   combine:
     name: Combine
     needs: [build-docker, build-host, build-documentation]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
