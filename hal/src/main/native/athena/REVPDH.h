@@ -18,8 +18,76 @@ struct REV_PDH_Version {
   uint32_t firmwareMajor;
   uint32_t firmwareMinor;
   uint32_t firmwareFix;
-  uint32_t hardwareRev;
+  uint32_t hardwareMinor;
+  uint32_t hardwareMajor;
   uint32_t uniqueId;
+};
+
+/**
+ * Storage for REV PDH Faults
+ */
+struct HAL_REVPDHFaults {
+  uint32_t channel0BreakerFault : 1;
+  uint32_t channel1BreakerFault : 1;
+  uint32_t channel2BreakerFault : 1;
+  uint32_t channel3BreakerFault : 1;
+  uint32_t channel4BreakerFault : 1;
+  uint32_t channel5BreakerFault : 1;
+  uint32_t channel6BreakerFault : 1;
+  uint32_t channel7BreakerFault : 1;
+  uint32_t channel8BreakerFault : 1;
+  uint32_t channel9BreakerFault : 1;
+  uint32_t channel10BreakerFault : 1;
+  uint32_t channel11BreakerFault : 1;
+  uint32_t channel12BreakerFault : 1;
+  uint32_t channel13BreakerFault : 1;
+  uint32_t channel14BreakerFault : 1;
+  uint32_t channel15BreakerFault : 1;
+  uint32_t channel16BreakerFault : 1;
+  uint32_t channel17BreakerFault : 1;
+  uint32_t channel18BreakerFault : 1;
+  uint32_t channel19BreakerFault : 1;
+  uint32_t channel20BreakerFault : 1;
+  uint32_t channel21BreakerFault : 1;
+  uint32_t channel22BreakerFault : 1;
+  uint32_t channel23BreakerFault : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t hardwareFault : 1;
+};
+
+/**
+ * Storage for REV PDH Sticky Faults
+ */
+struct HAL_REVPDHStickyFaults {
+  uint32_t channel0BreakerFault : 1;
+  uint32_t channel1BreakerFault : 1;
+  uint32_t channel2BreakerFault : 1;
+  uint32_t channel3BreakerFault : 1;
+  uint32_t channel4BreakerFault : 1;
+  uint32_t channel5BreakerFault : 1;
+  uint32_t channel6BreakerFault : 1;
+  uint32_t channel7BreakerFault : 1;
+  uint32_t channel8BreakerFault : 1;
+  uint32_t channel9BreakerFault : 1;
+  uint32_t channel10BreakerFault : 1;
+  uint32_t channel11BreakerFault : 1;
+  uint32_t channel12BreakerFault : 1;
+  uint32_t channel13BreakerFault : 1;
+  uint32_t channel14BreakerFault : 1;
+  uint32_t channel15BreakerFault : 1;
+  uint32_t channel16BreakerFault : 1;
+  uint32_t channel17BreakerFault : 1;
+  uint32_t channel18BreakerFault : 1;
+  uint32_t channel19BreakerFault : 1;
+  uint32_t channel20BreakerFault : 1;
+  uint32_t channel21BreakerFault : 1;
+  uint32_t channel22BreakerFault : 1;
+  uint32_t channel23BreakerFault : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t canBusOff : 1;
+  uint32_t hasReset : 1;
 };
 
 #ifdef __cplusplus
@@ -118,17 +186,13 @@ HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
                                               int32_t* status);
 
 /**
- * Checks if a PDH channel is currently experiencing a brownout condition.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
+ * Gets the firmware and hardware versions of a PDH device.
  *
  * @param handle        PDH handle
- * @param channel       the channel to retrieve the brownout status of
  *
- * @return 1 if the channel is experiencing a brownout; 0 otherwise
+ * @return version information
  */
-HAL_Bool HAL_REV_CheckPDHChannelBrownout(HAL_REVPDHHandle handle,
-                                         int32_t channel, int32_t* status);
+REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
  * Gets the voltage being supplied to a PDH device.
@@ -140,174 +204,30 @@ HAL_Bool HAL_REV_CheckPDHChannelBrownout(HAL_REVPDHHandle handle,
 double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
- * Checks if a PDH device is currently enabled.
+ * Gets the faults of a PDH device.
  *
  * @param handle        PDH handle
  *
- * @return 1 if the PDH is enabled; 0 otherwise
+ * @return the faults of the PDH
  */
-HAL_Bool HAL_REV_IsPDHEnabled(HAL_REVPDHHandle handle, int32_t* status);
+HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
- * Checks if the input voltage on a PDH device is currently below the minimum
- * voltage.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
+ * Gets the sticky faults of a PDH device.
  *
  * @param handle        PDH handle
  *
- * @return 1 if the PDH is experiencing a brownout; 0 otherwise
+ * @return the sticky faults of the PDH
  */
-HAL_Bool HAL_REV_CheckPDHBrownout(HAL_REVPDHHandle handle, int32_t* status);
-
-/**
- * Checks if the CAN RX or TX error levels on a PDH device have exceeded the
- * warning threshold.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has exceeded the warning threshold; 0
- * otherwise
- */
-HAL_Bool HAL_REV_CheckPDHCANWarning(HAL_REVPDHHandle handle, int32_t* status);
-
-/**
- * Checks if a PDH device is currently malfunctioning.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device is in a hardware fault state; 0
- * otherwise
- */
-HAL_Bool HAL_REV_CheckPDHHardwareFault(HAL_REVPDHHandle handle,
-                                       int32_t* status);
-
-/**
- * Checks if the input voltage on a PDH device has gone below the specified
- * minimum voltage.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has had a brownout; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyBrownout(HAL_REVPDHHandle handle,
-                                        int32_t* status);
-
-/**
- * Checks if the CAN RX or TX error levels on a PDH device have exceeded the
- * warning threshold.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has exceeded the CAN warning threshold;
- * 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyCANWarning(HAL_REVPDHHandle handle,
-                                          int32_t* status);
-
-/**
- * Checks if the CAN bus on a PDH device has previously experienced a 'Bus Off'
- * event.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has experienced a 'Bus Off' event; 0
- * otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyCANBusOff(HAL_REVPDHHandle handle,
-                                         int32_t* status);
-
-/**
- * Checks if a PDH device has malfunctioned.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has had a malfunction; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyHardwareFault(HAL_REVPDHHandle handle,
-                                             int32_t* status);
-
-/**
- * Checks if the firmware on a PDH device has malfunctioned and reset during
- * operation.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has had a malfunction and reset; 0
- * otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyFirmwareFault(HAL_REVPDHHandle handle,
-                                             int32_t* status);
-
-/**
- * Checks if a brownout has happened on channels 20-23 of a PDH device while it
- * was enabled.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- * @param channel       PDH channel to retrieve sticky brownout status (20 ..
- * 23)
- *
- *
- * @return 1 if the channel has had a brownout; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyChannelBrownout(HAL_REVPDHHandle handle,
-                                               int32_t channel,
-                                               int32_t* status);
-
-/**
- * Checks if a PDH device has reset.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- *
- * @return 1 if the device has reset; 0 otherwise
- */
-HAL_Bool HAL_REV_CheckPDHStickyHasReset(HAL_REVPDHHandle handle,
-                                        int32_t* status);
-
-/**
- * Gets the firmware and hardware versions of a PDH device.
- *
- * @param handle        PDH handle
- *
- * @return version information
- */
-REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
+HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
+                                                 int32_t* status);
 
 /**
  * Clears the sticky faults on a PDH device.
  *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
  * @param handle        PDH handle
  */
 void HAL_REV_ClearPDHFaults(HAL_REVPDHHandle handle, int32_t* status);
-
-/**
- * Identifies a PDH device by blinking its LED.
- *
- * NOTE: Not implemented in firmware as of 2021-04-23.
- *
- * @param handle        PDH handle
- */
-void HAL_REV_IdentifyPDH(HAL_REVPDHHandle handle, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
