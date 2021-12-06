@@ -407,7 +407,11 @@ public class DifferentialDrivetrainSim {
     kSingleCIMPerSide(DCMotor.getCIM(1)),
     kDualCIMPerSide(DCMotor.getCIM(2)),
     kSingleMiniCIMPerSide(DCMotor.getMiniCIM(1)),
-    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2));
+    kDualMiniCIMPerSide(DCMotor.getMiniCIM(2)),
+    kSingleFalcon500PerSide(DCMotor.getFalcon500(1)),
+    kDoubleFalcon500PerSide(DCMotor.getFalcon500(2)),
+    kSingleNEOPerSide(DCMotor.getNEO(1)),
+    kDoubleNEOPerSide(DCMotor.getNEO(2));
 
     @SuppressWarnings("MemberName")
     public final DCMotor value;
