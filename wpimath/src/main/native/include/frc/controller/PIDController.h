@@ -166,6 +166,27 @@ class WPILIB_DLLEXPORT PIDController
       double velocityTolerance = std::numeric_limits<double>::infinity());
 
   /**
+   * Returns the position tolerance of atSetpoint().
+   *
+   * @return The position tolerance
+   */
+  double GetPositionTolerance() const;
+
+  /**
+   * Returns the velocity tolerance of atSetpoint().
+   *
+   * @return The velocity tolerance
+   */
+  double GetVelocityTolerance() const;
+
+  /**
+   * Returns the current measurement of the process variable.
+   *
+   * @return The most recent measurement of the process variable.
+   */
+  double GetMeasurement() const;
+
+  /**
    * Returns the difference between the setpoint and the measurement.
    */
   double GetPositionError() const;

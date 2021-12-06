@@ -119,6 +119,18 @@ void PIDController::SetTolerance(double positionTolerance,
   m_velocityTolerance = velocityTolerance;
 }
 
+double PIDController::GetPositionTolerance() const {
+  return m_positionTolerance;
+}
+
+double PIDController::GetVelocityTolerance() const {
+  return m_velocityTolerance;
+}
+
+double PIDController::GetMeasurement() const {
+  return m_measurement;
+}
+
 double PIDController::GetPositionError() const {
   return m_positionError;
 }
@@ -164,12 +176,30 @@ void PIDController::Reset() {
 void PIDController::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.AddDoubleProperty(
-      "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+      "p", [this] { return GetP(); }, [this](double p) { SetP(p); });
   builder.AddDoubleProperty(
-      "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
+      "i", [this] { return GetI(); }, [this](double i) { SetI(i); });
   builder.AddDoubleProperty(
-      "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+      "d", [this] { return GetD(); }, [this](double d) { SetD(d); });
+  builder.AddDoubleProperty(
+      "positionTolerance", [this] { return GetPositionTolerance(); },
+      [this](double positionTolerance) {
+        m_positionTolerance = positionTolerance;
+      });
+  builder.AddDoubleProperty(
+      "velocityTolerance", [this] { return GetVelocityTolerance(); },
+      [this](double velocityTolerance) {
+        m_velocityTolerance = velocityTolerance;
+      });
   builder.AddDoubleProperty(
       "setpoint", [this] { return GetSetpoint(); },
-      [this](double value) { SetSetpoint(value); });
+      [this](double setpoint) { SetSetpoint(setpoint); });
+  builder.AddDoubleProperty(
+      "measurement", [this] { return GetMeasurement(); }, nullptr);
+  builder.AddDoubleProperty(
+      "positionError", [this] { return GetPositionError(); }, nullptr);
+  builder.AddDoubleProperty(
+      "velocityError", [this] { return GetVelocityError(); }, nullptr);
+  builder.AddBooleanProperty(
+      "atSetpoint", [this] { return AtSetpoint(); }, nullptr);
 }

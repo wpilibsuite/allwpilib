@@ -278,6 +278,33 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   /**
+   * Returns the position tolerance of atSetpoint().
+   *
+   * @return The position tolerance
+   */
+  public double getPositionTolerance() {
+    return m_positionTolerance;
+  }
+
+  /**
+   * Returns the velocity tolerance of atSetpoint().
+   *
+   * @return The velocity tolerance
+   */
+  public double getVelocityTolerance() {
+    return m_velocityTolerance;
+  }
+
+  /**
+   * Returns the current measurement of the process variable.
+   *
+   * @return The most recent measurement of the process variable.
+   */
+  public double getMeasurement() {
+    return m_measurement;
+  }
+
+  /**
    * Returns the difference between the setpoint and the measurement.
    *
    * @return The error.
@@ -350,6 +377,14 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("positionTolerance", this::getPositionTolerance,
+            positionTolerance -> m_positionTolerance = positionTolerance);
+    builder.addDoubleProperty("velocityTolerance", this::getVelocityTolerance,
+            velocityTolerance -> m_velocityTolerance = velocityTolerance);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addDoubleProperty("measurement", this::getMeasurement, null);
+    builder.addDoubleProperty("positionError", this::getPositionError, null);
+    builder.addDoubleProperty("velocityError", this::getVelocityError, null);
+    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
   }
 }
