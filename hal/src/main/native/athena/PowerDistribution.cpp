@@ -218,7 +218,7 @@ void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     HAL_ClearPDPStickyFaults(handle, status);
   } else {
-    HAL_REV_ClearPDHFaults(handle, status);
+    HAL_REV_ClearPDHStickyFaults(handle, status);
   }
 }
 

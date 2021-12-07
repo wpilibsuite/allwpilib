@@ -605,7 +605,7 @@ HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
   return stickyFaults;
 }
 
-void HAL_REV_ClearPDHFaults(HAL_REVPDHHandle handle, int32_t* status) {
+void HAL_REV_ClearPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;

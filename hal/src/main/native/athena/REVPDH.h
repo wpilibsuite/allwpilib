@@ -227,7 +227,7 @@ HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  */
-void HAL_REV_ClearPDHFaults(HAL_REVPDHHandle handle, int32_t* status);
+void HAL_REV_ClearPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
