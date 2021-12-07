@@ -135,4 +135,44 @@ void RamseteController::InitSendable(wpi::SendableBuilder& builder) {
         SetTolerance(Pose2d({units::meter_t{xTolerance}, m_tolerance.Y()},
                             m_tolerance.Rotation()));
       });
+  builder.AddDoubleProperty(
+      "toleranceY", [this] { return m_tolerance.Y().to<double>(); },
+      [this](double yTolerance) {
+        SetTolerance(Pose2d({m_tolerance.X(), units::meter_t{yTolerance}},
+                            m_tolerance.Rotation()));
+      });
+  builder.AddDoubleProperty(
+      "toleranceDegrees",
+      [this] { return m_tolerance.Rotation().Degrees().to<double>(); },
+      [this](double degreesTolerance) {
+        SetTolerance(Pose2d(m_tolerance.Translation(),
+                            {units::degree_t(degreesTolerance)}));
+      });
+  builder.AddDoubleProperty(
+      "referenceX", [this] { return m_reference.X().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "referenceY", [this] { return m_reference.Y().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "referenceDegrees",
+      [this] { return m_reference.Rotation().Degrees().to<double>(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "measurementX", [this] { return m_measurement.X().to<double>(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "measurementY", [this] { return m_measurement.Y().to<double>(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "measurementDegrees",
+      [this] { return m_measurement.Rotation().Degrees().to<double>(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "errorX", [this] { return m_error.X().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "errorY", [this] { return m_error.Y().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "errorDegrees",
+      [this] { return m_error.Rotation().Degrees().to<double>(); }, nullptr);
+  builder.AddBooleanProperty(
+      "atReference", [this] { return AtReference(); }, nullptr);
 }
