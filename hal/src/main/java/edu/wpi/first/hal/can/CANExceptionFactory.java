@@ -14,10 +14,17 @@ public final class CANExceptionFactory {
   static final int ERR_CANSessionMux_NotAllowed = -44088;
   static final int ERR_CANSessionMux_NotInitialized = -44089;
 
-  @SuppressWarnings({"MissingJavadocMethod", "PMD.AvoidUncheckedExceptionsInSignatures"})
-  public static void checkStatus(int status, int messageID)
-      throws CANInvalidBufferException, CANMessageNotAllowedException, CANNotInitializedException,
-          UncleanStatusException {
+  /**
+   * Checks the status of a CAN message with the given message ID.
+   *
+   * @param status The CAN status.
+   * @param messageID The CAN message ID.
+   * @throws CANInvalidBufferException if the buffer is invalid.
+   * @throws CANMessageNotAllowedException if the message isn't allowed.
+   * @throws CANNotInitializedException if the CAN bus isn't initialized.
+   * @throws UncleanStatusException if the status code passed in reports an error.
+   */
+  public static void checkStatus(int status, int messageID) {
     switch (status) {
       case NIRioStatus.kRioStatusSuccess:
         // Everything is ok... don't throw.
