@@ -5,8 +5,12 @@
 package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * Ramsete is a nonlinear time-varying feedback controller for unicycle models that drives the model
@@ -32,15 +36,17 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * Engineering in the FIRST Robotics Competition</a> section on Ramsete unicycle controller for a
  * derivation and analysis.
  */
-public class RamseteController {
+public class RamseteController implements Sendable {
   @SuppressWarnings("MemberName")
-  private final double m_b;
+  private double m_b;
 
   @SuppressWarnings("MemberName")
-  private final double m_zeta;
+  private double m_zeta;
 
-  private Pose2d m_poseError = new Pose2d();
-  private Pose2d m_poseTolerance = new Pose2d();
+  private Pose2d m_measurement = new Pose2d();
+  private Pose2d m_reference = new Pose2d();
+  private Pose2d m_error = new Pose2d();
+  private Pose2d m_tolerance = new Pose2d();
   private boolean m_enabled = true;
 
   /**
@@ -66,27 +72,94 @@ public class RamseteController {
   }
 
   /**
+   * Sets the 'b' parameter of the Ramsete controller.
+   *
+   * @param b Tuning parameter (b &gt; 0 rad²/m²) for which larger values make convergence more
+   *     aggressive like a proportional term.
+   */
+  public void setB(double b) {
+    m_b = b;
+  }
+
+  /**
+   * Sets the 'zeta' parameter of the Ramsete controller, which controls damping
+   *
+   * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
+   *     more damping in response.
+   */
+  public void setZeta(double zeta) {
+    m_zeta = zeta;
+  }
+
+  /**
+   * Gets the current 'b' parameter of the Ramsete controller.
+   *
+   * @return Tuning parameter (b &gt; 0 rad²/m²) for which larger values make convergence more
+   *     aggressive like a proportional term.
+   */
+  public double getB() {
+    return m_b;
+  }
+
+  /**
+   * Gets the current 'zeta' parameter of the Ramsete controller.
+   *
+   * @return Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
+   *     more damping in response.
+   */
+  public double getZeta() {
+    return m_zeta;
+  }
+
+  /**
    * Returns true if the pose error is within tolerance of the reference.
    *
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
-    final var eTranslate = m_poseError.getTranslation();
-    final var eRotate = m_poseError.getRotation();
-    final var tolTranslate = m_poseTolerance.getTranslation();
-    final var tolRotate = m_poseTolerance.getRotation();
+    final var eTranslate = m_error.getTranslation();
+    final var eRotate = m_error.getRotation();
+    final var tolTranslate = m_tolerance.getTranslation();
+    final var tolRotate = m_tolerance.getRotation();
     return Math.abs(eTranslate.getX()) < tolTranslate.getX()
         && Math.abs(eTranslate.getY()) < tolTranslate.getY()
         && Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
   }
 
   /**
-   * Sets the pose error which is considered tolerable for use with atReference().
+   * Sets the pose error which is considered tolerable by atReference().
    *
    * @param poseTolerance Pose error which is tolerable.
    */
   public void setTolerance(Pose2d poseTolerance) {
-    m_poseTolerance = poseTolerance;
+    m_tolerance = poseTolerance;
+  }
+
+  /**
+   * Gets the pose error which is considered tolerable by atReference().
+   *
+   * @return Pose error which is tolerable.
+   */
+  public Pose2d getTolerance() {
+    return m_tolerance;
+  }
+
+  /**
+   * Gets the current pose error.
+   *
+   * @return Most recent pose error.
+   */
+  public Pose2d getError() {
+    return m_error;
+  }
+
+  /**
+   * Gets the current pose measurement.
+   *
+   * @return Most recent pose measurement.
+   */
+  public Pose2d getMeasurement() {
+    return m_measurement;
   }
 
   /**
@@ -96,7 +169,7 @@ public class RamseteController {
    * trajectory.
    *
    * @param currentPose The current pose.
-   * @param poseRef The desired pose.
+   * @param referencePose The desired pose.
    * @param linearVelocityRefMeters The desired linear velocity in meters per second.
    * @param angularVelocityRefRadiansPerSecond The desired angular velocity in radians per second.
    * @return The next controller output.
@@ -104,26 +177,29 @@ public class RamseteController {
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
       Pose2d currentPose,
-      Pose2d poseRef,
+      Pose2d referencePose,
       double linearVelocityRefMeters,
       double angularVelocityRefRadiansPerSecond) {
+    m_measurement = currentPose;
+    m_reference = referencePose;
+
     if (!m_enabled) {
       return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
     }
 
-    m_poseError = poseRef.relativeTo(currentPose);
+    m_error = referencePose.relativeTo(currentPose);
 
     // Aliases for equation readability
-    final double eX = m_poseError.getX();
-    final double eY = m_poseError.getY();
-    final double eTheta = m_poseError.getRotation().getRadians();
+    final double eX = m_error.getX();
+    final double eY = m_error.getY();
+    final double eTheta = m_error.getRotation().getRadians();
     final double vRef = linearVelocityRefMeters;
     final double omegaRef = angularVelocityRefRadiansPerSecond;
 
     double k = 2.0 * m_zeta * Math.sqrt(Math.pow(omegaRef, 2) + m_b * Math.pow(vRef, 2));
 
     return new ChassisSpeeds(
-        vRef * m_poseError.getRotation().getCos() + k * eX,
+        vRef * m_error.getRotation().getCos() + k * eX,
         0.0,
         omegaRef + k * eTheta + m_b * vRef * sinc(eTheta) * eY);
   }
@@ -168,5 +244,43 @@ public class RamseteController {
     } else {
       return Math.sin(x) / x;
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("RamseteController");
+    builder.addDoubleProperty("b", this::getB, this::setB);
+    builder.addDoubleProperty("zeta", this::getZeta, this::setZeta);
+    builder.addDoubleProperty("toleranceX",
+            () -> m_tolerance.getX(),
+            xTolerance -> setTolerance(new Pose2d(new Translation2d(xTolerance, m_tolerance.getY()),
+                    m_tolerance.getRotation())));
+    builder.addDoubleProperty("toleranceY",
+            () -> m_tolerance.getY(),
+            yTolerance -> setTolerance(new Pose2d(new Translation2d(m_tolerance.getX(), yTolerance),
+                    m_tolerance.getRotation())));
+    builder.addDoubleProperty("toleranceDegrees",
+            () -> m_tolerance.getRotation().getDegrees(),
+            rotationTolerance -> setTolerance(new Pose2d(m_tolerance.getTranslation(),
+                    Rotation2d.fromDegrees(rotationTolerance))));
+    builder.addDoubleProperty("referenceX",
+            () -> m_reference.getX(), null);
+    builder.addDoubleProperty("referenceY",
+            () -> m_reference.getY(), null);
+    builder.addDoubleProperty("referenceDegrees",
+            () -> m_reference.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("measurementX",
+            () -> m_measurement.getX(), null);
+    builder.addDoubleProperty("measurementY",
+            () -> m_measurement.getY(), null);
+    builder.addDoubleProperty("measurementDegrees",
+            () -> m_measurement.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("errorX",
+            () -> m_error.getX(), null);
+    builder.addDoubleProperty("errorY",
+            () -> m_error.getY(), null);
+    builder.addDoubleProperty("errorDegrees",
+            () -> m_error.getRotation().getDegrees(), null);
+    builder.addBooleanProperty("atReference", this::atReference, null);
   }
 }
