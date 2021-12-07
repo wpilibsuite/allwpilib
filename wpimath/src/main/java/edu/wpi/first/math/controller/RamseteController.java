@@ -82,7 +82,7 @@ public class RamseteController implements Sendable {
   }
 
   /**
-   * Sets the 'zeta' parameter of the Ramsete controller, which controls damping
+   * Sets the 'zeta' parameter of the Ramsete controller, which controls damping.
    *
    * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
    *     more damping in response.
@@ -253,16 +253,16 @@ public class RamseteController implements Sendable {
     builder.addDoubleProperty("zeta", this::getZeta, this::setZeta);
     builder.addDoubleProperty("toleranceX",
             () -> m_tolerance.getX(),
-            xTolerance -> setTolerance(new Pose2d(new Translation2d(xTolerance, m_tolerance.getY()),
+            x -> setTolerance(new Pose2d(new Translation2d(x, m_tolerance.getY()),
                     m_tolerance.getRotation())));
     builder.addDoubleProperty("toleranceY",
             () -> m_tolerance.getY(),
-            yTolerance -> setTolerance(new Pose2d(new Translation2d(m_tolerance.getX(), yTolerance),
+            y -> setTolerance(new Pose2d(new Translation2d(m_tolerance.getX(), y),
                     m_tolerance.getRotation())));
     builder.addDoubleProperty("toleranceDegrees",
             () -> m_tolerance.getRotation().getDegrees(),
-            rotationTolerance -> setTolerance(new Pose2d(m_tolerance.getTranslation(),
-                    Rotation2d.fromDegrees(rotationTolerance))));
+            rotation -> setTolerance(new Pose2d(m_tolerance.getTranslation(),
+                    Rotation2d.fromDegrees(rotation))));
     builder.addDoubleProperty("referenceX",
             () -> m_reference.getX(), null);
     builder.addDoubleProperty("referenceY",

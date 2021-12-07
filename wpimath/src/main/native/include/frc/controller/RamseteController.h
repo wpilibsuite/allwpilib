@@ -6,6 +6,8 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/deprecated.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -43,7 +45,9 @@ namespace frc {
  * See <https://file.tavsys.net/control/controls-engineering-in-frc.pdf> section
  * on Ramsete unicycle controller for a derivation and analysis.
  */
-class WPILIB_DLLEXPORT RamseteController {
+class WPILIB_DLLEXPORT RamseteController
+    : public wpi::Sendable,
+      public wpi::SendableHelper<RamseteController> {
  public:
   using b_unit =
       units::compound_unit<units::squared<units::radians>,
@@ -79,6 +83,38 @@ class WPILIB_DLLEXPORT RamseteController {
   RamseteController();
 
   /**
+   * Sets the 'b' parameter of the Ramsete controller.
+   *
+   * @param b Tuning parameter (b &gt; 0 rad²/m²) for which larger values make
+   * convergence more aggressive like a proportional term.
+   */
+  void SetB(units::unit_t<b_unit> b);
+
+  /**
+   * Sets the 'zeta' parameter of the Ramsete controller, which controls damping
+   *
+   * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which
+   * larger values provide more damping in response.
+   */
+  void SetZeta(units::unit_t<zeta_unit> zeta);
+
+  /**
+   * Gets the current 'b' parameter of the Ramsete controller.
+   *
+   * @return Tuning parameter (b &gt; 0 rad²/m²) for which larger values make
+   * convergence more aggressive like a proportional term.
+   */
+  units::unit_t<b_unit> GetB() const;
+
+  /**
+   * Gets the current 'zeta' parameter of the Ramsete controller.
+   *
+   * @return Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger
+   * values provide more damping in response.
+   */
+  units::unit_t<zeta_unit> GetZeta() const;
+
+  /**
    * Returns true if the pose error is within tolerance of the reference.
    */
   bool AtReference() const;
@@ -90,6 +126,27 @@ class WPILIB_DLLEXPORT RamseteController {
    * @param poseTolerance Pose error which is tolerable.
    */
   void SetTolerance(const Pose2d& poseTolerance);
+
+  /**
+   * Gets the pose error which is considered tolerable by atReference().
+   *
+   * @return Pose error which is tolerable.
+   */
+  Pose2d GetTolerance() const;
+
+  /**
+   * Gets the current pose error.
+   *
+   * @return Most recent pose error.
+   */
+  Pose2d GetError() const;
+
+  /**
+   * Gets the current pose measurement.
+   *
+   * @return Most recent pose measurement.
+   */
+  Pose2d GetMeasurement() const;
 
   /**
    * Returns the next output of the Ramsete controller.
@@ -126,12 +183,16 @@ class WPILIB_DLLEXPORT RamseteController {
    */
   void SetEnabled(bool enabled);
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   units::unit_t<b_unit> m_b;
   units::unit_t<zeta_unit> m_zeta;
 
-  Pose2d m_poseError;
-  Pose2d m_poseTolerance;
+  Pose2d m_error;
+  Pose2d m_tolerance;
+  Pose2d m_measurement;
+  Pose2d m_reference;
   bool m_enabled = true;
 };
 
