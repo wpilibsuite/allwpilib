@@ -83,7 +83,7 @@ void InitializeREVPDH() {
 
 extern "C" {
 
-static PDH_status_0_t HAL_REV_ReadPDHStatus0(HAL_CANHandle hcan,
+static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
                                              int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -102,7 +102,7 @@ static PDH_status_0_t HAL_REV_ReadPDHStatus0(HAL_CANHandle hcan,
   return result;
 }
 
-static PDH_status_1_t HAL_REV_ReadPDHStatus1(HAL_CANHandle hcan,
+static PDH_status_1_t HAL_ReadREVPDHStatus1(HAL_CANHandle hcan,
                                              int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -121,7 +121,7 @@ static PDH_status_1_t HAL_REV_ReadPDHStatus1(HAL_CANHandle hcan,
   return result;
 }
 
-static PDH_status_2_t HAL_REV_ReadPDHStatus2(HAL_CANHandle hcan,
+static PDH_status_2_t HAL_ReadREVPDHStatus2(HAL_CANHandle hcan,
                                              int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -140,7 +140,7 @@ static PDH_status_2_t HAL_REV_ReadPDHStatus2(HAL_CANHandle hcan,
   return result;
 }
 
-static PDH_status_3_t HAL_REV_ReadPDHStatus3(HAL_CANHandle hcan,
+static PDH_status_3_t HAL_ReadREVPDHStatus3(HAL_CANHandle hcan,
                                              int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -159,7 +159,7 @@ static PDH_status_3_t HAL_REV_ReadPDHStatus3(HAL_CANHandle hcan,
   return result;
 }
 
-static PDH_status_4_t HAL_REV_ReadPDHStatus4(HAL_CANHandle hcan,
+static PDH_status_4_t HAL_ReadREVPDHStatus4(HAL_CANHandle hcan,
                                              int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -181,7 +181,7 @@ static PDH_status_4_t HAL_REV_ReadPDHStatus4(HAL_CANHandle hcan,
 /**
  * Helper function for the individual getter functions for status 4
  */
-PDH_status_4_t HAL_REV_GetPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
+PDH_status_4_t HAL_GetREVPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
   PDH_status_4_t statusFrame = {};
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -189,7 +189,7 @@ PDH_status_4_t HAL_REV_GetPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
     return statusFrame;
   }
 
-  statusFrame = HAL_REV_ReadPDHStatus4(hpdh->hcan, status);
+  statusFrame = HAL_ReadREVPDHStatus4(hpdh->hcan, status);
   return statusFrame;
 }
 
@@ -269,7 +269,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
   // Determine what periodic status the channel is in
   if (channel < 6) {
     // Periodic status 0
-    PDH_status_0_t statusFrame = HAL_REV_ReadPDHStatus0(hpdh->hcan, status);
+    PDH_status_0_t statusFrame = HAL_ReadREVPDHStatus0(hpdh->hcan, status);
     switch (channel) {
       case 0:
         return PDH_status_0_channel_0_current_decode(
@@ -292,7 +292,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
     }
   } else if (channel < 12) {
     // Periodic status 1
-    PDH_status_1_t statusFrame = HAL_REV_ReadPDHStatus1(hpdh->hcan, status);
+    PDH_status_1_t statusFrame = HAL_ReadREVPDHStatus1(hpdh->hcan, status);
     switch (channel) {
       case 6:
         return PDH_status_1_channel_6_current_decode(
@@ -315,7 +315,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
     }
   } else if (channel < 18) {
     // Periodic status 2
-    PDH_status_2_t statusFrame = HAL_REV_ReadPDHStatus2(hpdh->hcan, status);
+    PDH_status_2_t statusFrame = HAL_ReadREVPDHStatus2(hpdh->hcan, status);
     switch (channel) {
       case 12:
         return PDH_status_2_channel_12_current_decode(
@@ -338,7 +338,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
     }
   } else if (channel < 24) {
     // Periodic status 3
-    PDH_status_3_t statusFrame = HAL_REV_ReadPDHStatus3(hpdh->hcan, status);
+    PDH_status_3_t statusFrame = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
     switch (channel) {
       case 18:
         return PDH_status_3_channel_18_current_decode(
@@ -371,10 +371,10 @@ void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
     return;
   }
 
-  PDH_status_0_t statusFrame0 = HAL_REV_ReadPDHStatus0(hpdh->hcan, status);
-  PDH_status_1_t statusFrame1 = HAL_REV_ReadPDHStatus1(hpdh->hcan, status);
-  PDH_status_2_t statusFrame2 = HAL_REV_ReadPDHStatus2(hpdh->hcan, status);
-  PDH_status_3_t statusFrame3 = HAL_REV_ReadPDHStatus3(hpdh->hcan, status);
+  PDH_status_0_t statusFrame0 = HAL_ReadREVPDHStatus0(hpdh->hcan, status);
+  PDH_status_1_t statusFrame1 = HAL_ReadREVPDHStatus1(hpdh->hcan, status);
+  PDH_status_2_t statusFrame2 = HAL_ReadREVPDHStatus2(hpdh->hcan, status);
+  PDH_status_3_t statusFrame3 = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
 
   currents[0] =
       PDH_status_0_channel_0_current_decode(statusFrame0.channel_0_current);
@@ -427,7 +427,7 @@ void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
 }
 
 uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
-  PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
+  PDH_status_4_t statusFrame = HAL_GetREVPDHStatus4(handle, status);
 
   if (*status != 0) {
     return 0;
@@ -456,7 +456,7 @@ void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
 
 HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
                                               int32_t* status) {
-  PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
+  PDH_status_4_t statusFrame = HAL_GetREVPDHStatus4(handle, status);
 
   if (*status != 0) {
     return 0.0;
@@ -467,7 +467,7 @@ HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
 }
 
 double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status) {
-  PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
+  PDH_status_4_t statusFrame = HAL_GetREVPDHStatus4(handle, status);
 
   if (*status != 0) {
     return 0.0;
@@ -525,11 +525,11 @@ HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status) {
     return faults;
   }
 
-  PDH_status_0_t status0 = HAL_REV_ReadPDHStatus0(hpdh->hcan, status);
-  PDH_status_1_t status1 = HAL_REV_ReadPDHStatus1(hpdh->hcan, status);
-  PDH_status_2_t status2 = HAL_REV_ReadPDHStatus2(hpdh->hcan, status);
-  PDH_status_3_t status3 = HAL_REV_ReadPDHStatus3(hpdh->hcan, status);
-  PDH_status_4_t status4 = HAL_REV_ReadPDHStatus4(hpdh->hcan, status);
+  PDH_status_0_t status0 = HAL_ReadREVPDHStatus0(hpdh->hcan, status);
+  PDH_status_1_t status1 = HAL_ReadREVPDHStatus1(hpdh->hcan, status);
+  PDH_status_2_t status2 = HAL_ReadREVPDHStatus2(hpdh->hcan, status);
+  PDH_status_3_t status3 = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
+  PDH_status_4_t status4 = HAL_ReadREVPDHStatus4(hpdh->hcan, status);
 
   faults.channel0BreakerFault = status0.channel_0_breaker_fault;
   faults.channel1BreakerFault = status0.channel_1_breaker_fault;
@@ -571,7 +571,7 @@ HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
     return stickyFaults;
   }
 
-  PDH_status_4_t status4 = HAL_REV_ReadPDHStatus4(hpdh->hcan, status);
+  PDH_status_4_t status4 = HAL_ReadREVPDHStatus4(hpdh->hcan, status);
 
   stickyFaults.channel0BreakerFault = status4.sticky_ch0_breaker_fault;
   stickyFaults.channel1BreakerFault = status4.sticky_ch1_breaker_fault;
