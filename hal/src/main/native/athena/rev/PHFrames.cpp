@@ -48,8 +48,24 @@ static inline uint8_t pack_left_shift_u16(
     return (uint8_t)((uint8_t)(value << shift) & mask);
 }
 
+static inline uint8_t pack_left_shift_u32(
+    uint32_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value << shift) & mask);
+}
+
 static inline uint8_t pack_right_shift_u16(
     uint16_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value >> shift) & mask);
+}
+
+static inline uint8_t pack_right_shift_u32(
+    uint32_t value,
     uint8_t shift,
     uint8_t mask)
 {
@@ -62,6 +78,14 @@ static inline uint16_t unpack_left_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) << shift);
+}
+
+static inline uint32_t unpack_left_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) << shift);
 }
 
 static inline uint8_t unpack_right_shift_u8(
@@ -78,6 +102,14 @@ static inline uint16_t unpack_right_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) >> shift);
+}
+
+static inline uint32_t unpack_right_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) >> shift);
 }
 
 int PH_compressor_config_pack(
@@ -1623,6 +1655,7 @@ int PH_status_1_pack(
     dst_p[6] |= pack_left_shift_u8(src_p->sticky_hardware_fault, 6u, 0x40u);
     dst_p[6] |= pack_left_shift_u8(src_p->sticky_firmware_fault, 7u, 0x80u);
     dst_p[7] |= pack_left_shift_u8(src_p->sticky_has_reset_fault, 0u, 0x01u);
+    dst_p[7] |= pack_left_shift_u8(src_p->supply_voltage_5_v, 1u, 0xfeu);
 
     return (8);
 }
@@ -1650,6 +1683,7 @@ int PH_status_1_unpack(
     dst_p->sticky_hardware_fault = unpack_right_shift_u8(src_p[6], 6u, 0x40u);
     dst_p->sticky_firmware_fault = unpack_right_shift_u8(src_p[6], 7u, 0x80u);
     dst_p->sticky_has_reset_fault = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
+    dst_p->supply_voltage_5_v = unpack_right_shift_u8(src_p[7], 1u, 0xfeu);
 
     return (0);
 }
@@ -1853,6 +1887,21 @@ bool PH_status_1_sticky_has_reset_fault_is_in_range(uint8_t value)
     return (value <= 1u);
 }
 
+uint8_t PH_status_1_supply_voltage_5_v_encode(double value)
+{
+    return (uint8_t)((value - 4.5) / 0.0078125);
+}
+
+double PH_status_1_supply_voltage_5_v_decode(uint8_t value)
+{
+    return (((double)value * 0.0078125) + 4.5);
+}
+
+bool PH_status_1_supply_voltage_5_v_is_in_range(uint8_t value)
+{
+    return (value <= 128u);
+}
+
 int PH_clear_faults_pack(
     uint8_t *dst_p,
     const struct PH_clear_faults_t *src_p,
@@ -1875,4 +1924,148 @@ int PH_clear_faults_unpack(
     (void)size;
 
     return (0);
+}
+
+int PH_version_pack(
+    uint8_t *dst_p,
+    const struct PH_version_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->firmware_fix, 0u, 0xffu);
+    dst_p[1] |= pack_left_shift_u8(src_p->firmware_minor, 0u, 0xffu);
+    dst_p[2] |= pack_left_shift_u8(src_p->firmware_year, 0u, 0xffu);
+    dst_p[3] |= pack_left_shift_u8(src_p->hardware_minor, 0u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->hardware_major, 0u, 0xffu);
+    dst_p[5] |= pack_left_shift_u32(src_p->unique_id, 0u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->unique_id, 8u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->unique_id, 16u, 0xffu);
+
+    return (8);
+}
+
+int PH_version_unpack(
+    struct PH_version_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->firmware_fix = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
+    dst_p->firmware_minor = unpack_right_shift_u8(src_p[1], 0u, 0xffu);
+    dst_p->firmware_year = unpack_right_shift_u8(src_p[2], 0u, 0xffu);
+    dst_p->hardware_minor = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
+    dst_p->hardware_major = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
+    dst_p->unique_id = unpack_right_shift_u32(src_p[5], 0u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[6], 8u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[7], 16u, 0xffu);
+
+    return (0);
+}
+
+uint8_t PH_version_firmware_fix_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_fix_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_fix_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_firmware_minor_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_minor_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_minor_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_firmware_year_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_firmware_year_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_firmware_year_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_hardware_minor_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_hardware_minor_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_hardware_minor_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PH_version_hardware_major_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PH_version_hardware_major_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_hardware_major_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint32_t PH_version_unique_id_encode(double value)
+{
+    return (uint32_t)(value);
+}
+
+double PH_version_unique_id_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool PH_version_unique_id_is_in_range(uint32_t value)
+{
+    return (value <= 16777215u);
 }
