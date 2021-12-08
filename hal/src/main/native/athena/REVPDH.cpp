@@ -84,7 +84,7 @@ void InitializeREVPDH() {
 extern "C" {
 
 static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
-                                             int32_t* status) {
+                                            int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -103,7 +103,7 @@ static PDH_status_0_t HAL_ReadREVPDHStatus0(HAL_CANHandle hcan,
 }
 
 static PDH_status_1_t HAL_ReadREVPDHStatus1(HAL_CANHandle hcan,
-                                             int32_t* status) {
+                                            int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -122,7 +122,7 @@ static PDH_status_1_t HAL_ReadREVPDHStatus1(HAL_CANHandle hcan,
 }
 
 static PDH_status_2_t HAL_ReadREVPDHStatus2(HAL_CANHandle hcan,
-                                             int32_t* status) {
+                                            int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -141,7 +141,7 @@ static PDH_status_2_t HAL_ReadREVPDHStatus2(HAL_CANHandle hcan,
 }
 
 static PDH_status_3_t HAL_ReadREVPDHStatus3(HAL_CANHandle hcan,
-                                             int32_t* status) {
+                                            int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -160,7 +160,7 @@ static PDH_status_3_t HAL_ReadREVPDHStatus3(HAL_CANHandle hcan,
 }
 
 static PDH_status_4_t HAL_ReadREVPDHStatus4(HAL_CANHandle hcan,
-                                             int32_t* status) {
+                                            int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -194,8 +194,8 @@ PDH_status_4_t HAL_GetREVPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
-                                       const char* allocationLocation,
-                                       int32_t* status) {
+                                      const char* allocationLocation,
+                                      int32_t* status) {
   hal::init::CheckInit();
   if (!HAL_CheckREVPDHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
@@ -254,7 +254,7 @@ HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel) {
 }
 
 double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
-                                    int32_t* status) {
+                                   int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -364,7 +364,7 @@ double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
 }
 
 void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
-                                      int32_t* status) {
+                                     int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -437,7 +437,7 @@ uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
-                                     int32_t* status) {
+                                    int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -455,7 +455,7 @@ void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
 }
 
 HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
-                                              int32_t* status) {
+                                             int32_t* status) {
   PDH_status_4_t statusFrame = HAL_GetREVPDHStatus4(handle, status);
 
   if (*status != 0) {
@@ -477,7 +477,7 @@ double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status) {
 }
 
 HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
-                                      int32_t* status) {
+                                       int32_t* status) {
   HAL_REVPDHVersion version;
   std::memset(&version, 0, sizeof(version));
   uint8_t packedData[8] = {0};

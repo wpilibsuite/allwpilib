@@ -104,8 +104,8 @@ extern "C" {
  * @return the created PDH handle
  */
 HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
-                                       const char* allocationLocation,
-                                       int32_t* status);
+                                      const char* allocationLocation,
+                                      int32_t* status);
 
 /**
  * Frees a PDH device handle.
@@ -147,14 +147,14 @@ HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel);
  * @return the current of the PDH channel in Amps
  */
 double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
-                                    int32_t* status);
+                                   int32_t* status);
 
 /**
  * @param handle        PDH handle
  * @param currents      array of currents
  */
 void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
-                                      int32_t* status);
+                                     int32_t* status);
 
 /**
  * Gets the total current of the PDH in Amps, measured to the nearest even
@@ -174,7 +174,7 @@ uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status);
  * otherwise
  */
 void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
-                                     int32_t* status);
+                                    int32_t* status);
 
 /**
  * Gets the current state of the switchable channel on a PDH device.
@@ -186,7 +186,7 @@ void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
  * @return 1 if the switchable channel is enabled; 0 otherwise
  */
 HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
-                                              int32_t* status);
+                                             int32_t* status);
 
 /**
  * Gets the firmware and hardware versions of a PDH device.
