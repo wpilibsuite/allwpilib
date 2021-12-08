@@ -195,7 +195,8 @@ HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
  *
  * @return version information
  */
-HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
+HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
+                                       int32_t* status);
 
 /**
  * Gets the voltage being supplied to a PDH device.
