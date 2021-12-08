@@ -14,7 +14,10 @@
  * @{
  */
 
-struct REV_PDH_Version {
+/**
+ * Storage for REV PDH Version
+ */
+struct HAL_REVPDHVersion {
   uint32_t firmwareMajor;
   uint32_t firmwareMinor;
   uint32_t firmwareFix;
@@ -100,7 +103,7 @@ extern "C" {
  * @param module       the device CAN ID (1 .. 63)
  * @return the created PDH handle
  */
-HAL_REVPDHHandle HAL_REV_InitializePDH(int32_t module,
+HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
                                        const char* allocationLocation,
                                        int32_t* status);
 
@@ -109,12 +112,12 @@ HAL_REVPDHHandle HAL_REV_InitializePDH(int32_t module,
  *
  * @param handle        the previously created PDH handle
  */
-void HAL_REV_FreePDH(HAL_REVPDHHandle handle);
+void HAL_FreeREVPDH(HAL_REVPDHHandle handle);
 
 /**
  * Gets the module number for a pdh.
  */
-int32_t HAL_REV_GetPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status);
+int32_t HAL_GetREVPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
  * Checks if a PDH module number is valid.
@@ -124,33 +127,33 @@ int32_t HAL_REV_GetPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status);
  * @param module        module number (1 .. 63)
  * @return 1 if the module number is valid; 0 otherwise
  */
-HAL_Bool HAL_REV_CheckPDHModuleNumber(int32_t module);
+HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module);
 
 /**
  * Checks if a PDH channel number is valid.
  *
- * @param module        channel number (0 .. HAL_REV_PDH_NUM_CHANNELS)
+ * @param module        channel number (0 .. kNumREVPDHChannels)
  * @return 1 if the channel number is valid; 0 otherwise
  */
-HAL_Bool HAL_REV_CheckPDHChannelNumber(int32_t channel);
+HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel);
 
 /**
  * Gets the current of a PDH channel in Amps.
  *
  * @param handle        PDH handle
  * @param channel       the channel to retrieve the current of (0 ..
- * HAL_REV_PDH_NUM_CHANNELS)
+ * kNumREVPDHChannels)
  *
  * @return the current of the PDH channel in Amps
  */
-double HAL_REV_GetPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
+double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
                                     int32_t* status);
 
 /**
  * @param handle        PDH handle
  * @param currents      array of currents
  */
-void HAL_REV_GetPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
+void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
                                       int32_t* status);
 
 /**
@@ -161,7 +164,7 @@ void HAL_REV_GetPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
  *
  * @return the total current of the PDH in Amps
  */
-uint16_t HAL_REV_GetPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status);
+uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
  * Sets the state of the switchable channel on a PDH device.
@@ -170,7 +173,7 @@ uint16_t HAL_REV_GetPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status);
  * @param enabled       1 if the switchable channel should be enabled; 0
  * otherwise
  */
-void HAL_REV_SetPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
+void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
                                      int32_t* status);
 
 /**
@@ -182,7 +185,7 @@ void HAL_REV_SetPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
  * @param handle        PDH handle
  * @return 1 if the switchable channel is enabled; 0 otherwise
  */
-HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
+HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
                                               int32_t* status);
 
 /**
@@ -192,7 +195,7 @@ HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
  *
  * @return version information
  */
-REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
+HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
  * Gets the voltage being supplied to a PDH device.
@@ -201,7 +204,7 @@ REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @return the voltage at the input of the PDH in Volts
  */
-double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status);
+double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status);
 
 /**
  * Gets the faults of a PDH device.
@@ -227,7 +230,7 @@ HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
  *
  * @param handle        PDH handle
  */
-void HAL_REV_ClearPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status);
+void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

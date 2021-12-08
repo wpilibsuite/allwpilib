@@ -55,7 +55,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       HAL_CleanPDP(pdpHandle);
     }
     *status = 0;
-    auto pdhHandle = HAL_REV_InitializePDH(1, allocationLocation, status);
+    auto pdhHandle = HAL_InitializeREVPDH(1, allocationLocation, status);
     return static_cast<HAL_PowerDistributionHandle>(pdhHandle);
   }
 
@@ -70,7 +70,7 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       moduleNumber = 1;
     }
     return static_cast<HAL_PowerDistributionHandle>(
-        HAL_REV_InitializePDH(moduleNumber, allocationLocation, status));
+        HAL_InitializeREVPDH(moduleNumber, allocationLocation, status));
   }
 }
 
@@ -80,7 +80,7 @@ void HAL_CleanPowerDistribution(HAL_PowerDistributionHandle handle) {
   if (IsCtre(handle)) {
     HAL_CleanPDP(handle);
   } else {
-    HAL_REV_FreePDH(handle);
+    HAL_FreeREVPDH(handle);
   }
 }
 
@@ -89,7 +89,7 @@ int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPModuleNumber(handle, status);
   } else {
-    return HAL_REV_GetPDHModuleNumber(handle, status);
+    return HAL_GetREVPDHModuleNumber(handle, status);
   }
 }
 
@@ -98,7 +98,7 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_CheckPDPChannel(channel);
   } else {
-    return HAL_REV_CheckPDHChannelNumber(channel);
+    return HAL_CheckREVPDHChannelNumber(channel);
   }
 }
 
@@ -107,7 +107,7 @@ HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
   if (type == HAL_PowerDistributionType::HAL_PowerDistributionType_kCTRE) {
     return HAL_CheckPDPModule(module);
   } else {
-    return HAL_REV_CheckPDHModuleNumber(module);
+    return HAL_CheckREVPDHModuleNumber(module);
   }
 }
 
@@ -142,7 +142,7 @@ double HAL_GetPowerDistributionVoltage(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPVoltage(handle, status);
   } else {
-    return HAL_REV_GetPDHSupplyVoltage(handle, status);
+    return HAL_GetREVPDHVoltage(handle, status);
   }
 }
 
@@ -151,7 +151,7 @@ double HAL_GetPowerDistributionChannelCurrent(
   if (IsCtre(handle)) {
     return HAL_GetPDPChannelCurrent(handle, channel, status);
   } else {
-    return HAL_REV_GetPDHChannelCurrent(handle, channel, status);
+    return HAL_GetREVPDHChannelCurrent(handle, channel, status);
   }
 }
 
@@ -171,7 +171,7 @@ void HAL_GetPowerDistributionAllChannelCurrents(
       SetLastError(status, "Output array not large enough");
       return;
     }
-    return HAL_REV_GetPDHAllChannelCurrents(handle, currents, status);
+    return HAL_GetREVPDHAllChannelCurrents(handle, currents, status);
   }
 }
 
@@ -180,7 +180,7 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     return HAL_GetPDPTotalCurrent(handle, status);
   } else {
-    return HAL_REV_GetPDHTotalCurrent(handle, status);
+    return HAL_GetREVPDHTotalCurrent(handle, status);
   }
 }
 
@@ -218,7 +218,7 @@ void HAL_ClearPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
   if (IsCtre(handle)) {
     HAL_ClearPDPStickyFaults(handle, status);
   } else {
-    HAL_REV_ClearPDHStickyFaults(handle, status);
+    HAL_ClearREVPDHStickyFaults(handle, status);
   }
 }
 
@@ -228,7 +228,7 @@ void HAL_SetPowerDistributionSwitchableChannel(
     // No-op on CTRE
     return;
   } else {
-    HAL_REV_SetPDHSwitchableChannel(handle, enabled, status);
+    HAL_SetREVPDHSwitchableChannel(handle, enabled, status);
   }
 }
 
@@ -238,7 +238,7 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     // No-op on CTRE
     return false;
   } else {
-    return HAL_REV_GetPDHSwitchableChannelState(handle, status);
+    return HAL_GetREVPDHSwitchableChannelState(handle, status);
   }
 }
 

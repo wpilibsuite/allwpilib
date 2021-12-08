@@ -193,11 +193,11 @@ PDH_status_4_t HAL_REV_GetPDHStatus4(HAL_REVPDHHandle handle, int32_t* status) {
   return statusFrame;
 }
 
-HAL_REVPDHHandle HAL_REV_InitializePDH(int32_t module,
+HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
                                        const char* allocationLocation,
                                        int32_t* status) {
   hal::init::CheckInit();
-  if (!HAL_REV_CheckPDHModuleNumber(module)) {
+  if (!HAL_CheckREVPDHModuleNumber(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
@@ -230,7 +230,7 @@ HAL_REVPDHHandle HAL_REV_InitializePDH(int32_t module,
   return handle;
 }
 
-void HAL_REV_FreePDH(HAL_REVPDHHandle handle) {
+void HAL_FreeREVPDH(HAL_REVPDHHandle handle) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     return;
@@ -241,19 +241,19 @@ void HAL_REV_FreePDH(HAL_REVPDHHandle handle) {
   REVPDHHandles->Free(handle);
 }
 
-int32_t HAL_REV_GetPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status) {
+int32_t HAL_GetREVPDHModuleNumber(HAL_REVPDHHandle handle, int32_t* status) {
   return hal::getHandleIndex(handle);
 }
 
-HAL_Bool HAL_REV_CheckPDHModuleNumber(int32_t module) {
+HAL_Bool HAL_CheckREVPDHModuleNumber(int32_t module) {
   return ((module >= 1) && (module < kNumREVPDHModules)) ? 1 : 0;
 }
 
-HAL_Bool HAL_REV_CheckPDHChannelNumber(int32_t channel) {
+HAL_Bool HAL_CheckREVPDHChannelNumber(int32_t channel) {
   return ((channel >= 0) && (channel < kNumREVPDHChannels)) ? 1 : 0;
 }
 
-double HAL_REV_GetPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
+double HAL_GetREVPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
                                     int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -261,7 +261,7 @@ double HAL_REV_GetPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
     return 0;
   }
 
-  if (!HAL_REV_CheckPDHChannelNumber(channel)) {
+  if (!HAL_CheckREVPDHChannelNumber(channel)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return 0;
   }
@@ -363,7 +363,7 @@ double HAL_REV_GetPDHChannelCurrent(HAL_REVPDHHandle handle, int32_t channel,
   return 0;
 }
 
-void HAL_REV_GetPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
+void HAL_GetREVPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
                                       int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -426,7 +426,7 @@ void HAL_REV_GetPDHAllChannelCurrents(HAL_REVPDHHandle handle, double* currents,
       PDH_status_3_channel_23_current_decode(statusFrame3.channel_23_current);
 }
 
-uint16_t HAL_REV_GetPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
+uint16_t HAL_GetREVPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
   PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
 
   if (*status != 0) {
@@ -436,7 +436,7 @@ uint16_t HAL_REV_GetPDHTotalCurrent(HAL_REVPDHHandle handle, int32_t* status) {
   return PDH_status_4_total_current_decode(statusFrame.total_current);
 }
 
-void HAL_REV_SetPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
+void HAL_SetREVPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
                                      int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -454,7 +454,7 @@ void HAL_REV_SetPDHSwitchableChannel(HAL_REVPDHHandle handle, HAL_Bool enabled,
                      PDH_SET_SWITCH_CHANNEL_FRAME_API, status);
 }
 
-HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
+HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
                                               int32_t* status) {
   PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
 
@@ -466,7 +466,7 @@ HAL_Bool HAL_REV_GetPDHSwitchableChannelState(HAL_REVPDHHandle handle,
       statusFrame.switch_channel_state);
 }
 
-double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status) {
+double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status) {
   PDH_status_4_t statusFrame = HAL_REV_GetPDHStatus4(handle, status);
 
   if (*status != 0) {
@@ -476,9 +476,9 @@ double HAL_REV_GetPDHSupplyVoltage(HAL_REVPDHHandle handle, int32_t* status) {
   return PDH_status_4_v_bus_decode(statusFrame.v_bus);
 }
 
-REV_PDH_Version HAL_REV_GetPDHVersion(HAL_REVPDHHandle handle,
+HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
                                       int32_t* status) {
-  REV_PDH_Version version;
+  HAL_REVPDHVersion version;
   std::memset(&version, 0, sizeof(version));
   uint8_t packedData[8] = {0};
   int32_t length = 0;
@@ -605,7 +605,7 @@ HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
   return stickyFaults;
 }
 
-void HAL_REV_ClearPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {
+void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
