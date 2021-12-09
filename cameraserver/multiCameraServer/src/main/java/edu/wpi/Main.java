@@ -56,9 +56,9 @@ public final class Main {
     public JsonObject config;
   }
 
-  static int team;
-  static boolean server;
-  static List<CameraConfig> cameras = new ArrayList<>();
+  private static int team;
+  private static boolean server;
+  private static List<CameraConfig> cameras = new ArrayList<>();
 
   private Main() {}
 

@@ -33,30 +33,16 @@ public class Compressor implements Sendable, AutoCloseable {
    */
   public Compressor(int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(module, moduleType);
-    boolean allocatedCompressor = false;
-    boolean successfulCompletion = false;
 
-    try {
-      if (!m_module.reserveCompressor()) {
-        throw new AllocationException("Compressor already allocated");
-      }
-
-      allocatedCompressor = true;
-
-      m_module.enableCompressorDigital();
-
-      HAL.report(tResourceType.kResourceType_Compressor, module + 1);
-      SendableRegistry.addLW(this, "Compressor", module);
-      successfulCompletion = true;
-
-    } finally {
-      if (!successfulCompletion) {
-        if (allocatedCompressor) {
-          m_module.unreserveCompressor();
-        }
-        m_module.close();
-      }
+    if (!m_module.reserveCompressor()) {
+      m_module.close();
+      throw new AllocationException("Compressor already allocated");
     }
+
+    m_module.enableCompressorDigital();
+
+    HAL.report(tResourceType.kResourceType_Compressor, module + 1);
+    SendableRegistry.addLW(this, "Compressor", module);
   }
 
   /**

@@ -18,9 +18,9 @@ import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
-public class StateSpaceUtilTest {
+class StateSpaceUtilTest {
   @Test
-  public void testCostArray() {
+  void testCostArray() {
     var mat = StateSpaceUtil.makeCostMatrix(VecBuilder.fill(1.0, 2.0, 3.0));
 
     assertEquals(1.0, mat.get(0, 0), 1e-3);
@@ -35,7 +35,7 @@ public class StateSpaceUtilTest {
   }
 
   @Test
-  public void testCovArray() {
+  void testCovArray() {
     var mat = StateSpaceUtil.makeCovarianceMatrix(Nat.N3(), VecBuilder.fill(1.0, 2.0, 3.0));
 
     assertEquals(1.0, mat.get(0, 0), 1e-3);
@@ -51,7 +51,7 @@ public class StateSpaceUtilTest {
 
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testIsStabilizable() {
+  void testIsStabilizable() {
     Matrix<N2, N2> A;
     Matrix<N2, N1> B = VecBuilder.fill(0, 1);
 
@@ -78,7 +78,7 @@ public class StateSpaceUtilTest {
 
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testIsDetectable() {
+  void testIsDetectable() {
     Matrix<N2, N2> A;
     Matrix<N1, N2> C = Matrix.mat(Nat.N1(), Nat.N2()).fill(0, 1);
 
@@ -104,7 +104,7 @@ public class StateSpaceUtilTest {
   }
 
   @Test
-  public void testMakeWhiteNoiseVector() {
+  void testMakeWhiteNoiseVector() {
     var firstData = new ArrayList<Double>();
     var secondData = new ArrayList<Double>();
     for (int i = 0; i < 1000; i++) {
@@ -135,7 +135,7 @@ public class StateSpaceUtilTest {
   }
 
   @Test
-  public void testMatrixExp() {
+  void testMatrixExp() {
     Matrix<N2, N2> wrappedMatrix = Matrix.eye(Nat.N2());
     var wrappedResult = wrappedMatrix.exp();
 
@@ -152,7 +152,7 @@ public class StateSpaceUtilTest {
   }
 
   @Test
-  public void testSimpleMatrixExp() {
+  void testSimpleMatrixExp() {
     SimpleMatrix matrix = SimpleMatrixUtils.eye(2);
     var result = SimpleMatrixUtils.exp(matrix);
 
@@ -175,7 +175,7 @@ public class StateSpaceUtilTest {
   }
 
   @Test
-  public void testPoseToVector() {
+  void testPoseToVector() {
     Pose2d pose = new Pose2d(1, 2, new Rotation2d(3));
     var vector = StateSpaceUtil.poseToVector(pose);
     assertEquals(pose.getTranslation().getX(), vector.get(0, 0), 1e-6);

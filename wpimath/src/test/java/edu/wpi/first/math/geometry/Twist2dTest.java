@@ -60,6 +60,7 @@ class Twist2dTest {
     assertNotEquals(one, two);
   }
 
+  @Test
   void testPose2dLog() {
     final var start = new Pose2d();
     final var end = new Pose2d(5.0, 5.0, Rotation2d.fromDegrees(90.0));

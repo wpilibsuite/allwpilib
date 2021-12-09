@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveKinematicsConst
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class TrajectoryJsonTest {
+class TrajectoryJsonTest {
   @Test
   void deserializeMatches() {
     var config =

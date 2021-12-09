@@ -19,7 +19,7 @@ class PS4ControllerTest {
   @ParameterizedTest
   @EnumSource(value = PS4Controller.Button.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testButtons(PS4Controller.Button button)
+  void testButtons(PS4Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     PS4Controller joy = new PS4Controller(2);
@@ -60,7 +60,7 @@ class PS4ControllerTest {
   @ParameterizedTest
   @EnumSource(value = PS4Controller.Axis.class)
   @SuppressWarnings({"VariableDeclarationUsageDistance"})
-  public void testAxes(PS4Controller.Axis axis)
+  void testAxes(PS4Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     HAL.initialize(500, 0);
     PS4Controller joy = new PS4Controller(2);

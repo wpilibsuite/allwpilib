@@ -11,10 +11,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import org.junit.jupiter.api.Test;
 
-public class LinearQuadraticRegulatorTest {
+class LinearQuadraticRegulatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testLQROnElevator() {
+  void testLQROnElevator() {
     var motors = DCMotor.getVex775Pro(2);
 
     var m = 5.0;
@@ -36,7 +36,7 @@ public class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  public void testFourMotorElevator() {
+  void testFourMotorElevator() {
     var dt = 0.020;
 
     var plant =
@@ -52,7 +52,7 @@ public class LinearQuadraticRegulatorTest {
 
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testLQROnArm() {
+  void testLQROnArm() {
     var motors = DCMotor.getVex775Pro(2);
 
     var m = 4.0;
@@ -74,7 +74,7 @@ public class LinearQuadraticRegulatorTest {
   }
 
   @Test
-  public void testLatencyCompensate() {
+  void testLatencyCompensate() {
     var dt = 0.02;
 
     var plant =

@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class MecanumDrivePoseEstimatorTest {
+class MecanumDrivePoseEstimatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testAccuracy() {
+  void testAccuracy() {
     var kinematics =
         new MecanumDriveKinematics(
             new Translation2d(1, 1), new Translation2d(1, -1),

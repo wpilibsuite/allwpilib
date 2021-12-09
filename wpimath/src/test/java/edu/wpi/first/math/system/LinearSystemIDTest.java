@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 class LinearSystemIDTest {
   @Test
-  public void testDrivetrainVelocitySystem() {
+  void testDrivetrainVelocitySystem() {
     var model =
         LinearSystemId.createDrivetrainVelocitySystem(DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6);
     assertTrue(
@@ -40,7 +40,7 @@ class LinearSystemIDTest {
   }
 
   @Test
-  public void testElevatorSystem() {
+  void testElevatorSystem() {
     var model = LinearSystemId.createElevatorSystem(DCMotor.getNEO(2), 5, 0.05, 12);
     assertTrue(
         model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -99.05473), 0.001));
@@ -53,7 +53,7 @@ class LinearSystemIDTest {
   }
 
   @Test
-  public void testFlywheelSystem() {
+  void testFlywheelSystem() {
     var model = LinearSystemId.createFlywheelSystem(DCMotor.getNEO(2), 0.00032, 1.0);
     assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
 
@@ -65,7 +65,7 @@ class LinearSystemIDTest {
   }
 
   @Test
-  public void testIdentifyPositionSystem() {
+  void testIdentifyPositionSystem() {
     // By controls engineering in frc,
     // x-dot = [0 1 | 0 -kv/ka] x = [0 | 1/ka] u
     var kv = 1.0;
@@ -77,7 +77,7 @@ class LinearSystemIDTest {
   }
 
   @Test
-  public void testIdentifyVelocitySystem() {
+  void testIdentifyVelocitySystem() {
     // By controls engineering in frc,
     // V = kv * velocity + ka * acceleration
     // x-dot =  -kv/ka * v + 1/ka \cdot V

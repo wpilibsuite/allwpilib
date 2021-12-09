@@ -64,6 +64,7 @@ class UnitsTest extends UtilityClassTest<Units> {
     assertEquals(1500, Units.secondsToMilliseconds(1.5), 1e-2);
   }
 
+  @Test
   void kilogramsToLbsTest() {
     assertEquals(2.20462, Units.kilogramsToLbs(1), 1e-2);
   }

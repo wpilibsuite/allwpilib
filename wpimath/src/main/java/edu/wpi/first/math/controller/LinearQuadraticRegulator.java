@@ -104,10 +104,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     if (!StateSpaceUtil.isStabilizable(discA, discB)) {
       var builder = new StringBuilder("The system passed to the LQR is uncontrollable!\n\nA =\n");
-      builder.append(discA.getStorage().toString());
-      builder.append("\nB =\n");
-      builder.append(discB.getStorage().toString());
-      builder.append("\n");
+      builder
+          .append(discA.getStorage().toString())
+          .append("\nB =\n")
+          .append(discB.getStorage().toString())
+          .append('\n');
 
       var msg = builder.toString();
       MathSharedStore.reportError(msg, Thread.currentThread().getStackTrace());

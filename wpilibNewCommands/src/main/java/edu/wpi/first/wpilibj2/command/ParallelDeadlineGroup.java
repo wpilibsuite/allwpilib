@@ -92,7 +92,7 @@ public class ParallelDeadlineGroup extends CommandGroupBase {
       if (commandRunning.getKey().isFinished()) {
         commandRunning.getKey().end(false);
         commandRunning.setValue(false);
-        if (commandRunning.getKey() == m_deadline) {
+        if (commandRunning.getKey().equals(m_deadline)) {
           m_finished = true;
         }
       }

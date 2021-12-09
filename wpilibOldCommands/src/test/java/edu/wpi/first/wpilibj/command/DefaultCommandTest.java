@@ -7,7 +7,7 @@ package edu.wpi.first.wpilibj.command;
 import org.junit.jupiter.api.Test;
 
 /** Tests the {@link Command} library. */
-public class DefaultCommandTest extends AbstractCommandTest {
+class DefaultCommandTest extends AbstractCommandTest {
   /** Testing of default commands where the interrupting command ends itself. */
   @Test
   void defaultCommandWhereTheInteruptingCommandEndsItselfTest() {
