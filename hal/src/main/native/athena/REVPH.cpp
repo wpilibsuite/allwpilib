@@ -23,30 +23,34 @@ static constexpr HAL_CANDeviceType deviceType =
     HAL_CANDeviceType::HAL_CAN_Dev_kPneumatics;
 
 static constexpr int32_t kDefaultControlPeriod = 20;
-// static constexpr uint8_t kDefaultSensorMask = (1 <<
-// HAL_REV_PHSENSOR_DIGITAL);
 static constexpr uint8_t kDefaultCompressorDuty = 255;
 static constexpr uint8_t kDefaultPressureTarget = 120;
 static constexpr uint8_t kDefaultPressureHysteresis = 60;
 
-#define HAL_REV_MAX_PULSE_TIME 65534
-#define HAL_REV_MAX_PRESSURE_TARGET 120
-#define HAL_REV_MAX_PRESSURE_HYSTERESIS HAL_REV_MAX_PRESSURE_TARGET
+#define HAL_REVPH_MAX_PULSE_TIME 65534
 
 static constexpr uint32_t APIFromExtId(uint32_t extId) {
   return (extId >> 6) & 0x3FF;
 }
 
-static constexpr uint32_t PH_SET_ALL_FRAME_API =
-    APIFromExtId(PH_SET_ALL_FRAME_ID);
-static constexpr uint32_t PH_PULSE_ONCE_FRAME_API =
-    APIFromExtId(PH_PULSE_ONCE_FRAME_ID);
-static constexpr uint32_t PH_COMPRESSOR_CONFIG_API =
-    APIFromExtId(PH_COMPRESSOR_CONFIG_FRAME_ID);
 static constexpr uint32_t PH_STATUS_0_FRAME_API =
     APIFromExtId(PH_STATUS_0_FRAME_ID);
 static constexpr uint32_t PH_STATUS_1_FRAME_API =
     APIFromExtId(PH_STATUS_1_FRAME_ID);
+
+static constexpr uint32_t PH_SET_ALL_FRAME_API =
+    APIFromExtId(PH_SET_ALL_FRAME_ID);
+static constexpr uint32_t PH_PULSE_ONCE_FRAME_API =
+    APIFromExtId(PH_PULSE_ONCE_FRAME_ID);
+
+static constexpr uint32_t PH_COMPRESSOR_CONFIG_API =
+    APIFromExtId(PH_COMPRESSOR_CONFIG_FRAME_ID);
+
+static constexpr uint32_t PH_CLEAR_FAULTS_FRAME_API =
+    APIFromExtId(PH_CLEAR_FAULTS_FRAME_ID);
+
+static constexpr uint32_t PH_VERSION_FRAME_API =
+    APIFromExtId(PH_VERSION_FRAME_ID);
 
 static constexpr int32_t kPHFrameStatus0Timeout = 50;
 static constexpr int32_t kPHFrameStatus1Timeout = 50;
@@ -75,8 +79,7 @@ void InitializeREVPH() {
 }
 }  // namespace hal::init
 
-static PH_status_0_t HAL_REV_ReadPHStatus0(HAL_CANHandle hcan,
-                                           int32_t* status) {
+static PH_status_0_t HAL_ReadREVPHStatus0(HAL_CANHandle hcan, int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -94,8 +97,7 @@ static PH_status_0_t HAL_REV_ReadPHStatus0(HAL_CANHandle hcan,
   return result;
 }
 
-static PH_status_1_t HAL_REV_ReadPHStatus1(HAL_CANHandle hcan,
-                                           int32_t* status) {
+static PH_status_1_t HAL_ReadREVPHStatus1(HAL_CANHandle hcan, int32_t* status) {
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -119,9 +121,9 @@ enum REV_SolenoidState {
   kSolenoidControlledViaPulse
 };
 
-static void HAL_REV_UpdateDesiredPHSolenoidState(REV_PHObj* hph,
-                                                 int32_t solenoid,
-                                                 REV_SolenoidState state) {
+static void HAL_UpdateDesiredREVPHSolenoidState(REV_PHObj* hph,
+                                                int32_t solenoid,
+                                                REV_SolenoidState state) {
   switch (solenoid) {
     case 0:
       hph->desiredSolenoidsState.channel_0 = state;
@@ -174,15 +176,15 @@ static void HAL_REV_UpdateDesiredPHSolenoidState(REV_PHObj* hph,
   }
 }
 
-static void HAL_REV_SendSolenoidsState(REV_PHObj* hph, int32_t* status) {
+static void HAL_SendREVPHSolenoidsState(REV_PHObj* hph, int32_t* status) {
   uint8_t packedData[PH_SET_ALL_LENGTH] = {0};
   PH_set_all_pack(packedData, &(hph->desiredSolenoidsState), PH_SET_ALL_LENGTH);
   HAL_WriteCANPacketRepeating(hph->hcan, packedData, PH_SET_ALL_LENGTH,
                               PH_SET_ALL_FRAME_API, hph->controlPeriod, status);
 }
 
-static HAL_Bool HAL_REV_CheckPHPulseTime(int32_t time) {
-  return ((time > 0) && (time <= HAL_REV_MAX_PULSE_TIME)) ? 1 : 0;
+static HAL_Bool HAL_CheckREVPHPulseTime(int32_t time) {
+  return ((time > 0) && (time <= HAL_REVPH_MAX_PULSE_TIME)) ? 1 : 0;
 }
 
 HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
@@ -221,7 +223,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
   hph->controlPeriod = kDefaultControlPeriod;
 
   // Start closed-loop compressor control by starting solenoid state updates
-  HAL_REV_SendSolenoidsState(hph.get(), status);
+  HAL_SendREVPHSolenoidsState(hph.get(), status);
 
   return handle;
 }
@@ -251,7 +253,7 @@ HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
     return false;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return false;
@@ -333,7 +335,7 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
     return HAL_REVPHCompressorConfigType_kDisabled;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return HAL_REVPHCompressorConfigType_kDisabled;
@@ -349,7 +351,7 @@ HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status) {
     return false;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return false;
@@ -365,7 +367,7 @@ double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status) {
     return 0;
   }
 
-  PH_status_1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
@@ -389,7 +391,7 @@ double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
     return 0;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
@@ -401,6 +403,109 @@ double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
   return PH_status_0_analog_1_decode(status0.analog_1);
 }
 
+double HAL_GetREVPHVoltage(HAL_REVPHHandle handle, int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
+
+  if (*status != 0) {
+    return 0;
+  }
+
+  return PH_status_1_v_bus_decode(status1.v_bus);
+}
+
+double HAL_GetREVPH5VVoltage(HAL_REVPHHandle handle, int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
+
+  if (*status != 0) {
+    return 0;
+  }
+
+  return PH_status_1_supply_voltage_5_v_decode(status1.supply_voltage_5_v);
+}
+
+double HAL_GetREVPHSolenoidCurrent(HAL_REVPHHandle handle, int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
+
+  if (*status != 0) {
+    return 0;
+  }
+
+  return PH_status_1_solenoid_current_decode(status1.solenoid_current);
+}
+
+double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
+
+  if (*status != 0) {
+    return 0;
+  }
+
+  return PH_status_1_solenoid_voltage_decode(status1.solenoid_voltage);
+}
+
+HAL_REVPHVersion HAL_GetREVPHVersion(HAL_REVPHHandle handle, int32_t* status) {
+  HAL_REVPHVersion version;
+  std::memset(&version, 0, sizeof(version));
+  uint8_t packedData[8] = {0};
+  int32_t length = 0;
+  uint64_t timestamp = 0;
+  PH_version_t result = {};
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return version;
+  }
+
+  HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_LENGTH, PH_VERSION_FRAME_API,
+                       status);
+
+  if (*status != 0) {
+    return version;
+  }
+
+  HAL_ReadCANPacketTimeout(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
+                           &timestamp, kDefaultControlPeriod * 2, status);
+
+  if (*status != 0) {
+    return version;
+  }
+
+  PH_version_unpack(&result, packedData, PH_VERSION_LENGTH);
+
+  version.firmwareMajor = result.firmware_year;
+  version.firmwareMinor = result.firmware_minor;
+  version.firmwareFix = result.firmware_fix;
+  version.hardwareMinor = result.hardware_minor;
+  version.hardwareMajor = result.hardware_major;
+  version.uniqueId = result.unique_id;
+
+  return version;
+}
+
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
@@ -408,7 +513,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
     return 0;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
 
   if (*status != 0) {
     return 0;
@@ -448,11 +553,11 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
       // The mask bit for the solenoid is set, so we update the solenoid state
       REV_SolenoidState desiredSolenoidState =
           values & (1 << solenoid) ? kSolenoidEnabled : kSolenoidDisabled;
-      HAL_REV_UpdateDesiredPHSolenoidState(ph.get(), solenoid,
-                                           desiredSolenoidState);
+      HAL_UpdateDesiredREVPHSolenoidState(ph.get(), solenoid,
+                                          desiredSolenoidState);
     }
   }
-  HAL_REV_SendSolenoidsState(ph.get(), status);
+  HAL_SendREVPHSolenoidsState(ph.get(), status);
 }
 
 void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
@@ -471,7 +576,7 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
     return;
   }
 
-  if (!HAL_REV_CheckPHPulseTime(durMs)) {
+  if (!HAL_CheckREVPHPulseTime(durMs)) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(
         status,
@@ -482,9 +587,9 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
 
   {
     std::scoped_lock lock{ph->solenoidLock};
-    HAL_REV_UpdateDesiredPHSolenoidState(ph.get(), index,
-                                         kSolenoidControlledViaPulse);
-    HAL_REV_SendSolenoidsState(ph.get(), status);
+    HAL_UpdateDesiredREVPHSolenoidState(ph.get(), index,
+                                        kSolenoidControlledViaPulse);
+    HAL_SendREVPHSolenoidsState(ph.get(), status);
   }
 
   if (*status != 0) {
@@ -563,7 +668,7 @@ HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status) {
     return faults;
   }
 
-  PH_status_0_t status0 = HAL_REV_ReadPHStatus0(ph->hcan, status);
+  PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
   faults.channel0Fault = status0.channel_0_fault;
   faults.channel1Fault = status0.channel_1_fault;
   faults.channel2Fault = status0.channel_2_fault;
@@ -599,7 +704,7 @@ HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
     return stickyFaults;
   }
 
-  PH_status_1_t status1 = HAL_REV_ReadPHStatus1(ph->hcan, status);
+  PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
   stickyFaults.compressorOverCurrent = status1.sticky_compressor_oc_fault;
   stickyFaults.compressorOpen = status1.sticky_compressor_open_fault;
   stickyFaults.solenoidOverCurrent = status1.sticky_solenoid_oc_fault;
@@ -609,4 +714,16 @@ HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
   stickyFaults.hasReset = status1.sticky_has_reset_fault;
 
   return stickyFaults;
+}
+
+void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {
+  auto ph = REVPHHandles->Get(handle);
+  if (ph == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  uint8_t packedData[8] = {0};
+  HAL_WriteCANPacket(ph->hcan, packedData, PH_CLEAR_FAULTS_LENGTH,
+                     PH_CLEAR_FAULTS_FRAME_API, status);
 }
