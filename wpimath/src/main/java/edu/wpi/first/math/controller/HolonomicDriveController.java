@@ -6,8 +6,12 @@ package edu.wpi.first.math.controller;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
  * This holonomic drive controller can be used to follow trajectories using a holonomic drivetrain
@@ -21,10 +25,14 @@ import edu.wpi.first.math.trajectory.Trajectory;
  * point toward. This heading reference is profiled for smoothness.
  */
 @SuppressWarnings("MemberName")
-public class HolonomicDriveController {
+public class HolonomicDriveController implements Sendable {
   private Pose2d m_poseError = new Pose2d();
   private Rotation2d m_rotationError = new Rotation2d();
   private Pose2d m_poseTolerance = new Pose2d();
+  private Pose2d m_measurement = new Pose2d();
+  private Pose2d m_poseReference = new Pose2d();
+  private Rotation2d m_headingReference = new Rotation2d();
+
   private boolean m_enabled = true;
 
   private final PIDController m_xController;
@@ -46,6 +54,8 @@ public class HolonomicDriveController {
     m_xController = xController;
     m_yController = yController;
     m_thetaController = thetaController;
+
+    SendableRegistry.addChild(this, m_xController, m_yController, m_thetaController);
   }
 
   /**
@@ -73,17 +83,47 @@ public class HolonomicDriveController {
   }
 
   /**
+   * Gets the pose error which is considered tolerable by atReference().
+   *
+   * @return Pose error which is tolerable.
+   */
+  public Pose2d getTolerance() {
+    return m_poseTolerance;
+  }
+
+  /**
+   * Gets the current pose error.
+   *
+   * @return Most recent pose error.
+   */
+  public Pose2d getError() {
+    return m_poseError;
+  }
+
+  /**
+   * Gets the current pose measurement.
+   *
+   * @return Most recent pose measurement.
+   */
+  public Pose2d getMeasurement() {
+    return m_measurement;
+  }
+
+  /**
    * Returns the next output of the holonomic drive controller.
    *
    * @param currentPose The current pose.
    * @param poseRef The desired pose.
-   * @param linearVelocityRefMeters The linear velocity reference.
-   * @param angleRef The angular reference.
+   * @param linearVelocityRefMeters The desired heading (the heading of poseRef is ignored).
+   * @param headingRef The desired heading.
    * @return The next output of the holonomic drive controller.
    */
   @SuppressWarnings("LocalVariableName")
   public ChassisSpeeds calculate(
-      Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d angleRef) {
+      Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters, Rotation2d headingRef) {
+    m_measurement = currentPose;
+    m_poseReference = poseRef;
+    m_headingReference = headingRef;
     // If this is the first run, then we need to reset the theta controller to the current pose's
     // heading.
     if (m_firstRun) {
@@ -94,11 +134,11 @@ public class HolonomicDriveController {
     // Calculate feedforward velocities (field-relative).
     double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
     double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
-    double thetaFF =
-        m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
+    double thetaFF = m_thetaController.calculate(
+            currentPose.getRotation().getRadians(), headingRef.getRadians());
 
     m_poseError = poseRef.relativeTo(currentPose);
-    m_rotationError = angleRef.minus(currentPose.getRotation());
+    m_rotationError = headingRef.minus(currentPose.getRotation());
 
     if (!m_enabled) {
       return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());
@@ -135,5 +175,41 @@ public class HolonomicDriveController {
    */
   public void setEnabled(boolean enabled) {
     m_enabled = enabled;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("HolonomicDriveController");
+    builder.addDoubleProperty("toleranceX",
+            () -> m_poseTolerance.getX(),
+            x -> setTolerance(new Pose2d(new Translation2d(x, m_poseTolerance.getY()),
+                    m_poseTolerance.getRotation())));
+    builder.addDoubleProperty("toleranceY",
+            () -> m_poseTolerance.getY(),
+            y -> setTolerance(new Pose2d(new Translation2d(m_poseTolerance.getX(), y),
+                    m_poseTolerance.getRotation())));
+    builder.addDoubleProperty("toleranceDegrees",
+            () -> m_poseTolerance.getRotation().getDegrees(),
+            rotation -> setTolerance(new Pose2d(m_poseTolerance.getTranslation(),
+                    Rotation2d.fromDegrees(rotation))));
+    builder.addDoubleProperty("referenceX",
+            () -> m_poseReference.getX(), null);
+    builder.addDoubleProperty("referenceY",
+            () -> m_poseReference.getY(), null);
+    builder.addDoubleProperty("referenceDegrees",
+            () -> m_headingReference.getDegrees(), null);
+    builder.addDoubleProperty("measurementX",
+            () -> m_measurement.getX(), null);
+    builder.addDoubleProperty("measurementY",
+            () -> m_measurement.getY(), null);
+    builder.addDoubleProperty("measurementDegrees",
+            () -> m_measurement.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("errorX",
+            () -> m_poseError.getX(), null);
+    builder.addDoubleProperty("errorY",
+            () -> m_poseError.getY(), null);
+    builder.addDoubleProperty("errorDegrees",
+            () -> m_poseError.getRotation().getDegrees(), null);
+    builder.addBooleanProperty("atReference", this::atReference, null);
   }
 }

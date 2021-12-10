@@ -5,6 +5,8 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "frc/controller/PIDController.h"
 #include "frc/controller/ProfiledPIDController.h"
@@ -29,7 +31,9 @@ namespace frc {
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
-class WPILIB_DLLEXPORT HolonomicDriveController {
+class WPILIB_DLLEXPORT HolonomicDriveController:
+      public wpi::Sendable,
+      public wpi::SendableHelper<HolonomicDriveController> {
  public:
   /**
    * Constructs a holonomic drive controller.
@@ -57,6 +61,27 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * @param tolerance Pose error which is tolerable.
    */
   void SetTolerance(const Pose2d& tolerance);
+
+  /**
+   * Gets the pose error which is considered tolerable by atReference().
+   *
+   * @return Pose error which is tolerable.
+   */
+  Pose2d GetTolerance() const;
+
+  /**
+   * Gets the current pose error.
+   *
+   * @return Most recent pose error.
+   */
+  Pose2d GetError() const;
+
+  /**
+   * Gets the current pose measurement.
+   *
+   * @return Most recent pose measurement.
+   */
+  Pose2d GetMeasurement() const;
 
   /**
    * Returns the next output of the holonomic drive controller.
@@ -97,10 +122,15 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    */
   void SetEnabled(bool enabled);
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   Pose2d m_poseError;
   Rotation2d m_rotationError;
   Pose2d m_poseTolerance;
+  Pose2d m_measurement;
+  Pose2d m_poseReference;
+  Rotation2d m_headingReference;
   bool m_enabled = true;
 
   frc2::PIDController m_xController;

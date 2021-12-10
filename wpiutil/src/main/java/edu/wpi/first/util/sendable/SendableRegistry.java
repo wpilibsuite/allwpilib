@@ -193,15 +193,17 @@ public class SendableRegistry {
    * present.
    *
    * @param parent parent object
-   * @param child child object
+   * @param children object
    */
-  public static synchronized void addChild(Sendable parent, Object child) {
-    Component comp = components.get(child);
-    if (comp == null) {
-      comp = new Component();
-      components.put(child, comp);
+  public static synchronized void addChild(Sendable parent, Object... children) {
+    for (var child : children) {
+      Component comp = components.get(child);
+      if (comp == null) {
+        comp = new Component();
+        components.put(child, comp);
+      }
+      comp.m_parent = new WeakReference<>(parent);
     }
-    comp.m_parent = new WeakReference<>(parent);
   }
 
   /**
@@ -462,7 +464,7 @@ public class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
