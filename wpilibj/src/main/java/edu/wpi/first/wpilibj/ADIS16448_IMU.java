@@ -13,33 +13,19 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import java.nio.ByteBuffer;
 
-/**
- * This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port.
- */
+/** This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port. */
 @SuppressWarnings("unused")
 public class ADIS16448_IMU implements Gyro, NTSendable {
-  /**
-   * ADIS16448 Register Map Declaration
-   */
+  /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
+
   private static final int XGYRO_OUT = 0x04; // X-axis gyroscope output
   private static final int YGYRO_OUT = 0x06; // Y-axis gyroscope output
   private static final int ZGYRO_OUT = 0x08; // Z-axis gyroscope output
@@ -81,7 +67,9 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   private static final int SERIAL_NUM = 0x58; // Lot-specific serial number
 
   public enum IMUAxis {
-    kX, kY, kZ
+    kX,
+    kY,
+    kZ
   }
 
   // * Static Constants */
@@ -152,40 +140,41 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   long previous_timestamp = 0;
 
   /* CRC-16 Look-Up Table */
-  int adiscrc[] = new int[] {
-      0x0000, 0x17CE, 0x0FDF, 0x1811, 0x1FBE, 0x0870, 0x1061, 0x07AF,
-      0x1F3F, 0x08F1, 0x10E0, 0x072E, 0x0081, 0x174F, 0x0F5E, 0x1890,
-      0x1E3D, 0x09F3, 0x11E2, 0x062C, 0x0183, 0x164D, 0x0E5C, 0x1992,
-      0x0102, 0x16CC, 0x0EDD, 0x1913, 0x1EBC, 0x0972, 0x1163, 0x06AD,
-      0x1C39, 0x0BF7, 0x13E6, 0x0428, 0x0387, 0x1449, 0x0C58, 0x1B96,
-      0x0306, 0x14C8, 0x0CD9, 0x1B17, 0x1CB8, 0x0B76, 0x1367, 0x04A9,
-      0x0204, 0x15CA, 0x0DDB, 0x1A15, 0x1DBA, 0x0A74, 0x1265, 0x05AB,
-      0x1D3B, 0x0AF5, 0x12E4, 0x052A, 0x0285, 0x154B, 0x0D5A, 0x1A94,
-      0x1831, 0x0FFF, 0x17EE, 0x0020, 0x078F, 0x1041, 0x0850, 0x1F9E,
-      0x070E, 0x10C0, 0x08D1, 0x1F1F, 0x18B0, 0x0F7E, 0x176F, 0x00A1,
-      0x060C, 0x11C2, 0x09D3, 0x1E1D, 0x19B2, 0x0E7C, 0x166D, 0x01A3,
-      0x1933, 0x0EFD, 0x16EC, 0x0122, 0x068D, 0x1143, 0x0952, 0x1E9C,
-      0x0408, 0x13C6, 0x0BD7, 0x1C19, 0x1BB6, 0x0C78, 0x1469, 0x03A7,
-      0x1B37, 0x0CF9, 0x14E8, 0x0326, 0x0489, 0x1347, 0x0B56, 0x1C98,
-      0x1A35, 0x0DFB, 0x15EA, 0x0224, 0x058B, 0x1245, 0x0A54, 0x1D9A,
-      0x050A, 0x12C4, 0x0AD5, 0x1D1B, 0x1AB4, 0x0D7A, 0x156B, 0x02A5,
-      0x1021, 0x07EF, 0x1FFE, 0x0830, 0x0F9F, 0x1851, 0x0040, 0x178E,
-      0x0F1E, 0x18D0, 0x00C1, 0x170F, 0x10A0, 0x076E, 0x1F7F, 0x08B1,
-      0x0E1C, 0x19D2, 0x01C3, 0x160D, 0x11A2, 0x066C, 0x1E7D, 0x09B3,
-      0x1123, 0x06ED, 0x1EFC, 0x0932, 0x0E9D, 0x1953, 0x0142, 0x168C,
-      0x0C18, 0x1BD6, 0x03C7, 0x1409, 0x13A6, 0x0468, 0x1C79, 0x0BB7,
-      0x1327, 0x04E9, 0x1CF8, 0x0B36, 0x0C99, 0x1B57, 0x0346, 0x1488,
-      0x1225, 0x05EB, 0x1DFA, 0x0A34, 0x0D9B, 0x1A55, 0x0244, 0x158A,
-      0x0D1A, 0x1AD4, 0x02C5, 0x150B, 0x12A4, 0x056A, 0x1D7B, 0x0AB5,
-      0x0810, 0x1FDE, 0x07CF, 0x1001, 0x17AE, 0x0060, 0x1871, 0x0FBF,
-      0x172F, 0x00E1, 0x18F0, 0x0F3E, 0x0891, 0x1F5F, 0x074E, 0x1080,
-      0x162D, 0x01E3, 0x19F2, 0x0E3C, 0x0993, 0x1E5D, 0x064C, 0x1182,
-      0x0912, 0x1EDC, 0x06CD, 0x1103, 0x16AC, 0x0162, 0x1973, 0x0EBD,
-      0x1429, 0x03E7, 0x1BF6, 0x0C38, 0x0B97, 0x1C59, 0x0448, 0x1386,
-      0x0B16, 0x1CD8, 0x04C9, 0x1307, 0x14A8, 0x0366, 0x1B77, 0x0CB9,
-      0x0A14, 0x1DDA, 0x05CB, 0x1205, 0x15AA, 0x0264, 0x1A75, 0x0DBB,
-      0x152B, 0x02E5, 0x1AF4, 0x0D3A, 0x0A95, 0x1D5B, 0x054A, 0x1284
-  };
+  int adiscrc[] =
+      new int[] {
+        0x0000, 0x17CE, 0x0FDF, 0x1811, 0x1FBE, 0x0870, 0x1061, 0x07AF,
+        0x1F3F, 0x08F1, 0x10E0, 0x072E, 0x0081, 0x174F, 0x0F5E, 0x1890,
+        0x1E3D, 0x09F3, 0x11E2, 0x062C, 0x0183, 0x164D, 0x0E5C, 0x1992,
+        0x0102, 0x16CC, 0x0EDD, 0x1913, 0x1EBC, 0x0972, 0x1163, 0x06AD,
+        0x1C39, 0x0BF7, 0x13E6, 0x0428, 0x0387, 0x1449, 0x0C58, 0x1B96,
+        0x0306, 0x14C8, 0x0CD9, 0x1B17, 0x1CB8, 0x0B76, 0x1367, 0x04A9,
+        0x0204, 0x15CA, 0x0DDB, 0x1A15, 0x1DBA, 0x0A74, 0x1265, 0x05AB,
+        0x1D3B, 0x0AF5, 0x12E4, 0x052A, 0x0285, 0x154B, 0x0D5A, 0x1A94,
+        0x1831, 0x0FFF, 0x17EE, 0x0020, 0x078F, 0x1041, 0x0850, 0x1F9E,
+        0x070E, 0x10C0, 0x08D1, 0x1F1F, 0x18B0, 0x0F7E, 0x176F, 0x00A1,
+        0x060C, 0x11C2, 0x09D3, 0x1E1D, 0x19B2, 0x0E7C, 0x166D, 0x01A3,
+        0x1933, 0x0EFD, 0x16EC, 0x0122, 0x068D, 0x1143, 0x0952, 0x1E9C,
+        0x0408, 0x13C6, 0x0BD7, 0x1C19, 0x1BB6, 0x0C78, 0x1469, 0x03A7,
+        0x1B37, 0x0CF9, 0x14E8, 0x0326, 0x0489, 0x1347, 0x0B56, 0x1C98,
+        0x1A35, 0x0DFB, 0x15EA, 0x0224, 0x058B, 0x1245, 0x0A54, 0x1D9A,
+        0x050A, 0x12C4, 0x0AD5, 0x1D1B, 0x1AB4, 0x0D7A, 0x156B, 0x02A5,
+        0x1021, 0x07EF, 0x1FFE, 0x0830, 0x0F9F, 0x1851, 0x0040, 0x178E,
+        0x0F1E, 0x18D0, 0x00C1, 0x170F, 0x10A0, 0x076E, 0x1F7F, 0x08B1,
+        0x0E1C, 0x19D2, 0x01C3, 0x160D, 0x11A2, 0x066C, 0x1E7D, 0x09B3,
+        0x1123, 0x06ED, 0x1EFC, 0x0932, 0x0E9D, 0x1953, 0x0142, 0x168C,
+        0x0C18, 0x1BD6, 0x03C7, 0x1409, 0x13A6, 0x0468, 0x1C79, 0x0BB7,
+        0x1327, 0x04E9, 0x1CF8, 0x0B36, 0x0C99, 0x1B57, 0x0346, 0x1488,
+        0x1225, 0x05EB, 0x1DFA, 0x0A34, 0x0D9B, 0x1A55, 0x0244, 0x158A,
+        0x0D1A, 0x1AD4, 0x02C5, 0x150B, 0x12A4, 0x056A, 0x1D7B, 0x0AB5,
+        0x0810, 0x1FDE, 0x07CF, 0x1001, 0x17AE, 0x0060, 0x1871, 0x0FBF,
+        0x172F, 0x00E1, 0x18F0, 0x0F3E, 0x0891, 0x1F5F, 0x074E, 0x1080,
+        0x162D, 0x01E3, 0x19F2, 0x0E3C, 0x0993, 0x1E5D, 0x064C, 0x1182,
+        0x0912, 0x1EDC, 0x06CD, 0x1103, 0x16AC, 0x0162, 0x1973, 0x0EBD,
+        0x1429, 0x03E7, 0x1BF6, 0x0C38, 0x0B97, 0x1C59, 0x0448, 0x1386,
+        0x0B16, 0x1CD8, 0x04C9, 0x1307, 0x14A8, 0x0366, 0x1B77, 0x0CB9,
+        0x0A14, 0x1DDA, 0x05CB, 0x1205, 0x15AA, 0x0264, 0x1A75, 0x0DBB,
+        0x152B, 0x02E5, 0x1AF4, 0x0D3A, 0x0A95, 0x1D5B, 0x054A, 0x1284
+      };
 
   private static class AcquireTask implements Runnable {
     private final ADIS16448_IMU imu;
@@ -204,9 +193,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     this(IMUAxis.kZ, SPI.Port.kMXP, 4);
   }
 
-  /**
-   *
-   */
+  /** */
   public ADIS16448_IMU(final IMUAxis yaw_axis, SPI.Port port, int cal_time) {
     m_yaw_axis = yaw_axis;
     m_spi_port = port;
@@ -242,7 +229,8 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       return;
     }
     // Notify DS that IMU calibration delay is active
-    DriverStation.reportWarning("ADIS16448 IMU Detected. Starting initial calibration delay.", false);
+    DriverStation.reportWarning(
+        "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
     // Wait for whatever time the user set as the start-up delay
     try {
       Thread.sleep((long) (m_calibration_time * 1.2 * 1000));
@@ -262,16 +250,12 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     HAL.report(tResourceType.kResourceType_ADIS16448, 0);
   }
 
-  /**
-   *
-   */
+  /** */
   private static int toUShort(ByteBuffer buf) {
     return (buf.getShort(0)) & 0xFFFF;
   }
 
-  /**
-   *
-   */
+  /** */
   private static int toUShort(byte[] buf) {
     return (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
   }
@@ -284,37 +268,28 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return (((buf[0] & 0xFF) << 8) + (buf[1] & 0xFF));
   }
 
-  /**
-   *
-   */
+  /** */
   private static long toULong(int sint) {
     return sint & 0x00000000FFFFFFFFL;
   }
 
-  /**
-   *
-   */
+  /** */
   private static int toShort(int... buf) {
     return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
   }
 
-  /**
-   *
-   */
+  /** */
   private static int toShort(byte[] buf) {
     return buf[0] << 8 | buf[1];
   }
 
-  /**
-   *
-   */
+  /** */
   private static int toInt(int... buf) {
-    return (int) ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
+    return (int)
+        ((buf[0] & 0xFF) << 24 | (buf[1] & 0xFF) << 16 | (buf[2] & 0xFF) << 8 | (buf[3] & 0xFF));
   }
 
-  /**
-   *
-   */
+  /** */
   private boolean switchToStandardSPI() {
     // Check to see whether the acquire thread is active. If so, wait for it to stop
     // producing data.
@@ -346,7 +321,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
           m_spi.readAutoReceivedData(trashBuffer, Math.min(200, data_count), 0);
           /* Update remaining buffer count */
           data_count = m_spi.readAutoReceivedData(trashBuffer, 0, 0);
-
         }
         System.out.println("Paused auto SPI successfully.");
       }
@@ -383,9 +357,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /**
-   *
-   */
+  /** */
   boolean switchToAutoSPI() {
     // No SPI port has been set up. Go set one up first.
     if (m_spi == null) {
@@ -405,7 +377,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       m_auto_configured = true;
     }
     // Set auto SPI packet data and size
-    m_spi.setAutoTransmitData(new byte[] { GLOB_CMD }, 27);
+    m_spi.setAutoTransmitData(new byte[] {GLOB_CMD}, 27);
     // Configure auto stall time
     m_spi.configureAutoStall(100, 1000, 255);
     // Kick off auto SPI (Note: Device configration impossible after auto SPI is
@@ -444,11 +416,13 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
 
     /* Check max */
     if (m_decRate > 9) {
-      DriverStation.reportError("Attemted to write an invalid decimation value. Capping at 9", false);
+      DriverStation.reportError(
+          "Attemted to write an invalid decimation value. Capping at 9", false);
       m_decRate = 9;
     }
     if (m_decRate < 0) {
-      DriverStation.reportError("Attemted to write an invalid decimation value. Capping at 0", false);
+      DriverStation.reportError(
+          "Attemted to write an invalid decimation value. Capping at 0", false);
       m_decRate = 0;
     }
 
@@ -473,9 +447,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return 0;
   }
 
-  /**
-   *
-   */
+  /** */
   public int configCalTime(int new_cal_time) {
     if (m_calibration_time == new_cal_time) {
       return 1;
@@ -502,9 +474,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     m_accum_count = 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   @Override
   public void calibrate() {
     synchronized (this) {
@@ -562,9 +532,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     m_spi.write(buf, 2);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
       m_integ_gyro_x = 0.0;
@@ -573,9 +541,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /**
-   * Delete (free) the spi port used for the IMU.
-   */
+  /** Delete (free) the spi port used for the IMU. */
   @Override
   public void close() {
     if (m_thread_active) {
@@ -603,9 +569,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     System.out.println("Finished cleaning up after the IMU driver.");
   }
 
-  /**
-  *
-  */
+  /** */
   private void acquire() {
     // Set data packet length
     final int dataset_len = 29; // 18 data points + timestamp
@@ -651,14 +615,19 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       if (m_thread_active) {
         m_thread_idle = false;
 
-        data_count = m_spi.readAutoReceivedData(buffer, 0, 0); // Read number of bytes currently stored in the buffer
-        data_remainder = data_count % dataset_len; // Check if frame is incomplete. Add 1 because of timestamp
+        data_count =
+            m_spi.readAutoReceivedData(
+                buffer, 0, 0); // Read number of bytes currently stored in the buffer
+        data_remainder =
+            data_count % dataset_len; // Check if frame is incomplete. Add 1 because of timestamp
         data_to_read = data_count - data_remainder; // Remove incomplete data from read count
         if (data_to_read > BUFFER_SIZE) {
-          DriverStation.reportWarning("ADIS16448 data processing thread overrun has occurred!", false);
+          DriverStation.reportWarning(
+              "ADIS16448 data processing thread overrun has occurred!", false);
           data_to_read = BUFFER_SIZE - (BUFFER_SIZE % dataset_len);
         }
-        m_spi.readAutoReceivedData(buffer, data_to_read, 0); // Read data from DMA buffer (only complete sets)
+        m_spi.readAutoReceivedData(
+            buffer, data_to_read, 0); // Read data from DMA buffer (only complete sets)
 
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
@@ -666,8 +635,10 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
           int calc_crc = 0x0000FFFF; // Starting word
           int read_byte = 0;
           int imu_crc = 0;
-          for (int k = 5; k < 27; k += 2) { // Cycle through XYZ GYRO, XYZ ACCEL, XYZ MAG, BARO, TEMP (Ignore Status &
-                                            // CRC)
+          for (int k = 5;
+              k < 27;
+              k += 2) { // Cycle through XYZ GYRO, XYZ ACCEL, XYZ MAG, BARO, TEMP (Ignore Status &
+            // CRC)
             read_byte = buffer[i + k + 1]; // Process LSB
             calc_crc = (calc_crc >>> 8) ^ adiscrc[(calc_crc & 0x000000FF) ^ read_byte];
             read_byte = buffer[i + k]; // Process MSB
@@ -709,16 +680,26 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
             // Calculate complementary filter
             if (m_first_run) {
               // Set up inclinometer calculations for first run
-              accelAngleX = Math.atan2(-accel_x_si, Math.sqrt((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
-              accelAngleY = Math.atan2(accel_y_si,
-                  Math.sqrt((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
+              accelAngleX =
+                  Math.atan2(
+                      -accel_x_si,
+                      Math.sqrt((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
+              accelAngleY =
+                  Math.atan2(
+                      accel_y_si,
+                      Math.sqrt((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
               compAngleX = accelAngleX;
               compAngleY = accelAngleY;
             } else {
               // Run inclinometer calculations
-              accelAngleX = Math.atan2(-accel_x_si, Math.sqrt((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
-              accelAngleY = Math.atan2(accel_y_si,
-                  Math.sqrt((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
+              accelAngleX =
+                  Math.atan2(
+                      -accel_x_si,
+                      Math.sqrt((accel_y_si * accel_y_si) + (-accel_z_si * -accel_z_si)));
+              accelAngleY =
+                  Math.atan2(
+                      accel_y_si,
+                      Math.sqrt((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
               accelAngleX = formatAccelRange(accelAngleX, -accel_z_si);
               accelAngleY = formatAccelRange(accelAngleY, -accel_z_si);
               compAngleX = compFilterProcess(compAngleX, accelAngleX, -gyro_y_si);
@@ -823,7 +804,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   /**
-   *
    * @param compAngle
    * @param accAngle
    * @return
@@ -838,7 +818,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   /**
-   *
    * @param compAngle
    * @return
    */
@@ -853,7 +832,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   /**
-   *
    * @param accelAngle
    * @param accelZ
    * @return
@@ -868,7 +846,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   /**
-   *
    * @param compAngle
    * @param accelAngle
    * @param omega
@@ -884,9 +861,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return compAngle;
   }
 
-  /**
-   *
-   */
+  /** */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -900,9 +875,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /**
-   *
-   */
+  /** */
   public synchronized double getRate() {
     switch (m_yaw_axis) {
       case kX:
@@ -916,154 +889,97 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroAngleX() {
     return m_integ_gyro_x;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroAngleY() {
     return m_integ_gyro_y;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroAngleZ() {
     return m_integ_gyro_z;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroInstantX() {
     return m_gyro_x;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroInstantY() {
     return m_gyro_y;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getGyroInstantZ() {
     return m_gyro_z;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getAccelInstantX() {
     return m_accel_x;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getAccelInstantY() {
     return m_accel_y;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getAccelInstantZ() {
     return m_accel_z;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getMagInstantX() {
     return m_mag_x;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getMagInstantY() {
     return m_mag_y;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getMagInstantZ() {
     return m_mag_z;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getBarometricPressure() {
     return m_baro;
   }
 
-  /**
-   *
-   * @return
-   */
+  /** @return */
   public synchronized double getTemperature() {
     return m_temp;
   }
@@ -1073,5 +989,4 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     builder.setSmartDashboardType("Gyro");
     builder.addDoubleProperty("Value", this::getAngle, null);
   }
-
 }
