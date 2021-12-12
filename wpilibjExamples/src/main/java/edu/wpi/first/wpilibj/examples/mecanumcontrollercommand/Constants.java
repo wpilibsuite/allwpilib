@@ -55,8 +55,7 @@ public final class Constants {
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
     // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
-    // values for your robot.
+    // The SysId tool provides a convenient method for obtaining these values for your robot.
     public static final SimpleMotorFeedforward kFeedforward =
         new SimpleMotorFeedforward(1, 0.8, 0.15);
 

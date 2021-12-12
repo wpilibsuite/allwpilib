@@ -28,9 +28,8 @@ constexpr int kRightMotor2Port = 3;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
-// theoretically for *your* robot's drive. The RobotPy Characterization
-// Toolsuite provides a convenient tool for obtaining these values for your
-// robot.
+// theoretically for *your* robot's drive. The SysId tool provides a convenient
+// method for obtaining these values for your robot.
 constexpr auto ks = 1_V;
 constexpr auto kv = 0.8_V * 1_s / 1_m;
 constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
