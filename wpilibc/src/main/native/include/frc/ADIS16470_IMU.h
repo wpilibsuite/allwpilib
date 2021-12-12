@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2016-2020 Analog Devices Inc. All Rights Reserved.           */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -9,19 +13,20 @@
 
 #pragma once
 
+#include <frc/DigitalInput.h>
+#include <frc/DigitalOutput.h>
+#include <frc/DigitalSource.h>
+#include <frc/SPI.h>
+#include <stdint.h>
+
 #include <atomic>
-#include <cstdint>
 #include <memory>
 #include <thread>
 
-#include <frc/DigitalOutput.h>
-#include <frc/DigitalSource.h>
-#include <frc/DigitalInput.h>
 #include <networktables/NTSendable.h>
-#include <wpi/sendable/SendableHelper.h>
-#include <frc/SPI.h>
-#include <wpi/mutex.h>
 #include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/sendable/SendableHelper.h>
 
 // Not always defined in cmath (not part of standard)
 #ifndef M_PI
