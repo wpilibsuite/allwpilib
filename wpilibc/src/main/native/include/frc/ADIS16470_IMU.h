@@ -28,11 +28,6 @@
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
 
-// Not always defined in cmath (not part of standard)
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 namespace frc {
 
 /* ADIS16470 Calibration Time Enum Class */

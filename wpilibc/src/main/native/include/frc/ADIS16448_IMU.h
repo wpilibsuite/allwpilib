@@ -141,7 +141,7 @@ class ADIS16448_IMU : public nt::NTSendable,
    */
   explicit ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port, uint16_t cal_time);
 
-  ~ADIS16448_IMU();
+  ~ADIS16448_IMU() override;
 
   ADIS16448_IMU(ADIS16448_IMU&&) = default;
   ADIS16448_IMU& operator=(ADIS16448_IMU&&) = default;
@@ -320,7 +320,7 @@ class ADIS16448_IMU : public nt::NTSendable,
   mutable wpi::mutex m_mutex;
 
   // CRC-16 Look-Up Table
-  const uint16_t adiscrc[256] = {
+  static constexpr uint16_t adiscrc[256] = {
       0x0000, 0x17CE, 0x0FDF, 0x1811, 0x1FBE, 0x0870, 0x1061, 0x07AF, 0x1F3F,
       0x08F1, 0x10E0, 0x072E, 0x0081, 0x174F, 0x0F5E, 0x1890, 0x1E3D, 0x09F3,
       0x11E2, 0x062C, 0x0183, 0x164D, 0x0E5C, 0x1992, 0x0102, 0x16CC, 0x0EDD,

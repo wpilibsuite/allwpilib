@@ -41,7 +41,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 @SuppressWarnings("unused")
 public class ADIS16470_IMU implements Gyro, NTSendable {
-
     /* ADIS16470 Register Map Declaration */
     private static final int FLASH_CNT = 0x00; // Flash memory write count
     private static final int DIAG_STAT = 0x02; // Diagnostic and operational status
@@ -698,7 +697,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
         double accelAngleY = 0.0;
 
         while (true) {
-
             // Sleep loop for 10ms
             try {
                 Thread.sleep(10);
@@ -706,7 +704,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
             }
 
             if (m_thread_active) {
-
                 m_thread_idle = false;
 
                 data_count = m_spi.readAutoReceivedData(buffer, 0, 0); // Read number of bytes currently stored in the

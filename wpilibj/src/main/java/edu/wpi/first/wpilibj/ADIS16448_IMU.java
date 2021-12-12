@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 @SuppressWarnings("unused")
 public class ADIS16448_IMU implements Gyro, NTSendable {
-
   /**
    * ADIS16448 Register Map Declaration
    */
@@ -643,7 +642,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     double accelAngleY = 0.0;
 
     while (true) {
-
       // Sleep loop for 5ms
       try {
         Thread.sleep(5);
@@ -651,7 +649,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       }
 
       if (m_thread_active) {
-
         m_thread_idle = false;
 
         data_count = m_spi.readAutoReceivedData(buffer, 0, 0); // Read number of bytes currently stored in the buffer
@@ -665,7 +662,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
 
         // Could be multiple data sets in the buffer. Handle each one.
         for (int i = 0; i < data_to_read; i += dataset_len) {
-
           // Calculate CRC-16 on each data packet
           int calc_crc = 0x0000FFFF; // Starting word
           int read_byte = 0;
