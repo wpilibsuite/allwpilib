@@ -188,10 +188,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *     positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
-   *     maneuvers.
+   *     maneuvers. zRotation will control turning rate instead of curvature.
    */
   @SuppressWarnings("ParameterName")
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
@@ -313,10 +312,9 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *     positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
-   *     maneuvers.
+   *     maneuvers. zRotation will control rotation rate around the Z axis instead of curvature.
    * @return Wheel speeds.
    */
   @SuppressWarnings("ParameterName")
