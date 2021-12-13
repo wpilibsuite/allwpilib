@@ -63,6 +63,8 @@ class ConnectionNotifier
                        callback) override;
   unsigned int AddPolled(unsigned int poller_uid) override;
 
+  void Remove(unsigned int uid) override;
+
   void NotifyConnection(bool connected, const ConnectionInfo& conn_info,
                         unsigned int only_listener = UINT_MAX) override;
 

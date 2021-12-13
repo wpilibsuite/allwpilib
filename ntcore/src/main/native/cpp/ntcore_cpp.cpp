@@ -821,6 +821,57 @@ uint64_t Now() {
 }
 
 /*
+ * Data Logger Functions
+ */
+NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
+                                std::string_view prefix,
+                                std::string_view logPrefix) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) {
+    return 0;
+  }
+
+  return Handle(i, ii->storage.StartDataLog(log, prefix, logPrefix),
+                Handle::kDataLogger);
+}
+
+void StopEntryDataLog(NT_DataLogger logger) {
+  Handle handle{logger};
+  int id = handle.GetTypedIndex(Handle::kDataLogger);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) {
+    return;
+  }
+
+  ii->storage.StopDataLog(id);
+}
+
+NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
+                                               wpi::log::DataLog& log,
+                                               std::string_view name) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) {
+    return 0;
+  }
+
+  return Handle(i, ii->dispatcher.StartDataLog(log, name),
+                Handle::kConnectionDataLogger);
+}
+
+void StopConnectionDataLog(NT_ConnectionDataLogger logger) {
+  Handle handle{logger};
+  int id = handle.GetTypedIndex(Handle::kConnectionDataLogger);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) {
+    return;
+  }
+
+  ii->dispatcher.StopDataLog(id);
+}
+
+/*
  * Client/Server Functions
  */
 

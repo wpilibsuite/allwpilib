@@ -4,6 +4,7 @@
 
 package edu.wpi.first.networktables;
 
+import edu.wpi.first.util.datalog.DataLog;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -995,6 +996,50 @@ public final class NetworkTableInstance implements AutoCloseable {
    */
   public String[] loadEntries(String filename, String prefix) throws PersistentException {
     return NetworkTablesJNI.loadEntries(m_handle, filename, prefix);
+  }
+
+  /**
+   * Starts logging entry changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until StopEntryDataLog is called or the
+   *     instance is destroyed
+   * @param prefix only store entries with names that start with this prefix; the prefix is not
+   *     included in the data log entry name
+   * @param logPrefix prefix to add to data log entry names
+   * @return Data logger handle
+   */
+  public int startEntryDataLog(DataLog log, String prefix, String logPrefix) {
+    return NetworkTablesJNI.startEntryDataLog(m_handle, log, prefix, logPrefix);
+  }
+
+  /**
+   * Stops logging entry changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  public static void stopEntryDataLog(int logger) {
+    NetworkTablesJNI.stopEntryDataLog(logger);
+  }
+
+  /**
+   * Starts logging connection changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until StopConnectionDataLog is called or the
+   *     instance is destroyed
+   * @param name data log entry name
+   * @return Data logger handle
+   */
+  public int startConnectionDataLog(DataLog log, String name) {
+    return NetworkTablesJNI.startConnectionDataLog(m_handle, log, name);
+  }
+
+  /**
+   * Stops logging connection changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  public static void stopConnectionDataLog(int logger) {
+    NetworkTablesJNI.stopConnectionDataLog(logger);
   }
 
   private final ReentrantLock m_loggerLock = new ReentrantLock();
