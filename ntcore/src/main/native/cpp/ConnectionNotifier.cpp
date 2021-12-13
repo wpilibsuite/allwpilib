@@ -21,6 +21,10 @@ unsigned int ConnectionNotifier::AddPolled(unsigned int poller_uid) {
   return DoAdd(poller_uid);
 }
 
+void ConnectionNotifier::Remove(unsigned int uid) {
+  CallbackManager::Remove(uid);
+}
+
 void ConnectionNotifier::NotifyConnection(bool connected,
                                           const ConnectionInfo& conn_info,
                                           unsigned int only_listener) {

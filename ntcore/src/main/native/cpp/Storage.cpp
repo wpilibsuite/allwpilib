@@ -4,6 +4,7 @@
 
 #include "Storage.h"
 
+#include <wpi/DataLog.h>
 #include <wpi/StringExtras.h>
 #include <wpi/timestamp.h>
 
@@ -13,6 +14,7 @@
 #include "INetworkConnection.h"
 #include "IRpcServer.h"
 #include "Log.h"
+#include "ntcore_c.h"
 
 using namespace nt;
 
@@ -144,8 +146,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
         entry->seq_num = seq_num;
 
         // notify
-        m_notifier.NotifyEntry(entry->local_id, name, entry->value,
-                               NT_NOTIFY_NEW);
+        Notify(entry, NT_NOTIFY_NEW, false);
         return;
       }
       may_need_update = true;  // we may need to send an update message
@@ -208,7 +209,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
   entry->seq_num = seq_num;
 
   // notify
-  m_notifier.NotifyEntry(entry->local_id, name, entry->value, notify_flags);
+  Notify(entry, notify_flags, false);
 
   // broadcast to all other connections (note for client there won't
   // be any other connections, so don't bother)
@@ -250,8 +251,7 @@ void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
   }
 
   // notify
-  m_notifier.NotifyEntry(entry->local_id, entry->name, entry->value,
-                         NT_NOTIFY_UPDATE);
+  Notify(entry, NT_NOTIFY_UPDATE, false);
 
   // broadcast to all other connections (note for client there won't
   // be any other connections, so don't bother)
@@ -453,8 +453,7 @@ void Storage::ApplyInitialAssignments(
       entry->value = msg->value();
       entry->flags = msg->flags();
       // notify
-      m_notifier.NotifyEntry(entry->local_id, name, entry->value,
-                             NT_NOTIFY_NEW);
+      Notify(entry, NT_NOTIFY_NEW, false);
     } else {
       // if we have written the value locally and the value is not persistent,
       // then we don't update the local value and instead send it back to the
@@ -474,8 +473,7 @@ void Storage::ApplyInitialAssignments(
           entry->flags = msg->flags();
         }
         // notify
-        m_notifier.NotifyEntry(entry->local_id, name, entry->value,
-                               notify_flags);
+        Notify(entry, notify_flags, false);
       }
     }
 
@@ -628,11 +626,9 @@ void Storage::SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
 
   // notify
   if (!old_value) {
-    m_notifier.NotifyEntry(entry->local_id, entry->name, value,
-                           NT_NOTIFY_NEW | (local ? NT_NOTIFY_LOCAL : 0));
+    Notify(entry, NT_NOTIFY_NEW, local);
   } else if (*old_value != *value) {
-    m_notifier.NotifyEntry(entry->local_id, entry->name, value,
-                           NT_NOTIFY_UPDATE | (local ? NT_NOTIFY_LOCAL : 0));
+    Notify(entry, NT_NOTIFY_UPDATE, local);
   }
 
   // remember local changes
@@ -732,8 +728,7 @@ void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
   entry->flags = flags;
 
   // notify
-  m_notifier.NotifyEntry(entry->local_id, entry->name, entry->value,
-                         NT_NOTIFY_FLAGS | (local ? NT_NOTIFY_LOCAL : 0));
+  Notify(entry, NT_NOTIFY_FLAGS, local);
 
   // generate message
   if (!local || !m_dispatcher) {
@@ -817,8 +812,7 @@ void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<wpi::mutex>& lock,
   }
 
   // notify
-  m_notifier.NotifyEntry(entry->local_id, entry->name, old_value,
-                         NT_NOTIFY_DELETE | (local ? NT_NOTIFY_LOCAL : 0));
+  Notify(entry, NT_NOTIFY_DELETE, local, old_value);
 
   // if it had a value, generate message
   // don't send an update if we don't have an assigned id yet
@@ -832,14 +826,160 @@ void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<wpi::mutex>& lock,
   }
 }
 
+static std::string_view GetStorageTypeStr(NT_Type type) {
+  switch (type) {
+    case NT_BOOLEAN:
+      return wpi::log::BooleanLogEntry::kDataType;
+    case NT_DOUBLE:
+      return wpi::log::DoubleLogEntry::kDataType;
+    case NT_STRING:
+      return wpi::log::StringLogEntry::kDataType;
+    case NT_RAW:
+      return wpi::log::RawLogEntry::kDataType;
+    case NT_BOOLEAN_ARRAY:
+      return wpi::log::BooleanArrayLogEntry::kDataType;
+    case NT_DOUBLE_ARRAY:
+      return wpi::log::DoubleArrayLogEntry::kDataType;
+    case NT_STRING_ARRAY:
+      return wpi::log::StringArrayLogEntry::kDataType;
+    default:
+      return {};
+  }
+}
+
+void Storage::Notify(Entry* entry, unsigned int flags, bool local,
+                     std::shared_ptr<Value> value) {
+  auto& v = value ? value : entry->value;
+
+  // notifications
+  m_notifier.NotifyEntry(entry->local_id, entry->name, v,
+                         flags | (local ? NT_NOTIFY_LOCAL : 0));
+
+  if (m_dataloggers.empty()) {
+    return;
+  }
+
+  // data logging
+  // fast path the common case
+  if (entry->datalogs.empty() && (flags & NT_NOTIFY_NEW) == 0) {
+    return;
+  }
+
+  if (flags & NT_NOTIFY_DELETE) {
+    // remove all of the datalog entries
+    auto now = nt::Now();
+    for (auto&& datalog : entry->datalogs) {
+      datalog.log->Finish(datalog.entry, now);
+    }
+    entry->datalogs.clear();
+    entry->datalog_type = NT_UNASSIGNED;
+    return;
+  }
+
+  if (!v) {
+    return;
+  }
+
+  if (v->type() != entry->datalog_type) {
+    if (!entry->datalogs.empty()) {
+      // data type changed; need to finish any current logs
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->Finish(datalog.entry, v->time());
+      }
+      entry->datalogs.clear();
+    }
+
+    // create matching loggers
+    auto type = GetStorageTypeStr(v->type());
+    if (type.empty()) {
+      return;  // not a type we're going to log
+    }
+    for (auto&& logger : m_dataloggers) {
+      if (wpi::starts_with(entry->name, logger.prefix)) {
+        entry->datalogs.emplace_back(
+            logger.log,
+            logger.log->Start(
+                fmt::format("{}{}", logger.log_prefix,
+                            wpi::drop_front(entry->name, logger.prefix.size())),
+                type, "{\"source\":\"NT\"}", v->time()),
+            logger.uid);
+      }
+    }
+
+    if (entry->datalogs.empty()) {
+      return;  // we're done, nothing to log
+    }
+
+    // set datalog_type
+    entry->datalog_type = v->type();
+  }
+
+  auto time = v->time();
+  switch (v->type()) {
+    case NT_BOOLEAN: {
+      auto val = v->GetBoolean();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendBoolean(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_DOUBLE: {
+      auto val = v->GetDouble();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendDouble(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_STRING: {
+      auto val = v->GetString();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendString(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_RAW: {
+      auto val = v->GetRaw();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendRaw(
+            datalog.entry,
+            {reinterpret_cast<const uint8_t*>(val.data()), val.size()}, time);
+      }
+      break;
+    }
+    case NT_BOOLEAN_ARRAY: {
+      auto val = v->GetBooleanArray();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendBooleanArray(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_DOUBLE_ARRAY: {
+      auto val = v->GetDoubleArray();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendDoubleArray(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_STRING_ARRAY: {
+      auto val = v->GetStringArray();
+      for (auto&& datalog : entry->datalogs) {
+        datalog.log->AppendStringArray(datalog.entry, val, time);
+      }
+      break;
+    }
+    case NT_UNASSIGNED:
+    case NT_RPC:
+      break;
+  }
+}
+
 template <typename F>
 void Storage::DeleteAllEntriesImpl(bool local, F should_delete) {
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     if (entry->value && should_delete(entry)) {
       // notify it's being deleted
-      m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
-                             NT_NOTIFY_DELETE | (local ? NT_NOTIFY_LOCAL : 0));
+      Notify(entry, NT_NOTIFY_DELETE, local);
       // remove it from idmap
       if (entry->id < m_idmap.size()) {
         m_idmap[entry->id] = nullptr;
@@ -1067,6 +1207,94 @@ unsigned int Storage::AddPolledListener(unsigned int poller,
     }
   }
   return uid;
+}
+
+unsigned int Storage::StartDataLog(wpi::log::DataLog& log,
+                                   std::string_view prefix,
+                                   std::string_view log_prefix) {
+  std::scoped_lock lock(m_mutex);
+
+  // create
+  unsigned int uid = m_dataloggers.emplace_back(log, prefix, log_prefix);
+  m_dataloggers[uid].uid = uid;
+
+  // start logging any matching entries
+  auto now = nt::Now();
+  for (auto&& entry : m_entries) {
+    if (!entry.second || !wpi::starts_with(entry.second->name, prefix) ||
+        !entry.second->value) {
+      continue;
+    }
+    auto type = GetStorageTypeStr(entry.second->value->type());
+    if (type.empty()) {
+      continue;  // not a type we're going to log
+    }
+    int logentry = log.Start(
+        fmt::format("{}{}", log_prefix,
+                    wpi::drop_front(entry.second->name, prefix.size())),
+        type, "{\"source\":\"NT\"}", now);
+    entry.second->datalogs.emplace_back(&log, logentry, uid);
+    // log current value
+    auto& v = *entry.second->value;
+    entry.second->datalog_type = v.type();
+    auto time = v.time();
+    switch (v.type()) {
+      case NT_BOOLEAN:
+        log.AppendBoolean(logentry, v.GetBoolean(), time);
+        break;
+      case NT_DOUBLE:
+        log.AppendDouble(logentry, v.GetDouble(), time);
+        break;
+      case NT_STRING:
+        log.AppendString(logentry, v.GetString(), time);
+        break;
+      case NT_RAW: {
+        auto val = v.GetRaw();
+        log.AppendRaw(
+            logentry,
+            {reinterpret_cast<const uint8_t*>(val.data()), val.size()}, time);
+        break;
+      }
+      case NT_BOOLEAN_ARRAY:
+        log.AppendBooleanArray(logentry, v.GetBooleanArray(), time);
+        break;
+      case NT_DOUBLE_ARRAY:
+        log.AppendDoubleArray(logentry, v.GetDoubleArray(), time);
+        break;
+      case NT_STRING_ARRAY:
+        log.AppendStringArray(logentry, v.GetStringArray(), time);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return uid;
+}
+
+void Storage::StopDataLog(unsigned int uid) {
+  std::scoped_lock lock(m_mutex);
+
+  // erase the datalogger
+  auto datalogger = m_dataloggers.erase(uid);
+  if (!datalogger) {
+    return;
+  }
+
+  // finish any active entries
+  auto now = nt::Now();
+  for (auto&& entry : m_entries) {
+    if (!entry.second || entry.second->datalogs.empty()) {
+      continue;
+    }
+    auto it = std::find_if(
+        entry.second->datalogs.begin(), entry.second->datalogs.end(),
+        [&](const auto& elem) { return elem.logger_uid == uid; });
+    if (it != entry.second->datalogs.end()) {
+      it->log->Finish(it->entry, now);
+      entry.second->datalogs.erase(it);
+    }
+  }
 }
 
 bool Storage::GetPersistentEntries(

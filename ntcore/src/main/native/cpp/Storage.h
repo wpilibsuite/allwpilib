@@ -18,7 +18,9 @@
 
 #include <wpi/DenseMap.h>
 #include <wpi/SmallSet.h>
+#include <wpi/SmallVector.h>
 #include <wpi/StringMap.h>
+#include <wpi/UidVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/span.h>
@@ -117,6 +119,10 @@ class Storage : public IStorage {
   unsigned int AddPolledListener(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) const;
 
+  unsigned int StartDataLog(wpi::log::DataLog& log, std::string_view prefix,
+                            std::string_view log_prefix);
+  void StopDataLog(unsigned int uid);
+
   // Index-only
   unsigned int GetEntry(std::string_view name);
   std::vector<unsigned int> GetEntries(std::string_view prefix,
@@ -161,6 +167,29 @@ class Storage : public IStorage {
   void CancelRpcResult(unsigned int local_id, unsigned int call_uid);
 
  private:
+  struct DataLoggerEntry {
+    DataLoggerEntry(wpi::log::DataLog* log, int entry, unsigned int logger_uid)
+        : log{log}, entry{entry}, logger_uid{logger_uid} {}
+
+    wpi::log::DataLog* log;
+    int entry;
+    unsigned int logger_uid;
+  };
+
+  struct DataLogger {
+    DataLogger() = default;
+    DataLogger(wpi::log::DataLog& log, std::string_view prefix,
+               std::string_view log_prefix)
+        : log{&log}, prefix{prefix}, log_prefix{log_prefix} {}
+
+    explicit operator bool() const { return log != nullptr; }
+
+    wpi::log::DataLog* log = nullptr;
+    std::string prefix;
+    std::string log_prefix;
+    unsigned int uid;
+  };
+
   // Data for each table entry.
   struct Entry {
     explicit Entry(std::string_view name_) : name(name_) {}
@@ -195,6 +224,10 @@ class Storage : public IStorage {
     // Last UID used when calling this RPC (primarily for client use).  This
     // is incremented for each call.
     unsigned int rpc_call_uid{0};
+
+    // log entries
+    wpi::SmallVector<DataLoggerEntry, 0> datalogs;
+    NT_Type datalog_type{NT_UNASSIGNED};
   };
 
   using EntriesMap = wpi::StringMap<Entry*>;
@@ -210,6 +243,7 @@ class Storage : public IStorage {
   LocalMap m_localmap;
   RpcResultMap m_rpc_results;
   RpcBlockingCallSet m_rpc_blocking_calls;
+  wpi::UidVector<DataLogger, 4> m_dataloggers;
   // If any persistent values have changed
   mutable bool m_persistent_dirty = false;
 
@@ -254,6 +288,9 @@ class Storage : public IStorage {
                          std::unique_lock<wpi::mutex>& lock, bool local);
   void DeleteEntryImpl(Entry* entry, std::unique_lock<wpi::mutex>& lock,
                        bool local);
+
+  void Notify(Entry* entry, unsigned int flags, bool local,
+              std::shared_ptr<Value> value = {});
 
   // Must be called with m_mutex held
   template <typename F>
