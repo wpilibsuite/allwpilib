@@ -7,13 +7,18 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
-@SuppressWarnings("MemberName")
-public class SimpleMotorFeedforward {
-  public final double ks;
-  public final double kv;
-  public final double ka;
+public class SimpleMotorFeedforward implements Sendable {
+  private double m_ks;
+  private double m_kv;
+  private double m_ka;
+
+  private double m_velocity;
+  private double m_acceleration;
+  private double m_output;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains. Units of the gain values will
@@ -24,9 +29,9 @@ public class SimpleMotorFeedforward {
    * @param ka The acceleration gain.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka) {
-    this.ks = ks;
-    this.kv = kv;
-    this.ka = ka;
+    this.m_ks = ks;
+    this.m_kv = kv;
+    this.m_ka = ka;
   }
 
   /**
@@ -41,6 +46,87 @@ public class SimpleMotorFeedforward {
   }
 
   /**
+   * Gets the static friction compensation term of the feedforward.
+   *
+   * @return The static gain.
+   */
+  public double getKs() {
+    return m_ks;
+  }
+
+  /**
+   * Sets the static friction compensation term of the feedforward.
+   *
+   * @param ks The static gain.
+   */
+  public void setKs(double ks) {
+    this.m_ks = ks;
+  }
+
+  /**
+   * Gets the velocity gain of the feedforward.
+   *
+   * @return The velocity gain.
+   */
+  public double getKv() {
+    return m_kv;
+  }
+
+  /**
+   * Sets the velocity gain of the feedforward.
+   *
+   * @param kv The velocity gain.
+   */
+  public void setKv(double kv) {
+    this.m_kv = kv;
+  }
+
+  /**
+   * Gets the acceleration gain of the feedforward.
+   *
+   * @return The acceleration gain.
+   */
+  public double getKa() {
+    return m_ka;
+  }
+
+  /**
+   * Sets the acceleration gain of the feedforward.
+   *
+   * @param ka The acceleration gain.
+   */
+  public void setKa(double ka) {
+    this.m_ka = ka;
+  }
+
+  /**
+   * Gets the velocity corresponding the currently-calculated feedforward output.
+   *
+   * @return Most recent velocity.
+   */
+  public double getVelocity() {
+    return m_velocity;
+  }
+
+  /**
+   * Gets the acceleration corresponding the currently-calculated feedforward output.
+   *
+   * @return Most recent acceleration.
+   */
+  public double getAcceleration() {
+    return m_acceleration;
+  }
+
+  /**
+   * Gets the most recent output voltage.
+   *
+   * @return Most recent output.
+   */
+  public double getOutput() {
+    return m_output;
+  }
+
+  /**
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param velocity The velocity setpoint.
@@ -48,7 +134,7 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return ks * Math.signum(velocity) + kv * velocity + ka * acceleration;
+    return calculate(velocity, velocity + 0.02 * acceleration, 0.02);
   }
 
   /**
@@ -60,13 +146,18 @@ public class SimpleMotorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
-    var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
+    m_velocity = currentVelocity;
+    m_acceleration = (nextVelocity - currentVelocity) / dtSeconds;
+
+    var plant = LinearSystemId.identifyVelocitySystem(this.m_kv, this.m_ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
 
-    return ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
+    m_output = m_ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
+
+    return m_output;
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -95,7 +186,7 @@ public class SimpleMotorFeedforward {
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - ks - acceleration * ka) / kv;
+    return (maxVoltage - m_ks - acceleration * m_ka) / m_kv;
   }
 
   /**
@@ -110,7 +201,7 @@ public class SimpleMotorFeedforward {
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + ks - acceleration * ka) / kv;
+    return (-maxVoltage + m_ks - acceleration * m_ka) / m_kv;
   }
 
   /**
@@ -124,7 +215,7 @@ public class SimpleMotorFeedforward {
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
-    return (maxVoltage - ks * Math.signum(velocity) - velocity * kv) / ka;
+    return (maxVoltage - m_ks * Math.signum(velocity) - velocity * m_kv) / m_ka;
   }
 
   /**
@@ -139,5 +230,18 @@ public class SimpleMotorFeedforward {
    */
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, velocity);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("SimpleMotorFeedforward");
+    builder.addDoubleProperty("kS", this::getKs, this::setKs);
+    builder.addDoubleProperty("kV", this::getKv, this::setKv);
+    builder.addDoubleProperty("kA", this::getKa, this::setKa);
+    builder.addDoubleProperty("velocity", this::getVelocity, null);
+    builder.addDoubleProperty("velocityVoltage", () -> getVelocity() * m_kv, null);
+    builder.addDoubleProperty("acceleration", this::getAcceleration, null);
+    builder.addDoubleProperty("accelerationVoltage", () -> getAcceleration() * m_ka, null);
+    builder.addDoubleProperty("outputVoltage", this::getOutput, null);
   }
 }

@@ -31,8 +31,8 @@ namespace frc {
  * translations, users can specify a custom heading that the drivetrain should
  * point toward. This heading reference is profiled for smoothness.
  */
-class WPILIB_DLLEXPORT HolonomicDriveController:
-      public wpi::Sendable,
+class WPILIB_DLLEXPORT HolonomicDriveController
+    : public wpi::Sendable,
       public wpi::SendableHelper<HolonomicDriveController> {
  public:
   /**

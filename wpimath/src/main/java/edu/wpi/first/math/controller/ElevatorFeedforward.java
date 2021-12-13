@@ -4,16 +4,16 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
- * against the force of gravity).
+ * against the force of gravity directly).
  */
-@SuppressWarnings("MemberName")
-public class ElevatorFeedforward {
-  public final double ks;
-  public final double kg;
-  public final double kv;
-  public final double ka;
+public class ElevatorFeedforward implements Sendable {
+  private final SimpleMotorFeedforward m_simpleFeedforward;
+  private double m_kg;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains. Units of the gain values will
@@ -25,10 +25,8 @@ public class ElevatorFeedforward {
    * @param ka The acceleration gain.
    */
   public ElevatorFeedforward(double ks, double kg, double kv, double ka) {
-    this.ks = ks;
-    this.kg = kg;
-    this.kv = kv;
-    this.ka = ka;
+    m_simpleFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
+    this.m_kg = kg;
   }
 
   /**
@@ -44,6 +42,54 @@ public class ElevatorFeedforward {
   }
 
   /**
+   * Gets the gravity compensation term of the feedforward.
+   *
+   * @return The gravity compensation gain.
+   */
+  public double getKg() {
+    return m_kg;
+  }
+
+  /**
+   * Sets the gravity compensation term of the feedforward.
+   *
+   * @param kg The gravity compensation gain.
+   */
+  public void setKg(double kg) {
+    this.m_kg = kg;
+  }
+
+  /**
+   * Gets the SimpleMotorFeedforward that describes the motor without the effect of gravity.
+   *
+   * @return The internal SimpleMotorFeedforward.
+   */
+  public SimpleMotorFeedforward getSimpleFeedforward() {
+    return m_simpleFeedforward;
+  }
+
+  /**
+   * Gets the most recent output voltage.
+   *
+   * @return Most recent output.
+   */
+  public double getOutput() {
+    return m_simpleFeedforward.getOutput() + m_kg;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity The next velocity setpoint.
+   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @return The computed feedforward.
+   */
+  public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
+    return m_simpleFeedforward.calculate(currentVelocity, nextVelocity, dtSeconds) + m_kg;
+  }
+
+  /**
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param velocity The velocity setpoint.
@@ -51,20 +97,8 @@ public class ElevatorFeedforward {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return ks * Math.signum(velocity) + kg + kv * velocity + ka * acceleration;
+    return m_simpleFeedforward.calculate(velocity, acceleration) + m_kg;
   }
-
-  /**
-   * Calculates the feedforward from the gains and velocity setpoint (acceleration is assumed to be
-   * zero).
-   *
-   * @param velocity The velocity setpoint.
-   * @return The computed feedforward.
-   */
-  public double calculate(double velocity) {
-    return calculate(velocity, 0);
-  }
-
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
 
@@ -80,7 +114,8 @@ public class ElevatorFeedforward {
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - ks - kg - acceleration * ka) / kv;
+    return m_simpleFeedforward.maxAchievableVelocity(maxVoltage, acceleration)
+        - m_kg / m_simpleFeedforward.getKv();
   }
 
   /**
@@ -95,7 +130,8 @@ public class ElevatorFeedforward {
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + ks - kg - acceleration * ka) / kv;
+    return m_simpleFeedforward.minAchievableVelocity(maxVoltage, acceleration)
+        - m_kg / m_simpleFeedforward.getKv();
   }
 
   /**
@@ -109,7 +145,8 @@ public class ElevatorFeedforward {
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
-    return (maxVoltage - ks * Math.signum(velocity) - kg - velocity * kv) / ka;
+    return m_simpleFeedforward.maxAchievableAcceleration(maxVoltage, velocity)
+        - m_kg / m_simpleFeedforward.getKa();
   }
 
   /**
@@ -124,5 +161,12 @@ public class ElevatorFeedforward {
    */
   public double minAchievableAcceleration(double maxVoltage, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, velocity);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_simpleFeedforward.initSendable(builder);
+    builder.setSmartDashboardType("ElevatorFeedforward");
+    builder.addDoubleProperty("kG", this::getKg, this::setKg);
   }
 }

@@ -4,31 +4,31 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * A helper class that computes feedforward outputs for a simple arm (modeled as a motor acting
  * against the force of gravity on a beam suspended at an angle).
  */
 @SuppressWarnings("MemberName")
-public class ArmFeedforward {
-  public final double ks;
-  public final double kcos;
-  public final double kv;
-  public final double ka;
+public class ArmFeedforward implements Sendable {
+  private double m_kg;
+  private double m_positionRadians;
+  private final SimpleMotorFeedforward m_simpleFeedforward;
 
   /**
    * Creates a new ArmFeedforward with the specified gains. Units of the gain values will dictate
    * units of the computed feedforward.
    *
    * @param ks The static gain.
-   * @param kcos The gravity gain.
+   * @param kg The gravity gain.
    * @param kv The velocity gain.
    * @param ka The acceleration gain.
    */
-  public ArmFeedforward(double ks, double kcos, double kv, double ka) {
-    this.ks = ks;
-    this.kcos = kcos;
-    this.kv = kv;
-    this.ka = ka;
+  public ArmFeedforward(double ks, double kg, double kv, double ka) {
+    m_simpleFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
+    this.m_kg = kg;
   }
 
   /**
@@ -36,11 +36,66 @@ public class ArmFeedforward {
    * Units of the gain values will dictate units of the computed feedforward.
    *
    * @param ks The static gain.
-   * @param kcos The gravity gain.
+   * @param kg The gravity gain.
    * @param kv The velocity gain.
    */
-  public ArmFeedforward(double ks, double kcos, double kv) {
-    this(ks, kcos, kv, 0);
+  public ArmFeedforward(double ks, double kg, double kv) {
+    this(ks, kg, kv, 0);
+  }
+
+  /**
+   * Gets the gravity compensation term of the feedforward.
+   *
+   * @return The gravity compensation gain.
+   */
+  public double getKg() {
+    return m_kg;
+  }
+
+  /**
+   * Sets the gravity compensation term of the feedforward.
+   *
+   * @param kg The gravity compensation gain.
+   */
+  public void setKg(double kg) {
+    this.m_kg = kg;
+  }
+
+  /**
+   * Gets the SimpleMotorFeedforward that describes the motor without the effect of gravity.
+   *
+   * @return The internal SimpleMotorFeedforward.
+   */
+  public SimpleMotorFeedforward getSimpleFeedforward() {
+    return m_simpleFeedforward;
+  }
+
+  /**
+   * Returns the most recent position of the arm, in radians.
+   *
+   * @return The position of the arm in radians.
+   */
+  public double getPositionRadians() {
+    return m_positionRadians;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param positionRadians The position (angle) setpoint.
+   * @param currentVelocityRadPerSec The current velocity setpoint.
+   * @param nextVelocityRadPerSec The next velocity setpoint.
+   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @return The computed feedforward.
+   */
+  public double calculate(
+      double positionRadians,
+      double currentVelocityRadPerSec,
+      double nextVelocityRadPerSec,
+      double dtSeconds) {
+    m_positionRadians = positionRadians;
+    return m_simpleFeedforward.calculate(currentVelocityRadPerSec, nextVelocityRadPerSec, dtSeconds)
+        + m_kg * Math.cos(positionRadians);
   }
 
   /**
@@ -53,10 +108,8 @@ public class ArmFeedforward {
    */
   public double calculate(
       double positionRadians, double velocityRadPerSec, double accelRadPerSecSquared) {
-    return ks * Math.signum(velocityRadPerSec)
-        + kcos * Math.cos(positionRadians)
-        + kv * velocityRadPerSec
-        + ka * accelRadPerSecSquared;
+    return calculate(
+        positionRadians, velocityRadPerSec, velocityRadPerSec + 0.02 * accelRadPerSecSquared, 0.02);
   }
 
   /**
@@ -87,7 +140,8 @@ public class ArmFeedforward {
    */
   public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
+    return m_simpleFeedforward.maxAchievableVelocity(maxVoltage, acceleration)
+        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
   }
 
   /**
@@ -103,7 +157,8 @@ public class ArmFeedforward {
    */
   public double minAchievableVelocity(double maxVoltage, double angle, double acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + ks - Math.cos(angle) * kcos - acceleration * ka) / kv;
+    return m_simpleFeedforward.minAchievableVelocity(maxVoltage, acceleration)
+        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
   }
 
   /**
@@ -118,7 +173,8 @@ public class ArmFeedforward {
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
-    return (maxVoltage - ks * Math.signum(velocity) - Math.cos(angle) * kcos - velocity * kv) / ka;
+    return m_simpleFeedforward.maxAchievableAcceleration(maxVoltage, velocity)
+        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
   }
 
   /**
@@ -134,5 +190,13 @@ public class ArmFeedforward {
    */
   public double minAchievableAcceleration(double maxVoltage, double angle, double velocity) {
     return maxAchievableAcceleration(-maxVoltage, angle, velocity);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_simpleFeedforward.initSendable(builder);
+    builder.setSmartDashboardType("ArmFeedforward");
+    builder.addDoubleProperty("kG", this::getKg, this::setKg);
+    builder.addDoubleProperty("gravityOutput", () -> m_kg * Math.cos(m_positionRadians), null);
   }
 }

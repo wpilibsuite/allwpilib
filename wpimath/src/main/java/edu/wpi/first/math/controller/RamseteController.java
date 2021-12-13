@@ -104,8 +104,8 @@ public class RamseteController implements Sendable {
   /**
    * Gets the current 'zeta' parameter of the Ramsete controller.
    *
-   * @return Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
-   *     more damping in response.
+   * @return Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide more
+   *     damping in response.
    */
   public double getZeta() {
     return m_zeta;
@@ -251,36 +251,35 @@ public class RamseteController implements Sendable {
     builder.setSmartDashboardType("RamseteController");
     builder.addDoubleProperty("b", this::getB, this::setB);
     builder.addDoubleProperty("zeta", this::getZeta, this::setZeta);
-    builder.addDoubleProperty("toleranceX",
-            () -> m_tolerance.getX(),
-            x -> setTolerance(new Pose2d(new Translation2d(x, m_tolerance.getY()),
-                    m_tolerance.getRotation())));
-    builder.addDoubleProperty("toleranceY",
-            () -> m_tolerance.getY(),
-            y -> setTolerance(new Pose2d(new Translation2d(m_tolerance.getX(), y),
-                    m_tolerance.getRotation())));
-    builder.addDoubleProperty("toleranceDegrees",
-            () -> m_tolerance.getRotation().getDegrees(),
-            rotation -> setTolerance(new Pose2d(m_tolerance.getTranslation(),
-                    Rotation2d.fromDegrees(rotation))));
-    builder.addDoubleProperty("referenceX",
-            () -> m_reference.getX(), null);
-    builder.addDoubleProperty("referenceY",
-            () -> m_reference.getY(), null);
-    builder.addDoubleProperty("referenceDegrees",
-            () -> m_reference.getRotation().getDegrees(), null);
-    builder.addDoubleProperty("measurementX",
-            () -> m_measurement.getX(), null);
-    builder.addDoubleProperty("measurementY",
-            () -> m_measurement.getY(), null);
-    builder.addDoubleProperty("measurementDegrees",
-            () -> m_measurement.getRotation().getDegrees(), null);
-    builder.addDoubleProperty("errorX",
-            () -> m_error.getX(), null);
-    builder.addDoubleProperty("errorY",
-            () -> m_error.getY(), null);
-    builder.addDoubleProperty("errorDegrees",
-            () -> m_error.getRotation().getDegrees(), null);
+    builder.addDoubleProperty(
+        "toleranceX",
+        () -> m_tolerance.getX(),
+        x ->
+            setTolerance(
+                new Pose2d(new Translation2d(x, m_tolerance.getY()), m_tolerance.getRotation())));
+    builder.addDoubleProperty(
+        "toleranceY",
+        () -> m_tolerance.getY(),
+        y ->
+            setTolerance(
+                new Pose2d(new Translation2d(m_tolerance.getX(), y), m_tolerance.getRotation())));
+    builder.addDoubleProperty(
+        "toleranceDegrees",
+        () -> m_tolerance.getRotation().getDegrees(),
+        rotation ->
+            setTolerance(
+                new Pose2d(m_tolerance.getTranslation(), Rotation2d.fromDegrees(rotation))));
+    builder.addDoubleProperty("referenceX", () -> m_reference.getX(), null);
+    builder.addDoubleProperty("referenceY", () -> m_reference.getY(), null);
+    builder.addDoubleProperty(
+        "referenceDegrees", () -> m_reference.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("measurementX", () -> m_measurement.getX(), null);
+    builder.addDoubleProperty("measurementY", () -> m_measurement.getY(), null);
+    builder.addDoubleProperty(
+        "measurementDegrees", () -> m_measurement.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("errorX", () -> m_error.getX(), null);
+    builder.addDoubleProperty("errorY", () -> m_error.getY(), null);
+    builder.addDoubleProperty("errorDegrees", () -> m_error.getRotation().getDegrees(), null);
     builder.addBooleanProperty("atReference", this::atReference, null);
   }
 }

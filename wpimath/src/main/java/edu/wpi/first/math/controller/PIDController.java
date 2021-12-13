@@ -377,10 +377,14 @@ public class PIDController implements Sendable, AutoCloseable {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty("positionTolerance", this::getPositionTolerance,
-            positionTolerance -> m_positionTolerance = positionTolerance);
-    builder.addDoubleProperty("velocityTolerance", this::getVelocityTolerance,
-            velocityTolerance -> m_velocityTolerance = velocityTolerance);
+    builder.addDoubleProperty(
+        "positionTolerance",
+        this::getPositionTolerance,
+        positionTolerance -> m_positionTolerance = positionTolerance);
+    builder.addDoubleProperty(
+        "velocityTolerance",
+        this::getVelocityTolerance,
+        velocityTolerance -> m_velocityTolerance = velocityTolerance);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
     builder.addDoubleProperty("measurement", this::getMeasurement, null);
     builder.addDoubleProperty("positionError", this::getPositionError, null);

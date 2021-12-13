@@ -19,9 +19,9 @@ HolonomicDriveController::HolonomicDriveController(
     : m_xController(std::move(xController)),
       m_yController(std::move(yController)),
       m_thetaController(std::move(thetaController)) {
-    wpi::SendableRegistry::AddChild(this, &xController);
-    wpi::SendableRegistry::AddChild(this, &yController);
-    wpi::SendableRegistry::AddChild(this, &thetaController);
+  wpi::SendableRegistry::AddChild(this, &xController);
+  wpi::SendableRegistry::AddChild(this, &yController);
+  wpi::SendableRegistry::AddChild(this, &thetaController);
 }
 
 bool HolonomicDriveController::AtReference() const {
@@ -106,13 +106,14 @@ void HolonomicDriveController::InitSendable(wpi::SendableBuilder& builder) {
                             {units::degree_t(degreesTolerance)}));
       });
   builder.AddDoubleProperty(
-      "referenceX", [this] { return m_poseReference.X().to<double>(); }, nullptr);
+      "referenceX", [this] { return m_poseReference.X().to<double>(); },
+      nullptr);
   builder.AddDoubleProperty(
-      "referenceY", [this] { return m_poseReference.Y().to<double>(); }, nullptr);
+      "referenceY", [this] { return m_poseReference.Y().to<double>(); },
+      nullptr);
   builder.AddDoubleProperty(
       "referenceDegrees",
-      [this] { return m_headingReference.Degrees().to<double>(); },
-      nullptr);
+      [this] { return m_headingReference.Degrees().to<double>(); }, nullptr);
   builder.AddDoubleProperty(
       "measurementX", [this] { return m_measurement.X().to<double>(); },
       nullptr);
@@ -129,7 +130,8 @@ void HolonomicDriveController::InitSendable(wpi::SendableBuilder& builder) {
       "errorY", [this] { return m_poseError.Y().to<double>(); }, nullptr);
   builder.AddDoubleProperty(
       "errorDegrees",
-      [this] { return m_poseError.Rotation().Degrees().to<double>(); }, nullptr);
+      [this] { return m_poseError.Rotation().Degrees().to<double>(); },
+      nullptr);
   builder.AddBooleanProperty(
       "atReference", [this] { return AtReference(); }, nullptr);
 }
