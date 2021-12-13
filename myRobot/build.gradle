@@ -166,6 +166,8 @@ model {
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
