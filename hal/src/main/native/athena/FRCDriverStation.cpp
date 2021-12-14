@@ -16,6 +16,7 @@
 #include <wpi/SafeThread.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/SmallVector.h>
 
 #include "hal/DriverStation.h"
 
@@ -121,16 +122,44 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   return status;
 }
 
-static wpi::mutex* newDSDataAvailableMutex;
-static wpi::condition_variable* newDSDataAvailableCond;
-static int newDSDataAvailableCounter{0};
+namespace hal {
+struct EventVector {
+  wpi::mutex mutex;
+  wpi::SmallVector<WPI_EventHandle, 4> events;
+
+  void add(WPI_EventHandle handle) {
+    std::scoped_lock lock{mutex};
+    events.emplace_back(handle);
+  }
+  void remove(WPI_EventHandle handle) {
+    std::scoped_lock lock{mutex};
+    auto it = std::find_if(
+        events.begin(), events.end(),
+        [=](const WPI_EventHandle fromHandle) { return fromHandle == handle; });
+    if (it != events.end()) {
+      events.erase(it);
+    }
+  }
+  void wakeup() {
+    std::scoped_lock lock{mutex};
+    for (auto&& handle : events) {
+      wpi::SetEvent(handle);
+    }
+  }
+};
+struct FRCDriverStation {
+  EventVector newPacketEvents;
+  EventVector readyToUpdateEvents;
+  EventVector cacheUpdatedEvents;
+};
+}  // namespace hal
+
+static hal::FRCDriverStation* driverStation;
 
 namespace hal::init {
 void InitializeFRCDriverStation() {
-  static wpi::mutex newMutex;
-  newDSDataAvailableMutex = &newMutex;
-  static wpi::condition_variable newCond;
-  newDSDataAvailableCond = &newCond;
+  static FRCDriverStation ds;
+  driverStation = &ds;
 }
 }  // namespace hal::init
 
@@ -352,55 +381,6 @@ void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
 }
 
-static int& GetThreadLocalLastCount() {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
-  thread_local int lastCount{0};
-  return lastCount;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  std::scoped_lock lock{*newDSDataAvailableMutex};
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) {
-    return false;
-  }
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) {
-  HAL_WaitForDSDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  std::unique_lock lock{*newDSDataAvailableMutex};
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  lastCount = newDSDataAvailableCounter;
-  return true;
-}
-
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
 
@@ -410,45 +390,48 @@ static void newDataOccur(uint32_t refNum) {
   if (refNum != refNumber) {
     return;
   }
-  std::scoped_lock lock{*newDSDataAvailableMutex};
-  // Notify all threads
-  ++newDSDataAvailableCounter;
-  newDSDataAvailableCond->notify_all();
+  driverStation->newPacketEvents.wakeup();
 }
 
-/*
- * Call this to initialize the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
-void HAL_InitializeDriverStation(void) {
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) {
-    return;
-  }
+void HAL_UpdateDSData(void) {
+  driverStation->cacheUpdatedEvents.wakeup();
+}
 
-  std::scoped_lock lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) {
-    return;
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {
+  switch (handleWakeType) {
+    case HAL_DSWakeType_kNewPacket:
+      driverStation->newPacketEvents.add(handle);
+      break;
+    case HAL_DSWakeType_kCachesReadyToUpdate:
+      driverStation->readyToUpdateEvents.add(handle);
+      break;
+    case HAL_DSWakeType_kCachesUpdated:
+      driverStation->cacheUpdatedEvents.add(handle);
+      break;
   }
+}
 
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {
+  switch (handleWakeType) {
+    case HAL_DSWakeType_kNewPacket:
+      driverStation->newPacketEvents.remove(handle);
+      break;
+    case HAL_DSWakeType_kCachesReadyToUpdate:
+      driverStation->readyToUpdateEvents.remove(handle);
+      break;
+    case HAL_DSWakeType_kCachesUpdated:
+      driverStation->cacheUpdatedEvents.remove(handle);
+      break;
+  }
+}
+
+}  // extern "C"
+
+namespace hal {
+void InitializeDriverStation() {
   // Set up the occur function internally with NetComm
   NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);
   // Set up our occur reference number
   setNewDataOccurRef(refNumber);
-
-  initialized = true;
 }
-
-/*
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
-void HAL_ReleaseDSMutex(void) {
-  newDataOccur(refNumber);
-}
-
-}  // extern "C"
+}  // namespace hal

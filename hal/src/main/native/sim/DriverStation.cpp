@@ -23,9 +23,6 @@
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
-static wpi::condition_variable* newDSDataAvailableCond;
-static wpi::mutex newDSDataAvailableMutex;
-static int newDSDataAvailableCounter{0};
 static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
@@ -33,8 +30,6 @@ static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
 
 namespace hal::init {
 void InitializeDriverStation() {
-  static wpi::condition_variable nddaC;
-  newDSDataAvailableCond = &nddaC;
 }
 }  // namespace hal::init
 
@@ -224,103 +219,18 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-static int& GetThreadLocalLastCount() {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
-  thread_local int lastCount{0};
-  return lastCount;
-}
-
-HAL_Bool HAL_IsNewControlData(void) {
-  std::scoped_lock lock(newDSDataAvailableMutex);
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount == currentCount) {
-    return false;
-  }
-  lastCount = currentCount;
-  return true;
-}
-
-void HAL_WaitForDSData(void) {
-  HAL_WaitForDSDataTimeout(0);
-}
-
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
-  std::unique_lock lock(newDSDataAvailableMutex);
-  int& lastCount = GetThreadLocalLastCount();
-  int currentCount = newDSDataAvailableCounter;
-  if (lastCount != currentCount) {
-    lastCount = currentCount;
-    return true;
-  }
-
-  if (isFinalized.load()) {
-    return false;
-  }
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-
-  while (newDSDataAvailableCounter == currentCount) {
-    if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      newDSDataAvailableCond->wait(lock);
-    }
-  }
-  lastCount = newDSDataAvailableCounter;
-  return true;
-}
-
-// Constant number to be used for our occur handle
-constexpr int32_t refNumber = 42;
-
-static int32_t newDataOccur(uint32_t refNum) {
-  // Since we could get other values, require our specific handle
-  // to signal our threads
-  if (refNum != refNumber) {
-    return 0;
-  }
-  SimDriverStationData->CallNewDataCallbacks();
-  std::scoped_lock lock(newDSDataAvailableMutex);
-  // Nofify all threads
-  newDSDataAvailableCounter++;
-  newDSDataAvailableCond->notify_all();
-  return 0;
-}
-
-void HAL_InitializeDriverStation(void) {
-  hal::init::CheckInit();
-  static std::atomic_bool initialized{false};
-  static wpi::mutex initializeMutex;
-  // Initial check, as if it's true initialization has finished
-  if (initialized) {
-    return;
-  }
-
-  std::scoped_lock lock(initializeMutex);
-  // Second check in case another thread was waiting
-  if (initialized) {
-    return;
-  }
-
-  SimDriverStationData->ResetData();
-
-  std::atexit([]() {
-    isFinalized.store(true);
-    HAL_ReleaseDSMutex();
-  });
-
-  initialized = true;
-}
-
-void HAL_ReleaseDSMutex(void) {
-  newDataOccur(refNumber);
-}
+void HAL_UpdateDSData(void) {}
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {}
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {}
 
 }  // extern "C"
+
+namespace hal {
+void NewDriverStationData() {
+  SimDriverStationData->CallNewDataCallbacks();
+}
+
+void InitializeDriverStation() {
+  SimDriverStationData->ResetData();
+}
+}  // namespace hal

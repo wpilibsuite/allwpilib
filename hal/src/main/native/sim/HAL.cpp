@@ -57,6 +57,10 @@ static std::vector<std::pair<void*, void (*)(void*)>> gOnShutdown;
 static SimPeriodicCallbackRegistry gSimPeriodicBefore;
 static SimPeriodicCallbackRegistry gSimPeriodicAfter;
 
+namespace hal {
+  void InitializeDriverStation();
+}
+
 namespace hal::init {
 void InitializeHAL() {
   InitializeAccelerometerData();
@@ -335,7 +339,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   hal::init::HAL_IsInitialized.store(true);
 
   hal::RestartTiming();
-  HAL_InitializeDriverStation();
+  hal::InitializeDriverStation();
 
   initialized = true;
 

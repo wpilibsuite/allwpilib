@@ -4,7 +4,6 @@
 
 package edu.wpi.first.hal;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import java.util.List;
  */
 @SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public final class HAL extends JNIWrapper {
-  public static native void waitForDSData();
 
   public static native boolean initialize(int timeout, int mode);
 
@@ -117,123 +115,9 @@ public final class HAL extends JNIWrapper {
     }
   }
 
-  public static native void observeUserProgramStarting();
-
-  public static native void observeUserProgramDisabled();
-
-  public static native void observeUserProgramAutonomous();
-
-  public static native void observeUserProgramTeleop();
-
-  public static native void observeUserProgramTest();
-
-  public static void report(int resource, int instanceNumber) {
-    report(resource, instanceNumber, 0, "");
-  }
-
-  public static void report(int resource, int instanceNumber, int context) {
-    report(resource, instanceNumber, context, "");
-  }
-
-  /**
-   * Report the usage of a resource of interest.
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource one of the values in the tResourceType above (max value 51).
-   * @param instanceNumber an index that identifies the resource instance.
-   * @param context an optional additional context number for some cases (such as module number).
-   *     Set to 0 to omit.
-   * @param feature a string to be included describing features in use on a specific resource.
-   *     Setting the same resource more than once allows you to change the feature string.
-   * @return TODO
-   */
-  public static native int report(int resource, int instanceNumber, int context, String feature);
-
-  public static native int nativeGetControlWord();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static void getControlWord(ControlWord controlWord) {
-    int word = nativeGetControlWord();
-    controlWord.update(
-        (word & 1) != 0,
-        ((word >> 1) & 1) != 0,
-        ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0,
-        ((word >> 4) & 1) != 0,
-        ((word >> 5) & 1) != 0);
-  }
-
-  private static native int nativeGetAllianceStation();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static AllianceStationID getAllianceStation() {
-    switch (nativeGetAllianceStation()) {
-      case 0:
-        return AllianceStationID.Red1;
-      case 1:
-        return AllianceStationID.Red2;
-      case 2:
-        return AllianceStationID.Red3;
-      case 3:
-        return AllianceStationID.Blue1;
-      case 4:
-        return AllianceStationID.Blue2;
-      case 5:
-        return AllianceStationID.Blue3;
-      default:
-        return null;
-    }
-  }
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native boolean isNewControlData();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native void releaseDSMutex();
-
-  @SuppressWarnings("MissingJavadocMethod")
-  public static native boolean waitForDSDataTimeout(double timeout);
-
-  public static final int kMaxJoystickAxes = 12;
-  public static final int kMaxJoystickPOVs = 12;
-
-  public static native short getJoystickAxes(byte joystickNum, float[] axesArray);
-
-  public static native short getJoystickPOVs(byte joystickNum, short[] povsArray);
-
-  public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
-
-  public static native int setJoystickOutputs(
-      byte joystickNum, int outputs, short leftRumble, short rightRumble);
-
-  public static native int getJoystickIsXbox(byte joystickNum);
-
-  public static native int getJoystickType(byte joystickNum);
-
-  public static native String getJoystickName(byte joystickNum);
-
-  public static native int getJoystickAxisType(byte joystickNum, byte axis);
-
-  public static native double getMatchTime();
-
-  public static native boolean getSystemActive();
-
   public static native boolean getBrownedOut();
 
-  public static native int getMatchInfo(MatchInfoData info);
-
-  public static native int sendError(
-      boolean isError,
-      int errorCode,
-      boolean isLVCode,
-      String details,
-      String location,
-      String callStack,
-      boolean printMsg);
-
-  public static native int sendConsoleLine(String line);
+  public static native boolean getSystemActive();
 
   public static native int getPortWithModule(byte module, byte channel);
 

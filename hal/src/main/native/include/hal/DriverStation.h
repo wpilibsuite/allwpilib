@@ -8,12 +8,24 @@
 
 #include "hal/DriverStationTypes.h"
 #include "hal/Types.h"
+#include "wpi/Synchronization.h"
 
 /**
  * @defgroup hal_driverstation Driver Station Functions
  * @ingroup hal_capi
  * @{
  */
+
+// clang-format off
+/**
+ * The counter mode.
+ */
+HAL_ENUM(HAL_DriverStationWakeType) {
+  HAL_DSWakeType_kNewPacket = 0,
+  HAL_DSWakeType_kCachesReadyToUpdate = 1,
+  HAL_DSWakeType_kCachesUpdated = 2
+};
+// clang-format on
 
 #ifdef __cplusplus
 extern "C" {
@@ -191,44 +203,10 @@ double HAL_GetMatchTime(int32_t* status);
  */
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
-/**
- * Releases the DS Mutex to allow proper shutdown of any threads that are
- * waiting on it.
- */
-void HAL_ReleaseDSMutex(void);
+void HAL_UpdateDSData(void);
 
-/**
- * Has a new control packet from the driver station arrived since the last
- * time this function was called?
- *
- * @return true if the control data has been updated since the last call
- */
-HAL_Bool HAL_IsNewControlData(void);
-
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- * Checks if new control data has arrived since the last HAL_WaitForDSData or
- * HAL_IsNewControlData call. If new data has not arrived, waits for new data
- * to arrive. Otherwise, returns immediately.
- */
-void HAL_WaitForDSData(void);
-
-/**
- * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
- * forever. Otherwise, it will wait until either a new packet, or the timeout
- * time has passed.
- *
- * @param[in] timeout timeout in seconds
- * @return true for new data, false for timeout
- */
-HAL_Bool HAL_WaitForDSDataTimeout(double timeout);
-
-/**
- * Initializes the driver station communication. This will properly
- * handle multiple calls. However note that this CANNOT be called from a library
- * that interfaces with LabVIEW.
- */
-void HAL_InitializeDriverStation(void);
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType);
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType);
 
 /**
  * Sets the program starting flag in the DS.
