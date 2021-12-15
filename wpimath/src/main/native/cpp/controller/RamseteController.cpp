@@ -7,7 +7,6 @@
 #include <cmath>
 
 #include <wpi/sendable/SendableBuilder.h>
-#include <wpi/sendable/SendableRegistry.h>
 
 #include "units/angle.h"
 #include "units/math.h"

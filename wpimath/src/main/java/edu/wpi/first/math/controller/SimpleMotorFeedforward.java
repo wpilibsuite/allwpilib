@@ -118,7 +118,7 @@ public class SimpleMotorFeedforward implements Sendable {
   }
 
   /**
-   * Gets the most recent output voltage.
+   * Gets the most recent output.
    *
    * @return Most recent output.
    */
@@ -142,7 +142,7 @@ public class SimpleMotorFeedforward implements Sendable {
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
-   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @param dtSeconds The time until the next velocity setpoint.
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
@@ -239,9 +239,9 @@ public class SimpleMotorFeedforward implements Sendable {
     builder.addDoubleProperty("kV", this::getKv, this::setKv);
     builder.addDoubleProperty("kA", this::getKa, this::setKa);
     builder.addDoubleProperty("velocity", this::getVelocity, null);
-    builder.addDoubleProperty("velocityVoltage", () -> getVelocity() * m_kv, null);
+    builder.addDoubleProperty("velocityOutput", () -> getVelocity() * m_kv, null);
     builder.addDoubleProperty("acceleration", this::getAcceleration, null);
-    builder.addDoubleProperty("accelerationVoltage", () -> getAcceleration() * m_ka, null);
-    builder.addDoubleProperty("outputVoltage", this::getOutput, null);
+    builder.addDoubleProperty("accelerationOutput", () -> getAcceleration() * m_ka, null);
+    builder.addDoubleProperty("output", this::getOutput, null);
   }
 }

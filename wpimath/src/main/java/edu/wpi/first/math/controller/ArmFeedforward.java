@@ -14,7 +14,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 @SuppressWarnings("MemberName")
 public class ArmFeedforward implements Sendable {
   private double m_kg;
-  private double m_positionRadians;
+  private double m_angleRadians;
   private final SimpleMotorFeedforward m_simpleFeedforward;
 
   /**
@@ -71,12 +71,21 @@ public class ArmFeedforward implements Sendable {
   }
 
   /**
-   * Returns the most recent position of the arm, in radians.
+   * Returns the most recent angle of the arm, in radians.
    *
    * @return The position of the arm in radians.
    */
-  public double getPositionRadians() {
-    return m_positionRadians;
+  public double getAngleRadians() {
+    return m_angleRadians;
+  }
+
+  /**
+   * Gets the most recent output.
+   *
+   * @return Most recent output.
+   */
+  public double getOutput() {
+    return m_simpleFeedforward.getOutput() + m_kg * Math.cos(m_angleRadians);
   }
 
   /**
@@ -85,7 +94,7 @@ public class ArmFeedforward implements Sendable {
    * @param positionRadians The position (angle) setpoint.
    * @param currentVelocityRadPerSec The current velocity setpoint.
    * @param nextVelocityRadPerSec The next velocity setpoint.
-   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @param dtSeconds The time until the next velocity setpoint.
    * @return The computed feedforward.
    */
   public double calculate(
@@ -93,7 +102,7 @@ public class ArmFeedforward implements Sendable {
       double currentVelocityRadPerSec,
       double nextVelocityRadPerSec,
       double dtSeconds) {
-    m_positionRadians = positionRadians;
+    m_angleRadians = positionRadians;
     return m_simpleFeedforward.calculate(currentVelocityRadPerSec, nextVelocityRadPerSec, dtSeconds)
         + m_kg * Math.cos(positionRadians);
   }
@@ -174,7 +183,7 @@ public class ArmFeedforward implements Sendable {
    */
   public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
     return m_simpleFeedforward.maxAchievableAcceleration(maxVoltage, velocity)
-        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
+        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKa();
   }
 
   /**
@@ -197,6 +206,7 @@ public class ArmFeedforward implements Sendable {
     m_simpleFeedforward.initSendable(builder);
     builder.setSmartDashboardType("ArmFeedforward");
     builder.addDoubleProperty("kG", this::getKg, this::setKg);
-    builder.addDoubleProperty("gravityOutput", () -> m_kg * Math.cos(m_positionRadians), null);
+    builder.addDoubleProperty("gravityOutput", () -> m_kg * Math.cos(m_angleRadians), null);
+    builder.addDoubleProperty("output", this::getOutput, null);
   }
 }

@@ -6,6 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
+#include "frc/controller/SimpleMotorFeedforward.h"
 #include "units/time.h"
 #include "units/voltage.h"
 
@@ -15,7 +16,9 @@ namespace frc {
  * (modeled as a motor acting against the force of gravity).
  */
 template <class Distance>
-class ElevatorFeedforward {
+class WPILIB_DLLEXPORT ElevatorFeedforward
+    : public wpi::Sendable,
+      public wpi::SendableHelper<ElevatorFeedforward> {
  public:
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -35,22 +38,56 @@ class ElevatorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  constexpr ElevatorFeedforward(
-      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kG(kG), kV(kV), kA(kA) {}
+  ElevatorFeedforward(units::volt_t kS, units::volt_t kG,
+                      units::unit_t<kv_unit> kV,
+                      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      : kG(kG), m_simpleFeedforward(kS, kV, kA) {}
+
+  /**
+   * Gets the most recent output voltage.
+   *
+   * @return Most recent output.
+   */
+  units::volt_t GetOutput() const {
+    return m_simpleFeedforward.GetOutput() + kG;
+  }
+
+  /**
+   * Gets the SimpleMotorFeedforward that describes the motor without the effect
+   * of gravity.
+   *
+   * @return The internal SimpleMotorFeedforward.
+   */
+  SimpleMotorFeedforward<Distance>& GetSimpleFeedforward() {
+    return m_simpleFeedforward;
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param velocity     The velocity setpoint, in distance per second.
-   * @param acceleration The acceleration setpoint, in distance per second^2.
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity    The next velocity setpoint.
+   * @param dt              The time until the next velocity setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                                    units::unit_t<Acceleration> acceleration =
-                                        units::unit_t<Acceleration>(0)) {
-    return kS * wpi::sgn(velocity) + kG + kV * velocity + kA * acceleration;
+  units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) {
+    return m_simpleFeedforward.Calculate(currentVelocity, nextVelocity, dt) +
+           kG;
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
+   * @return The computed feedforward, in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Velocity> velocity,
+                          units::unit_t<Acceleration> acceleration =
+                              units::unit_t<Acceleration>(0)) {
+    return Calculate(velocity, velocity + acceleration * 20_ms, 20_ms);
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -70,7 +107,8 @@ class ElevatorFeedforward {
   constexpr units::unit_t<Velocity> MaxAchievableVelocity(
       units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kG - kA * acceleration) / kV;
+    return m_simpleFeedforward.MaxAchievableVelocity(maxVoltage, acceleration) -
+           kG / m_simpleFeedforward.kV;
   }
 
   /**
@@ -87,7 +125,8 @@ class ElevatorFeedforward {
   constexpr units::unit_t<Velocity> MinAchievableVelocity(
       units::volt_t maxVoltage, units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + kS - kG - kA * acceleration) / kV;
+    return m_simpleFeedforward.MinAchievableVelocity(maxVoltage, acceleration) -
+           kG / m_simpleFeedforward.kV;
   }
 
   /**
@@ -103,7 +142,8 @@ class ElevatorFeedforward {
    */
   constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
       units::volt_t maxVoltage, units::unit_t<Velocity> velocity) {
-    return (maxVoltage - kS * wpi::sgn(velocity) - kG - kV * velocity) / kA;
+    return m_simpleFeedforward.MaxAchievableAcceleration(maxVoltage, velocity) -
+           kG / m_simpleFeedforward.kA;
   }
 
   /**
@@ -122,9 +162,19 @@ class ElevatorFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
-  units::volt_t kS{0};
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    m_simpleFeedforward.InitSendable(builder);
+    builder.SetSmartDashboardType("ElevatorFeedforward");
+    builder.AddDoubleProperty(
+        "kG", [this] { return kG.value(); },
+        [this](double kG) { this->kG = units::volt_t{kG}; });
+    builder.AddDoubleProperty(
+        "outputVoltage", [this] { return GetOutput().value(); }, nullptr);
+  }
+
   units::volt_t kG{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
+
+ private:
+  SimpleMotorFeedforward<Distance> m_simpleFeedforward;
 };
 }  // namespace frc

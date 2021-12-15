@@ -121,9 +121,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance,
+            typename = std::enable_if_t<
+                units::traits::is_length_unit<Distance>::value ||
+                units::traits::is_angle_unit<Distance>::value>>
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
@@ -163,9 +164,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
-  template <typename Distance, typename = std::enable_if_t<
-                                   std::is_same_v<units::meter, Distance> ||
-                                   std::is_same_v<units::radian, Distance>>>
+  template <typename Distance,
+            typename =
+                std::enable_if_t<std::is_assignable_v<units::meter, Distance> ||
+                                 std::is_assignable_v<units::radian, Distance>>>
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {

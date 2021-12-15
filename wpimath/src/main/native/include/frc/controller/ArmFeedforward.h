@@ -7,6 +7,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
+#include "frc/controller/SimpleMotorFeedforward.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/math.h"
@@ -17,7 +18,9 @@ namespace frc {
  * A helper class that computes feedforward outputs for a simple arm (modeled as
  * a motor acting against the force of gravity on a beam suspended at an angle).
  */
-class WPILIB_DLLEXPORT ArmFeedforward {
+class WPILIB_DLLEXPORT ArmFeedforward
+    : public wpi::Sendable,
+      public wpi::SendableHelper<ArmFeedforward> {
  public:
   using Angle = units::radians;
   using Velocity = units::radians_per_second;
@@ -29,35 +32,77 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
-  constexpr ArmFeedforward() = default;
+  ArmFeedforward() = default;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
    *
    * @param kS   The static gain, in volts.
-   * @param kCos The gravity gain, in volts.
+   * @param kG The gravity gain, in volts.
    * @param kV   The velocity gain, in volt seconds per radian.
    * @param kA   The acceleration gain, in volt seconds^2 per radian.
    */
-  constexpr ArmFeedforward(
-      units::volt_t kS, units::volt_t kCos, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kCos(kCos), kV(kV), kA(kA) {}
+  ArmFeedforward(units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
+                 units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      : kG(kG), m_simpleFeedforward(kS, kV, kA) {}
+
+  /**
+   * Gets the most recent output voltage.
+   *
+   * @return Most recent output.
+   */
+  units::volt_t GetOutput() const {
+    return m_simpleFeedforward.GetOutput() + kG * units::math::cos(m_angle);
+  }
+
+  /**
+   * Returns the most recent angle of the arm, in radians.
+   *
+   * @return The position of the arm in radians.
+   */
+  units::radian_t GetAngle() const { return m_angle; }
+
+  /**
+   * Gets the SimpleMotorFeedforward that describes the motor without the effect
+   * of gravity.
+   *
+   * @return The internal SimpleMotorFeedforward.
+   */
+  SimpleMotorFeedforward<units::rad>& GetSimpleFeedforward() {
+    return m_simpleFeedforward;
+  }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param angle        The angle setpoint, in radians.
-   * @param velocity     The velocity setpoint, in radians per second.
-   * @param acceleration The acceleration setpoint, in radians per second^2.
+   * @param angle           The angle setpoint.
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity    The next velocity setpoint.
+   * @param dt              The time until the next velocity setpoint.
+   * @return The computed feedforward, in volts.
+   */
+  units::volt_t Calculate(units::unit_t<Angle> angle,
+                          units::unit_t<Velocity> currentVelocity,
+                          units::unit_t<Velocity> nextVelocity,
+                          units::second_t dt) {
+    m_angle = angle;
+    return m_simpleFeedforward.Calculate(currentVelocity, nextVelocity, dt) +
+           kG * units::math::cos(angle);
+  }
+
+  /**
+   * Calculates the feedforward from the gains and setpoints.
+   *
+   * @param angle        The angle setpoint.
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
    * @return The computed feedforward, in volts.
    */
   units::volt_t Calculate(units::unit_t<Angle> angle,
                           units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0)) const {
-    return kS * wpi::sgn(velocity) + kCos * units::math::cos(angle) +
-           kV * velocity + kA * acceleration;
+                              units::unit_t<Acceleration>(0)) {
+    return Calculate(angle, velocity, velocity + acceleration * 20_ms, 20_ms);
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -79,9 +124,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kCos * units::math::cos(angle) -
-            kA * acceleration) /
-           kV;
+    return m_simpleFeedforward.MaxAchievableVelocity(maxVoltage, acceleration) -
+           kG * units::math::cos(angle) / m_simpleFeedforward.kV;
   }
 
   /**
@@ -100,9 +144,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + kS - kCos * units::math::cos(angle) -
-            kA * acceleration) /
-           kV;
+    return m_simpleFeedforward.MinAchievableVelocity(maxVoltage, acceleration) -
+           kG * units::math::cos(angle) / m_simpleFeedforward.kV;
   }
 
   /**
@@ -120,9 +163,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   units::unit_t<Acceleration> MaxAchievableAcceleration(
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Velocity> velocity) {
-    return (maxVoltage - kS * wpi::sgn(velocity) -
-            kCos * units::math::cos(angle) - kV * velocity) /
-           kA;
+    return m_simpleFeedforward.MaxAchievableAcceleration(maxVoltage, velocity) -
+           kG * units::math::cos(angle) / m_simpleFeedforward.kA;
   }
 
   /**
@@ -143,9 +185,23 @@ class WPILIB_DLLEXPORT ArmFeedforward {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
-  units::volt_t kS{0};
-  units::volt_t kCos{0};
-  units::unit_t<kv_unit> kV{0};
-  units::unit_t<ka_unit> kA{0};
+  units::volt_t kG{0};
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    m_simpleFeedforward.InitSendable(builder);
+    builder.SetSmartDashboardType("ArmFeedforward");
+    builder.AddDoubleProperty(
+        "kG", [this] { return kG.value(); },
+        [this](double kG) { this->kG = units::volt_t{kG}; });
+    builder.AddDoubleProperty(
+        "gravityVoltage",
+        [this] { return (kG * units::math::cos(m_angle)).value(); }, nullptr);
+    builder.AddDoubleProperty(
+        "outputVoltage", [this] { return GetOutput().value(); }, nullptr);
+  }
+
+ private:
+  SimpleMotorFeedforward<Angle> m_simpleFeedforward;
+  units::unit_t<Angle> m_angle;
 };
 }  // namespace frc

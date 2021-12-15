@@ -69,7 +69,7 @@ public class ElevatorFeedforward implements Sendable {
   }
 
   /**
-   * Gets the most recent output voltage.
+   * Gets the most recent output.
    *
    * @return Most recent output.
    */
@@ -82,7 +82,7 @@ public class ElevatorFeedforward implements Sendable {
    *
    * @param currentVelocity The current velocity setpoint.
    * @param nextVelocity The next velocity setpoint.
-   * @param dtSeconds Time between velocity setpoints in seconds.
+   * @param dtSeconds The time until the next velocity setpoint.
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
@@ -168,5 +168,6 @@ public class ElevatorFeedforward implements Sendable {
     m_simpleFeedforward.initSendable(builder);
     builder.setSmartDashboardType("ElevatorFeedforward");
     builder.addDoubleProperty("kG", this::getKg, this::setKg);
+    builder.addDoubleProperty("output", () -> getOutput() + m_kg, null);
   }
 }

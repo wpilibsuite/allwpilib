@@ -5,6 +5,9 @@
 #pragma once
 
 #include <wpi/MathExtras.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "Eigen/Core"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
@@ -18,7 +21,9 @@ namespace frc {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-class SimpleMotorFeedforward {
+class WPILIB_DLLEXPORT SimpleMotorFeedforward
+    : public wpi::Sendable,
+      public wpi::SendableHelper<SimpleMotorFeedforward<Distance>> {
  public:
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
@@ -28,7 +33,7 @@ class SimpleMotorFeedforward {
   using ka_unit =
       units::compound_unit<units::volts, units::inverse<Acceleration>>;
 
-  constexpr SimpleMotorFeedforward() = default;
+  SimpleMotorFeedforward() = default;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -37,44 +42,53 @@ class SimpleMotorFeedforward {
    * @param kV The velocity gain, in volt seconds per distance.
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    */
-  constexpr SimpleMotorFeedforward(
-      units::volt_t kS, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+  SimpleMotorFeedforward(units::volt_t kS, units::unit_t<kv_unit> kV,
+                         units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
       : kS(kS), kV(kV), kA(kA) {}
+
+  /**
+   * Gets the most recent output voltage.
+   *
+   * @return Most recent output.
+   */
+  units::volt_t GetOutput() const { return m_output; }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param velocity     The velocity setpoint, in distance per second.
-   * @param acceleration The acceleration setpoint, in distance per second^2.
+   * @param velocity     The velocity setpoint.
+   * @param acceleration The acceleration setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity,
-                                    units::unit_t<Acceleration> acceleration =
-                                        units::unit_t<Acceleration>(0)) const {
-    return kS * wpi::sgn(velocity) + kV * velocity + kA * acceleration;
+  units::volt_t Calculate(units::unit_t<Velocity> velocity,
+                          units::unit_t<Acceleration> acceleration =
+                              units::unit_t<Acceleration>(0)) {
+    return Calculate(velocity, velocity + acceleration * 20_ms, 20_ms);
   }
 
   /**
    * Calculates the feedforward from the gains and setpoints.
    *
-   * @param currentVelocity The current velocity setpoint, in distance per
-   *                        second.
-   * @param nextVelocity    The next velocity setpoint, in distance per second.
-   * @param dt              Time between velocity setpoints in seconds.
+   * @param currentVelocity The current velocity setpoint.
+   * @param nextVelocity    The next velocity setpoint.
+   * @param dt              The time until the next velocity setpoint.
    * @return The computed feedforward, in volts.
    */
   units::volt_t Calculate(units::unit_t<Velocity> currentVelocity,
                           units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
+                          units::second_t dt) {
+    m_velocity = currentVelocity;
+    m_acceleration = (nextVelocity - currentVelocity) / dt;
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
-    LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
+    LinearPlantInversionFeedforward<1, 1> feedforward(plant.A(), plant.B(), dt);
 
     Eigen::Vector<double, 1> r{currentVelocity.value()};
     Eigen::Vector<double, 1> nextR{nextVelocity.value()};
 
-    return kS * wpi::sgn(currentVelocity.value()) +
-           units::volt_t{feedforward.Calculate(r, nextR)(0)};
+    m_output = kS * wpi::sgn(currentVelocity.value()) +
+               units::volt_t{feedforward.Calculate(r, nextR)(0)};
+
+    return m_output;
   }
 
   // Rearranging the main equation from the calculate() method yields the
@@ -151,5 +165,35 @@ class SimpleMotorFeedforward {
   units::volt_t kS{0};
   units::unit_t<kv_unit> kV{0};
   units::unit_t<ka_unit> kA{0};
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    builder.SetSmartDashboardType("SimpleMotorFeedforward");
+    builder.AddDoubleProperty(
+        "kS", [this] { return kS.value(); },
+        [this](double kS) { this->kS = units::volt_t{kS}; });
+    builder.AddDoubleProperty(
+        "kV", [this] { return kV.value(); },
+        [this](double kV) { this->kV = units::unit_t<kv_unit>{kV}; });
+    builder.AddDoubleProperty(
+        "kA", [this] { return kA.value(); },
+        [this](double kS) { this->kA = units::unit_t<ka_unit>{kA}; });
+    builder.AddDoubleProperty(
+        "velocity", [this] { return m_velocity.value(); }, nullptr);
+    builder.AddDoubleProperty(
+        "velocityVoltage", [this] { return (m_velocity * kV).value(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "acceleration", [this] { return m_acceleration.value(); }, nullptr);
+    builder.AddDoubleProperty(
+        "accelerationVoltage", [this] { return (m_acceleration * kA).value(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "outputVoltage", [this] { return m_output.value(); }, nullptr);
+  }
+
+ private:
+  units::unit_t<Velocity> m_velocity;
+  units::unit_t<Acceleration> m_acceleration;
+  units::volt_t m_output;
 };
 }  // namespace frc
