@@ -11,7 +11,9 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.util.function.BooleanConsumer;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -50,7 +52,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
     Function<NetworkTableEntry, Integer> m_createListener;
   }
 
-  private final List<Property> m_properties = new ArrayList<>();
+  private final Map<String, Property> m_properties = new LinkedHashMap<>();
   private Runnable m_safeState;
   private final List<Runnable> m_updateTables = new ArrayList<>();
   private NetworkTable m_table;
@@ -99,7 +101,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
   /** Update the network table values by calling the getters for all properties. */
   @Override
   public void update() {
-    for (Property property : m_properties) {
+    for (Property property : m_properties.values()) {
       if (property.m_update != null) {
         property.m_update.accept(property.m_entry);
       }
@@ -111,7 +113,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   /** Hook setters for all properties. */
   public void startListeners() {
-    for (Property property : m_properties) {
+    for (Property property : m_properties.values()) {
       property.startListener();
     }
     if (m_controllableEntry != null) {
@@ -121,7 +123,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
 
   /** Unhook setters for all properties. */
   public void stopListeners() {
-    for (Property property : m_properties) {
+    for (Property property : m_properties.values()) {
       property.stopListener();
     }
     if (m_controllableEntry != null) {
@@ -243,7 +245,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -272,7 +274,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -301,7 +303,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -332,7 +334,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -363,7 +365,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -394,7 +396,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -423,7 +425,7 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 
   /**
@@ -451,6 +453,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kNew
                       | EntryListenerFlags.kUpdate);
     }
-    m_properties.add(property);
+    m_properties.put(key, property);
   }
 }

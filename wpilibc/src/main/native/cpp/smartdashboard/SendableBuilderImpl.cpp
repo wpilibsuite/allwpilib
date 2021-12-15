@@ -31,8 +31,8 @@ bool SendableBuilderImpl::IsActuator() const {
 void SendableBuilderImpl::Update() {
   uint64_t time = nt::Now();
   for (auto& property : m_properties) {
-    if (property.update) {
-      property.update(property.entry, time);
+    if (property.second.update) {
+      property.second.update(property.second.entry, time);
     }
   }
   for (auto& updateTable : m_updateTables) {
@@ -42,7 +42,7 @@ void SendableBuilderImpl::Update() {
 
 void SendableBuilderImpl::StartListeners() {
   for (auto& property : m_properties) {
-    property.StartListener();
+    property.second.StartListener();
   }
   if (m_controllableEntry) {
     m_controllableEntry.SetBoolean(true);
@@ -51,7 +51,7 @@ void SendableBuilderImpl::StartListeners() {
 
 void SendableBuilderImpl::StopListeners() {
   for (auto& property : m_properties) {
-    property.StopListener();
+    property.second.StopListener();
   }
   if (m_controllableEntry) {
     m_controllableEntry.SetBoolean(false);
@@ -100,15 +100,15 @@ nt::NetworkTableEntry SendableBuilderImpl::GetEntry(std::string_view key) {
 void SendableBuilderImpl::AddBooleanProperty(std::string_view key,
                                              std::function<bool()> getter,
                                              std::function<void(bool)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeBoolean(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -121,20 +121,21 @@ void SendableBuilderImpl::AddBooleanProperty(std::string_view key,
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddDoubleProperty(
     std::string_view key, std::function<double()> getter,
     std::function<void(double)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeDouble(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -147,20 +148,21 @@ void SendableBuilderImpl::AddDoubleProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddStringProperty(
     std::string_view key, std::function<std::string()> getter,
     std::function<void(std::string_view)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeString(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -173,20 +175,21 @@ void SendableBuilderImpl::AddStringProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddBooleanArrayProperty(
     std::string_view key, std::function<std::vector<int>()> getter,
     std::function<void(wpi::span<const int>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeBooleanArray(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -199,20 +202,21 @@ void SendableBuilderImpl::AddBooleanArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddDoubleArrayProperty(
     std::string_view key, std::function<std::vector<double>()> getter,
     std::function<void(wpi::span<const double>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeDoubleArray(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -225,20 +229,21 @@ void SendableBuilderImpl::AddDoubleArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddStringArrayProperty(
     std::string_view key, std::function<std::vector<std::string>()> getter,
     std::function<void(wpi::span<const std::string>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeStringArray(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -251,20 +256,21 @@ void SendableBuilderImpl::AddStringArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddRawProperty(
     std::string_view key, std::function<std::string()> getter,
     std::function<void(std::string_view)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(nt::Value::MakeRaw(getter(), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -277,20 +283,21 @@ void SendableBuilderImpl::AddRawProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddValueProperty(
     std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
     std::function<void(std::shared_ptr<nt::Value>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       entry.SetValue(getter());
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -299,22 +306,23 @@ void SendableBuilderImpl::AddValueProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddSmallStringProperty(
     std::string_view key,
     std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
     std::function<void(std::string_view)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       wpi::SmallString<128> buf;
       entry.SetValue(nt::Value::MakeString(getter(buf), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -327,22 +335,23 @@ void SendableBuilderImpl::AddSmallStringProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddSmallBooleanArrayProperty(
     std::string_view key,
     std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)> getter,
     std::function<void(wpi::span<const int>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       wpi::SmallVector<int, 16> buf;
       entry.SetValue(nt::Value::MakeBooleanArray(getter(buf), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -355,6 +364,7 @@ void SendableBuilderImpl::AddSmallBooleanArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddSmallDoubleArrayProperty(
@@ -362,16 +372,16 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
     std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
         getter,
     std::function<void(wpi::span<const double>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       wpi::SmallVector<double, 16> buf;
       entry.SetValue(nt::Value::MakeDoubleArray(getter(buf), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -384,6 +394,7 @@ void SendableBuilderImpl::AddSmallDoubleArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddSmallStringArrayProperty(
@@ -392,16 +403,16 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
         wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
         getter,
     std::function<void(wpi::span<const std::string>)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       wpi::SmallVector<std::string, 16> buf;
       entry.SetValue(nt::Value::MakeStringArray(getter(buf), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -414,22 +425,23 @@ void SendableBuilderImpl::AddSmallStringArrayProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }
 
 void SendableBuilderImpl::AddSmallRawProperty(
     std::string_view key,
     std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
     std::function<void(std::string_view)> setter) {
-  m_properties.emplace_back(*m_table, key);
+  Property property{*m_table, key};
   if (getter) {
-    m_properties.back().update = [=](nt::NetworkTableEntry entry,
+    property.update = [=](nt::NetworkTableEntry entry,
                                      uint64_t time) {
       wpi::SmallVector<char, 128> buf;
       entry.SetValue(nt::Value::MakeRaw(getter(buf), time));
     };
   }
   if (setter) {
-    m_properties.back().createListener =
+    property.createListener =
         [=](nt::NetworkTableEntry entry) -> NT_EntryListener {
       return entry.AddListener(
           [=](const nt::EntryNotification& event) {
@@ -442,4 +454,5 @@ void SendableBuilderImpl::AddSmallRawProperty(
           NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
     };
   }
+  m_properties.insert_or_assign(key, std::move(property));
 }

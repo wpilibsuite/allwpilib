@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -197,7 +198,7 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
     std::function<NT_EntryListener(nt::NetworkTableEntry entry)> createListener;
   };
 
-  std::vector<Property> m_properties;
+  std::map<std::string_view, Property> m_properties;
   std::function<void()> m_safeState;
   std::vector<std::function<void()>> m_updateTables;
   std::shared_ptr<nt::NetworkTable> m_table;
