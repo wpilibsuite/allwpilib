@@ -11,9 +11,9 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import org.junit.jupiter.api.Test;
 
-public class MerweScaledSigmaPointsTest {
+class MerweScaledSigmaPointsTest {
   @Test
-  public void testZeroMeanPoints() {
+  void testZeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
         merweScaledSigmaPoints.sigmaPoints(
@@ -28,7 +28,7 @@ public class MerweScaledSigmaPointsTest {
   }
 
   @Test
-  public void testNonzeroMeanPoints() {
+  void testNonzeroMeanPoints() {
     var merweScaledSigmaPoints = new MerweScaledSigmaPoints<>(Nat.N2());
     var points =
         merweScaledSigmaPoints.sigmaPoints(

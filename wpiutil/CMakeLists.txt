@@ -14,18 +14,18 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.12.4.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.10.0/jackson-core-2.10.0.jar"
-            "${JAR_ROOT}/jackson-core-2.10.0.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.10.0/jackson-databind-2.10.0.jar"
-            "${JAR_ROOT}/jackson-databind-2.10.0.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.10.0/jackson-annotations-2.10.0.jar"
-            "${JAR_ROOT}/jackson-annotations-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.12.4/jackson-core-2.12.4.jar"
+            "${JAR_ROOT}/jackson-core-2.12.4.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.12.4/jackson-databind-2.12.4.jar"
+            "${JAR_ROOT}/jackson-databind-2.12.4.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.12.4/jackson-annotations-2.12.4.jar"
+            "${JAR_ROOT}/jackson-annotations-2.12.4.jar")
 
         message(STATUS "All files downloaded.")
     endif()

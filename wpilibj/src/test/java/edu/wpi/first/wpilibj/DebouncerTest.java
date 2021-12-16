@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import org.junit.jupiter.api.Test;
 
-public class DebouncerTest {
+class DebouncerTest {
   @Test
   void debounceRisingTest() {
     var debouncer = new Debouncer(0.02, Debouncer.DebounceType.kRising);

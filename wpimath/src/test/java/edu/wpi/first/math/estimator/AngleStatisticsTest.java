@@ -11,9 +11,9 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import org.junit.jupiter.api.Test;
 
-public class AngleStatisticsTest {
+class AngleStatisticsTest {
   @Test
-  public void testMean() {
+  void testMean() {
     // 3 states, 2 sigmas
     var sigmas =
         Matrix.mat(Nat.N3(), Nat.N2()).fill(1, 1.2, Math.toRadians(359), Math.toRadians(3), 1, 2);
@@ -27,7 +27,7 @@ public class AngleStatisticsTest {
   }
 
   @Test
-  public void testResidual() {
+  void testResidual() {
     var first = VecBuilder.fill(1, Math.toRadians(1), 2);
     var second = VecBuilder.fill(1, Math.toRadians(359), 1);
     assertTrue(
@@ -36,7 +36,7 @@ public class AngleStatisticsTest {
   }
 
   @Test
-  public void testAdd() {
+  void testAdd() {
     var first = VecBuilder.fill(1, Math.toRadians(1), 2);
     var second = VecBuilder.fill(1, Math.toRadians(359), 1);
     assertTrue(AngleStatistics.angleAdd(first, second, 1).isEqual(VecBuilder.fill(2, 0, 3), 1e-6));

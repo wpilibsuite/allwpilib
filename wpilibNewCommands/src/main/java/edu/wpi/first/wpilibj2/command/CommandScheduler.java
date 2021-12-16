@@ -170,7 +170,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     // Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
     // run when disabled, or the command is already scheduled.
     if (m_disabled
-        || (RobotState.isDisabled() && !command.runsWhenDisabled())
+        || RobotState.isDisabled() && !command.runsWhenDisabled()
         || m_scheduledCommands.containsKey(command)) {
       return;
     }

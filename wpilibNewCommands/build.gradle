@@ -26,8 +26,7 @@ dependencies {
     devImplementation project(':hal')
     devImplementation project(':wpimath')
     devImplementation project(':wpilibj')
-    testImplementation 'com.google.guava:guava:19.0'
-    testImplementation 'org.mockito:mockito-core:2.27.0'
+    testImplementation 'org.mockito:mockito-core:4.1.0'
 }
 
 nativeUtils.exportsConfigs {

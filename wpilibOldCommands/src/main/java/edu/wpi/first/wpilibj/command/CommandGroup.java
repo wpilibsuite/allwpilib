@@ -205,7 +205,7 @@ public class CommandGroup extends Command {
   }
 
   @Override
-  @SuppressWarnings("MethodName")
+  @SuppressWarnings({"MethodName", "PMD.AvoidReassigningLoopVariables"})
   void _execute() {
     Entry entry = null;
     Command cmd = null;
@@ -357,6 +357,7 @@ public class CommandGroup extends Command {
     return true;
   }
 
+  @SuppressWarnings("PMD.AvoidReassigningLoopVariables")
   private void cancelConflicts(Command command) {
     for (int i = 0; i < m_children.size(); i++) {
       Command child = m_children.elementAt(i).m_command;

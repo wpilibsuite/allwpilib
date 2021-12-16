@@ -639,8 +639,8 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * number of iterations to average with setToleranceBuffer() (defaults to 1). getAvgError() is
    * used for the onTarget() function.
    *
-   * @deprecated Use getError(), which is now already filtered.
    * @return the current average of the error
+   * @deprecated Use getError(), which is now already filtered.
    */
   @Deprecated
   public double getAvgError() {
@@ -676,9 +676,9 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * object. Use it by creating the type of tolerance that you want to use: setTolerance(new
    * PIDController.AbsoluteTolerance(0.1))
    *
-   * @deprecated Use setPercentTolerance() instead.
    * @param tolerance A tolerance object of the right type, e.g. PercentTolerance or
    *     AbsoluteTolerance
+   * @deprecated Use setPercentTolerance() instead.
    */
   @Deprecated
   public void setTolerance(Tolerance tolerance) {
@@ -721,8 +721,8 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    * erroneous measurements when the mechanism is on target. However, the mechanism will not
    * register as on target for at least the specified bufLength cycles.
    *
-   * @deprecated Use a LinearFilter as the input.
    * @param bufLength Number of previous cycles to average.
+   * @deprecated Use a LinearFilter as the input.
    */
   @Deprecated
   public void setToleranceBuffer(int bufLength) {

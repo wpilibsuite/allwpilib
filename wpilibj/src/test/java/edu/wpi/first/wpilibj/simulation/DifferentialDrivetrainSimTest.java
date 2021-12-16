@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 class DifferentialDrivetrainSimTest {
   @Test
-  public void testConvergence() {
+  void testConvergence() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -96,7 +96,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testCurrent() {
+  void testCurrent() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(
@@ -126,7 +126,7 @@ class DifferentialDrivetrainSimTest {
   }
 
   @Test
-  public void testModelStability() {
+  void testModelStability() {
     var motor = DCMotor.getNEO(2);
     var plant =
         LinearSystemId.createDrivetrainVelocitySystem(

@@ -99,7 +99,7 @@ public class Notifier implements AutoCloseable {
                   break;
                 }
 
-                Runnable handler = null;
+                Runnable handler;
                 m_processLock.lock();
                 try {
                   handler = m_handler;

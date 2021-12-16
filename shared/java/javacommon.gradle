@@ -104,9 +104,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
     devImplementation sourceSets.main.output
 }
@@ -120,7 +120,7 @@ task run(type: JavaExec) {
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.7"
 }
 
 jacocoTestReport {

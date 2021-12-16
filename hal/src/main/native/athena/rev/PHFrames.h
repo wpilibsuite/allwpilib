@@ -50,6 +50,7 @@ extern "C" {
 #define PH_STATUS_0_FRAME_ID (0x9051800u)
 #define PH_STATUS_1_FRAME_ID (0x9051840u)
 #define PH_CLEAR_FAULTS_FRAME_ID (0x9051b80u)
+#define PH_VERSION_FRAME_ID (0x9052600u)
 
 /* Frame lengths in bytes. */
 #define PH_COMPRESSOR_CONFIG_LENGTH (5u)
@@ -58,6 +59,7 @@ extern "C" {
 #define PH_STATUS_0_LENGTH (8u)
 #define PH_STATUS_1_LENGTH (8u)
 #define PH_CLEAR_FAULTS_LENGTH (0u)
+#define PH_VERSION_LENGTH (8u)
 
 /* Extended or standard frame types. */
 #define PH_COMPRESSOR_CONFIG_IS_EXTENDED (1)
@@ -66,6 +68,7 @@ extern "C" {
 #define PH_STATUS_0_IS_EXTENDED (1)
 #define PH_STATUS_1_IS_EXTENDED (1)
 #define PH_CLEAR_FAULTS_IS_EXTENDED (1)
+#define PH_VERSION_IS_EXTENDED (1)
 
 /* Frame cycle times in milliseconds. */
 
@@ -781,6 +784,13 @@ struct PH_status_1_t {
      * Offset: 0
      */
     uint8_t sticky_has_reset_fault : 1;
+
+    /**
+     * Range: 0..128 (4.5..5.5 V)
+     * Scale: 0.0078125
+     * Offset: 4.5
+     */
+    uint8_t supply_voltage_5_v : 7;
 };
 
 /**
@@ -795,6 +805,57 @@ struct PH_clear_faults_t {
      * Dummy signal in empty message.
      */
     uint8_t dummy;
+};
+
+/**
+ * Signals in message Version.
+ *
+ * Get the version of the PH
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct PH_version_t {
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t firmware_fix : 8;
+
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t firmware_minor : 8;
+
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t firmware_year : 8;
+
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t hardware_minor : 8;
+
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t hardware_major : 8;
+
+    /**
+     * Range: 0..16777215 (0..16777215 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t unique_id : 24;
 };
 
 /**
@@ -3503,6 +3564,33 @@ double PH_status_1_sticky_has_reset_fault_decode(uint8_t value);
 bool PH_status_1_sticky_has_reset_fault_is_in_range(uint8_t value);
 
 /**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_status_1_supply_voltage_5_v_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_status_1_supply_voltage_5_v_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_status_1_supply_voltage_5_v_is_in_range(uint8_t value);
+
+/**
  * Pack message Clear_Faults.
  *
  * @param[out] dst_p Buffer to pack the message into.
@@ -3529,6 +3617,196 @@ int PH_clear_faults_unpack(
     struct PH_clear_faults_t *dst_p,
     const uint8_t *src_p,
     size_t size);
+
+/**
+ * Pack message Version.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int PH_version_pack(
+    uint8_t *dst_p,
+    const struct PH_version_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message Version.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int PH_version_unpack(
+    struct PH_version_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_version_firmware_fix_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_firmware_fix_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_firmware_fix_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_version_firmware_minor_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_firmware_minor_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_firmware_minor_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_version_firmware_year_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_firmware_year_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_firmware_year_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_version_hardware_minor_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_hardware_minor_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_hardware_minor_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PH_version_hardware_major_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_hardware_major_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_hardware_major_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t PH_version_unique_id_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PH_version_unique_id_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PH_version_unique_id_is_in_range(uint32_t value);
 
 
 #ifdef __cplusplus

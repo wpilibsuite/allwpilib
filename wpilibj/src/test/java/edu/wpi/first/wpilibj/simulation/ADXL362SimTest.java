@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class ADXL362SimTest {
+class ADXL362SimTest {
   @ParameterizedTest
   @EnumSource(Accelerometer.Range.class)
   void testAccel(Accelerometer.Range range) {

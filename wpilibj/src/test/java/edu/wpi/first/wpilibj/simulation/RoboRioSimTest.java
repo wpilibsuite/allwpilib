@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
-public class RoboRioSimTest {
+class RoboRioSimTest {
   @Test
   void testFPGAButton() {
     RoboRioSim.resetData();

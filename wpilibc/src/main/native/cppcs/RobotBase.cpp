@@ -251,6 +251,9 @@ RobotBase::RobotBase() {
     }
   }
 
+  // Call DriverStation::InDisabled() to kick off DS thread
+  DriverStation::InDisabled(true);
+
   // First and one-time initialization
   inst.GetTable("LiveWindow")
       ->GetSubTable(".status")
