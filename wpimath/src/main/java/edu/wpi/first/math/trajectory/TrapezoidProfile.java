@@ -52,10 +52,10 @@ public class TrapezoidProfile {
 
   public static class Constraints {
     @SuppressWarnings("MemberName")
-    public final double maxVelocity;
+    public double maxVelocity;
 
     @SuppressWarnings("MemberName")
-    public final double maxAcceleration;
+    public double maxAcceleration;
 
     /**
      * Construct constraints for a TrapezoidProfile.

@@ -23,7 +23,8 @@ public class ProfiledPIDController implements Sendable {
   private double m_maximumInput;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private TrapezoidProfile.Constraints m_constraints;
+
+  public final TrapezoidProfile.Constraints m_constraints;
 
   /**
    * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
@@ -181,7 +182,8 @@ public class ProfiledPIDController implements Sendable {
    * @param constraints Velocity and acceleration constraints for goal.
    */
   public void setConstraints(TrapezoidProfile.Constraints constraints) {
-    m_constraints = constraints;
+    m_constraints.maxVelocity = constraints.maxVelocity;
+    m_constraints.maxAcceleration = constraints.maxAcceleration;
   }
 
   /**
@@ -372,10 +374,18 @@ public class ProfiledPIDController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    m_controller.initSendable(builder);
     builder.setSmartDashboardType("ProfiledPIDController");
-    builder.addDoubleProperty("p", this::getP, this::setP);
-    builder.addDoubleProperty("i", this::getI, this::setI);
-    builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("setpoint", m_controller::getSetpoint, null);
+    builder.addDoubleProperty(
+        "maxVelocity",
+        () -> m_constraints.maxVelocity,
+        maxVelocity -> m_constraints.maxVelocity = maxVelocity);
+    builder.addDoubleProperty(
+        "maxAcceleration",
+        () -> m_constraints.maxAcceleration,
+        maxAcceleration -> m_constraints.maxAcceleration = maxAcceleration);
     builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
+    builder.addDoubleProperty("goalVelocity", () -> getGoal().velocity, null);
   }
 }

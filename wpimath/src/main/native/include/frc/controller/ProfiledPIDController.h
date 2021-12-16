@@ -58,7 +58,7 @@ class ProfiledPIDController
    */
   ProfiledPIDController(double Kp, double Ki, double Kd,
                         Constraints constraints, units::second_t period = 20_ms)
-      : m_controller(Kp, Ki, Kd, period), m_constraints(constraints) {
+      : m_constraints(constraints), m_controller(Kp, Ki, Kd, period) {
     detail::ReportProfiledPIDController();
   }
 
@@ -343,17 +343,25 @@ class ProfiledPIDController
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
+    m_controller.InitSendable(builder);
     builder.SetSmartDashboardType("ProfiledPIDController");
     builder.AddDoubleProperty(
-        "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
+        "maxVelocity", [this] { return m_constraints.maxVelocity.value(); },
+        [this](double maxVelocity) {
+          m_constraints.maxVelocity = Velocity_t{maxVelocity};
+        });
     builder.AddDoubleProperty(
-        "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
-    builder.AddDoubleProperty(
-        "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
+        "maxAcceleration",
+        [this] { return m_constraints.maxAcceleration.value(); },
+        [this](double maxAcceleration) {
+          m_constraints.maxAcceleration = Acceleration_t{maxAcceleration};
+        });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });
   }
+
+  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
 
  private:
   frc2::PIDController m_controller;
@@ -361,7 +369,6 @@ class ProfiledPIDController
   Distance_t m_maximumInput{0};
   typename frc::TrapezoidProfile<Distance>::State m_goal;
   typename frc::TrapezoidProfile<Distance>::State m_setpoint;
-  typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
 };
 
 }  // namespace frc
