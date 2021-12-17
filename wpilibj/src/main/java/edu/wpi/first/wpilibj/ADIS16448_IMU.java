@@ -39,7 +39,9 @@ import java.nio.ByteBuffer;
 //CHECKSTYLE.OFF: ArrayTypeStyle
 
 /** This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port. */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.RedundantFieldInitializer",
+    "PMD.ImmutableField", "PMD.SingularField", "PMD.CollapsibleIfStatements",
+    "PMD.MissingOverride", "PMD.EmptyIfStmt", "PMD.EmptyStatementNotInLoop"})
 public class ADIS16448_IMU implements Gyro, NTSendable {
   /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count

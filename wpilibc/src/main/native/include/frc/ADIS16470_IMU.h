@@ -211,7 +211,7 @@ class ADIS16470_IMU : public nt::NTSendable,
   /**
    * @brief Destructor. Kills the acquisiton loop and closes the SPI peripheral.
    */
-  ~ADIS16470_IMU();
+  ~ADIS16470_IMU() override;
 
   ADIS16470_IMU(ADIS16470_IMU&&) = default;
   ADIS16470_IMU& operator=(ADIS16470_IMU&&) = default;

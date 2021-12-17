@@ -39,7 +39,9 @@ import java.nio.ByteOrder;
 //CHECKSTYLE.OFF: ArrayTypeStyle
 
 /** This class is for the ADIS16470 IMU that connects to the RoboRIO SPI port. */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.RedundantFieldInitializer",
+    "PMD.ImmutableField", "PMD.SingularField", "PMD.CollapsibleIfStatements",
+    "PMD.MissingOverride", "PMD.EmptyIfStmt", "PMD.EmptyStatementNotInLoop"})
 public class ADIS16470_IMU implements Gyro, NTSendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
