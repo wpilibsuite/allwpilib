@@ -136,7 +136,7 @@ class LinearSystemSim {
    * @return The normalized input.
    */
   Eigen::Vector<double, Inputs> ClampInput(Eigen::Vector<double, Inputs> u) {
-    return frc::NormalizeInputVector<Inputs>(
+    return frc::DesaturateInputVector<Inputs>(
         u, frc::RobotController::GetInputVoltage());
   }
 

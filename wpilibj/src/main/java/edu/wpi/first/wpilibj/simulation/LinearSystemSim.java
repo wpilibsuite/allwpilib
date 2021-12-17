@@ -186,6 +186,6 @@ public class LinearSystemSim<States extends Num, Inputs extends Num, Outputs ext
    * @return The normalized input.
    */
   protected Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
-    return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
+    return StateSpaceUtil.desaturateInputVector(u, RobotController.getBatteryVoltage());
   }
 }

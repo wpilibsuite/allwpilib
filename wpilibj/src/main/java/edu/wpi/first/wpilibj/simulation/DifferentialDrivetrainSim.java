@@ -360,7 +360,7 @@ public class DifferentialDrivetrainSim {
    * @return The normalized input.
    */
   protected Matrix<N2, N1> clampInput(Matrix<N2, N1> u) {
-    return StateSpaceUtil.normalizeInputVector(u, RobotController.getBatteryVoltage());
+    return StateSpaceUtil.desaturateInputVector(u, RobotController.getBatteryVoltage());
   }
 
   /** Represents the different states of the drivetrain. */
