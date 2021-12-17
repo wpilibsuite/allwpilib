@@ -80,8 +80,8 @@ public class SwerveDriveKinematics {
    *     component, the robot will rotate around that corner.
    * @return An array containing the module states. Use caution because these module states are not
    *     normalized. Sometimes, a user input may cause one of the module speeds to go above the
-   *     attainable max velocity. Use the {@link #normalizeWheelSpeeds(SwerveModuleState[], double)
-   *     normalizeWheelSpeeds} function to rectify this issue.
+   *     attainable max velocity. Use the {@link #desaturateWheelSpeeds(SwerveModuleState[], double)
+   *     DesaturateWheelSpeeds} function to rectify this issue.
    */
   @SuppressWarnings("LocalVariableName")
   public SwerveModuleState[] toSwerveModuleStates(
@@ -181,7 +181,7 @@ public class SwerveDriveKinematics {
    *     normalized speeds!
    * @param attainableMaxSpeedMetersPerSecond The absolute max speed that a module can reach.
    */
-  public static void normalizeWheelSpeeds(
+  public static void desaturateWheelSpeeds(
       SwerveModuleState[] moduleStates, double attainableMaxSpeedMetersPerSecond) {
     double realMaxSpeed = Collections.max(Arrays.asList(moduleStates)).speedMetersPerSecond;
     if (realMaxSpeed > attainableMaxSpeedMetersPerSecond) {

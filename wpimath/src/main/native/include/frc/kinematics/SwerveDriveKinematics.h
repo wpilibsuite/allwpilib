@@ -114,7 +114,7 @@ class SwerveDriveKinematics {
    * @return An array containing the module states. Use caution because these
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
-   * NormalizeWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
+   * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
    * units::meters_per_second_t) function to rectify this issue. In addition,
    * you can leverage the power of C++17 to directly assign the module states to
    * variables:
@@ -170,7 +170,7 @@ class SwerveDriveKinematics {
    * mutated with the normalized speeds!
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
-  static void NormalizeWheelSpeeds(
+  static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
       units::meters_per_second_t attainableMaxSpeed);
 
