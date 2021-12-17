@@ -333,17 +333,11 @@ class ADIS16448_IMU : public nt::NTSendable,
       return *this;
     }
 
-    void lock() {
-      mutex.lock();
-    }
+    void lock() { mutex.lock(); }
 
-    void unlock() {
-      mutex.unlock();
-    }
+    void unlock() { mutex.unlock(); }
 
-    bool try_lock() noexcept {
-      return mutex.try_lock();
-    }
+    bool try_lock() noexcept { return mutex.try_lock(); }
   };
 
   mutable NonMovableMutexWrapper m_mutex;

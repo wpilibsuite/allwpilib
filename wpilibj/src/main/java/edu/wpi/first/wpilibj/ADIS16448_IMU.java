@@ -20,6 +20,24 @@ import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import java.nio.ByteBuffer;
 
+//CHECKSTYLE.OFF: TypeName
+//CHECKSTYLE.OFF: MemberName
+//CHECKSTYLE.OFF: SummaryJavadoc
+//CHECKSTYLE.OFF: UnnecessaryParentheses
+//CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
+//CHECKSTYLE.OFF: NonEmptyAtclauseDescription
+//CHECKSTYLE.OFF: MissingOverride
+//CHECKSTYLE.OFF: AtclauseOrder
+//CHECKSTYLE.OFF: LocalVariableName
+//CHECKSTYLE.OFF: RedundantModifier
+//CHECKSTYLE.OFF: AbbreviationAsWordInName
+//CHECKSTYLE.OFF: ParameterName
+//CHECKSTYLE.OFF: EmptyCatchBlock
+//CHECKSTYLE.OFF: MissingJavadocMethod
+//CHECKSTYLE.OFF: MissingSwitchDefault
+//CHECKSTYLE.OFF: VariableDeclarationUsageDistance
+//CHECKSTYLE.OFF: ArrayTypeStyle
+
 /** This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port. */
 @SuppressWarnings("unused")
 public class ADIS16448_IMU implements Gyro, NTSendable {
@@ -390,9 +408,8 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       m_thread_active = true;
       m_acquire_task.start();
       System.out.println("New IMU Processing thread activated!");
-    }
-    // The thread was running, re-init run variables and start it up again.
-    else {
+    } else {
+      // The thread was running, re-init run variables and start it up again.
       m_first_run = true;
       m_thread_active = true;
       System.out.println("Old IMU Processing thread re-activated!");
