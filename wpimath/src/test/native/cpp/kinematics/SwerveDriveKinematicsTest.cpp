@@ -162,7 +162,7 @@ TEST_F(SwerveDriveKinematicsTest,
   EXPECT_NEAR(chassisSpeeds.omega.value(), 1.5, kEpsilon);
 }
 
-TEST_F(SwerveDriveKinematicsTest, Normalize) {
+TEST_F(SwerveDriveKinematicsTest, Desaturate) {
   SwerveModuleState state1{5.0_mps, Rotation2d()};
   SwerveModuleState state2{6.0_mps, Rotation2d()};
   SwerveModuleState state3{4.0_mps, Rotation2d()};

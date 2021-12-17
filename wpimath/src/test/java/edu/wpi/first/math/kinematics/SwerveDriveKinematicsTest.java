@@ -229,7 +229,7 @@ class SwerveDriveKinematicsTest {
   }
 
   @Test
-  void testNormalize() {
+  void testDesaturate() {
     SwerveModuleState fl = new SwerveModuleState(5, new Rotation2d());
     SwerveModuleState fr = new SwerveModuleState(6, new Rotation2d());
     SwerveModuleState bl = new SwerveModuleState(4, new Rotation2d());

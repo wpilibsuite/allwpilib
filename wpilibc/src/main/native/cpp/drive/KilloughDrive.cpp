@@ -102,7 +102,7 @@ KilloughDrive::WheelSpeeds KilloughDrive::DriveCartesianIK(double ySpeed,
   wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
   wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
 
-  Normalize(wheelSpeeds);
+  Desaturate(wheelSpeeds);
 
   return {wheelSpeeds[kLeft], wheelSpeeds[kRight], wheelSpeeds[kBack]};
 }

@@ -16,7 +16,7 @@ units::meters_per_second_t DifferentialDriveKinematicsConstraint::MaxVelocity(
     units::meters_per_second_t velocity) const {
   auto wheelSpeeds =
       m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
-  wheelSpeeds.Normalize(m_maxSpeed);
+  wheelSpeeds.Desaturate(m_maxSpeed);
 
   return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
 }

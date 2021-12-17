@@ -145,7 +145,7 @@ TEST_F(MecanumDriveKinematicsTest,
 
 TEST_F(MecanumDriveKinematicsTest, Normalize) {
   MecanumDriveWheelSpeeds wheelSpeeds{5_mps, 6_mps, 4_mps, 7_mps};
-  wheelSpeeds.Normalize(5.5_mps);
+  wheelSpeeds.Desaturate(5.5_mps);
 
   double kFactor = 5.5 / 7.0;
 
