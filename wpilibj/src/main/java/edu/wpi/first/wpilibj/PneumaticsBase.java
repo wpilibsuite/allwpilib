@@ -94,6 +94,8 @@ public interface PneumaticsBase extends AutoCloseable {
 
   void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage);
 
+  double getAnalogVoltage(int channel);
+
   CompressorConfigType getCompressorConfigType();
 
   /**

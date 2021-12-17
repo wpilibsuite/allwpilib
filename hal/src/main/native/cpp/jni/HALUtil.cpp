@@ -53,6 +53,7 @@ static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
+static JClass revPHVersionCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
@@ -61,7 +62,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls}};
+    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -238,6 +240,19 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
       static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
 }
 
+jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
+                           uint32_t firmwareMinor, uint32_t firmwareFix,
+                           uint32_t hardwareMinor, uint32_t hardwareMajor,
+                           uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(revPHVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      revPHVersionCls, constructor, static_cast<jint>(firmwareMajor),
+      static_cast<jint>(firmwareMinor), static_cast<jint>(firmwareFix),
+      static_cast<jint>(hardwareMinor), static_cast<jint>(hardwareMajor),
+      static_cast<jint>(uniqueId));
+}
+
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
                         float percentBusUtilization, uint32_t busOffCount,
                         uint32_t txFullCount, uint32_t receiveErrorCount,
@@ -385,9 +400,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGAVersion(JNIEnv* env, jclass) {
   int32_t status = 0;
   jshort returnValue = HAL_GetFPGAVersion(&status);
   CheckStatus(env, status);
@@ -400,9 +413,7 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAVersion
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGARevision
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGARevision(JNIEnv* env, jclass) {
   int32_t status = 0;
   jint returnValue = HAL_GetFPGARevision(&status);
   CheckStatus(env, status);
@@ -414,10 +425,8 @@ Java_edu_wpi_first_hal_HALUtil_getFPGARevision
  * Method:    getFPGATime
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGATime
-  (JNIEnv* env, jclass)
-{
+JNIEXPORT jlong JNICALL Java_edu_wpi_first_hal_HALUtil_getFPGATime(JNIEnv* env,
+                                                                   jclass) {
   int32_t status = 0;
   jlong returnValue = HAL_GetFPGATime(&status);
   CheckStatus(env, status);
@@ -430,9 +439,7 @@ Java_edu_wpi_first_hal_HALUtil_getFPGATime
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType(JNIEnv* env, jclass) {
   jint returnValue = HAL_GetRuntimeType();
   return returnValue;
 }
@@ -443,9 +450,7 @@ Java_edu_wpi_first_hal_HALUtil_getHALRuntimeType
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_HALUtil_getFPGAButton
-  (JNIEnv* env, jclass)
-{
+Java_edu_wpi_first_hal_HALUtil_getFPGAButton(JNIEnv* env, jclass) {
   int32_t status = 0;
   jboolean returnValue = HAL_GetFPGAButton(&status);
   CheckStatus(env, status);
@@ -457,10 +462,8 @@ Java_edu_wpi_first_hal_HALUtil_getFPGAButton
  * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
-  (JNIEnv* paramEnv, jclass, jint paramId)
-{
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage(
+    JNIEnv* paramEnv, jclass, jint paramId) {
   const char* msg = HAL_GetErrorMessage(paramId);
   return MakeJString(paramEnv, msg);
 }
@@ -470,10 +473,8 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrorMessage
  * Method:    getHALErrno
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALErrno
-  (JNIEnv*, jclass)
-{
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_HALUtil_getHALErrno(JNIEnv*,
+                                                                  jclass) {
   return errno;
 }
 
@@ -482,10 +483,8 @@ Java_edu_wpi_first_hal_HALUtil_getHALErrno
  * Method:    getHALstrerror
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_hal_HALUtil_getHALstrerror
-  (JNIEnv* env, jclass, jint errorCode)
-{
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_hal_HALUtil_getHALstrerror(
+    JNIEnv* env, jclass, jint errorCode) {
   const char* msg = std::strerror(errno);
   return MakeJString(env, msg);
 }

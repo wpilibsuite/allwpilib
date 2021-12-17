@@ -3,13 +3,21 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <frc/TimedRobot.h>
+#include <frc/PneumaticHub.h>
+#include <frc/AnalogOutput.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 class MyRobot : public frc::TimedRobot {
+  frc::AnalogOutput ao{0};
+  frc::PneumaticHub hub{1};
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {}
+  void RobotInit() override {
+    frc::SmartDashboard::PutNumber("AOut", 0);
+  }
 
   /**
    * This function is run once each time the robot enters autonomous mode
@@ -39,7 +47,10 @@ class MyRobot : public frc::TimedRobot {
   /**
    * This function is called periodically during all modes
    */
-  void RobotPeriodic() override {}
+  void RobotPeriodic() override {
+    ao.SetVoltage(frc::SmartDashboard::GetNumber("AOut", 0));
+    frc::SmartDashboard::PutNumber("Pressure", hub.GetAnalogVoltage(0).value());
+  }
 };
 
 int main() {

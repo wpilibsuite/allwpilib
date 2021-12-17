@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.REVPHJNI;
+import edu.wpi.first.hal.REVPHVersion;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -214,5 +215,42 @@ public class PneumaticHub implements PneumaticsBase {
   @Override
   public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
     REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  @Override
+  public double getAnalogVoltage(int channel) {
+    return REVPHJNI.getAnalogVoltage(m_handle, channel);
+  }
+
+  void clearStickyFaults() {
+    REVPHJNI.clearStickyFaults(m_handle);
+  }
+
+  REVPHVersion getVersion() {
+    return REVPHJNI.getVersion(m_handle);
+  }
+
+  int getFaults() {
+    return REVPHJNI.getFaults(m_handle);
+  }
+
+  int getStickyFaults() {
+    return REVPHJNI.getStickyFaults(m_handle);
+  }
+
+  double getInputVoltage() {
+    return REVPHJNI.getInputVoltage(m_handle);
+  }
+
+  double get5VRegulatedVoltage() {
+    return REVPHJNI.get5VVoltage(m_handle);
+  }
+
+  double getSolenoidsTotalCurrent() {
+    return REVPHJNI.getSolenoidCurrent(m_handle);
+  }
+
+  double getSolenoidsVoltage() {
+    return REVPHJNI.getSolenoidVoltage(m_handle);
   }
 }

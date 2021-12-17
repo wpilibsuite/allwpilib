@@ -96,15 +96,15 @@ void PneumaticsControlModule::EnableCompressorDigital() {
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::EnableCompressorAnalog(double minAnalogVoltage,
-                                                     double maxAnalogVoltage) {
+void PneumaticsControlModule::EnableCompressorAnalog(units::volt_t minAnalogVoltage,
+                                                     units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::EnableCompressorHybrid(double minAnalogVoltage,
-                                                     double maxAnalogVoltage) {
+void PneumaticsControlModule::EnableCompressorHybrid(units::volt_t minAnalogVoltage,
+                                                     units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
@@ -125,11 +125,11 @@ bool PneumaticsControlModule::GetPressureSwitch() const {
   return result;
 }
 
-double PneumaticsControlModule::GetCompressorCurrent() const {
+units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return result;
+  return units::ampere_t{result};
 }
 
 bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {
@@ -259,6 +259,10 @@ bool PneumaticsControlModule::ReserveCompressor() {
 void PneumaticsControlModule::UnreserveCompressor() {
   std::scoped_lock lock{m_dataStore->m_reservedLock};
   m_dataStore->m_compressorReserved = false;
+}
+
+units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
+  return units::volt_t{0};
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {

@@ -196,15 +196,15 @@ Java_edu_wpi_first_hal_REVPHJNI_getPressureSwitch
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
- * Method:    getAnalogPressure
+ * Method:    getAnalogVoltage
  * Signature: (II)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getAnalogPressure
+Java_edu_wpi_first_hal_REVPHJNI_getAnalogVoltage
   (JNIEnv* env, jclass, jint handle, jint channel)
 {
   int32_t status = 0;
-  auto result = HAL_GetREVPHAnalogPressure(handle, channel, &status);
+  auto result = HAL_GetREVPHAnalogVoltage(handle, channel, &status);
   CheckStatus(env, status, false);
   return result;
 }
@@ -265,6 +265,129 @@ Java_edu_wpi_first_hal_REVPHJNI_fireOneShot
   int32_t status = 0;
   HAL_FireREVPHOneShot(handle, index, durMs, &status);
   CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    clearStickyFaults
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_hal_REVPHJNI_clearStickyFaults
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_ClearREVPHStickyFaults(handle, &status);
+  CheckStatus(env, status, false);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getInputVoltage
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_REVPHJNI_getInputVoltage
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHVoltage(handle, &status);
+  CheckStatus(env, status, false);
+  return voltage;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    get5VVoltage
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_REVPHJNI_get5VVoltage
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPH5VVoltage(handle, &status);
+  CheckStatus(env, status, false);
+  return voltage;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getSolenoidCurrent
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_REVPHJNI_getSolenoidCurrent
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHSolenoidCurrent(handle, &status);
+  CheckStatus(env, status, false);
+  return voltage;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getSolenoidVoltage
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_hal_REVPHJNI_getSolenoidVoltage
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHSolenoidVoltage(handle, &status);
+  CheckStatus(env, status, false);
+  return voltage;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getStickyFaults
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_REVPHJNI_getStickyFaults
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_REVPHStickyFaults halFaults;
+  memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetREVPHStickyFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getFaults
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_hal_REVPHJNI_getFaults
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_REVPHFaults halFaults;
+  memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetREVPHFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_REVPHJNI
+ * Method:    getVersion
+ * Signature: (I)Ledu/wpi/first/hal/REVPHVersion;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_hal_REVPHJNI_getVersion
+  (JNIEnv * env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_REVPHVersion version;
+  memset(&version, 0, sizeof(version));
+  HAL_GetREVPHVersion(handle, &version, &status);
+  CheckStatus(env, status, false);
+  return CreateREVPHVersion(env, version.firmwareMajor, version.firmwareMinor, version.firmwareFix, version.hardwareMinor, version.hardwareMajor, version.uniqueId);
 }
 
 }  // extern "C"

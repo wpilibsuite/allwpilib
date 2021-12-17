@@ -48,8 +48,12 @@ bool Compressor::GetPressureSwitchValue() const {
   return m_module->GetPressureSwitch();
 }
 
-double Compressor::GetCurrent() const {
+units::ampere_t Compressor::GetCurrent() const {
   return m_module->GetCompressorCurrent();
+}
+
+units::volt_t Compressor::GetAnalogVoltage() const {
+  return m_module->GetAnalogVoltage(0);
 }
 
 void Compressor::Disable() {
@@ -60,13 +64,13 @@ void Compressor::EnableDigital() {
   m_module->EnableCompressorDigital();
 }
 
-void Compressor::EnableAnalog(double minAnalogVoltage,
-                              double maxAnalogVoltage) {
+void Compressor::EnableAnalog(units::volt_t minAnalogVoltage,
+                              units::volt_t maxAnalogVoltage) {
   m_module->EnableCompressorAnalog(minAnalogVoltage, maxAnalogVoltage);
 }
 
-void Compressor::EnableHybrid(double minAnalogVoltage,
-                              double maxAnalogVoltage) {
+void Compressor::EnableHybrid(units::volt_t minAnalogVoltage,
+                              units::volt_t maxAnalogVoltage) {
   m_module->EnableCompressorHybrid(minAnalogVoltage, maxAnalogVoltage);
 }
 

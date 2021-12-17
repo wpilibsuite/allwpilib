@@ -92,19 +92,19 @@ void PneumaticHub::EnableCompressorDigital() {
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticHub::EnableCompressorAnalog(double minAnalogVoltage,
-                                          double maxAnalogVoltage) {
+void PneumaticHub::EnableCompressorAnalog(units::volt_t minAnalogVoltage,
+                                          units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
-  HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage,
-                                      maxAnalogVoltage, &status);
+  HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
+                                      maxAnalogVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticHub::EnableCompressorHybrid(double minAnalogVoltage,
-                                          double maxAnalogVoltage) {
+void PneumaticHub::EnableCompressorHybrid(units::volt_t minAnalogVoltage,
+                                          units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
-  HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage,
-                                      maxAnalogVoltage, &status);
+  HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
+                                      maxAnalogVoltage.value(), &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
@@ -122,11 +122,11 @@ bool PneumaticHub::GetPressureSwitch() const {
   return result;
 }
 
-double PneumaticHub::GetCompressorCurrent() const {
+units::ampere_t PneumaticHub::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorCurrent(m_handle, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
-  return result;
+  return units::ampere_t{result};
 }
 
 void PneumaticHub::SetSolenoids(int mask, int values) {
@@ -201,6 +201,89 @@ bool PneumaticHub::ReserveCompressor() {
 void PneumaticHub::UnreserveCompressor() {
   std::scoped_lock lock{m_dataStore->m_reservedLock};
   m_dataStore->m_compressorReserved = false;
+}
+
+PneumaticHub::Version PneumaticHub::GetVersion() const {
+  int32_t status = 0;
+  HAL_REVPHVersion halVersions;
+  memset(&halVersions, 0, sizeof(halVersions));
+  HAL_GetREVPHVersion(m_handle, &halVersions, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  PneumaticHub::Version versions;
+  static_assert(sizeof(halVersions) == sizeof(versions));
+  static_assert(std::is_standard_layout_v<decltype(versions)>);
+  static_assert(std::is_trivial_v<decltype(versions)>);
+  memcpy(&versions, &halVersions, sizeof(versions));
+  return versions;
+}
+
+PneumaticHub::Faults PneumaticHub::GetFaults() const {
+  int32_t status = 0;
+  HAL_REVPHFaults halFaults;
+  memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetREVPHFaults(m_handle, &halFaults, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  PneumaticHub::Faults faults;
+  static_assert(sizeof(halFaults) == sizeof(faults));
+  static_assert(std::is_standard_layout_v<decltype(faults)>);
+  static_assert(std::is_trivial_v<decltype(faults)>);
+  memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
+  int32_t status = 0;
+  HAL_REVPHStickyFaults halStickyFaults;
+  memset(&halStickyFaults, 0, sizeof(halStickyFaults));
+  HAL_GetREVPHStickyFaults(m_handle, &halStickyFaults, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  PneumaticHub::StickyFaults stickyFaults;
+  static_assert(sizeof(halStickyFaults) == sizeof(stickyFaults));
+  static_assert(std::is_standard_layout_v<decltype(stickyFaults)>);
+  static_assert(std::is_trivial_v<decltype(stickyFaults)>);
+  memcpy(&stickyFaults, &halStickyFaults, sizeof(stickyFaults));
+  return stickyFaults;
+}
+
+void PneumaticHub::ClearStickyFaults() {
+  int32_t status = 0;
+  HAL_ClearREVPHStickyFaults(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+}
+
+units::volt_t PneumaticHub::GetInputVoltage() const {
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHVoltage(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return units::volt_t{voltage};
+}
+
+units::volt_t PneumaticHub::Get5VRegulatedVoltage() const {
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPH5VVoltage(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return units::volt_t{voltage};
+}
+
+units::ampere_t PneumaticHub::GetSolenoidsTotalCurrent() const {
+  int32_t status = 0;
+  auto current = HAL_GetREVPHSolenoidCurrent(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return units::ampere_t{current};
+}
+
+units::volt_t PneumaticHub::GetSolenoidsVoltage() const {
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHSolenoidVoltage(m_handle, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return units::volt_t{voltage};
+}
+
+units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
+  int32_t status = 0;
+  auto voltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  return units::volt_t{voltage};
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {
