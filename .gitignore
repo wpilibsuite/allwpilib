@@ -231,3 +231,6 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+
+# node
+node_modules

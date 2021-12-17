@@ -1,0 +1,20 @@
+{
+  "name": "allwpilib",
+  "version": "1.0.0",
+  "description": "JSON package definition for establishing formatting hooks w/ lint-stage.  To install formatting hook, run npm install",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wpilibsuite/allwpilib.git"
+  },
+  "author": "WPILib Team",
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.0"
+  },
+  "lint-staged": {
+    "*": "wpiformat -f"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  }
+}

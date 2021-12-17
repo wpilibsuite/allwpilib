@@ -118,6 +118,8 @@ make
 
 wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
+To automatically run wpiformat on staged files on commit, run `npm install` (requires Node.js).
+
 #### Java Code Quality Tools
 
 The Java code quality tools Checkstyle, PMD, and Spotless can be run via `./gradlew javaFormat`. SpotBugs can be run via the `spotbugsMain`, `spotbugsTest`, and `spotbugsDev` tasks. These tools will all be run automatically by the `build` task. To disable this behavior, pass the `-PskipJavaFormat` flag.
