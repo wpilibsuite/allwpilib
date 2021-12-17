@@ -164,7 +164,7 @@ class ADIS16448_IMU : public nt::NTSendable,
   /**
    * Configures the calibration time used for the next calibrate.
    *
-   * @param cal_time The calibration time that should be used
+   * @param new_cal_time The calibration time that should be used
    */
   int ConfigCalTime(int new_cal_time);
 
