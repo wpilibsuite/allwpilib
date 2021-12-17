@@ -365,7 +365,32 @@ class ADIS16470_IMU : public nt::NTSendable,
 
   std::thread m_acquire_task;
 
-  mutable wpi::mutex m_mutex;
+  struct NonMovableMutexWrapper {
+    wpi::mutex mutex;
+    NonMovableMutexWrapper() = default;
+
+    NonMovableMutexWrapper(const NonMovableMutexWrapper&) = delete;
+    NonMovableMutexWrapper& operator=(const NonMovableMutexWrapper&) = delete;
+
+    NonMovableMutexWrapper(NonMovableMutexWrapper&&) {}
+    NonMovableMutexWrapper& operator=(NonMovableMutexWrapper&&) {
+      return *this;
+    }
+
+    void lock() {
+      mutex.lock();
+    }
+
+    void unlock() {
+      mutex.unlock();
+    }
+
+    bool try_lock() noexcept {
+      return mutex.try_lock();
+    }
+  };
+
+  mutable NonMovableMutexWrapper m_mutex;
 };
 
 }  // namespace frc

@@ -300,7 +300,7 @@ int ADIS16448_IMU::ConfigCalTime(int new_cal_time) {
  *
  **/
 void ADIS16448_IMU::Calibrate() {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   // Calculate the running average
   int gyroAverageSize = std::min(m_accum_count, m_avg_size);
   double m_gyro_accum_x = 0.0;
@@ -372,7 +372,7 @@ void ADIS16448_IMU::WriteRegister(uint8_t reg, uint16_t val) {
  *the xgyro, ygyro, and zgyro outputs.
  **/
 void ADIS16448_IMU::Reset() {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   m_integ_gyro_x = 0.0;
   m_integ_gyro_y = 0.0;
   m_integ_gyro_z = 0.0;
@@ -549,7 +549,7 @@ void ADIS16448_IMU::Acquire() {
 
           // Update global variables and state
           {
-            std::lock_guard<wpi::mutex> sync(m_mutex);
+            std::scoped_lock sync(m_mutex);
             // Ignore first, integrated sample
             if (m_first_run) {
               m_integ_gyro_x = 0.0;
@@ -754,92 +754,92 @@ ADIS16448_IMU::IMUAxis ADIS16448_IMU::GetYawAxis() const {
 }
 
 double ADIS16448_IMU::GetGyroAngleX() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_integ_gyro_x;
 }
 
 double ADIS16448_IMU::GetGyroAngleY() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_integ_gyro_y;
 }
 
 double ADIS16448_IMU::GetGyroAngleZ() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_integ_gyro_z;
 }
 
 double ADIS16448_IMU::GetGyroInstantX() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_gyro_x;
 }
 
 double ADIS16448_IMU::GetGyroInstantY() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_gyro_y;
 }
 
 double ADIS16448_IMU::GetGyroInstantZ() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_gyro_z;
 }
 
 double ADIS16448_IMU::GetAccelInstantX() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_accel_x;
 }
 
 double ADIS16448_IMU::GetAccelInstantY() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_accel_y;
 }
 
 double ADIS16448_IMU::GetAccelInstantZ() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_accel_z;
 }
 
 double ADIS16448_IMU::GetMagInstantX() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_mag_x;
 }
 
 double ADIS16448_IMU::GetMagInstantY() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_mag_y;
 }
 
 double ADIS16448_IMU::GetMagInstantZ() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_mag_z;
 }
 
 double ADIS16448_IMU::GetXComplementaryAngle() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_compAngleX;
 }
 
 double ADIS16448_IMU::GetYComplementaryAngle() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_compAngleY;
 }
 
 double ADIS16448_IMU::GetXFilteredAccelAngle() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_accelAngleX;
 }
 
 double ADIS16448_IMU::GetYFilteredAccelAngle() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_accelAngleY;
 }
 
 double ADIS16448_IMU::GetBarometricPressure() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_baro;
 }
 
 double ADIS16448_IMU::GetTemperature() const {
-  std::lock_guard<wpi::mutex> sync(m_mutex);
+  std::scoped_lock sync(m_mutex);
   return m_temp;
 }
 

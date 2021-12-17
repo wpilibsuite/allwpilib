@@ -135,9 +135,8 @@ class ADIS16448_IMU : public nt::NTSendable,
    *
    * @param yaw_axis The axis where gravity is present. Valid options are kX,
    * kY, and kZ
-   * @param algorithm The AHRS algorithm to use. Valid options are
-   * kComplementary and kMadgwick
    * @param port The SPI port where the IMU is connected.
+   * @param cal_time The calibration time that should be used on start-up.
    */
   explicit ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port, uint16_t cal_time);
 
@@ -162,6 +161,11 @@ class ADIS16448_IMU : public nt::NTSendable,
    */
   void Calibrate();
 
+  /**
+   * Configures the calibration time used for the next calibrate.
+   *
+   * @param cal_time The calibration time that should be used
+   */
   int ConfigCalTime(int new_cal_time);
 
   /**
@@ -317,7 +321,32 @@ class ADIS16448_IMU : public nt::NTSendable,
 
   std::thread m_acquire_task;
 
-  mutable wpi::mutex m_mutex;
+  struct NonMovableMutexWrapper {
+    wpi::mutex mutex;
+    NonMovableMutexWrapper() = default;
+
+    NonMovableMutexWrapper(const NonMovableMutexWrapper&) = delete;
+    NonMovableMutexWrapper& operator=(const NonMovableMutexWrapper&) = delete;
+
+    NonMovableMutexWrapper(NonMovableMutexWrapper&&) {}
+    NonMovableMutexWrapper& operator=(NonMovableMutexWrapper&&) {
+      return *this;
+    }
+
+    void lock() {
+      mutex.lock();
+    }
+
+    void unlock() {
+      mutex.unlock();
+    }
+
+    bool try_lock() noexcept {
+      return mutex.try_lock();
+    }
+  };
+
+  mutable NonMovableMutexWrapper m_mutex;
 
   // CRC-16 Look-Up Table
   static constexpr uint16_t adiscrc[256] = {
