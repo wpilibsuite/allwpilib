@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.PortsJNI;
 import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
 import edu.wpi.first.hal.REVPHStickyFaults;
@@ -19,6 +20,7 @@ public class PneumaticHub implements PneumaticsBase {
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
+    public int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
     DataStore(int module) {
@@ -126,14 +128,12 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public void fireOneShot(int index) {
-    // TODO Combine APIs
-    // REVPHJNI.fireOneShot(m_handle, index, durMs);
+    REVPHJNI.fireOneShot(m_handle, index, m_dataStore.m_oneShotDurMs[index]);
   }
 
   @Override
   public void setOneShotDuration(int index, int durMs) {
-    // TODO Combine APIs
-    // REVPHJNI.setOneShotDuration(m_handle, index, durMs);
+    m_dataStore.m_oneShotDurMs[index] = durMs;
   }
 
   @Override
@@ -195,8 +195,8 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public int getSolenoidDisabledList() {
-    // TODO Get this working
-    return 0;
+    int raw = REVPHJNI.getStickyFaultsNative(m_handle);
+    return raw & 0xFFFF;
   }
 
   @Override

@@ -52,6 +52,7 @@ class PneumaticHub::DataStore {
   bool m_compressorReserved{false};
   wpi::mutex m_reservedLock;
   PneumaticHub m_moduleObject{HAL_kInvalidHandle, 0};
+  std::array<units::second_t, 16> m_oneShotDurMs{0_s};
 };
 
 PneumaticHub::PneumaticHub()
@@ -147,27 +148,26 @@ int PneumaticHub::GetModuleNumber() const {
 }
 
 int PneumaticHub::GetSolenoidDisabledList() const {
-  return 0;
-  // TODO Fix me
-  // int32_t status = 0;
-  // auto result = HAL_GetREVPHSolenoidDisabledList(m_handle, &status);
-  // FRC_CheckErrorStatus(status, "Module {}", m_module);
-  // return result;
+  int32_t status = 0;
+  HAL_REVPHStickyFaults faults;
+  std::memset(&faults, 0, sizeof(faults));
+  HAL_GetREVPHStickyFaults(m_handle, &faults, &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  uint32_t intFaults = 0;
+  static_assert(sizeof(faults) == sizeof(intFaults));
+  std::memcpy(&intFaults, &faults, sizeof(faults));
+  return intFaults & 0xFFFF;
 }
 
 void PneumaticHub::FireOneShot(int index) {
-  // TODO Fix me
-  // int32_t status = 0;
-  // HAL_FireREVPHOneShot(m_handle, index, &status);
-  // FRC_CheckErrorStatus(status, "Module {}", m_module);
+  int32_t status = 0;
+  HAL_FireREVPHOneShot(m_handle, index,
+                       m_dataStore->m_oneShotDurMs[index].value(), &status);
+  FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 void PneumaticHub::SetOneShotDuration(int index, units::second_t duration) {
-  // TODO Fix me
-  // int32_t status = 0;
-  // units::millisecond_t millis = duration;
-  // HAL_SetREVPHOneShotDuration(m_handle, index, millis.to<int32_t>(),
-  // &status); FRC_CheckErrorStatus(status, "Module {}", m_module);
+  m_dataStore->m_oneShotDurMs[index] = duration;
 }
 
 bool PneumaticHub::CheckSolenoidChannel(int channel) const {
