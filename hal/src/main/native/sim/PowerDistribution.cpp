@@ -170,14 +170,14 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
 }
 
 void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
-                                     HAL_REVPDHVersion* version,
+                                     HAL_PowerDistributionVersion* version,
                                      int32_t* status) {}
 
 void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
-                                    HAL_REVPDHFaults* faults, int32_t* status) {
+                                    HAL_PowerDistributionFaults* faults, int32_t* status) {
 }
 
 void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
-                                          HAL_REVPDHStickyFaults* stickyFaults,
+                                          HAL_PowerDistributionStickyFaults* stickyFaults,
                                           int32_t* status) {}
 }  // extern "C"

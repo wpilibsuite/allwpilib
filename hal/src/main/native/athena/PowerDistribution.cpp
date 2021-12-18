@@ -245,7 +245,7 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
 }
 
 void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
-                                     HAL_REVPDHVersion* version,
+                                     HAL_PowerDistributionVersion* version,
                                      int32_t* status) {
   if (IsCtre(handle)) {
     std::memset(version, 0, sizeof(*version));
@@ -255,7 +255,7 @@ void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
 }
 
 void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
-                                    HAL_REVPDHFaults* faults, int32_t* status) {
+                                    HAL_PowerDistributionFaults* faults, int32_t* status) {
   if (IsCtre(handle)) {
     std::memset(faults, 0, sizeof(*faults));
   } else {
@@ -264,7 +264,7 @@ void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
 }
 
 void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
-                                          HAL_REVPDHStickyFaults* stickyFaults,
+                                          HAL_PowerDistributionStickyFaults* stickyFaults,
                                           int32_t* status) {
   if (IsCtre(handle)) {
     std::memset(stickyFaults, 0, sizeof(*stickyFaults));

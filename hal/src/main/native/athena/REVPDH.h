@@ -117,7 +117,7 @@ HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
  *
  * @return version information
  */
-void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, HAL_REVPDHVersion* version,
+void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, HAL_PowerDistributionVersion* version,
                                        int32_t* status);
 
 /**
@@ -136,7 +136,7 @@ double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @return the faults of the PDH
  */
-void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_REVPDHFaults* faults, int32_t* status);
+void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_PowerDistributionFaults* faults, int32_t* status);
 
 /**
  * Gets the sticky faults of a PDH device.
@@ -145,7 +145,7 @@ void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_REVPDHFaults* faults, int3
  *
  * @return the sticky faults of the PDH
  */
-void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle, HAL_REVPDHStickyFaults* stickyFaults,
+void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle, HAL_PowerDistributionStickyFaults* stickyFaults,
                                                  int32_t* status);
 
 /**

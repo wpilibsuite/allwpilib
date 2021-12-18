@@ -218,10 +218,7 @@ void HAL_SetPowerDistributionSwitchableChannel(
 HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status);
 
-/**
- * Storage for REV PDH Version
- */
-struct HAL_REVPDHVersion {
+struct HAL_PowerDistributionVersion {
   uint32_t firmwareMajor;
   uint32_t firmwareMinor;
   uint32_t firmwareFix;
@@ -230,10 +227,7 @@ struct HAL_REVPDHVersion {
   uint32_t uniqueId;
 };
 
-/**
- * Storage for REV PDH Faults
- */
-struct HAL_REVPDHFaults {
+struct HAL_PowerDistributionFaults {
   uint32_t channel0BreakerFault : 1;
   uint32_t channel1BreakerFault : 1;
   uint32_t channel2BreakerFault : 1;
@@ -266,7 +260,7 @@ struct HAL_REVPDHFaults {
 /**
  * Storage for REV PDH Sticky Faults
  */
-struct HAL_REVPDHStickyFaults {
+struct HAL_PowerDistributionStickyFaults {
   uint32_t channel0BreakerFault : 1;
   uint32_t channel1BreakerFault : 1;
   uint32_t channel2BreakerFault : 1;
@@ -297,9 +291,9 @@ struct HAL_REVPDHStickyFaults {
   uint32_t hasReset : 1;
 };
 
-void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle, HAL_REVPDHVersion* version, int32_t* status);
-void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle, HAL_REVPDHFaults* faults, int32_t* status);
-void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle, HAL_REVPDHStickyFaults* stickyFaults, int32_t* status);
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle, HAL_PowerDistributionVersion* version, int32_t* status);
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle, HAL_PowerDistributionFaults* faults, int32_t* status);
+void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle, HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -476,7 +476,7 @@ double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status) {
   return PDH_status_4_v_bus_decode(statusFrame.v_bus);
 }
 
-void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, HAL_REVPDHVersion* version,
+void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, HAL_PowerDistributionVersion* version,
                                        int32_t* status) {
   std::memset(version, 0, sizeof(*version));
   uint8_t packedData[8] = {0};
@@ -514,7 +514,7 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle, HAL_REVPDHVersion* version,
   version->uniqueId = result.unique_id;
 }
 
-void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_REVPDHFaults* faults, int32_t* status) {
+void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_PowerDistributionFaults* faults, int32_t* status) {
   std::memset(faults, 0, sizeof(*faults));
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
@@ -557,7 +557,7 @@ void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, HAL_REVPDHFaults* faults, int3
   faults->hardwareFault = status4.hardware_fault;
 }
 
-void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle, HAL_REVPDHStickyFaults* stickyFaults,
+void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle, HAL_PowerDistributionStickyFaults* stickyFaults,
                                                  int32_t* status) {
   std::memset(stickyFaults, 0, sizeof(*stickyFaults));
   auto hpdh = REVPDHHandles->Get(handle);

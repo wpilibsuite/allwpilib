@@ -139,7 +139,7 @@ void PowerDistribution::SetSwitchableChannel(bool enabled) {
 
 PowerDistribution::Version PowerDistribution::GetVersion() const {
   int32_t status = 0;
-  HAL_REVPDHVersion halVersion;
+  HAL_PowerDistributionVersion halVersion;
   std::memset(&halVersion, 0, sizeof(halVersion));
   HAL_GetPowerDistributionVersion(m_handle, &halVersion, &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -153,7 +153,7 @@ PowerDistribution::Version PowerDistribution::GetVersion() const {
 
 PowerDistribution::Faults PowerDistribution::GetFaults() const {
   int32_t status = 0;
-  HAL_REVPDHFaults halFaults;
+  HAL_PowerDistributionFaults halFaults;
   std::memset(&halFaults, 0, sizeof(halFaults));
   HAL_GetPowerDistributionFaults(m_handle, &halFaults, &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -167,7 +167,7 @@ PowerDistribution::Faults PowerDistribution::GetFaults() const {
 
 PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   int32_t status = 0;
-  HAL_REVPDHStickyFaults halStickyFaults;
+  HAL_PowerDistributionStickyFaults halStickyFaults;
   std::memset(&halStickyFaults, 0, sizeof(halStickyFaults));
   HAL_GetPowerDistributionStickyFaults(m_handle, &halStickyFaults, &status);
   FRC_ReportError(status, "Module {}", m_module);
