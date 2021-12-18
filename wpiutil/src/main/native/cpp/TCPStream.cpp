@@ -36,6 +36,8 @@
 
 #include <cerrno>
 
+#include "fmt/format.h"
+
 using namespace wpi;
 
 TCPStream::TCPStream(int sd, sockaddr_in* address)
@@ -85,12 +87,8 @@ size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   }
   if (!result) {
     char Buffer[128];
-#ifdef _MSC_VER
-    sprintf_s(Buffer, "Send() failed: WSA error=%d\n", WSAGetLastError());
-#else
-    std::snprintf(Buffer, sizeof(Buffer), "Send() failed: WSA error=%d\n",
-                  WSAGetLastError());
-#endif
+    fmt::format_to_n(Buffer, sizeof(Buffer), "Send() failed: WSA error={}\n",
+                     WSAGetLastError());
     OutputDebugStringA(Buffer);
     *err = kConnectionReset;
     return 0;

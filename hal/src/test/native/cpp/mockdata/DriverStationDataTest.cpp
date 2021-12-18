@@ -4,6 +4,8 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
+
 #include "gtest/gtest.h"
 #include "hal/HAL.h"
 #include "hal/simulation/DriverStationData.h"
@@ -113,10 +115,9 @@ TEST(DriverStationTest, EventInfo) {
   std::string eventName = "UnitTest";
   std::string gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-  std::snprintf(info.eventName, sizeof(info.eventName), "%s",
-                eventName.c_str());
-  std::snprintf(reinterpret_cast<char*>(info.gameSpecificMessage),
-                sizeof(info.gameSpecificMessage), "%s", gameData.c_str());
+  fmt::format_to_n(info.eventName, sizeof(info.eventName), eventName);
+  fmt::format_to_n(reinterpret_cast<char*>(info.gameSpecificMessage),
+                   sizeof(info.gameSpecificMessage), gameData);
   info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;

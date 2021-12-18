@@ -10,6 +10,7 @@
 #include <cstring>
 #include <string>
 
+#include <fmt/format.h>
 #include <wpi/SmallVector.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -316,8 +317,8 @@ int32_t HALSIM_GetNotifierInfo(struct HALSIM_NotifierInfo* arr, int32_t size) {
     if (num < size) {
       arr[num].handle = handle;
       if (notifier->name.empty()) {
-        std::snprintf(arr[num].name, sizeof(arr[num].name), "Notifier%d",
-                      static_cast<int>(getHandleIndex(handle)));
+        fmt::format_to_n(arr[num].name, sizeof(arr[num].name), "Notifier{}",
+                         static_cast<int>(getHandleIndex(handle)));
       } else {
         std::strncpy(arr[num].name, notifier->name.c_str(),
                      sizeof(arr[num].name));

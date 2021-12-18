@@ -8,6 +8,7 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/numbers>
@@ -65,7 +66,7 @@ void glass::DisplayGyro(GyroModel* m) {
                   color, 1.2f);
     if (major) {
       char txt[16];
-      std::snprintf(txt, sizeof(txt), "%d°", i);
+      fmt::format_to_n(txt, sizeof(txt), "{}°", i);
       draw->AddText(
           center + (direction * radius * 1.25) - ImGui::CalcTextSize(txt) * 0.5,
           primaryColor, txt, nullptr);

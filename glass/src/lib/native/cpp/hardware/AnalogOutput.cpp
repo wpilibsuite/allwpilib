@@ -4,6 +4,8 @@
 
 #include "glass/hardware/AnalogOutput.h"
 
+#include <fmt/format.h>
+
 #include "glass/Context.h"
 #include "glass/DataSource.h"
 #include "glass/Storage.h"
@@ -30,9 +32,9 @@ void glass::DisplayAnalogOutputsDevice(AnalogOutputsModel* model) {
       std::string& name = GetStorage().GetString("name");
       char label[128];
       if (!name.empty()) {
-        std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), i);
+        fmt::format_to_n(label, sizeof(label), "{} [{}]###name", name, i);
       } else {
-        std::snprintf(label, sizeof(label), "Out[%d]###name", i);
+        fmt::format_to_n(label, sizeof(label), "Out[{}]###name", i);
       }
 
       double value = analogOutData->GetValue();

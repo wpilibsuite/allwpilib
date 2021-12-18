@@ -4,8 +4,7 @@
 
 #include "frc/smartdashboard/Mechanism2d.h"
 
-#include <cstdio>
-
+#include <fmt/format.h>
 #include <networktables/NTSendableBuilder.h>
 
 using namespace frc;
@@ -34,8 +33,8 @@ MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
 }
 
 void Mechanism2d::SetBackgroundColor(const Color8Bit& color) {
-  std::snprintf(m_color, sizeof(m_color), "#%02X%02X%02X", color.red,
-                color.green, color.blue);
+  fmt::format_to_n(m_color, sizeof(m_color), "#{:02X}{:02X}{:02X}", color.red,
+                   color.green, color.blue);
   if (m_table) {
     m_table->GetEntry(kBackgroundColor).SetString(m_color);
   }

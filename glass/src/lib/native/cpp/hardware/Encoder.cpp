@@ -70,10 +70,10 @@ void glass::DisplayEncoder(EncoderModel* model) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d,%d]###header", name.c_str(),
-                  chA, chB);
+    fmt::format_to_n(label, sizeof(label), "{} [{},{}]###header", name, chA,
+                     chB);
   } else {
-    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###header", chA, chB);
+    fmt::format_to_n(label, sizeof(label), "Encoder[{},{}]###header", chA, chB);
   }
 
   // header

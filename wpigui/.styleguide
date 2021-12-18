@@ -24,6 +24,7 @@ includeGuardRoots {
 }
 
 includeOtherLibs {
+  ^fmt/
   ^imgui
   ^implot
   ^stb

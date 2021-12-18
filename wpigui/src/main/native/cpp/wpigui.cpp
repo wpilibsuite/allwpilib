@@ -5,10 +5,10 @@
 #include "wpigui.h"
 
 #include <algorithm>
-#include <cstdio>
 #include <cstring>
 
 #include <GLFW/glfw3.h>
+#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_ProggyDotted.h>
 #include <imgui_impl_glfw.h>
@@ -26,7 +26,7 @@ namespace wpi {
 Context* gui::gContext;
 
 static void ErrorCallback(int error, const char* description) {
-  std::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+  fmt::print(stderr, "GLFW Error {}: {}\n", error, description);
 }
 
 static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -274,8 +274,8 @@ bool gui::Initialize(const char* title, int width, int height) {
       for (int i = 0; i < Font::kScaledLevels; ++i) {
         float size = 7.0f + i * 3.0f;
         ImFontConfig cfg;
-        std::snprintf(cfg.Name, sizeof(cfg.Name), "%s-%d", makeFont.first,
-                      static_cast<int>(size));
+        fmt::format_to_n(cfg.Name, sizeof(cfg.Name), "{}-{}", makeFont.first,
+                         static_cast<int>(size));
         font.scaled[i] = makeFont.second(io, size, &cfg);
       }
     }
@@ -500,7 +500,7 @@ void gui::EmitViewMenu() {
     if (ImGui::BeginMenu("Zoom")) {
       for (int i = 0; i < Font::kScaledLevels && (25 * (i + 2)) <= 200; ++i) {
         char label[20];
-        std::snprintf(label, sizeof(label), "%d%%", 25 * (i + 2));
+        fmt::format_to_n(label, sizeof(label), "{}%", 25 * (i + 2));
         bool selected = gContext->userScale == i;
         bool enabled = (gContext->fontScale - gContext->userScale + i) >= 0 &&
                        (gContext->fontScale - gContext->userScale + i) <

@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <cstdio>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -311,8 +310,8 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
-                static_cast<int>(i), static_cast<int>(plotIndex));
+  fmt::format_to_n(label, sizeof(label), "{}###name{}_{}", GetName(),
+                   static_cast<int>(i), static_cast<int>(plotIndex));
 
   int size = m_size;
   int offset = m_offset;
@@ -569,8 +568,8 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###plot%d", m_name.c_str(),
-                static_cast<int>(i));
+  fmt::format_to_n(label, sizeof(label), "{}###plot{}", m_name,
+                   static_cast<int>(i));
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
                           (m_antialiased ? ImPlotFlags_AntiAliased : 0) |
@@ -777,14 +776,14 @@ void PlotView::Display() {
 
       char name[64];
       if (!plot->GetName().empty()) {
-        std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
+        fmt::format_to_n(name, sizeof(name), "{}", plot->GetName());
       } else {
-        std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
+        fmt::format_to_n(name, sizeof(name), "Plot {}", static_cast<int>(i));
       }
 
       char label[90];
-      std::snprintf(label, sizeof(label), "%s###header%d", name,
-                    static_cast<int>(i));
+      fmt::format_to_n(label, sizeof(label), "{}###header{}", name,
+                       static_cast<int>(i));
 
       bool open = ImGui::CollapsingHeader(label);
 
@@ -987,7 +986,7 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     size_t numWindows = m_windows.size();
     for (size_t i = 0; i <= numWindows; ++i) {
-      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      fmt::format_to_n(id, sizeof(id), "Plot <{}>", static_cast<int>(i));
       bool match = false;
       for (size_t j = i; j < numWindows; ++j) {
         if (m_windows[j]->GetId() == id) {

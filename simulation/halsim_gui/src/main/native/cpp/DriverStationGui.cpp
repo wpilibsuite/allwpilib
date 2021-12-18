@@ -560,8 +560,8 @@ KeyboardJoystick::KeyboardJoystick(glass::Storage& storage, int index)
       m_axisStorage{storage.GetChildArray("axisConfig")},
       m_buttonKey{storage.GetIntArray("buttonKeys")},
       m_povStorage{storage.GetChildArray("povConfig")} {
-  std::snprintf(m_name, sizeof(m_name), "Keyboard %d", index);
-  std::snprintf(m_guid, sizeof(m_guid), "Keyboard%d", index);
+  fmt::format_to_n(m_name, sizeof(m_name), "Keyboard {}", index);
+  fmt::format_to_n(m_guid, sizeof(m_guid), "Keyboard{}", index);
 
   // init axes
   for (auto&& axisConfig : m_axisStorage) {
@@ -593,8 +593,12 @@ void KeyboardJoystick::EditKey(const char* label, int* key) {
   ImGui::Text("%s", label);
   ImGui::SameLine();
   char editLabel[32];
-  std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
-                s_keyEdit == key ? "(press key)" : GetKeyName(*key));
+  if (s_keyEdit == key) {
+    fmt::format_to_n(editLabel, sizeof(editLabel), "(press key)###edit");
+  } else {
+    fmt::format_to_n(editLabel, sizeof(editLabel), "{}###edit",
+                     GetKeyName(*key));
+  }
   if (ImGui::SmallButton(editLabel)) {
     s_keyEdit = key;
   }
@@ -638,7 +642,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_axisConfig.emplace_back(*m_axisStorage.back());
     }
     for (int i = 0; i < m_axisCount; ++i) {
-      std::snprintf(label, sizeof(label), "Axis %d", i);
+      fmt::format_to_n(label, sizeof(label), "Axis {}", i);
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("Increase", &m_axisConfig[i].incKey);
         EditKey("Decrease", &m_axisConfig[i].decKey);
@@ -671,7 +675,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_buttonKey.emplace_back(-1);
     }
     for (int i = 0; i < m_buttonCount; ++i) {
-      std::snprintf(label, sizeof(label), "Button %d", i + 1);
+      fmt::format_to_n(label, sizeof(label), "Button {}", i + 1);
       EditKey(label, &m_buttonKey[i]);
     }
     ImGui::PopID();
@@ -693,7 +697,7 @@ void KeyboardJoystick::SettingsDisplay() {
       m_povConfig.emplace_back(*m_povStorage.back());
     }
     for (int i = 0; i < m_povCount; ++i) {
-      std::snprintf(label, sizeof(label), "POV %d", i);
+      fmt::format_to_n(label, sizeof(label), "POV {}", i);
       if (ImGui::TreeNodeEx(label, ImGuiTreeNodeFlags_DefaultOpen)) {
         EditKey("  0 deg", &m_povConfig[i].key0);
         EditKey(" 45 deg", &m_povConfig[i].key45);
@@ -1180,7 +1184,7 @@ bool FMSSimModel::IsReadOnly() {
 
 static void DisplaySystemJoystick(SystemJoystick& joy, int i) {
   char label[64];
-  std::snprintf(label, sizeof(label), "%d: %s", i, joy.GetName());
+  fmt::format_to_n(label, sizeof(label), "{}: {}", i, joy.GetName());
 
   // highlight if any buttons pressed
   bool anyButtonPressed = joy.IsAnyButtonPressed();
@@ -1214,7 +1218,7 @@ static void DisplaySystemJoysticks() {
     DisplaySystemJoystick(*joy, i + GLFW_JOYSTICK_LAST + 1);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
-      std::snprintf(buf, sizeof(buf), "%s Settings", joy->GetName());
+      fmt::format_to_n(buf, sizeof(buf), "{} Settings", joy->GetName());
       if (ImGui::MenuItem(buf)) {
         if (auto win = DriverStationGui::dsManager->GetWindow(buf)) {
           win->SetVisible(true);
@@ -1299,7 +1303,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < joy.data.axes.count; ++j) {
         if (source && source->axes[j]) {
           char label[64];
-          std::snprintf(label, sizeof(label), "Axis[%d]", j);
+          fmt::format_to_n(label, sizeof(label), "Axis[{}]", j);
           ImGui::Selectable(label);
           source->axes[j]->EmitDrag();
           ImGui::SameLine();
@@ -1312,7 +1316,7 @@ static void DisplayJoysticks() {
       for (int j = 0; j < joy.data.povs.count; ++j) {
         if (source && source->povs[j]) {
           char label[64];
-          std::snprintf(label, sizeof(label), "POVs[%d]", j);
+          fmt::format_to_n(label, sizeof(label), "POVs[{}]", j);
           ImGui::Selectable(label);
           source->povs[j]->EmitDrag();
           ImGui::SameLine();
@@ -1412,7 +1416,7 @@ void DriverStationGui::GlobalInit() {
     int i = 0;
     for (auto&& joy : gKeyboardJoysticks) {
       char label[64];
-      std::snprintf(label, sizeof(label), "%s Settings", joy->GetName());
+      fmt::format_to_n(label, sizeof(label), "{} Settings", joy->GetName());
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },
               glass::Window::kHide)) {
