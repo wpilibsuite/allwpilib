@@ -86,7 +86,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // no auto
   return new frc2::SequentialCommandGroup(
-      std::move(swerveControllerCommand), std::move(swerveControllerCommand),
+      std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this]() {
             m_drive.Drive(units::meters_per_second_t(0),
