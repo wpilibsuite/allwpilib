@@ -343,11 +343,11 @@ Java_edu_wpi_first_hal_REVPHJNI_getSolenoidVoltage
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
- * Method:    getStickyFaults
+ * Method:    getStickyFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getStickyFaults
+Java_edu_wpi_first_hal_REVPHJNI_getStickyFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;
@@ -363,11 +363,11 @@ Java_edu_wpi_first_hal_REVPHJNI_getStickyFaults
 
 /*
  * Class:     edu_wpi_first_hal_REVPHJNI
- * Method:    getFaults
+ * Method:    getFaultsNative
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_REVPHJNI_getFaults
+Java_edu_wpi_first_hal_REVPHJNI_getFaultsNative
   (JNIEnv* env, jclass, jint handle)
 {
   int32_t status = 0;

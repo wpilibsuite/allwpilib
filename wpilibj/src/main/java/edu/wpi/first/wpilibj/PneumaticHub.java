@@ -4,7 +4,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
+import edu.wpi.first.hal.REVPHStickyFaults;
 import edu.wpi.first.hal.REVPHVersion;
 import java.util.HashMap;
 import java.util.Map;
@@ -230,11 +232,11 @@ public class PneumaticHub implements PneumaticsBase {
     return REVPHJNI.getVersion(m_handle);
   }
 
-  int getFaults() {
+  REVPHFaults getFaults() {
     return REVPHJNI.getFaults(m_handle);
   }
 
-  int getStickyFaults() {
+  REVPHStickyFaults getStickyFaults() {
     return REVPHJNI.getStickyFaults(m_handle);
   }
 

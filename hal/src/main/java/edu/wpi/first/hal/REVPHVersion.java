@@ -7,32 +7,32 @@ package edu.wpi.first.hal;
 @SuppressWarnings("AbbreviationAsWordInName")
 public class REVPHVersion {
   @SuppressWarnings("MemberName")
-  public int firmwareMajor;
+  public final int firmwareMajor;
 
   @SuppressWarnings("MemberName")
-  public int firmwareMinor;
+  public final int firmwareMinor;
 
   @SuppressWarnings("MemberName")
-  public int firmwareFix;
+  public final int firmwareFix;
 
   @SuppressWarnings("MemberName")
-  public int hardwareMinor;
+  public final int hardwareMinor;
 
   @SuppressWarnings("MemberName")
-  public int hardwareMajor;
+  public final int hardwareMajor;
 
   @SuppressWarnings("MemberName")
-  public int uniqueId;
+  public final int uniqueId;
 
   /**
    * Constructs a revph version (Called from the HAL).
    *
    * @param firmwareMajor firmware major
    * @param firmwareMinor firmware minor
-   * @param firmwareFix firmware fix
+   * @param firmwareFix   firmware fix
    * @param hardwareMinor hardware minor
    * @param hardwareMajor hardware major
-   * @param uniqueId unique id
+   * @param uniqueId      unique id
    */
   public REVPHVersion(
       int firmwareMajor,

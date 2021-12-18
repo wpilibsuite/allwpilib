@@ -60,9 +60,17 @@ public class REVPHJNI extends JNIWrapper {
 
   public static native double getSolenoidVoltage(int handle);
 
-  public static native int getStickyFaults(int handle);
+  public static native int getStickyFaultsNative(int handle);
 
-  public static native int getFaults(int handle);
+  public static REVPHStickyFaults getStickyFaults(int handle) {
+    return new REVPHStickyFaults(getStickyFaultsNative(handle));
+  }
+
+  public static native int getFaultsNative(int handle);
+
+  public static REVPHFaults getFaults(int handle) {
+    return new REVPHFaults(getFaultsNative(handle));
+  }
 
   public static native REVPHVersion getVersion(int handle);
 }
