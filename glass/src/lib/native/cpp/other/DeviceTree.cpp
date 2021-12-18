@@ -6,6 +6,7 @@
 
 #include <cinttypes>
 
+#include <fmt/format.h>
 #include <imgui.h>
 
 #include "glass/Context.h"
@@ -53,8 +54,15 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   // build label
   std::string& name = GetStorage().GetString("name");
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###header",
-                name.empty() ? id : name.c_str());
+  if (name.empty()) {
+    const auto result =
+        fmt::format_to_n(label, sizeof(label) - 1, "{}###header", id);
+    *result.out = '\0';
+  } else {
+    const auto result =
+        fmt::format_to_n(label, sizeof(label) - 1, "{}###header", name);
+    *result.out = '\0';
+  }
 
   bool open = CollapsingHeader(label, flags);
   PopupEditName("header", &name);

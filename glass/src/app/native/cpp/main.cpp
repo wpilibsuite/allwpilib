@@ -317,11 +317,17 @@ int main(int argc, char** argv) {
       char nameBuf[32];
       const char* name = glfwGetKeyName(*gEnterKey, 0);
       if (!name) {
-        std::snprintf(nameBuf, sizeof(nameBuf), "%d", *gEnterKey);
+        const auto result =
+            fmt::format_to_n(nameBuf, sizeof(nameBuf) - 1, "{}", *gEnterKey);
+        *result.out = '\0';
+
         name = nameBuf;
       }
-      std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
-                    gKeyEdit ? "(press key)" : name);
+      const auto result =
+          fmt::format_to_n(editLabel, sizeof(editLabel) - 1, "{}###edit",
+                           gKeyEdit ? "(press key)" : name);
+      *result.out = '\0';
+
       if (ImGui::SmallButton(editLabel)) {
         gKeyEdit = true;
       }

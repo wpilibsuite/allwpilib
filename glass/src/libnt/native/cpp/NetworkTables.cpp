@@ -6,7 +6,6 @@
 
 #include <cinttypes>
 #include <concepts>
-#include <cstdio>
 #include <cstring>
 #include <initializer_list>
 #include <memory>
@@ -1177,12 +1176,20 @@ static void EmitValueTree(
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
       char label[64];
-      std::snprintf(label, sizeof(label),
-                    child.valueChildrenMap ? "{...}##v_%s" : "[...]##v_%s",
-                    child.name.c_str());
+      if (child.valueChildrenMap) {
+        const auto result = fmt::format_to_n(label, sizeof(label) - 1,
+                                             "{{...}}##v_{}", child.name);
+        *result.out = '\0';
+      } else {
+        const auto result = fmt::format_to_n(label, sizeof(label) - 1,
+                                             "[...]##v_{}", child.name);
+        *result.out = '\0';
+      }
+
       if (TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth)) {
         EmitValueTree(child.valueChildren, flags);
         TreePop();
@@ -1208,10 +1215,18 @@ static void EmitEntry(NetworkTablesModel* model,
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
     auto pos = ImGui::GetCursorPos();
+
     char label[64];
-    std::snprintf(label, sizeof(label),
-                  entry.valueChildrenMap ? "{...}##v_%s" : "[...]##v_%s",
-                  entry.info.name.c_str());
+    if (entry.valueChildrenMap) {
+      const auto result = fmt::format_to_n(
+          label, sizeof(label) - 1, "{{...}}##v_{}", entry.info.name.c_str());
+      *result.out = '\0';
+    } else {
+      const auto result = fmt::format_to_n(
+          label, sizeof(label) - 1, "[...]##v_{}", entry.info.name.c_str());
+      *result.out = '\0';
+    }
+
     valueChildrenOpen =
         TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
                               ImGuiTreeNodeFlags_AllowItemOverlap);

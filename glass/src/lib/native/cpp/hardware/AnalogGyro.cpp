@@ -4,6 +4,8 @@
 
 #include "glass/hardware/AnalogGyro.h"
 
+#include <fmt/format.h>
+
 #include "glass/DataSource.h"
 #include "glass/other/DeviceTree.h"
 
@@ -11,7 +13,10 @@ using namespace glass;
 
 void glass::DisplayAnalogGyroDevice(AnalogGyroModel* model, int index) {
   char name[32];
-  std::snprintf(name, sizeof(name), "AnalogGyro[%d]", index);
+  const auto result =
+      fmt::format_to_n(name, sizeof(name) - 1, "AnalogGyro[{}]", index);
+  *result.out = '\0';
+
   if (BeginDevice(name)) {
     // angle
     if (auto angleData = model->GetAngleData()) {

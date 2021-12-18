@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <cstdio>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -321,8 +320,10 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   CheckSource();
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###name%d_%d", GetName(),
-                static_cast<int>(i), static_cast<int>(plotIndex));
+  const auto result =
+      fmt::format_to_n(label, sizeof(label) - 1, "{}###name{}_{}", GetName(),
+                       static_cast<int>(i), static_cast<int>(plotIndex));
+  *result.out = '\0';
 
   int size = m_size;
   int offset = m_offset;
@@ -580,8 +581,10 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###plot%d", m_name.c_str(),
-                static_cast<int>(i));
+  const auto result = fmt::format_to_n(label, sizeof(label) - 1, "{}###plot{}",
+                                       m_name, static_cast<int>(i));
+  *result.out = '\0';
+
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
@@ -937,14 +940,19 @@ void PlotView::Settings() {
 
     char name[64];
     if (!plot->GetName().empty()) {
-      std::snprintf(name, sizeof(name), "%s", plot->GetName().c_str());
+      const auto result = fmt::format_to_n(name, sizeof(name) - 1, "{}",
+                                           plot->GetName().c_str());
+      *result.out = '\0';
     } else {
-      std::snprintf(name, sizeof(name), "Plot %d", static_cast<int>(i));
+      const auto result = fmt::format_to_n(name, sizeof(name) - 1, "Plot {}",
+                                           static_cast<int>(i));
+      *result.out = '\0';
     }
 
     char label[90];
-    std::snprintf(label, sizeof(label), "%s###header%d", name,
-                  static_cast<int>(i));
+    const auto result = fmt::format_to_n(
+        label, sizeof(label) - 1, "{}###header{}", name, static_cast<int>(i));
+    *result.out = '\0';
 
     bool open = ImGui::CollapsingHeader(label);
 
@@ -1013,7 +1021,10 @@ void PlotProvider::DisplayMenu() {
     char id[32];
     size_t numWindows = m_windows.size();
     for (size_t i = 0; i <= numWindows; ++i) {
-      std::snprintf(id, sizeof(id), "Plot <%d>", static_cast<int>(i));
+      const auto result = fmt::format_to_n(id, sizeof(id) - 1, "Plot <{}>",
+                                           static_cast<int>(i));
+      *result.out = '\0';
+
       bool match = false;
       for (size_t j = 0; j < numWindows; ++j) {
         if (m_windows[j]->GetId() == id) {

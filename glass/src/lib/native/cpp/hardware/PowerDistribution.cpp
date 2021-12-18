@@ -5,8 +5,8 @@
 #include "glass/hardware/PowerDistribution.h"
 
 #include <algorithm>
-#include <cstdio>
 
+#include <fmt/format.h>
 #include <imgui.h>
 
 #include "glass/Context.h"
@@ -36,7 +36,10 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
 
 void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   char name[128];
-  std::snprintf(name, sizeof(name), "PowerDistribution[%d]", index);
+  const auto result =
+      fmt::format_to_n(name, sizeof(name) - 1, "PowerDistribution[{}]", index);
+  *result.out = '\0';
+
   if (CollapsingHeader(name)) {
     // temperature
     if (auto tempData = model->GetTemperatureData()) {

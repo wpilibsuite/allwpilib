@@ -4,6 +4,7 @@
 
 #include "glass/hardware/PWM.h"
 
+#include <fmt/format.h>
 #include <imgui.h>
 
 #include "glass/Context.h"
@@ -22,9 +23,13 @@ void glass::DisplayPWM(PWMModel* model, int index, bool outputsEnabled) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), index);
+    const auto result = fmt::format_to_n(label, sizeof(label) - 1,
+                                         "{} [{}]###name", name, index);
+    *result.out = '\0';
   } else {
-    std::snprintf(label, sizeof(label), "PWM[%d]###name", index);
+    const auto result =
+        fmt::format_to_n(label, sizeof(label) - 1, "PWM[{}]###name", index);
+    *result.out = '\0';
   }
 
   int led = model->GetAddressableLED();

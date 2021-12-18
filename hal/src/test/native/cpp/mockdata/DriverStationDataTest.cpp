@@ -4,6 +4,7 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "hal/HAL.h"
@@ -117,13 +118,22 @@ TEST(DriverStationTest, Joystick) {
 }
 
 TEST(DriverStationTest, EventInfo) {
-  std::string eventName = "UnitTest";
-  std::string gameData = "Insert game specific info here :D";
+  constexpr std::string_view eventName = "UnitTest";
+  constexpr std::string_view gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-  std::snprintf(info.eventName, sizeof(info.eventName), "%s",
-                eventName.c_str());
-  std::snprintf(reinterpret_cast<char*>(info.gameSpecificMessage),
-                sizeof(info.gameSpecificMessage), "%s", gameData.c_str());
+
+  {
+    const auto result =
+        fmt::format_to_n(info.eventName, sizeof(info.eventName) - 1, eventName);
+    *result.out = '\0';
+  }
+  {
+    const auto result =
+        fmt::format_to_n(reinterpret_cast<char*>(info.gameSpecificMessage),
+                         sizeof(info.gameSpecificMessage) - 1, gameData);
+    *result.out = '\0';
+  }
+
   info.gameSpecificMessageSize = gameData.size();
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
@@ -136,7 +146,7 @@ TEST(DriverStationTest, EventInfo) {
   std::string gsm{reinterpret_cast<char*>(dataBack.gameSpecificMessage),
                   dataBack.gameSpecificMessageSize};
 
-  EXPECT_STREQ(eventName.c_str(), dataBack.eventName);
+  EXPECT_EQ(eventName, dataBack.eventName);
   EXPECT_EQ(gameData, gsm);
   EXPECT_EQ(5, dataBack.matchNumber);
   EXPECT_EQ(HAL_MatchType::HAL_kMatchType_qualification, dataBack.matchType);

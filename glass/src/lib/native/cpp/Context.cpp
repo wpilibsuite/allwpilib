@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <cinttypes>
-#include <cstdio>
 #include <filesystem>
 
 #include <fmt/format.h>
@@ -533,7 +532,9 @@ void glass::PushID(const char* str_id_begin, const char* str_id_end) {
 
 void glass::PushID(int int_id) {
   char buf[16];
-  std::snprintf(buf, sizeof(buf), "%d", int_id);
+  const auto result = fmt::format_to_n(buf, sizeof(buf) - 1, "{}", int_id);
+  *result.out = '\0';
+
   PushStorageStack(buf);
   ImGui::PushID(int_id);
 }

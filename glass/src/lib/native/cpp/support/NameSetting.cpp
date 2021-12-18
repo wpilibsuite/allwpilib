@@ -4,9 +4,7 @@
 
 #include "glass/support/NameSetting.h"
 
-#include <cstdio>
-#include <cstring>
-
+#include <fmt/format.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #include <wpi/StringExtras.h>
@@ -16,75 +14,102 @@ using namespace glass;
 void NameSetting::GetName(char* buf, size_t size,
                           const char* defaultName) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s", m_name.c_str());
+    const auto result = fmt::format_to_n(buf, size - 1, "{}", m_name);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s", defaultName);
+    const auto result = fmt::format_to_n(buf, size - 1, "{}", defaultName);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::GetName(char* buf, size_t size, const char* defaultName,
                           int index) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s [%d]", m_name.c_str(), index);
+    const auto result =
+        fmt::format_to_n(buf, size - 1, "{} [{}]", m_name, index);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s[%d]", defaultName, index);
+    const auto result =
+        fmt::format_to_n(buf, size - 1, "{}[{}]", defaultName, index);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::GetName(char* buf, size_t size, const char* defaultName,
                           int index, int index2) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s [%d,%d]", m_name.c_str(), index, index2);
+    const auto result =
+        fmt::format_to_n(buf, size - 1, "{} [{},{}]", m_name, index, index2);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s[%d,%d]", defaultName, index, index2);
+    const auto result = fmt::format_to_n(buf, size - 1, "{}[{},{}]",
+                                         defaultName, index, index2);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::GetLabel(char* buf, size_t size,
                            const char* defaultName) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s###Name%s", m_name.c_str(), defaultName);
+    const auto result =
+        fmt::format_to_n(buf, size - 1, "{}###Name{}", m_name, defaultName);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s###Name%s", defaultName, defaultName);
+    const auto result = fmt::format_to_n(buf, size - 1, "{}###Name{}",
+                                         defaultName, defaultName);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::GetLabel(char* buf, size_t size, const char* defaultName,
                            int index) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s [%d]###Name%d", m_name.c_str(), index, index);
+    const auto result = fmt::format_to_n(buf, size - 1, "{} [{}]###Name{}",
+                                         m_name, index, index);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s[%d]###Name%d", defaultName, index, index);
+    const auto result = fmt::format_to_n(buf, size - 1, "{}[{}]###Name{}",
+                                         defaultName, index, index);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::GetLabel(char* buf, size_t size, const char* defaultName,
                            int index, int index2) const {
   if (!m_name.empty()) {
-    std::snprintf(buf, size, "%s [%d,%d]###Name%d", m_name.c_str(), index,
-                  index2, index);
+    const auto result = fmt::format_to_n(buf, size - 1, "{} [{},{}]###Name{}",
+                                         m_name, index, index2, index);
+    *result.out = '\0';
   } else {
-    std::snprintf(buf, size, "%s[%d,%d]###Name%d", defaultName, index, index2,
-                  index);
+    const auto result = fmt::format_to_n(buf, size - 1, "{}[{},{}]###Name{}",
+                                         defaultName, index, index2, index);
+    *result.out = '\0';
   }
 }
 
 void NameSetting::PushEditNameId(int index) {
   char id[64];
-  std::snprintf(id, sizeof(id), "Name%d", index);
+  const auto result = fmt::format_to_n(id, sizeof(id) - 1, "Name{}", index);
+  *result.out = '\0';
+
   ImGui::PushID(id);
 }
 
 void NameSetting::PushEditNameId(const char* name) {
   char id[128];
-  std::snprintf(id, sizeof(id), "Name%s", name);
+  const auto result = fmt::format_to_n(id, sizeof(id) - 1, "Name{}", name);
+  *result.out = '\0';
+
   ImGui::PushID(id);
 }
 
 bool NameSetting::PopupEditName(int index) {
   bool rv = false;
+
   char id[64];
-  std::snprintf(id, sizeof(id), "Name%d", index);
+  const auto result = fmt::format_to_n(id, sizeof(id) - 1, "Name{}", index);
+  *result.out = '\0';
+
   if (ImGui::BeginPopupContextItem(id)) {
     ImGui::Text("Edit name:");
     if (InputTextName("##edit")) {
@@ -101,8 +126,11 @@ bool NameSetting::PopupEditName(int index) {
 
 bool NameSetting::PopupEditName(const char* name) {
   bool rv = false;
+
   char id[128];
-  std::snprintf(id, sizeof(id), "Name%s", name);
+  const auto result = fmt::format_to_n(id, sizeof(id) - 1, "Name{}", name);
+  *result.out = '\0';
+
   if (ImGui::BeginPopupContextItem(id)) {
     ImGui::Text("Edit name:");
     if (InputTextName("##edit")) {

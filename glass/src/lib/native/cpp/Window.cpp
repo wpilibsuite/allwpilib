@@ -4,6 +4,7 @@
 
 #include "glass/Window.h"
 
+#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <wpi/StringExtras.h>
@@ -56,9 +57,15 @@ void Window::Display() {
   }
 
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###%s",
-                m_name.empty() ? m_defaultName.c_str() : m_name.c_str(),
-                m_id.c_str());
+  if (m_name.empty()) {
+    const auto result = fmt::format_to_n(label, sizeof(label) - 1, "{}###{}",
+                                         m_defaultName, m_id);
+    *result.out = '\0';
+  } else {
+    const auto result =
+        fmt::format_to_n(label, sizeof(label) - 1, "{}###{}", m_name, m_id);
+    *result.out = '\0';
+  }
 
   if (Begin(label, &m_visible, m_flags)) {
     if (m_renamePopupEnabled || m_view->HasSettings()) {
