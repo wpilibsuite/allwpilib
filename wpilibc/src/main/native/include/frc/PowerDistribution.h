@@ -102,6 +102,82 @@ class PowerDistribution : public wpi::Sendable,
 
   void SetSwitchableChannel(bool enabled);
 
+  struct Version {
+    uint32_t FirmwareMajor;
+    uint32_t FirmwareMinor;
+    uint32_t FirmwareFix;
+    uint32_t FardwareMinor;
+    uint32_t FardwareMajor;
+    uint32_t UniqueId;
+  };
+
+  Version GetVersion() const;
+
+  struct Faults {
+    uint32_t Channel0BreakerFault : 1;
+    uint32_t Channel1BreakerFault : 1;
+    uint32_t Channel2BreakerFault : 1;
+    uint32_t Channel3BreakerFault : 1;
+    uint32_t Channel4BreakerFault : 1;
+    uint32_t Channel5BreakerFault : 1;
+    uint32_t Channel6BreakerFault : 1;
+    uint32_t Channel7BreakerFault : 1;
+    uint32_t Channel8BreakerFault : 1;
+    uint32_t Channel9BreakerFault : 1;
+    uint32_t Channel10BreakerFault : 1;
+    uint32_t Channel11BreakerFault : 1;
+    uint32_t Channel12BreakerFault : 1;
+    uint32_t Channel13BreakerFault : 1;
+    uint32_t Channel14BreakerFault : 1;
+    uint32_t Channel15BreakerFault : 1;
+    uint32_t Channel16BreakerFault : 1;
+    uint32_t Channel17BreakerFault : 1;
+    uint32_t Channel18BreakerFault : 1;
+    uint32_t Channel19BreakerFault : 1;
+    uint32_t Channel20BreakerFault : 1;
+    uint32_t Channel21BreakerFault : 1;
+    uint32_t Channel22BreakerFault : 1;
+    uint32_t Channel23BreakerFault : 1;
+    uint32_t Brownout : 1;
+    uint32_t CanWarning : 1;
+    uint32_t HardwareFault : 1;
+  };
+
+  Faults GetFaults() const;
+
+  struct StickyFaults {
+    uint32_t Channel0BreakerFault : 1;
+    uint32_t Channel1BreakerFault : 1;
+    uint32_t Channel2BreakerFault : 1;
+    uint32_t Channel3BreakerFault : 1;
+    uint32_t Channel4BreakerFault : 1;
+    uint32_t Channel5BreakerFault : 1;
+    uint32_t Channel6BreakerFault : 1;
+    uint32_t Channel7BreakerFault : 1;
+    uint32_t Channel8BreakerFault : 1;
+    uint32_t Channel9BreakerFault : 1;
+    uint32_t Channel10BreakerFault : 1;
+    uint32_t Channel11BreakerFault : 1;
+    uint32_t Channel12BreakerFault : 1;
+    uint32_t Channel13BreakerFault : 1;
+    uint32_t Channel14BreakerFault : 1;
+    uint32_t Channel15BreakerFault : 1;
+    uint32_t Channel16BreakerFault : 1;
+    uint32_t Channel17BreakerFault : 1;
+    uint32_t Channel18BreakerFault : 1;
+    uint32_t Channel19BreakerFault : 1;
+    uint32_t Channel20BreakerFault : 1;
+    uint32_t Channel21BreakerFault : 1;
+    uint32_t Channel22BreakerFault : 1;
+    uint32_t Channel23BreakerFault : 1;
+    uint32_t Brownout : 1;
+    uint32_t CanWarning : 1;
+    uint32_t CanBusOff : 1;
+    uint32_t HasReset : 1;
+  };
+
+  StickyFaults GetStickyFaults() const;
+
   void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:

@@ -218,6 +218,89 @@ void HAL_SetPowerDistributionSwitchableChannel(
 HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status);
 
+/**
+ * Storage for REV PDH Version
+ */
+struct HAL_REVPDHVersion {
+  uint32_t firmwareMajor;
+  uint32_t firmwareMinor;
+  uint32_t firmwareFix;
+  uint32_t hardwareMinor;
+  uint32_t hardwareMajor;
+  uint32_t uniqueId;
+};
+
+/**
+ * Storage for REV PDH Faults
+ */
+struct HAL_REVPDHFaults {
+  uint32_t channel0BreakerFault : 1;
+  uint32_t channel1BreakerFault : 1;
+  uint32_t channel2BreakerFault : 1;
+  uint32_t channel3BreakerFault : 1;
+  uint32_t channel4BreakerFault : 1;
+  uint32_t channel5BreakerFault : 1;
+  uint32_t channel6BreakerFault : 1;
+  uint32_t channel7BreakerFault : 1;
+  uint32_t channel8BreakerFault : 1;
+  uint32_t channel9BreakerFault : 1;
+  uint32_t channel10BreakerFault : 1;
+  uint32_t channel11BreakerFault : 1;
+  uint32_t channel12BreakerFault : 1;
+  uint32_t channel13BreakerFault : 1;
+  uint32_t channel14BreakerFault : 1;
+  uint32_t channel15BreakerFault : 1;
+  uint32_t channel16BreakerFault : 1;
+  uint32_t channel17BreakerFault : 1;
+  uint32_t channel18BreakerFault : 1;
+  uint32_t channel19BreakerFault : 1;
+  uint32_t channel20BreakerFault : 1;
+  uint32_t channel21BreakerFault : 1;
+  uint32_t channel22BreakerFault : 1;
+  uint32_t channel23BreakerFault : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t hardwareFault : 1;
+};
+
+/**
+ * Storage for REV PDH Sticky Faults
+ */
+struct HAL_REVPDHStickyFaults {
+  uint32_t channel0BreakerFault : 1;
+  uint32_t channel1BreakerFault : 1;
+  uint32_t channel2BreakerFault : 1;
+  uint32_t channel3BreakerFault : 1;
+  uint32_t channel4BreakerFault : 1;
+  uint32_t channel5BreakerFault : 1;
+  uint32_t channel6BreakerFault : 1;
+  uint32_t channel7BreakerFault : 1;
+  uint32_t channel8BreakerFault : 1;
+  uint32_t channel9BreakerFault : 1;
+  uint32_t channel10BreakerFault : 1;
+  uint32_t channel11BreakerFault : 1;
+  uint32_t channel12BreakerFault : 1;
+  uint32_t channel13BreakerFault : 1;
+  uint32_t channel14BreakerFault : 1;
+  uint32_t channel15BreakerFault : 1;
+  uint32_t channel16BreakerFault : 1;
+  uint32_t channel17BreakerFault : 1;
+  uint32_t channel18BreakerFault : 1;
+  uint32_t channel19BreakerFault : 1;
+  uint32_t channel20BreakerFault : 1;
+  uint32_t channel21BreakerFault : 1;
+  uint32_t channel22BreakerFault : 1;
+  uint32_t channel23BreakerFault : 1;
+  uint32_t brownout : 1;
+  uint32_t canWarning : 1;
+  uint32_t canBusOff : 1;
+  uint32_t hasReset : 1;
+};
+
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle, HAL_REVPDHVersion* version, int32_t* status);
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle, HAL_REVPDHFaults* faults, int32_t* status);
+void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle, HAL_REVPDHStickyFaults* stickyFaults, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
