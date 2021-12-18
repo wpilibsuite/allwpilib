@@ -43,9 +43,6 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
       m_controller(xController, yController, thetaController),
       m_outputStates(output) {
   this->AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 template <size_t NumModules>
@@ -80,13 +77,13 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
       m_controller(xController, yController, thetaController),
       m_outputStates(output) {
   this->AddRequirements(requirements);
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
 }
 
 template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Initialize() {
+  m_desiredRotation = [&] {
+    return m_trajectory.States().back().pose.Rotation();
+  };
   m_timer.Reset();
   m_timer.Start();
 }
