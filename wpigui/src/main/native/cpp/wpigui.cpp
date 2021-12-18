@@ -15,6 +15,7 @@
 #include <imgui_internal.h>
 #include <implot.h>
 #include <stb_image.h>
+#include <wpi/StringExtras.h>
 #include <wpi/fs.h>
 
 #include "wpigui_internal.h"
@@ -71,21 +72,21 @@ static void IniReadLine(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   }
   ++value;
   int num = std::atoi(value);
-  if (std::strncmp(lineStr, "width=", 6) == 0) {
+  if (wpi::starts_with(lineStr, "width=")) {
     impl->width = num;
     impl->loadedWidthHeight = true;
-  } else if (std::strncmp(lineStr, "height=", 7) == 0) {
+  } else if (wpi::starts_with(lineStr, "height=")) {
     impl->height = num;
     impl->loadedWidthHeight = true;
-  } else if (std::strncmp(lineStr, "maximized=", 10) == 0) {
+  } else if (wpi::starts_with(lineStr, "maximized=")) {
     impl->maximized = num;
-  } else if (std::strncmp(lineStr, "xpos=", 5) == 0) {
+  } else if (wpi::starts_with(lineStr, "xpos=")) {
     impl->xPos = num;
-  } else if (std::strncmp(lineStr, "ypos=", 5) == 0) {
+  } else if (wpi::starts_with(lineStr, "ypos=")) {
     impl->yPos = num;
-  } else if (std::strncmp(lineStr, "userScale=", 10) == 0) {
+  } else if (wpi::starts_with(lineStr, "userScale=")) {
     impl->userScale = num;
-  } else if (std::strncmp(lineStr, "style=", 6) == 0) {
+  } else if (wpi::starts_with(lineStr, "style=")) {
     impl->style = num;
   }
 }
