@@ -29,10 +29,10 @@ public class REVPHVersion {
    *
    * @param firmwareMajor firmware major
    * @param firmwareMinor firmware minor
-   * @param firmwareFix   firmware fix
+   * @param firmwareFix firmware fix
    * @param hardwareMinor hardware minor
    * @param hardwareMajor hardware major
-   * @param uniqueId      unique id
+   * @param uniqueId unique id
    */
   public REVPHVersion(
       int firmwareMajor,
