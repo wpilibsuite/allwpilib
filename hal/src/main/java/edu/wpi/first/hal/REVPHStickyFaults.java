@@ -29,7 +29,7 @@ public class REVPHStickyFaults {
 
   /**
    * Called from HAL.
-   * 
+   *
    * @param faults sticky fault bit mask
    */
   public REVPHStickyFaults(int faults) {

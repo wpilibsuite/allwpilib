@@ -74,7 +74,7 @@ public class REVPHFaults {
 
   /**
    * Called from HAL to construct.
-   * 
+   *
    * @param faults the fault bitfields
    */
   public REVPHFaults(int faults) {
