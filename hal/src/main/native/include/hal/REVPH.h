@@ -121,12 +121,13 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
 HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
-                                  int32_t* status);
+                                 int32_t* status);
 double HAL_GetREVPHVoltage(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPH5VVoltage(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHSolenoidCurrent(HAL_REVPHHandle handle, int32_t* status);
 double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status);
-void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version, int32_t* status);
+void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
+                         int32_t* status);
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status);
 void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
@@ -135,10 +136,12 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
 void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
                           int32_t* status);
 
-void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults, int32_t* status);
+void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
+                        int32_t* status);
 
-void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle, HAL_REVPHStickyFaults* stickyFaults,
-                                               int32_t* status);
+void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
+                              HAL_REVPHStickyFaults* stickyFaults,
+                              int32_t* status);
 
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status);
 

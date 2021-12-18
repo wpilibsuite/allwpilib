@@ -178,7 +178,7 @@ HAL_Bool HAL_GetREVPHPressureSwitch(HAL_REVPHHandle handle, int32_t* status) {
 }
 
 double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
-                                  int32_t* status) {
+                                 int32_t* status) {
   return 0;
 }
 
@@ -244,11 +244,14 @@ double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status) {
   return 0;
 }
 
-void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version, int32_t* status) {}
+void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
+                         int32_t* status) {}
 
-void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults, int32_t* status) {}
+void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
+                        int32_t* status) {}
 
-void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle, HAL_REVPHStickyFaults* stickyFaults,
-                                               int32_t* status) {}
+void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
+                              HAL_REVPHStickyFaults* stickyFaults,
+                              int32_t* status) {}
 
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {}

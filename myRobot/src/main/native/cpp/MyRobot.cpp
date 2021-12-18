@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/TimedRobot.h>
-#include <frc/PneumaticHub.h>
 #include <frc/AnalogOutput.h>
+#include <frc/PneumaticHub.h>
+#include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 class MyRobot : public frc::TimedRobot {
@@ -15,9 +15,7 @@ class MyRobot : public frc::TimedRobot {
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
-  void RobotInit() override {
-    frc::SmartDashboard::PutNumber("AOut", 0);
-  }
+  void RobotInit() override { frc::SmartDashboard::PutNumber("AOut", 0); }
 
   /**
    * This function is run once each time the robot enters autonomous mode

@@ -122,7 +122,8 @@ class Compressor : public wpi::Sendable,
    * @param minAnalogVoltage The minimum voltage to enable compressor
    * @param maxAnalogVoltage The maximum voltage to disable compressor
    */
-  void EnableAnalog(units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage);
+  void EnableAnalog(units::volt_t minAnalogVoltage,
+                    units::volt_t maxAnalogVoltage);
 
   /**
    * Enable compressor closed loop control using hybrid input.
@@ -132,7 +133,8 @@ class Compressor : public wpi::Sendable,
    * @param minAnalogVoltage The minimum voltage to enable compressor
    * @param maxAnalogVoltage The maximum voltage to disable compressor
    */
-  void EnableHybrid(units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage);
+  void EnableHybrid(units::volt_t minAnalogVoltage,
+                    units::volt_t maxAnalogVoltage);
 
   CompressorConfigType GetConfigType() const;
 

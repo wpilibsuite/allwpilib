@@ -96,15 +96,15 @@ void PneumaticsControlModule::EnableCompressorDigital() {
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::EnableCompressorAnalog(units::volt_t minAnalogVoltage,
-                                                     units::volt_t maxAnalogVoltage) {
+void PneumaticsControlModule::EnableCompressorAnalog(
+    units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
-void PneumaticsControlModule::EnableCompressorHybrid(units::volt_t minAnalogVoltage,
-                                                     units::volt_t maxAnalogVoltage) {
+void PneumaticsControlModule::EnableCompressorHybrid(
+    units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);

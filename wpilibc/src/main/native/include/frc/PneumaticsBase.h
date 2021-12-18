@@ -6,9 +6,9 @@
 
 #include <memory>
 
+#include <units/current.h>
 #include <units/time.h>
 #include <units/voltage.h>
-#include <units/current.h>
 
 #include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsModuleType.h"

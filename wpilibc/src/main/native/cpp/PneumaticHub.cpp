@@ -206,42 +206,42 @@ void PneumaticHub::UnreserveCompressor() {
 PneumaticHub::Version PneumaticHub::GetVersion() const {
   int32_t status = 0;
   HAL_REVPHVersion halVersions;
-  memset(&halVersions, 0, sizeof(halVersions));
+  std::memset(&halVersions, 0, sizeof(halVersions));
   HAL_GetREVPHVersion(m_handle, &halVersions, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   PneumaticHub::Version versions;
   static_assert(sizeof(halVersions) == sizeof(versions));
   static_assert(std::is_standard_layout_v<decltype(versions)>);
   static_assert(std::is_trivial_v<decltype(versions)>);
-  memcpy(&versions, &halVersions, sizeof(versions));
+  std::memcpy(&versions, &halVersions, sizeof(versions));
   return versions;
 }
 
 PneumaticHub::Faults PneumaticHub::GetFaults() const {
   int32_t status = 0;
   HAL_REVPHFaults halFaults;
-  memset(&halFaults, 0, sizeof(halFaults));
+  std::memset(&halFaults, 0, sizeof(halFaults));
   HAL_GetREVPHFaults(m_handle, &halFaults, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   PneumaticHub::Faults faults;
   static_assert(sizeof(halFaults) == sizeof(faults));
   static_assert(std::is_standard_layout_v<decltype(faults)>);
   static_assert(std::is_trivial_v<decltype(faults)>);
-  memcpy(&faults, &halFaults, sizeof(faults));
+  std::memcpy(&faults, &halFaults, sizeof(faults));
   return faults;
 }
 
 PneumaticHub::StickyFaults PneumaticHub::GetStickyFaults() const {
   int32_t status = 0;
   HAL_REVPHStickyFaults halStickyFaults;
-  memset(&halStickyFaults, 0, sizeof(halStickyFaults));
+  std::memset(&halStickyFaults, 0, sizeof(halStickyFaults));
   HAL_GetREVPHStickyFaults(m_handle, &halStickyFaults, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
   PneumaticHub::StickyFaults stickyFaults;
   static_assert(sizeof(halStickyFaults) == sizeof(stickyFaults));
   static_assert(std::is_standard_layout_v<decltype(stickyFaults)>);
   static_assert(std::is_trivial_v<decltype(stickyFaults)>);
-  memcpy(&stickyFaults, &halStickyFaults, sizeof(stickyFaults));
+  std::memcpy(&stickyFaults, &halStickyFaults, sizeof(stickyFaults));
   return stickyFaults;
 }
 
