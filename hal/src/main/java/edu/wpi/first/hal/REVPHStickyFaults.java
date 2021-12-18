@@ -27,6 +27,11 @@ public class REVPHStickyFaults {
   @SuppressWarnings("MemberName")
   public final boolean HasReset;
 
+  /**
+   * Called from HAL.
+   * 
+   * @param faults sticky fault bit mask
+   */
   public REVPHStickyFaults(int faults) {
     CompressorOverCurrent = (faults & 0x1) != 0;
     CompressorOpen = (faults & 0x2) != 0;

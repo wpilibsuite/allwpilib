@@ -72,6 +72,11 @@ public class REVPHFaults {
   @SuppressWarnings("MemberName")
   public final boolean HardwareFault;
 
+  /**
+   * Called from HAL to construct.
+   * 
+   * @param faults the fault bitfields
+   */
   public REVPHFaults(int faults) {
     Channel0Fault = (faults & 0x1) != 0;
     Channel1Fault = (faults & 0x2) != 0;
