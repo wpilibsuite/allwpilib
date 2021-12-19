@@ -46,15 +46,16 @@ bool glass::DisplayPCMSolenoids(PCMModel* model, int index,
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d]###name", name.c_str(), index);
+    std::snprintf(label, sizeof(label), "%s [%d]###header", name.c_str(),
+                  index);
   } else {
-    std::snprintf(label, sizeof(label), "PCM[%d]###name", index);
+    std::snprintf(label, sizeof(label), "PCM[%d]###header", index);
   }
 
   // header
   bool open = CollapsingHeader(label);
 
-  PopupEditName("name", &name);
+  PopupEditName("header", &name);
 
   ImGui::SetItemAllowOverlap();
   ImGui::SameLine();
