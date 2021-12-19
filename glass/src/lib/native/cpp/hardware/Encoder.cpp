@@ -70,17 +70,17 @@ void glass::DisplayEncoder(EncoderModel* model) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (!name.empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d,%d]###name", name.c_str(), chA,
-                  chB);
+    std::snprintf(label, sizeof(label), "%s [%d,%d]###header", name.c_str(),
+                  chA, chB);
   } else {
-    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###name", chA, chB);
+    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###header", chA, chB);
   }
 
   // header
   bool open = CollapsingHeader(label);
 
   // context menu to change name
-  if (PopupEditName("name", &name)) {
+  if (PopupEditName("header", &name)) {
     model->SetName(name);
   }
 
