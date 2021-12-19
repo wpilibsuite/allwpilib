@@ -24,6 +24,8 @@ try {
 } catch(Exception ex) {
 }
 
+ext.skip_gz_msgs = false
+
 if (project.hasProperty("forceGazebo")) {
     if (!protobuf_version?.trim()) {
         println "Protobuf is not available. (pkg-config --modversion protobuf failed)"
