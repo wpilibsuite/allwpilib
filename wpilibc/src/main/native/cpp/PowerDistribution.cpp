@@ -137,6 +137,48 @@ void PowerDistribution::SetSwitchableChannel(bool enabled) {
   FRC_ReportError(status, "Module {}", m_module);
 }
 
+PowerDistribution::Version PowerDistribution::GetVersion() const {
+  int32_t status = 0;
+  HAL_PowerDistributionVersion halVersion;
+  std::memset(&halVersion, 0, sizeof(halVersion));
+  HAL_GetPowerDistributionVersion(m_handle, &halVersion, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  PowerDistribution::Version version;
+  static_assert(sizeof(halVersion) == sizeof(version));
+  static_assert(std::is_standard_layout_v<decltype(version)>);
+  static_assert(std::is_trivial_v<decltype(version)>);
+  std::memcpy(&version, &halVersion, sizeof(version));
+  return version;
+}
+
+PowerDistribution::Faults PowerDistribution::GetFaults() const {
+  int32_t status = 0;
+  HAL_PowerDistributionFaults halFaults;
+  std::memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetPowerDistributionFaults(m_handle, &halFaults, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  PowerDistribution::Faults faults;
+  static_assert(sizeof(halFaults) == sizeof(faults));
+  static_assert(std::is_standard_layout_v<decltype(faults)>);
+  static_assert(std::is_trivial_v<decltype(faults)>);
+  std::memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
+  int32_t status = 0;
+  HAL_PowerDistributionStickyFaults halStickyFaults;
+  std::memset(&halStickyFaults, 0, sizeof(halStickyFaults));
+  HAL_GetPowerDistributionStickyFaults(m_handle, &halStickyFaults, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  PowerDistribution::StickyFaults stickyFaults;
+  static_assert(sizeof(halStickyFaults) == sizeof(stickyFaults));
+  static_assert(std::is_standard_layout_v<decltype(stickyFaults)>);
+  static_assert(std::is_trivial_v<decltype(stickyFaults)>);
+  std::memcpy(&stickyFaults, &halStickyFaults, sizeof(stickyFaults));
+  return stickyFaults;
+}
+
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
   int32_t status = 0;

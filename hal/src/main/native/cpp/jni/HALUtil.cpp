@@ -46,6 +46,7 @@ static JException canMessageNotFoundExCls;
 static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
+static JClass powerDistributionVersionCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
@@ -56,6 +57,8 @@ static JClass baseStoreCls;
 static JClass revPHVersionCls;
 
 static const JClassInit classes[] = {
+    {"edu/wpi/first/hal/PowerDistributionVersion",
+     &powerDistributionVersionCls},
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
     {"edu/wpi/first/hal/can/CANStatus", &canStatusCls},
     {"edu/wpi/first/hal/MatchInfoData", &matchInfoDataCls},
@@ -331,6 +334,21 @@ jobject CreateHALValue(JNIEnv* env, const HAL_Value& value) {
 jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index) {
   static jmethodID ctor = env->GetMethodID(baseStoreCls, "<init>", "(II)V");
   return env->NewObject(baseStoreCls, ctor, valueType, index);
+}
+
+jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
+                                       uint32_t firmwareMinor,
+                                       uint32_t firmwareFix,
+                                       uint32_t hardwareMinor,
+                                       uint32_t hardwareMajor,
+                                       uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(powerDistributionVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      powerDistributionVersionCls, constructor,
+      static_cast<jint>(firmwareMajor), static_cast<jint>(firmwareMinor),
+      static_cast<jint>(firmwareFix), static_cast<jint>(hardwareMinor),
+      static_cast<jint>(hardwareMajor), static_cast<jint>(uniqueId));
 }
 
 JavaVM* GetJVM() {

@@ -476,10 +476,10 @@ double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status) {
   return PDH_status_4_v_bus_decode(statusFrame.v_bus);
 }
 
-HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
-                                       int32_t* status) {
-  HAL_REVPDHVersion version;
-  std::memset(&version, 0, sizeof(version));
+void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
+                          HAL_PowerDistributionVersion* version,
+                          int32_t* status) {
+  std::memset(version, 0, sizeof(*version));
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -487,14 +487,14 @@ HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return version;
+    return;
   }
 
   HAL_WriteCANRTRFrame(hpdh->hcan, PDH_VERSION_LENGTH, PDH_VERSION_FRAME_API,
                        status);
 
   if (*status != 0) {
-    return version;
+    return;
   }
 
   HAL_ReadCANPacketTimeout(hpdh->hcan, PDH_VERSION_FRAME_API, packedData,
@@ -502,27 +502,26 @@ HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
                            status);
 
   if (*status != 0) {
-    return version;
+    return;
   }
 
   PDH_version_unpack(&result, packedData, PDH_VERSION_LENGTH);
 
-  version.firmwareMajor = result.firmware_year;
-  version.firmwareMinor = result.firmware_minor;
-  version.firmwareFix = result.firmware_fix;
-  version.hardwareMinor = result.hardware_minor;
-  version.hardwareMajor = result.hardware_major;
-  version.uniqueId = result.unique_id;
-
-  return version;
+  version->firmwareMajor = result.firmware_year;
+  version->firmwareMinor = result.firmware_minor;
+  version->firmwareFix = result.firmware_fix;
+  version->hardwareMinor = result.hardware_minor;
+  version->hardwareMajor = result.hardware_major;
+  version->uniqueId = result.unique_id;
 }
 
-HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status) {
-  HAL_REVPDHFaults faults = {};
+void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle,
+                         HAL_PowerDistributionFaults* faults, int32_t* status) {
+  std::memset(faults, 0, sizeof(*faults));
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return faults;
+    return;
   }
 
   PDH_status_0_t status0 = HAL_ReadREVPDHStatus0(hpdh->hcan, status);
@@ -531,78 +530,75 @@ HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status) {
   PDH_status_3_t status3 = HAL_ReadREVPDHStatus3(hpdh->hcan, status);
   PDH_status_4_t status4 = HAL_ReadREVPDHStatus4(hpdh->hcan, status);
 
-  faults.channel0BreakerFault = status0.channel_0_breaker_fault;
-  faults.channel1BreakerFault = status0.channel_1_breaker_fault;
-  faults.channel2BreakerFault = status0.channel_2_breaker_fault;
-  faults.channel3BreakerFault = status0.channel_3_breaker_fault;
-  faults.channel4BreakerFault = status1.channel_4_breaker_fault;
-  faults.channel5BreakerFault = status1.channel_5_breaker_fault;
-  faults.channel6BreakerFault = status1.channel_6_breaker_fault;
-  faults.channel7BreakerFault = status1.channel_7_breaker_fault;
-  faults.channel8BreakerFault = status2.channel_8_breaker_fault;
-  faults.channel9BreakerFault = status2.channel_9_breaker_fault;
-  faults.channel10BreakerFault = status2.channel_10_breaker_fault;
-  faults.channel11BreakerFault = status2.channel_11_breaker_fault;
-  faults.channel12BreakerFault = status3.channel_12_breaker_fault;
-  faults.channel13BreakerFault = status3.channel_13_breaker_fault;
-  faults.channel14BreakerFault = status3.channel_14_breaker_fault;
-  faults.channel15BreakerFault = status3.channel_15_breaker_fault;
-  faults.channel16BreakerFault = status3.channel_16_breaker_fault;
-  faults.channel17BreakerFault = status3.channel_17_breaker_fault;
-  faults.channel18BreakerFault = status3.channel_18_breaker_fault;
-  faults.channel19BreakerFault = status3.channel_19_breaker_fault;
-  faults.channel20BreakerFault = status3.channel_20_breaker_fault;
-  faults.channel21BreakerFault = status3.channel_21_breaker_fault;
-  faults.channel22BreakerFault = status3.channel_22_breaker_fault;
-  faults.channel23BreakerFault = status3.channel_23_breaker_fault;
-  faults.brownout = status4.brownout_fault;
-  faults.canWarning = status4.can_warning_fault;
-  faults.hardwareFault = status4.hardware_fault;
-
-  return faults;
+  faults->channel0BreakerFault = status0.channel_0_breaker_fault;
+  faults->channel1BreakerFault = status0.channel_1_breaker_fault;
+  faults->channel2BreakerFault = status0.channel_2_breaker_fault;
+  faults->channel3BreakerFault = status0.channel_3_breaker_fault;
+  faults->channel4BreakerFault = status1.channel_4_breaker_fault;
+  faults->channel5BreakerFault = status1.channel_5_breaker_fault;
+  faults->channel6BreakerFault = status1.channel_6_breaker_fault;
+  faults->channel7BreakerFault = status1.channel_7_breaker_fault;
+  faults->channel8BreakerFault = status2.channel_8_breaker_fault;
+  faults->channel9BreakerFault = status2.channel_9_breaker_fault;
+  faults->channel10BreakerFault = status2.channel_10_breaker_fault;
+  faults->channel11BreakerFault = status2.channel_11_breaker_fault;
+  faults->channel12BreakerFault = status3.channel_12_breaker_fault;
+  faults->channel13BreakerFault = status3.channel_13_breaker_fault;
+  faults->channel14BreakerFault = status3.channel_14_breaker_fault;
+  faults->channel15BreakerFault = status3.channel_15_breaker_fault;
+  faults->channel16BreakerFault = status3.channel_16_breaker_fault;
+  faults->channel17BreakerFault = status3.channel_17_breaker_fault;
+  faults->channel18BreakerFault = status3.channel_18_breaker_fault;
+  faults->channel19BreakerFault = status3.channel_19_breaker_fault;
+  faults->channel20BreakerFault = status3.channel_20_breaker_fault;
+  faults->channel21BreakerFault = status3.channel_21_breaker_fault;
+  faults->channel22BreakerFault = status3.channel_22_breaker_fault;
+  faults->channel23BreakerFault = status3.channel_23_breaker_fault;
+  faults->brownout = status4.brownout_fault;
+  faults->canWarning = status4.can_warning_fault;
+  faults->hardwareFault = status4.hardware_fault;
 }
 
-HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
-                                                 int32_t* status) {
-  HAL_REVPDHStickyFaults stickyFaults = {};
+void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
+                               HAL_PowerDistributionStickyFaults* stickyFaults,
+                               int32_t* status) {
+  std::memset(stickyFaults, 0, sizeof(*stickyFaults));
   auto hpdh = REVPDHHandles->Get(handle);
   if (hpdh == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return stickyFaults;
+    return;
   }
 
   PDH_status_4_t status4 = HAL_ReadREVPDHStatus4(hpdh->hcan, status);
 
-  stickyFaults.channel0BreakerFault = status4.sticky_ch0_breaker_fault;
-  stickyFaults.channel1BreakerFault = status4.sticky_ch1_breaker_fault;
-  stickyFaults.channel2BreakerFault = status4.sticky_ch2_breaker_fault;
-  stickyFaults.channel3BreakerFault = status4.sticky_ch3_breaker_fault;
-  stickyFaults.channel4BreakerFault = status4.sticky_ch4_breaker_fault;
-  stickyFaults.channel5BreakerFault = status4.sticky_ch5_breaker_fault;
-  stickyFaults.channel6BreakerFault = status4.sticky_ch6_breaker_fault;
-  stickyFaults.channel7BreakerFault = status4.sticky_ch7_breaker_fault;
-  stickyFaults.channel8BreakerFault = status4.sticky_ch8_breaker_fault;
-  stickyFaults.channel9BreakerFault = status4.sticky_ch9_breaker_fault;
-  stickyFaults.channel10BreakerFault = status4.sticky_ch10_breaker_fault;
-  stickyFaults.channel11BreakerFault = status4.sticky_ch11_breaker_fault;
-  stickyFaults.channel12BreakerFault = status4.sticky_ch12_breaker_fault;
-  stickyFaults.channel13BreakerFault = status4.sticky_ch13_breaker_fault;
-  stickyFaults.channel14BreakerFault = status4.sticky_ch14_breaker_fault;
-  stickyFaults.channel15BreakerFault = status4.sticky_ch15_breaker_fault;
-  stickyFaults.channel16BreakerFault = status4.sticky_ch16_breaker_fault;
-  stickyFaults.channel17BreakerFault = status4.sticky_ch17_breaker_fault;
-  stickyFaults.channel18BreakerFault = status4.sticky_ch18_breaker_fault;
-  stickyFaults.channel19BreakerFault = status4.sticky_ch19_breaker_fault;
-  stickyFaults.channel20BreakerFault = status4.sticky_ch20_breaker_fault;
-  stickyFaults.channel21BreakerFault = status4.sticky_ch21_breaker_fault;
-  stickyFaults.channel22BreakerFault = status4.sticky_ch22_breaker_fault;
-  stickyFaults.channel23BreakerFault = status4.sticky_ch23_breaker_fault;
-  stickyFaults.brownout = status4.sticky_brownout_fault;
-  stickyFaults.canWarning = status4.sticky_can_warning_fault;
-  stickyFaults.canBusOff = status4.sticky_can_bus_off_fault;
-  stickyFaults.hasReset = status4.sticky_has_reset_fault;
-
-  return stickyFaults;
+  stickyFaults->channel0BreakerFault = status4.sticky_ch0_breaker_fault;
+  stickyFaults->channel1BreakerFault = status4.sticky_ch1_breaker_fault;
+  stickyFaults->channel2BreakerFault = status4.sticky_ch2_breaker_fault;
+  stickyFaults->channel3BreakerFault = status4.sticky_ch3_breaker_fault;
+  stickyFaults->channel4BreakerFault = status4.sticky_ch4_breaker_fault;
+  stickyFaults->channel5BreakerFault = status4.sticky_ch5_breaker_fault;
+  stickyFaults->channel6BreakerFault = status4.sticky_ch6_breaker_fault;
+  stickyFaults->channel7BreakerFault = status4.sticky_ch7_breaker_fault;
+  stickyFaults->channel8BreakerFault = status4.sticky_ch8_breaker_fault;
+  stickyFaults->channel9BreakerFault = status4.sticky_ch9_breaker_fault;
+  stickyFaults->channel10BreakerFault = status4.sticky_ch10_breaker_fault;
+  stickyFaults->channel11BreakerFault = status4.sticky_ch11_breaker_fault;
+  stickyFaults->channel12BreakerFault = status4.sticky_ch12_breaker_fault;
+  stickyFaults->channel13BreakerFault = status4.sticky_ch13_breaker_fault;
+  stickyFaults->channel14BreakerFault = status4.sticky_ch14_breaker_fault;
+  stickyFaults->channel15BreakerFault = status4.sticky_ch15_breaker_fault;
+  stickyFaults->channel16BreakerFault = status4.sticky_ch16_breaker_fault;
+  stickyFaults->channel17BreakerFault = status4.sticky_ch17_breaker_fault;
+  stickyFaults->channel18BreakerFault = status4.sticky_ch18_breaker_fault;
+  stickyFaults->channel19BreakerFault = status4.sticky_ch19_breaker_fault;
+  stickyFaults->channel20BreakerFault = status4.sticky_ch20_breaker_fault;
+  stickyFaults->channel21BreakerFault = status4.sticky_ch21_breaker_fault;
+  stickyFaults->channel22BreakerFault = status4.sticky_ch22_breaker_fault;
+  stickyFaults->channel23BreakerFault = status4.sticky_ch23_breaker_fault;
+  stickyFaults->brownout = status4.sticky_brownout_fault;
+  stickyFaults->canWarning = status4.sticky_can_warning_fault;
+  stickyFaults->canBusOff = status4.sticky_can_bus_off_fault;
+  stickyFaults->hasReset = status4.sticky_has_reset_fault;
 }
 
 void HAL_ClearREVPDHStickyFaults(HAL_REVPDHHandle handle, int32_t* status) {

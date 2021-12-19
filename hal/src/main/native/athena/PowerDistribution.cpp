@@ -4,6 +4,7 @@
 
 #include "hal/PowerDistribution.h"
 
+#include <cstring>
 #include <thread>
 
 #include "CTREPDP.h"
@@ -239,6 +240,36 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     return false;
   } else {
     return HAL_GetREVPDHSwitchableChannelState(handle, status);
+  }
+}
+
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
+                                     HAL_PowerDistributionVersion* version,
+                                     int32_t* status) {
+  if (IsCtre(handle)) {
+    std::memset(version, 0, sizeof(*version));
+  } else {
+    HAL_GetREVPDHVersion(handle, version, status);
+  }
+}
+
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
+                                    HAL_PowerDistributionFaults* faults,
+                                    int32_t* status) {
+  if (IsCtre(handle)) {
+    std::memset(faults, 0, sizeof(*faults));
+  } else {
+    HAL_GetREVPDHFaults(handle, faults, status);
+  }
+}
+
+void HAL_GetPowerDistributionStickyFaults(
+    HAL_PowerDistributionHandle handle,
+    HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status) {
+  if (IsCtre(handle)) {
+    std::memset(stickyFaults, 0, sizeof(*stickyFaults));
+  } else {
+    HAL_GetREVPDHStickyFaults(handle, stickyFaults, status);
   }
 }
 
