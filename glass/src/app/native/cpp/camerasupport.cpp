@@ -7,9 +7,6 @@
 #ifdef _WIN32
 #include "Windows.h"
 #include "delayimp.h"
-#endif
-
-#ifdef _WIN32
 static int CheckDelayException(int exception_value) {
   if (exception_value ==
           VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND) ||
@@ -21,7 +18,6 @@ static int CheckDelayException(int exception_value) {
   // Don't attempt to handle other errors
   return EXCEPTION_CONTINUE_SEARCH;
 }
-
 static bool TryDelayLoadAllImports(LPCSTR szDll) {
   __try {
     HRESULT hr = __HrLoadAllImportsForDll(szDll);
@@ -33,11 +29,9 @@ static bool TryDelayLoadAllImports(LPCSTR szDll) {
   }
   return true;
 }
-
 namespace glass {
 bool HasCameraSupport() {
   bool hasCameraSupport = false;
-
   hasCameraSupport = TryDelayLoadAllImports("MF.dll");
   if (hasCameraSupport) {
     hasCameraSupport = TryDelayLoadAllImports("MFPlat.dll");
