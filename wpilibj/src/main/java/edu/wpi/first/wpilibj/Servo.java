@@ -65,8 +65,7 @@ public class Servo extends PWM {
   /**
    * Set the servo angle.
    *
-   * <p>Assume that the servo angle is linear with respect to the PWM value (big assumption, need to
-   * test).
+   * <p>The angles are based on the HS-322HD Servo, and have a range of 0 to 180 degrees.
    *
    * <p>Servo angles that are out of the supported range of the servo simply "saturate" in that
    * direction In other words, if the servo has a range of (X degrees to Y degrees) than angles of
