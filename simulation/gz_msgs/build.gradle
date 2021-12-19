@@ -38,9 +38,11 @@ tasks.whenTaskAdded { task ->
     task.onlyIf { !project.hasProperty('skip_gz_msgs') }
 }
 
-dependencies {
-    implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
-    implementation "com.google.protobuf:protoc:${protobuf_version}"
+if (!ext.skip_gz_msgs) {
+    dependencies {
+        implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
+        implementation "com.google.protobuf:protoc:${protobuf_version}"
+    }
 }
 
 /* There is a nice gradle plugin for protobuf, and the protoc tool

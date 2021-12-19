@@ -71,6 +71,8 @@ The gradlew wrapper only exists in the root of the main project, so be sure to r
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
+If opening from a fresh clone, generated java dependencies will not exist. Most IDEs will not run the generation tasks, which will cause lots of IDE errors. Manually run `./gradlew compileJava` from a terminal to run all the compile tasks, and then refresh your IDE's configuration (In VS Code open settings.gradle and save).
+
 ### Faster builds
 
 `./gradlew build` builds _everything_, which includes debug and release builds for desktop and all installed cross compilers. Many developers don't need or want to build all of this. Therefore, common tasks have shortcuts to only build necessary components for common development and testing tasks.
