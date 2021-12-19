@@ -7,7 +7,9 @@
 #ifdef _WIN32
 #include "Windows.h"
 #include "delayimp.h"
+#endif
 
+#ifdef _WIN32
 static int CheckDelayException(int exception_value) {
   if (exception_value ==
           VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND) ||
