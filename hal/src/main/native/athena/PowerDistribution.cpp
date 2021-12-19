@@ -4,9 +4,8 @@
 
 #include "hal/PowerDistribution.h"
 
-#include <thread>
-
 #include <cstring>
+#include <thread>
 
 #include "CTREPDP.h"
 #include "HALInternal.h"
@@ -255,7 +254,8 @@ void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
 }
 
 void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
-                                    HAL_PowerDistributionFaults* faults, int32_t* status) {
+                                    HAL_PowerDistributionFaults* faults,
+                                    int32_t* status) {
   if (IsCtre(handle)) {
     std::memset(faults, 0, sizeof(*faults));
   } else {
@@ -263,9 +263,9 @@ void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
   }
 }
 
-void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle,
-                                          HAL_PowerDistributionStickyFaults* stickyFaults,
-                                          int32_t* status) {
+void HAL_GetPowerDistributionStickyFaults(
+    HAL_PowerDistributionHandle handle,
+    HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status) {
   if (IsCtre(handle)) {
     std::memset(stickyFaults, 0, sizeof(*stickyFaults));
   } else {

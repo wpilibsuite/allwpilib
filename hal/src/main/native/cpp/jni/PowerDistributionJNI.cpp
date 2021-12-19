@@ -416,9 +416,9 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getVersion
   std::memset(&version, 0, sizeof(version));
   HAL_GetPowerDistributionVersion(handle, &version, &status);
   CheckStatus(env, status, false);
-  return CreatePowerDistributionVersion(env, version.firmwareMajor, version.firmwareMinor,
-                            version.firmwareFix, version.hardwareMinor,
-                            version.hardwareMajor, version.uniqueId);
+  return CreatePowerDistributionVersion(
+      env, version.firmwareMajor, version.firmwareMinor, version.firmwareFix,
+      version.hardwareMinor, version.hardwareMajor, version.uniqueId);
 }
 
 }  // extern "C"

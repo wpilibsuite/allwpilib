@@ -1,7 +1,10 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package edu.wpi.first.hal;
 
 public class PowerDistributionStickyFaults {
-
   @SuppressWarnings("MemberName")
   public final boolean Channel0BreakerFault;
 
@@ -86,6 +89,11 @@ public class PowerDistributionStickyFaults {
   @SuppressWarnings("MemberName")
   public final boolean HasReset;
 
+  /**
+   * Constructs from a bitfield.
+   *
+   * @param faults faults
+   */
   public PowerDistributionStickyFaults(int faults) {
     Channel0BreakerFault = (faults & 0x1) != 0;
     Channel1BreakerFault = (faults & 0x2) != 0;

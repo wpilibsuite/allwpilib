@@ -291,9 +291,15 @@ struct HAL_PowerDistributionStickyFaults {
   uint32_t hasReset : 1;
 };
 
-void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle, HAL_PowerDistributionVersion* version, int32_t* status);
-void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle, HAL_PowerDistributionFaults* faults, int32_t* status);
-void HAL_GetPowerDistributionStickyFaults(HAL_PowerDistributionHandle handle, HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
+                                     HAL_PowerDistributionVersion* version,
+                                     int32_t* status);
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
+                                    HAL_PowerDistributionFaults* faults,
+                                    int32_t* status);
+void HAL_GetPowerDistributionStickyFaults(
+    HAL_PowerDistributionHandle handle,
+    HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status);
 
 #ifdef __cplusplus
 }  // extern "C"
