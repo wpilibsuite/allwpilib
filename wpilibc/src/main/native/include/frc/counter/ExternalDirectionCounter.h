@@ -15,7 +15,12 @@
 namespace frc {
 class DigitalSource;
 
-/** Counter using external direction. */
+/** Counter using external direction.
+ *
+ * <p>This counts on an edge from one digital input and the whether it counts
+ * up or down based on the state of a second digital input.
+ *
+ */
 class ExternalDirectionCounter
     : public wpi::Sendable,
       public wpi::SendableHelper<ExternalDirectionCounter> {
@@ -51,7 +56,7 @@ class ExternalDirectionCounter
   int GetCount() const;
 
   /**
-   * Sets to revert the counter direction.
+   * Sets to reverse the counter direction.
    *
    * @param reverseDirection True to reverse counting direction.
    */
