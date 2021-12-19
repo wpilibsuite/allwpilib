@@ -196,7 +196,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     nativeUtils.useRequiredLibrary(it, 'imgui_static')
                     if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
-                        it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << 'delayimp.lib' << '/delay:nobind'
+                        it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
                     } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                         it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     } else {
