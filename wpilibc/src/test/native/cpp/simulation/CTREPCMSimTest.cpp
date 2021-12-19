@@ -143,7 +143,7 @@ TEST(CTREPCMSimTest, SetCompressorCurrent) {
 
   sim.SetCompressorCurrent(35.04);
   EXPECT_EQ(35.04, sim.GetCompressorCurrent());
-  EXPECT_EQ(35.04, pcm.GetCompressorCurrent());
+  EXPECT_EQ(35.04_A, pcm.GetCompressorCurrent());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }

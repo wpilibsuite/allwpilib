@@ -53,6 +53,7 @@ static JClass accumulatorResultCls;
 static JClass canDataCls;
 static JClass halValueCls;
 static JClass baseStoreCls;
+static JClass revPHVersionCls;
 
 static const JClassInit classes[] = {
     {"edu/wpi/first/hal/PWMConfigDataResult", &pwmConfigDataResultCls},
@@ -61,7 +62,8 @@ static const JClassInit classes[] = {
     {"edu/wpi/first/hal/AccumulatorResult", &accumulatorResultCls},
     {"edu/wpi/first/hal/CANData", &canDataCls},
     {"edu/wpi/first/hal/HALValue", &halValueCls},
-    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls}};
+    {"edu/wpi/first/hal/DMAJNISample$BaseStore", &baseStoreCls},
+    {"edu/wpi/first/hal/REVPHVersion", &revPHVersionCls}};
 
 static const JExceptionInit exceptions[] = {
     {"java/lang/IllegalArgumentException", &illegalArgExCls},
@@ -236,6 +238,19 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
       pwmConfigDataResultCls, constructor, static_cast<jint>(maxPwm),
       static_cast<jint>(deadbandMaxPwm), static_cast<jint>(centerPwm),
       static_cast<jint>(deadbandMinPwm), static_cast<jint>(minPwm));
+}
+
+jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
+                           uint32_t firmwareMinor, uint32_t firmwareFix,
+                           uint32_t hardwareMinor, uint32_t hardwareMajor,
+                           uint32_t uniqueId) {
+  static jmethodID constructor =
+      env->GetMethodID(revPHVersionCls, "<init>", "(IIIIII)V");
+  return env->NewObject(
+      revPHVersionCls, constructor, static_cast<jint>(firmwareMajor),
+      static_cast<jint>(firmwareMinor), static_cast<jint>(firmwareFix),
+      static_cast<jint>(hardwareMinor), static_cast<jint>(hardwareMajor),
+      static_cast<jint>(uniqueId));
 }
 
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
