@@ -485,9 +485,16 @@ bool UsbCameraImpl::DeviceConnect() {
   const wchar_t* path = m_widePath.c_str();
   m_mediaSource = CreateVideoCaptureDevice(path);
 
-  if (!m_mediaSource)
+  if (!m_mediaSource) {
     return false;
-  m_imageCallback = CreateSourceReaderCB(shared_from_this(), m_mode);
+  }
+  auto weakThis = weak_from_this();
+  auto sharedThis = weakThis.lock();
+  if (sharedThis) {
+    m_imageCallback = CreateSourceReaderCB(sharedThis, m_mode);
+  } else {
+    return false;
+  }
 
   m_sourceReader =
       CreateSourceReader(m_mediaSource.Get(), m_imageCallback.Get());
