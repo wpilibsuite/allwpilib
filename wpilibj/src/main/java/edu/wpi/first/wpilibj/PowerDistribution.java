@@ -6,7 +6,10 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.PowerDistributionFaults;
 import edu.wpi.first.hal.PowerDistributionJNI;
+import edu.wpi.first.hal.PowerDistributionStickyFaults;
+import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -155,6 +158,18 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   public void setSwitchableChannel(boolean enabled) {
     PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
+  }
+
+  PowerDistributionVersion getVersion() {
+    return PowerDistributionJNI.getVersion(m_handle);
+  }
+
+  PowerDistributionFaults getFaults() {
+    return PowerDistributionJNI.getFaults(m_handle);
+  }
+
+  PowerDistributionStickyFaults getStickyFaults() {
+    return PowerDistributionJNI.getStickyFaults(m_handle);
   }
 
   @Override
