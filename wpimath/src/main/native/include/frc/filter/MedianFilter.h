@@ -47,9 +47,8 @@ class MedianFilter : public wpi::Sendable,
     // If buffer is at max size, pop element off of end of circular buffer
     // and remove from ordered list
     if (curSize > m_size) {
-      m_sortedValues.erase(std::find(m_sortedValues.begin(),
-                                      m_sortedValues.end(),
-                                      m_values.pop_back()));
+      m_sortedValues.erase(std::find(
+          m_sortedValues.begin(), m_sortedValues.end(), m_values.pop_back()));
       --curSize;
     }
 
@@ -62,8 +61,7 @@ class MedianFilter : public wpi::Sendable,
     } else {
       // If size is even, return average of middle elements
       m_output =
-          (m_sortedValues[curSize / 2 - 1] + m_sortedValues[curSize / 2]) /
-          2.0;
+          (m_sortedValues[curSize / 2 - 1] + m_sortedValues[curSize / 2]) / 2.0;
     }
 
     return m_output;
@@ -79,12 +77,10 @@ class MedianFilter : public wpi::Sendable,
 
   /**
    * Gets a copy of the filter's internal data buffer.
-   * 
+   *
    * @return A copy of the internal data buffer.
    */
-  std::vector<T> GetData() {
-    return m_values;
-  }
+  std::vector<T> GetData() { return m_values; }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
     builder.SetSmartDashboardType("MedianFilter");
@@ -93,8 +89,7 @@ class MedianFilter : public wpi::Sendable,
     builder.AddSmallDoubleArrayProperty(
         "inputs",
         [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_values.GetData().begin(),
-                        m_values.GetData().end());
+          values.assign(m_values.GetData().begin(), m_values.GetData().end());
           return values;
         },
         nullptr);

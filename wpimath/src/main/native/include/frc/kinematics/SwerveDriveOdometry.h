@@ -8,6 +8,9 @@
 #include <cstddef>
 #include <ctime>
 
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/timestamp.h>
 
 #include "SwerveDriveKinematics.h"
@@ -27,7 +30,9 @@ namespace frc {
  * when using computer-vision systems.
  */
 template <size_t NumModules>
-class SwerveDriveOdometry {
+class SwerveDriveOdometry
+    : public wpi::Sendable,
+      public wpi::SendableHelper<SwerveDriveOdometry<NumModules>> {
  public:
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -101,6 +106,20 @@ class SwerveDriveOdometry {
   const Pose2d& Update(const Rotation2d& gyroAngle,
                        ModuleStates&&... moduleStates) {
     return UpdateWithTime(wpi::Now() * 1.0e-6_s, gyroAngle, moduleStates...);
+  }
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    builder.SetSmartDashboardType("SwerveDriveOdometry");
+    builder.AddDoubleProperty(
+        "poseMetersX", [&] { return m_pose.X().value(); }, nullptr);
+    builder.AddDoubleProperty(
+        "poseMetersY", [&] { return m_pose.Y().value(); }, nullptr);
+    builder.AddDoubleProperty(
+        "poseDegrees", [&] { return m_pose.Rotation().Degrees().value(); },
+        nullptr);
+    builder.AddDoubleProperty(
+        "gyroOffsetDegrees", [&] { return m_gyroOffset.Degrees().value(); },
+        nullptr);
   }
 
  private:

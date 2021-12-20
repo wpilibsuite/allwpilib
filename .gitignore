@@ -236,3 +236,4 @@ coverage_report/
 node_modules
 package.json
 package-lock.json
+.husky

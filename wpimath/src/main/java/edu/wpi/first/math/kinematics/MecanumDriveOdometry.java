@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
@@ -18,7 +20,7 @@ import edu.wpi.first.util.WPIUtilJNI;
  * <p>Teams can use odometry during the autonomous period for complex tasks like path following.
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
-public class MecanumDriveOdometry {
+public class MecanumDriveOdometry implements Sendable {
   private final MecanumDriveKinematics m_kinematics;
   private Pose2d m_poseMeters;
   private double m_prevTimeSeconds = -1;
@@ -121,5 +123,14 @@ public class MecanumDriveOdometry {
    */
   public Pose2d update(Rotation2d gyroAngle, MecanumDriveWheelSpeeds wheelSpeeds) {
     return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, wheelSpeeds);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("MecanumDriveOdometry");
+    builder.addDoubleProperty("poseMetersX", m_poseMeters::getX, null);
+    builder.addDoubleProperty("poseMetersY", m_poseMeters::getY, null);
+    builder.addDoubleProperty("poseDegrees", () -> m_poseMeters.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("gyroOffsetDegrees", m_gyroOffset::getDegrees, null);
   }
 }

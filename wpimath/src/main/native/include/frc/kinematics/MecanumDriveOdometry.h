@@ -5,6 +5,9 @@
 #pragma once
 
 #include <wpi/SymbolExports.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/timestamp.h>
 
 #include "frc/geometry/Pose2d.h"
@@ -23,7 +26,9 @@ namespace frc {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-class WPILIB_DLLEXPORT MecanumDriveOdometry {
+class WPILIB_DLLEXPORT MecanumDriveOdometry
+    : public wpi::Sendable,
+      public wpi::SendableHelper<MecanumDriveOdometry> {
  public:
   /**
    * Constructs a MecanumDriveOdometry object.
@@ -92,6 +97,8 @@ class WPILIB_DLLEXPORT MecanumDriveOdometry {
                        MecanumDriveWheelSpeeds wheelSpeeds) {
     return UpdateWithTime(wpi::Now() * 1.0e-6_s, gyroAngle, wheelSpeeds);
   }
+
+  void InitSendable(wpi::SendableBuilder& builder) override;
 
  private:
   MecanumDriveKinematics m_kinematics;

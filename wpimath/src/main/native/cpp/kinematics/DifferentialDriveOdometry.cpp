@@ -37,3 +37,17 @@ const Pose2d& DifferentialDriveOdometry::Update(const Rotation2d& gyroAngle,
 
   return m_pose;
 }
+
+void DifferentialDriveOdometry::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("DifferentialDriveOdometry");
+  builder.AddDoubleProperty(
+      "poseMetersX", [&] { return m_pose.X().value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "poseMetersY", [&] { return m_pose.Y().value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "poseDegrees", [&] { return m_pose.Rotation().Degrees().value(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "gyroOffsetDegrees", [&] { return m_gyroOffset.Degrees().value(); },
+      nullptr);
+}

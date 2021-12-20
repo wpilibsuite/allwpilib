@@ -25,7 +25,7 @@ namespace frc {
  */
 template <class Unit>
 class SlewRateLimiter : public wpi::Sendable,
-                     public wpi::SendableHelper<SlewRateLimiter<Unit>> {
+                        public wpi::SendableHelper<SlewRateLimiter<Unit>> {
  public:
   using Unit_t = units::unit_t<Unit>;
   using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
@@ -75,15 +75,10 @@ class SlewRateLimiter : public wpi::Sendable,
     builder.AddDoubleProperty(
         "rateLimit", [&] { return m_rateLimit.value(); }, nullptr);
     builder.AddDoubleProperty(
-        "input",
-        [&]{
-          return m_input.value();
-        },
-        nullptr);
+        "input", [&] { return m_input.value(); }, nullptr);
     builder.AddDoubleProperty(
         "output", [&] { return m_prevVal.value(); }, nullptr);
   }
-
 
  private:
   Rate_t m_rateLimit;

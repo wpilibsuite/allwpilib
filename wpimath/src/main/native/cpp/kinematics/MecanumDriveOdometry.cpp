@@ -38,3 +38,17 @@ const Pose2d& MecanumDriveOdometry::UpdateWithTime(
 
   return m_pose;
 }
+
+void MecanumDriveOdometry::InitSendable(wpi::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("MecanumDriveOdometry");
+  builder.AddDoubleProperty(
+      "poseMetersX", [&] { return m_pose.X().value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "poseMetersY", [&] { return m_pose.Y().value(); }, nullptr);
+  builder.AddDoubleProperty(
+      "poseDegrees", [&] { return m_pose.Rotation().Degrees().value(); },
+      nullptr);
+  builder.AddDoubleProperty(
+      "gyroOffsetDegrees", [&] { return m_gyroOffset.Degrees().value(); },
+      nullptr);
+}

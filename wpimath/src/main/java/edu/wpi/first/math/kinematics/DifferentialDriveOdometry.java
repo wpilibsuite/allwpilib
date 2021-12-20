@@ -9,6 +9,8 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -20,7 +22,7 @@ import edu.wpi.first.math.geometry.Twist2d;
  * <p>It is important that you reset your encoders to zero before using this class. Any subsequent
  * pose resets also require the encoders to be reset to zero.
  */
-public class DifferentialDriveOdometry {
+public class DifferentialDriveOdometry implements Sendable {
   private Pose2d m_poseMeters;
 
   private Rotation2d m_gyroOffset;
@@ -109,5 +111,14 @@ public class DifferentialDriveOdometry {
 
     m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
     return m_poseMeters;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("DifferentialDriveOdometry");
+    builder.addDoubleProperty("poseMetersX", m_poseMeters::getX, null);
+    builder.addDoubleProperty("poseMetersY", m_poseMeters::getY, null);
+    builder.addDoubleProperty("poseDegrees", () -> m_poseMeters.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("gyroOffsetDegrees", m_gyroOffset::getDegrees, null);
   }
 }
