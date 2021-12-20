@@ -6,6 +6,8 @@ package edu.wpi.first.math.filter;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * A class that limits the rate of change of an input value. Useful for implementing voltage,
@@ -13,10 +15,12 @@ import edu.wpi.first.util.WPIUtilJNI;
  * controlled is a velocity or a voltage; when controlling a position, consider using a {@link
  * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
  */
-public class SlewRateLimiter {
-  private final double m_rateLimit;
+public class SlewRateLimiter implements Sendable {
+  public double m_rateLimit;
+
   private double m_prevVal;
   private double m_prevTime;
+  private double m_input;
 
   /**
    * Creates a new SlewRateLimiter with the given rate limit and initial value.
@@ -46,6 +50,7 @@ public class SlewRateLimiter {
    * @return The filtered value, which will not change faster than the slew rate.
    */
   public double calculate(double input) {
+    m_input = input;
     double currentTime = WPIUtilJNI.now() * 1e-6;
     double elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
@@ -62,5 +67,31 @@ public class SlewRateLimiter {
   public void reset(double value) {
     m_prevVal = value;
     m_prevTime = WPIUtilJNI.now() * 1e-6;
+  }
+
+  /**
+   * Returns the most recent input to the filter.
+   *
+   * @return The most recent input.
+   */
+  public double getInput() {
+    return m_input;
+  }
+
+  /**
+   * Returns the most recent output of the filter.
+   *
+   * @return The most recent output.
+   */
+  public double getOutput() {
+    return m_prevVal;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("SlewRateLimiter");
+    builder.addDoubleProperty("rateLimit", () -> m_rateLimit, rateLimit -> m_rateLimit = rateLimit);
+    builder.addDoubleProperty("input", this::getInput, null);
+    builder.addDoubleProperty("output", this::getOutput, null);
   }
 }

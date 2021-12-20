@@ -7,6 +7,8 @@ package edu.wpi.first.math.filter;
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
 
@@ -47,7 +49,7 @@ import org.ejml.simple.SimpleMatrix;
  * then want to run it at 200Hz! Combining this with Note 1 - the impetus is on YOU as a developer
  * to make sure calculate() gets called at the desired, constant frequency!
  */
-public class LinearFilter {
+public class LinearFilter implements Sendable {
   private final CircularBuffer m_inputs;
   private final CircularBuffer m_outputs;
   private final double[] m_inputGains;
@@ -263,5 +265,14 @@ public class LinearFilter {
     } else {
       return n * factorial(n - 1);
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("LinearFilter");
+    builder.addDoubleArrayProperty("inputGains", () -> m_inputGains, null);
+    builder.addDoubleArrayProperty("outputGains", () -> m_outputGains, null);
+    builder.addDoubleArrayProperty("inputs", m_inputs::getData, null);
+    builder.addDoubleArrayProperty("outputs", m_outputs::getData, null);
   }
 }

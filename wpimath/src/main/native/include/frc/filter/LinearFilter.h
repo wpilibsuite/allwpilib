@@ -11,6 +11,9 @@
 #include <vector>
 
 #include <wpi/circular_buffer.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 #include <wpi/span.h>
 
 #include "Eigen/Core"
@@ -71,7 +74,8 @@ namespace frc {
  * sure Calculate() gets called at the desired, constant frequency!
  */
 template <class T>
-class LinearFilter {
+class LinearFilter : public wpi::Sendable,
+                     public wpi::SendableHelper<LinearFilter<T>> {
  public:
   /**
    * Create a linear FIR or IIR filter.
@@ -273,6 +277,38 @@ class LinearFilter {
     }
 
     return retVal;
+  }
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    builder.SetSmartDashboardType("LinearFilter");
+    builder.AddSmallDoubleArrayProperty(
+        "inputGains",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_inputGains.begin(), m_inputGains.end());
+          return values;
+        },
+        nullptr);
+    builder.AddSmallDoubleArrayProperty(
+        "outputGains",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_outputGains.begin(), m_outputGains.end());
+          return values;
+        },
+        nullptr);
+    builder.AddSmallDoubleArrayProperty(
+        "inputs",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_inputs.GetData().begin(), m_inputs.GetData().end());
+          return values;
+        },
+        nullptr);
+    builder.AddSmallDoubleArrayProperty(
+        "outputs",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_outputs.GetData().begin(), m_outputs.GetData().end());
+          return values;
+        },
+        nullptr);
   }
 
  private:

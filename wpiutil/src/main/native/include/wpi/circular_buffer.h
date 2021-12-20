@@ -266,6 +266,15 @@ class circular_buffer {
     return m_data[(m_front + index) % m_data.size()];
   }
 
+  /**
+   * Returns a copy of the currently-stored data in the buffer.
+   *
+   * @return A copy of the underlying double array.
+   */
+  const std::vector<T> GetData() {
+    return m_data;
+  }
+
  private:
   std::vector<T> m_data;
 

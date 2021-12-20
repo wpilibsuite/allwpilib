@@ -168,6 +168,15 @@ public class CircularBuffer {
   }
 
   /**
+   * Returns a copy of the currently-stored data in the buffer.
+   *
+   * @return A copy of the underlying double array.
+   */
+  public double[] getData() {
+    return m_data.clone();
+  }
+
+  /**
    * Increment an index modulo the length of the m_data buffer.
    *
    * @param index Index into the buffer.

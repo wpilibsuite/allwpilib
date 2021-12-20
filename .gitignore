@@ -231,3 +231,8 @@ imgui.ini
 /bazel-*
 user.bazelrc
 coverage_report/
+
+# Node
+node_modules
+package.json
+package-lock.json

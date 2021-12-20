@@ -5,6 +5,8 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.util.CircularBuffer;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,10 +16,13 @@ import java.util.List;
  * especially with processes that generate occasional, extreme outliers (such as values from vision
  * processing, LIDAR, or ultrasonic sensors).
  */
-public class MedianFilter {
-  private final CircularBuffer m_valueBuffer;
-  private final List<Double> m_orderedValues;
-  private final int m_size;
+public class MedianFilter implements Sendable {
+  private final CircularBuffer m_values;
+  private final List<Double> m_sortedValues;
+
+  public final int m_size;
+
+  private double m_output;
 
   /**
    * Creates a new MedianFilter.
@@ -26,9 +31,9 @@ public class MedianFilter {
    */
   public MedianFilter(int size) {
     // Circular buffer of values currently in the window, ordered by time
-    m_valueBuffer = new CircularBuffer(size);
+    m_values = new CircularBuffer(size);
     // List of values currently in the window, ordered by value
-    m_orderedValues = new ArrayList<>(size);
+    m_sortedValues = new ArrayList<>(size);
     // Size of rolling window
     m_size = size;
   }
@@ -41,7 +46,7 @@ public class MedianFilter {
    */
   public double calculate(double next) {
     // Find insertion point for next value
-    int index = Collections.binarySearch(m_orderedValues, next);
+    int index = Collections.binarySearch(m_sortedValues, next);
 
     // Deal with binarySearch behavior for element not found
     if (index < 0) {
@@ -49,32 +54,51 @@ public class MedianFilter {
     }
 
     // Place value at proper insertion point
-    m_orderedValues.add(index, next);
+    m_sortedValues.add(index, next);
 
-    int curSize = m_orderedValues.size();
+    int curSize = m_sortedValues.size();
 
     // If buffer is at max size, pop element off of end of circular buffer
     // and remove from ordered list
     if (curSize > m_size) {
-      m_orderedValues.remove(m_valueBuffer.removeLast());
+      m_sortedValues.remove(m_values.removeLast());
       --curSize;
     }
 
     // Add next value to circular buffer
-    m_valueBuffer.addFirst(next);
+    m_values.addFirst(next);
 
     if (curSize % 2 != 0) {
       // If size is odd, return middle element of sorted list
-      return m_orderedValues.get(curSize / 2);
+      m_output = m_sortedValues.get(curSize / 2);
     } else {
       // If size is even, return average of middle elements
-      return (m_orderedValues.get(curSize / 2 - 1) + m_orderedValues.get(curSize / 2)) / 2.0;
+      m_output = (m_sortedValues.get(curSize / 2 - 1) + m_sortedValues.get(curSize / 2)) / 2.0;
     }
+
+    return m_output;
   }
 
   /** Resets the filter, clearing the window of all elements. */
   public void reset() {
-    m_orderedValues.clear();
-    m_valueBuffer.clear();
+    m_sortedValues.clear();
+    m_values.clear();
+  }
+
+  /**
+   * Gets a copy of the filter's internal data buffer.
+   *
+   * @return A copy of the internal data buffer.
+   */
+  public double[] getData() {
+    return m_values.getData();
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("MedianFilter");
+    builder.addDoubleProperty("size", () -> m_size, null);
+    builder.addDoubleArrayProperty("inputs", m_values::getData, null);
+    builder.addDoubleProperty("output", () -> m_output, null);
   }
 }
