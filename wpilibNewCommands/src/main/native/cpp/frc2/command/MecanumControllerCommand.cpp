@@ -242,9 +242,11 @@ MecanumControllerCommand::MecanumControllerCommand(
 }
 
 void MecanumControllerCommand::Initialize() {
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
+  if (m_desiredRotation == nullptr) {
+    m_desiredRotation = [&] {
+      return m_trajectory.States().back().pose.Rotation();
+    };
+  }
   m_prevTime = 0_s;
   auto initialState = m_trajectory.Sample(0_s);
 

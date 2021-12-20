@@ -81,9 +81,11 @@ SwerveControllerCommand<NumModules>::SwerveControllerCommand(
 
 template <size_t NumModules>
 void SwerveControllerCommand<NumModules>::Initialize() {
-  m_desiredRotation = [&] {
-    return m_trajectory.States().back().pose.Rotation();
-  };
+  if (m_desiredRotation == nullptr) {
+    m_desiredRotation = [&] {
+      return m_trajectory.States().back().pose.Rotation();
+    };
+  }
   m_timer.Reset();
   m_timer.Start();
 }
