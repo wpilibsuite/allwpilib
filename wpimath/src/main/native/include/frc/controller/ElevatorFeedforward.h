@@ -18,7 +18,7 @@ namespace frc {
 template <class Distance>
 class WPILIB_DLLEXPORT ElevatorFeedforward
     : public wpi::Sendable,
-      public wpi::SendableHelper<ElevatorFeedforward> {
+      public wpi::SendableHelper<ElevatorFeedforward<Distance>> {
  public:
   using Velocity =
       units::compound_unit<Distance, units::inverse<units::seconds>>;
