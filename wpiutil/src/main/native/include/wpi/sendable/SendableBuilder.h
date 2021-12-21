@@ -30,7 +30,7 @@ class SendableBuilder {
    *
    * @param type    data type
    */
-  virtual void SetSmartDashboardType(std::string_view type) = 0;
+  virtual SendableBuilder& SetSmartDashboardType(std::string_view type) = 0;
 
   /**
    * Set a flag indicating if this sendable should be treated as an actuator.
@@ -38,7 +38,7 @@ class SendableBuilder {
    *
    * @param value   true if actuator, false if not
    */
-  virtual void SetActuator(bool value) = 0;
+  virtual SendableBuilder& SetActuator(bool value) = 0;
 
   /**
    * Set the function that should be called to set the Sendable into a safe
@@ -46,7 +46,7 @@ class SendableBuilder {
    *
    * @param func    function
    */
-  virtual void SetSafeState(std::function<void()> func) = 0;
+  virtual SendableBuilder& SetSafeState(std::function<void()> func) = 0;
 
   /**
    * Add a boolean property.
@@ -55,9 +55,9 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddBooleanProperty(std::string_view key,
-                                  std::function<bool()> getter,
-                                  std::function<void(bool)> setter) = 0;
+  virtual SendableBuilder& AddBooleanProperty(
+      std::string_view key, std::function<bool()> getter,
+      std::function<void(bool)> setter) = 0;
 
   /**
    * Add a double property.
@@ -66,9 +66,9 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddDoubleProperty(std::string_view key,
-                                 std::function<double()> getter,
-                                 std::function<void(double)> setter) = 0;
+  virtual SendableBuilder& AddDoubleProperty(
+      std::string_view key, std::function<double()> getter,
+      std::function<void(double)> setter) = 0;
 
   /**
    * Add a string property.
@@ -77,7 +77,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddStringProperty(
+  virtual SendableBuilder& AddStringProperty(
       std::string_view key, std::function<std::string()> getter,
       std::function<void(std::string_view)> setter) = 0;
 
@@ -88,7 +88,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddBooleanArrayProperty(
+  virtual SendableBuilder& AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,
       std::function<void(wpi::span<const int>)> setter) = 0;
 
@@ -99,7 +99,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddDoubleArrayProperty(
+  virtual SendableBuilder& AddDoubleArrayProperty(
       std::string_view key, std::function<std::vector<double>()> getter,
       std::function<void(wpi::span<const double>)> setter) = 0;
 
@@ -110,7 +110,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddStringArrayProperty(
+  virtual SendableBuilder& AddStringArrayProperty(
       std::string_view key, std::function<std::vector<std::string>()> getter,
       std::function<void(wpi::span<const std::string>)> setter) = 0;
 
@@ -121,9 +121,9 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddRawProperty(std::string_view key,
-                              std::function<std::string()> getter,
-                              std::function<void(std::string_view)> setter) = 0;
+  virtual SendableBuilder& AddRawProperty(
+      std::string_view key, std::function<std::string()> getter,
+      std::function<void(std::string_view)> setter) = 0;
 
   /**
    * Add a string property (SmallString form).
@@ -132,7 +132,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddSmallStringProperty(
+  virtual SendableBuilder& AddSmallStringProperty(
       std::string_view key,
       std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) = 0;
@@ -144,7 +144,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddSmallBooleanArrayProperty(
+  virtual SendableBuilder& AddSmallBooleanArrayProperty(
       std::string_view key,
       std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)>
           getter,
@@ -157,7 +157,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddSmallDoubleArrayProperty(
+  virtual SendableBuilder& AddSmallDoubleArrayProperty(
       std::string_view key,
       std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
           getter,
@@ -170,7 +170,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddSmallStringArrayProperty(
+  virtual SendableBuilder& AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
           wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
@@ -184,7 +184,7 @@ class SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual void AddSmallRawProperty(
+  virtual SendableBuilder& AddSmallRawProperty(
       std::string_view key,
       std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) = 0;

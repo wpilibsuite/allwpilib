@@ -86,66 +86,69 @@ class SendableBuilderImpl : public nt::NTSendableBuilder {
    */
   void ClearProperties() override;
 
-  void SetSmartDashboardType(std::string_view type) override;
-  void SetActuator(bool value) override;
-  void SetSafeState(std::function<void()> func) override;
-  void SetUpdateTable(std::function<void()> func) override;
+  SendableBuilder& SetSmartDashboardType(std::string_view type) override;
+  SendableBuilder& SetActuator(bool value) override;
+  SendableBuilder& SetSafeState(std::function<void()> func) override;
+  SendableBuilder& SetUpdateTable(std::function<void()> func) override;
   nt::NetworkTableEntry GetEntry(std::string_view key) override;
 
-  void AddBooleanProperty(std::string_view key, std::function<bool()> getter,
-                          std::function<void(bool)> setter) override;
+  SendableBuilder& AddBooleanProperty(
+      std::string_view key, std::function<bool()> getter,
+      std::function<void(bool)> setter) override;
 
-  void AddDoubleProperty(std::string_view key, std::function<double()> getter,
-                         std::function<void(double)> setter) override;
+  SendableBuilder& AddDoubleProperty(
+      std::string_view key, std::function<double()> getter,
+      std::function<void(double)> setter) override;
 
-  void AddStringProperty(std::string_view key,
-                         std::function<std::string()> getter,
-                         std::function<void(std::string_view)> setter) override;
+  SendableBuilder& AddStringProperty(
+      std::string_view key, std::function<std::string()> getter,
+      std::function<void(std::string_view)> setter) override;
 
-  void AddBooleanArrayProperty(
+  SendableBuilder& AddBooleanArrayProperty(
       std::string_view key, std::function<std::vector<int>()> getter,
       std::function<void(wpi::span<const int>)> setter) override;
 
-  void AddDoubleArrayProperty(
+  SendableBuilder& AddDoubleArrayProperty(
       std::string_view key, std::function<std::vector<double>()> getter,
       std::function<void(wpi::span<const double>)> setter) override;
 
-  void AddStringArrayProperty(
+  SendableBuilder& AddStringArrayProperty(
       std::string_view key, std::function<std::vector<std::string>()> getter,
       std::function<void(wpi::span<const std::string>)> setter) override;
 
-  void AddRawProperty(std::string_view key, std::function<std::string()> getter,
-                      std::function<void(std::string_view)> setter) override;
+  SendableBuilder& AddRawProperty(
+      std::string_view key, std::function<std::string()> getter,
+      std::function<void(std::string_view)> setter) override;
 
-  void AddValueProperty(
+  SendableBuilder& AddValueProperty(
       std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
       std::function<void(std::shared_ptr<nt::Value>)> setter) override;
 
-  void AddSmallStringProperty(
+  SendableBuilder& AddSmallStringProperty(
       std::string_view key,
       std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) override;
 
-  void AddSmallBooleanArrayProperty(
+  SendableBuilder& AddSmallBooleanArrayProperty(
       std::string_view key,
       std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)>
           getter,
       std::function<void(wpi::span<const int>)> setter) override;
 
-  void AddSmallDoubleArrayProperty(
+  SendableBuilder& AddSmallDoubleArrayProperty(
       std::string_view key,
       std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
           getter,
       std::function<void(wpi::span<const double>)> setter) override;
 
-  void AddSmallStringArrayProperty(
+  SendableBuilder& AddSmallStringArrayProperty(
       std::string_view key,
       std::function<
           wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
           getter,
       std::function<void(wpi::span<const std::string>)> setter) override;
 
-  void AddSmallRawProperty(
+  SendableBuilder& AddSmallRawProperty(
       std::string_view key,
       std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
       std::function<void(std::string_view)> setter) override;
