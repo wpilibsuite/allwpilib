@@ -96,9 +96,9 @@ public class MedianFilter implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("MedianFilter");
-    builder.addDoubleProperty("size", () -> m_size, null);
-    builder.addDoubleArrayProperty("inputs", m_values::getData, null);
-    builder.addDoubleProperty("output", () -> m_output, null);
+    builder
+        .addDoubleProperty("size", () -> m_size, null)
+        .addDoubleArrayProperty("inputs", m_values::getData, null)
+        .addDoubleProperty("output", () -> m_output, null);
   }
 }

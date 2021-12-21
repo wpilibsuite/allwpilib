@@ -89,9 +89,9 @@ public class SlewRateLimiter implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("SlewRateLimiter");
-    builder.addDoubleProperty("rateLimit", () -> m_rateLimit, rateLimit -> m_rateLimit = rateLimit);
-    builder.addDoubleProperty("input", this::getInput, null);
-    builder.addDoubleProperty("output", this::getOutput, null);
+    builder
+        .addDoubleProperty("rateLimit", () -> m_rateLimit, rateLimit -> m_rateLimit = rateLimit)
+        .addDoubleProperty("input", this::getInput, null)
+        .addDoubleProperty("output", this::getOutput, null);
   }
 }

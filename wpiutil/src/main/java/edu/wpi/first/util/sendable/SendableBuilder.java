@@ -76,7 +76,8 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  SendableBuilder addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
+  SendableBuilder addBooleanArrayProperty(
+      String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
 
   /**
    * Add a double array property.
@@ -85,7 +86,8 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  SendableBuilder addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
+  SendableBuilder addDoubleArrayProperty(
+      String key, Supplier<double[]> getter, Consumer<double[]> setter);
 
   /**
    * Add a string array property.
@@ -94,7 +96,8 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  SendableBuilder addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
+  SendableBuilder addStringArrayProperty(
+      String key, Supplier<String[]> getter, Consumer<String[]> setter);
 
   /**
    * Add a raw property.

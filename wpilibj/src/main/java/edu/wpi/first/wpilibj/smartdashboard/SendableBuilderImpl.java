@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.util.sendable.SendableBuilder;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -237,7 +236,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @return The builder.
    */
   @Override
-  public SendableBuilder addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
+  public SendableBuilder addBooleanProperty(
+      String key, BooleanSupplier getter, BooleanConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setBoolean(getter.getAsBoolean());
@@ -269,7 +269,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @return The builder.
    */
   @Override
-  public SendableBuilder addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
+  public SendableBuilder addDoubleProperty(
+      String key, DoubleSupplier getter, DoubleConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setDouble(getter.getAsDouble());
@@ -300,7 +301,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @return The builder.
    */
   @Override
-  public SendableBuilder addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
+  public SendableBuilder addStringProperty(
+      String key, Supplier<String> getter, Consumer<String> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setString(getter.get());
@@ -430,7 +432,8 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @return The builder.
    */
   @Override
-  public SendableBuilder addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
+  public SendableBuilder addRawProperty(
+      String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setRaw(getter.get());

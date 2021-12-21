@@ -248,37 +248,39 @@ public class RamseteController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("b", this::getB, this::setB);
-    builder.addDoubleProperty("zeta", this::getZeta, this::setZeta);
-    builder.addDoubleProperty(
-        "toleranceX",
-        () -> m_tolerance.getX(),
-        x ->
-            setTolerance(
-                new Pose2d(new Translation2d(x, m_tolerance.getY()), m_tolerance.getRotation())));
-    builder.addDoubleProperty(
-        "toleranceY",
-        () -> m_tolerance.getY(),
-        y ->
-            setTolerance(
-                new Pose2d(new Translation2d(m_tolerance.getX(), y), m_tolerance.getRotation())));
-    builder.addDoubleProperty(
-        "toleranceDegrees",
-        () -> m_tolerance.getRotation().getDegrees(),
-        rotation ->
-            setTolerance(
-                new Pose2d(m_tolerance.getTranslation(), Rotation2d.fromDegrees(rotation))));
-    builder.addDoubleProperty("referenceX", () -> m_reference.getX(), null);
-    builder.addDoubleProperty("referenceY", () -> m_reference.getY(), null);
-    builder.addDoubleProperty(
-        "referenceDegrees", () -> m_reference.getRotation().getDegrees(), null);
-    builder.addDoubleProperty("measurementX", () -> m_measurement.getX(), null);
-    builder.addDoubleProperty("measurementY", () -> m_measurement.getY(), null);
-    builder.addDoubleProperty(
-        "measurementDegrees", () -> m_measurement.getRotation().getDegrees(), null);
-    builder.addDoubleProperty("errorX", () -> m_error.getX(), null);
-    builder.addDoubleProperty("errorY", () -> m_error.getY(), null);
-    builder.addDoubleProperty("errorDegrees", () -> m_error.getRotation().getDegrees(), null);
-    builder.addBooleanProperty("atReference", this::atReference, null);
+    builder
+        .addDoubleProperty("b", this::getB, this::setB)
+        .addDoubleProperty("zeta", this::getZeta, this::setZeta)
+        .addDoubleProperty(
+            "toleranceX",
+            () -> m_tolerance.getX(),
+            x ->
+                setTolerance(
+                    new Pose2d(
+                        new Translation2d(x, m_tolerance.getY()), m_tolerance.getRotation())))
+        .addDoubleProperty(
+            "toleranceY",
+            () -> m_tolerance.getY(),
+            y ->
+                setTolerance(
+                    new Pose2d(
+                        new Translation2d(m_tolerance.getX(), y), m_tolerance.getRotation())))
+        .addDoubleProperty(
+            "toleranceDegrees",
+            () -> m_tolerance.getRotation().getDegrees(),
+            rotation ->
+                setTolerance(
+                    new Pose2d(m_tolerance.getTranslation(), Rotation2d.fromDegrees(rotation))))
+        .addDoubleProperty("referenceX", () -> m_reference.getX(), null)
+        .addDoubleProperty("referenceY", () -> m_reference.getY(), null)
+        .addDoubleProperty("referenceDegrees", () -> m_reference.getRotation().getDegrees(), null)
+        .addDoubleProperty("measurementX", () -> m_measurement.getX(), null)
+        .addDoubleProperty("measurementY", () -> m_measurement.getY(), null)
+        .addDoubleProperty(
+            "measurementDegrees", () -> m_measurement.getRotation().getDegrees(), null)
+        .addDoubleProperty("errorX", () -> m_error.getX(), null)
+        .addDoubleProperty("errorY", () -> m_error.getY(), null)
+        .addDoubleProperty("errorDegrees", () -> m_error.getRotation().getDegrees(), null)
+        .addBooleanProperty("atReference", this::atReference, null);
   }
 }

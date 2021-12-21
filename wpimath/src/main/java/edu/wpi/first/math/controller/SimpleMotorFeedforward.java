@@ -234,13 +234,14 @@ public class SimpleMotorFeedforward implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("kS", this::getKs, this::setKs);
-    builder.addDoubleProperty("kV", this::getKv, this::setKv);
-    builder.addDoubleProperty("kA", this::getKa, this::setKa);
-    builder.addDoubleProperty("velocity", this::getVelocity, null);
-    builder.addDoubleProperty("velocityOutput", () -> getVelocity() * m_kv, null);
-    builder.addDoubleProperty("acceleration", this::getAcceleration, null);
-    builder.addDoubleProperty("accelerationOutput", () -> getAcceleration() * m_ka, null);
-    builder.addDoubleProperty("output", this::getOutput, null);
+    builder
+        .addDoubleProperty("kS", this::getKs, this::setKs)
+        .addDoubleProperty("kV", this::getKv, this::setKv)
+        .addDoubleProperty("kA", this::getKa, this::setKa)
+        .addDoubleProperty("velocity", this::getVelocity, null)
+        .addDoubleProperty("velocityOutput", () -> getVelocity() * m_kv, null)
+        .addDoubleProperty("acceleration", this::getAcceleration, null)
+        .addDoubleProperty("accelerationOutput", () -> getAcceleration() * m_ka, null)
+        .addDoubleProperty("output", this::getOutput, null);
   }
 }
