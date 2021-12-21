@@ -8,6 +8,8 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "Eigen/Core"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
@@ -45,7 +47,9 @@ namespace frc {
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
  * heading.
  */
-class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
+class WPILIB_DLLEXPORT MecanumDrivePoseEstimator
+    : public wpi::Sendable,
+      public wpi::SendableHelper<MecanumDrivePoseEstimator> {
  public:
   /**
    * Constructs a MecanumDrivePoseEstimator.
@@ -202,6 +206,8 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
                         const Rotation2d& gyroAngle,
                         const MecanumDriveWheelSpeeds& wheelSpeeds);
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   MecanumDriveKinematics m_kinematics;
@@ -218,6 +224,11 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
+
+  Pose2d m_visionPose;
+  Pose2d m_estimatedPose;
+
+  units::second_t m_visionLatency;
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(

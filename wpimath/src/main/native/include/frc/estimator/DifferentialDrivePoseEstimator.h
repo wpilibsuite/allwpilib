@@ -6,6 +6,9 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "Eigen/Core"
 #include "frc/estimator/KalmanFilterLatencyCompensator.h"
@@ -50,7 +53,9 @@ namespace frc {
  * position, and heading; or <strong>y = [dist_l, dist_r, theta] </strong>
  * containing left encoder position, right encoder position, and gyro heading.
  */
-class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
+class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator
+    : public wpi::Sendable,
+      public wpi::SendableHelper<DifferentialDrivePoseEstimator> {
  public:
   /**
    * Constructs a DifferentialDrivePoseEstimator.
@@ -212,6 +217,8 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
                         units::meter_t leftDistance,
                         units::meter_t rightDistance);
 
+  void InitSendable(wpi::SendableBuilder& builder) override;
+
  private:
   UnscentedKalmanFilter<5, 3, 3> m_observer;
   KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
@@ -227,6 +234,11 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   Rotation2d m_gyroOffset;
   Rotation2d m_previousAngle;
+
+  Pose2d m_visionPose;
+  Pose2d m_estimatedPose;
+
+  units::second_t m_visionLatency;
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(

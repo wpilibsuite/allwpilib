@@ -16,6 +16,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.BiConsumer;
 
 /**
@@ -52,7 +54,7 @@ import java.util.function.BiConsumer;
  * heading; or <strong>y = [dist_l, dist_r, theta] </strong> containing left encoder position, right
  * encoder position, and gyro heading.
  */
-public class DifferentialDrivePoseEstimator {
+public class DifferentialDrivePoseEstimator implements Sendable {
   final UnscentedKalmanFilter<N5, N3, N3> m_observer; // Package-private to allow for unit testing
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N5, N3, N3> m_latencyCompensator;
@@ -64,6 +66,11 @@ public class DifferentialDrivePoseEstimator {
   private Rotation2d m_previousAngle;
 
   private Matrix<N3, N3> m_visionContR;
+
+  private Pose2d m_visionPose;
+  private Pose2d m_estimatedPose;
+
+  private double m_visionLatency;
 
   /**
    * Constructs a DifferentialDrivePoseEstimator.
@@ -255,6 +262,8 @@ public class DifferentialDrivePoseEstimator {
    *     source in this case.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    m_visionLatency = m_prevTimeSeconds - timestampSeconds;
+    m_visionPose = visionRobotPoseMeters;
     m_latencyCompensator.applyPastGlobalMeasurement(
         Nat.N3(),
         m_observer,
@@ -358,7 +367,8 @@ public class DifferentialDrivePoseEstimator {
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);
 
-    return getEstimatedPosition();
+    m_estimatedPose = getEstimatedPosition();
+    return m_estimatedPose;
   }
 
   private static Matrix<N5, N1> fillStateVector(Pose2d pose, double leftDist, double rightDist) {
@@ -368,5 +378,32 @@ public class DifferentialDrivePoseEstimator {
         pose.getRotation().getRadians(),
         leftDist,
         rightDist);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_observer.initSendable(builder);
+    builder
+        .addDoubleProperty(
+            "visionStdDevX",
+            () -> Math.sqrt(m_visionContR.get(0, 0)),
+            (double stdDev) -> m_visionContR.set(0, 0, stdDev * stdDev))
+        .addDoubleProperty(
+            "visionStdDevY",
+            () -> Math.sqrt(m_visionContR.get(1, 1)),
+            (double stdDev) -> m_visionContR.set(1, 1, stdDev * stdDev))
+        .addDoubleProperty(
+            "visionStdDevDegrees",
+            () -> Math.toDegrees(Math.sqrt(m_visionContR.get(2, 2))),
+            (double error) ->
+                m_visionContR.set(2, 2, Math.toRadians(error) * Math.toRadians(error)))
+        .addDoubleProperty("visionPoseMetersX", m_visionPose::getX, null)
+        .addDoubleProperty("visionPoseMetersY", m_visionPose::getY, null)
+        .addDoubleProperty("visionPoseDegrees", () -> m_visionPose.getRotation().getDegrees(), null)
+        .addDoubleProperty("visionLatencyMs", () -> m_visionLatency * 1000, null)
+        .addDoubleProperty("estimatedPoseMetersX", m_estimatedPose::getX, null)
+        .addDoubleProperty("estimatedPoseMetersY", m_estimatedPose::getY, null)
+        .addDoubleProperty(
+            "estimatedPoseDegrees", () -> m_estimatedPose.getRotation().getDegrees(), null);
   }
 }

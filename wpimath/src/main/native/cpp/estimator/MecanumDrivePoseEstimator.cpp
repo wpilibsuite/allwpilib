@@ -11,7 +11,7 @@
 
 using namespace frc;
 
-frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
+MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
     const Rotation2d& gyroAngle, const Pose2d& initialPose,
     MecanumDriveKinematics kinematics,
     const wpi::array<double, 3>& stateStdDevs,
@@ -23,9 +23,9 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
              const Eigen::Vector<double, 3>& u) { return u; },
           [](const Eigen::Vector<double, 3>& x,
              const Eigen::Vector<double, 3>& u) { return x.block<1, 1>(2, 0); },
-          stateStdDevs, localMeasurementStdDevs, frc::AngleMean<3, 3>(2),
-          frc::AngleMean<1, 3>(0), frc::AngleResidual<3>(2),
-          frc::AngleResidual<1>(0), frc::AngleAdd<3>(2), nominalDt),
+          stateStdDevs, localMeasurementStdDevs, AngleMean<3, 3>(2),
+          AngleMean<1, 3>(0), AngleResidual<3>(2), AngleResidual<1>(0),
+          AngleAdd<3>(2), nominalDt),
       m_kinematics(kinematics),
       m_nominalDt(nominalDt) {
   SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -38,8 +38,8 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
         [](const Eigen::Vector<double, 3>& x, const Eigen::Vector<double, 3>&) {
           return x;
         },
-        m_visionContR, frc::AngleMean<3, 3>(2), frc::AngleResidual<3>(2),
-        frc::AngleResidual<3>(2), frc::AngleAdd<3>(2));
+        m_visionContR, AngleMean<3, 3>(2), AngleResidual<3>(2),
+        AngleResidual<3>(2), AngleAdd<3>(2));
   };
 
   // Set initial state.
@@ -50,14 +50,14 @@ frc::MecanumDrivePoseEstimator::MecanumDrivePoseEstimator(
   m_previousAngle = initialPose.Rotation();
 }
 
-void frc::MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
+void MecanumDrivePoseEstimator::SetVisionMeasurementStdDevs(
     const wpi::array<double, 3>& visionMeasurmentStdDevs) {
   // Create R (covariances) for vision measurements.
-  m_visionContR = frc::MakeCovMatrix(visionMeasurmentStdDevs);
+  m_visionContR = MakeCovMatrix(visionMeasurmentStdDevs);
 }
 
-void frc::MecanumDrivePoseEstimator::ResetPosition(
-    const Pose2d& pose, const Rotation2d& gyroAngle) {
+void MecanumDrivePoseEstimator::ResetPosition(const Pose2d& pose,
+                                              const Rotation2d& gyroAngle) {
   // Reset state estimate and error covariance
   m_observer.Reset();
   m_latencyCompensator.Reset();
@@ -68,25 +68,27 @@ void frc::MecanumDrivePoseEstimator::ResetPosition(
   m_previousAngle = pose.Rotation();
 }
 
-Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
+Pose2d MecanumDrivePoseEstimator::GetEstimatedPosition() const {
   return Pose2d(m_observer.Xhat(0) * 1_m, m_observer.Xhat(1) * 1_m,
                 Rotation2d(units::radian_t{m_observer.Xhat(2)}));
 }
 
-void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
+void MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
+  m_visionPose = visionRobotPose;
+  m_visionLatency = m_prevTime - timestamp;
   m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
       &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
       m_visionCorrect, timestamp);
 }
 
-Pose2d frc::MecanumDrivePoseEstimator::Update(
+Pose2d MecanumDrivePoseEstimator::Update(
     const Rotation2d& gyroAngle, const MecanumDriveWheelSpeeds& wheelSpeeds) {
   return UpdateWithTime(units::microsecond_t(wpi::Now()), gyroAngle,
                         wheelSpeeds);
 }
 
-Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
+Pose2d MecanumDrivePoseEstimator::UpdateWithTime(
     units::second_t currentTime, const Rotation2d& gyroAngle,
     const MecanumDriveWheelSpeeds& wheelSpeeds) {
   auto dt = m_prevTime >= 0_s ? currentTime - m_prevTime : m_nominalDt;
@@ -112,5 +114,52 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
   m_observer.Predict(u, dt);
   m_observer.Correct(u, localY);
 
-  return GetEstimatedPosition();
+  m_estimatedPose = GetEstimatedPosition();
+  return m_estimatedPose;
+}
+
+void MecanumDrivePoseEstimator::InitSendable(wpi::SendableBuilder& builder) {
+  m_observer.InitSendable(builder);
+  builder.SetSmartDashboardType("MecanumDrivePoseEstimator")
+      .AddDoubleProperty(
+          "VisionStdDevMetersX", [&] { return std::sqrt(m_visionContR(0, 0)); },
+          [&](double stdDev) { m_visionContR(0, 0) = stdDev * stdDev; })
+      .AddDoubleProperty(
+          "VisionStdDevMetersY", [&] { return std::sqrt(m_visionContR(1, 1)); },
+          [&](double stdDev) { m_visionContR(1, 1) = stdDev * stdDev; })
+      .AddDoubleProperty(
+          "VisionStdDevDegrees",
+          [&] {
+            return units::degree_t{
+                units::radian_t{std::sqrt(m_visionContR(3, 3))}}
+                .value();
+          },
+          [&](double stdDevDegrees) {
+            double stdDevRads =
+                units::radian_t{units::degree_t{stdDevDegrees}}.value();
+            m_visionContR(3, 3) = stdDevRads * stdDevRads;
+          })
+      .AddDoubleProperty(
+          "VisionPoseMetersX", [&] { return m_visionPose.X().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "VisionPoseMetersY", [&] { return m_visionPose.Y().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "VisionPoseDegrees",
+          [&] { return m_visionPose.Rotation().Degrees().value(); }, nullptr)
+      .AddDoubleProperty(
+          "VisionLatencyMs",
+          [&] { return units::millisecond_t{m_visionLatency}.value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseMetersX", [&] { return m_estimatedPose.X().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseMetersY", [&] { return m_estimatedPose.Y().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseDegrees",
+          [&] { return m_estimatedPose.Rotation().Degrees().value(); },
+          nullptr);
 }

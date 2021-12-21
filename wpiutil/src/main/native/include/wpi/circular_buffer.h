@@ -271,9 +271,7 @@ class circular_buffer {
    *
    * @return A copy of the underlying double array.
    */
-  const std::vector<T> GetData() {
-    return m_data;
-  }
+  const std::vector<T> GetData() { return m_data; }
 
  private:
   std::vector<T> m_data;

@@ -13,6 +13,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.NumericalIntegration;
 import edu.wpi.first.math.system.NumericalJacobian;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.function.BiFunction;
 
 /**
@@ -36,7 +38,7 @@ import java.util.function.BiFunction;
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
-    implements KalmanTypeFilter<States, Inputs, Outputs> {
+    implements KalmanTypeFilter<States, Inputs, Outputs>, Sendable {
   private final Nat<States> m_states;
   private final Nat<Outputs> m_outputs;
 
@@ -368,5 +370,26 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
     m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleArrayProperty(
+        "modelStdDevs",
+        () -> m_contQ.diag().getData(),
+        stdDevs -> {
+          for (int i = 0; i < stdDevs.length; i++) {
+            m_contQ.set(i, i, stdDevs[i] * stdDevs[i]);
+          }
+        });
+    builder.addDoubleArrayProperty(
+        "measurementStdDevs",
+        () -> m_contR.diag().getData(),
+        stdDevs -> {
+          for (int i = 0; i < stdDevs.length; i++) {
+            m_contR.set(i, i, stdDevs[i] * stdDevs[i]);
+          }
+        });
+    builder.addDoubleArrayProperty("stateEstimate", () -> getXhat().getData(), null);
   }
 }

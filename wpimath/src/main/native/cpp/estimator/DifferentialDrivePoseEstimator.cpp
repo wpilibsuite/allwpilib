@@ -72,6 +72,8 @@ Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
 
 void DifferentialDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
+  m_visionPose = visionRobotPose;
+  m_visionLatency = m_prevTime - timestamp;
   m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
       &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
       m_visionCorrect, timestamp);
@@ -107,7 +109,8 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   m_observer.Predict(u, dt);
   m_observer.Correct(u, localY);
 
-  return GetEstimatedPosition();
+  m_estimatedPose = GetEstimatedPosition();
+  return m_estimatedPose;
 }
 
 Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::F(
@@ -142,4 +145,51 @@ Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::FillStateVector(
                                   pose.Translation().Y().value(),
                                   pose.Rotation().Radians().value(),
                                   leftDistance.value(), rightDistance.value()};
+}
+
+void DifferentialDrivePoseEstimator::InitSendable(
+    wpi::SendableBuilder& builder) {
+  m_observer.InitSendable(builder);
+  builder.SetSmartDashboardType("DifferentialDrivePoseEstimator")
+      .AddDoubleProperty(
+          "VisionStdDevMetersX", [&] { return std::sqrt(m_visionContR(0, 0)); },
+          [&](double stdDev) { m_visionContR(0, 0) = stdDev * stdDev; })
+      .AddDoubleProperty(
+          "VisionStdDevMetersY", [&] { return std::sqrt(m_visionContR(1, 1)); },
+          [&](double stdDev) { m_visionContR(1, 1) = stdDev * stdDev; })
+      .AddDoubleProperty(
+          "VisionStdDevDegrees",
+          [&] {
+            return units::degree_t{
+                units::radian_t{std::sqrt(m_visionContR(3, 3))}}
+                .value();
+          },
+          [&](double stdDevDegrees) {
+            double stdDevRads =
+                units::radian_t{units::degree_t{stdDevDegrees}}.value();
+            m_visionContR(3, 3) = stdDevRads * stdDevRads;
+          })
+      .AddDoubleProperty(
+          "VisionPoseMetersX", [&] { return m_visionPose.X().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "VisionPoseMetersY", [&] { return m_visionPose.Y().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "VisionPoseDegrees",
+          [&] { return m_visionPose.Rotation().Degrees().value(); }, nullptr)
+      .AddDoubleProperty(
+          "VisionLatencyMs",
+          [&] { return units::millisecond_t{m_visionLatency}.value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseMetersX", [&] { return m_estimatedPose.X().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseMetersY", [&] { return m_estimatedPose.Y().value(); },
+          nullptr)
+      .AddDoubleProperty(
+          "EstimatedPoseDegrees",
+          [&] { return m_estimatedPose.Rotation().Degrees().value(); },
+          nullptr);
 }

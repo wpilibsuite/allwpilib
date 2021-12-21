@@ -7,6 +7,9 @@
 #include <functional>
 
 #include <wpi/array.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "Eigen/Cholesky"
 #include "Eigen/Core"
@@ -44,7 +47,10 @@ namespace frc {
  * @tparam Outputs The number of outputs.
  */
 template <int States, int Inputs, int Outputs>
-class ExtendedKalmanFilter {
+class ExtendedKalmanFilter
+    : public wpi::Sendable,
+      public wpi::SendableHelper<
+          ExtendedKalmanFilter<States, Inputs, Outputs>> {
  public:
   /**
    * Constructs an extended Kalman filter.
@@ -332,6 +338,43 @@ class ExtendedKalmanFilter {
 
     // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
     m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
+  }
+
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    builder.SetSmartDashboardType("ExtendedKalmanFilter")
+        .AddSmallDoubleArrayProperty(
+            "modelStdDevs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              Eigen::Vector<double, States> diag = m_contQ.diagonal();
+              diag.array().pow(0.5);
+              values.assign(diag.data(), diag.data() + diag.size());
+              return values;
+            },
+            [&](wpi::span<const double> stdDevs) {
+              for (size_t i = 0; i < stdDevs.extent; i++) {
+                m_contQ(i, i) = stdDevs[i] * stdDevs[i];
+              }
+            })
+        .AddSmallDoubleArrayProperty(
+            "measurementStdDevs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              Eigen::Vector<double, Outputs> diag = m_contR.diagonal();
+              diag.array().pow(0.5);
+              values.assign(diag.data(), diag.data() + diag.size());
+              return values;
+            },
+            [&](wpi::span<const double> stdDevs) {
+              for (size_t i = 0; i < stdDevs.extent; i++) {
+                m_contR(i, i) = stdDevs[i] * stdDevs[i];
+              }
+            })
+        .AddSmallDoubleArrayProperty(
+            "stateEstimate",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              values.assign(m_xHat.data(), m_xHat.data() + m_xHat.size());
+              return values;
+            },
+            nullptr);
   }
 
  private:

@@ -13,6 +13,8 @@ import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
@@ -30,10 +32,14 @@ import edu.wpi.first.math.system.LinearSystem;
  * theory".
  */
 @SuppressWarnings("ClassTypeParameterName")
-public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
+public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
+    implements Sendable {
   private final Nat<States> m_states;
+  private final Nat<Outputs> m_outputs;
 
   private final LinearSystem<States, Inputs, Outputs> m_plant;
+
+  private final double m_nominalDtSeconds;
 
   /** The steady-state Kalman gain matrix. */
   @SuppressWarnings("MemberName")
@@ -42,6 +48,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   /** The state estimate. */
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
+
+  private final Matrix<States, States> m_contQ;
+  private final Matrix<Outputs, Outputs> m_contR;
 
   /**
    * Constructs a state-space observer with the given plant.
@@ -61,20 +70,60 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
       Matrix<States, N1> stateStdDevs,
       Matrix<Outputs, N1> measurementStdDevs,
       double dtSeconds) {
-    this.m_states = states;
+    m_states = states;
+    m_outputs = outputs;
+    m_nominalDtSeconds = dtSeconds;
+    m_plant = plant;
 
-    this.m_plant = plant;
+    m_contQ = new Matrix(m_states, m_states);
+    m_contR = new Matrix(m_outputs, m_outputs);
+    m_K = new Matrix<>(m_states, m_outputs);
 
-    var contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    setStdDevs(stateStdDevs, measurementStdDevs);
+  }
 
-    var pair = Discretization.discretizeAQTaylor(plant.getA(), contQ, dtSeconds);
+  /**
+   * Sets the standard deviation for the model.
+   *
+   * @param stateStdDevs Standard deviations of model states.
+   */
+  public void setStateStdDevs(Matrix<States, N1> stateStdDevs) {
+    m_contQ.assignBlock(0, 0, StateSpaceUtil.makeCovarianceMatrix(m_states, stateStdDevs));
+    updateK();
+  }
+
+  /**
+   * Sets the standard deviations for the measurements.
+   *
+   * @param measurementStdDevs Standard deviation of measurements.
+   */
+  public void setMeasurementStdDevs(Matrix<Outputs, N1> measurementStdDevs) {
+    m_contR.assignBlock(0, 0, StateSpaceUtil.makeCovarianceMatrix(m_outputs, measurementStdDevs));
+    updateK();
+  }
+
+  /**
+   * Sets the standard deviations for the model and the measurements.
+   *
+   * @param stateStdDevs Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   */
+  public void setStdDevs(Matrix<States, N1> stateStdDevs, Matrix<Outputs, N1> measurementStdDevs) {
+    m_contQ.assignBlock(0, 0, StateSpaceUtil.makeCovarianceMatrix(m_states, stateStdDevs));
+    m_contR.assignBlock(0, 0, StateSpaceUtil.makeCovarianceMatrix(m_outputs, measurementStdDevs));
+    updateK();
+  }
+
+  /** Computes and replaces K from the rest of the KalmanFilter state. */
+  @SuppressWarnings("ParameterName")
+  private void updateK() {
+    var pair = Discretization.discretizeAQTaylor(m_plant.getA(), m_contQ, m_nominalDtSeconds);
     var discA = pair.getFirst();
     var discQ = pair.getSecond();
 
-    var discR = Discretization.discretizeR(contR, dtSeconds);
+    var discR = Discretization.discretizeR(m_contR, m_nominalDtSeconds);
 
-    var C = plant.getC();
+    var C = m_plant.getC();
 
     if (!StateSpaceUtil.isDetectable(discA, C)) {
       var builder =
@@ -109,9 +158,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K =
+    m_K.assignBlock(
+        0,
+        0,
         new Matrix<>(
-            S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose());
+            S.transpose().getStorage().solve((C.times(P.transpose())).getStorage()).transpose()));
 
     reset();
   }
@@ -201,5 +252,28 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     final var D = m_plant.getD();
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleArrayProperty(
+        "modelStdDevs",
+        () -> m_contQ.diag().elementPower(0.5).getData(),
+        stdDevs -> {
+          for (int i = 0; i < stdDevs.length; i++) {
+            m_contQ.set(i, i, stdDevs[i] * stdDevs[i]);
+          }
+          updateK();
+        });
+    builder.addDoubleArrayProperty(
+        "measurementStdDevs",
+        () -> m_contR.diag().elementPower(0.5).getData(),
+        stdDevs -> {
+          for (int i = 0; i < stdDevs.length; i++) {
+            m_contR.set(i, i, stdDevs[i] * stdDevs[i]);
+          }
+          updateK();
+        });
+    builder.addDoubleArrayProperty("stateEstimate", () -> getXhat().getData(), null);
   }
 }

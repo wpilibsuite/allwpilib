@@ -11,6 +11,9 @@
 
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
+#include <wpi/sendable/Sendable.h>
+#include <wpi/sendable/SendableBuilder.h>
+#include <wpi/sendable/SendableHelper.h>
 
 #include "Eigen/Cholesky"
 #include "Eigen/Core"
@@ -45,69 +48,67 @@ namespace detail {
  * @tparam Outputs The number of outputs.
  */
 template <int States, int Inputs, int Outputs>
-class KalmanFilterImpl {
+class KalmanFilterImpl
+    : public wpi::Sendable,
+      public wpi::SendableHelper<KalmanFilterImpl<States, Inputs, Outputs>> {
  public:
   /**
    * Constructs a state-space observer with the given plant.
    *
    * @param plant              The plant used for the prediction step.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param modelStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
-                   const wpi::array<double, States>& stateStdDevs,
+                   const wpi::array<double, States>& modelStdDevs,
                    const wpi::array<double, Outputs>& measurementStdDevs,
                    units::second_t dt) {
     m_plant = &plant;
 
-    auto contQ = MakeCovMatrix(stateStdDevs);
-    auto contR = MakeCovMatrix(measurementStdDevs);
+    m_contQ = MakeCovMatrix(modelStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
 
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
-
-    auto discR = DiscretizeR<Outputs>(contR, dt);
-
-    const auto& C = plant.C();
-
-    if (!IsDetectable<States, Outputs>(discA, C)) {
-      std::string msg = fmt::format(
-          "The system passed to the Kalman filter is "
-          "unobservable!\n\nA =\n{}\nC =\n{}\n",
-          discA, C);
-
-      wpi::math::MathSharedStore::ReportError(msg);
-      throw std::invalid_argument(msg);
-    }
-
-    Eigen::Matrix<double, States, States> P =
-        drake::math::DiscreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, discR);
-
-    // S = CPCᵀ + R
-    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
-
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
-
-    Reset();
+    UpdateK();
   }
 
   KalmanFilterImpl(KalmanFilterImpl&&) = default;
   KalmanFilterImpl& operator=(KalmanFilterImpl&&) = default;
+
+  /**
+   * Sets the standard deviation for the model.
+   *
+   * @param modelStdDevs Standard deviations of model states.
+   */
+  void SetModelStdDevs(const wpi::array<double, States>& modelStdDevs) {
+    m_contQ = MakeCovMatrix(modelStdDevs);
+    UpdateK();
+  }
+
+  /**
+   * Sets the standard deviations for the measurements.
+   *
+   * @param measurementStdDevs Standard deviation of measurements.
+   */
+  void SetMeasurementStdDevs(
+      const wpi::array<double, Outputs>& measurementStdDevs) {
+    m_contR = MakeCovMatrix(measurementStdDevs);
+
+    UpdateK();
+  }
+
+  /**
+   * Sets the standard deviations for the model and the measurements.
+   *
+   * @param modelStdDevs Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   */
+  void SetStdDevs(const wpi::array<double, States>& modelStdDevs,
+                  const wpi::array<double, Outputs>& measurementStdDevs) {
+    m_contQ = MakeCovMatrix(modelStdDevs);
+    m_contR = MakeCovMatrix(measurementStdDevs);
+    UpdateK();
+  }
 
   /**
    * Returns the steady-state Kalman gain matrix K.
@@ -176,8 +177,49 @@ class KalmanFilterImpl {
     m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
   }
 
+  void InitSendable(wpi::SendableBuilder& builder) override {
+    builder.SetSmartDashboardType("KalmanFilter")
+        .AddSmallDoubleArrayProperty(
+            "modelStdDevs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              Eigen::Vector<double, States> diag = m_contQ.diagonal();
+              diag.array().pow(0.5);
+              values.assign(diag.data(), diag.data() + diag.size());
+              return values;
+            },
+            [&](wpi::span<const double> stdDevs) {
+              for (size_t i = 0; i < stdDevs.extent; i++) {
+                m_contQ(i, i) = stdDevs[i] * stdDevs[i];
+              }
+              UpdateK();
+            })
+        .AddSmallDoubleArrayProperty(
+            "measurementStdDevs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              Eigen::Vector<double, Outputs> diag = m_contR.diagonal();
+              diag.array().pow(0.5);
+              values.assign(diag.data(), diag.data() + diag.size());
+              return values;
+            },
+            [&](wpi::span<const double> stdDevs) {
+              for (size_t i = 0; i < stdDevs.extent; i++) {
+                m_contR(i, i) = stdDevs[i] * stdDevs[i];
+              }
+              UpdateK();
+            })
+        .AddSmallDoubleArrayProperty(
+            "stateEstimate",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              values.assign(m_xHat.data(), m_xHat.data() + m_xHat.size());
+              return values;
+            },
+            nullptr);
+  }
+
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
+
+  units::second_t m_nominalDt;
 
   /**
    * The steady-state Kalman gain matrix.
@@ -188,6 +230,54 @@ class KalmanFilterImpl {
    * The state estimate.
    */
   Eigen::Vector<double, States> m_xHat;
+
+  Eigen::Matrix<double, States, States> m_contQ;
+
+  Eigen::Matrix<double, Outputs, Outputs> m_contR;
+
+  void UpdateK() {
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, States> discQ;
+    DiscretizeAQTaylor<States>(m_plant->A(), m_contQ, m_nominalDt, &discA,
+                               &discQ);
+
+    auto discR = DiscretizeR<Outputs>(m_contR, m_nominalDt);
+
+    const auto& C = m_plant->C();
+
+    if (!IsDetectable<States, Outputs>(discA, C)) {
+      std::string msg = fmt::format(
+          "The system passed to the Kalman filter is "
+          "unobservable!\n\nA =\n{}\nC =\n{}\n",
+          discA, C);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
+    Eigen::Matrix<double, States, States> P =
+        drake::math::DiscreteAlgebraicRiccatiEquation(
+            discA.transpose(), C.transpose(), discQ, discR);
+
+    // S = CPCᵀ + R
+    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
+
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
+    // efficiently.
+    //
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
+    //
+    // The solution of Ax = b can be found via x = A.solve(b).
+    //
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
+    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
+
+    Reset();
+  }
 };
 
 }  // namespace detail
@@ -199,16 +289,16 @@ class KalmanFilter : public detail::KalmanFilterImpl<States, Inputs, Outputs> {
    * Constructs a state-space observer with the given plant.
    *
    * @param plant              The plant used for the prediction step.
-   * @param stateStdDevs       Standard deviations of model states.
+   * @param modelStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const wpi::array<double, States>& stateStdDevs,
+               const wpi::array<double, States>& modelStdDevs,
                const wpi::array<double, Outputs>& measurementStdDevs,
                units::second_t dt)
       : detail::KalmanFilterImpl<States, Inputs, Outputs>{
-            plant, stateStdDevs, measurementStdDevs, dt} {}
+            plant, modelStdDevs, measurementStdDevs, dt} {}
 
   KalmanFilter(KalmanFilter&&) = default;
   KalmanFilter& operator=(KalmanFilter&&) = default;
@@ -221,7 +311,7 @@ class WPILIB_DLLEXPORT KalmanFilter<1, 1, 1>
     : public detail::KalmanFilterImpl<1, 1, 1> {
  public:
   KalmanFilter(LinearSystem<1, 1, 1>& plant,
-               const wpi::array<double, 1>& stateStdDevs,
+               const wpi::array<double, 1>& modelStdDevs,
                const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
@@ -236,7 +326,7 @@ class WPILIB_DLLEXPORT KalmanFilter<2, 1, 1>
     : public detail::KalmanFilterImpl<2, 1, 1> {
  public:
   KalmanFilter(LinearSystem<2, 1, 1>& plant,
-               const wpi::array<double, 2>& stateStdDevs,
+               const wpi::array<double, 2>& modelStdDevs,
                const wpi::array<double, 1>& measurementStdDevs,
                units::second_t dt);
 
