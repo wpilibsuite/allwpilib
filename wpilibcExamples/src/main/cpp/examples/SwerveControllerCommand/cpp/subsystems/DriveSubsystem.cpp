@@ -69,8 +69,8 @@ void DriveSubsystem::SetModuleStates(
   kDriveKinematics.NormalizeWheelSpeeds(&desiredStates,
                                         AutoConstants::kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);
-  m_rearLeft.SetDesiredState(desiredStates[1]);
-  m_frontRight.SetDesiredState(desiredStates[2]);
+  m_frontRight.SetDesiredState(desiredStates[1]);
+  m_rearLeft.SetDesiredState(desiredStates[2]);
   m_rearRight.SetDesiredState(desiredStates[3]);
 }
 
