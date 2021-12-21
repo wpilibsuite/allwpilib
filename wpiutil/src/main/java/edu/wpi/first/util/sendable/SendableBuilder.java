@@ -24,7 +24,7 @@ public interface SendableBuilder {
    *
    * @param type data type
    */
-  void setSmartDashboardType(String type);
+  SendableBuilder setSmartDashboardType(String type);
 
   /**
    * Set a flag indicating if this sendable should be treated as an actuator. By default this flag
@@ -32,7 +32,7 @@ public interface SendableBuilder {
    *
    * @param value true if actuator, false if not
    */
-  void setActuator(boolean value);
+  SendableBuilder setActuator(boolean value);
 
   /**
    * Set the function that should be called to set the Sendable into a safe state. This is called
@@ -40,7 +40,7 @@ public interface SendableBuilder {
    *
    * @param func function
    */
-  void setSafeState(Runnable func);
+  SendableBuilder setSafeState(Runnable func);
 
   /**
    * Add a boolean property.
@@ -49,7 +49,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
+  SendableBuilder addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
   /**
    * Add a double property.
@@ -58,7 +58,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
+  SendableBuilder addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
 
   /**
    * Add a string property.
@@ -67,7 +67,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
+  SendableBuilder addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
 
   /**
    * Add a boolean array property.
@@ -76,7 +76,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
+  SendableBuilder addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
 
   /**
    * Add a double array property.
@@ -85,7 +85,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
+  SendableBuilder addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
 
   /**
    * Add a string array property.
@@ -94,7 +94,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
+  SendableBuilder addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
 
   /**
    * Add a raw property.
@@ -103,7 +103,7 @@ public interface SendableBuilder {
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
    */
-  void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
+  SendableBuilder addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
    * Gets the kind of backend being used.

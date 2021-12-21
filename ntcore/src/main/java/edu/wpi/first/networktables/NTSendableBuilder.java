@@ -15,8 +15,9 @@ public interface NTSendableBuilder extends SendableBuilder {
    * the entry handles returned by getEntry().
    *
    * @param func function
+   * @return The builder.
    */
-  void setUpdateTable(Runnable func);
+  SendableBuilder setUpdateTable(Runnable func);
 
   /**
    * Add a property without getters or setters. This can be used to get entry handles for the
@@ -33,8 +34,9 @@ public interface NTSendableBuilder extends SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
-  void addValueProperty(
+  SendableBuilder addValueProperty(
       String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter);
 
   /**
