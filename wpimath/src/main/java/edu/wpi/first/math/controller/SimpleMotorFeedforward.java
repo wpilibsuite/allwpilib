@@ -234,7 +234,6 @@ public class SimpleMotorFeedforward implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("SimpleMotorFeedforward");
     builder.addDoubleProperty("kS", this::getKs, this::setKs);
     builder.addDoubleProperty("kV", this::getKv, this::setKv);
     builder.addDoubleProperty("kA", this::getKa, this::setKa);

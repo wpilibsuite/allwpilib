@@ -410,6 +410,7 @@ public class SendableRegistry {
       comp.m_builder.clearProperties();
     }
     comp.m_builder = builder; // clear any current builder
+    comp.m_builder.setSmartDashboardType(sendable.getClass().getSimpleName()); // default type to class name
     sendable.initSendable(comp.m_builder);
     comp.m_builder.update();
   }

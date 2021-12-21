@@ -293,7 +293,6 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Relay");
     builder.setActuator(true);
     builder.setSafeState(() -> set(Value.kOff));
     builder.addStringProperty(

@@ -248,7 +248,6 @@ public class RamseteController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("RamseteController");
     builder.addDoubleProperty("b", this::getB, this::setB);
     builder.addDoubleProperty("zeta", this::getZeta, this::setZeta);
     builder.addDoubleProperty(

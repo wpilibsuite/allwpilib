@@ -375,7 +375,6 @@ public class ProfiledPIDController implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     m_controller.initSendable(builder);
-    builder.setSmartDashboardType("ProfiledPIDController");
     builder.addDoubleProperty("setpoint", m_controller::getSetpoint, null);
     builder.addDoubleProperty(
         "maxVelocity",

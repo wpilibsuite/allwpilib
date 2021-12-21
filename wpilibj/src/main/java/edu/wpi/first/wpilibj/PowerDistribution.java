@@ -159,7 +159,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PowerDistribution");
     int numChannels = getNumChannels();
     for (int i = 0; i < numChannels; ++i) {
       final int chan = i;

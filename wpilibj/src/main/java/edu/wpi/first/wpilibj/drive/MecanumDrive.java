@@ -262,7 +262,6 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("MecanumDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty(

@@ -166,7 +166,6 @@ public class ElevatorFeedforward implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     m_simpleFeedforward.initSendable(builder);
-    builder.setSmartDashboardType("ElevatorFeedforward");
     builder.addDoubleProperty("kG", this::getKg, this::setKg);
     builder.addDoubleProperty("output", () -> getOutput() + m_kg, null);
   }

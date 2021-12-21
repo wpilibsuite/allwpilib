@@ -103,7 +103,6 @@ public class Servo extends PWM {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Servo");
     builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

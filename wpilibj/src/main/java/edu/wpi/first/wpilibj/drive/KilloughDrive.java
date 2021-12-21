@@ -280,7 +280,6 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("KilloughDrive");
     builder.setActuator(true);
     builder.setSafeState(this::stopMotor);
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);

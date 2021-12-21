@@ -513,7 +513,6 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Counter");
     builder.addDoubleProperty("Value", this::get, null);
   }
 }

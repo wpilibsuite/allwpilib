@@ -180,7 +180,6 @@ public class HolonomicDriveController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HolonomicDriveController");
     builder.addDoubleProperty(
         "toleranceX",
         () -> m_poseTolerance.getX(),
