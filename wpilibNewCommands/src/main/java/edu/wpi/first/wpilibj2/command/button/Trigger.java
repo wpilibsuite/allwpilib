@@ -24,7 +24,7 @@ import java.util.function.BooleanSupplier;
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
  */
-public class Trigger {
+public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_isActive;
 
   /**
@@ -49,9 +49,25 @@ public class Trigger {
    *
    * <p>This method will be called repeatedly a command is linked to the Trigger.
    *
+   * <p>Functionally identical to {@link Trigger#getAsBoolean()}.
+   *
    * @return whether or not the trigger condition is active.
    */
   public boolean get() {
+    return this.getAsBoolean();
+  }
+
+  /**
+   * Returns whether or not the trigger is active.
+   *
+   * <p>This method will be called repeatedly a command is linked to the Trigger.
+   *
+   * <p>Functionally identical to {@link Trigger#get()}.
+   *
+   * @return whether or not the trigger condition is active.
+   */
+  @Override
+  public boolean getAsBoolean() {
     return m_isActive.getAsBoolean();
   }
 
