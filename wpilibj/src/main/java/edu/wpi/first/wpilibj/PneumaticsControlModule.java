@@ -250,4 +250,9 @@ public class PneumaticsControlModule implements PneumaticsBase {
         ? CompressorConfigType.Digital
         : CompressorConfigType.Disabled;
   }
+
+  @Override
+  public double getAnalogVoltage(int channel) {
+    return 0;
+  }
 }

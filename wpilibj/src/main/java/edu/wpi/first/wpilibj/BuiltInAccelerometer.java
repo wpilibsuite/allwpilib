@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
  */
 public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
   private Range m_range;
+
   /**
    * Constructor.
    *

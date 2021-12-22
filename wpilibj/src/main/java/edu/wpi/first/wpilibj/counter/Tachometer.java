@@ -16,7 +16,14 @@ import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** Tachometer. */
+/**
+ * Tachometer.
+ *
+ * <p>The Tachometer class measures the time between digital pulses to determine the rotation speed
+ * of a mechanism. Examples of devices that could be used with the tachometer class are a hall
+ * effect sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel. Unlike
+ * encoders, this class only needs a single digital input.
+ */
 public class Tachometer implements Sendable, AutoCloseable {
   private final DigitalSource m_source;
   private final int m_handle;
@@ -26,7 +33,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   /**
    * Constructs a new tachometer.
    *
-   * @param source The source.
+   * @param source The DigitalSource (e.g. DigitalInput) of the Tachometer.
    */
   public Tachometer(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "Tachometer");

@@ -362,4 +362,63 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannelNoError
   return state;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getStickyFaultsNative
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getStickyFaultsNative
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionStickyFaults halFaults;
+  std::memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetPowerDistributionStickyFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  std::memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getFaultsNative
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getFaultsNative
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionFaults halFaults;
+  std::memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetPowerDistributionFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  std::memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getVersion
+ * Signature: (I)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getVersion
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionVersion version;
+  std::memset(&version, 0, sizeof(version));
+  HAL_GetPowerDistributionVersion(handle, &version, &status);
+  CheckStatus(env, status, false);
+  return CreatePowerDistributionVersion(
+      env, version.firmwareMajor, version.firmwareMinor, version.firmwareFix,
+      version.hardwareMinor, version.hardwareMajor, version.uniqueId);
+}
+
 }  // extern "C"

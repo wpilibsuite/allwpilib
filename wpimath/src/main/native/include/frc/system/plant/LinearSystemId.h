@@ -121,10 +121,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param kA The acceleration gain, in volt seconds^2 per distance.
    * @throws std::domain_error if kV <= 0 or kA <= 0.
    */
-  template <typename Distance,
-            typename = std::enable_if_t<
-                units::traits::is_length_unit<Distance>::value ||
-                units::traits::is_angle_unit<Distance>::value>>
+  template <typename Distance, typename = std::enable_if_t<
+                                   units::traits::is_length_unit_v<Distance> ||
+                                   units::traits::is_angle_unit_v<Distance>>>
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {

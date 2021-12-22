@@ -17,7 +17,12 @@ import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** Counter using external direction. */
+/**
+ * Counter using external direction.
+ *
+ * <p>This counts on an edge from one digital input and the whether it counts up or down based on
+ * the state of a second digital input.
+ */
 public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   private final DigitalSource m_countSource;
   private final DigitalSource m_directionSource;
@@ -71,7 +76,7 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets to revert the counter direction.
+   * Sets to revese the counter direction.
    *
    * @param reverseDirection True to reverse counting direction.
    */

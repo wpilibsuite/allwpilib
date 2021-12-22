@@ -15,7 +15,12 @@
 namespace frc {
 class DigitalSource;
 
-/** Up Down Counter. */
+/** Up Down Counter.
+ *
+ * This class can count edges on a single digital input or count up based on an
+ * edge from one digital input and down on an edge from another digital input.
+ *
+ */
 class UpDownCounter : public wpi::Sendable,
                       public wpi::SendableHelper<UpDownCounter> {
  public:

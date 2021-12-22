@@ -56,4 +56,18 @@ public class PowerDistributionJNI extends JNIWrapper {
   public static native boolean getSwitchableChannelNoError(int handle);
 
   public static native void setSwitchableChannelNoError(int handle, boolean enabled);
+
+  public static native int getFaultsNative(int handle);
+
+  public static PowerDistributionFaults getFaults(int handle) {
+    return new PowerDistributionFaults(getFaultsNative(handle));
+  }
+
+  public static native int getStickyFaultsNative(int handle);
+
+  public static PowerDistributionStickyFaults getStickyFaults(int handle) {
+    return new PowerDistributionStickyFaults(getStickyFaultsNative(handle));
+  }
+
+  public static native PowerDistributionVersion getVersion(int handle);
 }

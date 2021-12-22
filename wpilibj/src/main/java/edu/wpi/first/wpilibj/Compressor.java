@@ -118,6 +118,15 @@ public class Compressor implements Sendable, AutoCloseable {
     return m_module.getCompressorCurrent();
   }
 
+  /**
+   * Query the analog input voltage (on channel 0) (if supported).
+   *
+   * @return The analog input voltage, in volts
+   */
+  public double getAnalogVoltage() {
+    return m_module.getAnalogVoltage(0);
+  }
+
   /** Disable the compressor. */
   public void disable() {
     m_disabled = true;
