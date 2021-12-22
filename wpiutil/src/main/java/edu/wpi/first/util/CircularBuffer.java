@@ -173,7 +173,11 @@ public class CircularBuffer {
    * @return A copy of the underlying double array.
    */
   public double[] getData() {
-    return m_data.clone();
+    double[] data = new double[m_data.length];
+    for (int i = 0; i < m_data.length; i++) {
+      data[i] = get(i);
+    }
+    return data;
   }
 
   /**

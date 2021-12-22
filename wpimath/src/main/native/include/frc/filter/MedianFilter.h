@@ -89,7 +89,7 @@ class MedianFilter : public wpi::Sendable,
     builder.AddSmallDoubleArrayProperty(
         "inputs",
         [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_values.GetData().begin(), m_values.GetData().end());
+          values.assign(m_values.begin(), m_values.end());
           return values;
         },
         nullptr);

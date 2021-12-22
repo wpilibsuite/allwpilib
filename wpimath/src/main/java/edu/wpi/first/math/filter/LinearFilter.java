@@ -270,8 +270,6 @@ public class LinearFilter implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
-        .addDoubleArrayProperty("inputGains", () -> m_inputGains, null)
-        .addDoubleArrayProperty("outputGains", () -> m_outputGains, null)
         .addDoubleArrayProperty("inputs", m_inputs::getData, null)
         .addDoubleArrayProperty("outputs", m_outputs::getData, null);
   }

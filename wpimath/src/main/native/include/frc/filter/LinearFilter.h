@@ -280,35 +280,21 @@ class LinearFilter : public wpi::Sendable,
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
-    builder.SetSmartDashboardType("LinearFilter");
-    builder.AddSmallDoubleArrayProperty(
-        "inputGains",
-        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_inputGains.begin(), m_inputGains.end());
-          return values;
-        },
-        nullptr);
-    builder.AddSmallDoubleArrayProperty(
-        "outputGains",
-        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_outputGains.begin(), m_outputGains.end());
-          return values;
-        },
-        nullptr);
-    builder.AddSmallDoubleArrayProperty(
-        "inputs",
-        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_inputs.GetData().begin(), m_inputs.GetData().end());
-          return values;
-        },
-        nullptr);
-    builder.AddSmallDoubleArrayProperty(
-        "outputs",
-        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-          values.assign(m_outputs.GetData().begin(), m_outputs.GetData().end());
-          return values;
-        },
-        nullptr);
+    builder.SetSmartDashboardType("LinearFilter")
+        .AddSmallDoubleArrayProperty(
+            "inputs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              values.assign(m_inputs.begin(), m_inputs.end());
+              return values;
+            },
+            nullptr)
+        .AddSmallDoubleArrayProperty(
+            "outputs",
+            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+              values.assign(m_outputs.begin(), m_outputs.end());
+              return values;
+            },
+            nullptr);
   }
 
  private:
