@@ -120,5 +120,7 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {}
+  public void initSendable(SendableBuilder builder) {
+    m_trigger.initSendable(builder);
+  }
 }

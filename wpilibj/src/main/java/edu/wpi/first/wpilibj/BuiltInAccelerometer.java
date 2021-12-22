@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.hal.AccelerometerJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.EnumHelper;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
 public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoCloseable {
+  private Range m_range;
   /**
    * Constructor.
    *
@@ -41,9 +43,10 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
 
   @Override
   public void setRange(Range range) {
+    m_range = range;
     AccelerometerJNI.setAccelerometerActive(false);
 
-    switch (range) {
+    switch (m_range) {
       case k2G:
         AccelerometerJNI.setAccelerometerRange(0);
         break;
@@ -93,9 +96,16 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("3AxisAccelerometer");
-    builder.addDoubleProperty("X", this::getX, null);
-    builder.addDoubleProperty("Y", this::getY, null);
-    builder.addDoubleProperty("Z", this::getZ, null);
+    builder
+        .setSmartDashboardType("3AxisAccelerometer")
+        .addStringProperty(
+            "range",
+            m_range::name,
+            range -> {
+              m_range = EnumHelper.enumFromString(range, Range.k2G);
+            })
+        .addDoubleProperty("X", this::getX, null)
+        .addDoubleProperty("Y", this::getY, null)
+        .addDoubleProperty("Z", this::getZ, null);
   }
 }

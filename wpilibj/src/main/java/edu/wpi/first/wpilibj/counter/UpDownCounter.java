@@ -21,6 +21,8 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
   private final int m_handle;
 
+  private boolean m_reverseDirection;
+
   /**
    * Constructs a new UpDown Counter.
    *
@@ -93,7 +95,8 @@ public class UpDownCounter implements Sendable, AutoCloseable {
    * @param reverseDirection True to reverse counting direction.
    */
   public void setReverseDirection(boolean reverseDirection) {
-    CounterJNI.setCounterReverseDirection(m_handle, reverseDirection);
+    m_reverseDirection = reverseDirection;
+    CounterJNI.setCounterReverseDirection(m_handle, m_reverseDirection);
   }
 
   /**
@@ -107,7 +110,10 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("UpDown Counter");
-    builder.addDoubleProperty("Count", this::getCount, null);
+    builder
+        .setSmartDashboardType("UpDown Counter")
+        .addDoubleProperty("Count", this::getCount, null)
+        .addBooleanProperty(
+            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }

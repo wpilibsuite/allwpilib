@@ -130,8 +130,7 @@ public class AnalogPotentiometer implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     if (m_analogInput != null) {
-      builder.setSmartDashboardType("Analog Input");
-      builder.addDoubleProperty("Value", this::get, null);
+      builder.setSmartDashboardType("Analog Input").addDoubleProperty("Value", this::get, null);
     }
   }
 

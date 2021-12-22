@@ -4,11 +4,15 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.util.sendable.EnumHelper;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
 /**
  * A simple debounce filter for boolean streams. Requires that the boolean change value from
  * baseline for a specified period of time before the filtered value changes.
  */
-public class Debouncer {
+public class Debouncer implements Sendable {
   public enum DebounceType {
     kRising,
     kFalling,
@@ -16,8 +20,8 @@ public class Debouncer {
   }
 
   private final Timer m_timer = new Timer();
-  private final double m_debounceTime;
-  private final DebounceType m_debounceType;
+  private double m_debounceTime;
+  private DebounceType m_debounceType;
   private boolean m_baseline;
 
   /**
@@ -75,5 +79,16 @@ public class Debouncer {
     } else {
       return m_baseline;
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder
+        .addDoubleProperty(
+            "debounceTime", () -> m_debounceTime, debounceTime -> m_debounceTime = debounceTime)
+        .addStringProperty(
+            "debounceType",
+            () -> m_debounceType.name(),
+            type -> m_debounceType = EnumHelper.enumFromString(type, DebounceType.kRising));
   }
 }

@@ -110,7 +110,10 @@ public class AnalogAccelerometer implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Accelerometer");
-    builder.addDoubleProperty("Value", this::getAcceleration, null);
+    builder
+        .setSmartDashboardType("Accelerometer")
+        .addDoubleProperty("Value", this::getAcceleration, null)
+        .addDoubleProperty("sensitivityVoltsPerG", () -> m_voltsPerG, this::setSensitivity)
+        .addDoubleProperty("zeroVoltage", () -> m_zeroGVoltage, this::setZero);
   }
 }

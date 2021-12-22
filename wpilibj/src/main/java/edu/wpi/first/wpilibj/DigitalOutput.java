@@ -172,8 +172,10 @@ public class DigitalOutput extends DigitalSource implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Digital Output");
-    builder.addBooleanProperty("Value", this::get, this::set);
+    builder
+        .setSmartDashboardType("Digital Output")
+        .addDoubleProperty("Channel", this::getChannel, null)
+        .addBooleanProperty("Value", this::get, this::set);
   }
 
   /**

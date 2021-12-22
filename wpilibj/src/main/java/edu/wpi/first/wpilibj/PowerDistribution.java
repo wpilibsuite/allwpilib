@@ -165,13 +165,16 @@ public class PowerDistribution implements Sendable, AutoCloseable {
       builder.addDoubleProperty(
           "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
     }
-    builder.addDoubleProperty(
-        "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);
-    builder.addDoubleProperty(
-        "TotalCurrent", () -> PowerDistributionJNI.getTotalCurrent(m_handle), null);
-    builder.addBooleanProperty(
-        "SwitchableChannel",
-        () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
-        value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+    builder
+        .addDoubleProperty("Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null)
+        .addDoubleProperty(
+            "TotalCurrent", () -> PowerDistributionJNI.getTotalCurrent(m_handle), null)
+        .addDoubleProperty("totalPower", this::getTotalPower, null)
+        .addDoubleProperty("totalEnergy", this::getTotalEnergy, null)
+        .addDoubleProperty("temperature", this::getTemperature, null)
+        .addBooleanProperty(
+            "SwitchableChannel",
+            () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
+            value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
   }
 }

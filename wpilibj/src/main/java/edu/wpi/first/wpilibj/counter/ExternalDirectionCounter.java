@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 import edu.wpi.first.hal.CounterJNI;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.sendable.EnumHelper;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -22,6 +23,9 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
   private final DigitalSource m_directionSource;
 
   private final int m_handle;
+
+  private boolean m_reverseDirection;
+  private EdgeConfiguration m_edgeConfiguration;
 
   /**
    * Constructs a new ExternalDirectionCounter.
@@ -72,7 +76,8 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
    * @param reverseDirection True to reverse counting direction.
    */
   public void setReverseDirection(boolean reverseDirection) {
-    CounterJNI.setCounterReverseDirection(m_handle, reverseDirection);
+    m_reverseDirection = reverseDirection;
+    CounterJNI.setCounterReverseDirection(m_handle, m_reverseDirection);
   }
 
   /** Resets the current count. */
@@ -86,7 +91,9 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
    * @param configuration The counting edge configuration.
    */
   public void setEdgeConfiguration(EdgeConfiguration configuration) {
-    CounterJNI.setCounterUpSourceEdge(m_handle, configuration.rising, configuration.falling);
+    m_edgeConfiguration = configuration;
+    CounterJNI.setCounterUpSourceEdge(
+        m_handle, m_edgeConfiguration.rising, m_edgeConfiguration.falling);
   }
 
   @Override
@@ -99,7 +106,14 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("External Direction Counter");
-    builder.addDoubleProperty("Count", this::getCount, null);
+    builder
+        .setSmartDashboardType("External Direction Counter")
+        .addDoubleProperty("Count", this::getCount, null)
+        .addBooleanProperty("reverseDirection", () -> m_reverseDirection, this::setReverseDirection)
+        .addStringProperty(
+            "edgeConfiguration",
+            m_edgeConfiguration::name,
+            configuration ->
+                EnumHelper.enumFromString(configuration, EdgeConfiguration.kRisingEdge));
   }
 }

@@ -56,6 +56,9 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
 
   int m_encoder; // the HAL encoder object
 
+  private boolean m_reverseDirection;
+  private double m_maxPeriod;
+
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
    * common to all constructors.
@@ -373,7 +376,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    */
   @Override
   public void setMaxPeriod(double maxPeriod) {
-    EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
+    m_maxPeriod = maxPeriod;
+    EncoderJNI.setEncoderMaxPeriod(m_encoder, m_maxPeriod);
   }
 
   /**
@@ -457,7 +461,8 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
    * @param reverseDirection true if the encoder direction should be reversed
    */
   public void setReverseDirection(boolean reverseDirection) {
-    EncoderJNI.setEncoderReverseDirection(m_encoder, reverseDirection);
+    m_reverseDirection = reverseDirection;
+    EncoderJNI.setEncoderReverseDirection(m_encoder, m_reverseDirection);
   }
 
   /**
@@ -569,8 +574,20 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       builder.setSmartDashboardType("Encoder");
     }
 
-    builder.addDoubleProperty("Speed", this::getRate, null);
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
+    builder
+        .addDoubleProperty("Speed", this::getRate, null)
+        .addDoubleProperty("Distance", this::getDistance, null)
+        .addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null)
+        .addBooleanProperty("Direction", this::getDirection, null)
+        .addBooleanProperty("Stopped", this::getStopped, null)
+        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addDoubleProperty(
+            "samplesToAverage",
+            this::getSamplesToAverage,
+            samplesToAverage -> {
+              setSamplesToAverage((int) samplesToAverage);
+            })
+        .addBooleanProperty(
+            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }

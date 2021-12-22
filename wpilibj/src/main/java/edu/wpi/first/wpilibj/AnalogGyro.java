@@ -30,6 +30,8 @@ public class AnalogGyro implements Gyro, Sendable {
 
   private int m_gyroHandle;
 
+  private double m_sensitivity;
+
   /** Initialize the gyro. Calibration is handled by calibrate(). */
   public void initGyro() {
     if (m_gyroHandle == 0) {
@@ -169,7 +171,8 @@ public class AnalogGyro implements Gyro, Sendable {
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
   public void setSensitivity(double voltsPerDegreePerSecond) {
-    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, voltsPerDegreePerSecond);
+    m_sensitivity = voltsPerDegreePerSecond;
+    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, m_sensitivity);
   }
 
   /**
@@ -194,7 +197,11 @@ public class AnalogGyro implements Gyro, Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Gyro");
-    builder.addDoubleProperty("Value", this::getAngle, null);
+    builder
+        .setSmartDashboardType("Gyro")
+        .addDoubleProperty("Value", this::getAngle, null)
+        .addDoubleProperty("rate", this::getRate, null)
+        .addDoubleProperty(
+            "SensitivityVoltsPerDegPerSec", () -> m_sensitivity, this::setSensitivity);
   }
 }

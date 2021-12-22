@@ -312,6 +312,8 @@ public class Ultrasonic implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("Value", this::getRangeInches, null);
+    builder
+        .addDoubleProperty("Value", this::getRangeInches, null)
+        .addBooleanProperty("valid", this::isRangeValid, null);
   }
 }

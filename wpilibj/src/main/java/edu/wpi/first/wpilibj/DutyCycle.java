@@ -111,8 +111,10 @@ public class DutyCycle implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Duty Cycle");
-    builder.addDoubleProperty("Frequency", this::getFrequency, null);
-    builder.addDoubleProperty("Output", this::getOutput, null);
+    builder
+        .setSmartDashboardType("Duty Cycle")
+        .addDoubleProperty("sourceChannel", this::getSourceChannel, null)
+        .addDoubleProperty("Frequency", this::getFrequency, null)
+        .addDoubleProperty("Output", this::getOutput, null);
   }
 }

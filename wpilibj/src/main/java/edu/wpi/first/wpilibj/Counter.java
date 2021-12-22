@@ -53,6 +53,8 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   int m_counter; // /< The FPGA counter object.
   private int m_index; // /< The index of this counter.
   private double m_distancePerPulse; // distance of travel for each tick
+  private double m_maxPeriod;
+  private boolean m_reverseDirection;
 
   /**
    * Create an instance of a counter with the given mode.
@@ -402,7 +404,8 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    */
   @Override
   public void setMaxPeriod(double maxPeriod) {
-    CounterJNI.setCounterMaxPeriod(m_counter, maxPeriod);
+    m_maxPeriod = maxPeriod;
+    CounterJNI.setCounterMaxPeriod(m_counter, m_maxPeriod);
   }
 
   /**
@@ -452,6 +455,7 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
    * @param reverseDirection true if the value counted should be negated.
    */
   public void setReverseDirection(boolean reverseDirection) {
+    m_reverseDirection = reverseDirection;
     CounterJNI.setCounterReverseDirection(m_counter, reverseDirection);
   }
 
@@ -513,6 +517,22 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("Value", this::get, null);
+    builder
+        .addDoubleProperty("Value", this::get, null)
+        .addDoubleProperty("Distance", this::getDistance, null)
+        .addDoubleProperty("Rate", this::getRate, null)
+        .addDoubleProperty("Period", this::getPeriod, null)
+        .addBooleanProperty("Direction", this::getDirection, null)
+        .addBooleanProperty("Stopped", this::getStopped, null)
+        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addDoubleProperty("distancePerPulse", () -> m_distancePerPulse, this::setDistancePerPulse)
+        .addDoubleProperty(
+            "samplesToAverage",
+            this::getSamplesToAverage,
+            samplesToAverage -> {
+              setSamplesToAverage((int) samplesToAverage);
+            })
+        .addBooleanProperty(
+            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }

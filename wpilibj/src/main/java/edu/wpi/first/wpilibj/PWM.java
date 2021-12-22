@@ -39,6 +39,8 @@ public class PWM implements Sendable, AutoCloseable {
 
   private int m_handle;
 
+  private boolean m_eliminateDeadband;
+
   /**
    * Allocate a PWM given a channel.
    *
@@ -95,7 +97,17 @@ public class PWM implements Sendable, AutoCloseable {
    *     values.
    */
   public void enableDeadbandElimination(boolean eliminateDeadband) {
-    PWMJNI.setPWMEliminateDeadband(m_handle, eliminateDeadband);
+    m_eliminateDeadband = eliminateDeadband;
+    PWMJNI.setPWMEliminateDeadband(m_handle, m_eliminateDeadband);
+  }
+
+  /**
+   * Returns whether deadband elimination is currently enabled.
+   *
+   * @return Whether deadband elimination is enabled.
+   */
+  public boolean deadbandEliminationEnabled() {
+    return m_eliminateDeadband;
   }
 
   /**
@@ -257,8 +269,14 @@ public class PWM implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setActuator(true);
-    builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
+    builder
+        .setActuator(true)
+        .setSafeState(this::setDisabled)
+        .addDoubleProperty("Channel", this::getChannel, null)
+        .addBooleanProperty(
+            "DeadbandElimination",
+            this::deadbandEliminationEnabled,
+            this::enableDeadbandElimination)
+        .addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
   }
 }

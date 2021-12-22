@@ -273,9 +273,16 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Distance", this::getDistance, null);
-    builder.addDoubleProperty("Distance Per Rotation", this::getDistancePerRotation, null);
-    builder.addBooleanProperty("Is Connected", this::isConnected, null);
+    builder
+        .setSmartDashboardType("AbsoluteEncoder")
+        .addDoubleProperty("sourceChannel", this::getSourceChannel, null)
+        .addDoubleProperty("Distance", this::getDistance, null)
+        .addBooleanProperty("Is Connected", this::isConnected, null)
+        .addDoubleProperty(
+            "Distance Per Rotation", this::getDistancePerRotation, this::setDistancePerRotation)
+        .addDoubleProperty(
+            "frequencyThreshold",
+            () -> m_frequencyThreshold,
+            threshold -> setConnectedFrequencyThreshold((int) threshold));
   }
 }

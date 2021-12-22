@@ -88,9 +88,11 @@ public class MotorControllerGroup implements MotorController, Sendable, AutoClos
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Motor Controller");
-    builder.setActuator(true);
-    builder.setSafeState(this::stopMotor);
-    builder.addDoubleProperty("Value", this::get, this::set);
+    builder
+        .setSmartDashboardType("Motor Controller")
+        .setActuator(true)
+        .setSafeState(this::stopMotor)
+        .addBooleanProperty("Inverted", this::getInverted, this::setInverted)
+        .addDoubleProperty("Value", this::get, this::set);
   }
 }

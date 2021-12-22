@@ -21,6 +21,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   private final DigitalSource m_source;
   private final int m_handle;
   private int m_edgesPerRevolution = 1;
+  private double m_maxPeriod;
 
   /**
    * Constructs a new tachometer.
@@ -143,7 +144,8 @@ public class Tachometer implements Sendable, AutoCloseable {
    * @param maxPeriod The max period (in seconds).
    */
   public void setMaxPeriod(double maxPeriod) {
-    CounterJNI.setCounterMaxPeriod(m_handle, maxPeriod);
+    m_maxPeriod = maxPeriod;
+    CounterJNI.setCounterMaxPeriod(m_handle, m_maxPeriod);
   }
 
   /**
@@ -157,6 +159,17 @@ public class Tachometer implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
+    builder
+        .addDoubleProperty("RPM", this::getRevolutionsPerMinute, null)
+        .addDoubleProperty(
+            "edgesPerRev", this::getEdgesPerRevolution, epr -> setEdgesPerRevolution((int) epr))
+        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addDoubleProperty(
+            "samplesToAverage",
+            this::getSamplesToAverage,
+            samplesToAverage -> {
+              setSamplesToAverage((int) samplesToAverage);
+            })
+        .addBooleanProperty("Stopped", this::getStopped, null);
   }
 }
