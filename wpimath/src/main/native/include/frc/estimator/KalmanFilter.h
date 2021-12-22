@@ -63,13 +63,11 @@ class KalmanFilterImpl
   KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
                    const wpi::array<double, States>& modelStdDevs,
                    const wpi::array<double, Outputs>& measurementStdDevs,
-                   units::second_t dt) {
+                   units::second_t dt)
+      : m_nominalDt{dt} {
     m_plant = &plant;
 
-    m_contQ = MakeCovMatrix(modelStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-
-    UpdateK();
+    SetStdDevs(modelStdDevs, measurementStdDevs);
   }
 
   KalmanFilterImpl(KalmanFilterImpl&&) = default;
@@ -188,7 +186,7 @@ class KalmanFilterImpl
               return values;
             },
             [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.extent; i++) {
+              for (size_t i = 0; i < stdDevs.size(); i++) {
                 m_contQ(i, i) = stdDevs[i] * stdDevs[i];
               }
               UpdateK();
@@ -202,7 +200,7 @@ class KalmanFilterImpl
               return values;
             },
             [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.extent; i++) {
+              for (size_t i = 0; i < stdDevs.size(); i++) {
                 m_contR(i, i) = stdDevs[i] * stdDevs[i];
               }
               UpdateK();

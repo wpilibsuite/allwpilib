@@ -62,7 +62,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dtSeconds Nominal discretization timestep.
    */
-  @SuppressWarnings("LocalVariableName")
   public KalmanFilter(
       Nat<States> states,
       Nat<Outputs> outputs,
@@ -115,7 +114,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   }
 
   /** Computes and replaces K from the rest of the KalmanFilter state. */
-  @SuppressWarnings("ParameterName")
+  @SuppressWarnings("LocalVariableName")
   private void updateK() {
     var pair = Discretization.discretizeAQTaylor(m_plant.getA(), m_contQ, m_nominalDtSeconds);
     var discA = pair.getFirst();

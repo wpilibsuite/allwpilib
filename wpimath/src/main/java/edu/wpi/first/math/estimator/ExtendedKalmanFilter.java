@@ -135,7 +135,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     m_addFuncX = addFuncX;
 
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    this.m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
     m_dtSeconds = dtSeconds;
 
     reset();

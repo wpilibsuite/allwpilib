@@ -351,7 +351,7 @@ class ExtendedKalmanFilter
               return values;
             },
             [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.extent; i++) {
+              for (size_t i = 0; i < stdDevs.size(); i++) {
                 m_contQ(i, i) = stdDevs[i] * stdDevs[i];
               }
             })
@@ -364,7 +364,7 @@ class ExtendedKalmanFilter
               return values;
             },
             [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.extent; i++) {
+              for (size_t i = 0; i < stdDevs.size(); i++) {
                 m_contR(i, i) = stdDevs[i] * stdDevs[i];
               }
             })

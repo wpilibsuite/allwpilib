@@ -23,6 +23,7 @@ public interface SendableBuilder {
    * for this sendable.
    *
    * @param type data type
+   * @return The builder.
    */
   SendableBuilder setSmartDashboardType(String type);
 
@@ -31,6 +32,7 @@ public interface SendableBuilder {
    * is false.
    *
    * @param value true if actuator, false if not
+   * @return The builder.
    */
   SendableBuilder setActuator(boolean value);
 
@@ -39,6 +41,7 @@ public interface SendableBuilder {
    * when entering and exiting Live Window mode.
    *
    * @param func function
+   * @return The builder.
    */
   SendableBuilder setSafeState(Runnable func);
 
@@ -48,6 +51,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
@@ -57,6 +61,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
 
@@ -66,6 +71,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
 
@@ -75,6 +81,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
@@ -85,6 +92,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter);
@@ -95,6 +103,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter);
@@ -105,6 +114,7 @@ public interface SendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
+   * @return The builder.
    */
   SendableBuilder addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
