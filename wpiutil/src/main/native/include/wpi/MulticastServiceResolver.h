@@ -92,10 +92,10 @@ typedef struct WPI_ServiceData {  // NOLINT
   const char** txtValues;
 } WPI_ServiceData;
 
-WPI_ServiceData** WPI_GetMulticastServiceResolverData(
+WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle, int32_t* dataCount);
 
-void WPI_FreeServiceData(WPI_ServiceData** serviceData);
+void WPI_FreeServiceData(WPI_ServiceData* serviceData, int32_t length);
 
 #ifdef __cplusplus
 }  // extern "C"
