@@ -17,7 +17,7 @@
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "gtest/gtest.h"
 
-TEST(DifferentialDriveSimTest, Convergence) {
+TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -42,9 +42,8 @@ TEST(DifferentialDriveSimTest, Convergence) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       frc::Pose2d(), {}, frc::Pose2d(2_m, 2_m, 0_rad), config);
 
-  // NOLINTNEXTLINE
-  for (double t = 0; t < trajectory.TotalTime().value(); t += 0.02) {
-    auto state = trajectory.Sample(20_ms);
+  for (auto t = 0_s; t < trajectory.TotalTime(); t += 20_ms) {
+    auto state = trajectory.Sample(t);
     auto ramseteOut = ramsete.Calculate(sim.GetPose(), state);
 
     auto [l, r] = kinematics.ToWheelSpeeds(ramseteOut);
@@ -70,7 +69,7 @@ TEST(DifferentialDriveSimTest, Convergence) {
   EXPECT_NEAR(groundTruthX(2, 0), sim.GetHeading().Radians().value(), 0.01);
 }
 
-TEST(DifferentialDriveSimTest, Current) {
+TEST(DifferentialDrivetrainSimTest, Current) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
@@ -97,7 +96,7 @@ TEST(DifferentialDriveSimTest, Current) {
   EXPECT_TRUE(sim.GetCurrentDraw() > 0_A);
 }
 
-TEST(DifferentialDriveSimTest, ModelStability) {
+TEST(DifferentialDrivetrainSimTest, ModelStability) {
   auto motor = frc::DCMotor::NEO(2);
   auto plant = frc::LinearSystemId::DrivetrainVelocitySystem(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
