@@ -48,10 +48,40 @@ Furthermore, WayMaker adds a new feature called per-segment interpolation. In ot
 WayMaker also allows the user to mark reversal points -  a maneuver in which the robot approaches a point, stops, and backs away from the point, continuing its drive facing the opposite direction. In PathWeaver, drive direction could only be set for the entire path as a whole, which made paths like the 2021 Bounce Path awkward to code.
 
 # Definitions
+## Frames of Reference
+ * Chassis Relative  - 
+    * `x` is positive in the robot's forward direction and negative in the backward direction.
+    * `y` is positive pointing left from the robot's perspective and negative pointing right.
+    * `omega` is angular velocity with positive turning counterclockwise, as viewed from above.
+    > Chassis Relative does not have a heading because the robot always faces forward in the +x chassis-relative direction.
+ * Field Relative -
+    * `x` is positive toward the opposing alliance wall, and negative towards the robot's own alliance wall. 
+    * `y` is positive toward the right (long side) field boundary as viewed from the robot's alliance station.
+    * `omega` is angular velocity with positive turning counterclockwise, as viewed from above. It is the same in chassis-relative and field-relative frames.
+    * `heading` is the angle of the chassis-relative +x in the field frame. It is measured counterclockwise from the field-relative +x direction.
+## Glossary
  * Path - a curve representing the course of the robot and defined by an ordered list of waypoints, through which the path must pass.
  * Trajectory - a list of states that the robot should target. The trajectory is generated from a path and is best described as a velocity profile along the path.
  * Waypoint - a point through which the path must pass. Waypoints have a heading, which may also constrain the path.
- * Reversal - a maneuver in which the robot approaches a point, stops, and backs away from the point, continuing its drive facing the opposite direction. This is similar to one point of a three-point turn operation. WayMaker supports marking a waypoint as a reversal point.
+ * Heading - 
+    * (of a point along the path) The desired direction of travel through the point, synonymous with the direction of the path tangent vector at the point.
+    * (of a robot) The angle of the chassis-relative +x in the field frame, measured counterclockwise from the field-relative +x direction.
+    > If a robot is driving a path with negative chassis x velocity, the robot heading may be opposite the path heading.
+ * Forward - 
+    * (of robot motion) When the direction of motion is in the direction of the chassis-relative +x axis.
+    * (of a path) The direction that the robot should traverse the path.
+ * Reverse - 
+    * (of robot motion) When the direction of motion is in the direction of the chassis-relative -x axis.
+    * (of a path) The direction opposite the robot's motion along the path.
+
+ * Segment - A portion of a path between two consecutive waypoints.
+ * Reversal - a maneuver in which the robot approaches a point with a chassis +x velocity, stops, and reverses away from the point with a chassis -x velocity, or vice versa.
+ * Reversal Point - A waypoint where the robot should perform a reversal instead of passing through the waypoint.
+ 
+# Diagrams
+
+
+
 
 # Design
 
@@ -80,37 +110,44 @@ Each waypoint has the following properties. Depending on the path type of the se
 
 |**Name**|**Description**|**Type**|**Default**|
 |---|---|---|---|
-Index |Index 0 is the start point, and the robot follows the points in increasing order | Integer|
-|X coordinate|In existing WPILib Pose2D coordinate system|Length|
-|Y coordinate|In existing WPILib Pose2D coordinate system|Length|
-|Heading|Direction of robot travel|Angle|towards positive field X.
+Index |Index 0 is the start point, and the robot follows the points in increasing order| Integer|
+|X coordinate|In field-relative coordinates|Length|
+|Y coordinate|In field-relative coordinates|Length|
+|Heading|Path tangent at this point, in field-relative coordinates|Angle|towards positive field X.
 |Tangent|Length of control vector|Length|Optimized for smooth curvature
-|Holonomic Angle|Direction robot faces|Angle|Matches Heading
+|Holonomic Angle|Field-relative conversion of chassis-relative +x vector angle|Angle|Matches Heading
 
-Holonomic Angle is one of a few features that will likely be restricted behind a "Holonomic Mode" toggle. This toggle allows access to features only usable with holonomic drives. WayMaker's generator will need a sensible way to handle these features when generating for a differential drive. For example, Holonomic Angle can be simply ignored, since it will likely output as a separate motion profile anyway. 
+> Holonomic Angle is one of a few features that will likely be restricted behind a "Holonomic Mode" toggle. This toggle allows access to features only usable with holonomic drives. WayMaker's generator will need a sensible way to handle these features when generating for a differential drive. For example, Holonomic Angle can be simply ignored, since it will likely output as a separate motion profile anyway. 
 
 Each segment has the following properties.
 
-|**Name**|**Description**|**Type**
-|---|---|---|
+|**Name**|**Description**|**Type** | **Default**
+|---|---|---|---|
 |Index|The index of the segment’s start point|Integer
-|Interpolation Type|A string representing the algorithm for interpolating the segment.|CubicHermite\|QuinticHermite\|Clothoid\|etc...|
-|Drive Direction|Whether the robot should have positive velocity (false) or negative velocity (true) when traversing this segment.|Boolean
+|Interpolation Type|A string representing the algorithm for interpolating the segment.|CubicHermite\|QuinticHermite\|Clothoid\|etc...|Same as both neighbor segments if matching, otherwise same as previous segment in the path.
+|Velocity Sign| See below. If the robot should have negative (true) instead of positive (false) chassis x-velocity when traversing the segment.|Boolean|Same as both neighbor segments if matching, otherwise same as previous segment in the path.
 
-)
+### Segment Velocity Sign
 
-### What Reversal Means
-Reversal being true on a segment means that velocity is negative. 
 
-If a waypoint is between two segments with different reversal flags, the robot will drive towards the point, approach the point at the angle specified by the heading, slow down to a stop, and drive away from the point, traveling opposite the direction of the heading. 
 
-If a waypoint is between two identically-reversed segments, the robot will pass through the point traveling in the direction of the heading, even though it may be driving with negative velocity to do so. This is done to ensure that toggling the reversal flag on these two segments does not change the path shape, simply the sign of the velocity at that point. 
+![Reversal Points Figure](/waymakerDocs/media/reversal/reversal-point.svg)
 
->**NOTE**: This is different from the PathWeaver operation of reversal, in which the robot would move in the opposite direction of the heading. Checking "Reverse Spline" in PathWeaver would produce a different path shape.
+*Figure 1: Reversal Point*
 
-Roughly speaking, if the reversal flags are the same on both sides of a waypoint, the tangent vectors pointing in the direction of robot travel either side of the point should be nearly parallel. If the reversal flags are not the same, the tangent vectors should be pointing in opposite directions. The tangent on the "approach", that is, the segment before the reversal point in the path, should match the heading angle of the waypoint.
+In Figure 1, the green color of the segments between 1 and 3 means that the robot moves along the path facing and driving forward. The large hollow triangle points along the chassis-relative +x axis. Similarly, the red color means the robot drives in reverse, with the "forward" direction pointing opposite the direction of travel. 
 
-Reversal’s representation in the UI is currently TBD. From the user's perspective, it might be setting a flag on the waypoint where drive direction should switch
+In a scenario such as point 3, which is where the path switches from positive to negative x-velocity, the robot will approach the point front-first, slow down to a stop, and reverse direction, driving away from the point back-first. 
+
+If a waypoint is between two segments of the same drive direction, like points 2 and 4, the robot will pass through the point traveling in the direction of the heading, even though its front may be facing the opposite way. This maintains the meaning of heading: Heading always points along the path in the direction of travel.
+
+>**NOTE**: This is different from the PathWeaver and current TrajectoryGenerator operation of reversal, in which the heading always refers to the chassis-relative +x direction. WayMaker generator will have to convert to that convention before generating trajectories.
+
+
+
+Reversal’s representation in the UI is currently TBD. From the user's perspective, it might be setting a flag on the waypoint where drive direction should switch. 
+
+
 ## Framework
 
 WayMaker is written in C++, using the ImGUI framework. This framework and language is chosen to match the ecosystem of current WPILib tooling, to minimize additional burden of maintenance. 
@@ -137,7 +174,7 @@ WayMaker is written in C++, using the ImGUI framework. This framework and langua
   "segments": [
       {
           "type": "CubicHermite" | "QuinticHermite" | "Clothoid",
-          "reverse": bool
+          "velocitySign": bool
       },
       //... n-1 segments.
   ]
@@ -156,9 +193,9 @@ For a PathWeaver import from a .csv, the following transformations occur:
     >**TBD**: Whose responsibility is it to set PathWeaver to export paths in meters? 
 * `x` remains the same value as in PathWeaver.
 * `y` is adjusted by the width of the field to fit the WPILib coordinate system.
-* `reverse` is true for all segments if it is true for all PathWeaver points, otherwise it is false for all segments. 
+* `velocitySign` is true (reverse velocity) for all segments if it is true for all PathWeaver points, otherwise it is false for all segments. 
     >**TBD**: What to do with malformed data? (e.g., reverse not the same on all points in the csv?)
-* `heading` and `tangent` are a coordinate conversion from PathWeaver's Tangent X and Tangent Y. If `reverse` is true, `heading` is then offset by 180 degrees to account for the difference in reverse behavior between PathWeaver and WayMaker. 
+* `heading` and `tangent` are a coordinate conversion from PathWeaver's Tangent X and Tangent Y. If `velocitySign` is true, `heading` is then offset by 180 degrees to account for the difference in reverse behavior between PathWeaver and WayMaker. 
 * `holonomicAngle` is set to the same as the adjusted `heading`. 
 * `type` is "QuinticHermite" for all segments.
 
