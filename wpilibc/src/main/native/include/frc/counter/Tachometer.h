@@ -76,6 +76,15 @@ class Tachometer : public wpi::Sendable,
   void SetEdgesPerRevolution(int edges);
 
   /**
+   * Gets the current tachometer revolutions per second.
+   *
+   * SetEdgesPerRevolution must be set with a non 0 value for this to work.
+   *
+   * @return Current RPS.
+   */
+  units::turns_per_second_t GetRevolutionsPerSecond() const;
+
+  /**
    * Gets the current tachometer revolutions per minute.
    *
    * SetEdgesPerRevolution must be set with a non 0 value for this to work.

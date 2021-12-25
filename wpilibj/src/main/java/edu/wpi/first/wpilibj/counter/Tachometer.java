@@ -99,13 +99,13 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the current tachometer revolution per minute.
+   * Gets the current tachometer revolutions per second.
    *
    * <p>setEdgesPerRevolution must be set with a non 0 value for this to return valid values.
    *
-   * @return Current RPM.
+   * @return Current RPS.
    */
-  public double getRevolutionsPerMinute() {
+  public double getRevolutionsPerSecond() {
     double period = getPeriod();
     if (period == 0) {
       return 0;
@@ -114,7 +114,18 @@ public class Tachometer implements Sendable, AutoCloseable {
     if (edgesPerRevolution == 0) {
       return 0;
     }
-    return ((1.0 / edgesPerRevolution) / period) * 60;
+    return (1.0 / edgesPerRevolution) / period;
+  }
+
+  /**
+   * Gets the current tachometer revolutions per minute.
+   *
+   * <p>setEdgesPerRevolution must be set with a non 0 value for this to return valid values.
+   *
+   * @return Current RPM.
+   */
+  public double getRevolutionsPerMinute() {
+    return getRevolutionsPerSecond() * 60;
   }
 
   /**
@@ -165,6 +176,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Tachometer");
+    builder.addDoubleProperty("RPS", this::getRevolutionsPerSecond, null);
     builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
   }
 }
