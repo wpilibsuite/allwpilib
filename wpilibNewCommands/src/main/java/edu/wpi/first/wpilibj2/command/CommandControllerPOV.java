@@ -7,9 +7,7 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
-/**
- * Provides POVButtons for binding commands to any GenericHID inherited class.
- */
+/** Provides POVButtons for binding commands to any GenericHID inherited class. */
 public class CommandControllerPOV {
   private final GenericHID m_hid;
   private final int m_povNumber;
@@ -25,7 +23,7 @@ public class CommandControllerPOV {
 
   /**
    * Constructs a ControllerPOV.
-   * 
+   *
    * @param hid The HID controller to read the POV from.
    */
   public CommandControllerPOV(GenericHID hid) {
@@ -34,7 +32,7 @@ public class CommandControllerPOV {
 
   /**
    * Constructs a ControllerPOV.
-   * 
+   *
    * @param hid The HID controller to read the POV from.
    * @param povNumber The controller POV index to use.
    */
@@ -48,7 +46,6 @@ public class CommandControllerPOV {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton up() {
     if (m_upButton == null) {
       m_upButton = new POVButton(m_hid, 0, m_povNumber);
@@ -75,7 +72,6 @@ public class CommandControllerPOV {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton right() {
     if (m_rightButton == null) {
       m_rightButton = new POVButton(m_hid, 90, m_povNumber);
@@ -102,7 +98,6 @@ public class CommandControllerPOV {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton down() {
     if (m_downButton == null) {
       m_downButton = new POVButton(m_hid, 180, m_povNumber);
@@ -129,7 +124,6 @@ public class CommandControllerPOV {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton left() {
     if (m_leftButton == null) {
       m_leftButton = new POVButton(m_hid, 270, m_povNumber);

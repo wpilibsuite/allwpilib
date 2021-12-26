@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * Provides JoystickButtons for binding commands to an XboxController's buttons. Additionally offers
@@ -22,20 +21,15 @@ public class CommandXboxController extends GenericHID {
   private JoystickButton m_rightBumper;
   private JoystickButton m_leftStick;
   private JoystickButton m_rightStick;
-  private JoystickButton m_aButton;
-  private JoystickButton m_bButton;
-  private JoystickButton m_xButton;
-  private JoystickButton m_yButton;
+  private JoystickButton m_a;
+  private JoystickButton m_b;
+  private JoystickButton m_x;
+  private JoystickButton m_y;
   private JoystickButton m_backButton;
   private JoystickButton m_startButton;
-  private POVButton m_uButton; // 0 degrees 
-  private POVButton m_urButton; // 45 degrees
-  private POVButton m_rButton; // 90 degrees
-  private POVButton m_drButton; // 135 degrees
-  private POVButton m_dButton; // 180 degrees
-  private POVButton m_dlButton; // 225 degrees
-  private POVButton m_lButton; // 270 degrees
-  private POVButton m_ulButton; // 315 degrees
+
+  @SuppressWarnings("checkstyle:MemberName")
+  public final CommandControllerPOV pov;
 
   /**
    * Constructs a CommandXboxController.
@@ -44,6 +38,7 @@ public class CommandXboxController extends GenericHID {
    */
   public CommandXboxController(final int port) {
     super(port);
+    pov = new CommandControllerPOV(this);
 
     HAL.report(tResourceType.kResourceType_XboxController, port + 1);
   }
@@ -106,12 +101,12 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   @SuppressWarnings("checkstyle:MethodName")
-  public JoystickButton aButton() {
-    if (m_aButton == null) {
-      m_aButton = new JoystickButton(this, XboxController.Button.kA.value);
+  public JoystickButton a() {
+    if (m_a == null) {
+      m_a = new JoystickButton(this, XboxController.Button.kA.value);
     }
 
-    return m_aButton;
+    return m_a;
   }
 
   /**
@@ -120,12 +115,12 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   @SuppressWarnings("checkstyle:MethodName")
-  public JoystickButton bButton() {
-    if (m_bButton == null) {
-      m_bButton = new JoystickButton(this, XboxController.Button.kB.value);
+  public JoystickButton b() {
+    if (m_b == null) {
+      m_b = new JoystickButton(this, XboxController.Button.kB.value);
     }
 
-    return m_bButton;
+    return m_b;
   }
 
   /**
@@ -134,12 +129,12 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   @SuppressWarnings("checkstyle:MethodName")
-  public JoystickButton xButton() {
-    if (m_xButton == null) {
-      m_xButton = new JoystickButton(this, XboxController.Button.kX.value);
+  public JoystickButton x() {
+    if (m_x == null) {
+      m_x = new JoystickButton(this, XboxController.Button.kX.value);
     }
 
-    return m_xButton;
+    return m_x;
   }
 
   /**
@@ -148,12 +143,12 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   @SuppressWarnings("checkstyle:MethodName")
-  public JoystickButton yButton() {
-    if (m_yButton == null) {
-      m_yButton = new JoystickButton(this, XboxController.Button.kY.value);
+  public JoystickButton y() {
+    if (m_y == null) {
+      m_y = new JoystickButton(this, XboxController.Button.kY.value);
     }
 
-    return m_yButton;
+    return m_y;
   }
 
   /**
@@ -161,7 +156,7 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton backButton() {
+  public JoystickButton back() {
     if (m_backButton == null) {
       m_backButton = new JoystickButton(this, XboxController.Button.kBack.value);
     }
@@ -174,120 +169,12 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton startButton() {
+  public JoystickButton start() {
     if (m_startButton == null) {
       m_startButton = new JoystickButton(this, XboxController.Button.kStart.value);
     }
 
     return m_startButton;
-  }
-
-  /**
-   * Returns the upper (0 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  @SuppressWarnings("checkstyle:MethodName")
-  public POVButton uButton() {
-    if (m_uButton == null) {
-      m_uButton = new POVButton(this, 0);
-    }
-
-    return m_uButton;
-  }
-
-  /**
-   * Returns the upper-right (45 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton urButton() {
-    if (m_urButton == null) {
-      m_urButton = new POVButton(this, 45);
-    }
-
-    return m_urButton;
-  }
-
-  /**
-   * Returns the right (90 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  @SuppressWarnings("checkstyle:MethodName")
-  public POVButton rButton() {
-    if (m_rButton == null) {
-      m_rButton = new POVButton(this, 90);
-    }
-
-    return m_rButton;
-  }
-
-  /**
-   * Returns the downwards-right (135 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton drButton() {
-    if (m_drButton == null) {
-      m_drButton = new POVButton(this, 135);
-    }
-
-    return m_drButton;
-  }
-
-  /**
-   * Returns the downwards (180 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  @SuppressWarnings("checkstyle:MethodName")
-  public POVButton dButton() {
-    if (m_dButton == null) {
-      m_dButton = new POVButton(this, 180);
-    }
-
-    return m_dButton;
-  }
-
-  /**
-   * Returns the downwards-left (225 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton dlButton() {
-    if (m_dlButton == null) {
-      m_dlButton = new POVButton(this, 225);
-    }
-
-    return m_dlButton;
-  }
-
-  /**
-   * Returns the left (270 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  @SuppressWarnings("checkstyle:MethodName")
-  public POVButton lButton() {
-    if (m_lButton == null) {
-      m_lButton = new POVButton(this, 270);
-    }
-
-    return m_lButton;
-  }
-
-  /**
-   * Returns the upwards-left (315 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton ulButton() {
-    if (m_ulButton == null) {
-      m_ulButton = new POVButton(this, 315);
-    }
-
-    return m_ulButton;
   }
 
   /**

@@ -9,7 +9,6 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * Provides JoystickButtons for binding commands to an PS4Controller's buttons. Additionally offers
@@ -18,26 +17,23 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 public class CommandPS4Controller extends GenericHID {
   // reuses the Button and Axis enums from the original PS4Controller
 
-  private JoystickButton m_squareButton;
-  private JoystickButton m_crossButton;
-  private JoystickButton m_circleButton;
-  private JoystickButton m_triangleButton;
+  private JoystickButton m_square;
+  private JoystickButton m_cross;
+  private JoystickButton m_circle;
+  private JoystickButton m_triangle;
+  private JoystickButton m_l1;
+  private JoystickButton m_r1;
+  private JoystickButton m_l2;
+  private JoystickButton m_r2;
+  private JoystickButton m_share;
+  private JoystickButton m_options;
+  private JoystickButton m_l3;
+  private JoystickButton m_r3;
+  private JoystickButton m_ps;
+  private JoystickButton m_touchpad;
 
-  private JoystickButton m_aButton;
-  private JoystickButton m_bButton;
-  private JoystickButton m_xButton;
-  private JoystickButton m_yButton;
-
-  private JoystickButton m_backButton;
-  private JoystickButton m_startButton;
-  private POVButton m_uButton; // 0 degrees 
-  private POVButton m_urButton; // 45 degrees
-  private POVButton m_rButton; // 90 degrees
-  private POVButton m_drButton; // 135 degrees
-  private POVButton m_dButton; // 180 degrees
-  private POVButton m_dlButton; // 225 degrees
-  private POVButton m_lButton; // 270 degrees
-  private POVButton m_ulButton; // 315 degrees
+  @SuppressWarnings("checkstyle:MemberName")
+  public final CommandControllerPOV pov;
 
   /**
    * Constructs a CommandPS4Controller.
@@ -46,242 +42,191 @@ public class CommandPS4Controller extends GenericHID {
    */
   public CommandPS4Controller(final int port) {
     super(port);
+    pov = new CommandControllerPOV(this);
 
     HAL.report(tResourceType.kResourceType_PS4Controller, port + 1);
   }
 
   /**
-   * Returns the left bumper's JoystickButton object.
+   * Returns the square button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton squareButton() {
-    if (m_squareButton == null) {
-      m_squareButton = new JoystickButton(this, PS4Controller.Button.kSquare.value);
+  public JoystickButton square() {
+    if (m_square == null) {
+      m_square = new JoystickButton(this, PS4Controller.Button.kSquare.value);
     }
 
-    return m_squareButton;
+    return m_square;
   }
 
   /**
-   * Returns the right bumper's JoystickButton object.
+   * Returns the cross button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton crossButton() {
-    if (m_crossButton == null) {
-      m_crossButton = new JoystickButton(this, PS4Controller.Button.kCross.value);
+  public JoystickButton cross() {
+    if (m_cross == null) {
+      m_cross = new JoystickButton(this, PS4Controller.Button.kCross.value);
     }
 
-    return m_crossButton;
+    return m_cross;
   }
 
   /**
-   * Returns the left stick's JoystickButton object.
+   * Returns the circle button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton circleButton() {
-    if (m_circleButton == null) {
-      m_circleButton = new JoystickButton(this, PS4Controller.Button.kCircle.value);
+  public JoystickButton circle() {
+    if (m_circle == null) {
+      m_circle = new JoystickButton(this, PS4Controller.Button.kCircle.value);
     }
 
-    return m_circleButton;
+    return m_circle;
   }
 
   /**
-   * Returns the right stick's JoystickButton object.
+   * Returns the triangle button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton triangleButton() {
-    if (m_triangleButton == null) {
-      m_triangleButton = new JoystickButton(this, PS4Controller.Button.kTriangle.value);
+  public JoystickButton triangle() {
+    if (m_triangle == null) {
+      m_triangle = new JoystickButton(this, PS4Controller.Button.kTriangle.value);
     }
 
-    return m_triangleButton;
+    return m_triangle;
   }
 
   /**
-   * Returns the A button's JoystickButton object.
-   *
-   * <p>To get its value, use {@link JoystickButton#get()}.
-   */  
-  public JoystickButton aButton() {
-    if (m_aButton == null) {
-      m_aButton = new JoystickButton(this, PS4Controller.Button.kA.value);
-    }
-
-    return m_aButton;
-  }
-
-  /**
-   * Returns the B button's JoystickButton object.
+   * Returns the left shoulder's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton bButton() {
-    if (m_bButton == null) {
-      m_bButton = new JoystickButton(this, PS4Controller.Button.kB.value);
+  public JoystickButton l1() {
+    if (m_l1 == null) {
+      m_l1 = new JoystickButton(this, PS4Controller.Button.kL1.value);
     }
 
-    return m_bButton;
+    return m_l1;
   }
 
   /**
-   * Returns the X button's JoystickButton object.
+   * Returns the right shoulder's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton xButton() {
-    if (m_xButton == null) {
-      m_xButton = new JoystickButton(this, PS4Controller.Button.kX.value);
+  public JoystickButton r1() {
+    if (m_r1 == null) {
+      m_r1 = new JoystickButton(this, PS4Controller.Button.kR1.value);
     }
 
-    return m_xButton;
+    return m_r1;
   }
 
   /**
-   * Returns the Y button's JoystickButton object.
+   * Returns the left trigger's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton yButton() {
-    if (m_yButton == null) {
-      m_yButton = new JoystickButton(this, PS4Controller.Button.kY.value);
+  public JoystickButton l2() {
+    if (m_l2 == null) {
+      m_l2 = new JoystickButton(this, PS4Controller.Button.kL2.value);
     }
 
-    return m_yButton;
+    return m_l2;
   }
 
   /**
-   * Returns the back button's JoystickButton object.
+   * Returns the right trigger's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton backButton() {
-    if (m_backButton == null) {
-      m_backButton = new JoystickButton(this, PS4Controller.Button.kBack.value);
+  public JoystickButton r2() {
+    if (m_r2 == null) {
+      m_r2 = new JoystickButton(this, PS4Controller.Button.kR2.value);
     }
 
-    return m_backButton;
+    return m_r2;
   }
 
   /**
-   * Returns the start button's JoystickButton object.
+   * Returns the share button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton startButton() {
-    if (m_startButton == null) {
-      m_startButton = new JoystickButton(this, PS4Controller.Button.kStart.value);
+  public JoystickButton share() {
+    if (m_share == null) {
+      m_share = new JoystickButton(this, PS4Controller.Button.kShare.value);
     }
 
-    return m_startButton;
+    return m_share;
   }
 
   /**
-   * Returns the upper (0 degrees) POVButton object.
+   * Returns the options button's JoystickButton object.
    *
-   * <p>To get its value, use {@link POVButton#get()}.
+   * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public POVButton uButton() {
-    if (m_uButton == null) {
-      m_uButton = new POVButton(this, 0);
+  public JoystickButton options() {
+    if (m_options == null) {
+      m_options = new JoystickButton(this, PS4Controller.Button.kOptions.value);
     }
 
-    return m_uButton;
+    return m_options;
   }
 
   /**
-   * Returns the upper-right (45 degrees) POVButton object.
+   * Returns the left joystick's JoystickButton object.
    *
-   * <p>To get its value, use {@link POVButton#get()}.
+   * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public POVButton urButton() {
-    if (m_urButton == null) {
-      m_urButton = new POVButton(this, 45);
+  public JoystickButton l3() {
+    if (m_l3 == null) {
+      m_l3 = new JoystickButton(this, PS4Controller.Button.kL3.value);
     }
 
-    return m_urButton;
+    return m_l3;
   }
 
   /**
-   * Returns the right (90 degrees) POVButton object.
+   * Returns the right joystick's JoystickButton object.
    *
-   * <p>To get its value, use {@link POVButton#get()}.
+   * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public POVButton rButton() {
-    if (m_rButton == null) {
-      m_rButton = new POVButton(this, 90);
+  public JoystickButton r3() {
+    if (m_r3 == null) {
+      m_r3 = new JoystickButton(this, PS4Controller.Button.kR3.value);
     }
 
-    return m_rButton;
+    return m_r3;
   }
 
   /**
-   * Returns the downwards-right (135 degrees) POVButton object.
+   * Returns the PS button's JoystickButton object.
    *
-   * <p>To get its value, use {@link POVButton#get()}.
+   * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public POVButton drButton() {
-    if (m_drButton == null) {
-      m_drButton = new POVButton(this, 135);
+  public JoystickButton ps() {
+    if (m_ps == null) {
+      m_ps = new JoystickButton(this, PS4Controller.Button.kPS.value);
     }
 
-    return m_drButton;
+    return m_ps;
   }
 
   /**
-   * Returns the downwards (180 degrees) POVButton object.
+   * Returns the touchpad's JoystickButton object.
    *
-   * <p>To get its value, use {@link POVButton#get()}.
+   * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public POVButton dButton() {
-    if (m_dButton == null) {
-      m_dButton = new POVButton(this, 180);
+  public JoystickButton touchpad() {
+    if (m_touchpad == null) {
+      m_touchpad = new JoystickButton(this, PS4Controller.Button.kTouchpad.value);
     }
 
-    return m_dButton;
-  }
-
-  /**
-   * Returns the downwards-left (225 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton dlButton() {
-    if (m_dlButton == null) {
-      m_dlButton = new POVButton(this, 225);
-    }
-
-    return m_dlButton;
-  }
-
-  /**
-   * Returns the left (270 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton lButton() {
-    if (m_lButton == null) {
-      m_lButton = new POVButton(this, 270);
-    }
-
-    return m_lButton;
-  }
-
-  /**
-   * Returns the upwards-left (315 degrees) POVButton object.
-   *
-   * <p>To get its value, use {@link POVButton#get()}.
-   */
-  public POVButton ulButton() {
-    if (m_ulButton == null) {
-      m_ulButton = new POVButton(this, 315);
-    }
-
-    return m_ulButton;
+    return m_touchpad;
   }
 
   /**
@@ -326,7 +271,7 @@ public class CommandPS4Controller extends GenericHID {
    *
    * @return The axis value.
    */
-  public double getLeftTriggerAxis() {
+  public double getL2Axis() {
     return getRawAxis(PS4Controller.Axis.kL2.value);
   }
 
@@ -336,7 +281,7 @@ public class CommandPS4Controller extends GenericHID {
    *
    * @return The axis value.
    */
-  public double getRightTriggerAxis() {
+  public double getR2Axis() {
     return getRawAxis(PS4Controller.Axis.kR2.value);
   }
 }
