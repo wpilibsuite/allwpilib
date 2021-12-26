@@ -194,7 +194,7 @@ public class DriveSubsystem extends SubsystemBase {
       rightVolts *= batteryVoltage / 12.0;
     }
     m_leftMotors.setVoltage(leftVolts);
-    m_rightMotors.setVoltage(-rightVolts);
+    m_rightMotors.setVoltage(rightVolts);
     m_drive.feed();
   }
 

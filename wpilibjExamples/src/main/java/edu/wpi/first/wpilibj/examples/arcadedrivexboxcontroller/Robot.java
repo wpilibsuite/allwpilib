@@ -20,6 +20,14 @@ public class Robot extends TimedRobot {
   private final XboxController m_driverController = new XboxController(0);
 
   @Override
+  public void robotInit() {
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_rightMotor.setInverted(true);
+  }
+
+  @Override
   public void teleopPeriodic() {
     // Drive with split arcade drive.
     // That means that the Y axis of the left stick moves forward
