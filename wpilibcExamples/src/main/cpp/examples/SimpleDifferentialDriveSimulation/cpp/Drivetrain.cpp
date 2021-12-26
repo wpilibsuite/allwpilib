@@ -43,7 +43,7 @@ void Drivetrain::SimulationPeriodic() {
   // voltages make the right side move forward.
   m_drivetrainSimulator.SetInputs(units::volt_t{m_leftLeader.Get()} *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{-m_rightLeader.Get()} *
+                                  units::volt_t{m_rightLeader.Get()} *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
