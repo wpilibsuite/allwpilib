@@ -75,6 +75,7 @@ model {
 
             if (it.component.name == "${nativeName}Dev") {
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalJniDependency(it)
             }
 
