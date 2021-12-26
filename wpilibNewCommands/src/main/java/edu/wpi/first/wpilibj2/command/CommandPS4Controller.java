@@ -7,25 +7,27 @@ package edu.wpi.first.wpilibj2.command;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
- * Provides JoystickButtons for binding commands to an XboxController's buttons. Additionally offers
+ * Provides JoystickButtons for binding commands to an PS4Controller's buttons. Additionally offers
  * getters for retrieving axis values.
  */
-public class CommandXboxController extends GenericHID {
-  // reuses the Button and Axis enums from the original XboxController
+public class CommandPS4Controller extends GenericHID {
+  // reuses the Button and Axis enums from the original PS4Controller
 
-  private JoystickButton m_leftBumper;
-  private JoystickButton m_rightBumper;
-  private JoystickButton m_leftStick;
-  private JoystickButton m_rightStick;
+  private JoystickButton m_squareButton;
+  private JoystickButton m_crossButton;
+  private JoystickButton m_circleButton;
+  private JoystickButton m_triangleButton;
+
   private JoystickButton m_aButton;
   private JoystickButton m_bButton;
   private JoystickButton m_xButton;
   private JoystickButton m_yButton;
+
   private JoystickButton m_backButton;
   private JoystickButton m_startButton;
   private POVButton m_uButton; // 0 degrees 
@@ -38,14 +40,14 @@ public class CommandXboxController extends GenericHID {
   private POVButton m_ulButton; // 315 degrees
 
   /**
-   * Constructs a CommandXboxController.
+   * Constructs a CommandPS4Controller.
    *
    * @param port The Driver Station port to initialize it on.
    */
-  public CommandXboxController(final int port) {
+  public CommandPS4Controller(final int port) {
     super(port);
 
-    HAL.report(tResourceType.kResourceType_XboxController, port + 1);
+    HAL.report(tResourceType.kResourceType_PS4Controller, port + 1);
   }
 
   /**
@@ -53,12 +55,12 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton leftBumper() {
-    if (m_leftBumper == null) {
-      m_leftBumper = new JoystickButton(this, XboxController.Button.kLeftBumper.value);
+  public JoystickButton squareButton() {
+    if (m_squareButton == null) {
+      m_squareButton = new JoystickButton(this, PS4Controller.Button.kSquare.value);
     }
 
-    return m_leftBumper;
+    return m_squareButton;
   }
 
   /**
@@ -66,12 +68,12 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton rightBumper() {
-    if (m_rightBumper == null) {
-      m_rightBumper = new JoystickButton(this, XboxController.Button.kRightBumper.value);
+  public JoystickButton crossButton() {
+    if (m_crossButton == null) {
+      m_crossButton = new JoystickButton(this, PS4Controller.Button.kCross.value);
     }
 
-    return m_rightBumper;
+    return m_crossButton;
   }
 
   /**
@@ -79,12 +81,12 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton leftStick() {
-    if (m_leftStick == null) {
-      m_leftStick = new JoystickButton(this, XboxController.Button.kLeftStick.value);
+  public JoystickButton circleButton() {
+    if (m_circleButton == null) {
+      m_circleButton = new JoystickButton(this, PS4Controller.Button.kCircle.value);
     }
 
-    return m_leftStick;
+    return m_circleButton;
   }
 
   /**
@@ -92,23 +94,22 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  public JoystickButton rightStick() {
-    if (m_rightStick == null) {
-      m_rightStick = new JoystickButton(this, XboxController.Button.kRightStick.value);
+  public JoystickButton triangleButton() {
+    if (m_triangleButton == null) {
+      m_triangleButton = new JoystickButton(this, PS4Controller.Button.kTriangle.value);
     }
 
-    return m_rightStick;
+    return m_triangleButton;
   }
 
   /**
    * Returns the A button's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
-   */
-  @SuppressWarnings("checkstyle:MethodName")
+   */  
   public JoystickButton aButton() {
     if (m_aButton == null) {
-      m_aButton = new JoystickButton(this, XboxController.Button.kA.value);
+      m_aButton = new JoystickButton(this, PS4Controller.Button.kA.value);
     }
 
     return m_aButton;
@@ -119,10 +120,9 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton bButton() {
     if (m_bButton == null) {
-      m_bButton = new JoystickButton(this, XboxController.Button.kB.value);
+      m_bButton = new JoystickButton(this, PS4Controller.Button.kB.value);
     }
 
     return m_bButton;
@@ -133,10 +133,9 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton xButton() {
     if (m_xButton == null) {
-      m_xButton = new JoystickButton(this, XboxController.Button.kX.value);
+      m_xButton = new JoystickButton(this, PS4Controller.Button.kX.value);
     }
 
     return m_xButton;
@@ -147,10 +146,9 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton yButton() {
     if (m_yButton == null) {
-      m_yButton = new JoystickButton(this, XboxController.Button.kY.value);
+      m_yButton = new JoystickButton(this, PS4Controller.Button.kY.value);
     }
 
     return m_yButton;
@@ -163,7 +161,7 @@ public class CommandXboxController extends GenericHID {
    */
   public JoystickButton backButton() {
     if (m_backButton == null) {
-      m_backButton = new JoystickButton(this, XboxController.Button.kBack.value);
+      m_backButton = new JoystickButton(this, PS4Controller.Button.kBack.value);
     }
 
     return m_backButton;
@@ -176,7 +174,7 @@ public class CommandXboxController extends GenericHID {
    */
   public JoystickButton startButton() {
     if (m_startButton == null) {
-      m_startButton = new JoystickButton(this, XboxController.Button.kStart.value);
+      m_startButton = new JoystickButton(this, PS4Controller.Button.kStart.value);
     }
 
     return m_startButton;
@@ -187,7 +185,6 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton uButton() {
     if (m_uButton == null) {
       m_uButton = new POVButton(this, 0);
@@ -214,7 +211,6 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton rButton() {
     if (m_rButton == null) {
       m_rButton = new POVButton(this, 90);
@@ -241,7 +237,6 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton dButton() {
     if (m_dButton == null) {
       m_dButton = new POVButton(this, 180);
@@ -268,7 +263,6 @@ public class CommandXboxController extends GenericHID {
    *
    * <p>To get its value, use {@link POVButton#get()}.
    */
-  @SuppressWarnings("checkstyle:MethodName")
   public POVButton lButton() {
     if (m_lButton == null) {
       m_lButton = new POVButton(this, 270);
@@ -296,7 +290,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(XboxController.Axis.kLeftX.value);
+    return getRawAxis(PS4Controller.Axis.kLeftX.value);
   }
 
   /**
@@ -305,7 +299,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(XboxController.Axis.kRightX.value);
+    return getRawAxis(PS4Controller.Axis.kRightX.value);
   }
 
   /**
@@ -314,7 +308,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(XboxController.Axis.kLeftY.value);
+    return getRawAxis(PS4Controller.Axis.kLeftY.value);
   }
 
   /**
@@ -323,7 +317,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(XboxController.Axis.kRightY.value);
+    return getRawAxis(PS4Controller.Axis.kRightY.value);
   }
 
   /**
@@ -333,7 +327,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getRawAxis(XboxController.Axis.kLeftTrigger.value);
+    return getRawAxis(PS4Controller.Axis.kL2.value);
   }
 
   /**
@@ -343,6 +337,6 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getRawAxis(XboxController.Axis.kRightTrigger.value);
+    return getRawAxis(PS4Controller.Axis.kR2.value);
   }
 }
