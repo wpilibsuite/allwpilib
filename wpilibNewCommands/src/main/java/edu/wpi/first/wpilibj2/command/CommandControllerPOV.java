@@ -29,8 +29,7 @@ public class CommandControllerPOV {
    * @param hid The HID controller to read the POV from.
    */
   public CommandControllerPOV(GenericHID hid) {
-    m_hid = hid;
-    m_povNumber = 0;
+    this(hid, 0);
   }
 
   /**
@@ -50,7 +49,7 @@ public class CommandControllerPOV {
    * <p>To get its value, use {@link POVButton#get()}.
    */
   @SuppressWarnings("checkstyle:MethodName")
-  public POVButton uButton() {
+  public POVButton up() {
     if (m_upButton == null) {
       m_upButton = new POVButton(m_hid, 0, m_povNumber);
     }
