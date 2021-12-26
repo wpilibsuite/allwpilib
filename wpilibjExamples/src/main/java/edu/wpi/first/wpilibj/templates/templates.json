@@ -14,7 +14,8 @@
     "name": "Timed Skeleton (Advanced)",
     "description": "Skeleton (stub) code for TimedRobot",
     "tags": [
-      "Timed", "Skeleton"
+      "Timed",
+      "Skeleton"
     ],
     "foldername": "timedskeleton",
     "gradlebase": "java",
@@ -25,7 +26,8 @@
     "name": "RobotBase Skeleton (Advanced)",
     "description": "Skeleton (stub) code for RobotBase",
     "tags": [
-      "RobotBase", "Skeleton"
+      "RobotBase",
+      "Skeleton"
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "java",
@@ -47,7 +49,8 @@
     "name": "Romi - Timed Robot",
     "description": "Romi - Timed style",
     "tags": [
-      "Timed", "Romi"
+      "Timed",
+      "Romi"
     ],
     "foldername": "romitimed",
     "gradlebase": "javaromi",
@@ -58,7 +61,8 @@
     "name": "Romi - Command Robot",
     "description": "Romi - Command style",
     "tags": [
-      "Command", "Romi"
+      "Command",
+      "Romi"
     ],
     "foldername": "romicommandbased",
     "gradlebase": "javaromi",
@@ -73,6 +77,18 @@
     ],
     "foldername": "educational",
     "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Educational Robot",
+    "description": "Romi - Educational Robot",
+    "tags": [
+      "Educational",
+      "Romi"
+    ],
+    "foldername": "romieducational",
+    "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
   }
