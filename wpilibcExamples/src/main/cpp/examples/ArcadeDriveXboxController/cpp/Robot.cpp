@@ -29,8 +29,8 @@ class Robot : public frc::TimedRobot {
     // Drive with split arcade style
     // That means that the Y axis of the left stick moves forward
     // and backward, and the X of the right stick turns left and right.
-    m_robotDrive.ArcadeDrive(m_driverController.GetLeftY(),
-                             m_driverController.GetRightX());
+    m_robotDrive.ArcadeDrive(-m_driverController.GetLeftY(),
+                             -m_driverController.GetRightX());
   }
 };
 
