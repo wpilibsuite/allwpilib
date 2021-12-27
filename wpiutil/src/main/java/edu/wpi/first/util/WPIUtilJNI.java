@@ -62,6 +62,8 @@ public final class WPIUtilJNI {
 
   public static native long now();
 
+  public static native long getSystemTime();
+
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
 
   public static native void removePortForwarder(int port);
