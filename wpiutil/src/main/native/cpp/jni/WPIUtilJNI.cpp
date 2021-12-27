@@ -77,6 +77,19 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    disableMockTime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_disableMockTime
+  (JNIEnv*, jclass)
+{
+  mockTimeEnabled = false;
+  wpi::SetNowImpl(nullptr);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    setMockTime
  * Signature: (J)V
  */

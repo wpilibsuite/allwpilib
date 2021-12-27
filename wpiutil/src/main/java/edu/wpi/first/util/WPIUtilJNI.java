@@ -56,6 +56,8 @@ public final class WPIUtilJNI {
 
   public static native void enableMockTime();
 
+  public static native void disableMockTime();
+
   public static native void setMockTime(long time);
 
   public static native long now();
