@@ -18,6 +18,13 @@ class Robot : public frc::TimedRobot {
   frc::Joystick m_stick{0};
 
  public:
+  void RobotInit() override {
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_rightMotor.SetInverted(true);
+  }
+
   void TeleopPeriodic() override {
     // Drive with arcade style
     m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());

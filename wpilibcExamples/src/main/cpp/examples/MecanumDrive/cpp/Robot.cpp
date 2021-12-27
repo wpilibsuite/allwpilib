@@ -14,10 +14,10 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
-    // Invert the left side motors. You may need to change or remove this to
+    // Invert the right side motors. You may need to change or remove this to
     // match your robot.
-    m_frontLeft.SetInverted(true);
-    m_rearLeft.SetInverted(true);
+    m_frontRight.SetInverted(true);
+    m_rearRight.SetInverted(true);
   }
 
   void TeleopPeriodic() override {
