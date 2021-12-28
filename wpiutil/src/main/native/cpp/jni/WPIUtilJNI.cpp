@@ -118,6 +118,18 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getSystemTime
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getSystemTime
+  (JNIEnv*, jclass)
+{
+  return wpi::GetSystemTime();
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    addPortForwarder
  * Signature: (ILjava/lang/String;I)V
  */
