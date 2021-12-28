@@ -45,7 +45,7 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.arcadeDrive(
-                    m_driverController.getLeftY(), m_driverController.getRightX()),
+                    -m_driverController.getLeftY(), m_driverController.getRightX()),
             m_robotDrive));
   }
 
@@ -74,7 +74,7 @@ public class RobotContainer {
                 // Setpoint is 0
                 0,
                 // Pipe the output to the turning controls
-                output -> m_robotDrive.arcadeDrive(m_driverController.getLeftY(), output),
+                output -> m_robotDrive.arcadeDrive(-m_driverController.getLeftY(), output),
                 // Require the robot drive
                 m_robotDrive));
 
