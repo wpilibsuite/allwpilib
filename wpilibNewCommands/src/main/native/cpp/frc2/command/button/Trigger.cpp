@@ -139,8 +139,10 @@ Trigger Trigger::CancelWhenActive(Command* command) {
   return *this;
 }
 
-Trigger Trigger::Debounce(units::second_t debounceTime) {
-  return Trigger([debouncer = frc::Debouncer(debounceTime), *this]() mutable {
-    return debouncer.Calculate(m_isActive());
-  });
+Trigger Trigger::Debounce(units::second_t debounceTime,
+                          frc::Debouncer::DebounceType type) {
+  return Trigger(
+      [debouncer = frc::Debouncer(debounceTime, type), *this]() mutable {
+        return debouncer.Calculate(m_isActive());
+      });
 }

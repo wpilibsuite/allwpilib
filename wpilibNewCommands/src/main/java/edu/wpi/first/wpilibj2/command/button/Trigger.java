@@ -381,13 +381,25 @@ public class Trigger implements BooleanSupplier {
    * Creates a new debounced trigger from this trigger - it will become active when this trigger has
    * been active for longer than the specified period.
    *
-   * @param seconds the debounce period
-   * @return the debounced trigger
+   * @param seconds The debounce period.
+   * @return The debounced trigger (rising edges debounced only)
    */
   public Trigger debounce(double seconds) {
+    return debounce(seconds, Debouncer.DebounceType.kRising);
+  }
+
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
+   */
+  public Trigger debounce(double seconds, Debouncer.DebounceType type) {
     return new Trigger(
         new BooleanSupplier() {
-          Debouncer m_debouncer = new Debouncer(seconds);
+          Debouncer m_debouncer = new Debouncer(seconds, type);
 
           @Override
           public boolean getAsBoolean() {
