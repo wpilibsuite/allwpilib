@@ -90,11 +90,13 @@ public interface PneumaticsBase extends AutoCloseable {
 
   void enableCompressorDigital();
 
-  void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage);
+  void enableCompressorAnalog(double minPressure, double maxPressure);
 
-  void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage);
+  void enableCompressorHybrid(double minPressure, double maxPressure);
 
   double getAnalogVoltage(int channel);
+
+  double getPressure(int channel);
 
   CompressorConfigType getCompressorConfigType();
 

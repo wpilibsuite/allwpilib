@@ -68,6 +68,18 @@ public class PneumaticHub implements PneumaticsBase {
     }
   }
 
+  /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
+  private static double voltsToPsi(double sensorVoltage, double supplyVoltage) {
+    double pressure = 250 * (sensorVoltage / supplyVoltage) - 25;
+    return pressure;
+  }
+
+  /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
+  private static double psiToVolts(double pressure, double supplyVoltage) {
+    double voltage = supplyVoltage * (0.004 * pressure + 0.1);
+    return voltage;
+  }
+
   private final DataStore m_dataStore;
   private final int m_handle;
 
@@ -210,18 +222,51 @@ public class PneumaticHub implements PneumaticsBase {
   }
 
   @Override
-  public void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorAnalog(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlAnalog(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 
   @Override
-  public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorHybrid(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 
   @Override
   public double getAnalogVoltage(int channel) {
     return REVPHJNI.getAnalogVoltage(m_handle, channel);
+  }
+
+  @Override
+  public double getPressure(int channel) {
+    double sensorVoltage = REVPHJNI.getAnalogVoltage(m_handle, channel);
+    double supplyVoltage = REVPHJNI.get5VVoltage(m_handle);
+    return voltsToPsi(sensorVoltage, supplyVoltage);
   }
 
   void clearStickyFaults() {

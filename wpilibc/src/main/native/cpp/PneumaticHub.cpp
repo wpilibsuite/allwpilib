@@ -16,6 +16,20 @@
 
 using namespace frc;
 
+/** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
+units::pounds_per_square_inch_t VoltsToPSI(units::volt_t sensorVoltage,
+                                           units::volt_t supplyVoltage) {
+  auto pressure = 250 * (sensorVoltage.value() / supplyVoltage.value()) - 25;
+  return units::pounds_per_square_inch_t{pressure};
+}
+
+/** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
+units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
+                         units::volt_t supplyVoltage) {
+  auto voltage = supplyVoltage.value() * (0.004 * pressure.value() + 0.1);
+  return units::volt_t{voltage};
+}
+
 wpi::mutex PneumaticHub::m_handleLock;
 std::unique_ptr<wpi::DenseMap<int, std::weak_ptr<PneumaticHub::DataStore>>>
     PneumaticHub::m_handleMap = nullptr;
@@ -93,17 +107,51 @@ void PneumaticHub::EnableCompressorDigital() {
   FRC_ReportError(status, "Module {}", m_module);
 }
 
-void PneumaticHub::EnableCompressorAnalog(units::volt_t minAnalogVoltage,
-                                          units::volt_t maxAnalogVoltage) {
+void PneumaticHub::EnableCompressorAnalog(
+    units::pounds_per_square_inch_t minPressure,
+    units::pounds_per_square_inch_t maxPressure) {
+  if (minPressure.value() >= maxPressure.value()) {
+    throw FRC_MakeError(err::InvalidParameter, "{}",
+                        "maxPressure must be greater than minPresure");
+  }
+  if (minPressure.value() < 0 || minPressure.value() > 120) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "minPressure must be between 0 and 120 PSI, got {}",
+                        minPressure.value());
+  }
+  if (maxPressure.value() < 0 || maxPressure.value() > 120) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "maxPressure must be between 0 and 120 PSI, got {}",
+                        maxPressure.value());
+  }
   int32_t status = 0;
+  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, units::volt_t{5.0});
+  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, units::volt_t{5.0});
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);
 }
 
-void PneumaticHub::EnableCompressorHybrid(units::volt_t minAnalogVoltage,
-                                          units::volt_t maxAnalogVoltage) {
+void PneumaticHub::EnableCompressorHybrid(
+    units::pounds_per_square_inch_t minPressure,
+    units::pounds_per_square_inch_t maxPressure) {
+  if (minPressure.value() >= maxPressure.value()) {
+    throw FRC_MakeError(err::InvalidParameter, "{}",
+                        "maxPressure must be greater than minPresure");
+  }
+  if (minPressure.value() < 0 || minPressure.value() > 120) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "minPressure must be between 0 and 120 PSI, got {}",
+                        minPressure.value());
+  }
+  if (maxPressure.value() < 0 || maxPressure.value() > 120) {
+    throw FRC_MakeError(err::ParameterOutOfRange,
+                        "maxPressure must be between 0 and 120 PSI, got {}",
+                        maxPressure.value());
+  }
   int32_t status = 0;
+  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, units::volt_t{5.0});
+  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, units::volt_t{5.0});
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -284,6 +332,15 @@ units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
   auto voltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
   FRC_ReportError(status, "Module {}", m_module);
   return units::volt_t{voltage};
+}
+
+units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
+  int32_t status = 0;
+  auto sensorVoltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  auto supplyVoltage = HAL_GetREVPH5VVoltage(m_handle, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  return VoltsToPSI(units::volt_t{sensorVoltage}, units::volt_t{supplyVoltage});
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {

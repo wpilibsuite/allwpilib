@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <units/current.h>
+#include <units/pressure.h>
 #include <units/time.h>
 #include <units/voltage.h>
 
@@ -31,11 +32,13 @@ class PneumaticsBase {
 
   virtual void EnableCompressorDigital() = 0;
 
-  virtual void EnableCompressorAnalog(units::volt_t minAnalogVoltage,
-                                      units::volt_t maxAnalogVoltage) = 0;
+  virtual void EnableCompressorAnalog(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) = 0;
 
-  virtual void EnableCompressorHybrid(units::volt_t minAnalogVoltage,
-                                      units::volt_t maxAnalogVoltage) = 0;
+  virtual void EnableCompressorHybrid(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) = 0;
 
   virtual CompressorConfigType GetCompressorConfigType() const = 0;
 
@@ -62,6 +65,8 @@ class PneumaticsBase {
   virtual void UnreserveCompressor() = 0;
 
   virtual units::volt_t GetAnalogVoltage(int channel) const = 0;
+
+  virtual units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
 
   virtual Solenoid MakeSolenoid(int channel) = 0;
   virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,
