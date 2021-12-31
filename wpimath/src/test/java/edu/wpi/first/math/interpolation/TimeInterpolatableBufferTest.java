@@ -10,9 +10,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.junit.jupiter.api.Test;
 
-public class TimeInterpolatableBufferTest {
+class TimeInterpolatableBufferTest {
   @Test
-  public void testInterpolation() {
+  void testInterpolation() {
     TimeInterpolatableBuffer<Rotation2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
 
     buffer.addSample(0, new Rotation2d());
@@ -28,7 +28,7 @@ public class TimeInterpolatableBufferTest {
   }
 
   @Test
-  public void testPose2d() {
+  void testPose2d() {
     TimeInterpolatableBuffer<Pose2d> buffer = TimeInterpolatableBuffer.createBuffer(10);
 
     // We expect to be at (1 - 1/Math.sqrt(2), 1/Math.sqrt(2), 45deg) at t=0.5
