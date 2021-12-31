@@ -63,11 +63,10 @@ inline void ADISReportError(int32_t status, const char* file, int line,
  * Constructor.
  */
 ADIS16470_IMU::ADIS16470_IMU()
-    : ADIS16470_IMU(kZ, SPI::Port::kOnboardCS0, ADIS16470CalibrationTime::_4s) {
-}
+    : ADIS16470_IMU(kZ, SPI::Port::kOnboardCS0, CalibrationTime::_4s) {}
 
 ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
-                             ADIS16470CalibrationTime cal_time)
+                             CalibrationTime cal_time)
     : m_yaw_axis(yaw_axis),
       m_spi_port(port),
       m_calibration_time(static_cast<uint16_t>(cal_time)) {
@@ -292,7 +291,7 @@ bool ADIS16470_IMU::SwitchToAutoSPI() {
  * themselves. After waiting the configured calibration time, the Calibrate()
  *function should be called to activate the new offset calibration.
  **/
-int ADIS16470_IMU::ConfigCalTime(ADIS16470CalibrationTime new_cal_time) {
+int ADIS16470_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   if (m_calibration_time == static_cast<uint16_t>(new_cal_time)) {
     return 1;
   }
