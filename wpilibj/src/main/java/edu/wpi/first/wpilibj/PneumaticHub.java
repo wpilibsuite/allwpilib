@@ -27,6 +27,17 @@ public class PneumaticHub implements PneumaticsBase {
       m_handle = REVPHJNI.initialize(module);
       m_module = module;
       m_handleMap.put(module, this);
+
+      final REVPHVersion version = REVPHJNI.getVersion(m_handle);
+      if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
+        final String fwVersion =
+            version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
+        throw new IllegalStateException(
+            "The Pneumatic Hub has firmware version "
+                + fwVersion
+                + ", and must be updated to version 2022.0.0 or later "
+                + "using the REV Hardware Client.");
+      }
     }
 
     @Override

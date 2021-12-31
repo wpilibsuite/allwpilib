@@ -39,6 +39,15 @@ class PneumaticHub::DataStore {
     m_moduleObject = PneumaticHub{handle, module};
     m_moduleObject.m_dataStore =
         std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
+
+    auto version = m_moduleObject.GetVersion();
+    if (version.FirmwareMajor > 0 && version.FirmwareMajor < 22) {
+      throw FRC_MakeError(
+          err::AssertionFailure,
+          "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
+          "updated to version 2022.0.0 or later using the REV Hardware Client",
+          version.FirmwareMajor, version.FirmwareMinor, version.FirmwareFix);
+    }
   }
 
   ~DataStore() noexcept { HAL_FreeREVPH(m_moduleObject.m_handle); }
