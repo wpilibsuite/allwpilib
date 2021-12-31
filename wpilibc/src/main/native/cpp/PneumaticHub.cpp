@@ -13,6 +13,7 @@
 #include "frc/Errors.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
+#include "frc/fmt/Units.h"
 
 using namespace frc;
 
@@ -117,12 +118,12 @@ void PneumaticHub::EnableCompressorAnalog(
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
-                        minPressure.value());
+                        minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
-                        maxPressure.value());
+                        maxPressure);
   }
   int32_t status = 0;
   units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
@@ -142,12 +143,12 @@ void PneumaticHub::EnableCompressorHybrid(
   if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
-                        minPressure.value());
+                        minPressure);
   }
   if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
-                        maxPressure.value());
+                        maxPressure);
   }
   int32_t status = 0;
   units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
