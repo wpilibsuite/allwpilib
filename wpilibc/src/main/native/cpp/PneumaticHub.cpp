@@ -110,23 +110,23 @@ void PneumaticHub::EnableCompressorDigital() {
 void PneumaticHub::EnableCompressorAnalog(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
-  if (minPressure.value() >= maxPressure.value()) {
+  if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter, "{}",
                         "maxPressure must be greater than minPresure");
   }
-  if (minPressure.value() < 0 || minPressure.value() > 120) {
+  if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
                         minPressure.value());
   }
-  if (maxPressure.value() < 0 || maxPressure.value() > 120) {
+  if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure.value());
   }
   int32_t status = 0;
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, units::volt_t{5.0});
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, units::volt_t{5.0});
+  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
+  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
   HAL_SetREVPHClosedLoopControlAnalog(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);
@@ -135,23 +135,23 @@ void PneumaticHub::EnableCompressorAnalog(
 void PneumaticHub::EnableCompressorHybrid(
     units::pounds_per_square_inch_t minPressure,
     units::pounds_per_square_inch_t maxPressure) {
-  if (minPressure.value() >= maxPressure.value()) {
+  if (minPressure >= maxPressure) {
     throw FRC_MakeError(err::InvalidParameter, "{}",
                         "maxPressure must be greater than minPresure");
   }
-  if (minPressure.value() < 0 || minPressure.value() > 120) {
+  if (minPressure < 0_psi || minPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "minPressure must be between 0 and 120 PSI, got {}",
                         minPressure.value());
   }
-  if (maxPressure.value() < 0 || maxPressure.value() > 120) {
+  if (maxPressure < 0_psi || maxPressure > 120_psi) {
     throw FRC_MakeError(err::ParameterOutOfRange,
                         "maxPressure must be between 0 and 120 PSI, got {}",
                         maxPressure.value());
   }
   int32_t status = 0;
-  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, units::volt_t{5.0});
-  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, units::volt_t{5.0});
+  units::volt_t minAnalogVoltage = PSIToVolts(minPressure, 5_V);
+  units::volt_t maxAnalogVoltage = PSIToVolts(maxPressure, 5_V);
   HAL_SetREVPHClosedLoopControlHybrid(m_handle, minAnalogVoltage.value(),
                                       maxAnalogVoltage.value(), &status);
   FRC_ReportError(status, "Module {}", m_module);

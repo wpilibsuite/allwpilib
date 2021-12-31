@@ -269,7 +269,7 @@ units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
 
 units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
     int channel) const {
-  return units::pounds_per_square_inch_t{0};
+  return 0_psi;
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {
