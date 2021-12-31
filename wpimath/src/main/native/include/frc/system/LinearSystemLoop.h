@@ -54,7 +54,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const Eigen::Vector<double, Inputs>& u) {
-              return frc::NormalizeInputVector<Inputs>(u, maxVoltage.value());
+              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
             },
             dt) {}
 
@@ -99,7 +99,7 @@ class LinearSystemLoop {
       KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
       : LinearSystemLoop(controller, feedforward, observer,
                          [=](const Eigen::Vector<double, Inputs>& u) {
-                           return frc::NormalizeInputVector<Inputs>(
+                           return frc::DesaturateInputVector<Inputs>(
                                u, maxVoltage.value());
                          }) {}
 

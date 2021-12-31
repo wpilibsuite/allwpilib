@@ -153,7 +153,7 @@ public final class StateSpaceUtil {
   }
 
   /**
-   * Normalize all inputs if any excedes the maximum magnitude. Useful for systems such as
+   * Renormalize all inputs if any exceeds the maximum magnitude. Useful for systems such as
    * differential drivetrains.
    *
    * @param u The input vector.
@@ -161,7 +161,7 @@ public final class StateSpaceUtil {
    * @param <I> The number of inputs.
    * @return The normalizedInput
    */
-  public static <I extends Num> Matrix<I, N1> normalizeInputVector(
+  public static <I extends Num> Matrix<I, N1> desaturateInputVector(
       Matrix<I, N1> u, double maxMagnitude) {
     double maxValue = u.maxAbs();
     boolean isCapped = maxValue > maxMagnitude;

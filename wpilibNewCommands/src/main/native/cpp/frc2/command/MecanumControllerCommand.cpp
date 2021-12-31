@@ -278,7 +278,7 @@ void MecanumControllerCommand::Execute() {
       m_controller.Calculate(m_pose(), m_desiredState, m_desiredRotation());
   auto targetWheelSpeeds = m_kinematics.ToWheelSpeeds(targetChassisSpeeds);
 
-  targetWheelSpeeds.Normalize(m_maxWheelVelocity);
+  targetWheelSpeeds.Desaturate(m_maxWheelVelocity);
 
   auto frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeft;
   auto rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeft;

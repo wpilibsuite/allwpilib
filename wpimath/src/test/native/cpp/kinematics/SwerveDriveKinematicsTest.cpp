@@ -162,14 +162,14 @@ TEST_F(SwerveDriveKinematicsTest,
   EXPECT_NEAR(chassisSpeeds.omega.value(), 1.5, kEpsilon);
 }
 
-TEST_F(SwerveDriveKinematicsTest, Normalize) {
+TEST_F(SwerveDriveKinematicsTest, Desaturate) {
   SwerveModuleState state1{5.0_mps, Rotation2d()};
   SwerveModuleState state2{6.0_mps, Rotation2d()};
   SwerveModuleState state3{4.0_mps, Rotation2d()};
   SwerveModuleState state4{7.0_mps, Rotation2d()};
 
   wpi::array<SwerveModuleState, 4> arr{state1, state2, state3, state4};
-  SwerveDriveKinematics<4>::NormalizeWheelSpeeds(&arr, 5.5_mps);
+  SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&arr, 5.5_mps);
 
   double kFactor = 5.5 / 7.0;
 
