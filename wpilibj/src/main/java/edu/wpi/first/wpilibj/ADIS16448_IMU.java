@@ -18,30 +18,36 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import java.nio.ByteBuffer;
 
-//CHECKSTYLE.OFF: TypeName
-//CHECKSTYLE.OFF: MemberName
-//CHECKSTYLE.OFF: SummaryJavadoc
-//CHECKSTYLE.OFF: UnnecessaryParentheses
-//CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
-//CHECKSTYLE.OFF: NonEmptyAtclauseDescription
-//CHECKSTYLE.OFF: MissingOverride
-//CHECKSTYLE.OFF: AtclauseOrder
-//CHECKSTYLE.OFF: LocalVariableName
-//CHECKSTYLE.OFF: RedundantModifier
-//CHECKSTYLE.OFF: AbbreviationAsWordInName
-//CHECKSTYLE.OFF: ParameterName
-//CHECKSTYLE.OFF: EmptyCatchBlock
-//CHECKSTYLE.OFF: MissingJavadocMethod
-//CHECKSTYLE.OFF: MissingSwitchDefault
-//CHECKSTYLE.OFF: VariableDeclarationUsageDistance
-//CHECKSTYLE.OFF: ArrayTypeStyle
+// CHECKSTYLE.OFF: TypeName
+// CHECKSTYLE.OFF: MemberName
+// CHECKSTYLE.OFF: SummaryJavadoc
+// CHECKSTYLE.OFF: UnnecessaryParentheses
+// CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
+// CHECKSTYLE.OFF: NonEmptyAtclauseDescription
+// CHECKSTYLE.OFF: MissingOverride
+// CHECKSTYLE.OFF: AtclauseOrder
+// CHECKSTYLE.OFF: LocalVariableName
+// CHECKSTYLE.OFF: RedundantModifier
+// CHECKSTYLE.OFF: AbbreviationAsWordInName
+// CHECKSTYLE.OFF: ParameterName
+// CHECKSTYLE.OFF: EmptyCatchBlock
+// CHECKSTYLE.OFF: MissingJavadocMethod
+// CHECKSTYLE.OFF: MissingSwitchDefault
+// CHECKSTYLE.OFF: VariableDeclarationUsageDistance
+// CHECKSTYLE.OFF: ArrayTypeStyle
 
 /** This class is for the ADIS16448 IMU that connects to the RoboRIO MXP port. */
-@SuppressWarnings({"unused", "PMD.RedundantFieldInitializer",
-    "PMD.ImmutableField", "PMD.SingularField", "PMD.CollapsibleIfStatements",
-    "PMD.MissingOverride", "PMD.EmptyIfStmt", "PMD.EmptyStatementNotInLoop"})
+@SuppressWarnings({
+  "unused",
+  "PMD.RedundantFieldInitializer",
+  "PMD.ImmutableField",
+  "PMD.SingularField",
+  "PMD.CollapsibleIfStatements",
+  "PMD.MissingOverride",
+  "PMD.EmptyIfStmt",
+  "PMD.EmptyStatementNotInLoop"
+})
 public class ADIS16448_IMU implements Gyro, NTSendable {
   /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
@@ -156,9 +162,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
 
-  /* Previous timestamp */
-  long previous_timestamp = 0;
-
   /* CRC-16 Look-Up Table */
   int adiscrc[] =
       new int[] {
@@ -213,7 +216,11 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     this(IMUAxis.kZ, SPI.Port.kMXP, 4);
   }
 
-  /** */
+  /**
+   * @param yaw_axis The axis that measures the yaw
+   * @param port The SPI Port the gyro is plugged into
+   * @param cal_time Calibration time
+   */
   public ADIS16448_IMU(final IMUAxis yaw_axis, SPI.Port port, int cal_time) {
     m_yaw_axis = yaw_axis;
     m_spi_port = port;
@@ -271,11 +278,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   /** */
-  private static int toUShort(ByteBuffer buf) {
-    return (buf.getShort(0)) & 0xFFFF;
-  }
-
-  /** */
   private static int toUShort(byte[] buf) {
     return (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
   }
@@ -296,11 +298,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   /** */
   private static int toShort(int... buf) {
     return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
-  }
-
-  /** */
-  private static int toShort(byte[] buf) {
-    return buf[0] << 8 | buf[1];
   }
 
   /** */
@@ -466,7 +463,12 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return 0;
   }
 
-  /** */
+  /**
+   * Configures calibration time
+   *
+   * @param new_cal_time New calibration time
+   * @return 1 if the new calibration time is the same as the current one else 0
+   */
   public int configCalTime(int new_cal_time) {
     if (m_calibration_time == new_cal_time) {
       return 1;
@@ -485,12 +487,14 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
     // Set average size to size (correct bad values)
     m_avg_size = size;
-    // Resize vector
-    m_accum_gyro_x = new double[size];
-    m_accum_gyro_y = new double[size];
-    m_accum_gyro_z = new double[size];
-    // Set acculumate count to 0
-    m_accum_count = 0;
+    synchronized (this) {
+      // Resize vector
+      m_accum_gyro_x = new double[size];
+      m_accum_gyro_y = new double[size];
+      m_accum_gyro_z = new double[size];
+      // Set acculumate count to 0
+      m_accum_count = 0;
+    }
   }
 
   /** {@inheritDoc} */
@@ -517,6 +521,12 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
+  /**
+   * Sets the yaw axis
+   *
+   * @param yaw_axis The new yaw axis to use
+   * @return 1 if the new yaw axis is the same as the current one else 0.
+   */
   public int setYawAxis(IMUAxis yaw_axis) {
     if (m_yaw_axis == yaw_axis) {
       return 1;
@@ -908,97 +918,97 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /** @return */
+  /** @return Yaw Axis */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return */
+  /** @return accumulated gyro angle in the X axis */
   public synchronized double getGyroAngleX() {
     return m_integ_gyro_x;
   }
 
-  /** @return */
+  /** @return accumulated gyro angle in the Y axis */
   public synchronized double getGyroAngleY() {
     return m_integ_gyro_y;
   }
 
-  /** @return */
+  /** @return accumulated gyro angle in the Z axis */
   public synchronized double getGyroAngleZ() {
     return m_integ_gyro_z;
   }
 
-  /** @return */
+  /** @return current gyro angle in the X axis */
   public synchronized double getGyroInstantX() {
     return m_gyro_x;
   }
 
-  /** @return */
+  /** @return current gyro angle in the Y axis */
   public synchronized double getGyroInstantY() {
     return m_gyro_y;
   }
 
-  /** @return */
+  /** @return current gyro angle in the Z axis */
   public synchronized double getGyroInstantZ() {
     return m_gyro_z;
   }
 
-  /** @return */
+  /** @return urrent acceleration in the X axis */
   public synchronized double getAccelInstantX() {
     return m_accel_x;
   }
 
-  /** @return */
+  /** @return current acceleration in the Y axis */
   public synchronized double getAccelInstantY() {
     return m_accel_y;
   }
 
-  /** @return */
+  /** @return current acceleration in the Z axis */
   public synchronized double getAccelInstantZ() {
     return m_accel_z;
   }
 
-  /** @return */
+  /** @return Mag instant X */
   public synchronized double getMagInstantX() {
     return m_mag_x;
   }
 
-  /** @return */
+  /** @return Mag instant Y */
   public synchronized double getMagInstantY() {
     return m_mag_y;
   }
 
-  /** @return */
+  /** @return Mag instant Z */
   public synchronized double getMagInstantZ() {
     return m_mag_z;
   }
 
-  /** @return */
+  /** @return X axis complementary angle */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return */
+  /** @return Y axis complementary angle */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return */
+  /** @return X axis filtered acceleration angle */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return */
+  /** @return Y axis filtered acceleration angle */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
-  /** @return */
+  /** @return Barometric Pressure */
   public synchronized double getBarometricPressure() {
     return m_baro;
   }
 
-  /** @return */
+  /** @return Temperature */
   public synchronized double getTemperature() {
     return m_temp;
   }

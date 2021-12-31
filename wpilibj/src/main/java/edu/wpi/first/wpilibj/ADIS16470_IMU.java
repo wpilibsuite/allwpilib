@@ -20,28 +20,35 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-//CHECKSTYLE.OFF: TypeName
-//CHECKSTYLE.OFF: MemberName
-//CHECKSTYLE.OFF: SummaryJavadoc
-//CHECKSTYLE.OFF: UnnecessaryParentheses
-//CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
-//CHECKSTYLE.OFF: NonEmptyAtclauseDescription
-//CHECKSTYLE.OFF: MissingOverride
-//CHECKSTYLE.OFF: AtclauseOrder
-//CHECKSTYLE.OFF: LocalVariableName
-//CHECKSTYLE.OFF: RedundantModifier
-//CHECKSTYLE.OFF: AbbreviationAsWordInName
-//CHECKSTYLE.OFF: ParameterName
-//CHECKSTYLE.OFF: EmptyCatchBlock
-//CHECKSTYLE.OFF: MissingJavadocMethod
-//CHECKSTYLE.OFF: MissingSwitchDefault
-//CHECKSTYLE.OFF: VariableDeclarationUsageDistance
-//CHECKSTYLE.OFF: ArrayTypeStyle
+// CHECKSTYLE.OFF: TypeName
+// CHECKSTYLE.OFF: MemberName
+// CHECKSTYLE.OFF: SummaryJavadoc
+// CHECKSTYLE.OFF: UnnecessaryParentheses
+// CHECKSTYLE.OFF: OverloadMethodsDeclarationOrder
+// CHECKSTYLE.OFF: NonEmptyAtclauseDescription
+// CHECKSTYLE.OFF: MissingOverride
+// CHECKSTYLE.OFF: AtclauseOrder
+// CHECKSTYLE.OFF: LocalVariableName
+// CHECKSTYLE.OFF: RedundantModifier
+// CHECKSTYLE.OFF: AbbreviationAsWordInName
+// CHECKSTYLE.OFF: ParameterName
+// CHECKSTYLE.OFF: EmptyCatchBlock
+// CHECKSTYLE.OFF: MissingJavadocMethod
+// CHECKSTYLE.OFF: MissingSwitchDefault
+// CHECKSTYLE.OFF: VariableDeclarationUsageDistance
+// CHECKSTYLE.OFF: ArrayTypeStyle
 
 /** This class is for the ADIS16470 IMU that connects to the RoboRIO SPI port. */
-@SuppressWarnings({"unused", "PMD.RedundantFieldInitializer",
-    "PMD.ImmutableField", "PMD.SingularField", "PMD.CollapsibleIfStatements",
-    "PMD.MissingOverride", "PMD.EmptyIfStmt", "PMD.EmptyStatementNotInLoop"})
+@SuppressWarnings({
+  "unused",
+  "PMD.RedundantFieldInitializer",
+  "PMD.ImmutableField",
+  "PMD.SingularField",
+  "PMD.CollapsibleIfStatements",
+  "PMD.MissingOverride",
+  "PMD.EmptyIfStmt",
+  "PMD.EmptyStatementNotInLoop"
+})
 public class ADIS16470_IMU implements Gyro, NTSendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
@@ -243,9 +250,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
 
-  // Previous timestamp
-  long previous_timestamp = 0;
-
   private static class AcquireTask implements Runnable {
     private ADIS16470_IMU imu;
 
@@ -264,8 +268,9 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   /**
-   * @param yaw_axis Which axis is Yaw
-   * @param port SPI port to use
+   * @param yaw_axis The axis that measures the yaw
+   * @param port The SPI Port the gyro is plugged into
+   * @param cal_time Calibration time
    */
   public ADIS16470_IMU(IMUAxis yaw_axis, SPI.Port port, ADIS16470CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
@@ -340,26 +345,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   /**
-   * @param buf
-   * @return
-   */
-  private static int toUShort(byte[] buf) {
-    return (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
-  }
-
-  /**
-   * @param data
-   * @return
-   */
-  private static int toUShort(int... data) {
-    byte[] buf = new byte[data.length];
-    for (int i = 0; i < data.length; ++i) {
-      buf[i] = (byte) data[i];
-    }
-    return toUShort(buf);
-  }
-
-  /**
    * @param sint
    * @return
    */
@@ -373,22 +358,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
    */
   private static int toShort(int... buf) {
     return (short) (((buf[0] & 0xFF) << 8) + ((buf[1] & 0xFF) << 0));
-  }
-
-  /**
-   * @param buf
-   * @return
-   */
-  private static int toShort(ByteBuffer buf) {
-    return toShort(buf.get(0), buf.get(1));
-  }
-
-  /**
-   * @param buf
-   * @return
-   */
-  private static int toShort(byte[] buf) {
-    return buf[0] << 8 | buf[1];
   }
 
   /**
@@ -531,8 +500,10 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   /**
-   * @param new_cal_time
-   * @return
+   * Configures calibration time
+   *
+   * @param new_cal_time New calibration time
+   * @return 1 if the new calibration time is the same as the current one else 0
    */
   public int configCalTime(ADIS16470CalibrationTime new_cal_time) {
     if (m_calibration_time == new_cal_time.value) {
@@ -585,8 +556,11 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   /**
-   * @param yaw_axis
-   * @return
+   * Sets the yaw axis
+   *
+   * @param yaw_axis The new yaw axis to use
+   * @return 1 if the new yaw axis is the same as the current one, 2 if the switch to Standard SPI
+   *     failed, else 0.
    */
   public int setYawAxis(IMUAxis yaw_axis) {
     if (m_yaw_axis == yaw_axis) {
@@ -932,57 +906,57 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
     return 0.0;
   }
 
-  /** @return */
+  /** @return Yaw Axis */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return */
+  /** @return current gyro angle in the X direction */
   public synchronized double getGyroInstantX() {
     return m_gyro_x;
   }
 
-  /** @return */
+  /** @return current gyro angle in the Y axis */
   public synchronized double getGyroInstantY() {
     return m_gyro_y;
   }
 
-  /** @return */
+  /** @return current gyro angle in the Z axis */
   public synchronized double getGyroInstantZ() {
     return m_gyro_z;
   }
 
-  /** @return */
+  /** @return current acceleration in the X axis */
   public synchronized double getAccelInstantX() {
     return m_accel_x;
   }
 
-  /** @return */
+  /** @return current acceleration in the Y axis */
   public synchronized double getAccelInstantY() {
     return m_accel_y;
   }
 
-  /** @return */
+  /** @return current acceleration in the Z axis */
   public synchronized double getAccelInstantZ() {
     return m_accel_z;
   }
 
-  /** @return */
+  /** @return X axis complementary angle */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return */
+  /** @return Y axis complementary angle */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return */
+  /** @return X axis filtered acceleration angle */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return */
+  /** @return Y axis filtered acceleration angle */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
