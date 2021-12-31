@@ -8,12 +8,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
 /** Represents a 2d pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Pose2d {
+public class Pose2d implements Interpolatable<Pose2d> {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
@@ -241,5 +242,19 @@ public class Pose2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
+  }
+
+  @Override
+  @SuppressWarnings("ParameterName")
+  public Pose2d interpolate(Pose2d endValue, double t) {
+    if (t < 0) {
+      return this;
+    } else if (t >= 1) {
+      return endValue;
+    } else {
+      var twist = this.log(endValue);
+      var scaledTwist = new Twist2d(twist.dx * t, twist.dy * t, twist.dtheta * t);
+      return this.exp(scaledTwist);
+    }
   }
 }
