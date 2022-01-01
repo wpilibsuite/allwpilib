@@ -72,6 +72,9 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 * wpigui
   * imgui
 
+* ntcore
+  * wpiutil
+
 * glass/libglass
   * wpiutil
   * wpimath
@@ -93,9 +96,6 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpigui
   * libglass
   * libglassnt
-
-* ntcore
-  * wpiutil
 
 * cscore
   * opencv
