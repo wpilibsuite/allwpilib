@@ -34,75 +34,6 @@
 #endif
 
 namespace frc {
-
-/** @brief ADIS16448 Register Map Declaration */
-static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
-static constexpr uint8_t XGYRO_OUT = 0x04;  // X-axis gyroscope output
-static constexpr uint8_t YGYRO_OUT = 0x06;  // Y-axis gyroscope output
-static constexpr uint8_t ZGYRO_OUT = 0x08;  // Z-axis gyroscope output
-static constexpr uint8_t XACCL_OUT = 0x0A;  // X-axis accelerometer output
-static constexpr uint8_t YACCL_OUT = 0x0C;  // Y-axis accelerometer output
-static constexpr uint8_t ZACCL_OUT = 0x0E;  // Z-axis accelerometer output
-static constexpr uint8_t XMAGN_OUT = 0x10;  // X-axis magnetometer output
-static constexpr uint8_t YMAGN_OUT = 0x12;  // Y-axis magnetometer output
-static constexpr uint8_t ZMAGN_OUT = 0x14;  // Z-axis magnetometer output
-static constexpr uint8_t BARO_OUT =
-    0x16;  // Barometer pressure measurement, high word
-static constexpr uint8_t TEMP_OUT = 0x18;  // Temperature output
-static constexpr uint8_t XGYRO_OFF =
-    0x1A;  // X-axis gyroscope bias offset factor
-static constexpr uint8_t YGYRO_OFF =
-    0x1C;  // Y-axis gyroscope bias offset factor
-static constexpr uint8_t ZGYRO_OFF =
-    0x1E;  // Z-axis gyroscope bias offset factor
-static constexpr uint8_t XACCL_OFF =
-    0x20;  // X-axis acceleration bias offset factor
-static constexpr uint8_t YACCL_OFF =
-    0x22;  // Y-axis acceleration bias offset factor
-static constexpr uint8_t ZACCL_OFF =
-    0x24;  // Z-axis acceleration bias offset factor
-static constexpr uint8_t XMAGN_HIC =
-    0x26;  // X-axis magnetometer, hard iron factor
-static constexpr uint8_t YMAGN_HIC =
-    0x28;  // Y-axis magnetometer, hard iron factor
-static constexpr uint8_t ZMAGN_HIC =
-    0x2A;  // Z-axis magnetometer, hard iron factor
-static constexpr uint8_t XMAGN_SIC =
-    0x2C;  // X-axis magnetometer, soft iron factor
-static constexpr uint8_t YMAGN_SIC =
-    0x2E;  // Y-axis magnetometer, soft iron factor
-static constexpr uint8_t ZMAGN_SIC =
-    0x30;  // Z-axis magnetometer, soft iron factor
-static constexpr uint8_t GPIO_CTRL = 0x32;  // GPIO control
-static constexpr uint8_t MSC_CTRL = 0x34;   // MISC control
-static constexpr uint8_t SMPL_PRD =
-    0x36;  // Sample clock/Decimation filter control
-static constexpr uint8_t SENS_AVG = 0x38;    // Digital filter control
-static constexpr uint8_t SEQ_CNT = 0x3A;     // MAGN_OUT and BARO_OUT counter
-static constexpr uint8_t DIAG_STAT = 0x3C;   // System status
-static constexpr uint8_t GLOB_CMD = 0x3E;    // System command
-static constexpr uint8_t ALM_MAG1 = 0x40;    // Alarm 1 amplitude threshold
-static constexpr uint8_t ALM_MAG2 = 0x42;    // Alarm 2 amplitude threshold
-static constexpr uint8_t ALM_SMPL1 = 0x44;   // Alarm 1 sample size
-static constexpr uint8_t ALM_SMPL2 = 0x46;   // Alarm 2 sample size
-static constexpr uint8_t ALM_CTRL = 0x48;    // Alarm control
-static constexpr uint8_t LOT_ID1 = 0x52;     // Lot identification number
-static constexpr uint8_t LOT_ID2 = 0x54;     // Lot identification number
-static constexpr uint8_t PROD_ID = 0x56;     // Product identifier
-static constexpr uint8_t SERIAL_NUM = 0x58;  // Lot-specific serial number
-
-/** @brief ADIS16448 Static Constants */
-const double rad_to_deg = 57.2957795;
-const double deg_to_rad = 0.0174532;
-const double grav = 9.81;
-
-/** @brief struct to store offset data */
-struct offset_data {
-  double m_accum_gyro_x = 0.0;
-  double m_accum_gyro_y = 0.0;
-  double m_accum_gyro_z = 0.0;
-};
-
 /**
  * Use DMA SPI to read rate, acceleration, and magnetometer data from the
  * ADIS16448 IMU and return the robots heading relative to a starting position,
@@ -246,6 +177,74 @@ class ADIS16448_IMU : public nt::NTSendable,
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
  private:
+  /** @brief ADIS16448 Register Map Declaration */
+  static constexpr uint8_t FLASH_CNT = 0x00;  // Flash memory write count
+  static constexpr uint8_t XGYRO_OUT = 0x04;  // X-axis gyroscope output
+  static constexpr uint8_t YGYRO_OUT = 0x06;  // Y-axis gyroscope output
+  static constexpr uint8_t ZGYRO_OUT = 0x08;  // Z-axis gyroscope output
+  static constexpr uint8_t XACCL_OUT = 0x0A;  // X-axis accelerometer output
+  static constexpr uint8_t YACCL_OUT = 0x0C;  // Y-axis accelerometer output
+  static constexpr uint8_t ZACCL_OUT = 0x0E;  // Z-axis accelerometer output
+  static constexpr uint8_t XMAGN_OUT = 0x10;  // X-axis magnetometer output
+  static constexpr uint8_t YMAGN_OUT = 0x12;  // Y-axis magnetometer output
+  static constexpr uint8_t ZMAGN_OUT = 0x14;  // Z-axis magnetometer output
+  static constexpr uint8_t BARO_OUT =
+      0x16;  // Barometer pressure measurement, high word
+  static constexpr uint8_t TEMP_OUT = 0x18;  // Temperature output
+  static constexpr uint8_t XGYRO_OFF =
+      0x1A;  // X-axis gyroscope bias offset factor
+  static constexpr uint8_t YGYRO_OFF =
+      0x1C;  // Y-axis gyroscope bias offset factor
+  static constexpr uint8_t ZGYRO_OFF =
+      0x1E;  // Z-axis gyroscope bias offset factor
+  static constexpr uint8_t XACCL_OFF =
+      0x20;  // X-axis acceleration bias offset factor
+  static constexpr uint8_t YACCL_OFF =
+      0x22;  // Y-axis acceleration bias offset factor
+  static constexpr uint8_t ZACCL_OFF =
+      0x24;  // Z-axis acceleration bias offset factor
+  static constexpr uint8_t XMAGN_HIC =
+      0x26;  // X-axis magnetometer, hard iron factor
+  static constexpr uint8_t YMAGN_HIC =
+      0x28;  // Y-axis magnetometer, hard iron factor
+  static constexpr uint8_t ZMAGN_HIC =
+      0x2A;  // Z-axis magnetometer, hard iron factor
+  static constexpr uint8_t XMAGN_SIC =
+      0x2C;  // X-axis magnetometer, soft iron factor
+  static constexpr uint8_t YMAGN_SIC =
+      0x2E;  // Y-axis magnetometer, soft iron factor
+  static constexpr uint8_t ZMAGN_SIC =
+      0x30;  // Z-axis magnetometer, soft iron factor
+  static constexpr uint8_t GPIO_CTRL = 0x32;  // GPIO control
+  static constexpr uint8_t MSC_CTRL = 0x34;   // MISC control
+  static constexpr uint8_t SMPL_PRD =
+      0x36;  // Sample clock/Decimation filter control
+  static constexpr uint8_t SENS_AVG = 0x38;    // Digital filter control
+  static constexpr uint8_t SEQ_CNT = 0x3A;     // MAGN_OUT and BARO_OUT counter
+  static constexpr uint8_t DIAG_STAT = 0x3C;   // System status
+  static constexpr uint8_t GLOB_CMD = 0x3E;    // System command
+  static constexpr uint8_t ALM_MAG1 = 0x40;    // Alarm 1 amplitude threshold
+  static constexpr uint8_t ALM_MAG2 = 0x42;    // Alarm 2 amplitude threshold
+  static constexpr uint8_t ALM_SMPL1 = 0x44;   // Alarm 1 sample size
+  static constexpr uint8_t ALM_SMPL2 = 0x46;   // Alarm 2 sample size
+  static constexpr uint8_t ALM_CTRL = 0x48;    // Alarm control
+  static constexpr uint8_t LOT_ID1 = 0x52;     // Lot identification number
+  static constexpr uint8_t LOT_ID2 = 0x54;     // Lot identification number
+  static constexpr uint8_t PROD_ID = 0x56;     // Product identifier
+  static constexpr uint8_t SERIAL_NUM = 0x58;  // Lot-specific serial number
+
+  /** @brief ADIS16448 Static Constants */
+  static constexpr double rad_to_deg = 57.2957795;
+  static constexpr double deg_to_rad = 0.0174532;
+  static constexpr double grav = 9.81;
+
+  /** @brief struct to store offset data */
+  struct offset_data {
+    double m_accum_gyro_x = 0.0;
+    double m_accum_gyro_y = 0.0;
+    double m_accum_gyro_z = 0.0;
+  };
+
   bool SwitchToStandardSPI();
 
   bool SwitchToAutoSPI();
