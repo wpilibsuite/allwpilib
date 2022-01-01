@@ -70,18 +70,18 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 * wpiutil
 
 * wpigui
-  *imgui
+  * imgui
 
 * glass/libglass
-  *wpiutil
-  *wpimath
-  *wpigui
+  * wpiutil
+  * wpimath
+  * wpigui
 
 * glass/libglassnt
-  *wpiutil
-  *ntcore
-  *wpimath
-  *wpigui
+  * wpiutil
+  * ntcore
+  * wpimath
+  * wpigui
 
 * hal
   * wpiutil
