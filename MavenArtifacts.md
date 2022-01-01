@@ -69,12 +69,30 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
 
 * wpiutil
 
+* wpigui
+  *imgui
+
+* glass/libglass
+  *wpiutil
+  *wpimath
+  *wpigui
+
+* glass/libglassnt
+  *wpiutil
+  *ntcore
+  *wpimath
+  *wpigui
+
 * hal
   * wpiutil
 
 * halsim
-  * imgui
   * wpiutil
+  * ntcore
+  * wpimath
+  * wpigui
+  * libglass
+  * libglassnt
 
 * ntcore
   * wpiutil
@@ -111,13 +129,14 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cscore
   * wpiutil
 
-* wpilibNewCommands
+* wpilibOldCommands
   * wpilibc
   * hal
   * cameraserver
   * ntcore
   * cscore
   * wpiutil
+
 
 ### Third Party Artifacts
 
@@ -128,3 +147,4 @@ All artifacts are based at `edu.wpi.first.thirdparty.frcYEAR` in the repository.
 * googletest
 * imgui
 * opencv
+* libssh
