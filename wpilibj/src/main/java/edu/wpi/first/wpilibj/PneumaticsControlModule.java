@@ -235,12 +235,12 @@ public class PneumaticsControlModule implements PneumaticsBase {
   }
 
   @Override
-  public void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorAnalog(double minPressure, double maxPressure) {
     CTREPCMJNI.setClosedLoopControl(m_handle, false);
   }
 
   @Override
-  public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorHybrid(double minPressure, double maxPressure) {
     CTREPCMJNI.setClosedLoopControl(m_handle, false);
   }
 
@@ -253,6 +253,11 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public double getAnalogVoltage(int channel) {
+    return 0;
+  }
+
+  @Override
+  public double getPressure(int channel) {
     return 0;
   }
 }
