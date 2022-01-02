@@ -13,19 +13,18 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotPeriodic() override {
-    frc::DriverStation& ds = frc::DriverStation::GetInstance();
-
     // pull alliance port high if on red alliance, pull low if on blue alliance
-    m_allianceOutput.Set(ds.GetAlliance() == frc::DriverStation::kRed);
+    m_allianceOutput.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::kRed);
 
     // pull enabled port high if enabled, low if disabled
-    m_enabledOutput.Set(ds.IsEnabled());
+    m_enabledOutput.Set(frc::DriverStation::IsEnabled());
 
     // pull auto port high if in autonomous, low if in teleop (or disabled)
-    m_autonomousOutput.Set(ds.IsAutonomous());
+    m_autonomousOutput.Set(frc::DriverStation::IsAutonomous());
 
     // pull alert port high if match time remaining is between 30 and 25 seconds
-    m_alertOutput.Set(ds.GetMatchTime() <= 30 && ds.GetMatchTime() >= 25);
+    auto matchTime = frc::DriverStation::GetMatchTime();
+    m_alertOutput.Set(matchTime <= 30 && matchTime >= 25);
   }
 
  private:

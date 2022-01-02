@@ -26,18 +26,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    DriverStation driverStation = DriverStation.getInstance();
-
     // pull alliance port high if on red alliance, pull low if on blue alliance
-    m_allianceOutput.set(driverStation.getAlliance() == DriverStation.Alliance.Red);
+    m_allianceOutput.set(DriverStation.getAlliance() == DriverStation.Alliance.Red);
 
     // pull enabled port high if enabled, low if disabled
-    m_enabledOutput.set(driverStation.isEnabled());
+    m_enabledOutput.set(DriverStation.isEnabled());
 
     // pull auto port high if in autonomous, low if in teleop (or disabled)
-    m_autonomousOutput.set(driverStation.isAutonomous());
+    m_autonomousOutput.set(DriverStation.isAutonomous());
 
     // pull alert port high if match time remaining is between 30 and 25 seconds
-    m_alertOutput.set(driverStation.getMatchTime() <= 30 && driverStation.getMatchTime() >= 25);
+    var matchTime = DriverStation.getMatchTime();
+    m_alertOutput.set(matchTime <= 30 && matchTime >= 25);
   }
 }

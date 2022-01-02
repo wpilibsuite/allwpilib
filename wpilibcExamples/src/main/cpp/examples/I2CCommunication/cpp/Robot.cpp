@@ -28,15 +28,15 @@ class Robot : public frc::TimedRobot {
     // alliance, enabled in teleop mode, with 43 seconds left in the match.
     wpi::SmallString<128> data;
     wpi::raw_svector_ostream os(data);
-    os << (m_ds.GetAlliance() == frc::DriverStation::Alliance::kRed ? "R" : "B")
-       << (m_ds.IsEnabled() ? "E" : "D") << (m_ds.IsAutonomous() ? "A" : "T")
-       << wpi::format("%03d", m_ds.GetMatchTime());
+    os << (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? "R" : "B")
+       << (frc::DriverStation::IsEnabled() ? "E" : "D") << (frc::DriverStation::IsAutonomous() ? "A" : "T")
+       << wpi::format("%03d", frc::DriverStation::GetMatchTime());
 
     arduino.WriteBulk(reinterpret_cast<uint8_t*>(data.data()), data.size());
   }
 
  private:
-  int deviceAddress = 4;
+  static constexpr int deviceAddress = 4;
   frc::I2C arduino{frc::I2C::Port::kOnboard, deviceAddress};
 };
 

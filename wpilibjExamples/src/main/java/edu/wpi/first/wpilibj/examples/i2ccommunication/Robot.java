@@ -35,8 +35,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    DriverStation driverStation = DriverStation.getInstance();
-
     // Creates a string to hold current robot state information, including
     // alliance, enabled state, operation mode, and match time. The message
     // is sent in format "AEM###" where A is the alliance color, (R)ed or
@@ -49,10 +47,10 @@ public class Robot extends TimedRobot {
     StringBuilder stateMessage = new StringBuilder(6);
 
     stateMessage
-            .append(driverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
-            .append(driverStation.isEnabled() ? "E" : "D")
-            .append(driverStation.isAutonomous() ? "A" : "T")
-            .append(String.format("%03d" , (int) driverStation.getMatchTime()));
+            .append(DriverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
+            .append(DriverStation.isEnabled() ? "E" : "D")
+            .append(DriverStation.isAutonomous() ? "A" : "T")
+            .append(String.format("%03d" , (int) DriverStation.getMatchTime()));
 
     writeString(stateMessage.toString());
   }
