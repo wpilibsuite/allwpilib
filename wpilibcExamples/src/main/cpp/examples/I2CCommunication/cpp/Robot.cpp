@@ -5,7 +5,7 @@
 #include <frc/DriverStation.h>
 #include <frc/I2C.h>
 #include <frc/TimedRobot.h>
-#include <wpi/Format.h>
+#include <fmt/format.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringRef.h>
 #include <wpi/raw_ostream.h>
@@ -30,7 +30,7 @@ class Robot : public frc::TimedRobot {
     wpi::raw_svector_ostream os(data);
     os << (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? "R" : "B")
        << (frc::DriverStation::IsEnabled() ? "E" : "D") << (frc::DriverStation::IsAutonomous() ? "A" : "T")
-       << wpi::format("%03d", frc::DriverStation::GetMatchTime());
+       << fmt::format("%03d", frc::DriverStation::GetMatchTime());
 
     arduino.WriteBulk(reinterpret_cast<uint8_t*>(data.data()), data.size());
   }
