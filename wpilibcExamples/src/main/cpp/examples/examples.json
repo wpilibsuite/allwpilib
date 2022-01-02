@@ -551,7 +551,7 @@
     ],
     "foldername": "DriveDistanceOffboard",
     "gradlebase": "cpp",
-    "commandversion": 2,
+    "commandversion": 2
   },
   {
     "name": "RamseteController",
@@ -723,7 +723,6 @@
       "Field2d"
     ],
     "foldername": "SimpleDifferentialDriveSimulation",
-    "commandversion": 1,
     "gradlebase": "cpp",
     "mainclass": "Main",
     "commandversion": 2
