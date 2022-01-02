@@ -4,6 +4,8 @@
 
 #include "hal/REVPH.h"
 
+#include <thread>
+
 #include <fmt/format.h>
 
 #include "HALInitializer.h"
@@ -487,8 +489,15 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
-  HAL_ReadCANPacketTimeout(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
-                           &timestamp, kDefaultControlPeriod * 2, status);
+  uint32_t timeoutMs = 100;
+  for (uint32_t i = 0; i <= timeoutMs; i++) {
+    HAL_ReadCANPacketNew(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
+    if (*status == 0) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 
   if (*status != 0) {
     return;

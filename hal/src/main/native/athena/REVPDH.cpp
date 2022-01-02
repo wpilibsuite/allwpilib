@@ -11,6 +11,7 @@
 #include <hal/handles/IndexedHandleResource.h>
 
 #include <cstring>
+#include <thread>
 
 #include <fmt/format.h>
 
@@ -497,9 +498,15 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
-  HAL_ReadCANPacketTimeout(hpdh->hcan, PDH_VERSION_FRAME_API, packedData,
-                           &length, &timestamp, kDefaultControlPeriod * 2,
-                           status);
+  uint32_t timeoutMs = 100;
+  for (uint32_t i = 0; i <= timeoutMs; i++) {
+    HAL_ReadCANPacketNew(hpdh->hcan, PDH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
+    if (*status == 0) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 
   if (*status != 0) {
     return;
