@@ -38,10 +38,11 @@ using namespace glass;
 namespace gui = wpi::gui;
 
 namespace {
-
+// Enum for length display units
 enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 
 // Per-frame field data (not persistent)
+// Handles conversion between screen coordinates and field coordinates.
 struct FieldFrameData {
   frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {
@@ -63,6 +64,7 @@ struct FieldFrameData {
 };
 
 // Pose drag target info
+
 struct SelectedTargetInfo {
   FieldObjectModel* objModel = nullptr;
   std::string name;
@@ -83,6 +85,7 @@ struct PoseDragState {
 };
 
 // Popup edit state
+// For both editing existing pose targets and inserting new poses.
 class PopupState {
  public:
   void Open(SelectedTargetInfo* target, const frc::Translation2d& pos);
@@ -107,6 +110,7 @@ class PopupState {
   int m_insertIndex;
 };
 
+// Graphics options for displaying path
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
@@ -362,7 +366,7 @@ FieldInfo::FieldInfo() {
       "robotWidth", DisplayOptions::kDefaultWidth.to<float>());
   m_pRobotLength = storage.GetFloatRef(
       "robotHeight", DisplayOptions::kDefaultLength.to<float>());
-  m_pSelectedName = storage.getStringRef("selected", "");
+  m_pSelectedName = storage.GetStringRef("selected", "");
 }
 
 void FieldInfo::DisplaySettings() {
@@ -381,9 +385,6 @@ void FieldInfo::DisplaySettings() {
   InputFloatLength("Field Height", m_pHeight);
   InputFloatLength("Robot Width", m_pRobotWidth);
   InputFloatLength("Robot Length", m_pRobotLength);
-  ImGui::BeginCombo("Selected Object");
-
-  ImGui::EndCombo();
   // ImGui::InputInt("Field Top", m_pTop);
   // ImGui::InputInt("Field Left", m_pLeft);
   // ImGui::InputInt("Field Right", m_pRight);
