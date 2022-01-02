@@ -36,6 +36,7 @@ struct REV_PDHObj {
   int32_t controlPeriod;
   HAL_CANHandle hcan;
   std::string previousAllocation;
+  HAL_PowerDistributionVersion versionInfo;
 };
 
 }  // namespace
@@ -491,6 +492,18 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
+  if (hpdh->versionInfo.firmwareMajor > 0) {
+    version->firmwareMajor = hpdh->versionInfo.firmwareMajor;
+    version->firmwareMinor = hpdh->versionInfo.firmwareMinor;
+    version->firmwareFix = hpdh->versionInfo.firmwareFix;
+    version->hardwareMajor = hpdh->versionInfo.hardwareMajor;
+    version->hardwareMinor = hpdh->versionInfo.hardwareMinor;
+    version->uniqueId = hpdh->versionInfo.uniqueId;
+
+    *status = 0;
+    return;
+  }
+
   HAL_WriteCANRTRFrame(hpdh->hcan, PDH_VERSION_LENGTH, PDH_VERSION_FRAME_API,
                        status);
 
@@ -520,6 +533,7 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
+  hpdh->versionInfo = version;
 }
 
 void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle,

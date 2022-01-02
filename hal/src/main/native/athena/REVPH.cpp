@@ -65,6 +65,7 @@ struct REV_PHObj {
   wpi::mutex solenoidLock;
   HAL_CANHandle hcan;
   std::string previousAllocation;
+  HAL_REVPHVersion versionInfo;
 };
 
 }  // namespace
@@ -482,6 +483,18 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
+  if (ph->versionInfo.firmwareMajor > 0) {
+    version->firmwareMajor = ph->versionInfo.firmwareMajor;
+    version->firmwareMinor = ph->versionInfo.firmwareMinor;
+    version->firmwareFix = ph->versionInfo.firmwareFix;
+    version->hardwareMajor = ph->versionInfo.hardwareMajor;
+    version->hardwareMinor = ph->versionInfo.hardwareMinor;
+    version->uniqueId = ph->versionInfo.uniqueId;
+
+    *status = 0;
+    return;
+  }
+
   HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_LENGTH, PH_VERSION_FRAME_API,
                        status);
 
@@ -511,6 +524,7 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
+  ph->versionInfo = version;
 }
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
