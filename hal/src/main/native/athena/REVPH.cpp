@@ -524,7 +524,13 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
-  ph->versionInfo = version;
+
+  ph->versionInfo->firmwareMajor = version->firmwareMajor;
+  ph->versionInfo->firmwareMinor = version->firmwareMinor;
+  ph->versionInfo->firmwareFix = version->firmwareFix;
+  ph->versionInfo->hardwareMajor = version->hardwareMajor;
+  ph->versionInfo->hardwareMinor = version->hardwareMinor;
+  ph->versionInfo->uniqueId = version->uniqueId;
 }
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {

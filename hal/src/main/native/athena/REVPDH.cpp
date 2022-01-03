@@ -533,7 +533,13 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
-  hpdh->versionInfo = version;
+  
+  hpdh->versionInfo->firmwareMajor = version->firmwareMajor;
+  hpdh->versionInfo->firmwareMinor = version->firmwareMinor;
+  hpdh->versionInfo->firmwareFix = version->firmwareFix;
+  hpdh->versionInfo->hardwareMajor = version->hardwareMajor;
+  hpdh->versionInfo->hardwareMinor = version->hardwareMinor;
+  hpdh->versionInfo->uniqueId = version->uniqueId;
 }
 
 void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle,
