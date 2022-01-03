@@ -76,6 +76,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpiutil
 
 * wpimath
+  * wpiutil
 
 * glass/libglass
   * wpiutil
@@ -121,6 +122,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
   * wpiutil
 
 * wpilibNewCommands
@@ -129,6 +131,7 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * cameraserver
   * ntcore
   * cscore
+  * wpimath
   * wpiutil
 
 * wpilibOldCommands
