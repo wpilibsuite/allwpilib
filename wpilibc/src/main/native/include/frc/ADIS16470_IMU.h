@@ -23,6 +23,7 @@
 #include <memory>
 #include <thread>
 
+#include <hal/SimDevice.h>
 #include <networktables/NTSendable.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
@@ -134,17 +135,17 @@ class ADIS16470_IMU : public nt::NTSendable,
 
   double GetRate() const;
 
-  double GetGyroInstantX() const;
+  double GetGyroRateX() const;
 
-  double GetGyroInstantY() const;
+  double GetGyroRateY() const;
 
-  double GetGyroInstantZ() const;
+  double GetGyroRateZ() const;
 
-  double GetAccelInstantX() const;
+  double GetAccelX() const;
 
-  double GetAccelInstantY() const;
+  double GetAccelY() const;
 
-  double GetAccelInstantZ() const;
+  double GetAccelZ() const;
 
   double GetXComplementaryAngle() const;
 
@@ -160,6 +161,13 @@ class ADIS16470_IMU : public nt::NTSendable,
 
   // IMU yaw axis
   IMUAxis m_yaw_axis;
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  int GetPort() const;
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
@@ -367,6 +375,17 @@ class ADIS16470_IMU : public nt::NTSendable,
   double m_scaled_sample_rate = 2500.0;  // Default sample rate setting
 
   std::thread m_acquire_task;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simGyroAngleX;
+  hal::SimDouble m_simGyroAngleY;
+  hal::SimDouble m_simGyroAngleZ;
+  hal::SimDouble m_simGyroRateX;
+  hal::SimDouble m_simGyroRateY;
+  hal::SimDouble m_simGyroRateZ;
+  hal::SimDouble m_simAccelX;
+  hal::SimDouble m_simAccelY;
+  hal::SimDouble m_simAccelZ;
 
   struct NonMovableMutexWrapper {
     wpi::mutex mutex;

@@ -15,6 +15,8 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -162,6 +164,17 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
 
+  private SimDevice m_simDevice;
+  private SimDouble m_simGyroAngleX;
+  private SimDouble m_simGyroAngleY;
+  private SimDouble m_simGyroAngleZ;
+  private SimDouble m_simGyroRateX;
+  private SimDouble m_simGyroRateY;
+  private SimDouble m_simGyroRateZ;
+  private SimDouble m_simAccelX;
+  private SimDouble m_simAccelY;
+  private SimDouble m_simAccelZ;
+
   /* CRC-16 Look-Up Table */
   int adiscrc[] =
       new int[] {
@@ -227,52 +240,68 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
 
     m_acquire_task = new Thread(new AcquireTask(this));
 
-    // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
-    m_reset_out = new DigitalOutput(18); // Drive MXP DIO8 low
-    Timer.delay(0.01); // Wait 10ms
-    m_reset_out.close();
-    m_reset_in = new DigitalInput(18); // Set MXP DIO8 high
-    Timer.delay(0.25); // Wait 250ms
-
-    configCalTime(cal_time);
-
-    if (!switchToStandardSPI()) {
-      return;
+    m_simDevice = SimDevice.create("Gyro:ADIS16448", port.value);
+    if (m_simDevice != null) {
+      m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
+      m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
+      m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
+      m_simAccelX = m_simDevice.createDouble("accel_x", SimDevice.Direction.kInput, 0.0);
+      m_simAccelY = m_simDevice.createDouble("accel_y", SimDevice.Direction.kInput, 0.0);
+      m_simAccelZ = m_simDevice.createDouble("accel_z", SimDevice.Direction.kInput, 0.0);
     }
 
-    // Set IMU internal decimation to 819.2 SPS
-    writeRegister(SMPL_PRD, 0x0001);
-    // Enable Data Ready (LOW = Good Data) on DIO1 (PWM0 on MXP)
-    writeRegister(MSC_CTRL, 0x0016);
-    // Disable IMU internal Bartlett filter
-    writeRegister(SENS_AVG, 0x0400);
-    // Clear offset registers
-    writeRegister(XGYRO_OFF, 0x0000);
-    writeRegister(YGYRO_OFF, 0x0000);
-    writeRegister(ZGYRO_OFF, 0x0000);
+    if (m_simDevice == null) {
+      // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
+      m_reset_out = new DigitalOutput(18); // Drive MXP DIO8 low
+      Timer.delay(0.01); // Wait 10ms
+      m_reset_out.close();
+      m_reset_in = new DigitalInput(18); // Set MXP DIO8 high
+      Timer.delay(0.25); // Wait 250ms
 
-    // Configure standard SPI
-    if (!switchToAutoSPI()) {
-      return;
+      configCalTime(cal_time);
+
+      if (!switchToStandardSPI()) {
+        return;
+      }
+
+      // Set IMU internal decimation to 819.2 SPS
+      writeRegister(SMPL_PRD, 0x0001);
+      // Enable Data Ready (LOW = Good Data) on DIO1 (PWM0 on MXP)
+      writeRegister(MSC_CTRL, 0x0016);
+      // Disable IMU internal Bartlett filter
+      writeRegister(SENS_AVG, 0x0400);
+      // Clear offset registers
+      writeRegister(XGYRO_OFF, 0x0000);
+      writeRegister(YGYRO_OFF, 0x0000);
+      writeRegister(ZGYRO_OFF, 0x0000);
+
+      // Configure standard SPI
+      if (!switchToAutoSPI()) {
+        return;
+      }
+      // Notify DS that IMU calibration delay is active
+      DriverStation.reportWarning(
+          "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
+      // Wait for whatever time the user set as the start-up delay
+      try {
+        Thread.sleep((long) (m_calibration_time * 1.2 * 1000));
+      } catch (InterruptedException e) {
+      }
+      // Execute calibration routine
+      calibrate();
+      // Reset accumulated offsets
+      reset();
+      // Tell the acquire loop that we're done starting up
+      m_start_up_mode = false;
+      // Let the user know the IMU was initiallized successfully
+      DriverStation.reportWarning("ADIS16448 IMU Successfully Initialized!", false);
+      // Drive MXP PWM5 (IMU ready LED) low (active low)
+      m_status_led = new DigitalOutput(19);
     }
-    // Notify DS that IMU calibration delay is active
-    DriverStation.reportWarning(
-        "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
-    // Wait for whatever time the user set as the start-up delay
-    try {
-      Thread.sleep((long) (m_calibration_time * 1.2 * 1000));
-    } catch (InterruptedException e) {
-    }
-    // Execute calibration routine
-    calibrate();
-    // Reset accumulated offsets
-    reset();
-    // Tell the acquire loop that we're done starting up
-    m_start_up_mode = false;
-    // Let the user know the IMU was initiallized successfully
-    DriverStation.reportWarning("ADIS16448 IMU Successfully Initialized!", false);
-    // Drive MXP PWM5 (IMU ready LED) low (active low)
-    m_status_led = new DigitalOutput(19);
+
     // Report usage and post data to DS
     HAL.report(tResourceType.kResourceType_ADIS16448, 0);
   }
@@ -908,11 +937,11 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   public synchronized double getRate() {
     switch (m_yaw_axis) {
       case kX:
-        return getGyroInstantX();
+        return getGyroRateX();
       case kY:
-        return getGyroInstantY();
+        return getGyroRateY();
       case kZ:
-        return getGyroInstantZ();
+        return getGyroRateZ();
       default:
         return 0.0;
     }
@@ -925,46 +954,73 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
 
   /** @return accumulated gyro angle in the X axis */
   public synchronized double getGyroAngleX() {
+    if (m_simGyroAngleX != null) {
+      return m_simGyroAngleX.get();
+    }
     return m_integ_gyro_x;
   }
 
   /** @return accumulated gyro angle in the Y axis */
   public synchronized double getGyroAngleY() {
+    if (m_simGyroAngleY != null) {
+      return m_simGyroAngleY.get();
+    }
     return m_integ_gyro_y;
   }
 
   /** @return accumulated gyro angle in the Z axis */
   public synchronized double getGyroAngleZ() {
+    if (m_simGyroAngleZ != null) {
+      return m_simGyroAngleZ.get();
+    }
     return m_integ_gyro_z;
   }
 
   /** @return current gyro angle in the X axis */
-  public synchronized double getGyroInstantX() {
+  public synchronized double getGyroRateX() {
+    if (m_simGyroRateX != null) {
+      return m_simGyroRateX.get();
+    }
     return m_gyro_x;
   }
 
   /** @return current gyro angle in the Y axis */
-  public synchronized double getGyroInstantY() {
+  public synchronized double getGyroRateY() {
+    if (m_simGyroRateY != null) {
+      return m_simGyroRateY.get();
+    }
     return m_gyro_y;
   }
 
   /** @return current gyro angle in the Z axis */
-  public synchronized double getGyroInstantZ() {
+  public synchronized double getGyroRateZ() {
+    if (m_simGyroRateZ != null) {
+      return m_simGyroRateZ.get();
+    }
     return m_gyro_z;
   }
 
   /** @return urrent acceleration in the X axis */
-  public synchronized double getAccelInstantX() {
+  public synchronized double getAccelX() {
+    if (m_simAccelX != null) {
+      return m_simAccelX.get();
+    }
     return m_accel_x;
   }
 
   /** @return current acceleration in the Y axis */
-  public synchronized double getAccelInstantY() {
+  public synchronized double getAccelY() {
+    if (m_simAccelY != null) {
+      return m_simAccelY.get();
+    }
     return m_accel_y;
   }
 
   /** @return current acceleration in the Z axis */
-  public synchronized double getAccelInstantZ() {
+  public synchronized double getAccelZ() {
+    if (m_simAccelZ != null) {
+      return m_simAccelZ.get();
+    }
     return m_accel_z;
   }
 
@@ -1011,6 +1067,15 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   /** @return Temperature */
   public synchronized double getTemperature() {
     return m_temp;
+  }
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  public int getPort() {
+    return m_spi_port.value;
   }
 
   @Override
