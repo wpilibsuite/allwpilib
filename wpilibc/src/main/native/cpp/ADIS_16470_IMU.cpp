@@ -69,54 +69,79 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
                              CalibrationTime cal_time)
     : m_yaw_axis(yaw_axis),
       m_spi_port(port),
-      m_calibration_time(static_cast<uint16_t>(cal_time)) {
-  // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
-  // Relies on the RIO hardware by default configuring an output as low
-  // and configuring an input as high Z. The 10k pull-up resistor internal to
-  // the IMU then forces the reset line high for normal operation.
-  DigitalOutput* m_reset_out =
-      new DigitalOutput(27);  // Drive SPI CS2 (IMU RST) low
-  Wait(10_ms);                // Wait 10ms
-  delete m_reset_out;
-  new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
-  Wait(500_ms);          // Wait 500ms for reset to complete
-
-  // Configure standard SPI
-  if (!SwitchToStandardSPI()) {
-    return;
+      m_calibration_time(static_cast<uint16_t>(cal_time)),
+      m_simDevice("Gyro:ADIS16470", port) {
+  if (m_simDevice) {
+    m_simGyroAngleX =
+        m_simDevice.CreateDouble("gyro_angle_x", hal::SimDevice::kInput, 0.0);
+    m_simGyroAngleY =
+        m_simDevice.CreateDouble("gyro_angle_y", hal::SimDevice::kInput, 0.0);
+    m_simGyroAngleZ =
+        m_simDevice.CreateDouble("gyro_angle_z", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateX =
+        m_simDevice.CreateDouble("gyro_rate_x", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateY =
+        m_simDevice.CreateDouble("gyro_rate_y", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateZ =
+        m_simDevice.CreateDouble("gyro_rate_z", hal::SimDevice::kInput, 0.0);
+    m_simAccelX =
+        m_simDevice.CreateDouble("accel_x", hal::SimDevice::kInput, 0.0);
+    m_simAccelY =
+        m_simDevice.CreateDouble("accel_y", hal::SimDevice::kInput, 0.0);
+    m_simAccelZ =
+        m_simDevice.CreateDouble("accel_z", hal::SimDevice::kInput, 0.0);
   }
 
-  // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) =
-  // 400Hz)
-  WriteRegister(DEC_RATE, 0x0004);
-  // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and
-  // PoP
-  WriteRegister(MSC_CTRL, 0x0001);
-  // Configure IMU internal Bartlett filter
-  WriteRegister(FILT_CTRL, 0x0000);
-  // Configure continuous bias calibration time based on user setting
-  WriteRegister(NULL_CNFG, m_calibration_time | 0x700);
+  if (!m_simDevice) {
+    // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
+    // Relies on the RIO hardware by default configuring an output as low
+    // and configuring an input as high Z. The 10k pull-up resistor internal to
+    // the IMU then forces the reset line high for normal operation.
+    DigitalOutput* m_reset_out =
+        new DigitalOutput(27);  // Drive SPI CS2 (IMU RST) low
+    Wait(10_ms);                // Wait 10ms
+    delete m_reset_out;
+    new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
+    Wait(500_ms);          // Wait 500ms for reset to complete
 
-  // Notify DS that IMU calibration delay is active
-  REPORT_WARNING("ADIS16470 IMU Detected. Starting initial calibration delay.");
+    // Configure standard SPI
+    if (!SwitchToStandardSPI()) {
+      return;
+    }
 
-  // Wait for samples to accumulate internal to the IMU (110% of user-defined
-  // time)
-  Wait(units::second_t{pow(2, m_calibration_time) / 2000 * 64 * 1.1});
+    // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1)
+    // = 400Hz)
+    WriteRegister(DEC_RATE, 0x0004);
+    // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation
+    // and PoP
+    WriteRegister(MSC_CTRL, 0x0001);
+    // Configure IMU internal Bartlett filter
+    WriteRegister(FILT_CTRL, 0x0000);
+    // Configure continuous bias calibration time based on user setting
+    WriteRegister(NULL_CNFG, m_calibration_time | 0x700);
 
-  // Write offset calibration command to IMU
-  WriteRegister(GLOB_CMD, 0x0001);
+    // Notify DS that IMU calibration delay is active
+    REPORT_WARNING(
+        "ADIS16470 IMU Detected. Starting initial calibration delay.");
 
-  // Configure and enable auto SPI
-  if (!SwitchToAutoSPI()) {
-    return;
+    // Wait for samples to accumulate internal to the IMU (110% of user-defined
+    // time)
+    Wait(units::second_t{pow(2, m_calibration_time) / 2000 * 64 * 1.1});
+
+    // Write offset calibration command to IMU
+    WriteRegister(GLOB_CMD, 0x0001);
+
+    // Configure and enable auto SPI
+    if (!SwitchToAutoSPI()) {
+      return;
+    }
+
+    // Let the user know the IMU was initiallized successfully
+    REPORT_WARNING("ADIS16470 IMU Successfully Initialized!");
+
+    // Drive SPI CS3 (IMU ready LED) low (active low)
+    new DigitalOutput(28);
   }
-
-  // Let the user know the IMU was initiallized successfully
-  REPORT_WARNING("ADIS16470 IMU Successfully Initialized!");
-
-  // Drive SPI CS3 (IMU ready LED) low (active low)
-  new DigitalOutput(28);
 
   // Report usage and post data to DS
   HAL_Report(HALUsageReporting::kResourceType_ADIS16470, 0);
@@ -708,6 +733,23 @@ double ADIS16470_IMU::CompFilterProcess(double compAngle, double accelAngle,
  *not coincide with the IMU Z axis.
  **/
 double ADIS16470_IMU::GetAngle() const {
+  switch (m_yaw_axis) {
+    case kX:
+      if (m_simGyroAngleX) {
+        return m_simGyroAngleX.Get();
+      }
+      break;
+    case kY:
+      if (m_simGyroAngleY) {
+        return m_simGyroAngleY.Get();
+      }
+      break;
+    case kZ:
+      if (m_simGyroAngleZ) {
+        return m_simGyroAngleZ.Get();
+      }
+      break;
+  }
   std::scoped_lock sync(m_mutex);
   return m_integ_angle;
 }
@@ -716,11 +758,11 @@ double ADIS16470_IMU::GetRate() const {
   std::scoped_lock sync(m_mutex);
   switch (m_yaw_axis) {
     case kX:
-      return m_gyro_x;
+      return GetGyroRateX();
     case kY:
-      return m_gyro_y;
+      return GetGyroRateY();
     case kZ:
-      return m_gyro_z;
+      return GetGyroRateZ();
     default:
       return 0.0;
   }
@@ -730,32 +772,50 @@ ADIS16470_IMU::IMUAxis ADIS16470_IMU::GetYawAxis() const {
   return m_yaw_axis;
 }
 
-double ADIS16470_IMU::GetGyroInstantX() const {
+double ADIS16470_IMU::GetGyroRateX() const {
+  if (m_simGyroRateX) {
+    return m_simGyroRateX.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_gyro_x;
 }
 
-double ADIS16470_IMU::GetGyroInstantY() const {
+double ADIS16470_IMU::GetGyroRateY() const {
+  if (m_simGyroRateY) {
+    return m_simGyroRateY.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_gyro_y;
 }
 
-double ADIS16470_IMU::GetGyroInstantZ() const {
+double ADIS16470_IMU::GetGyroRateZ() const {
+  if (m_simGyroRateZ) {
+    return m_simGyroRateZ.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_gyro_z;
 }
 
-double ADIS16470_IMU::GetAccelInstantX() const {
+double ADIS16470_IMU::GetAccelX() const {
+  if (m_simAccelX) {
+    return m_simAccelX.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_accel_x;
 }
 
-double ADIS16470_IMU::GetAccelInstantY() const {
+double ADIS16470_IMU::GetAccelY() const {
+  if (m_simAccelY) {
+    return m_simAccelY.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_accel_y;
 }
 
-double ADIS16470_IMU::GetAccelInstantZ() const {
+double ADIS16470_IMU::GetAccelZ() const {
+  if (m_simAccelZ) {
+    return m_simAccelZ.Get();
+  }
   std::scoped_lock sync(m_mutex);
   return m_accel_z;
 }
@@ -778,6 +838,10 @@ double ADIS16470_IMU::GetXFilteredAccelAngle() const {
 double ADIS16470_IMU::GetYFilteredAccelAngle() const {
   std::scoped_lock sync(m_mutex);
   return m_accelAngleY;
+}
+
+int ADIS16470_IMU::GetPort() const {
+  return m_spi_port;
 }
 
 /**

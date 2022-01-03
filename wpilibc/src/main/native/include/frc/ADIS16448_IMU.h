@@ -23,15 +23,11 @@
 #include <memory>
 #include <thread>
 
+#include <hal/SimDevice.h>
 #include <networktables/NTSendable.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
-
-// Not always defined in cmath (not part of standard)
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 namespace frc {
 /**
@@ -138,17 +134,17 @@ class ADIS16448_IMU : public nt::NTSendable,
 
   double GetGyroAngleZ() const;
 
-  double GetGyroInstantX() const;
+  double GetGyroRateX() const;
 
-  double GetGyroInstantY() const;
+  double GetGyroRateY() const;
 
-  double GetGyroInstantZ() const;
+  double GetGyroRateZ() const;
 
-  double GetAccelInstantX() const;
+  double GetAccelX() const;
 
-  double GetAccelInstantY() const;
+  double GetAccelY() const;
 
-  double GetAccelInstantZ() const;
+  double GetAccelZ() const;
 
   double GetXComplementaryAngle() const;
 
@@ -173,6 +169,13 @@ class ADIS16448_IMU : public nt::NTSendable,
   int SetYawAxis(IMUAxis yaw_axis);
 
   int ConfigDecRate(uint16_t DecimationRate);
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  int GetPort() const;
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
@@ -319,6 +322,17 @@ class ADIS16448_IMU : public nt::NTSendable,
   DigitalInput* m_auto_interrupt = nullptr;
 
   std::thread m_acquire_task;
+
+  hal::SimDevice m_simDevice;
+  hal::SimDouble m_simGyroAngleX;
+  hal::SimDouble m_simGyroAngleY;
+  hal::SimDouble m_simGyroAngleZ;
+  hal::SimDouble m_simGyroRateX;
+  hal::SimDouble m_simGyroRateY;
+  hal::SimDouble m_simGyroRateZ;
+  hal::SimDouble m_simAccelX;
+  hal::SimDouble m_simAccelY;
+  hal::SimDouble m_simAccelZ;
 
   struct NonMovableMutexWrapper {
     wpi::mutex mutex;

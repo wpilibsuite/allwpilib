@@ -14,6 +14,8 @@ package edu.wpi.first.wpilibj;
 // import java.lang.FdLibm.Pow;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.SimDevice;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -250,6 +252,17 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   private DigitalOutput m_status_led;
   private Thread m_acquire_task;
 
+  private SimDevice m_simDevice;
+  private SimDouble m_simGyroAngleX;
+  private SimDouble m_simGyroAngleY;
+  private SimDouble m_simGyroAngleZ;
+  private SimDouble m_simGyroRateX;
+  private SimDouble m_simGyroRateY;
+  private SimDouble m_simGyroRateZ;
+  private SimDouble m_simAccelX;
+  private SimDouble m_simAccelY;
+  private SimDouble m_simAccelZ;
+
   private static class AcquireTask implements Runnable {
     private ADIS16470_IMU imu;
 
@@ -279,58 +292,73 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
 
     m_acquire_task = new Thread(new AcquireTask(this));
 
-    // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
-    // Relies on the RIO hardware by default configuring an output as low
-    // and configuring an input as high Z. The 10k pull-up resistor internal to the
-    // IMU then forces the reset line high for normal operation.
-    m_reset_out = new DigitalOutput(27); // Drive SPI CS2 (IMU RST) low
-    Timer.delay(0.01); // Wait 10ms
-    m_reset_out.close();
-    m_reset_in = new DigitalInput(27); // Set SPI CS2 (IMU RST) high
-    Timer.delay(0.25); // Wait 250ms for reset to complete
-
-    if (!switchToStandardSPI()) {
-      return;
+    m_simDevice = SimDevice.create("Gyro:ADIS16470", port.value);
+    if (m_simDevice != null) {
+      m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
+      m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
+      m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
+      m_simAccelX = m_simDevice.createDouble("accel_x", SimDevice.Direction.kInput, 0.0);
+      m_simAccelY = m_simDevice.createDouble("accel_y", SimDevice.Direction.kInput, 0.0);
+      m_simAccelZ = m_simDevice.createDouble("accel_z", SimDevice.Direction.kInput, 0.0);
     }
 
-    // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) =
-    // 400Hz)
-    writeRegister(DEC_RATE, 4);
+    if (m_simDevice == null) {
+      // Force the IMU reset pin to toggle on startup (doesn't require DS enable)
+      // Relies on the RIO hardware by default configuring an output as low
+      // and configuring an input as high Z. The 10k pull-up resistor internal to the
+      // IMU then forces the reset line high for normal operation.
+      m_reset_out = new DigitalOutput(27); // Drive SPI CS2 (IMU RST) low
+      Timer.delay(0.01); // Wait 10ms
+      m_reset_out.close();
+      m_reset_in = new DigitalInput(27); // Set SPI CS2 (IMU RST) high
+      Timer.delay(0.25); // Wait 250ms for reset to complete
 
-    // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and
-    // PoP
-    writeRegister(MSC_CTRL, 1);
+      if (!switchToStandardSPI()) {
+        return;
+      }
 
-    // Configure IMU internal Bartlett filter
-    writeRegister(FILT_CTRL, 0);
+      // Set IMU internal decimation to 4 (output data rate of 2000 SPS / (4 + 1) =
+      // 400Hz)
+      writeRegister(DEC_RATE, 4);
 
-    // Configure continuous bias calibration time based on user setting
-    writeRegister(NULL_CNFG, (m_calibration_time | 0x0700));
+      // Set data ready polarity (HIGH = Good Data), Disable gSense Compensation and
+      // PoP
+      writeRegister(MSC_CTRL, 1);
 
-    // Notify DS that IMU calibration delay is active
-    DriverStation.reportWarning(
-        "ADIS16470 IMU Detected. Starting initial calibration delay.", false);
+      // Configure IMU internal Bartlett filter
+      writeRegister(FILT_CTRL, 0);
 
-    // Wait for samples to accumulate internal to the IMU (110% of user-defined
-    // time)
-    try {
-      Thread.sleep((long) (Math.pow(2.0, m_calibration_time) / 2000 * 64 * 1.1 * 1000));
-    } catch (InterruptedException e) {
+      // Configure continuous bias calibration time based on user setting
+      writeRegister(NULL_CNFG, (m_calibration_time | 0x0700));
+
+      // Notify DS that IMU calibration delay is active
+      DriverStation.reportWarning(
+          "ADIS16470 IMU Detected. Starting initial calibration delay.", false);
+
+      // Wait for samples to accumulate internal to the IMU (110% of user-defined
+      // time)
+      try {
+        Thread.sleep((long) (Math.pow(2.0, m_calibration_time) / 2000 * 64 * 1.1 * 1000));
+      } catch (InterruptedException e) {
+      }
+
+      // Write offset calibration command to IMU
+      writeRegister(GLOB_CMD, 0x0001);
+
+      // Configure and enable auto SPI
+      if (!switchToAutoSPI()) {
+        return;
+      }
+
+      // Let the user know the IMU was initiallized successfully
+      DriverStation.reportWarning("ADIS16470 IMU Successfully Initialized!", false);
+
+      // Drive "Ready" LED low
+      m_status_led = new DigitalOutput(28); // Set SPI CS3 (IMU Ready LED) low
     }
-
-    // Write offset calibration command to IMU
-    writeRegister(GLOB_CMD, 0x0001);
-
-    // Configure and enable auto SPI
-    if (!switchToAutoSPI()) {
-      return;
-    }
-
-    // Let the user know the IMU was initiallized successfully
-    DriverStation.reportWarning("ADIS16470 IMU Successfully Initialized!", false);
-
-    // Drive "Ready" LED low
-    m_status_led = new DigitalOutput(28); // Set SPI CS3 (IMU Ready LED) low
 
     // Report usage and post data to DS
     HAL.report(tResourceType.kResourceType_ADIS16470, 0);
@@ -890,6 +918,23 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
 
   /** {@inheritDoc} */
   public synchronized double getAngle() {
+    switch (m_yaw_axis) {
+      case kX:
+        if (m_simGyroAngleX != null) {
+          return m_simGyroAngleX.get();
+        }
+        break;
+      case kY:
+        if (m_simGyroAngleY != null) {
+          return m_simGyroAngleY.get();
+        }
+        break;
+      case kZ:
+        if (m_simGyroAngleZ != null) {
+          return m_simGyroAngleZ.get();
+        }
+        break;
+    }
     return m_integ_angle;
   }
 
@@ -897,11 +942,11 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   public synchronized double getRate() {
     switch (m_yaw_axis) {
       case kX:
-        return m_gyro_x;
+        return getGyroRateX();
       case kY:
-        return m_gyro_y;
+        return getGyroRateY();
       case kZ:
-        return m_gyro_z;
+        return getGyroRateZ();
     }
     return 0.0;
   }
@@ -912,17 +957,26 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   /** @return current gyro angle in the X direction */
-  public synchronized double getGyroInstantX() {
+  public synchronized double getGyroRateX() {
+    if (m_simGyroRateX != null) {
+      return m_simGyroRateX.get();
+    }
     return m_gyro_x;
   }
 
   /** @return current gyro angle in the Y axis */
-  public synchronized double getGyroInstantY() {
+  public synchronized double getGyroRateY() {
+    if (m_simGyroRateY != null) {
+      return m_simGyroRateY.get();
+    }
     return m_gyro_y;
   }
 
   /** @return current gyro angle in the Z axis */
-  public synchronized double getGyroInstantZ() {
+  public synchronized double getGyroRateZ() {
+    if (m_simGyroRateZ != null) {
+      return m_simGyroRateZ.get();
+    }
     return m_gyro_z;
   }
 
@@ -959,6 +1013,15 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   /** @return Y axis filtered acceleration angle */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
+  }
+
+  /**
+   * Get the SPI port number.
+   *
+   * @return The SPI port number.
+   */
+  public int getPort() {
+    return m_spi_port.value;
   }
 
   @Override
