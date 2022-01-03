@@ -268,7 +268,7 @@
     ],
     "foldername": "I2CCommunication",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
   {
     "name": "Digital Communication Sample",
@@ -278,7 +278,7 @@
     ],
     "foldername": "DigitalCommunication",
     "gradlebase": "cpp",
-    "commandversion": 1
+    "commandversion": 2
   },
 
   {
