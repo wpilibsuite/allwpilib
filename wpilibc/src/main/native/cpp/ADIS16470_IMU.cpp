@@ -11,7 +11,8 @@
 /* Juan Chong - frcsupport@analog.com                                         */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/ADIS16470_IMU.h>
+#include "frc/ADIS16470_IMU.h"
+
 #include <frc/DigitalInput.h>
 #include <frc/DigitalSource.h>
 #include <frc/DriverStation.h>
