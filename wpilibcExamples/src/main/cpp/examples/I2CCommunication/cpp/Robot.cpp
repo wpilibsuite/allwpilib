@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <fmt/format.h>
+
 #include <frc/DriverStation.h>
 #include <frc/I2C.h>
 #include <frc/TimedRobot.h>
-#include <fmt/format.h>
-#include <wpi/SmallString.h>
-#include <wpi/StringRef.h>
-#include <wpi/raw_ostream.h>
+#include <frc/Timer.h>
 
 /**
  * This is a sample program demonstrating how to communicate to a light
@@ -26,13 +25,16 @@ class Robot : public frc::TimedRobot {
     //
     // For example, "RET043" would indicate that the robot is on the red
     // alliance, enabled in teleop mode, with 43 seconds left in the match.
-    wpi::SmallString<128> data;
-    wpi::raw_svector_ostream os(data);
-    os << (frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed ? "R" : "B")
-       << (frc::DriverStation::IsEnabled() ? "E" : "D") << (frc::DriverStation::IsAutonomous() ? "A" : "T")
-       << fmt::format("%03d", frc::DriverStation::GetMatchTime());
+    auto string = fmt::format(
+        "{}{}{}{:03}",
+        frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kRed
+            ? "R"
+            : "B",
+        frc::DriverStation::IsEnabled() ? "E" : "D",
+        frc::DriverStation::IsAutonomous() ? "A" : "T",
+        static_cast<int>(frc::Timer::GetMatchTime().value()));
 
-    arduino.WriteBulk(reinterpret_cast<uint8_t*>(data.data()), data.size());
+    arduino.WriteBulk(reinterpret_cast<uint8_t*>(string.data()), string.size());
   }
 
  private:
@@ -41,5 +43,7 @@ class Robot : public frc::TimedRobot {
 };
 
 #ifndef RUNNING_FRC_TESTS
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
 #endif

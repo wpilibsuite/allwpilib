@@ -14,7 +14,8 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotPeriodic() override {
     // pull alliance port high if on red alliance, pull low if on blue alliance
-    m_allianceOutput.Set(frc::DriverStation::GetAlliance() == frc::DriverStation::kRed);
+    m_allianceOutput.Set(frc::DriverStation::GetAlliance() ==
+                         frc::DriverStation::kRed);
 
     // pull enabled port high if enabled, low if disabled
     m_enabledOutput.Set(frc::DriverStation::IsEnabled());
@@ -40,4 +41,6 @@ class Robot : public frc::TimedRobot {
   frc::DigitalOutput m_alertOutput{kAlertPort};
 };
 
-int main() { return frc::StartRobot<Robot>(); }
+int main() {
+  return frc::StartRobot<Robot>();
+}
