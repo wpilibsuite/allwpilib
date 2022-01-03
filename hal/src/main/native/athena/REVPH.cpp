@@ -4,6 +4,8 @@
 
 #include "hal/REVPH.h"
 
+#include <thread>
+
 #include <fmt/format.h>
 
 #include "HALInitializer.h"
@@ -63,6 +65,7 @@ struct REV_PHObj {
   wpi::mutex solenoidLock;
   HAL_CANHandle hcan;
   std::string previousAllocation;
+  HAL_REVPHVersion versionInfo;
 };
 
 }  // namespace
@@ -221,6 +224,9 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
   hph->previousAllocation = allocationLocation ? allocationLocation : "";
   hph->hcan = hcan;
   hph->controlPeriod = kDefaultControlPeriod;
+  std::memset(&hph->desiredSolenoidsState, 0,
+              sizeof(hph->desiredSolenoidsState));
+  std::memset(&hph->versionInfo, 0, sizeof(hph->versionInfo));
 
   // Start closed-loop compressor control by starting solenoid state updates
   HAL_SendREVPHSolenoidsState(hph.get(), status);
@@ -480,6 +486,18 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
+  if (ph->versionInfo.firmwareMajor > 0) {
+    version->firmwareMajor = ph->versionInfo.firmwareMajor;
+    version->firmwareMinor = ph->versionInfo.firmwareMinor;
+    version->firmwareFix = ph->versionInfo.firmwareFix;
+    version->hardwareMajor = ph->versionInfo.hardwareMajor;
+    version->hardwareMinor = ph->versionInfo.hardwareMinor;
+    version->uniqueId = ph->versionInfo.uniqueId;
+
+    *status = 0;
+    return;
+  }
+
   HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_LENGTH, PH_VERSION_FRAME_API,
                        status);
 
@@ -487,8 +505,15 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
     return;
   }
 
-  HAL_ReadCANPacketTimeout(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
-                           &timestamp, kDefaultControlPeriod * 2, status);
+  uint32_t timeoutMs = 100;
+  for (uint32_t i = 0; i <= timeoutMs; i++) {
+    HAL_ReadCANPacketNew(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
+    if (*status == 0) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 
   if (*status != 0) {
     return;
@@ -502,6 +527,8 @@ void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
+
+  ph->versionInfo = *version;
 }
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {

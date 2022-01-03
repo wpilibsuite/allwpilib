@@ -11,6 +11,7 @@
 #include <hal/handles/IndexedHandleResource.h>
 
 #include <cstring>
+#include <thread>
 
 #include <fmt/format.h>
 
@@ -35,6 +36,7 @@ struct REV_PDHObj {
   int32_t controlPeriod;
   HAL_CANHandle hcan;
   std::string previousAllocation;
+  HAL_PowerDistributionVersion versionInfo;
 };
 
 }  // namespace
@@ -226,6 +228,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
   hpdh->previousAllocation = allocationLocation ? allocationLocation : "";
   hpdh->hcan = hcan;
   hpdh->controlPeriod = kDefaultControlPeriod;
+  std::memset(&hpdh->versionInfo, 0, sizeof(hpdh->versionInfo));
 
   return handle;
 }
@@ -490,6 +493,18 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
+  if (hpdh->versionInfo.firmwareMajor > 0) {
+    version->firmwareMajor = hpdh->versionInfo.firmwareMajor;
+    version->firmwareMinor = hpdh->versionInfo.firmwareMinor;
+    version->firmwareFix = hpdh->versionInfo.firmwareFix;
+    version->hardwareMajor = hpdh->versionInfo.hardwareMajor;
+    version->hardwareMinor = hpdh->versionInfo.hardwareMinor;
+    version->uniqueId = hpdh->versionInfo.uniqueId;
+
+    *status = 0;
+    return;
+  }
+
   HAL_WriteCANRTRFrame(hpdh->hcan, PDH_VERSION_LENGTH, PDH_VERSION_FRAME_API,
                        status);
 
@@ -497,9 +512,15 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
     return;
   }
 
-  HAL_ReadCANPacketTimeout(hpdh->hcan, PDH_VERSION_FRAME_API, packedData,
-                           &length, &timestamp, kDefaultControlPeriod * 2,
-                           status);
+  uint32_t timeoutMs = 100;
+  for (uint32_t i = 0; i <= timeoutMs; i++) {
+    HAL_ReadCANPacketNew(hpdh->hcan, PDH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
+    if (*status == 0) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 
   if (*status != 0) {
     return;
@@ -513,6 +534,8 @@ void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
   version->hardwareMinor = result.hardware_minor;
   version->hardwareMajor = result.hardware_major;
   version->uniqueId = result.unique_id;
+
+  hpdh->versionInfo = *version;
 }
 
 void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle,
