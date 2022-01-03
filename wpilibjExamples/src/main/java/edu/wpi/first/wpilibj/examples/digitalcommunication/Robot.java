@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * This is a sample program demonstrating how to communicate to a light
- * controller from the robot code using the roboRIO's DIO ports.
+ * This is a sample program demonstrating how to communicate to a light controller from the robot
+ * code using the roboRIO's DIO ports.
  */
 public class Robot extends TimedRobot {
   // define ports for digitalcommunication with light controller

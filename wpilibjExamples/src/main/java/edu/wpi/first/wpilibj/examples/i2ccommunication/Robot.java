@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
- * This is a sample program demonstrating how to communicate to a light
- * controller from the robot code using the roboRIO's I2C port.
+ * This is a sample program demonstrating how to communicate to a light controller from the robot
+ * code using the roboRIO's I2C port.
  */
 public class Robot extends TimedRobot {
   private static int kDeviceAddress = 4;
@@ -47,10 +47,10 @@ public class Robot extends TimedRobot {
     StringBuilder stateMessage = new StringBuilder(6);
 
     stateMessage
-            .append(DriverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
-            .append(DriverStation.isEnabled() ? "E" : "D")
-            .append(DriverStation.isAutonomous() ? "A" : "T")
-            .append(String.format("%03d" , (int) DriverStation.getMatchTime()));
+        .append(DriverStation.getAlliance() == DriverStation.Alliance.Red ? "R" : "B")
+        .append(DriverStation.isEnabled() ? "E" : "D")
+        .append(DriverStation.isAutonomous() ? "A" : "T")
+        .append(String.format("%03d", (int) DriverStation.getMatchTime()));
 
     writeString(stateMessage.toString());
   }
