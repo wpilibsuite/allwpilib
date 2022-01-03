@@ -228,6 +228,7 @@ HAL_REVPDHHandle HAL_InitializeREVPDH(int32_t module,
   hpdh->previousAllocation = allocationLocation ? allocationLocation : "";
   hpdh->hcan = hcan;
   hpdh->controlPeriod = kDefaultControlPeriod;
+  std::memset(&hpdh->versionInfo, 0, sizeof(hpdh->versionInfo));
 
   return handle;
 }
