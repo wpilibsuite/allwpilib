@@ -13,10 +13,6 @@
 
 #pragma once
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/DigitalSource.h>
-#include <frc/SPI.h>
 #include <stdint.h>
 
 #include <atomic>
@@ -25,9 +21,20 @@
 
 #include <hal/SimDevice.h>
 #include <networktables/NTSendable.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
+#include <units/magnetic_field_strength.h>
+#include <units/pressure.h>
+#include <units/temperature.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
+
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
+#include "frc/DigitalSource.h"
+#include "frc/SPI.h"
 
 namespace frc {
 /**
@@ -49,6 +56,22 @@ namespace frc {
 class ADIS16448_IMU : public nt::NTSendable,
                       public wpi::SendableHelper<ADIS16448_IMU> {
  public:
+  /* ADIS16448 Calibration Time Enum Class */
+  enum class CalibrationTime {
+    _32ms = 0,
+    _64ms = 1,
+    _128ms = 2,
+    _256ms = 3,
+    _512ms = 4,
+    _1s = 5,
+    _2s = 6,
+    _4s = 7,
+    _8s = 8,
+    _16s = 9,
+    _32s = 10,
+    _64s = 11
+  };
+
   enum IMUAxis { kX, kY, kZ };
 
   /**
@@ -65,7 +88,8 @@ class ADIS16448_IMU : public nt::NTSendable,
    * @param port The SPI port where the IMU is connected.
    * @param cal_time The calibration time that should be used on start-up.
    */
-  explicit ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port, uint16_t cal_time);
+  explicit ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
+                         CalibrationTime cal_time);
 
   ~ADIS16448_IMU() override;
 
@@ -93,7 +117,7 @@ class ADIS16448_IMU : public nt::NTSendable,
    *
    * @param new_cal_time The calibration time that should be used
    */
-  int ConfigCalTime(int new_cal_time);
+  int ConfigCalTime(CalibrationTime new_cal_time);
 
   /**
    * Reset the gyro.
@@ -105,64 +129,57 @@ class ADIS16448_IMU : public nt::NTSendable,
   void Reset();
 
   /**
-   * Return the actual angle in degrees that the robot is currently facing.
-   *
-   * The angle is based on the current accumulator value corrected by
-   * offset calibration and built-in IMU calibration. The angle is continuous,
-   * that is it will continue from 360->361 degrees. This allows algorithms
-   * that wouldn't want to see a discontinuity in the gyro output as it sweeps
-   * from 360 to 0 on the second time around. The axis returned by this
-   * function is adjusted fased on the configured yaw_axis.
-   *
-   * @return the current heading of the robot in degrees. This heading is based
-   *         on integration of the returned rate from the gyro.
+   * Returns the yaw axis angle in degrees (CCW positive).
    */
-  double GetAngle() const;
+  units::degree_t GetAngle() const;
 
   /**
-   * Return the rate of rotation of the yaw_axis gyro.
-   *
-   * The rate is based on the most recent reading of the gyro value
-   *
-   * @return the current rate in degrees per second
+   * Returns the accumulated gyro angle in the X axis.
    */
-  double GetRate() const;
+  units::degree_t GetGyroAngleX() const;
 
-  double GetGyroAngleX() const;
+  /**
+   * Returns the accumulated gyro angle in the Y axis.
+   */
+  units::degree_t GetGyroAngleY() const;
 
-  double GetGyroAngleY() const;
+  /**
+   * Returns the accumulated gyro angle in the Z axis.
+   */
+  units::degree_t GetGyroAngleZ() const;
 
-  double GetGyroAngleZ() const;
+  /**
+   * Returns the acceleration in the X axis.
+   */
+  units::meters_per_second_squared_t GetAccelX() const;
 
-  double GetGyroRateX() const;
+  /**
+   * Returns the acceleration in the Y axis.
+   */
+  units::meters_per_second_squared_t GetAccelY() const;
 
-  double GetGyroRateY() const;
+  /**
+   * Returns the acceleration in the Z axis.
+   */
+  units::meters_per_second_squared_t GetAccelZ() const;
 
-  double GetGyroRateZ() const;
+  units::degree_t GetXComplementaryAngle() const;
 
-  double GetAccelX() const;
+  units::degree_t GetYComplementaryAngle() const;
 
-  double GetAccelY() const;
+  units::degree_t GetXFilteredAccelAngle() const;
 
-  double GetAccelZ() const;
+  units::degree_t GetYFilteredAccelAngle() const;
 
-  double GetXComplementaryAngle() const;
+  units::tesla_t GetMagneticFieldX() const;
 
-  double GetYComplementaryAngle() const;
+  units::tesla_t GetMagneticFieldY() const;
 
-  double GetXFilteredAccelAngle() const;
+  units::tesla_t GetMagneticFieldZ() const;
 
-  double GetYFilteredAccelAngle() const;
+  units::pounds_per_square_inch_t GetBarometricPressure() const;
 
-  double GetMagInstantX() const;
-
-  double GetMagInstantY() const;
-
-  double GetMagInstantZ() const;
-
-  double GetBarometricPressure() const;
-
-  double GetTemperature() const;
+  units::celsius_t GetTemperature() const;
 
   IMUAxis GetYawAxis() const;
 
@@ -317,7 +334,7 @@ class ADIS16448_IMU : public nt::NTSendable,
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
-  uint16_t m_calibration_time;
+  CalibrationTime m_calibration_time;
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
 
@@ -327,9 +344,6 @@ class ADIS16448_IMU : public nt::NTSendable,
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;
-  hal::SimDouble m_simGyroRateX;
-  hal::SimDouble m_simGyroRateY;
-  hal::SimDouble m_simGyroRateZ;
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;
