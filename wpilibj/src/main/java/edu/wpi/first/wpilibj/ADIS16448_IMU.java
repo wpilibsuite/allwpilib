@@ -19,7 +19,6 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 // CHECKSTYLE.OFF: TypeName
 // CHECKSTYLE.OFF: MemberName
@@ -50,7 +49,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16448_IMU implements Gyro, NTSendable {
+public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   /** ADIS16448 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
 
@@ -93,6 +92,27 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   private static final int LOT_ID2 = 0x54; // Lot identification number
   private static final int PROD_ID = 0x56; // Product identifier
   private static final int SERIAL_NUM = 0x58; // Lot-specific serial number
+
+  public enum CalibrationTime {
+    _32ms(0),
+    _64ms(1),
+    _128ms(2),
+    _256ms(3),
+    _512ms(4),
+    _1s(5),
+    _2s(6),
+    _4s(7),
+    _8s(8),
+    _16s(9),
+    _32s(10),
+    _64s(11);
+
+    private int value;
+
+    private CalibrationTime(int value) {
+      this.value = value;
+    }
+  }
 
   public enum IMUAxis {
     kX,
@@ -149,7 +169,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
 
   /* State variables */
   private volatile boolean m_thread_active = false;
-  private int m_calibration_time = 0;
+  private CalibrationTime m_calibration_time = CalibrationTime._512ms;
   private volatile boolean m_first_run = true;
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
@@ -168,9 +188,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
-  private SimDouble m_simGyroRateX;
-  private SimDouble m_simGyroRateY;
-  private SimDouble m_simGyroRateZ;
   private SimDouble m_simAccelX;
   private SimDouble m_simAccelY;
   private SimDouble m_simAccelZ;
@@ -226,7 +243,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
   }
 
   public ADIS16448_IMU() {
-    this(IMUAxis.kZ, SPI.Port.kMXP, 4);
+    this(IMUAxis.kZ, SPI.Port.kMXP, CalibrationTime._512ms);
   }
 
   /**
@@ -234,7 +251,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
-  public ADIS16448_IMU(final IMUAxis yaw_axis, SPI.Port port, int cal_time) {
+  public ADIS16448_IMU(final IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
     m_spi_port = port;
 
@@ -245,9 +262,6 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
       m_simAccelX = m_simDevice.createDouble("accel_x", SimDevice.Direction.kInput, 0.0);
       m_simAccelY = m_simDevice.createDouble("accel_y", SimDevice.Direction.kInput, 0.0);
       m_simAccelZ = m_simDevice.createDouble("accel_z", SimDevice.Direction.kInput, 0.0);
@@ -287,7 +301,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
           "ADIS16448 IMU Detected. Starting initial calibration delay.", false);
       // Wait for whatever time the user set as the start-up delay
       try {
-        Thread.sleep((long) (m_calibration_time * 1.2 * 1000));
+        Thread.sleep((long) (m_calibration_time.value * 1.2 * 1000));
       } catch (InterruptedException e) {
       }
       // Execute calibration routine
@@ -498,12 +512,12 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
    * @param new_cal_time New calibration time
    * @return 1 if the new calibration time is the same as the current one else 0
    */
-  public int configCalTime(int new_cal_time) {
+  public int configCalTime(CalibrationTime new_cal_time) {
     if (m_calibration_time == new_cal_time) {
       return 1;
     } else {
       m_calibration_time = new_cal_time;
-      m_avg_size = m_calibration_time * 819;
+      m_avg_size = m_calibration_time.value * 819;
       initOffsetBuffer(m_avg_size);
       return 0;
     }
@@ -526,8 +540,11 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /** {@inheritDoc} */
-  @Override
+  /**
+   * Calibrate the gyro. It's important to make sure that the robot is not moving while the
+   * calibration is in progress, this is typically done when the robot is first turned on while it's
+   * sitting at rest before the match starts.
+   */
   public void calibrate() {
     synchronized (this) {
       int gyroAverageSize = Math.min(m_accum_count, m_avg_size);
@@ -919,7 +936,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return compAngle;
   }
 
-  /** */
+  /** @return Yaw axis angle in degrees (CCW positive) */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -933,26 +950,12 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     }
   }
 
-  /** */
-  public synchronized double getRate() {
-    switch (m_yaw_axis) {
-      case kX:
-        return getGyroRateX();
-      case kY:
-        return getGyroRateY();
-      case kZ:
-        return getGyroRateZ();
-      default:
-        return 0.0;
-    }
-  }
-
   /** @return Yaw Axis */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return accumulated gyro angle in the X axis */
+  /** @return accumulated gyro angle in the X axis in degrees */
   public synchronized double getGyroAngleX() {
     if (m_simGyroAngleX != null) {
       return m_simGyroAngleX.get();
@@ -960,7 +963,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return m_integ_gyro_x;
   }
 
-  /** @return accumulated gyro angle in the Y axis */
+  /** @return accumulated gyro angle in the Y axis in degrees */
   public synchronized double getGyroAngleY() {
     if (m_simGyroAngleY != null) {
       return m_simGyroAngleY.get();
@@ -968,7 +971,7 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return m_integ_gyro_y;
   }
 
-  /** @return accumulated gyro angle in the Z axis */
+  /** @return accumulated gyro angle in the Z axis in degrees */
   public synchronized double getGyroAngleZ() {
     if (m_simGyroAngleZ != null) {
       return m_simGyroAngleZ.get();
@@ -976,95 +979,75 @@ public class ADIS16448_IMU implements Gyro, NTSendable {
     return m_integ_gyro_z;
   }
 
-  /** @return current gyro angle in the X axis */
-  public synchronized double getGyroRateX() {
-    if (m_simGyroRateX != null) {
-      return m_simGyroRateX.get();
-    }
-    return m_gyro_x;
-  }
-
-  /** @return current gyro angle in the Y axis */
-  public synchronized double getGyroRateY() {
-    if (m_simGyroRateY != null) {
-      return m_simGyroRateY.get();
-    }
-    return m_gyro_y;
-  }
-
-  /** @return current gyro angle in the Z axis */
-  public synchronized double getGyroRateZ() {
-    if (m_simGyroRateZ != null) {
-      return m_simGyroRateZ.get();
-    }
-    return m_gyro_z;
-  }
-
-  /** @return urrent acceleration in the X axis */
+  /** @return urrent acceleration in the X axis in meters per second squared */
   public synchronized double getAccelX() {
     if (m_simAccelX != null) {
       return m_simAccelX.get();
     }
-    return m_accel_x;
+    return m_accel_x * 9.81;
   }
 
-  /** @return current acceleration in the Y axis */
+  /** @return current acceleration in the Y axis in meters per second squared */
   public synchronized double getAccelY() {
     if (m_simAccelY != null) {
       return m_simAccelY.get();
     }
-    return m_accel_y;
+    return m_accel_y * 9.81;
   }
 
-  /** @return current acceleration in the Z axis */
+  /** @return current acceleration in the Z axis in meters per second squared */
   public synchronized double getAccelZ() {
     if (m_simAccelZ != null) {
       return m_simAccelZ.get();
     }
-    return m_accel_z;
+    return m_accel_z * 9.81;
   }
 
-  /** @return Mag instant X */
-  public synchronized double getMagInstantX() {
-    return m_mag_x;
+  /** @return Magnetic field strength in the X axis in Tesla */
+  public synchronized double getMagneticFieldX() {
+    // mG to T
+    return m_mag_x * 1e-7;
   }
 
-  /** @return Mag instant Y */
-  public synchronized double getMagInstantY() {
-    return m_mag_y;
+  /** @return Magnetic field strength in the Y axis in Tesla */
+  public synchronized double getMagneticFieldY() {
+    // mG to T
+    return m_mag_y * 1e-7;
   }
 
-  /** @return Mag instant Z */
-  public synchronized double getMagInstantZ() {
-    return m_mag_z;
+  /** @return Magnetic field strength in the Z axis in Tesla */
+  public synchronized double getMagneticFieldZ() {
+    // mG to T
+    return m_mag_z * 1e-7;
   }
 
-  /** @return X axis complementary angle */
+  /** @return X axis complementary angle in degrees */
   public synchronized double getXComplementaryAngle() {
     return m_compAngleX;
   }
 
-  /** @return Y axis complementary angle */
+  /** @return Y axis complementary angle in degrees */
   public synchronized double getYComplementaryAngle() {
     return m_compAngleY;
   }
 
-  /** @return X axis filtered acceleration angle */
+  /** @return X axis filtered acceleration angle in degrees */
   public synchronized double getXFilteredAccelAngle() {
     return m_accelAngleX;
   }
 
-  /** @return Y axis filtered acceleration angle */
+  /** @return Y axis filtered acceleration angle in degrees */
   public synchronized double getYFilteredAccelAngle() {
     return m_accelAngleY;
   }
 
-  /** @return Barometric Pressure */
+  /** @return Barometric Pressure in PSI */
   public synchronized double getBarometricPressure() {
-    return m_baro;
+    // mbar to PSI
+    return m_baro * 0.0145;
   }
 
-  /** @return Temperature */
+  /** @return Temperature in degrees Celsius */
   public synchronized double getTemperature() {
     return m_temp;
   }

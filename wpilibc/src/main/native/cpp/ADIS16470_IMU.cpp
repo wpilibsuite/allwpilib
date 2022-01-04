@@ -79,12 +79,6 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
         m_simDevice.CreateDouble("gyro_angle_y", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleZ =
         m_simDevice.CreateDouble("gyro_angle_z", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateX =
-        m_simDevice.CreateDouble("gyro_rate_x", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateY =
-        m_simDevice.CreateDouble("gyro_rate_y", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateZ =
-        m_simDevice.CreateDouble("gyro_rate_z", hal::SimDevice::kInput, 0.0);
     m_simAccelX =
         m_simDevice.CreateDouble("accel_x", hal::SimDevice::kInput, 0.0);
     m_simAccelY =
@@ -383,22 +377,6 @@ void ADIS16470_IMU::Calibrate() {
   if (!SwitchToAutoSPI()) {
     REPORT_ERROR("Failed to configure/reconfigure auto SPI.");
   }
-}
-
-int ADIS16470_IMU::SetYawAxis(IMUAxis yaw_axis) {
-  if (m_yaw_axis == yaw_axis) {
-    return 1;
-  }
-  if (!SwitchToStandardSPI()) {
-    REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
-    return 2;
-  }
-  m_yaw_axis = yaw_axis;
-  if (!SwitchToAutoSPI()) {
-    REPORT_ERROR("Failed to configure/reconfigure auto SPI.");
-    return 2;
-  }
-  return 0;
 }
 
 /**
@@ -733,112 +711,90 @@ double ADIS16470_IMU::CompFilterProcess(double compAngle, double accelAngle,
  *m_yaw_axis. This function is most useful in situations where the yaw axis may
  *not coincide with the IMU Z axis.
  **/
-double ADIS16470_IMU::GetAngle() const {
+units::degree_t ADIS16470_IMU::GetAngle() const {
   switch (m_yaw_axis) {
     case kX:
       if (m_simGyroAngleX) {
-        return m_simGyroAngleX.Get();
+        return units::degree_t{m_simGyroAngleX.Get()};
       }
       break;
     case kY:
       if (m_simGyroAngleY) {
-        return m_simGyroAngleY.Get();
+        return units::degree_t{m_simGyroAngleY.Get()};
       }
       break;
     case kZ:
       if (m_simGyroAngleZ) {
-        return m_simGyroAngleZ.Get();
+        return units::degree_t{m_simGyroAngleZ.Get()};
       }
       break;
   }
   std::scoped_lock sync(m_mutex);
-  return m_integ_angle;
+  return units::degree_t{m_integ_angle};
 }
 
-double ADIS16470_IMU::GetRate() const {
-  std::scoped_lock sync(m_mutex);
-  switch (m_yaw_axis) {
-    case kX:
-      return GetGyroRateX();
-    case kY:
-      return GetGyroRateY();
-    case kZ:
-      return GetGyroRateZ();
-    default:
-      return 0.0;
+units::meters_per_second_squared_t ADIS16470_IMU::GetAccelX() const {
+  if (m_simAccelX) {
+    return units::meters_per_second_squared_t{m_simAccelX.Get()};
   }
+  std::scoped_lock sync(m_mutex);
+  return units::meters_per_second_squared_t{m_accel_x};
+}
+
+units::meters_per_second_squared_t ADIS16470_IMU::GetAccelY() const {
+  if (m_simAccelY) {
+    return units::meters_per_second_squared_t{m_simAccelY.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::meters_per_second_squared_t{m_accel_y};
+}
+
+units::meters_per_second_squared_t ADIS16470_IMU::GetAccelZ() const {
+  if (m_simAccelZ) {
+    return units::meters_per_second_squared_t{m_simAccelZ.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::meters_per_second_squared_t{m_accel_z};
+}
+
+units::degree_t ADIS16470_IMU::GetXComplementaryAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_compAngleX};
+}
+
+units::degree_t ADIS16470_IMU::GetYComplementaryAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_compAngleY};
+}
+
+units::degree_t ADIS16470_IMU::GetXFilteredAccelAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_accelAngleX};
+}
+
+units::degree_t ADIS16470_IMU::GetYFilteredAccelAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_accelAngleY};
 }
 
 ADIS16470_IMU::IMUAxis ADIS16470_IMU::GetYawAxis() const {
   return m_yaw_axis;
 }
 
-double ADIS16470_IMU::GetGyroRateX() const {
-  if (m_simGyroRateX) {
-    return m_simGyroRateX.Get();
+int ADIS16470_IMU::SetYawAxis(IMUAxis yaw_axis) {
+  if (m_yaw_axis == yaw_axis) {
+    return 1;
   }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_x;
-}
-
-double ADIS16470_IMU::GetGyroRateY() const {
-  if (m_simGyroRateY) {
-    return m_simGyroRateY.Get();
+  if (!SwitchToStandardSPI()) {
+    REPORT_ERROR("Failed to configure/reconfigure standard SPI.");
+    return 2;
   }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_y;
-}
-
-double ADIS16470_IMU::GetGyroRateZ() const {
-  if (m_simGyroRateZ) {
-    return m_simGyroRateZ.Get();
+  m_yaw_axis = yaw_axis;
+  if (!SwitchToAutoSPI()) {
+    REPORT_ERROR("Failed to configure/reconfigure auto SPI.");
+    return 2;
   }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_z;
-}
-
-double ADIS16470_IMU::GetAccelX() const {
-  if (m_simAccelX) {
-    return m_simAccelX.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_x;
-}
-
-double ADIS16470_IMU::GetAccelY() const {
-  if (m_simAccelY) {
-    return m_simAccelY.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_y;
-}
-
-double ADIS16470_IMU::GetAccelZ() const {
-  if (m_simAccelZ) {
-    return m_simAccelZ.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_z;
-}
-
-double ADIS16470_IMU::GetXComplementaryAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_compAngleX;
-}
-
-double ADIS16470_IMU::GetYComplementaryAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_compAngleY;
-}
-
-double ADIS16470_IMU::GetXFilteredAccelAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_accelAngleX;
-}
-
-double ADIS16470_IMU::GetYFilteredAccelAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_accelAngleY;
+  return 0;
 }
 
 int ADIS16470_IMU::GetPort() const {
@@ -854,6 +810,7 @@ int ADIS16470_IMU::GetPort() const {
 void ADIS16470_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16470 IMU");
   auto yaw_angle = builder.GetEntry("Yaw Angle").GetHandle();
-  builder.SetUpdateTable(
-      [=]() { nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle()); });
+  builder.SetUpdateTable([=]() {
+    nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle().value());
+  });
 }

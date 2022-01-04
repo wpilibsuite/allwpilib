@@ -13,10 +13,6 @@
 
 #pragma once
 
-#include <frc/DigitalInput.h>
-#include <frc/DigitalOutput.h>
-#include <frc/DigitalSource.h>
-#include <frc/SPI.h>
 #include <stdint.h>
 
 #include <atomic>
@@ -25,9 +21,17 @@
 
 #include <hal/SimDevice.h>
 #include <networktables/NTSendable.h>
+#include <units/acceleration.h>
+#include <units/angle.h>
+#include <units/angular_velocity.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/sendable/SendableHelper.h>
+
+#include "frc/DigitalInput.h"
+#include "frc/DigitalOutput.h"
+#include "frc/DigitalSource.h"
+#include "frc/SPI.h"
 
 namespace frc {
 /**
@@ -119,41 +123,32 @@ class ADIS16470_IMU : public nt::NTSendable,
   void Reset();
 
   /**
-   * @brief Returns the current integrated angle for the axis specified.
-   *
-   * The angle is based on the current accumulator value corrected by
-   * offset calibration and built-in IMU calibration. The angle is continuous,
-   * that is it will continue from 360->361 degrees. This allows algorithms
-   * that wouldn't want to see a discontinuity in the gyro output as it sweeps
-   * from 360 to 0 on the second time around. The axis returned by this
-   * function is adjusted based on the configured yaw_axis.
-   *
-   * @return the current heading of the robot in degrees. This heading is based
-   *         on integration of the returned rate from the gyro.
+   * Returns the yaw axis angle in degrees (CCW positive).
    */
-  double GetAngle() const;
+  units::degree_t GetAngle() const;
 
-  double GetRate() const;
+  /**
+   * Returns the acceleration in the X axis.
+   */
+  units::meters_per_second_squared_t GetAccelX() const;
 
-  double GetGyroRateX() const;
+  /**
+   * Returns the acceleration in the Y axis.
+   */
+  units::meters_per_second_squared_t GetAccelY() const;
 
-  double GetGyroRateY() const;
+  /**
+   * Returns the acceleration in the Z axis.
+   */
+  units::meters_per_second_squared_t GetAccelZ() const;
 
-  double GetGyroRateZ() const;
+  units::degree_t GetXComplementaryAngle() const;
 
-  double GetAccelX() const;
+  units::degree_t GetYComplementaryAngle() const;
 
-  double GetAccelY() const;
+  units::degree_t GetXFilteredAccelAngle() const;
 
-  double GetAccelZ() const;
-
-  double GetXComplementaryAngle() const;
-
-  double GetYComplementaryAngle() const;
-
-  double GetXFilteredAccelAngle() const;
-
-  double GetYFilteredAccelAngle() const;
+  units::degree_t GetYFilteredAccelAngle() const;
 
   IMUAxis GetYawAxis() const;
 
@@ -380,9 +375,6 @@ class ADIS16470_IMU : public nt::NTSendable,
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;
-  hal::SimDouble m_simGyroRateX;
-  hal::SimDouble m_simGyroRateY;
-  hal::SimDouble m_simGyroRateZ;
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;

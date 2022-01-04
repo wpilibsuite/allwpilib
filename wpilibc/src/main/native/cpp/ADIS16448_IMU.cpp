@@ -66,10 +66,11 @@ inline void ADISReportError(int32_t status, const char* file, int line,
 #define REPORT_ERROR(msg) \
   ADISReportError(err::Error, __FILE__, __LINE__, __FUNCTION__, "{}", msg)
 
-ADIS16448_IMU::ADIS16448_IMU() : ADIS16448_IMU(kZ, SPI::Port::kMXP, 4) {}
+ADIS16448_IMU::ADIS16448_IMU()
+    : ADIS16448_IMU(kZ, SPI::Port::kMXP, CalibrationTime::_512ms) {}
 
 ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
-                             uint16_t cal_time)
+                             CalibrationTime cal_time)
     : m_yaw_axis(yaw_axis),
       m_spi_port(port),
       m_simDevice("Gyro:ADIS16448", port) {
@@ -80,12 +81,6 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
         m_simDevice.CreateDouble("gyro_angle_y", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleZ =
         m_simDevice.CreateDouble("gyro_angle_z", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateX =
-        m_simDevice.CreateDouble("gyro_rate_x", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateY =
-        m_simDevice.CreateDouble("gyro_rate_y", hal::SimDevice::kInput, 0.0);
-    m_simGyroRateZ =
-        m_simDevice.CreateDouble("gyro_rate_z", hal::SimDevice::kInput, 0.0);
     m_simAccelX =
         m_simDevice.CreateDouble("accel_x", hal::SimDevice::kInput, 0.0);
     m_simAccelY =
@@ -311,12 +306,12 @@ bool ADIS16448_IMU::SwitchToAutoSPI() {
 /**
  *
  **/
-int ADIS16448_IMU::ConfigCalTime(int new_cal_time) {
+int ADIS16448_IMU::ConfigCalTime(CalibrationTime new_cal_time) {
   if (m_calibration_time == new_cal_time) {
     return 1;
   } else {
-    m_calibration_time = static_cast<uint16_t>(new_cal_time);
-    m_avg_size = m_calibration_time * 819;
+    m_calibration_time = new_cal_time;
+    m_avg_size = static_cast<uint16_t>(m_calibration_time) * 819;
     InitOffsetBuffer(m_avg_size);
     return 0;
   }
@@ -346,16 +341,6 @@ void ADIS16448_IMU::Calibrate() {
   // std::cout << "Avg Size: " << gyroAverageSize << " X off: " <<
   // m_gyro_offset_x << " Y off: " << m_gyro_offset_y << " Z off: " <<
   // m_gyro_offset_z << std::endl;
-}
-
-int ADIS16448_IMU::SetYawAxis(IMUAxis yaw_axis) {
-  if (m_yaw_axis == yaw_axis) {
-    return 1;
-  } else {
-    m_yaw_axis = yaw_axis;
-    Reset();
-    return 0;
-  }
 }
 
 /**
@@ -744,12 +729,7 @@ int ADIS16448_IMU::ConfigDecRate(uint16_t DecimationSetting) {
   return 0;
 }
 
-/**
- * This function returns the most recent integrated angle for the axis chosen by
- *m_yaw_axis. This function is most useful in situations where the yaw axis may
- *not coincide with the IMU Z axis.
- **/
-double ADIS16448_IMU::GetAngle() const {
+units::degree_t ADIS16448_IMU::GetAngle() const {
   switch (m_yaw_axis) {
     case kX:
       return GetGyroAngleX();
@@ -758,142 +738,115 @@ double ADIS16448_IMU::GetAngle() const {
     case kZ:
       return GetGyroAngleZ();
     default:
-      return 0.0;
+      return 0_deg;
   }
 }
 
-double ADIS16448_IMU::GetRate() const {
-  switch (m_yaw_axis) {
-    case kX:
-      return GetGyroRateX();
-    case kY:
-      return GetGyroRateY();
-    case kZ:
-      return GetGyroRateZ();
-    default:
-      return 0.0;
+units::degree_t ADIS16448_IMU::GetGyroAngleX() const {
+  if (m_simGyroAngleX) {
+    return units::degree_t{m_simGyroAngleX.Get()};
   }
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_integ_gyro_x};
+}
+
+units::degree_t ADIS16448_IMU::GetGyroAngleY() const {
+  if (m_simGyroAngleY) {
+    return units::degree_t{m_simGyroAngleY.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_integ_gyro_y};
+}
+
+units::degree_t ADIS16448_IMU::GetGyroAngleZ() const {
+  if (m_simGyroAngleZ) {
+    return units::degree_t{m_simGyroAngleZ.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_integ_gyro_z};
+}
+
+units::meters_per_second_squared_t ADIS16448_IMU::GetAccelX() const {
+  if (m_simAccelX) {
+    return units::meters_per_second_squared_t{m_simAccelX.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return m_accel_x * 9.81_mps_sq;
+}
+
+units::meters_per_second_squared_t ADIS16448_IMU::GetAccelY() const {
+  if (m_simAccelY) {
+    return units::meters_per_second_squared_t{m_simAccelY.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return m_accel_y * 9.81_mps_sq;
+}
+
+units::meters_per_second_squared_t ADIS16448_IMU::GetAccelZ() const {
+  if (m_simAccelZ) {
+    return units::meters_per_second_squared_t{m_simAccelZ.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return m_accel_z * 9.81_mps_sq;
+}
+
+units::tesla_t ADIS16448_IMU::GetMagneticFieldX() const {
+  std::scoped_lock sync(m_mutex);
+  return units::gauss_t{m_mag_x * 1e-3};
+}
+
+units::tesla_t ADIS16448_IMU::GetMagneticFieldY() const {
+  std::scoped_lock sync(m_mutex);
+  return units::gauss_t{m_mag_y * 1e-3};
+}
+
+units::tesla_t ADIS16448_IMU::GetMagneticFieldZ() const {
+  std::scoped_lock sync(m_mutex);
+  return units::gauss_t{m_mag_z * 1e-3};
+}
+
+units::degree_t ADIS16448_IMU::GetXComplementaryAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_compAngleX};
+}
+
+units::degree_t ADIS16448_IMU::GetYComplementaryAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_compAngleY};
+}
+
+units::degree_t ADIS16448_IMU::GetXFilteredAccelAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_accelAngleX};
+}
+
+units::degree_t ADIS16448_IMU::GetYFilteredAccelAngle() const {
+  std::scoped_lock sync(m_mutex);
+  return units::degree_t{m_accelAngleY};
+}
+
+units::pounds_per_square_inch_t ADIS16448_IMU::GetBarometricPressure() const {
+  std::scoped_lock sync(m_mutex);
+  return units::mbar_t{m_baro};
+}
+
+units::celsius_t ADIS16448_IMU::GetTemperature() const {
+  std::scoped_lock sync(m_mutex);
+  return units::celsius_t{m_temp};
 }
 
 ADIS16448_IMU::IMUAxis ADIS16448_IMU::GetYawAxis() const {
   return m_yaw_axis;
 }
 
-double ADIS16448_IMU::GetGyroAngleX() const {
-  if (m_simGyroAngleX) {
-    return m_simGyroAngleX.Get();
+int ADIS16448_IMU::SetYawAxis(IMUAxis yaw_axis) {
+  if (m_yaw_axis == yaw_axis) {
+    return 1;
+  } else {
+    m_yaw_axis = yaw_axis;
+    Reset();
+    return 0;
   }
-  std::scoped_lock sync(m_mutex);
-  return m_integ_gyro_x;
-}
-
-double ADIS16448_IMU::GetGyroAngleY() const {
-  if (m_simGyroAngleY) {
-    return m_simGyroAngleY.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_integ_gyro_y;
-}
-
-double ADIS16448_IMU::GetGyroAngleZ() const {
-  if (m_simGyroAngleZ) {
-    return m_simGyroAngleZ.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_integ_gyro_z;
-}
-
-double ADIS16448_IMU::GetGyroRateX() const {
-  if (m_simGyroRateX) {
-    return m_simGyroRateX.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_x;
-}
-
-double ADIS16448_IMU::GetGyroRateY() const {
-  if (m_simGyroRateY) {
-    return m_simGyroRateY.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_y;
-}
-
-double ADIS16448_IMU::GetGyroRateZ() const {
-  if (m_simGyroRateZ) {
-    return m_simGyroRateZ.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_gyro_z;
-}
-
-double ADIS16448_IMU::GetAccelX() const {
-  if (m_simAccelX) {
-    return m_simAccelX.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_x;
-}
-
-double ADIS16448_IMU::GetAccelY() const {
-  if (m_simAccelY) {
-    return m_simAccelY.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_y;
-}
-
-double ADIS16448_IMU::GetAccelZ() const {
-  if (m_simAccelZ) {
-    return m_simAccelZ.Get();
-  }
-  std::scoped_lock sync(m_mutex);
-  return m_accel_z;
-}
-
-double ADIS16448_IMU::GetMagInstantX() const {
-  std::scoped_lock sync(m_mutex);
-  return m_mag_x;
-}
-
-double ADIS16448_IMU::GetMagInstantY() const {
-  std::scoped_lock sync(m_mutex);
-  return m_mag_y;
-}
-
-double ADIS16448_IMU::GetMagInstantZ() const {
-  std::scoped_lock sync(m_mutex);
-  return m_mag_z;
-}
-
-double ADIS16448_IMU::GetXComplementaryAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_compAngleX;
-}
-
-double ADIS16448_IMU::GetYComplementaryAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_compAngleY;
-}
-
-double ADIS16448_IMU::GetXFilteredAccelAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_accelAngleX;
-}
-
-double ADIS16448_IMU::GetYFilteredAccelAngle() const {
-  std::scoped_lock sync(m_mutex);
-  return m_accelAngleY;
-}
-
-double ADIS16448_IMU::GetBarometricPressure() const {
-  std::scoped_lock sync(m_mutex);
-  return m_baro;
-}
-
-double ADIS16448_IMU::GetTemperature() const {
-  std::scoped_lock sync(m_mutex);
-  return m_temp;
 }
 
 int ADIS16448_IMU::GetPort() const {
@@ -909,6 +862,7 @@ int ADIS16448_IMU::GetPort() const {
 void ADIS16448_IMU::InitSendable(nt::NTSendableBuilder& builder) {
   builder.SetSmartDashboardType("ADIS16448 IMU");
   auto yaw_angle = builder.GetEntry("Yaw Angle").GetHandle();
-  builder.SetUpdateTable(
-      [=]() { nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle()); });
+  builder.SetUpdateTable([=]() {
+    nt::NetworkTableEntry(yaw_angle).SetDouble(GetAngle().value());
+  });
 }

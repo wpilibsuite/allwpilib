@@ -13,9 +13,6 @@ public class ADIS16448_IMUSim {
   private final SimDouble m_simGyroAngleX;
   private final SimDouble m_simGyroAngleY;
   private final SimDouble m_simGyroAngleZ;
-  private final SimDouble m_simGyroRateX;
-  private final SimDouble m_simGyroRateY;
-  private final SimDouble m_simGyroRateZ;
   private final SimDouble m_simAccelX;
   private final SimDouble m_simAccelY;
   private final SimDouble m_simAccelZ;
@@ -30,16 +27,13 @@ public class ADIS16448_IMUSim {
     m_simGyroAngleX = wrappedSimDevice.getDouble("gyro_angle_x");
     m_simGyroAngleY = wrappedSimDevice.getDouble("gyro_angle_y");
     m_simGyroAngleZ = wrappedSimDevice.getDouble("gyro_angle_z");
-    m_simGyroRateX = wrappedSimDevice.getDouble("gyro_rate_x");
-    m_simGyroRateY = wrappedSimDevice.getDouble("gyro_rate_y");
-    m_simGyroRateZ = wrappedSimDevice.getDouble("gyro_rate_z");
     m_simAccelX = wrappedSimDevice.getDouble("accel_x");
     m_simAccelY = wrappedSimDevice.getDouble("accel_y");
     m_simAccelZ = wrappedSimDevice.getDouble("accel_z");
   }
 
   /**
-   * Sets the X axis angle (CCW positive).
+   * Sets the X axis angle in degrees (CCW positive).
    *
    * @param angleDegrees The angle.
    */
@@ -48,7 +42,7 @@ public class ADIS16448_IMUSim {
   }
 
   /**
-   * Sets the Y axis angle (CCW positive).
+   * Sets the Y axis angle in degrees (CCW positive).
    *
    * @param angleDegrees The angle.
    */
@@ -57,7 +51,7 @@ public class ADIS16448_IMUSim {
   }
 
   /**
-   * Sets the Z axis angle (CCW positive).
+   * Sets the Z axis angle in degrees (CCW positive).
    *
    * @param angleDegrees The angle.
    */
@@ -66,56 +60,29 @@ public class ADIS16448_IMUSim {
   }
 
   /**
-   * Sets the X axis angular rate (CCW positive).
+   * Sets the X axis acceleration in meters per second squared.
    *
-   * @param rateDegreesPerSecond The angular rate.
+   * @param accelMetersPerSecondSquared The acceleration.
    */
-  public void setGyroRateX(double rateDegreesPerSecond) {
-    m_simGyroRateX.set(rateDegreesPerSecond);
+  public void setAccelX(double accelMetersPerSecondSquared) {
+    m_simAccelX.set(accelMetersPerSecondSquared);
   }
 
   /**
-   * Sets the Y axis angular rate (CCW positive).
+   * Sets the Y axis acceleration in meters per second squared.
    *
-   * @param rateDegreesPerSecond The angular rate.
+   * @param accelMetersPerSecondSquared The acceleration.
    */
-  public void setGyroRateY(double rateDegreesPerSecond) {
-    m_simGyroRateY.set(rateDegreesPerSecond);
+  public void setAccelY(double accelMetersPerSecondSquared) {
+    m_simAccelY.set(accelMetersPerSecondSquared);
   }
 
   /**
-   * Sets the Z axis angular rate (CCW positive).
+   * Sets the Z axis acceleration in meters per second squared.
    *
-   * @param rateDegreesPerSecond The angular rate.
+   * @param accelMetersPerSecondSquared The acceleration.
    */
-  public void setGyroRateZ(double rateDegreesPerSecond) {
-    m_simGyroRateZ.set(rateDegreesPerSecond);
-  }
-
-  /**
-   * Sets the X axis acceleration.
-   *
-   * @param accelMetersPerSecond The acceleration.
-   */
-  public void setAccelX(double accelMetersPerSecond) {
-    m_simAccelX.set(accelMetersPerSecond / 9.81);
-  }
-
-  /**
-   * Sets the Y axis acceleration.
-   *
-   * @param accelMetersPerSecond The acceleration.
-   */
-  public void setAccelY(double accelMetersPerSecond) {
-    m_simAccelY.set(accelMetersPerSecond / 9.81);
-  }
-
-  /**
-   * Sets the Z axis acceleration.
-   *
-   * @param accelMetersPerSecond The acceleration.
-   */
-  public void setAccelZ(double accelMetersPerSecond) {
-    m_simAccelZ.set(accelMetersPerSecond / 9.81);
+  public void setAccelZ(double accelMetersPerSecondSquared) {
+    m_simAccelZ.set(accelMetersPerSecondSquared);
   }
 }

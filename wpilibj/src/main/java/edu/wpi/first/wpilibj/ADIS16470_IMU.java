@@ -18,7 +18,6 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -51,7 +50,7 @@ import java.nio.ByteOrder;
   "PMD.EmptyIfStmt",
   "PMD.EmptyStatementNotInLoop"
 })
-public class ADIS16470_IMU implements Gyro, NTSendable {
+public class ADIS16470_IMU implements AutoCloseable, NTSendable {
   /* ADIS16470 Register Map Declaration */
   private static final int FLASH_CNT = 0x00; // Flash memory write count
   private static final int DIAG_STAT = 0x02; // Diagnostic and operational status
@@ -179,13 +178,7 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
     FLASH_CNT
   };
 
-  public enum IMUAxis {
-    kX,
-    kY,
-    kZ
-  }
-
-  public enum ADIS16470CalibrationTime {
+  public enum CalibrationTime {
     _32ms(0),
     _64ms(1),
     _128ms(2),
@@ -201,9 +194,15 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
 
     private int value;
 
-    private ADIS16470CalibrationTime(int value) {
+    private CalibrationTime(int value) {
       this.value = value;
     }
+  }
+
+  public enum IMUAxis {
+    kX,
+    kY,
+    kZ
   }
 
   // Static Constants
@@ -256,9 +255,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
-  private SimDouble m_simGyroRateX;
-  private SimDouble m_simGyroRateY;
-  private SimDouble m_simGyroRateZ;
   private SimDouble m_simAccelX;
   private SimDouble m_simAccelY;
   private SimDouble m_simAccelZ;
@@ -277,7 +273,7 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
   }
 
   public ADIS16470_IMU() {
-    this(IMUAxis.kZ, SPI.Port.kOnboardCS0, ADIS16470CalibrationTime._4s);
+    this(IMUAxis.kZ, SPI.Port.kOnboardCS0, CalibrationTime._4s);
   }
 
   /**
@@ -285,7 +281,7 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
    * @param port The SPI Port the gyro is plugged into
    * @param cal_time Calibration time
    */
-  public ADIS16470_IMU(IMUAxis yaw_axis, SPI.Port port, ADIS16470CalibrationTime cal_time) {
+  public ADIS16470_IMU(IMUAxis yaw_axis, SPI.Port port, CalibrationTime cal_time) {
     m_yaw_axis = yaw_axis;
     m_calibration_time = cal_time.value;
     m_spi_port = port;
@@ -297,9 +293,6 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
-      m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
       m_simAccelX = m_simDevice.createDouble("accel_x", SimDevice.Direction.kInput, 0.0);
       m_simAccelY = m_simDevice.createDouble("accel_y", SimDevice.Direction.kInput, 0.0);
       m_simAccelZ = m_simDevice.createDouble("accel_z", SimDevice.Direction.kInput, 0.0);
@@ -533,7 +526,7 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
    * @param new_cal_time New calibration time
    * @return 1 if the new calibration time is the same as the current one else 0
    */
-  public int configCalTime(ADIS16470CalibrationTime new_cal_time) {
+  public int configCalTime(CalibrationTime new_cal_time) {
     if (m_calibration_time == new_cal_time.value) {
       return 1;
     }
@@ -570,8 +563,11 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
     return 0;
   }
 
-  /** {@inheritDoc} */
-  @Override
+  /**
+   * Calibrate the gyro. It's important to make sure that the robot is not moving while the
+   * calibration is in progress, this is typically done when the robot is first turned on while it's
+   * sitting at rest before the match starts.
+   */
   public void calibrate() {
     if (!switchToStandardSPI()) {
       DriverStation.reportError("Failed to configure/reconfigure standard SPI.", false);
@@ -916,7 +912,7 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
     return compAngle;
   }
 
-  /** {@inheritDoc} */
+  /** @return Yaw axis angle in degrees (CCW positive) */
   public synchronized double getAngle() {
     switch (m_yaw_axis) {
       case kX:
@@ -938,61 +934,24 @@ public class ADIS16470_IMU implements Gyro, NTSendable {
     return m_integ_angle;
   }
 
-  /** {@inheritDoc} */
-  public synchronized double getRate() {
-    switch (m_yaw_axis) {
-      case kX:
-        return getGyroRateX();
-      case kY:
-        return getGyroRateY();
-      case kZ:
-        return getGyroRateZ();
-    }
-    return 0.0;
-  }
-
   /** @return Yaw Axis */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
   }
 
-  /** @return current gyro angle in the X direction */
-  public synchronized double getGyroRateX() {
-    if (m_simGyroRateX != null) {
-      return m_simGyroRateX.get();
-    }
-    return m_gyro_x;
-  }
-
-  /** @return current gyro angle in the Y axis */
-  public synchronized double getGyroRateY() {
-    if (m_simGyroRateY != null) {
-      return m_simGyroRateY.get();
-    }
-    return m_gyro_y;
-  }
-
-  /** @return current gyro angle in the Z axis */
-  public synchronized double getGyroRateZ() {
-    if (m_simGyroRateZ != null) {
-      return m_simGyroRateZ.get();
-    }
-    return m_gyro_z;
-  }
-
   /** @return current acceleration in the X axis */
-  public synchronized double getAccelInstantX() {
-    return m_accel_x;
+  public synchronized double getAccelX() {
+    return m_accel_x * 9.81;
   }
 
   /** @return current acceleration in the Y axis */
-  public synchronized double getAccelInstantY() {
-    return m_accel_y;
+  public synchronized double getAccelY() {
+    return m_accel_y * 9.81;
   }
 
   /** @return current acceleration in the Z axis */
-  public synchronized double getAccelInstantZ() {
-    return m_accel_z;
+  public synchronized double getAccelZ() {
+    return m_accel_z * 9.81;
   }
 
   /** @return X axis complementary angle */
