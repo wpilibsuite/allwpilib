@@ -45,6 +45,8 @@ class LinearSystemSim {
     m_u = Eigen::Vector<double, Inputs>::Zero();
   }
 
+  virtual ~LinearSystemSim() = default;
+
   /**
    * Updates the simulation.
    *
