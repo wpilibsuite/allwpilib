@@ -8,10 +8,9 @@
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/motorcontrol/Spark.h>
+#include <frc/romi/RomiGyro.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/length.h>
-
-#include "sensors/RomiGyro.h"
 
 class Drivetrain : public frc2::SubsystemBase {
  public:

@@ -37,6 +37,8 @@ dependencies {
     implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 
+    implementation 'edu.wpi.first.romi:romi-vendordep-java:2022.+'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'

@@ -50,6 +50,16 @@ def simModules = ["halsim_gui"]
 
 apply from: "${rootDir}/shared/opencv.gradle"
 
+nativeUtils.nativeDependencyContainer.register('romidep', nativeUtils.getNativeDependencyTypeClass("WPISharedMavenDependency")) {
+    groupId = "edu.wpi.first.romi"
+    artifactId = "romi-vendordep-cpp"
+    headerClassifier = "headers"
+	sourceClassifier = "source"
+    ext = "zip"
+    version = '2022.+'
+    targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
+};
+
 model {
     components {
         commands(NativeLibrarySpec) {
@@ -94,6 +104,9 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+				    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.desktopPlatforms) {
+                        nativeUtils.useRequiredLibrary(binary, 'romidep')
+                    }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                     }

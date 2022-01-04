@@ -6,6 +6,7 @@
 
 #include <frc/Joystick.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc/romi/OnBoardIO.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/button/Button.h>
 
@@ -13,7 +14,6 @@
 #include "commands/AutonomousDistance.h"
 #include "commands/AutonomousTime.h"
 #include "subsystems/Drivetrain.h"
-#include "subsystems/OnBoardIO.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
