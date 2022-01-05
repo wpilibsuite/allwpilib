@@ -13,6 +13,9 @@ public class ADIS16470_IMUSim {
   private final SimDouble m_simGyroAngleX;
   private final SimDouble m_simGyroAngleY;
   private final SimDouble m_simGyroAngleZ;
+  private final SimDouble m_simGyroRateX;
+  private final SimDouble m_simGyroRateY;
+  private final SimDouble m_simGyroRateZ;
   private final SimDouble m_simAccelX;
   private final SimDouble m_simAccelY;
   private final SimDouble m_simAccelZ;
@@ -27,6 +30,9 @@ public class ADIS16470_IMUSim {
     m_simGyroAngleX = wrappedSimDevice.getDouble("gyro_angle_x");
     m_simGyroAngleY = wrappedSimDevice.getDouble("gyro_angle_y");
     m_simGyroAngleZ = wrappedSimDevice.getDouble("gyro_angle_z");
+    m_simGyroRateX = wrappedSimDevice.getDouble("gyro_rate_x");
+    m_simGyroRateY = wrappedSimDevice.getDouble("gyro_rate_y");
+    m_simGyroRateZ = wrappedSimDevice.getDouble("gyro_rate_z");
     m_simAccelX = wrappedSimDevice.getDouble("accel_x");
     m_simAccelY = wrappedSimDevice.getDouble("accel_y");
     m_simAccelZ = wrappedSimDevice.getDouble("accel_z");
@@ -57,6 +63,33 @@ public class ADIS16470_IMUSim {
    */
   public void setGyroAngleZ(double angleDegrees) {
     m_simGyroAngleZ.set(angleDegrees);
+  }
+
+  /**
+   * Sets the X axis angle in degrees per second (CCW positive).
+   *
+   * @param angularRateDegreesPerSecond The angular rate.
+   */
+  public void setGyroRateX(double angularRateDegreesPerSecond) {
+    m_simGyroRateX.set(angularRateDegreesPerSecond);
+  }
+
+  /**
+   * Sets the Y axis angle in degrees per second (CCW positive).
+   *
+   * @param angularRateDegreesPerSecond The angular rate.
+   */
+  public void setGyroRateY(double angularRateDegreesPerSecond) {
+    m_simGyroRateY.set(angularRateDegreesPerSecond);
+  }
+
+  /**
+   * Sets the Z axis angle in degrees per second (CCW positive).
+   *
+   * @param angularRateDegreesPerSecond The angular rate.
+   */
+  public void setGyroRateZ(double angularRateDegreesPerSecond) {
+    m_simGyroRateZ.set(angularRateDegreesPerSecond);
   }
 
   /**
