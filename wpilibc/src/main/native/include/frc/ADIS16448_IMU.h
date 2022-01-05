@@ -134,6 +134,11 @@ class ADIS16448_IMU : public nt::NTSendable,
   units::degree_t GetAngle() const;
 
   /**
+   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   */
+  units::degrees_per_second_t GetRate() const;
+
+  /**
    * Returns the accumulated gyro angle in the X axis.
    */
   units::degree_t GetGyroAngleX() const;
@@ -147,6 +152,21 @@ class ADIS16448_IMU : public nt::NTSendable,
    * Returns the accumulated gyro angle in the Z axis.
    */
   units::degree_t GetGyroAngleZ() const;
+
+  /**
+   * Returns the angular rate in the X axis.
+   */
+  units::degrees_per_second_t GetGyroRateX() const;
+
+  /**
+   * Returns the angular rate in the Y axis.
+   */
+  units::degrees_per_second_t GetGyroRateY() const;
+
+  /**
+   * Returns the angular rate in the Z axis.
+   */
+  units::degrees_per_second_t GetGyroRateZ() const;
 
   /**
    * Returns the acceleration in the X axis.
@@ -259,10 +279,10 @@ class ADIS16448_IMU : public nt::NTSendable,
   static constexpr double grav = 9.81;
 
   /** @brief struct to store offset data */
-  struct offset_data {
-    double m_accum_gyro_x = 0.0;
-    double m_accum_gyro_y = 0.0;
-    double m_accum_gyro_z = 0.0;
+  struct OffsetData {
+    double gyro_rate_x = 0.0;
+    double gyro_rate_y = 0.0;
+    double gyro_rate_z = 0.0;
   };
 
   bool SwitchToStandardSPI();
@@ -281,9 +301,9 @@ class ADIS16448_IMU : public nt::NTSendable,
   IMUAxis m_yaw_axis;
 
   // Last read values (post-scaling)
-  double m_gyro_x = 0.0;
-  double m_gyro_y = 0.0;
-  double m_gyro_z = 0.0;
+  double m_gyro_rate_x = 0.0;
+  double m_gyro_rate_y = 0.0;
+  double m_gyro_rate_z = 0.0;
   double m_accel_x = 0.0;
   double m_accel_y = 0.0;
   double m_accel_z = 0.0;
@@ -299,11 +319,11 @@ class ADIS16448_IMU : public nt::NTSendable,
   double m_compAngleX, m_compAngleY, m_accelAngleX, m_accelAngleY = 0.0;
 
   // vector for storing most recent imu values
-  offset_data* m_offset_buffer = nullptr;
+  OffsetData* m_offset_buffer = nullptr;
 
-  double m_gyro_offset_x = 0.0;
-  double m_gyro_offset_y = 0.0;
-  double m_gyro_offset_z = 0.0;
+  double m_gyro_rate_offset_x = 0.0;
+  double m_gyro_rate_offset_y = 0.0;
+  double m_gyro_rate_offset_z = 0.0;
 
   // function to re-init offset buffer
   void InitOffsetBuffer(int size);
@@ -313,9 +333,9 @@ class ADIS16448_IMU : public nt::NTSendable,
   int m_accum_count = 0;
 
   // Integrated gyro values
-  double m_integ_gyro_x = 0.0;
-  double m_integ_gyro_y = 0.0;
-  double m_integ_gyro_z = 0.0;
+  double m_integ_gyro_angle_x = 0.0;
+  double m_integ_gyro_angle_y = 0.0;
+  double m_integ_gyro_angle_z = 0.0;
 
   // Complementary filter functions
   double FormatFastConverge(double compAngle, double accAngle);
@@ -344,6 +364,9 @@ class ADIS16448_IMU : public nt::NTSendable,
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;
+  hal::SimDouble m_simGyroRateX;
+  hal::SimDouble m_simGyroRateY;
+  hal::SimDouble m_simGyroRateZ;
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;

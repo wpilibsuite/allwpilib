@@ -79,6 +79,12 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
         m_simDevice.CreateDouble("gyro_angle_y", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleZ =
         m_simDevice.CreateDouble("gyro_angle_z", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateX =
+        m_simDevice.CreateDouble("gyro_rate_x", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateY =
+        m_simDevice.CreateDouble("gyro_rate_y", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateZ =
+        m_simDevice.CreateDouble("gyro_rate_z", hal::SimDevice::kInput, 0.0);
     m_simAccelX =
         m_simDevice.CreateDouble("accel_x", hal::SimDevice::kInput, 0.0);
     m_simAccelY =
@@ -499,15 +505,15 @@ void ADIS16470_IMU::Acquire() {
   int data_to_read = 0;
   uint32_t previous_timestamp = 0;
   double delta_angle = 0.0;
-  double gyro_x = 0.0;
-  double gyro_y = 0.0;
-  double gyro_z = 0.0;
+  double gyro_rate_x = 0.0;
+  double gyro_rate_y = 0.0;
+  double gyro_rate_z = 0.0;
   double accel_x = 0.0;
   double accel_y = 0.0;
   double accel_z = 0.0;
-  double gyro_x_si = 0.0;
-  double gyro_y_si = 0.0;
-  // double gyro_z_si = 0.0;
+  double gyro_rate_x_si = 0.0;
+  double gyro_rate_y_si = 0.0;
+  // double gyro_rate_z_si = 0.0;
   double accel_x_si = 0.0;
   double accel_y_si = 0.0;
   double accel_z_si = 0.0;
@@ -561,17 +567,17 @@ void ADIS16470_IMU::Acquire() {
          * time (based on timestamp) */
         delta_angle = (ToInt(&buffer[i + 3]) * delta_angle_sf) /
                       (m_scaled_sample_rate / (buffer[i] - previous_timestamp));
-        gyro_x = (BuffToShort(&buffer[i + 7]) / 10.0);
-        gyro_y = (BuffToShort(&buffer[i + 9]) / 10.0);
-        gyro_z = (BuffToShort(&buffer[i + 11]) / 10.0);
+        gyro_rate_x = (BuffToShort(&buffer[i + 7]) / 10.0);
+        gyro_rate_y = (BuffToShort(&buffer[i + 9]) / 10.0);
+        gyro_rate_z = (BuffToShort(&buffer[i + 11]) / 10.0);
         accel_x = (BuffToShort(&buffer[i + 13]) / 800.0);
         accel_y = (BuffToShort(&buffer[i + 15]) / 800.0);
         accel_z = (BuffToShort(&buffer[i + 17]) / 800.0);
 
         // Convert scaled sensor data to SI units
-        gyro_x_si = gyro_x * deg_to_rad;
-        gyro_y_si = gyro_y * deg_to_rad;
-        // gyro_z_si = gyro_z * deg_to_rad;
+        gyro_rate_x_si = gyro_rate_x * deg_to_rad;
+        gyro_rate_y_si = gyro_rate_y * deg_to_rad;
+        // gyro_rate_z_si = gyro_rate_z * deg_to_rad;
         accel_x_si = accel_x * grav;
         accel_y_si = accel_y * grav;
         accel_z_si = accel_z * grav;
@@ -602,8 +608,10 @@ void ADIS16470_IMU::Acquire() {
                                                  (accel_z_si * accel_z_si)));
           accelAngleX = FormatAccelRange(accelAngleX, accel_z_si);
           accelAngleY = FormatAccelRange(accelAngleY, accel_z_si);
-          compAngleX = CompFilterProcess(compAngleX, accelAngleX, -gyro_y_si);
-          compAngleY = CompFilterProcess(compAngleY, accelAngleY, gyro_x_si);
+          compAngleX =
+              CompFilterProcess(compAngleX, accelAngleX, -gyro_rate_y_si);
+          compAngleY =
+              CompFilterProcess(compAngleY, accelAngleY, gyro_rate_x_si);
         }
 
         // DEBUG: Print accumulated values
@@ -619,9 +627,9 @@ void ADIS16470_IMU::Acquire() {
           } else {
             m_integ_angle += delta_angle;
           }
-          m_gyro_x = gyro_x;
-          m_gyro_y = gyro_y;
-          m_gyro_z = gyro_z;
+          m_gyro_rate_x = gyro_rate_x;
+          m_gyro_rate_y = gyro_rate_y;
+          m_gyro_rate_z = gyro_rate_z;
           m_accel_x = accel_x;
           m_accel_y = accel_y;
           m_accel_z = accel_z;
@@ -639,15 +647,15 @@ void ADIS16470_IMU::Acquire() {
       data_to_read = 0;
       previous_timestamp = 0.0;
       delta_angle = 0.0;
-      gyro_x = 0.0;
-      gyro_y = 0.0;
-      gyro_z = 0.0;
+      gyro_rate_x = 0.0;
+      gyro_rate_y = 0.0;
+      gyro_rate_z = 0.0;
       accel_x = 0.0;
       accel_y = 0.0;
       accel_z = 0.0;
-      gyro_x_si = 0.0;
-      gyro_y_si = 0.0;
-      // gyro_z_si = 0.0;
+      gyro_rate_x_si = 0.0;
+      gyro_rate_y_si = 0.0;
+      // gyro_rate_z_si = 0.0;
       accel_x_si = 0.0;
       accel_y_si = 0.0;
       accel_z_si = 0.0;
@@ -700,17 +708,6 @@ double ADIS16470_IMU::CompFilterProcess(double compAngle, double accelAngle,
   return compAngle;
 }
 
-/**
- * @brief Returns the current integrated angle for the axis specified.
- *
- * @param m_yaw_axis An enum indicating the axis chosen to act as the yaw axis.
- *
- * @return The current integrated angle in degrees.
- *
- * This function returns the most recent integrated angle for the axis chosen by
- *m_yaw_axis. This function is most useful in situations where the yaw axis may
- *not coincide with the IMU Z axis.
- **/
 units::degree_t ADIS16470_IMU::GetAngle() const {
   switch (m_yaw_axis) {
     case kX:
@@ -731,6 +728,30 @@ units::degree_t ADIS16470_IMU::GetAngle() const {
   }
   std::scoped_lock sync(m_mutex);
   return units::degree_t{m_integ_angle};
+}
+
+units::degrees_per_second_t ADIS16470_IMU::GetRate() const {
+  if (m_yaw_axis == kX) {
+    if (m_simGyroRateX) {
+      return units::degrees_per_second_t{m_simGyroRateX.Get()};
+    }
+    std::scoped_lock sync(m_mutex);
+    return units::degrees_per_second_t{m_gyro_rate_x};
+  } else if (m_yaw_axis == kY) {
+    if (m_simGyroRateY) {
+      return units::degrees_per_second_t{m_simGyroRateY.Get()};
+    }
+    std::scoped_lock sync(m_mutex);
+    return units::degrees_per_second_t{m_gyro_rate_y};
+  } else if (m_yaw_axis == kZ) {
+    if (m_simGyroRateZ) {
+      return units::degrees_per_second_t{m_simGyroRateZ.Get()};
+    }
+    std::scoped_lock sync(m_mutex);
+    return units::degrees_per_second_t{m_gyro_rate_z};
+  } else {
+    return 0_deg_per_s;
+  }
 }
 
 units::meters_per_second_squared_t ADIS16470_IMU::GetAccelX() const {

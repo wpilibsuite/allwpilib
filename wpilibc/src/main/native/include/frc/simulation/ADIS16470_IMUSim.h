@@ -49,6 +49,27 @@ class ADIS16470_IMUSim {
   void SetGyroAngleZ(units::degree_t angle);
 
   /**
+   * Sets the X axis angular rate (CCW positive).
+   *
+   * @param angularRate The angular rate.
+   */
+  void SetGyroRateX(units::degrees_per_second_t angularRate);
+
+  /**
+   * Sets the Y axis angular rate (CCW positive).
+   *
+   * @param angularRate The angular rate.
+   */
+  void SetGyroRateY(units::degrees_per_second_t angularRate);
+
+  /**
+   * Sets the Z axis angular rate (CCW positive).
+   *
+   * @param angularRate The angular rate.
+   */
+  void SetGyroRateZ(units::degrees_per_second_t angularRate);
+
+  /**
    * Sets the X axis acceleration.
    *
    * @param accel The acceleration.
@@ -73,6 +94,9 @@ class ADIS16470_IMUSim {
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;
+  hal::SimDouble m_simGyroRateX;
+  hal::SimDouble m_simGyroRateY;
+  hal::SimDouble m_simGyroRateZ;
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;

@@ -14,6 +14,9 @@ ADIS16470_IMUSim::ADIS16470_IMUSim(const frc::ADIS16470_IMU& imu) {
   m_simGyroAngleX = deviceSim.GetDouble("gyro_angle_x");
   m_simGyroAngleY = deviceSim.GetDouble("gyro_angle_y");
   m_simGyroAngleZ = deviceSim.GetDouble("gyro_angle_z");
+  m_simGyroRateX = deviceSim.GetDouble("gyro_rate_x");
+  m_simGyroRateY = deviceSim.GetDouble("gyro_rate_y");
+  m_simGyroRateZ = deviceSim.GetDouble("gyro_rate_z");
   m_simAccelX = deviceSim.GetDouble("accel_x");
   m_simAccelY = deviceSim.GetDouble("accel_y");
   m_simAccelZ = deviceSim.GetDouble("accel_z");
@@ -29,6 +32,18 @@ void ADIS16470_IMUSim::SetGyroAngleY(units::degree_t angle) {
 
 void ADIS16470_IMUSim::SetGyroAngleZ(units::degree_t angle) {
   m_simGyroAngleZ.Set(angle.value());
+}
+
+void ADIS16470_IMUSim::SetGyroRateX(units::degrees_per_second_t angularRate) {
+  m_simGyroRateX.Set(angularRate.value());
+}
+
+void ADIS16470_IMUSim::SetGyroRateY(units::degrees_per_second_t angularRate) {
+  m_simGyroRateY.Set(angularRate.value());
+}
+
+void ADIS16470_IMUSim::SetGyroRateZ(units::degrees_per_second_t angularRate) {
+  m_simGyroRateZ.Set(angularRate.value());
 }
 
 void ADIS16470_IMUSim::SetAccelX(units::meters_per_second_squared_t accel) {

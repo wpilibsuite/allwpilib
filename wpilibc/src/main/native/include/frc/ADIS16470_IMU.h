@@ -128,6 +128,11 @@ class ADIS16470_IMU : public nt::NTSendable,
   units::degree_t GetAngle() const;
 
   /**
+   * Returns the yaw axis angular rate in degrees per second (CCW positive).
+   */
+  units::degrees_per_second_t GetRate() const;
+
+  /**
    * Returns the acceleration in the X axis.
    */
   units::meters_per_second_squared_t GetAccelX() const;
@@ -342,7 +347,12 @@ class ADIS16470_IMU : public nt::NTSendable,
   double m_integ_angle = 0.0;
 
   // Instant raw outputs
-  double m_gyro_x, m_gyro_y, m_gyro_z, m_accel_x, m_accel_y, m_accel_z = 0.0;
+  double m_gyro_rate_x = 0.0;
+  double m_gyro_rate_y = 0.0;
+  double m_gyro_rate_z = 0.0;
+  double m_accel_x = 0.0;
+  double m_accel_y = 0.0;
+  double m_accel_z = 0.0;
 
   // Complementary filter variables
   double m_tau = 1.0;
@@ -375,6 +385,9 @@ class ADIS16470_IMU : public nt::NTSendable,
   hal::SimDouble m_simGyroAngleX;
   hal::SimDouble m_simGyroAngleY;
   hal::SimDouble m_simGyroAngleZ;
+  hal::SimDouble m_simGyroRateX;
+  hal::SimDouble m_simGyroRateY;
+  hal::SimDouble m_simGyroRateZ;
   hal::SimDouble m_simAccelX;
   hal::SimDouble m_simAccelY;
   hal::SimDouble m_simAccelZ;

@@ -129,14 +129,14 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   private IMUAxis m_yaw_axis;
 
   /* Offset data storage */
-  private double m_accum_gyro_x[];
-  private double m_accum_gyro_y[];
-  private double m_accum_gyro_z[];
+  private double m_offset_data_gyro_rate_x[];
+  private double m_offset_data_gyro_rate_y[];
+  private double m_offset_data_gyro_rate_z[];
 
   /* Instant raw output variables */
-  private double m_gyro_x = 0.0;
-  private double m_gyro_y = 0.0;
-  private double m_gyro_z = 0.0;
+  private double m_gyro_rate_x = 0.0;
+  private double m_gyro_rate_y = 0.0;
+  private double m_gyro_rate_z = 0.0;
   private double m_accel_x = 0.0;
   private double m_accel_y = 0.0;
   private double m_accel_z = 0.0;
@@ -147,16 +147,16 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   private double m_temp = 0.0;
 
   /* IMU gyro offset variables */
-  private double m_gyro_offset_x = 0.0;
-  private double m_gyro_offset_y = 0.0;
-  private double m_gyro_offset_z = 0.0;
+  private double m_gyro_rate_offset_x = 0.0;
+  private double m_gyro_rate_offset_y = 0.0;
+  private double m_gyro_rate_offset_z = 0.0;
   private int m_avg_size = 0;
   private int m_accum_count = 0;
 
   /* Integrated gyro angle variables */
-  private double m_integ_gyro_x = 0.0;
-  private double m_integ_gyro_y = 0.0;
-  private double m_integ_gyro_z = 0.0;
+  private double m_integ_gyro_angle_x = 0.0;
+  private double m_integ_gyro_angle_y = 0.0;
+  private double m_integ_gyro_angle_z = 0.0;
 
   /* Complementary filter variables */
   private double m_dt = 0.0;
@@ -188,6 +188,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   private SimDouble m_simGyroAngleX;
   private SimDouble m_simGyroAngleY;
   private SimDouble m_simGyroAngleZ;
+  private SimDouble m_simGyroRateX;
+  private SimDouble m_simGyroRateY;
+  private SimDouble m_simGyroRateZ;
   private SimDouble m_simAccelX;
   private SimDouble m_simAccelY;
   private SimDouble m_simAccelZ;
@@ -262,6 +265,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
       m_simGyroAngleX = m_simDevice.createDouble("gyro_angle_x", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleY = m_simDevice.createDouble("gyro_angle_y", SimDevice.Direction.kInput, 0.0);
       m_simGyroAngleZ = m_simDevice.createDouble("gyro_angle_z", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateX = m_simDevice.createDouble("gyro_rate_x", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateY = m_simDevice.createDouble("gyro_rate_y", SimDevice.Direction.kInput, 0.0);
+      m_simGyroRateZ = m_simDevice.createDouble("gyro_rate_z", SimDevice.Direction.kInput, 0.0);
       m_simAccelX = m_simDevice.createDouble("accel_x", SimDevice.Direction.kInput, 0.0);
       m_simAccelY = m_simDevice.createDouble("accel_y", SimDevice.Direction.kInput, 0.0);
       m_simAccelZ = m_simDevice.createDouble("accel_z", SimDevice.Direction.kInput, 0.0);
@@ -532,9 +538,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     m_avg_size = size;
     synchronized (this) {
       // Resize vector
-      m_accum_gyro_x = new double[size];
-      m_accum_gyro_y = new double[size];
-      m_accum_gyro_z = new double[size];
+      m_offset_data_gyro_rate_x = new double[size];
+      m_offset_data_gyro_rate_y = new double[size];
+      m_offset_data_gyro_rate_z = new double[size];
       // Set acculumate count to 0
       m_accum_count = 0;
     }
@@ -548,22 +554,23 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   public void calibrate() {
     synchronized (this) {
       int gyroAverageSize = Math.min(m_accum_count, m_avg_size);
-      double m_gyro_accum_x = 0.0;
-      double m_gyro_accum_y = 0.0;
-      double m_gyro_accum_z = 0.0;
+      double accum_gyro_rate_x = 0.0;
+      double accum_gyro_rate_y = 0.0;
+      double accum_gyro_rate_z = 0.0;
       for (int i = 0; i < gyroAverageSize; i++) {
-        m_gyro_accum_x += m_accum_gyro_x[i];
-        m_gyro_accum_y += m_accum_gyro_y[i];
-        m_gyro_accum_z += m_accum_gyro_z[i];
+        accum_gyro_rate_x += m_offset_data_gyro_rate_x[i];
+        accum_gyro_rate_y += m_offset_data_gyro_rate_y[i];
+        accum_gyro_rate_z += m_offset_data_gyro_rate_z[i];
       }
-      m_gyro_offset_x = m_gyro_accum_x / gyroAverageSize;
-      m_gyro_offset_y = m_gyro_accum_y / gyroAverageSize;
-      m_gyro_offset_z = m_gyro_accum_z / gyroAverageSize;
-      m_integ_gyro_x = 0.0;
-      m_integ_gyro_y = 0.0;
-      m_integ_gyro_z = 0.0;
+      m_gyro_rate_offset_x = accum_gyro_rate_x / gyroAverageSize;
+      m_gyro_rate_offset_y = accum_gyro_rate_y / gyroAverageSize;
+      m_gyro_rate_offset_z = accum_gyro_rate_z / gyroAverageSize;
+      m_integ_gyro_angle_x = 0.0;
+      m_integ_gyro_angle_y = 0.0;
+      m_integ_gyro_angle_z = 0.0;
       // System.out.println("Avg Size: " + gyroAverageSize + "X Off: " +
-      // m_gyro_offset_x + "Y Off: " + m_gyro_offset_y + "Z Off: " + m_gyro_offset_z);
+      // m_gyro_rate_offset_x + "Y Off: " + m_gyro_rate_offset_y + "Z Off: " +
+      // m_gyro_rate_offset_z);
     }
   }
 
@@ -610,9 +617,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   /** {@inheritDoc} */
   public void reset() {
     synchronized (this) {
-      m_integ_gyro_x = 0.0;
-      m_integ_gyro_y = 0.0;
-      m_integ_gyro_z = 0.0;
+      m_integ_gyro_angle_x = 0.0;
+      m_integ_gyro_angle_y = 0.0;
+      m_integ_gyro_angle_z = 0.0;
     }
   }
 
@@ -658,9 +665,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     int bufferAvgIndex = 0;
     double previous_timestamp = 0.0;
     double delta_angle = 0.0;
-    double gyro_x = 0.0;
-    double gyro_y = 0.0;
-    double gyro_z = 0.0;
+    double gyro_rate_x = 0.0;
+    double gyro_rate_y = 0.0;
+    double gyro_rate_z = 0.0;
     double accel_x = 0.0;
     double accel_y = 0.0;
     double accel_z = 0.0;
@@ -669,9 +676,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     double mag_z = 0.0;
     double baro = 0.0;
     double temp = 0.0;
-    double gyro_x_si = 0.0;
-    double gyro_y_si = 0.0;
-    double gyro_z_si = 0.0;
+    double gyro_rate_x_si = 0.0;
+    double gyro_rate_y_si = 0.0;
+    double gyro_rate_z_si = 0.0;
     double accel_x_si = 0.0;
     double accel_y_si = 0.0;
     double accel_z_si = 0.0;
@@ -728,9 +735,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
             m_dt = ((double) buffer[i] - previous_timestamp) / 1000000.0;
 
             // Scale sensor data
-            gyro_x = (toShort(buffer[i + 5], buffer[i + 6]) * 0.04);
-            gyro_y = (toShort(buffer[i + 7], buffer[i + 8]) * 0.04);
-            gyro_z = (toShort(buffer[i + 9], buffer[i + 10]) * 0.04);
+            gyro_rate_x = (toShort(buffer[i + 5], buffer[i + 6]) * 0.04);
+            gyro_rate_y = (toShort(buffer[i + 7], buffer[i + 8]) * 0.04);
+            gyro_rate_z = (toShort(buffer[i + 9], buffer[i + 10]) * 0.04);
             accel_x = (toShort(buffer[i + 11], buffer[i + 12]) * 0.833);
             accel_y = (toShort(buffer[i + 13], buffer[i + 14]) * 0.833);
             accel_z = (toShort(buffer[i + 15], buffer[i + 16]) * 0.833);
@@ -742,9 +749,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
             // Convert scaled sensor data to SI units (for tilt calculations)
             // TODO: Should the unit outputs be selectable?
-            gyro_x_si = gyro_x * deg_to_rad;
-            gyro_y_si = gyro_y * deg_to_rad;
-            gyro_z_si = gyro_z * deg_to_rad;
+            gyro_rate_x_si = gyro_rate_x * deg_to_rad;
+            gyro_rate_y_si = gyro_rate_y * deg_to_rad;
+            gyro_rate_z_si = gyro_rate_z * deg_to_rad;
             accel_x_si = accel_x * grav;
             accel_y_si = accel_y * grav;
             accel_z_si = accel_z * grav;
@@ -777,31 +784,31 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
                       Math.sqrt((-accel_x_si * -accel_x_si) + (-accel_z_si * -accel_z_si)));
               accelAngleX = formatAccelRange(accelAngleX, -accel_z_si);
               accelAngleY = formatAccelRange(accelAngleY, -accel_z_si);
-              compAngleX = compFilterProcess(compAngleX, accelAngleX, -gyro_y_si);
-              compAngleY = compFilterProcess(compAngleY, accelAngleY, -gyro_x_si);
+              compAngleX = compFilterProcess(compAngleX, accelAngleX, -gyro_rate_y_si);
+              compAngleY = compFilterProcess(compAngleY, accelAngleY, -gyro_rate_x_si);
             }
 
             // Update global variables and state
             synchronized (this) {
               // Ignore first, integrated sample
               if (m_first_run) {
-                m_integ_gyro_x = 0.0;
-                m_integ_gyro_y = 0.0;
-                m_integ_gyro_z = 0.0;
+                m_integ_gyro_angle_x = 0.0;
+                m_integ_gyro_angle_y = 0.0;
+                m_integ_gyro_angle_z = 0.0;
               } else {
                 // Accumulate gyro for offset calibration
                 // Add to buffer
                 bufferAvgIndex = m_accum_count % m_avg_size;
-                m_accum_gyro_x[bufferAvgIndex] = gyro_x;
-                m_accum_gyro_y[bufferAvgIndex] = gyro_y;
-                m_accum_gyro_z[bufferAvgIndex] = gyro_z;
+                m_offset_data_gyro_rate_x[bufferAvgIndex] = gyro_rate_x;
+                m_offset_data_gyro_rate_y[bufferAvgIndex] = gyro_rate_y;
+                m_offset_data_gyro_rate_z[bufferAvgIndex] = gyro_rate_z;
                 // Increment counter
                 m_accum_count++;
               }
               if (!m_start_up_mode) {
-                m_gyro_x = gyro_x;
-                m_gyro_y = gyro_y;
-                m_gyro_z = gyro_z;
+                m_gyro_rate_x = gyro_rate_x;
+                m_gyro_rate_y = gyro_rate_y;
+                m_gyro_rate_z = gyro_rate_z;
                 m_accel_x = accel_x;
                 m_accel_y = accel_y;
                 m_accel_z = accel_z;
@@ -815,9 +822,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
                 m_accelAngleX = accelAngleX * rad_to_deg;
                 m_accelAngleY = accelAngleY * rad_to_deg;
                 // Accumulate gyro for angle integration and publish to global variables
-                m_integ_gyro_x += (gyro_x - m_gyro_offset_x) * m_dt;
-                m_integ_gyro_y += (gyro_y - m_gyro_offset_y) * m_dt;
-                m_integ_gyro_z += (gyro_z - m_gyro_offset_z) * m_dt;
+                m_integ_gyro_angle_x += (gyro_rate_x - m_gyro_rate_offset_x) * m_dt;
+                m_integ_gyro_angle_y += (gyro_rate_y - m_gyro_rate_offset_y) * m_dt;
+                m_integ_gyro_angle_z += (gyro_rate_z - m_gyro_rate_offset_z) * m_dt;
               }
               // System.out.println("Good CRC");
             }
@@ -853,9 +860,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
         data_to_read = 0;
         previous_timestamp = 0.0;
         delta_angle = 0.0;
-        gyro_x = 0.0;
-        gyro_y = 0.0;
-        gyro_z = 0.0;
+        gyro_rate_x = 0.0;
+        gyro_rate_y = 0.0;
+        gyro_rate_z = 0.0;
         accel_x = 0.0;
         accel_y = 0.0;
         accel_z = 0.0;
@@ -864,9 +871,9 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
         mag_z = 0.0;
         baro = 0.0;
         temp = 0.0;
-        gyro_x_si = 0.0;
-        gyro_y_si = 0.0;
-        gyro_z_si = 0.0;
+        gyro_rate_x_si = 0.0;
+        gyro_rate_y_si = 0.0;
+        gyro_rate_z_si = 0.0;
         accel_x_si = 0.0;
         accel_y_si = 0.0;
         accel_z_si = 0.0;
@@ -950,6 +957,20 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     }
   }
 
+  /** @return Yaw axis angular rate in degrees per second (CCW positive) */
+  public synchronized double getRate() {
+    switch (m_yaw_axis) {
+      case kX:
+        return getGyroAngleX();
+      case kY:
+        return getGyroAngleY();
+      case kZ:
+        return getGyroAngleZ();
+      default:
+        return 0.0;
+    }
+  }
+
   /** @return Yaw Axis */
   public IMUAxis getYawAxis() {
     return m_yaw_axis;
@@ -960,7 +981,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     if (m_simGyroAngleX != null) {
       return m_simGyroAngleX.get();
     }
-    return m_integ_gyro_x;
+    return m_integ_gyro_angle_x;
   }
 
   /** @return accumulated gyro angle in the Y axis in degrees */
@@ -968,7 +989,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     if (m_simGyroAngleY != null) {
       return m_simGyroAngleY.get();
     }
-    return m_integ_gyro_y;
+    return m_integ_gyro_angle_y;
   }
 
   /** @return accumulated gyro angle in the Z axis in degrees */
@@ -976,7 +997,31 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
     if (m_simGyroAngleZ != null) {
       return m_simGyroAngleZ.get();
     }
-    return m_integ_gyro_z;
+    return m_integ_gyro_angle_z;
+  }
+
+  /** @return gyro angular rate in the X axis in degrees per second */
+  public synchronized double getGyroRateX() {
+    if (m_simGyroRateX != null) {
+      return m_simGyroRateX.get();
+    }
+    return m_gyro_rate_x;
+  }
+
+  /** @return gyro angular rate in the Y axis in degrees per second */
+  public synchronized double getGyroRateY() {
+    if (m_simGyroRateY != null) {
+      return m_simGyroRateY.get();
+    }
+    return m_gyro_rate_y;
+  }
+
+  /** @return gyro angular rate in the Z axis in degrees per second */
+  public synchronized double getGyroRateZ() {
+    if (m_simGyroRateZ != null) {
+      return m_simGyroRateZ.get();
+    }
+    return m_gyro_rate_z;
   }
 
   /** @return urrent acceleration in the X axis in meters per second squared */

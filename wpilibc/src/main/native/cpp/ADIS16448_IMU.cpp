@@ -81,6 +81,12 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
         m_simDevice.CreateDouble("gyro_angle_y", hal::SimDevice::kInput, 0.0);
     m_simGyroAngleZ =
         m_simDevice.CreateDouble("gyro_angle_z", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateX =
+        m_simDevice.CreateDouble("gyro_rate_x", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateY =
+        m_simDevice.CreateDouble("gyro_rate_y", hal::SimDevice::kInput, 0.0);
+    m_simGyroRateZ =
+        m_simDevice.CreateDouble("gyro_rate_z", hal::SimDevice::kInput, 0.0);
     m_simAccelX =
         m_simDevice.CreateDouble("accel_x", hal::SimDevice::kInput, 0.0);
     m_simAccelY =
@@ -237,7 +243,7 @@ void ADIS16448_IMU::InitOffsetBuffer(int size) {
   if (m_offset_buffer != nullptr) {
     delete[] m_offset_buffer;
   }
-  m_offset_buffer = new offset_data[size];
+  m_offset_buffer = new OffsetData[size];
 
   // set accumulate count to 0
   m_accum_count = 0;
@@ -324,23 +330,23 @@ void ADIS16448_IMU::Calibrate() {
   std::scoped_lock sync(m_mutex);
   // Calculate the running average
   int gyroAverageSize = std::min(m_accum_count, m_avg_size);
-  double m_gyro_accum_x = 0.0;
-  double m_gyro_accum_y = 0.0;
-  double m_gyro_accum_z = 0.0;
+  double accum_gyro_rate_x = 0.0;
+  double accum_gyro_rate_y = 0.0;
+  double accum_gyro_rate_z = 0.0;
   for (int i = 0; i < gyroAverageSize; i++) {
-    m_gyro_accum_x += m_offset_buffer[i].m_accum_gyro_x;
-    m_gyro_accum_y += m_offset_buffer[i].m_accum_gyro_y;
-    m_gyro_accum_z += m_offset_buffer[i].m_accum_gyro_z;
+    accum_gyro_rate_x += m_offset_buffer[i].gyro_rate_x;
+    accum_gyro_rate_y += m_offset_buffer[i].gyro_rate_y;
+    accum_gyro_rate_z += m_offset_buffer[i].gyro_rate_z;
   }
-  m_gyro_offset_x = m_gyro_accum_x / gyroAverageSize;
-  m_gyro_offset_y = m_gyro_accum_y / gyroAverageSize;
-  m_gyro_offset_z = m_gyro_accum_z / gyroAverageSize;
-  m_integ_gyro_x = 0.0;
-  m_integ_gyro_y = 0.0;
-  m_integ_gyro_z = 0.0;
+  m_gyro_rate_offset_x = accum_gyro_rate_x / gyroAverageSize;
+  m_gyro_rate_offset_y = accum_gyro_rate_y / gyroAverageSize;
+  m_gyro_rate_offset_z = accum_gyro_rate_z / gyroAverageSize;
+  m_integ_gyro_angle_x = 0.0;
+  m_integ_gyro_angle_y = 0.0;
+  m_integ_gyro_angle_z = 0.0;
   // std::cout << "Avg Size: " << gyroAverageSize << " X off: " <<
-  // m_gyro_offset_x << " Y off: " << m_gyro_offset_y << " Z off: " <<
-  // m_gyro_offset_z << std::endl;
+  // m_gyro_rate_offset_x << " Y off: " << m_gyro_rate_offset_y << " Z off: " <<
+  // m_gyro_rate_offset_z << std::endl;
 }
 
 /**
@@ -384,9 +390,9 @@ void ADIS16448_IMU::WriteRegister(uint8_t reg, uint16_t val) {
  **/
 void ADIS16448_IMU::Reset() {
   std::scoped_lock sync(m_mutex);
-  m_integ_gyro_x = 0.0;
-  m_integ_gyro_y = 0.0;
-  m_integ_gyro_z = 0.0;
+  m_integ_gyro_angle_x = 0.0;
+  m_integ_gyro_angle_y = 0.0;
+  m_integ_gyro_angle_z = 0.0;
 }
 
 void ADIS16448_IMU::Close() {
@@ -422,9 +428,6 @@ void ADIS16448_IMU::Acquire() {
 
   const int BUFFER_SIZE = 4000;
 
-  // struct to store accumulate data
-  offset_data sample_data;
-
   // This buffer can contain many datasets
   uint32_t buffer[BUFFER_SIZE];
   int data_count = 0;
@@ -432,9 +435,9 @@ void ADIS16448_IMU::Acquire() {
   int data_to_read = 0;
   int bufferAvgIndex = 0;
   uint32_t previous_timestamp = 0;
-  double gyro_x = 0.0;
-  double gyro_y = 0.0;
-  double gyro_z = 0.0;
+  double gyro_rate_x = 0.0;
+  double gyro_rate_y = 0.0;
+  double gyro_rate_z = 0.0;
   double accel_x = 0.0;
   double accel_y = 0.0;
   double accel_z = 0.0;
@@ -443,9 +446,9 @@ void ADIS16448_IMU::Acquire() {
   double mag_z = 0.0;
   double baro = 0.0;
   double temp = 0.0;
-  double gyro_x_si = 0.0;
-  double gyro_y_si = 0.0;
-  // double gyro_z_si = 0.0;
+  double gyro_rate_x_si = 0.0;
+  double gyro_rate_y_si = 0.0;
+  // double gyro_rate_z_si = 0.0;
   double accel_x_si = 0.0;
   double accel_y_si = 0.0;
   double accel_z_si = 0.0;
@@ -502,9 +505,9 @@ void ADIS16448_IMU::Acquire() {
           // Timestamp is at buffer[i]
           m_dt = (buffer[i] - previous_timestamp) / 1000000.0;
           // Split array and scale data
-          gyro_x = BuffToShort(&buffer[i + 5]) * 0.04;
-          gyro_y = BuffToShort(&buffer[i + 7]) * 0.04;
-          gyro_z = BuffToShort(&buffer[i + 9]) * 0.04;
+          gyro_rate_x = BuffToShort(&buffer[i + 5]) * 0.04;
+          gyro_rate_y = BuffToShort(&buffer[i + 7]) * 0.04;
+          gyro_rate_z = BuffToShort(&buffer[i + 9]) * 0.04;
           accel_x = BuffToShort(&buffer[i + 11]) * 0.833;
           accel_y = BuffToShort(&buffer[i + 13]) * 0.833;
           accel_z = BuffToShort(&buffer[i + 15]) * 0.833;
@@ -525,9 +528,9 @@ void ADIS16448_IMU::Acquire() {
           BuffToShort(&buffer[i + 27]) << std::endl; */
 
           // Convert scaled sensor data to SI units
-          gyro_x_si = gyro_x * deg_to_rad;
-          gyro_y_si = gyro_y * deg_to_rad;
-          // gyro_z_si = gyro_z * deg_to_rad;
+          gyro_rate_x_si = gyro_rate_x * deg_to_rad;
+          gyro_rate_y_si = gyro_rate_y * deg_to_rad;
+          // gyro_rate_z_si = gyro_rate_z * deg_to_rad;
           accel_x_si = accel_x * grav;
           accel_y_si = accel_y * grav;
           accel_z_si = accel_z * grav;
@@ -554,8 +557,10 @@ void ADIS16448_IMU::Acquire() {
                                          (-accel_z_si * -accel_z_si)));
             accelAngleX = FormatAccelRange(accelAngleX, -accel_z_si);
             accelAngleY = FormatAccelRange(accelAngleY, -accel_z_si);
-            compAngleX = CompFilterProcess(compAngleX, accelAngleX, -gyro_y_si);
-            compAngleY = CompFilterProcess(compAngleY, accelAngleY, -gyro_x_si);
+            compAngleX =
+                CompFilterProcess(compAngleX, accelAngleX, -gyro_rate_y_si);
+            compAngleY =
+                CompFilterProcess(compAngleY, accelAngleY, -gyro_rate_x_si);
           }
 
           // Update global variables and state
@@ -563,27 +568,24 @@ void ADIS16448_IMU::Acquire() {
             std::scoped_lock sync(m_mutex);
             // Ignore first, integrated sample
             if (m_first_run) {
-              m_integ_gyro_x = 0.0;
-              m_integ_gyro_y = 0.0;
-              m_integ_gyro_z = 0.0;
+              m_integ_gyro_angle_x = 0.0;
+              m_integ_gyro_angle_y = 0.0;
+              m_integ_gyro_angle_z = 0.0;
             } else {
               // Accumulate gyro for offset calibration
-              // Build most recent sample data
-              sample_data.m_accum_gyro_x = gyro_x;
-              sample_data.m_accum_gyro_y = gyro_y;
-              sample_data.m_accum_gyro_z = gyro_z;
-              // Add to buffer
+              // Add most recent sample data to buffer
               bufferAvgIndex = m_accum_count % m_avg_size;
-              m_offset_buffer[bufferAvgIndex] = sample_data;
+              m_offset_buffer[bufferAvgIndex] =
+                  OffsetData{gyro_rate_x, gyro_rate_y, gyro_rate_z};
               // Increment counter
               m_accum_count++;
             }
             // Don't post accumulated data to the global variables until an
             // initial gyro offset has been calculated
             if (!m_start_up_mode) {
-              m_gyro_x = gyro_x;
-              m_gyro_y = gyro_y;
-              m_gyro_z = gyro_z;
+              m_gyro_rate_x = gyro_rate_x;
+              m_gyro_rate_y = gyro_rate_y;
+              m_gyro_rate_z = gyro_rate_z;
               m_accel_x = accel_x;
               m_accel_y = accel_y;
               m_accel_z = accel_z;
@@ -598,9 +600,12 @@ void ADIS16448_IMU::Acquire() {
               m_accelAngleY = accelAngleY * rad_to_deg;
               // Accumulate gyro for angle integration and publish to global
               // variables
-              m_integ_gyro_x += (gyro_x - m_gyro_offset_x) * m_dt;
-              m_integ_gyro_y += (gyro_y - m_gyro_offset_y) * m_dt;
-              m_integ_gyro_z += (gyro_z - m_gyro_offset_z) * m_dt;
+              m_integ_gyro_angle_x +=
+                  (gyro_rate_x - m_gyro_rate_offset_x) * m_dt;
+              m_integ_gyro_angle_y +=
+                  (gyro_rate_y - m_gyro_rate_offset_y) * m_dt;
+              m_integ_gyro_angle_z +=
+                  (gyro_rate_z - m_gyro_rate_offset_z) * m_dt;
             }
           }
           m_first_run = false;
@@ -628,9 +633,9 @@ void ADIS16448_IMU::Acquire() {
       data_remainder = 0;
       data_to_read = 0;
       previous_timestamp = 0.0;
-      gyro_x = 0.0;
-      gyro_y = 0.0;
-      gyro_z = 0.0;
+      gyro_rate_x = 0.0;
+      gyro_rate_y = 0.0;
+      gyro_rate_z = 0.0;
       accel_x = 0.0;
       accel_y = 0.0;
       accel_z = 0.0;
@@ -639,9 +644,9 @@ void ADIS16448_IMU::Acquire() {
       mag_z = 0.0;
       baro = 0.0;
       temp = 0.0;
-      gyro_x_si = 0.0;
-      gyro_y_si = 0.0;
-      // gyro_z_si = 0.0;
+      gyro_rate_x_si = 0.0;
+      gyro_rate_y_si = 0.0;
+      // gyro_rate_z_si = 0.0;
       accel_x_si = 0.0;
       accel_y_si = 0.0;
       accel_z_si = 0.0;
@@ -742,12 +747,25 @@ units::degree_t ADIS16448_IMU::GetAngle() const {
   }
 }
 
+units::degrees_per_second_t ADIS16448_IMU::GetRate() const {
+  switch (m_yaw_axis) {
+    case kX:
+      return GetGyroRateX();
+    case kY:
+      return GetGyroRateY();
+    case kZ:
+      return GetGyroRateZ();
+    default:
+      return 0_deg_per_s;
+  }
+}
+
 units::degree_t ADIS16448_IMU::GetGyroAngleX() const {
   if (m_simGyroAngleX) {
     return units::degree_t{m_simGyroAngleX.Get()};
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_x};
+  return units::degree_t{m_integ_gyro_angle_x};
 }
 
 units::degree_t ADIS16448_IMU::GetGyroAngleY() const {
@@ -755,7 +773,7 @@ units::degree_t ADIS16448_IMU::GetGyroAngleY() const {
     return units::degree_t{m_simGyroAngleY.Get()};
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_y};
+  return units::degree_t{m_integ_gyro_angle_y};
 }
 
 units::degree_t ADIS16448_IMU::GetGyroAngleZ() const {
@@ -763,7 +781,31 @@ units::degree_t ADIS16448_IMU::GetGyroAngleZ() const {
     return units::degree_t{m_simGyroAngleZ.Get()};
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_z};
+  return units::degree_t{m_integ_gyro_angle_z};
+}
+
+units::degrees_per_second_t ADIS16448_IMU::GetGyroRateX() const {
+  if (m_simGyroRateX) {
+    return units::degrees_per_second_t{m_simGyroRateX.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::degrees_per_second_t{m_gyro_rate_x};
+}
+
+units::degrees_per_second_t ADIS16448_IMU::GetGyroRateY() const {
+  if (m_simGyroRateY) {
+    return units::degrees_per_second_t{m_simGyroRateY.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::degrees_per_second_t{m_gyro_rate_y};
+}
+
+units::degrees_per_second_t ADIS16448_IMU::GetGyroRateZ() const {
+  if (m_simGyroRateZ) {
+    return units::degrees_per_second_t{m_simGyroRateZ.Get()};
+  }
+  std::scoped_lock sync(m_mutex);
+  return units::degrees_per_second_t{m_gyro_rate_z};
 }
 
 units::meters_per_second_squared_t ADIS16448_IMU::GetAccelX() const {
