@@ -145,6 +145,8 @@ if (USE_VCPKG_EIGEN)
 set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
+find_package(LIBSSH 0.7.1)
+
 if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
 set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
@@ -258,6 +260,9 @@ if (WITH_GUI)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
+    if (LIBSSH_FOUND)
+        add_subdirectory(roborioteamnumbersetter)
+    endif()
 endif()
 
 if (WITH_WPILIB OR WITH_SIMULATION_MODULES)
