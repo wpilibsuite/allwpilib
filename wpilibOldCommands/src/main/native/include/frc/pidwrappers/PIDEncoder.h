@@ -11,6 +11,9 @@ namespace frc {
 
 /**
  * Wrapper so that PIDSource is implemented for Encoder for old PIDController
+ *
+ * @deprecated Use frc2::PIDController class instead which doesn't require this
+ * wrapper.
  */
 class PIDEncoder : public PIDSource, public Encoder {
   using Encoder::Encoder;

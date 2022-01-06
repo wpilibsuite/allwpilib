@@ -9,7 +9,13 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 
-/** Wrapper so that PIDSource is implemented for Encoder for old PIDController. */
+/**
+ * Wrapper so that PIDSource is implemented for Encoder for old PIDController.
+ *
+ * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} which doesn't require this
+ *     wrapper.
+ */
+@Deprecated(since = "2022", forRemoval = true)
 public class PIDEncoder extends Encoder implements PIDSource {
   private PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
