@@ -262,6 +262,7 @@ if (WITH_GUI)
     add_subdirectory(outlineviewer)
     if (LIBSSH_FOUND)
         add_subdirectory(roborioteamnumbersetter)
+        add_subdirectory(datalogtool)
     endif()
 endif()
 
