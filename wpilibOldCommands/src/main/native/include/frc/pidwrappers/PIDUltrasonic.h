@@ -15,7 +15,9 @@ namespace frc {
  * @deprecated Use frc2::PIDController class instead which doesn't require this
  * wrapper.
  */
-class PIDUltrasonic : public PIDSource, public Ultrasonic {
+class WPI_DEPRECATED("Use frc2::PIDController class instead.") PIDUltrasonic
+    : public PIDSource,
+      public Ultrasonic {
   using Ultrasonic::Ultrasonic;
 
  public:
