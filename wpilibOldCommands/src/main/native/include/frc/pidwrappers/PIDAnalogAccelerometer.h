@@ -12,8 +12,13 @@ namespace frc {
 /**
  * Wrapper so that PIDSource is implemented for AnalogAccelerometer for old
  * PIDController
+ *
+ * @deprecated Use frc2::PIDController class instead which doesn't require this
+ * wrapper.
  */
-class PIDAnalogAccelerometer : public PIDSource, public AnalogAccelerometer {
+class WPI_DEPRECATED("Use frc2::PIDController class instead.")
+    PIDAnalogAccelerometer : public PIDSource,
+                             public AnalogAccelerometer {
   using AnalogAccelerometer::AnalogAccelerometer;
 
  public:

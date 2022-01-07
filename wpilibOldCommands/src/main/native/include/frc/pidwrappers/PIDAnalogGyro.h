@@ -11,8 +11,13 @@ namespace frc {
 
 /**
  * Wrapper so that PIDSource is implemented for AnalogGyro for old PIDController
+ *
+ * @deprecated Use frc2::PIDController class instead which doesn't require this
+ * wrapper.
  */
-class PIDAnalogGyro : public PIDSource, public AnalogGyro {
+class WPI_DEPRECATED("Use frc2::PIDController class instead.") PIDAnalogGyro
+    : public PIDSource,
+      public AnalogGyro {
   using AnalogGyro::AnalogGyro;
 
  public:

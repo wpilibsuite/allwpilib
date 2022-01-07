@@ -9,7 +9,13 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
-/** Wrapper so that PIDOutput is implemented for MotorController for old PIDController. */
+/**
+ * Wrapper so that PIDOutput is implemented for MotorController for old PIDController.
+ *
+ * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} which doesn't require this
+ *     wrapper.
+ */
+@Deprecated(since = "2022", forRemoval = true)
 public class PIDMotorController implements PIDOutput, MotorController, Sendable {
   private final MotorController m_motorController;
 
