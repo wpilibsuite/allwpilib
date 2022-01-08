@@ -19,6 +19,6 @@ class ExampleGlobalMeasurementSensor {
     return frc::Pose2d(estimatedRobotPose.X() + units::meter_t(randVec(0)),
                        estimatedRobotPose.Y() + units::meter_t(randVec(1)),
                        estimatedRobotPose.Rotation() +
-                           frc::Rotation2d(units::radian_t(randVec(3))));
+                           frc::Rotation2d(units::radian_t(randVec(2))));
   }
 };

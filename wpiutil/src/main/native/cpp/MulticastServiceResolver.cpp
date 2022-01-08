@@ -63,7 +63,7 @@ WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
   return resolver->GetEventHandle();
 }
 
-WPI_ServiceData** WPI_GetMulticastServiceResolverData(
+WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle, int32_t* dataCount) {
   std::vector<wpi::MulticastServiceResolver::ServiceData> allData;
   {
@@ -77,7 +77,6 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
     return nullptr;
   }
   size_t allocSize = sizeof(WPI_ServiceData) * allData.size();
-  allocSize += sizeof(WPI_ServiceData*) * allData.size();
 
   for (auto&& data : allData) {
     // Include space for hostName and serviceType (+ terminators)
@@ -100,26 +99,22 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
   if (!cDataRaw) {
     return nullptr;
   }
-  WPI_ServiceData** rootArray = reinterpret_cast<WPI_ServiceData**>(cDataRaw);
-  cDataRaw += (sizeof(WPI_ServiceData*) + allData.size());
-  WPI_ServiceData** currentData = rootArray;
+  WPI_ServiceData* rootArray = reinterpret_cast<WPI_ServiceData*>(cDataRaw);
+  cDataRaw += (sizeof(WPI_ServiceData) + allData.size());
+  WPI_ServiceData* currentData = rootArray;
 
   for (auto&& data : allData) {
-    WPI_ServiceData* cData = reinterpret_cast<WPI_ServiceData*>(cDataRaw);
-    *currentData = cData;
-    currentData++;
-    cData->ipv4Address = data.ipv4Address;
-    cData->port = data.port;
-    cData->txtCount = data.txt.size();
-    cDataRaw += sizeof(WPI_ServiceData);
+    currentData->ipv4Address = data.ipv4Address;
+    currentData->port = data.port;
+    currentData->txtCount = data.txt.size();
 
     std::memcpy(cDataRaw, data.hostName.c_str(), data.hostName.size() + 1);
-    cData->hostName = reinterpret_cast<const char*>(cDataRaw);
+    currentData->hostName = reinterpret_cast<const char*>(cDataRaw);
     cDataRaw += data.hostName.size() + 1;
 
     std::memcpy(cDataRaw, data.serviceName.c_str(),
                 data.serviceName.size() + 1);
-    cData->serviceName = reinterpret_cast<const char*>(cDataRaw);
+    currentData->serviceName = reinterpret_cast<const char*>(cDataRaw);
     cDataRaw += data.serviceName.size() + 1;
 
     char** valuesPtrArr = reinterpret_cast<char**>(cDataRaw);
@@ -127,8 +122,8 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
     char** keysPtrArr = reinterpret_cast<char**>(cDataRaw);
     cDataRaw += (sizeof(char**) * data.txt.size());
 
-    cData->txtKeys = const_cast<const char**>(keysPtrArr);
-    cData->txtValues = const_cast<const char**>(valuesPtrArr);
+    currentData->txtKeys = const_cast<const char**>(keysPtrArr);
+    currentData->txtValues = const_cast<const char**>(valuesPtrArr);
 
     for (size_t i = 0; i < data.txt.size(); i++) {
       keysPtrArr[i] = reinterpret_cast<char*>(cDataRaw);
@@ -141,12 +136,13 @@ WPI_ServiceData** WPI_GetMulticastServiceResolverData(
                   data.txt[i].second.size() + 1);
       cDataRaw += (data.txt[i].second.size() + 1);
     }
+    currentData++;
   }
 
   return rootArray;
 }
 
-void WPI_FreeServiceData(WPI_ServiceData** serviceData) {
+void WPI_FreeServiceData(WPI_ServiceData* serviceData, int32_t length) {
   std::free(serviceData);
 }
 }  // extern "C"

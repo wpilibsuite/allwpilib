@@ -53,11 +53,11 @@ bool glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   // build label
   std::string& name = GetStorage().GetString("name");
   char label[128];
-  std::snprintf(label, sizeof(label), "%s###name",
+  std::snprintf(label, sizeof(label), "%s###header",
                 name.empty() ? id : name.c_str());
 
   bool open = CollapsingHeader(label, flags);
-  PopupEditName("name", &name);
+  PopupEditName("header", &name);
 
   if (!open) {
     PopID();

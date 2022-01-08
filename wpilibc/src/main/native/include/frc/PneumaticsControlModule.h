@@ -26,17 +26,19 @@ class PneumaticsControlModule : public PneumaticsBase {
 
   void EnableCompressorDigital() override;
 
-  void EnableCompressorAnalog(double minAnalogVoltage,
-                              double maxAnalogVoltage) override;
+  void EnableCompressorAnalog(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
 
-  void EnableCompressorHybrid(double minAnalogVoltage,
-                              double maxAnalogVoltage) override;
+  void EnableCompressorHybrid(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
 
   CompressorConfigType GetCompressorConfigType() const override;
 
   bool GetPressureSwitch() const override;
 
-  double GetCompressorCurrent() const override;
+  units::ampere_t GetCompressorCurrent() const override;
 
   bool GetCompressorCurrentTooHighFault() const;
   bool GetCompressorCurrentTooHighStickyFault() const;
@@ -71,6 +73,10 @@ class PneumaticsControlModule : public PneumaticsBase {
   bool ReserveCompressor() override;
 
   void UnreserveCompressor() override;
+
+  units::volt_t GetAnalogVoltage(int channel) const override;
+
+  units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
   Solenoid MakeSolenoid(int channel) override;
   DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,

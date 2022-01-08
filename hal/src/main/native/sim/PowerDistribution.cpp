@@ -168,4 +168,16 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status) {
   return false;
 }
+
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
+                                     HAL_PowerDistributionVersion* version,
+                                     int32_t* status) {}
+
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
+                                    HAL_PowerDistributionFaults* faults,
+                                    int32_t* status) {}
+
+void HAL_GetPowerDistributionStickyFaults(
+    HAL_PowerDistributionHandle handle,
+    HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status) {}
 }  // extern "C"

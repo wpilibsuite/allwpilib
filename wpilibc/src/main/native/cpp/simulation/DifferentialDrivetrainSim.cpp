@@ -43,8 +43,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 
 Eigen::Vector<double, 2> DifferentialDrivetrainSim::ClampInput(
     const Eigen::Vector<double, 2>& u) {
-  return frc::NormalizeInputVector<2>(u,
-                                      frc::RobotController::GetInputVoltage());
+  return frc::DesaturateInputVector<2>(u,
+                                       frc::RobotController::GetInputVoltage());
 }
 
 void DifferentialDrivetrainSim::SetInputs(units::volt_t leftVoltage,

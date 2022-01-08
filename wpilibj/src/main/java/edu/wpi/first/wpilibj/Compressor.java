@@ -117,6 +117,25 @@ public class Compressor implements Sendable, AutoCloseable {
     return m_module.getCompressorCurrent();
   }
 
+  /**
+   * Query the analog input voltage (on channel 0) (if supported).
+   *
+   * @return The analog input voltage, in volts
+   */
+  public double getAnalogVoltage() {
+    return m_module.getAnalogVoltage(0);
+  }
+
+  /**
+   * Query the analog sensor pressure (on channel 0) (if supported). Note this is only for use with
+   * the REV Analog Pressure Sensor.
+   *
+   * @return The analog sensor pressure, in PSI
+   */
+  public double getPressure() {
+    return m_module.getPressure(0);
+  }
+
   /** Disable the compressor. */
   public void disable() {
     m_module.disableCompressor();
@@ -128,27 +147,29 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Enable compressor closed loop control using analog input.
+   * Enable compressor closed loop control using analog input. Note this is only for use with the
+   * REV Analog Pressure Sensor.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
-   * @param minAnalogVoltage The minimum voltage to enable compressor
-   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
    */
-  public void enableAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
-    m_module.enableCompressorAnalog(minAnalogVoltage, maxAnalogVoltage);
+  public void enableAnalog(double minPressure, double maxPressure) {
+    m_module.enableCompressorAnalog(minPressure, maxPressure);
   }
 
   /**
-   * Enable compressor closed loop control using hybrid input.
+   * Enable compressor closed loop control using hybrid input. Note this is only for use with the
+   * REV Analog Pressure Sensor.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
-   * @param minAnalogVoltage The minimum voltage to enable compressor
-   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
    */
-  public void enableHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
-    m_module.enableCompressorHybrid(minAnalogVoltage, maxAnalogVoltage);
+  public void enableHybrid(double minPressure, double maxPressure) {
+    m_module.enableCompressorHybrid(minPressure, maxPressure);
   }
 
   /**

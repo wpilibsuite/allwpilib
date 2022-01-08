@@ -46,7 +46,8 @@ class Servo : public PWM {
    * Get the servo position.
    *
    * Servo values range from 0.0 to 1.0 corresponding to the range of full left
-   * to full right.
+   * to full right. This returns the commanded position, not the position that
+   * the servo is actually at, as the servo does not report its own position.
    *
    * @return Position from 0.0 to 1.0.
    */
@@ -55,8 +56,8 @@ class Servo : public PWM {
   /**
    * Set the servo angle.
    *
-   * Assume that the servo angle is linear with respect to the PWM value (big
-   * assumption, need to test).
+   * The angles are based on the HS-322HD Servo, and have a range of 0 to 180
+   * degrees.
    *
    * Servo angles that are out of the supported range of the servo simply
    * "saturate" in that direction. In other words, if the servo has a range of
@@ -71,8 +72,8 @@ class Servo : public PWM {
   /**
    * Get the servo angle.
    *
-   * Assume that the servo angle is linear with respect to the PWM value (big
-   * assumption, need to test).
+   * This returns the commanded angle, not the angle that the servo is actually
+   * at, as the servo does not report its own angle.
    *
    * @return The angle in degrees to which the servo is set.
    */

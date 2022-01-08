@@ -9,7 +9,13 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 
-/** Wrapper so that PIDSource is implemented for AnalogAccelerometer for old PIDController. */
+/**
+ * Wrapper so that PIDSource is implemented for AnalogAccelerometer for old PIDController.
+ *
+ * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} which doesn't require this
+ *     wrapper.
+ */
+@Deprecated(since = "2022", forRemoval = true)
 public class PIDAnalogAccelerometer extends AnalogAccelerometer implements PIDSource {
   protected PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 

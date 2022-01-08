@@ -56,9 +56,13 @@ public final class WPIUtilJNI {
 
   public static native void enableMockTime();
 
+  public static native void disableMockTime();
+
   public static native void setMockTime(long time);
 
   public static native long now();
+
+  public static native long getSystemTime();
 
   public static native void addPortForwarder(int port, String remoteHost, int remotePort);
 

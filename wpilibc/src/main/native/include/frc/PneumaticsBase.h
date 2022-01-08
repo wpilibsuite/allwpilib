@@ -6,7 +6,10 @@
 
 #include <memory>
 
+#include <units/current.h>
+#include <units/pressure.h>
 #include <units/time.h>
+#include <units/voltage.h>
 
 #include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsModuleType.h"
@@ -23,17 +26,19 @@ class PneumaticsBase {
 
   virtual bool GetPressureSwitch() const = 0;
 
-  virtual double GetCompressorCurrent() const = 0;
+  virtual units::ampere_t GetCompressorCurrent() const = 0;
 
   virtual void DisableCompressor() = 0;
 
   virtual void EnableCompressorDigital() = 0;
 
-  virtual void EnableCompressorAnalog(double minAnalogVoltage,
-                                      double maxAnalogVoltage) = 0;
+  virtual void EnableCompressorAnalog(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) = 0;
 
-  virtual void EnableCompressorHybrid(double minAnalogVoltage,
-                                      double maxAnalogVoltage) = 0;
+  virtual void EnableCompressorHybrid(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) = 0;
 
   virtual CompressorConfigType GetCompressorConfigType() const = 0;
 
@@ -58,6 +63,10 @@ class PneumaticsBase {
   virtual bool ReserveCompressor() = 0;
 
   virtual void UnreserveCompressor() = 0;
+
+  virtual units::volt_t GetAnalogVoltage(int channel) const = 0;
+
+  virtual units::pounds_per_square_inch_t GetPressure(int channel) const = 0;
 
   virtual Solenoid MakeSolenoid(int channel) = 0;
   virtual DoubleSolenoid MakeDoubleSolenoid(int forwardChannel,

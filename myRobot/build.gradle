@@ -162,6 +162,7 @@ model {
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
@@ -171,7 +172,6 @@ model {
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 } else {
@@ -209,11 +209,11 @@ model {
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':hal').addHalDependency(binary, 'static')
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
                 }

@@ -4,7 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.PortsJNI;
+import edu.wpi.first.hal.REVPHFaults;
 import edu.wpi.first.hal.REVPHJNI;
+import edu.wpi.first.hal.REVPHStickyFaults;
+import edu.wpi.first.hal.REVPHVersion;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +20,24 @@ public class PneumaticHub implements PneumaticsBase {
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
+    public int[] m_oneShotDurMs = new int[PortsJNI.getNumREVPHChannels()];
     private final Object m_reserveLock = new Object();
 
     DataStore(int module) {
       m_handle = REVPHJNI.initialize(module);
       m_module = module;
       m_handleMap.put(module, this);
+
+      final REVPHVersion version = REVPHJNI.getVersion(m_handle);
+      if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
+        final String fwVersion =
+            version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
+        throw new IllegalStateException(
+            "The Pneumatic Hub has firmware version "
+                + fwVersion
+                + ", and must be updated to version 2022.0.0 or later "
+                + "using the REV Hardware Client.");
+      }
     }
 
     @Override
@@ -61,6 +77,18 @@ public class PneumaticHub implements PneumaticsBase {
     synchronized (m_handleLock) {
       store.removeRef();
     }
+  }
+
+  /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
+  private static double voltsToPsi(double sensorVoltage, double supplyVoltage) {
+    double pressure = 250 * (sensorVoltage / supplyVoltage) - 25;
+    return pressure;
+  }
+
+  /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
+  private static double psiToVolts(double pressure, double supplyVoltage) {
+    double voltage = supplyVoltage * (0.004 * pressure + 0.1);
+    return voltage;
   }
 
   private final DataStore m_dataStore;
@@ -123,14 +151,12 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public void fireOneShot(int index) {
-    // TODO Combine APIs
-    // REVPHJNI.fireOneShot(m_handle, index, durMs);
+    REVPHJNI.fireOneShot(m_handle, index, m_dataStore.m_oneShotDurMs[index]);
   }
 
   @Override
   public void setOneShotDuration(int index, int durMs) {
-    // TODO Combine APIs
-    // REVPHJNI.setOneShotDuration(m_handle, index, durMs);
+    m_dataStore.m_oneShotDurMs[index] = durMs;
   }
 
   @Override
@@ -192,8 +218,8 @@ public class PneumaticHub implements PneumaticsBase {
 
   @Override
   public int getSolenoidDisabledList() {
-    // TODO Get this working
-    return 0;
+    int raw = REVPHJNI.getStickyFaultsNative(m_handle);
+    return raw & 0xFFFF;
   }
 
   @Override
@@ -207,12 +233,82 @@ public class PneumaticHub implements PneumaticsBase {
   }
 
   @Override
-  public void enableCompressorAnalog(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorAnalog(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlAnalog(m_handle, minAnalogVoltage, maxAnalogVoltage);
   }
 
   @Override
-  public void enableCompressorHybrid(double minAnalogVoltage, double maxAnalogVoltage) {
+  public void enableCompressorHybrid(double minPressure, double maxPressure) {
+    if (minPressure >= maxPressure) {
+      throw new IllegalArgumentException("maxPressure must be greater than minPressure");
+    }
+    if (minPressure < 0 || minPressure > 120) {
+      throw new IllegalArgumentException(
+          "minPressure must be between 0 and 120 PSI, got " + minPressure);
+    }
+    if (maxPressure < 0 || maxPressure > 120) {
+      throw new IllegalArgumentException(
+          "maxPressure must be between 0 and 120 PSI, got " + maxPressure);
+    }
+    double minAnalogVoltage = psiToVolts(minPressure, 5);
+    double maxAnalogVoltage = psiToVolts(maxPressure, 5);
     REVPHJNI.setClosedLoopControlHybrid(m_handle, minAnalogVoltage, maxAnalogVoltage);
+  }
+
+  @Override
+  public double getAnalogVoltage(int channel) {
+    return REVPHJNI.getAnalogVoltage(m_handle, channel);
+  }
+
+  @Override
+  public double getPressure(int channel) {
+    double sensorVoltage = REVPHJNI.getAnalogVoltage(m_handle, channel);
+    double supplyVoltage = REVPHJNI.get5VVoltage(m_handle);
+    return voltsToPsi(sensorVoltage, supplyVoltage);
+  }
+
+  void clearStickyFaults() {
+    REVPHJNI.clearStickyFaults(m_handle);
+  }
+
+  REVPHVersion getVersion() {
+    return REVPHJNI.getVersion(m_handle);
+  }
+
+  REVPHFaults getFaults() {
+    return REVPHJNI.getFaults(m_handle);
+  }
+
+  REVPHStickyFaults getStickyFaults() {
+    return REVPHJNI.getStickyFaults(m_handle);
+  }
+
+  double getInputVoltage() {
+    return REVPHJNI.getInputVoltage(m_handle);
+  }
+
+  double get5VRegulatedVoltage() {
+    return REVPHJNI.get5VVoltage(m_handle);
+  }
+
+  double getSolenoidsTotalCurrent() {
+    return REVPHJNI.getSolenoidCurrent(m_handle);
+  }
+
+  double getSolenoidsVoltage() {
+    return REVPHJNI.getSolenoidVoltage(m_handle);
   }
 }

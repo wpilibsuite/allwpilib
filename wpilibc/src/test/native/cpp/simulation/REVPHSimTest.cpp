@@ -129,7 +129,7 @@ TEST(REVPHSimTest, SetEnableAnalog) {
   ph.DisableCompressor();
   EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
 
-  ph.EnableCompressorAnalog(1, 2);
+  ph.EnableCompressorAnalog(1_psi, 2_psi);
   EXPECT_EQ(sim.GetCompressorConfigType(),
             static_cast<int>(CompressorConfigType::Analog));
   EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Analog);
@@ -150,7 +150,7 @@ TEST(REVPHSimTest, SetEnableHybrid) {
   ph.DisableCompressor();
   EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Disabled);
 
-  ph.EnableCompressorHybrid(1, 2);
+  ph.EnableCompressorHybrid(1_psi, 2_psi);
   EXPECT_EQ(sim.GetCompressorConfigType(),
             static_cast<int>(CompressorConfigType::Hybrid));
   EXPECT_EQ(ph.GetCompressorConfigType(), CompressorConfigType::Hybrid);
@@ -187,7 +187,7 @@ TEST(REVPHSimTest, SetCompressorCurrent) {
 
   sim.SetCompressorCurrent(35.04);
   EXPECT_EQ(35.04, sim.GetCompressorCurrent());
-  EXPECT_EQ(35.04, ph.GetCompressorCurrent());
+  EXPECT_EQ(35.04_A, ph.GetCompressorCurrent());
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(35.04, callback.GetLastValue());
 }

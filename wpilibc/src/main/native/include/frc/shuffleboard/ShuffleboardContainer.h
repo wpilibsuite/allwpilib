@@ -128,6 +128,18 @@ class ShuffleboardContainer : public virtual ShuffleboardValue {
   ComplexWidget& Add(std::string_view title, const cs::VideoSource& video);
 
   /**
+   * Adds a widget to this container to display a video stream.
+   *
+   * @param title      the title of the widget
+   * @param cameraName the name of the streamed camera
+   * @param cameraUrls the URLs with which the dashboard can access the camera
+   * stream
+   * @return a widget to display the camera stream
+   */
+  ComplexWidget& AddCamera(std::string_view title, std::string_view cameraName,
+                           wpi::span<const std::string> cameraUrls);
+
+  /**
    * Adds a widget to this container to display the given sendable.
    *
    * @param sendable the sendable to display
@@ -525,5 +537,11 @@ inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
 inline frc::ComplexWidget& frc::ShuffleboardContainer::Add(
     std::string_view title, const cs::VideoSource& video) {
   return Add(title, frc::SendableCameraWrapper::Wrap(video));
+}
+
+inline frc::ComplexWidget& frc::ShuffleboardContainer::AddCamera(
+    std::string_view title, std::string_view cameraName,
+    wpi::span<const std::string> cameraUrls) {
+  return Add(title, frc::SendableCameraWrapper::Wrap(cameraName, cameraUrls));
 }
 #endif

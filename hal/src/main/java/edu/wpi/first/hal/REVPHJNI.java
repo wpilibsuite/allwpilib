@@ -40,7 +40,7 @@ public class REVPHJNI extends JNIWrapper {
 
   public static native boolean getPressureSwitch(int handle);
 
-  public static native double getAnalogPressure(int handle, int channel);
+  public static native double getAnalogVoltage(int handle, int channel);
 
   public static native double getCompressorCurrent(int handle);
 
@@ -49,4 +49,28 @@ public class REVPHJNI extends JNIWrapper {
   public static native void setSolenoids(int handle, int mask, int values);
 
   public static native void fireOneShot(int handle, int index, int durMs);
+
+  public static native void clearStickyFaults(int handle);
+
+  public static native double getInputVoltage(int handle);
+
+  public static native double get5VVoltage(int handle);
+
+  public static native double getSolenoidCurrent(int handle);
+
+  public static native double getSolenoidVoltage(int handle);
+
+  public static native int getStickyFaultsNative(int handle);
+
+  public static REVPHStickyFaults getStickyFaults(int handle) {
+    return new REVPHStickyFaults(getStickyFaultsNative(handle));
+  }
+
+  public static native int getFaultsNative(int handle);
+
+  public static REVPHFaults getFaults(int handle) {
+    return new REVPHFaults(getFaultsNative(handle));
+  }
+
+  public static native REVPHVersion getVersion(int handle);
 }

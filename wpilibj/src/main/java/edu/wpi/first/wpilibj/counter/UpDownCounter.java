@@ -14,7 +14,12 @@ import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** Up Down Counter. */
+/**
+ * Up Down Counter.
+ *
+ * <p>This class can count edges on a single digital input or count up based on an edge from one
+ * digital input and down on an edge from another digital input.
+ */
 public class UpDownCounter implements Sendable, AutoCloseable {
   private DigitalSource m_upSource;
   private DigitalSource m_downSource;
@@ -88,7 +93,7 @@ public class UpDownCounter implements Sendable, AutoCloseable {
   }
 
   /**
-   * Sets to revert the counter direction.
+   * Sets to reverse the counter direction.
    *
    * @param reverseDirection True to reverse counting direction.
    */

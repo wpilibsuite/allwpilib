@@ -18,6 +18,12 @@ class DigitalSource;
 
 /**
  * Tachometer for getting rotational speed from a device.
+ *
+ * <p>The Tachometer class measures the time between digital pulses to
+ * determine the rotation speed of a mechanism. Examples of devices that could
+ * be used with the tachometer class are a hall effect sensor, break beam
+ * sensor, or optical sensor detecting tape on a shooter wheel. Unlike
+ * encoders, this class only needs a single digital input.
  */
 class Tachometer : public wpi::Sendable,
                    public wpi::SendableHelper<Tachometer> {
@@ -68,6 +74,15 @@ class Tachometer : public wpi::Sendable,
    * @param edges Edges per revolution.
    */
   void SetEdgesPerRevolution(int edges);
+
+  /**
+   * Gets the current tachometer revolutions per second.
+   *
+   * SetEdgesPerRevolution must be set with a non 0 value for this to work.
+   *
+   * @return Current RPS.
+   */
+  units::turns_per_second_t GetRevolutionsPerSecond() const;
 
   /**
    * Gets the current tachometer revolutions per minute.

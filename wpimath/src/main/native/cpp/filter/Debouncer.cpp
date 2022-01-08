@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Debouncer.h"
+#include "frc/filter/Debouncer.h"
 
 using namespace frc;
 
@@ -17,18 +17,26 @@ Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
       m_baseline = true;
       break;
   }
-  m_timer.Start();
+  ResetTimer();
+}
+
+void Debouncer::ResetTimer() {
+  m_prevTime = units::microsecond_t(wpi::Now());
+}
+
+bool Debouncer::HasElapsed() const {
+  return units::microsecond_t(wpi::Now()) - m_prevTime >= m_debounceTime;
 }
 
 bool Debouncer::Calculate(bool input) {
   if (input == m_baseline) {
-    m_timer.Reset();
+    ResetTimer();
   }
 
-  if (m_timer.HasElapsed(m_debounceTime)) {
+  if (HasElapsed()) {
     if (m_debounceType == DebounceType::kBoth) {
       m_baseline = input;
-      m_timer.Reset();
+      ResetTimer();
     }
     return input;
   } else {

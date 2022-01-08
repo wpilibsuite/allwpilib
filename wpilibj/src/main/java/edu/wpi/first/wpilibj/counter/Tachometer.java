@@ -16,7 +16,14 @@ import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/** Tachometer. */
+/**
+ * Tachometer.
+ *
+ * <p>The Tachometer class measures the time between digital pulses to determine the rotation speed
+ * of a mechanism. Examples of devices that could be used with the tachometer class are a hall
+ * effect sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel. Unlike
+ * encoders, this class only needs a single digital input.
+ */
 public class Tachometer implements Sendable, AutoCloseable {
   private final DigitalSource m_source;
   private final int m_handle;
@@ -25,7 +32,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   /**
    * Constructs a new tachometer.
    *
-   * @param source The source.
+   * @param source The DigitalSource (e.g. DigitalInput) of the Tachometer.
    */
   public Tachometer(DigitalSource source) {
     m_source = requireNonNullParam(source, "source", "Tachometer");
@@ -92,13 +99,13 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the current tachometer revolution per minute.
+   * Gets the current tachometer revolutions per second.
    *
    * <p>setEdgesPerRevolution must be set with a non 0 value for this to return valid values.
    *
-   * @return Current RPM.
+   * @return Current RPS.
    */
-  public double getRevolutionsPerMinute() {
+  public double getRevolutionsPerSecond() {
     double period = getPeriod();
     if (period == 0) {
       return 0;
@@ -107,7 +114,18 @@ public class Tachometer implements Sendable, AutoCloseable {
     if (edgesPerRevolution == 0) {
       return 0;
     }
-    return ((1.0 / edgesPerRevolution) / period) * 60;
+    return (1.0 / edgesPerRevolution) / period;
+  }
+
+  /**
+   * Gets the current tachometer revolutions per minute.
+   *
+   * <p>setEdgesPerRevolution must be set with a non 0 value for this to return valid values.
+   *
+   * @return Current RPM.
+   */
+  public double getRevolutionsPerMinute() {
+    return getRevolutionsPerSecond() * 60;
   }
 
   /**
@@ -158,6 +176,7 @@ public class Tachometer implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Tachometer");
+    builder.addDoubleProperty("RPS", this::getRevolutionsPerSecond, null);
     builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
   }
 }

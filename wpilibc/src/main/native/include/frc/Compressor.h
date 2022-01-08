@@ -95,7 +95,22 @@ class Compressor : public wpi::Sendable,
    *
    * @return The current through the compressor, in amps
    */
-  double GetCurrent() const;
+  units::ampere_t GetCurrent() const;
+
+  /**
+   * Query the analog input voltage (on channel 0) (if supported).
+   *
+   * @return The analog input voltage, in volts
+   */
+  units::volt_t GetAnalogVoltage() const;
+
+  /**
+   * Query the analog sensor pressure (on channel 0) (if supported). Note this
+   * is only for use with the REV Analog Pressure Sensor.
+   *
+   * @return The analog sensor pressure, in PSI
+   */
+  units::pounds_per_square_inch_t GetPressure() const;
 
   /**
    * Disable the compressor.
@@ -108,24 +123,28 @@ class Compressor : public wpi::Sendable,
   void EnableDigital();
 
   /**
-   * Enable compressor closed loop control using analog input.
+   * Enable compressor closed loop control using analog input. Note this is only
+   * for use with the REV Analog Pressure Sensor.
    *
    * <p>On CTRE PCM, this will enable digital control.
    *
-   * @param minAnalogVoltage The minimum voltage to enable compressor
-   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
    */
-  void EnableAnalog(double minAnalogVoltage, double maxAnalogVoltage);
+  void EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
 
   /**
-   * Enable compressor closed loop control using hybrid input.
+   * Enable compressor closed loop control using hybrid input. Note this is only
+   * for use with the REV Analog Pressure Sensor.
    *
    * On CTRE PCM, this will enable digital control.
    *
-   * @param minAnalogVoltage The minimum voltage to enable compressor
-   * @param maxAnalogVoltage The maximum voltage to disable compressor
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
    */
-  void EnableHybrid(double minAnalogVoltage, double maxAnalogVoltage);
+  void EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
 
   CompressorConfigType GetConfigType() const;
 

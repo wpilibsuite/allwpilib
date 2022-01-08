@@ -845,6 +845,20 @@ constexpr int sgn(T val) {
   return (T(0) < val) - (val < T(0));
 }
 
+/**
+ * Linearly interpolates between two values.
+ *
+ * @param startValue The start value.
+ * @param endValue The end value.
+ * @param t The fraction for interpolation.
+ *
+ * @return The interpolated value.
+ */
+template <typename T>
+constexpr T Lerp(const T& startValue, const T& endValue, double t) {
+  return startValue + (endValue - startValue) * t;
+}
+
 } // namespace wpi
 
 #endif

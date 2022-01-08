@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include "hal/PowerDistribution.h"
 #include "hal/Types.h"
 
 /**
@@ -13,85 +14,6 @@
  * @ingroup hal_capi
  * @{
  */
-
-/**
- * Storage for REV PDH Version
- */
-struct HAL_REVPDHVersion {
-  uint32_t firmwareMajor;
-  uint32_t firmwareMinor;
-  uint32_t firmwareFix;
-  uint32_t hardwareMinor;
-  uint32_t hardwareMajor;
-  uint32_t uniqueId;
-};
-
-/**
- * Storage for REV PDH Faults
- */
-struct HAL_REVPDHFaults {
-  uint32_t channel0BreakerFault : 1;
-  uint32_t channel1BreakerFault : 1;
-  uint32_t channel2BreakerFault : 1;
-  uint32_t channel3BreakerFault : 1;
-  uint32_t channel4BreakerFault : 1;
-  uint32_t channel5BreakerFault : 1;
-  uint32_t channel6BreakerFault : 1;
-  uint32_t channel7BreakerFault : 1;
-  uint32_t channel8BreakerFault : 1;
-  uint32_t channel9BreakerFault : 1;
-  uint32_t channel10BreakerFault : 1;
-  uint32_t channel11BreakerFault : 1;
-  uint32_t channel12BreakerFault : 1;
-  uint32_t channel13BreakerFault : 1;
-  uint32_t channel14BreakerFault : 1;
-  uint32_t channel15BreakerFault : 1;
-  uint32_t channel16BreakerFault : 1;
-  uint32_t channel17BreakerFault : 1;
-  uint32_t channel18BreakerFault : 1;
-  uint32_t channel19BreakerFault : 1;
-  uint32_t channel20BreakerFault : 1;
-  uint32_t channel21BreakerFault : 1;
-  uint32_t channel22BreakerFault : 1;
-  uint32_t channel23BreakerFault : 1;
-  uint32_t brownout : 1;
-  uint32_t canWarning : 1;
-  uint32_t hardwareFault : 1;
-};
-
-/**
- * Storage for REV PDH Sticky Faults
- */
-struct HAL_REVPDHStickyFaults {
-  uint32_t channel0BreakerFault : 1;
-  uint32_t channel1BreakerFault : 1;
-  uint32_t channel2BreakerFault : 1;
-  uint32_t channel3BreakerFault : 1;
-  uint32_t channel4BreakerFault : 1;
-  uint32_t channel5BreakerFault : 1;
-  uint32_t channel6BreakerFault : 1;
-  uint32_t channel7BreakerFault : 1;
-  uint32_t channel8BreakerFault : 1;
-  uint32_t channel9BreakerFault : 1;
-  uint32_t channel10BreakerFault : 1;
-  uint32_t channel11BreakerFault : 1;
-  uint32_t channel12BreakerFault : 1;
-  uint32_t channel13BreakerFault : 1;
-  uint32_t channel14BreakerFault : 1;
-  uint32_t channel15BreakerFault : 1;
-  uint32_t channel16BreakerFault : 1;
-  uint32_t channel17BreakerFault : 1;
-  uint32_t channel18BreakerFault : 1;
-  uint32_t channel19BreakerFault : 1;
-  uint32_t channel20BreakerFault : 1;
-  uint32_t channel21BreakerFault : 1;
-  uint32_t channel22BreakerFault : 1;
-  uint32_t channel23BreakerFault : 1;
-  uint32_t brownout : 1;
-  uint32_t canWarning : 1;
-  uint32_t canBusOff : 1;
-  uint32_t hasReset : 1;
-};
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,8 +117,9 @@ HAL_Bool HAL_GetREVPDHSwitchableChannelState(HAL_REVPDHHandle handle,
  *
  * @return version information
  */
-HAL_REVPDHVersion HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
-                                       int32_t* status);
+void HAL_GetREVPDHVersion(HAL_REVPDHHandle handle,
+                          HAL_PowerDistributionVersion* version,
+                          int32_t* status);
 
 /**
  * Gets the voltage being supplied to a PDH device.
@@ -214,7 +137,8 @@ double HAL_GetREVPDHVoltage(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @return the faults of the PDH
  */
-HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status);
+void HAL_GetREVPDHFaults(HAL_REVPDHHandle handle,
+                         HAL_PowerDistributionFaults* faults, int32_t* status);
 
 /**
  * Gets the sticky faults of a PDH device.
@@ -223,8 +147,9 @@ HAL_REVPDHFaults HAL_GetREVPDHFaults(HAL_REVPDHHandle handle, int32_t* status);
  *
  * @return the sticky faults of the PDH
  */
-HAL_REVPDHStickyFaults HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
-                                                 int32_t* status);
+void HAL_GetREVPDHStickyFaults(HAL_REVPDHHandle handle,
+                               HAL_PowerDistributionStickyFaults* stickyFaults,
+                               int32_t* status);
 
 /**
  * Clears the sticky faults on a PDH device.

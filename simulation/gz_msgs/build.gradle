@@ -24,6 +24,8 @@ try {
 } catch(Exception ex) {
 }
 
+ext.skip_gz_msgs = false
+
 if (project.hasProperty("forceGazebo")) {
     if (!protobuf_version?.trim()) {
         println "Protobuf is not available. (pkg-config --modversion protobuf failed)"
@@ -38,9 +40,11 @@ tasks.whenTaskAdded { task ->
     task.onlyIf { !project.hasProperty('skip_gz_msgs') }
 }
 
-dependencies {
-    implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
-    implementation "com.google.protobuf:protoc:${protobuf_version}"
+if (!ext.skip_gz_msgs) {
+    dependencies {
+        implementation "com.google.protobuf:protobuf-java:${protobuf_version}"
+        implementation "com.google.protobuf:protoc:${protobuf_version}"
+    }
 }
 
 /* There is a nice gradle plugin for protobuf, and the protoc tool

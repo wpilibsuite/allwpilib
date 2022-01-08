@@ -59,6 +59,11 @@ jobject CreatePWMConfigDataResult(JNIEnv* env, int32_t maxPwm,
                                   int32_t deadbandMaxPwm, int32_t centerPwm,
                                   int32_t deadbandMinPwm, int32_t minPwm);
 
+jobject CreateREVPHVersion(JNIEnv* env, uint32_t firmwareMajor,
+                           uint32_t firmwareMinor, uint32_t firmwareFix,
+                           uint32_t hardwareMinor, uint32_t hardwareMajor,
+                           uint32_t uniqueId);
+
 void SetCanStatusObject(JNIEnv* env, jobject canStatus,
                         float percentBusUtilization, uint32_t busOffCount,
                         uint32_t txFullCount, uint32_t receiveErrorCount,
@@ -76,6 +81,13 @@ jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
 jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
+
+jobject CreatePowerDistributionVersion(JNIEnv* env, uint32_t firmwareMajor,
+                                       uint32_t firmwareMinor,
+                                       uint32_t firmwareFix,
+                                       uint32_t hardwareMinor,
+                                       uint32_t hardwareMajor,
+                                       uint32_t uniqueId);
 
 JavaVM* GetJVM();
 

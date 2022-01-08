@@ -4,6 +4,8 @@
 
 #include "hal/REVPH.h"
 
+#include <thread>
+
 #include <fmt/format.h>
 
 #include "HALInitializer.h"
@@ -63,6 +65,7 @@ struct REV_PHObj {
   wpi::mutex solenoidLock;
   HAL_CANHandle hcan;
   std::string previousAllocation;
+  HAL_REVPHVersion versionInfo;
 };
 
 }  // namespace
@@ -221,6 +224,9 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
   hph->previousAllocation = allocationLocation ? allocationLocation : "";
   hph->hcan = hcan;
   hph->controlPeriod = kDefaultControlPeriod;
+  std::memset(&hph->desiredSolenoidsState, 0,
+              sizeof(hph->desiredSolenoidsState));
+  std::memset(&hph->versionInfo, 0, sizeof(hph->versionInfo));
 
   // Start closed-loop compressor control by starting solenoid state updates
   HAL_SendREVPHSolenoidsState(hph.get(), status);
@@ -376,8 +382,8 @@ double HAL_GetREVPHCompressorCurrent(HAL_REVPHHandle handle, int32_t* status) {
   return PH_status_1_compressor_current_decode(status1.compressor_current);
 }
 
-double HAL_GetREVPHAnalogPressure(HAL_REVPHHandle handle, int32_t channel,
-                                  int32_t* status) {
+double HAL_GetREVPHAnalogVoltage(HAL_REVPHHandle handle, int32_t channel,
+                                 int32_t* status) {
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -467,9 +473,9 @@ double HAL_GetREVPHSolenoidVoltage(HAL_REVPHHandle handle, int32_t* status) {
   return PH_status_1_solenoid_voltage_decode(status1.solenoid_voltage);
 }
 
-HAL_REVPHVersion HAL_GetREVPHVersion(HAL_REVPHHandle handle, int32_t* status) {
-  HAL_REVPHVersion version;
-  std::memset(&version, 0, sizeof(version));
+void HAL_GetREVPHVersion(HAL_REVPHHandle handle, HAL_REVPHVersion* version,
+                         int32_t* status) {
+  std::memset(version, 0, sizeof(*version));
   uint8_t packedData[8] = {0};
   int32_t length = 0;
   uint64_t timestamp = 0;
@@ -477,33 +483,52 @@ HAL_REVPHVersion HAL_GetREVPHVersion(HAL_REVPHHandle handle, int32_t* status) {
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return version;
+    return;
+  }
+
+  if (ph->versionInfo.firmwareMajor > 0) {
+    version->firmwareMajor = ph->versionInfo.firmwareMajor;
+    version->firmwareMinor = ph->versionInfo.firmwareMinor;
+    version->firmwareFix = ph->versionInfo.firmwareFix;
+    version->hardwareMajor = ph->versionInfo.hardwareMajor;
+    version->hardwareMinor = ph->versionInfo.hardwareMinor;
+    version->uniqueId = ph->versionInfo.uniqueId;
+
+    *status = 0;
+    return;
   }
 
   HAL_WriteCANRTRFrame(ph->hcan, PH_VERSION_LENGTH, PH_VERSION_FRAME_API,
                        status);
 
   if (*status != 0) {
-    return version;
+    return;
   }
 
-  HAL_ReadCANPacketTimeout(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
-                           &timestamp, kDefaultControlPeriod * 2, status);
+  uint32_t timeoutMs = 100;
+  for (uint32_t i = 0; i <= timeoutMs; i++) {
+    HAL_ReadCANPacketNew(ph->hcan, PH_VERSION_FRAME_API, packedData, &length,
+                         &timestamp, status);
+    if (*status == 0) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 
   if (*status != 0) {
-    return version;
+    return;
   }
 
   PH_version_unpack(&result, packedData, PH_VERSION_LENGTH);
 
-  version.firmwareMajor = result.firmware_year;
-  version.firmwareMinor = result.firmware_minor;
-  version.firmwareFix = result.firmware_fix;
-  version.hardwareMinor = result.hardware_minor;
-  version.hardwareMajor = result.hardware_major;
-  version.uniqueId = result.unique_id;
+  version->firmwareMajor = result.firmware_year;
+  version->firmwareMinor = result.firmware_minor;
+  version->firmwareFix = result.firmware_fix;
+  version->hardwareMinor = result.hardware_minor;
+  version->hardwareMajor = result.hardware_major;
+  version->uniqueId = result.unique_id;
 
-  return version;
+  ph->versionInfo = *version;
 }
 
 int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
@@ -660,60 +685,58 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
                      PH_PULSE_ONCE_FRAME_API, status);
 }
 
-HAL_REVPHFaults HAL_GetREVPHFaults(HAL_REVPHHandle handle, int32_t* status) {
-  HAL_REVPHFaults faults = {};
+void HAL_GetREVPHFaults(HAL_REVPHHandle handle, HAL_REVPHFaults* faults,
+                        int32_t* status) {
+  std::memset(faults, 0, sizeof(*faults));
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return faults;
+    return;
   }
 
   PH_status_0_t status0 = HAL_ReadREVPHStatus0(ph->hcan, status);
-  faults.channel0Fault = status0.channel_0_fault;
-  faults.channel1Fault = status0.channel_1_fault;
-  faults.channel2Fault = status0.channel_2_fault;
-  faults.channel3Fault = status0.channel_3_fault;
-  faults.channel4Fault = status0.channel_4_fault;
-  faults.channel5Fault = status0.channel_5_fault;
-  faults.channel6Fault = status0.channel_6_fault;
-  faults.channel7Fault = status0.channel_7_fault;
-  faults.channel8Fault = status0.channel_8_fault;
-  faults.channel9Fault = status0.channel_9_fault;
-  faults.channel10Fault = status0.channel_10_fault;
-  faults.channel11Fault = status0.channel_11_fault;
-  faults.channel12Fault = status0.channel_12_fault;
-  faults.channel13Fault = status0.channel_13_fault;
-  faults.channel14Fault = status0.channel_14_fault;
-  faults.channel15Fault = status0.channel_15_fault;
-  faults.compressorOverCurrent = status0.compressor_oc_fault;
-  faults.compressorOpen = status0.compressor_open_fault;
-  faults.solenoidOverCurrent = status0.solenoid_oc_fault;
-  faults.brownout = status0.brownout_fault;
-  faults.canWarning = status0.can_warning_fault;
-  faults.hardwareFault = status0.hardware_fault;
-
-  return faults;
+  faults->channel0Fault = status0.channel_0_fault;
+  faults->channel1Fault = status0.channel_1_fault;
+  faults->channel2Fault = status0.channel_2_fault;
+  faults->channel3Fault = status0.channel_3_fault;
+  faults->channel4Fault = status0.channel_4_fault;
+  faults->channel5Fault = status0.channel_5_fault;
+  faults->channel6Fault = status0.channel_6_fault;
+  faults->channel7Fault = status0.channel_7_fault;
+  faults->channel8Fault = status0.channel_8_fault;
+  faults->channel9Fault = status0.channel_9_fault;
+  faults->channel10Fault = status0.channel_10_fault;
+  faults->channel11Fault = status0.channel_11_fault;
+  faults->channel12Fault = status0.channel_12_fault;
+  faults->channel13Fault = status0.channel_13_fault;
+  faults->channel14Fault = status0.channel_14_fault;
+  faults->channel15Fault = status0.channel_15_fault;
+  faults->compressorOverCurrent = status0.compressor_oc_fault;
+  faults->compressorOpen = status0.compressor_open_fault;
+  faults->solenoidOverCurrent = status0.solenoid_oc_fault;
+  faults->brownout = status0.brownout_fault;
+  faults->canWarning = status0.can_warning_fault;
+  faults->hardwareFault = status0.hardware_fault;
 }
 
-HAL_REVPHStickyFaults HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
-                                               int32_t* status) {
-  HAL_REVPHStickyFaults stickyFaults = {};
+void HAL_GetREVPHStickyFaults(HAL_REVPHHandle handle,
+                              HAL_REVPHStickyFaults* stickyFaults,
+                              int32_t* status) {
+  std::memset(stickyFaults, 0, sizeof(*stickyFaults));
   auto ph = REVPHHandles->Get(handle);
   if (ph == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return stickyFaults;
+    return;
   }
 
   PH_status_1_t status1 = HAL_ReadREVPHStatus1(ph->hcan, status);
-  stickyFaults.compressorOverCurrent = status1.sticky_compressor_oc_fault;
-  stickyFaults.compressorOpen = status1.sticky_compressor_open_fault;
-  stickyFaults.solenoidOverCurrent = status1.sticky_solenoid_oc_fault;
-  stickyFaults.brownout = status1.sticky_brownout_fault;
-  stickyFaults.canWarning = status1.sticky_can_warning_fault;
-  stickyFaults.canBusOff = status1.sticky_can_bus_off_fault;
-  stickyFaults.hasReset = status1.sticky_has_reset_fault;
-
-  return stickyFaults;
+  stickyFaults->compressorOverCurrent = status1.sticky_compressor_oc_fault;
+  stickyFaults->compressorOpen = status1.sticky_compressor_open_fault;
+  stickyFaults->solenoidOverCurrent = status1.sticky_solenoid_oc_fault;
+  stickyFaults->brownout = status1.sticky_brownout_fault;
+  stickyFaults->canWarning = status1.sticky_can_warning_fault;
+  stickyFaults->canBusOff = status1.sticky_can_bus_off_fault;
+  stickyFaults->hasReset = status1.sticky_has_reset_fault;
 }
 
 void HAL_ClearREVPHStickyFaults(HAL_REVPHHandle handle, int32_t* status) {

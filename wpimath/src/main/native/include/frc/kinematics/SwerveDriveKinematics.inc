@@ -88,7 +88,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 }
 
 template <size_t NumModules>
-void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(
+void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
   auto& states = *moduleStates;
