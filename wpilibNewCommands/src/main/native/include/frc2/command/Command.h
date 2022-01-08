@@ -42,6 +42,8 @@ class ProxyScheduleCommand;
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see CommandScheduler
  * @see CommandHelper
  */

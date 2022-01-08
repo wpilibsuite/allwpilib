@@ -13,6 +13,8 @@ import java.util.Map;
  * "deadline") ends, interrupting all other commands that are still running at that point.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelDeadlineGroup extends CommandGroupBase {
   // maps commands in this group to whether they are still running

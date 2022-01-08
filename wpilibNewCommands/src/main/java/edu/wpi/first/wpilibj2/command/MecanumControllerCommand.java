@@ -35,6 +35,8 @@ import java.util.function.Supplier;
  *
  * <p>The robot angle controller does not follow the angle given by the trajectory but rather goes
  * to the angle given in the final state of the trajectory.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 @SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {

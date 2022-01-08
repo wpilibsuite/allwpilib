@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Class that holds scheduling state for a command. Used internally by the {@link CommandScheduler}.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 class CommandState {
   // The time since this command was initialized.

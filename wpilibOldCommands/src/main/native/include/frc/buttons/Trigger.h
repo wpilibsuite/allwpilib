@@ -25,6 +25,8 @@ class Command;
  * a button while the robot is reading a certain sensor input). For this, they
  * only have to write the Trigger::Get() method to get the full functionality of
  * the Trigger class.
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class Trigger : public wpi::Sendable, public wpi::SendableHelper<Trigger> {
  public:

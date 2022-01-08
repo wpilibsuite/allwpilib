@@ -16,6 +16,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} instead.
  */
 @Deprecated(since = "2020", forRemoval = true)

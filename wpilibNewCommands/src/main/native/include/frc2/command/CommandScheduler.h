@@ -26,6 +26,8 @@ class Subsystem;
  * commands synchronously from the main loop.  Subsystems should be registered
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandScheduler final : public nt::NTSendable,
                                public wpi::SendableHelper<CommandScheduler> {

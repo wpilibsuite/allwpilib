@@ -17,6 +17,8 @@ namespace frc2 {
  * A Command that runs instantly; it will initialize, execute once, and end on
  * the same iteration of the scheduler.  Users can either pass in a Runnable and
  * a set of requirements, or else subclass this command if desired.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class InstantCommand : public CommandHelper<CommandBase, InstantCommand> {
  public:
