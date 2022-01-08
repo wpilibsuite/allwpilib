@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj.templates.educational;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -35,34 +36,31 @@ public class EducationalRobot extends RobotBase {
     robotInit();
 
     // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      DriverStation.updateData();
       if (isDisabled()) {
-        DriverStation.inDisabled(true);
         disabled();
-        DriverStation.inDisabled(false);
+        DriverStationJNI.observeUserProgramDisabled();
         while (isDisabled()) {
           DriverStation.waitForData();
         }
       } else if (isAutonomous()) {
-        DriverStation.inAutonomous(true);
         autonomous();
-        DriverStation.inAutonomous(false);
+        DriverStationJNI.observeUserProgramAutonomous();
         while (isAutonomousEnabled()) {
           DriverStation.waitForData();
         }
       } else if (isTest()) {
-        DriverStation.inTest(true);
         test();
-        DriverStation.inTest(false);
+        DriverStationJNI.observeUserProgramTest();
         while (isTest() && isEnabled()) {
           DriverStation.waitForData();
         }
       } else {
-        DriverStation.inTeleop(true);
         teleop();
-        DriverStation.inTeleop(false);
+        DriverStationJNI.observeUserProgramTeleop();
         while (isTeleopEnabled()) {
           DriverStation.waitForData();
         }

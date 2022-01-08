@@ -4,6 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -259,7 +260,7 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.reset();
 
     // Get current mode
-    m_word.update();
+    DriverStation.updateData();
     Mode mode = Mode.kNone;
     if (m_word.isDisabled()) {
       mode = Mode.kDisabled;
@@ -308,19 +309,19 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // Call the appropriate function depending upon the current robot mode
     if (mode == Mode.kDisabled) {
-      HAL.observeUserProgramDisabled();
+      DriverStationJNI.observeUserProgramDisabled();
       disabledPeriodic();
       m_watchdog.addEpoch("disabledPeriodic()");
     } else if (mode == Mode.kAutonomous) {
-      HAL.observeUserProgramAutonomous();
+      DriverStationJNI.observeUserProgramAutonomous();
       autonomousPeriodic();
       m_watchdog.addEpoch("autonomousPeriodic()");
     } else if (mode == Mode.kTeleop) {
-      HAL.observeUserProgramTeleop();
+      DriverStationJNI.observeUserProgramTeleop();
       teleopPeriodic();
       m_watchdog.addEpoch("teleopPeriodic()");
     } else {
-      HAL.observeUserProgramTest();
+      DriverStationJNI.observeUserProgramTest();
       testPeriodic();
       m_watchdog.addEpoch("testPeriodic()");
     }

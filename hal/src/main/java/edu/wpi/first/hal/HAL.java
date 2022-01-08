@@ -123,5 +123,17 @@ public final class HAL extends JNIWrapper {
 
   public static native int getPort(byte channel);
 
+  public static void report(int resource, int instanceNumber) {
+    report(resource, instanceNumber, 0, "");
+  }
+
+  public static void report(int resource, int instanceNumber, int context) {
+    report(resource, instanceNumber, context, "");
+  }
+
+  public static int report(int resource, int instanceNumber, int context, String feature) {
+    return DriverStationJNI.report(resource, instanceNumber, context, feature);
+  }
+
   private HAL() {}
 }

@@ -118,13 +118,11 @@ public class DriverStationJNI extends JNIWrapper {
 
   public static native void updateDSData();
 
-  public static final int kNewPacketWakeType = 0;
-  public static final int kCachesReadyToUpdateWakeType = 1;
-  public static final int kCachesUpdatedWakeType = 2;
+  public static native void provideNewDataEventHandle(int handle);
 
-  public static native void provideNewDataEventHandle(int handle, int wakeType);
+  public static native void removeNewDataEventHandle(int handle);
 
-  public static native void removeNewDataEventHandle(int handle, int wakeType);
+  public static native boolean getOutputsActive();
 
   private DriverStationJNI() {}
 }

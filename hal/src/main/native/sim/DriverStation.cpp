@@ -23,7 +23,7 @@
 #include "mockdata/DriverStationDataInternal.h"
 
 static wpi::mutex msgMutex;
-static std::atomic_bool isFinalized{false};
+//static std::atomic_bool isFinalized{false};
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};

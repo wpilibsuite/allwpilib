@@ -11,20 +11,6 @@ public class DSControlWord {
   private final ControlWord m_controlWord = new ControlWord();
 
   /**
-   * DSControlWord constructor.
-   *
-   * <p>Upon construction, the current Driver Station control word is read and stored internally.
-   */
-  public DSControlWord() {
-    update();
-  }
-
-  /** Update internal Driver Station control word. */
-  public void update() {
-    DriverStation.updateControlWordFromCache(m_controlWord);
-  }
-
-  /**
    * Gets a value indicating whether the Driver Station requires the robot to be enabled.
    *
    * @return True if the robot is enabled, false otherwise.

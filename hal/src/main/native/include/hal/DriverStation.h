@@ -16,17 +16,6 @@
  * @{
  */
 
-// clang-format off
-/**
- * The counter mode.
- */
-HAL_ENUM(HAL_DriverStationWakeType) {
-  HAL_DSWakeType_kNewPacket = 0,
-  HAL_DSWakeType_kCachesReadyToUpdate = 1,
-  HAL_DSWakeType_kCachesUpdated = 2
-};
-// clang-format on
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -196,6 +185,11 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 double HAL_GetMatchTime(int32_t* status);
 
 /**
+ * Gets if outputs are enabled by the control system.
+ */
+HAL_Bool HAL_GetOutputsEnabled();
+
+/**
  * Gets info about a specific match.
  *
  * @param[in] info the match info (output)
@@ -205,8 +199,8 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info);
 
 void HAL_UpdateDSData(void);
 
-void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType);
-void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType);
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle);
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle);
 
 /**
  * Sets the program starting flag in the DS.

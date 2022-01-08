@@ -30,6 +30,24 @@ struct HAL_JoystickAxesInt {
 
 static constexpr int kJoystickPorts = 6;
 
+namespace {
+struct JoystickDataCache {
+  JoystickDataCache() {
+    std::memset(this, 0, sizeof(*this));
+  }
+  void Update();
+
+  HAL_JoystickAxes axes[kJoystickPorts];
+  HAL_JoystickPOVs povs[kJoystickPorts];
+  HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_AllianceStationID allianceStation;
+  float matchTime;
+  HAL_ControlWord controlWord;
+};
+static_assert(std::is_standard_layout_v<JoystickDataCache>);
+//static_assert(std::is_trivial_v<JoystickDataCache>);
+}  // namespace
+
 // Message and Data variables
 static wpi::mutex msgMutex;
 
@@ -69,6 +87,28 @@ static int32_t HAL_GetJoystickButtonsInternal(int32_t joystickNum,
   return FRC_NetworkCommunication_getJoystickButtons(
       joystickNum, &buttons->buttons, &buttons->count);
 }
+
+void JoystickDataCache::Update() {
+  for (int i = 0; i < kJoystickPorts; i++) {
+    HAL_GetJoystickAxesInternal(i, &axes[i]);
+    HAL_GetJoystickPOVsInternal(i, &povs[i]);
+    HAL_GetJoystickButtonsInternal(i, &buttons[i]);
+  }
+  FRC_NetworkCommunication_getAllianceStation(
+      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
+  FRC_NetworkCommunication_getMatchTime(&matchTime);
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(&controlWord));
+}
+
+static JoystickDataCache caches[3];
+static JoystickDataCache* currentRead = &caches[0];
+static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* cacheToUpdate = &caches[2];
+
+static std::mutex cacheMutex;
+
 /**
  * Retrieve the Joystick Descriptor for particular slot.
  *
@@ -101,12 +141,6 @@ static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
     desc->axisCount = 0;
   }
   return retval;
-}
-
-static int32_t HAL_GetControlWordInternal(HAL_ControlWord* controlWord) {
-  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
-  return FRC_NetworkCommunication_getControlWord(
-      reinterpret_cast<ControlWord_t*>(controlWord));
 }
 
 static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
@@ -148,9 +182,7 @@ struct EventVector {
   }
 };
 struct FRCDriverStation {
-  EventVector newPacketEvents;
-  EventVector readyToUpdateEvents;
-  EventVector cacheUpdatedEvents;
+  EventVector newDataEvents;
 };
 }  // namespace hal
 
@@ -272,20 +304,29 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  return HAL_GetControlWordInternal(controlWord);
+  // TODO determine if we need to handle this on timeout
+  std::scoped_lock lock{cacheMutex};
+  *controlWord = currentRead->controlWord;
+  return 0;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  return HAL_GetJoystickAxesInternal(joystickNum, axes);
+  std::scoped_lock lock{cacheMutex};
+  *axes = currentRead->axes[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  return HAL_GetJoystickPOVsInternal(joystickNum, povs);
+  std::scoped_lock lock{cacheMutex};
+  *povs = currentRead->povs[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  return HAL_GetJoystickButtonsInternal(joystickNum, buttons);
+  std::scoped_lock lock{cacheMutex};
+  *buttons = currentRead->buttons[joystickNum];
+  return 0;
 }
 
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
@@ -298,10 +339,8 @@ int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
-  HAL_AllianceStationID allianceStation;
-  *status = FRC_NetworkCommunication_getAllianceStation(
-      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
-  return allianceStation;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->allianceStation;
 }
 
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
@@ -356,9 +395,8 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  float matchTime;
-  *status = FRC_NetworkCommunication_getMatchTime(&matchTime);
-  return matchTime;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->matchTime;
 }
 
 void HAL_ObserveUserProgramStarting(void) {
@@ -390,39 +428,31 @@ static void newDataOccur(uint32_t refNum) {
   if (refNum != refNumber) {
     return;
   }
-  driverStation->newPacketEvents.wakeup();
+  cacheToUpdate->Update();
+  {
+    std::scoped_lock lock{cacheMutex};
+    std::swap(currentCache, cacheToUpdate);
+  }
+  driverStation->newDataEvents.wakeup();
 }
 
 void HAL_UpdateDSData(void) {
-  driverStation->cacheUpdatedEvents.wakeup();
-}
-
-void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {
-  switch (handleWakeType) {
-    case HAL_DSWakeType_kNewPacket:
-      driverStation->newPacketEvents.add(handle);
-      break;
-    case HAL_DSWakeType_kCachesReadyToUpdate:
-      driverStation->readyToUpdateEvents.add(handle);
-      break;
-    case HAL_DSWakeType_kCachesUpdated:
-      driverStation->cacheUpdatedEvents.add(handle);
-      break;
+  {
+    std::scoped_lock lock{cacheMutex};
+    std::swap(currentCache, currentRead);
   }
 }
 
-void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {
-  switch (handleWakeType) {
-    case HAL_DSWakeType_kNewPacket:
-      driverStation->newPacketEvents.remove(handle);
-      break;
-    case HAL_DSWakeType_kCachesReadyToUpdate:
-      driverStation->readyToUpdateEvents.remove(handle);
-      break;
-    case HAL_DSWakeType_kCachesUpdated:
-      driverStation->cacheUpdatedEvents.remove(handle);
-      break;
-  }
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  driverStation->newDataEvents.add(handle);
+}
+
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
+  driverStation->newDataEvents.remove(handle);
+}
+
+HAL_Bool HAL_GetOutputsEnabled() {
+  return FRC_NetworkCommunication_getWatchdogActive();
 }
 
 }  // extern "C"

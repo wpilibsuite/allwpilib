@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -235,7 +235,7 @@ public class GenericHID {
    */
   public void setOutput(int outputNumber, boolean value) {
     m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -245,7 +245,7 @@ public class GenericHID {
    */
   public void setOutputs(int value) {
     m_outputs = value;
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -266,6 +266,6 @@ public class GenericHID {
     } else {
       m_rightRumble = (short) (value * 65535);
     }
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    DriverStationJNI.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 }
