@@ -60,7 +60,7 @@ struct WPILIB_DLLEXPORT Twist2d {
    * @param factor The factor by which to scale.
    * @return The scaled Twist2d.
    */
-  Twist2d operator*(double factor) {
+  Twist2d operator*(double factor) const {
     return Twist2d{dx * factor, dy * factor, dtheta * factor};
   }
 };
