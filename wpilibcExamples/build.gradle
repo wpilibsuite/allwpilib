@@ -104,7 +104,7 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-				    if (binary.targetPlatform.name == nativeUtils.wpi.platforms.desktopPlatforms) {
+				    if (nativeUtils.wpi.platforms.desktopPlatforms.contains(binary.targetPlatform.name)) {
                         nativeUtils.useRequiredLibrary(binary, 'romidep')
                     }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
