@@ -9,6 +9,11 @@
 
 namespace frc {
 
+/**
+ * A Button} that gets its state from a GenericHID.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class JoystickButton : public Button {
  public:
   JoystickButton(GenericHID* joystick, int buttonNumber);

@@ -12,6 +12,8 @@ import java.util.function.BooleanSupplier;
 /**
  * A command that does nothing but ends after a specified match time or condition. Useful for
  * CommandGroups.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class WaitUntilCommand extends CommandBase {
   private final BooleanSupplier m_condition;

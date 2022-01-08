@@ -12,6 +12,8 @@ import java.util.Map;
  * A CommandGroup that runs a set of commands in parallel, ending when the last command ends.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelCommandGroup extends CommandGroupBase {
   // maps commands in this group to whether they are still running

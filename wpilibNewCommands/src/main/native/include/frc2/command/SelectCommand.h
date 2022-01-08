@@ -35,6 +35,8 @@ namespace frc2 {
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 template <typename Key>
 class SelectCommand : public CommandHelper<CommandBase, SelectCommand<Key>> {

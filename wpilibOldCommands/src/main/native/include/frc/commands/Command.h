@@ -40,6 +40,8 @@ class CommandGroup;
  * other one will not even be started, and the active one will continue
  * functioning.
  *
+ * This class is provided by the OldCommands VendorDep
+ *  *
  * @see CommandGroup
  * @see Subsystem
  */

@@ -13,6 +13,8 @@ enum class PIDSourceType { kDisplacement, kRate };
  *
  * All sensors that can be used with the PID class will implement the PIDSource
  * that returns a standard value that will be used in the PID code.
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class PIDSource {
  public:

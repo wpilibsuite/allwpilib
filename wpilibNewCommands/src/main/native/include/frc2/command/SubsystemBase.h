@@ -16,6 +16,8 @@ namespace frc2 {
 /**
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class SubsystemBase : public Subsystem,
                       public wpi::Sendable,

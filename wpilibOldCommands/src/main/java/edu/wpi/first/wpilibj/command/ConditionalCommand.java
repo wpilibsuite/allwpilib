@@ -22,6 +22,8 @@ import java.util.Enumeration;
  * <p>A ConditionalCommand will require the superset of subsystems of the onTrue and onFalse
  * commands.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @see Command
  * @see Scheduler
  */

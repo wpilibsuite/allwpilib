@@ -30,6 +30,8 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  *
+ * This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use frc2::PIDController class instead.
  */
 class PIDController : public PIDBase, public Controller {

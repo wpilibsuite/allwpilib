@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 /**
  * Wrapper so that PIDSource is implemented for AnalogGyro for old PIDController.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} which doesn't require this
  *     wrapper.
  */

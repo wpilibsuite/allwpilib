@@ -14,6 +14,8 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
  * cannot be added to any other groups, or scheduled individually.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class PerpetualCommand extends CommandBase {
   protected final Command m_command;

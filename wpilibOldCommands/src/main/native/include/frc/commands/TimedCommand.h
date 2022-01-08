@@ -16,6 +16,8 @@ namespace frc {
  * A TimedCommand will wait for a timeout before finishing.
  *
  * TimedCommand is used to execute a command for a given amount of time.
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class TimedCommand : public Command {
  public:

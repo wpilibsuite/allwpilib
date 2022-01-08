@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 /**
  * Wrapper so that PIDOutput is implemented for MotorController for old PIDController.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use {@link edu.wpi.first.math.controller.PIDController} which doesn't require this
  *     wrapper.
  */

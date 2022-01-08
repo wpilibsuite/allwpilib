@@ -13,6 +13,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 /**
  * A subsystem that uses a {@link ProfiledPIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class ProfiledPIDSubsystem extends SubsystemBase {
   protected final ProfiledPIDController m_controller;

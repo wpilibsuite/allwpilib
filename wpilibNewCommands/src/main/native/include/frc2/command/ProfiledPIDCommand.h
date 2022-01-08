@@ -22,6 +22,8 @@ namespace frc2 {
  * class. The controller calculation and output are performed synchronously in
  * the command's execute() method.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see ProfiledPIDController<Distance>
  */
 template <class Distance>

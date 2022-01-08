@@ -24,6 +24,8 @@ class Command;
  * methods are named fairly abstractly; for purpose-specific wrappers, see
  * Button.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Button
  */
 class Trigger {

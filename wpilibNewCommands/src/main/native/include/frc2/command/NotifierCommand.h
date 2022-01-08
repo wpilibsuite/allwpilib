@@ -24,6 +24,8 @@ namespace frc2 {
  * <p>WARNING: Do not use this class unless you are confident in your ability to
  * make the executed code thread-safe.  If you do not know what "thread-safe"
  * means, that is a good sign that you should not use this class.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class NotifierCommand : public CommandHelper<CommandBase, NotifierCommand> {
  public:

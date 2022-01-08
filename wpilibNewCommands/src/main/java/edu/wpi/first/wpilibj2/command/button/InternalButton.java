@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj2.command.button;
 /**
  * This class is intended to be used within a program. The programmer can manually set its value.
  * Also includes a setting for whether or not it should invert its value.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class InternalButton extends Button {
   private boolean m_pressed;
