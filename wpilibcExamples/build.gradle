@@ -54,7 +54,7 @@ nativeUtils.nativeDependencyContainer.register('romidep', nativeUtils.getNativeD
     groupId = "edu.wpi.first.romi"
     artifactId = "romi-vendordep-cpp"
     headerClassifier = "headers"
-	sourceClassifier = "source"
+    sourceClassifier = "source"
     ext = "zip"
     version = '2022.+'
     targetPlatforms.addAll(nativeUtils.wpi.platforms.desktopPlatforms)
@@ -104,7 +104,7 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
-				    if (nativeUtils.wpi.platforms.desktopPlatforms.contains(binary.targetPlatform.name)) {
+                    if (nativeUtils.wpi.platforms.desktopPlatforms.contains(binary.targetPlatform.name)) {
                         nativeUtils.useRequiredLibrary(binary, 'romidep')
                     }
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
