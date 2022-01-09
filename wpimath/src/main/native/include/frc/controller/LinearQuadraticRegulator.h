@@ -135,7 +135,7 @@ class LinearQuadraticRegulatorImpl {
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    m_K = (B.transpose() * S * B + R)
+    m_K = (discB.transpose() * S * discB + R)
               .llt()
               .solve(discB.transpose() * S * discA + N.transpose());
 
