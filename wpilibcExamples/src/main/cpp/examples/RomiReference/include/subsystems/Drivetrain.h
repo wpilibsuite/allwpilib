@@ -116,6 +116,6 @@ class Drivetrain : public frc2::SubsystemBase {
 
   frc::DifferentialDrive m_drive{m_leftMotor, m_rightMotor};
 
-  RomiGyro m_gyro;
+  frc::RomiGyro m_gyro;
   frc::BuiltInAccelerometer m_accelerometer;
 };

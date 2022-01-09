@@ -46,8 +46,8 @@ class RobotContainer {
 
   // The robot's subsystems
   Drivetrain m_drive;
-  OnBoardIO m_onboardIO{OnBoardIO::ChannelMode::INPUT,
-                        OnBoardIO::ChannelMode::INPUT};
+  frc::OnBoardIO m_onboardIO{frc::OnBoardIO::ChannelMode::INPUT,
+                             frc::OnBoardIO::ChannelMode::INPUT};
 
   // Example button
   frc2::Button m_onboardButtonA{
