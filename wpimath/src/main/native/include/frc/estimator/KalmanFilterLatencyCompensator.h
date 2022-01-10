@@ -93,13 +93,20 @@ class KalmanFilterLatencyCompensator {
         timestamp,
         [](const auto& entry, const auto& ts) { return entry.first < ts; });
 
-    // If vision measurement is too old, throw it out
-    if (it == m_pastObserverSnapshots.cbegin()) {
-      return;
-    }
-
     size_t indexOfClosestEntry;
-    if (it == m_pastObserverSnapshots.cend()) {
+
+    if (it == m_pastObserverSnapshots.cbegin()) {
+      // If the global measurement is older than any snapshot, throw out the
+      // measurement because there's no state estimate into which to incorporate
+      // the measurement
+      if (timestamp < it->first) {
+        return;
+      }
+
+      // If the first snapshot has same timestamp as the global measurement, use
+      // that snapshot
+      indexOfClosestEntry = 0;
+    } else if (it == m_pastObserverSnapshots.cend()) {
       // If all snapshots are older than the global measurement, use the newest
       // snapshot
       indexOfClosestEntry = m_pastObserverSnapshots.size() - 1;
@@ -107,7 +114,9 @@ class KalmanFilterLatencyCompensator {
       // Index of snapshot taken after the global measurement
       int nextIdx = std::distance(m_pastObserverSnapshots.cbegin(), it);
 
-      // Index of snapshot taken before the global measurement
+      // Index of snapshot taken before the global measurement. Since we already
+      // handled the case where the index points to the first snapshot, this
+      // computation is guaranteed to be nonnegative.
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement

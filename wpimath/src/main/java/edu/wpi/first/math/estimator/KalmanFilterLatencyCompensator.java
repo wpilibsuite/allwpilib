@@ -96,13 +96,20 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       }
     }
 
-    // If measurement is too old, throw it out
-    if (low == 0) {
-      return;
-    }
-
     int indexOfClosestEntry;
-    if (low == maxIdx && m_pastObserverSnapshots.get(low).getKey() < timestamp) {
+
+    if (low == 0) {
+      // If the global measurement is older than any snapshot, throw out the
+      // measurement because there's no state estimate into which to incorporate
+      // the measurement
+      if (timestamp < m_pastObserverSnapshots.get(low).getKey()) {
+        return;
+      }
+
+      // If the first snapshot has same timestamp as the global measurement, use
+      // that snapshot
+      indexOfClosestEntry = 0;
+    } else if (low == maxIdx && m_pastObserverSnapshots.get(low).getKey() < timestamp) {
       // If all snapshots are older than the global measurement, use the newest
       // snapshot
       indexOfClosestEntry = maxIdx;
@@ -110,7 +117,9 @@ public class KalmanFilterLatencyCompensator<S extends Num, I extends Num, O exte
       // Index of snapshot taken after the global measurement
       int nextIdx = low;
 
-      // Index of snapshot taken before the global measurement
+      // Index of snapshot taken before the global measurement. Since we already
+      // handled the case where the index points to the first snapshot, this
+      // computation is guaranteed to be nonnegative.
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
