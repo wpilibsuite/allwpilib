@@ -86,26 +86,37 @@ class KalmanFilterLatencyCompensator {
       return;
     }
 
-    // We will perform a binary search to find the index of the element in the
-    // vector that has a timestamp that is equal to or greater than the vision
-    // measurement timestamp.
-    auto lowerBoundIter = std::lower_bound(
+    // Perform a binary search to find the index of first snapshot whose
+    // timestamp is greater than or equal to the global measurement timestamp
+    auto it = std::lower_bound(
         m_pastObserverSnapshots.cbegin(), m_pastObserverSnapshots.cend(),
         timestamp,
         [](const auto& entry, const auto& ts) { return entry.first < ts; });
-    int index = std::distance(m_pastObserverSnapshots.cbegin(), lowerBoundIter);
 
-    // High and Low should be the same. The sampled timestamp is greater than or
-    // equal to the vision pose timestamp. We will now find the entry which is
-    // closest in time to the requested timestamp.
+    // If vision measurement is too old, throw it out
+    if (it == m_pastObserverSnapshots.cbegin()) {
+      return;
+    }
 
-    size_t indexOfClosestEntry =
-        units::math::abs(
-            timestamp - m_pastObserverSnapshots[std::max(index - 1, 0)].first) <
-                units::math::abs(timestamp -
-                                 m_pastObserverSnapshots[index].first)
-            ? index - 1
-            : index;
+    size_t indexOfClosestEntry;
+    if (it == m_pastObserverSnapshots.cend()) {
+      // If all snapshots are older than the global measurement, use the newest
+      // snapshot
+      indexOfClosestEntry = m_pastObserverSnapshots.size() - 1;
+    } else {
+      // Index of snapshot taken after the global measurement
+      int nextIdx = std::distance(m_pastObserverSnapshots.cbegin(), it);
+
+      // Index of snapshot taken before the global measurement
+      int prevIdx = nextIdx - 1;
+
+      // Find the snapshot closest in time to global measurement
+      units::second_t prevTimeDiff =
+          units::math::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
+      units::second_t nextTimeDiff =
+          units::math::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
+      indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
+    }
 
     units::second_t lastTimestamp =
         m_pastObserverSnapshots[indexOfClosestEntry].first - nominalDt;
