@@ -62,7 +62,7 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
+   * @param motor The motor (or gearbox) attached to the flywheel.
    * @param jKgMetersSquared The moment of inertia J of the flywheel.
    * @param G The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
