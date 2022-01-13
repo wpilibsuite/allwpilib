@@ -25,6 +25,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated All APIs which use this have been deprecated.
  */
 @Deprecated(since = "2020", forRemoval = true)

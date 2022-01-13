@@ -7,7 +7,7 @@ from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, wa
 
 
 def main():
-    root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "8.0.1")
+    root, repo = setup_upstream_repo("https://github.com/fmtlib/fmt", "8.1.1")
     wpiutil = os.path.join(root, "wpiutil")
 
     # Delete old install

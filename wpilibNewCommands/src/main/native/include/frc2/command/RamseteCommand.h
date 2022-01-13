@@ -37,6 +37,8 @@ namespace frc2 {
  * secondary constructor that omits the PID and feedforward functionality,
  * returning only the raw wheel speeds from the RAMSETE controller.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see RamseteController
  * @see Trajectory
  */

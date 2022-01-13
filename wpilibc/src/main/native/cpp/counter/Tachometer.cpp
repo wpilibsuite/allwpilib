@@ -64,17 +64,21 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
   m_edgesPerRevolution = edges;
 }
 
-units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
+units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
   if (period.to<double>() == 0) {
-    return units::revolutions_per_minute_t{0.0};
+    return units::turns_per_second_t{0.0};
   }
   int edgesPerRevolution = GetEdgesPerRevolution();
   if (edgesPerRevolution == 0) {
-    return units::revolutions_per_minute_t{0.0};
+    return units::turns_per_second_t{0.0};
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
-  return units::revolutions_per_minute_t{rotationHz.to<double>() * 60};
+  return units::turns_per_second_t{rotationHz.to<double>()};
+}
+
+units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {
+  return units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
 }
 
 bool Tachometer::GetStopped() const {
@@ -111,6 +115,8 @@ void Tachometer::SetUpdateWhenEmpty(bool updateWhenEmpty) {
 
 void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Tachometer");
+  builder.AddDoubleProperty(
+      "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); }, nullptr);
   builder.AddDoubleProperty(
       "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); }, nullptr);
 }

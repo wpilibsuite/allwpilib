@@ -81,6 +81,14 @@
     <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
   </Match>
   <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
+  </Match>
+  <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>

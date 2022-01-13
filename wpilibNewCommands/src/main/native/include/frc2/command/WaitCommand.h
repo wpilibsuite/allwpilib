@@ -15,6 +15,8 @@ namespace frc2 {
  * A command that does nothing but takes a specified amount of time to finish.
  * Useful for CommandGroups.  Can also be subclassed to make a command with an
  * internal timer.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class WaitCommand : public CommandHelper<CommandBase, WaitCommand> {
  public:

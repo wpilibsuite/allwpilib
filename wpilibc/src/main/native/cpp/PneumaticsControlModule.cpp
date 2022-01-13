@@ -97,14 +97,16 @@ void PneumaticsControlModule::EnableCompressorDigital() {
 }
 
 void PneumaticsControlModule::EnableCompressorAnalog(
-    units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage) {
+    units::pounds_per_square_inch_t minPressure,
+    units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorHybrid(
-    units::volt_t minAnalogVoltage, units::volt_t maxAnalogVoltage) {
+    units::pounds_per_square_inch_t minPressure,
+    units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   FRC_CheckErrorStatus(status, "Module {}", m_module);
@@ -263,6 +265,11 @@ void PneumaticsControlModule::UnreserveCompressor() {
 
 units::volt_t PneumaticsControlModule::GetAnalogVoltage(int channel) const {
   return units::volt_t{0};
+}
+
+units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
+    int channel) const {
+  return 0_psi;
 }
 
 Solenoid PneumaticsControlModule::MakeSolenoid(int channel) {

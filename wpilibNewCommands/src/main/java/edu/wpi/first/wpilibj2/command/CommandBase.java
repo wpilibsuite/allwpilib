@@ -10,7 +10,11 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.HashSet;
 import java.util.Set;
 
-/** A {@link Sendable} base class for {@link Command}s. */
+/**
+ * A {@link Sendable} base class for {@link Command}s.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
+ */
 public abstract class CommandBase implements Sendable, Command {
   protected Set<Subsystem> m_requirements = new HashSet<>();
 

@@ -32,6 +32,8 @@ import java.util.Enumeration;
  * active command is not interruptible, the other one will not even be started, and the active one
  * will continue functioning.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @see Subsystem
  * @see CommandGroup
  * @see IllegalUseOfCommandException

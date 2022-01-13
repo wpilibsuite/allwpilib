@@ -55,6 +55,8 @@ public class Servo extends PWM {
    * Get the servo position.
    *
    * <p>Servo values range from 0.0 to 1.0 corresponding to the range of full left to full right.
+   * This returns the commanded position, not the position that the servo is actually at, as the
+   * servo does not report its own position.
    *
    * @return Position from 0.0 to 1.0.
    */
@@ -87,8 +89,8 @@ public class Servo extends PWM {
   /**
    * Get the servo angle.
    *
-   * <p>Assume that the servo angle is linear with respect to the PWM value (big assumption, need to
-   * test).
+   * <p>This returns the commanded angle, not the angle that the servo is actually at, as the servo
+   * does not report its own angle.
    *
    * @return The angle in degrees to which the servo is set.
    */

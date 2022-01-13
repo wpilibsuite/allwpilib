@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-void DifferentialDriveWheelSpeeds::Normalize(
+void DifferentialDriveWheelSpeeds::Desaturate(
     units::meters_per_second_t attainableMaxSpeed) {
   auto realMaxSpeed =
       units::math::max(units::math::abs(left), units::math::abs(right));

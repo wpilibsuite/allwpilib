@@ -12,8 +12,15 @@ namespace frc {
 /**
  * Wrapper so that PIDSource is implemented for AnalogInput for old
  * PIDController
+ *
+ * This class is provided by the OldCommands VendorDep
+ *
+ * @deprecated Use frc2::PIDController class instead which doesn't require this
+ * wrapper.
  */
-class PIDAnalogInput : public PIDSource, public AnalogInput {
+class WPI_DEPRECATED("Use frc2::PIDController class instead.") PIDAnalogInput
+    : public PIDSource,
+      public AnalogInput {
   using AnalogInput::AnalogInput;
 
  public:

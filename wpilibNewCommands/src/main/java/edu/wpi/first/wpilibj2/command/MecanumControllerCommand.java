@@ -35,6 +35,8 @@ import java.util.function.Supplier;
  *
  * <p>The robot angle controller does not follow the angle given by the trajectory but rather goes
  * to the angle given in the final state of the trajectory.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 @SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {
@@ -359,7 +361,7 @@ public class MecanumControllerCommand extends CommandBase {
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
 
-    targetWheelSpeeds.normalize(m_maxWheelVelocityMetersPerSecond);
+    targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
 
     var frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
     var rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;

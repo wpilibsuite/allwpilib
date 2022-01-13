@@ -43,6 +43,12 @@ public class I2C implements AutoCloseable {
     m_port = port.value;
     m_deviceAddress = deviceAddress;
 
+    if (port == I2C.Port.kOnboard) {
+      DriverStation.reportWarning(
+          "Onboard I2C port is subject to system lockups. See Known Issues page for details",
+          false);
+    }
+
     I2CJNI.i2CInitialize((byte) port.value);
 
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);

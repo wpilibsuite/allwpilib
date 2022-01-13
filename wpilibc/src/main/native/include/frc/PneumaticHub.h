@@ -26,11 +26,13 @@ class PneumaticHub : public PneumaticsBase {
 
   void EnableCompressorDigital() override;
 
-  void EnableCompressorAnalog(units::volt_t minAnalogVoltage,
-                              units::volt_t maxAnalogVoltage) override;
+  void EnableCompressorAnalog(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
 
-  void EnableCompressorHybrid(units::volt_t minAnalogVoltage,
-                              units::volt_t maxAnalogVoltage) override;
+  void EnableCompressorHybrid(
+      units::pounds_per_square_inch_t minPressure,
+      units::pounds_per_square_inch_t maxPressure) override;
 
   CompressorConfigType GetCompressorConfigType() const override;
 
@@ -126,6 +128,8 @@ class PneumaticHub : public PneumaticsBase {
   units::volt_t GetSolenoidsVoltage() const;
 
   units::volt_t GetAnalogVoltage(int channel) const override;
+
+  units::pounds_per_square_inch_t GetPressure(int channel) const override;
 
  private:
   class DataStore;

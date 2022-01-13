@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <units/time.h>
+#include <wpi/timestamp.h>
 
-#include "frc/Timer.h"
+#include "units/time.h"
 
 namespace frc {
 /**
@@ -14,7 +14,7 @@ namespace frc {
  * change value from baseline for a specified period of time before the filtered
  * value changes.
  */
-class Debouncer {
+class WPILIB_DLLEXPORT Debouncer {
  public:
   enum DebounceType { kRising, kFalling, kBoth };
 
@@ -38,9 +38,14 @@ class Debouncer {
   bool Calculate(bool input);
 
  private:
-  frc::Timer m_timer;
   units::second_t m_debounceTime;
   bool m_baseline;
   DebounceType m_debounceType;
+
+  units::second_t m_prevTime;
+
+  void ResetTimer();
+
+  bool HasElapsed() const;
 };
 }  // namespace frc

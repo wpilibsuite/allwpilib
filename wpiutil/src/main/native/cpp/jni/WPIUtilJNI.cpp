@@ -77,6 +77,19 @@ Java_edu_wpi_first_util_WPIUtilJNI_enableMockTime
 
 /*
  * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    disableMockTime
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_disableMockTime
+  (JNIEnv*, jclass)
+{
+  mockTimeEnabled = false;
+  wpi::SetNowImpl(nullptr);
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
  * Method:    setMockTime
  * Signature: (J)V
  */
@@ -101,6 +114,18 @@ Java_edu_wpi_first_util_WPIUtilJNI_now
   } else {
     return wpi::Now();
   }
+}
+
+/*
+ * Class:     edu_wpi_first_util_WPIUtilJNI
+ * Method:    getSystemTime
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL
+Java_edu_wpi_first_util_WPIUtilJNI_getSystemTime
+  (JNIEnv*, jclass)
+{
+  return wpi::GetSystemTime();
 }
 
 /*

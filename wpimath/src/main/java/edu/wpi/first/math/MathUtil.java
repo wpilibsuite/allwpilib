@@ -84,4 +84,17 @@ public final class MathUtil {
   public static double angleModulus(double angleRadians) {
     return inputModulus(angleRadians, -Math.PI, Math.PI);
   }
+
+  /**
+   * Perform linear interpolation between two values.
+   *
+   * @param startValue The value to start at.
+   * @param endValue The value to end at.
+   * @param t How far between the two values to interpolate. This is clamped to [0, 1].
+   * @return The interpolated value.
+   */
+  @SuppressWarnings("ParameterName")
+  public static double interpolate(double startValue, double endValue, double t) {
+    return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
+  }
 }

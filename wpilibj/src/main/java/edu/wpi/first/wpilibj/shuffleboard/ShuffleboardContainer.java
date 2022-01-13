@@ -123,6 +123,20 @@ public interface ShuffleboardContainer extends ShuffleboardValue {
   SimpleWidget add(String title, Object defaultValue);
 
   /**
+   * Adds a widget to this container to display a video stream.
+   *
+   * @param title the title of the widget
+   * @param cameraName the name of the streamed camera
+   * @param cameraUrls the URLs with which the dashboard can access the camera stream
+   * @return a widget to display the camera stream
+   * @throws IllegalArgumentException if a widget already exists in this container with the given
+   *     title
+   */
+  default ComplexWidget addCamera(String title, String cameraName, String... cameraUrls) {
+    return add(title, SendableCameraWrapper.wrap(cameraName, cameraUrls));
+  }
+
+  /**
    * Adds a widget to this container. The widget will display the data provided by the value
    * supplier. Changes made on the dashboard will not propagate to the widget object, and will be
    * overridden by values from the value supplier.

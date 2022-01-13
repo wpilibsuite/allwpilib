@@ -15,7 +15,6 @@
 #include <imgui_internal.h>
 #include <implot.h>
 #include <stb_image.h>
-#include <wpi/fs.h>
 
 #include "wpigui_internal.h"
 
@@ -320,7 +319,7 @@ void gui::Main() {
 
   // Delete the save file if requested.
   if (!gContext->saveSettings && gContext->resetOnExit) {
-    fs::remove(fs::path{gContext->iniPath});
+    std::remove(gContext->iniPath.c_str());
   }
 
   glfwDestroyWindow(gContext->window);

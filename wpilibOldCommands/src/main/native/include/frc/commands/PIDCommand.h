@@ -14,6 +14,15 @@
 
 namespace frc {
 
+/**
+ * This class defines aCommand which interacts heavily with a PID loop.
+ *
+ * It provides some convenience methods to run an internal PIDController . It
+ * will also start and stop said PIDController when the PIDCommand is first
+ * initialized and ended/interrupted.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
   PIDCommand(std::string_view name, double p, double i, double d);

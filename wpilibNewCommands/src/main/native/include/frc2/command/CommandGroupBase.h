@@ -18,6 +18,8 @@ namespace frc2 {
  * A base for CommandGroups.  Statically tracks commands that have been
  * allocated to groups to ensure those commands are not also used independently,
  * which can result in inconsistent command state and unpredictable execution.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandGroupBase : public CommandBase {
  public:

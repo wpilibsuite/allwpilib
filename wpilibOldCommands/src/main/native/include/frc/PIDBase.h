@@ -30,6 +30,8 @@ namespace frc {
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  *
+ * This class is provided by the OldCommands VendorDep
+ *
  * @deprecated All APIs which use this have been deprecated.
  */
 class PIDBase : public PIDInterface,

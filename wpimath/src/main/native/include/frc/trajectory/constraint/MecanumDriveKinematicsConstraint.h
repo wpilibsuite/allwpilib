@@ -33,7 +33,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematicsConstraint
                             units::meters_per_second_t speed) const override;
 
  private:
-  const MecanumDriveKinematics& m_kinematics;
+  MecanumDriveKinematics m_kinematics;
   units::meters_per_second_t m_maxSpeed;
 };
 }  // namespace frc

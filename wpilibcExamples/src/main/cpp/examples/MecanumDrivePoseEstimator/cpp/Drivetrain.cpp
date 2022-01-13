@@ -44,7 +44,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                           xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
-  wheelSpeeds.Normalize(kMaxSpeed);
+  wheelSpeeds.Desaturate(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }
 

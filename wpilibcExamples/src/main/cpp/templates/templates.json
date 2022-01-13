@@ -1,5 +1,15 @@
 [
   {
+    "name": "Command Robot",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [
@@ -30,13 +40,13 @@
     "commandversion": 2
   },
   {
-    "name": "Command Robot",
-    "description": "Command style",
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
     "tags": [
-      "Command"
+      "Command", "Romi"
     ],
     "foldername": "commandbased",
-    "gradlebase": "cpp",
+    "gradlebase": "cppromi",
     "commandversion": 2
   },
   {
@@ -46,16 +56,6 @@
       "Timed", "Romi"
     ],
     "foldername": "timed",
-    "gradlebase": "cppromi",
-    "commandversion": 2
-  },
-  {
-    "name": "Romi - Command Robot",
-    "description": "Romi - Command style",
-    "tags": [
-      "Command", "Romi"
-    ],
-    "foldername": "commandbased",
     "gradlebase": "cppromi",
     "commandversion": 2
   }

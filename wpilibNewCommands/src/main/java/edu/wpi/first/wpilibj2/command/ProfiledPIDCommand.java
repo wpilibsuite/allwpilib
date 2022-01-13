@@ -17,6 +17,8 @@ import java.util.function.Supplier;
  * A command that controls an output with a {@link ProfiledPIDController}. Runs forever by default -
  * to add exit conditions and/or other behavior, subclass this class. The controller calculation and
  * output are performed synchronously in the command's execute() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ProfiledPIDCommand extends CommandBase {
   protected final ProfiledPIDController m_controller;

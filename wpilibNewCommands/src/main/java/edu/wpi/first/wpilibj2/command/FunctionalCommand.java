@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  * the constructor. Useful for inline definitions of complex commands - note, however, that if a
  * command is beyond a certain complexity it is usually better practice to write a proper class for
  * it than to inline it.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class FunctionalCommand extends CommandBase {
   protected final Runnable m_onInit;

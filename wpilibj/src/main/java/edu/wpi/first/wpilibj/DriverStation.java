@@ -1107,6 +1107,7 @@ public class DriverStation {
       return true;
     } catch (InterruptedException ex) {
       // return false on a thread interrupt
+      Thread.currentThread().interrupt();
       return false;
     } finally {
       m_waitForDataMutex.unlock();

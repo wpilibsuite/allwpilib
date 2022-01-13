@@ -86,7 +86,7 @@ public class MecanumDriveKinematics {
    *     component, the robot will rotate around that corner.
    * @return The wheel speeds. Use caution because they are not normalized. Sometimes, a user input
    *     may cause one of the wheel speeds to go above the attainable max velocity. Use the {@link
-   *     MecanumDriveWheelSpeeds#normalize(double)} function to rectify this issue.
+   *     MecanumDriveWheelSpeeds#desaturate(double)} function to rectify this issue.
    */
   public MecanumDriveWheelSpeeds toWheelSpeeds(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {

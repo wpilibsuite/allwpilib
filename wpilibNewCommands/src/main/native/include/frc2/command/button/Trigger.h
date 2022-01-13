@@ -9,6 +9,7 @@
 #include <memory>
 #include <utility>
 
+#include <frc/filter/Debouncer.h>
 #include <units/time.h>
 #include <wpi/span.h>
 
@@ -22,6 +23,8 @@ class Command;
  * Trigger class is a base for all command-event-binding classes, and so the
  * methods are named fairly abstractly; for purpose-specific wrappers, see
  * Button.
+ *
+ * This class is provided by the NewCommands VendorDep
  *
  * @see Button
  */
@@ -350,10 +353,13 @@ class Trigger {
    * Creates a new debounced trigger from this trigger - it will become active
    * when this trigger has been active for longer than the specified period.
    *
-   * @param debounceTime the debounce period
-   * @return the debounced trigger
+   * @param debounceTime The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
    */
-  Trigger Debounce(units::second_t debounceTime);
+  Trigger Debounce(units::second_t debounceTime,
+                   frc::Debouncer::DebounceType type =
+                       frc::Debouncer::DebounceType::kRising);
 
  private:
   std::function<bool()> m_isActive;

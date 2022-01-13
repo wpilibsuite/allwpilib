@@ -20,4 +20,6 @@ public class FieldImages {
   public static final String k2021GalacticSearchBFieldConfig =
       "/edu/wpi/first/fields/2021-galacticsearchb.json";
   public static final String k2021SlalomFieldConfig = "/edu/wpi/first/fields/2021-slalompath.json";
+  public static final String k2022RapidReactFieldConfig =
+      "/edu/wpi/first/fields/2022-rapidreact.json";
 }

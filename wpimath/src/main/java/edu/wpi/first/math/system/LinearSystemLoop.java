@@ -57,7 +57,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
         controller,
         new LinearPlantInversionFeedforward<>(plant, dtSeconds),
         observer,
-        u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
+        u -> StateSpaceUtil.desaturateInputVector(u, maxVoltageVolts));
   }
 
   /**
@@ -104,7 +104,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
         controller,
         feedforward,
         observer,
-        u -> StateSpaceUtil.normalizeInputVector(u, maxVoltageVolts));
+        u -> StateSpaceUtil.desaturateInputVector(u, maxVoltageVolts));
   }
 
   /**

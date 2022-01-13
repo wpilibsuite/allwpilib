@@ -336,8 +336,8 @@ Eigen::Vector<double, Inputs> ClampInputMaxMagnitude(
 }
 
 /**
- * Normalize all inputs if any excedes the maximum magnitude. Useful for systems
- * such as differential drivetrains.
+ * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
+ * systems such as differential drivetrains.
  *
  * @tparam Inputs      The number of inputs.
  * @param u            The input vector.
@@ -345,7 +345,7 @@ Eigen::Vector<double, Inputs> ClampInputMaxMagnitude(
  * @return The normalizedInput
  */
 template <int Inputs>
-Eigen::Vector<double, Inputs> NormalizeInputVector(
+Eigen::Vector<double, Inputs> DesaturateInputVector(
     const Eigen::Vector<double, Inputs>& u, double maxMagnitude) {
   double maxValue = u.template lpNorm<Eigen::Infinity>();
 

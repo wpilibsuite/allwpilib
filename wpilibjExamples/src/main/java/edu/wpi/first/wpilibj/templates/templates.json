@@ -1,5 +1,16 @@
 [
   {
+    "name": "Command Robot",
+    "description": "Command style",
+    "tags": [
+      "Command"
+    ],
+    "foldername": "commandbased",
+    "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
     "name": "Timed Robot",
     "description": "Timed style",
     "tags": [
@@ -14,7 +25,8 @@
     "name": "Timed Skeleton (Advanced)",
     "description": "Skeleton (stub) code for TimedRobot",
     "tags": [
-      "Timed", "Skeleton"
+      "Timed",
+      "Skeleton"
     ],
     "foldername": "timedskeleton",
     "gradlebase": "java",
@@ -25,7 +37,8 @@
     "name": "RobotBase Skeleton (Advanced)",
     "description": "Skeleton (stub) code for RobotBase",
     "tags": [
-      "RobotBase", "Skeleton"
+      "RobotBase",
+      "Skeleton"
     ],
     "foldername": "robotbaseskeleton",
     "gradlebase": "java",
@@ -33,13 +46,14 @@
     "commandversion": 2
   },
   {
-    "name": "Command Robot",
-    "description": "Command style",
+    "name": "Romi - Command Robot",
+    "description": "Romi - Command style",
     "tags": [
-      "Command"
+      "Command",
+      "Romi"
     ],
-    "foldername": "commandbased",
-    "gradlebase": "java",
+    "foldername": "romicommandbased",
+    "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
   },
@@ -47,20 +61,10 @@
     "name": "Romi - Timed Robot",
     "description": "Romi - Timed style",
     "tags": [
-      "Timed", "Romi"
+      "Timed",
+      "Romi"
     ],
     "foldername": "romitimed",
-    "gradlebase": "javaromi",
-    "mainclass": "Main",
-    "commandversion": 2
-  },
-  {
-    "name": "Romi - Command Robot",
-    "description": "Romi - Command style",
-    "tags": [
-      "Command", "Romi"
-    ],
-    "foldername": "romicommandbased",
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
@@ -73,6 +77,18 @@
     ],
     "foldername": "educational",
     "gradlebase": "java",
+    "mainclass": "Main",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Educational Robot",
+    "description": "Romi - Educational Robot",
+    "tags": [
+      "Educational",
+      "Romi"
+    ],
+    "foldername": "romieducational",
+    "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
   }

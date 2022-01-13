@@ -15,11 +15,17 @@ namespace frc {
 /**
  * Wrapper so that PIDOutput is implemented for MotorController for old
  * PIDController
+ *
+ * This class is provided by the OldCommands VendorDep
+ *
+ * @deprecated Use frc2::PIDController class instead which doesn't require this
+ * wrapper.
  */
 class PIDMotorController : public PIDOutput,
                            public MotorController,
                            public wpi::Sendable {
  public:
+  WPI_DEPRECATED("Use frc2::PIDController class instead.")
   explicit PIDMotorController(MotorController& motorController);
 
   /**
