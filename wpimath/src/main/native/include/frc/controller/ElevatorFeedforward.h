@@ -53,16 +53,6 @@ class WPILIB_DLLEXPORT ElevatorFeedforward
   }
 
   /**
-   * Gets the SimpleMotorFeedforward that describes the motor without the effect
-   * of gravity.
-   *
-   * @return The internal SimpleMotorFeedforward.
-   */
-  SimpleMotorFeedforward<Distance>& GetSimpleFeedforward() {
-    return m_simpleFeedforward;
-  }
-
-  /**
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param currentVelocity The current velocity setpoint.
@@ -173,8 +163,6 @@ class WPILIB_DLLEXPORT ElevatorFeedforward
   }
 
   units::volt_t kG{0};
-
- private:
   SimpleMotorFeedforward<Distance> m_simpleFeedforward;
 };
 }  // namespace frc

@@ -63,16 +63,6 @@ class WPILIB_DLLEXPORT ArmFeedforward
   units::radian_t GetAngle() const { return m_angle; }
 
   /**
-   * Gets the SimpleMotorFeedforward that describes the motor without the effect
-   * of gravity.
-   *
-   * @return The internal SimpleMotorFeedforward.
-   */
-  SimpleMotorFeedforward<units::rad>& GetSimpleFeedforward() {
-    return m_simpleFeedforward;
-  }
-
-  /**
    * Calculates the feedforward from the gains and setpoints.
    *
    * @param angle           The angle setpoint.
@@ -185,8 +175,6 @@ class WPILIB_DLLEXPORT ArmFeedforward
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
-  units::volt_t kG{0};
-
   void InitSendable(wpi::SendableBuilder& builder) override {
     m_simpleFeedforward.InitSendable(builder);
     builder.SetSmartDashboardType("ArmFeedforward");
@@ -200,8 +188,10 @@ class WPILIB_DLLEXPORT ArmFeedforward
         "outputVoltage", [this] { return GetOutput().value(); }, nullptr);
   }
 
+ SimpleMotorFeedforward<Angle> m_simpleFeedforward;
+ units::volt_t kG{0};
+
  private:
-  SimpleMotorFeedforward<Angle> m_simpleFeedforward;
   units::unit_t<Angle> m_angle;
 };
 }  // namespace frc
