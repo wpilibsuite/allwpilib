@@ -11,10 +11,11 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** A helper class that computes feedforward outputs for a simple permanent-magnet DC motor. */
+@SuppressWarnings("MemberName")
 public class SimpleMotorFeedforward implements Sendable {
-  private double m_ks;
-  private double m_kv;
-  private double m_ka;
+  public double ks;
+  public double kv;
+  public double ka;
 
   private double m_velocity;
   private double m_acceleration;
@@ -29,9 +30,9 @@ public class SimpleMotorFeedforward implements Sendable {
    * @param ka The acceleration gain.
    */
   public SimpleMotorFeedforward(double ks, double kv, double ka) {
-    this.m_ks = ks;
-    this.m_kv = kv;
-    this.m_ka = ka;
+    this.ks = ks;
+    this.kv = kv;
+    this.ka = ka;
   }
 
   /**
@@ -43,60 +44,6 @@ public class SimpleMotorFeedforward implements Sendable {
    */
   public SimpleMotorFeedforward(double ks, double kv) {
     this(ks, kv, 0);
-  }
-
-  /**
-   * Gets the static friction compensation term of the feedforward.
-   *
-   * @return The static gain.
-   */
-  public double getKs() {
-    return m_ks;
-  }
-
-  /**
-   * Sets the static friction compensation term of the feedforward.
-   *
-   * @param ks The static gain.
-   */
-  public void setKs(double ks) {
-    this.m_ks = ks;
-  }
-
-  /**
-   * Gets the velocity gain of the feedforward.
-   *
-   * @return The velocity gain.
-   */
-  public double getKv() {
-    return m_kv;
-  }
-
-  /**
-   * Sets the velocity gain of the feedforward.
-   *
-   * @param kv The velocity gain.
-   */
-  public void setKv(double kv) {
-    this.m_kv = kv;
-  }
-
-  /**
-   * Gets the acceleration gain of the feedforward.
-   *
-   * @return The acceleration gain.
-   */
-  public double getKa() {
-    return m_ka;
-  }
-
-  /**
-   * Sets the acceleration gain of the feedforward.
-   *
-   * @param ka The acceleration gain.
-   */
-  public void setKa(double ka) {
-    this.m_ka = ka;
   }
 
   /**
@@ -149,13 +96,13 @@ public class SimpleMotorFeedforward implements Sendable {
     m_velocity = currentVelocity;
     m_acceleration = (nextVelocity - currentVelocity) / dtSeconds;
 
-    var plant = LinearSystemId.identifyVelocitySystem(this.m_kv, this.m_ka);
+    var plant = LinearSystemId.identifyVelocitySystem(this.kv, this.ka);
     var feedforward = new LinearPlantInversionFeedforward<>(plant, dtSeconds);
 
     var r = Matrix.mat(Nat.N1(), Nat.N1()).fill(currentVelocity);
     var nextR = Matrix.mat(Nat.N1(), Nat.N1()).fill(nextVelocity);
 
-    m_output = m_ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
+    m_output = ks * Math.signum(currentVelocity) + feedforward.calculate(r, nextR).get(0, 0);
 
     return m_output;
   }
@@ -186,7 +133,7 @@ public class SimpleMotorFeedforward implements Sendable {
    */
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - m_ks - acceleration * m_ka) / m_kv;
+    return (maxVoltage - ks - acceleration * ka) / kv;
   }
 
   /**
@@ -201,7 +148,7 @@ public class SimpleMotorFeedforward implements Sendable {
    */
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + m_ks - acceleration * m_ka) / m_kv;
+    return (-maxVoltage + ks - acceleration * ka) / kv;
   }
 
   /**
@@ -215,7 +162,7 @@ public class SimpleMotorFeedforward implements Sendable {
    * @return The maximum possible acceleration at the given velocity.
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
-    return (maxVoltage - m_ks * Math.signum(velocity) - velocity * m_kv) / m_ka;
+    return (maxVoltage - ks * Math.signum(velocity) - velocity * kv) / ka;
   }
 
   /**
@@ -235,13 +182,13 @@ public class SimpleMotorFeedforward implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
-        .addDoubleProperty("kS", this::getKs, this::setKs)
-        .addDoubleProperty("kV", this::getKv, this::setKv)
-        .addDoubleProperty("kA", this::getKa, this::setKa)
+        .addDoubleProperty("kS", () -> ks, ks -> this.ks = ks)
+        .addDoubleProperty("kV", () -> kv, kv -> this.kv = kv)
+        .addDoubleProperty("kA", () -> ka, ka -> this.ka = ka)
         .addDoubleProperty("velocity", this::getVelocity, null)
-        .addDoubleProperty("velocityOutput", () -> getVelocity() * m_kv, null)
+        .addDoubleProperty("velocityOutput", () -> getVelocity() * kv, null)
         .addDoubleProperty("acceleration", this::getAcceleration, null)
-        .addDoubleProperty("accelerationOutput", () -> getAcceleration() * m_ka, null)
+        .addDoubleProperty("accelerationOutput", () -> getAcceleration() * ka, null)
         .addDoubleProperty("output", this::getOutput, null);
   }
 }

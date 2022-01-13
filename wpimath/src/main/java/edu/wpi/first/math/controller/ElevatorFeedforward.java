@@ -11,9 +11,10 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  * A helper class that computes feedforward outputs for a simple elevator (modeled as a motor acting
  * against the force of gravity directly).
  */
+@SuppressWarnings("MemberName")
 public class ElevatorFeedforward implements Sendable {
-  private final SimpleMotorFeedforward m_simpleFeedforward;
-  private double m_kg;
+  public final SimpleMotorFeedforward m_simpleFeedforward;
+  public double kg;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains. Units of the gain values will
@@ -26,7 +27,7 @@ public class ElevatorFeedforward implements Sendable {
    */
   public ElevatorFeedforward(double ks, double kg, double kv, double ka) {
     m_simpleFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
-    this.m_kg = kg;
+    this.kg = kg;
   }
 
   /**
@@ -39,24 +40,6 @@ public class ElevatorFeedforward implements Sendable {
    */
   public ElevatorFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
-  }
-
-  /**
-   * Gets the gravity compensation term of the feedforward.
-   *
-   * @return The gravity compensation gain.
-   */
-  public double getKg() {
-    return m_kg;
-  }
-
-  /**
-   * Sets the gravity compensation term of the feedforward.
-   *
-   * @param kg The gravity compensation gain.
-   */
-  public void setKg(double kg) {
-    this.m_kg = kg;
   }
 
   /**
@@ -74,7 +57,7 @@ public class ElevatorFeedforward implements Sendable {
    * @return Most recent output.
    */
   public double getOutput() {
-    return m_simpleFeedforward.getOutput() + m_kg;
+    return m_simpleFeedforward.getOutput() + kg;
   }
 
   /**
@@ -86,7 +69,7 @@ public class ElevatorFeedforward implements Sendable {
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity, double dtSeconds) {
-    return m_simpleFeedforward.calculate(currentVelocity, nextVelocity, dtSeconds) + m_kg;
+    return m_simpleFeedforward.calculate(currentVelocity, nextVelocity, dtSeconds) + kg;
   }
 
   /**
@@ -97,7 +80,7 @@ public class ElevatorFeedforward implements Sendable {
    * @return The computed feedforward.
    */
   public double calculate(double velocity, double acceleration) {
-    return m_simpleFeedforward.calculate(velocity, acceleration) + m_kg;
+    return m_simpleFeedforward.calculate(velocity, acceleration) + kg;
   }
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
@@ -115,7 +98,7 @@ public class ElevatorFeedforward implements Sendable {
   public double maxAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume max velocity is positive
     return m_simpleFeedforward.maxAchievableVelocity(maxVoltage, acceleration)
-        - m_kg / m_simpleFeedforward.getKv();
+        - kg / m_simpleFeedforward.kv;
   }
 
   /**
@@ -131,7 +114,7 @@ public class ElevatorFeedforward implements Sendable {
   public double minAchievableVelocity(double maxVoltage, double acceleration) {
     // Assume min velocity is negative, ks flips sign
     return m_simpleFeedforward.minAchievableVelocity(maxVoltage, acceleration)
-        - m_kg / m_simpleFeedforward.getKv();
+        - kg / m_simpleFeedforward.kv;
   }
 
   /**
@@ -146,7 +129,7 @@ public class ElevatorFeedforward implements Sendable {
    */
   public double maxAchievableAcceleration(double maxVoltage, double velocity) {
     return m_simpleFeedforward.maxAchievableAcceleration(maxVoltage, velocity)
-        - m_kg / m_simpleFeedforward.getKa();
+        - kg / m_simpleFeedforward.ka;
   }
 
   /**
@@ -167,7 +150,7 @@ public class ElevatorFeedforward implements Sendable {
   public void initSendable(SendableBuilder builder) {
     m_simpleFeedforward.initSendable(builder);
     builder
-        .addDoubleProperty("kG", this::getKg, this::setKg)
-        .addDoubleProperty("output", () -> getOutput() + m_kg, null);
+        .addDoubleProperty("kG", () -> kg, kg -> this.kg = kg)
+        .addDoubleProperty("output", () -> getOutput() + kg, null);
   }
 }

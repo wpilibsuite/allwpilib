@@ -13,9 +13,9 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  */
 @SuppressWarnings("MemberName")
 public class ArmFeedforward implements Sendable {
-  private double m_kg;
+  public double kg;
   private double m_angleRadians;
-  private final SimpleMotorFeedforward m_simpleFeedforward;
+  public final SimpleMotorFeedforward m_simpleFeedforward;
 
   /**
    * Creates a new ArmFeedforward with the specified gains. Units of the gain values will dictate
@@ -28,7 +28,7 @@ public class ArmFeedforward implements Sendable {
    */
   public ArmFeedforward(double ks, double kg, double kv, double ka) {
     m_simpleFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
-    this.m_kg = kg;
+    this.kg = kg;
   }
 
   /**
@@ -41,33 +41,6 @@ public class ArmFeedforward implements Sendable {
    */
   public ArmFeedforward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
-  }
-
-  /**
-   * Gets the gravity compensation term of the feedforward.
-   *
-   * @return The gravity compensation gain.
-   */
-  public double getKg() {
-    return m_kg;
-  }
-
-  /**
-   * Sets the gravity compensation term of the feedforward.
-   *
-   * @param kg The gravity compensation gain.
-   */
-  public void setKg(double kg) {
-    this.m_kg = kg;
-  }
-
-  /**
-   * Gets the SimpleMotorFeedforward that describes the motor without the effect of gravity.
-   *
-   * @return The internal SimpleMotorFeedforward.
-   */
-  public SimpleMotorFeedforward getSimpleFeedforward() {
-    return m_simpleFeedforward;
   }
 
   /**
@@ -85,7 +58,7 @@ public class ArmFeedforward implements Sendable {
    * @return Most recent output.
    */
   public double getOutput() {
-    return m_simpleFeedforward.getOutput() + m_kg * Math.cos(m_angleRadians);
+    return m_simpleFeedforward.getOutput() + kg * Math.cos(m_angleRadians);
   }
 
   /**
@@ -104,7 +77,7 @@ public class ArmFeedforward implements Sendable {
       double dtSeconds) {
     m_angleRadians = positionRadians;
     return m_simpleFeedforward.calculate(currentVelocityRadPerSec, nextVelocityRadPerSec, dtSeconds)
-        + m_kg * Math.cos(positionRadians);
+        + kg * Math.cos(positionRadians);
   }
 
   /**
@@ -150,7 +123,7 @@ public class ArmFeedforward implements Sendable {
   public double maxAchievableVelocity(double maxVoltage, double angle, double acceleration) {
     // Assume max velocity is positive
     return m_simpleFeedforward.maxAchievableVelocity(maxVoltage, acceleration)
-        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
+        - Math.cos(angle) * kg / m_simpleFeedforward.kv;
   }
 
   /**
@@ -167,7 +140,7 @@ public class ArmFeedforward implements Sendable {
   public double minAchievableVelocity(double maxVoltage, double angle, double acceleration) {
     // Assume min velocity is negative, ks flips sign
     return m_simpleFeedforward.minAchievableVelocity(maxVoltage, acceleration)
-        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKv();
+        - Math.cos(angle) * kg / m_simpleFeedforward.kv;
   }
 
   /**
@@ -183,7 +156,7 @@ public class ArmFeedforward implements Sendable {
    */
   public double maxAchievableAcceleration(double maxVoltage, double angle, double velocity) {
     return m_simpleFeedforward.maxAchievableAcceleration(maxVoltage, velocity)
-        - Math.cos(angle) * m_kg / m_simpleFeedforward.getKa();
+        - Math.cos(angle) * kg / m_simpleFeedforward.ka;
   }
 
   /**
@@ -205,8 +178,8 @@ public class ArmFeedforward implements Sendable {
   public void initSendable(SendableBuilder builder) {
     m_simpleFeedforward.initSendable(builder);
     builder
-        .addDoubleProperty("kG", this::getKg, this::setKg)
-        .addDoubleProperty("gravityOutput", () -> m_kg * Math.cos(m_angleRadians), null)
+        .addDoubleProperty("kG", () -> kg, kg -> this.kg = kg)
+        .addDoubleProperty("gravityOutput", () -> kg * Math.cos(m_angleRadians), null)
         .addDoubleProperty("output", this::getOutput, null);
   }
 }
