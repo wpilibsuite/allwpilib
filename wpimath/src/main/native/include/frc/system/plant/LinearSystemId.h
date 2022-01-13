@@ -321,6 +321,38 @@ class WPILIB_DLLEXPORT LinearSystemId {
   }
 
   /**
+   * Constructs the state-space model for a DC motor motor.
+   *
+   * States: [[angular position, angular velocity]]
+   * Inputs: [[voltage]]
+   * Outputs: [[angular position, angular velocity]]
+   *
+   * @param motor Instance of DCMotor.
+   * @param J Moment of inertia.
+   * @param G Gear ratio from motor to carriage.
+   * @throws std::domain_error if J <= 0 or G <= 0.
+   */
+  static LinearSystem<2, 1, 2> DCMotorSystem(DCMotor motor,
+                                             units::kilogram_square_meter_t J,
+                                             double G) {
+    if (J <= 0_kg_sq_m) {
+      throw std::domain_error("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw std::domain_error("G must be greater than zero.");
+    }
+
+    Eigen::Matrix<double, 2, 2> A{
+        {0.0, 1.0},
+        {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
+    Eigen::Matrix<double, 2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
+    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Eigen::Matrix<double, 2, 1> D{0.0, 0.0};
+
+    return LinearSystem<2, 1, 2>(A, B, C, D);
+  }
+
+  /**
    * Constructs the state-space model for a drivetrain.
    *
    * States: [[left velocity], [right velocity]]
