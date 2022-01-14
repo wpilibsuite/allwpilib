@@ -92,8 +92,7 @@ FMT_FUNC void report_error(format_func func, int error_code,
 // A wrapper around fwrite that throws on error.
 inline void fwrite_fully(const void* ptr, size_t size, size_t count,
                          FILE* stream) {
-  size_t written = std::fwrite(ptr, size, count, stream);
-  if (written < count) FMT_THROW(system_error(errno, "cannot write to file"));
+  std::fwrite(ptr, size, count, stream);
 }
 
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
