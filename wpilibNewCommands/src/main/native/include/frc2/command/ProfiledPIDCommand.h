@@ -97,7 +97,7 @@ class ProfiledPIDCommand
                      std::initializer_list<Subsystem*> requirements)
       : ProfiledPIDCommand(
             controller, measurementSource,
-            [&goalSource]() {
+            [goalSource = std::move(goalSource)]() {
               return State{goalSource(), Velocity_t{0}};
             },
             useOutput, requirements) {}
@@ -119,7 +119,7 @@ class ProfiledPIDCommand
                      wpi::span<Subsystem* const> requirements = {})
       : ProfiledPIDCommand(
             controller, measurementSource,
-            [&goalSource]() {
+            [goalSource = std::move(goalSource)]() {
               return State{goalSource(), Velocity_t{0}};
             },
             useOutput, requirements) {}
