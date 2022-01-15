@@ -38,8 +38,8 @@ import java.util.function.BiConsumer;
  * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
  * position, and heading.
  *
- * <p><strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity, right wheel
- * velocity, and change in gyro heading.
+ * <p><strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity, and angular rate
+ * in the field coordinate system.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
  * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
