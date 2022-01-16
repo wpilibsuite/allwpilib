@@ -40,8 +40,8 @@ import java.util.function.BiConsumer;
  * <p><strong> x = [x, y, theta, dist_l, dist_r]ᵀ </strong> in the field coordinate system
  * containing x position, y position, heading, left encoder distance, and right encoder distance.
  *
- * <p><strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity, right wheel
- * velocity, and change in gyro heading.
+ * <p><strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity, and angular rate
+ * in the field coordinate system.
  *
  * <p>NB: Using velocities make things considerably easier, because it means that teams don't have
  * to worry about getting an accurate model. Basically, we suspect that it's easier for teams to get

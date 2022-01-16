@@ -38,8 +38,8 @@ namespace frc {
  * system containing x position, y position, heading, left encoder distance,
  * and right encoder distance.
  *
- * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
- * right wheel velocity, and change in gyro heading.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
  * NB: Using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we

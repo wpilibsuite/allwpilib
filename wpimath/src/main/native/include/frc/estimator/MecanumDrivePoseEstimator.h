@@ -38,8 +38,8 @@ namespace frc {
  * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
  * containing x position, y position, and heading.
  *
- * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
- * right wheel velocity, and change in gyro heading.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
