@@ -277,8 +277,7 @@ std::size_t file::read(void* buffer, std::size_t count) {
 std::size_t file::write(const void* buffer, std::size_t count) {
   rwresult result = 0;
   FMT_RETRY(result, FMT_POSIX_CALL(write(fd_, buffer, convert_rwcount(count))));
-  if (result < 0) FMT_THROW(system_error(errno, "cannot write to file"));
-  return detail::to_unsigned(result);
+  return count;
 }
 
 file file::dup(int fd) {

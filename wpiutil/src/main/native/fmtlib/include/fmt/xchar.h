@@ -207,8 +207,7 @@ inline void vprint(std::FILE* f, wstring_view fmt, wformat_args args) {
   wmemory_buffer buffer;
   detail::vformat_to(buffer, fmt, args);
   buffer.push_back(L'\0');
-  if (std::fputws(buffer.data(), f) == -1)
-    FMT_THROW(system_error(errno, FMT_STRING("cannot write to file")));
+  std::fputws(buffer.data(), f);
 }
 
 inline void vprint(wstring_view fmt, wformat_args args) {

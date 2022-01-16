@@ -3,7 +3,7 @@
 import os
 import shutil
 
-from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if
+from upstream_utils import setup_upstream_repo, comment_out_invalid_includes, walk_cwd_and_copy_if, apply_patches
 
 
 def main():
@@ -30,6 +30,9 @@ def main():
     for f in include_files:
         comment_out_invalid_includes(
             f, [os.path.join(wpiutil, "src/main/native/fmtlib/include")])
+
+    apply_patches(root,
+                  ["upstream_utils/fmt-dont-throw-on-write-failure.patch"])
 
 
 if __name__ == "__main__":
