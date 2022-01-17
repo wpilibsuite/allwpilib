@@ -52,7 +52,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Constructs a PowerDistribution object.
    *
-   * <p>Detects the connected PDP/PDH Using the default CAN ID (0 for CTRE and 1 for REV).
+   * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
    */
   public PowerDistribution() {
     m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
@@ -98,7 +98,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * Query the current of a single channel of the PDP/PDH.
    *
    * @param channel The channel (0-15 for PDP, 0-23 for PDH) to query
-   * @return The current of one of the channel in Amperes
+   * @return The current of the channel in Amperes
    */
   public double getCurrent(int channel) {
     double current = PowerDistributionJNI.getChannelCurrent(m_handle, channel);
@@ -155,7 +155,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Gets whether the PDH switchable channel is turned on or off. Returns false with the CTRE PDP.
    *
-   * @return the output state of the PDH switchable channel
+   * @return The output state of the PDH switchable channel
    */
   public boolean getSwitchableChannel() {
     return PowerDistributionJNI.getSwitchableChannel(m_handle);
@@ -164,7 +164,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   /**
    * Sets the PDH switchable channel on or off. Does nothing with the CTRE PDP.
    *
-   * @param enabled whether the turn PDH switchable channel on or off
+   * @param enabled Whether to turn the PDH switchable channel on or off
    */
   public void setSwitchableChannel(boolean enabled) {
     PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);

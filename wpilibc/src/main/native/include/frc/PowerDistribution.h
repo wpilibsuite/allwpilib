@@ -23,7 +23,7 @@ class PowerDistribution : public wpi::Sendable,
   /**
    * Constructs a PowerDistribution object.
    *
-   * Detects the connected PDP/PDH Using the default CAN ID (0 for CTRE and 1
+   * Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1
    * for REV).
    */
   PowerDistribution();
@@ -104,14 +104,14 @@ class PowerDistribution : public wpi::Sendable,
    * Gets whether the PDH switchable channel is turned on or off. Returns false
    * with the CTRE PDP.
    *
-   * @return the output state of the PDH switchable channel
+   * @return The output state of the PDH switchable channel
    */
   bool GetSwitchableChannel() const;
 
   /**
    * Sets the PDH switchable channel on or off. Does nothing with the CTRE PDP.
    *
-   * @param enabled whether the turn PDH switchable channel on or off
+   * @param enabled Whether to turn the PDH switchable channel on or off
    */
   void SetSwitchableChannel(bool enabled);
 
