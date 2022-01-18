@@ -80,20 +80,20 @@ PneumaticsControlModule::PneumaticsControlModule(HAL_CTREPCMHandle handle,
 bool PneumaticsControlModule::GetCompressor() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressor(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 void PneumaticsControlModule::DisableCompressor() {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, false, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorDigital() {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorAnalog(
@@ -101,7 +101,7 @@ void PneumaticsControlModule::EnableCompressorAnalog(
     units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorHybrid(
@@ -109,13 +109,13 @@ void PneumaticsControlModule::EnableCompressorHybrid(
     units::pounds_per_square_inch_t maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 CompressorConfigType PneumaticsControlModule::GetCompressorConfigType() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMClosedLoopControl(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result ? CompressorConfigType::Digital
                 : CompressorConfigType::Disabled;
 }
@@ -123,85 +123,85 @@ CompressorConfigType PneumaticsControlModule::GetCompressorConfigType() const {
 bool PneumaticsControlModule::GetPressureSwitch() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMPressureSwitch(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return units::ampere_t{result};
 }
 
 bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrentTooHighFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetCompressorCurrentTooHighStickyFault() const {
   int32_t status = 0;
   auto result =
       HAL_GetCTREPCMCompressorCurrentTooHighStickyFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetCompressorShortedFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorShortedFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetCompressorShortedStickyFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorShortedStickyFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetCompressorNotConnectedFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorNotConnectedFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetCompressorNotConnectedStickyFault() const {
   int32_t status = 0;
   auto result =
       HAL_GetCTREPCMCompressorNotConnectedStickyFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 bool PneumaticsControlModule::GetSolenoidVoltageFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoidVoltageFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 bool PneumaticsControlModule::GetSolenoidVoltageStickyFault() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoidVoltageStickyFault(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 void PneumaticsControlModule::ClearAllStickyFaults() {
   int32_t status = 0;
   HAL_ClearAllCTREPCMStickyFaults(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::SetSolenoids(int mask, int values) {
   int32_t status = 0;
   HAL_SetCTREPCMSolenoids(m_handle, mask, values, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 int PneumaticsControlModule::GetSolenoids() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoids(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
@@ -212,14 +212,14 @@ int PneumaticsControlModule::GetModuleNumber() const {
 int PneumaticsControlModule::GetSolenoidDisabledList() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMSolenoidDisabledList(m_handle, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
   return result;
 }
 
 void PneumaticsControlModule::FireOneShot(int index) {
   int32_t status = 0;
   HAL_FireCTREPCMOneShot(m_handle, index, &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::SetOneShotDuration(int index,
@@ -227,7 +227,7 @@ void PneumaticsControlModule::SetOneShotDuration(int index,
   int32_t status = 0;
   units::millisecond_t millis = duration;
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
-  FRC_CheckErrorStatus(status, "Module {}", m_module);
+  FRC_ReportError(status, "Module {}", m_module);
 }
 
 bool PneumaticsControlModule::CheckSolenoidChannel(int channel) const {
