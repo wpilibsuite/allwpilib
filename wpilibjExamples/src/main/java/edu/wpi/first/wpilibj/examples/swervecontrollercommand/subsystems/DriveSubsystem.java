@@ -132,7 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
     m_rearLeft.resetEncoders();
-    m_frontRight.resetEncoders();
+    m_rearLeft.resetEncoders();
     m_rearRight.resetEncoders();
   }
 
