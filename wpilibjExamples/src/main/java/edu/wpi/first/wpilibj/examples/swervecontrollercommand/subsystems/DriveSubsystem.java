@@ -124,7 +124,7 @@ public class DriveSubsystem extends SubsystemBase {
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
-    m_frontLeft.setDesiredState(desiredStates[2]);
+    m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
@@ -132,7 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
     m_rearLeft.resetEncoders();
-    m_rearLeft.resetEncoders();
+    m_frontRight.resetEncoders();
     m_rearRight.resetEncoders();
   }
 
