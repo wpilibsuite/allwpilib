@@ -52,11 +52,13 @@ public final class Constants {
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = 0.7;
     // Distance between front and back wheels on robot
+
+    // Instantiated in the following order: front left, rear left, front right, rear right.
     public static final SwerveDriveKinematics kDriveKinematics =
         new SwerveDriveKinematics(
             new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final boolean kGyroReversed = false;
