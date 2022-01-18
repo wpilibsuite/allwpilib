@@ -44,8 +44,7 @@ class SpeedController;
  * </pre>
  *
  * Each Drive() function provides different inverse kinematic relations for a
- * Mecanum drive robot. Motor outputs for the right side are negated, so motor
- * direction inversion by the user is usually unnecessary.
+ * Mecanum drive robot.
  *
  * This library uses the NED axes convention (North-East-Down as external
  * reference in the world frame):
@@ -60,9 +59,6 @@ class SpeedController;
  * with SetDeadband().
  *
  * RobotDrive porting guide:
- * <br>In MecanumDrive, the right side motor controllers are automatically
- * inverted, while in RobotDrive, no motor controllers are automatically
- * inverted.
  * <br>DriveCartesian(double, double, double, double) is equivalent to
  * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
  * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted

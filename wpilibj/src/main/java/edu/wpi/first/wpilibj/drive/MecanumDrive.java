@@ -34,8 +34,7 @@ import edu.wpi.first.wpilibj.SpeedController;
  * </pre>
  *
  * <p>Each drive() function provides different inverse kinematic relations for a Mecanum drive
- * robot. Motor outputs for the right side are negated, so motor direction inversion by the user is
- * usually unnecessary.
+ * robot.
  *
  * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
  * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
@@ -49,8 +48,6 @@ import edu.wpi.first.wpilibj.SpeedController;
  * value can be changed with {@link #setDeadband}.
  *
  * <p>RobotDrive porting guide: <br>
- * In MecanumDrive, the right side motor controllers are automatically inverted, while in
- * RobotDrive, no motor controllers are automatically inverted. <br>
  * {@link #driveCartesian(double, double, double, double)} is equivalent to RobotDrive's
  * mecanumDrive_Cartesian(double, double, double, double) if a deadband of 0 is used, and the ySpeed
  * and gyroAngle values are inverted compared to RobotDrive (eg driveCartesian(xSpeed, -ySpeed,
