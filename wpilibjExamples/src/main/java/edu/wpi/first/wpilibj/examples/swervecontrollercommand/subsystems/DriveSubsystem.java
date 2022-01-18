@@ -68,8 +68,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry.update(
         m_gyro.getRotation2d(),
         m_frontLeft.getState(),
-        m_rearLeft.getState(),
         m_frontRight.getState(),
+        m_rearLeft.getState(),
         m_rearRight.getState());
   }
 
@@ -109,8 +109,8 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_rearLeft.setDesiredState(swerveModuleStates[1]);
-    m_frontRight.setDesiredState(swerveModuleStates[2]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
@@ -123,8 +123,8 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(desiredStates[0]);
-    m_rearLeft.setDesiredState(desiredStates[1]);
-    m_frontRight.setDesiredState(desiredStates[2]);
+    m_frontRight.setDesiredState(desiredStates[1]);
+    m_frontLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
