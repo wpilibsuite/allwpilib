@@ -335,8 +335,13 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
 
 void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle,
                                      int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
   uint8_t controlData[] = {0, 0, 0, 0x80};
-  HAL_WriteCANPacket(handle, controlData, sizeof(controlData), Control2,
+  HAL_WriteCANPacket(pcm->canHandle, controlData, sizeof(controlData), Control2,
                      status);
 }
 
