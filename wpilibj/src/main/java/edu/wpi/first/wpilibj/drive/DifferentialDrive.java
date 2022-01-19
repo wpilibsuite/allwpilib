@@ -95,10 +95,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   private boolean m_reported;
   
   /**
-  * Wheel speeds for a differential drive. 
-  *
-  * Uses normalized voltage [-1.0..1.0].
-  */
+   * Wheel speeds for a differential drive. Uses normalized voltage [-1.0..1.0].
+   */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     public double left;

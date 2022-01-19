@@ -63,10 +63,8 @@ class KilloughDrive : public RobotDriveBase,
   static constexpr double kDefaultBackMotorAngle = 270.0;
 
   /**
-  * Wheel speeds for a Killough drive. 
-  *
-  * Uses normalized voltage [-1.0..1.0].
-  */
+   * Wheel speeds for a Killough drive. Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double left = 0.0;
     double right = 0.0;

@@ -67,10 +67,8 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
   private boolean m_reported;
 
   /**
-  * Wheel speeds for a mecanum drive. 
-  *
-  * Uses normalized voltage [-1.0..1.0].
-  */
+   * Wheel speeds for a mecanum drive. Uses normalized voltage [-1.0..1.0].
+   */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     public double frontLeft;
