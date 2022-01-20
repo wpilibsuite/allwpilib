@@ -72,9 +72,11 @@ class MecanumDrive : public RobotDriveBase,
                      public wpi::Sendable,
                      public wpi::SendableHelper<MecanumDrive> {
  public:
- /**
-  * Wheel speeds for a mecanum drive. Uses normalized voltage [-1.0..1.0].
-  */
+  /**
+   * Wheel speeds for a mecanum drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double frontLeft = 0.0;
     double frontRight = 0.0;

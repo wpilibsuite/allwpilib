@@ -59,7 +59,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
   private boolean m_reported;
 
   /**
-   * Wheel speeds for a Killough drive. Uses normalized voltage [-1.0..1.0].
+   * Wheel speeds for a Killough drive.
+   *
+   * <p>Uses normalized voltage [-1.0..1.0].
    */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {

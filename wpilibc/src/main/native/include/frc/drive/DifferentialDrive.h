@@ -102,7 +102,9 @@ class DifferentialDrive : public RobotDriveBase,
                           public wpi::SendableHelper<DifferentialDrive> {
  public:
   /**
-   * Wheel speeds for a differential drive. Uses normalized voltage [-1.0..1.0].
+   * Wheel speeds for a differential drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
    */
   struct WheelSpeeds {
     double left = 0.0;
