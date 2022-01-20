@@ -77,7 +77,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
      *
      * @param left The left speed [-1.0..1.0].
      * @param right The right speed [-1.0..1.0].
-     * @param back The back speed,[-1.0..1.0].
+     * @param back The back speed [-1.0..1.0].
      */
     public WheelSpeeds(double left, double right, double back) {
       this.left = left;
