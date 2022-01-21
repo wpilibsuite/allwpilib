@@ -6,7 +6,8 @@
 
 #include "wpi/StackTrace.h"
 
-static std::atomic<std::string (*)(int offset)> gStackTraceImpl{wpi::GetStackTraceDefault};
+static std::atomic<std::string (*)(int offset)> gStackTraceImpl{
+    wpi::GetStackTraceDefault};
 
 std::string wpi::GetStackTrace(int offset) {
   return (gStackTraceImpl.load())(offset);
