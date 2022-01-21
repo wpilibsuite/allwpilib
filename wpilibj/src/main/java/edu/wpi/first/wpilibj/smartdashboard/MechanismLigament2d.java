@@ -118,6 +118,32 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   /**
+   * Get the ligament color.
+   *
+   * @return the color of the line
+   */
+  public synchronized Color8Bit getColor() {
+    if (m_colorEntry != null) {
+      m_color = m_colorEntry.getString("");
+    }
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    if (m_color.length() == 7 && m_color.charAt(0) == '#') {
+      try {
+        r = Integer.parseInt(m_color.substring(1, 3), 16);
+        g = Integer.parseInt(m_color.substring(3, 5), 16);
+        b = Integer.parseInt(m_color.substring(5, 7), 16);
+      } catch (NumberFormatException e) {
+        r = 0;
+        g = 0;
+        b = 0;
+      }
+    }
+    return new Color8Bit(r, g, b);
+  }
+
+  /**
    * Set the line thickness.
    *
    * @param weight the line thickness
@@ -125,6 +151,18 @@ public class MechanismLigament2d extends MechanismObject2d {
   public synchronized void setLineWeight(double weight) {
     m_weight = weight;
     flush();
+  }
+
+  /**
+   * Get the line thickness.
+   *
+   * @return the line thickness
+   */
+  public synchronized double getLineWeight() {
+    if (m_weightEntry != null) {
+      m_weight = m_weightEntry.getDouble(0.0);
+    }
+    return m_weight;
   }
 
   @Override
