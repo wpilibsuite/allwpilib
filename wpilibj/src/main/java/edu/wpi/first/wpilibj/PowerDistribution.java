@@ -153,6 +153,20 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
+   * Gets the module type for this power distribution object.
+   *
+   * @return The module type
+   */
+  public ModuleType getType() {
+    int type = PowerDistributionJNI.getType(m_handle);
+    if (type == PowerDistributionJNI.REV_TYPE) {
+      return ModuleType.kRev;
+    } else {
+      return ModuleType.kCTRE;
+    }
+  }
+
+  /**
    * Gets whether the PDH switchable channel is turned on or off. Returns false with the CTRE PDP.
    *
    * @return The output state of the PDH switchable channel

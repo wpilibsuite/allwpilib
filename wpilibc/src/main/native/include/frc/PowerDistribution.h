@@ -101,6 +101,11 @@ class PowerDistribution : public wpi::Sendable,
   int GetModule() const;
 
   /**
+   * Gets module type.
+   */
+  ModuleType GetType() const;
+
+  /**
    * Gets whether the PDH switchable channel is turned on or off. Returns false
    * with the CTRE PDP.
    *
