@@ -72,6 +72,11 @@ class MecanumDrive : public RobotDriveBase,
                      public wpi::Sendable,
                      public wpi::SendableHelper<MecanumDrive> {
  public:
+  /**
+   * Wheel speeds for a mecanum drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double frontLeft = 0.0;
     double frontRight = 0.0;
@@ -140,6 +145,7 @@ class MecanumDrive : public RobotDriveBase,
    *                  Clockwise is positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around
    *                  the Z axis. Use this to implement field-oriented controls.
+   * @return Wheel speeds [-1.0..1.0].
    */
   static WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed,
                                       double zRotation, double gyroAngle = 0.0);

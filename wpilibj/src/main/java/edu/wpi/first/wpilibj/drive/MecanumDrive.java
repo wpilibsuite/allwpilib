@@ -66,6 +66,11 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
 
   private boolean m_reported;
 
+  /**
+   * Wheel speeds for a mecanum drive.
+   *
+   * <p>Uses normalized voltage [-1.0..1.0].
+   */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     public double frontLeft;
@@ -79,10 +84,10 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
     /**
      * Constructs a WheelSpeeds.
      *
-     * @param frontLeft The front left speed.
-     * @param frontRight The front right speed.
-     * @param rearLeft The rear left speed.
-     * @param rearRight The rear right speed.
+     * @param frontLeft The front left speed [-1.0..1.0].
+     * @param frontRight The front right speed [-1.0..1.0].
+     * @param rearLeft The rear left speed [-1.0..1.0].
+     * @param rearRight The rear right speed [-1.0..1.0].
      */
     public WheelSpeeds(double frontLeft, double frontRight, double rearLeft, double rearRight) {
       this.frontLeft = frontLeft;
@@ -216,7 +221,7 @@ public class MecanumDrive extends RobotDriveBase implements Sendable, AutoClosea
    *     positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
-   * @return Wheel speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds driveCartesianIK(
