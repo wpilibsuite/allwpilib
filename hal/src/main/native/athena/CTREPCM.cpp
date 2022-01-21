@@ -398,7 +398,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
       (std::min)(static_cast<uint32_t>(durMs) / 10,
                  static_cast<uint32_t>(0xFF));
   HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
-                              Control2, SendPeriod, status);
+                              Control3, SendPeriod, status);
 }
 
 }  // extern "C"
