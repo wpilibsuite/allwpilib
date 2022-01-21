@@ -86,6 +86,9 @@ deploy {
 
                 myRobotCpp(NativeExecutableArtifact) {
                     libraryDirectory = '/usr/local/frc/third-party/lib'
+                    def excludes = getLibraryFilter().getExcludes()
+                    excludes.add('**/*.so.debug')
+                    excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
                         ctx.execute('chmod +x myRobotCpp')
                     }
