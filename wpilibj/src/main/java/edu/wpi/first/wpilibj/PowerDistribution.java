@@ -15,8 +15,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 
 /**
- * Class for getting voltage, current, temperature, power and energy from the Power Distribution
- * Panel over CAN.
+ * Class for getting voltage, current, temperature, power and energy from the CTRE Power
+ * Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
  */
 public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
@@ -36,9 +36,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Constructs a PowerDistribution.
+   * Constructs a PowerDistribution object.
    *
-   * @param module The CAN ID of the PDP.
+   * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
   public PowerDistribution(int module, ModuleType moduleType) {
@@ -50,9 +50,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Constructs a PowerDistribution.
+   * Constructs a PowerDistribution object.
    *
-   * <p>Uses the default CAN ID (0 for CTRE and 1 for REV).
+   * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
    */
   public PowerDistribution() {
     m_handle = PowerDistributionJNI.initialize(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
@@ -68,37 +68,37 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Gets the number of channel for this power distribution.
+   * Gets the number of channels for this power distribution object.
    *
-   * @return Number of output channels.
+   * @return Number of output channels (16 for PDP, 24 for PDH).
    */
   public int getNumChannels() {
     return PowerDistributionJNI.getNumChannels(m_handle);
   }
 
   /**
-   * Query the input voltage of the PDP.
+   * Query the input voltage of the PDP/PDH.
    *
-   * @return The voltage of the PDP in volts
+   * @return The voltage in volts
    */
   public double getVoltage() {
     return PowerDistributionJNI.getVoltage(m_handle);
   }
 
   /**
-   * Query the temperature of the PDP.
+   * Query the temperature of the PDP/PDH.
    *
-   * @return The temperature of the PDP in degrees Celsius
+   * @return The temperature in degrees Celsius
    */
   public double getTemperature() {
     return PowerDistributionJNI.getTemperature(m_handle);
   }
 
   /**
-   * Query the current of a single channel of the PDP.
+   * Query the current of a single channel of the PDP/PDH.
    *
-   * @param channel The PDP channel to query.
-   * @return The current of one of the PDP channels (channels 0-15) in Amperes
+   * @param channel The channel (0-15 for PDP, 0-23 for PDH) to query
+   * @return The current of the channel in Amperes
    */
   public double getCurrent(int channel) {
     double current = PowerDistributionJNI.getChannelCurrent(m_handle, channel);
@@ -107,7 +107,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the current of all monitored PDP channels (0-15).
+   * Query the current of all monitored channels.
    *
    * @return The current of all the channels in Amperes
    */
@@ -116,7 +116,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total power drawn from the monitored PDP channels.
+   * Query the total power drawn from the monitored channels.
    *
    * @return the total power in Watts
    */
@@ -125,7 +125,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Query the total energy drawn from the monitored PDP channels.
+   * Query the total energy drawn from the monitored channels.
    *
    * @return the total energy in Joules
    */
@@ -138,7 +138,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     PowerDistributionJNI.resetTotalEnergy(m_handle);
   }
 
-  /** Clear all PDP sticky faults. */
+  /** Clear all PDP/PDH sticky faults. */
   public void clearStickyFaults() {
     PowerDistributionJNI.clearStickyFaults(m_handle);
   }
@@ -152,10 +152,20 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return m_module;
   }
 
+  /**
+   * Gets whether the PDH switchable channel is turned on or off. Returns false with the CTRE PDP.
+   *
+   * @return The output state of the PDH switchable channel
+   */
   public boolean getSwitchableChannel() {
     return PowerDistributionJNI.getSwitchableChannel(m_handle);
   }
 
+  /**
+   * Sets the PDH switchable channel on or off. Does nothing with the CTRE PDP.
+   *
+   * @param enabled Whether to turn the PDH switchable channel on or off
+   */
   public void setSwitchableChannel(boolean enabled) {
     PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
   }
