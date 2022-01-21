@@ -113,7 +113,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     if (fieldRelative) {
-      m_drive.driveCartesian(ySpeed, xSpeed, rot, -m_gyro.getAngle());
+      m_drive.driveCartesian(ySpeed, xSpeed, rot, m_gyro.getRotation2d());
     } else {
       m_drive.driveCartesian(ySpeed, xSpeed, rot);
     }
