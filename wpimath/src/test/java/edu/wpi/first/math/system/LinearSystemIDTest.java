@@ -65,6 +65,19 @@ class LinearSystemIDTest {
   }
 
   @Test
+  void testDCMotorSystem() {
+    var model = LinearSystemId.createDCMotorSystem(DCMotor.getNEO(2), 0.00032, 1.0);
+    assertTrue(
+        model.getA().isEqual(Matrix.mat(Nat.N2(), Nat.N2()).fill(0, 1, 0, -26.87032), 0.001));
+
+    assertTrue(model.getB().isEqual(VecBuilder.fill(0, 1354.166667), 0.001));
+
+    assertTrue(model.getC().isEqual(Matrix.eye(Nat.N2()), 0.001));
+
+    assertTrue(model.getD().isEqual(new Matrix<>(Nat.N2(), Nat.N1()), 0.001));
+  }
+
+  @Test
   void testIdentifyPositionSystem() {
     // By controls engineering in frc,
     // x-dot = [0 1 | 0 -kv/ka] x = [0 | 1/ka] u

@@ -49,6 +49,18 @@ TEST(LinearSystemIDTest, FlywheelSystem) {
   ASSERT_TRUE(model.D().isApprox(Eigen::Matrix<double, 1, 1>{0.0}, 0.001));
 }
 
+TEST(LinearSystemIDTest, DCMotorSystem) {
+  auto model = frc::LinearSystemId::DCMotorSystem(frc::DCMotor::NEO(2),
+                                                  0.00032_kg_sq_m, 1.0);
+  ASSERT_TRUE(model.A().isApprox(
+      Eigen::Matrix<double, 2, 2>{{0, 1}, {0, -26.87032}}, 0.001));
+  ASSERT_TRUE(
+      model.B().isApprox(Eigen::Matrix<double, 2, 1>{0, 1354.166667}, 0.001));
+  ASSERT_TRUE(model.C().isApprox(
+      Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
+  ASSERT_TRUE(model.D().isApprox(Eigen::Matrix<double, 2, 1>{0.0, 0.0}, 0.001));
+}
+
 TEST(LinearSystemIDTest, IdentifyPositionSystem) {
   // By controls engineering in frc,
   // x-dot = [0 1 | 0 -kv/ka] x = [0 | 1/ka] u
