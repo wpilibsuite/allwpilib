@@ -46,13 +46,12 @@ class SpeedController;
  * Each Drive() function provides different inverse kinematic relations for a
  * Mecanum drive robot.
  *
- * This library uses the NED axes convention (North-East-Down as external
- * reference in the world frame):
- * http://www.nuclearprojects.com/ins/images/axis_big.png.
- *
- * The positive X axis points ahead, the positive Y axis points to the right,
+ * The positive Y axis points ahead, the positive X axis points to the right,
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * Note: the axis conventions used in this class differ from DifferentialDrive.
+ * This may change in a future year's WPILib release.
  *
  * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
  * so that the full range is still used. This deadband value can be changed
@@ -104,9 +103,9 @@ class MecanumDrive : public RobotDriveBase,
    * Angles are measured clockwise from the positive X axis. The robot's speed
    * is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Forward is
    *                  positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Right is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
@@ -137,9 +136,9 @@ class MecanumDrive : public RobotDriveBase,
    * Angles are measured clockwise from the positive X axis. The robot's speed
    * is independent from its angle or rotation rate.
    *
-   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Forward is
    *                  positive.
-   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Right is
    *                  positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *                  Clockwise is positive.
