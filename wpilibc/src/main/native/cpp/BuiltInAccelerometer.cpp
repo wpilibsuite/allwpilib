@@ -13,7 +13,7 @@
 
 using namespace frc;
 
-BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
+BuiltInAccelerometer::BuiltInAccelerometer(Range range) : m_range{range} {
   SetRange(range);
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
@@ -22,6 +22,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {
+  m_range = range;
   if (range == kRange_16G) {
     throw FRC_MakeError(err::ParameterOutOfRange, "{}",
                         "16G range not supported (use k2G, k4G, or k8G)");
@@ -45,11 +46,23 @@ double BuiltInAccelerometer::GetZ() {
 }
 
 void BuiltInAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("3AxisAccelerometer");
-  builder.AddDoubleProperty(
-      "X", [=] { return GetX(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Y", [=] { return GetY(); }, nullptr);
-  builder.AddDoubleProperty(
+  builder.SetSmartDashboardType("3AxisAccelerometer")
+  .AddDoubleProperty(
+    "range",
+    [=] { return static_cast<int>(m_range); },
+    [=] (double id) { 
+      int iid = id;
+      if (iid >= 0 && iid <= 3) {
+        SetRange(static_cast<Range>(iid));
+      } else {
+        SetRange(Range::kRange_8G);
+      }
+    }
+  )
+  .AddDoubleProperty(
+      "X", [=] { return GetX(); }, nullptr)
+  .AddDoubleProperty(
+      "Y", [=] { return GetY(); }, nullptr)
+  .AddDoubleProperty(
       "Z", [=] { return GetZ(); }, nullptr);
 }

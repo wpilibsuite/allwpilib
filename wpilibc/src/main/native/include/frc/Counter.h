@@ -434,6 +434,8 @@ class Counter : public CounterBase,
 
  private:
   int m_index = 0;  // The index of this counter.
+  bool m_reverseDirection = false;
+  units::second_t m_maxPeriod;
 
   friend class DigitalGlitchFilter;
 };

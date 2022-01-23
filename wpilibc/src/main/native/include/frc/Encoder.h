@@ -372,6 +372,8 @@ class Encoder : public CounterBase,
   std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
   std::shared_ptr<DigitalSource> m_indexSource = nullptr;
   hal::Handle<HAL_EncoderHandle> m_encoder;
+  units::second_t m_maxPeriod;
+  bool m_reverseDirection;
 
   friend class DigitalGlitchFilter;
 };

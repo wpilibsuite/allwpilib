@@ -71,6 +71,13 @@ class PWMMotorController : public MotorController,
    */
   void EnableDeadbandElimination(bool eliminateDeadband);
 
+  /**
+   * Returns whether deadband elimination is currently enabled.
+   *
+   * @return Whether deadband elimination is enabled.
+   */
+  bool DeadbandEliminationEnabled();
+
  protected:
   /**
    * Constructor for a PWM Motor %Controller connected via PWM.

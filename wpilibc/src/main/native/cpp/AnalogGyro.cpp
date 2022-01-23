@@ -92,6 +92,7 @@ double AnalogGyro::GetOffset() const {
 
 void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
   int32_t status = 0;
+  m_sensitivity = voltsPerDegreePerSecond;
   HAL_SetAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
                                            voltsPerDegreePerSecond, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_analog->GetChannel());
@@ -138,7 +139,15 @@ std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
 }
 
 void AnalogGyro::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Gyro");
-  builder.AddDoubleProperty(
-      "Value", [=] { return GetAngle(); }, nullptr);
+  builder.SetSmartDashboardType("Gyro")
+      .AddDoubleProperty("channel", [=] { return m_analog->GetChannel(); }, nullptr)
+      .AddDoubleProperty(
+          "Value", [=] { return GetAngle(); }, nullptr)
+      .AddDoubleProperty(
+        "rate", [=] { return GetRate(); }, nullptr
+      )
+      .AddDoubleProperty(
+        "sensitivityVoltsPerDegPerSec", [=] { return m_sensitivity; },
+        [&] (double sensitivity) { SetSensitivity(sensitivity); }
+      );
 }

@@ -59,8 +59,9 @@ int AnalogOutput::GetChannel() const {
 }
 
 void AnalogOutput::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Analog Output");
-  builder.AddDoubleProperty(
-      "Value", [=] { return GetVoltage(); },
-      [=](double value) { SetVoltage(value); });
+  builder.SetSmartDashboardType("Analog Output")
+      .AddDoubleProperty("channel", [=] { return m_channel; }, nullptr)
+      .AddDoubleProperty(
+          "Value", [=] { return GetVoltage(); },
+          [=](double value) { SetVoltage(value); });
 }

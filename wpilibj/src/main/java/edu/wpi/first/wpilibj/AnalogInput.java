@@ -337,6 +337,7 @@ public class AnalogInput implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder
         .setSmartDashboardType("Analog Input")
+        .addDoubleProperty("channel", () -> m_channel, null)
         .addDoubleProperty("Value", this::getAverageVoltage, null);
   }
 }

@@ -87,6 +87,7 @@ units::second_t Encoder::GetPeriod() const {
 
 void Encoder::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
+  m_maxPeriod = maxPeriod;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
@@ -154,6 +155,7 @@ double Encoder::GetDistancePerPulse() const {
 
 void Encoder::SetReverseDirection(bool reverseDirection) {
   int32_t status = 0;
+  m_reverseDirection = reverseDirection;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
   FRC_CheckErrorStatus(status, "{}", "SetReverseDirection");
 }
@@ -217,11 +219,28 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
   }
 
   builder.AddDoubleProperty(
-      "Speed", [=] { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance", [=] { return GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr);
+      "Speed", [=] { return GetRate(); }, nullptr)
+      .AddDoubleProperty(
+          "Distance", [=] { return GetDistance(); }, nullptr)
+      .AddDoubleProperty(
+          "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr)
+      .AddBooleanProperty(
+        "direction", [=] { return GetDirection(); }, nullptr)
+      .AddBooleanProperty(
+        "stopped", [=] { return GetStopped(); }, nullptr)
+      .AddDoubleProperty(
+        "maxPeriodSeconds", [=] { return m_maxPeriod.value(); }, 
+        [=] (double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); }
+      )
+      .AddDoubleProperty(
+        "samplesToAverage", [=] { return GetSamplesToAverage(); },
+        [&] (double samplesToAverage) { SetSamplesToAverage(samplesToAverage); }
+      )
+      .AddBooleanProperty(
+        "reverseDirection", [=] { return m_reverseDirection;},
+        [=] (bool reverseDirection) { SetReverseDirection(reverseDirection); }
+      );
+      
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {

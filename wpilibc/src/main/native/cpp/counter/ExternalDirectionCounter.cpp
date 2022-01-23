@@ -75,6 +75,7 @@ int ExternalDirectionCounter::GetCount() const {
 
 void ExternalDirectionCounter::SetReverseDirection(bool reverseDirection) {
   int32_t status = 0;
+  m_reverseDirection = reverseDirection;
   HAL_SetCounterReverseDirection(m_handle, reverseDirection, &status);
   FRC_CheckErrorStatus(status, "{}", m_index);
 }
@@ -88,6 +89,7 @@ void ExternalDirectionCounter::Reset() {
 void ExternalDirectionCounter::SetEdgeConfiguration(
     EdgeConfiguration configuration) {
   int32_t status = 0;
+  m_edgeConfiguration = configuration;
   bool rising = configuration == EdgeConfiguration::kRisingEdge ||
                 configuration == EdgeConfiguration::kBoth;
   bool falling = configuration == EdgeConfiguration::kFallingEdge ||
@@ -97,7 +99,21 @@ void ExternalDirectionCounter::SetEdgeConfiguration(
 }
 
 void ExternalDirectionCounter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("External Direction Counter");
-  builder.AddDoubleProperty(
-      "Count", [&] { return GetCount(); }, nullptr);
+  builder.SetSmartDashboardType("External Direction Counter")
+      .AddDoubleProperty(
+          "Count", [&] { return GetCount(); }, nullptr)
+      .AddDoubleProperty(
+          "reverseDirection", [&] { return m_reverseDirection; },
+          [&](bool reverseDirection) { m_reverseDirection = reverseDirection; })
+      .AddDoubleProperty(
+          "edgeConfiguration",
+          [&] { return static_cast<int>(m_edgeConfiguration); },
+          [&](double id) {
+            int iid = id;
+            if (iid >= 0 && iid <= 3) {
+              SetEdgeConfiguration(EdgeConfiguration{iid});
+            } else {
+              SetEdgeConfiguration(EdgeConfiguration::kNone);
+            }
+          });
 }

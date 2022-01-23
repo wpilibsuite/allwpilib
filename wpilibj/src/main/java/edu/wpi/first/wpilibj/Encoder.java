@@ -578,9 +578,9 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
         .addDoubleProperty("Speed", this::getRate, null)
         .addDoubleProperty("Distance", this::getDistance, null)
         .addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null)
-        .addBooleanProperty("Direction", this::getDirection, null)
-        .addBooleanProperty("Stopped", this::getStopped, null)
-        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addBooleanProperty("direction", this::getDirection, null)
+        .addBooleanProperty("stopped", this::getStopped, null)
+        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
         .addDoubleProperty(
             "samplesToAverage",
             this::getSamplesToAverage,

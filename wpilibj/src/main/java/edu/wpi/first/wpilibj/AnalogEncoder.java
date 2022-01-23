@@ -164,7 +164,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder
         .setSmartDashboardType("AbsoluteEncoder")
-        .addDoubleProperty("Channel", this::getChannel, null)
+        .addDoubleProperty("channel", this::getChannel, null)
         .addDoubleProperty("Distance", this::getDistance, null)
         .addDoubleProperty(
             "Distance Per Rotation", this::getDistancePerRotation, this::setDistancePerRotation);

@@ -80,5 +80,7 @@ class ExternalDirectionCounter
   std::shared_ptr<DigitalSource> m_directionSource;
   hal::Handle<HAL_CounterHandle> m_handle;
   int32_t m_index = 0;
+  EdgeConfiguration m_edgeConfiguration;
+  bool m_reverseDirection;
 };
 }  // namespace frc

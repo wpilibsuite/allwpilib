@@ -519,12 +519,12 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder
         .addDoubleProperty("Value", this::get, null)
-        .addDoubleProperty("Distance", this::getDistance, null)
-        .addDoubleProperty("Rate", this::getRate, null)
-        .addDoubleProperty("Period", this::getPeriod, null)
-        .addBooleanProperty("Direction", this::getDirection, null)
-        .addBooleanProperty("Stopped", this::getStopped, null)
-        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addDoubleProperty("distance", this::getDistance, null)
+        .addDoubleProperty("rate", this::getRate, null)
+        .addDoubleProperty("periodSeconds", this::getPeriod, null)
+        .addBooleanProperty("direction", this::getDirection, null)
+        .addBooleanProperty("stopped", this::getStopped, null)
+        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
         .addDoubleProperty("distancePerPulse", () -> m_distancePerPulse, this::setDistancePerPulse)
         .addDoubleProperty(
             "samplesToAverage",

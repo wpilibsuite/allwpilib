@@ -35,6 +35,9 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
   protected DutyCycle m_dutyCycle;
   protected boolean m_ownsAnalog;
 
+  private boolean m_averaged;
+  private boolean m_filtered;
+
   /**
    * Constructor for an analog trigger given a channel number.
    *
@@ -138,6 +141,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    * @param useAveragedValue true to use an averaged value, false otherwise
    */
   public void setAveraged(boolean useAveragedValue) {
+    m_averaged = useAveragedValue;
     AnalogJNI.setAnalogTriggerAveraged(m_port, useAveragedValue);
   }
 
@@ -149,6 +153,7 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
    * @param useFilteredValue true to use a filtered value, false otherwise
    */
   public void setFiltered(boolean useFilteredValue) {
+    m_filtered = useFilteredValue;
     AnalogJNI.setAnalogTriggerFiltered(m_port, useFilteredValue);
   }
 
@@ -194,8 +199,12 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    if (m_ownsAnalog) {
-      m_analogInput.initSendable(builder);
-    }
+    builder
+        .setSmartDashboardType("AnalogTrigger")
+        .addDoubleProperty("index", this::getIndex, null)
+        .addBooleanProperty("filtered", () -> m_filtered, this::setFiltered)
+        .addBooleanProperty("averaged", () -> m_averaged, this::setAveraged)
+        .addBooleanProperty("inWindow", this::getInWindow, null)
+        .addBooleanProperty("triggerState", this::getTriggerState, null);
   }
 }

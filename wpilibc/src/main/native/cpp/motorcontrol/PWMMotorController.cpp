@@ -46,15 +46,27 @@ void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
   m_pwm.EnableDeadbandElimination(eliminateDeadband);
 }
 
+bool PWMMotorController::DeadbandEliminationEnabled() {
+  return m_pwm.DeadbandEliminationEnabled();
+}
+
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::SendableRegistry::AddLW(this, name, channel);
 }
 
 void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.SetSafeState([=] { Disable(); });
-  builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
+  builder.SetSmartDashboardType("Motor Controller")
+      .SetActuator(true)
+      .SetSafeState([=] { Disable(); })
+      .AddBooleanProperty(
+          "inverted", [&] { return GetInverted(); },
+          [&](bool inverted) { SetInverted(inverted); })
+      .AddBooleanProperty(
+          "deadbandElimination", [&] { return DeadbandEliminationEnabled(); },
+          [&](bool eliminateDeadband) {
+            EnableDeadbandElimination(eliminateDeadband);
+          })
+      .AddDoubleProperty(
+          "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }

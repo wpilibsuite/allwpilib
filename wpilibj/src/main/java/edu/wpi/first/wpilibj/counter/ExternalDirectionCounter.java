@@ -16,6 +16,7 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 /**
  * Counter using external direction.
@@ -115,10 +116,10 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
         .setSmartDashboardType("External Direction Counter")
         .addDoubleProperty("Count", this::getCount, null)
         .addBooleanProperty("reverseDirection", () -> m_reverseDirection, this::setReverseDirection)
-        .addStringProperty(
+        .addDoubleProperty(
             "edgeConfiguration",
-            m_edgeConfiguration::name,
-            configuration ->
-                EnumHelper.enumFromString(configuration, EdgeConfiguration.kRisingEdge));
+            () -> m_edgeConfiguration.ordinal(),
+            id -> setEdgeConfiguration(EnumHelper.enumFromOrdinal((int) id,
+                                                                  EdgeConfiguration.kNone)));
   }
 }

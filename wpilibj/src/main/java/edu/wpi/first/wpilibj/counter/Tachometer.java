@@ -182,7 +182,7 @@ public class Tachometer implements Sendable, AutoCloseable {
         .addDoubleProperty("RPS", this::getRevolutionsPerSecond, null)
         .addDoubleProperty(
             "edgesPerRev", this::getEdgesPerRevolution, epr -> setEdgesPerRevolution((int) epr))
-        .addDoubleProperty("MaxPeriod", () -> m_maxPeriod, this::setMaxPeriod)
+        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
         .addDoubleProperty(
             "samplesToAverage",
             this::getSamplesToAverage,

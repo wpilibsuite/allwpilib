@@ -135,6 +135,7 @@ class Tachometer : public wpi::Sendable,
   std::shared_ptr<DigitalSource> m_source;
   hal::Handle<HAL_CounterHandle> m_handle;
   int m_edgesPerRevolution;
+  units::second_t m_maxPeriod;
   int32_t m_index;
 };
 }  // namespace frc

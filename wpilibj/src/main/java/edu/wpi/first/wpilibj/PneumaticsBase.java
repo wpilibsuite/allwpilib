@@ -4,7 +4,10 @@
 
 package edu.wpi.first.wpilibj;
 
-public interface PneumaticsBase extends AutoCloseable {
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
+public interface PneumaticsBase extends AutoCloseable, Sendable {
   /**
    * For internal use to get a module for a specific type.
    *
@@ -34,6 +37,10 @@ public interface PneumaticsBase extends AutoCloseable {
       return SensorUtil.getDefaultREVPHModule();
     }
     throw new IllegalArgumentException("Unknown module type");
+  }
+
+  static int[] getPortNumbers(int bitmap) {
+    Integer.
   }
 
   /**
@@ -129,6 +136,11 @@ public interface PneumaticsBase extends AutoCloseable {
 
   @Override
   void close();
+
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Pneumatics")
+        .add
+  }
 
   Solenoid makeSolenoid(int channel);
 

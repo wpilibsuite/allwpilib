@@ -174,6 +174,13 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
   void EnableDeadbandElimination(bool eliminateDeadband);
 
   /**
+   * Returns whether deadband elimination is currently enabled.
+   *
+   * @return Whether deadband elimination is enabled.
+   */
+  bool DeadbandEliminationEnabled();
+
+  /**
    * Set the bounds on the PWM pulse widths.
    *
    * This sets the bounds on the PWM values for a particular type of controller.
@@ -229,6 +236,7 @@ class PWM : public wpi::Sendable, public wpi::SendableHelper<PWM> {
  private:
   int m_channel;
   hal::Handle<HAL_DigitalHandle> m_handle;
+  bool m_eliminateDeadband;
 };
 
 }  // namespace frc

@@ -86,5 +86,6 @@ class UpDownCounter : public wpi::Sendable,
   std::shared_ptr<DigitalSource> m_downSource;
   hal::Handle<HAL_CounterHandle> m_handle;
   int32_t m_index = 0;
+  bool m_reverseDirection;
 };
 }  // namespace frc

@@ -5,7 +5,6 @@
 package edu.wpi.first.math.filter;
 
 import edu.wpi.first.util.WPIUtilJNI;
-
 import edu.wpi.first.util.sendable.EnumHelper;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -21,8 +20,8 @@ public class Debouncer implements Sendable {
     kBoth
   }
 
-  private final double m_debounceTimeSeconds;
-  private final DebounceType m_debounceType;
+  private double m_debounceTimeSeconds;
+  private DebounceType m_debounceType;
   private boolean m_baseline;
 
   private double m_prevTimeSeconds;
@@ -97,10 +96,11 @@ public class Debouncer implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder
         .addDoubleProperty(
-            "debounceTime", () -> m_debounceTime, debounceTime -> m_debounceTime = debounceTime)
-        .addStringProperty(
+            "debounceTimeSeconds", () -> m_debounceTimeSeconds,
+            debounceTime -> m_debounceTimeSeconds = debounceTime)
+        .addDoubleProperty(
             "debounceType",
-            () -> m_debounceType.name(),
-            type -> m_debounceType = EnumHelper.enumFromString(type, DebounceType.kRising));
+            m_debounceType::ordinal,
+            type -> m_debounceType = EnumHelper.enumFromOrdinal((int) type, DebounceType.kRising));
   }
 }

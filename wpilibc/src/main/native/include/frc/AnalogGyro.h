@@ -199,6 +199,7 @@ class AnalogGyro : public Gyro,
 
  private:
   hal::Handle<HAL_GyroHandle> m_gyroHandle;
+  double m_sensitivity;
 };
 
 }  // namespace frc

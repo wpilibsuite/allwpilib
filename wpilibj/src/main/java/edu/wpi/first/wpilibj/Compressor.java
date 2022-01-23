@@ -24,7 +24,6 @@ import edu.wpi.first.util.sendable.SendableRegistry;
  */
 public class Compressor implements Sendable, AutoCloseable {
   private PneumaticsBase m_module;
-  private boolean m_disabled;
 
   /**
    * Constructs a compressor for a specified module and type.
@@ -139,13 +138,11 @@ public class Compressor implements Sendable, AutoCloseable {
 
   /** Disable the compressor. */
   public void disable() {
-    m_disabled = true;
     m_module.disableCompressor();
   }
 
   /** Enable compressor closed loop control using digital input. */
   public void enableDigital() {
-    m_disabled = false;
     m_module.enableCompressorDigital();
   }
 
@@ -159,7 +156,6 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param maxPressure The maximum pressure in PSI to disable compressor
    */
   public void enableAnalog(double minPressure, double maxPressure) {
-    m_disabled = false;
     m_module.enableCompressorAnalog(minPressure, maxPressure);
   }
 
@@ -173,7 +169,6 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param maxPressure The maximum pressure in PSI to disable compressor
    */
   public void enableHybrid(double minPressure, double maxPressure) {
-    m_disabled = false;
     m_module.enableCompressorHybrid(minPressure, maxPressure);
   }
 
@@ -189,16 +184,8 @@ public class Compressor implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
-        .addBooleanProperty(
-            "Disabled",
-            () -> m_disabled,
-            disabled -> {
-              if (disabled) {
-                disable();
-              }
-            })
         .addBooleanProperty("Enabled", this::enabled, null)
         .addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null)
-        .addDoubleProperty("Current", this::getCurrent, null);
+        .addDoubleProperty("currentAmps", this::getCurrent, null);
   }
 }

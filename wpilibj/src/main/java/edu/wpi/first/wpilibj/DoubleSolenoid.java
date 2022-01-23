@@ -214,20 +214,21 @@ public class DoubleSolenoid implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Double Solenoid");
-    builder.setActuator(true);
-    builder.setSafeState(() -> set(Value.kOff));
-    builder.addStringProperty(
-        "Value",
-        () -> get().name().substring(1),
-        value -> {
-          if ("Forward".equals(value)) {
-            set(Value.kForward);
-          } else if ("Reverse".equals(value)) {
-            set(Value.kReverse);
-          } else {
-            set(Value.kOff);
-          }
-        });
+    builder
+        .setSmartDashboardType("Double Solenoid")
+        .setActuator(true)
+        .setSafeState(() -> set(Value.kOff))
+        .addStringProperty(
+            "Value",
+            () -> get().name().substring(1),
+            value -> {
+              if ("Forward".equals(value)) {
+                set(Value.kForward);
+              } else if ("Reverse".equals(value)) {
+                set(Value.kReverse);
+              } else {
+                set(Value.kOff);
+              }
+            });
   }
 }

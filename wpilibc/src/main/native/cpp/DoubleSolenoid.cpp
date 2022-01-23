@@ -125,28 +125,28 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
 }
 
 void DoubleSolenoid::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Double Solenoid");
-  builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(kOff); });
-  builder.AddSmallStringProperty(
-      "Value",
-      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
-        switch (Get()) {
-          case kForward:
-            return "Forward";
-          case kReverse:
-            return "Reverse";
-          default:
-            return "Off";
-        }
-      },
-      [=](std::string_view value) {
-        Value lvalue = kOff;
-        if (value == "Forward") {
-          lvalue = kForward;
-        } else if (value == "Reverse") {
-          lvalue = kReverse;
-        }
-        Set(lvalue);
-      });
+  builder.SetSmartDashboardType("Double Solenoid")
+      .SetActuator(true)
+      .SetSafeState([=] { Set(kOff); })
+      .AddSmallStringProperty(
+          "Value",
+          [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+            switch (Get()) {
+              case kForward:
+                return "Forward";
+              case kReverse:
+                return "Reverse";
+              default:
+                return "Off";
+            }
+          },
+          [=](std::string_view value) {
+            Value lvalue = kOff;
+            if (value == "Forward") {
+              lvalue = kForward;
+            } else if (value == "Reverse") {
+              lvalue = kReverse;
+            }
+            Set(lvalue);
+          });
 }

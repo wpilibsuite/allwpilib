@@ -56,6 +56,9 @@ class BuiltInAccelerometer : public Accelerometer,
   double GetZ() override;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
+
+ private:
+  Range m_range;
 };
 
 }  // namespace frc

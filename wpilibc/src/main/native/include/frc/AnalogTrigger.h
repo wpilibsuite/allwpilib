@@ -157,6 +157,8 @@ class AnalogTrigger : public wpi::Sendable,
   AnalogInput* m_analogInput = nullptr;
   DutyCycle* m_dutyCycle = nullptr;
   bool m_ownsAnalog = false;
+  bool m_filtered = false;
+  bool m_averaged = false;
 };
 
 }  // namespace frc

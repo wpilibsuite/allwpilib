@@ -115,15 +115,6 @@ public abstract class PWMMotorController extends MotorSafety
     m_pwm.enableDeadbandElimination(eliminateDeadband);
   }
 
-  /**
-   * Returns whether deadband elimination is currently enabled.
-   *
-   * @return Whether deadband elimination is enabled.
-   */
-  public boolean deadbandEliminationEnabled() {
-    return m_pwm.deadbandEliminationEnabled();
-  }
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
@@ -133,7 +124,7 @@ public abstract class PWMMotorController extends MotorSafety
         .addDoubleProperty("Channel", this::getChannel, null)
         .addBooleanProperty(
             "DeadbandElimination",
-            this::deadbandEliminationEnabled,
+            m_pwm::deadbandEliminationEnabled,
             this::enableDeadbandElimination)
         .addBooleanProperty("Inverted", this::getInverted, this::setInverted)
         .addDoubleProperty("Value", this::get, this::set);

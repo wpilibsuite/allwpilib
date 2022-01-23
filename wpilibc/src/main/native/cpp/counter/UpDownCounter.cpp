@@ -69,6 +69,7 @@ int UpDownCounter::GetCount() const {
 
 void UpDownCounter::SetReverseDirection(bool reverseDirection) {
   int32_t status = 0;
+  m_reverseDirection = reverseDirection;
   HAL_SetCounterReverseDirection(m_handle, reverseDirection, &status);
   FRC_CheckErrorStatus(status, "{}", m_index);
 }
@@ -100,7 +101,12 @@ void UpDownCounter::SetDownEdgeConfiguration(EdgeConfiguration configuration) {
 }
 
 void UpDownCounter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("UpDown Counter");
-  builder.AddDoubleProperty(
-      "Count", [&] { return GetCount(); }, nullptr);
+  builder.SetSmartDashboardType("UpDown Counter")
+      .AddDoubleProperty(
+          "Count", [&] { return GetCount(); }, nullptr)
+      .AddBooleanProperty(
+          "reverseDirection", [&] { return m_reverseDirection; },
+          [&](bool reverseDirection) {
+            SetReverseDirection(reverseDirection);
+          });
 }

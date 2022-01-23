@@ -61,7 +61,7 @@ public class AnalogOutput implements Sendable, AutoCloseable {
   public void initSendable(SendableBuilder builder) {
     builder
         .setSmartDashboardType("Analog Output")
-        .addDoubleProperty("Channel", this::getChannel, null)
+        .addDoubleProperty("channel", this::getChannel, null)
         .addDoubleProperty("Value", this::getVoltage, this::setVoltage);
   }
 }

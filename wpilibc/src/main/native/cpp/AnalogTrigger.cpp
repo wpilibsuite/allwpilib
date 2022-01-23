@@ -10,6 +10,7 @@
 #include <hal/FRCUsageReporting.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/sendable/SendableRegistry.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogInput.h"
 #include "frc/DutyCycle.h"
@@ -75,12 +76,14 @@ void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
 
 void AnalogTrigger::SetAveraged(bool useAveragedValue) {
   int32_t status = 0;
+  m_averaged = useAveragedValue;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
 
 void AnalogTrigger::SetFiltered(bool useFilteredValue) {
   int32_t status = 0;
+  m_filtered = useFilteredValue;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
 }
@@ -113,9 +116,13 @@ std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
 }
 
 void AnalogTrigger::InitSendable(wpi::SendableBuilder& builder) {
-  if (m_ownsAnalog) {
-    m_analogInput->InitSendable(builder);
-  }
+  builder
+      .SetSmartDashboardType("AnalogTrigger")
+      .AddDoubleProperty("index", [=] { return GetIndex(); }, nullptr)
+      .AddBooleanProperty("filtered", [=] { return m_filtered; }, [=] (bool filtered) { SetFiltered(filtered); })
+      .AddBooleanProperty("averaged", [=] { return m_averaged; }, [=] (bool averaged) { SetAveraged(averaged); })
+      .AddBooleanProperty("inWindow", [=] { return GetInWindow(); }, nullptr)
+      .AddBooleanProperty("triggerState", [=] { return GetTriggerState(); }, nullptr);
 }
 
 int AnalogTrigger::GetSourceChannel() const {

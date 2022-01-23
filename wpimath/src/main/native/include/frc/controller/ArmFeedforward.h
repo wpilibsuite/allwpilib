@@ -188,8 +188,8 @@ class WPILIB_DLLEXPORT ArmFeedforward
         "outputVoltage", [this] { return GetOutput().value(); }, nullptr);
   }
 
- SimpleMotorFeedforward<Angle> m_simpleFeedforward;
- units::volt_t kG{0};
+  SimpleMotorFeedforward<Angle> m_simpleFeedforward;
+  units::volt_t kG{0};
 
  private:
   units::unit_t<Angle> m_angle;

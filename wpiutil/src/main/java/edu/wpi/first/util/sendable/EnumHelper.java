@@ -12,18 +12,20 @@ import java.util.Arrays;
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class EnumHelper {
   /**
-   * Casts a string to an enum, defaulting if the string does not match a valid enum value.
+   * Casts an integer to its corresponding enum value, defaulting if the ordinal
+   * is out-of-bounds.
    *
-   * @param value The string to cast to the enum.
-   * @param defaultValue Default value to use if the cast fails.
+   * @param ordinal The ordinal index of the enum value.
+   * @param defaultValue Default value to use if index is invalid.
    * @param <E> Type of the enum.
-   * @return Casted enum value.
+   * @return Enum value.
    */
-  public static <E extends Enum<?>> E enumFromString(String value, E defaultValue) {
+  public static <E extends Enum<?>> E enumFromOrdinal(int ordinal, E defaultValue) {
     E[] enumValues = (E[]) defaultValue.getClass().getEnumConstants();
-    return Arrays.stream(enumValues)
-        .filter(p -> p.name().equals(value))
-        .findFirst()
-        .orElse(defaultValue);
+    try {
+      return enumValues[ordinal];
+    } catch (Exception e) {
+      return defaultValue;
+    }
   }
 }

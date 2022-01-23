@@ -135,6 +135,10 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
+bool PWM::DeadbandEliminationEnabled() {
+  return m_eliminateDeadband;
+}
+
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
   int32_t status = 0;

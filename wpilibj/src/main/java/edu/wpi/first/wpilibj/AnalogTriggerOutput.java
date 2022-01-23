@@ -121,6 +121,9 @@ public class AnalogTriggerOutput extends DigitalSource implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    m_trigger.initSendable(builder);
+    builder.setSmartDashboardType("AnalogTriggerOutput")
+         .addDoubleProperty("index", m_trigger::getIndex, null)
+         .addDoubleProperty("type", () -> m_outputType.value, null)
+         .addBooleanProperty("value", this::get, null);
   }
 }

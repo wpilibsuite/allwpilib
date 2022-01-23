@@ -103,6 +103,7 @@ void Tachometer::SetSamplesToAverage(int samples) {
 
 void Tachometer::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
+  m_maxPeriod = maxPeriod;
   HAL_SetCounterMaxPeriod(m_handle, maxPeriod.to<double>(), &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
 }
@@ -114,9 +115,24 @@ void Tachometer::SetUpdateWhenEmpty(bool updateWhenEmpty) {
 }
 
 void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Tachometer");
-  builder.AddDoubleProperty(
-      "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); }, nullptr);
-  builder.AddDoubleProperty(
-      "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); }, nullptr);
+  builder.SetSmartDashboardType("Tachometer")
+      .AddDoubleProperty(
+          "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); },
+          nullptr)
+      .AddDoubleProperty(
+          "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); },
+          nullptr)
+      .AddDoubleProperty(
+          "edgesPerRev", [&] { return GetEdgesPerRevolution(); },
+          [&](double edgesPerRev) { SetEdgesPerRevolution(edgesPerRev); })
+      .AddDoubleProperty(
+          "maxPeriodSeconds", [&] { return m_maxPeriod.value(); },
+          [&](double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); })
+      .AddDoubleProperty(
+          "samplesToAverage", [&] { return GetSamplesToAverage(); },
+          [&](double samplesToAverage) {
+            SetSamplesToAverage(samplesToAverage);
+          })
+      .AddBooleanProperty(
+          "stopped", [&] { return GetStopped(); }, nullptr);
 }

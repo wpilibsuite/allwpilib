@@ -232,6 +232,7 @@ void Counter::SetPulseLengthMode(double threshold) {
 
 void Counter::SetReverseDirection(bool reverseDirection) {
   int32_t status = 0;
+  m_reverseDirection = reverseDirection;
   HAL_SetCounterReverseDirection(m_counter, reverseDirection, &status);
   FRC_CheckErrorStatus(status, "SetReverseDirection to {}",
                        reverseDirection ? "true" : "false");
@@ -282,6 +283,7 @@ units::second_t Counter::GetPeriod() const {
 
 void Counter::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
+  m_maxPeriod = maxPeriod;
   HAL_SetCounterMaxPeriod(m_counter, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
@@ -307,7 +309,25 @@ bool Counter::GetDirection() const {
 }
 
 void Counter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Counter");
-  builder.AddDoubleProperty(
-      "Value", [=] { return Get(); }, nullptr);
+  builder.SetSmartDashboardType("Counter")
+      .AddDoubleProperty(
+          "Value", [=] { return Get(); }, nullptr)
+      .AddDoubleProperty(
+          "periodSeconds", [=] { return GetPeriod().value(); }, nullptr)
+      .AddBooleanProperty(
+        "direction", [=] { return GetDirection(); }, nullptr)
+      .AddBooleanProperty(
+        "stopped", [=] { return GetStopped(); }, nullptr)
+      .AddDoubleProperty(
+          "maxPeriodSeconds", [=] { return m_maxPeriod.value(); }, 
+          [=] (double maxPeriod) {
+            SetMaxPeriod(units::second_t{maxPeriod});
+          })
+      .AddDoubleProperty(
+          "samplesToAverage", [=] { return GetSamplesToAverage(); }, 
+          [=] (double samplesToAverage) {
+            SetSamplesToAverage(samplesToAverage);
+          })
+      .AddBooleanProperty(
+        "reverseDirection", [=] { return m_reverseDirection; }, nullptr);
 }

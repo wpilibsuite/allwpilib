@@ -47,9 +47,15 @@ void AnalogAccelerometer::SetZero(double zero) {
 }
 
 void AnalogAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Accelerometer");
-  builder.AddDoubleProperty(
-      "Value", [=] { return GetAcceleration(); }, nullptr);
+  builder.SetSmartDashboardType("Accelerometer")
+      .AddDoubleProperty("channel", [=] { return m_analogInput->GetChannel(); },
+      nullptr )
+      .AddDoubleProperty(
+          "Value", [=] { return GetAcceleration(); }, nullptr)
+      .AddDoubleProperty(
+        "sensitivityVoltsPerG", [=] { return m_voltsPerG; },
+        [=] (double voltsPerG) { SetSensitivity(voltsPerG); }
+      );
 }
 
 void AnalogAccelerometer::InitAccelerometer() {
