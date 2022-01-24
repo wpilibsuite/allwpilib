@@ -14,7 +14,6 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SmallVector.h>
 #include <wpi/StringExtras.h>
-#include <waymaker/Waypoint.h>
 
 using namespace glass;
 
