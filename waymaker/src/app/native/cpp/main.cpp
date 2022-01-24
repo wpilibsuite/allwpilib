@@ -34,18 +34,16 @@ int main() {
   glass::WMField2DModel* fieldModel = new glass::WMField2DModel("Test Field");
   glass::Field2DView* fieldView = new glass::Field2DView(fieldModel);
 
-  gui::ConfigurePlatformSaveFile("waymaker.ini");
-
   gui::AddInit([] {
     glass::ResetTime();
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
+    //ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; 
   });
 
 
 
   gui::AddLateExecute([&] {
-      ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),
-                                   ImGuiDockNodeFlags_PassthruCentralNode);
+      //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),
+      //                             ImGuiDockNodeFlags_PassthruCentralNode);
       ImGui::Begin("Test");
       ImGui::End();
     ImGui::BeginMainMenuBar();
@@ -64,12 +62,14 @@ int main() {
     }
     ImGui::EndMainMenuBar();
 
+    
+
     if (about) {
       ImGui::OpenPopup("About");
       about = false;
     }
     if (ImGui::BeginPopupModal("About")) {
-      ImGui::Text("Glass: A different kind of dashboard");
+      ImGui::Text("WayMaker: Basic waypoint visualization for FRC");
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
       if (ImGui::Button("Close")) {
@@ -82,6 +82,7 @@ int main() {
     ImGui::End();
     ImGui::ShowMetricsWindow();
     ImGui::Begin("Exporter");
+    // Template-string constructor generation for a Trajectory object.
       fieldModel->ForEachFieldObject([&](auto& objModel, auto name) {
         if (!objModel.Exists()) {
           return;
