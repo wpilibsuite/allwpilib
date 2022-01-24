@@ -23,7 +23,7 @@ ExternalProject_Add(gl3w
 )
 ExternalProject_Add(imgui
   GIT_REPOSITORY    https://github.com/ocornut/imgui.git
-  GIT_TAG           1780579403f07158adef7ac2f1e15d7990e732df
+  GIT_TAG           1.86
   SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-src"
   BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/imgui-build"
   CONFIGURE_COMMAND ""
