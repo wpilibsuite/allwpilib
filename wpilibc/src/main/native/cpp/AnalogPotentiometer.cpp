@@ -45,5 +45,6 @@ double AnalogPotentiometer::Get() const {
 
 void AnalogPotentiometer::InitSendable(wpi::SendableBuilder& builder) {
   m_analog_input->InitSendable(builder);
-  builder.AddDoubleProperty("Value", [=] { return Get(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Value", [=] { return Get(); }, nullptr);
 }

@@ -218,29 +218,30 @@ void Encoder::InitSendable(wpi::SendableBuilder& builder) {
     builder.SetSmartDashboardType("Encoder");
   }
 
-  builder.AddDoubleProperty(
-      "Speed", [=] { return GetRate(); }, nullptr)
+  builder
+      .AddDoubleProperty(
+          "Speed", [=] { return GetRate(); }, nullptr)
       .AddDoubleProperty(
           "Distance", [=] { return GetDistance(); }, nullptr)
       .AddDoubleProperty(
           "Distance per Tick", [=] { return GetDistancePerPulse(); }, nullptr)
       .AddBooleanProperty(
-        "direction", [=] { return GetDirection(); }, nullptr)
+          "direction", [=] { return GetDirection(); }, nullptr)
       .AddBooleanProperty(
-        "stopped", [=] { return GetStopped(); }, nullptr)
+          "stopped", [=] { return GetStopped(); }, nullptr)
       .AddDoubleProperty(
-        "maxPeriodSeconds", [=] { return m_maxPeriod.value(); }, 
-        [=] (double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); }
-      )
+          "maxPeriodSeconds", [=] { return m_maxPeriod.value(); },
+          [=](double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); })
       .AddDoubleProperty(
-        "samplesToAverage", [=] { return GetSamplesToAverage(); },
-        [&] (double samplesToAverage) { SetSamplesToAverage(samplesToAverage); }
-      )
+          "samplesToAverage", [=] { return GetSamplesToAverage(); },
+          [&](double samplesToAverage) {
+            SetSamplesToAverage(samplesToAverage);
+          })
       .AddBooleanProperty(
-        "reverseDirection", [=] { return m_reverseDirection;},
-        [=] (bool reverseDirection) { SetReverseDirection(reverseDirection); }
-      );
-      
+          "reverseDirection", [=] { return m_reverseDirection; },
+          [=](bool reverseDirection) {
+            SetReverseDirection(reverseDirection);
+          });
 }
 
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {

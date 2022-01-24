@@ -6,12 +6,11 @@
 
 #include <hal/AnalogTrigger.h>
 #include <hal/FRCUsageReporting.h>
+#include <wpi/sendable/SendableBuilder.h>
 
 #include "frc/AnalogTrigger.h"
 #include "frc/AnalogTriggerType.h"
 #include "frc/Errors.h"
-
-#include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc;
 
@@ -42,9 +41,12 @@ int AnalogTriggerOutput::GetChannel() const {
 
 void AnalogTriggerOutput::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AnalogTriggerOutput")
-      .AddDoubleProperty("index", [=] { return m_trigger->GetIndex(); }, nullptr)
-      .AddDoubleProperty("type", [=] { return static_cast<int>(m_outputType); }, nullptr)
-      .AddBooleanProperty("value", [=] { return Get(); }, nullptr);
+      .AddDoubleProperty(
+          "index", [=] { return m_trigger->GetIndex(); }, nullptr)
+      .AddDoubleProperty(
+          "type", [=] { return static_cast<int>(m_outputType); }, nullptr)
+      .AddBooleanProperty(
+          "value", [=] { return Get(); }, nullptr);
 }
 
 AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,

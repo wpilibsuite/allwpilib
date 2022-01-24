@@ -16,7 +16,6 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.DigitalSource;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 /**
  * Counter using external direction.
@@ -119,7 +118,8 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
         .addDoubleProperty(
             "edgeConfiguration",
             () -> m_edgeConfiguration.ordinal(),
-            id -> setEdgeConfiguration(EnumHelper.enumFromOrdinal((int) id,
-                                                                  EdgeConfiguration.kNone)));
+            id ->
+                setEdgeConfiguration(
+                    EnumHelper.enumFromOrdinal((int) id, EdgeConfiguration.kNone)));
   }
 }

@@ -315,19 +315,17 @@ void Counter::InitSendable(wpi::SendableBuilder& builder) {
       .AddDoubleProperty(
           "periodSeconds", [=] { return GetPeriod().value(); }, nullptr)
       .AddBooleanProperty(
-        "direction", [=] { return GetDirection(); }, nullptr)
+          "direction", [=] { return GetDirection(); }, nullptr)
       .AddBooleanProperty(
-        "stopped", [=] { return GetStopped(); }, nullptr)
+          "stopped", [=] { return GetStopped(); }, nullptr)
       .AddDoubleProperty(
-          "maxPeriodSeconds", [=] { return m_maxPeriod.value(); }, 
-          [=] (double maxPeriod) {
-            SetMaxPeriod(units::second_t{maxPeriod});
-          })
+          "maxPeriodSeconds", [=] { return m_maxPeriod.value(); },
+          [=](double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); })
       .AddDoubleProperty(
-          "samplesToAverage", [=] { return GetSamplesToAverage(); }, 
-          [=] (double samplesToAverage) {
+          "samplesToAverage", [=] { return GetSamplesToAverage(); },
+          [=](double samplesToAverage) {
             SetSamplesToAverage(samplesToAverage);
           })
       .AddBooleanProperty(
-        "reverseDirection", [=] { return m_reverseDirection; }, nullptr);
+          "reverseDirection", [=] { return m_reverseDirection; }, nullptr);
 }

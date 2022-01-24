@@ -140,8 +140,10 @@ public class Solenoid implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setActuator(true);
-    builder.setSafeState(() -> set(false));
-    builder.addBooleanProperty("Value", this::get, this::set);
+    builder
+        .setActuator(true)
+        .setSafeState(() -> set(false))
+        .addDoubleProperty("channel", this::getChannel, null)
+        .addBooleanProperty("Value", this::get, this::set);
   }
 }

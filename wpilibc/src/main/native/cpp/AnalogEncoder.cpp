@@ -107,10 +107,11 @@ int AnalogEncoder::GetChannel() const {
 
 void AnalogEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder")
-     .AddDoubleProperty("channel", [=] { return m_analogInput->GetChannel(); }, nullptr)
-     .AddDoubleProperty(
-      "Distance", [=] { return GetDistance(); }, nullptr)
-     .AddDoubleProperty(
-      "Distance Per Rotation",
-      [=] { return GetDistancePerRotation(); }, nullptr);
+      .AddDoubleProperty(
+          "channel", [=] { return m_analogInput->GetChannel(); }, nullptr)
+      .AddDoubleProperty(
+          "Distance", [=] { return GetDistance(); }, nullptr)
+      .AddDoubleProperty(
+          "Distance Per Rotation", [=] { return GetDistancePerRotation(); },
+          nullptr);
 }

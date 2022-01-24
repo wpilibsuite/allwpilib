@@ -73,9 +73,11 @@ void Solenoid::StartPulse() {
 }
 
 void Solenoid::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Solenoid");
-  builder.SetActuator(true);
-  builder.SetSafeState([=] { Set(false); });
-  builder.AddBooleanProperty(
-      "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
+  builder.SetSmartDashboardType("Solenoid")
+      .SetActuator(true)
+      .SetSafeState([=] { Set(false); })
+      .AddDoubleProperty(
+          "channel", [=] { return GetChannel(); }, nullptr)
+      .AddBooleanProperty(
+          "Value", [=] { return Get(); }, [=](bool value) { Set(value); });
 }

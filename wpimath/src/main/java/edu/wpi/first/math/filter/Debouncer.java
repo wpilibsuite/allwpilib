@@ -96,7 +96,8 @@ public class Debouncer implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder
         .addDoubleProperty(
-            "debounceTimeSeconds", () -> m_debounceTimeSeconds,
+            "debounceTimeSeconds",
+            () -> m_debounceTimeSeconds,
             debounceTime -> m_debounceTimeSeconds = debounceTime)
         .addDoubleProperty(
             "debounceType",

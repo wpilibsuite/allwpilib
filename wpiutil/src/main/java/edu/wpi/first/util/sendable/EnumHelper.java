@@ -4,16 +4,11 @@
 
 package edu.wpi.first.util.sendable;
 
-import java.util.Arrays;
-
-/**
- * Helper class for various enum functions.
- */
+/** Helper class for various enum functions. */
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class EnumHelper {
   /**
-   * Casts an integer to its corresponding enum value, defaulting if the ordinal
-   * is out-of-bounds.
+   * Casts an integer to its corresponding enum value, defaulting if the ordinal is out-of-bounds.
    *
    * @param ordinal The ordinal index of the enum value.
    * @param defaultValue Default value to use if index is invalid.
@@ -22,9 +17,10 @@ public abstract class EnumHelper {
    */
   public static <E extends Enum<?>> E enumFromOrdinal(int ordinal, E defaultValue) {
     E[] enumValues = (E[]) defaultValue.getClass().getEnumConstants();
-    try {
+
+    if (ordinal >= 0 && ordinal < enumValues.length) {
       return enumValues[ordinal];
-    } catch (Exception e) {
+    } else {
       return defaultValue;
     }
   }

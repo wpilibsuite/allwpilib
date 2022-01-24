@@ -194,28 +194,37 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
         },
         nullptr);
   }
-  builder.AddDoubleProperty(
-      "Voltage",
-      [=] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddDoubleProperty(
-      "TotalCurrent",
-      [=] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddBooleanProperty(
-      "SwitchableChannel",
-      [=] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionSwitchableChannel(m_handle, &lStatus);
-      },
-      [=](bool value) {
-        int32_t lStatus = 0;
-        HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
-      });
+  builder
+      .AddDoubleProperty(
+          "Voltage",
+          [=] {
+            int32_t lStatus = 0;
+            return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
+          },
+          nullptr)
+      .AddDoubleProperty(
+          "TotalCurrent",
+          [=] {
+            int32_t lStatus = 0;
+            return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
+          },
+          nullptr)
+      .AddDoubleProperty(
+          "totalPowerWatts", [=] { return GetTotalPower(); }, nullptr)
+      .AddDoubleProperty(
+          "totalEnergyJoules", [=] { return GetTotalEnergy(); }, nullptr)
+      .AddDoubleProperty(
+          "temperatureCelsius", [=] { return GetTemperature(); }, nullptr)
+      .AddBooleanProperty(
+          "SwitchableChannel",
+          [=] {
+            int32_t lStatus = 0;
+            return HAL_GetPowerDistributionSwitchableChannel(m_handle,
+                                                             &lStatus);
+          },
+          [=](bool value) {
+            int32_t lStatus = 0;
+            HAL_SetPowerDistributionSwitchableChannel(m_handle, value,
+                                                      &lStatus);
+          });
 }

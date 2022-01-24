@@ -163,17 +163,16 @@ int DutyCycleEncoder::GetSourceChannel() const {
 
 void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("AbsoluteEncoder")
-      .AddDoubleProperty("sourceChannel",
-      [=] { return GetSourceChannel(); }, nullptr)
       .AddDoubleProperty(
-         "Distance", [this] { return this->GetDistance(); }, nullptr)
+          "sourceChannel", [=] { return GetSourceChannel(); }, nullptr)
+      .AddDoubleProperty(
+          "Distance", [this] { return this->GetDistance(); }, nullptr)
       .AddDoubleProperty(
           "Distance Per Rotation",
           [this] { return this->GetDistancePerRotation(); }, nullptr)
       .AddDoubleProperty(
           "Is Connected", [this] { return this->IsConnected(); }, nullptr)
       .AddDoubleProperty(
-        "frequencyThreshold", [=] { return m_frequencyThreshold; }, 
-        [=] (double threshold) { SetConnectedFrequencyThreshold(threshold); }
-      );
+          "frequencyThreshold", [=] { return m_frequencyThreshold; },
+          [=](double threshold) { SetConnectedFrequencyThreshold(threshold); });
 }

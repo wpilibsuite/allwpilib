@@ -5,14 +5,11 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.CTREPCMJNI;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
-public class PneumaticsControlModule implements PneumaticsBase, Sendable {
+public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     public final int m_module;
     public final int m_handle;
@@ -262,11 +259,5 @@ public class PneumaticsControlModule implements PneumaticsBase, Sendable {
   @Override
   public double getPressure(int channel) {
     return 0;
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Pneumatics")
-        .
   }
 }

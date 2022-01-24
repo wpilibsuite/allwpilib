@@ -313,6 +313,9 @@ public class Ultrasonic implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
+        .addDoubleProperty("pingChannel", m_pingChannel::getChannel, null)
+        .addDoubleProperty("echoChannel", m_echoChannel::getChannel, null)
+        .addBooleanProperty("enabled", this::isEnabled, this::setEnabled)
         .addDoubleProperty("Value", this::getRangeInches, null)
         .addBooleanProperty("valid", this::isRangeValid, null);
   }

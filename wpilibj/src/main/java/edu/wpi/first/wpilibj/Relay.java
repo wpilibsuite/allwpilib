@@ -294,7 +294,7 @@ public class Relay extends MotorSafety implements Sendable, AutoCloseable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder
-        .addDoubleProperty("Channel", this::getChannel, null)
+        .addDoubleProperty("channel", this::getChannel, null)
         .setActuator(true)
         .setSafeState(() -> set(Value.kOff))
         .addStringProperty(

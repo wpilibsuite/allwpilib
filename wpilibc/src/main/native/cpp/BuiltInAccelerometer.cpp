@@ -47,22 +47,20 @@ double BuiltInAccelerometer::GetZ() {
 
 void BuiltInAccelerometer::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("3AxisAccelerometer")
-  .AddDoubleProperty(
-    "range",
-    [=] { return static_cast<int>(m_range); },
-    [=] (double id) { 
-      int iid = id;
-      if (iid >= 0 && iid <= 3) {
-        SetRange(static_cast<Range>(iid));
-      } else {
-        SetRange(Range::kRange_8G);
-      }
-    }
-  )
-  .AddDoubleProperty(
-      "X", [=] { return GetX(); }, nullptr)
-  .AddDoubleProperty(
-      "Y", [=] { return GetY(); }, nullptr)
-  .AddDoubleProperty(
-      "Z", [=] { return GetZ(); }, nullptr);
+      .AddDoubleProperty(
+          "range", [=] { return static_cast<int>(m_range); },
+          [=](double id) {
+            int iid = id;
+            if (iid >= 0 && iid <= 3) {
+              SetRange(static_cast<Range>(iid));
+            } else {
+              SetRange(Range::kRange_8G);
+            }
+          })
+      .AddDoubleProperty(
+          "X", [=] { return GetX(); }, nullptr)
+      .AddDoubleProperty(
+          "Y", [=] { return GetY(); }, nullptr)
+      .AddDoubleProperty(
+          "Z", [=] { return GetZ(); }, nullptr);
 }
