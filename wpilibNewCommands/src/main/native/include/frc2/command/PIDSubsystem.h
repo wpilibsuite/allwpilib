@@ -13,6 +13,8 @@ namespace frc2 {
  * A subsystem that uses a PIDController to control an output.  The controller
  * is run synchronously from the subsystem's periodic() method.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see PIDController
  */
 class PIDSubsystem : public SubsystemBase {

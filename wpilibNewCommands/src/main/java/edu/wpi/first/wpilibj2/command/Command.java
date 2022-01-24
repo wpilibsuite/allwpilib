@@ -14,6 +14,8 @@ import java.util.function.BooleanSupplier;
  *
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public interface Command {
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */

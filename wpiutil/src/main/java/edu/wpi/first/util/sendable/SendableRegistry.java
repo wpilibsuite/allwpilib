@@ -462,7 +462,7 @@ public class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();
@@ -494,11 +494,8 @@ public class SendableRegistry {
           if (cause != null) {
             throwable = cause;
           }
-          System.out.println(
-              "Unhandled exception calling LiveWindow for "
-                  + comp.m_name
-                  + ": "
-                  + throwable.toString());
+          System.err.println("Unhandled exception calling LiveWindow for " + comp.m_name + ": ");
+          throwable.printStackTrace();
           comp.m_liveWindow = false;
         }
         if (cbdata.data != null) {

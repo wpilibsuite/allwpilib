@@ -65,7 +65,7 @@ void EventLoopRunner::Stop() {
 void EventLoopRunner::ExecAsync(LoopFunc func) {
   if (auto thr = m_owner.GetThread()) {
     if (auto doExec = thr->m_doExec.lock()) {
-      doExec->Call(func);
+      doExec->Call(std::move(func));
     }
   }
 }
@@ -74,7 +74,7 @@ void EventLoopRunner::ExecSync(LoopFunc func) {
   wpi::future<void> f;
   if (auto thr = m_owner.GetThread()) {
     if (auto doExec = thr->m_doExec.lock()) {
-      f = doExec->Call(func);
+      f = doExec->Call(std::move(func));
     }
   }
   if (f.valid()) {

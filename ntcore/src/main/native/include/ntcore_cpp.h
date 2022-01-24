@@ -585,7 +585,7 @@ NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
  * The caller is responsible for calling PollEntryListener() to poll.
  *
  * @param poller            poller handle
- * @param prefix            UTF-8 string prefix
+ * @param entry             entry handle
  * @param flags             NotifyKind bitmask
  * @return Listener handle
  */

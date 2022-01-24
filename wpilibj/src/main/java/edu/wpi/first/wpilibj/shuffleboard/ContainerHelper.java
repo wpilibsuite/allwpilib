@@ -59,7 +59,7 @@ final class ContainerHelper {
     return widget;
   }
 
-  ComplexWidget add(Sendable sendable) throws IllegalArgumentException {
+  ComplexWidget add(Sendable sendable) {
     String name = SendableRegistry.getName(sendable);
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Sendable must have a name");

@@ -44,43 +44,34 @@ extern "C" {
 #endif
 
 /* Frame ids. */
-#define PDH_SWITCH_CHANNEL_SET_FRAME_ID (0x8050840u)
-#define PDH_STATUS0_FRAME_ID (0x8051800u)
-#define PDH_STATUS1_FRAME_ID (0x8051840u)
-#define PDH_STATUS2_FRAME_ID (0x8051880u)
-#define PDH_STATUS3_FRAME_ID (0x80518c0u)
-#define PDH_STATUS4_FRAME_ID (0x8051900u)
+#define PDH_SET_SWITCH_CHANNEL_FRAME_ID (0x8050840u)
+#define PDH_STATUS_0_FRAME_ID (0x8051800u)
+#define PDH_STATUS_1_FRAME_ID (0x8051840u)
+#define PDH_STATUS_2_FRAME_ID (0x8051880u)
+#define PDH_STATUS_3_FRAME_ID (0x80518c0u)
+#define PDH_STATUS_4_FRAME_ID (0x8051900u)
 #define PDH_CLEAR_FAULTS_FRAME_ID (0x8051b80u)
-#define PDH_IDENTIFY_FRAME_ID (0x8051d80u)
 #define PDH_VERSION_FRAME_ID (0x8052600u)
-#define PDH_CONFIGURE_HR_CHANNEL_FRAME_ID (0x80538c0u)
-#define PDH_ENTER_BOOTLOADER_FRAME_ID (0x8057fc0u)
 
 /* Frame lengths in bytes. */
-#define PDH_SWITCH_CHANNEL_SET_LENGTH (1u)
-#define PDH_STATUS0_LENGTH (8u)
-#define PDH_STATUS1_LENGTH (8u)
-#define PDH_STATUS2_LENGTH (8u)
-#define PDH_STATUS3_LENGTH (8u)
-#define PDH_STATUS4_LENGTH (8u)
+#define PDH_SET_SWITCH_CHANNEL_LENGTH (1u)
+#define PDH_STATUS_0_LENGTH (8u)
+#define PDH_STATUS_1_LENGTH (8u)
+#define PDH_STATUS_2_LENGTH (8u)
+#define PDH_STATUS_3_LENGTH (8u)
+#define PDH_STATUS_4_LENGTH (8u)
 #define PDH_CLEAR_FAULTS_LENGTH (0u)
-#define PDH_IDENTIFY_LENGTH (0u)
 #define PDH_VERSION_LENGTH (8u)
-#define PDH_CONFIGURE_HR_CHANNEL_LENGTH (3u)
-#define PDH_ENTER_BOOTLOADER_LENGTH (0u)
 
 /* Extended or standard frame types. */
-#define PDH_SWITCH_CHANNEL_SET_IS_EXTENDED (1)
-#define PDH_STATUS0_IS_EXTENDED (1)
-#define PDH_STATUS1_IS_EXTENDED (1)
-#define PDH_STATUS2_IS_EXTENDED (1)
-#define PDH_STATUS3_IS_EXTENDED (1)
-#define PDH_STATUS4_IS_EXTENDED (1)
+#define PDH_SET_SWITCH_CHANNEL_IS_EXTENDED (1)
+#define PDH_STATUS_0_IS_EXTENDED (1)
+#define PDH_STATUS_1_IS_EXTENDED (1)
+#define PDH_STATUS_2_IS_EXTENDED (1)
+#define PDH_STATUS_3_IS_EXTENDED (1)
+#define PDH_STATUS_4_IS_EXTENDED (1)
 #define PDH_CLEAR_FAULTS_IS_EXTENDED (1)
-#define PDH_IDENTIFY_IS_EXTENDED (1)
 #define PDH_VERSION_IS_EXTENDED (1)
-#define PDH_CONFIGURE_HR_CHANNEL_IS_EXTENDED (1)
-#define PDH_ENTER_BOOTLOADER_IS_EXTENDED (1)
 
 /* Frame cycle times in milliseconds. */
 
@@ -89,36 +80,29 @@ extern "C" {
 
 
 /**
- * Signals in message SwitchChannelSet.
+ * Signals in message Set_Switch_Channel.
  *
  * Set the switch channel output
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_switch_channel_set_t {
+struct PDH_set_switch_channel_t {
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
     uint8_t output_set_value : 1;
-
-    /**
-     * Range: 0..1 (0..1 -)
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t use_system_enable : 1;
 };
 
 /**
- * Signals in message Status0.
+ * Signals in message Status_0.
  *
  * Periodic status frame 0
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_status0_t {
+struct PDH_status_0_t {
     /**
      * Range: 0..1023 (0..127.875 A)
      * Scale: 0.125
@@ -145,14 +129,14 @@ struct PDH_status0_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_0_brownout : 1;
+    uint8_t channel_0_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_1_brownout : 1;
+    uint8_t channel_1_breaker_fault : 1;
 
     /**
      * Range: 0..1023 (0..127.875 A)
@@ -180,24 +164,24 @@ struct PDH_status0_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_2_brownout : 1;
+    uint8_t channel_2_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_3_brownout : 1;
+    uint8_t channel_3_breaker_fault : 1;
 };
 
 /**
- * Signals in message Status1.
+ * Signals in message Status_1.
  *
  * Periodic status frame 1
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_status1_t {
+struct PDH_status_1_t {
     /**
      * Range: 0..1023 (0..127.875 A)
      * Scale: 0.125
@@ -224,14 +208,14 @@ struct PDH_status1_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_4_brownout : 1;
+    uint8_t channel_4_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_5_brownout : 1;
+    uint8_t channel_5_breaker_fault : 1;
 
     /**
      * Range: 0..1023 (0..127.875 A)
@@ -259,24 +243,24 @@ struct PDH_status1_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_6_brownout : 1;
+    uint8_t channel_6_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_7_brownout : 1;
+    uint8_t channel_7_breaker_fault : 1;
 };
 
 /**
- * Signals in message Status2.
+ * Signals in message Status_2.
  *
  * Periodic status frame 2
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_status2_t {
+struct PDH_status_2_t {
     /**
      * Range: 0..1023 (0..127.875 A)
      * Scale: 0.125
@@ -303,14 +287,14 @@ struct PDH_status2_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_8_brownout : 1;
+    uint8_t channel_8_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_9_brownout : 1;
+    uint8_t channel_9_breaker_fault : 1;
 
     /**
      * Range: 0..1023 (0..127.875 A)
@@ -338,24 +322,24 @@ struct PDH_status2_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_10_brownout : 1;
+    uint8_t channel_10_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_11_brownout : 1;
+    uint8_t channel_11_breaker_fault : 1;
 };
 
 /**
- * Signals in message Status3.
+ * Signals in message Status_3.
  *
  * Periodic status frame 3
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_status3_t {
+struct PDH_status_3_t {
     /**
      * Range: 0..1023 (0..127.875 A)
      * Scale: 0.125
@@ -375,38 +359,38 @@ struct PDH_status3_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_12_brownout : 1;
+    uint8_t channel_12_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_13_brownout : 1;
+    uint8_t channel_13_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_14_brownout : 1;
+    uint8_t channel_14_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_15_brownout : 1;
+    uint8_t channel_15_breaker_fault : 1;
 
     /**
-     * Range: 0..255 (0..15.9375 A)
+     * Range: 0..511 (0..31.9375 A)
      * Scale: 0.0625
      * Offset: 0
      */
     uint8_t channel_20_current : 8;
 
     /**
-     * Range: 0..255 (0..15.9375 A)
+     * Range: 0..511 (0..31.9375 A)
      * Scale: 0.0625
      * Offset: 0
      */
@@ -431,66 +415,66 @@ struct PDH_status3_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_16_brownout : 1;
+    uint8_t channel_16_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_17_brownout : 1;
+    uint8_t channel_17_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_18_brownout : 1;
+    uint8_t channel_18_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_19_brownout : 1;
+    uint8_t channel_19_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_20_brownout : 1;
+    uint8_t channel_20_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_21_brownout : 1;
+    uint8_t channel_21_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_22_brownout : 1;
+    uint8_t channel_22_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel_23_brownout : 1;
+    uint8_t channel_23_breaker_fault : 1;
 };
 
 /**
- * Signals in message Status4.
+ * Signals in message Status_4.
  *
  * Periodic status frame 4
  *
  * All signal values are as on the CAN bus.
  */
-struct PDH_status4_t {
+struct PDH_status_4_t {
     /**
      * Range: 0..4095 (0..31.9921875 V)
      * Scale: 0.0078125
@@ -517,7 +501,7 @@ struct PDH_status4_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t brownout : 1;
+    uint8_t brownout_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -531,7 +515,7 @@ struct PDH_status4_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t can_warning : 1;
+    uint8_t can_warning_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -545,14 +529,14 @@ struct PDH_status4_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sw_state : 1;
+    uint8_t switch_channel_state : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_brownout : 1;
+    uint8_t sticky_brownout_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -566,14 +550,14 @@ struct PDH_status4_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_can_warning : 1;
+    uint8_t sticky_can_warning_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_can_bus_off : 1;
+    uint8_t sticky_can_bus_off_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
@@ -594,35 +578,35 @@ struct PDH_status4_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_ch20_brownout : 1;
+    uint8_t sticky_ch20_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_ch21_brownout : 1;
+    uint8_t sticky_ch21_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_ch22_brownout : 1;
+    uint8_t sticky_ch22_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_ch23_brownout : 1;
+    uint8_t sticky_ch23_breaker_fault : 1;
 
     /**
      * Range: 0..1 (0..1 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t sticky_has_reset : 1;
+    uint8_t sticky_has_reset_fault : 1;
 
     /**
      * Range: 0..255 (0..510 A)
@@ -630,30 +614,156 @@ struct PDH_status4_t {
      * Offset: 0
      */
     uint8_t total_current : 8;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch0_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch1_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch2_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch3_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch4_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch5_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch6_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch7_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch8_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch9_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch10_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch11_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch12_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch13_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch14_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch15_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch16_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch17_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch18_breaker_fault : 1;
+
+    /**
+     * Range: 0..1 (0..1 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t sticky_ch19_breaker_fault : 1;
 };
 
 /**
- * Signals in message ClearFaults.
+ * Signals in message Clear_Faults.
  *
  * Clear sticky faults on the device
  *
  * All signal values are as on the CAN bus.
  */
 struct PDH_clear_faults_t {
-    /**
-     * Dummy signal in empty message.
-     */
-    uint8_t dummy;
-};
-
-/**
- * Signals in message Identify.
- *
- * Flash the LED on the device to identify this device
- *
- * All signal values are as on the CAN bus.
- */
-struct PDH_identify_t {
     /**
      * Dummy signal in empty message.
      */
@@ -694,55 +804,25 @@ struct PDH_version_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t hardware_code : 8;
+    uint8_t hardware_minor : 8;
 
     /**
-     * Range: 0..4294967295 (0..4294967295 -)
+     * Range: 0..255 (0..255 -)
      * Scale: 1
      * Offset: 0
      */
-    uint32_t unique_id : 32;
-};
+    uint8_t hardware_major : 8;
 
-/**
- * Signals in message ConfigureHRChannel.
- *
- * Configure a periodic high-resolution channel frame to send back data for a particular channel. This can be useful for more detailed diagnostics, or even for current based control or monitoring.
- *
- * All signal values are as on the CAN bus.
- */
-struct PDH_configure_hr_channel_t {
     /**
-     * Range: 0..23 (0..23 -)
+     * Range: 0..16777215 (0..16777215 -)
      * Scale: 1
      * Offset: 0
      */
-    uint8_t channel : 8;
-
-    /**
-     * Range: 0..65535 (0..65535 -)
-     * Scale: 1
-     * Offset: 0
-     */
-    uint16_t period : 16;
+    uint32_t unique_id : 24;
 };
 
 /**
- * Signals in message Enter_Bootloader.
- *
- * Enter the REV bootloader from user application
- *
- * All signal values are as on the CAN bus.
- */
-struct PDH_enter_bootloader_t {
-    /**
-     * Dummy signal in empty message.
-     */
-    uint8_t dummy;
-};
-
-/**
- * Pack message SwitchChannelSet.
+ * Pack message Set_Switch_Channel.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -750,13 +830,13 @@ struct PDH_enter_bootloader_t {
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_switch_channel_set_pack(
+int PDH_set_switch_channel_pack(
     uint8_t *dst_p,
-    const struct PDH_switch_channel_set_t *src_p,
+    const struct PDH_set_switch_channel_t *src_p,
     size_t size);
 
 /**
- * Unpack message SwitchChannelSet.
+ * Unpack message Set_Switch_Channel.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -764,8 +844,8 @@ int PDH_switch_channel_set_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_switch_channel_set_unpack(
-    struct PDH_switch_channel_set_t *dst_p,
+int PDH_set_switch_channel_unpack(
+    struct PDH_set_switch_channel_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -776,7 +856,7 @@ int PDH_switch_channel_set_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t PDH_switch_channel_set_output_set_value_encode(double value);
+uint8_t PDH_set_switch_channel_output_set_value_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -785,7 +865,7 @@ uint8_t PDH_switch_channel_set_output_set_value_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_switch_channel_set_output_set_value_decode(uint8_t value);
+double PDH_set_switch_channel_output_set_value_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -794,37 +874,10 @@ double PDH_switch_channel_set_output_set_value_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_switch_channel_set_output_set_value_is_in_range(uint8_t value);
+bool PDH_set_switch_channel_output_set_value_is_in_range(uint8_t value);
 
 /**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t PDH_switch_channel_set_use_system_enable_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double PDH_switch_channel_set_use_system_enable_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool PDH_switch_channel_set_use_system_enable_is_in_range(uint8_t value);
-
-/**
- * Pack message Status0.
+ * Pack message Status_0.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -832,13 +885,13 @@ bool PDH_switch_channel_set_use_system_enable_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_status0_pack(
+int PDH_status_0_pack(
     uint8_t *dst_p,
-    const struct PDH_status0_t *src_p,
+    const struct PDH_status_0_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status0.
+ * Unpack message Status_0.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -846,8 +899,8 @@ int PDH_status0_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_status0_unpack(
-    struct PDH_status0_t *dst_p,
+int PDH_status_0_unpack(
+    struct PDH_status_0_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -858,7 +911,7 @@ int PDH_status0_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_0_current_encode(double value);
+uint16_t PDH_status_0_channel_0_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -867,7 +920,7 @@ uint16_t PDH_status0_channel_0_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_0_current_decode(uint16_t value);
+double PDH_status_0_channel_0_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -876,7 +929,7 @@ double PDH_status0_channel_0_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_0_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_0_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -885,7 +938,7 @@ bool PDH_status0_channel_0_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_1_current_encode(double value);
+uint16_t PDH_status_0_channel_1_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -894,7 +947,7 @@ uint16_t PDH_status0_channel_1_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_1_current_decode(uint16_t value);
+double PDH_status_0_channel_1_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -903,7 +956,7 @@ double PDH_status0_channel_1_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_1_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_1_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -912,7 +965,7 @@ bool PDH_status0_channel_1_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_2_current_encode(double value);
+uint16_t PDH_status_0_channel_2_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -921,7 +974,7 @@ uint16_t PDH_status0_channel_2_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_2_current_decode(uint16_t value);
+double PDH_status_0_channel_2_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -930,7 +983,7 @@ double PDH_status0_channel_2_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_2_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_2_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -939,7 +992,7 @@ bool PDH_status0_channel_2_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status0_channel_0_brownout_encode(double value);
+uint8_t PDH_status_0_channel_0_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -948,7 +1001,7 @@ uint8_t PDH_status0_channel_0_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_0_brownout_decode(uint8_t value);
+double PDH_status_0_channel_0_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -957,7 +1010,7 @@ double PDH_status0_channel_0_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_0_brownout_is_in_range(uint8_t value);
+bool PDH_status_0_channel_0_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -966,7 +1019,7 @@ bool PDH_status0_channel_0_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status0_channel_1_brownout_encode(double value);
+uint8_t PDH_status_0_channel_1_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -975,7 +1028,7 @@ uint8_t PDH_status0_channel_1_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_1_brownout_decode(uint8_t value);
+double PDH_status_0_channel_1_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -984,7 +1037,7 @@ double PDH_status0_channel_1_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_1_brownout_is_in_range(uint8_t value);
+bool PDH_status_0_channel_1_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -993,7 +1046,7 @@ bool PDH_status0_channel_1_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_3_current_encode(double value);
+uint16_t PDH_status_0_channel_3_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1002,7 +1055,7 @@ uint16_t PDH_status0_channel_3_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_3_current_decode(uint16_t value);
+double PDH_status_0_channel_3_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1011,7 +1064,7 @@ double PDH_status0_channel_3_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_3_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_3_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1020,7 +1073,7 @@ bool PDH_status0_channel_3_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_4_current_encode(double value);
+uint16_t PDH_status_0_channel_4_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1029,7 +1082,7 @@ uint16_t PDH_status0_channel_4_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_4_current_decode(uint16_t value);
+double PDH_status_0_channel_4_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1038,7 +1091,7 @@ double PDH_status0_channel_4_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_4_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_4_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1047,7 +1100,7 @@ bool PDH_status0_channel_4_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status0_channel_5_current_encode(double value);
+uint16_t PDH_status_0_channel_5_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1056,7 +1109,7 @@ uint16_t PDH_status0_channel_5_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_5_current_decode(uint16_t value);
+double PDH_status_0_channel_5_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1065,7 +1118,7 @@ double PDH_status0_channel_5_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_5_current_is_in_range(uint16_t value);
+bool PDH_status_0_channel_5_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1074,7 +1127,7 @@ bool PDH_status0_channel_5_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status0_channel_2_brownout_encode(double value);
+uint8_t PDH_status_0_channel_2_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1083,7 +1136,7 @@ uint8_t PDH_status0_channel_2_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_2_brownout_decode(uint8_t value);
+double PDH_status_0_channel_2_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1092,7 +1145,7 @@ double PDH_status0_channel_2_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_2_brownout_is_in_range(uint8_t value);
+bool PDH_status_0_channel_2_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1101,7 +1154,7 @@ bool PDH_status0_channel_2_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status0_channel_3_brownout_encode(double value);
+uint8_t PDH_status_0_channel_3_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1110,7 +1163,7 @@ uint8_t PDH_status0_channel_3_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status0_channel_3_brownout_decode(uint8_t value);
+double PDH_status_0_channel_3_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1119,10 +1172,10 @@ double PDH_status0_channel_3_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status0_channel_3_brownout_is_in_range(uint8_t value);
+bool PDH_status_0_channel_3_breaker_fault_is_in_range(uint8_t value);
 
 /**
- * Pack message Status1.
+ * Pack message Status_1.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -1130,13 +1183,13 @@ bool PDH_status0_channel_3_brownout_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_status1_pack(
+int PDH_status_1_pack(
     uint8_t *dst_p,
-    const struct PDH_status1_t *src_p,
+    const struct PDH_status_1_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status1.
+ * Unpack message Status_1.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1144,8 +1197,8 @@ int PDH_status1_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_status1_unpack(
-    struct PDH_status1_t *dst_p,
+int PDH_status_1_unpack(
+    struct PDH_status_1_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -1156,7 +1209,7 @@ int PDH_status1_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_6_current_encode(double value);
+uint16_t PDH_status_1_channel_6_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1165,7 +1218,7 @@ uint16_t PDH_status1_channel_6_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_6_current_decode(uint16_t value);
+double PDH_status_1_channel_6_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1174,7 +1227,7 @@ double PDH_status1_channel_6_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_6_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_6_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1183,7 +1236,7 @@ bool PDH_status1_channel_6_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_7_current_encode(double value);
+uint16_t PDH_status_1_channel_7_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1192,7 +1245,7 @@ uint16_t PDH_status1_channel_7_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_7_current_decode(uint16_t value);
+double PDH_status_1_channel_7_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1201,7 +1254,7 @@ double PDH_status1_channel_7_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_7_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_7_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1210,7 +1263,7 @@ bool PDH_status1_channel_7_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_8_current_encode(double value);
+uint16_t PDH_status_1_channel_8_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1219,7 +1272,7 @@ uint16_t PDH_status1_channel_8_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_8_current_decode(uint16_t value);
+double PDH_status_1_channel_8_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1228,7 +1281,7 @@ double PDH_status1_channel_8_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_8_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_8_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1237,7 +1290,7 @@ bool PDH_status1_channel_8_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status1_channel_4_brownout_encode(double value);
+uint8_t PDH_status_1_channel_4_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1246,7 +1299,7 @@ uint8_t PDH_status1_channel_4_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_4_brownout_decode(uint8_t value);
+double PDH_status_1_channel_4_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1255,7 +1308,7 @@ double PDH_status1_channel_4_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_4_brownout_is_in_range(uint8_t value);
+bool PDH_status_1_channel_4_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1264,7 +1317,7 @@ bool PDH_status1_channel_4_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status1_channel_5_brownout_encode(double value);
+uint8_t PDH_status_1_channel_5_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1273,7 +1326,7 @@ uint8_t PDH_status1_channel_5_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_5_brownout_decode(uint8_t value);
+double PDH_status_1_channel_5_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1282,7 +1335,7 @@ double PDH_status1_channel_5_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_5_brownout_is_in_range(uint8_t value);
+bool PDH_status_1_channel_5_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1291,7 +1344,7 @@ bool PDH_status1_channel_5_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_9_current_encode(double value);
+uint16_t PDH_status_1_channel_9_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1300,7 +1353,7 @@ uint16_t PDH_status1_channel_9_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_9_current_decode(uint16_t value);
+double PDH_status_1_channel_9_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1309,7 +1362,7 @@ double PDH_status1_channel_9_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_9_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_9_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1318,7 +1371,7 @@ bool PDH_status1_channel_9_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_10_current_encode(double value);
+uint16_t PDH_status_1_channel_10_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1327,7 +1380,7 @@ uint16_t PDH_status1_channel_10_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_10_current_decode(uint16_t value);
+double PDH_status_1_channel_10_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1336,7 +1389,7 @@ double PDH_status1_channel_10_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_10_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_10_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1345,7 +1398,7 @@ bool PDH_status1_channel_10_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status1_channel_11_current_encode(double value);
+uint16_t PDH_status_1_channel_11_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1354,7 +1407,7 @@ uint16_t PDH_status1_channel_11_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_11_current_decode(uint16_t value);
+double PDH_status_1_channel_11_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1363,7 +1416,7 @@ double PDH_status1_channel_11_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_11_current_is_in_range(uint16_t value);
+bool PDH_status_1_channel_11_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1372,7 +1425,7 @@ bool PDH_status1_channel_11_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status1_channel_6_brownout_encode(double value);
+uint8_t PDH_status_1_channel_6_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1381,7 +1434,7 @@ uint8_t PDH_status1_channel_6_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_6_brownout_decode(uint8_t value);
+double PDH_status_1_channel_6_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1390,7 +1443,7 @@ double PDH_status1_channel_6_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_6_brownout_is_in_range(uint8_t value);
+bool PDH_status_1_channel_6_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1399,7 +1452,7 @@ bool PDH_status1_channel_6_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status1_channel_7_brownout_encode(double value);
+uint8_t PDH_status_1_channel_7_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1408,7 +1461,7 @@ uint8_t PDH_status1_channel_7_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status1_channel_7_brownout_decode(uint8_t value);
+double PDH_status_1_channel_7_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1417,10 +1470,10 @@ double PDH_status1_channel_7_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status1_channel_7_brownout_is_in_range(uint8_t value);
+bool PDH_status_1_channel_7_breaker_fault_is_in_range(uint8_t value);
 
 /**
- * Pack message Status2.
+ * Pack message Status_2.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -1428,13 +1481,13 @@ bool PDH_status1_channel_7_brownout_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_status2_pack(
+int PDH_status_2_pack(
     uint8_t *dst_p,
-    const struct PDH_status2_t *src_p,
+    const struct PDH_status_2_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status2.
+ * Unpack message Status_2.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1442,8 +1495,8 @@ int PDH_status2_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_status2_unpack(
-    struct PDH_status2_t *dst_p,
+int PDH_status_2_unpack(
+    struct PDH_status_2_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -1454,7 +1507,7 @@ int PDH_status2_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_12_current_encode(double value);
+uint16_t PDH_status_2_channel_12_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1463,7 +1516,7 @@ uint16_t PDH_status2_channel_12_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_12_current_decode(uint16_t value);
+double PDH_status_2_channel_12_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1472,7 +1525,7 @@ double PDH_status2_channel_12_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_12_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_12_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1481,7 +1534,7 @@ bool PDH_status2_channel_12_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_13_current_encode(double value);
+uint16_t PDH_status_2_channel_13_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1490,7 +1543,7 @@ uint16_t PDH_status2_channel_13_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_13_current_decode(uint16_t value);
+double PDH_status_2_channel_13_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1499,7 +1552,7 @@ double PDH_status2_channel_13_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_13_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_13_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1508,7 +1561,7 @@ bool PDH_status2_channel_13_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_14_current_encode(double value);
+uint16_t PDH_status_2_channel_14_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1517,7 +1570,7 @@ uint16_t PDH_status2_channel_14_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_14_current_decode(uint16_t value);
+double PDH_status_2_channel_14_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1526,7 +1579,7 @@ double PDH_status2_channel_14_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_14_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_14_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1535,7 +1588,7 @@ bool PDH_status2_channel_14_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status2_channel_8_brownout_encode(double value);
+uint8_t PDH_status_2_channel_8_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1544,7 +1597,7 @@ uint8_t PDH_status2_channel_8_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_8_brownout_decode(uint8_t value);
+double PDH_status_2_channel_8_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1553,7 +1606,7 @@ double PDH_status2_channel_8_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_8_brownout_is_in_range(uint8_t value);
+bool PDH_status_2_channel_8_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1562,7 +1615,7 @@ bool PDH_status2_channel_8_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status2_channel_9_brownout_encode(double value);
+uint8_t PDH_status_2_channel_9_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1571,7 +1624,7 @@ uint8_t PDH_status2_channel_9_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_9_brownout_decode(uint8_t value);
+double PDH_status_2_channel_9_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1580,7 +1633,7 @@ double PDH_status2_channel_9_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_9_brownout_is_in_range(uint8_t value);
+bool PDH_status_2_channel_9_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1589,7 +1642,7 @@ bool PDH_status2_channel_9_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_15_current_encode(double value);
+uint16_t PDH_status_2_channel_15_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1598,7 +1651,7 @@ uint16_t PDH_status2_channel_15_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_15_current_decode(uint16_t value);
+double PDH_status_2_channel_15_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1607,7 +1660,7 @@ double PDH_status2_channel_15_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_15_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_15_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1616,7 +1669,7 @@ bool PDH_status2_channel_15_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_16_current_encode(double value);
+uint16_t PDH_status_2_channel_16_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1625,7 +1678,7 @@ uint16_t PDH_status2_channel_16_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_16_current_decode(uint16_t value);
+double PDH_status_2_channel_16_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1634,7 +1687,7 @@ double PDH_status2_channel_16_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_16_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_16_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1643,7 +1696,7 @@ bool PDH_status2_channel_16_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status2_channel_17_current_encode(double value);
+uint16_t PDH_status_2_channel_17_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1652,7 +1705,7 @@ uint16_t PDH_status2_channel_17_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_17_current_decode(uint16_t value);
+double PDH_status_2_channel_17_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1661,7 +1714,7 @@ double PDH_status2_channel_17_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_17_current_is_in_range(uint16_t value);
+bool PDH_status_2_channel_17_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1670,7 +1723,7 @@ bool PDH_status2_channel_17_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status2_channel_10_brownout_encode(double value);
+uint8_t PDH_status_2_channel_10_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1679,7 +1732,7 @@ uint8_t PDH_status2_channel_10_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_10_brownout_decode(uint8_t value);
+double PDH_status_2_channel_10_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1688,7 +1741,7 @@ double PDH_status2_channel_10_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_10_brownout_is_in_range(uint8_t value);
+bool PDH_status_2_channel_10_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1697,7 +1750,7 @@ bool PDH_status2_channel_10_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status2_channel_11_brownout_encode(double value);
+uint8_t PDH_status_2_channel_11_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1706,7 +1759,7 @@ uint8_t PDH_status2_channel_11_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status2_channel_11_brownout_decode(uint8_t value);
+double PDH_status_2_channel_11_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1715,10 +1768,10 @@ double PDH_status2_channel_11_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status2_channel_11_brownout_is_in_range(uint8_t value);
+bool PDH_status_2_channel_11_breaker_fault_is_in_range(uint8_t value);
 
 /**
- * Pack message Status3.
+ * Pack message Status_3.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -1726,13 +1779,13 @@ bool PDH_status2_channel_11_brownout_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_status3_pack(
+int PDH_status_3_pack(
     uint8_t *dst_p,
-    const struct PDH_status3_t *src_p,
+    const struct PDH_status_3_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status3.
+ * Unpack message Status_3.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -1740,8 +1793,8 @@ int PDH_status3_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_status3_unpack(
-    struct PDH_status3_t *dst_p,
+int PDH_status_3_unpack(
+    struct PDH_status_3_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -1752,7 +1805,7 @@ int PDH_status3_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status3_channel_18_current_encode(double value);
+uint16_t PDH_status_3_channel_18_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1761,7 +1814,7 @@ uint16_t PDH_status3_channel_18_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_18_current_decode(uint16_t value);
+double PDH_status_3_channel_18_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1770,7 +1823,7 @@ double PDH_status3_channel_18_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_18_current_is_in_range(uint16_t value);
+bool PDH_status_3_channel_18_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1779,7 +1832,7 @@ bool PDH_status3_channel_18_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status3_channel_19_current_encode(double value);
+uint16_t PDH_status_3_channel_19_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1788,7 +1841,7 @@ uint16_t PDH_status3_channel_19_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_19_current_decode(uint16_t value);
+double PDH_status_3_channel_19_current_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1797,7 +1850,7 @@ double PDH_status3_channel_19_current_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_19_current_is_in_range(uint16_t value);
+bool PDH_status_3_channel_19_current_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1806,7 +1859,7 @@ bool PDH_status3_channel_19_current_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_12_brownout_encode(double value);
+uint8_t PDH_status_3_channel_12_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1815,7 +1868,7 @@ uint8_t PDH_status3_channel_12_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_12_brownout_decode(uint8_t value);
+double PDH_status_3_channel_12_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1824,7 +1877,7 @@ double PDH_status3_channel_12_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_12_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_12_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1833,7 +1886,7 @@ bool PDH_status3_channel_12_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_13_brownout_encode(double value);
+uint8_t PDH_status_3_channel_13_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1842,7 +1895,7 @@ uint8_t PDH_status3_channel_13_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_13_brownout_decode(uint8_t value);
+double PDH_status_3_channel_13_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1851,7 +1904,7 @@ double PDH_status3_channel_13_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_13_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_13_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1860,7 +1913,7 @@ bool PDH_status3_channel_13_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_14_brownout_encode(double value);
+uint8_t PDH_status_3_channel_14_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1869,7 +1922,7 @@ uint8_t PDH_status3_channel_14_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_14_brownout_decode(uint8_t value);
+double PDH_status_3_channel_14_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1878,7 +1931,7 @@ double PDH_status3_channel_14_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_14_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_14_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1887,7 +1940,7 @@ bool PDH_status3_channel_14_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_15_brownout_encode(double value);
+uint8_t PDH_status_3_channel_15_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1896,7 +1949,7 @@ uint8_t PDH_status3_channel_15_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_15_brownout_decode(uint8_t value);
+double PDH_status_3_channel_15_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1905,7 +1958,7 @@ double PDH_status3_channel_15_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_15_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_15_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1914,7 +1967,7 @@ bool PDH_status3_channel_15_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_20_current_encode(double value);
+uint8_t PDH_status_3_channel_20_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1923,7 +1976,7 @@ uint8_t PDH_status3_channel_20_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_20_current_decode(uint8_t value);
+double PDH_status_3_channel_20_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1932,7 +1985,7 @@ double PDH_status3_channel_20_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_20_current_is_in_range(uint8_t value);
+bool PDH_status_3_channel_20_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1941,7 +1994,7 @@ bool PDH_status3_channel_20_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_21_current_encode(double value);
+uint8_t PDH_status_3_channel_21_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1950,7 +2003,7 @@ uint8_t PDH_status3_channel_21_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_21_current_decode(uint8_t value);
+double PDH_status_3_channel_21_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1959,7 +2012,7 @@ double PDH_status3_channel_21_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_21_current_is_in_range(uint8_t value);
+bool PDH_status_3_channel_21_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1968,7 +2021,7 @@ bool PDH_status3_channel_21_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_22_current_encode(double value);
+uint8_t PDH_status_3_channel_22_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1977,7 +2030,7 @@ uint8_t PDH_status3_channel_22_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_22_current_decode(uint8_t value);
+double PDH_status_3_channel_22_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1986,7 +2039,7 @@ double PDH_status3_channel_22_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_22_current_is_in_range(uint8_t value);
+bool PDH_status_3_channel_22_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1995,7 +2048,7 @@ bool PDH_status3_channel_22_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_23_current_encode(double value);
+uint8_t PDH_status_3_channel_23_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2004,7 +2057,7 @@ uint8_t PDH_status3_channel_23_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_23_current_decode(uint8_t value);
+double PDH_status_3_channel_23_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2013,7 +2066,7 @@ double PDH_status3_channel_23_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_23_current_is_in_range(uint8_t value);
+bool PDH_status_3_channel_23_current_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2022,7 +2075,7 @@ bool PDH_status3_channel_23_current_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_16_brownout_encode(double value);
+uint8_t PDH_status_3_channel_16_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2031,7 +2084,7 @@ uint8_t PDH_status3_channel_16_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_16_brownout_decode(uint8_t value);
+double PDH_status_3_channel_16_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2040,7 +2093,7 @@ double PDH_status3_channel_16_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_16_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_16_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2049,7 +2102,7 @@ bool PDH_status3_channel_16_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_17_brownout_encode(double value);
+uint8_t PDH_status_3_channel_17_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2058,7 +2111,7 @@ uint8_t PDH_status3_channel_17_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_17_brownout_decode(uint8_t value);
+double PDH_status_3_channel_17_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2067,7 +2120,7 @@ double PDH_status3_channel_17_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_17_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_17_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2076,7 +2129,7 @@ bool PDH_status3_channel_17_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_18_brownout_encode(double value);
+uint8_t PDH_status_3_channel_18_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2085,7 +2138,7 @@ uint8_t PDH_status3_channel_18_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_18_brownout_decode(uint8_t value);
+double PDH_status_3_channel_18_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2094,7 +2147,7 @@ double PDH_status3_channel_18_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_18_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_18_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2103,7 +2156,7 @@ bool PDH_status3_channel_18_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_19_brownout_encode(double value);
+uint8_t PDH_status_3_channel_19_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2112,7 +2165,7 @@ uint8_t PDH_status3_channel_19_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_19_brownout_decode(uint8_t value);
+double PDH_status_3_channel_19_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2121,7 +2174,7 @@ double PDH_status3_channel_19_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_19_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_19_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2130,7 +2183,7 @@ bool PDH_status3_channel_19_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_20_brownout_encode(double value);
+uint8_t PDH_status_3_channel_20_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2139,7 +2192,7 @@ uint8_t PDH_status3_channel_20_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_20_brownout_decode(uint8_t value);
+double PDH_status_3_channel_20_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2148,7 +2201,7 @@ double PDH_status3_channel_20_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_20_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_20_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2157,7 +2210,7 @@ bool PDH_status3_channel_20_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_21_brownout_encode(double value);
+uint8_t PDH_status_3_channel_21_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2166,7 +2219,7 @@ uint8_t PDH_status3_channel_21_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_21_brownout_decode(uint8_t value);
+double PDH_status_3_channel_21_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2175,7 +2228,7 @@ double PDH_status3_channel_21_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_21_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_21_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2184,7 +2237,7 @@ bool PDH_status3_channel_21_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_22_brownout_encode(double value);
+uint8_t PDH_status_3_channel_22_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2193,7 +2246,7 @@ uint8_t PDH_status3_channel_22_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_22_brownout_decode(uint8_t value);
+double PDH_status_3_channel_22_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2202,7 +2255,7 @@ double PDH_status3_channel_22_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_22_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_22_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2211,7 +2264,7 @@ bool PDH_status3_channel_22_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status3_channel_23_brownout_encode(double value);
+uint8_t PDH_status_3_channel_23_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2220,7 +2273,7 @@ uint8_t PDH_status3_channel_23_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status3_channel_23_brownout_decode(uint8_t value);
+double PDH_status_3_channel_23_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2229,10 +2282,10 @@ double PDH_status3_channel_23_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status3_channel_23_brownout_is_in_range(uint8_t value);
+bool PDH_status_3_channel_23_breaker_fault_is_in_range(uint8_t value);
 
 /**
- * Pack message Status4.
+ * Pack message Status_4.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -2240,13 +2293,13 @@ bool PDH_status3_channel_23_brownout_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int PDH_status4_pack(
+int PDH_status_4_pack(
     uint8_t *dst_p,
-    const struct PDH_status4_t *src_p,
+    const struct PDH_status_4_t *src_p,
     size_t size);
 
 /**
- * Unpack message Status4.
+ * Unpack message Status_4.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -2254,8 +2307,8 @@ int PDH_status4_pack(
  *
  * @return zero(0) or negative error code.
  */
-int PDH_status4_unpack(
-    struct PDH_status4_t *dst_p,
+int PDH_status_4_unpack(
+    struct PDH_status_4_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -2266,7 +2319,7 @@ int PDH_status4_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t PDH_status4_v_bus_encode(double value);
+uint16_t PDH_status_4_v_bus_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2275,7 +2328,7 @@ uint16_t PDH_status4_v_bus_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_v_bus_decode(uint16_t value);
+double PDH_status_4_v_bus_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2284,7 +2337,7 @@ double PDH_status4_v_bus_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_v_bus_is_in_range(uint16_t value);
+bool PDH_status_4_v_bus_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2293,7 +2346,7 @@ bool PDH_status4_v_bus_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_system_enable_encode(double value);
+uint8_t PDH_status_4_system_enable_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2302,7 +2355,7 @@ uint8_t PDH_status4_system_enable_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_system_enable_decode(uint8_t value);
+double PDH_status_4_system_enable_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2311,7 +2364,7 @@ double PDH_status4_system_enable_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_system_enable_is_in_range(uint8_t value);
+bool PDH_status_4_system_enable_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2320,7 +2373,7 @@ bool PDH_status4_system_enable_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_rsvd0_encode(double value);
+uint8_t PDH_status_4_rsvd0_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2329,7 +2382,7 @@ uint8_t PDH_status4_rsvd0_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_rsvd0_decode(uint8_t value);
+double PDH_status_4_rsvd0_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2338,7 +2391,7 @@ double PDH_status4_rsvd0_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_rsvd0_is_in_range(uint8_t value);
+bool PDH_status_4_rsvd0_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2347,7 +2400,7 @@ bool PDH_status4_rsvd0_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_brownout_encode(double value);
+uint8_t PDH_status_4_brownout_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2356,7 +2409,7 @@ uint8_t PDH_status4_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_brownout_decode(uint8_t value);
+double PDH_status_4_brownout_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2365,7 +2418,7 @@ double PDH_status4_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_brownout_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2374,7 +2427,7 @@ bool PDH_status4_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_rsvd1_encode(double value);
+uint8_t PDH_status_4_rsvd1_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2383,7 +2436,7 @@ uint8_t PDH_status4_rsvd1_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_rsvd1_decode(uint8_t value);
+double PDH_status_4_rsvd1_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2392,7 +2445,7 @@ double PDH_status4_rsvd1_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_rsvd1_is_in_range(uint8_t value);
+bool PDH_status_4_rsvd1_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2401,7 +2454,7 @@ bool PDH_status4_rsvd1_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_can_warning_encode(double value);
+uint8_t PDH_status_4_can_warning_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2410,7 +2463,7 @@ uint8_t PDH_status4_can_warning_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_can_warning_decode(uint8_t value);
+double PDH_status_4_can_warning_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2419,7 +2472,7 @@ double PDH_status4_can_warning_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_can_warning_is_in_range(uint8_t value);
+bool PDH_status_4_can_warning_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2428,7 +2481,7 @@ bool PDH_status4_can_warning_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_hardware_fault_encode(double value);
+uint8_t PDH_status_4_hardware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2437,7 +2490,7 @@ uint8_t PDH_status4_hardware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_hardware_fault_decode(uint8_t value);
+double PDH_status_4_hardware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2446,7 +2499,7 @@ double PDH_status4_hardware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_hardware_fault_is_in_range(uint8_t value);
+bool PDH_status_4_hardware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2455,7 +2508,7 @@ bool PDH_status4_hardware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sw_state_encode(double value);
+uint8_t PDH_status_4_switch_channel_state_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2464,7 +2517,7 @@ uint8_t PDH_status4_sw_state_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sw_state_decode(uint8_t value);
+double PDH_status_4_switch_channel_state_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2473,7 +2526,7 @@ double PDH_status4_sw_state_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sw_state_is_in_range(uint8_t value);
+bool PDH_status_4_switch_channel_state_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2482,7 +2535,7 @@ bool PDH_status4_sw_state_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_brownout_encode(double value);
+uint8_t PDH_status_4_sticky_brownout_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2491,7 +2544,7 @@ uint8_t PDH_status4_sticky_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_brownout_decode(uint8_t value);
+double PDH_status_4_sticky_brownout_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2500,7 +2553,7 @@ double PDH_status4_sticky_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_brownout_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2509,7 +2562,7 @@ bool PDH_status4_sticky_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_rsvd2_encode(double value);
+uint8_t PDH_status_4_rsvd2_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2518,7 +2571,7 @@ uint8_t PDH_status4_rsvd2_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_rsvd2_decode(uint8_t value);
+double PDH_status_4_rsvd2_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2527,7 +2580,7 @@ double PDH_status4_rsvd2_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_rsvd2_is_in_range(uint8_t value);
+bool PDH_status_4_rsvd2_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2536,7 +2589,7 @@ bool PDH_status4_rsvd2_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_can_warning_encode(double value);
+uint8_t PDH_status_4_sticky_can_warning_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2545,7 +2598,7 @@ uint8_t PDH_status4_sticky_can_warning_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_can_warning_decode(uint8_t value);
+double PDH_status_4_sticky_can_warning_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2554,7 +2607,7 @@ double PDH_status4_sticky_can_warning_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_can_warning_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_can_warning_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2563,7 +2616,7 @@ bool PDH_status4_sticky_can_warning_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_can_bus_off_encode(double value);
+uint8_t PDH_status_4_sticky_can_bus_off_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2572,7 +2625,7 @@ uint8_t PDH_status4_sticky_can_bus_off_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_can_bus_off_decode(uint8_t value);
+double PDH_status_4_sticky_can_bus_off_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2581,7 +2634,7 @@ double PDH_status4_sticky_can_bus_off_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_can_bus_off_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_can_bus_off_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2590,7 +2643,7 @@ bool PDH_status4_sticky_can_bus_off_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_hardware_fault_encode(double value);
+uint8_t PDH_status_4_sticky_hardware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2599,7 +2652,7 @@ uint8_t PDH_status4_sticky_hardware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_hardware_fault_decode(uint8_t value);
+double PDH_status_4_sticky_hardware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2608,7 +2661,7 @@ double PDH_status4_sticky_hardware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_hardware_fault_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_hardware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2617,7 +2670,7 @@ bool PDH_status4_sticky_hardware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_firmware_fault_encode(double value);
+uint8_t PDH_status_4_sticky_firmware_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2626,7 +2679,7 @@ uint8_t PDH_status4_sticky_firmware_fault_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_firmware_fault_decode(uint8_t value);
+double PDH_status_4_sticky_firmware_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2635,7 +2688,7 @@ double PDH_status4_sticky_firmware_fault_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_firmware_fault_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_firmware_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2644,7 +2697,7 @@ bool PDH_status4_sticky_firmware_fault_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_ch20_brownout_encode(double value);
+uint8_t PDH_status_4_sticky_ch20_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2653,7 +2706,7 @@ uint8_t PDH_status4_sticky_ch20_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_ch20_brownout_decode(uint8_t value);
+double PDH_status_4_sticky_ch20_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2662,7 +2715,7 @@ double PDH_status4_sticky_ch20_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_ch20_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_ch20_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2671,7 +2724,7 @@ bool PDH_status4_sticky_ch20_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_ch21_brownout_encode(double value);
+uint8_t PDH_status_4_sticky_ch21_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2680,7 +2733,7 @@ uint8_t PDH_status4_sticky_ch21_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_ch21_brownout_decode(uint8_t value);
+double PDH_status_4_sticky_ch21_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2689,7 +2742,7 @@ double PDH_status4_sticky_ch21_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_ch21_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_ch21_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2698,7 +2751,7 @@ bool PDH_status4_sticky_ch21_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_ch22_brownout_encode(double value);
+uint8_t PDH_status_4_sticky_ch22_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2707,7 +2760,7 @@ uint8_t PDH_status4_sticky_ch22_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_ch22_brownout_decode(uint8_t value);
+double PDH_status_4_sticky_ch22_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2716,7 +2769,7 @@ double PDH_status4_sticky_ch22_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_ch22_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_ch22_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2725,7 +2778,7 @@ bool PDH_status4_sticky_ch22_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_ch23_brownout_encode(double value);
+uint8_t PDH_status_4_sticky_ch23_breaker_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2734,7 +2787,7 @@ uint8_t PDH_status4_sticky_ch23_brownout_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_ch23_brownout_decode(uint8_t value);
+double PDH_status_4_sticky_ch23_breaker_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2743,7 +2796,7 @@ double PDH_status4_sticky_ch23_brownout_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_ch23_brownout_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_ch23_breaker_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2752,7 +2805,7 @@ bool PDH_status4_sticky_ch23_brownout_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_sticky_has_reset_encode(double value);
+uint8_t PDH_status_4_sticky_has_reset_fault_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2761,7 +2814,7 @@ uint8_t PDH_status4_sticky_has_reset_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_sticky_has_reset_decode(uint8_t value);
+double PDH_status_4_sticky_has_reset_fault_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2770,7 +2823,7 @@ double PDH_status4_sticky_has_reset_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_sticky_has_reset_is_in_range(uint8_t value);
+bool PDH_status_4_sticky_has_reset_fault_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -2779,7 +2832,7 @@ bool PDH_status4_sticky_has_reset_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_status4_total_current_encode(double value);
+uint8_t PDH_status_4_total_current_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2788,7 +2841,7 @@ uint8_t PDH_status4_total_current_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_status4_total_current_decode(uint8_t value);
+double PDH_status_4_total_current_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2797,10 +2850,550 @@ double PDH_status4_total_current_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_status4_total_current_is_in_range(uint8_t value);
+bool PDH_status_4_total_current_is_in_range(uint8_t value);
 
 /**
- * Pack message ClearFaults.
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch0_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch0_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch0_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch1_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch1_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch1_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch2_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch2_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch2_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch3_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch3_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch3_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch4_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch4_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch4_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch5_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch5_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch5_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch6_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch6_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch6_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch7_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch7_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch7_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch8_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch8_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch8_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch9_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch9_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch9_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch10_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch10_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch10_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch11_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch11_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch11_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch12_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch12_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch12_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch13_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch13_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch13_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch14_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch14_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch14_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch15_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch15_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch15_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch16_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch16_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch16_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch17_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch17_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch17_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch18_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch18_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch18_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_status_4_sticky_ch19_breaker_fault_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_status_4_sticky_ch19_breaker_fault_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_status_4_sticky_ch19_breaker_fault_is_in_range(uint8_t value);
+
+/**
+ * Pack message Clear_Faults.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -2814,7 +3407,7 @@ int PDH_clear_faults_pack(
     size_t size);
 
 /**
- * Unpack message ClearFaults.
+ * Unpack message Clear_Faults.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -2824,34 +3417,6 @@ int PDH_clear_faults_pack(
  */
 int PDH_clear_faults_unpack(
     struct PDH_clear_faults_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Pack message Identify.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int PDH_identify_pack(
-    uint8_t *dst_p,
-    const struct PDH_identify_t *src_p,
-    size_t size);
-
-/**
- * Unpack message Identify.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int PDH_identify_unpack(
-    struct PDH_identify_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -2971,7 +3536,7 @@ bool PDH_version_firmware_year_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t PDH_version_hardware_code_encode(double value);
+uint8_t PDH_version_hardware_minor_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -2980,7 +3545,7 @@ uint8_t PDH_version_hardware_code_encode(double value);
  *
  * @return Decoded signal.
  */
-double PDH_version_hardware_code_decode(uint8_t value);
+double PDH_version_hardware_minor_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -2989,7 +3554,34 @@ double PDH_version_hardware_code_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool PDH_version_hardware_code_is_in_range(uint8_t value);
+bool PDH_version_hardware_minor_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t PDH_version_hardware_major_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double PDH_version_hardware_major_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool PDH_version_hardware_major_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -3017,116 +3609,6 @@ double PDH_version_unique_id_decode(uint32_t value);
  * @return true if in range, false otherwise.
  */
 bool PDH_version_unique_id_is_in_range(uint32_t value);
-
-/**
- * Pack message ConfigureHRChannel.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int PDH_configure_hr_channel_pack(
-    uint8_t *dst_p,
-    const struct PDH_configure_hr_channel_t *src_p,
-    size_t size);
-
-/**
- * Unpack message ConfigureHRChannel.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int PDH_configure_hr_channel_unpack(
-    struct PDH_configure_hr_channel_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t PDH_configure_hr_channel_channel_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double PDH_configure_hr_channel_channel_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool PDH_configure_hr_channel_channel_is_in_range(uint8_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint16_t PDH_configure_hr_channel_period_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double PDH_configure_hr_channel_period_decode(uint16_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool PDH_configure_hr_channel_period_is_in_range(uint16_t value);
-
-/**
- * Pack message Enter_Bootloader.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int PDH_enter_bootloader_pack(
-    uint8_t *dst_p,
-    const struct PDH_enter_bootloader_t *src_p,
-    size_t size);
-
-/**
- * Unpack message Enter_Bootloader.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int PDH_enter_bootloader_unpack(
-    struct PDH_enter_bootloader_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
 
 
 #ifdef __cplusplus

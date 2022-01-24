@@ -9,6 +9,7 @@
 #include <memory>
 #include <random>
 
+#include <wpi/array.h>
 #include <wpi/numbers>
 
 #include "gtest/gtest.h"
@@ -106,7 +107,7 @@ class LinearFilterOutputTest
 TEST_P(LinearFilterOutputTest, Output) {
   double filterOutput = 0.0;
   for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    filterOutput = m_filter.Calculate(m_data(t.to<double>()));
+    filterOutput = m_filter.Calculate(m_data(t.value()));
   }
 
   RecordProperty("LinearFilterOutput", filterOutput);
@@ -120,34 +121,65 @@ INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                                          kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
-                   double max) {
+void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+                          double max) {
+  static_assert(Samples % 2 != 0, "Number of samples must be odd.");
+
+  // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
+  wpi::array<int, Samples> stencil{wpi::empty_array};
+  for (int i = 0; i < Samples; ++i) {
+    stencil[i] = -(Samples - 1) / 2 + i;
+  }
+
+  auto filter =
+      frc::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
+                                                                       h);
+
+  for (int i = min / h.value(); i < max / h.value(); ++i) {
+    // Let filter initialize
+    if (i < static_cast<int>(min / h.value()) + Samples) {
+      filter.Calculate(f(i * h.value()));
+      continue;
+    }
+
+    // For central finite difference, the derivative computed at this point is
+    // half the window size in the past.
+    // The order of accuracy is O(h^(N - d)) where N is number of stencil
+    // points and d is order of derivative
+    EXPECT_NEAR(dfdx((i - (Samples - 1) / 2) * h.value()),
+                filter.Calculate(f(i * h.value())),
+                std::pow(h.value(), Samples - Derivative));
+  }
+}
+
+template <int Derivative, int Samples, typename F, typename DfDx>
+void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+                           double max) {
   auto filter =
       frc::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
           h);
 
-  for (int i = min / h.to<double>(); i < max / h.to<double>(); ++i) {
+  for (int i = min / h.value(); i < max / h.value(); ++i) {
     // Let filter initialize
-    if (i < static_cast<int>(min / h.to<double>()) + Samples) {
-      filter.Calculate(f(i * h.to<double>()));
+    if (i < static_cast<int>(min / h.value()) + Samples) {
+      filter.Calculate(f(i * h.value()));
       continue;
     }
 
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx(i * h.to<double>()),
-                filter.Calculate(f(i * h.to<double>())),
-                10.0 * std::pow(h.to<double>(), Samples - Derivative));
+    EXPECT_NEAR(dfdx(i * h.value()), filter.Calculate(f(i * h.value())),
+                10.0 * std::pow(h.value(), Samples - Derivative));
   }
 }
 
 /**
- * Test backward finite difference.
+ * Test central finite difference.
  */
-TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
+TEST(LinearFilterOutputTest, CentralFiniteDifference) {
   constexpr auto h = 5_ms;
 
-  AssertResults<1, 2>(
+  AssertCentralResults<1, 3>(
       [](double x) {
         // f(x) = x²
         return x * x;
@@ -158,7 +190,7 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
       },
       h, -20.0, 20.0);
 
-  AssertResults<1, 2>(
+  AssertCentralResults<1, 3>(
       [](double x) {
         // f(x) = std::sin(x)
         return std::sin(x);
@@ -169,7 +201,7 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
       },
       h, -20.0, 20.0);
 
-  AssertResults<1, 2>(
+  AssertCentralResults<1, 3>(
       [](double x) {
         // f(x) = ln(x)
         return std::log(x);
@@ -180,7 +212,7 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
       },
       h, 1.0, 20.0);
 
-  AssertResults<2, 4>(
+  AssertCentralResults<2, 5>(
       [](double x) {
         // f(x) = x^2
         return x * x;
@@ -191,7 +223,7 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
       },
       h, -20.0, 20.0);
 
-  AssertResults<2, 4>(
+  AssertCentralResults<2, 5>(
       [](double x) {
         // f(x) = std::sin(x)
         return std::sin(x);
@@ -202,7 +234,80 @@ TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
       },
       h, -20.0, 20.0);
 
-  AssertResults<2, 4>(
+  AssertCentralResults<2, 5>(
+      [](double x) {
+        // f(x) = ln(x)
+        return std::log(x);
+      },
+      [](double x) {
+        // d²f/dx² = -1 / x²
+        return -1.0 / (x * x);
+      },
+      h, 1.0, 20.0);
+}
+
+/**
+ * Test backward finite difference.
+ */
+TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
+  constexpr auto h = 5_ms;
+
+  AssertBackwardResults<1, 2>(
+      [](double x) {
+        // f(x) = x²
+        return x * x;
+      },
+      [](double x) {
+        // df/dx = 2x
+        return 2.0 * x;
+      },
+      h, -20.0, 20.0);
+
+  AssertBackwardResults<1, 2>(
+      [](double x) {
+        // f(x) = std::sin(x)
+        return std::sin(x);
+      },
+      [](double x) {
+        // df/dx = std::cos(x)
+        return std::cos(x);
+      },
+      h, -20.0, 20.0);
+
+  AssertBackwardResults<1, 2>(
+      [](double x) {
+        // f(x) = ln(x)
+        return std::log(x);
+      },
+      [](double x) {
+        // df/dx = 1 / x
+        return 1.0 / x;
+      },
+      h, 1.0, 20.0);
+
+  AssertBackwardResults<2, 4>(
+      [](double x) {
+        // f(x) = x^2
+        return x * x;
+      },
+      [](double x) {
+        // d²f/dx² = 2
+        return 2.0;
+      },
+      h, -20.0, 20.0);
+
+  AssertBackwardResults<2, 4>(
+      [](double x) {
+        // f(x) = std::sin(x)
+        return std::sin(x);
+      },
+      [](double x) {
+        // d²f/dx² = -std::sin(x)
+        return -std::sin(x);
+      },
+      h, -20.0, 20.0);
+
+  AssertBackwardResults<2, 4>(
       [](double x) {
         // f(x) = ln(x)
         return std::log(x);

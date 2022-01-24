@@ -38,7 +38,7 @@ TEST_F(PIDInputOutputTest, IntegralGainOutput) {
     out = controller->Calculate(0.025, 0);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().to<double>(), out);
+  EXPECT_DOUBLE_EQ(-0.5 * controller->GetPeriod().value(), out);
 }
 
 TEST_F(PIDInputOutputTest, DerivativeGainOutput) {

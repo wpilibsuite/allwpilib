@@ -31,6 +31,9 @@ public class RomiDrivetrain {
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     resetEncoders();
+
+    // Invert right side since motor is flipped
+    m_rightMotor.setInverted(true);
   }
 
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {

@@ -35,7 +35,7 @@ class SPI {
    */
   explicit SPI(Port port);
 
-  ~SPI();
+  virtual ~SPI();
 
   SPI(SPI&&) = default;
   SPI& operator=(SPI&&) = default;
@@ -135,10 +135,12 @@ class SPI {
    * If the receive FIFO is empty, there is no active transfer, and initiate
    * is false, errors.
    *
-   * @param initiate If true, this function pushes "0" into the transmit buffer
-   *                 and initiates a transfer. If false, this function assumes
-   *                 that data is already in the receive FIFO from a previous
-   *                 write.
+   * @param initiate     If true, this function pushes "0" into the transmit
+   *                     buffer and initiates a transfer. If false, this
+   *                     function assumes that data is already in the receive
+   *                     FIFO from a previous write.
+   * @param dataReceived Buffer to receive data from the device
+   * @param size         The length of the transaction, in bytes
    */
   virtual int Read(bool initiate, uint8_t* dataReceived, int size);
 
@@ -268,17 +270,17 @@ class SPI {
   /**
    * Initialize the accumulator.
    *
-   * @param period    Time between reads
-   * @param cmd       SPI command to send to request data
-   * @param xferSize  SPI transfer size, in bytes
-   * @param validMask Mask to apply to received data for validity checking
-   * @param validData After valid_mask is applied, required matching value for
-   *                  validity checking
-   * @param dataShift Bit shift to apply to received data to get actual data
-   *                  value
-   * @param dataSize  Size (in bits) of data field
-   * @param isSigned  Is data field signed?
-   * @param bigEndian Is device big endian?
+   * @param period     Time between reads
+   * @param cmd        SPI command to send to request data
+   * @param xferSize   SPI transfer size, in bytes
+   * @param validMask  Mask to apply to received data for validity checking
+   * @param validValue After valid_mask is applied, required matching value for
+   *                   validity checking
+   * @param dataShift  Bit shift to apply to received data to get actual data
+   *                   value
+   * @param dataSize   Size (in bits) of data field
+   * @param isSigned   Is data field signed?
+   * @param bigEndian  Is device big endian?
    */
   void InitAccumulator(units::second_t period, int cmd, int xferSize,
                        int validMask, int validValue, int dataShift,
@@ -292,17 +294,17 @@ class SPI {
    * -->         xferSize, int validMask, int validValue, int dataShift, <!--
    * -->         int dataSize, bool isSigned, bool bigEndian)
    *
-   * @param period    Time between reads
-   * @param cmd       SPI command to send to request data
-   * @param xferSize  SPI transfer size, in bytes
-   * @param validMask Mask to apply to received data for validity checking
-   * @param validData After valid_mask is applied, required matching value for
-   *                  validity checking
-   * @param dataShift Bit shift to apply to received data to get actual data
-   *                  value
-   * @param dataSize  Size (in bits) of data field
-   * @param isSigned  Is data field signed?
-   * @param bigEndian Is device big endian?
+   * @param period     Time between reads
+   * @param cmd        SPI command to send to request data
+   * @param xferSize   SPI transfer size, in bytes
+   * @param validMask  Mask to apply to received data for validity checking
+   * @param validValue After valid_mask is applied, required matching value for
+   *                   validity checking
+   * @param dataShift  Bit shift to apply to received data to get actual data
+   *                   value
+   * @param dataSize   Size (in bits) of data field
+   * @param isSigned   Is data field signed?
+   * @param bigEndian  Is device big endian?
    */
   WPI_DEPRECATED("Use InitAccumulator with unit-safety instead")
   void InitAccumulator(double period, int cmd, int xferSize, int validMask,

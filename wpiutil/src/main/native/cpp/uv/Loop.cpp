@@ -51,12 +51,12 @@ void Loop::Close() {
   }
 }
 
-void Loop::Walk(std::function<void(Handle&)> callback) {
+void Loop::Walk(function_ref<void(Handle&)> callback) {
   uv_walk(
       m_loop,
       [](uv_handle_t* handle, void* func) {
         auto& h = *static_cast<Handle*>(handle->data);
-        auto& f = *static_cast<std::function<void(Handle&)>*>(func);
+        auto& f = *static_cast<function_ref<void(Handle&)>*>(func);
         f(h);
       },
       &callback);

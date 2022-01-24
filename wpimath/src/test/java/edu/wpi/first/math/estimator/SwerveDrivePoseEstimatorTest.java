@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-public class SwerveDrivePoseEstimatorTest {
+class SwerveDrivePoseEstimatorTest {
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testAccuracy() {
+  void testAccuracy() {
     var kinematics =
         new SwerveDriveKinematics(
             new Translation2d(1, 1),

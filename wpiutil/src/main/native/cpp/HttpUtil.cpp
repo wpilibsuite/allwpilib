@@ -232,7 +232,7 @@ bool FindMultipartBoundary(raw_istream& is, std::string_view boundary,
 
     // Did we find the boundary?
     if (searchBuf[0] == '-' && searchBuf[1] == '-' &&
-        searchBuf.substr(2) == boundary) {
+        wpi::substr(searchBuf, 2) == boundary) {
       return true;
     }
 

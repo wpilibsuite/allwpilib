@@ -54,7 +54,7 @@ class WPILIB_DLLEXPORT HolonomicDriveController {
    * Sets the pose error which is considered tolerable for use with
    * AtReference().
    *
-   * @param poseTolerance Pose error which is tolerable.
+   * @param tolerance Pose error which is tolerable.
    */
   void SetTolerance(const Pose2d& tolerance);
 

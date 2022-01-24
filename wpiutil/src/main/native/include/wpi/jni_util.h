@@ -26,15 +26,27 @@
 /** Java Native Interface (JNI) utility functions */
 namespace wpi::java {
 
-// Gets a Java stack trace.  Also provides the last function
-// in the stack trace not starting with excludeFuncPrefix (useful for e.g.
-// finding the first user call to a series of library functions).
+/**
+ * Gets a Java stack trace.
+ *
+ * Also provides the last function in the stack trace not starting with
+ * excludeFuncPrefix (useful for e.g. finding the first user call to a series of
+ * library functions).
+ *
+ * @param env JRE environment.
+ * @param func Storage for last function in the stack trace not starting with
+ *             excludeFuncPrefix.
+ * @param excludeFuncPrefix Prefix for functions to ignore in stack trace.
+ */
 std::string GetJavaStackTrace(JNIEnv* env, std::string* func = nullptr,
                               std::string_view excludeFuncPrefix = {});
 
-// Finds a class and keep it as a global reference.
-// Use with caution, as the destructor does NOT call DeleteGlobalRef due
-// to potential shutdown issues with doing so.
+/**
+ * Finds a class and keeps it as a global reference.
+ *
+ * Use with caution, as the destructor does NOT call DeleteGlobalRef due to
+ * potential shutdown issues with doing so.
+ */
 class JClass {
  public:
   JClass() = default;
@@ -92,8 +104,11 @@ class JGlobal {
   T m_cls = nullptr;
 };
 
-// Container class for cleaning up Java local references.
-// The destructor calls DeleteLocalRef.
+/**
+ * Container class for cleaning up Java local references.
+ *
+ * The destructor calls DeleteLocalRef.
+ */
 template <typename T>
 class JLocal {
  public:
@@ -126,9 +141,12 @@ class JLocal {
 // Conversions from Java objects to C++
 //
 
-// Java string (jstring) reference.  The string is provided as UTF8.
-// This is not actually a reference, as it makes a copy of the string
-// characters, but it's named this way for consistency.
+/**
+ * Java string (jstring) reference.
+ *
+ * The string is provided as UTF8. This is not actually a reference, as it makes
+ * a copy of the string characters, but it's named this way for consistency.
+ */
 class JStringRef {
  public:
   JStringRef(JNIEnv* env, jstring str) {
@@ -163,7 +181,9 @@ namespace detail {
 template <typename C, typename T>
 class JArrayRefInner {};
 
-// Specialization of JArrayRefBase to provide std::string_view conversion.
+/**
+ * Specialization of JArrayRefBase to provide std::string_view conversion.
+ */
 template <typename C>
 class JArrayRefInner<C, jbyte> {
  public:
@@ -178,7 +198,9 @@ class JArrayRefInner<C, jbyte> {
   }
 };
 
-// Base class for J*ArrayRef and CriticalJ*ArrayRef
+/**
+ * Base class for J*ArrayRef and CriticalJ*ArrayRef
+ */
 template <typename T>
 class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
  public:
@@ -329,7 +351,12 @@ WPI_JNI_JARRAYREF(jdouble, Double)
 // Conversions from C++ to Java objects
 //
 
-// Convert a UTF8 string into a jstring.
+/**
+ * Convert a UTF8 string into a jstring.
+ *
+ * @param env JRE environment.
+ * @param str String to convert.
+ */
 inline jstring MakeJString(JNIEnv* env, std::string_view str) {
   SmallVector<UTF16, 128> chars;
   convertUTF8ToUTF16String(str, chars);
@@ -339,9 +366,12 @@ inline jstring MakeJString(JNIEnv* env, std::string_view str) {
 // details for MakeJIntArray
 namespace detail {
 
-// Slow path (get primitive array and set individual elements).  This
-// is used if the input type is not an integer of the same size (note
-// signed/unsigned is ignored).
+/**
+ * Slow path (get primitive array and set individual elements).
+ *
+ * This is used if the input type is not an integer of the same size (note
+ * signed/unsigned is ignored).
+ */
 template <typename T,
           bool = (std::is_integral<T>::value && sizeof(jint) == sizeof(T))>
 struct ConvertIntArray {
@@ -363,7 +393,9 @@ struct ConvertIntArray {
   }
 };
 
-// Fast path (use SetIntArrayRegion)
+/**
+ * Fast path (use SetIntArrayRegion).
+ */
 template <typename T>
 struct ConvertIntArray<T, true> {
   static jintArray ToJava(JNIEnv* env, span<const T> arr) {
@@ -379,32 +411,62 @@ struct ConvertIntArray<T, true> {
 
 }  // namespace detail
 
-// Convert an span to a jintArray.
+/**
+ * Convert a span to a jintArray.
+ *
+ * @param env JRE environment.
+ * @param arr Span to convert.
+ */
 template <typename T>
 inline jintArray MakeJIntArray(JNIEnv* env, span<const T> arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
+/**
+ * Convert a span to a jintArray.
+ *
+ * @param env JRE environment.
+ * @param arr Span to convert.
+ */
 template <typename T>
 inline jintArray MakeJIntArray(JNIEnv* env, span<T> arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
-// Convert a SmallVector to a jintArray.  This is required in addition to
-// ArrayRef because template resolution occurs prior to implicit conversions.
+/**
+ * Convert a SmallVector to a jintArray.
+ *
+ * This is required in addition to ArrayRef because template resolution occurs
+ * prior to implicit conversions.
+ *
+ * @param env JRE environment.
+ * @param arr SmallVector to convert.
+ */
 template <typename T>
 inline jintArray MakeJIntArray(JNIEnv* env, const SmallVectorImpl<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
-// Convert a std::vector to a jintArray.  This is required in addition to
-// ArrayRef because template resolution occurs prior to implicit conversions.
+/**
+ * Convert a std::vector to a jintArray.
+ *
+ * This is required in addition to ArrayRef because template resolution occurs
+ * prior to implicit conversions.
+ *
+ * @param env JRE environment.
+ * @param arr SmallVector to convert.
+ */
 template <typename T>
 inline jintArray MakeJIntArray(JNIEnv* env, const std::vector<T>& arr) {
   return detail::ConvertIntArray<T>::ToJava(env, arr);
 }
 
-// Convert a std::string_view into a jbyteArray.
+/**
+ * Convert a std::string_view into a jbyteArray.
+ *
+ * @param env JRE environment.
+ * @param str std::string_view to convert.
+ */
 inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
   jbyteArray jarr = env->NewByteArray(str.size());
   if (!jarr) {
@@ -415,7 +477,12 @@ inline jbyteArray MakeJByteArray(JNIEnv* env, std::string_view str) {
   return jarr;
 }
 
-// Convert an array of integers into a jbooleanArray.
+/**
+ * Convert an array of integers into a jbooleanArray.
+ *
+ * @param env JRE environment.
+ * @param arr Array to convert.
+ */
 inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const int> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
@@ -433,7 +500,12 @@ inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const int> arr) {
   return jarr;
 }
 
-// Convert an array of booleans into a jbooleanArray.
+/**
+ * Convert an array of booleans into a jbooleanArray.
+ *
+ * @param env JRE environment.
+ * @param arr Array to convert.
+ */
 inline jbooleanArray MakeJBooleanArray(JNIEnv* env, span<const bool> arr) {
   jbooleanArray jarr = env->NewBooleanArray(arr.size());
   if (!jarr) {
@@ -472,7 +544,12 @@ WPI_JNI_MAKEJARRAY(jdouble, Double)
 
 #undef WPI_JNI_MAKEJARRAY
 
-// Convert an array of std::string into a jarray of jstring.
+/**
+ * Convert an array of std::string into a jarray of jstring.
+ *
+ * @param env JRE environment.
+ * @param arr Array to convert.
+ */
 inline jobjectArray MakeJStringArray(JNIEnv* env, span<const std::string> arr) {
   static JClass stringCls{env, "java/lang/String"};
   if (!stringCls) {
@@ -489,21 +566,45 @@ inline jobjectArray MakeJStringArray(JNIEnv* env, span<const std::string> arr) {
   return jarr;
 }
 
-// Generic callback thread implementation.
-//
-// JNI's AttachCurrentThread() creates a Java Thread object on every
-// invocation, which is both time inefficient and causes issues with Eclipse
-// (which tries to keep a thread list up-to-date and thus gets swamped).
-//
-// Instead, this class attaches just once.  When a hardware notification
-// occurs, a condition variable wakes up this thread and this thread actually
-// makes the call into Java.
-//
-// The template parameter T is the message being passed to the callback, but
-// also needs to provide the following functions:
-//  static JavaVM* GetJVM();
-//  static const char* GetName();
-//  void CallJava(JNIEnv *env, jobject func, jmethodID mid);
+/**
+ * Convert an array of std::string into a jarray of jstring.
+ *
+ * @param env JRE environment.
+ * @param arr Array to convert.
+ */
+inline jobjectArray MakeJStringArray(JNIEnv* env, span<std::string_view> arr) {
+  static JClass stringCls{env, "java/lang/String"};
+  if (!stringCls) {
+    return nullptr;
+  }
+  jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
+  if (!jarr) {
+    return nullptr;
+  }
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jstring> elem{env, MakeJString(env, arr[i])};
+    env->SetObjectArrayElement(jarr, i, elem.obj());
+  }
+  return jarr;
+}
+
+/**
+ * Generic callback thread implementation.
+ *
+ * JNI's AttachCurrentThread() creates a Java Thread object on every
+ * invocation, which is both time inefficient and causes issues with Eclipse
+ * (which tries to keep a thread list up-to-date and thus gets swamped).
+ *
+ * Instead, this class attaches just once.  When a hardware notification
+ * occurs, a condition variable wakes up this thread and this thread actually
+ * makes the call into Java.
+ *
+ * The template parameter T is the message being passed to the callback, but
+ * also needs to provide the following functions:
+ *  static JavaVM* GetJVM();
+ *  static const char* GetName();
+ *  void CallJava(JNIEnv *env, jobject func, jmethodID mid);
+ */
 template <typename T>
 class JCallbackThread : public SafeThread {
  public:
@@ -759,10 +860,13 @@ inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
   return oss.str();
 }
 
-// Finds an exception class and keep it as a global reference.
-// Similar to JClass, but provides Throw methods.
-// Use with caution, as the destructor does NOT call DeleteGlobalRef due
-// to potential shutdown issues with doing so.
+/**
+ * Finds an exception class and keep it as a global reference.
+ *
+ * Similar to JClass, but provides Throw methods. Use with caution, as the
+ * destructor does NOT call DeleteGlobalRef due to potential shutdown issues
+ * with doing so.
+ */
 class JException : public JClass {
  public:
   JException() = default;

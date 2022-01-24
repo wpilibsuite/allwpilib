@@ -98,11 +98,11 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   if (*status != 0) {
     if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", channel,
+      hal::SetLastErrorPreviouslyAllocated(status, "PWM or DIO", origChannel,
                                            port->previousAllocation);
     } else {
       hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for PWM", 0,
-                                       kNumPWMChannels, channel);
+                                       kNumPWMChannels, origChannel);
     }
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
   }

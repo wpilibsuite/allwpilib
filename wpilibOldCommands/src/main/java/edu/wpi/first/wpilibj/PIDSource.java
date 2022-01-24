@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj;
 /**
  * This interface allows for PIDController to automatically read from this object.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use DoubleSupplier and new PIDController class.
  */
 @Deprecated(since = "2020", forRemoval = true)

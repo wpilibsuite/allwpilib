@@ -12,7 +12,16 @@
 
 static units::second_t now = 0_s;
 
-TEST(SlewRateLimiterTest, SlewRateLimit) {
+class SlewRateLimiterTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+  }
+
+  void TearDown() override { WPI_SetNowImpl(nullptr); }
+};
+
+TEST_F(SlewRateLimiterTest, SlewRateLimit) {
   WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
 
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
@@ -22,9 +31,7 @@ TEST(SlewRateLimiterTest, SlewRateLimit) {
   EXPECT_LT(limiter.Calculate(2_m), 2_m);
 }
 
-TEST(SlewRateLimiterTest, SlewRateNoLimit) {
-  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
-
+TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 
   now += 1_s;

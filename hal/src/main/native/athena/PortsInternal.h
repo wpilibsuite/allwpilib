@@ -36,5 +36,7 @@ constexpr int32_t kNumREVPDHModules = 63;
 constexpr int32_t kNumREVPDHChannels = 24;
 constexpr int32_t kNumDutyCycles = tDutyCycle::kNumSystems;
 constexpr int32_t kNumAddressableLEDs = tLED::kNumSystems;
+constexpr int32_t kNumREVPHModules = 63;
+constexpr int32_t kNumREVPHChannels = 16;
 
 }  // namespace hal

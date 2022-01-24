@@ -8,6 +8,13 @@
 
 namespace frc {
 
+/**
+ * This Button is intended to be used within a program. The programmer can
+ * manually set its value. Also includes a setting for whether or not it should
+ * invert its value.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class InternalButton : public Button {
  public:
   InternalButton() = default;

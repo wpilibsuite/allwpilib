@@ -68,6 +68,10 @@ void Robot::TestInit() {}
 
 void Robot::TestPeriodic() {}
 
+void Robot::SimulationInit() {}
+
+void Robot::SimulationPeriodic() {}
+
 #ifndef RUNNING_FRC_TESTS
 int main() {
   return frc::StartRobot<Robot>();

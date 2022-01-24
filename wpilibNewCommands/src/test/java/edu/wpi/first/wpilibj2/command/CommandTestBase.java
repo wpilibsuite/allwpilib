@@ -13,7 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 
 /** Basic setup for all {@link Command tests}." */
-public abstract class CommandTestBase {
+public class CommandTestBase {
   protected CommandTestBase() {}
 
   @BeforeEach

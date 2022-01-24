@@ -232,14 +232,14 @@ static bool DIOAnyInitialized() {
 }
 
 void DIOSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "DIO", DIOAnyInitialized, [] { return std::make_unique<DIOsSimModel>(); },
       [](glass::Window* win, glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(470, 20);
         return glass::MakeFunctionView([=] {
           glass::DisplayDIOs(static_cast<DIOsSimModel*>(model),
-                             HALSimGui::halProvider.AreOutputsEnabled());
+                             HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

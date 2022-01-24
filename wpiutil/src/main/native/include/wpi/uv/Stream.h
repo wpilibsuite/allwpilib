@@ -11,6 +11,7 @@
 #include <functional>
 #include <initializer_list>
 #include <memory>
+#include <utility>
 
 #include "wpi/Signal.h"
 #include "wpi/span.h"
@@ -180,7 +181,7 @@ class Stream : public Handle {
    */
   void Write(std::initializer_list<Buffer> bufs,
              std::function<void(span<Buffer>, Error)> callback) {
-    Write({bufs.begin(), bufs.end()}, callback);
+    Write({bufs.begin(), bufs.end()}, std::move(callback));
   }
 
   /**

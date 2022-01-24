@@ -82,17 +82,38 @@ class static_circular_buffer {
     size_t m_index;
   };
 
+  /**
+   * Returns begin iterator.
+   */
   iterator begin() { return iterator(this, 0); }
+
+  /**
+   * Returns end iterator.
+   */
   iterator end() {
     return iterator(this, ::wpi::static_circular_buffer<T, N>::size());
   }
 
+  /**
+   * Returns begin iterator.
+   */
   const_iterator begin() const { return const_iterator(this, 0); }
+
+  /**
+   * Returns end iterator.
+   */
   const_iterator end() const {
     return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
   }
 
+  /**
+   * Returns begin iterator.
+   */
   const_iterator cbegin() const { return const_iterator(this, 0); }
+
+  /**
+   * Returns end iterator.
+   */
   const_iterator cend() const {
     return const_iterator(this, ::wpi::static_circular_buffer<T, N>::size());
   }

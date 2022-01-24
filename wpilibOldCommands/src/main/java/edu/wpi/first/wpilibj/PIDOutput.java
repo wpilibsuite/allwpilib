@@ -7,6 +7,8 @@ package edu.wpi.first.wpilibj;
 /**
  * This interface allows PIDController to write it's results to its output.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @deprecated Use DoubleConsumer and new PIDController class.
  */
 @FunctionalInterface

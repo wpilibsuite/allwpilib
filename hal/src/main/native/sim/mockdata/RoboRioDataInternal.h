@@ -24,6 +24,7 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults6V)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults5V)
   HAL_SIMDATAVALUE_DEFINE_NAME(UserFaults3V3)
+  HAL_SIMDATAVALUE_DEFINE_NAME(BrownoutVoltage)
 
  public:
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetFPGAButtonName> fpgaButton{false};
@@ -46,6 +47,8 @@ class RoboRioData {
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults6VName> userFaults6V{0};
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults5VName> userFaults5V{0};
   SimDataValue<int32_t, HAL_MakeInt, GetUserFaults3V3Name> userFaults3V3{0};
+  SimDataValue<double, HAL_MakeDouble, GetBrownoutVoltageName> brownoutVoltage{
+      6.75};
 
   virtual void ResetData();
 };

@@ -68,6 +68,11 @@ public class Drivetrain {
   /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
     m_gyro.reset();
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+    m_frontRightMotor.setInverted(true);
+    m_backRightMotor.setInverted(true);
   }
 
   /**
@@ -128,7 +133,7 @@ public class Drivetrain {
             fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
-    mecanumDriveWheelSpeeds.normalize(kMaxSpeed);
+    mecanumDriveWheelSpeeds.desaturate(kMaxSpeed);
     setSpeeds(mecanumDriveWheelSpeeds);
   }
 

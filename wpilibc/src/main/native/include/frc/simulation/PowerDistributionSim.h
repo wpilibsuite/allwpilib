@@ -140,7 +140,8 @@ class PowerDistributionSim {
    *
    * @param currents output array; set to the current in each channel. The
    *                 array must be big enough to hold all the PowerDistribution
-   * channels
+   *                 channels
+   * @param length   length of output array
    */
   void GetAllCurrents(double* currents, int length) const;
 
@@ -149,7 +150,8 @@ class PowerDistributionSim {
    *
    * @param currents array containing the current values for each channel. The
    *                 array must be big enough to hold all the PowerDistribution
-   * channels
+   *                 channels
+   * @param length   length of array
    */
   void SetAllCurrents(const double* currents, int length);
 

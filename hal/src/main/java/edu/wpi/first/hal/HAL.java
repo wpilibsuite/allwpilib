@@ -196,8 +196,8 @@ public final class HAL extends JNIWrapper {
   @SuppressWarnings("MissingJavadocMethod")
   public static native boolean waitForDSDataTimeout(double timeout);
 
-  public static int kMaxJoystickAxes = 12;
-  public static int kMaxJoystickPOVs = 12;
+  public static final int kMaxJoystickAxes = 12;
+  public static final int kMaxJoystickPOVs = 12;
 
   public static native short getJoystickAxes(byte joystickNum, float[] axesArray);
 

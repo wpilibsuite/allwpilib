@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <frc/fmt/Eigen.h>
+
+#include <string>
+
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
@@ -16,6 +20,7 @@
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
 #include "unsupported/Eigen/MatrixFunctions"
+#include "wpimath/MathShared.h"
 
 namespace frc {
 namespace detail {
@@ -27,6 +32,9 @@ namespace detail {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
 class LinearQuadraticRegulatorImpl {
@@ -82,6 +90,16 @@ class LinearQuadraticRegulatorImpl {
     Eigen::Matrix<double, States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
 
+    if (!IsStabilizable<States, Inputs>(discA, discB)) {
+      std::string msg = fmt::format(
+          "The system passed to the LQR is uncontrollable!\n\nA =\n{}\nB "
+          "=\n{}\n",
+          discA, discB);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
     Eigen::Matrix<double, States, States> S =
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
 
@@ -117,7 +135,7 @@ class LinearQuadraticRegulatorImpl {
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    m_K = (B.transpose() * S * B + R)
+    m_K = (discB.transpose() * S * discB + R)
               .llt()
               .solve(discB.transpose() * S * discA + N.transpose());
 
@@ -251,6 +269,7 @@ class LinearQuadraticRegulator
   /**
    * Constructs a controller with the given coefficients and plant.
    *
+   * @tparam Outputs The number of outputs.
    * @param plant  The plant being controlled.
    * @param Qelems The maximum desired error tolerance for each state.
    * @param Relems The maximum desired control effort for each input.

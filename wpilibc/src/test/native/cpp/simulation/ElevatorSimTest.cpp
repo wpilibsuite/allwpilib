@@ -41,7 +41,7 @@ TEST(ElevatorSimTest, StateSpaceSim) {
     encoderSim.SetDistance(y(0));
   }
 
-  EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().to<double>(), 0.2);
+  EXPECT_NEAR(controller.GetSetpoint(), sim.GetPosition().value(), 0.2);
 }
 
 TEST(ElevatorSimTest, MinMax) {

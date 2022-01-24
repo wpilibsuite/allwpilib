@@ -11,6 +11,8 @@ import java.util.List;
  * A CommandGroups that runs a list of commands in sequence.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class SequentialCommandGroup extends CommandGroupBase {
   private final List<Command> m_commands = new ArrayList<>();

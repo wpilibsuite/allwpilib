@@ -61,7 +61,9 @@ generatedFileExclude {
   src/main/native/include/wpi/raw_ostream\.h$
   src/main/native/include/wpi/span\.h$
   src/main/native/include/wpi/fs\.h$
+  src/main/native/include/wpi/mpack\.h$
   src/main/native/cpp/fs\.cpp$
+  src/main/native/cpp/mpack\.cpp$
   src/main/native/include/wpi/ghc/
   src/test/native/cpp/span/
   src/main/native/include/wpi/type_traits\.h$
@@ -75,6 +77,7 @@ generatedFileExclude {
   src/main/native/resources/
   src/test/native/cpp/llvm/
   src/main/native/windows/StackWalker
+  src/main/native/linux/AvahiClient
 }
 
 licenseUpdateExclude {

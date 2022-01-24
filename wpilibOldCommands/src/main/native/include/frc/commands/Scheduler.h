@@ -15,6 +15,18 @@ class ButtonScheduler;
 class Command;
 class Subsystem;
 
+/**
+ * The Scheduler is a singleton which holds the top-level running commands. It
+ * is in charge of both calling the command's run() method and to make sure that
+ * there are no two commands with conflicting requirements running.
+ *
+ * It is fine if teams wish to take control of the Scheduler themselves, all
+ * that needs to be done is to call frc::Scheduler::getInstance()->run() often
+ * to have Commands function correctly. However, this is already done for you if
+ * you use the CommandBased Robot template.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
  public:
   /**
@@ -42,7 +54,7 @@ class Scheduler : public nt::NTSendable, public wpi::SendableHelper<Scheduler> {
    *
    * All Subsystems should call this.
    *
-   * @param system the system
+   * @param subsystem the system
    */
   void RegisterSubsystem(Subsystem* subsystem);
 

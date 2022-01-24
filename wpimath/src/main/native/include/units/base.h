@@ -366,6 +366,7 @@ template<> inline constexpr const char* abbreviation(const namespaceName::nameSi
 	namespace traits\
 	{\
 		template<typename... T> struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::all_true<units::traits::detail::is_ ## unitCategory ## _unit_impl<std::decay_t<T>>::value...>::value> {};\
+		template<typename... T> inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T...>::value;\
 	}
 #else
 #define UNIT_ADD_IS_UNIT_CATEGORY_TRAIT(unitCategory)\
@@ -375,6 +376,8 @@ template<> inline constexpr const char* abbreviation(const namespaceName::nameSi
 			struct is_ ## unitCategory ## _unit : std::integral_constant<bool, units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T1>::type>::value &&\
 				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T2>::type>::value &&\
 				units::traits::detail::is_ ## unitCategory ## _unit_impl<typename std::decay<T3>::type>::value>{};\
+			template<typename T1, typename T2 = T1, typename T3 = T1>\
+			inline constexpr bool is_ ## unitCategory ## _unit_v = is_ ## unitCategory ## _unit<T1, T2, T3>::value;\
 	}
 #endif
 
@@ -589,6 +592,8 @@ namespace units
 			has_num<T>::value &&
 			has_den<T>::value>
 		{};
+		template<class T>
+		inline constexpr bool is_ratio_v = is_ratio<T>::value;
 	}
 
 	//------------------------------
@@ -613,6 +618,8 @@ namespace units
 	 */
 	template<bool... Args>
 	struct all_true : std::is_same<units::bool_pack<true, Args...>, units::bool_pack<Args..., true>> {};
+	template<bool... Args>
+	inline constexpr bool all_true_t_v = all_true<Args...>::type::value;
 	/** @endcond */	// DOXYGEN IGNORE
 
 	/**
@@ -713,6 +720,8 @@ namespace units
 		 */
 		template<class T>
 		struct is_unit : std::is_base_of<units::detail::_unit, T>::type {};
+		template<class T>
+		inline constexpr bool is_unit_v = is_unit<T>::value;
 	}
 
 	/** @} */ // end of TypeTraits
@@ -1521,6 +1530,8 @@ namespace units
 		template<class U1, class U2>
 		struct is_convertible_unit : std::is_same <traits::base_unit_of<typename units::traits::unit_traits<U1>::base_unit_type>,
 			base_unit_of<typename units::traits::unit_traits<U2>::base_unit_type >> {};
+		template<class U1, class U2>
+		inline constexpr bool is_convertible_unit_v = is_convertible_unit<U1, U2>::value;
 	}
 
 	//------------------------------
@@ -1714,6 +1725,8 @@ namespace units
 		 */
 		template<class T, class Ret>
 		struct has_value_member : traits::detail::has_value_member_impl<T, Ret>::type {};
+		template<class T, class Ret>
+		inline constexpr bool has_value_member_v = has_value_member<T, Ret>::value;
 	}
 	/** @endcond */	// END DOXYGEN IGNORE
 
@@ -1852,6 +1865,8 @@ namespace units
 		 */
 		template<class T>
 		struct is_unit_t : std::is_base_of<units::detail::_unit_t, T>::type {};
+		template<class T>
+		inline constexpr bool is_unit_t_v = is_unit_t<T>::value;
 	}
 
 	/**
@@ -2401,12 +2416,16 @@ namespace units
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
 		struct has_linear_scale : std::integral_constant<bool, units::all_true<std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value > {};
+		template<typename... T>
+		inline constexpr bool has_linear_scale_v = has_linear_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_linear_scale : std::integral_constant<bool,
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
 			std::is_base_of<units::linear_scale<typename units::traits::unit_t_traits<T3>::underlying_type>, T3>::value> {};
+		template<typename T1, typename T2 = T1, typename T3 = T1>
+		inline constexpr bool has_linear_scale_v = has_linear_scale<T1, T2, T3>::value;
 #endif
 
 		/**
@@ -2419,12 +2438,16 @@ namespace units
 #if !defined(_MSC_VER) || _MSC_VER > 1800	// bug in VS2013 prevents this from working
 		template<typename... T>
 		struct has_decibel_scale : std::integral_constant<bool,	units::all_true<std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T>::underlying_type>, T>::value...>::value> {};
+		template<typename... T>
+		inline constexpr bool has_decibel_scale_v = has_decibel_scale<T...>::value;
 #else
 		template<typename T1, typename T2 = T1, typename T3 = T1>
 		struct has_decibel_scale : std::integral_constant<bool,
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T1>::underlying_type>, T1>::value &&
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T2>::value &&
 			std::is_base_of<units::decibel_scale<typename units::traits::unit_t_traits<T2>::underlying_type>, T3>::value> {};
+		template<typename T1, typename T2 = T1, typename T3 = T1>
+		inline constexpr bool has_decibel_scale_v = has_decibel_scale<T1, T2, T3>::value;
 #endif
 
 		/**
@@ -2439,6 +2462,8 @@ namespace units
 		struct is_same_scale : std::integral_constant<bool,
 			std::is_same<typename units::traits::unit_t_traits<T1>::non_linear_scale_type, typename units::traits::unit_t_traits<T2>::non_linear_scale_type>::value>
 		{};
+		template<typename T1, typename T2>
+		inline constexpr bool is_same_scale_v = is_same_scale<T1, T2>::value;
 	}
 
 	//----------------------------------
@@ -3033,6 +3058,8 @@ namespace dimensionless {
 		struct is_unit_value_t : std::integral_constant<bool,
 			std::is_base_of<units::detail::_unit_value_t<Units>, T>::value>
 		{};
+		template<typename T, typename Units = typename traits::unit_value_t_traits<T>::unit_type>
+		inline constexpr bool is_unit_value_t_v = is_unit_value_t<T, Units>::value;
 
 		/**
 		 * @ingroup		TypeTraits
@@ -3045,6 +3072,8 @@ namespace dimensionless {
 		{
 			static_assert(is_base_unit<Category>::value, "Template parameter `Category` must be a `base_unit` type.");
 		};
+		template<typename Category, typename T>
+		inline constexpr bool is_unit_value_t_category_v = is_unit_value_t_category<Category, T>::value;
 	}
 
 	/** @cond */	// DOXYGEN IGNORE

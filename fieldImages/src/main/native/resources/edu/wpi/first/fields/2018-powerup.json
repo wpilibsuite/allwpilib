@@ -1,0 +1,10 @@
+{
+  "game": "FIRST Power Up",
+  "field-image": "2018-field.jpg",
+  "field-corners": {
+    "top-left": [125, 20],
+    "bottom-right": [827, 370]
+  },
+  "field-size": [54, 27],
+  "field-unit": "feet"
+}

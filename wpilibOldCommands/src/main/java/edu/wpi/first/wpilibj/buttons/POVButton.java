@@ -6,7 +6,11 @@ package edu.wpi.first.wpilibj.buttons;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-/** A {@link Button} that gets its state from a POV on a {@link GenericHID}. */
+/**
+ * A {@link Button} that gets its state from a POV on a {@link GenericHID}.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ */
 public class POVButton extends Button {
   private final GenericHID m_joystick;
   private final int m_angle;

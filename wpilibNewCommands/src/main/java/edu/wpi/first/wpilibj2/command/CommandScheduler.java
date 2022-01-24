@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  * synchronously from the main loop. Subsystems should be registered with the scheduler using {@link
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public final class CommandScheduler implements NTSendable, AutoCloseable {
   /** The Singleton Instance. */
@@ -170,7 +172,7 @@ public final class CommandScheduler implements NTSendable, AutoCloseable {
     // Do nothing if the scheduler is disabled, the robot is disabled and the command doesn't
     // run when disabled, or the command is already scheduled.
     if (m_disabled
-        || (RobotState.isDisabled() && !command.runsWhenDisabled())
+        || RobotState.isDisabled() && !command.runsWhenDisabled()
         || m_scheduledCommands.containsKey(command)) {
       return;
     }

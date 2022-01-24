@@ -17,7 +17,7 @@ NTSpeedControllerModel::NTSpeedControllerModel(NT_Inst instance,
     : m_nt(instance),
       m_value(m_nt.GetEntry(fmt::format("{}/Value", path))),
       m_name(m_nt.GetEntry(fmt::format("{}/.name", path))),
-      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable"))),
+      m_controllable(m_nt.GetEntry(fmt::format("{}/.controllable", path))),
       m_valueData(fmt::format("NT_SpdCtrl:{}", path)),
       m_nameValue(wpi::rsplit(path, '/').second) {
   m_nt.AddListener(m_value);

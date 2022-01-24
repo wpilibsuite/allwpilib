@@ -7,6 +7,8 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/StringExtras.h>
+
 #include "TestPrinters.h"
 #include "WireEncoder.h"
 #include "gtest/gtest.h"
@@ -84,7 +86,7 @@ TEST_F(WireEncoderTest, Write8) {
   e.Write8(0x101u);  // should be truncated
   e.Write8(0u);
   ASSERT_EQ(3u, e.size() - off);
-  ASSERT_EQ("\x05\x01\x00"sv, std::string_view(e.data(), e.size()).substr(off));
+  ASSERT_EQ("\x05\x01\x00"sv, wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, Write16) {
@@ -99,7 +101,7 @@ TEST_F(WireEncoderTest, Write16) {
   e.Write16(0u);
   ASSERT_EQ(8u, e.size() - off);
   ASSERT_EQ("\x00\x05\x00\x01\x45\x67\x00\x00"sv,
-            std::string_view(e.data(), e.size()).substr(off));
+            wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, Write32) {
@@ -117,7 +119,7 @@ TEST_F(WireEncoderTest, Write32) {
   ASSERT_EQ(std::string_view("\x00\x00\x00\x05\x00\x00\x00\x01\x00\x00\xab\xcd"
                              "\x12\x34\x56\x78\x00\x00\x00\x00",
                              20),
-            std::string_view(e.data(), e.size()).substr(off));
+            wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, WriteDouble) {
@@ -140,7 +142,7 @@ TEST_F(WireEncoderTest, WriteDouble) {
                              "\x00\x10\x00\x00\x00\x00\x00\x00"
                              "\x7f\xef\xff\xff\xff\xff\xff\xff",
                              40),
-            std::string_view(e.data(), e.size()).substr(off));
+            wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, WriteUleb128) {
@@ -153,8 +155,7 @@ TEST_F(WireEncoderTest, WriteUleb128) {
   e.WriteUleb128(0x7ful);
   e.WriteUleb128(0x80ul);
   ASSERT_EQ(4u, e.size() - off);
-  ASSERT_EQ("\x00\x7f\x80\x01"sv,
-            std::string_view(e.data(), e.size()).substr(off));
+  ASSERT_EQ("\x00\x7f\x80\x01"sv, wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, WriteType) {
@@ -174,7 +175,7 @@ TEST_F(WireEncoderTest, WriteType) {
   ASSERT_EQ(nullptr, e.error());
   ASSERT_EQ(8u, e.size() - off);
   ASSERT_EQ("\x00\x01\x02\x03\x10\x11\x12\x20"sv,
-            std::string_view(e.data(), e.size()).substr(off));
+            wpi::substr({e.data(), e.size()}, off));
 }
 
 TEST_F(WireEncoderTest, WriteTypeError) {

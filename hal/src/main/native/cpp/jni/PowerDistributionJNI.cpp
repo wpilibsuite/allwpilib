@@ -292,4 +292,133 @@ Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannel
   return state;
 }
 
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getVoltageNoError
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getVoltageNoError
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  double voltage = HAL_GetPowerDistributionVoltage(handle, &status);
+  return voltage;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getChannelCurrentNoError
+ * Signature: (II)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getChannelCurrentNoError
+  (JNIEnv* env, jclass, jint handle, jint channel)
+{
+  int32_t status = 0;
+  double current =
+      HAL_GetPowerDistributionChannelCurrent(handle, channel, &status);
+  return current;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getTotalCurrentNoError
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getTotalCurrentNoError
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  double current = HAL_GetPowerDistributionTotalCurrent(handle, &status);
+  return current;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    setSwitchableChannelNoError
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_setSwitchableChannelNoError
+  (JNIEnv* env, jclass, jint handle, jboolean enabled)
+{
+  int32_t status = 0;
+  HAL_SetPowerDistributionSwitchableChannel(handle, enabled, &status);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getSwitchableChannelNoError
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getSwitchableChannelNoError
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  auto state = HAL_GetPowerDistributionSwitchableChannel(handle, &status);
+  return state;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getStickyFaultsNative
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getStickyFaultsNative
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionStickyFaults halFaults;
+  std::memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetPowerDistributionStickyFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  std::memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getFaultsNative
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getFaultsNative
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionFaults halFaults;
+  std::memset(&halFaults, 0, sizeof(halFaults));
+  HAL_GetPowerDistributionFaults(handle, &halFaults, &status);
+  CheckStatus(env, status, false);
+  jint faults;
+  static_assert(sizeof(faults) == sizeof(halFaults));
+  std::memcpy(&faults, &halFaults, sizeof(faults));
+  return faults;
+}
+
+/*
+ * Class:     edu_wpi_first_hal_PowerDistributionJNI
+ * Method:    getVersion
+ * Signature: (I)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL
+Java_edu_wpi_first_hal_PowerDistributionJNI_getVersion
+  (JNIEnv* env, jclass, jint handle)
+{
+  int32_t status = 0;
+  HAL_PowerDistributionVersion version;
+  std::memset(&version, 0, sizeof(version));
+  HAL_GetPowerDistributionVersion(handle, &version, &status);
+  CheckStatus(env, status, false);
+  return CreatePowerDistributionVersion(
+      env, version.firmwareMajor, version.firmwareMinor, version.firmwareFix,
+      version.hardwareMinor, version.hardwareMajor, version.uniqueId);
+}
+
 }  // extern "C"

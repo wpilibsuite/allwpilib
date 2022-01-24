@@ -21,9 +21,9 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.to<double>(),
-                                      chassisSpeeds.vy.to<double>(),
-                                      chassisSpeeds.omega.to<double>()};
+  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
+                                      chassisSpeeds.vy.value(),
+                                      chassisSpeeds.omega.value()};
 
   Eigen::Vector<double, 4> wheelsVector =
       m_inverseKinematics * chassisSpeedsVector;
@@ -39,8 +39,8 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
 ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
     const MecanumDriveWheelSpeeds& wheelSpeeds) const {
   Eigen::Vector<double, 4> wheelSpeedsVector{
-      wheelSpeeds.frontLeft.to<double>(), wheelSpeeds.frontRight.to<double>(),
-      wheelSpeeds.rearLeft.to<double>(), wheelSpeeds.rearRight.to<double>()};
+      wheelSpeeds.frontLeft.value(), wheelSpeeds.frontRight.value(),
+      wheelSpeeds.rearLeft.value(), wheelSpeeds.rearRight.value()};
 
   Eigen::Vector3d chassisSpeedsVector =
       m_forwardKinematics.solve(wheelSpeedsVector);
@@ -54,9 +54,9 @@ void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
                                                   Translation2d fr,
                                                   Translation2d rl,
                                                   Translation2d rr) const {
-  m_inverseKinematics = Eigen::Matrix<double, 4, 3>{
-      {1, -1, (-(fl.X() + fl.Y())).template to<double>()},
-      {1, 1, (fr.X() - fr.Y()).template to<double>()},
-      {1, 1, (rl.X() - rl.Y()).template to<double>()},
-      {1, -1, (-(rr.X() + rr.Y())).template to<double>()}};
+  m_inverseKinematics =
+      Eigen::Matrix<double, 4, 3>{{1, -1, (-(fl.X() + fl.Y())).value()},
+                                  {1, 1, (fr.X() - fr.Y()).value()},
+                                  {1, 1, (rl.X() - rl.Y()).value()},
+                                  {1, -1, (-(rr.X() + rr.Y())).value()}};
 }

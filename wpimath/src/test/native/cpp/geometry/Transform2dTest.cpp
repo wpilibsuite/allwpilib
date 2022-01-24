@@ -21,12 +21,10 @@ TEST(Transform2dTest, Inverse) {
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
 
-  EXPECT_NEAR(initial.X().to<double>(), untransformed.X().to<double>(),
-              kEpsilon);
-  EXPECT_NEAR(initial.Y().to<double>(), untransformed.Y().to<double>(),
-              kEpsilon);
-  EXPECT_NEAR(initial.Rotation().Degrees().to<double>(),
-              untransformed.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(initial.X().value(), untransformed.X().value(), kEpsilon);
+  EXPECT_NEAR(initial.Y().value(), untransformed.Y().value(), kEpsilon);
+  EXPECT_NEAR(initial.Rotation().Degrees().value(),
+              untransformed.Rotation().Degrees().value(), kEpsilon);
 }
 
 TEST(Transform2dTest, Composition) {
@@ -37,10 +35,10 @@ TEST(Transform2dTest, Composition) {
   auto transformedSeparate = initial + transform1 + transform2;
   auto transformedCombined = initial + (transform1 + transform2);
 
-  EXPECT_NEAR(transformedSeparate.X().to<double>(),
-              transformedCombined.X().to<double>(), kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Y().to<double>(),
-              transformedCombined.Y().to<double>(), kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Rotation().Degrees().to<double>(),
-              transformedCombined.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(transformedSeparate.X().value(), transformedCombined.X().value(),
+              kEpsilon);
+  EXPECT_NEAR(transformedSeparate.Y().value(), transformedCombined.Y().value(),
+              kEpsilon);
+  EXPECT_NEAR(transformedSeparate.Rotation().Degrees().value(),
+              transformedCombined.Rotation().Degrees().value(), kEpsilon);
 }

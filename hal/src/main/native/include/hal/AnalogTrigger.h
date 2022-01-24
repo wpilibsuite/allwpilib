@@ -33,8 +33,9 @@ extern "C" {
 /**
  * Initializes an analog trigger.
  *
- * @param portHandle the analog input to use for triggering
- * @return           the created analog trigger handle
+ * @param[in] portHandle the analog input to use for triggering
+ * @param[out] status     Error status variable. 0 on success.
+ * @return the created analog trigger handle
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle portHandle, int32_t* status);
@@ -42,6 +43,8 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
 /**
  * Initializes an analog trigger with a Duty Cycle input
  *
+ * @param[in] dutyCycleHandle the analog input to use for duty cycle
+ * @param[out] status          Error status variable. 0 on success.
  */
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
     HAL_DutyCycleHandle dutyCycleHandle, int32_t* status);
@@ -49,7 +52,8 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTriggerDutyCycle(
 /**
  * Frees an analog trigger.
  *
- * @param analogTriggerHandle the trigger handle
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[out] status Error status variable. 0 on success.
  */
 void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
                             int32_t* status);
@@ -60,9 +64,10 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analogTriggerHandle,
  * HAL_SetAnalogTriggerLimitsVoltage or HAL_SetAnalogTriggerLimitsDutyCycle
  * is likely better in most cases.
  *
- * @param analogTriggerHandle the trigger handle
- * @param lower               the lower ADC value
- * @param upper               the upper ADC value
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] lower               the lower ADC value
+ * @param[in] upper               the upper ADC value
+ * @param[out] status              Error status variable. 0 on success.
  */
 void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
                                    int32_t lower, int32_t upper,
@@ -73,14 +78,25 @@ void HAL_SetAnalogTriggerLimitsRaw(HAL_AnalogTriggerHandle analogTriggerHandle,
  *
  * The limits are given as floating point voltage values.
  *
- * @param analogTriggerHandle the trigger handle
- * @param lower               the lower voltage value
- * @param upper               the upper voltage value
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] lower               the lower voltage value
+ * @param[in] upper               the upper voltage value
+ * @param[out] status              Error status variable. 0 on success.
  */
 void HAL_SetAnalogTriggerLimitsVoltage(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status);
 
+/**
+ * Sets the upper and lower limits of the analog trigger.
+ *
+ * The limits are given as floating point duty cycle values.
+ *
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] lower               the lower duty cycle value
+ * @param[in] upper               the upper duty cycle value
+ * @param[out] status              Error status variable. 0 on success.
+ */
 void HAL_SetAnalogTriggerLimitsDutyCycle(
     HAL_AnalogTriggerHandle analogTriggerHandle, double lower, double upper,
     int32_t* status);
@@ -94,8 +110,9 @@ void HAL_SetAnalogTriggerLimitsDutyCycle(
  * This is not allowed to be used if filtered mode is set.
  * This is not allowed to be used with Duty Cycle based inputs.
  *
- * @param analogTriggerHandle the trigger handle
- * @param useAveragedValue    true to use averaged values, false for raw
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] useAveragedValue    true to use averaged values, false for raw
+ * @param[out] status              Error status variable. 0 on success.
  */
 void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useAveragedValue, int32_t* status);
@@ -109,9 +126,10 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analogTriggerHandle,
  *
  * This is not allowed to be used if averaged mode is set.
  *
- * @param analogTriggerHandle the trigger handle
- * @param useFilteredValue    true to use filtered values, false for average or
- * raw
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] useFilteredValue    true to use filtered values, false for average
+ *                                or raw
+ * @param[out] status             Error status variable. 0 on success.
  */
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
                                   HAL_Bool useFilteredValue, int32_t* status);
@@ -121,8 +139,9 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analogTriggerHandle,
  *
  * True if the analog input is between the upper and lower limits.
  *
- * @param analogTriggerHandle the trigger handle
- * @return                    the InWindow output of the analog trigger
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[out] status Error status variable. 0 on success.
+ * @return the InWindow output of the analog trigger
  */
 HAL_Bool HAL_GetAnalogTriggerInWindow(
     HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
@@ -134,8 +153,9 @@ HAL_Bool HAL_GetAnalogTriggerInWindow(
  * False if below lower limit.
  * If in Hysteresis, maintain previous state.
  *
- * @param analogTriggerHandle the trigger handle
- * @return                    the TriggerState output of the analog trigger
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[out] status              Error status variable. 0 on success.
+ * @return the TriggerState output of the analog trigger
  */
 HAL_Bool HAL_GetAnalogTriggerTriggerState(
     HAL_AnalogTriggerHandle analogTriggerHandle, int32_t* status);
@@ -143,9 +163,10 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
 /**
  * Gets the state of the analog trigger output.
  *
- * @param analogTriggerHandle the trigger handle
- * @param type                the type of trigger to trigger on
- * @return                    the state of the analog trigger output
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[in] type                the type of trigger to trigger on
+ * @param[out] status              Error status variable. 0 on success.
+ * @return the state of the analog trigger output
  */
 HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,
@@ -154,7 +175,8 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
 /**
  * Get the FPGA index for the AnlogTrigger.
  *
- * @param analogTriggerHandle the trigger handle
+ * @param[in] analogTriggerHandle the trigger handle
+ * @param[out] status              Error status variable. 0 on success.
  * @return the FPGA index
  */
 int32_t HAL_GetAnalogTriggerFPGAIndex(

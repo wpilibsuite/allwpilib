@@ -18,8 +18,8 @@ constexpr empty_array_t empty_array;
  * This class is a wrapper around std::array that does compile time size
  * checking.
  *
- * std::array's implicit constructor can lead result in uninitialized elements
- * if the number of arguments doesn't match the std::array size.
+ * std::array's implicit constructor can result in uninitialized elements if the
+ * number of arguments doesn't match the std::array size.
  */
 template <typename T, size_t N>
 class array : public std::array<T, N> {
@@ -28,7 +28,7 @@ class array : public std::array<T, N> {
 
   template <typename... Ts>
   array(T arg, Ts&&... args)  // NOLINT
-      : std::array<T, N>{arg, std::forward<Ts>(args)...} {
+      : std::array<T, N>{std::forward<T>(arg), std::forward<Ts>(args)...} {
     static_assert(1 + sizeof...(args) == N, "Dimension mismatch");
   }
 

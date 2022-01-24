@@ -8,7 +8,7 @@
 #include "commands/SetElevatorSetpoint.h"
 #include "commands/SetWristSetpoint.h"
 
-Place::Place(Claw* claw, Wrist* wrist, Elevator* elevator) {
+Place::Place(Claw& claw, Wrist& wrist, Elevator& elevator) {
   SetName("Place");
   // clang-format off
   AddCommands(SetElevatorSetpoint(0.25, elevator),

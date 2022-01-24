@@ -90,8 +90,8 @@ class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi *
-                                  kDrumRadius.to<double>() / 4096.0);
+    m_encoder.SetDistancePerPulse(2.0 * wpi::numbers::pi * kDrumRadius.value() /
+                                  4096.0);
   }
 
   void TeleopInit() override {
@@ -119,9 +119,9 @@ class Robot : public frc::TimedRobot {
                                               m_lastProfiledReference))
             .Calculate(20_ms);
 
-    m_loop.SetNextR(Eigen::Vector<double, 2>{
-        m_lastProfiledReference.position.to<double>(),
-        m_lastProfiledReference.velocity.to<double>()});
+    m_loop.SetNextR(
+        Eigen::Vector<double, 2>{m_lastProfiledReference.position.value(),
+                                 m_lastProfiledReference.velocity.value()});
 
     // Correct our Kalman filter's state vector estimate with encoder data.
     m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetDistance()});

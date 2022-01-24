@@ -54,7 +54,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  kDriveKinematics.NormalizeWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
 
   auto [fl, fr, bl, br] = states;
 
@@ -66,11 +66,11 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::SetModuleStates(
     wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-  kDriveKinematics.NormalizeWheelSpeeds(&desiredStates,
-                                        AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
+                                         AutoConstants::kMaxSpeed);
   m_frontLeft.SetDesiredState(desiredStates[0]);
-  m_rearLeft.SetDesiredState(desiredStates[1]);
-  m_frontRight.SetDesiredState(desiredStates[2]);
+  m_frontRight.SetDesiredState(desiredStates[1]);
+  m_rearLeft.SetDesiredState(desiredStates[2]);
   m_rearRight.SetDesiredState(desiredStates[3]);
 }
 

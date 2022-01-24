@@ -43,7 +43,7 @@ constexpr int kEncoderCPR = 1024;
 constexpr auto kWheelDiameter = 6_in;
 constexpr double kEncoderDistancePerPulse =
     // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameter.to<double>() * wpi::numbers::pi) /
+    (kWheelDiameter.value() * wpi::numbers::pi) /
     static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
@@ -74,8 +74,8 @@ constexpr auto kMaxAcceleration = 3_mps_sq;
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
-constexpr double kRamseteB = 2;
-constexpr double kRamseteZeta = 0.7;
+constexpr auto kRamseteB = 2 * 1_rad * 1_rad / (1_m * 1_m);
+constexpr auto kRamseteZeta = 0.7 / 1_rad;
 }  // namespace AutoConstants
 
 namespace OIConstants {

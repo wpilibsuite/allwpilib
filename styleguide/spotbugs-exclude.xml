@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
   <Match>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+    <Class name="edu.wpi.first.wpilibj.test.TestSuite" />
+  </Match>
+  <Match>
     <Bug pattern="DM_DEFAULT_ENCODING" />
   </Match>
   <Match>
@@ -14,6 +18,10 @@
   </Match>
   <Match>
     <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+    <Source name="MechanismLigament2d.java" />
   </Match>
   <Match>
     <Bug pattern="MS_CANNOT_BE_FINAL" />
@@ -71,6 +79,14 @@
   <Match>
     <Bug pattern="UC_USELESS_VOID_METHOD" />
     <Class name="edu.wpi.first.wpilibj.templates.timed.Robot" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16448_IMU" />
+  </Match>
+  <Match>
+    <Bug pattern="URF_UNREAD_FIELD" />
+    <Class name="edu.wpi.first.wpilibj.ADIS16470_IMU" />
   </Match>
   <Match>
     <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />

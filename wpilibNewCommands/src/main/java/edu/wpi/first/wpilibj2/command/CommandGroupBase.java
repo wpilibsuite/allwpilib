@@ -13,6 +13,8 @@ import java.util.WeakHashMap;
  * A base for CommandGroups. Statically tracks commands that have been allocated to groups to ensure
  * those commands are not also used independently, which can result in inconsistent command state
  * and unpredictable execution.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class CommandGroupBase extends CommandBase {
   private static final Set<Command> m_groupedCommands =

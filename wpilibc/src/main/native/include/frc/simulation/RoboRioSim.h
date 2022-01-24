@@ -38,7 +38,7 @@ class RoboRioSim {
   /**
    * Define the state of the FPGA button.
    *
-   * @param fpgaButton the new state
+   * @param fPGAButton the new state
    */
   static void SetFPGAButton(bool fPGAButton);
 
@@ -393,6 +393,30 @@ class RoboRioSim {
    * @param userFaults3V3 number of faults
    */
   static void SetUserFaults3V3(int userFaults3V3);
+
+  /**
+   * Register a callback to be run whenever the brownout voltage changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]] static std::unique_ptr<CallbackStore>
+  RegisterBrownoutVoltageCallback(NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Measure the brownout voltage.
+   *
+   * @return the brownout voltage
+   */
+  static units::volt_t GetBrownoutVoltage();
+
+  /**
+   * Define the brownout voltage.
+   *
+   * @param brownoutVoltage the new voltage
+   */
+  static void SetBrownoutVoltage(units::volt_t brownoutVoltage);
 
   /**
    * Reset all simulation data.

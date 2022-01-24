@@ -94,6 +94,11 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
   private boolean m_reported;
 
+  /**
+   * Wheel speeds for a differential drive.
+   *
+   * <p>Uses normalized voltage [-1.0..1.0].
+   */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     public double left;
@@ -105,8 +110,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     /**
      * Constructs a WheelSpeeds.
      *
-     * @param left The left speed.
-     * @param right The right speed.
+     * @param left The left speed [-1.0..1.0].
+     * @param right The right speed [-1.0..1.0].
      */
     public WheelSpeeds(double left, double right) {
       this.left = left;
@@ -185,15 +190,12 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Curvature drive method for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds. Also handles the robot's
-   * quick turn functionality - "quick turn" overrides constant-curvature turning for turn-in-place
-   * maneuvers.
+   * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *     positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
-   *     maneuvers.
+   *     maneuvers. zRotation will control turning rate instead of curvature.
    */
   @SuppressWarnings("ParameterName")
   public void curvatureDrive(double xSpeed, double zRotation, boolean allowTurnInPlace) {
@@ -259,7 +261,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds arcadeDriveIK(double xSpeed, double zRotation, boolean squareInputs) {
@@ -312,16 +314,13 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * Curvature drive inverse kinematics for differential drive platform.
    *
    * <p>The rotation argument controls the curvature of the robot's path rather than its rate of
-   * heading change. This makes the robot more controllable at high speeds. Also handles the robot's
-   * quick turn functionality - "quick turn" overrides constant-curvature turning for turn-in-place
-   * maneuvers.
+   * heading change. This makes the robot more controllable at high speeds.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
-   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
-   *     positive.
+   * @param zRotation The normalized curvature [-1.0..1.0]. Clockwise is positive.
    * @param allowTurnInPlace If set, overrides constant-curvature turning for turn-in-place
-   *     maneuvers.
-   * @return Wheel speeds.
+   *     maneuvers. zRotation will control rotation rate around the Z axis instead of curvature.
+   * @return Wheel speeds [-1.0..1.0].
    */
   @SuppressWarnings("ParameterName")
   public static WheelSpeeds curvatureDriveIK(
@@ -329,8 +328,8 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
 
-    double leftSpeed = 0.0;
-    double rightSpeed = 0.0;
+    double leftSpeed;
+    double rightSpeed;
 
     if (allowTurnInPlace) {
       leftSpeed = xSpeed + zRotation;
@@ -357,7 +356,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param rightSpeed The robot right side's speed along the X axis [-1.0..1.0]. Forward is
    *     positive.
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
-   * @return Wheel speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   public static WheelSpeeds tankDriveIK(double leftSpeed, double rightSpeed, boolean squareInputs) {
     leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);

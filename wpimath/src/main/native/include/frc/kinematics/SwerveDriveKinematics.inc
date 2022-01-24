@@ -26,16 +26,16 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) =
         Eigen::Matrix<double, 2, 3>{
-          {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).template to<double>()},
-          {0, 1, (+m_modules[i].X() - centerOfRotation.X()).template to<double>()}};
+          {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).value()},
+          {0, 1, (+m_modules[i].X() - centerOfRotation.X()).value()}};
       // clang-format on
     }
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.to<double>(),
-                                      chassisSpeeds.vy.to<double>(),
-                                      chassisSpeeds.omega.to<double>()};
+  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
+                                      chassisSpeeds.vy.value(),
+                                      chassisSpeeds.omega.value()};
 
   Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
       m_inverseKinematics * chassisSpeedsVector;
@@ -46,7 +46,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     units::meters_per_second_t y{moduleStatesMatrix(i * 2 + 1, 0)};
 
     auto speed = units::math::hypot(x, y);
-    Rotation2d rotation{x.to<double>(), y.to<double>()};
+    Rotation2d rotation{x.value(), y.value()};
 
     moduleStates[i] = {speed, rotation};
   }
@@ -74,10 +74,9 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 
   for (size_t i = 0; i < NumModules; ++i) {
     SwerveModuleState module = moduleStates[i];
-    moduleStatesMatrix(i * 2, 0) =
-        module.speed.to<double>() * module.angle.Cos();
+    moduleStatesMatrix(i * 2, 0) = module.speed.value() * module.angle.Cos();
     moduleStatesMatrix(i * 2 + 1, 0) =
-        module.speed.to<double>() * module.angle.Sin();
+        module.speed.value() * module.angle.Sin();
   }
 
   Eigen::Vector3d chassisSpeedsVector =
@@ -89,7 +88,7 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 }
 
 template <size_t NumModules>
-void SwerveDriveKinematics<NumModules>::NormalizeWheelSpeeds(
+void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
     wpi::array<SwerveModuleState, NumModules>* moduleStates,
     units::meters_per_second_t attainableMaxSpeed) {
   auto& states = *moduleStates;

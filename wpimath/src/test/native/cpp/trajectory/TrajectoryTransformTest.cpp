@@ -21,10 +21,10 @@ void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
     auto a = a2.RelativeTo(a1);
     auto b = b2.RelativeTo(b1);
 
-    EXPECT_NEAR(a.X().to<double>(), b.X().to<double>(), 1E-9);
-    EXPECT_NEAR(a.Y().to<double>(), b.Y().to<double>(), 1E-9);
-    EXPECT_NEAR(a.Rotation().Radians().to<double>(),
-                b.Rotation().Radians().to<double>(), 1E-9);
+    EXPECT_NEAR(a.X().value(), b.X().value(), 1E-9);
+    EXPECT_NEAR(a.Y().value(), b.Y().value(), 1E-9);
+    EXPECT_NEAR(a.Rotation().Radians().value(), b.Rotation().Radians().value(),
+                1E-9);
   }
 }
 
@@ -39,9 +39,9 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().to<double>(), 1.0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().to<double>(), 2.0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().to<double>(), 30.0, 1E-9);
+  EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
+  EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
+  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }
@@ -57,9 +57,9 @@ TEST(TrajectoryTransformsTest, RelativeTo) {
 
   auto firstPose = transformedTrajectory.Sample(0_s).pose;
 
-  EXPECT_NEAR(firstPose.X().to<double>(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().to<double>(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().to<double>(), 0, 1E-9);
+  EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
+  EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
+  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }

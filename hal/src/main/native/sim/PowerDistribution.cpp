@@ -30,6 +30,19 @@ extern "C" {
 HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     int32_t module, HAL_PowerDistributionType type,
     const char* allocationLocation, int32_t* status) {
+  if (type == HAL_PowerDistributionType_kAutomatic) {
+    if (module != HAL_DEFAULT_POWER_DISTRIBUTION_MODULE) {
+      *status = PARAMETER_OUT_OF_RANGE;
+      hal::SetLastError(
+          status, "Automatic PowerDistributionType must have default module");
+      return HAL_kInvalidHandle;
+    }
+
+    // TODO Make this not matter
+    type = HAL_PowerDistributionType_kCTRE;
+    module = 0;
+  }
+
   if (!HAL_CheckPowerDistributionModule(module, type)) {
     *status = PARAMETER_OUT_OF_RANGE;
     hal::SetLastError(status, fmt::format("Invalid pdp module {}", module));
@@ -155,4 +168,16 @@ HAL_Bool HAL_GetPowerDistributionSwitchableChannel(
     HAL_PowerDistributionHandle handle, int32_t* status) {
   return false;
 }
+
+void HAL_GetPowerDistributionVersion(HAL_PowerDistributionHandle handle,
+                                     HAL_PowerDistributionVersion* version,
+                                     int32_t* status) {}
+
+void HAL_GetPowerDistributionFaults(HAL_PowerDistributionHandle handle,
+                                    HAL_PowerDistributionFaults* faults,
+                                    int32_t* status) {}
+
+void HAL_GetPowerDistributionStickyFaults(
+    HAL_PowerDistributionHandle handle,
+    HAL_PowerDistributionStickyFaults* stickyFaults, int32_t* status) {}
 }  // extern "C"

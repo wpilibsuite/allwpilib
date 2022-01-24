@@ -44,7 +44,7 @@ void GetAddrInfo(Loop& loop, std::function<void(const addrinfo&)> callback,
                  std::string_view node, std::string_view service,
                  const addrinfo* hints) {
   auto req = std::make_shared<GetAddrInfoReq>();
-  req->resolved.connect(callback);
+  req->resolved.connect(std::move(callback));
   GetAddrInfo(loop, req, node, service, hints);
 }
 

@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <glass/Context.h>
+#include <glass/Storage.h>
 #include <glass/other/Plot.h>
 
 #include <cstdio>
@@ -35,7 +36,7 @@ using namespace halsimgui;
 
 namespace gui = wpi::gui;
 
-static glass::PlotProvider gPlotProvider{"Plot"};
+static std::unique_ptr<glass::PlotProvider> gPlotProvider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -46,54 +47,59 @@ __declspec(dllexport)
 
   gui::CreateContext();
   glass::CreateContext();
+
+  glass::SetStorageName("simgui");
+
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();
-  gPlotProvider.GlobalInit();
+  gPlotProvider = std::make_unique<glass::PlotProvider>(
+      glass::GetStorageRoot().GetChild("Plot"));
+  gPlotProvider->GlobalInit();
 
   // These need to initialize first
-  gui::AddInit(EncoderSimGui::Initialize);
-  gui::AddInit(SimDeviceGui::Initialize);
+  EncoderSimGui::Initialize();
+  SimDeviceGui::Initialize();
 
-  gui::AddInit(AccelerometerSimGui::Initialize);
-  gui::AddInit(AddressableLEDGui::Initialize);
-  gui::AddInit(AnalogGyroSimGui::Initialize);
-  gui::AddInit(AnalogInputSimGui::Initialize);
-  gui::AddInit(AnalogOutputSimGui::Initialize);
-  gui::AddInit(DIOSimGui::Initialize);
-  gui::AddInit(NetworkTablesSimGui::Initialize);
-  gui::AddInit(PCMSimGui::Initialize);
-  gui::AddInit(PowerDistributionSimGui::Initialize);
-  gui::AddInit(PWMSimGui::Initialize);
-  gui::AddInit(RelaySimGui::Initialize);
-  gui::AddInit(RoboRioSimGui::Initialize);
-  gui::AddInit(TimingGui::Initialize);
+  AccelerometerSimGui::Initialize();
+  AddressableLEDGui::Initialize();
+  AnalogGyroSimGui::Initialize();
+  AnalogInputSimGui::Initialize();
+  AnalogOutputSimGui::Initialize();
+  DIOSimGui::Initialize();
+  NetworkTablesSimGui::Initialize();
+  PCMSimGui::Initialize();
+  PowerDistributionSimGui::Initialize();
+  PWMSimGui::Initialize();
+  RelaySimGui::Initialize();
+  RoboRioSimGui::Initialize();
+  TimingGui::Initialize();
 
   HALSimGui::mainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("Hardware")) {
-      HALSimGui::halProvider.DisplayMenu();
+      HALSimGui::halProvider->DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("NetworkTables")) {
       NetworkTablesSimGui::DisplayMenu();
       ImGui::Separator();
-      HALSimGui::ntProvider.DisplayMenu();
+      HALSimGui::ntProvider->DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("DS")) {
-      DriverStationGui::dsManager.DisplayMenu();
+      DriverStationGui::dsManager->DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {
-      bool paused = gPlotProvider.IsPaused();
+      bool paused = gPlotProvider->IsPaused();
       if (ImGui::MenuItem("Pause All Plots", nullptr, &paused)) {
-        gPlotProvider.SetPaused(paused);
+        gPlotProvider->SetPaused(paused);
       }
       ImGui::Separator();
-      gPlotProvider.DisplayMenu();
+      gPlotProvider->DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Window")) {
-      HALSimGui::manager.DisplayMenu();
+      HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
     }
   });

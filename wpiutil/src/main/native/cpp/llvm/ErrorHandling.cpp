@@ -88,7 +88,7 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   if (handler) {
     handler(handlerData, std::string{Reason}, GenCrashDiag);
   } else {
-    fmt::print(stderr, "LLVM ERROR: {}\n");
+    fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
   }
 
   exit(1);

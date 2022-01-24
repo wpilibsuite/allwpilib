@@ -13,15 +13,15 @@ TEST(SwerveModuleStateTest, Optimize) {
   frc::SwerveModuleState refA{-2_mps, 180_deg};
   auto optimizedA = frc::SwerveModuleState::Optimize(refA, angleA);
 
-  EXPECT_NEAR(optimizedA.speed.to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(optimizedA.angle.Degrees().to<double>(), 0.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.speed.value(), 2.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 0.0, kEpsilon);
 
   frc::Rotation2d angleB{-50_deg};
   frc::SwerveModuleState refB{4.7_mps, 41_deg};
   auto optimizedB = frc::SwerveModuleState::Optimize(refB, angleB);
 
-  EXPECT_NEAR(optimizedB.speed.to<double>(), -4.7, kEpsilon);
-  EXPECT_NEAR(optimizedB.angle.Degrees().to<double>(), -139.0, kEpsilon);
+  EXPECT_NEAR(optimizedB.speed.value(), -4.7, kEpsilon);
+  EXPECT_NEAR(optimizedB.angle.Degrees().value(), -139.0, kEpsilon);
 }
 
 TEST(SwerveModuleStateTest, NoOptimize) {
@@ -29,13 +29,13 @@ TEST(SwerveModuleStateTest, NoOptimize) {
   frc::SwerveModuleState refA{2_mps, 89_deg};
   auto optimizedA = frc::SwerveModuleState::Optimize(refA, angleA);
 
-  EXPECT_NEAR(optimizedA.speed.to<double>(), 2.0, kEpsilon);
-  EXPECT_NEAR(optimizedA.angle.Degrees().to<double>(), 89.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.speed.value(), 2.0, kEpsilon);
+  EXPECT_NEAR(optimizedA.angle.Degrees().value(), 89.0, kEpsilon);
 
   frc::Rotation2d angleB{0_deg};
   frc::SwerveModuleState refB{-2_mps, -2_deg};
   auto optimizedB = frc::SwerveModuleState::Optimize(refB, angleB);
 
-  EXPECT_NEAR(optimizedB.speed.to<double>(), -2.0, kEpsilon);
-  EXPECT_NEAR(optimizedB.angle.Degrees().to<double>(), -2.0, kEpsilon);
+  EXPECT_NEAR(optimizedB.speed.value(), -2.0, kEpsilon);
+  EXPECT_NEAR(optimizedB.angle.Degrees().value(), -2.0, kEpsilon);
 }

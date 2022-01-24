@@ -12,9 +12,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
-public class NumericalIntegrationTest {
+class NumericalIntegrationTest {
   @Test
-  public void testExponential() {
+  void testExponential() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     var y1 =
@@ -31,7 +31,7 @@ public class NumericalIntegrationTest {
   }
 
   @Test
-  public void testExponentialRKF45() {
+  void testExponentialRKF45() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     var y1 =
@@ -49,7 +49,7 @@ public class NumericalIntegrationTest {
   }
 
   @Test
-  public void testExponentialRKDP() {
+  void testExponentialRKDP() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     var y1 =

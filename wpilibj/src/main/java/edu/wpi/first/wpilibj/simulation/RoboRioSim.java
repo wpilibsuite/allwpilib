@@ -498,6 +498,39 @@ public final class RoboRioSim {
     RoboRioDataJNI.setUserFaults3V3(userFaults3V3);
   }
 
+  /**
+   * Register a callback to be run whenever the Brownout voltage changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public static CallbackStore registerBrownoutVoltageCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerBrownoutVoltageCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelBrownoutVoltageCallback);
+  }
+
+  /**
+   * Measure the Brownout voltage.
+   *
+   * @return the Brownout voltage
+   */
+  public static double getBrownoutVoltage() {
+    return RoboRioDataJNI.getBrownoutVoltage();
+  }
+
+  /**
+   * Define the Brownout voltage.
+   *
+   * @param vInVoltage the new voltage
+   */
+  @SuppressWarnings("ParameterName")
+  public static void setBrownoutVoltage(double vInVoltage) {
+    RoboRioDataJNI.setBrownoutVoltage(vInVoltage);
+  }
+
   /** Reset all simulation data. */
   public static void resetData() {
     RoboRioDataJNI.resetData();

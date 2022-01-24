@@ -72,7 +72,7 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.to<double>()});
+  SetInput(Eigen::Vector<double, 1>{voltage.value()});
 }
 
 Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
@@ -96,7 +96,7 @@ Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
           xdot += Eigen::Vector<double, 2>{
               0.0, (m_mass * m_r * -9.8 * 3.0 / (m_mass * m_r * m_r) *
                     std::cos(x(0)))
-                       .template to<double>()};
+                       .value()};
         }
         return xdot;
       },
@@ -104,9 +104,9 @@ Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
 
   // Check for collisions.
   if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minAngle.to<double>(), 0.0};
+    return Eigen::Vector<double, 2>{m_minAngle.value(), 0.0};
   } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxAngle.to<double>(), 0.0};
+    return Eigen::Vector<double, 2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;
 }

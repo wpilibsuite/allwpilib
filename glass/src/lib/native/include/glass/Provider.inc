@@ -26,7 +26,7 @@ void Provider<Functions>::ShowDefault(std::string_view name) {
   if (it == m_viewEntries.end() || (*it)->name != name) {
     return;
   }
-  this->Show(it->get(), (*it)->window);
+  (*it)->showDefault = true;
 }
 
 template <typename Functions>

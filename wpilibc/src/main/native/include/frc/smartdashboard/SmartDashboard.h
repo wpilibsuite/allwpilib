@@ -114,8 +114,8 @@ class SmartDashboard {
    * In order for the value to appear in the dashboard, it must be registered
    * with SendableRegistry.  WPILib components do this automatically.
    *
-   * @param keyName the key
-   * @param value   the value
+   * @param key  the key
+   * @param data the value
    */
   static void PutData(std::string_view key, wpi::Sendable* data);
 
@@ -167,6 +167,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
+   * @param defaultValue the default value to set if key doesn't exist
    * @return the value
    */
   static bool GetBoolean(std::string_view keyName, bool defaultValue);
@@ -198,6 +199,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
+   * @param defaultValue the default value to set if the key doesn't exist
    * @return the value
    */
   static double GetNumber(std::string_view keyName, double defaultValue);
@@ -230,6 +232,7 @@ class SmartDashboard {
    * If the key is not found, returns the default value.
    *
    * @param keyName the key
+   * @param defaultValue the default value to set if the key doesn't exist
    * @return the value
    */
   static std::string GetString(std::string_view keyName,
@@ -418,7 +421,6 @@ class SmartDashboard {
    * complex data object.
    *
    * @param keyName the key
-   * @param value   the object to retrieve the value into
    */
   static std::shared_ptr<nt::Value> GetValue(std::string_view keyName);
 

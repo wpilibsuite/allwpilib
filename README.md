@@ -39,7 +39,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
     - On macOS, install the JDK 11 .pkg from the link above
 - C++ compiler
     - On Linux, install GCC 8 or greater
-    - On Windows, install [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio 2019)
+    - On Windows, install [Visual Studio Community 2022 or 2019](https://visualstudio.microsoft.com/vs/community/) and select the C++ programming language during installation (Gradle can't use the build tools for Visual Studio)
     - On macOS, install the Xcode command-line build tools via `xcode-select --install`
 - ARM compiler toolchain
     - Run `./gradlew installRoboRioToolchain` after cloning this repository
@@ -70,6 +70,8 @@ To build a specific subproject, such as WPILibC, you must access the subproject 
 The gradlew wrapper only exists in the root of the main project, so be sure to run all commands from there. All of the subprojects have build tasks that can be run. Gradle automatically determines and rebuilds dependencies, so if you make a change in the HAL and then run `./gradlew :wpilibc:build`, the HAL will be rebuilt, then WPILibC.
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
+
+If opening from a fresh clone, generated java dependencies will not exist. Most IDEs will not run the generation tasks, which will cause lots of IDE errors. Manually run `./gradlew compileJava` from a terminal to run all the compile tasks, and then refresh your IDE's configuration (In VS Code open settings.gradle and save).
 
 ### Faster builds
 

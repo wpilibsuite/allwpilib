@@ -42,18 +42,15 @@ void DriveSubsystem::SimulationPeriodic() {
   // voltages make the right side move forward.
   m_drivetrainSimulator.SetInputs(units::volt_t{m_leftMotors.Get()} *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{-m_rightMotors.Get()} *
+                                  units::volt_t{m_rightMotors.Get()} *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 
-  m_leftEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetLeftPosition().to<double>());
-  m_leftEncoderSim.SetRate(
-      m_drivetrainSimulator.GetLeftVelocity().to<double>());
+  m_leftEncoderSim.SetDistance(m_drivetrainSimulator.GetLeftPosition().value());
+  m_leftEncoderSim.SetRate(m_drivetrainSimulator.GetLeftVelocity().value());
   m_rightEncoderSim.SetDistance(
-      m_drivetrainSimulator.GetRightPosition().to<double>());
-  m_rightEncoderSim.SetRate(
-      m_drivetrainSimulator.GetRightVelocity().to<double>());
+      m_drivetrainSimulator.GetRightPosition().value());
+  m_rightEncoderSim.SetRate(m_drivetrainSimulator.GetRightVelocity().value());
   m_gyroSim.SetAngle(-m_drivetrainSimulator.GetHeading().Degrees());
 }
 
@@ -67,7 +64,7 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
 
 void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
   m_leftMotors.SetVoltage(left);
-  m_rightMotors.SetVoltage(-right);
+  m_rightMotors.SetVoltage(right);
   m_drive.Feed();
 }
 

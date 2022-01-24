@@ -19,6 +19,8 @@ namespace frc {
  * buttons on an operator interface as a common use case of the more generalized
  * Trigger objects. This is a simple wrapper around Trigger with the method
  * names renamed to fit the Button object use.
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class Button : public Trigger {
  public:

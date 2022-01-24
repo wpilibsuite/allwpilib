@@ -78,7 +78,7 @@ bool IsStabilizableImpl(const Eigen::Matrix<double, States, States>& A,
 
     Eigen::ColPivHouseholderQR<
         Eigen::Matrix<std::complex<double>, States, States + Inputs>>
-        qr(E);
+        qr{E};
     if (qr.rank() < States) {
       return false;
     }
@@ -258,10 +258,12 @@ Eigen::Vector<double, 4> PoseTo4dVector(const Pose2d& pose);
 /**
  * Returns true if (A, B) is a stabilizable pair.
  *
- * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+ * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
  * any, have absolute values less than one, where an eigenvalue is
- * uncontrollable if rank(λI - A, B) < n where n is number of states.
+ * uncontrollable if rank(λI - A, B) < n where n is the number of states.
  *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
  * @param A System matrix.
  * @param B Input matrix.
  */
@@ -269,6 +271,25 @@ template <int States, int Inputs>
 bool IsStabilizable(const Eigen::Matrix<double, States, States>& A,
                     const Eigen::Matrix<double, States, Inputs>& B) {
   return detail::IsStabilizableImpl<States, Inputs>(A, B);
+}
+
+/**
+ * Returns true if (A, C) is a detectable pair.
+ *
+ * (A, C) is detectable if and only if the unobservable eigenvalues of A, if
+ * any, have absolute values less than one, where an eigenvalue is unobservable
+ * if rank(λI - A; C) < n where n is the number of states.
+ *
+ * @tparam States The number of states.
+ * @tparam Outputs The number of outputs.
+ * @param A System matrix.
+ * @param C Output matrix.
+ */
+template <int States, int Outputs>
+bool IsDetectable(const Eigen::Matrix<double, States, States>& A,
+                  const Eigen::Matrix<double, Outputs, States>& C) {
+  return detail::IsStabilizableImpl<States, Outputs>(A.transpose(),
+                                                     C.transpose());
 }
 
 // Template specializations are used here to make common state-input pairs
@@ -296,7 +317,10 @@ Eigen::Vector<double, 3> PoseToVector(const Pose2d& pose);
 /**
  * Clamps input vector between system's minimum and maximum allowable input.
  *
+ * @tparam Inputs The number of inputs.
  * @param u Input vector to clamp.
+ * @param umin The minimum input magnitude.
+ * @param umax The maximum input magnitude.
  * @return Clamped input vector.
  */
 template <int Inputs>
@@ -312,16 +336,16 @@ Eigen::Vector<double, Inputs> ClampInputMaxMagnitude(
 }
 
 /**
- * Normalize all inputs if any excedes the maximum magnitude. Useful for systems
- * such as differential drivetrains.
+ * Renormalize all inputs if any exceeds the maximum magnitude. Useful for
+ * systems such as differential drivetrains.
  *
+ * @tparam Inputs      The number of inputs.
  * @param u            The input vector.
  * @param maxMagnitude The maximum magnitude any input can have.
- * @param <I>          The number of inputs.
  * @return The normalizedInput
  */
 template <int Inputs>
-Eigen::Vector<double, Inputs> NormalizeInputVector(
+Eigen::Vector<double, Inputs> DesaturateInputVector(
     const Eigen::Vector<double, Inputs>& u, double maxMagnitude) {
   double maxValue = u.template lpNorm<Eigen::Infinity>();
 

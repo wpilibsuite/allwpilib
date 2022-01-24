@@ -49,7 +49,7 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     // look for vendor at start of line
     if (wpi::starts_with(line, vendorStr)) {
       foundVendor = true;
-      buf += wpi::trim(line.substr(5));
+      buf += wpi::trim(wpi::substr(line, 5));
       buf += ' ';
       continue;
     }
@@ -62,8 +62,8 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
       }
 
       // look for product
-      if (wpi::starts_with(line.substr(1), productStr)) {
-        buf += wpi::trim(line.substr(6));
+      if (wpi::starts_with(wpi::substr(line, 1), productStr)) {
+        buf += wpi::trim(wpi::substr(line, 6));
         return buf;
       }
     }

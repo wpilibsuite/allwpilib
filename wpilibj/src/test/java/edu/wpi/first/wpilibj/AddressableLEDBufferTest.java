@@ -6,7 +6,6 @@ package edu.wpi.first.wpilibj;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import edu.wpi.first.wpilibj.util.Color;
@@ -63,13 +62,13 @@ class AddressableLEDBufferTest {
     buffer.setLED(2, Color.kFirstRed);
     buffer.setLED(3, Color.kFirstBlue);
 
-    assertTrue(buffer.getLED(0).equals(Color.kFirstBlue));
-    assertTrue(buffer.getLED(1).equals(Color.kDenim));
-    assertTrue(buffer.getLED(2).equals(Color.kFirstRed));
-    assertTrue(buffer.getLED(3).equals(Color.kFirstBlue));
-    assertTrue(buffer.getLED8Bit(0).equals(firstBlueColor8Bit));
-    assertTrue(buffer.getLED8Bit(1).equals(denimColor8Bit));
-    assertTrue(buffer.getLED8Bit(2).equals(firstRedColor8Bit));
-    assertTrue(buffer.getLED8Bit(3).equals(firstBlueColor8Bit));
+    assertEquals(Color.kFirstBlue, buffer.getLED(0));
+    assertEquals(Color.kDenim, buffer.getLED(1));
+    assertEquals(Color.kFirstRed, buffer.getLED(2));
+    assertEquals(Color.kFirstBlue, buffer.getLED(3));
+    assertEquals(firstBlueColor8Bit, buffer.getLED8Bit(0));
+    assertEquals(denimColor8Bit, buffer.getLED8Bit(1));
+    assertEquals(firstRedColor8Bit, buffer.getLED8Bit(2));
+    assertEquals(firstBlueColor8Bit, buffer.getLED8Bit(3));
   }
 }

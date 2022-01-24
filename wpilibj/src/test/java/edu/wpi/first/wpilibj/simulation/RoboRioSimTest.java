@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.IntCallback;
 import org.junit.jupiter.api.Test;
 
-public class RoboRioSimTest {
+class RoboRioSimTest {
   @Test
   void testFPGAButton() {
     RoboRioSim.resetData();
@@ -59,6 +59,23 @@ public class RoboRioSimTest {
       assertEquals(kTestCurrent, currentCallback.getSetValue());
       assertEquals(kTestCurrent, RoboRioSim.getVInCurrent());
       assertEquals(kTestCurrent, RobotController.getInputCurrent());
+    }
+  }
+
+  @Test
+  void testSetBrownout() {
+    RoboRioSim.resetData();
+
+    DoubleCallback voltageCallback = new DoubleCallback();
+    try (CallbackStore voltageCb =
+        RoboRioSim.registerBrownoutVoltageCallback(voltageCallback, false)) {
+      final double kTestVoltage = 1.91;
+
+      RoboRioSim.setBrownoutVoltage(kTestVoltage);
+      assertTrue(voltageCallback.wasTriggered());
+      assertEquals(kTestVoltage, voltageCallback.getSetValue());
+      assertEquals(kTestVoltage, RoboRioSim.getBrownoutVoltage());
+      assertEquals(kTestVoltage, RobotController.getBrownoutVoltage());
     }
   }
 

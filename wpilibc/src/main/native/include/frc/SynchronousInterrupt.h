@@ -13,7 +13,7 @@ namespace frc {
 class DigitalSource;
 
 /**
- * Class for handling ssynchronous interrupts.
+ * Class for handling synchronous (blocking) interrupts.
  *
  * <p> By default, interrupts will occur on rising edge.
  *
@@ -30,16 +30,22 @@ class SynchronousInterrupt {
 
   /**
    * Construct a Synchronous Interrupt from a Digital Source.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
    */
   explicit SynchronousInterrupt(DigitalSource& source);
 
   /**
    * Construct a Synchronous Interrupt from a Digital Source.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
    */
   explicit SynchronousInterrupt(DigitalSource* source);
 
   /**
    * Construct a Synchronous Interrupt from a Digital Source.
+   *
+   * @param source the DigitalSource the interrupts are triggered from
    */
   explicit SynchronousInterrupt(std::shared_ptr<DigitalSource> source);
 
@@ -72,6 +78,8 @@ class SynchronousInterrupt {
 
   /**
    * Get the timestamp (relative to FPGA Time) of the last rising edge.
+   *
+   * @return the timestamp in seconds relative to getFPGATime
    */
   units::second_t GetRisingTimestamp();
 

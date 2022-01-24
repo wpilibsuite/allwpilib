@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * (for instance, if they want to react to the user holding a button while the robot is reading a
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
  */
 public abstract class Trigger implements Sendable {
   private volatile boolean m_sendablePressed;

@@ -150,7 +150,7 @@ public final class RuntimeDetector {
    * @return if architecture is aarch64
    */
   public static boolean isAarch64() {
-    return System.getProperty("os.arch").equals("aarch64");
+    return "aarch64".equals(System.getProperty("os.arch"));
   }
 
   public static boolean isLinux() {

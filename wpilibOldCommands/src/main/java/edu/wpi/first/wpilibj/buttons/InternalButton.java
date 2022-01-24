@@ -5,8 +5,10 @@
 package edu.wpi.first.wpilibj.buttons;
 
 /**
- * This class is intended to be used within a program. The programmer can manually set its value.
- * Also includes a setting for whether or not it should invert its value.
+ * This {@link Button} is intended to be used within a program. The programmer can manually set its
+ * value. * Also includes a setting for whether or not it should invert its value.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
  */
 public class InternalButton extends Button {
   private boolean m_pressed;

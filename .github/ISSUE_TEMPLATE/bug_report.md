@@ -22,7 +22,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. Windows]
+ - WPILib Version: [e.g. 2021.3.1]
+ - OS: [e.g. Windows 11]
  - Java version [e.g. 1.10.2]
  - C++ version [e.g. 17]
 

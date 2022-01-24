@@ -87,7 +87,7 @@ static std::pair<std::string_view, std::string_view> ReadStringToken(
       break;
     }
   }
-  return {wpi::slice(source, 0, pos), source.substr(pos)};
+  return {wpi::slice(source, 0, pos), wpi::substr(source, pos)};
 }
 
 static int fromxdigit(char ch) {

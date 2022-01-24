@@ -39,10 +39,10 @@ void QueueWork(Loop& loop, std::function<void()> work,
                std::function<void()> afterWork) {
   auto req = std::make_shared<WorkReq>();
   if (work) {
-    req->work.connect(work);
+    req->work.connect(std::move(work));
   }
   if (afterWork) {
-    req->afterWork.connect(afterWork);
+    req->afterWork.connect(std::move(afterWork));
   }
   QueueWork(loop, req);
 }

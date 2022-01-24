@@ -23,5 +23,5 @@ void ArmSubsystem::UseState(State setpoint) {
       m_feedforward.Calculate(setpoint.position, setpoint.velocity);
   // Add the feedforward to the PID output to get the motor output
   m_motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
-                      setpoint.position.to<double>(), feedforward / 12_V);
+                      setpoint.position.value(), feedforward / 12_V);
 }

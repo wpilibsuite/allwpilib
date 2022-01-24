@@ -208,7 +208,7 @@ wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     if (wpi::trim(key) == "boundary") {
       value = wpi::trim(wpi::trim(value), '"');  // value may be quoted
       if (wpi::starts_with(value, "--")) {
-        value = value.substr(2);
+        value = wpi::substr(value, 2);
       }
       boundary.append(value.begin(), value.end());
     }

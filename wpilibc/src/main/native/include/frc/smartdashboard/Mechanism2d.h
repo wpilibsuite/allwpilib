@@ -48,6 +48,7 @@ class Mechanism2d : public nt::NTSendable,
    *
    * @param width the width
    * @param height the height
+   * @param backgroundColor the background color
    */
   Mechanism2d(double width, double height,
               const Color8Bit& backgroundColor = {0, 0, 32});

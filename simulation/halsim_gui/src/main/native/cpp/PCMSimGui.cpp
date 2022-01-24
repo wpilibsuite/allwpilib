@@ -197,10 +197,10 @@ static bool PCMsAnyInitialized() {
 }
 
 void PCMSimGui::Initialize() {
-  HALSimGui::halProvider.RegisterModel("CTREPCMs", PCMsAnyInitialized, [] {
+  HALSimGui::halProvider->RegisterModel("CTREPCMs", PCMsAnyInitialized, [] {
     return std::make_unique<PCMsSimModel>();
   });
-  HALSimGui::halProvider.RegisterView(
+  HALSimGui::halProvider->RegisterView(
       "Solenoids", "CTREPCMs",
       [](glass::Model* model) {
         bool any = false;
@@ -218,14 +218,14 @@ void PCMSimGui::Initialize() {
         return glass::MakeFunctionView([=] {
           glass::DisplayPCMsSolenoids(
               static_cast<PCMsSimModel*>(model),
-              HALSimGui::halProvider.AreOutputsEnabled());
+              HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 
   SimDeviceGui::GetDeviceTree().Add(
-      HALSimGui::halProvider.GetModel("CTREPCMs"), [](glass::Model* model) {
+      HALSimGui::halProvider->GetModel("CTREPCMs"), [](glass::Model* model) {
         glass::DisplayCompressorsDevice(
             static_cast<PCMsSimModel*>(model),
-            HALSimGui::halProvider.AreOutputsEnabled());
+            HALSimGui::halProvider->AreOutputsEnabled());
       });
 }

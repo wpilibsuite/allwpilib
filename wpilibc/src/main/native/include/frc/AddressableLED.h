@@ -140,7 +140,7 @@ class AddressableLED {
    * <p>The sync time is the time to hold output so LEDs enable. Default set for
    * WS2812.
    *
-   * @param syncTimeMicroSeconds the sync time
+   * @param syncTime the sync time
    */
   void SetSyncTime(units::microsecond_t syncTime);
 

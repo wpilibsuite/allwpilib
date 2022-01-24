@@ -38,8 +38,11 @@ class RpcServerThread
     : public wpi::CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
                                  RpcNotifierData> {
  public:
-  RpcServerThread(int inst, wpi::Logger& logger)
-      : m_inst(inst), m_logger(logger) {}
+  RpcServerThread(std::function<void()> on_start, std::function<void()> on_exit,
+                  int inst, wpi::Logger& logger)
+      : CallbackThread(std::move(on_start), std::move(on_exit)),
+        m_inst(inst),
+        m_logger(logger) {}
 
   bool Matches(const RpcListenerData& /*listener*/,
                const RpcNotifierData& data) {

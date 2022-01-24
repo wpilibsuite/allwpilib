@@ -31,9 +31,9 @@ TEST_F(SwerveDriveOdometryTest, TwoIterations) {
   auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(), state, state,
                                         state, state);
 
-  EXPECT_NEAR(0.5, pose.X().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
 TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
@@ -49,9 +49,9 @@ TEST_F(SwerveDriveOdometryTest, 90DegreeTurn) {
   auto pose =
       m_odometry.UpdateWithTime(1_s, Rotation2d(90_deg), fl, fr, bl, br);
 
-  EXPECT_NEAR(12.0, pose.X().to<double>(), kEpsilon);
-  EXPECT_NEAR(12.0, pose.Y().to<double>(), kEpsilon);
-  EXPECT_NEAR(90.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.X().value(), kEpsilon);
+  EXPECT_NEAR(12.0, pose.Y().value(), kEpsilon);
+  EXPECT_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
 }
 
 TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
@@ -65,7 +65,7 @@ TEST_F(SwerveDriveOdometryTest, GyroAngleReset) {
   auto pose = m_odometry.UpdateWithTime(0.1_s, Rotation2d(90_deg), state, state,
                                         state, state);
 
-  EXPECT_NEAR(0.5, pose.X().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Y().to<double>(), kEpsilon);
-  EXPECT_NEAR(0.0, pose.Rotation().Degrees().to<double>(), kEpsilon);
+  EXPECT_NEAR(0.5, pose.X().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Y().value(), kEpsilon);
+  EXPECT_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
 }

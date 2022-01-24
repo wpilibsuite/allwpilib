@@ -5,7 +5,6 @@
 package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.hal.ControlWord;
-import edu.wpi.first.hal.HAL;
 
 /** A wrapper around Driver Station control word. */
 public class DSControlWord {
@@ -22,7 +21,7 @@ public class DSControlWord {
 
   /** Update internal Driver Station control word. */
   public void update() {
-    HAL.getControlWord(m_controlWord);
+    DriverStation.updateControlWordFromCache(m_controlWord);
   }
 
   /**

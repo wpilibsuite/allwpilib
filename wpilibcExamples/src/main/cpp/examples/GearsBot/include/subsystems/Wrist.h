@@ -51,6 +51,5 @@ class Wrist : public frc2::PIDSubsystem {
   frc::AnalogPotentiometer m_pot{3};  // Defaults to degrees
 #endif
 
-  static constexpr double kP_real = 1;
-  static constexpr double kP_simulation = 0.05;
+  static constexpr double kP = 1;
 };

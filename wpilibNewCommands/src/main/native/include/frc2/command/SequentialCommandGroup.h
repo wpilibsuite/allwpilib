@@ -29,6 +29,8 @@ const size_t invalid_index = std::numeric_limits<size_t>::max();
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class SequentialCommandGroup
     : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {

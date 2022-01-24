@@ -16,7 +16,7 @@
 #endif
 
 // offset in microseconds
-static uint64_t zerotime() noexcept {
+static uint64_t time_since_epoch() noexcept {
 #ifdef _WIN32
   FILETIME ft;
   uint64_t tmpres = 0;
@@ -35,7 +35,7 @@ static uint64_t zerotime() noexcept {
 #else
   // 1-us intervals
   return std::chrono::duration_cast<std::chrono::microseconds>(
-             std::chrono::high_resolution_clock::now().time_since_epoch())
+             std::chrono::system_clock::now().time_since_epoch())
       .count();
 #endif
 }
@@ -66,7 +66,7 @@ static uint64_t update_frequency() {
 }
 #endif
 
-static const uint64_t zerotime_val = zerotime();
+static const uint64_t zerotime_val = time_since_epoch();
 static const uint64_t offset_val = timestamp();
 #ifdef _WIN32
 static const uint64_t frequency_val = update_frequency();
@@ -96,6 +96,10 @@ uint64_t wpi::Now() {
   return (now_impl.load())();
 }
 
+uint64_t wpi::GetSystemTime() {
+  return time_since_epoch();
+}
+
 extern "C" {
 
 uint64_t WPI_NowDefault(void) {
@@ -108,6 +112,10 @@ void WPI_SetNowImpl(uint64_t (*func)(void)) {
 
 uint64_t WPI_Now(void) {
   return wpi::Now();
+}
+
+uint64_t WPI_GetSystemTime(void) {
+  return wpi::GetSystemTime();
 }
 
 }  // extern "C"

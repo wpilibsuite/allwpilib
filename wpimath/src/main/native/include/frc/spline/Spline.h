@@ -109,8 +109,7 @@ class Spline {
    * @return The vector.
    */
   static Eigen::Vector2d ToVector(const Translation2d& translation) {
-    return Eigen::Vector2d{translation.X().to<double>(),
-                           translation.Y().to<double>()};
+    return Eigen::Vector2d{translation.X().value(), translation.Y().value()};
   }
 
   /**

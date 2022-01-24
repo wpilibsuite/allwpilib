@@ -25,6 +25,7 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
@@ -731,15 +732,15 @@ void glass::DisplayNetworkTables(NetworkTablesModel* model,
 void NetworkTablesFlagsSettings::Update() {
   if (!m_pTreeView) {
     auto& storage = GetStorage();
-    m_pTreeView = storage.GetBoolRef(
-        "tree", m_defaultFlags & NetworkTablesFlags_TreeView);
-    m_pShowConnections = storage.GetBoolRef(
+    m_pTreeView =
+        &storage.GetBool("tree", m_defaultFlags & NetworkTablesFlags_TreeView);
+    m_pShowConnections = &storage.GetBool(
         "connections", m_defaultFlags & NetworkTablesFlags_ShowConnections);
-    m_pShowFlags = storage.GetBoolRef(
+    m_pShowFlags = &storage.GetBool(
         "flags", m_defaultFlags & NetworkTablesFlags_ShowFlags);
-    m_pShowTimestamp = storage.GetBoolRef(
+    m_pShowTimestamp = &storage.GetBool(
         "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
-    m_pCreateNoncanonicalKeys = storage.GetBoolRef(
+    m_pCreateNoncanonicalKeys = &storage.GetBool(
         "createNonCanonical",
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
   }

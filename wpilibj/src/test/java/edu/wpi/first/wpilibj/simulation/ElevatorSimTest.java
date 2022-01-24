@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import org.junit.jupiter.api.Test;
 
-public class ElevatorSimTest {
+class ElevatorSimTest {
   @Test
   @SuppressWarnings({"LocalVariableName", "resource"})
-  public void testStateSpaceSimWithElevator() {
+  void testStateSpaceSimWithElevator() {
     RoboRioSim.resetData();
 
     var controller = new PIDController(10, 0, 0);
@@ -61,7 +61,7 @@ public class ElevatorSimTest {
   }
 
   @Test
-  public void testMinMax() {
+  void testMinMax() {
     var plant =
         LinearSystemId.createElevatorSystem(
             DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
@@ -92,7 +92,7 @@ public class ElevatorSimTest {
   }
 
   @Test
-  public void testStability() {
+  void testStability() {
     var sim = new ElevatorSim(DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10);
 
     sim.setState(VecBuilder.fill(0, 0));

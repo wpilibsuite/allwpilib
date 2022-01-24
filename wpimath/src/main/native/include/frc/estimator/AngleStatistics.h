@@ -15,6 +15,7 @@ namespace frc {
  * Subtracts a and b while normalizing the resulting value in the selected row
  * as if it were an angle.
  *
+ * @tparam States The number of states.
  * @param a A vector to subtract from.
  * @param b A vector to subtract with.
  * @param angleStateIdx The row containing angles to be normalized.
@@ -25,7 +26,7 @@ Eigen::Vector<double, States> AngleResidual(
     const Eigen::Vector<double, States>& b, int angleStateIdx) {
   Eigen::Vector<double, States> ret = a - b;
   ret[angleStateIdx] =
-      AngleModulus(units::radian_t{ret[angleStateIdx]}).to<double>();
+      AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
   return ret;
 }
 
@@ -33,6 +34,7 @@ Eigen::Vector<double, States> AngleResidual(
  * Returns a function that subtracts two vectors while normalizing the resulting
  * value in the selected row as if it were an angle.
  *
+ * @tparam States The number of states.
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
@@ -48,6 +50,7 @@ AngleResidual(int angleStateIdx) {
  * Adds a and b while normalizing the resulting value in the selected row as an
  * angle.
  *
+ * @tparam States The number of states.
  * @param a A vector to add with.
  * @param b A vector to add with.
  * @param angleStateIdx The row containing angles to be normalized.
@@ -66,6 +69,7 @@ Eigen::Vector<double, States> AngleAdd(const Eigen::Vector<double, States>& a,
  * Returns a function that adds two vectors while normalizing the resulting
  * value in the selected row as an angle.
  *
+ * @tparam States The number of states.
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
@@ -79,9 +83,12 @@ AngleAdd(int angleStateIdx) {
  * Computes the mean of sigmas with the weights Wm while computing a special
  * angle mean for a select row.
  *
+ * @tparam CovDim Dimension of covariance of sigma points after passing through
+ *                the transform.
+ * @tparam States The number of states.
  * @param sigmas Sigma points.
  * @param Wm Weights for the mean.
- * @param angleStateIdx The row containing the angles.
+ * @param angleStatesIdx The row containing the angles.
  */
 template <int CovDim, int States>
 Eigen::Vector<double, CovDim> AngleMean(
@@ -103,6 +110,9 @@ Eigen::Vector<double, CovDim> AngleMean(
  * Returns a function that computes the mean of sigmas with the weights Wm while
  * computing a special angle mean for a select row.
  *
+ * @tparam CovDim Dimension of covariance of sigma points after passing through
+ *                the transform.
+ * @tparam States The number of states.
  * @param angleStateIdx The row containing the angles.
  */
 template <int CovDim, int States>

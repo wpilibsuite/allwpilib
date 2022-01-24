@@ -41,10 +41,11 @@ auto NumericalJacobian(F&& f, const Eigen::Vector<double, Cols>& x) {
  * @tparam States  Number of rows in x.
  * @tparam Inputs  Number of rows in u.
  * @tparam F       Function object type.
- * @tparam Args... Remaining arguments to f(x, u, ...).
+ * @tparam Args... Types of remaining arguments to f(x, u, ...).
  * @param f        Vector-valued function from which to compute Jacobian.
  * @param x        State vector.
  * @param u        Input vector.
+ * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
 auto NumericalJacobianX(F&& f, const Eigen::Vector<double, States>& x,
@@ -62,10 +63,11 @@ auto NumericalJacobianX(F&& f, const Eigen::Vector<double, States>& x,
  * @tparam States  Number of rows in x.
  * @tparam Inputs  Number of rows in u.
  * @tparam F       Function object type.
- * @tparam Args... Remaining arguments to f(x, u, ...).
+ * @tparam Args... Types of remaining arguments to f(x, u, ...).
  * @param f        Vector-valued function from which to compute Jacobian.
  * @param x        State vector.
  * @param u        Input vector.
+ * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
 auto NumericalJacobianU(F&& f, const Eigen::Vector<double, States>& x,

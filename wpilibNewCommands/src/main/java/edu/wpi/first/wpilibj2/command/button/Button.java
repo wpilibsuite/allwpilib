@@ -17,6 +17,8 @@ import java.util.function.BooleanSupplier;
  * <p>This class represents a subclass of Trigger that is specifically aimed at buttons on an
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
  */
 public class Button extends Trigger {
   /**

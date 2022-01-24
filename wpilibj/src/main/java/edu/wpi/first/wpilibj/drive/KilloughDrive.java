@@ -58,6 +58,11 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
 
   private boolean m_reported;
 
+  /**
+   * Wheel speeds for a Killough drive.
+   *
+   * <p>Uses normalized voltage [-1.0..1.0].
+   */
   @SuppressWarnings("MemberName")
   public static class WheelSpeeds {
     public double left;
@@ -70,9 +75,9 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
     /**
      * Constructs a WheelSpeeds.
      *
-     * @param left The left speed.
-     * @param right The right speed.
-     * @param back The back speed.
+     * @param left The left speed [-1.0..1.0].
+     * @param right The right speed [-1.0..1.0].
+     * @param back The back speed [-1.0..1.0].
      */
     public WheelSpeeds(double left, double right, double back) {
       this.left = left;
@@ -240,7 +245,7 @@ public class KilloughDrive extends RobotDriveBase implements Sendable, AutoClose
    *     positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use this
    *     to implement field-oriented controls.
-   * @return Wheel speeds.
+   * @return Wheel speeds [-1.0..1.0].
    */
   @SuppressWarnings("ParameterName")
   public WheelSpeeds driveCartesianIK(

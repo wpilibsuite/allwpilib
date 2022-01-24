@@ -20,22 +20,28 @@ class ADXL362Sim {
   /**
    * Constructs from a ADXL362 object.
    *
-   * @param ADXL362 accel to simulate
+   * @param accel ADXL362 accel to simulate
    */
   explicit ADXL362Sim(const ADXL362& accel);
 
   /**
    * Sets the X acceleration.
+   *
+   * @param accel The X acceleration.
    */
   void SetX(double accel);
 
   /**
    * Sets the Y acceleration.
+   *
+   * @param accel The Y acceleration.
    */
   void SetY(double accel);
 
   /**
    * Sets the Z acceleration.
+   *
+   * @param accel The Z acceleration.
    */
   void SetZ(double accel);
 

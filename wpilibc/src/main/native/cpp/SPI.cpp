@@ -274,7 +274,7 @@ void SPI::SetAutoTransmitData(wpi::span<const uint8_t> dataToSend,
 
 void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
-  HAL_StartSPIAutoRate(m_port, period.to<double>(), &status);
+  HAL_StartSPIAutoRate(m_port, period.value(), &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
 }
 
@@ -307,7 +307,7 @@ int SPI::ReadAutoReceivedData(uint32_t* buffer, int numToRead,
                               units::second_t timeout) {
   int32_t status = 0;
   int32_t val = HAL_ReadSPIAutoReceivedData(m_port, buffer, numToRead,
-                                            timeout.to<double>(), &status);
+                                            timeout.value(), &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
   return val;
 }

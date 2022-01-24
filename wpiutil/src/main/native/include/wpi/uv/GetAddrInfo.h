@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include "wpi/Signal.h"
 #include "wpi/uv/Request.h"
@@ -110,7 +111,7 @@ inline void GetAddrInfo(const std::shared_ptr<Loop>& loop,
                         std::function<void(const addrinfo&)> callback,
                         std::string_view node, std::string_view service = {},
                         const addrinfo* hints = nullptr) {
-  GetAddrInfo(*loop, callback, node, service, hints);
+  GetAddrInfo(*loop, std::move(callback), node, service, hints);
 }
 
 }  // namespace wpi::uv

@@ -34,15 +34,18 @@ namespace frc {
  * never call it, then this class will behave mostly like regular encoder
  * odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta]]ᵀ </strong> in the
- * field-coordinate system.
+ * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
+ * containing x position, y position, and heading.
  *
- * <strong> u = [[vx, vy, omega]]ᵀ </strong> in the field-coordinate system.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
- * <strong> y = [[x, y, theta]]ᵀ </strong> in field coords from vision,
- * or <strong> y = [[theta]]ᵀ </strong> from the gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
+ * heading.
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator {
@@ -51,7 +54,7 @@ class SwerveDrivePoseEstimator {
    * Constructs a SwerveDrivePoseEstimator.
    *
    * @param gyroAngle                The current gyro angle.
-   * @param initialPoseMeters        The starting pose estimate.
+   * @param initialPose              The starting pose estimate.
    * @param kinematics               A correctly-configured kinematics object
    *                                 for your drivetrain.
    * @param stateStdDevs             Standard deviations of model states.
@@ -269,11 +272,10 @@ class SwerveDrivePoseEstimator {
         Translation2d(chassisSpeeds.vx * 1_s, chassisSpeeds.vy * 1_s)
             .RotateBy(angle);
 
-    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().template to<double>(),
-                               fieldRelativeSpeeds.Y().template to<double>(),
-                               omega.template to<double>()};
+    Eigen::Vector<double, 3> u{fieldRelativeSpeeds.X().value(),
+                               fieldRelativeSpeeds.Y().value(), omega.value()};
 
-    Eigen::Vector<double, 1> localY{angle.Radians().template to<double>()};
+    Eigen::Vector<double, 1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
     m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
