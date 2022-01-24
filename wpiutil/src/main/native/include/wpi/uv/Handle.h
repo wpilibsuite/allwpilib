@@ -191,8 +191,8 @@ class Handle : public std::enable_shared_from_this<Handle> {
    */
   void SetBufferAllocator(std::function<Buffer(size_t)> alloc,
                           std::function<void(Buffer&)> dealloc) {
-    m_allocBuf = alloc;
-    m_freeBuf = dealloc;
+    m_allocBuf = std::move(alloc);
+    m_freeBuf = std::move(dealloc);
   }
 
   /**

@@ -18,6 +18,8 @@ namespace frc2 {
  * A base for CommandGroups.  Statically tracks commands that have been
  * allocated to groups to ensure those commands are not also used independently,
  * which can result in inconsistent command state and unpredictable execution.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandGroupBase : public CommandBase {
  public:
@@ -46,7 +48,8 @@ class CommandGroupBase : public CommandBase {
    * @param commands The commands to check
    * @return True if all the commands are ungrouped.
    */
-  static bool RequireUngrouped(wpi::span<const std::unique_ptr<Command>>);
+  static bool RequireUngrouped(
+      wpi::span<const std::unique_ptr<Command>> commands);
 
   /**
    * Requires that the specified commands not have been already allocated to a
@@ -55,7 +58,7 @@ class CommandGroupBase : public CommandBase {
    * @param commands The commands to check
    * @return True if all the commands are ungrouped.
    */
-  static bool RequireUngrouped(std::initializer_list<const Command*>);
+  static bool RequireUngrouped(std::initializer_list<const Command*> commands);
 
   /**
    * Adds the given commands to the command group.

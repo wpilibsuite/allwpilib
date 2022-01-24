@@ -5,6 +5,8 @@
 #ifndef NTCORE_CONNECTIONNOTIFIER_H_
 #define NTCORE_CONNECTIONNOTIFIER_H_
 
+#include <utility>
+
 #include <wpi/CallbackManager.h>
 
 #include "Handle.h"
@@ -19,7 +21,9 @@ class ConnectionNotifierThread
     : public wpi::CallbackThread<ConnectionNotifierThread,
                                  ConnectionNotification> {
  public:
-  explicit ConnectionNotifierThread(int inst) : m_inst(inst) {}
+  ConnectionNotifierThread(std::function<void()> on_start,
+                           std::function<void()> on_exit, int inst)
+      : CallbackThread(std::move(on_start), std::move(on_exit)), m_inst(inst) {}
 
   bool Matches(const ListenerData& /*listener*/,
                const ConnectionNotification& /*data*/) {

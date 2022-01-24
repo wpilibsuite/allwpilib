@@ -5,6 +5,7 @@
 #include "HALProvider.h"
 
 #include <glass/Model.h>
+#include <glass/Storage.h>
 
 #include <algorithm>
 #include <string>
@@ -14,6 +15,32 @@
 using namespace halsimgui;
 
 static bool gDisableOutputsOnDSDisable = true;
+
+HALProvider::HALProvider(glass::Storage& storage) : Provider{storage} {
+  storage.SetCustomApply([this] {
+    for (auto&& childIt : m_storage.GetChildren()) {
+      auto it = FindViewEntry(childIt.key());
+      if (it != m_viewEntries.end() && (*it)->name == childIt.key()) {
+        Show(it->get(), nullptr);
+      }
+    }
+    for (auto&& entry : m_viewEntries) {
+      if (entry->showDefault) {
+        Show(entry.get(), entry->window);
+        if (entry->window) {
+          entry->window->SetDefaultVisibility(glass::Window::kShow);
+        }
+      }
+    }
+  });
+  storage.SetCustomClear([this, &storage] {
+    for (auto&& entry : m_viewEntries) {
+      entry->window = nullptr;
+    }
+    m_windows.clear();
+    storage.ClearValues();
+  });
+}
 
 bool HALProvider::AreOutputsDisabled() {
   return gDisableOutputsOnDSDisable && !HALSIM_GetDriverStationEnabled();
@@ -28,31 +55,14 @@ void HALProvider::DisplayMenu() {
     bool visible = viewEntry->window && viewEntry->window->IsVisible();
     bool wasVisible = visible;
     bool exists = viewEntry->modelEntry->exists();
-    ImGui::MenuItem(viewEntry->name.c_str(), nullptr, &visible,
-                    visible || exists);
-    if (!wasVisible && visible) {
-      Show(viewEntry.get(), viewEntry->window);
-    } else if (wasVisible && !visible && viewEntry->window) {
-      viewEntry->window->SetVisible(false);
+    if (ImGui::MenuItem(viewEntry->name.c_str(), nullptr, &visible,
+                        visible || exists)) {
+      if (!wasVisible && visible) {
+        Show(viewEntry.get(), viewEntry->window);
+      } else if (wasVisible && !visible && viewEntry->window) {
+        viewEntry->window->SetVisible(false);
+      }
     }
-  }
-}
-
-void HALProvider::Update() {
-  Provider::Update();
-
-  // check for visible windows that need displays (typically this is due to
-  // file loading)
-  for (auto&& window : m_windows) {
-    if (!window->IsVisible() || window->HasView()) {
-      continue;
-    }
-    auto id = window->GetId();
-    auto it = FindViewEntry(id);
-    if (it == m_viewEntries.end() || (*it)->name != id) {
-      continue;
-    }
-    Show(it->get(), window.get());
   }
 }
 
@@ -87,7 +97,7 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(entry->name, true);
+    window = GetOrAddWindow(entry->name, true, glass::Window::kHide);
   }
   if (!window) {
     return;

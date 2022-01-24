@@ -27,6 +27,10 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystemLoop {
@@ -37,6 +41,7 @@ class LinearSystemLoop {
    * call reset with the initial system state before enabling the loop. This
    * constructor assumes that the input(s) to this system are voltage.
    *
+   * @param plant      State-space plant.
    * @param controller State-space controller.
    * @param observer   State-space observer.
    * @param maxVoltage The maximum voltage that can be applied. Commonly 12.
@@ -49,8 +54,7 @@ class LinearSystemLoop {
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const Eigen::Vector<double, Inputs>& u) {
-              return frc::NormalizeInputVector<Inputs>(
-                  u, maxVoltage.template to<double>());
+              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
             },
             dt) {}
 
@@ -95,8 +99,8 @@ class LinearSystemLoop {
       KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
       : LinearSystemLoop(controller, feedforward, observer,
                          [=](const Eigen::Vector<double, Inputs>& u) {
-                           return frc::NormalizeInputVector<Inputs>(
-                               u, maxVoltage.template to<double>());
+                           return frc::DesaturateInputVector<Inputs>(
+                               u, maxVoltage.value());
                          }) {}
 
   /**

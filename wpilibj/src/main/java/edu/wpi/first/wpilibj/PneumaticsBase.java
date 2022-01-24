@@ -12,9 +12,11 @@ public interface PneumaticsBase extends AutoCloseable {
    * @param type module type
    * @return module
    */
-  static PneumaticsControlModule getForType(int module, PneumaticsModuleType type) {
+  static PneumaticsBase getForType(int module, PneumaticsModuleType type) {
     if (type == PneumaticsModuleType.CTREPCM) {
-      return new PneumaticsControlModule();
+      return new PneumaticsControlModule(module);
+    } else if (type == PneumaticsModuleType.REVPH) {
+      return new PneumaticHub(module);
     }
     throw new IllegalArgumentException("Unknown module type");
   }
@@ -28,6 +30,8 @@ public interface PneumaticsBase extends AutoCloseable {
   static int getDefaultForType(PneumaticsModuleType type) {
     if (type == PneumaticsModuleType.CTREPCM) {
       return SensorUtil.getDefaultCTREPCMModule();
+    } else if (type == PneumaticsModuleType.REVPH) {
+      return SensorUtil.getDefaultREVPHModule();
     }
     throw new IllegalArgumentException("Unknown module type");
   }
@@ -82,9 +86,19 @@ public interface PneumaticsBase extends AutoCloseable {
 
   double getCompressorCurrent();
 
-  void setClosedLoopControl(boolean on);
+  void disableCompressor();
 
-  boolean getClosedLoopControl();
+  void enableCompressorDigital();
+
+  void enableCompressorAnalog(double minPressure, double maxPressure);
+
+  void enableCompressorHybrid(double minPressure, double maxPressure);
+
+  double getAnalogVoltage(int channel);
+
+  double getPressure(int channel);
+
+  CompressorConfigType getCompressorConfigType();
 
   /**
    * Check if a solenoid channel is valid.

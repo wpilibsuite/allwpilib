@@ -15,7 +15,6 @@
 #include <imgui_internal.h>
 #include <implot.h>
 #include <stb_image.h>
-#include <wpi/fs.h>
 
 #include "wpigui_internal.h"
 
@@ -34,7 +33,9 @@ static void WindowSizeCallback(GLFWwindow* window, int width, int height) {
     gContext->width = width;
     gContext->height = height;
   }
-  PlatformRenderFrame();
+  if (!gContext->isPlatformRendering) {
+    PlatformRenderFrame();
+  }
 }
 
 static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -96,8 +97,8 @@ static void IniWriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler,
   out_buf->appendf(
       "[MainWindow][GLOBAL]\nwidth=%d\nheight=%d\nmaximized=%d\n"
       "xpos=%d\nypos=%d\nuserScale=%d\nstyle=%d\n\n",
-      gContext->width, gContext->height, gContext->maximized, gContext->xPos,
-      gContext->yPos, gContext->userScale, gContext->style);
+      gContext->width, gContext->height, gContext->maximized ? 1 : 0,
+      gContext->xPos, gContext->yPos, gContext->userScale, gContext->style);
 }
 
 void gui::CreateContext() {
@@ -146,7 +147,12 @@ bool gui::Initialize(const char* title, int width, int height) {
   iniHandler.WriteAllFn = IniWriteAll;
   ImGui::GetCurrentContext()->SettingsHandlers.push_back(iniHandler);
 
-  io.IniFilename = gContext->iniPath.c_str();
+  if (gContext->loadSettings) {
+    gContext->loadSettings();
+    io.IniFilename = nullptr;
+  } else {
+    io.IniFilename = gContext->iniPath.c_str();
+  }
 
   for (auto&& initialize : gContext->initializers) {
     if (initialize) {
@@ -155,7 +161,11 @@ bool gui::Initialize(const char* title, int width, int height) {
   }
 
   // Load INI file
-  ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+  if (gContext->loadIniSettings) {
+    gContext->loadIniSettings();
+  } else if (io.IniFilename) {
+    ImGui::LoadIniSettingsFromDisk(io.IniFilename);
+  }
 
   // Set initial window settings
   glfwWindowHint(GLFW_MAXIMIZED, gContext->maximized ? GLFW_TRUE : GLFW_FALSE);
@@ -282,7 +292,23 @@ void gui::Main() {
   while (!glfwWindowShouldClose(gContext->window) && !gContext->exit) {
     // Poll and handle events (inputs, window resize, etc.)
     glfwPollEvents();
+    gContext->isPlatformRendering = true;
     PlatformRenderFrame();
+    gContext->isPlatformRendering = false;
+
+    // custom saving
+    if (gContext->saveSettings) {
+      auto& io = ImGui::GetIO();
+      if (io.WantSaveIniSettings) {
+        gContext->saveSettings(false);
+        io.WantSaveIniSettings = false;  // reset flag
+      }
+    }
+  }
+
+  // Save (if custom save)
+  if (gContext->saveSettings) {
+    gContext->saveSettings(true);
   }
 
   // Cleanup
@@ -292,8 +318,8 @@ void gui::Main() {
   ImGui::DestroyContext();
 
   // Delete the save file if requested.
-  if (gContext->resetOnExit) {
-    fs::remove(fs::path{gContext->iniPath});
+  if (!gContext->saveSettings && gContext->resetOnExit) {
+    std::remove(gContext->iniPath.c_str());
   }
 
   glfwDestroyWindow(gContext->window);
@@ -367,6 +393,14 @@ void gui::AddLateExecute(std::function<void()> execute) {
   }
 }
 
+void gui::ConfigureCustomSaveSettings(std::function<void()> load,
+                                      std::function<void()> loadIni,
+                                      std::function<void(bool)> save) {
+  gContext->loadSettings = load;
+  gContext->loadIniSettings = loadIni;
+  gContext->saveSettings = save;
+}
+
 GLFWwindow* gui::GetSystemWindow() {
   return gContext->window;
 }
@@ -416,27 +450,31 @@ void gui::SetClearColor(ImVec4 color) {
   gContext->clearColor = color;
 }
 
-void gui::ConfigurePlatformSaveFile(const std::string& name) {
-  gContext->iniPath = name;
+std::string gui::GetPlatformSaveFileDir() {
 #if defined(_MSC_VER)
   const char* env = std::getenv("APPDATA");
   if (env) {
-    gContext->iniPath = env + std::string("/" + name);
+    return env + std::string("/");
   }
 #elif defined(__APPLE__)
   const char* env = std::getenv("HOME");
   if (env) {
-    gContext->iniPath = env + std::string("/Library/Preferences/" + name);
+    return env + std::string("/Library/Preferences/");
   }
 #else
   const char* xdg = std::getenv("XDG_CONFIG_HOME");
   const char* env = std::getenv("HOME");
   if (xdg) {
-    gContext->iniPath = xdg + std::string("/" + name);
+    return xdg + std::string("/");
   } else if (env) {
-    gContext->iniPath = env + std::string("/.config/" + name);
+    return env + std::string("/.config/");
   }
 #endif
+  return "";
+}
+
+void gui::ConfigurePlatformSaveFile(const std::string& name) {
+  gContext->iniPath = GetPlatformSaveFileDir() + name;
 }
 
 void gui::EmitViewMenu() {
@@ -473,7 +511,9 @@ void gui::EmitViewMenu() {
       ImGui::EndMenu();
     }
 
-    ImGui::MenuItem("Reset UI on Exit?", nullptr, &gContext->resetOnExit);
+    if (!gContext->saveSettings) {
+      ImGui::MenuItem("Reset UI on Exit?", nullptr, &gContext->resetOnExit);
+    }
     ImGui::EndMenu();
   }
 }

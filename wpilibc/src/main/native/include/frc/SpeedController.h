@@ -11,6 +11,8 @@ namespace frc {
 
 /**
  * Interface for speed controlling devices.
+ *
+ * @deprecated Use MotorController.
  */
 class WPI_DEPRECATED("use MotorController") SpeedController {
  public:

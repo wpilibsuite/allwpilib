@@ -37,6 +37,7 @@
 
   <rule ref="category/java/design.xml">
     <exclude name="AvoidThrowingRawExceptionTypes" />
+    <exclude name="CognitiveComplexity" />
     <exclude name="CyclomaticComplexity" />
     <exclude name="DataClass" />
     <exclude name="ExcessiveClassLength" />
@@ -60,9 +61,10 @@
     <exclude name="AvoidDuplicateLiterals" />
     <exclude name="AvoidLiteralsInIfCondition" />
     <exclude name="BeanMembersShouldSerialize" />
+    <exclude name="CloseResource" />
     <exclude name="ConstructorCallsOverridableMethod" />
     <exclude name="DataflowAnomalyAnalysis" />
-    <exclude name="DoNotCallSystemExit" />
+    <exclude name="DoNotTerminateVM" />
     <exclude name="FinalizeDoesNotCallSuperFinalize" />
     <exclude name="JUnitSpelling" />
     <exclude name="MissingSerialVersionUID" />
@@ -83,8 +85,8 @@
 
   <rule name="UnnecessaryCastRule" language="java"
     message="Avoid unnecessary casts"
-    class="net.sourceforge.pmd.lang.java.rule.migrating.UnnecessaryCastRule"
-    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/migrating/UnnecessaryCastRule.java" />
+    class="net.sourceforge.pmd.lang.java.rule.codestyle.UnnecessaryCastRule"
+    externalInfoUrl="https://github.com/pmd/pmd/blob/master/pmd-java/src/main/java/net/sourceforge/pmd/lang/java/rule/codestyle/UnnecessaryCastRule.java" />
 
   <!-- Custom Rules -->
   <rule name="UseRequireNonNull"

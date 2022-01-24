@@ -19,6 +19,8 @@ namespace frc2 {
  * A command that runs a TrapezoidProfile.  Useful for smoothly controlling
  * mechanism motion.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see TrapezoidProfile
  */
 template <class Distance>
@@ -35,8 +37,9 @@ class TrapezoidProfileCommand
    * Creates a new TrapezoidProfileCommand that will execute the given
    * TrapezoidalProfile. Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,
@@ -49,8 +52,9 @@ class TrapezoidProfileCommand
    * Creates a new TrapezoidProfileCommand that will execute the given
    * TrapezoidalProfile. Output will be piped to the provided consumer function.
    *
-   * @param profile The motion profile to execute.
-   * @param output  The consumer for the profile output.
+   * @param profile      The motion profile to execute.
+   * @param output       The consumer for the profile output.
+   * @param requirements The list of requirements.
    */
   TrapezoidProfileCommand(frc::TrapezoidProfile<Distance> profile,
                           std::function<void(State)> output,

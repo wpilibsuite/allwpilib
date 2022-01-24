@@ -200,6 +200,5 @@ void IterativeRobotBase::LoopFunc() {
 }
 
 void IterativeRobotBase::PrintLoopOverrunMessage() {
-  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun",
-                  m_period.to<double>());
+  FRC_ReportError(err::Error, "Loop time of {:.6f}s overrun", m_period.value());
 }

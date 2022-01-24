@@ -38,7 +38,7 @@ void CommandGroup::AddSequential(Command* command, units::second_t timeout) {
   }
   if (timeout < 0_s) {
     throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
-                        timeout.to<double>());
+                        timeout.value());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_InSequence,
@@ -82,7 +82,7 @@ void CommandGroup::AddParallel(Command* command, units::second_t timeout) {
   }
   if (timeout < 0_s) {
     throw FRC_MakeError(err::ParameterOutOfRange, "timeout {} < 0 s",
-                        timeout.to<double>());
+                        timeout.value());
   }
 
   m_commands.emplace_back(command, CommandGroupEntry::kSequence_BranchChild,

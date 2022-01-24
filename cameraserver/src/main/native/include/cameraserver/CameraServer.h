@@ -229,6 +229,7 @@ class CameraServer {
    * Adds a MJPEG server.
    *
    * @param name Server name
+   * @param port Port number
    */
   static cs::MjpegServer AddServer(std::string_view name, int port);
 

@@ -46,10 +46,10 @@ public class RamseteController {
   /**
    * Construct a Ramsete unicycle controller.
    *
-   * @param b Tuning parameter (b &gt; 0) for which larger values make convergence more aggressive
-   *     like a proportional term.
-   * @param zeta Tuning parameter (0 &lt; zeta &lt; 1) for which larger values provide more damping
-   *     in response.
+   * @param b Tuning parameter (b &gt; 0 rad²/m²) for which larger values make convergence more
+   *     aggressive like a proportional term.
+   * @param zeta Tuning parameter (0 rad⁻¹ &lt; zeta &lt; 1 rad⁻¹) for which larger values provide
+   *     more damping in response.
    */
   @SuppressWarnings("ParameterName")
   public RamseteController(double b, double zeta) {
@@ -58,8 +58,8 @@ public class RamseteController {
   }
 
   /**
-   * Construct a Ramsete unicycle controller. The default arguments for b and zeta of 2.0 and 0.7
-   * have been well-tested to produce desirable results.
+   * Construct a Ramsete unicycle controller. The default arguments for b and zeta of 2.0 rad²/m²
+   * and 0.7 rad⁻¹ have been well-tested to produce desirable results.
    */
   public RamseteController() {
     this(2.0, 0.7);

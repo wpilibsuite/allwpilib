@@ -23,6 +23,8 @@ import java.util.function.Supplier;
  * scheduled individually.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class SelectCommand extends CommandBase {
   private final Map<Object, Command> m_commands;

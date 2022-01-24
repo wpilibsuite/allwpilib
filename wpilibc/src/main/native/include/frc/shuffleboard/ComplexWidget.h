@@ -21,7 +21,7 @@ namespace frc {
 class ShuffleboardContainer;
 
 /**
- * A Shuffleboard widget that handles a {@link Sendable} object such as a speed
+ * A Shuffleboard widget that handles a Sendable object such as a speed
  * controller or sensor.
  */
 class ComplexWidget final : public ShuffleboardWidget<ComplexWidget> {

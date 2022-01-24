@@ -14,18 +14,18 @@ if (WITH_JAVA)
   include(UseJava)
   set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "UTF8" "-Xlint:unchecked")
 
-  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.10.0.jar")
+  if(NOT EXISTS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson/jackson-core-2.12.4.jar")
         set(BASE_URL "https://search.maven.org/remotecontent?filepath=")
         set(JAR_ROOT "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/jackson")
 
         message(STATUS "Downloading Jackson jarfiles...")
 
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.10.0/jackson-core-2.10.0.jar"
-            "${JAR_ROOT}/jackson-core-2.10.0.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.10.0/jackson-databind-2.10.0.jar"
-            "${JAR_ROOT}/jackson-databind-2.10.0.jar")
-        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.10.0/jackson-annotations-2.10.0.jar"
-            "${JAR_ROOT}/jackson-annotations-2.10.0.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-core/2.12.4/jackson-core-2.12.4.jar"
+            "${JAR_ROOT}/jackson-core-2.12.4.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-databind/2.12.4/jackson-databind-2.12.4.jar"
+            "${JAR_ROOT}/jackson-databind-2.12.4.jar")
+        file(DOWNLOAD "${BASE_URL}com/fasterxml/jackson/core/jackson-annotations/2.12.4/jackson-annotations-2.12.4.jar"
+            "${JAR_ROOT}/jackson-annotations-2.12.4.jar")
 
         message(STATUS "All files downloaded.")
     endif()
@@ -88,6 +88,8 @@ GENERATE_RESOURCES(src/main/native/resources generated/main/cpp WPI wpi wpiutil_
 file(GLOB_RECURSE wpiutil_native_src src/main/native/cpp/*.cpp)
 list(REMOVE_ITEM wpiutil_native_src ${wpiutil_jni_src})
 file(GLOB_RECURSE wpiutil_unix_src src/main/native/unix/*.cpp)
+file(GLOB_RECURSE wpiutil_linux_src src/main/native/linux/*.cpp)
+file(GLOB_RECURSE wpiutil_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpiutil_windows_src src/main/native/windows/*.cpp)
 
 file(GLOB fmtlib_native_src src/main/native/fmtlib/src/*.cpp)
@@ -189,6 +191,11 @@ if (MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
 else ()
     target_sources(wpiutil PRIVATE ${wpiutil_unix_src})
+    if (APPLE)
+        target_sources(wpiutil PRIVATE ${wpiutil_macos_src})
+    else()
+        target_sources(wpiutil PRIVATE ${wpiutil_linux_src})
+    endif()
 endif()
 
 target_include_directories(wpiutil PUBLIC

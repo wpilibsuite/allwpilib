@@ -79,9 +79,9 @@ public final class WPIMathJNI {
   /**
    * Returns true if (A, B) is a stabilizable pair.
    *
-   * <p>(A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
+   * <p>(A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if any, have
    * absolute values less than one, where an eigenvalue is uncontrollable if rank(lambda * I - A, B)
-   * &lt; n where n is number of states.
+   * &lt; n where n is the number of states.
    *
    * @param states the number of states of the system.
    * @param inputs the number of inputs to the system.

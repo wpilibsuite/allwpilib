@@ -22,16 +22,18 @@ namespace {
 class WebSocketWriteReq : public uv::WriteReq {
  public:
   explicit WebSocketWriteReq(
-      std::function<void(span<uv::Buffer>, uv::Error)> callback) {
-    finish.connect([=](uv::Error err) {
+      std::function<void(span<uv::Buffer>, uv::Error)> callback)
+      : m_callback{std::move(callback)} {
+    finish.connect([this](uv::Error err) {
       span<uv::Buffer> bufs{m_bufs};
       for (auto&& buf : bufs.subspan(0, m_startUser)) {
         buf.Deallocate();
       }
-      callback(bufs.subspan(m_startUser), err);
+      m_callback(bufs.subspan(m_startUser), err);
     });
   }
 
+  std::function<void(span<uv::Buffer>, uv::Error)> m_callback;
   SmallVector<uv::Buffer, 4> m_bufs;
   size_t m_startUser;
 };
@@ -589,7 +591,7 @@ void WebSocket::Send(
     return;
   }
 
-  auto req = std::make_shared<WebSocketWriteReq>(callback);
+  auto req = std::make_shared<WebSocketWriteReq>(std::move(callback));
   raw_uv_ostream os{req->m_bufs, 4096};
 
   // opcode (includes FIN bit)

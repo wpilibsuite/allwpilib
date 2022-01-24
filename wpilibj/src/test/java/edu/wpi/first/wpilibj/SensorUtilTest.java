@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class SensorUtilTest {
+class SensorUtilTest {
   @Test
   void checkAnalogInputChannel() {
     assertThrows(IllegalArgumentException.class, () -> SensorUtil.checkAnalogInputChannel(100));

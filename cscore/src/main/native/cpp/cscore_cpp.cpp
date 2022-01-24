@@ -708,9 +708,13 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 // Listener Functions
 //
 
-void SetListenerOnStart(std::function<void()> onStart) {}
+void SetListenerOnStart(std::function<void()> onStart) {
+  Instance::GetInstance().notifier.SetOnStart(onStart);
+}
 
-void SetListenerOnExit(std::function<void()> onExit) {}
+void SetListenerOnExit(std::function<void()> onExit) {
+  Instance::GetInstance().notifier.SetOnExit(onExit);
+}
 
 static void StartBackground(int eventMask, bool immediateNotify) {
   auto& inst = Instance::GetInstance();

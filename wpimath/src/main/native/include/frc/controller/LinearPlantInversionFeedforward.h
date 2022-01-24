@@ -24,6 +24,9 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
  */
 template <int States, int Inputs>
 class LinearPlantInversionFeedforward {
@@ -31,8 +34,9 @@ class LinearPlantInversionFeedforward {
   /**
    * Constructs a feedforward with the given plant.
    *
-   * @param plant     The plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @tparam Outputs The number of outputs.
+   * @param plant The plant being controlled.
+   * @param dt    Discretization timestep.
    */
   template <int Outputs>
   LinearPlantInversionFeedforward(
@@ -42,9 +46,9 @@ class LinearPlantInversionFeedforward {
   /**
    * Constructs a feedforward with the given coefficients.
    *
-   * @param A         Continuous system matrix of the plant being controlled.
-   * @param B         Continuous input matrix of the plant being controlled.
-   * @param dtSeconds Discretization timestep.
+   * @param A  Continuous system matrix of the plant being controlled.
+   * @param B  Continuous input matrix of the plant being controlled.
+   * @param dt Discretization timestep.
    */
   LinearPlantInversionFeedforward(
       const Eigen::Matrix<double, States, States>& A,
@@ -64,7 +68,7 @@ class LinearPlantInversionFeedforward {
   /**
    * Returns an element of the previously calculated feedforward.
    *
-   * @param row Row of uff.
+   * @param i Row of uff.
    *
    * @return The row of the calculated feedforward.
    */

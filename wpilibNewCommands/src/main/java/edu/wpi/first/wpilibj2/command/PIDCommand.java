@@ -15,6 +15,8 @@ import java.util.function.DoubleSupplier;
  * A command that controls an output with a {@link PIDController}. Runs forever by default - to add
  * exit conditions and/or other behavior, subclass this class. The controller calculation and output
  * are performed synchronously in the command's execute() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class PIDCommand extends CommandBase {
   protected final PIDController m_controller;

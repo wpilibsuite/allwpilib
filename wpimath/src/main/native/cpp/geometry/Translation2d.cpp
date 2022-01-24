@@ -59,8 +59,8 @@ bool Translation2d::operator!=(const Translation2d& other) const {
 }
 
 void frc::to_json(wpi::json& json, const Translation2d& translation) {
-  json = wpi::json{{"x", translation.X().to<double>()},
-                   {"y", translation.Y().to<double>()}};
+  json =
+      wpi::json{{"x", translation.X().value()}, {"y", translation.Y().value()}};
 }
 
 void frc::from_json(const wpi::json& json, Translation2d& translation) {

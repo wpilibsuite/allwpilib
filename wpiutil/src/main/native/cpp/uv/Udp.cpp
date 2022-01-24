@@ -20,7 +20,8 @@ class CallbackUdpSendReq : public UdpSendReq {
   CallbackUdpSendReq(span<const Buffer> bufs,
                      std::function<void(span<Buffer>, Error)> callback)
       : m_bufs{bufs.begin(), bufs.end()} {
-    complete.connect([=](Error err) { callback(m_bufs, err); });
+    complete.connect(
+        [this, f = std::move(callback)](Error err) { f(m_bufs, err); });
   }
 
  private:
@@ -137,7 +138,8 @@ void Udp::Send(const sockaddr& addr, span<const Buffer> bufs,
 
 void Udp::Send(const sockaddr& addr, span<const Buffer> bufs,
                std::function<void(span<Buffer>, Error)> callback) {
-  Send(addr, bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
+  Send(addr, bufs,
+       std::make_shared<CallbackUdpSendReq>(bufs, std::move(callback)));
 }
 
 void Udp::Send(span<const Buffer> bufs,
@@ -157,7 +159,7 @@ void Udp::Send(span<const Buffer> bufs,
 
 void Udp::Send(span<const Buffer> bufs,
                std::function<void(span<Buffer>, Error)> callback) {
-  Send(bufs, std::make_shared<CallbackUdpSendReq>(bufs, callback));
+  Send(bufs, std::make_shared<CallbackUdpSendReq>(bufs, std::move(callback)));
 }
 
 void Udp::StartRecv() {

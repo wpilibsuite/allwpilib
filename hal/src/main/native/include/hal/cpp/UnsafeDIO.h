@@ -58,9 +58,9 @@ int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status);
  * functions on the Proxy object passed as a parameter can deadlock your
  * program.
  *
- * @param handle the HAL digital handle of the pin to toggle.
- * @param status status check
- * @param func   A functor taking a ref to a DIOSetProxy object.
+ * @param[in] handle the HAL digital handle of the pin to toggle.
+ * @param[out] status status check
+ * @param[in] func   A functor taking a ref to a DIOSetProxy object.
  */
 template <typename Functor>
 void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,

@@ -21,7 +21,7 @@ class DutyCycleEncoderSim {
   /**
    * Constructs from a DutyCycleEncoder object.
    *
-   * @param dutyCycleEncoder DutyCycleEncoder to simulate
+   * @param encoder DutyCycleEncoder to simulate
    */
   explicit DutyCycleEncoderSim(const DutyCycleEncoder& encoder);
 

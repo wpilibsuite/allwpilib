@@ -11,6 +11,8 @@ import edu.wpi.first.math.controller.PIDController;
 /**
  * A subsystem that uses a {@link PIDController} to control an output. The controller is run
  * synchronously from the subsystem's periodic() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public abstract class PIDSubsystem extends SubsystemBase {
   protected final PIDController m_controller;

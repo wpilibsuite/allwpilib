@@ -21,7 +21,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   if (period <= 0_s) {
     wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
-        period.to<double>());
+        period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
         "{}", "Controller period defaulted to 20ms.");
@@ -86,7 +86,7 @@ bool PIDController::AtSetpoint() const {
     positionError = m_setpoint - m_measurement;
   }
 
-  double velocityError = (positionError - m_prevError) / m_period.to<double>();
+  double velocityError = (positionError - m_prevError) / m_period.value();
 
   return std::abs(positionError) < m_positionTolerance &&
          std::abs(velocityError) < m_velocityTolerance;
@@ -139,11 +139,11 @@ double PIDController::Calculate(double measurement) {
     m_positionError = m_setpoint - measurement;
   }
 
-  m_velocityError = (m_positionError - m_prevError) / m_period.to<double>();
+  m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
   if (m_Ki != 0) {
     m_totalError =
-        std::clamp(m_totalError + m_positionError * m_period.to<double>(),
+        std::clamp(m_totalError + m_positionError * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 

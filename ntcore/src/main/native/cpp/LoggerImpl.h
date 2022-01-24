@@ -5,6 +5,8 @@
 #ifndef NTCORE_LOGGERIMPL_H_
 #define NTCORE_LOGGERIMPL_H_
 
+#include <utility>
+
 #include <wpi/CallbackManager.h>
 
 #include "Handle.h"
@@ -35,7 +37,9 @@ struct LoggerListenerData : public wpi::CallbackListenerData<
 class LoggerThread
     : public wpi::CallbackThread<LoggerThread, LogMessage, LoggerListenerData> {
  public:
-  explicit LoggerThread(int inst) : m_inst(inst) {}
+  LoggerThread(std::function<void()> on_start, std::function<void()> on_exit,
+               int inst)
+      : CallbackThread(std::move(on_start), std::move(on_exit)), m_inst(inst) {}
 
   bool Matches(const LoggerListenerData& listener, const LogMessage& data) {
     return data.level >= listener.min_level && data.level <= listener.max_level;

@@ -36,14 +36,14 @@ class PWMMotorController : public MotorController,
    * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
    * the value for the FPGA.
    *
-   * @param speed The speed value between -1.0 and 1.0 to set.
+   * @param value The speed value between -1.0 and 1.0 to set.
    */
   void Set(double value) override;
 
   /**
    * Get the recently set value of the PWM. This value is affected by the
    * inversion property. If you want the value that is sent directly to the
-   * MotorController, use {@link PWM#getSpeed()} instead.
+   * MotorController, use PWM::GetSpeed() instead.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
    */
@@ -60,6 +60,16 @@ class PWMMotorController : public MotorController,
   std::string GetDescription() const override;
 
   int GetChannel() const;
+
+  /**
+   * Optionally eliminate the deadband from a motor controller.
+   *
+   * @param eliminateDeadband If true, set the motor curve on the speed
+   *                          controller to eliminate the deadband in the middle
+   *                          of the range. Otherwise, keep the full range
+   *                          without modifying any values.
+   */
+  void EnableDeadbandElimination(bool eliminateDeadband);
 
  protected:
   /**

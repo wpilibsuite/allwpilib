@@ -103,7 +103,7 @@ MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double ySpeed,
   wheelSpeeds[kRearLeft] = input.x - input.y + zRotation;
   wheelSpeeds[kRearRight] = input.x + input.y - zRotation;
 
-  Normalize(wheelSpeeds);
+  Desaturate(wheelSpeeds);
 
   return {wheelSpeeds[kFrontLeft], wheelSpeeds[kFrontRight],
           wheelSpeeds[kRearLeft], wheelSpeeds[kRearRight]};

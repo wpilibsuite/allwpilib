@@ -31,6 +31,7 @@ HALSIMGUI_DATASOURCE_DOUBLE(RoboRioUserVoltage3V3, "Rio 3.3V Voltage");
 HALSIMGUI_DATASOURCE_DOUBLE(RoboRioUserCurrent3V3, "Rio 3.3V Current");
 HALSIMGUI_DATASOURCE_BOOLEAN(RoboRioUserActive3V3, "Rio 3.3V Active");
 HALSIMGUI_DATASOURCE_INT(RoboRioUserFaults3V3, "Rio 3.3V Faults");
+HALSIMGUI_DATASOURCE_DOUBLE(RoboRioBrownoutVoltage, "Rio Brownout Voltage");
 
 class RoboRioUser6VRailSimModel : public glass::RoboRioRailModel {
  public:
@@ -108,10 +109,16 @@ class RoboRioSimModel : public glass::RoboRioModel {
   glass::DataSource* GetUserButton() override { return &m_userButton; }
   glass::DataSource* GetVInVoltageData() override { return &m_vInVoltage; }
   glass::DataSource* GetVInCurrentData() override { return &m_vInCurrent; }
+  glass::DataSource* GetBrownoutVoltage() override {
+    return &m_brownoutVoltage;
+  }
 
   void SetUserButton(bool val) override { HALSIM_SetRoboRioFPGAButton(val); }
   void SetVInVoltage(double val) override { HALSIM_SetRoboRioVInVoltage(val); }
   void SetVInCurrent(double val) override { HALSIM_SetRoboRioVInCurrent(val); }
+  void SetBrownoutVoltage(double val) override {
+    HALSIM_SetRoboRioBrownoutVoltage(val);
+  }
 
  private:
   RoboRioFPGAButtonSource m_userButton;
@@ -120,11 +127,12 @@ class RoboRioSimModel : public glass::RoboRioModel {
   RoboRioUser6VRailSimModel m_user6VRail;
   RoboRioUser5VRailSimModel m_user5VRail;
   RoboRioUser3V3RailSimModel m_user3V3Rail;
+  RoboRioBrownoutVoltageSource m_brownoutVoltage;
 };
 }  // namespace
 
 void RoboRioSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "RoboRIO", [] { return true; },
       [] { return std::make_unique<RoboRioSimModel>(); },
       [](glass::Window* win, glass::Model* model) {

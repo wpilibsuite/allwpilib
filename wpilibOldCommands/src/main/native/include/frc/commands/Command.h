@@ -40,6 +40,8 @@ class CommandGroup;
  * other one will not even be started, and the active one will continue
  * functioning.
  *
+ * This class is provided by the OldCommands VendorDep
+ *  *
  * @see CommandGroup
  * @see Subsystem
  */
@@ -135,7 +137,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
    * @param subsystem The Subsystem required
    * @see Subsystem
    */
-  void Requires(Subsystem* s);
+  void Requires(Subsystem* subsystem);
 
   /**
    * Starts up the command. Gets the command ready to start.
@@ -214,7 +216,7 @@ class Command : public wpi::Sendable, public wpi::SendableHelper<Command> {
   /**
    * Checks if the command requires the given Subsystem.
    *
-   * @param system the system
+   * @param subsystem the subsystem
    * @return whether or not the subsystem is required (false if given nullptr)
    */
   bool DoesRequire(Subsystem* subsystem) const;

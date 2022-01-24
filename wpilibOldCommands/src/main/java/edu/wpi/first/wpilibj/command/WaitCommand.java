@@ -8,6 +8,8 @@ package edu.wpi.first.wpilibj.command;
  * A {@link WaitCommand} will wait for a certain amount of time before finishing. It is useful if
  * you want a {@link CommandGroup} to pause for a moment.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @see CommandGroup
  */
 public class WaitCommand extends TimedCommand {

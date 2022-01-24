@@ -16,6 +16,8 @@ namespace frc2 {
 /**
  * A base for subsystems that handles registration in the constructor, and
  * provides a more intuitive method for setting the default command.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class SubsystemBase : public Subsystem,
                       public wpi::Sendable,
@@ -47,7 +49,7 @@ class SubsystemBase : public Subsystem,
   /**
    * Sets the subsystem name of this Subsystem.
    *
-   * @param subsystem subsystem name
+   * @param name subsystem name
    */
   void SetSubsystem(std::string_view name);
 

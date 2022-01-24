@@ -21,8 +21,6 @@ class WPILIB_DLLEXPORT TrajectoryUtil {
    *
    * @param trajectory the trajectory to export
    * @param path the path of the file to export to
-   *
-   * @return The interpolated state.
    */
   static void ToPathweaverJson(const Trajectory& trajectory,
                                std::string_view path);
@@ -38,19 +36,19 @@ class WPILIB_DLLEXPORT TrajectoryUtil {
   /**
    * Deserializes a Trajectory from PathWeaver-style JSON.
    *
-   * @param json the string containing the serialized JSON
+   * @param trajectory the trajectory to export
    *
-   * @return the trajectory represented by the JSON
+   * @return the string containing the serialized JSON
    */
   static std::string SerializeTrajectory(const Trajectory& trajectory);
 
   /**
    * Serializes a Trajectory to PathWeaver-style JSON.
    *
-   * @param trajectory the trajectory to export
+   * @param jsonStr the string containing the serialized JSON
    *
-   * @return the string containing the serialized JSON
+   * @return the trajectory represented by the JSON
    */
-  static Trajectory DeserializeTrajectory(std::string_view json_str);
+  static Trajectory DeserializeTrajectory(std::string_view jsonStr);
 };
 }  // namespace frc

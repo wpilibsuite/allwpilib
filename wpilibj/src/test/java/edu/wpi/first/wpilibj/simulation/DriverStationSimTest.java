@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class DriverStationSimTest {
+class DriverStationSimTest {
   @Test
   void testEnabled() {
     HAL.initialize(500, 0);
@@ -192,7 +192,7 @@ public class DriverStationSimTest {
 
   @ParameterizedTest
   @EnumSource(DriverStation.MatchType.class)
-  public void testMatchType(DriverStation.MatchType matchType) {
+  void testMatchType(DriverStation.MatchType matchType) {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -202,7 +202,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testReplayNumber() {
+  void testReplayNumber() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -212,7 +212,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testMatchNumber() {
+  void testMatchNumber() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -222,7 +222,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testMatchTime() {
+  void testMatchTime() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -238,7 +238,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testSetGameSpecificMessage() {
+  void testSetGameSpecificMessage() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 
@@ -249,7 +249,7 @@ public class DriverStationSimTest {
   }
 
   @Test
-  public void testSetEventName() {
+  void testSetEventName() {
     HAL.initialize(500, 0);
     DriverStationSim.resetData();
 

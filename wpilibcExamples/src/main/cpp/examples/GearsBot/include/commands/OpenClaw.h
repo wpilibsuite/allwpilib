@@ -15,7 +15,7 @@
  */
 class OpenClaw : public frc2::CommandHelper<frc2::WaitCommand, OpenClaw> {
  public:
-  explicit OpenClaw(Claw* claw);
+  explicit OpenClaw(Claw& claw);
   void Initialize() override;
   void End(bool interrupted) override;
 

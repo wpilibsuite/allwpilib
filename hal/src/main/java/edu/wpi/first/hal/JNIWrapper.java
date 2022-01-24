@@ -55,4 +55,6 @@ public class JNIWrapper {
     loader.loadLibrary();
     libraryLoaded = true;
   }
+
+  public static void suppressUnused(Object object) {}
 }

@@ -4,6 +4,13 @@
 
 package edu.wpi.first.wpilibj;
 
+/**
+ * Interface for PID Controller.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
+ * @deprecated All APIs which use this have been deprecated.
+ */
 @Deprecated(since = "2020", forRemoval = true)
 @SuppressWarnings("SummaryJavadoc")
 public interface PIDInterface {

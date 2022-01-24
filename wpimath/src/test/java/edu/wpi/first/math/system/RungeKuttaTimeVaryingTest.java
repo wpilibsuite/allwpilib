@@ -12,7 +12,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.N1;
 import org.junit.jupiter.api.Test;
 
-public class RungeKuttaTimeVaryingTest {
+class RungeKuttaTimeVaryingTest {
   private static Matrix<N1, N1> rungeKuttaTimeVaryingSolution(double t) {
     return new MatBuilder<>(Nat.N1(), Nat.N1())
         .fill(12.0 * Math.exp(t) / (Math.pow(Math.exp(t) + 1.0, 2.0)));
@@ -26,7 +26,7 @@ public class RungeKuttaTimeVaryingTest {
   //
   // x(t) = 12 * e^t / ((e^t + 1)^2)
   @Test
-  public void rungeKuttaTimeVaryingTest() {
+  void rungeKuttaTimeVaryingTest() {
     final var y0 = rungeKuttaTimeVaryingSolution(5.0);
 
     final var y1 =

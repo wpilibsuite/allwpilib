@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class MedianFilterTest {
+class MedianFilterTest {
   @Test
   void medianFilterNotFullTestEven() {
     MedianFilter filter = new MedianFilter(10);

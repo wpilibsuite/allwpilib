@@ -34,7 +34,14 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @param color the color of the line
    */
-  void SetColor(const frc::Color8Bit& color);
+  void SetColor(const Color8Bit& color);
+
+  /**
+   * Get the ligament color.
+   *
+   * @return the color of the line
+   */
+  Color8Bit GetColor();
 
   /**
    * Set the ligament's length.
@@ -53,7 +60,7 @@ class MechanismLigament2d : public MechanismObject2d {
   /**
    * Set the ligament's angle relative to its parent.
    *
-   * @param degrees the angle
+   * @param angle the angle
    */
   void SetAngle(units::degree_t angle);
 
@@ -67,9 +74,16 @@ class MechanismLigament2d : public MechanismObject2d {
   /**
    * Set the line thickness.
    *
-   * @param weight the line thickness
+   * @param lineWidth the line thickness
    */
   void SetLineWeight(double lineWidth);
+
+  /**
+   * Get the line thickness.
+   *
+   * @return the line thickness
+   */
+  double GetLineWeight();
 
  protected:
   void UpdateEntries(std::shared_ptr<nt::NetworkTable> table) override;

@@ -280,7 +280,7 @@ public class DriverStation {
   private static boolean m_userInTest;
 
   // Control word variables
-  private static final Object m_controlWordMutex;
+  private static final ReentrantLock m_controlWordMutex = new ReentrantLock();
   private static final ControlWord m_controlWordCache;
   private static long m_lastControlWordUpdate;
 
@@ -319,7 +319,6 @@ public class DriverStation {
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
     }
 
-    m_controlWordMutex = new Object();
     m_controlWordCache = new ControlWord();
     m_lastControlWordUpdate = 0;
 
@@ -757,9 +756,12 @@ public class DriverStation {
    * @return True if the robot is enabled, false otherwise.
    */
   public static boolean isEnabled() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getEnabled() && m_controlWordCache.getDSAttached();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -778,9 +780,12 @@ public class DriverStation {
    * @return True if the robot is e-stopped, false otherwise.
    */
   public static boolean isEStopped() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getEStop();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -791,9 +796,12 @@ public class DriverStation {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public static boolean isAutonomous() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getAutonomous();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -804,9 +812,12 @@ public class DriverStation {
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public static boolean isAutonomousEnabled() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getAutonomous() && m_controlWordCache.getEnabled();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -851,11 +862,14 @@ public class DriverStation {
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public static boolean isTeleopEnabled() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return !m_controlWordCache.getAutonomous()
           && !m_controlWordCache.getTest()
           && m_controlWordCache.getEnabled();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -866,9 +880,12 @@ public class DriverStation {
    * @return True if test mode should be enabled, false otherwise.
    */
   public static boolean isTest() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getTest();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -878,9 +895,12 @@ public class DriverStation {
    * @return True if Driver Station is attached, false otherwise.
    */
   public static boolean isDSAttached() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getDSAttached();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -910,9 +930,12 @@ public class DriverStation {
    * @return true if the robot is competing on a field being controlled by a Field Management System
    */
   public static boolean isFMSAttached() {
-    synchronized (m_controlWordMutex) {
+    m_controlWordMutex.lock();
+    try {
       updateControlWord(false);
       return m_controlWordCache.getFMSAttached();
+    } finally {
+      m_controlWordMutex.unlock();
     }
   }
 
@@ -1107,6 +1130,7 @@ public class DriverStation {
       return true;
     } catch (InterruptedException ex) {
       // return false on a thread interrupt
+      Thread.currentThread().interrupt();
       return false;
     } finally {
       m_waitForDataMutex.unlock();
@@ -1227,8 +1251,13 @@ public class DriverStation {
 
     HAL.getMatchInfo(m_matchInfoCache);
 
-    // Force a control word update, to make sure the data is the newest.
-    updateControlWord(true);
+    m_controlWordMutex.lock();
+    try {
+      // Force a control word update, to make sure the data is the newest.
+      updateControlWord(true);
+    } finally {
+      m_controlWordMutex.unlock();
+    }
 
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
@@ -1325,18 +1354,33 @@ public class DriverStation {
   }
 
   /**
+   * Forces a control word cache update, and update the passed in control word.
+   *
+   * @param word Word to update.
+   */
+  public static void updateControlWordFromCache(ControlWord word) {
+    m_controlWordMutex.lock();
+    try {
+      updateControlWord(true);
+      word.update(m_controlWordCache);
+    } finally {
+      m_controlWordMutex.unlock();
+    }
+  }
+
+  /**
    * Updates the data in the control word cache. Updates if the force parameter is set, or if 50ms
    * have passed since the last update.
+   *
+   * <p>Must be called with m_controlWordMutex lock held.
    *
    * @param force True to force an update to the cache, otherwise update if 50ms have passed.
    */
   private static void updateControlWord(boolean force) {
     long now = System.currentTimeMillis();
-    synchronized (m_controlWordMutex) {
-      if (now - m_lastControlWordUpdate > 50 || force) {
-        HAL.getControlWord(m_controlWordCache);
-        m_lastControlWordUpdate = now;
-      }
+    if (now - m_lastControlWordUpdate > 50 || force) {
+      HAL.getControlWord(m_controlWordCache);
+      m_lastControlWordUpdate = now;
     }
   }
 }

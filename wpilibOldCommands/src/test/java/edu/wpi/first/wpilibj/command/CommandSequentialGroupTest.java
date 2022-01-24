@@ -16,7 +16,7 @@ class CommandSequentialGroupTest extends AbstractCommandTest {
    * timeout.
    */
   @Test
-  public void testThreeCommandOnSubSystem() {
+  void testThreeCommandOnSubSystem() {
     logger.fine("Beginning Test");
     final ASubsystem subsystem = new ASubsystem();
 

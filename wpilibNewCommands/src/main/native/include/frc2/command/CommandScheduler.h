@@ -26,6 +26,8 @@ class Subsystem;
  * commands synchronously from the main loop.  Subsystems should be registered
  * with the scheduler using RegisterSubsystem() in order for their Periodic()
  * methods to be called and for their default commands to be scheduled.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandScheduler final : public nt::NTSendable,
                                public wpi::SendableHelper<CommandScheduler> {
@@ -209,7 +211,7 @@ class CommandScheduler final : public nt::NTSendable,
    * <p>Commands will be canceled even if they are not scheduled as
    * interruptible.
    *
-   * @param commands the commands to cancel
+   * @param command the command to cancel
    */
   void Cancel(Command* command);
 
@@ -278,7 +280,7 @@ class CommandScheduler final : public nt::NTSendable,
    * that are directly scheduled by the scheduler; it will not work on commands
    * inside of CommandGroups, as the scheduler does not see them.
    *
-   * @param commands the command to query
+   * @param command the command to query
    * @return whether the command is currently scheduled
    */
   bool IsScheduled(const Command* command) const;

@@ -6,7 +6,7 @@ package edu.wpi.first.wpilibj2.command.button;
 
 import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.wpilibj.Debouncer;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,8 +23,10 @@ import java.util.function.BooleanSupplier;
  * (for instance, if they want to react to the user holding a button while the robot is reading a
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
-public class Trigger {
+public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_isActive;
 
   /**
@@ -49,9 +51,25 @@ public class Trigger {
    *
    * <p>This method will be called repeatedly a command is linked to the Trigger.
    *
+   * <p>Functionally identical to {@link Trigger#getAsBoolean()}.
+   *
    * @return whether or not the trigger condition is active.
    */
   public boolean get() {
+    return this.getAsBoolean();
+  }
+
+  /**
+   * Returns whether or not the trigger is active.
+   *
+   * <p>This method will be called repeatedly a command is linked to the Trigger.
+   *
+   * <p>Functionally identical to {@link Trigger#get()}.
+   *
+   * @return whether or not the trigger condition is active.
+   */
+  @Override
+  public boolean getAsBoolean() {
     return m_isActive.getAsBoolean();
   }
 
@@ -365,13 +383,25 @@ public class Trigger {
    * Creates a new debounced trigger from this trigger - it will become active when this trigger has
    * been active for longer than the specified period.
    *
-   * @param seconds the debounce period
-   * @return the debounced trigger
+   * @param seconds The debounce period.
+   * @return The debounced trigger (rising edges debounced only)
    */
   public Trigger debounce(double seconds) {
+    return debounce(seconds, Debouncer.DebounceType.kRising);
+  }
+
+  /**
+   * Creates a new debounced trigger from this trigger - it will become active when this trigger has
+   * been active for longer than the specified period.
+   *
+   * @param seconds The debounce period.
+   * @param type The debounce type.
+   * @return The debounced trigger.
+   */
+  public Trigger debounce(double seconds, Debouncer.DebounceType type) {
     return new Trigger(
         new BooleanSupplier() {
-          Debouncer m_debouncer = new Debouncer(seconds);
+          Debouncer m_debouncer = new Debouncer(seconds, type);
 
           @Override
           public boolean getAsBoolean() {

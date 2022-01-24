@@ -129,6 +129,16 @@ ext {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
                     }
                 }
+                wpiutilmacOSCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/macOS'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        include '**/*.h'
+                    }
+                }
             }
         } else {
             it.sources {
@@ -146,6 +156,16 @@ ext {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    }
+                }
+                wpiutilLinuxCpp(CppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/linux'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/fmtlib/include'
+                        include '**/*.h'
                     }
                 }
             }
@@ -274,7 +294,7 @@ model {
 }
 
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-core:2.10.0"
-    api "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-core:2.12.4"
+    api "com.fasterxml.jackson.core:jackson-databind:2.12.4"
 }

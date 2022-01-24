@@ -35,7 +35,7 @@ class HttpServerConnection {
    * Build common response headers.
    *
    * Called by SendHeader() to send headers common to every response.
-   * Each line must be terminated with \r\n.
+   * Each line must be terminated with "\r\n".
    *
    * The default implementation sends the following:
    * "Server: WebServer/1.0\r\n"

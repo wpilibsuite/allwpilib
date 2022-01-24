@@ -5,7 +5,7 @@
 #include "commands/GrabHatch.h"
 
 GrabHatch::GrabHatch(HatchSubsystem* subsystem) : m_hatch(subsystem) {
-  AddRequirements({subsystem});
+  AddRequirements(subsystem);
 }
 
 void GrabHatch::Initialize() {

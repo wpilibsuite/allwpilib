@@ -1,35 +1,5 @@
 [
   {
-    "name": "Timed Robot",
-    "description": "Timed style",
-    "tags": [
-      "Timed"
-    ],
-    "foldername": "timed",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
-    "name": "Timed Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for TimedRobot",
-    "tags": [
-      "Timed", "Skeleton"
-    ],
-    "foldername": "timedskeleton",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
-    "name": "RobotBase Skeleton (Advanced)",
-    "description": "Skeleton (stub) code for RobotBase",
-    "tags": [
-      "RobotBase", "Skeleton"
-    ],
-    "foldername": "robotbaseskeleton",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
     "name": "Command Robot",
     "description": "Command style",
     "tags": [
@@ -40,23 +10,33 @@
     "commandversion": 2
   },
   {
-    "name": "Old Command Robot",
-    "description": "Old-Command style (deprecated)",
+    "name": "Timed Robot",
+    "description": "Timed style",
     "tags": [
-      "Command"
-    ],
-    "foldername": "oldcommandbased",
-    "gradlebase": "cpp",
-    "commandversion": 1
-  },
-  {
-    "name": "Romi - Timed Robot",
-    "description": "Romi - Timed style",
-    "tags": [
-      "Timed", "Romi"
+      "Timed"
     ],
     "foldername": "timed",
-    "gradlebase": "cppromi",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Timed Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for TimedRobot",
+    "tags": [
+      "Timed", "Skeleton"
+    ],
+    "foldername": "timedskeleton",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "RobotBase Skeleton (Advanced)",
+    "description": "Skeleton (stub) code for RobotBase",
+    "tags": [
+      "RobotBase", "Skeleton"
+    ],
+    "foldername": "robotbaseskeleton",
+    "gradlebase": "cpp",
     "commandversion": 2
   },
   {
@@ -66,6 +46,16 @@
       "Command", "Romi"
     ],
     "foldername": "commandbased",
+    "gradlebase": "cppromi",
+    "commandversion": 2
+  },
+  {
+    "name": "Romi - Timed Robot",
+    "description": "Romi - Timed style",
+    "tags": [
+      "Timed", "Romi"
+    ],
+    "foldername": "timed",
     "gradlebase": "cppromi",
     "commandversion": 2
   }

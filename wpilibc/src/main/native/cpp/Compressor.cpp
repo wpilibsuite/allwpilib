@@ -19,7 +19,7 @@ Compressor::Compressor(int module, PneumaticsModuleType moduleType)
     throw FRC_MakeError(err::ResourceAlreadyAllocated, "{}", module);
   }
 
-  SetClosedLoopControl(true);
+  m_module->EnableCompressorDigital();
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, module + 1);
   wpi::SendableRegistry::AddLW(this, "Compressor", module);
@@ -33,11 +33,11 @@ Compressor::~Compressor() {
 }
 
 void Compressor::Start() {
-  SetClosedLoopControl(true);
+  EnableDigital();
 }
 
 void Compressor::Stop() {
-  SetClosedLoopControl(false);
+  Disable();
 }
 
 bool Compressor::Enabled() const {
@@ -48,23 +48,42 @@ bool Compressor::GetPressureSwitchValue() const {
   return m_module->GetPressureSwitch();
 }
 
-double Compressor::GetCompressorCurrent() const {
+units::ampere_t Compressor::GetCurrent() const {
   return m_module->GetCompressorCurrent();
 }
 
-void Compressor::SetClosedLoopControl(bool on) {
-  m_module->SetClosedLoopControl(on);
+units::volt_t Compressor::GetAnalogVoltage() const {
+  return m_module->GetAnalogVoltage(0);
 }
 
-bool Compressor::GetClosedLoopControl() const {
-  return m_module->GetClosedLoopControl();
+units::pounds_per_square_inch_t Compressor::GetPressure() const {
+  return m_module->GetPressure(0);
+}
+
+void Compressor::Disable() {
+  m_module->DisableCompressor();
+}
+
+void Compressor::EnableDigital() {
+  m_module->EnableCompressorDigital();
+}
+
+void Compressor::EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                              units::pounds_per_square_inch_t maxPressure) {
+  m_module->EnableCompressorAnalog(minPressure, maxPressure);
+}
+
+void Compressor::EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                              units::pounds_per_square_inch_t maxPressure) {
+  m_module->EnableCompressorHybrid(minPressure, maxPressure);
+}
+
+CompressorConfigType Compressor::GetConfigType() const {
+  return m_module->GetCompressorConfigType();
 }
 
 void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty(
-      "Closed Loop Control", [=]() { return GetClosedLoopControl(); },
-      [=](bool value) { SetClosedLoopControl(value); });
   builder.AddBooleanProperty(
       "Enabled", [=] { return Enabled(); }, nullptr);
   builder.AddBooleanProperty(

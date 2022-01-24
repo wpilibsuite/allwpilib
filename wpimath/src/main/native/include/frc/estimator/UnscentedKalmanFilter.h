@@ -20,6 +20,30 @@
 
 namespace frc {
 
+/**
+ * A Kalman filter combines predictions from a model and measurements to give an
+ * estimate of the true system state. This is useful because many states cannot
+ * be measured directly as a result of sensor noise, or because the state is
+ * "hidden".
+ *
+ * Kalman filters use a K gain matrix to determine whether to trust the model or
+ * measurements more. Kalman filter theory uses statistics to compute an optimal
+ * K gain which minimizes the sum of squares error in the state estimate. This K
+ * gain is used to correct the state estimate by some amount of the difference
+ * between the actual measurements and the measurements predicted by the model.
+ *
+ * An unscented Kalman filter uses nonlinear state and measurement models. It
+ * propagates the error covariance using sigma points chosen to approximate the
+ * true probability distribution.
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
+ * "Stochastic control theory".
+ *
+ * @tparam States The number of states.
+ * @tparam Inputs The number of inputs.
+ * @tparam Outputs The number of outputs.
+ */
 template <int States, int Inputs, int Outputs>
 class UnscentedKalmanFilter {
  public:
@@ -331,7 +355,7 @@ class UnscentedKalmanFilter {
     }
 
     // Mean and covariance of prediction passed through UT
-    auto [yHat, Py] = UnscentedTransform<States, Rows>(
+    auto [yHat, Py] = UnscentedTransform<Rows, States>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY);
     Py += discR;
 

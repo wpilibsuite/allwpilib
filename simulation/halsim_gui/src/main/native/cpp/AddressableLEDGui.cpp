@@ -100,7 +100,7 @@ static bool AddressableLEDsExists() {
 }
 
 void AddressableLEDGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "Addressable LEDs", [] { return AddressableLEDsExists(); },
       [] { return std::make_unique<AddressableLEDsModel>(); },
       [](glass::Window* win, glass::Model* model) {

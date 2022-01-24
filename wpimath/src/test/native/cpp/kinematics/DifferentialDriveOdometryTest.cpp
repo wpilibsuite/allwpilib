@@ -18,7 +18,7 @@ TEST(DifferentialDriveOdometryTest, EncoderDistances) {
   const auto& pose = odometry.Update(Rotation2d(135_deg), 0_m,
                                      units::meter_t(5 * wpi::numbers::pi));
 
-  EXPECT_NEAR(pose.X().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Y().to<double>(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().Degrees().to<double>(), 90.0, kEpsilon);
+  EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);
+  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, kEpsilon);
 }

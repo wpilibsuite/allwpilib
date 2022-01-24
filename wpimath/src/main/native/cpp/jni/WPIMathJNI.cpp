@@ -18,25 +18,33 @@
 
 using namespace wpi::java;
 
+/**
+ * Returns true if (A, B) is a stabilizable pair.
+ *
+ * (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+ * any, have absolute values less than one, where an eigenvalue is
+ * uncontrollable if rank(λI - A, B) < n where n is the number of states.
+ *
+ * @param A System matrix.
+ * @param B Input matrix.
+ */
 bool check_stabilizable(const Eigen::Ref<const Eigen::MatrixXd>& A,
                         const Eigen::Ref<const Eigen::MatrixXd>& B) {
-  // This function checks if (A,B) is a stabilizable pair.
-  // (A,B) is stabilizable if and only if the uncontrollable eigenvalues of
-  // A, if any, have absolute values less than one, where an eigenvalue is
-  // uncontrollable if Rank[lambda * I - A, B] < n.
-  int n = B.rows(), m = B.cols();
-  Eigen::EigenSolver<Eigen::MatrixXd> es(A);
-  for (int i = 0; i < n; i++) {
+  int states = B.rows();
+  int inputs = B.cols();
+  Eigen::EigenSolver<Eigen::MatrixXd> es{A};
+  for (int i = 0; i < states; ++i) {
     if (es.eigenvalues()[i].real() * es.eigenvalues()[i].real() +
             es.eigenvalues()[i].imag() * es.eigenvalues()[i].imag() <
         1) {
       continue;
     }
 
-    Eigen::MatrixXcd E(n, n + m);
-    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(n, n) - A, B;
-    Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr(E);
-    if (qr.rank() != n) {
+    Eigen::MatrixXcd E{states, states + inputs};
+    E << es.eigenvalues()[i] * Eigen::MatrixXcd::Identity(states, states) - A,
+        B;
+    Eigen::ColPivHouseholderQR<Eigen::MatrixXcd> qr{E};
+    if (qr.rank() < states) {
       return false;
     }
   }
@@ -50,13 +58,13 @@ std::vector<double> GetElementsFromTrajectory(
   elements.reserve(trajectory.States().size() * 7);
 
   for (auto&& state : trajectory.States()) {
-    elements.push_back(state.t.to<double>());
-    elements.push_back(state.velocity.to<double>());
-    elements.push_back(state.acceleration.to<double>());
-    elements.push_back(state.pose.X().to<double>());
-    elements.push_back(state.pose.Y().to<double>());
-    elements.push_back(state.pose.Rotation().Radians().to<double>());
-    elements.push_back(state.curvature.to<double>());
+    elements.push_back(state.t.value());
+    elements.push_back(state.velocity.value());
+    elements.push_back(state.acceleration.value());
+    elements.push_back(state.pose.X().value());
+    elements.push_back(state.pose.Y().value());
+    elements.push_back(state.pose.Rotation().Radians().value());
+    elements.push_back(state.curvature.value());
   }
 
   return elements;
@@ -196,7 +204,7 @@ Java_edu_wpi_first_math_WPIMathJNI_isStabilizable
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
       B{nativeB, states, inputs};
 
-  bool isStabilizable = check_stabilizable(A, B);  // NOLINT
+  bool isStabilizable = check_stabilizable(A, B);
 
   env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
   env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
@@ -265,7 +273,7 @@ Java_edu_wpi_first_math_WPIMathJNI_deserializeTrajectory
     return MakeJDoubleArray(env, elements);
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "edu/wpi/first/math/trajectory/TrajectoryUtil$"
         "TrajectorySerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());
@@ -290,7 +298,7 @@ Java_edu_wpi_first_math_WPIMathJNI_serializeTrajectory
                        frc::TrajectoryUtil::SerializeTrajectory(trajectory));
   } catch (std::exception& e) {
     jclass cls = env->FindClass(
-        "edu/wpi/first/wpilibj/trajectory/TrajectoryUtil$"
+        "edu/wpi/first/math/trajectory/TrajectoryUtil$"
         "TrajectorySerializationException");
     if (cls) {
       env->ThrowNew(cls, e.what());

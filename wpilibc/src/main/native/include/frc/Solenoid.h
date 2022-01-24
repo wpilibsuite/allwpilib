@@ -91,8 +91,7 @@ class Solenoid : public wpi::Sendable, public wpi::SendableHelper<Solenoid> {
    * the startPulse method to allow the PCM to control the timing of a pulse.
    * The timing can be controlled in 0.01 second increments.
    *
-   * @param durationSeconds The duration of the pulse, from 0.01 to 2.55
-   *                        seconds.
+   * @param duration The duration of the pulse, from 0.01 to 2.55 seconds.
    *
    * @see startPulse()
    */

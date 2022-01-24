@@ -52,12 +52,12 @@ const char* GetErrorMessage(int32_t* code);
  * Reports an error to the driver station (using HAL_SendError).
  * Generally the FRC_ReportError wrapper macro should be used instead.
  *
- * @param status error code
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
- * @param format error message format
- * @param args error message format args
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  */
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
                   const char* funcName, fmt::string_view format,
@@ -67,12 +67,12 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
  * Reports an error to the driver station (using HAL_SendError).
  * Generally the FRC_ReportError wrapper macro should be used instead.
  *
- * @param status error code
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
- * @param format error message format
- * @param args error message format args
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  */
 template <typename S, typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
@@ -86,11 +86,12 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  * by the caller. Generally the FRC_MakeError wrapper macro should be used
  * instead.
  *
- * @param status error code
- * @param message error message details
- * @param fileName source file name
- * @param lineNumber source line number
- * @param funcName source function name
+ * @param[out] status error code
+ * @param[in]  fileName source file name
+ * @param[in]  lineNumber source line number
+ * @param[in]  funcName source function name
+ * @param[in]  format error message format
+ * @param[in]  args error message format args
  * @return runtime error object
  */
 [[nodiscard]] RuntimeError MakeErrorV(int32_t status, const char* fileName,
@@ -124,8 +125,8 @@ namespace warn {
 /**
  * Reports an error to the driver station (using HAL_SendError).
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  */
 #define FRC_ReportError(status, format, ...)                       \
   do {                                                             \
@@ -139,8 +140,8 @@ namespace warn {
  * Makes a runtime error exception object. This object should be thrown
  * by the caller.
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  * @return runtime error object
  */
 #define FRC_MakeError(status, format, ...)                   \
@@ -151,8 +152,8 @@ namespace warn {
  * Checks a status code and depending on its value, either throws a
  * RuntimeError exception, calls ReportError, or does nothing (if no error).
  *
- * @param status error code
- * @param format error message format
+ * @param[out] status error code
+ * @param[in]  format error message format
  */
 #define FRC_CheckErrorStatus(status, format, ...)                      \
   do {                                                                 \

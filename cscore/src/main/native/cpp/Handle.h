@@ -5,6 +5,8 @@
 #ifndef CSCORE_HANDLE_H_
 #define CSCORE_HANDLE_H_
 
+#include <wpi/Synchronization.h>
+
 #include "cscore_c.h"
 
 namespace cs {
@@ -18,7 +20,7 @@ class Handle {
  public:
   enum Type {
     kUndefined = 0,
-    kProperty = 0x40,
+    kProperty = wpi::kHandleTypeCSBase,
     kSource,
     kSink,
     kListener,

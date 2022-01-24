@@ -18,6 +18,8 @@ class Command;
  * A class used to bind command scheduling to button presses.  Can be composed
  * with other buttons with the operators in Trigger.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Trigger
  */
 class Button : public Trigger {
@@ -25,7 +27,7 @@ class Button : public Trigger {
   /**
    * Create a new button that is pressed when the given condition is true.
    *
-   * @param isActive Whether the button is pressed.
+   * @param isPressed Whether the button is pressed.
    */
   explicit Button(std::function<bool()> isPressed);
 

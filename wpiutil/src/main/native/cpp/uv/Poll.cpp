@@ -37,7 +37,7 @@ void Poll::Reuse(int fd, std::function<void()> callback) {
   if (!m_reuseData) {
     m_reuseData = std::make_unique<ReuseData>();
   }
-  m_reuseData->callback = callback;
+  m_reuseData->callback = std::move(callback);
   m_reuseData->isSocket = false;
   m_reuseData->fd = fd;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
@@ -62,7 +62,7 @@ void Poll::ReuseSocket(uv_os_sock_t sock, std::function<void()> callback) {
   if (!m_reuseData) {
     m_reuseData = std::make_unique<ReuseData>();
   }
-  m_reuseData->callback = callback;
+  m_reuseData->callback = std::move(callback);
   m_reuseData->isSocket = true;
   m_reuseData->sock = sock;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {

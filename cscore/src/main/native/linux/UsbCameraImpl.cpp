@@ -107,7 +107,7 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
 
 static bool IsPercentageProperty(std::string_view name) {
   if (wpi::starts_with(name, "raw_")) {
-    name = name.substr(4);
+    name = wpi::substr(name, 4);
   }
   return name == "brightness" || name == "contrast" || name == "saturation" ||
          name == "hue" || name == "sharpness" || name == "gain" ||
@@ -181,13 +181,13 @@ static bool GetVendorProduct(int dev, int* vendor, int* product) {
   }
   std::string_view readStr{readBuf};
   if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('v')).substr(1, 4), 16)) {
+          wpi::substr(wpi::substr(readStr, readStr.find('v')), 1, 4), 16)) {
     *vendor = v.value();
   } else {
     return false;
   }
   if (auto v = wpi::parse_integer<int>(
-          readStr.substr(readStr.find('p')).substr(1, 4), 16)) {
+          wpi::substr(wpi::substr(readStr, readStr.find('p')), 1, 4), 16)) {
     *product = v.value();
   } else {
     return false;
@@ -236,8 +236,8 @@ static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
   std::optional<int> vendor;
   std::optional<int> product;
   if (wpi::starts_with(card, "UVC Camera (") &&
-      (vendor = wpi::parse_integer<int>(card.substr(12, 4), 16)) &&
-      (product = wpi::parse_integer<int>(card.substr(17, 4), 16))) {
+      (vendor = wpi::parse_integer<int>(wpi::substr(card, 12, 4), 16)) &&
+      (product = wpi::parse_integer<int>(wpi::substr(card, 17, 4), 16))) {
     std::string card2 = GetUsbNameFromId(vendor.value(), product.value());
     if (!card2.empty()) {
       *desc = std::move(card2);
@@ -283,7 +283,7 @@ static int GetDeviceNum(const char* cpath) {
   if (!wpi::starts_with(fn, "video")) {
     return -1;
   }
-  if (auto dev = wpi::parse_integer<int>(fn.substr(5), 10)) {
+  if (auto dev = wpi::parse_integer<int>(wpi::substr(fn, 5), 10)) {
     return dev.value();
   }
   return -1;
@@ -1635,7 +1635,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       }
 
       unsigned int dev = 0;
-      if (auto v = wpi::parse_integer<unsigned int>(fname.substr(5), 10)) {
+      if (auto v =
+              wpi::parse_integer<unsigned int>(wpi::substr(fname, 5), 10)) {
         dev = v.value();
       } else {
         continue;
@@ -1686,7 +1687,8 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
             std::string fname = fs::path{target}.filename();
             std::optional<unsigned int> dev;
             if (wpi::starts_with(fname, "video") &&
-                (dev = wpi::parse_integer<unsigned int>(fname.substr(5), 10)) &&
+                (dev = wpi::parse_integer<unsigned int>(wpi::substr(fname, 5),
+                                                        10)) &&
                 dev.value() < retval.size()) {
               retval[dev.value()].otherPaths.emplace_back(path.str());
             }

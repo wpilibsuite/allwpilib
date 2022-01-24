@@ -50,14 +50,29 @@ TEST(RoboRioSimTest, SetVin) {
   RoboRioSim::SetVInVoltage(units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().to<double>());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetInputVoltage());
 
   RoboRioSim::SetVInCurrent(units::ampere_t{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetVInCurrent().to<double>());
+  EXPECT_EQ(kTestCurrent, RoboRioSim::GetVInCurrent().value());
   EXPECT_EQ(kTestCurrent, RobotController::GetInputCurrent());
+}
+
+TEST(RoboRioSimTest, SetBrownout) {
+  RoboRioSim::ResetData();
+
+  DoubleCallback voltageCallback;
+  auto voltageCb = RoboRioSim::RegisterBrownoutVoltageCallback(
+      voltageCallback.GetCallback(), false);
+  constexpr double kTestVoltage = 1.91;
+
+  RoboRioSim::SetBrownoutVoltage(units::volt_t{kTestVoltage});
+  EXPECT_TRUE(voltageCallback.WasTriggered());
+  EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
+  EXPECT_EQ(kTestVoltage, RobotController::GetBrownoutVoltage().value());
 }
 
 TEST(RoboRioSimTest, Set6V) {
@@ -82,13 +97,13 @@ TEST(RoboRioSimTest, Set6V) {
   RoboRioSim::SetUserVoltage6V(units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage6V().to<double>());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage6V().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetVoltage6V());
 
   RoboRioSim::SetUserCurrent6V(units::ampere_t{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent6V().to<double>());
+  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent6V().value());
   EXPECT_EQ(kTestCurrent, RobotController::GetCurrent6V());
 
   RoboRioSim::SetUserActive6V(false);
@@ -126,13 +141,13 @@ TEST(RoboRioSimTest, Set5V) {
   RoboRioSim::SetUserVoltage5V(units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage5V().to<double>());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage5V().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetVoltage5V());
 
   RoboRioSim::SetUserCurrent5V(units::ampere_t{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent5V().to<double>());
+  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent5V().value());
   EXPECT_EQ(kTestCurrent, RobotController::GetCurrent5V());
 
   RoboRioSim::SetUserActive5V(false);
@@ -170,13 +185,13 @@ TEST(RoboRioSimTest, Set3V3) {
   RoboRioSim::SetUserVoltage3V3(units::volt_t{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
-  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().to<double>());
+  EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetVoltage3V3());
 
   RoboRioSim::SetUserCurrent3V3(units::ampere_t{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
-  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().to<double>());
+  EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().value());
   EXPECT_EQ(kTestCurrent, RobotController::GetCurrent3V3());
 
   RoboRioSim::SetUserActive3V3(false);

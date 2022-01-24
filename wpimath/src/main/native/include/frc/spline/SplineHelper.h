@@ -80,14 +80,14 @@ class WPILIB_DLLEXPORT SplineHelper {
  private:
   static Spline<3>::ControlVector CubicControlVector(double scalar,
                                                      const Pose2d& point) {
-    return {{point.X().to<double>(), scalar * point.Rotation().Cos()},
-            {point.Y().to<double>(), scalar * point.Rotation().Sin()}};
+    return {{point.X().value(), scalar * point.Rotation().Cos()},
+            {point.Y().value(), scalar * point.Rotation().Sin()}};
   }
 
   static Spline<5>::ControlVector QuinticControlVector(double scalar,
                                                        const Pose2d& point) {
-    return {{point.X().to<double>(), scalar * point.Rotation().Cos(), 0.0},
-            {point.Y().to<double>(), scalar * point.Rotation().Sin(), 0.0}};
+    return {{point.X().value(), scalar * point.Rotation().Cos(), 0.0},
+            {point.Y().value(), scalar * point.Rotation().Sin(), 0.0}};
   }
 
   /**

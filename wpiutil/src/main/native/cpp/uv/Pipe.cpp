@@ -28,7 +28,7 @@ void Pipe::Reuse(std::function<void()> callback, bool ipc) {
   if (!m_reuseData) {
     m_reuseData = std::make_unique<ReuseData>();
   }
-  m_reuseData->callback = callback;
+  m_reuseData->callback = std::move(callback);
   m_reuseData->ipc = ipc;
   uv_close(GetRawHandle(), [](uv_handle_t* handle) {
     Pipe& h = *static_cast<Pipe*>(handle->data);
@@ -85,7 +85,7 @@ void Pipe::Connect(std::string_view name,
 
 void Pipe::Connect(std::string_view name, std::function<void()> callback) {
   auto req = std::make_shared<PipeConnectReq>();
-  req->connected.connect(callback);
+  req->connected.connect(std::move(callback));
   Connect(name, req);
 }
 

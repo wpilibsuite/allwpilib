@@ -27,6 +27,7 @@
 #include <wpigui.h>
 
 #include "glass/Context.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
@@ -61,7 +62,7 @@ struct FrameData {
 
 class BackgroundInfo {
  public:
-  BackgroundInfo();
+  explicit BackgroundInfo(Storage& storage);
 
   void DisplaySettings();
 
@@ -72,11 +73,11 @@ class BackgroundInfo {
 
  private:
   void Reset();
-  bool LoadImageImpl(const char* fn);
+  bool LoadImageImpl(const std::string& fn);
 
   std::unique_ptr<pfd::open_file> m_fileOpener;
 
-  std::string* m_pFilename;
+  std::string& m_filename;
   gui::Texture m_texture;
 
   // in image pixels
@@ -86,10 +87,8 @@ class BackgroundInfo {
 
 }  // namespace
 
-BackgroundInfo::BackgroundInfo() {
-  auto& storage = GetStorage();
-  m_pFilename = storage.GetStringRef("image");
-}
+BackgroundInfo::BackgroundInfo(Storage& storage)
+    : m_filename{storage.GetString("image")} {}
 
 void BackgroundInfo::DisplaySettings() {
   if (ImGui::Button("Choose image...")) {
@@ -106,7 +105,7 @@ void BackgroundInfo::DisplaySettings() {
 
 void BackgroundInfo::Reset() {
   m_texture = gui::Texture{};
-  m_pFilename->clear();
+  m_filename.clear();
   m_imageWidth = 0;
   m_imageHeight = 0;
 }
@@ -119,16 +118,16 @@ void BackgroundInfo::LoadImage() {
     }
     m_fileOpener.reset();
   }
-  if (!m_texture && !m_pFilename->empty()) {
-    if (!LoadImageImpl(m_pFilename->c_str())) {
-      m_pFilename->clear();
+  if (!m_texture && !m_filename.empty()) {
+    if (!LoadImageImpl(m_filename)) {
+      m_filename.clear();
     }
   }
 }
 
-bool BackgroundInfo::LoadImageImpl(const char* fn) {
+bool BackgroundInfo::LoadImageImpl(const std::string& fn) {
   fmt::print("GUI: loading background image '{}'\n", fn);
-  auto texture = gui::Texture::CreateFromFile(fn);
+  auto texture = gui::Texture::CreateFromFile(fn.c_str());
   if (!texture) {
     std::puts("GUI: could not read background image");
     return false;
@@ -136,7 +135,7 @@ bool BackgroundInfo::LoadImageImpl(const char* fn) {
   m_texture = std::move(texture);
   m_imageWidth = m_texture.GetWidth();
   m_imageHeight = m_texture.GetHeight();
-  *m_pFilename = fn;
+  m_filename = fn;
   return true;
 }
 
@@ -175,7 +174,7 @@ void glass::DisplayMechanism2DSettings(Mechanism2DModel* model) {
   auto& storage = GetStorage();
   auto bg = storage.GetData<BackgroundInfo>();
   if (!bg) {
-    storage.SetData(std::make_shared<BackgroundInfo>());
+    storage.SetData(std::make_shared<BackgroundInfo>(storage));
     bg = storage.GetData<BackgroundInfo>();
   }
   bg->DisplaySettings();
@@ -208,7 +207,7 @@ void glass::DisplayMechanism2D(Mechanism2DModel* model,
   auto& storage = GetStorage();
   auto bg = storage.GetData<BackgroundInfo>();
   if (!bg) {
-    storage.SetData(std::make_shared<BackgroundInfo>());
+    storage.SetData(std::make_shared<BackgroundInfo>(storage));
     bg = storage.GetData<BackgroundInfo>();
   }
 

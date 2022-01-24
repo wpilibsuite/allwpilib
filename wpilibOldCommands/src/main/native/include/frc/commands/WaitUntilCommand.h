@@ -12,16 +12,18 @@
 
 namespace frc {
 
+/**
+ * A WaitCommand will wait until a certain match time before finishing.
+ *
+ * This will wait until the game clock reaches some value, then continue to
+ * the next command.
+ *
+ * This class is provided by the OldCommands VendorDep
+ *
+ * @see CommandGroup
+ */
 class WaitUntilCommand : public Command {
  public:
-  /**
-   * A WaitCommand will wait until a certain match time before finishing.
-   *
-   * This will wait until the game clock reaches some value, then continue to
-   * the next command.
-   *
-   * @see CommandGroup
-   */
   explicit WaitUntilCommand(units::second_t time);
 
   WaitUntilCommand(std::string_view name, units::second_t time);

@@ -7,9 +7,11 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/CompressorConfigType.h"
 #include "frc/PneumaticsBase.h"
 #include "frc/PneumaticsModuleType.h"
 #include "frc/SensorUtil.h"
@@ -59,13 +61,19 @@ class Compressor : public wpi::Sendable,
   /**
    * Starts closed-loop control. Note that closed loop control is enabled by
    * default.
+   *
+   * @deprecated Use EnableDigital() instead.
    */
+  WPI_DEPRECATED("Use EnableDigital() instead")
   void Start();
 
   /**
    * Stops closed-loop control. Note that closed loop control is enabled by
    * default.
+   *
+   * @deprecated Use Disable() instead.
    */
+  WPI_DEPRECATED("Use Disable() instead")
   void Stop();
 
   /**
@@ -87,25 +95,58 @@ class Compressor : public wpi::Sendable,
    *
    * @return The current through the compressor, in amps
    */
-  double GetCompressorCurrent() const;
+  units::ampere_t GetCurrent() const;
 
   /**
-   * Enables or disables automatically turning the compressor on when the
-   * pressure is low.
+   * Query the analog input voltage (on channel 0) (if supported).
    *
-   * @param on Set to true to enable closed loop control of the compressor.
-   *           False to disable.
+   * @return The analog input voltage, in volts
    */
-  void SetClosedLoopControl(bool on);
+  units::volt_t GetAnalogVoltage() const;
 
   /**
-   * Returns true if the compressor will automatically turn on when the
-   * pressure is low.
+   * Query the analog sensor pressure (on channel 0) (if supported). Note this
+   * is only for use with the REV Analog Pressure Sensor.
    *
-   * @return True if closed loop control of the compressor is enabled. False if
-   *         disabled.
+   * @return The analog sensor pressure, in PSI
    */
-  bool GetClosedLoopControl() const;
+  units::pounds_per_square_inch_t GetPressure() const;
+
+  /**
+   * Disable the compressor.
+   */
+  void Disable();
+
+  /**
+   * Enable compressor closed loop control using digital input.
+   */
+  void EnableDigital();
+
+  /**
+   * Enable compressor closed loop control using analog input. Note this is only
+   * for use with the REV Analog Pressure Sensor.
+   *
+   * <p>On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
+   */
+  void EnableAnalog(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
+
+  /**
+   * Enable compressor closed loop control using hybrid input. Note this is only
+   * for use with the REV Analog Pressure Sensor.
+   *
+   * On CTRE PCM, this will enable digital control.
+   *
+   * @param minPressure The minimum pressure in PSI to enable compressor
+   * @param maxPressure The maximum pressure in PSI to disable compressor
+   */
+  void EnableHybrid(units::pounds_per_square_inch_t minPressure,
+                    units::pounds_per_square_inch_t maxPressure);
+
+  CompressorConfigType GetConfigType() const;
 
   void InitSendable(wpi::SendableBuilder& builder) override;
 
