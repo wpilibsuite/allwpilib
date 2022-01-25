@@ -31,6 +31,7 @@ static constexpr const char* widgetStrings[] = {
     "Differential Drivebase",
     "Mecanum Drivebase",
     "Camera Stream",
+    "Field",
 };
 
 const char* detail::GetStringForWidgetType(BuiltInWidgets type) {
