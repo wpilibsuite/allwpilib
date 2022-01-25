@@ -96,6 +96,7 @@ public final class Mechanism2d implements NTSendable {
 
   @Override
   public void initSendable(NTSendableBuilder builder) {
+    builder.setSmartDashboardType("Mechanism2d");
     synchronized (this) {
       m_table = builder.getTable();
       m_table.getEntry("dims").setDoubleArray(m_dims);

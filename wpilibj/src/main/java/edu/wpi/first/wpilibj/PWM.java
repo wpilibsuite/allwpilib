@@ -269,6 +269,7 @@ public class PWM implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("PWM");
     builder.setActuator(true);
     builder.setSafeState(this::setDisabled);
     builder.addDoubleProperty("Channel", this::getChannel, null);

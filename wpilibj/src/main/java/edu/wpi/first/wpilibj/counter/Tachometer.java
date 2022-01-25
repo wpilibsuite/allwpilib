@@ -177,6 +177,7 @@ public class Tachometer implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Tachometer");
     builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
     builder.addDoubleProperty("RPS", this::getRevolutionsPerSecond, null);
     builder.addDoubleProperty(

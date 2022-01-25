@@ -312,6 +312,7 @@ public class Ultrasonic implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Ultrasonic");
     builder.addDoubleProperty("pingChannel", m_pingChannel::getChannel, null);
     builder.addDoubleProperty("echoChannel", m_echoChannel::getChannel, null);
     builder.addBooleanProperty("enabled", this::isEnabled, this::setEnabled);

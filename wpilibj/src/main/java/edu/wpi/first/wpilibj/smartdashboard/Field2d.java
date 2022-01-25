@@ -101,6 +101,7 @@ public class Field2d implements NTSendable {
 
   @Override
   public void initSendable(NTSendableBuilder builder) {
+    builder.setSmartDashboardType("Field2d");
     synchronized (this) {
       m_table = builder.getTable();
       for (FieldObject2d obj : m_objects) {
