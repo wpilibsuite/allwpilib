@@ -473,6 +473,15 @@ public enum BuiltInWidgets implements WidgetType {
    * </table>
    */
   kCameraStream("Camera Stream"),
+  /**
+   * Displays a field2d object.<br>
+   * Supported types:
+   *
+   * <ul>
+   *   <li>{@link edu.wpi.first.wpilibj.smartdashboard.Field2d}
+   * </ul>
+   */
+  kField("Field"),
   ;
 
   private final String m_widgetName;
