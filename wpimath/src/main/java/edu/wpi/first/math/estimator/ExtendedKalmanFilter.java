@@ -374,6 +374,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("ExtendedKalmanFilter");
     builder.addDoubleArrayProperty(
         "modelStdDevs",
         () -> m_contQ.diag().getData(),

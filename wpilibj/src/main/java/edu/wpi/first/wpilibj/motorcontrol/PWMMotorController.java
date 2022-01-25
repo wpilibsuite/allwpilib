@@ -117,16 +117,13 @@ public abstract class PWMMotorController extends MotorSafety
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("Motor Controller")
-        .setActuator(true)
-        .setSafeState(this::disable)
-        .addDoubleProperty("Channel", this::getChannel, null)
-        .addBooleanProperty(
-            "DeadbandElimination",
-            m_pwm::deadbandEliminationEnabled,
-            this::enableDeadbandElimination)
-        .addBooleanProperty("Inverted", this::getInverted, this::setInverted)
-        .addDoubleProperty("Value", this::get, this::set);
+    builder.setSmartDashboardType("Motor Controller");
+    builder.setActuator(true);
+    builder.setSafeState(this::disable);
+    builder.addDoubleProperty("Channel", this::getChannel, null);
+    builder.addBooleanProperty(
+        "DeadbandElimination", m_pwm::deadbandEliminationEnabled, this::enableDeadbandElimination);
+    builder.addBooleanProperty("Inverted", this::getInverted, this::setInverted);
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

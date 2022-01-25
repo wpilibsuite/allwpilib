@@ -115,24 +115,20 @@ void Tachometer::SetUpdateWhenEmpty(bool updateWhenEmpty) {
 }
 
 void Tachometer::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Tachometer")
-      .AddDoubleProperty(
-          "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); },
-          nullptr)
-      .AddDoubleProperty(
-          "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); },
-          nullptr)
-      .AddDoubleProperty(
-          "edgesPerRev", [&] { return GetEdgesPerRevolution(); },
-          [&](double edgesPerRev) { SetEdgesPerRevolution(edgesPerRev); })
-      .AddDoubleProperty(
-          "maxPeriodSeconds", [&] { return m_maxPeriod.value(); },
-          [&](double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); })
-      .AddDoubleProperty(
-          "samplesToAverage", [&] { return GetSamplesToAverage(); },
-          [&](double samplesToAverage) {
-            SetSamplesToAverage(samplesToAverage);
-          })
-      .AddBooleanProperty(
-          "stopped", [&] { return GetStopped(); }, nullptr);
+  builder.SetSmartDashboardType("Tachometer");
+  builder.AddDoubleProperty(
+      "RPS", [&] { return GetRevolutionsPerSecond().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "RPM", [&] { return GetRevolutionsPerMinute().to<double>(); }, nullptr);
+  builder.AddDoubleProperty(
+      "edgesPerRev", [&] { return GetEdgesPerRevolution(); },
+      [&](double edgesPerRev) { SetEdgesPerRevolution(edgesPerRev); });
+  builder.AddDoubleProperty(
+      "maxPeriodSeconds", [&] { return m_maxPeriod.value(); },
+      [&](double maxPeriod) { SetMaxPeriod(units::second_t{maxPeriod}); });
+  builder.AddDoubleProperty(
+      "samplesToAverage", [&] { return GetSamplesToAverage(); },
+      [&](double samplesToAverage) { SetSamplesToAverage(samplesToAverage); });
+  builder.AddBooleanProperty(
+      "stopped", [&] { return GetStopped(); }, nullptr);
 }

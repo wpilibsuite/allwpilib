@@ -26,7 +26,7 @@ class NTSendableBuilder : public wpi::SendableBuilder {
    *
    * @param func    function
    */
-  virtual SendableBuilder& SetUpdateTable(std::function<void()> func) = 0;
+  virtual void SetUpdateTable(std::function<void()> func) = 0;
 
   /**
    * Add a property without getters or setters.  This can be used to get
@@ -44,7 +44,7 @@ class NTSendableBuilder : public wpi::SendableBuilder {
    * @param getter  getter function (returns current value)
    * @param setter  setter function (sets new value)
    */
-  virtual SendableBuilder& AddValueProperty(
+  virtual void AddValueProperty(
       std::string_view key, std::function<std::shared_ptr<Value>()> getter,
       std::function<void(std::shared_ptr<Value>)> setter) = 0;
 

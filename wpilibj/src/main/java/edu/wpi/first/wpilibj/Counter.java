@@ -517,22 +517,22 @@ public class Counter implements CounterBase, Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("Value", this::get, null)
-        .addDoubleProperty("distance", this::getDistance, null)
-        .addDoubleProperty("rate", this::getRate, null)
-        .addDoubleProperty("periodSeconds", this::getPeriod, null)
-        .addBooleanProperty("direction", this::getDirection, null)
-        .addBooleanProperty("stopped", this::getStopped, null)
-        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
-        .addDoubleProperty("distancePerPulse", () -> m_distancePerPulse, this::setDistancePerPulse)
-        .addDoubleProperty(
-            "samplesToAverage",
-            this::getSamplesToAverage,
-            samplesToAverage -> {
-              setSamplesToAverage((int) samplesToAverage);
-            })
-        .addBooleanProperty(
-            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
+    builder.addDoubleProperty("Value", this::get, null);
+    builder.addDoubleProperty("distance", this::getDistance, null);
+    builder.addDoubleProperty("rate", this::getRate, null);
+    builder.addDoubleProperty("periodSeconds", this::getPeriod, null);
+    builder.addBooleanProperty("direction", this::getDirection, null);
+    builder.addBooleanProperty("stopped", this::getStopped, null);
+    builder.addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod);
+    builder.addDoubleProperty(
+        "distancePerPulse", () -> m_distancePerPulse, this::setDistancePerPulse);
+    builder.addDoubleProperty(
+        "samplesToAverage",
+        this::getSamplesToAverage,
+        samplesToAverage -> {
+          setSamplesToAverage((int) samplesToAverage);
+        });
+    builder.addBooleanProperty(
+        "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }

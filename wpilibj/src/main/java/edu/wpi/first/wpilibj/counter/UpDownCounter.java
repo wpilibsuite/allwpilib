@@ -115,10 +115,9 @@ public class UpDownCounter implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("UpDown Counter")
-        .addDoubleProperty("Count", this::getCount, null)
-        .addBooleanProperty(
-            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
+    builder.setSmartDashboardType("UpDown Counter");
+    builder.addDoubleProperty("Count", this::getCount, null);
+    builder.addBooleanProperty(
+        "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }

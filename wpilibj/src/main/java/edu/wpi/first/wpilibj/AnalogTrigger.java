@@ -199,12 +199,11 @@ public class AnalogTrigger implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("AnalogTrigger")
-        .addDoubleProperty("index", this::getIndex, null)
-        .addBooleanProperty("filtered", () -> m_filtered, this::setFiltered)
-        .addBooleanProperty("averaged", () -> m_averaged, this::setAveraged)
-        .addBooleanProperty("inWindow", this::getInWindow, null)
-        .addBooleanProperty("triggerState", this::getTriggerState, null);
+    builder.setSmartDashboardType("AnalogTrigger");
+    builder.addDoubleProperty("index", this::getIndex, null);
+    builder.addBooleanProperty("filtered", () -> m_filtered, this::setFiltered);
+    builder.addBooleanProperty("averaged", () -> m_averaged, this::setAveraged);
+    builder.addBooleanProperty("inWindow", this::getInWindow, null);
+    builder.addBooleanProperty("triggerState", this::getTriggerState, null);
   }
 }

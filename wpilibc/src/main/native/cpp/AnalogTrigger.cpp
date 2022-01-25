@@ -116,19 +116,19 @@ std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
 }
 
 void AnalogTrigger::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AnalogTrigger")
-      .AddDoubleProperty(
-          "index", [=] { return GetIndex(); }, nullptr)
-      .AddBooleanProperty(
-          "filtered", [=] { return m_filtered; },
-          [=](bool filtered) { SetFiltered(filtered); })
-      .AddBooleanProperty(
-          "averaged", [=] { return m_averaged; },
-          [=](bool averaged) { SetAveraged(averaged); })
-      .AddBooleanProperty(
-          "inWindow", [=] { return GetInWindow(); }, nullptr)
-      .AddBooleanProperty(
-          "triggerState", [=] { return GetTriggerState(); }, nullptr);
+  builder.SetSmartDashboardType("AnalogTrigger");
+  builder.AddDoubleProperty(
+      "index", [=] { return GetIndex(); }, nullptr);
+  builder.AddBooleanProperty(
+      "filtered", [=] { return m_filtered; },
+      [=](bool filtered) { SetFiltered(filtered); });
+  builder.AddBooleanProperty(
+      "averaged", [=] { return m_averaged; },
+      [=](bool averaged) { SetAveraged(averaged); });
+  builder.AddBooleanProperty(
+      "inWindow", [=] { return GetInWindow(); }, nullptr);
+  builder.AddBooleanProperty(
+      "triggerState", [=] { return GetTriggerState(); }, nullptr);
 }
 
 int AnalogTrigger::GetSourceChannel() const {

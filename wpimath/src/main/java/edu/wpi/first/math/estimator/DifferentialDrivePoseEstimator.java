@@ -383,27 +383,26 @@ public class DifferentialDrivePoseEstimator implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     m_observer.initSendable(builder);
-    builder
-        .addDoubleProperty(
-            "visionStdDevX",
-            () -> Math.sqrt(m_visionContR.get(0, 0)),
-            (double stdDev) -> m_visionContR.set(0, 0, stdDev * stdDev))
-        .addDoubleProperty(
-            "visionStdDevY",
-            () -> Math.sqrt(m_visionContR.get(1, 1)),
-            (double stdDev) -> m_visionContR.set(1, 1, stdDev * stdDev))
-        .addDoubleProperty(
-            "visionStdDevDegrees",
-            () -> Math.toDegrees(Math.sqrt(m_visionContR.get(2, 2))),
-            (double error) ->
-                m_visionContR.set(2, 2, Math.toRadians(error) * Math.toRadians(error)))
-        .addDoubleProperty("visionPoseMetersX", m_visionPose::getX, null)
-        .addDoubleProperty("visionPoseMetersY", m_visionPose::getY, null)
-        .addDoubleProperty("visionPoseDegrees", () -> m_visionPose.getRotation().getDegrees(), null)
-        .addDoubleProperty("visionLatencyMs", () -> m_visionLatency * 1000, null)
-        .addDoubleProperty("estimatedPoseMetersX", m_estimatedPose::getX, null)
-        .addDoubleProperty("estimatedPoseMetersY", m_estimatedPose::getY, null)
-        .addDoubleProperty(
-            "estimatedPoseDegrees", () -> m_estimatedPose.getRotation().getDegrees(), null);
+    builder.addDoubleProperty(
+        "visionStdDevX",
+        () -> Math.sqrt(m_visionContR.get(0, 0)),
+        (double stdDev) -> m_visionContR.set(0, 0, stdDev * stdDev));
+    builder.addDoubleProperty(
+        "visionStdDevY",
+        () -> Math.sqrt(m_visionContR.get(1, 1)),
+        (double stdDev) -> m_visionContR.set(1, 1, stdDev * stdDev));
+    builder.addDoubleProperty(
+        "visionStdDevDegrees",
+        () -> Math.toDegrees(Math.sqrt(m_visionContR.get(2, 2))),
+        (double error) -> m_visionContR.set(2, 2, Math.toRadians(error) * Math.toRadians(error)));
+    builder.addDoubleProperty("visionPoseMetersX", m_visionPose::getX, null);
+    builder.addDoubleProperty("visionPoseMetersY", m_visionPose::getY, null);
+    builder.addDoubleProperty(
+        "visionPoseDegrees", () -> m_visionPose.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("visionLatencyMs", () -> m_visionLatency * 1000, null);
+    builder.addDoubleProperty("estimatedPoseMetersX", m_estimatedPose::getX, null);
+    builder.addDoubleProperty("estimatedPoseMetersY", m_estimatedPose::getY, null);
+    builder.addDoubleProperty(
+        "estimatedPoseDegrees", () -> m_estimatedPose.getRotation().getDegrees(), null);
   }
 }

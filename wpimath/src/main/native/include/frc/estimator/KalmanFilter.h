@@ -176,42 +176,14 @@ class KalmanFilterImpl
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
-    builder.SetSmartDashboardType("KalmanFilter")
-        .AddSmallDoubleArrayProperty(
-            "modelStdDevs",
-            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-              Eigen::Vector<double, States> diag = m_contQ.diagonal();
-              diag.array().pow(0.5);
-              values.assign(diag.data(), diag.data() + diag.size());
-              return values;
-            },
-            [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.size(); i++) {
-                m_contQ(i, i) = stdDevs[i] * stdDevs[i];
-              }
-              UpdateK();
-            })
-        .AddSmallDoubleArrayProperty(
-            "measurementStdDevs",
-            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-              Eigen::Vector<double, Outputs> diag = m_contR.diagonal();
-              diag.array().pow(0.5);
-              values.assign(diag.data(), diag.data() + diag.size());
-              return values;
-            },
-            [&](wpi::span<const double> stdDevs) {
-              for (size_t i = 0; i < stdDevs.size(); i++) {
-                m_contR(i, i) = stdDevs[i] * stdDevs[i];
-              }
-              UpdateK();
-            })
-        .AddSmallDoubleArrayProperty(
-            "stateEstimate",
-            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-              values.assign(m_xHat.data(), m_xHat.data() + m_xHat.size());
-              return values;
-            },
-            nullptr);
+    builder.SetSmartDashboardType("KalmanFilter");
+    builder.AddSmallDoubleArrayProperty(
+        "stateEstimate",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_xHat.data(), m_xHat.data() + m_xHat.size());
+          return values;
+        },
+        nullptr);
   }
 
  private:

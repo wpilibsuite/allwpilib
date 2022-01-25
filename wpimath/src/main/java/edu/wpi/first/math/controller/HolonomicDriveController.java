@@ -180,39 +180,36 @@ public class HolonomicDriveController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty(
-            "toleranceX",
-            () -> m_poseTolerance.getX(),
-            x ->
-                setTolerance(
-                    new Pose2d(
-                        new Translation2d(x, m_poseTolerance.getY()),
-                        m_poseTolerance.getRotation())))
-        .addDoubleProperty(
-            "toleranceY",
-            () -> m_poseTolerance.getY(),
-            y ->
-                setTolerance(
-                    new Pose2d(
-                        new Translation2d(m_poseTolerance.getX(), y),
-                        m_poseTolerance.getRotation())))
-        .addDoubleProperty(
-            "toleranceDegrees",
-            () -> m_poseTolerance.getRotation().getDegrees(),
-            rotation ->
-                setTolerance(
-                    new Pose2d(m_poseTolerance.getTranslation(), Rotation2d.fromDegrees(rotation))))
-        .addDoubleProperty("referenceX", () -> m_poseReference.getX(), null)
-        .addDoubleProperty("referenceY", () -> m_poseReference.getY(), null)
-        .addDoubleProperty("referenceDegrees", () -> m_headingReference.getDegrees(), null)
-        .addDoubleProperty("measurementX", () -> m_measurement.getX(), null)
-        .addDoubleProperty("measurementY", () -> m_measurement.getY(), null)
-        .addDoubleProperty(
-            "measurementDegrees", () -> m_measurement.getRotation().getDegrees(), null)
-        .addDoubleProperty("errorX", () -> m_poseError.getX(), null)
-        .addDoubleProperty("errorY", () -> m_poseError.getY(), null)
-        .addDoubleProperty("errorDegrees", () -> m_poseError.getRotation().getDegrees(), null)
-        .addBooleanProperty("atReference", this::atReference, null);
+    builder.addDoubleProperty(
+        "toleranceX",
+        () -> m_poseTolerance.getX(),
+        x ->
+            setTolerance(
+                new Pose2d(
+                    new Translation2d(x, m_poseTolerance.getY()), m_poseTolerance.getRotation())));
+    builder.addDoubleProperty(
+        "toleranceY",
+        () -> m_poseTolerance.getY(),
+        y ->
+            setTolerance(
+                new Pose2d(
+                    new Translation2d(m_poseTolerance.getX(), y), m_poseTolerance.getRotation())));
+    builder.addDoubleProperty(
+        "toleranceDegrees",
+        () -> m_poseTolerance.getRotation().getDegrees(),
+        rotation ->
+            setTolerance(
+                new Pose2d(m_poseTolerance.getTranslation(), Rotation2d.fromDegrees(rotation))));
+    builder.addDoubleProperty("referenceX", () -> m_poseReference.getX(), null);
+    builder.addDoubleProperty("referenceY", () -> m_poseReference.getY(), null);
+    builder.addDoubleProperty("referenceDegrees", () -> m_headingReference.getDegrees(), null);
+    builder.addDoubleProperty("measurementX", () -> m_measurement.getX(), null);
+    builder.addDoubleProperty("measurementY", () -> m_measurement.getY(), null);
+    builder.addDoubleProperty(
+        "measurementDegrees", () -> m_measurement.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("errorX", () -> m_poseError.getX(), null);
+    builder.addDoubleProperty("errorY", () -> m_poseError.getY(), null);
+    builder.addDoubleProperty("errorDegrees", () -> m_poseError.getRotation().getDegrees(), null);
+    builder.addBooleanProperty("atReference", this::atReference, null);
   }
 }

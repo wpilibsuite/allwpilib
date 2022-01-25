@@ -174,21 +174,21 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("PowerDistribution");
     int numChannels = getNumChannels();
     for (int i = 0; i < numChannels; ++i) {
       final int chan = i;
       builder.addDoubleProperty(
           "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
     }
-    builder
-        .addDoubleProperty("Voltage", this::getVoltage, null)
-        .addDoubleProperty("TotalCurrent", this::getTotalCurrent, null)
-        .addDoubleProperty("totalPowerWatts", this::getTotalPower, null)
-        .addDoubleProperty("totalEnergyJoules", this::getTotalEnergy, null)
-        .addDoubleProperty("temperatureCelsius", this::getTemperature, null)
-        .addBooleanProperty(
-            "SwitchableChannel",
-            () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
-            value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
+    builder.addDoubleProperty("Voltage", this::getVoltage, null);
+    builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
+    builder.addDoubleProperty("totalPowerWatts", this::getTotalPower, null);
+    builder.addDoubleProperty("totalEnergyJoules", this::getTotalEnergy, null);
+    builder.addDoubleProperty("temperatureCelsius", this::getTemperature, null);
+    builder.addBooleanProperty(
+        "SwitchableChannel",
+        () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
+        value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
   }
 }

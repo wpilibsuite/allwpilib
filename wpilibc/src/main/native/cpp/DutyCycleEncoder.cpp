@@ -162,17 +162,17 @@ int DutyCycleEncoder::GetSourceChannel() const {
 }
 
 void DutyCycleEncoder::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AbsoluteEncoder")
-      .AddDoubleProperty(
-          "sourceChannel", [=] { return GetSourceChannel(); }, nullptr)
-      .AddDoubleProperty(
-          "Distance", [this] { return this->GetDistance(); }, nullptr)
-      .AddDoubleProperty(
-          "Distance Per Rotation",
-          [this] { return this->GetDistancePerRotation(); }, nullptr)
-      .AddDoubleProperty(
-          "Is Connected", [this] { return this->IsConnected(); }, nullptr)
-      .AddDoubleProperty(
-          "frequencyThreshold", [=] { return m_frequencyThreshold; },
-          [=](double threshold) { SetConnectedFrequencyThreshold(threshold); });
+  builder.SetSmartDashboardType("AbsoluteEncoder");
+  builder.AddDoubleProperty(
+      "sourceChannel", [=] { return GetSourceChannel(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance", [this] { return this->GetDistance(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Distance Per Rotation",
+      [this] { return this->GetDistancePerRotation(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Is Connected", [this] { return this->IsConnected(); }, nullptr);
+  builder.AddDoubleProperty(
+      "frequencyThreshold", [=] { return m_frequencyThreshold; },
+      [=](double threshold) { SetConnectedFrequencyThreshold(threshold); });
 }

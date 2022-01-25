@@ -105,8 +105,7 @@ public class Servo extends PWM {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder
-        .addDoubleProperty("Value", this::get, this::set)
-        .addDoubleProperty("angleDegrees", this::getAngle, this::setAngle);
+    builder.addDoubleProperty("Value", this::get, this::set);
+    builder.addDoubleProperty("angleDegrees", this::getAngle, this::setAngle);
   }
 }

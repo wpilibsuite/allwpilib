@@ -183,9 +183,8 @@ public class Compressor implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addBooleanProperty("Enabled", this::enabled, null)
-        .addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null)
-        .addDoubleProperty("currentAmps", this::getCurrent, null);
+    builder.addBooleanProperty("Enabled", this::enabled, null);
+    builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
+    builder.addDoubleProperty("currentAmps", this::getCurrent, null);
   }
 }

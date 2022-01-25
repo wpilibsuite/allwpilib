@@ -160,18 +160,18 @@ void Ultrasonic::SetEnabled(bool enable) {
 }
 
 void Ultrasonic::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Ultrasonic")
-      .AddDoubleProperty(
-          "pingChannel", [=] { return m_pingChannel->GetChannel(); }, nullptr)
-      .AddDoubleProperty(
-          "echoChannel", [=] { return m_echoChannel->GetChannel(); }, nullptr)
-      .AddBooleanProperty(
-          "enabled", [=] { return IsEnabled(); },
-          [=](bool enabled) { SetEnabled(enabled); })
-      .AddDoubleProperty(
-          "Value", [=] { return units::inch_t{GetRange()}.value(); }, nullptr)
-      .AddBooleanProperty(
-          "valid", [=] { return IsRangeValid(); }, nullptr);
+  builder.SetSmartDashboardType("Ultrasonic");
+  builder.AddDoubleProperty(
+      "pingChannel", [=] { return m_pingChannel->GetChannel(); }, nullptr);
+  builder.AddDoubleProperty(
+      "echoChannel", [=] { return m_echoChannel->GetChannel(); }, nullptr);
+  builder.AddBooleanProperty(
+      "enabled", [=] { return IsEnabled(); },
+      [=](bool enabled) { SetEnabled(enabled); });
+  builder.AddDoubleProperty(
+      "Value", [=] { return units::inch_t{GetRange()}.value(); }, nullptr);
+  builder.AddBooleanProperty(
+      "valid", [=] { return IsRangeValid(); }, nullptr);
 }
 
 void Ultrasonic::Initialize() {

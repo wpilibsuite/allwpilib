@@ -101,12 +101,10 @@ void UpDownCounter::SetDownEdgeConfiguration(EdgeConfiguration configuration) {
 }
 
 void UpDownCounter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("UpDown Counter")
-      .AddDoubleProperty(
-          "Count", [&] { return GetCount(); }, nullptr)
-      .AddBooleanProperty(
-          "reverseDirection", [&] { return m_reverseDirection; },
-          [&](bool reverseDirection) {
-            SetReverseDirection(reverseDirection);
-          });
+  builder.SetSmartDashboardType("UpDown Counter");
+  builder.AddDoubleProperty(
+      "Count", [&] { return GetCount(); }, nullptr);
+  builder.AddBooleanProperty(
+      "reverseDirection", [&] { return m_reverseDirection; },
+      [&](bool reverseDirection) { SetReverseDirection(reverseDirection); });
 }

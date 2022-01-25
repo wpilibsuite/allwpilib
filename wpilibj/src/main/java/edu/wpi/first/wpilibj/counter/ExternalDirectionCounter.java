@@ -111,15 +111,13 @@ public class ExternalDirectionCounter implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("External Direction Counter")
-        .addDoubleProperty("Count", this::getCount, null)
-        .addBooleanProperty("reverseDirection", () -> m_reverseDirection, this::setReverseDirection)
-        .addDoubleProperty(
-            "edgeConfiguration",
-            () -> m_edgeConfiguration.ordinal(),
-            id ->
-                setEdgeConfiguration(
-                    EnumHelper.enumFromOrdinal((int) id, EdgeConfiguration.kNone)));
+    builder.setSmartDashboardType("External Direction Counter");
+    builder.addDoubleProperty("Count", this::getCount, null);
+    builder.addBooleanProperty(
+        "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
+    builder.addDoubleProperty(
+        "edgeConfiguration",
+        () -> m_edgeConfiguration.ordinal(),
+        id -> setEdgeConfiguration(EnumHelper.enumFromOrdinal((int) id, EdgeConfiguration.kNone)));
   }
 }

@@ -40,13 +40,13 @@ int AnalogTriggerOutput::GetChannel() const {
 }
 
 void AnalogTriggerOutput::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AnalogTriggerOutput")
-      .AddDoubleProperty(
-          "index", [=] { return m_trigger->GetIndex(); }, nullptr)
-      .AddDoubleProperty(
-          "type", [=] { return static_cast<int>(m_outputType); }, nullptr)
-      .AddBooleanProperty(
-          "value", [=] { return Get(); }, nullptr);
+  builder.SetSmartDashboardType("AnalogTriggerOutput");
+  builder.AddDoubleProperty(
+      "index", [=] { return m_trigger->GetIndex(); }, nullptr);
+  builder.AddDoubleProperty(
+      "type", [=] { return static_cast<int>(m_outputType); }, nullptr);
+  builder.AddBooleanProperty(
+      "value", [=] { return Get(); }, nullptr);
 }
 
 AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,

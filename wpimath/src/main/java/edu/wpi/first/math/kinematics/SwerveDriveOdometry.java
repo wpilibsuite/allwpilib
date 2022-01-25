@@ -131,10 +131,9 @@ public class SwerveDriveOdometry implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("poseMetersX", m_poseMeters::getX, null)
-        .addDoubleProperty("poseMetersY", m_poseMeters::getY, null)
-        .addDoubleProperty("poseDegrees", () -> m_poseMeters.getRotation().getDegrees(), null)
-        .addDoubleProperty("gyroOffsetDegrees", m_gyroOffset::getDegrees, null);
+    builder.addDoubleProperty("poseMetersX", m_poseMeters::getX, null);
+    builder.addDoubleProperty("poseMetersY", m_poseMeters::getY, null);
+    builder.addDoubleProperty("poseDegrees", () -> m_poseMeters.getRotation().getDegrees(), null);
+    builder.addDoubleProperty("gyroOffsetDegrees", m_gyroOffset::getDegrees, null);
   }
 }

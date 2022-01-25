@@ -197,12 +197,11 @@ public class AnalogGyro implements Gyro, Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("Gyro")
-        .addDoubleProperty("channel", m_analog::getChannel, null)
-        .addDoubleProperty("Value", this::getAngle, null)
-        .addDoubleProperty("rate", this::getRate, null)
-        .addDoubleProperty(
-            "sensitivityVoltsPerDegPerSec", () -> m_sensitivity, this::setSensitivity);
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("channel", m_analog::getChannel, null);
+    builder.addDoubleProperty("Value", this::getAngle, null);
+    builder.addDoubleProperty("rate", this::getRate, null);
+    builder.addDoubleProperty(
+        "sensitivityVoltsPerDegPerSec", () -> m_sensitivity, this::setSensitivity);
   }
 }

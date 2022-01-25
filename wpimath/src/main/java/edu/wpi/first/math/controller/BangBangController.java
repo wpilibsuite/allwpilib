@@ -149,11 +149,11 @@ public class BangBangController implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("tolerance", this::getTolerance, this::setTolerance)
-        .addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint)
-        .addDoubleProperty("measurement", this::getMeasurement, null)
-        .addDoubleProperty("error", this::getError, null)
-        .addBooleanProperty("atSetpoint", this::atSetpoint, null);
+    builder.setSmartDashboardType("BangBangController");
+    builder.addDoubleProperty("tolerance", this::getTolerance, this::setTolerance);
+    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addDoubleProperty("measurement", this::getMeasurement, null);
+    builder.addDoubleProperty("error", this::getError, null);
+    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
   }
 }

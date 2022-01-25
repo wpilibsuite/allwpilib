@@ -177,9 +177,9 @@ public class ArmFeedforward implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     m_simpleFeedforward.initSendable(builder);
-    builder
-        .addDoubleProperty("kG", () -> kg, kg -> this.kg = kg)
-        .addDoubleProperty("gravityOutput", () -> kg * Math.cos(m_angleRadians), null)
-        .addDoubleProperty("output", this::getOutput, null);
+    builder.setSmartDashboardType("ArmFeedforward");
+    builder.addDoubleProperty("kG", () -> kg, kg -> this.kg = kg);
+    builder.addDoubleProperty("gravityOutput", () -> kg * Math.cos(m_angleRadians), null);
+    builder.addDoubleProperty("output", this::getOutput, null);
   }
 }

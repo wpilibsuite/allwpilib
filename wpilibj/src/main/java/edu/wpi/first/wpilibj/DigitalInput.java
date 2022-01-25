@@ -106,9 +106,8 @@ public class DigitalInput extends DigitalSource implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("Digital Input")
-        .addDoubleProperty("channel", this::getChannel, null)
-        .addBooleanProperty("Value", this::get, null);
+    builder.setSmartDashboardType("Digital Input");
+    builder.addDoubleProperty("channel", this::getChannel, null);
+    builder.addBooleanProperty("Value", this::get, null);
   }
 }

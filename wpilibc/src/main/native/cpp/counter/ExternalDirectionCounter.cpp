@@ -99,21 +99,21 @@ void ExternalDirectionCounter::SetEdgeConfiguration(
 }
 
 void ExternalDirectionCounter::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("External Direction Counter")
-      .AddDoubleProperty(
-          "Count", [&] { return GetCount(); }, nullptr)
-      .AddDoubleProperty(
-          "reverseDirection", [&] { return m_reverseDirection; },
-          [&](bool reverseDirection) { m_reverseDirection = reverseDirection; })
-      .AddDoubleProperty(
-          "edgeConfiguration",
-          [&] { return static_cast<int>(m_edgeConfiguration); },
-          [&](double id) {
-            int iid = id;
-            if (iid >= 0 && iid <= 3) {
-              SetEdgeConfiguration(EdgeConfiguration{iid});
-            } else {
-              SetEdgeConfiguration(EdgeConfiguration::kNone);
-            }
-          });
+  builder.SetSmartDashboardType("External Direction Counter");
+  builder.AddDoubleProperty(
+      "Count", [&] { return GetCount(); }, nullptr);
+  builder.AddDoubleProperty(
+      "reverseDirection", [&] { return m_reverseDirection; },
+      [&](bool reverseDirection) { m_reverseDirection = reverseDirection; });
+  builder.AddDoubleProperty(
+      "edgeConfiguration",
+      [&] { return static_cast<int>(m_edgeConfiguration); },
+      [&](double id) {
+        int iid = id;
+        if (iid >= 0 && iid <= 3) {
+          SetEdgeConfiguration(EdgeConfiguration{iid});
+        } else {
+          SetEdgeConfiguration(EdgeConfiguration::kNone);
+        }
+      });
 }

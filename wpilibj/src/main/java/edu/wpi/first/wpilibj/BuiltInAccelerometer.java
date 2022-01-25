@@ -97,14 +97,13 @@ public class BuiltInAccelerometer implements Accelerometer, Sendable, AutoClosea
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setSmartDashboardType("3AxisAccelerometer")
-        .addDoubleProperty(
-            "range",
-            () -> m_range.ordinal(),
-            range -> setRange(EnumHelper.enumFromOrdinal((int) range, Range.k2G)))
-        .addDoubleProperty("X", this::getX, null)
-        .addDoubleProperty("Y", this::getY, null)
-        .addDoubleProperty("Z", this::getZ, null);
+    builder.setSmartDashboardType("3AxisAccelerometer");
+    builder.addDoubleProperty(
+        "range",
+        () -> m_range.ordinal(),
+        range -> setRange(EnumHelper.enumFromOrdinal((int) range, Range.k2G)));
+    builder.addDoubleProperty("X", this::getX, null);
+    builder.addDoubleProperty("Y", this::getY, null);
+    builder.addDoubleProperty("Z", this::getZ, null);
   }
 }

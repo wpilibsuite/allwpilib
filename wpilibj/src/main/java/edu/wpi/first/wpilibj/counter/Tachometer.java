@@ -177,18 +177,17 @@ public class Tachometer implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("RPM", this::getRevolutionsPerMinute, null)
-        .addDoubleProperty("RPS", this::getRevolutionsPerSecond, null)
-        .addDoubleProperty(
-            "edgesPerRev", this::getEdgesPerRevolution, epr -> setEdgesPerRevolution((int) epr))
-        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
-        .addDoubleProperty(
-            "samplesToAverage",
-            this::getSamplesToAverage,
-            samplesToAverage -> {
-              setSamplesToAverage((int) samplesToAverage);
-            })
-        .addBooleanProperty("Stopped", this::getStopped, null);
+    builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
+    builder.addDoubleProperty("RPS", this::getRevolutionsPerSecond, null);
+    builder.addDoubleProperty(
+        "edgesPerRev", this::getEdgesPerRevolution, epr -> setEdgesPerRevolution((int) epr));
+    builder.addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod);
+    builder.addDoubleProperty(
+        "samplesToAverage",
+        this::getSamplesToAverage,
+        samplesToAverage -> {
+          setSamplesToAverage((int) samplesToAverage);
+        });
+    builder.addBooleanProperty("Stopped", this::getStopped, null);
   }
 }

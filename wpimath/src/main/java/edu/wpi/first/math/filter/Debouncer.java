@@ -94,14 +94,13 @@ public class Debouncer implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty(
-            "debounceTimeSeconds",
-            () -> m_debounceTimeSeconds,
-            debounceTime -> m_debounceTimeSeconds = debounceTime)
-        .addDoubleProperty(
-            "debounceType",
-            m_debounceType::ordinal,
-            type -> m_debounceType = EnumHelper.enumFromOrdinal((int) type, DebounceType.kRising));
+    builder.addDoubleProperty(
+        "debounceTimeSeconds",
+        () -> m_debounceTimeSeconds,
+        debounceTime -> m_debounceTimeSeconds = debounceTime);
+    builder.addDoubleProperty(
+        "debounceType",
+        m_debounceType::ordinal,
+        type -> m_debounceType = EnumHelper.enumFromOrdinal((int) type, DebounceType.kRising));
   }
 }

@@ -373,22 +373,22 @@ public class PIDController implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("p", this::getP, this::setP)
-        .addDoubleProperty("i", this::getI, this::setI)
-        .addDoubleProperty("d", this::getD, this::setD)
-        .addDoubleProperty(
-            "positionTolerance",
-            this::getPositionTolerance,
-            positionTolerance -> m_positionTolerance = positionTolerance)
-        .addDoubleProperty(
-            "velocityTolerance",
-            this::getVelocityTolerance,
-            velocityTolerance -> m_velocityTolerance = velocityTolerance)
-        .addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint)
-        .addDoubleProperty("measurement", this::getMeasurement, null)
-        .addDoubleProperty("positionError", this::getPositionError, null)
-        .addDoubleProperty("velocityError", this::getVelocityError, null)
-        .addBooleanProperty("atSetpoint", this::atSetpoint, null);
+    builder.setSmartDashboardType("PIDController");
+    builder.addDoubleProperty("p", this::getP, this::setP);
+    builder.addDoubleProperty("i", this::getI, this::setI);
+    builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty(
+        "positionTolerance",
+        this::getPositionTolerance,
+        positionTolerance -> m_positionTolerance = positionTolerance);
+    builder.addDoubleProperty(
+        "velocityTolerance",
+        this::getVelocityTolerance,
+        velocityTolerance -> m_velocityTolerance = velocityTolerance);
+    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addDoubleProperty("measurement", this::getMeasurement, null);
+    builder.addDoubleProperty("positionError", this::getPositionError, null);
+    builder.addDoubleProperty("velocityError", this::getVelocityError, null);
+    builder.addBooleanProperty("atSetpoint", this::atSetpoint, null);
   }
 }

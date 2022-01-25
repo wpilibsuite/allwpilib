@@ -76,37 +76,30 @@ void SendableBuilderImpl::ClearProperties() {
   m_properties.clear();
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::SetSmartDashboardType(
-    std::string_view type) {
+void SendableBuilderImpl::SetSmartDashboardType(std::string_view type) {
   m_table->GetEntry(".type").SetString(type);
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::SetActuator(bool value) {
+void SendableBuilderImpl::SetActuator(bool value) {
   m_table->GetEntry(".actuator").SetBoolean(value);
   m_actuator = value;
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::SetSafeState(
-    std::function<void()> func) {
+void SendableBuilderImpl::SetSafeState(std::function<void()> func) {
   m_safeState = func;
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::SetUpdateTable(
-    std::function<void()> func) {
+void SendableBuilderImpl::SetUpdateTable(std::function<void()> func) {
   m_updateTables.emplace_back(std::move(func));
-  return *this;
 }
 
 nt::NetworkTableEntry SendableBuilderImpl::GetEntry(std::string_view key) {
   return m_table->GetEntry(key);
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddBooleanProperty(
-    std::string_view key, std::function<bool()> getter,
-    std::function<void(bool)> setter) {
+void SendableBuilderImpl::AddBooleanProperty(std::string_view key,
+                                             std::function<bool()> getter,
+                                             std::function<void(bool)> setter) {
   Property property{*m_table, key};
   if (getter) {
     property.update = [=](nt::NetworkTableEntry entry, uint64_t time) {
@@ -128,10 +121,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddBooleanProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddDoubleProperty(
+void SendableBuilderImpl::AddDoubleProperty(
     std::string_view key, std::function<double()> getter,
     std::function<void(double)> setter) {
   Property property{*m_table, key};
@@ -155,10 +147,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddDoubleProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddStringProperty(
+void SendableBuilderImpl::AddStringProperty(
     std::string_view key, std::function<std::string()> getter,
     std::function<void(std::string_view)> setter) {
   Property property{*m_table, key};
@@ -182,10 +173,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddStringProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddBooleanArrayProperty(
+void SendableBuilderImpl::AddBooleanArrayProperty(
     std::string_view key, std::function<std::vector<int>()> getter,
     std::function<void(wpi::span<const int>)> setter) {
   Property property{*m_table, key};
@@ -209,10 +199,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddBooleanArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddDoubleArrayProperty(
+void SendableBuilderImpl::AddDoubleArrayProperty(
     std::string_view key, std::function<std::vector<double>()> getter,
     std::function<void(wpi::span<const double>)> setter) {
   Property property{*m_table, key};
@@ -236,10 +225,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddDoubleArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddStringArrayProperty(
+void SendableBuilderImpl::AddStringArrayProperty(
     std::string_view key, std::function<std::vector<std::string>()> getter,
     std::function<void(wpi::span<const std::string>)> setter) {
   Property property{*m_table, key};
@@ -263,10 +251,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddStringArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddRawProperty(
+void SendableBuilderImpl::AddRawProperty(
     std::string_view key, std::function<std::string()> getter,
     std::function<void(std::string_view)> setter) {
   Property property{*m_table, key};
@@ -290,10 +277,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddRawProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddValueProperty(
+void SendableBuilderImpl::AddValueProperty(
     std::string_view key, std::function<std::shared_ptr<nt::Value>()> getter,
     std::function<void(std::shared_ptr<nt::Value>)> setter) {
   Property property{*m_table, key};
@@ -313,10 +299,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddValueProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddSmallStringProperty(
+void SendableBuilderImpl::AddSmallStringProperty(
     std::string_view key,
     std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
     std::function<void(std::string_view)> setter) {
@@ -342,10 +327,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddSmallStringProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddSmallBooleanArrayProperty(
+void SendableBuilderImpl::AddSmallBooleanArrayProperty(
     std::string_view key,
     std::function<wpi::span<const int>(wpi::SmallVectorImpl<int>& buf)> getter,
     std::function<void(wpi::span<const int>)> setter) {
@@ -371,10 +355,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddSmallBooleanArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddSmallDoubleArrayProperty(
+void SendableBuilderImpl::AddSmallDoubleArrayProperty(
     std::string_view key,
     std::function<wpi::span<const double>(wpi::SmallVectorImpl<double>& buf)>
         getter,
@@ -401,10 +384,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddSmallDoubleArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddSmallStringArrayProperty(
+void SendableBuilderImpl::AddSmallStringArrayProperty(
     std::string_view key,
     std::function<
         wpi::span<const std::string>(wpi::SmallVectorImpl<std::string>& buf)>
@@ -432,10 +414,9 @@ wpi::SendableBuilder& SendableBuilderImpl::AddSmallStringArrayProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }
 
-wpi::SendableBuilder& SendableBuilderImpl::AddSmallRawProperty(
+void SendableBuilderImpl::AddSmallRawProperty(
     std::string_view key,
     std::function<std::string_view(wpi::SmallVectorImpl<char>& buf)> getter,
     std::function<void(std::string_view)> setter) {
@@ -461,5 +442,4 @@ wpi::SendableBuilder& SendableBuilderImpl::AddSmallRawProperty(
     };
   }
   m_properties.insert_or_assign(key, std::move(property));
-  return *this;
 }

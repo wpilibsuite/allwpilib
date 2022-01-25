@@ -375,17 +375,17 @@ public class ProfiledPIDController implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     m_controller.initSendable(builder);
-    builder
-        .addDoubleProperty("setpoint", m_controller::getSetpoint, null)
-        .addDoubleProperty(
-            "maxVelocity",
-            () -> m_constraints.maxVelocity,
-            maxVelocity -> m_constraints.maxVelocity = maxVelocity)
-        .addDoubleProperty(
-            "maxAcceleration",
-            () -> m_constraints.maxAcceleration,
-            maxAcceleration -> m_constraints.maxAcceleration = maxAcceleration)
-        .addDoubleProperty("goal", () -> getGoal().position, this::setGoal)
-        .addDoubleProperty("goalVelocity", () -> getGoal().velocity, null);
+    builder.setSmartDashboardType("ProfiledPIDController");
+    builder.addDoubleProperty("setpoint", m_controller::getSetpoint, null);
+    builder.addDoubleProperty(
+        "maxVelocity",
+        () -> m_constraints.maxVelocity,
+        maxVelocity -> m_constraints.maxVelocity = maxVelocity);
+    builder.addDoubleProperty(
+        "maxAcceleration",
+        () -> m_constraints.maxAcceleration,
+        maxAcceleration -> m_constraints.maxAcceleration = maxAcceleration);
+    builder.addDoubleProperty("goal", () -> getGoal().position, this::setGoal);
+    builder.addDoubleProperty("goalVelocity", () -> getGoal().velocity, null);
   }
 }

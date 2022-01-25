@@ -181,14 +181,14 @@ public class SimpleMotorFeedforward implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .addDoubleProperty("kS", () -> ks, ks -> this.ks = ks)
-        .addDoubleProperty("kV", () -> kv, kv -> this.kv = kv)
-        .addDoubleProperty("kA", () -> ka, ka -> this.ka = ka)
-        .addDoubleProperty("velocity", this::getVelocity, null)
-        .addDoubleProperty("velocityOutput", () -> getVelocity() * kv, null)
-        .addDoubleProperty("acceleration", this::getAcceleration, null)
-        .addDoubleProperty("accelerationOutput", () -> getAcceleration() * ka, null)
-        .addDoubleProperty("output", this::getOutput, null);
+    builder.setSmartDashboardType("SimpleMotorFeedforward");
+    builder.addDoubleProperty("kS", () -> ks, ks -> this.ks = ks);
+    builder.addDoubleProperty("kV", () -> kv, kv -> this.kv = kv);
+    builder.addDoubleProperty("kA", () -> ka, ka -> this.ka = ka);
+    builder.addDoubleProperty("velocity", this::getVelocity, null);
+    builder.addDoubleProperty("velocityOutput", () -> getVelocity() * kv, null);
+    builder.addDoubleProperty("acceleration", this::getAcceleration, null);
+    builder.addDoubleProperty("accelerationOutput", () -> getAcceleration() * ka, null);
+    builder.addDoubleProperty("output", this::getOutput, null);
   }
 }

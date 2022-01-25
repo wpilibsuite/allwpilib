@@ -92,11 +92,11 @@ int DutyCycle::GetSourceChannel() const {
 }
 
 void DutyCycle::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Duty Cycle")
-      .AddDoubleProperty(
-          "sourceChannel", [=] { return GetSourceChannel(); }, nullptr)
-      .AddDoubleProperty(
-          "Frequency", [=] { return GetFrequency(); }, nullptr)
-      .AddDoubleProperty(
-          "Output", [=] { return GetOutput(); }, nullptr);
+  builder.SetSmartDashboardType("Duty Cycle");
+  builder.AddDoubleProperty(
+      "sourceChannel", [=] { return GetSourceChannel(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Frequency", [=] { return GetFrequency(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Output", [=] { return GetOutput(); }, nullptr);
 }

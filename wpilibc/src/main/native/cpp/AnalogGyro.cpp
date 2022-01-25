@@ -139,14 +139,14 @@ std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {
 }
 
 void AnalogGyro::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Gyro")
-      .AddDoubleProperty(
-          "channel", [=] { return m_analog->GetChannel(); }, nullptr)
-      .AddDoubleProperty(
-          "Value", [=] { return GetAngle(); }, nullptr)
-      .AddDoubleProperty(
-          "rate", [=] { return GetRate(); }, nullptr)
-      .AddDoubleProperty(
-          "sensitivityVoltsPerDegPerSec", [=] { return m_sensitivity; },
-          [&](double sensitivity) { SetSensitivity(sensitivity); });
+  builder.SetSmartDashboardType("Gyro");
+  builder.AddDoubleProperty(
+      "channel", [=] { return m_analog->GetChannel(); }, nullptr);
+  builder.AddDoubleProperty(
+      "Value", [=] { return GetAngle(); }, nullptr);
+  builder.AddDoubleProperty(
+      "rate", [=] { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty(
+      "sensitivityVoltsPerDegPerSec", [=] { return m_sensitivity; },
+      [&](double sensitivity) { SetSensitivity(sensitivity); });
 }

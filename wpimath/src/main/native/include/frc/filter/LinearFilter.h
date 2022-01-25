@@ -280,21 +280,21 @@ class LinearFilter : public wpi::Sendable,
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
-    builder.SetSmartDashboardType("LinearFilter")
-        .AddSmallDoubleArrayProperty(
-            "inputs",
-            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-              values.assign(m_inputs.begin(), m_inputs.end());
-              return values;
-            },
-            nullptr)
-        .AddSmallDoubleArrayProperty(
-            "outputs",
-            [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
-              values.assign(m_outputs.begin(), m_outputs.end());
-              return values;
-            },
-            nullptr);
+    builder.SetSmartDashboardType("LinearFilter");
+    builder.AddSmallDoubleArrayProperty(
+        "inputs",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_inputs.begin(), m_inputs.end());
+          return values;
+        },
+        nullptr);
+    builder.AddSmallDoubleArrayProperty(
+        "outputs",
+        [&](wpi::SmallVectorImpl<double>& values) -> wpi::span<double> {
+          values.assign(m_outputs.begin(), m_outputs.end());
+          return values;
+        },
+        nullptr);
   }
 
  private:

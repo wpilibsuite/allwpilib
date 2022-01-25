@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.util.function.BooleanConsumer;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -166,12 +165,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * for this sendable.
    *
    * @param type data type
-   * @return The builder.
    */
   @Override
-  public SendableBuilder setSmartDashboardType(String type) {
+  public void setSmartDashboardType(String type) {
     m_table.getEntry(".type").setString(type);
-    return this;
   }
 
   /**
@@ -179,13 +176,11 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * is false.
    *
    * @param value true if actuator, false if not
-   * @return The builder.
    */
   @Override
-  public SendableBuilder setActuator(boolean value) {
+  public void setActuator(boolean value) {
     m_table.getEntry(".actuator").setBoolean(value);
     m_actuator = value;
-    return this;
   }
 
   /**
@@ -193,12 +188,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * when entering and exiting Live Window mode.
    *
    * @param func function
-   * @return The builder.
    */
   @Override
-  public SendableBuilder setSafeState(Runnable func) {
+  public void setSafeState(Runnable func) {
     m_safeState = func;
-    return this;
   }
 
   /**
@@ -207,12 +200,10 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * the entry handles returned by getEntry().
    *
    * @param func function
-   * @return The builder.
    */
   @Override
-  public SendableBuilder setUpdateTable(Runnable func) {
+  public void setUpdateTable(Runnable func) {
     m_updateTables.add(func);
-    return this;
   }
 
   /**
@@ -233,11 +224,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addBooleanProperty(
-      String key, BooleanSupplier getter, BooleanConsumer setter) {
+  public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setBoolean(getter.getAsBoolean());
@@ -257,7 +246,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -266,11 +254,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addDoubleProperty(
-      String key, DoubleSupplier getter, DoubleConsumer setter) {
+  public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setDouble(getter.getAsDouble());
@@ -289,7 +275,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -298,11 +283,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addStringProperty(
-      String key, Supplier<String> getter, Consumer<String> setter) {
+  public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setString(getter.get());
@@ -321,7 +304,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -330,10 +312,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addBooleanArrayProperty(
+  public void addBooleanArrayProperty(
       String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
@@ -354,7 +335,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -363,10 +343,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addDoubleArrayProperty(
+  public void addDoubleArrayProperty(
       String key, Supplier<double[]> getter, Consumer<double[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
@@ -387,7 +366,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -396,10 +374,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addStringArrayProperty(
+  public void addStringArrayProperty(
       String key, Supplier<String[]> getter, Consumer<String[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
@@ -420,7 +397,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -429,11 +405,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addRawProperty(
-      String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
+  public void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
       property.m_update = entry -> entry.setRaw(getter.get());
@@ -452,7 +426,6 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 
   /**
@@ -461,10 +434,9 @@ public class SendableBuilderImpl implements NTSendableBuilder {
    * @param key property name
    * @param getter getter function (returns current value)
    * @param setter setter function (sets new value)
-   * @return The builder.
    */
   @Override
-  public SendableBuilder addValueProperty(
+  public void addValueProperty(
       String key, Supplier<NetworkTableValue> getter, Consumer<NetworkTableValue> setter) {
     Property property = new Property(m_table, key);
     if (getter != null) {
@@ -482,6 +454,5 @@ public class SendableBuilderImpl implements NTSendableBuilder {
                       | EntryListenerFlags.kUpdate);
     }
     m_properties.put(key, property);
-    return this;
   }
 }

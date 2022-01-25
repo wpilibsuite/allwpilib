@@ -269,14 +269,11 @@ public class PWM implements Sendable, AutoCloseable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder
-        .setActuator(true)
-        .setSafeState(this::setDisabled)
-        .addDoubleProperty("Channel", this::getChannel, null)
-        .addBooleanProperty(
-            "DeadbandElimination",
-            this::deadbandEliminationEnabled,
-            this::enableDeadbandElimination)
-        .addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
+    builder.setActuator(true);
+    builder.setSafeState(this::setDisabled);
+    builder.addDoubleProperty("Channel", this::getChannel, null);
+    builder.addBooleanProperty(
+        "DeadbandElimination", this::deadbandEliminationEnabled, this::enableDeadbandElimination);
+    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
   }
 }

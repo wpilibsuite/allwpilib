@@ -56,17 +56,17 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
 }
 
 void PWMMotorController::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller")
-      .SetActuator(true)
-      .SetSafeState([=] { Disable(); })
-      .AddBooleanProperty(
-          "inverted", [&] { return GetInverted(); },
-          [&](bool inverted) { SetInverted(inverted); })
-      .AddBooleanProperty(
-          "deadbandElimination", [&] { return DeadbandEliminationEnabled(); },
-          [&](bool eliminateDeadband) {
-            EnableDeadbandElimination(eliminateDeadband);
-          })
-      .AddDoubleProperty(
-          "Value", [=] { return Get(); }, [=](double value) { Set(value); });
+  builder.SetSmartDashboardType("Motor Controller");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { Disable(); });
+  builder.AddBooleanProperty(
+      "inverted", [&] { return GetInverted(); },
+      [&](bool inverted) { SetInverted(inverted); });
+  builder.AddBooleanProperty(
+      "deadbandElimination", [&] { return DeadbandEliminationEnabled(); },
+      [&](bool eliminateDeadband) {
+        EnableDeadbandElimination(eliminateDeadband);
+      });
+  builder.AddDoubleProperty(
+      "Value", [=] { return Get(); }, [=](double value) { Set(value); });
 }

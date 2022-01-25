@@ -83,12 +83,11 @@ CompressorConfigType Compressor::GetConfigType() const {
 }
 
 void Compressor::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Compressor")
-      .AddBooleanProperty(
-          "Enabled", [=] { return Enabled(); }, nullptr)
-      .AddBooleanProperty(
-          "Pressure switch", [=]() { return GetPressureSwitchValue(); },
-          nullptr)
-      .AddDoubleProperty(
-          "currentAmps", [=] { return GetCurrent().value(); }, nullptr);
+  builder.SetSmartDashboardType("Compressor");
+  builder.AddBooleanProperty(
+      "Enabled", [=] { return Enabled(); }, nullptr);
+  builder.AddBooleanProperty(
+      "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
+  builder.AddDoubleProperty(
+      "currentAmps", [=] { return GetCurrent().value(); }, nullptr);
 }

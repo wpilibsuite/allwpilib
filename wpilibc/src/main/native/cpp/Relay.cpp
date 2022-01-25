@@ -173,34 +173,34 @@ std::string Relay::GetDescription() const {
 }
 
 void Relay::InitSendable(wpi::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Relay")
-      .SetActuator(true)
-      .SetSafeState([=] { Set(kOff); })
-      .AddDoubleProperty(
-          "channel", [=] { return GetChannel(); }, nullptr)
-      .AddSmallStringProperty(
-          "Value",
-          [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
-            switch (Get()) {
-              case kOn:
-                return "On";
-              case kForward:
-                return "Forward";
-              case kReverse:
-                return "Reverse";
-              default:
-                return "Off";
-            }
-          },
-          [=](std::string_view value) {
-            if (value == "Off") {
-              Set(kOff);
-            } else if (value == "Forward") {
-              Set(kForward);
-            } else if (value == "Reverse") {
-              Set(kReverse);
-            } else if (value == "On") {
-              Set(kOn);
-            }
-          });
+  builder.SetSmartDashboardType("Relay");
+  builder.SetActuator(true);
+  builder.SetSafeState([=] { Set(kOff); });
+  builder.AddDoubleProperty(
+      "channel", [=] { return GetChannel(); }, nullptr);
+  builder.AddSmallStringProperty(
+      "Value",
+      [=](wpi::SmallVectorImpl<char>& buf) -> std::string_view {
+        switch (Get()) {
+          case kOn:
+            return "On";
+          case kForward:
+            return "Forward";
+          case kReverse:
+            return "Reverse";
+          default:
+            return "Off";
+        }
+      },
+      [=](std::string_view value) {
+        if (value == "Off") {
+          Set(kOff);
+        } else if (value == "Forward") {
+          Set(kForward);
+        } else if (value == "Reverse") {
+          Set(kReverse);
+        } else if (value == "On") {
+          Set(kOn);
+        }
+      });
 }

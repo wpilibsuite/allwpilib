@@ -574,20 +574,19 @@ public class Encoder implements CounterBase, Sendable, AutoCloseable {
       builder.setSmartDashboardType("Encoder");
     }
 
-    builder
-        .addDoubleProperty("Speed", this::getRate, null)
-        .addDoubleProperty("Distance", this::getDistance, null)
-        .addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null)
-        .addBooleanProperty("direction", this::getDirection, null)
-        .addBooleanProperty("stopped", this::getStopped, null)
-        .addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod)
-        .addDoubleProperty(
-            "samplesToAverage",
-            this::getSamplesToAverage,
-            samplesToAverage -> {
-              setSamplesToAverage((int) samplesToAverage);
-            })
-        .addBooleanProperty(
-            "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
+    builder.addDoubleProperty("Speed", this::getRate, null);
+    builder.addDoubleProperty("Distance", this::getDistance, null);
+    builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
+    builder.addBooleanProperty("direction", this::getDirection, null);
+    builder.addBooleanProperty("stopped", this::getStopped, null);
+    builder.addDoubleProperty("maxPeriodSeconds", () -> m_maxPeriod, this::setMaxPeriod);
+    builder.addDoubleProperty(
+        "samplesToAverage",
+        this::getSamplesToAverage,
+        samplesToAverage -> {
+          setSamplesToAverage((int) samplesToAverage);
+        });
+    builder.addBooleanProperty(
+        "reverseDirection", () -> m_reverseDirection, this::setReverseDirection);
   }
 }
