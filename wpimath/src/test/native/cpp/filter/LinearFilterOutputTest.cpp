@@ -146,7 +146,7 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
     // half the window size in the past.
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx((i - (Samples - 1) / 2) * h.value()),
+    EXPECT_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()),
                 filter.Calculate(f(i * h.value())),
                 std::pow(h.value(), Samples - Derivative));
   }
