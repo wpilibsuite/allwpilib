@@ -63,50 +63,56 @@ class KalmanFilterImpl
   KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
                    const wpi::array<double, States>& modelStdDevs,
                    const wpi::array<double, Outputs>& measurementStdDevs,
-                   units::second_t dt)
-      : m_nominalDt{dt} {
+                   units::second_t dt) {
     m_plant = &plant;
 
-    SetStdDevs(modelStdDevs, measurementStdDevs);
+    auto contQ = MakeCovMatrix(modelStdDevs);
+    auto contR = MakeCovMatrix(measurementStdDevs);
+
+    Eigen::Matrix<double, States, States> discA;
+    Eigen::Matrix<double, States, States> discQ;
+    DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
+
+    auto discR = DiscretizeR<Outputs>(contR, dt);
+
+    const auto& C = plant.C();
+
+    if (!IsDetectable<States, Outputs>(discA, C)) {
+      std::string msg = fmt::format(
+          "The system passed to the Kalman filter is "
+          "unobservable!\n\nA =\n{}\nC =\n{}\n",
+          discA, C);
+
+      wpi::math::MathSharedStore::ReportError(msg);
+      throw std::invalid_argument(msg);
+    }
+
+    Eigen::Matrix<double, States, States> P =
+        drake::math::DiscreteAlgebraicRiccatiEquation(
+            discA.transpose(), C.transpose(), discQ, discR);
+
+    // S = CPCᵀ + R
+    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
+
+    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
+    // efficiently.
+    //
+    // K = PCᵀS⁻¹
+    // KS = PCᵀ
+    // (KS)ᵀ = (PCᵀ)ᵀ
+    // SᵀKᵀ = CPᵀ
+    //
+    // The solution of Ax = b can be found via x = A.solve(b).
+    //
+    // Kᵀ = Sᵀ.solve(CPᵀ)
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
+    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
+
+    Reset();
   }
 
   KalmanFilterImpl(KalmanFilterImpl&&) = default;
   KalmanFilterImpl& operator=(KalmanFilterImpl&&) = default;
-
-  /**
-   * Sets the standard deviation for the model.
-   *
-   * @param modelStdDevs Standard deviations of model states.
-   */
-  void SetModelStdDevs(const wpi::array<double, States>& modelStdDevs) {
-    m_contQ = MakeCovMatrix(modelStdDevs);
-    UpdateK();
-  }
-
-  /**
-   * Sets the standard deviations for the measurements.
-   *
-   * @param measurementStdDevs Standard deviation of measurements.
-   */
-  void SetMeasurementStdDevs(
-      const wpi::array<double, Outputs>& measurementStdDevs) {
-    m_contR = MakeCovMatrix(measurementStdDevs);
-
-    UpdateK();
-  }
-
-  /**
-   * Sets the standard deviations for the model and the measurements.
-   *
-   * @param modelStdDevs Standard deviations of model states.
-   * @param measurementStdDevs Standard deviations of measurements.
-   */
-  void SetStdDevs(const wpi::array<double, States>& modelStdDevs,
-                  const wpi::array<double, Outputs>& measurementStdDevs) {
-    m_contQ = MakeCovMatrix(modelStdDevs);
-    m_contR = MakeCovMatrix(measurementStdDevs);
-    UpdateK();
-  }
 
   /**
    * Returns the steady-state Kalman gain matrix K.
@@ -204,50 +210,6 @@ class KalmanFilterImpl
   Eigen::Matrix<double, States, States> m_contQ;
 
   Eigen::Matrix<double, Outputs, Outputs> m_contR;
-
-  void UpdateK() {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(m_plant->A(), m_contQ, m_nominalDt, &discA,
-                               &discQ);
-
-    auto discR = DiscretizeR<Outputs>(m_contR, m_nominalDt);
-
-    const auto& C = m_plant->C();
-
-    if (!IsDetectable<States, Outputs>(discA, C)) {
-      std::string msg = fmt::format(
-          "The system passed to the Kalman filter is "
-          "unobservable!\n\nA =\n{}\nC =\n{}\n",
-          discA, C);
-
-      wpi::math::MathSharedStore::ReportError(msg);
-      throw std::invalid_argument(msg);
-    }
-
-    Eigen::Matrix<double, States, States> P =
-        drake::math::DiscreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, discR);
-
-    // S = CPCᵀ + R
-    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
-
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
-
-    Reset();
-  }
 };
 
 }  // namespace detail
