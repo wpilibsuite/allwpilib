@@ -280,35 +280,35 @@ public class PneumaticHub implements PneumaticsBase {
     return voltsToPsi(sensorVoltage, supplyVoltage);
   }
 
-  void clearStickyFaults() {
+  public void clearStickyFaults() {
     REVPHJNI.clearStickyFaults(m_handle);
   }
 
-  REVPHVersion getVersion() {
+  public REVPHVersion getVersion() {
     return REVPHJNI.getVersion(m_handle);
   }
 
-  REVPHFaults getFaults() {
+  public REVPHFaults getFaults() {
     return REVPHJNI.getFaults(m_handle);
   }
 
-  REVPHStickyFaults getStickyFaults() {
+  public REVPHStickyFaults getStickyFaults() {
     return REVPHJNI.getStickyFaults(m_handle);
   }
 
-  double getInputVoltage() {
+  public double getInputVoltage() {
     return REVPHJNI.getInputVoltage(m_handle);
   }
 
-  double get5VRegulatedVoltage() {
+  public double get5VRegulatedVoltage() {
     return REVPHJNI.get5VVoltage(m_handle);
   }
 
-  double getSolenoidsTotalCurrent() {
+  public double getSolenoidsTotalCurrent() {
     return REVPHJNI.getSolenoidCurrent(m_handle);
   }
 
-  double getSolenoidsVoltage() {
+  public double getSolenoidsVoltage() {
     return REVPHJNI.getSolenoidVoltage(m_handle);
   }
 }
