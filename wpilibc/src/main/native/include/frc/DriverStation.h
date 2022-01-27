@@ -9,6 +9,10 @@
 #include <units/time.h>
 #include <wpi/deprecated.h>
 
+namespace wpi::log {
+class DataLog;
+}  // namespace wpi::log
+
 namespace frc {
 
 /**
@@ -440,6 +444,14 @@ class DriverStation {
    * @return Whether joystick connection warnings are silenced.
    */
   static bool IsJoystickConnectionWarningSilenced();
+
+  /**
+   * Starts logging DriverStation data to data log. Repeated calls are ignored.
+   *
+   * @param log data log
+   * @param logJoysticks if true, log joystick data
+   */
+  static void StartDataLog(wpi::log::DataLog& log, bool logJoysticks = true);
 
  private:
   DriverStation() = default;
