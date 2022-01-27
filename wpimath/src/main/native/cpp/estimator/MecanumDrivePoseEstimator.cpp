@@ -122,23 +122,6 @@ void MecanumDrivePoseEstimator::InitSendable(wpi::SendableBuilder& builder) {
   m_observer.InitSendable(builder);
   builder.SetSmartDashboardType("MecanumDrivePoseEstimator");
   builder.AddDoubleProperty(
-      "VisionStdDevMetersX", [&] { return std::sqrt(m_visionContR(0, 0)); },
-      [&](double stdDev) { m_visionContR(0, 0) = stdDev * stdDev; });
-  builder.AddDoubleProperty(
-      "VisionStdDevMetersY", [&] { return std::sqrt(m_visionContR(1, 1)); },
-      [&](double stdDev) { m_visionContR(1, 1) = stdDev * stdDev; });
-  builder.AddDoubleProperty(
-      "VisionStdDevDegrees",
-      [&] {
-        return units::degree_t{units::radian_t{std::sqrt(m_visionContR(3, 3))}}
-            .value();
-      },
-      [&](double stdDevDegrees) {
-        double stdDevRads =
-            units::radian_t{units::degree_t{stdDevDegrees}}.value();
-        m_visionContR(3, 3) = stdDevRads * stdDevRads;
-      });
-  builder.AddDoubleProperty(
       "VisionPoseMetersX", [&] { return m_visionPose.X().value(); }, nullptr);
   builder.AddDoubleProperty(
       "VisionPoseMetersY", [&] { return m_visionPose.Y().value(); }, nullptr);
