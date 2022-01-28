@@ -4,6 +4,7 @@
 
 #include "frc/PneumaticHub.h"
 
+#include <fmt/format.h>
 #include <hal/REVPH.h>
 #include <wpi/NullDeleter.h>
 #include <wpi/StackTrace.h>
@@ -56,12 +57,36 @@ class PneumaticHub::DataStore {
         std::shared_ptr<DataStore>{this, wpi::NullDeleter<DataStore>()};
 
     auto version = m_moduleObject.GetVersion();
-    if (version.FirmwareMajor > 0 && version.FirmwareMajor < 22) {
-      throw FRC_MakeError(
-          err::AssertionFailure,
-          "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
-          "updated to version 2022.0.0 or later using the REV Hardware Client",
-          version.FirmwareMajor, version.FirmwareMinor, version.FirmwareFix);
+
+    if (version.FirmwareMajor > 0) {
+      // Write PH firmware version to roboRIO
+      std::FILE* file = nullptr;
+      file = std::fopen(
+          fmt::format("/tmp/frc_versions/REV_PH_{:0>2}_WPILib_Version.ini",
+                      module)
+              .c_str(),
+          "w");
+      if (file != nullptr) {
+        std::fputs("[Version]\n", file);
+        std::fputs(fmt::format("model=REV PH\n").c_str(), file);
+        std::fputs(fmt::format("deviceID={:x}\n", (0x9052600 | module)).c_str(),
+                   file);
+        std::fputs(fmt::format("currentVersion={}.{}.{}", version.FirmwareMajor,
+                               version.FirmwareMinor, version.FirmwareFix)
+                       .c_str(),
+                   file);
+        std::fclose(file);
+      }
+
+      // Check PH firmware version
+      if (version.FirmwareMajor < 22) {
+        throw FRC_MakeError(
+            err::AssertionFailure,
+            "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
+            "updated to version 2022.0.0 or later using the REV Hardware "
+            "Client",
+            version.FirmwareMajor, version.FirmwareMinor, version.FirmwareFix);
+      }
     }
   }
 
