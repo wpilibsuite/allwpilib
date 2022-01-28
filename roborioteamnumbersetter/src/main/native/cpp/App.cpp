@@ -31,6 +31,16 @@ namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
 
+namespace rtns {
+std::string_view GetResource_rtns_16_png();
+std::string_view GetResource_rtns_32_png();
+std::string_view GetResource_rtns_48_png();
+std::string_view GetResource_rtns_64_png();
+std::string_view GetResource_rtns_128_png();
+std::string_view GetResource_rtns_256_png();
+std::string_view GetResource_rtns_512_png();
+}  // namespace rtns
+
 #define GLFWAPI extern "C"
 GLFWAPI void glfwGetWindowSize(GLFWwindow* window, int* width, int* height);
 #define GLFW_DONT_CARE -1
@@ -239,6 +249,15 @@ static void DisplayGui() {
 void Application(std::string_view saveDir) {
   gui::CreateContext();
   glass::CreateContext();
+
+  // Add icons
+  gui::AddIcon(rtns::GetResource_rtns_16_png());
+  gui::AddIcon(rtns::GetResource_rtns_32_png());
+  gui::AddIcon(rtns::GetResource_rtns_48_png());
+  gui::AddIcon(rtns::GetResource_rtns_64_png());
+  gui::AddIcon(rtns::GetResource_rtns_128_png());
+  gui::AddIcon(rtns::GetResource_rtns_256_png());
+  gui::AddIcon(rtns::GetResource_rtns_512_png());
 
   glass::SetStorageName("roborioteamnumbersetter");
   glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()

@@ -12,7 +12,7 @@ file(GLOB rtns_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibV
 if (WIN32)
     set(rtns_rc src/main/native/win/roborioteamnumbersetter.rc)
 elseif(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE glass.icns)
+    set(MACOSX_BUNDLE_ICON_FILE rtns.icns)
     set(APP_ICON_MACOSX src/main/native/mac/rtns.icns)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
