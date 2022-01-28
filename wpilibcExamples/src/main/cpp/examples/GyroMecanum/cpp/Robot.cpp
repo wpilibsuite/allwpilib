@@ -10,8 +10,8 @@
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to
- * maintain rotation vectorsin relation to the starting orientation of the robot
- * (field-oriented controls).
+ * maintain rotation vectors in relation to the starting orientation of the
+ * robot (field-oriented controls).
  */
 class Robot : public frc::TimedRobot {
  public:
@@ -28,7 +28,7 @@ class Robot : public frc::TimedRobot {
    * Mecanum drive is used with the gyro angle as an input.
    */
   void TeleopPeriodic() override {
-    m_robotDrive.DriveCartesian(m_joystick.GetX(), m_joystick.GetY(),
+    m_robotDrive.DriveCartesian(-m_joystick.GetY(), m_joystick.GetX(),
                                 m_joystick.GetZ(), m_gyro.GetAngle());
   }
 
