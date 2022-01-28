@@ -184,15 +184,15 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     PowerDistributionJNI.setSwitchableChannel(m_handle, enabled);
   }
 
-  PowerDistributionVersion getVersion() {
+  public PowerDistributionVersion getVersion() {
     return PowerDistributionJNI.getVersion(m_handle);
   }
 
-  PowerDistributionFaults getFaults() {
+  public PowerDistributionFaults getFaults() {
     return PowerDistributionJNI.getFaults(m_handle);
   }
 
-  PowerDistributionStickyFaults getStickyFaults() {
+  public PowerDistributionStickyFaults getStickyFaults() {
     return PowerDistributionJNI.getStickyFaults(m_handle);
   }
 
