@@ -39,6 +39,12 @@ nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.roborio).configure {
     cppCompiler.args.add('-Werror=deprecated-declarations')
 }
 
+nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configure {
+    linker.args.remove('/DEBUG:FULL')
+    cppCompiler.debugArgs.remove('/Zi')
+    cCompiler.debugArgs.remove('/Zi')
+}
+
 ext {
     sharedCvConfigs = examplesMap + templatesMap + [commands: []]
     staticCvConfigs = [:]
