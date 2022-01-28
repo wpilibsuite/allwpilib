@@ -124,8 +124,8 @@ class PowerDistribution : public wpi::Sendable,
     uint32_t FirmwareMajor;
     uint32_t FirmwareMinor;
     uint32_t FirmwareFix;
-    uint32_t FardwareMinor;
-    uint32_t FardwareMajor;
+    uint32_t HardwareMinor;
+    uint32_t HardwareMajor;
     uint32_t UniqueId;
   };
 
