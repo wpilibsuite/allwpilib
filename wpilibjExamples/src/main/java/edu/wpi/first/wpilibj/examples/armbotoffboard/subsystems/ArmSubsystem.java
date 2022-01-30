@@ -16,7 +16,7 @@ public class ArmSubsystem extends TrapezoidProfileSubsystem {
       new ExampleSmartMotorController(ArmConstants.kMotorPort);
   private final ArmFeedforward m_feedforward =
       new ArmFeedforward(
-          ArmConstants.kSVolts, ArmConstants.kCosVolts,
+          ArmConstants.kSVolts, ArmConstants.kGVolts,
           ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
   /** Create a new ArmSubsystem. */

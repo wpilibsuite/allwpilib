@@ -46,7 +46,7 @@ constexpr double kP = 1;
 // These are fake gains; in actuality these must be determined individually for
 // each robot
 constexpr auto kS = 1_V;
-constexpr auto kCos = 1_V;
+constexpr auto kG = 1_V;
 constexpr auto kV = 0.5_V * 1_s / 1_rad;
 constexpr auto kA = 0.1_V * 1_s * 1_s / 1_rad;
 
