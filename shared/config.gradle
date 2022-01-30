@@ -21,7 +21,10 @@ nativeUtils {
 
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
-nativeUtils.wpi.addReleaseSymbolGeneration()
+
+if (project.name != 'wpilibcExamples') {
+    nativeUtils.wpi.addReleaseSymbolGeneration()
+}
 
 nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()
