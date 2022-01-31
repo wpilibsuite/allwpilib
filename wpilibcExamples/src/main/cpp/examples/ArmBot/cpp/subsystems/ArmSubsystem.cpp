@@ -15,7 +15,7 @@ ArmSubsystem::ArmSubsystem()
               kP, 0, 0, {kMaxVelocity, kMaxAcceleration})),
       m_motor(kMotorPort),
       m_encoder(kEncoderPorts[0], kEncoderPorts[1]),
-      m_feedforward(kS, kCos, kV, kA) {
+      m_feedforward(kS, kG, kV, kA) {
   m_encoder.SetDistancePerPulse(kEncoderDistancePerPulse.value());
   // Start arm in neutral position
   SetGoal(State{kArmOffset, 0_rad_per_s});
