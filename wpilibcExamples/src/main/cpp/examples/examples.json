@@ -713,7 +713,8 @@
       "Sensors",
       "Simulation",
       "Physics",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Preferences"
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",

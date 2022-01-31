@@ -10,6 +10,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
@@ -31,8 +32,13 @@ public class Robot extends TimedRobot {
   private static final int kEncoderBChannel = 1;
   private static final int kJoystickPort = 0;
 
+  public static final String kArmPositionKey = "ArmPosition";
+  public static final String kArmPKey = "ArmP";
+
   // The P gain for the PID controller that drives this arm.
-  private static final double kArmKp = 50.0;
+  private static double kArmKp = 50.0;
+
+  private static double armPositionDeg = 75.0;
 
   // distance per pulse = (angle per revolution) / (pulses per revolution)
   //  = (2 * PI rads) / (4096 pulses)
@@ -88,6 +94,14 @@ public class Robot extends TimedRobot {
     // Put Mechanism 2d to SmartDashboard
     SmartDashboard.putData("Arm Sim", m_mech2d);
     m_armTower.setColor(new Color8Bit(Color.kBlue));
+
+    // Set the Arm position setpoint and P constant to Preferences if the keys don't already exist
+    if (!Preferences.containsKey(kArmPositionKey)) {
+      Preferences.setDouble(kArmPositionKey, armPositionDeg);
+    }
+    if (!Preferences.containsKey(kArmPKey)) {
+      Preferences.setDouble(kArmPKey, kArmKp);
+    }
   }
 
   @Override
@@ -110,10 +124,21 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void teleopInit() {
+    // Read Preferences for Arm setpoint and kP on entering Teleop
+    armPositionDeg = Preferences.getDouble(kArmPositionKey, armPositionDeg);
+    if (kArmKp != Preferences.getDouble(kArmPKey, kArmKp)) {
+      kArmKp = Preferences.getDouble(kArmPKey, kArmKp);
+      m_controller.setP(kArmKp);
+    }
+  }
+
+  @Override
   public void teleopPeriodic() {
     if (m_joystick.getTrigger()) {
       // Here, we run PID control like normal, with a constant setpoint of 75 degrees.
-      var pidOutput = m_controller.calculate(m_encoder.getDistance(), Units.degreesToRadians(75));
+      var pidOutput =
+          m_controller.calculate(m_encoder.getDistance(), Units.degreesToRadians(armPositionDeg));
       m_motor.setVoltage(pidOutput);
     } else {
       // Otherwise, we disable the motor.
