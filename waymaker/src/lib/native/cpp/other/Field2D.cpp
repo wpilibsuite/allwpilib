@@ -146,8 +146,6 @@ struct DisplayOptions {
   const gui::Texture& texture;
 };
 
-
-
 // Per-frame pose data (not persistent)
 class PoseFrameData {
  public:
@@ -166,7 +164,8 @@ class PoseFrameData {
   void Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
             std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
   void DrawInterior(ImDrawList* drawList, std::vector<ImVec2>* center,
-            std::vector<ImVec2>* left, std::vector<ImVec2>* right) const;
+                    std::vector<ImVec2>* left,
+                    std::vector<ImVec2>* right) const;
 
   // in window coordinates
   ImVec2 m_center;
@@ -202,6 +201,7 @@ class ObjectInfo {
   int* m_pSplineType;
   bool* m_pReversed;
   bool* m_pSelected;
+
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -212,8 +212,8 @@ class ObjectInfo {
   float* m_pWidth;
   float* m_pLength;
 
-  int* m_pStyle;  // DisplayOptions::Style
-  int* m_pSplineStyle; //DisplayOptions::Style
+  int* m_pStyle;        // DisplayOptions::Style
+  int* m_pSplineStyle;  // DisplayOptions::Style
   float* m_pWeight;
   int* m_pColor;
 
@@ -223,10 +223,9 @@ class ObjectInfo {
   int* m_pArrowColor;
 
   bool* m_pSelectable;
-  
 
   std::string* m_pFilename;
-  
+
   gui::Texture m_texture;
 };
 
@@ -245,6 +244,7 @@ class FieldInfo {
 
   wpi::StringMap<std::unique_ptr<ObjectInfo>> m_objects;
   std::string* m_pSelectedName;
+
  private:
   void Reset();
   bool LoadImageImpl(const char* fn);
@@ -260,7 +260,6 @@ class FieldInfo {
   float* m_pHeight;
   float* m_pRobotWidth;
   float* m_pRobotLength;
-  
 
   // in image pixels
   int m_imageWidth;
@@ -571,7 +570,8 @@ ObjectInfo::ObjectInfo() {
   m_pLength =
       storage.GetFloatRef("length", DisplayOptions::kDefaultLength.to<float>());
   m_pStyle = storage.GetIntRef("style", DisplayOptions::kDefaultStyle);
-  m_pSplineStyle = storage.GetIntRef("splineStyle", DisplayOptions::kDefaultSplineStyle);
+  m_pSplineStyle =
+      storage.GetIntRef("splineStyle", DisplayOptions::kDefaultSplineStyle);
   m_pWeight = storage.GetFloatRef("weight", DisplayOptions::kDefaultWeight);
   m_pColor = storage.GetIntRef("color", DisplayOptions::kDefaultColor);
   m_pArrows = storage.GetBoolRef("arrows", DisplayOptions::kDefaultArrows);
@@ -583,9 +583,9 @@ ObjectInfo::ObjectInfo() {
       storage.GetIntRef("arrowColor", DisplayOptions::kDefaultArrowColor);
   m_pSelectable =
       storage.GetBoolRef("selectable", DisplayOptions::kDefaultSelectable);
-  m_pSplineType = storage.GetIntRef("splineType", FieldObjectModel::SplineType::kCubic);
-  m_pReversed =
-      storage.GetBoolRef("reversed", false);
+  m_pSplineType =
+      storage.GetIntRef("splineType", FieldObjectModel::SplineType::kCubic);
+  m_pReversed = storage.GetBoolRef("reversed", false);
   m_pSelected = storage.GetBoolRef("selected", false);
 }
 
@@ -625,7 +625,6 @@ void ObjectInfo::DisplaySettings() {
   ImGui::Combo("Spline Type", m_pSplineType, splineTypeChoices,
                IM_ARRAYSIZE(splineTypeChoices));
   ImGui::Checkbox("Reversed", m_pReversed);
-
 }
 
 void ObjectInfo::DrawLine(ImDrawList* drawList,
@@ -871,14 +870,8 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
                             m_displayOptions.arrowColor,
                             m_displayOptions.arrowWeight);
     }
-
-
   }
 }
-
-
-
-  
 
 void glass::DisplayField2DSettings(Field2DModel* model) {
   auto& storage = GetStorage();
@@ -1069,7 +1062,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   auto poses = gPopupState.GetInsertModel() == &model
                    ? gPopupState.GetInsertPoses()
                    : model.GetPoses();
-  model.SetSplineType(* obj->m_pSplineType);
+  model.SetSplineType(*obj->m_pSplineType);
   auto spline = gPopupState.GetInsertModel() == &model
                     ? gPopupState.GetInsertPoses()
                     : model.GetSpline();
@@ -1077,11 +1070,11 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   size_t i = 0;
   size_t j = 0;
   for (auto&& pose : poses) {
-    if (*obj->m_pSplineType == (int)FieldObjectModel::SplineType::kCubic &&
+    if (*obj->m_pSplineType ==
+            static_cast<int>(FieldObjectModel::SplineType::kCubic) &&
         i != 0 && i != (poses.size() - 1)) {
       displayOptions.style = DisplayOptions::kCircle;
-    }
-    else {
+    } else {
       displayOptions.style = style;
     }
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
@@ -1101,14 +1094,13 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     if (gDragState.target.objModel == &model && gDragState.target.index == i) {
       pfd.HandleDrag(m_mousePos);
     }
-      pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
-    
+    pfd.Draw(m_drawList, &m_centerLine, &m_leftLine, &m_rightLine);
+
     ++i;
   }
   if (i > 1) {
     splineDisplayOptions.arrows = false;
     for (auto&& pose : spline) {
-
       PoseFrameData pfd{pose, model, j, m_ffd, splineDisplayOptions};
 
       // draw
@@ -1124,7 +1116,6 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   m_drawSplit.Merge(m_drawList);
 
   PopID();
-
 }
 
 void PopupState::Open(SelectedTargetInfo* target,
@@ -1272,7 +1263,6 @@ void glass::DisplayField2D(Field2DModel* model, const ImVec2& contentSize) {
 void Field2DView::Display() {
   if (ImGui::Begin("Settings")) {
     DisplayField2DSettings(m_model);
-    
   }
   ImGui::End();
   DisplayField2D(m_model, ImGui::GetWindowContentRegionMax() -
