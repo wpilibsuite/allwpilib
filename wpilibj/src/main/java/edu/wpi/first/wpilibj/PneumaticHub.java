@@ -37,7 +37,7 @@ public class PneumaticHub implements PneumaticsBase {
       final String fwVersion =
           version.firmwareMajor + "." + version.firmwareMinor + "." + version.firmwareFix;
 
-      if (version.firmwareMajor > 0) {
+      if (version.firmwareMajor > 0 && RobotBase.isReal()) {
         // Write PH firmware version to roboRIO
         final String fileName = "REV_PH_" + String.format("%02d", module) + "_WPILib_Version.ini";
         final File file = new File("/tmp/frc_versions/" + fileName);
@@ -62,15 +62,15 @@ public class PneumaticHub implements PneumaticsBase {
           DriverStation.reportError(
               "Could not write " + fileName + ": " + ex.toString(), ex.getStackTrace());
         }
+      }
 
-        // Check PH firmware version
-        if (version.firmwareMajor < 22) {
-          throw new IllegalStateException(
-              "The Pneumatic Hub has firmware version "
-                  + fwVersion
-                  + ", and must be updated to version 2022.0.0 or later "
-                  + "using the REV Hardware Client.");
-        }
+      // Check PH firmware version
+      if (version.firmwareMajor > 0 && version.firmwareMajor < 22) {
+        throw new IllegalStateException(
+            "The Pneumatic Hub has firmware version "
+                + fwVersion
+                + ", and must be updated to version 2022.0.0 or later "
+                + "using the REV Hardware Client.");
       }
     }
 

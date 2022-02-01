@@ -12,6 +12,7 @@
 #include "frc/Compressor.h"
 #include "frc/DoubleSolenoid.h"
 #include "frc/Errors.h"
+#include "frc/RobotBase.h"
 #include "frc/SensorUtil.h"
 #include "frc/Solenoid.h"
 #include "frc/fmt/Units.h"
@@ -58,7 +59,7 @@ class PneumaticHub::DataStore {
 
     auto version = m_moduleObject.GetVersion();
 
-    if (version.FirmwareMajor > 0) {
+    if (version.FirmwareMajor > 0 && RobotBase::IsReal()) {
       // Write PH firmware version to roboRIO
       std::FILE* file = nullptr;
       file = std::fopen(
@@ -77,16 +78,15 @@ class PneumaticHub::DataStore {
                    file);
         std::fclose(file);
       }
+    }
 
-      // Check PH firmware version
-      if (version.FirmwareMajor < 22) {
-        throw FRC_MakeError(
-            err::AssertionFailure,
-            "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
-            "updated to version 2022.0.0 or later using the REV Hardware "
-            "Client",
-            version.FirmwareMajor, version.FirmwareMinor, version.FirmwareFix);
-      }
+    // Check PH firmware version
+    if (version.FirmwareMajor > 0 && version.FirmwareMajor < 22) {
+      throw FRC_MakeError(
+          err::AssertionFailure,
+          "The Pneumatic Hub has firmware version {}.{}.{}, and must be "
+          "updated to version 2022.0.0 or later using the REV Hardware Client",
+          version.FirmwareMajor, version.FirmwareMinor, version.FirmwareFix);
     }
   }
 
