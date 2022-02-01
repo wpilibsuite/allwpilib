@@ -94,7 +94,7 @@ class Robot : public frc::TimedRobot {
       frc::Preferences::SetDouble(kArmPositionKey, armPosition.value());
     }
     if (!frc::Preferences::ContainsKey(kArmPKey)) {
-      frc::Preferences::SetDouble(kArmPKey, armPosition.value());
+      frc::Preferences::SetDouble(kArmPKey, kArmKp);
     }
   }
 
