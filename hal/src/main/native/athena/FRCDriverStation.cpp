@@ -115,6 +115,10 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
       info->eventName, &matchType, &info->matchNumber, &info->replayNumber,
       info->gameSpecificMessage, &info->gameSpecificMessageSize);
 
+  if (info->gameSpecificMessageSize > sizeof(info->gameSpecificMessage)) {
+    info->gameSpecificMessageSize = 0;
+  }
+
   info->matchType = static_cast<HAL_MatchType>(matchType);
 
   *(std::end(info->eventName) - 1) = '\0';
