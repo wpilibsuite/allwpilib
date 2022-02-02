@@ -101,7 +101,7 @@ class PneumaticHub::DataStore {
   bool m_compressorReserved{false};
   wpi::mutex m_reservedLock;
   PneumaticHub m_moduleObject{HAL_kInvalidHandle, 0};
-  std::array<units::second_t, 16> m_oneShotDurMs{0_s};
+  std::array<units::millisecond_t, 16> m_oneShotDurMs{0_ms};
 };
 
 PneumaticHub::PneumaticHub()
