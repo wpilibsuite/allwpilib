@@ -169,7 +169,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
   /* State variables */
   private volatile boolean m_thread_active = false;
-  private CalibrationTime m_calibration_time = CalibrationTime._512ms;
+  private CalibrationTime m_calibration_time = CalibrationTime._32ms;
   private volatile boolean m_first_run = true;
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;

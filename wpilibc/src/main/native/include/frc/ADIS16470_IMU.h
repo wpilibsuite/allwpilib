@@ -374,7 +374,7 @@ class ADIS16470_IMU : public nt::NTSendable,
   volatile bool m_thread_idle = false;
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
-  uint16_t m_calibration_time;
+  uint16_t m_calibration_time = 0;
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
   double m_scaled_sample_rate = 2500.0;  // Default sample rate setting
