@@ -430,7 +430,7 @@ public class DriverStation {
    */
   public static boolean getStickButton(final int stick, final int button) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
@@ -468,7 +468,7 @@ public class DriverStation {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -508,7 +508,7 @@ public class DriverStation {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -610,7 +610,7 @@ public class DriverStation {
    */
   public static int getStickButtons(final int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
