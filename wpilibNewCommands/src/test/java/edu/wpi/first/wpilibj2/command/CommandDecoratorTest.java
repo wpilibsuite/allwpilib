@@ -39,11 +39,11 @@ class CommandDecoratorTest extends CommandTestBase {
   }
 
   @Test
-  void withInterruptTest() {
+  void untilTest() {
     try (CommandScheduler scheduler = new CommandScheduler()) {
       ConditionHolder condition = new ConditionHolder();
 
-      Command command = new WaitCommand(10).withInterrupt(condition::getCondition);
+      Command command = new WaitCommand(10).until(condition::getCondition);
 
       scheduler.schedule(command);
       scheduler.run();

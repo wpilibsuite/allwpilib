@@ -120,6 +120,17 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
+  virtual ParallelRaceGroup Until(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command with an interrupt condition.  If the specified
+   * condition becomes true before the command finishes normally, the command
+   * will be interrupted and un-scheduled. Note that this only applies to the
+   * command returned by this method; the calling command is not itself changed.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
   virtual ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**

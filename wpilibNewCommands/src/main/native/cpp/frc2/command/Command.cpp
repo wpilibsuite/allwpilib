@@ -37,6 +37,13 @@ ParallelRaceGroup Command::WithTimeout(units::second_t duration) && {
   return ParallelRaceGroup(std::move(temp));
 }
 
+ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
+
 ParallelRaceGroup Command::WithInterrupt(std::function<bool()> condition) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));

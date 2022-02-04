@@ -18,7 +18,7 @@ namespace frc2 {
 /**
  * A command that starts a notifier to run the given runnable periodically in a
  * separate thread. Has no end condition as-is; either subclass it or use
- * Command::WithTimeout(double) or Command::WithInterrupt(BooleanSupplier) to
+ * Command::WithTimeout(double) or Command::Until(BooleanSupplier) to
  * give it one.
  *
  * <p>WARNING: Do not use this class unless you are confident in your ability to

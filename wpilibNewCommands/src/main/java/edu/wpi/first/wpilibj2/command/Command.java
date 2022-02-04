@@ -91,8 +91,27 @@ public interface Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
+  default ParallelRaceGroup until(BooleanSupplier condition) {
     return raceWith(new WaitUntilCommand(condition));
+  }
+
+  /**
+   * Decorates this command with an interrupt condition. If the specified condition becomes true
+   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
+   * that this only applies to the command returned by this method; the calling command is not
+   * itself changed.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
+  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
+    return until(condition);
   }
 
   /**
