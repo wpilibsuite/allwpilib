@@ -51,13 +51,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-2019
+          - os: windows-2022
             artifact-name: Win64Debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly --max-workers 1"
             outputs: "build/allOutputs"
-          - os: windows-2019
+          - os: windows-2022
             artifact-name: Win64Release
             architecture: x64
             build-options: "-PciReleaseOnly --max-workers 1"
@@ -69,7 +69,7 @@ jobs:
             build-options: "-Pbuildalldesktop"
             task: "build"
             outputs: "build/allOutputs"
-          - os: windows-2019
+          - os: windows-2022
             artifact-name: Win32
             architecture: x86
             task: ":ntcoreffi:build"
