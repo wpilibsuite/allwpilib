@@ -105,7 +105,7 @@ class PlotSeries {
   int& m_digitalBitGap;
 
   // value storage
-  static constexpr int kMaxSize = 2000;
+  static constexpr int kMaxSize = 20000;
   static constexpr double kTimeGap = 0.05;
   std::atomic<int> m_size = 0;
   std::atomic<int> m_offset = 0;
