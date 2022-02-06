@@ -30,6 +30,14 @@ static Instance& GetInstance() {
   return instance;
 }
 
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetPreferencesInstance() {
+  GetInstance() = Instance();
+}
+}  // namespace frc::impl
+#endif
+
 Preferences* Preferences::GetInstance() {
   ::GetInstance();
   static Preferences instance;
