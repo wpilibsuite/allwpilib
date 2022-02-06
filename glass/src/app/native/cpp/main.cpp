@@ -47,6 +47,8 @@ static std::unique_ptr<glass::Window> gNetworkTablesLogWindow;
 
 static glass::MainMenuBar gMainMenu;
 static bool gAbout = false;
+static bool gSetEnterKey = false;
+static bool gKeyEdit = false;
 
 static void NtInitialize() {
   // update window title when connection status changes
@@ -178,6 +180,9 @@ int main(int argc, char** argv) {
 
   gMainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("View")) {
+      if (ImGui::MenuItem("Set Enter Key")) {
+        gSetEnterKey = true;
+      }
       if (ImGui::MenuItem("Reset Time")) {
         glass::ResetTime();
       }
@@ -228,6 +233,57 @@ int main(int argc, char** argv) {
       ImGui::Text("Save location: %s", glass::GetStorageDir().c_str());
       if (ImGui::Button("Close")) {
         ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
+
+    int& enterKey = glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.KeyMap[ImGuiKey_Enter] = enterKey;
+
+    if (gSetEnterKey) {
+      ImGui::OpenPopup("Set Enter Key");
+      gSetEnterKey = false;
+    }
+    if (ImGui::BeginPopupModal("Set Enter Key")) {
+      ImGui::Text("Set the key to use to mean 'Enter'");
+      ImGui::Text("This is useful to edit values without the DS disabling");
+      ImGui::Separator();
+
+      if (gKeyEdit) {
+        for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); ++i) {
+          if (io.KeysDown[i]) {
+            // remove all other uses
+            enterKey = i;
+            gKeyEdit = false;
+            break;
+          }
+        }
+      }
+
+      ImGui::Text("Key:");
+      ImGui::SameLine();
+      char editLabel[32];
+      char nameBuf[32];
+      const char* name = glfwGetKeyName(enterKey, 0);
+      if (!name) {
+        std::snprintf(nameBuf, sizeof(nameBuf), "%d", enterKey);
+        name = nameBuf;
+      }
+      std::snprintf(editLabel, sizeof(editLabel), "%s###edit",
+                    gKeyEdit ? "(press key)" : name);
+      if (ImGui::SmallButton(editLabel)) {
+        gKeyEdit = true;
+      }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("Reset")) {
+        enterKey = GLFW_KEY_ENTER;
+      }
+
+      if (ImGui::Button("Close")) {
+        ImGui::CloseCurrentPopup();
+        gKeyEdit = false;
       }
       ImGui::EndPopup();
     }
