@@ -19,6 +19,8 @@ using namespace frc;
 
 namespace {
 struct Instance {
+  Instance() { HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0); }
+
   detail::ListenerExecutor listenerExecutor;
   std::shared_ptr<nt::NetworkTable> table =
       nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
@@ -28,7 +30,6 @@ struct Instance {
 }  // namespace
 
 static Instance& GetInstance() {
-  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
   static Instance instance;
   return instance;
 }
