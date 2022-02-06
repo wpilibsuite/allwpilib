@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
-#include <iostream>
 #include <thread>
 
 #include <fmt/format.h>

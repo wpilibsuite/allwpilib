@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
-#include <iostream>
 #include <vector>
 
 #include "frc/geometry/Pose2d.h"
