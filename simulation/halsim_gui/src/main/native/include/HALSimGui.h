@@ -8,6 +8,7 @@
 #include <glass/WindowManager.h>
 #include <glass/networktables/NetworkTablesProvider.h>
 
+#include <functional>
 #include <memory>
 
 #include "HALProvider.h"
@@ -24,5 +25,10 @@ class HALSimGui {
   static std::unique_ptr<HALProvider> halProvider;
   static std::unique_ptr<glass::NetworkTablesProvider> ntProvider;
 };
+
+void AddGuiInit(std::function<void()> initialize);
+void AddGuiLateExecute(std::function<void()> execute);
+void AddGuiEarlyExecute(std::function<void()> execute);
+void GuiExit();
 
 }  // namespace halsimgui
