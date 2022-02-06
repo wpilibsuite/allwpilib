@@ -914,6 +914,9 @@ internal::file_dialog::file_dialog(type in_type,
     if (flags(flag::is_verbose))
         print_command(command);
 
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
+
     m_async->start_process(command);
 #endif
 }
@@ -1132,6 +1135,9 @@ notify::notify(std::string const &title,
     if (flags(flag::is_verbose))
         print_command(command);
 
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
+
     m_async->start_process(command);
 #endif
 }
@@ -1332,6 +1338,9 @@ message::message(std::string const &title,
 
     if (flags(flag::is_verbose))
         print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
