@@ -19,7 +19,6 @@
 #include <frc/Timer.h>
 
 #include <cmath>
-#include <iostream>
 #include <string>
 
 #include <hal/HAL.h>
@@ -171,7 +170,6 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
     while (!m_thread_idle) {
       Wait(10_ms);
     }
-    std::cout << "Paused the IMU processing thread successfully!" << std::endl;
     // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
     if (m_spi != nullptr && m_auto_configured) {
       m_spi->StopAuto();
@@ -190,12 +188,10 @@ bool ADIS16470_IMU::SwitchToStandardSPI() {
         /*Get the reamining data count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       }
-      std::cout << "Paused the auto SPI successfully!" << std::endl;
     }
   }
   // There doesn't seem to be a SPI port active. Let's try to set one up
   if (m_spi == nullptr) {
-    std::cout << "Setting up a new SPI port." << std::endl;
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(2000000);
     m_spi->SetMSBFirst();
@@ -284,11 +280,9 @@ bool ADIS16470_IMU::SwitchToAutoSPI() {
     m_first_run = true;
     m_thread_active = true;
     m_acquire_task = std::thread(&ADIS16470_IMU::Acquire, this);
-    std::cout << "New IMU Processing thread activated!" << std::endl;
   } else {
     m_first_run = true;
     m_thread_active = true;
-    std::cout << "Old IMU Processing thread re-activated!" << std::endl;
   }
   // Looks like the thread didn't start for some reason. Abort.
   /*
@@ -465,7 +459,6 @@ void ADIS16470_IMU::Close() {
     }
     m_spi = nullptr;
   }
-  std::cout << "Finished cleaning up after the IMU driver." << std::endl;
 }
 
 ADIS16470_IMU::~ADIS16470_IMU() {
@@ -547,18 +540,6 @@ void ADIS16470_IMU::Acquire() {
           buffer, data_to_read,
           0_s);  // Read data from DMA buffer (only complete sets)
 
-      /*
-      // DEBUG: Print buffer size and contents to terminal
-      std::cout << "Start - " << data_count << "," << data_remainder << "," <<
-      data_to_read << std::endl; for (int m = 0; m < data_to_read - 1; m++ )
-      {
-        std::cout << buffer[m] << ",";
-      }
-      std::cout << " " << std::endl;
-      std::cout << "End" << std::endl;
-      std::cout << "Reading " << data_count << " bytes." << std::endl;
-      */
-
       // Could be multiple data sets in the buffer. Handle each one.
       for (int i = 0; i < data_to_read; i += dataset_len) {
         // Timestamp is at buffer[i]
@@ -585,12 +566,6 @@ void ADIS16470_IMU::Acquire() {
         // Store timestamp for next iteration
         previous_timestamp = buffer[i];
 
-        /*
-        // DEBUG: Print timestamp and delta values
-        std::cout << previous_timestamp << "," << delta_x << "," << delta_y <<
-        "," << delta_z << std::endl;
-        */
-
         m_alpha = m_tau / (m_tau + m_dt);
 
         if (m_first_run) {
@@ -613,9 +588,6 @@ void ADIS16470_IMU::Acquire() {
           compAngleY =
               CompFilterProcess(compAngleY, accelAngleY, gyro_rate_x_si);
         }
-
-        // DEBUG: Print accumulated values
-        // std::cout << m_compAngleX << "," << m_compAngleY << std::endl;
 
         {
           std::scoped_lock sync(m_mutex);

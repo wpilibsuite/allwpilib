@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <string>
 
 #include <hal/HAL.h>
@@ -174,7 +173,6 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
     while (!m_thread_idle) {
       Wait(10_ms);
     }
-    std::cout << "Paused the IMU processing thread successfully!" << std::endl;
     // Maybe we're in auto SPI mode? If so, kill auto SPI, and then SPI.
     if (m_spi != nullptr && m_auto_configured) {
       m_spi->StopAuto();
@@ -193,12 +191,10 @@ bool ADIS16448_IMU::SwitchToStandardSPI() {
         /* Update remaining buffer count */
         data_count = m_spi->ReadAutoReceivedData(trashBuffer, 0, 0_s);
       }
-      std::cout << "Paused the auto SPI successfully!" << std::endl;
     }
   }
   // There doesn't seem to be a SPI port active. Let's try to set one up
   if (m_spi == nullptr) {
-    std::cout << "Setting up a new SPI port." << std::endl;
     m_spi = new SPI(m_spi_port);
     m_spi->SetClockRate(1000000);
     m_spi->SetMSBFirst();
@@ -292,11 +288,9 @@ bool ADIS16448_IMU::SwitchToAutoSPI() {
     InitOffsetBuffer(m_avg_size);
     // Kick off acquire thread
     m_acquire_task = std::thread(&ADIS16448_IMU::Acquire, this);
-    std::cout << "New IMU Processing thread activated!" << std::endl;
   } else {
     m_first_run = true;
     m_thread_active = true;
-    std::cout << "Old IMU Processing thread re-activated!" << std::endl;
   }
   // Looks like the thread didn't start for some reason. Abort.
   /*
@@ -344,9 +338,6 @@ void ADIS16448_IMU::Calibrate() {
   m_integ_gyro_angle_x = 0.0;
   m_integ_gyro_angle_y = 0.0;
   m_integ_gyro_angle_z = 0.0;
-  // std::cout << "Avg Size: " << gyroAverageSize << " X off: " <<
-  // m_gyro_rate_offset_x << " Y off: " << m_gyro_rate_offset_y << " Z off: " <<
-  // m_gyro_rate_offset_z << std::endl;
 }
 
 /**
@@ -415,7 +406,6 @@ void ADIS16448_IMU::Close() {
     m_spi = nullptr;
   }
   delete[] m_offset_buffer;
-  std::cout << "Finished cleaning up after the IMU driver." << std::endl;
 }
 
 ADIS16448_IMU::~ADIS16448_IMU() {
@@ -517,16 +507,6 @@ void ADIS16448_IMU::Acquire() {
           baro = BuffToShort(&buffer[i + 23]) * 0.02;
           temp = BuffToShort(&buffer[i + 25]) * 0.07386 + 31.0;
 
-          /*std::cout << BuffToShort(&buffer[i + 3]) << "," <<
-          BuffToShort(&buffer[i + 5]) << "," << BuffToShort(&buffer[i + 7]) <<
-          "," << BuffToShort(&buffer[i + 9]) << "," << BuffToShort(&buffer[i +
-          11]) << "," << BuffToShort(&buffer[i + 13]) << "," <<
-          BuffToShort(&buffer[i + 15]) << "," << BuffToShort(&buffer[i + 17]) <<
-          "," << BuffToShort(&buffer[i + 19]) << "," << BuffToShort(&buffer[i +
-          21]) << "," << BuffToShort(&buffer[i + 23]) << "," <<
-          BuffToShort(&buffer[i + 25]) << "," <<
-          BuffToShort(&buffer[i + 27]) << std::endl; */
-
           // Convert scaled sensor data to SI units
           gyro_rate_x_si = gyro_rate_x * deg_to_rad;
           gyro_rate_y_si = gyro_rate_y * deg_to_rad;
@@ -609,22 +589,6 @@ void ADIS16448_IMU::Acquire() {
             }
           }
           m_first_run = false;
-        } else {
-          /*
-          // Print notification when crc fails and bad data is rejected
-          std::cout << "IMU Data CRC Mismatch Detected." << std::endl;
-          std::cout << "Calculated CRC: " << calc_crc << std::endl;
-          std::cout << "Read CRC: " << imu_crc << std::endl;
-          // DEBUG: Plot sub-array data in terminal
-          std::cout << BuffToUShort(&buffer[i + 3]) << "," <<
-          BuffToUShort(&buffer[i + 5]) << "," << BuffToUShort(&buffer[i + 7]) <<
-          "," << BuffToUShort(&buffer[i + 9]) << "," << BuffToUShort(&buffer[i +
-          11]) << "," << BuffToUShort(&buffer[i + 13]) << "," <<
-          BuffToUShort(&buffer[i + 15]) << "," << BuffToUShort(&buffer[i + 17])
-          << "," << BuffToUShort(&buffer[i + 19]) << "," <<
-          BuffToUShort(&buffer[i + 21]) << "," << BuffToUShort(&buffer[i + 23])
-          << "," << BuffToUShort(&buffer[i + 25]) << "," <<
-          BuffToUShort(&buffer[i + 27]) << std::endl; */
         }
       }
     } else {
