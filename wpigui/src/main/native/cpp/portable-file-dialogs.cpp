@@ -46,7 +46,6 @@
 #ifdef _WIN32
 #include <set>
 #endif
-#include <iostream>
 #include <regex>
 #include <thread>
 #include <chrono>
@@ -595,13 +594,17 @@ std::string internal::dialog::get_icon_name(icon _icon)
     }
 }
 
-// THis is only used for debugging purposes
-std::ostream& operator <<(std::ostream &s, std::vector<std::string> const &v)
+// This is only used for debugging purposes
+void print_command(std::vector<std::string> const &v)
 {
-    int not_first = 0;
-    for (auto &e : v)
-        s << (not_first++ ? " " : "") << e;
-    return s;
+    fputs("pfd: ", stderr);
+    for (size_t i = 0; i < v.size(); ++i) {
+        if (i > 0) {
+            fputc(' ', stderr);
+        }
+        fputs(v[i].c_str(), stderr);
+    }
+    fputc('\n', stderr);
 }
 
 // Properly quote a string for Powershell: replace ' or " with '' or ""
@@ -909,7 +912,10 @@ internal::file_dialog::file_dialog(type in_type,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
@@ -1127,7 +1133,10 @@ notify::notify(std::string const &title,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
@@ -1328,7 +1337,10 @@ message::message(std::string const &title,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
