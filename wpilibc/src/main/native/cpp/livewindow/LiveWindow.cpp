@@ -48,10 +48,22 @@ struct Instance {
 };
 }  // namespace
 
-static Instance& GetInstance() {
-  static Instance instance;
+static std::unique_ptr<Instance>& GetInstanceHolder() {
+  static std::unique_ptr<Instance> instance = std::make_unique<Instance>();
   return instance;
 }
+
+static Instance& GetInstance() {
+  return *GetInstanceHolder();
+}
+
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetLiveWindow() {
+  std::make_unique<Instance>().swap(GetInstanceHolder());
+}
+}  // namespace frc::impl
+#endif
 
 std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {
   auto data = std::static_pointer_cast<Component>(
