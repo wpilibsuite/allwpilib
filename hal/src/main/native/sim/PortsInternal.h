@@ -29,10 +29,13 @@ constexpr int32_t kNumCTREPDPModules = 63;
 constexpr int32_t kNumCTREPDPChannels = 16;
 constexpr int32_t kNumREVPDHModules = 63;
 constexpr int32_t kNumREVPDHChannels = 24;
+constexpr int32_t kNumPDSimModules = kNumREVPDHModules;
+constexpr int32_t kNumPDSimChannels = kNumREVPDHChannels;
 constexpr int32_t kNumDutyCycles = 8;
 constexpr int32_t kNumAddressableLEDs = 1;
 constexpr int32_t kNumREVPHModules = 63;
 constexpr int32_t kNumREVPHChannels = 16;
 constexpr int32_t kSPIAccelerometers = 5;
 constexpr int32_t kSPIPorts = 5;
+
 }  // namespace hal
