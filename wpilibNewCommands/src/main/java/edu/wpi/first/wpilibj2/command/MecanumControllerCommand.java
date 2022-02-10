@@ -113,7 +113,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_controller =
         new HolonomicDriveController(
             requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
-            requireNonNullParam(yController, "xController", "MecanumControllerCommand"),
+            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
             requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
@@ -256,7 +256,7 @@ public class MecanumControllerCommand extends CommandBase {
     m_controller =
         new HolonomicDriveController(
             requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
-            requireNonNullParam(yController, "xController", "MecanumControllerCommand"),
+            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
             requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
