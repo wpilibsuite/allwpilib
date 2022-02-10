@@ -119,7 +119,8 @@ public class RamseteCommand extends CommandBase {
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
-    m_output = requireNonNullParam(outputMetersPerSecond, "outputMetersPerSecond", "RamseteCommand");
+    m_output =
+        requireNonNullParam(outputMetersPerSecond, "outputMetersPerSecond", "RamseteCommand");
 
     m_feedforward = null;
     m_speeds = null;
