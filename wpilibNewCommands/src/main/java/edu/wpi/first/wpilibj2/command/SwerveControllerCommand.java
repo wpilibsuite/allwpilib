@@ -79,11 +79,11 @@ public class SwerveControllerCommand extends CommandBase {
     m_controller =
         new HolonomicDriveController(
             requireNonNullParam(xController, "xController", "SwerveControllerCommand"),
-            requireNonNullParam(yController, "xController", "SwerveControllerCommand"),
+            requireNonNullParam(yController, "yController", "SwerveControllerCommand"),
             requireNonNullParam(thetaController, "thetaController", "SwerveControllerCommand"));
 
     m_outputModuleStates =
-        requireNonNullParam(outputModuleStates, "frontLeftOutput", "SwerveControllerCommand");
+        requireNonNullParam(outputModuleStates, "outputModuleStates", "SwerveControllerCommand");
 
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "SwerveControllerCommand");

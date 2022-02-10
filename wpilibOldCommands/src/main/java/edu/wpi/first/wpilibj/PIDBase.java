@@ -153,7 +153,7 @@ public class PIDBase implements PIDInterface, PIDOutput, Sendable, AutoCloseable
    */
   @SuppressWarnings("ParameterName")
   public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source, PIDOutput output) {
-    requireNonNullParam(source, "PIDSource", "PIDBase");
+    requireNonNullParam(source, "source", "PIDBase");
     requireNonNullParam(output, "output", "PIDBase");
 
     m_setpointTimer = new Timer();
