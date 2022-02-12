@@ -182,4 +182,36 @@ class CommandDecoratorTest extends CommandTestBase {
       assertTrue(scheduler.isScheduled(perpetual));
     }
   }
+
+  @Test
+  void onInitTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Counter counter = new Counter();
+      Command command = new InstantCommand();
+
+      Command init = command.onInit(counter::increment);
+
+      scheduler.schedule(init);
+      scheduler.run();
+      assertTrue(counter.m_counter == 1);
+
+      scheduler.schedule(init);
+      scheduler.run();
+      assertTrue(counter.m_counter == 2);
+    }
+  }
+
+  @Test
+  void onInitRequirementsTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Subsystem instantReq = new TestSubsystem();
+      Subsystem initReq = new TestSubsystem();
+
+      Command command = new InstantCommand(()->{}, instantReq);
+      Command init = command.onInit(()->{}, initReq);
+
+      assertTrue(init.hasRequirement(instantReq));
+      assertTrue(init.hasRequirement(initReq));
+    }
+  }
 }
