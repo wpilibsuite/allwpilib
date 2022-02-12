@@ -280,7 +280,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
 
     double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
 
-    if (xSpeed >= 0.0) {
+    if (maxInput >= 0.0) {
       // First quadrant, else second quadrant
       if (zRotation >= 0.0) {
         leftSpeed = maxInput;
