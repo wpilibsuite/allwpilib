@@ -4,8 +4,8 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -331,22 +331,21 @@ public interface Command {
     return this.getClass().getSimpleName();
   }
 
- /**
+  /**
    * Decorates this command with a code injection at the end of this command's initialize() method.
-   * 
+   *
    * @param toRun the Runnable that should be run at the end of the initialize() method.
-   * @returns the decorated Command
+   * @param requirements any additional requirements for the added code.
+   * @return the decorated Command
    */
 
   default Command onInit(Runnable toRun, Subsystem... requirements) {
-
     Set<Subsystem> requirementsSet = new HashSet<Subsystem>();
     Command command = this;
 
     requirementsSet.addAll(Set.of(requirements));
     requirementsSet.addAll(this.getRequirements());
     return new Command() {
-
       protected final Command m_command = command;
       protected final Runnable m_toRun = toRun;
       protected final Set<Subsystem> m_requirements = requirementsSet;
@@ -361,12 +360,12 @@ public interface Command {
         m_command.initialize();
         m_toRun.run();
       }
-    
+
       @Override
       public void execute() {
         m_command.execute();
       }
-      
+
       @Override
       public boolean isFinished() {
         return m_command.isFinished();
