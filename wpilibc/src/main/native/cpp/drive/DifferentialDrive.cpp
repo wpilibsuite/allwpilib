@@ -112,7 +112,7 @@ DifferentialDrive::WheelSpeeds DifferentialDrive::ArcadeDriveIK(
   double maxInput =
       std::copysign(std::max(std::abs(xSpeed), std::abs(zRotation)), xSpeed);
 
-  if (xSpeed >= 0.0) {
+  if (maxInput >= 0.0) {
     // First quadrant, else second quadrant
     if (zRotation >= 0.0) {
       leftSpeed = maxInput;
