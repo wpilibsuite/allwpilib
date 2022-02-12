@@ -42,10 +42,10 @@ public class ProfiledPIDCommand extends CommandBase {
       Supplier<State> goalSource,
       BiConsumer<Double, State> useOutput,
       Subsystem... requirements) {
-    requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
-    requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
-    requireNonNullParam(goalSource, "goalSource", "SynchronousPIDCommand");
-    requireNonNullParam(useOutput, "useOutput", "SynchronousPIDCommand");
+    requireNonNullParam(controller, "controller", "ProfiledPIDCommand");
+    requireNonNullParam(measurementSource, "measurementSource", "ProfiledPIDCommand");
+    requireNonNullParam(goalSource, "goalSource", "ProfiledPIDCommand");
+    requireNonNullParam(useOutput, "useOutput", "ProfiledPIDCommand");
 
     m_controller = controller;
     m_useOutput = useOutput;
