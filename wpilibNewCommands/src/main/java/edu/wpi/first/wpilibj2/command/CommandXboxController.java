@@ -5,10 +5,15 @@
 package edu.wpi.first.wpilibj2.command;
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+
+import java.util.EnumMap;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import static edu.wpi.first.wpilibj.XboxController.Axis;
+import static edu.wpi.first.wpilibj.XboxController.Button;
 
 /**
  * Provides JoystickButtons for binding commands to an XboxController's buttons. Additionally offers
@@ -17,16 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class CommandXboxController extends GenericHID {
   // reuses the Button and Axis enums from the original XboxController
 
-  private JoystickButton m_leftBumper;
-  private JoystickButton m_rightBumper;
-  private JoystickButton m_leftStick;
-  private JoystickButton m_rightStick;
-  private JoystickButton m_a;
-  private JoystickButton m_b;
-  private JoystickButton m_x;
-  private JoystickButton m_y;
-  private JoystickButton m_backButton;
-  private JoystickButton m_startButton;
+  private final EnumMap<Button, JoystickButton> m_buttons = new EnumMap<>(Button.class);
 
   @SuppressWarnings("checkstyle:MemberName")
   public final CommandControllerPOV pov;
@@ -44,16 +40,21 @@ public class CommandXboxController extends GenericHID {
   }
 
   /**
+   * Builds a {@link JoystickButton} for this controller from the provided {@link Button}.
+   * @param button the Button to build for
+   * @return Built JoystickButton
+   */
+  private JoystickButton build(Button button) {
+		return new JoystickButton(this, button.value);
+	}
+
+  /**
    * Returns the left bumper's JoystickButton object.
    *
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton leftBumper() {
-    if (m_leftBumper == null) {
-      m_leftBumper = new JoystickButton(this, XboxController.Button.kLeftBumper.value);
-    }
-
-    return m_leftBumper;
+    return m_buttons.computeIfAbsent(Button.kLeftBumper, this::build);
   }
 
   /**
@@ -62,11 +63,7 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton rightBumper() {
-    if (m_rightBumper == null) {
-      m_rightBumper = new JoystickButton(this, XboxController.Button.kRightBumper.value);
-    }
-
-    return m_rightBumper;
+    return m_buttons.computeIfAbsent(Button.kRightBumper, this::build);
   }
 
   /**
@@ -75,11 +72,7 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton leftStick() {
-    if (m_leftStick == null) {
-      m_leftStick = new JoystickButton(this, XboxController.Button.kLeftStick.value);
-    }
-
-    return m_leftStick;
+    return m_buttons.computeIfAbsent(Button.kLeftStick, this::build);
   }
 
   /**
@@ -88,11 +81,7 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton rightStick() {
-    if (m_rightStick == null) {
-      m_rightStick = new JoystickButton(this, XboxController.Button.kRightStick.value);
-    }
-
-    return m_rightStick;
+    return m_buttons.computeIfAbsent(Button.kRightStick, this::build);
   }
 
   /**
@@ -102,11 +91,7 @@ public class CommandXboxController extends GenericHID {
    */
   @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton a() {
-    if (m_a == null) {
-      m_a = new JoystickButton(this, XboxController.Button.kA.value);
-    }
-
-    return m_a;
+    return m_buttons.computeIfAbsent(Button.kA, this::build);
   }
 
   /**
@@ -116,11 +101,7 @@ public class CommandXboxController extends GenericHID {
    */
   @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton b() {
-    if (m_b == null) {
-      m_b = new JoystickButton(this, XboxController.Button.kB.value);
-    }
-
-    return m_b;
+    return m_buttons.computeIfAbsent(Button.kB, this::build);
   }
 
   /**
@@ -130,11 +111,7 @@ public class CommandXboxController extends GenericHID {
    */
   @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton x() {
-    if (m_x == null) {
-      m_x = new JoystickButton(this, XboxController.Button.kX.value);
-    }
-
-    return m_x;
+    return m_buttons.computeIfAbsent(Button.kX, this::build);
   }
 
   /**
@@ -144,11 +121,7 @@ public class CommandXboxController extends GenericHID {
    */
   @SuppressWarnings("checkstyle:MethodName")
   public JoystickButton y() {
-    if (m_y == null) {
-      m_y = new JoystickButton(this, XboxController.Button.kY.value);
-    }
-
-    return m_y;
+    return m_buttons.computeIfAbsent(Button.kY, this::build);
   }
 
   /**
@@ -157,11 +130,7 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton back() {
-    if (m_backButton == null) {
-      m_backButton = new JoystickButton(this, XboxController.Button.kBack.value);
-    }
-
-    return m_backButton;
+    return m_buttons.computeIfAbsent(Button.kBack, this::build);
   }
 
   /**
@@ -170,11 +139,7 @@ public class CommandXboxController extends GenericHID {
    * <p>To get its value, use {@link JoystickButton#get()}.
    */
   public JoystickButton start() {
-    if (m_startButton == null) {
-      m_startButton = new JoystickButton(this, XboxController.Button.kStart.value);
-    }
-
-    return m_startButton;
+    return m_buttons.computeIfAbsent(Button.kStart, this::build);
   }
 
   /**
@@ -183,7 +148,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(XboxController.Axis.kLeftX.value);
+    return getRawAxis(Axis.kLeftX.value);
   }
 
   /**
@@ -192,7 +157,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(XboxController.Axis.kRightX.value);
+    return getRawAxis(Axis.kRightX.value);
   }
 
   /**
@@ -201,7 +166,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(XboxController.Axis.kLeftY.value);
+    return getRawAxis(Axis.kLeftY.value);
   }
 
   /**
@@ -210,7 +175,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(XboxController.Axis.kRightY.value);
+    return getRawAxis(Axis.kRightY.value);
   }
 
   /**
@@ -220,7 +185,7 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getRawAxis(XboxController.Axis.kLeftTrigger.value);
+    return getRawAxis(Axis.kLeftTrigger.value);
   }
 
   /**
@@ -230,6 +195,6 @@ public class CommandXboxController extends GenericHID {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getRawAxis(XboxController.Axis.kRightTrigger.value);
+    return getRawAxis(Axis.kRightTrigger.value);
   }
 }
