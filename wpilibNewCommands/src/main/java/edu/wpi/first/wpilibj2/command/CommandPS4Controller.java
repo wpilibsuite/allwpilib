@@ -4,16 +4,14 @@
 
 package edu.wpi.first.wpilibj2.command;
 
+import static edu.wpi.first.wpilibj.PS4Controller.Axis;
+import static edu.wpi.first.wpilibj.PS4Controller.Button;
+
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import static edu.wpi.first.wpilibj.PS4Controller.Button;
-
 import java.util.EnumMap;
-
-import static edu.wpi.first.wpilibj.PS4Controller.Axis;
 
 /**
  * Provides JoystickButtons for binding commands to an PS4Controller's buttons. Additionally offers
@@ -41,12 +39,13 @@ public class CommandPS4Controller extends GenericHID {
 
   /**
    * Builds a {@link JoystickButton} for this controller from the provided {@link Button}.
+   *
    * @param button the Button to build for
    * @return Built JoystickButton
    */
   private JoystickButton build(Button button) {
-		return new JoystickButton(this, button.value);
-	}
+    return new JoystickButton(this, button.value);
+  }
 
   /**
    * Returns the square button's JoystickButton object.

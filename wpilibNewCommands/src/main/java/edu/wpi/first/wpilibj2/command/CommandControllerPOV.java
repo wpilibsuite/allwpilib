@@ -4,10 +4,9 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import java.util.EnumMap;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import java.util.EnumMap;
 
 /** Provides POVButtons for binding commands to any GenericHID inherited class. */
 public class CommandControllerPOV {
@@ -16,14 +15,14 @@ public class CommandControllerPOV {
 
   private enum POVAngle {
     kCenter(-1),
-		kUp(0),
-		kUpRight(45),
-		kRight(90),
-		kDownRight(135),
-		kDown(180),
-		kDownLeft(225),
-		kLeft(270),
-		kUpLeft(315);
+    kUp(0),
+    kUpRight(45),
+    kRight(90),
+    kDownRight(135),
+    kDown(180),
+    kDownLeft(225),
+    kLeft(270),
+    kUpLeft(315);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -33,8 +32,7 @@ public class CommandControllerPOV {
     }
 
     /**
-     * Get the human-friendly name of the POV angle. This is done by
-     * stripping the leading `k`.
+     * Get the human-friendly name of the POV angle. This is done by stripping the leading `k`.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -70,12 +68,13 @@ public class CommandControllerPOV {
 
   /**
    * Builds a {@link POVButton} for this POV from the provided {@link POVAngle}.
+   *
    * @param button the POVAngle to build for
    * @return Built POVButton
    */
   private POVButton build(POVAngle angle) {
-		return new POVButton(m_hid, angle.value, m_povNumber);
-	}
+    return new POVButton(m_hid, angle.value, m_povNumber);
+  }
 
   /**
    * Returns the centered (not pressed) POVButton object.
