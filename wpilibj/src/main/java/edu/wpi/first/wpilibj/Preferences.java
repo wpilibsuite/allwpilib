@@ -109,6 +109,7 @@ public final class Preferences {
   public static void initString(String key, String value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultString(value);
+    entry.setPersistent();
   }
 
   /**
@@ -144,6 +145,7 @@ public final class Preferences {
   public static void initInt(String key, int value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -179,6 +181,7 @@ public final class Preferences {
   public static void initDouble(String key, double value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -214,6 +217,7 @@ public final class Preferences {
   public static void initFloat(String key, float value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -249,6 +253,7 @@ public final class Preferences {
   public static void initBoolean(String key, boolean value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultBoolean(value);
+    entry.setPersistent();
   }
 
   /**
@@ -284,6 +289,7 @@ public final class Preferences {
   public static void initLong(String key, long value) {
     NetworkTableEntry entry = m_table.getEntry(key);
     entry.setDefaultDouble(value);
+    entry.setPersistent();
   }
 
   /**
