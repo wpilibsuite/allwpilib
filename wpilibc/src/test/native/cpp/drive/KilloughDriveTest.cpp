@@ -8,6 +8,80 @@
 #include "frc/drive/KilloughDrive.h"
 #include "gtest/gtest.h"
 
+TEST(KilloughDriveTest, CartesianIK) {
+  frc::MockMotorController left;
+  frc::MockMotorController right;
+  frc::MockMotorController back;
+  frc::KilloughDrive drive{left, right, back};
+
+  // Forward
+  auto speeds = drive.DriveCartesianIK(1.0, 0.0, 0.0);
+  EXPECT_DOUBLE_EQ(0.5, speeds.left);
+  EXPECT_DOUBLE_EQ(-0.5, speeds.right);
+  EXPECT_NEAR(0.0, speeds.back, 1e-9);
+
+  // Left
+  speeds = drive.DriveCartesianIK(0.0, -1.0, 0.0);
+  EXPECT_DOUBLE_EQ(-std::sqrt(3) / 2, speeds.left);
+  EXPECT_DOUBLE_EQ(-std::sqrt(3) / 2, speeds.right);
+  EXPECT_DOUBLE_EQ(1.0, speeds.back);
+
+  // Right
+  speeds = drive.DriveCartesianIK(0.0, 1.0, 0.0);
+  EXPECT_DOUBLE_EQ(std::sqrt(3) / 2, speeds.left);
+  EXPECT_DOUBLE_EQ(std::sqrt(3) / 2, speeds.right);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.back);
+
+  // Rotate CCW
+  speeds = drive.DriveCartesianIK(0.0, 0.0, -1.0);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.back);
+
+  // Rotate CW
+  speeds = drive.DriveCartesianIK(0.0, 0.0, 1.0);
+  EXPECT_DOUBLE_EQ(1.0, speeds.left);
+  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  EXPECT_DOUBLE_EQ(1.0, speeds.back);
+}
+
+TEST(KilloughDriveTest, CartesianIKGyro90CW) {
+  frc::MockMotorController left;
+  frc::MockMotorController right;
+  frc::MockMotorController back;
+  frc::KilloughDrive drive{left, right, back};
+
+  // Forward in global frame; left in robot frame
+  auto speeds = drive.DriveCartesianIK(1.0, 0.0, 0.0, 90.0);
+  EXPECT_DOUBLE_EQ(-std::sqrt(3) / 2, speeds.left);
+  EXPECT_DOUBLE_EQ(-std::sqrt(3) / 2, speeds.right);
+  EXPECT_DOUBLE_EQ(1.0, speeds.back);
+
+  // Left in global frame; backward in robot frame
+  speeds = drive.DriveCartesianIK(0.0, -1.0, 0.0, 90.0);
+  EXPECT_DOUBLE_EQ(-0.5, speeds.left);
+  EXPECT_NEAR(0.5, speeds.right, 1e-9);
+  EXPECT_NEAR(0.0, speeds.back, 1e-9);
+
+  // Right in global frame; forward in robot frame
+  speeds = drive.DriveCartesianIK(0.0, 1.0, 0.0, 90.0);
+  EXPECT_DOUBLE_EQ(0.5, speeds.left);
+  EXPECT_NEAR(-0.5, speeds.right, 1e-9);
+  EXPECT_NEAR(0.0, speeds.back, 1e-9);
+
+  // Rotate CCW
+  speeds = drive.DriveCartesianIK(0.0, 0.0, -1.0, 90.0);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.left);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.right);
+  EXPECT_DOUBLE_EQ(-1.0, speeds.back);
+
+  // Rotate CW
+  speeds = drive.DriveCartesianIK(0.0, 0.0, 1.0, 90.0);
+  EXPECT_DOUBLE_EQ(1.0, speeds.left);
+  EXPECT_DOUBLE_EQ(1.0, speeds.right);
+  EXPECT_DOUBLE_EQ(1.0, speeds.back);
+}
+
 TEST(KilloughDriveTest, Cartesian) {
   frc::MockMotorController left;
   frc::MockMotorController right;
