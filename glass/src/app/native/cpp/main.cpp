@@ -264,7 +264,7 @@ int main(int argc, char** argv) {
 
       ImGui::Text("Key:");
       ImGui::SameLine();
-      char editLabel[32];
+      char editLabel[40];
       char nameBuf[32];
       const char* name = glfwGetKeyName(enterKey, 0);
       if (!name) {
