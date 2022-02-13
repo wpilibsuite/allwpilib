@@ -39,10 +39,10 @@ public class PIDCommand extends CommandBase {
       DoubleSupplier setpointSource,
       DoubleConsumer useOutput,
       Subsystem... requirements) {
-    requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
-    requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
-    requireNonNullParam(setpointSource, "setpointSource", "SynchronousPIDCommand");
-    requireNonNullParam(useOutput, "useOutput", "SynchronousPIDCommand");
+    requireNonNullParam(controller, "controller", "PIDCommand");
+    requireNonNullParam(measurementSource, "measurementSource", "PIDCommand");
+    requireNonNullParam(setpointSource, "setpointSource", "PIDCommand");
+    requireNonNullParam(useOutput, "useOutput", "PIDCommand");
 
     m_controller = controller;
     m_useOutput = useOutput;

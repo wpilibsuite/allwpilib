@@ -60,10 +60,23 @@ Component& SendableRegistryInst::GetOrAdd(void* sendable,
   return *components[compUid - 1];
 }
 
-static SendableRegistryInst& GetInstance() {
-  static SendableRegistryInst instance;
+static std::unique_ptr<SendableRegistryInst>& GetInstanceHolder() {
+  static std::unique_ptr<SendableRegistryInst> instance =
+      std::make_unique<SendableRegistryInst>();
   return instance;
 }
+
+static SendableRegistryInst& GetInstance() {
+  return *GetInstanceHolder();
+}
+
+#ifndef __FRC_ROBORIO__
+namespace wpi::impl {
+void ResetSendableRegistry() {
+  std::make_unique<SendableRegistryInst>().swap(GetInstanceHolder());
+}
+}  // namespace wpi::impl
+#endif
 
 void SendableRegistry::SetLiveWindowBuilderFactory(
     std::function<std::unique_ptr<SendableBuilder>()> factory) {
