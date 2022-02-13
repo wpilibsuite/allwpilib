@@ -66,7 +66,7 @@ class DSCommPacket {
   HAL_AllianceStationID m_alliance_station;
   HAL_MatchInfo matchInfo;
   std::array<DSCommJoystickPacket, HAL_kMaxJoysticks> m_joystick_packets;
-  double m_match_time;
+  double m_match_time = -1;
 };
 
 }  // namespace halsim

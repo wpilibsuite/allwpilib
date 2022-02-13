@@ -310,6 +310,10 @@ void DSCommPacket::SetupJoystickTag(wpi::raw_uv_ostream& buf) {
 void DSCommPacket::SendUDPToHALSim(void) {
   SendJoysticks();
 
+  if (!m_control_word.enabled) {
+    m_match_time = -1;
+  }
+
   HALSIM_SetDriverStationMatchTime(m_match_time);
   HALSIM_SetDriverStationEnabled(m_control_word.enabled);
   HALSIM_SetDriverStationAutonomous(m_control_word.autonomous);
