@@ -4,7 +4,7 @@
 
 package edu.wpi.first.wpilibj2.command;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
-class RepeatingCommandTest {
+class RepeatCommandTest {
   @Test
   void callsMethodsCorrectly() {
     HAL.initialize(500, 0);
@@ -25,12 +25,12 @@ class RepeatingCommandTest {
     var endCounter = new AtomicInteger(0);
     var isFinishedHook = new AtomicBoolean(false);
 
-    var command =
+    final var command =
         new RepeatCommand(
             new FunctionalCommand(
                 initCounter::incrementAndGet,
                 exeCounter::incrementAndGet,
-                _interrupted -> endCounter.incrementAndGet(),
+                interrupted -> endCounter.incrementAndGet(),
                 () -> {
                   isFinishedCounter.incrementAndGet();
                   return isFinishedHook.get();

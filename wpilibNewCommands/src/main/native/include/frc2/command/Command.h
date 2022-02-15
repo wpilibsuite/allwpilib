@@ -187,14 +187,15 @@ class Command {
   virtual PerpetualCommand Perpetually() &&;
 
   /**
-   * Decorates this command to run repeatedly, restarting it when it ends, until this command is
-   * interrupted. The decorated command can still be canceled.
+   * Decorates this command to run repeatedly, restarting it when it ends, until
+   * this command is interrupted. The decorated command can still be canceled.
    *
-   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
-   * cannot be used independently after being decorated, or be re-decorated with a different
-   * decorator, unless it is manually cleared from the list of grouped commands with {@link
-   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
-   * decorated without issue.
+   * <p>Note: This decorator works by composing this command within a
+   * CommandGroup. The command cannot be used independently after being
+   * decorated, or be re-decorated with a different decorator, unless it is
+   * manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can,
+   * however, be further decorated without issue.
    *
    * @return the decorated command
    */
