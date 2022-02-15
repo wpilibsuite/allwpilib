@@ -63,7 +63,7 @@ public class CTREPCMSim extends PneumaticsBaseSim {
    *     this object so GC doesn't cancel the callback.
    */
   public CallbackStore registerClosedLoopEnabledCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     int uid = CTREPCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelClosedLoopEnabledCallback);
   }
@@ -96,7 +96,7 @@ public class CTREPCMSim extends PneumaticsBaseSim {
 
   @Override
   public CallbackStore registerCompressorOnCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     int uid = CTREPCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorOnCallback);
   }
@@ -113,9 +113,9 @@ public class CTREPCMSim extends PneumaticsBaseSim {
 
   @Override
   public CallbackStore registerSolenoidOutputCallback(
-          int channel, NotifyCallback callback, boolean initialNotify) {
+      int channel, NotifyCallback callback, boolean initialNotify) {
     int uid =
-            CTREPCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
+        CTREPCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
     return new CallbackStore(m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidOutputCallback);
   }
 
@@ -131,7 +131,7 @@ public class CTREPCMSim extends PneumaticsBaseSim {
 
   @Override
   public CallbackStore registerPressureSwitchCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     int uid = CTREPCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelPressureSwitchCallback);
   }
@@ -148,7 +148,7 @@ public class CTREPCMSim extends PneumaticsBaseSim {
 
   @Override
   public CallbackStore registerCompressorCurrentCallback(
-          NotifyCallback callback, boolean initialNotify) {
+      NotifyCallback callback, boolean initialNotify) {
     int uid = CTREPCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
     return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorCurrentCallback);
   }

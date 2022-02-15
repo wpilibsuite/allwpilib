@@ -2,9 +2,29 @@ package edu.wpi.first.wpilibj.simulation;
 
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.wpilibj.PneumaticsBase;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
+/** Common base class for pneumatics module simulation classes. */
 public abstract class PneumaticsBaseSim {
   protected final int m_index;
+
+  /**
+   * Get a module sim for a specific type.
+   *
+   * @param module the module number / CAN ID.
+   * @param type the module type.
+   * @return the module object.
+   */
+  public static PneumaticsBaseSim getForType(int module, PneumaticsModuleType type) {
+    switch (type) {
+      case CTREPCM:
+        return new CTREPCMSim(module);
+      case REVPH:
+        return new REVPHSim(module);
+      default:
+        throw new IllegalArgumentException("Unknown module type");
+    }
+  }
 
   protected PneumaticsBaseSim(int index) {
     m_index = index;
@@ -36,8 +56,8 @@ public abstract class PneumaticsBaseSim {
    * @return the {@link CallbackStore} object associated with this callback. Save a reference to
    *     this object so GC doesn't cancel the callback.
    */
-  public abstract CallbackStore registerInitializedCallback(NotifyCallback callback,
-                                                     boolean initialNotify);
+  public abstract CallbackStore registerInitializedCallback(
+      NotifyCallback callback, boolean initialNotify);
 
   /**
    * Check if the compressor is on.
@@ -62,7 +82,7 @@ public abstract class PneumaticsBaseSim {
    *     this object so GC doesn't cancel the callback.
    */
   public abstract CallbackStore registerCompressorOnCallback(
-          NotifyCallback callback, boolean initialNotify);
+      NotifyCallback callback, boolean initialNotify);
 
   /**
    * Check the solenoid output on a specific channel.
@@ -90,7 +110,7 @@ public abstract class PneumaticsBaseSim {
    *     this object so GC doesn't cancel the callback.
    */
   public abstract CallbackStore registerSolenoidOutputCallback(
-          int channel, NotifyCallback callback, boolean initialNotify);
+      int channel, NotifyCallback callback, boolean initialNotify);
 
   /**
    * Check the value of the pressure switch.
@@ -115,7 +135,7 @@ public abstract class PneumaticsBaseSim {
    *     this object so GC doesn't cancel the callback.
    */
   public abstract CallbackStore registerPressureSwitchCallback(
-          NotifyCallback callback, boolean initialNotify);
+      NotifyCallback callback, boolean initialNotify);
 
   /**
    * Read the compressor current.
@@ -140,10 +160,8 @@ public abstract class PneumaticsBaseSim {
    *     this object so GC doesn't cancel the callback.
    */
   public abstract CallbackStore registerCompressorCurrentCallback(
-          NotifyCallback callback, boolean initialNotify);
+      NotifyCallback callback, boolean initialNotify);
 
-  /**
-   * Reset all simulation data for this object.
-   */
+  /** Reset all simulation data for this object. */
   public abstract void resetData();
 }
