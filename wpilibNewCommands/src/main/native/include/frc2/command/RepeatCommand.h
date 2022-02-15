@@ -67,7 +67,7 @@ class RepeatCommand : public CommandHelper<CommandBase, RepeatCommand> {
 
   void End(bool interrupted) override;
 
-  bool RunsWhenDisabled() override;
+  bool RunsWhenDisabled() const override;
 
   RepeatCommand Repeat() && override;
 

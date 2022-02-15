@@ -36,7 +36,7 @@ void RepeatCommand::End(bool interrupted) {
   m_command->End(interrupted);
 }
 
-bool RepeatCommand::RunsWhenDisabled() {
+bool RepeatCommand::RunsWhenDisabled() const {
   return m_command->RunsWhenDisabled();
 }
 
