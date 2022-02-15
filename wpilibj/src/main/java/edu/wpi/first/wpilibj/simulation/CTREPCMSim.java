@@ -36,71 +36,6 @@ public class CTREPCMSim extends PneumaticsBaseSim {
     super(module);
   }
 
-  @Override
-  public CallbackStore registerSolenoidOutputCallback(
-      int channel, NotifyCallback callback, boolean initialNotify) {
-    int uid =
-        CTREPCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
-    return new CallbackStore(m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidOutputCallback);
-  }
-
-  @Override
-  public boolean getSolenoidOutput(int channel) {
-    return CTREPCMDataJNI.getSolenoidOutput(m_index, channel);
-  }
-
-  @Override
-  public void setSolenoidOutput(int channel, boolean solenoidOutput) {
-    CTREPCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
-  }
-
-  @Override
-  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = CTREPCMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelInitializedCallback);
-  }
-
-  @Override
-  public boolean getInitialized() {
-    return CTREPCMDataJNI.getInitialized(m_index);
-  }
-
-  @Override
-  public void setInitialized(boolean initialized) {
-    CTREPCMDataJNI.setInitialized(m_index, initialized);
-  }
-
-  @Override
-  public CallbackStore registerCompressorOnCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = CTREPCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorOnCallback);
-  }
-
-  @Override
-  public boolean getCompressorOn() {
-    return CTREPCMDataJNI.getCompressorOn(m_index);
-  }
-
-  @Override
-  public void setCompressorOn(boolean compressorOn) {
-    CTREPCMDataJNI.setCompressorOn(m_index, compressorOn);
-  }
-
-  /**
-   * Register a callback to be run whenever the closed loop state changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
-   */
-  public CallbackStore registerClosedLoopEnabledCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = CTREPCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelClosedLoopEnabledCallback);
-  }
-
   /**
    * Check whether the closed loop compressor control is active.
    *
@@ -119,26 +54,86 @@ public class CTREPCMSim extends PneumaticsBaseSim {
     CTREPCMDataJNI.setClosedLoopEnabled(m_index, closedLoopEnabled);
   }
 
-  public CallbackStore registerPressureSwitchCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = CTREPCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelPressureSwitchCallback);
+  /**
+   * Register a callback to be run whenever the closed loop state changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public CallbackStore registerClosedLoopEnabledCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerClosedLoopEnabledCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelClosedLoopEnabledCallback);
   }
 
+  @Override
+  public boolean getInitialized() {
+    return CTREPCMDataJNI.getInitialized(m_index);
+  }
+
+  @Override
+  public void setInitialized(boolean initialized) {
+    CTREPCMDataJNI.setInitialized(m_index, initialized);
+  }
+
+  @Override
+  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelInitializedCallback);
+  }
+
+  @Override
+  public boolean getCompressorOn() {
+    return CTREPCMDataJNI.getCompressorOn(m_index);
+  }
+
+  @Override
+  public void setCompressorOn(boolean compressorOn) {
+    CTREPCMDataJNI.setCompressorOn(m_index, compressorOn);
+  }
+
+  @Override
+  public CallbackStore registerCompressorOnCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorOnCallback);
+  }
+
+  @Override
+  public boolean getSolenoidOutput(int channel) {
+    return CTREPCMDataJNI.getSolenoidOutput(m_index, channel);
+  }
+
+  @Override
+  public void setSolenoidOutput(int channel, boolean solenoidOutput) {
+    CTREPCMDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
+  }
+
+  @Override
+  public CallbackStore registerSolenoidOutputCallback(
+          int channel, NotifyCallback callback, boolean initialNotify) {
+    int uid =
+            CTREPCMDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
+    return new CallbackStore(m_index, channel, uid, CTREPCMDataJNI::cancelSolenoidOutputCallback);
+  }
+
+  @Override
   public boolean getPressureSwitch() {
     return CTREPCMDataJNI.getPressureSwitch(m_index);
   }
 
-
+  @Override
   public void setPressureSwitch(boolean pressureSwitch) {
     CTREPCMDataJNI.setPressureSwitch(m_index, pressureSwitch);
   }
 
   @Override
-  public CallbackStore registerCompressorCurrentCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = CTREPCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorCurrentCallback);
+  public CallbackStore registerPressureSwitchCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelPressureSwitchCallback);
   }
 
   @Override
@@ -149,6 +144,13 @@ public class CTREPCMSim extends PneumaticsBaseSim {
   @Override
   public void setCompressorCurrent(double compressorCurrent) {
     CTREPCMDataJNI.setCompressorCurrent(m_index, compressorCurrent);
+  }
+
+  @Override
+  public CallbackStore registerCompressorCurrentCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = CTREPCMDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, CTREPCMDataJNI::cancelCompressorCurrentCallback);
   }
 
   @Override

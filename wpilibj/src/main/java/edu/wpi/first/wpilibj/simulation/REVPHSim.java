@@ -36,71 +36,6 @@ public class REVPHSim extends PneumaticsBaseSim {
     super(module);
   }
 
-  @Override
-  public CallbackStore registerSolenoidOutputCallback(
-      int channel, NotifyCallback callback, boolean initialNotify) {
-    int uid =
-        REVPHDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
-    return new CallbackStore(m_index, channel, uid, REVPHDataJNI::cancelSolenoidOutputCallback);
-  }
-
-  @Override
-  public boolean getSolenoidOutput(int channel) {
-    return REVPHDataJNI.getSolenoidOutput(m_index, channel);
-  }
-
-  @Override
-  public void setSolenoidOutput(int channel, boolean solenoidOutput) {
-    REVPHDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
-  }
-
-  @Override
-  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelInitializedCallback);
-  }
-
-  @Override
-  public boolean getInitialized() {
-    return REVPHDataJNI.getInitialized(m_index);
-  }
-
-  @Override
-  public void setInitialized(boolean initialized) {
-    REVPHDataJNI.setInitialized(m_index, initialized);
-  }
-
-  @Override
-  public CallbackStore registerCompressorOnCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorOnCallback);
-  }
-
-  @Override
-  public boolean getCompressorOn() {
-    return REVPHDataJNI.getCompressorOn(m_index);
-  }
-
-  @Override
-  public void setCompressorOn(boolean compressorOn) {
-    REVPHDataJNI.setCompressorOn(m_index, compressorOn);
-  }
-
-  /**
-   * Register a callback to be run whenever the closed loop state changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
-   *     this object so GC doesn't cancel the callback.
-   */
-  public CallbackStore registerCompressorConfigTypeCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerCompressorConfigTypeCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorConfigTypeCallback);
-  }
-
   /**
    * Check whether the closed loop compressor control is active.
    *
@@ -119,11 +54,69 @@ public class REVPHSim extends PneumaticsBaseSim {
     REVPHDataJNI.setCompressorConfigType(m_index, compressorConfigType);
   }
 
+  /**
+   * Register a callback to be run whenever the closed loop state changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether the callback should be called with the initial value
+   * @return the {@link CallbackStore} object associated with this callback. Save a reference to
+   *     this object so GC doesn't cancel the callback.
+   */
+  public CallbackStore registerCompressorConfigTypeCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = REVPHDataJNI.registerCompressorConfigTypeCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorConfigTypeCallback);
+  }
+
   @Override
-  public CallbackStore registerPressureSwitchCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelPressureSwitchCallback);
+  public boolean getInitialized() {
+    return REVPHDataJNI.getInitialized(m_index);
+  }
+
+  @Override
+  public void setInitialized(boolean initialized) {
+    REVPHDataJNI.setInitialized(m_index, initialized);
+  }
+
+  @Override
+  public CallbackStore registerInitializedCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = REVPHDataJNI.registerInitializedCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelInitializedCallback);
+  }
+
+  @Override
+  public boolean getCompressorOn() {
+    return REVPHDataJNI.getCompressorOn(m_index);
+  }
+
+  @Override
+  public void setCompressorOn(boolean compressorOn) {
+    REVPHDataJNI.setCompressorOn(m_index, compressorOn);
+  }
+
+  @Override
+  public CallbackStore registerCompressorOnCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = REVPHDataJNI.registerCompressorOnCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorOnCallback);
+  }
+
+  @Override
+  public boolean getSolenoidOutput(int channel) {
+    return REVPHDataJNI.getSolenoidOutput(m_index, channel);
+  }
+
+  @Override
+  public void setSolenoidOutput(int channel, boolean solenoidOutput) {
+    REVPHDataJNI.setSolenoidOutput(m_index, channel, solenoidOutput);
+  }
+
+  @Override
+  public CallbackStore registerSolenoidOutputCallback(
+          int channel, NotifyCallback callback, boolean initialNotify) {
+    int uid =
+            REVPHDataJNI.registerSolenoidOutputCallback(m_index, channel, callback, initialNotify);
+    return new CallbackStore(m_index, channel, uid, REVPHDataJNI::cancelSolenoidOutputCallback);
   }
 
   @Override
@@ -137,10 +130,10 @@ public class REVPHSim extends PneumaticsBaseSim {
   }
 
   @Override
-  public CallbackStore registerCompressorCurrentCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = REVPHDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorCurrentCallback);
+  public CallbackStore registerPressureSwitchCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = REVPHDataJNI.registerPressureSwitchCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelPressureSwitchCallback);
   }
 
   @Override
@@ -151,6 +144,13 @@ public class REVPHSim extends PneumaticsBaseSim {
   @Override
   public void setCompressorCurrent(double compressorCurrent) {
     REVPHDataJNI.setCompressorCurrent(m_index, compressorCurrent);
+  }
+
+  @Override
+  public CallbackStore registerCompressorCurrentCallback(
+          NotifyCallback callback, boolean initialNotify) {
+    int uid = REVPHDataJNI.registerCompressorCurrentCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, REVPHDataJNI::cancelCompressorCurrentCallback);
   }
 
   @Override
