@@ -258,6 +258,22 @@ public interface Command {
   }
 
   /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until this command is
+   * interrupted. The decorated command can still be canceled.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @return the decorated command
+   */
+  default RepeatCommand repeat() {
+    return new RepeatCommand(this);
+  }
+
+  /**
    * Decorates this command to run "by proxy" by wrapping it in a {@link ProxyScheduleCommand}. This
    * is useful for "forking off" from command groups when the user does not wish to extend the
    * command's requirements to the entire command group.
