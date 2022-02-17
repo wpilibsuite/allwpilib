@@ -19,11 +19,12 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   bool isFinishedHook = false;
 
   FunctionalCommand commandToRepeat{
-    [&initCounter] {initCounter++;},
-    [&exeCounter] {exeCounter++;},
-    [&endCounter](bool interrupted) {endCounter++;},
-    [&isFinishedCounter, &isFinishedHook] {isFinishedCounter++; return isFinishedHook;}
-  };
+      [&initCounter] { initCounter++; }, [&exeCounter] { exeCounter++; },
+      [&endCounter](bool interrupted) { endCounter++; },
+      [&isFinishedCounter, &isFinishedHook] {
+        isFinishedCounter++;
+        return isFinishedHook;
+      }};
   RepeatCommand command = commandToRepeat.Repeat();
 
   EXPECT_EQ(0, initCounter);
