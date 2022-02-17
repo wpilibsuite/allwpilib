@@ -32,7 +32,7 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   EXPECT_EQ(0, isFinishedCounter);
   EXPECT_EQ(0, endCounter);
 
-  scheduler.Schedule(command);
+  scheduler.Schedule(&command);
   EXPECT_EQ(1, initCounter);
   EXPECT_EQ(0, exeCounter);
   EXPECT_EQ(0, isFinishedCounter);
