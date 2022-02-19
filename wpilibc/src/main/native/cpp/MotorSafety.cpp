@@ -89,7 +89,15 @@ void MotorSafety::Check() {
   if (stopTime < Timer::GetFPGATimestamp()) {
     FRC_ReportError(err::Timeout, "{}... Output not updated often enough",
                     GetDescription());
-    StopMotor();
+
+    try {
+      StopMotor();
+    } catch (frc::RuntimeError& e) {
+      e.Report();
+    } catch (std::exception& e) {
+      FRC_ReportError(err::Error, "{} StopMotor threw unexpected exception: {}",
+                      GetDescription(), e.what());
+    }
   }
 }
 
