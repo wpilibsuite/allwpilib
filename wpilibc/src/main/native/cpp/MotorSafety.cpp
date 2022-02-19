@@ -17,6 +17,15 @@ using namespace frc;
 static wpi::SmallPtrSet<MotorSafety*, 32> instanceList;
 static wpi::mutex listMutex;
 
+#ifndef __FRC_ROBORIO__
+namespace frc::impl {
+void ResetMotorSafety() {
+  std::scoped_lock lock(listMutex);
+  instanceList.clear();
+}
+}  // namespace frc::impl
+#endif
+
 MotorSafety::MotorSafety() {
   std::scoped_lock lock(listMutex);
   instanceList.insert(this);
