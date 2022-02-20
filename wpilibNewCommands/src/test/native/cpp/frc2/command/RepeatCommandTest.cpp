@@ -18,13 +18,15 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
   int endCounter = 0;
   bool isFinishedHook = false;
 
-  auto command = FunctionalCommand(
-      [&initCounter] { initCounter++; }, [&exeCounter] { exeCounter++; },
-      [&endCounter](bool interrupted) { endCounter++; },
-      [&isFinishedCounter, &isFinishedHook] {
-        isFinishedCounter++;
-        return isFinishedHook;
-      }).Repeat();
+  auto command =
+      FunctionalCommand([&initCounter] { initCounter++; },
+                        [&exeCounter] { exeCounter++; },
+                        [&endCounter](bool interrupted) { endCounter++; },
+                        [&isFinishedCounter, &isFinishedHook] {
+                          isFinishedCounter++;
+                          return isFinishedHook;
+                        })
+          .Repeat();
 
   EXPECT_EQ(0, initCounter);
   EXPECT_EQ(0, exeCounter);
