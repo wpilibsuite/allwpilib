@@ -91,6 +91,12 @@ class MotorSafety {
   static void CheckMotors();
 
   virtual void StopMotor() = 0;
+
+  /**
+   * The return value from this method is printed out when an error occurs
+   *
+   * This method must not throw!
+   */
   virtual std::string GetDescription() const = 0;
 
  private:
