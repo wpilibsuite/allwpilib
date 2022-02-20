@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.SensorUtil;
 /** Class to control a simulated PneumaticHub (PH). */
 @SuppressWarnings("AbbreviationAsWordInName")
 public class REVPHSim extends PneumaticsBaseSim {
-
   /** Constructs for the default PH. */
   public REVPHSim() {
     super(SensorUtil.getDefaultREVPHModule());
