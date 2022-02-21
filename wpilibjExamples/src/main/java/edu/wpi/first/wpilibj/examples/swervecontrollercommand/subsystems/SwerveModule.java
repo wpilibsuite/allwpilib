@@ -36,8 +36,12 @@ public class SwerveModule {
   /**
    * Constructs a SwerveModule.
    *
-   * @param driveMotorChannel ID for the drive motor.
-   * @param turningMotorChannel ID for the turning motor.
+   * @param driveMotorChannel The port of the drive motor.
+   * @param turningMotorChannel The port of the turning motor.
+   * @param driveEncoderPorts The ports of the drive encoder.
+   * @param turningEncoderPorts The ports of the turning encoder.
+   * @param driveEncoderReversed Whether the drive encoder is reversed.
+   * @param turningEncoderReversed Whether the turning encoder is reversed.
    */
   public SwerveModule(
       int driveMotorChannel,
