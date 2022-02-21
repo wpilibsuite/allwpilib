@@ -36,22 +36,22 @@ public class SwerveModule {
   /**
    * Constructs a SwerveModule.
    *
-   * @param driveMotorChannel The port of the drive motor.
-   * @param turningMotorChannel The port of the turning motor.
+   * @param driveMotorPort The port of the drive motor.
+   * @param turningMotorPort The port of the turning motor.
    * @param driveEncoderPorts The ports of the drive encoder.
    * @param turningEncoderPorts The ports of the turning encoder.
    * @param driveEncoderReversed Whether the drive encoder is reversed.
    * @param turningEncoderReversed Whether the turning encoder is reversed.
    */
   public SwerveModule(
-      int driveMotorChannel,
-      int turningMotorChannel,
+      int driveMotorPort,
+      int turningMotorPort,
       int[] driveEncoderPorts,
       int[] turningEncoderPorts,
       boolean driveEncoderReversed,
       boolean turningEncoderReversed) {
-    m_driveMotor = new Spark(driveMotorChannel);
-    m_turningMotor = new Spark(turningMotorChannel);
+    m_driveMotor = new Spark(driveMotorPort);
+    m_turningMotor = new Spark(turningMotorPort);
 
     this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
 
