@@ -53,9 +53,9 @@ public class SwerveModule {
     m_driveMotor = new Spark(driveMotorChannel);
     m_turningMotor = new Spark(turningMotorChannel);
 
-    this.m_driveEncoder = new Encoder(driveEncoderChannels[0], driveEncoderChannels[1]);
+    m_driveEncoder = new Encoder(driveEncoderChannels[0], driveEncoderChannels[1]);
 
-    this.m_turningEncoder = new Encoder(turningEncoderChannels[0], turningEncoderChannels[1]);
+    m_turningEncoder = new Encoder(turningEncoderChannels[0], turningEncoderChannels[1]);
 
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
@@ -110,7 +110,7 @@ public class SwerveModule {
     m_turningMotor.set(turnOutput);
   }
 
-  /** Zeros all the SwerveModule encoders. */
+  /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_driveEncoder.reset();
     m_turningEncoder.reset();
