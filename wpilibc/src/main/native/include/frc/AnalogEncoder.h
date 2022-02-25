@@ -72,15 +72,37 @@ class AnalogEncoder : public wpi::Sendable,
   units::turn_t Get() const;
 
   /**
+   * Get the absolute position of the analog encoder.
+   *
+   * <p>GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute position
+   * relative to the last reset. This could potentially be negative, which needs to be accounted
+   * for.
+   *
+   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   *
+   * @return the absolute position
+   */
+  double GetAbsolutePosition() const;
+
+  /**
    * Get the offset of position relative to the last reset.
    *
-   * GetPositionInRotation() - GetPositionOffset() will give an encoder absolute
+   * GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute
    * position relative to the last reset. This could potentially be negative,
    * which needs to be accounted for.
    *
    * @return the position offset
    */
   double GetPositionOffset() const;
+
+  /**
+   * Set the position offset.
+   *
+   * <p>This must be in the range of 0-1.
+   *
+   * @param offset the offset
+   */
+  void SetPositionOffset(double offset);
 
   /**
    * Set the distance per rotation of the encoder. This sets the multiplier used
@@ -131,5 +153,6 @@ class AnalogEncoder : public wpi::Sendable,
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
+  hal::SimDouble m_simAbsolutePosition;
 };
 }  // namespace frc

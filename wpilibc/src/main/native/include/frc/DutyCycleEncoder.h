@@ -122,6 +122,39 @@ class DutyCycleEncoder : public wpi::Sendable,
   units::turn_t Get() const;
 
   /**
+   * Get the absolute position of the duty cycle encoder encoder.
+   *
+   * <p>GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute position
+   * relative to the last reset. This could potentially be negative, which needs to be accounted
+   * for.
+   *
+   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   *
+   * @return the absolute position
+   */
+  double GetAbsolutePosition() const;
+
+  /**
+   * Get the offset of position relative to the last reset.
+   *
+   * GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute
+   * position relative to the last reset. This could potentially be negative,
+   * which needs to be accounted for.
+   *
+   * @return the position offset
+   */
+  double GetPositionOffset() const;
+
+  /**
+   * Set the position offset.
+   *
+   * <p>This must be in the range of 0-1.
+   *
+   * @param offset the offset
+   */
+  void SetPositionOffset(double offset);
+
+  /**
    * Set the encoder duty cycle range. As the encoder needs to maintain a duty
    * cycle, the duty cycle cannot go all the way to 0% or all the way to 100%.
    * For example, an encoder with a 4096 us period might have a minimum duty
@@ -182,6 +215,7 @@ class DutyCycleEncoder : public wpi::Sendable,
 
  private:
   void Init();
+  double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
   std::unique_ptr<AnalogTrigger> m_analogTrigger;
@@ -195,6 +229,7 @@ class DutyCycleEncoder : public wpi::Sendable,
 
   hal::SimDevice m_simDevice;
   hal::SimDouble m_simPosition;
+  hal::SimDouble m_simAbsolutePosition;
   hal::SimDouble m_simDistancePerRotation;
   hal::SimBoolean m_simIsConnected;
 };
