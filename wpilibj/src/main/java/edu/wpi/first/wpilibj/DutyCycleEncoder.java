@@ -32,6 +32,7 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
 
   protected SimDevice m_simDevice;
   protected SimDouble m_simPosition;
+  protected SimDouble m_simAbsolutePosition;
   protected SimDouble m_simDistancePerRotation;
   protected SimBoolean m_simIsConnected;
 
@@ -75,6 +76,8 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       m_simPosition = m_simDevice.createDouble("position", SimDevice.Direction.kInput, 0.0);
       m_simDistancePerRotation =
           m_simDevice.createDouble("distance_per_rot", SimDevice.Direction.kOutput, 1.0);
+      m_simAbsolutePosition =
+          m_simDevice.createDouble("absPosition", SimDevice.Direction.kInput, 0.0);
       m_simIsConnected = m_simDevice.createBoolean("connected", SimDevice.Direction.kInput, true);
     } else {
       m_counter = new Counter();
@@ -85,6 +88,23 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
     }
 
     SendableRegistry.addLW(this, "DutyCycle Encoder", m_dutyCycle.getSourceChannel());
+  }
+
+  private double mapSensorRange(double pos) {
+    // map sensor range
+    if (pos < m_sensorMin) {
+      pos = m_sensorMin;
+    }
+    if (pos > m_sensorMax) {
+      pos = m_sensorMax;
+    }
+    pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+    return pos;
+  }
+
+  private boolean doubleEquals(double a, double b) {
+    double epsilon = 0.00001d;
+    return Math.abs(a - b) < epsilon;
   }
 
   /**
@@ -107,15 +127,9 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
       double pos = m_dutyCycle.getOutput();
       double counter2 = m_counter.get();
       double pos2 = m_dutyCycle.getOutput();
-      if (counter == counter2 && pos == pos2) {
+      if (counter == counter2 && doubleEquals(pos, pos2)) {
         // map sensor range
-        if (pos < m_sensorMin) {
-          pos = m_sensorMin;
-        }
-        if (pos > m_sensorMax) {
-          pos = m_sensorMax;
-        }
-        pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+        pos = mapSensorRange(pos);
         double position = counter + pos - m_positionOffset;
         m_lastPosition = position;
         return position;
@@ -128,16 +142,44 @@ public class DutyCycleEncoder implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the absolute position of the duty cycle encoder.
+   *
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
+   *
+   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   *
+   * @return the absolute position
+   */
+  public double getAbsolutePosition() {
+    if (m_simAbsolutePosition != null) {
+      return m_simAbsolutePosition.get();
+    }
+
+    return mapSensorRange(m_dutyCycle.getOutput());
+  }
+
+  /**
    * Get the offset of position relative to the last reset.
    *
-   * <p>getPositionInRotation() - getPositionOffset() will give an encoder absolute position
-   * relative to the last reset. This could potentially be negative, which needs to be accounted
-   * for.
+   * <p>getAbsolutePosition() - getPositionOffset() will give an encoder absolute position relative
+   * to the last reset. This could potentially be negative, which needs to be accounted for.
    *
    * @return the position offset
    */
   public double getPositionOffset() {
     return m_positionOffset;
+  }
+
+  /**
+   * Set the position offset.
+   *
+   * <p>This must be in the range of 0-1.
+   *
+   * @param offset the offset
+   */
+  public void setPositionOffset(double offset) {
+    m_positionOffset = MathUtil.clamp(offset, 0.0, 1.0);
   }
 
   /**
