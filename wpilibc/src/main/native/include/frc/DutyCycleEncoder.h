@@ -124,11 +124,12 @@ class DutyCycleEncoder : public wpi::Sendable,
   /**
    * Get the absolute position of the duty cycle encoder encoder.
    *
-   * <p>GetAbsolutePosition() - GetPositionOffset() will give an encoder absolute position
-   * relative to the last reset. This could potentially be negative, which needs to be accounted
-   * for.
+   * <p>GetAbsolutePosition() - GetPositionOffset() will give an encoder
+   * absolute position relative to the last reset. This could potentially be
+   * negative, which needs to be accounted for.
    *
-   * <p>This will not account for rollovers, and will always be just the raw absolute position.
+   * <p>This will not account for rollovers, and will always be just the raw
+   * absolute position.
    *
    * @return the absolute position
    */
