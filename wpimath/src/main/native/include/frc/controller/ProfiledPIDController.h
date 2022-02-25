@@ -226,7 +226,7 @@ class ProfiledPIDController
    */
   void SetTolerance(
       Distance_t positionTolerance,
-      Velocity_t velocityTolerance = std::numeric_limits<double>::infinity()) {
+      Velocity_t velocityTolerance = Velocity_t(std::numeric_limits<double>::infinity())) {
     m_controller.SetTolerance(positionTolerance.value(),
                               velocityTolerance.value());
   }
