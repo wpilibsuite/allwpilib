@@ -52,8 +52,8 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Adds two rotations together, with the result being bounded between -pi and
    * pi.
    *
-   * For example, Rotation2d.FromDegrees(30) + Rotation2d.FromDegrees(60) =
-   * Rotation2d{pi/2}
+   * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
+   * <code>Rotation2d{wpi::numbers::pi/2.0}</code>
    *
    * @param other The rotation to add.
    *
@@ -65,8 +65,8 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Subtracts the new rotation from the current rotation and returns the new
    * rotation.
    *
-   * For example, Rotation2d.FromDegrees(10) - Rotation2d.FromDegrees(100) =
-   * Rotation2d{-pi/2}
+   * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
+   * <code>Rotation2d{-wpi::numbers::pi/2.0}</code>
    *
    * @param other The rotation to subtract.
    *
