@@ -15,7 +15,7 @@ class json;
 namespace frc {
 
 /**
- * A rotation in a 2d coordinate frame represented a point on the unit circle
+ * A rotation in a 2d coordinate frame represented by a point on the unit circle
  * (cosine and sine).
  */
 class WPILIB_DLLEXPORT Rotation2d {
@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * pi.
    *
    * For example, Rotation2d.FromDegrees(30) + Rotation2d.FromDegrees(60) =
-   * Rotation2d{-pi/2}
+   * Rotation2d{pi/2}
    *
    * @param other The rotation to add.
    *

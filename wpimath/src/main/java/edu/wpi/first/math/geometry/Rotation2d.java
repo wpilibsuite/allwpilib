@@ -70,7 +70,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   /**
    * Adds two rotations together, with the result being bounded between -pi and pi.
    *
-   * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) = Rotation2d{-pi/2}
+   * <p>For example, Rotation2d.fromDegrees(30) + Rotation2d.fromDegrees(60) = Rotation2d{pi/2}
    *
    * @param other The rotation to add.
    * @return The sum of the two rotations.
