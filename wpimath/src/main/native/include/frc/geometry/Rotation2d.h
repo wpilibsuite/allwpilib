@@ -53,7 +53,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    * pi.
    *
    * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
-   * <code>Rotation2d{wpi::numbers::pi/2.0}</code>
+   * <code>Rotation2d{units::radian_t{wpi::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to add.
    *

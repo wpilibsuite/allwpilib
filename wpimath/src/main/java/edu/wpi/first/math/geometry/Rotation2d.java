@@ -70,7 +70,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   /**
    * Adds two rotations together, with the result being bounded between -pi and pi.
    *
-   * <p>For example, <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code> equals <code>Rotation2d.fromRadians(Math.PI/2.0)</code>
+   * <p>For example, <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code> equals
+   * <code>Rotation2d.fromRadians(Math.PI/2.0)</code>
    *
    * @param other The rotation to add.
    * @return The sum of the two rotations.
@@ -82,7 +83,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   /**
    * Subtracts the new rotation from the current rotation and returns the new rotation.
    *
-   * <p>For example, <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code> equals <code>Rotation2d.fromRadians(-Math.PI/2.0)</code>
+   * <p>For example, <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code>
+   * equals <code>Rotation2d.fromRadians(-Math.PI/2.0)</code>
    *
    * @param other The rotation to subtract.
    * @return The difference between the two rotations.
