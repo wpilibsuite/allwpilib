@@ -157,6 +157,7 @@ double PIDController::Calculate(double measurement, double setpoint) {
 }
 
 void PIDController::Reset() {
+  m_positionError = 0;
   m_prevError = 0;
   m_totalError = 0;
 }
