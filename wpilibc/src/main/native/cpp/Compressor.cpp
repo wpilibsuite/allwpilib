@@ -29,7 +29,9 @@ Compressor::Compressor(PneumaticsModuleType moduleType)
     : Compressor{PneumaticsBase::GetDefaultForType(moduleType), moduleType} {}
 
 Compressor::~Compressor() {
-  m_module->UnreserveCompressor();
+  if (m_module) {
+    m_module->UnreserveCompressor();
+  }
 }
 
 void Compressor::Start() {
