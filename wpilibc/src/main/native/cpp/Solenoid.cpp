@@ -39,7 +39,9 @@ Solenoid::Solenoid(PneumaticsModuleType moduleType, int channel)
                channel} {}
 
 Solenoid::~Solenoid() {
-  m_module->UnreserveSolenoids(m_mask);
+  if (m_module) {
+    m_module->UnreserveSolenoids(m_mask);
+  }
 }
 
 void Solenoid::Set(bool on) {
