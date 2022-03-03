@@ -209,9 +209,12 @@
     "mainclass": "Main",
     "commandversion": 2
   },
-  {"name": "Mechanism2d",
+  {
+    "name": "Mechanism2d",
     "description": "An example usage of Mechanism2d to display mechanism states on a dashboard.",
-    "tags": ["Mechanism2d"],
+    "tags": [
+      "Mechanism2d"
+    ],
     "foldername": "mechanism2d",
     "gradlebase": "java",
     "mainclass": "Main",
@@ -790,6 +793,20 @@
       "I2C"
     ],
     "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "Flywheel BangBangController",
+    "description": "A sample program to demonstrate the use of a BangBangController with a flywheel to control RPM",
+    "tags": [
+      "Flywheel",
+      "Simulation",
+      "Sensors",
+      "Joystick"
+    ],
+    "foldername": "flywheelbangbangcontroller",
     "gradlebase": "java",
     "commandversion": 2,
     "mainclass": "Main"
