@@ -1,0 +1,86 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include <frc/TimedRobot.h>
+#include <frc/controller/BangBangController.h>
+#include <frc/Encoder.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/controller/SimpleMotorFeedforward.h>
+#include <frc/Joystick.h>
+#include <frc/simulation/FlywheelSim.h>
+#include <frc/simulation/EncoderSim.h>
+/**
+ * This is a sample program to demonstrate the use of a BangBangController with
+ * a flywheel to control RPM.
+ */
+class Robot : public frc::TimedRobot {
+ public:
+  /**
+   * Controls flywheel to a set rpm controlled by a joystick
+   */
+  void TeleopPeriodic() override {
+    // Scale setpoint value between 0 and maxSetpointValue
+    units::meters_per_second_t setpoint{
+        std::max(0.0, m_joystick.GetRawAxis(0) * kMaxSetpointValue)};
+    // Set setpoint and measurement of the bang bang controller
+    double bangOutput =
+        m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value());
+
+    // Controls a motor with the output of the BangBang controller and a
+    // feedforward Shrinks the feedforward slightly to avoid overspeeding the
+    // shooter
+    double feedf = m_feedforward.Calculate(setpoint).value();
+    m_flywheelMotor.Set(bangOutput + 0.9 * feedf);
+  }
+
+  void RobotInit() override {
+    // Add bang bang controler to SmartDashboard and networktables.
+    frc::SmartDashboard::PutData("BangBangControler", &m_bangBangControler);
+  }
+  /** Update our simulation. This should be run every robot loop in simulation.
+   */
+  void SimulationPeriodic() override {
+    // To update our simulation, we set motor voltage inputs, update the
+    // simulation, and write the simulated velocities to our simulated encoder
+    m_flywheelSim.SetInputVoltage(units::volt_t{m_flywheelMotor.Get()} *
+                                  frc::RobotController::GetInputVoltage());
+    m_flywheelSim.Update(0.02_s);
+    units::revolutions_per_minute_t speed = m_flywheelSim.GetAngularVelocity();
+    m_encoderSim.SetRate(speed.value());
+  }
+
+ private:
+  static constexpr int kMotorPort = 0;
+  static constexpr int kEncoderAChannel = 0;
+  static constexpr int kEncoderBChannel = 1;
+
+  static constexpr double kMaxSetpointValue =
+      6000;  // Max value for joystick control
+
+  frc::PWMSparkMax m_flywheelMotor{kMotorPort};
+  frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
+  frc::BangBangController m_bangBangControler{};
+  // Gains are for example purposes only - must be determined for your own
+  // robot!
+  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
+      0.0001_V, 0.000195_V / 1_mps, 0.0003_V / 1_mps_sq};
+  frc::Joystick m_joystick{0};  // Joystick to control setpoint
+
+  // Simulation classes help us simulate our robot
+
+  // Reduction between motors and encoder, as output over input. If the flywheel
+  // spins slower than the motors, this number should be greater than one.
+  static constexpr double kFlywheelGearing = 1.0;
+  frc::sim::FlywheelSim m_flywheelSim{
+      frc::DCMotor::NEO(1), kFlywheelGearing,
+      0.5 * 1.5_lb * units::math::pow<2>(4_in)};  // 1/2*M*R^2
+  frc::sim::EncoderSim m_encoderSim{m_encoder};
+};
+
+#ifndef RUNNING_FRC_TESTS
+int main() {
+  return frc::StartRobot<Robot>();
+}
+#endif
