@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class InterpolatingTreeMapTest {
+class InterpolatingTreeMapTest {
   @Test
   void testInterpolation() {
     InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> interpolatingTreeMap =
