@@ -90,11 +90,11 @@ TEST(MathUtilTest, AngleModulus) {
 }
 
 TEST(MathUtilTest, AddScalar) {
-  EXPECT_UNITS_EQ(frc::AddScalar(0.5, 0.25), 0.75);
-  EXPECT_UNITS_EQ(frc::AddScalar(-0.5, 0.25), -0.75);
+  EXPECT_DOUBLE_EQ(frc::AddScalar(0.5, 0.25), 0.75);
+  EXPECT_DOUBLE_EQ(frc::AddScalar(-0.5, 0.25), -0.75);
 
-  EXPECT_UNITS_EQ(frc::AddScalar(0.5, -0.25), 0.75);
-  EXPECT_UNITS_EQ(frc::AddScalar(-0.5, -0.25), -0.75);
+  EXPECT_DOUBLE_EQ(frc::AddScalar(0.5, -0.25), 0.75);
+  EXPECT_DOUBLE_EQ(frc::AddScalar(-0.5, -0.25), -0.75);
 
-  EXPECT_UNITS_EQ(frc::AddScalar(-0, 4), -4);
+  EXPECT_DOUBLE_EQ(frc::AddScalar(-0, 4), -4);
 }
