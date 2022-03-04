@@ -10,6 +10,15 @@ import org.junit.jupiter.api.Test;
 
 class MathUtilTest {
   @Test
+  void testClamp() {
+    assertEquals(5, MathUtil.clamp(10, 1, 5)); // test int
+    assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5)); // test double
+
+    assertEquals(-5, MathUtil.clamp(-10, -1, -5)); // test negative int
+    assertEquals(-5.5, MathUtil.clamp(-10.5, -1.5, -5.5)); // test negative double
+  }
+
+  @Test
   void testApplyDeadband() {
     // < 0
     assertEquals(-1.0, MathUtil.applyDeadband(-1.0, 0.02));
@@ -66,5 +75,27 @@ class MathUtilTest {
     assertEquals(MathUtil.angleModulus(-5 * Math.PI), Math.PI);
     assertEquals(MathUtil.angleModulus(Math.PI / 2), Math.PI / 2);
     assertEquals(MathUtil.angleModulus(-Math.PI / 2), -Math.PI / 2);
+  }
+
+  @Test
+  void testInterpolate() {
+    assertEquals(50, MathUtil.interpolate(0, 100, 0.5));
+    assertEquals(-50, MathUtil.interpolate(0, -100, 0.5));
+    assertEquals(0, MathUtil.interpolate(-50, 50, 0.5));
+    assertEquals(-25, MathUtil.interpolate(-50, 50, 0.25));
+    assertEquals(25, MathUtil.interpolate(-50, 50, 0.75));
+
+    assertEquals(0, MathUtil.interpolate(0, -100, -0.5));
+  }
+
+  @Test
+  void testAddScalar() {
+    assertEquals(0.75, MathUtil.addScalar(0.5, 0.25));
+    assertEquals(-0.75, MathUtil.addScalar(-0.5, 0.25));
+
+    assertEquals(0.75, MathUtil.addScalar(0.5, -0.25));
+    assertEquals(-0.75, MathUtil.addScalar(-0.5, -0.25));
+
+    assertEquals(-4, MathUtil.addScalar(-0, 4)); // For Peter
   }
 }

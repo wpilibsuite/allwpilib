@@ -97,4 +97,15 @@ public final class MathUtil {
   public static double interpolate(double startValue, double endValue, double t) {
     return startValue + (endValue - startValue) * MathUtil.clamp(t, 0, 1);
   }
+
+  /**
+   * Adds a scalar value to whatever is input
+   *
+   * @param value The number the scalar is added to.
+   * @param scalar The magnitude that is added to the value
+   * @return The value with the scalar added.
+   */
+  public static double addScalar(double value, double scalar) {
+    return Math.copySign(Math.abs(value) + Math.abs(scalar), value);
+  }
 }
