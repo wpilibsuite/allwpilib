@@ -19,10 +19,10 @@ public class InterpolatingTreeMapTest {
     interpolatingTreeMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(4000.0));
 
     assertEquals(
-        new InterpolatingDouble(750.0).value.doubleValue(),
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(1.5)).value.doubleValue());
+        new InterpolatingDouble(750.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(1.5)).value);
     assertEquals(
-        new InterpolatingDouble(1750.0).value.doubleValue(),
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(3.0)).value.doubleValue());
+        new InterpolatingDouble(1750.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(3.0)).value);
   }
 }
