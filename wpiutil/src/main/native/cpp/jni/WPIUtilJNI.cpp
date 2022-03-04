@@ -335,17 +335,21 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
   JStringRef serviceNameRef{env, serviceName};
   JStringRef serviceTypeRef{env, serviceType};
 
-  size_t keysLen = env->GetArrayLength(keys);
   wpi::SmallVector<std::pair<std::string, std::string>, 8> txtVec;
-  txtVec.reserve(keysLen);
-  for (size_t i = 0; i < keysLen; i++) {
-    JLocal<jstring> key{
-        env, static_cast<jstring>(env->GetObjectArrayElement(keys, i))};
-    JLocal<jstring> value{
-        env, static_cast<jstring>(env->GetObjectArrayElement(values, i))};
 
-    txtVec.emplace_back(std::pair<std::string, std::string>{
-        JStringRef{env, key}.str(), JStringRef{env, value}.str()});
+  if (keys != nullptr && values != nullptr) {
+    size_t keysLen = env->GetArrayLength(keys);
+    
+    txtVec.reserve(keysLen);
+    for (size_t i = 0; i < keysLen; i++) {
+      JLocal<jstring> key{
+          env, static_cast<jstring>(env->GetObjectArrayElement(keys, i))};
+      JLocal<jstring> value{
+          env, static_cast<jstring>(env->GetObjectArrayElement(values, i))};
+
+      txtVec.emplace_back(std::pair<std::string, std::string>{
+          JStringRef{env, key}.str(), JStringRef{env, value}.str()});
+    }
   }
 
   auto announcer = std::make_unique<wpi::MulticastServiceAnnouncer>(

@@ -26,6 +26,18 @@ public class MulticastServiceAnnouncer implements AutoCloseable {
         WPIUtilJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, keys, values);
   }
 
+  /**
+   * Creates a MulticastServiceAnnouncer.
+   *
+   * @param serviceName service name
+   * @param serviceType service type
+   * @param port port
+   */
+  public MulticastServiceAnnouncer(String serviceName, String serviceType, int port) {
+    m_handle =
+        WPIUtilJNI.createMulticastServiceAnnouncer(serviceName, serviceType, port, null, null);
+  }
+
   @Override
   public void close() {
     WPIUtilJNI.freeMulticastServiceAnnouncer(m_handle);

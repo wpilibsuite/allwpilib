@@ -22,6 +22,8 @@ class MulticastServiceAnnouncer {
   MulticastServiceAnnouncer(
       std::string_view serviceName, std::string_view serviceType, int port,
       wpi::span<const std::pair<std::string_view, std::string_view>> txt);
+  MulticastServiceAnnouncer(
+      std::string_view serviceName, std::string_view serviceType, int port);
   ~MulticastServiceAnnouncer() noexcept;
   void Start();
   void Stop();

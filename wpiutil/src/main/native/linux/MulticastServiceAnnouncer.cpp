@@ -45,18 +45,22 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
   this->serviceType = serviceType;
   this->port = port;
 
-  std::vector<std::string> txts;
-  for (auto&& i : txt) {
-    txts.push_back(fmt::format("{}={}", i.first, i.second));
-  }
+  if (txt.empty()) {
+    this->stringList = nullptr;
+  } else {
+    std::vector<std::string> txts;
+    for (auto&& i : txt) {
+      txts.push_back(fmt::format("{}={}", i.first, i.second));
+    }
 
-  std::vector<const char*> txtArr;
-  for (auto&& i : txts) {
-    txtArr.push_back(i.c_str());
-  }
+    std::vector<const char*> txtArr;
+    for (auto&& i : txts) {
+      txtArr.push_back(i.c_str());
+    }
 
-  this->stringList =
-      this->table.string_list_new_from_array(txtArr.data(), txtArr.size());
+    this->stringList =
+        this->table.string_list_new_from_array(txtArr.data(), txtArr.size());
+  }
 }
 
 static void RegisterService(AvahiClient* client,
@@ -84,11 +88,19 @@ static void RegisterService(AvahiClient* client,
 
   while (true) {
     if (impl->table.entry_group_is_empty(impl->group)) {
-      auto ret = impl->table.entry_group_add_service_strlst(
-          impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
-          AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
-          impl->serviceType.c_str(), "local", nullptr, impl->port,
-          impl->stringList);
+      int ret = 0;
+      if (impl->stringList == nullptr) {
+        ret = impl->table.entry_group_add_service(
+            impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
+            AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
+            impl->serviceType.c_str(), "local", nullptr, impl->port);
+      } else {
+        ret = impl->table.entry_group_add_service_strlst(
+            impl->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC,
+            AVAHI_PUBLISH_USE_MULTICAST, impl->serviceName.c_str(),
+            impl->serviceType.c_str(), "local", nullptr, impl->port,
+            impl->stringList);
+      }
       if (ret == AVAHI_ERR_COLLISION) {
         // Local collision
         char* newName =
@@ -118,6 +130,12 @@ static void ClientCallback(AvahiClient* client, AvahiClientState state,
       impl->table.entry_group_reset(impl->group);
     }
   }
+}
+
+MulticastServiceAnnouncer::MulticastServiceAnnouncer(
+    std::string_view serviceName, std::string_view serviceType, int port) {
+  wpi::span<const std::pair<std::string_view, std::string_view>> txt;
+  pImpl = std::make_unique<Impl>(serviceName, serviceType, port, txt);
 }
 
 MulticastServiceAnnouncer::MulticastServiceAnnouncer(
