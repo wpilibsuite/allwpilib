@@ -56,15 +56,13 @@ constexpr units::radian_t AngleModulus(units::radian_t angle) {
 }
 
 /**
- * Adds a scalar value to whatever is input
+ * Adds a scalar magnitude to a value.
  *
  * @param value The number the scalar is added to.
  * @param scalar The magnitude that is added to the value
  * @return The value with the scalar added.
  */
 WPILIB_DLLEXPORT
-double AddScalar(double value, double scalar) {
-  return std::copysign(std::abs(value) + std::abs(scalar), value);
-}
+double AddScalar(double value, double scalar);
 
 }  // namespace frc

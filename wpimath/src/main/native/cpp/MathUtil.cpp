@@ -20,4 +20,8 @@ double ApplyDeadband(double value, double deadband) {
   }
 }
 
+double AddScalar(double value, double scalar) {
+  return std::copysign(std::abs(value) + std::abs(scalar), value);
+}
+
 }  // namespace frc

@@ -96,6 +96,6 @@ class MathUtilTest {
     assertEquals(0.75, MathUtil.addScalar(0.5, -0.25));
     assertEquals(-0.75, MathUtil.addScalar(-0.5, -0.25));
 
-    assertEquals(-4, MathUtil.addScalar(-0, 4)); // For Peter
+    assertEquals(-4, MathUtil.addScalar(-0, 4));
   }
 }
