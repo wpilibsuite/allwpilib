@@ -17,7 +17,6 @@ import java.util.TreeMap;
 public class InterpolatingTreeMap<
         K extends InverseInterpolable<K> & Comparable<K>, V extends Interpolatable<V>>
     extends TreeMap<K, V> {
-
   int m_max;
 
   public InterpolatingTreeMap(int maximumSize) {
