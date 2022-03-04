@@ -339,7 +339,7 @@ Java_edu_wpi_first_util_WPIUtilJNI_createMulticastServiceAnnouncer
 
   if (keys != nullptr && values != nullptr) {
     size_t keysLen = env->GetArrayLength(keys);
-    
+
     txtVec.reserve(keysLen);
     for (size_t i = 0; i < keysLen; i++) {
       JLocal<jstring> key{

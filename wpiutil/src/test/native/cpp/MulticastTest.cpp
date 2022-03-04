@@ -11,7 +11,7 @@
 TEST(MulticastServiceAnnouncerTest, EmptyText) {
   const std::string_view serviceName = "TestServiceNoText";
   const std::string_view serviceType = "_wpinotxt";
-  const int port = rand();
+  const int port = std::rand();
   wpi::MulticastServiceAnnouncer announcer(serviceName, serviceType, port);
   wpi::MulticastServiceResolver resolver(serviceType);
 
@@ -26,7 +26,7 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
 TEST(MulticastServiceAnnouncerTest, SingleText) {
   const std::string_view serviceName = "TestServiceSingle";
   const std::string_view serviceType = "_wpitxt";
-  const int port = rand();
+  const int port = std::rand();
   std::array<std::pair<std::string, std::string>, 1> txt = {
       std::make_pair("hello", "world")};
   wpi::MulticastServiceAnnouncer announcer(serviceName, serviceType, port, txt);
