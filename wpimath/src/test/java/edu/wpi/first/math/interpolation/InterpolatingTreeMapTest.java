@@ -14,15 +14,29 @@ class InterpolatingTreeMapTest {
     InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> interpolatingTreeMap =
         new InterpolatingTreeMap<>();
 
-    interpolatingTreeMap.put(new InterpolatingDouble(1.0), new InterpolatingDouble(500.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(2.0), new InterpolatingDouble(1000.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(6.0), new InterpolatingDouble(4000.0));
+    interpolatingTreeMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(450.0));
+    interpolatingTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(510.0));
+    interpolatingTreeMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(525.0));
+    interpolatingTreeMap.put(new InterpolatingDouble(312.0), new InterpolatingDouble(550.0));
+    interpolatingTreeMap.put(new InterpolatingDouble(326.0), new InterpolatingDouble(650.0));
 
     assertEquals(
-        new InterpolatingDouble(750.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(1.5)).value);
+        new InterpolatingDouble(450.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(100.0)).value);
     assertEquals(
-        new InterpolatingDouble(1750.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(3.0)).value);
+        new InterpolatingDouble(450.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(125.0)).value);
+    assertEquals(
+        new InterpolatingDouble(480.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(162.5)).value);
+    assertEquals(
+        new InterpolatingDouble(510.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(200.0)).value);
+    assertEquals(
+        new InterpolatingDouble(650.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(326.0)).value);
+    assertEquals(
+        new InterpolatingDouble(650.0).value,
+        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(400.0)).value);
   }
 }
