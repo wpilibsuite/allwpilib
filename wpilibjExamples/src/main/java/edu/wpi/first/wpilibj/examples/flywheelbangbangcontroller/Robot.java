@@ -5,6 +5,7 @@
 package edu.wpi.first.wpilibj.examples.flywheelbangbangcontroller;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Encoder;
@@ -32,8 +33,14 @@ public class Robot extends TimedRobot {
   // Create Bang Bang controler
   private final BangBangController m_bangBangControler = new BangBangController();
 
+  // Gains are for example purposes only - must be determined for your own robot!
+  public static final double kflywheelkS = 0.0001;
+  public static final double kflywheelkV = 0.000195;
+  private final SimpleMotorFeedforward m_feedforward =
+      new SimpleMotorFeedforward(kflywheelkS, kflywheelkV);
+
   private final Joystick m_joystick = new Joystick(0); // Joystick to control setpoint
-  private static final double k_maxSetpointValue = 6000; // Max value for joystick control
+  private static final double kmaxSetpointValue = 6000; // Max value for joystick control
 
   // Simulation classes help us simulate our robot
 
@@ -57,13 +64,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Scale setpoint value between 0 and maxSetpointValue
-    double setpoint = Math.max(0, m_joystick.getRawAxis(0) * k_maxSetpointValue);
+    double setpoint = Math.max(0, m_joystick.getRawAxis(0) * kmaxSetpointValue);
 
     // Set setpoint and measurement of the bang bang controller
     double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint);
 
-    // Update motor output (Either 0 or 1)
-    m_flywheelMotor.set(bangOutput);
+    // Controls a motor with the output of the BangBang controller and a feedforward
+    // Shrinks the feedforward slightly to avoid overspeeding the shooter
+    m_flywheelMotor.set(bangOutput + 0.9 * m_feedforward.calculate(setpoint));
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
