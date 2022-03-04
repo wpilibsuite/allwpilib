@@ -786,7 +786,6 @@
     ],
     "foldername": "flywheelbangbangcontroller",
     "gradlebase": "cpp",
-    "commandversion": 2,
-    "mainclass": "Main"
+    "commandversion": 2
   }
 ]
