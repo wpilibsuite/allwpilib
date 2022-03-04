@@ -28,15 +28,15 @@ public class InterpolatingDouble
 
   @Override
   public double inverseInterpolate(InterpolatingDouble upper, InterpolatingDouble query) {
-    double upper_to_lower = upper.value - value;
-    if (upper_to_lower <= 0) {
+    double upperToLower = upper.value - value;
+    if (upperToLower <= 0) {
       return 0;
     }
-    double query_to_lower = query.value - value;
-    if (query_to_lower <= 0) {
+    double queryToLower = query.value - value;
+    if (queryToLower <= 0) {
       return 0;
     }
-    return query_to_lower / upper_to_lower;
+    return queryToLower / upperToLower;
   }
 
   @Override

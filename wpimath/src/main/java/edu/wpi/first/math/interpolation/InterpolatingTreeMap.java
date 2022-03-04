@@ -17,12 +17,11 @@ import java.util.TreeMap;
 public class InterpolatingTreeMap<
         K extends InverseInterpolable<K> & Comparable<K>, V extends Interpolatable<V>>
     extends TreeMap<K, V> {
-  private static final long serialVersionUID = 8347275262778054124L;
 
-  int max_;
+  int m_max;
 
   public InterpolatingTreeMap(int maximumSize) {
-    max_ = maximumSize;
+    m_max = maximumSize;
   }
 
   public InterpolatingTreeMap() {
@@ -38,7 +37,7 @@ public class InterpolatingTreeMap<
    */
   @Override
   public V put(K key, V value) {
-    if (max_ > 0 && max_ <= size()) {
+    if (m_max > 0 && m_max <= size()) {
       // "Prune" the tree if it is oversize
       K first = firstKey();
       remove(first);
