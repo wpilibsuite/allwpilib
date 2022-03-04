@@ -53,8 +53,8 @@ public class InterpolatingTreeMap<
   }
 
   /**
-   * Given a key, it searches the map for the closest higher value and closest lower value
-   * and then linearly interpolates between the two for a return value.
+   * Given a key, it searches the map for the closest higher value and closest lower value and then
+   * linearly interpolates between the two for a return value.
    *
    * @param key Lookup for a value (does not have to exist)
    * @return V or null; V if it is Interpolable or exists, null if it is at a bound and cannot
