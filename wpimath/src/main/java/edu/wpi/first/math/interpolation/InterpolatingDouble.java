@@ -13,7 +13,7 @@ public class InterpolatingDouble
     implements Interpolatable<InterpolatingDouble>,
         InverseInterpolable<InterpolatingDouble>,
         Comparable<InterpolatingDouble> {
-  public double value = 0.0;
+  public double value;
 
   public InterpolatingDouble(double val) {
     value = val;
