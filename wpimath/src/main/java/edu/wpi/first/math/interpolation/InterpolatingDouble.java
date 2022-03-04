@@ -13,16 +13,16 @@ public class InterpolatingDouble
     implements Interpolatable<InterpolatingDouble>,
         InverseInterpolable<InterpolatingDouble>,
         Comparable<InterpolatingDouble> {
-  public Double value = 0.0;
+  public double value = 0.0;
 
-  public InterpolatingDouble(Double val) {
+  public InterpolatingDouble(double val) {
     value = val;
   }
 
   @Override
   public InterpolatingDouble interpolate(InterpolatingDouble other, double x) {
-    Double dydx = other.value - value;
-    Double searchY = dydx * x + value;
+    double dydx = other.value - value;
+    double searchY = dydx * x + value;
     return new InterpolatingDouble(searchY);
   }
 
