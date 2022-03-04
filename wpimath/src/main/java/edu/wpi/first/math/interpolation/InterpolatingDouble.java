@@ -4,6 +4,8 @@
 
 package edu.wpi.first.math.interpolation;
 
+import java.util.Objects;
+
 /**
  * A Double that can be interpolated using the InterpolatingTreeMap.
  *
@@ -42,6 +44,11 @@ public class InterpolatingDouble
   @Override
   public int compareTo(InterpolatingDouble other) {
     return Double.compare(value, other.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
   }
 
   @Override
