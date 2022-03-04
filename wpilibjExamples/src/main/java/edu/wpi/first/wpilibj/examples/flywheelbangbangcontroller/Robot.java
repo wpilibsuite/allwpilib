@@ -34,13 +34,14 @@ public class Robot extends TimedRobot {
   private final BangBangController m_bangBangControler = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
-  public static final double kflywheelkS = 0.0001;
-  public static final double kflywheelkV = 0.000195;
+  public static final double kFlywheelKs = 0.0001;
+  public static final double kFlywheelKv = 0.000195;
+  public static final double kFlywheelKa = 0.0003;
   private final SimpleMotorFeedforward m_feedforward =
-      new SimpleMotorFeedforward(kflywheelkS, kflywheelkV);
+      new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
 
   private final Joystick m_joystick = new Joystick(0); // Joystick to control setpoint
-  private static final double kmaxSetpointValue = 6000; // Max value for joystick control
+  private static final double kMaxSetpointValue = 6000; // Max value for joystick control
 
   // Simulation classes help us simulate our robot
 
@@ -64,7 +65,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // Scale setpoint value between 0 and maxSetpointValue
-    double setpoint = Math.max(0, m_joystick.getRawAxis(0) * kmaxSetpointValue);
+    double setpoint = Math.max(0, m_joystick.getRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang bang controller
     double bangOutput = m_bangBangControler.calculate(m_encoder.getRate(), setpoint);
