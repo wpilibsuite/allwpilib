@@ -41,12 +41,6 @@ public class InterpolatingDouble
 
   @Override
   public int compareTo(InterpolatingDouble other) {
-    if (other.value < value) {
-      return 1;
-    } else if (other.value > value) {
-      return -1;
-    } else {
-      return 0;
-    }
+    return Double.compare(value, other.value);
   }
 }
