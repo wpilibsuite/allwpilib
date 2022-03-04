@@ -37,7 +37,7 @@ TEST(InterpolatingMap, Insert) {
 }
 
 TEST(InterpolatingMap, Clear) {
-    frc3512::InterpolatingMap<units::meter_t, units::radians_per_second_t> table;
+    frc::InterpolatingMap<units::meter_t, units::radians_per_second_t> table;
 
     table.Insert(125_in, 450_rad_per_s);
     table.Insert(200_in, 510_rad_per_s);
