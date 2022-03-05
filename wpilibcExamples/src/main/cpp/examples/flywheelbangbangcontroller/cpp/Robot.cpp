@@ -2,27 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <frc/Encoder.h>
+#include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/controller/BangBangController.h>
-#include <frc/Encoder.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
-#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
-#include <frc/Joystick.h>
-#include <frc/simulation/FlywheelSim.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/simulation/EncoderSim.h>
+#include <frc/simulation/FlywheelSim.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+
 /**
  * This is a sample program to demonstrate the use of a BangBangController with
- * a flywheel to control RPM.
+ * a flywheel to control speed.
  */
 class Robot : public frc::TimedRobot {
  public:
   /**
-   * Controls flywheel to a set rpm controlled by a joystick
+   * Controls flywheel to a set speed (rad/s) controlled by a joystick
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    units::meters_per_second_t setpoint{
+    units::radians_per_second_t setpoint{
         std::max(0.0, m_joystick.GetRawAxis(0) * kMaxSetpointValue)};
     // Set setpoint and measurement of the bang bang controller
     double bangOutput =
@@ -47,8 +48,7 @@ class Robot : public frc::TimedRobot {
     m_flywheelSim.SetInputVoltage(units::volt_t{m_flywheelMotor.Get()} *
                                   frc::RobotController::GetInputVoltage());
     m_flywheelSim.Update(0.02_s);
-    units::revolutions_per_minute_t speed = m_flywheelSim.GetAngularVelocity();
-    m_encoderSim.SetRate(speed.value());
+    m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());
   }
 
  private:
@@ -57,15 +57,15 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
 
   static constexpr double kMaxSetpointValue =
-      6000;  // Max value for joystick control
+      630;  // Max value for joystick control (rad/s)
 
   frc::PWMSparkMax m_flywheelMotor{kMotorPort};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
   frc::BangBangController m_bangBangControler{};
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  frc::SimpleMotorFeedforward<units::meters> m_feedforward{
-      0.0001_V, 0.000195_V / 1_mps, 0.0003_V / 1_mps_sq};
+  frc::SimpleMotorFeedforward<units::radians> m_feedforward{
+      0.000954_V, 0.00186_V / 1_rad_per_s, 0.00286_V / 1_rad_per_s_sq};
   frc::Joystick m_joystick{0};  // Joystick to control setpoint
 
   // Simulation classes help us simulate our robot
