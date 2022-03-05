@@ -23,8 +23,8 @@ class Robot : public frc::TimedRobot {
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    units::radians_per_second_t setpoint{
-        std::max(0.0, m_joystick.GetRawAxis(0) * kMaxSetpointValue)};
+    units::radians_per_second_t setpoint =
+        units::math::max(0_rad_per_s, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
     // Set setpoint and measurement of the bang bang controller
     double bangOutput =
         m_bangBangControler.Calculate(m_encoder.GetRate(), setpoint.value());
@@ -56,12 +56,11 @@ class Robot : public frc::TimedRobot {
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
 
-  static constexpr double kMaxSetpointValue =
-      630;  // Max value for joystick control (rad/s)
+  static constexpr units::radians_per_second_t kMaxSetpointValue{630.0};
 
   frc::PWMSparkMax m_flywheelMotor{kMotorPort};
   frc::Encoder m_encoder{kEncoderAChannel, kEncoderBChannel};
-  frc::BangBangController m_bangBangControler{};
+  frc::BangBangController m_bangBangControler;
   // Gains are for example purposes only - must be determined for your own
   // robot!
   frc::SimpleMotorFeedforward<units::radians> m_feedforward{
