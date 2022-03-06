@@ -21,8 +21,8 @@
    limitations under the License.
 */
 
-#ifndef WPIUTIL_WPI_TCPACCEPTOR_H_
-#define WPIUTIL_WPI_TCPACCEPTOR_H_
+#ifndef WPINET_WPI_TCPACCEPTOR_H_
+#define WPINET_WPI_TCPACCEPTOR_H_
 
 #include <atomic>
 #include <memory>
@@ -55,4 +55,4 @@ class TCPAcceptor : public NetworkAcceptor {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_TCPACCEPTOR_H_
+#endif  // WPINET_WPI_TCPACCEPTOR_H_

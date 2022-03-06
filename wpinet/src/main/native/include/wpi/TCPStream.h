@@ -21,8 +21,8 @@
    limitations under the License.
 */
 
-#ifndef WPIUTIL_WPI_TCPSTREAM_H_
-#define WPIUTIL_WPI_TCPSTREAM_H_
+#ifndef WPINET_WPI_TCPSTREAM_H_
+#define WPINET_WPI_TCPSTREAM_H_
 
 #include <cstddef>
 #include <string>
@@ -69,4 +69,4 @@ class TCPStream : public NetworkStream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_TCPSTREAM_H_
+#endif  // WPINET_WPI_TCPSTREAM_H_

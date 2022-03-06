@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifndef WPIUTIL_WPI_HTTPUTIL_INC_
-#define WPIUTIL_WPI_HTTPUTIL_INC_
+#ifndef WPINET_WPI_HTTPUTIL_INC_
+#define WPINET_WPI_HTTPUTIL_INC_
 
 #include <utility>
 
@@ -52,4 +52,4 @@ void HttpRequest::SetPath(std::string_view path_, const T& params) {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_HTTPUTIL_INC_
+#endif  // WPINET_WPI_HTTPUTIL_INC_
