@@ -9,7 +9,6 @@
 #include <units/current.h>
 #include <units/impedance.h>
 #include <units/voltage.h>
-
 #include <wpi/span.h>
 
 namespace frc::sim {
