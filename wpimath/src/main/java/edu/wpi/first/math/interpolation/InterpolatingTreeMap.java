@@ -34,7 +34,9 @@ public class InterpolatingTreeMap<K extends Number, V extends Number> extends Tr
       V ceiling = get(ceilingKey);
 
       return interpolate(floor, ceiling, inverseInterpolate(ceilingKey, key, floorKey));
-    } else return val.doubleValue();
+    } else {
+      return val.doubleValue();
+    }
   }
 
   public double interpolate(V val1, V val2, double d) {

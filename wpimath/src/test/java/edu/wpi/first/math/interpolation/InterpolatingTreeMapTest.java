@@ -36,6 +36,13 @@ class InterpolatingTreeMapTest {
 
     // Key above maximum gives largest value
     assertEquals(650.0, interpolatingDoubleTreeMap.getInterpolated(400.0));
+
+    interpolatingDoubleTreeMap.clear();
+
+    interpolatingDoubleTreeMap.put(100.0, 250.0);
+    interpolatingDoubleTreeMap.put(200.0, 500.0);
+
+    assertEquals(375.0, interpolatingDoubleTreeMap.getInterpolated(150.0));
   }
 
   @Test
