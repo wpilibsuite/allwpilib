@@ -11,32 +11,19 @@ import org.junit.jupiter.api.Test;
 class InterpolatingTreeMapTest {
   @Test
   void testInterpolation() {
-    InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> interpolatingTreeMap =
-        new InterpolatingTreeMap<>();
+    InterpolatingDoubleTreeMap interpolatingDoubleTreeMap = new InterpolatingDoubleTreeMap();
 
-    interpolatingTreeMap.put(new InterpolatingDouble(125.0), new InterpolatingDouble(450.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(510.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(525.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(312.0), new InterpolatingDouble(550.0));
-    interpolatingTreeMap.put(new InterpolatingDouble(326.0), new InterpolatingDouble(650.0));
+    interpolatingDoubleTreeMap.put(125.0, 450.0);
+    interpolatingDoubleTreeMap.put(200.0, 510.0);
+    interpolatingDoubleTreeMap.put(268.0, 525.0);
+    interpolatingDoubleTreeMap.put(312.0, 550.0);
+    interpolatingDoubleTreeMap.put(326.0, 650.0);
 
-    assertEquals(
-        new InterpolatingDouble(450.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(100.0)).value);
-    assertEquals(
-        new InterpolatingDouble(450.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(125.0)).value);
-    assertEquals(
-        new InterpolatingDouble(480.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(162.5)).value);
-    assertEquals(
-        new InterpolatingDouble(510.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(200.0)).value);
-    assertEquals(
-        new InterpolatingDouble(650.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(326.0)).value);
-    assertEquals(
-        new InterpolatingDouble(650.0).value,
-        interpolatingTreeMap.getInterpolated(new InterpolatingDouble(400.0)).value);
+    assertEquals(450.0, interpolatingDoubleTreeMap.getInterpolated(100.0));
+    assertEquals(450.0, interpolatingDoubleTreeMap.getInterpolated(125.0));
+    assertEquals(480.0, interpolatingDoubleTreeMap.getInterpolated(162.5));
+    assertEquals(510.0, interpolatingDoubleTreeMap.getInterpolated(200.0));
+    assertEquals(650.0, interpolatingDoubleTreeMap.getInterpolated(326.0));
+    assertEquals(650.0, interpolatingDoubleTreeMap.getInterpolated(400.0));
   }
 }
