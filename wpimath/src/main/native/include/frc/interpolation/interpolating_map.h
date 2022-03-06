@@ -28,7 +28,7 @@ class InterpolatingMap {
    * @param key   The key.
    * @param value The value.
    */
-  void Insert(const Key& key, const Value& value) {
+  void insert(const Key& key, const Value& value) {
     m_container.insert(std::make_pair(key, value));
   }
 
@@ -38,7 +38,7 @@ class InterpolatingMap {
    * @param key   The key.
    * @param value The value.
    */
-  void Insert(Key&& key, Value&& value) {
+  void insert(Key&& key, Value&& value) {
     m_container.insert(std::make_pair(key, value));
   }
 
@@ -78,7 +78,7 @@ class InterpolatingMap {
   /**
    * Clears the contents.
    */
-  void Clear() { m_container.clear(); }
+  void clear() { m_container.clear(); }
 
  private:
   std::map<Key, Value> m_container;

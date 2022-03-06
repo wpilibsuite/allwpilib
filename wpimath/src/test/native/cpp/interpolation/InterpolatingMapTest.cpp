@@ -40,16 +40,16 @@ TEST(InterpolatingMapTest, Insert) {
 TEST(InterpolatingMapTest, Clear) {
   frc::InterpolatingMap<units::meter_t, units::radians_per_second_t> table;
 
-  table.Insert(125_in, 450_rad_per_s);
-  table.Insert(200_in, 510_rad_per_s);
-  table.Insert(268_in, 525_rad_per_s);
-  table.Insert(312_in, 550_rad_per_s);
-  table.Insert(326_in, 650_rad_per_s);
+  table.insert(125_in, 450_rad_per_s);
+  table.insert(200_in, 510_rad_per_s);
+  table.insert(268_in, 525_rad_per_s);
+  table.insert(312_in, 550_rad_per_s);
+  table.insert(326_in, 650_rad_per_s);
 
-  table.Clear();
+  table.clear();
 
-  table.Insert(100_in, 250_rad_per_s);
-  table.Insert(200_in, 500_rad_per_s);
+  table.insert(100_in, 250_rad_per_s);
+  table.insert(200_in, 500_rad_per_s);
 
   EXPECT_EQ(375_rad_per_s, table[150_in]);
 }
