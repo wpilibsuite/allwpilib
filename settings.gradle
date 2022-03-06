@@ -17,6 +17,7 @@ Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
 
 include 'wpiutil'
+include 'wpinet'
 include 'ntcore'
 include 'hal'
 include 'cscore'

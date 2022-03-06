@@ -2,9 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util.net;
-
-import edu.wpi.first.util.WPIUtilJNI;
+package edu.wpi.first.net;
 
 /**
  * Forward ports to another host. This is primarily useful for accessing Ethernet-connected devices
@@ -24,7 +22,7 @@ public final class PortForwarder {
    * @param remotePort remote port number
    */
   public static void add(int port, String remoteHost, int remotePort) {
-    WPIUtilJNI.addPortForwarder(port, remoteHost, remotePort);
+    WPINetJNI.addPortForwarder(port, remoteHost, remotePort);
   }
 
   /**
@@ -33,6 +31,6 @@ public final class PortForwarder {
    * @param port local port number
    */
   public static void remove(int port) {
-    WPIUtilJNI.removePortForwarder(port);
+    WPINetJNI.removePortForwarder(port);
   }
 }

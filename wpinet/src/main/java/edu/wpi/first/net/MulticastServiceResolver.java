@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package edu.wpi.first.util;
+package edu.wpi.first.net;
 
 /** Class to resolve a service over mDNS. */
 public class MulticastServiceResolver implements AutoCloseable {
@@ -14,31 +14,31 @@ public class MulticastServiceResolver implements AutoCloseable {
    * @param serviceType service type to look for
    */
   public MulticastServiceResolver(String serviceType) {
-    m_handle = WPIUtilJNI.createMulticastServiceResolver(serviceType);
+    m_handle = WPINetJNI.createMulticastServiceResolver(serviceType);
   }
 
   @Override
   public void close() {
-    WPIUtilJNI.freeMulticastServiceResolver(m_handle);
+    WPINetJNI.freeMulticastServiceResolver(m_handle);
   }
 
   public void start() {
-    WPIUtilJNI.startMulticastServiceResolver(m_handle);
+    WPINetJNI.startMulticastServiceResolver(m_handle);
   }
 
   public void stop() {
-    WPIUtilJNI.stopMulticastServiceResolver(m_handle);
+    WPINetJNI.stopMulticastServiceResolver(m_handle);
   }
 
   public boolean hasImplementation() {
-    return WPIUtilJNI.getMulticastServiceResolverHasImplementation(m_handle);
+    return WPINetJNI.getMulticastServiceResolverHasImplementation(m_handle);
   }
 
   public int getEventHandle() {
-    return WPIUtilJNI.getMulticastServiceResolverEventHandle(m_handle);
+    return WPINetJNI.getMulticastServiceResolverEventHandle(m_handle);
   }
 
   public ServiceData[] getData() {
-    return WPIUtilJNI.getMulticastServiceResolverData(m_handle);
+    return WPINetJNI.getMulticastServiceResolverData(m_handle);
   }
 }
