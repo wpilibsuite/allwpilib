@@ -120,6 +120,13 @@ int main(int argc, const char** argv) {
         } else {
           fmt::print("  invalid\n");
         }
+      } else if (entry->second.type == "boolean[]") {
+        std::vector<int> val;
+        if (record.GetBooleanArray(&val)) {
+          fmt::print("  {}\n", fmt::join(val, ", "));
+        } else {
+          fmt::print("  invalid\n");
+        }
       } else if (entry->second.type == "double[]") {
         std::vector<double> val;
         if (record.GetDoubleArray(&val)) {
