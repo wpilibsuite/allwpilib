@@ -76,10 +76,12 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if (NOT MSVC AND NOT APPLE)
+if (NOT MSVC AND NOT APPLE AND NOT ANDROID)
     find_library(ATOMIC NAMES atomic libatomic.so.1)
     if (ATOMIC)
         message(STATUS "Found libatomic: ${ATOMIC}")
+    else()
+        message(STATUS "libatomic not found. If build fails, install libatomic")
     endif()
 endif()
 
@@ -147,7 +149,12 @@ if (MSVC)
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
-target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS} ${ATOMIC})
+target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
+
+if (ATOMIC)
+    target_link_libraries(wpiutil INTERFACE ${ATOMIC})
+endif()
+
 
 if (NOT USE_VCPKG_FMTLIB)
     target_sources(wpiutil PRIVATE ${fmtlib_native_src})
