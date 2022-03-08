@@ -152,7 +152,7 @@ wpilib_target_warnings(wpiutil)
 target_link_libraries(wpiutil Threads::Threads ${CMAKE_DL_LIBS})
 
 if (ATOMIC)
-    target_link_libraries(wpiutil INTERFACE ${ATOMIC})
+    target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
 
