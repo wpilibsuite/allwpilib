@@ -70,9 +70,8 @@ import edu.wpi.first.wpilibj.SpeedController;
  * |       |
  * </pre>
  *
- * <p>Each drive() function provides different inverse kinematic relations for a differential drive
- * robot. Motor outputs for the right side are negated, so motor direction inversion by the user is
- * usually unnecessary.
+ * <p>Each drive function provides different inverse kinematic relations for a differential drive
+ * robot.
  *
  * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
  * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
