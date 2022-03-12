@@ -43,6 +43,13 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
+  private Matrix<States, States> P;
+
+  private Matrix<States, States> discA;
+  private Matrix<States, States> discQ;
+
+  private Matrix<Outputs, Outputs> discR;
+
   /**
    * Constructs a state-space observer with the given plant.
    *
@@ -69,10 +76,10 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     var contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
     var pair = Discretization.discretizeAQTaylor(plant.getA(), contQ, dtSeconds);
-    var discA = pair.getFirst();
-    var discQ = pair.getSecond();
+    discA = pair.getFirst();
+    discQ = pair.getSecond();
 
-    var discR = Discretization.discretizeR(contR, dtSeconds);
+    discR = Discretization.discretizeR(contR, dtSeconds);
 
     var C = plant.getC();
 
@@ -90,8 +97,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
       throw new IllegalArgumentException(msg);
     }
 
-    var P =
-        new Matrix<>(
+    P = new Matrix<>(
             Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR));
 
     // S = CPCᵀ + R
@@ -187,6 +193,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   @SuppressWarnings("ParameterName")
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
+
+    P = discA.times(P.times(discA.transpose())).plus(discQ);
   }
 
   /**
@@ -199,7 +207,13 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();
+    
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
+
+    // S = CPCᵀ + R
+    var S = C.times(P).times(C.transpose()).plus(discR);
+
+    m_K = S.transpose().solve((C.times(P.transpose()))).transpose();
   }
 }
