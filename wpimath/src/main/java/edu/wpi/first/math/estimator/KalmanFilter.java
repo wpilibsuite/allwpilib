@@ -43,6 +43,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   @SuppressWarnings("MemberName")
   private Matrix<States, N1> m_xHat;
 
+  @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
 
   private Matrix<States, States> m_discA;
@@ -98,7 +99,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     }
 
     m_P = new Matrix<>(
-            Drake.discreteAlgebraicRiccatiEquation(m_discA.transpose(), C.transpose(), m_discQ, m_discR));
+            Drake.discreteAlgebraicRiccatiEquation(
+                m_discA.transpose(),
+                C.transpose(),
+                m_discQ,
+                m_discR));
 
     // S = CPCᵀ + R
     var S = C.times(m_P).times(C.transpose()).plus(m_discR);
@@ -115,7 +120,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().solve((C.times(m_P.transpose()))).transpose();
+    m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
     reset();
   }
@@ -207,11 +212,12 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     final var C = m_plant.getC();
     final var D = m_plant.getD();
     
+    @SuppressWarnings("LocalVariableName")
     // S = CPCᵀ + R
     var S = C.times(m_P).times(C.transpose()).plus(m_discR);
     
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().solve((C.times(m_P.transpose()))).transpose();
+    m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
