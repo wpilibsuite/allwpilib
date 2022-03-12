@@ -37,7 +37,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
   /** The steady-state Kalman gain matrix. */
   @SuppressWarnings("MemberName")
-  private final Matrix<States, Outputs> m_K;
+  private Matrix<States, Outputs> m_K;
 
   /** The state estimate. */
   @SuppressWarnings("MemberName")
