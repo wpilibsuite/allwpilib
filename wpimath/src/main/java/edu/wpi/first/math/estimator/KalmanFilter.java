@@ -192,6 +192,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
 
+    // Pₖ₊₁⁺ = A(Pₖ₊₁⁻)Aᵀ + Q
     m_P = m_discA.times(m_P.times(m_discA.transpose())).plus(m_discQ);
   }
 
@@ -205,16 +206,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();
-    final var I = Matrix.eye(States);
     
+    // S = CPCᵀ + R
+    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
+    
+    // K = (Sᵀ.solve(CPᵀ))ᵀ
+    m_K = S.transpose().solve((C.times(m_P.transpose()))).transpose();
+
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
 
-    // S = CPCᵀ + R
-    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
-
-    m_K = S.transpose().solve((C.times(m_P.transpose()))).transpose();
-
-    m_P = I.minus(m_K.times(C)).times(m_P);
+    // Pₖ₊₁⁺ = (I − Kₖ₊₁C)Pₖ₊₁⁻
+    m_P = Matrix.eye(m_states).minus(m_K.times(C)).times(m_P);
   }
 }
