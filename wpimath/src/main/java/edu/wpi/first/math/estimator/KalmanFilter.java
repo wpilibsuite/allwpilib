@@ -46,10 +46,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
 
-  private Matrix<States, States> m_discA;
-  private Matrix<States, States> m_discQ;
-
-  private Matrix<Outputs, Outputs> m_discR;
+  private final Matrix<States, States> m_discA;
+  private final Matrix<States, States> m_discQ;
+  private final Matrix<Outputs, Outputs> m_discR;
 
   /**
    * Constructs a state-space observer with the given plant.
