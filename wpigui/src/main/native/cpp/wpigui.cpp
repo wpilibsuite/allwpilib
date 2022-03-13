@@ -125,6 +125,7 @@ bool gui::Initialize(const char* title, int width, int height) {
   // Setup window
   glfwSetErrorCallback(ErrorCallback);
   glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
+  glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_FALSE);
   PlatformGlfwInitHints();
   if (!glfwInit()) {
     return false;
