@@ -7,7 +7,7 @@
 #include <map>
 #include <utility>
 
-namespace frc {
+namespace wpi {
 
 /**
  * Implements a table of key-value pairs with linear interpolation between
@@ -20,7 +20,7 @@ namespace frc {
  * @tparam Value The value type.
  */
 template <typename Key, typename Value>
-class InterpolatingMap {
+class interpolating_map {
  public:
   /**
    * Inserts a key-value pair.
@@ -84,4 +84,4 @@ class InterpolatingMap {
   std::map<Key, Value> m_container;
 };
 
-}  // namespace frc
+}  // namespace wpi
