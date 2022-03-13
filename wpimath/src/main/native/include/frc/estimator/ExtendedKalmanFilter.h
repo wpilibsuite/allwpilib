@@ -327,11 +327,15 @@ class ExtendedKalmanFilter {
     Eigen::Matrix<double, States, Rows> K =
         S.transpose().ldlt().solve(C * m_P.transpose()).transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));
 
-    // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
-    m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P;
+    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Use Joseph form for numerical stability
+    m_P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * m_P *
+              (Eigen::Matrix<double, States, States>::Identity() - K * C)
+                  .transpose() +
+          K * discR * K.transpose();
   }
 
  private:

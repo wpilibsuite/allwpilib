@@ -366,7 +366,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, h.apply(m_xHat, u))));
 
-    // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
-    m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);
+    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Use Joseph form for numerical stability
+    m_P =
+        Matrix.eye(m_states)
+            .minus(K.times(C))
+            .times(m_P)
+            .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
+            .plus(K.times(discR).times(K.transpose()));
   }
 }
