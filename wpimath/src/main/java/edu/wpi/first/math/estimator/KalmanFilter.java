@@ -46,6 +46,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   @SuppressWarnings("MemberName")
   private Matrix<States, States> m_P;
 
+  @SuppressWarnings("MemberName")
+  private final Matrix<Outputs, States> m_C;
+
   private final Matrix<States, States> m_discA;
   private final Matrix<States, States> m_discQ;
   private final Matrix<Outputs, Outputs> m_discR;
@@ -81,15 +84,15 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     m_discR = Discretization.discretizeR(contR, dtSeconds);
 
-    var C = plant.getC();
+    m_C = plant.getC();
 
-    if (!StateSpaceUtil.isDetectable(m_discA, C)) {
+    if (!StateSpaceUtil.isDetectable(m_discA, m_C)) {
       var builder =
           new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
       builder
           .append(m_discA.getStorage().toString())
           .append("\nC =\n")
-          .append(C.getStorage().toString())
+          .append(m_C.getStorage().toString())
           .append('\n');
 
       var msg = builder.toString();
@@ -97,15 +100,13 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
       throw new IllegalArgumentException(msg);
     }
 
-    m_P = new Matrix<>(
+    m_P =
+        new Matrix<>(
             Drake.discreteAlgebraicRiccatiEquation(
-                m_discA.transpose(),
-                C.transpose(),
-                m_discQ,
-                m_discR));
+                m_discA.transpose(), m_C.transpose(), m_discQ, m_discR));
 
     // S = CPCᵀ + R
-    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
+    var S = m_C.times(m_P).times(m_C.transpose()).plus(m_discR);
 
     // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
@@ -119,7 +120,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    m_K = S.transpose().solve(m_C.times(m_P.transpose())).transpose();
 
     reset();
   }
@@ -196,8 +197,14 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
 
-    // Pₖ₊₁⁺ = A(Pₖ₊₁⁻)Aᵀ + Q
-    m_P = m_discA.times(m_P.times(m_discA.transpose())).plus(m_discQ);
+    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Use Joseph form for numerical stability
+    m_P =
+        Matrix.eye(m_states)
+            .minus(m_K.times(m_C))
+            .times(m_P)
+            .times(Matrix.eye(m_states).minus(m_K.times(m_C)).transpose())
+            .plus(m_K.times(m_discR).times(m_K.transpose()));
   }
 
   /**
@@ -210,11 +217,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
     final var C = m_plant.getC();
     final var D = m_plant.getD();
-    
+
     @SuppressWarnings("LocalVariableName")
     // S = CPCᵀ + R
     var S = C.times(m_P).times(C.transpose()).plus(m_discR);
-    
+
     // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
 
