@@ -22,7 +22,8 @@ extern "C" {
 /**
  * Initializes a CAN device.
  *
- * These follow the FIRST standard CAN layout. Link TBD
+ * These follow the FIRST standard CAN layout.
+ * https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html
  *
  * @param[in] manufacturer the can manufacturer
  * @param[in] deviceId     the device ID (0-63)
