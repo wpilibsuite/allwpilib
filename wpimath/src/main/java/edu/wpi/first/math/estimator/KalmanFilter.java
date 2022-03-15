@@ -209,18 +209,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
    */
   @SuppressWarnings("ParameterName")
   public void correct(Matrix<Inputs, N1> u, Matrix<Outputs, N1> y) {
-    final var C = m_plant.getC();
     final var D = m_plant.getD();
 
     @SuppressWarnings("LocalVariableName")
     // S = CPCᵀ + R
-    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
+    var S = m_C.times(m_P).times(m_C.transpose()).plus(m_discR);
 
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
+    m_K = S.transpose().solve(m_C.times(m_P.transpose())).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
-    m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
+    m_xHat = m_xHat.plus(m_K.times(y.minus(m_C.times(m_xHat).plus(D.times(u)))));
 
     // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
     // Use Joseph form for numerical stability
