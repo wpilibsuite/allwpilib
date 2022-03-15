@@ -24,7 +24,7 @@ import edu.wpi.first.math.system.LinearSystem;
  * of squares error in the state estimate. This K gain is used to correct the state estimate by some
  * amount of the difference between the actual measurements and the measurements predicted by the
  * model.
- * 
+ *
  * <p>The Steady State Kalman filter requires symmetric updates (1:1 predict:update ratio).
  *
  * <p>For more on the underlying math, read
