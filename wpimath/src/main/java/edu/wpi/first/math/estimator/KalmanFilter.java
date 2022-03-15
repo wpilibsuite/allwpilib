@@ -197,14 +197,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
 
-    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
-    // Use Joseph form for numerical stability
-    m_P =
-        Matrix.eye(m_states)
-            .minus(m_K.times(m_C))
-            .times(m_P)
-            .times(Matrix.eye(m_states).minus(m_K.times(m_C)).transpose())
-            .plus(m_K.times(m_discR).times(m_K.transpose()));
+    // Pₖ₊₁⁺ = A(Pₖ₊₁⁻)Aᵀ + Q
+    m_P = m_discA.times(m_P.times(m_discA.transpose())).plus(m_discQ);
   }
 
   /**
@@ -228,7 +222,13 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(m_K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
 
-    // Pₖ₊₁⁺ = (I − Kₖ₊₁C)Pₖ₊₁⁻
-    m_P = Matrix.eye(m_states).minus(m_K.times(C)).times(m_P);
+    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Use Joseph form for numerical stability
+    m_P =
+        Matrix.eye(m_states)
+            .minus(m_K.times(m_C))
+            .times(m_P)
+            .times(Matrix.eye(m_states).minus(m_K.times(m_C)).transpose())
+            .plus(m_K.times(m_discR).times(m_K.transpose()));;
   }
 }
