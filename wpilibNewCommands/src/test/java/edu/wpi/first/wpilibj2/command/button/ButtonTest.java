@@ -181,6 +181,8 @@ class ButtonTest extends CommandTestBase {
     InternalButton button1 = new InternalButton();
     BooleanSupplier booleanSupplier = () -> false;
 
+    button1.setPressed(true);
+
     assertFalse(button1.and(booleanSupplier).get());
     assertTrue(button1.or(booleanSupplier).get());
   }
