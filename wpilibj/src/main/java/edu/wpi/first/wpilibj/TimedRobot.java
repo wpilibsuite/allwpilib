@@ -130,7 +130,14 @@ public class TimedRobot extends IterativeRobotBase {
 
       callback.func.run();
 
-      callback.expirationTime += callback.period;
+      // Increment the expiration time by the number of full periods it's behind
+      // plus one to avoid rapid repeat fires from a large loop overrun. We
+      // assume currentTime >= expirationTime rather than checking for it since
+      // the callback wouldn't be running otherwise.
+      double currentTime = Timer.getFPGATimestamp();
+      callback.expirationTime +=
+          Math.floor((currentTime - callback.expirationTime) / callback.period) * callback.period
+              + callback.period;
       m_callbacks.add(callback);
 
       // Process all other callbacks that are ready to run
