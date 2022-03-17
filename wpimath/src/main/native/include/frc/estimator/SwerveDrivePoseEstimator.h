@@ -62,11 +62,10 @@ class SwerveDrivePoseEstimator {
    *                                 model's state estimates less. This matrix
    *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
-   *                                 measurements. Increase these numbers to
-   *                                 trust sensor readings from encoders
-   *                                 and gyros less. This matrix is in the form
-   *                                 [theta], with units in radians.
+   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
+   *                                 Increase this number to trust sensor
+   *                                 readings from the gyro less. This matrix is
+   *                                 in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
