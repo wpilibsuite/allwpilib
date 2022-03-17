@@ -12,10 +12,10 @@
 #include "Eigen/Core"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/time.h"
 
@@ -127,7 +127,7 @@ class SwerveDrivePoseEstimator {
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.Reset();
-    m_latencyCompensator.Reset();
+    m_poseBuffer.Clear();
 
     m_observer.SetXhat(PoseTo3dVector(pose));
 
@@ -184,9 +184,9 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-        &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-        m_visionCorrect, timestamp);
+    m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                        visionRobotPose - m_poseBuffer.Sample(timestamp))));
   }
 
   /**
@@ -275,7 +275,7 @@ class SwerveDrivePoseEstimator {
     Eigen::Vector<double, 1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
-    m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
     m_observer.Predict(u, dt);
     m_observer.Correct(u, localY);
@@ -286,8 +286,7 @@ class SwerveDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
-  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
-      m_latencyCompensator;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
   std::function<void(const Eigen::Vector<double, 3>& u,
                      const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;

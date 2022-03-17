@@ -56,7 +56,7 @@ void DifferentialDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle) {
   // Reset state estimate and error covariance
   m_observer.Reset();
-  m_latencyCompensator.Reset();
+  m_poseBuffer.Clear();
 
   m_observer.SetXhat(FillStateVector(pose, 0_m, 0_m));
 
@@ -72,9 +72,9 @@ Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
 
 void DifferentialDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-      &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-      m_visionCorrect, timestamp);
+  m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+                  PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                      visionRobotPose - m_poseBuffer.Sample(timestamp))));
 }
 
 Pose2d DifferentialDrivePoseEstimator::Update(
@@ -103,7 +103,7 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   auto localY = Eigen::Vector<double, 3>{
       leftDistance.value(), rightDistance.value(), angle.Radians().value()};
 
-  m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
   m_observer.Predict(u, dt);
   m_observer.Correct(u, localY);
 

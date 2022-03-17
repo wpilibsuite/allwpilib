@@ -10,10 +10,10 @@
 #include <wpi/array.h>
 
 #include "Eigen/Core"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "units/time.h"
 
@@ -204,8 +204,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   MecanumDriveKinematics m_kinematics;
-  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
-      m_latencyCompensator;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
   std::function<void(const Eigen::Vector<double, 3>& u,
                      const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;

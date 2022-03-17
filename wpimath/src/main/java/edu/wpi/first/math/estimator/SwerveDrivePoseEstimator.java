@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -48,7 +50,7 @@ public class SwerveDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
   private final SwerveDriveKinematics m_kinematics;
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
-  private final KalmanFilterLatencyCompensator<N3, N3, N1> m_latencyCompensator;
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
 
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
@@ -134,7 +136,7 @@ public class SwerveDrivePoseEstimator {
             AngleStatistics.angleAdd(2),
             m_nominalDt);
     m_kinematics = kinematics;
-    m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
+    m_poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -182,7 +184,7 @@ public class SwerveDrivePoseEstimator {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.reset();
-    m_latencyCompensator.reset();
+    m_poseBuffer.clear();
 
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
 
@@ -215,13 +217,12 @@ public class SwerveDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    m_latencyCompensator.applyPastGlobalMeasurement(
-        Nat.N3(),
-        m_observer,
-        m_nominalDt,
-        StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
-        m_visionCorrect,
-        timestampSeconds);
+    m_visionCorrect.accept(
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+        StateSpaceUtil.poseTo3dVector(
+            getEstimatedPosition()
+                .transformBy(
+                    visionRobotPoseMeters.minus(m_poseBuffer.getSample(timestampSeconds)))));
   }
 
   /**
@@ -294,7 +295,7 @@ public class SwerveDrivePoseEstimator {
     m_previousAngle = angle;
 
     var localY = VecBuilder.fill(angle.getRadians());
-    m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
+    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);
 
