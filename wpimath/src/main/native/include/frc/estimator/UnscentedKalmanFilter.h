@@ -192,7 +192,7 @@ class UnscentedKalmanFilter {
    *
    * @param i Row of x-hat.
    */
-  double Xhat(int i) const { return m_xHat(i, 0); }
+  double Xhat(int i) const { return m_xHat(i); }
 
   /**
    * Set initial state estimate x-hat.
@@ -207,7 +207,7 @@ class UnscentedKalmanFilter {
    * @param i     Row of x-hat.
    * @param value Value for element of x-hat.
    */
-  void SetXhat(int i, double value) { m_xHat(i, 0) = value; }
+  void SetXhat(int i, double value) { m_xHat(i) = value; }
 
   /**
    * Resets the observer.
