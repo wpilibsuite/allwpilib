@@ -49,10 +49,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
   private Matrix<States, States> m_contQ;
   private Matrix<Outputs, Outputs> m_contR;
 
-  private final Matrix<States, States> m_discA;
-  private final Matrix<States, States> m_discQ;
-  private final Matrix<Outputs, Outputs> m_discR;
-
   /**
    * Constructs a state-space observer with the given plant.
    *
@@ -75,20 +71,22 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     this.m_plant = plant;
 
-    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
+    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
 
     var pair = Discretization.discretizeAQTaylor(plant.getA(), m_contQ, dtSeconds);
-    m_discA = pair.getFirst();
-    m_discQ = pair.getSecond();
+    final var discA = pair.getFirst();
+    final var discQ = pair.getSecond();
+
+    final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
     final var C = plant.getC();
 
-    if (!StateSpaceUtil.isDetectable(m_discA, C)) {
+    if (!StateSpaceUtil.isDetectable(discA, C)) {
       var builder =
           new StringBuilder("The system passed to the Kalman filter is unobservable!\n\nA =\n");
       builder
-          .append(m_discA.getStorage().toString())
+          .append(discA.getStorage().toString())
           .append("\nC =\n")
           .append(C.getStorage().toString())
           .append('\n');
@@ -101,10 +99,10 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     m_P =
         new Matrix<>(
             Drake.discreteAlgebraicRiccatiEquation(
-                m_discA.transpose(), C.transpose(), m_discQ, m_discR));
+                discA.transpose(), C.transpose(), discQ, discR));
 
     // S = CPCᵀ + R
-    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
+    var S = C.times(m_P).times(C.transpose()).plus(discR);
 
     // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
     // efficiently.
@@ -196,11 +194,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     this.m_xHat = m_plant.calculateX(m_xHat, u, dtSeconds);
 
     var pair = Discretization.discretizeAQTaylor(m_plant.getA(), m_contQ, dtSeconds);
-    m_discA = pair.getFirst();
-    m_discQ = pair.getSecond();
+    final var discA = pair.getFirst();
+    final var discQ = pair.getSecond();
 
-    // Pₖ₊₁⁺ = A(Pₖ₊₁⁻)Aᵀ + Q
-    m_P = m_discA.times(m_P.times(m_discA.transpose())).plus(m_discQ);
+    // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
+    m_P = discA.times(m_P.times(discA.transpose())).plus(discQ);
   }
 
   /**
@@ -215,11 +213,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
     final var C = m_plant.getC();
     final var D = m_plant.getD();
 
-    m_discR = Discretization.discretizeR(m_contR, dtSeconds);
+    final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
     @SuppressWarnings("LocalVariableName")
     // S = CPCᵀ + R
-    var S = C.times(m_P).times(C.transpose()).plus(m_discR);
+    var S = C.times(m_P).times(C.transpose()).plus(discR);
 
     // K = (Sᵀ.solve(CPᵀ))ᵀ
     m_K = S.transpose().solve(C.times(m_P.transpose())).transpose();
@@ -234,6 +232,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
             .minus(m_K.times(C))
             .times(m_P)
             .times(Matrix.eye(m_states).minus(m_K.times(C)).transpose())
-            .plus(m_K.times(m_discR).times(m_K.transpose()));
+            .plus(m_K.times(discR).times(m_K.transpose()));
   }
 }
