@@ -14,8 +14,8 @@ class MathUtilTest {
     assertEquals(5, MathUtil.clamp(10, 1, 5)); // test int
     assertEquals(5.5, MathUtil.clamp(10.5, 1.5, 5.5)); // test double
 
-    assertEquals(-5, MathUtil.clamp(-10, -1, -5)); // test negative int
-    assertEquals(-5.5, MathUtil.clamp(-10.5, -1.5, -5.5)); // test negative double
+    assertEquals(-5, MathUtil.clamp(-10, -5, -1)); // test negative int
+    assertEquals(-5.5, MathUtil.clamp(-10.5, -5.5, -1.5)); // test negative double
   }
 
   @Test
