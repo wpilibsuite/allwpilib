@@ -95,6 +95,4 @@ TEST(MathUtilTest, AddScalar) {
 
   EXPECT_DOUBLE_EQ(frc::AddScalar(0.5, -0.25), 0.75);
   EXPECT_DOUBLE_EQ(frc::AddScalar(-0.5, -0.25), -0.75);
-
-  EXPECT_DOUBLE_EQ(frc::AddScalar(-0, 4), -4);
 }
