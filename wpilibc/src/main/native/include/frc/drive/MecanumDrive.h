@@ -57,15 +57,8 @@ class SpeedController;
  * so that the full range is still used. This deadband value can be changed
  * with SetDeadband().
  *
- * RobotDrive porting guide:
- * <br>DriveCartesian(double, double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Cartesian(double, double, double, double)
- * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted
- * compared to RobotDrive (eg DriveCartesian(xSpeed, -ySpeed, zRotation,
- * -gyroAngle).
- * <br>DrivePolar(double, double, double) is equivalent to
- * RobotDrive's MecanumDrive_Polar(double, double, double) if a
- * deadband of 0 is used.
+ * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
+ * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class MecanumDrive : public RobotDriveBase,
                      public wpi::Sendable,

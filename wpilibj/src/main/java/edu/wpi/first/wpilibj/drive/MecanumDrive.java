@@ -47,13 +47,8 @@ import edu.wpi.first.wpilibj.SpeedController;
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
  *
- * <p>RobotDrive porting guide: <br>
- * {@link #driveCartesian(double, double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Cartesian(double, double, double, double) if a deadband of 0 is used, and the ySpeed
- * and gyroAngle values are inverted compared to RobotDrive (eg driveCartesian(xSpeed, -ySpeed,
- * zRotation, -gyroAngle). <br>
- * {@link #drivePolar(double, double, double)} is equivalent to RobotDrive's
- * mecanumDrive_Polar(double, double, double)} if a deadband of 0 is used.
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The driveCartesian or
+ * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
 @SuppressWarnings("removal")
 public class MecanumDrive extends RobotDriveBase implements Sendable, AutoCloseable {
