@@ -7,7 +7,6 @@ package edu.wpi.first.math.controller;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.Discretization;
 import edu.wpi.first.math.system.LinearSystem;
 import org.ejml.simple.SimpleMatrix;
 
@@ -40,13 +39,10 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
    *
    * @param plant The plant being controlled.
    * @param plantRef The plant whose dynamics should be followed.
-   * @param dtSeconds Discretization timestep.
    */
   public ImplicitModelFollower(
-      LinearSystem<States, Inputs, Outputs> plant,
-      LinearSystem<States, Inputs, Outputs> plantRef,
-      double dtSeconds) {
-    this(plant.getA(), plant.getB(), plantRef.getA(), plantRef.getB(), dtSeconds);
+      LinearSystem<States, Inputs, Outputs> plant, LinearSystem<States, Inputs, Outputs> plantRef) {
+    this(plant.getA(), plant.getB(), plantRef.getA(), plantRef.getB());
   }
 
   /**
@@ -56,46 +52,34 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
    * @param B Continuous input matrix of the plant being controlled.
    * @param Aref Continuous system matrix whose dynamics should be followed.
    * @param Bref Continuous input matrix whose dynamics should be followed.
-   * @param dtSeconds Discretization timestep.
    */
   @SuppressWarnings("ParameterName")
   public ImplicitModelFollower(
       Matrix<States, States> A,
       Matrix<States, Inputs> B,
       Matrix<States, States> Aref,
-      Matrix<States, Inputs> Bref,
-      double dtSeconds) {
+      Matrix<States, Inputs> Bref) {
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
-
-    // Discretize real dynamics
-    var discABPair = Discretization.discretizeAB(A, B, dtSeconds);
-    var discA = discABPair.getFirst();
-    var discB = discABPair.getSecond();
-
-    // Discretize desired dynamics
-    var discABrefPair = Discretization.discretizeAB(Aref, Bref, dtSeconds);
-    var discAref = discABrefPair.getFirst();
-    var discBref = discABrefPair.getSecond();
 
     // Find u_imf that makes real model match reference model.
     //
-    // x_k+1 = Ax_k + Bu_imf
-    // z_k+1 = Aref z_k + Bref u_k
+    // dx/dt = Ax + Bu_imf
+    // dz/dt = A_ref z + B_ref u
     //
-    // Let x_k = z_k.
+    // Let x = z.
     //
-    // x_k+1 = z_k+1
-    // Ax_k + Bu_imf = Aref x_k + Bref u_k
-    // Bu_imf = Aref x_k - Ax_k + Bref u_k
-    // Bu_imf = (Aref - A)x_k + Bref u_k
-    // u_imf = B^+ ((Aref - A)x_k + Bref u_k)
-    // u_imf = -B^+ (A - Aref)x_k + B^+ Bref u_k
+    // dx/dt = dz/dt
+    // Ax + Bu_imf = Aref x + B_ref u
+    // Bu_imf = A_ref x - Ax + B_ref u
+    // Bu_imf = (A_ref - A)x + B_ref u
+    // u_imf = B⁻¹((A_ref - A)x + Bref u)
+    // u_imf = -B⁻¹(A - A_ref)x + B⁻¹B_ref u
 
     // The first term makes the open-loop poles that of the reference
     // system, and the second term makes the input behave like that of the
     // reference system.
-    m_A = discB.solve(discA.minus(discAref)).times(-1.0);
-    m_B = discB.solve(discBref);
+    m_A = B.solve(A.minus(Aref)).times(-1.0);
+    m_B = B.solve(Bref);
 
     reset();
   }
