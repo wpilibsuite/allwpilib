@@ -83,6 +83,9 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
  * be set to 0, and larger values will be scaled so that the full range is still used. This deadband
  * value can be changed with {@link #setDeadband}.
+ *
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default. The tankDrive, arcadeDrive,
+ * or curvatureDrive methods should be called periodically to avoid Motor Safety timeouts.
  */
 @SuppressWarnings("removal")
 public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {

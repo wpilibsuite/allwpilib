@@ -53,6 +53,9 @@ class SpeedController;
  * The positive X axis points ahead, the positive Y axis points right, and the
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
+ * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class KilloughDrive : public RobotDriveBase,
                       public wpi::Sendable,
