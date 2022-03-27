@@ -69,7 +69,7 @@ public class Trigger implements BooleanSupplier {
    * @return whether or not the trigger condition is active.
    */
   @Override
-  public boolean getAsBoolean() {
+  public final boolean getAsBoolean() {
     return this.get();
   }
 

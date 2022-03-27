@@ -196,7 +196,6 @@ class ButtonTest extends CommandTestBase {
     verify(command).schedule(true);
   }
 
-
   @Test
   void booleanSupplierTest() {
     InternalButton button = new InternalButton();
