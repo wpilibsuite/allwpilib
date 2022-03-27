@@ -195,4 +195,14 @@ class ButtonTest extends CommandTestBase {
     scheduler.run();
     verify(command).schedule(true);
   }
+
+
+  @Test
+  void booleanSupplierTest() {
+    InternalButton button = new InternalButton();
+
+    assertFalse(button.getAsBoolean());
+    button.setPressed(true);
+    assertTrue(button.getAsBoolean());
+  }
 }
