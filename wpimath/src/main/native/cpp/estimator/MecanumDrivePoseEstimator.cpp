@@ -75,9 +75,11 @@ Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
-                  PoseTo3dVector(GetEstimatedPosition().TransformBy(
-                      visionRobotPose - m_poseBuffer.Sample(timestamp))));
+  if (auto sample = m_poseBuffer.Sample(timestamp)) {
+    m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                        visionRobotPose - sample.value())));
+  }
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::Update(

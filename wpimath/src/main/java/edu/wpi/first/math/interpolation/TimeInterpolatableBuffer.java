@@ -6,6 +6,7 @@ package edu.wpi.first.math.interpolation;
 
 import edu.wpi.first.math.MathUtil;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -19,7 +20,7 @@ import java.util.TreeMap;
 public class TimeInterpolatableBuffer<T> {
   private final double m_historySize;
   private final InterpolateFunction<T> m_interpolatingFunc;
-  private final NavigableMap<Double, T> m_buffer = new TreeMap<>();
+  private final NavigableMap<Double, T> m_pastSnapshots = new TreeMap<>();
 
   private TimeInterpolatableBuffer(
       InterpolateFunction<T> interpolateFunction, double historySizeSeconds) {
@@ -70,7 +71,7 @@ public class TimeInterpolatableBuffer<T> {
    */
   public void addSample(double timeSeconds, T sample) {
     cleanUp(timeSeconds);
-    m_buffer.put(timeSeconds, sample);
+    m_pastSnapshots.put(timeSeconds, sample);
   }
 
   /**
@@ -79,10 +80,10 @@ public class TimeInterpolatableBuffer<T> {
    * @param time The current timestamp.
    */
   private void cleanUp(double time) {
-    while (!m_buffer.isEmpty()) {
-      var entry = m_buffer.firstEntry();
+    while (!m_pastSnapshots.isEmpty()) {
+      var entry = m_pastSnapshots.firstEntry();
       if (time - entry.getKey() >= m_historySize) {
-        m_buffer.remove(entry.getKey());
+        m_pastSnapshots.remove(entry.getKey());
       } else {
         return;
       }
@@ -91,45 +92,46 @@ public class TimeInterpolatableBuffer<T> {
 
   /** Clear all old samples. */
   public void clear() {
-    m_buffer.clear();
+    m_pastSnapshots.clear();
   }
 
   /**
-   * Sample the buffer at the given time. If the buffer is empty, this will return null.
+   * Sample the buffer at the given time. If the buffer is empty, an empty Optional is returned.
    *
    * @param timeSeconds The time at which to sample.
-   * @return The interpolated value at that timestamp. Might be null.
+   * @return The interpolated value at that timestamp or an empty Optional.
    */
   @SuppressWarnings("UnnecessaryParentheses")
-  public T getSample(double timeSeconds) {
-    if (m_buffer.isEmpty()) {
-      return null;
+  public Optional<T> getSample(double timeSeconds) {
+    if (m_pastSnapshots.isEmpty()) {
+      return Optional.empty();
     }
 
     // Special case for when the requested time is the same as a sample
-    var nowEntry = m_buffer.get(timeSeconds);
+    var nowEntry = m_pastSnapshots.get(timeSeconds);
     if (nowEntry != null) {
-      return nowEntry;
+      return Optional.of(nowEntry);
     }
 
-    var topBound = m_buffer.ceilingEntry(timeSeconds);
-    var bottomBound = m_buffer.floorEntry(timeSeconds);
+    var topBound = m_pastSnapshots.ceilingEntry(timeSeconds);
+    var bottomBound = m_pastSnapshots.floorEntry(timeSeconds);
 
     // Return null if neither sample exists, and the opposite bound if the other is null
     if (topBound == null && bottomBound == null) {
-      return null;
+      return Optional.empty();
     } else if (topBound == null) {
-      return bottomBound.getValue();
+      return Optional.of(bottomBound.getValue());
     } else if (bottomBound == null) {
-      return topBound.getValue();
+      return Optional.of(topBound.getValue());
     } else {
       // Otherwise, interpolate. Because T is between [0, 1], we want the ratio of (the difference
       // between the current time and bottom bound) and (the difference between top and bottom
       // bounds).
-      return m_interpolatingFunc.interpolate(
-          bottomBound.getValue(),
-          topBound.getValue(),
-          ((timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey())));
+      return Optional.of(
+          m_interpolatingFunc.interpolate(
+              bottomBound.getValue(),
+              topBound.getValue(),
+              ((timeSeconds - bottomBound.getKey()) / (topBound.getKey() - bottomBound.getKey()))));
     }
   }
 

@@ -219,12 +219,13 @@ public class MecanumDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    m_visionCorrect.accept(
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
-        StateSpaceUtil.poseTo3dVector(
-            getEstimatedPosition()
-                .transformBy(
-                    visionRobotPoseMeters.minus(m_poseBuffer.getSample(timestampSeconds)))));
+    var sample = m_poseBuffer.getSample(timestampSeconds);
+    if (sample.isPresent()) {
+      m_visionCorrect.accept(
+          new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+          StateSpaceUtil.poseTo3dVector(
+              getEstimatedPosition().transformBy(visionRobotPoseMeters.minus(sample.get()))));
+    }
   }
 
   /**
