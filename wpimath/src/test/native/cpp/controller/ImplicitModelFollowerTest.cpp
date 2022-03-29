@@ -17,7 +17,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
   auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
                                                         Kv_t{1.0}, Ka_t{1.0});
 
-  ImplicitModelFollower<2, 2> imf{plant, plant, dt};
+  ImplicitModelFollower<2, 2> imf{plant, plant};
 
   Eigen::Vector<double, 2> x{0.0, 0.0};
   Eigen::Vector<double, 2> xImf{0.0, 0.0};
@@ -66,7 +66,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   auto plantRef = LinearSystemId::IdentifyDrivetrainSystem(
       Kv_t{1.0}, Ka_t{2.0}, Kv_t{1.0}, Ka_t{1.0});
 
-  ImplicitModelFollower<2, 2> imf{plant, plantRef, dt};
+  ImplicitModelFollower<2, 2> imf{plant, plantRef};
 
   Eigen::Vector<double, 2> x{0.0, 0.0};
   Eigen::Vector<double, 2> xImf{0.0, 0.0};
