@@ -115,11 +115,9 @@ public final class ComputerVisionUtil {
    */
   public static Transform2d estimateCameraToTarget(
       Translation2d cameraToTargetTranslation, Pose2d fieldToTarget, Rotation2d gyroAngle) {
-    // This pose maps our camera at the origin out to our target, in the robot
-    // reference frame
-    // The translation part of this Transform2d is from the above step, and the
-    // rotation uses our robot's
-    // gyro.
+    // Map our camera at the origin out to our target, in the robot reference
+    // frame. Gyro angle is needed because there's a circle of possible camera
+    // poses for which the camera has the same yaw from camera to target.
     return new Transform2d(
         cameraToTargetTranslation, gyroAngle.unaryMinus().minus(fieldToTarget.getRotation()));
   }

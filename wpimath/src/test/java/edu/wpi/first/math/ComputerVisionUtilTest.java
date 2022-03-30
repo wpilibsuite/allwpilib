@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class ComputerVisionUtilTest {
   @Test
-  void testDistance() {
+  void testCalculateDistanceToTarget() {
     var camHeight = 1;
     var targetHeight = 3;
     var camPitch = Units.degreesToRadians(0);
@@ -49,7 +49,7 @@ class ComputerVisionUtilTest {
   }
 
   @Test
-  void testTransform() {
+  void testEstimateFieldToRobot() {
     var camHeight = 1;
     var targetHeight = 3;
     var camPitch = 0;
@@ -74,5 +74,23 @@ class ComputerVisionUtilTest {
     Assertions.assertEquals(-3.464, fieldToRobot.getX(), 0.1);
     Assertions.assertEquals(0, fieldToRobot.getY(), 0.1);
     Assertions.assertEquals(0, fieldToRobot.getRotation().getDegrees(), 0.1);
+
+    gyroAngle = Rotation2d.fromDegrees(-30);
+
+    fieldToRobot =
+        ComputerVisionUtil.estimateFieldToRobot(
+            ComputerVisionUtil.estimateCameraToTarget(
+                new Translation2d(
+                    ComputerVisionUtil.calculateDistanceToTarget(
+                        camHeight, targetHeight, camPitch, targetPitch),
+                    targetYaw),
+                fieldToTarget,
+                gyroAngle),
+            fieldToTarget,
+            cameraToRobot);
+
+    Assertions.assertEquals(-3.0, fieldToRobot.getX(), 0.1);
+    Assertions.assertEquals(1.732, fieldToRobot.getY(), 0.1);
+    Assertions.assertEquals(-30.0, fieldToRobot.getRotation().getDegrees(), 0.1);
   }
 }

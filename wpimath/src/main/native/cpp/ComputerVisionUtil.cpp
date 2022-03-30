@@ -40,10 +40,9 @@ frc::Pose2d EstimateFieldToRobot(const frc::Transform2d& cameraToTarget,
 frc::Transform2d EstimateCameraToTarget(
     const frc::Translation2d& cameraToTargetTranslation,
     const frc::Pose2d& fieldToTarget, const frc::Rotation2d& gyroAngle) {
-  // This pose maps our camera at the origin out to our target, in the robot
-  // reference frame
-  // The translation part of this frc::Transform2d is from the above step, and
-  // the rotation uses our robot's gyro.
+  // Map our camera at the origin out to our target, in the robot reference
+  // frame. Gyro angle is needed because there's a circle of possible camera
+  // poses for which the camera has the same yaw from camera to target.
   return frc::Transform2d{cameraToTargetTranslation,
                           -gyroAngle - fieldToTarget.Rotation()};
 }

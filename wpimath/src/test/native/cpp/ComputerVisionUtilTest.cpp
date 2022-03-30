@@ -10,7 +10,7 @@
 #include "units/angle.h"
 #include "units/length.h"
 
-TEST(ComputerVisionUtilTest, Distance) {
+TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   auto camHeight = 1_m;
   auto targetHeight = 3_m;
   auto camPitch = 0_deg;
@@ -41,7 +41,7 @@ TEST(ComputerVisionUtilTest, Distance) {
   EXPECT_NEAR(3.464, dist.value(), 0.01);
 }
 
-TEST(ComputerVisionUtilTest, Transform) {
+TEST(ComputerVisionUtilTest, EstimateFieldToRobot) {
   auto camHeight = 1_m;
   auto targetHeight = 3_m;
   auto camPitch = 0_deg;
@@ -63,4 +63,19 @@ TEST(ComputerVisionUtilTest, Transform) {
   EXPECT_NEAR(-3.464, fieldToRobot.X().value(), 0.1);
   EXPECT_NEAR(0, fieldToRobot.Y().value(), 0.1);
   EXPECT_NEAR(0, fieldToRobot.Rotation().Degrees().value(), 0.1);
+
+  gyroAngle = -30_deg;
+
+  fieldToRobot = frc::EstimateFieldToRobot(
+      frc::EstimateCameraToTarget(
+          frc::Translation2d{
+              frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
+                                             targetPitch),
+              targetYaw},
+          fieldToTarget, gyroAngle),
+      fieldToTarget, cameraToRobot);
+
+  EXPECT_NEAR(-3.0, fieldToRobot.X().value(), 0.1);
+  EXPECT_NEAR(1.732, fieldToRobot.Y().value(), 0.1);
+  EXPECT_NEAR(-30.0, fieldToRobot.Rotation().Degrees().value(), 0.1);
 }
