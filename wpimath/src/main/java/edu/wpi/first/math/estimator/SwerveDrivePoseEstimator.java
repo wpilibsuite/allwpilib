@@ -209,6 +209,10 @@ public class SwerveDrivePoseEstimator {
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
    *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link SwerveDrivePoseEstimator#updateWithTime}
@@ -232,6 +236,10 @@ public class SwerveDrivePoseEstimator {
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link

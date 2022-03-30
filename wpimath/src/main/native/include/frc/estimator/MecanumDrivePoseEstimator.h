@@ -123,6 +123,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -143,6 +147,10 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
