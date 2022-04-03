@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <units/math.h>
 #include <units/time.h>
 
 #include "frc/Encoder.h"
@@ -15,10 +16,13 @@
 #include "frc/system/plant/LinearSystemId.h"
 #include "gtest/gtest.h"
 
+#define EXPECT_NEAR_UNITS(val1, val2, eps) \
+  EXPECT_LE(units::math::abs(val1 - val2), eps)
+
 TEST(ElevatorSimTest, StateSpaceSim) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 3_m,
-                            {0.01});
+                            true, {0.01});
   frc2::PIDController controller(10, 0.0, 0.0);
 
   frc::PWMVictorSPX motor(0);
@@ -45,7 +49,7 @@ TEST(ElevatorSimTest, StateSpaceSim) {
 TEST(ElevatorSimTest, MinMax) {
   frc::sim::ElevatorSim sim(frc::DCMotor::Vex775Pro(4), 14.67, 8_kg,
                             units::meter_t(0.75 * 25.4 / 1000.0), 0_m, 1_m,
-                            {0.01});
+                            true, {0.01});
   for (size_t i = 0; i < 100; ++i) {
     sim.SetInput(Eigen::Vector<double, 1>{0.0});
     sim.Update(20_ms);
@@ -64,26 +68,19 @@ TEST(ElevatorSimTest, MinMax) {
 }
 
 TEST(ElevatorSimTest, Stability) {
-  static constexpr double kElevatorGearing = 100.0;
-  static constexpr units::meter_t kElevatorDrumRadius = 0.5_in;
-  static constexpr units::kilogram_t kCarriageMass = 4.0_kg;
-  frc::DCMotor m_elevatorGearbox = frc::DCMotor::Vex775Pro(4);
+  frc::sim::ElevatorSim sim{
+      frc::DCMotor::Vex775Pro(4), 100, 4_kg, 0.5_in, 0_m, 10_m, true};
 
-  frc::LinearSystem<2, 1, 1> system = frc::LinearSystemId::ElevatorSystem(
-      m_elevatorGearbox, kCarriageMass, kElevatorDrumRadius, kElevatorGearing);
-
-  Eigen::Vector<double, 2> x0{0.0, 0.0};
-  Eigen::Vector<double, 1> u0{12.0};
-
-  Eigen::Vector<double, 2> x1{0.0, 0.0};
-  for (size_t i = 0; i < 50; i++) {
-    x1 = frc::RKDP(
-        [&](const Eigen::Vector<double, 2>& x,
-            const Eigen::Vector<double, 1>& u) -> Eigen::Vector<double, 2> {
-          return system.A() * x + system.B() * u;
-        },
-        x1, u0, 0.020_s);
+  sim.SetState(Eigen::Vector<double, 2>{0.0, 0.0});
+  sim.SetInput(Eigen::Vector<double, 1>{12.0});
+  for (int i = 0; i < 50; ++i) {
+    sim.Update(20_ms);
   }
 
-  EXPECT_NEAR(x1(0), system.CalculateX(x0, u0, 1_s)(0), 0.1);
+  frc::LinearSystem<2, 1, 1> system = frc::LinearSystemId::ElevatorSystem(
+      frc::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100);
+  EXPECT_NEAR_UNITS(units::meter_t{system.CalculateX(
+                        Eigen::Vector<double, 2>{0.0, 0.0},
+                        Eigen::Vector<double, 1>{12.0}, 20_ms * 50)(0)},
+                    sim.GetPosition(), 1_cm);
 }
