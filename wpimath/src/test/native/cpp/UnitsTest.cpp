@@ -3063,14 +3063,17 @@ TEST_F(Constexpr, construction) {
   constexpr meter_t result0(0);
   constexpr auto result1 = make_unit<meter_t>(1);
   constexpr auto result2 = meter_t(2);
+  constexpr auto result3 = -3_m;
 
   EXPECT_EQ(meter_t(0), result0);
   EXPECT_EQ(meter_t(1), result1);
   EXPECT_EQ(meter_t(2), result2);
+  EXPECT_EQ(meter_t(-3), result3);
 
   EXPECT_TRUE(noexcept(result0));
   EXPECT_TRUE(noexcept(result1));
   EXPECT_TRUE(noexcept(result2));
+  EXPECT_TRUE(noexcept(result3));
 }
 
 TEST_F(Constexpr, constants) {

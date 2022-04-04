@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <frc/system/Discretization.h>
 #include <frc/system/LinearSystem.h>
 
 #include "Eigen/Core"
@@ -33,58 +32,44 @@ class ImplicitModelFollower {
    *
    * @param plant    The plant being controlled.
    * @param plantRef The plant whose dynamics should be followed.
-   * @param dt       Discretization timestep.
    */
   template <int Outputs>
   ImplicitModelFollower(const LinearSystem<States, Inputs, Outputs>& plant,
-                        const LinearSystem<States, Inputs, Outputs>& plantRef,
-                        units::second_t dt)
+                        const LinearSystem<States, Inputs, Outputs>& plantRef)
       : ImplicitModelFollower<States, Inputs>(plant.A(), plant.B(),
-                                              plantRef.A(), plantRef.B(), dt) {}
+                                              plantRef.A(), plantRef.B()) {}
 
   /**
    * Constructs a controller with the given coefficients and plant.
    *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Aref   Continuous system matrix whose dynamics should be followed.
-   * @param Bref   Continuous input matrix whose dynamics should be followed.
-   * @param dt     Discretization timestep.
+   * @param A    Continuous system matrix of the plant being controlled.
+   * @param B    Continuous input matrix of the plant being controlled.
+   * @param Aref Continuous system matrix whose dynamics should be followed.
+   * @param Bref Continuous input matrix whose dynamics should be followed.
    */
   ImplicitModelFollower(const Eigen::Matrix<double, States, States>& A,
                         const Eigen::Matrix<double, States, Inputs>& B,
                         const Eigen::Matrix<double, States, States>& Aref,
-                        const Eigen::Matrix<double, States, Inputs>& Bref,
-                        units::second_t dt) {
-    // Discretize real dynamics
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    frc::DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
-
-    // Discretize desired dynamics
-    Eigen::Matrix<double, States, States> discAref;
-    Eigen::Matrix<double, States, Inputs> discBref;
-    frc::DiscretizeAB<States, Inputs>(Aref, Bref, dt, &discAref, &discBref);
-
+                        const Eigen::Matrix<double, States, Inputs>& Bref) {
     // Find u_imf that makes real model match reference model.
     //
-    // x_k+1 = Ax_k + Bu_imf
-    // z_k+1 = Aref z_k + Bref u_k
+    // dx/dt = Ax + Bu_imf
+    // dz/dt = A_ref z + B_ref u
     //
-    // Let x_k = z_k.
+    // Let x = z.
     //
-    // x_k+1 = z_k+1
-    // Ax_k + Bu_imf = Aref x_k + Bref u_k
-    // Bu_imf = Aref x_k - Ax_k + Bref u_k
-    // Bu_imf = (Aref - A)x_k + Bref u_k
-    // u_imf = B^+ ((Aref - A)x_k + Bref u_k)
-    // u_imf = -B^+ (A - Aref)x_k + B^+ Bref u_k
+    // dx/dt = dz/dt
+    // Ax + Bu_imf = Aref x + B_ref u
+    // Bu_imf = A_ref x - Ax + B_ref u
+    // Bu_imf = (A_ref - A)x + B_ref u
+    // u_imf = B⁻¹((A_ref - A)x + Bref u)
+    // u_imf = -B⁻¹(A - A_ref)x + B⁻¹B_ref u
 
     // The first term makes the open-loop poles that of the reference
     // system, and the second term makes the input behave like that of the
     // reference system.
-    m_A = -discB.householderQr().solve(discA - discAref);
-    m_B = discB.householderQr().solve(discBref);
+    m_A = -B.householderQr().solve(A - Aref);
+    m_B = B.householderQr().solve(Bref);
 
     Reset();
   }
