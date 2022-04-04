@@ -78,10 +78,20 @@ class Compressor : public wpi::Sendable,
 
   /**
    * Check if compressor output is active.
+   * To (re)enable the compressor use EnableDigital() or EnableAnalog(...).
    *
-   * @return true if the compressor is on
+   * @return true if the compressor is on.
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
    */
+  WPI_DEPRECATED("To avoid confusion in thinking this (re)enables the compressor use IsEnabled()")
   bool Enabled() const;
+
+  /**
+   * Returns whether the compressor is active or not.
+   *
+   * @return ture if the compressor is on - otherwise false.
+   */
+  bool IsEnabled() const;
 
   /**
    * Check if the pressure switch is triggered.
