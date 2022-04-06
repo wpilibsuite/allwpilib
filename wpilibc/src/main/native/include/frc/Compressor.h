@@ -81,9 +81,12 @@ class Compressor : public wpi::Sendable,
    * To (re)enable the compressor use EnableDigital() or EnableAnalog(...).
    *
    * @return true if the compressor is on.
-   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor
+   * use IsEnabled().
    */
-  WPI_DEPRECATED("To avoid confusion in thinking this (re)enables the compressor use IsEnabled()")
+  WPI_DEPRECATED(
+      "To avoid confusion in thinking this (re)enables the compressor use "
+      "IsEnabled()")
   bool Enabled() const;
 
   /**
