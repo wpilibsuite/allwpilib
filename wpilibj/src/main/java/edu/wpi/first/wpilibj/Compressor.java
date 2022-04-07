@@ -28,7 +28,7 @@ public class Compressor implements Sendable, AutoCloseable {
   /**
    * Constructs a compressor for a specified module and type.
    *
-   * @param module     The module ID to use.
+   * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
   public Compressor(int module, PneumaticsModuleType moduleType) {
@@ -91,8 +91,8 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the status of the compressor.
-   * To (re)enable the compressor use enableDigital() or enableAnalog(...).
+   * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
+   * enableAnalog(...).
    *
    * @return true if the compressor is on
    * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
@@ -148,16 +148,12 @@ public class Compressor implements Sendable, AutoCloseable {
     return m_module.getPressure(0);
   }
 
-  /**
-   * Disable the compressor.
-   */
+  /** Disable the compressor. */
   public void disable() {
     m_module.disableCompressor();
   }
 
-  /**
-   * Enable compressor closed loop control using digital input.
-   */
+  /** Enable compressor closed loop control using digital input. */
   public void enableDigital() {
     m_module.enableCompressorDigital();
   }
