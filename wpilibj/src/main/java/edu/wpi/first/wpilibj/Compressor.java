@@ -105,7 +105,7 @@ public class Compressor implements Sendable, AutoCloseable {
   /**
    * Returns whether the compressor is active or not.
    *
-   * @return ture if the compressor is on - otherwise false.
+   * @return true if the compressor is on - otherwise false.
    */
   public boolean isEnabled() {
     return m_module.getCompressor();

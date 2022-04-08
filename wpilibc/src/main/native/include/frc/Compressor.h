@@ -92,7 +92,7 @@ class Compressor : public wpi::Sendable,
   /**
    * Returns whether the compressor is active or not.
    *
-   * @return ture if the compressor is on - otherwise false.
+   * @return true if the compressor is on - otherwise false.
    */
   bool IsEnabled() const;
 
