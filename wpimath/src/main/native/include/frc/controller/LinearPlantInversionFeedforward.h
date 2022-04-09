@@ -123,7 +123,7 @@ class LinearPlantInversionFeedforward {
    */
   Eigen::Vector<double, Inputs> Calculate(
       const Eigen::Vector<double, States>& nextR) {
-    return Calculate(m_r, nextR);  // NOLINT
+    return Calculate(m_r, nextR);
   }
 
   /**
