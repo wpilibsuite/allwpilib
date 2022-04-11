@@ -91,14 +91,6 @@ public class ResistanceCalculator {
   }
 
   /**
-   * Create a new calculator with the same buffer size and r^2 threshold
-   * @return Another ResistanceCalculator with empty buffers
-   */
-  public ResistanceCalculator copy() {
-    return new ResistanceCalculator(m_bufferSize, m_rSquaredThreshhold);
-  }
-
-  /**
    * Update the buffers with new (totalCurrent, voltage) points, and remove old points if necessary.
    *
    * @param totalCurrent The current total current

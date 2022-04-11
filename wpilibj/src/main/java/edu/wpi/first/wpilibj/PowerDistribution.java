@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
-  private final boolean m_resistanceEnabled;
   private final ResistanceCalculator m_totalResistanceCalculator;
   private final List<ResistanceCalculator> m_channelResistanceCalculators;
   private final AtomicReference<Double> m_totalResistance = new AtomicReference<>(Double.NaN);
@@ -53,37 +52,22 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Constructs a PowerDistribution object. To enable calculating resistance, use
-   * {@link PowerDistribution#PowerDistribution(int, ModuleType, ResistanceCalculator)} instead.
+   * Constructs a PowerDistribution object.
    *
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
   public PowerDistribution(int module, ModuleType moduleType) {
-    this(module, moduleType.value, null);
+    this(module, moduleType.value);
   }
 
   /**
-   * Constructs a PowerDistribution object. To enable calculating resistance, use
-   * {@link PowerDistribution#PowerDistribution(int, ModuleType, ResistanceCalculator)} instead.
+   * Constructs a PowerDistribution object.
    *
    * <p>Detects the connected PDP/PDH using the default CAN ID (0 for CTRE and 1 for REV).
    */
   public PowerDistribution() {
-    this(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE, null);
-  }
-
-  /**
-   * Constructs a PowerDistribution object. To disable calculating resistance, use
-   * {@link PowerDistribution#PowerDistribution(int, ModuleType)} instead.
-   *
-   * @param module The CAN ID of the PDP/PDH.
-   * @param moduleType Module type (CTRE or REV).
-   * @param resistanceCalculator Object to calculate resistance.
-   */
-  public PowerDistribution(
-      int module, ModuleType moduleType, ResistanceCalculator resistanceCalculator) {
-    this(module, moduleType.value, resistanceCalculator);
+    this(kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
   }
 
   /**
@@ -91,27 +75,20 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    *
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type as an integer (CTRE or REV).
-   * @param resistanceCalculator Object to calculate resistance.
    */
-  private PowerDistribution(
-      int module, int moduleType, ResistanceCalculator resistanceCalculator) {
+  private PowerDistribution(int module, int moduleType) {
     m_handle = PowerDistributionJNI.initialize(module, moduleType);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
-    m_totalResistanceCalculator = resistanceCalculator;
 
+    m_totalResistanceCalculator = new ResistanceCalculator();
     m_channelResistances = new AtomicReferenceArray<>(this.getNumChannels());
     m_channelResistanceCalculators = new ArrayList<>();
-    m_resistanceEnabled = m_totalResistanceCalculator != null;
-    if (m_resistanceEnabled) {
-      int numChannels = this.getNumChannels();
-      for (int i = 0; i < numChannels; i ++) {
-        m_channelResistanceCalculators.add(m_totalResistanceCalculator.copy());
-      }
-      m_resistanceLoop = new Notifier(this::updateResistances);
-      m_resistanceLoop.startPeriodic(PowerDistribution.kUpdatePeriod);
-    } else {
-      m_resistanceLoop = null;
+    int numChannels = this.getNumChannels();
+    for (int i = 0; i < numChannels; i ++) {
+      m_channelResistanceCalculators.add(new ResistanceCalculator());
     }
+    m_resistanceLoop = new Notifier(this::updateResistances);
+    m_resistanceLoop.startPeriodic(PowerDistribution.kUpdatePeriod);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
     SendableRegistry.addLW(this, "PowerDistribution", m_module);
@@ -255,11 +232,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The robot resistance if a resistance calculator was given, {@code NaN} otherwise.
    */
   public double getTotalResistance() {
-    if (m_resistanceEnabled) {
-      return m_totalResistance.get();
-    } else {
-      return Double.NaN;
-    }
+    return m_totalResistance.get();
   }
 
   /**
@@ -269,26 +242,20 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @return The channel's resistance if a resistance calculator was given, {@code NaN} otherwise.
    */
   public double getResistance(int channel) {
-    if (m_resistanceEnabled) {
-      return m_channelResistances.get(channel);
-    } else {
-      return Double.NaN;
-    }
+    return m_channelResistances.get(channel);
   }
 
   /**
    * Update the total resistance and the resistance of each channel.
    */
   private void updateResistances() {
-    if (m_resistanceEnabled) {
-      double voltage = this.getVoltage();
-      m_totalResistance.set(
-          m_totalResistanceCalculator.calculate(this.getTotalCurrent(), voltage));
-      for (int channel = 0; channel < m_channelResistances.length(); channel ++) {
-        ResistanceCalculator calculator = m_channelResistanceCalculators.get(channel);
-        double resistance = calculator.calculate(this.getCurrent(channel), voltage);
-        m_channelResistances.set(channel, resistance);
-      }
+    double voltage = this.getVoltage();
+    m_totalResistance.set(
+        m_totalResistanceCalculator.calculate(this.getTotalCurrent(), voltage));
+    for (int channel = 0; channel < m_channelResistances.length(); channel ++) {
+      ResistanceCalculator calculator = m_channelResistanceCalculators.get(channel);
+      double resistance = calculator.calculate(this.getCurrent(channel), voltage);
+      m_channelResistances.set(channel, resistance);
     }
   }
 
@@ -300,11 +267,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
       final int chan = i;
       builder.addDoubleProperty(
           "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
-      if (m_resistanceEnabled) {
-        builder.addDoubleProperty(
-            "ChanResistance" + i,
-            () -> this.getResistance(chan), null);
-      }
+      builder.addDoubleProperty(
+          "ChanResistance" + i,
+          () -> this.getResistance(chan), null);
     }
     builder.addDoubleProperty(
         "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);
@@ -314,10 +279,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "SwitchableChannel",
         () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
         value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
-    if (m_resistanceEnabled) {
-      builder.addDoubleProperty(
-          "TotalResistance",
-          this::getTotalResistance, null);
-    }
+    builder.addDoubleProperty(
+        "TotalResistance",
+        this::getTotalResistance, null);
   }
 }
