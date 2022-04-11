@@ -14,80 +14,83 @@ import edu.wpi.first.util.CircularBuffer;
  */
 public class ResistanceCalculator {
   /**
-   * Buffers holding the total current values that will eventually need to be subtracted from the sum when
-   * they leave the window.
+   * Buffers holding the total current values that will eventually need to be
+   * subtracted from the sum when they leave the window.
    */
-  private final CircularBuffer currentBuffer;
+  private final CircularBuffer m_currentBuffer;
   /**
    * Buffer holding the voltage values that will eventually need to be subtracted from the sum when
    * they leave the window.
    */
-  private final CircularBuffer voltageBuffer;
+  private final CircularBuffer m_voltageBuffer;
   /**
    * The maximum number of points to take the linear regression over.
    */
-  private final int bufferSize;
+  private final int m_bufferSize;
   /**
    * The minimum R^2 value considered significant enough to return the regression slope instead of
    * NaN.
    */
-  private final double rSquaredThreshhold;
+  private final double m_rSquaredThreshhold;
   /**
-   * Running sum of the past total currents
+   * Running sum of the past total currents.
    */
-  private double currentSum;
+  private double m_currentSum = 0;
   /**
-   * Running sum of the past voltages
+   * Running sum of the past voltages.
    */
-  private double voltageSum;
+  private double m_voltageSum = 0;
   /**
-   * Running sum of the squares of the past total currents
+   * Running sum of the squares of the past total currents.
    */
-  private double currentSquaredSum;
+  private double m_currentSquaredSum = 0;
   /**
-   * Running sum of the squares of the past voltages
+   * Running sum of the squares of the past voltages.
    */
-  private double voltageSquaredSum;
+  private double m_voltageSquaredSum = 0;
   /**
-   * Running sum of the past current*voltage's
+   * Running sum of the past current*voltage's.
    */
-  private double prodSum;
+  private double m_prodSum = 0;
   /**
-   * The number of points currently in the buffer
+   * The number of points currently in the buffer.
    */
-  private int numPoints;
+  private int m_numPoints = 0;
 
   /**
    * Default constructor.
    *
-   * @param bufferSize         The maximum number of points to take the linear regression over.
-   * @param rSquaredThreshhold The minimum R^2 value considered significant enough to return the
+   * @param bufferSize          The maximum number of points to take the linear regression over.
+   * @param krSquaredThreshhold The minimum R^2 value considered significant enough to return the
    *                           regression slope instead of NaN. Defaults to 0.
    */
-  public ResistanceCalculator(int bufferSize, double rSquaredThreshhold) {
-    currentBuffer = new CircularBuffer(bufferSize);
-    voltageBuffer = new CircularBuffer(bufferSize);
-    this.rSquaredThreshhold = rSquaredThreshhold;
-    numPoints = 0;
-    currentSum = 0;
-    voltageSum = 0;
-    this.bufferSize = bufferSize;
+  public ResistanceCalculator(int bufferSize, double krSquaredThreshhold) {
+    m_currentBuffer = new CircularBuffer(bufferSize);
+    m_voltageBuffer = new CircularBuffer(bufferSize);
+    this.m_rSquaredThreshhold = krSquaredThreshhold;
+    m_numPoints = 0;
+    m_currentSum = 0;
+    m_voltageSum = 0;
+    this.m_bufferSize = bufferSize;
   }
 
   /**
-   * The current resistance, equal to the slope (negated) of the linear regression line.
+   * @return The current resistance, equal to the slope (negated) of the linear regression line.
    */
   public Double getResistance() {
-    if (numPoints < 2) {
+    if (m_numPoints < 2) {
       return Double.NaN;
     }
 
-    double currentVariance = (currentSquaredSum / numPoints) - Math.pow(currentSum / numPoints, 2);
-    double voltageVariance = (voltageSquaredSum / numPoints) - Math.pow(voltageSum / numPoints, 2);
-    double covariance = (prodSum - currentSum * voltageSum / numPoints) / (numPoints - 1);
-    double rSquared = covariance * covariance / (currentVariance * voltageVariance);
+    double currentVariance =
+        (m_currentSquaredSum / m_numPoints) - Math.pow(m_currentSum / m_numPoints, 2);
+    double voltageVariance =
+        (m_voltageSquaredSum / m_numPoints) - Math.pow(m_voltageSum / m_numPoints, 2);
+    double covariance =
+        (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
+    double krSquared = covariance * covariance / (currentVariance * voltageVariance);
 
-    if (rSquared > rSquaredThreshhold) {
+    if (krSquared > m_rSquaredThreshhold) {
       // Slope of total current vs voltage
       double slope = covariance / currentVariance;
       return -slope;
@@ -97,30 +100,30 @@ public class ResistanceCalculator {
   }
 
   /**
-   * Update the buffers with new (totalCurrent, voltage) points, and remove old points if necessary
+   * Update the buffers with new (totalCurrent, voltage) points, and remove old points if necessary.
    *
    * @param totalCurrent The current total current
    * @param voltage      The current voltage
    */
   public void update(double totalCurrent, double voltage) {
-    if (numPoints >= bufferSize) {
+    if (m_numPoints >= m_bufferSize) {
       // Pop the last point and remove it from the sums
-      double backCurrent = currentBuffer.removeLast();
-      double backVoltage = voltageBuffer.removeLast();
-      currentSum -= backCurrent;
-      voltageSum -= backVoltage;
-      currentSquaredSum -= backCurrent * backCurrent;
-      voltageSquaredSum -= backVoltage * backVoltage;
-      prodSum -= backCurrent * backVoltage;
+      double backCurrent = m_currentBuffer.removeLast();
+      double backVoltage = m_voltageBuffer.removeLast();
+      m_currentSum -= backCurrent;
+      m_voltageSum -= backVoltage;
+      m_currentSquaredSum -= backCurrent * backCurrent;
+      m_voltageSquaredSum -= backVoltage * backVoltage;
+      m_prodSum -= backCurrent * backVoltage;
     } else {
-      numPoints++;
+      m_numPoints++;
     }
-    currentBuffer.addFirst(totalCurrent);
-    voltageBuffer.addFirst(voltage);
-    currentSum += totalCurrent;
-    voltageSum += voltage;
-    currentSquaredSum += totalCurrent * totalCurrent;
-    voltageSquaredSum += voltage * voltage;
-    prodSum += totalCurrent * voltage;
+    m_currentBuffer.addFirst(totalCurrent);
+    m_voltageBuffer.addFirst(voltage);
+    m_currentSum += totalCurrent;
+    m_voltageSum += voltage;
+    m_currentSquaredSum += totalCurrent * totalCurrent;
+    m_voltageSquaredSum += voltage * voltage;
+    m_prodSum += totalCurrent * voltage;
   }
 }
