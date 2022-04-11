@@ -18,7 +18,7 @@ namespace frc {
  * The LiveWindow class is the public interface for putting sensors and
  * actuators on the LiveWindow.
  */
-class LiveWindow {
+class LiveWindow final {
  public:
   /**
    * Get an instance of the LiveWindow main class.
