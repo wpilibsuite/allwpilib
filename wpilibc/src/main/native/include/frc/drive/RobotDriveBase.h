@@ -16,6 +16,8 @@ namespace frc {
 
 /**
  * Common base class for drive platforms.
+ *
+ * MotorSafety is enabled by default.
  */
 class RobotDriveBase : public MotorSafety {
  public:

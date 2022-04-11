@@ -10,6 +10,17 @@ package edu.wpi.first.util.datalog;
  *
  * <p>The data log is periodically flushed to disk. It can also be explicitly flushed to disk by
  * using the flush() function.
+ *
+ * <p>The finish() function is needed only to indicate in the log that a particular entry is no
+ * longer being used (it releases the name to ID mapping). The finish() function is not required to
+ * be called for data to be flushed to disk; entries in the log are written as append() calls are
+ * being made. In fact, finish() does not need to be called at all.
+ *
+ * <p>DataLog calls are thread safe. DataLog uses a typical multiple-supplier, single-consumer
+ * setup. Writes to the log are atomic, but there is no guaranteed order in the log when multiple
+ * threads are writing to it; whichever thread grabs the write mutex first will get written first.
+ * For this reason (as well as the fact that timestamps can be set to arbitrary values), records in
+ * the log are not guaranteed to be sorted by timestamp.
  */
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
 public final class DataLog implements AutoCloseable {

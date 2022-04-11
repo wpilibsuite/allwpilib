@@ -29,6 +29,7 @@ class ParallelDeadlineGroup;
 class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
+class RepeatCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -184,6 +185,14 @@ class Command {
    * @return the decorated command
    */
   virtual PerpetualCommand Perpetually() &&;
+
+  /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until
+   * this command is interrupted. The decorated command can still be canceled.
+   *
+   * @return the decorated command
+   */
+  virtual RepeatCommand Repeat() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a

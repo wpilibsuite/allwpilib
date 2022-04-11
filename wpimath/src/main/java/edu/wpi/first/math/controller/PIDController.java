@@ -181,6 +181,15 @@ public class PIDController implements Sendable, AutoCloseable {
    */
   public void setSetpoint(double setpoint) {
     m_setpoint = setpoint;
+
+    if (m_continuous) {
+      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+      m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+    } else {
+      m_positionError = m_setpoint - m_measurement;
+    }
+
+    m_velocityError = (m_positionError - m_prevError) / m_period;
   }
 
   /**
@@ -200,18 +209,8 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return Whether the error is within the acceptable bounds.
    */
   public boolean atSetpoint() {
-    double positionError;
-    if (m_continuous) {
-      double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-      positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-    } else {
-      positionError = m_setpoint - m_measurement;
-    }
-
-    double velocityError = (positionError - m_prevError) / m_period;
-
-    return Math.abs(positionError) < m_positionTolerance
-        && Math.abs(velocityError) < m_velocityTolerance;
+    return Math.abs(m_positionError) < m_positionTolerance
+        && Math.abs(m_velocityError) < m_velocityTolerance;
   }
 
   /**
@@ -303,8 +302,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return The next controller output.
    */
   public double calculate(double measurement, double setpoint) {
-    // Set setpoint to provided value
-    setSetpoint(setpoint);
+    m_setpoint = setpoint;
     return calculate(measurement);
   }
 
@@ -322,7 +320,7 @@ public class PIDController implements Sendable, AutoCloseable {
       double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
       m_positionError = MathUtil.inputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
     } else {
-      m_positionError = m_setpoint - measurement;
+      m_positionError = m_setpoint - m_measurement;
     }
 
     m_velocityError = (m_positionError - m_prevError) / m_period;

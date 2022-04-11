@@ -11,6 +11,7 @@
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
+#include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -85,6 +86,10 @@ SequentialCommandGroup Command::AndThen(
 
 PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
+}
+
+RepeatCommand Command::Repeat() && {
+  return RepeatCommand(std::move(*this).TransferOwnership());
 }
 
 ProxyScheduleCommand Command::AsProxy() {

@@ -76,4 +76,19 @@ class Rotation2dTest {
     var rot2 = Rotation2d.fromDegrees(43.5);
     assertNotEquals(rot1, rot2);
   }
+
+  @Test
+  void testInterpolate() {
+    // 50 + (70 - 50) * 0.5 = 60
+    var rot1 = Rotation2d.fromDegrees(50);
+    var rot2 = Rotation2d.fromDegrees(70);
+    var interpolated = rot1.interpolate(rot2, 0.5);
+    assertEquals(60.0, interpolated.getDegrees(), 1e-2);
+
+    // -160 minus half distance between 170 and -160 (15) = -175
+    var rot3 = Rotation2d.fromDegrees(170);
+    var rot4 = Rotation2d.fromDegrees(-160);
+    interpolated = rot3.interpolate(rot4, 0.5);
+    assertEquals(-175.0, interpolated.getDegrees());
+  }
 }

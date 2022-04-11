@@ -5,7 +5,6 @@
 #include <frc/Encoder.h>
 #include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
-#include <frc/controller/LinearPlantInversionFeedforward.h>
 #include <frc/controller/LinearQuadraticRegulator.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/estimator/KalmanFilter.h>

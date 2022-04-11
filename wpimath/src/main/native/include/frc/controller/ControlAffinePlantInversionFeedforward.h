@@ -104,7 +104,7 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i, 0); }
+  double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
@@ -120,7 +120,7 @@ class ControlAffinePlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
