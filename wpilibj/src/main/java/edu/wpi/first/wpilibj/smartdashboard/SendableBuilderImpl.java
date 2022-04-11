@@ -20,14 +20,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SendableBuilderImpl implements NTSendableBuilder {
-  private static class Property {
+  private static class Property implements AutoCloseable {
     Property(NetworkTable table, String key) {
       m_entry = table.getEntry(key);
     }
 
     @Override
-    @SuppressWarnings("NoFinalizer")
-    protected synchronized void finalize() {
+    public void close() {
       stopListener();
     }
 
