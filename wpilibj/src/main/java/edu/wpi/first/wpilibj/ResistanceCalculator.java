@@ -8,7 +8,7 @@ import edu.wpi.first.util.CircularBuffer;
 
 /**
  * Finds the resistance of a channel using a running linear regression over a window
- * (resistance is voltage sag / total current).
+ * (resistance is voltage sag / current).
  * Must be updated with current and voltage periodically using the
  * {@link ResistanceCalculator#calculate(double, double) calculate} method.
  */
@@ -17,7 +17,7 @@ public class ResistanceCalculator {
   public static double kDefaultRSquaredThreshold = 0.75;
 
   /**
-   * Buffers holding the total current values that will eventually need to be
+   * Buffers holding the current values that will eventually need to be
    * subtracted from the sum when they leave the window.
    */
   private final CircularBuffer m_currentBuffer;
@@ -36,7 +36,7 @@ public class ResistanceCalculator {
    */
   private final double m_rSquaredThreshhold;
   /**
-   * Running sum of the past total currents.
+   * Running sum of the past currents.
    */
   private double m_currentSum = 0;
   /**
@@ -44,7 +44,7 @@ public class ResistanceCalculator {
    */
   private double m_voltageSum = 0;
   /**
-   * Running sum of the squares of the past total currents.
+   * Running sum of the squares of the past currents.
    */
   private double m_currentSquaredSum = 0;
   /**
@@ -78,10 +78,10 @@ public class ResistanceCalculator {
 
   /**
    * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
-   * linear regression over a window. Must be updated with current and voltage periodically using the
-   * {@link ResistanceCalculator#calculate(double, double) calculate} method.
-   * <p>Uses a buffer size of {@link ResistanceCalculator#kDefaultBufferSize} and an r^2 threshold of
-   * {@link ResistanceCalculator#kDefaultRSquaredThreshold}.</p>
+   * linear regression over a window. Must be updated with current and voltage periodically using
+   * the {@link ResistanceCalculator#calculate(double, double) calculate} method.
+   * <p>Uses a buffer size of {@link ResistanceCalculator#kDefaultBufferSize} and an r^2 threshold
+   * of {@link ResistanceCalculator#kDefaultRSquaredThreshold}.</p>
    */
   public ResistanceCalculator() {
     m_currentBuffer = new CircularBuffer(kDefaultBufferSize);
@@ -91,33 +91,35 @@ public class ResistanceCalculator {
   }
 
   /**
-   * Update the buffers with new (totalCurrent, voltage) points, and remove old points if necessary.
+   * Update the buffers with new (current, voltage) points, and remove old points if necessary.
    *
-   * @param totalCurrent The current total current
-   * @param voltage      The current voltage
+   * @param current The current current
+   * @param voltage The current voltage
    * @return The current resistance, equal to the slope (negated) of the linear regression line.
    */
-  public double calculate(double totalCurrent, double voltage) {
-    // Update buffers
-    if (m_numPoints >= m_bufferSize) {
-      // Pop the last point and remove it from the sums
-      double backCurrent = m_currentBuffer.removeLast();
-      double backVoltage = m_voltageBuffer.removeLast();
-      m_currentSum -= backCurrent;
-      m_voltageSum -= backVoltage;
-      m_currentSquaredSum -= backCurrent * backCurrent;
-      m_voltageSquaredSum -= backVoltage * backVoltage;
-      m_prodSum -= backCurrent * backVoltage;
-    } else {
-      m_numPoints++;
+  public double calculate(double current, double voltage) {
+    // Update buffers only if drawing current
+    if (current != 0) {
+      if (m_numPoints >= m_bufferSize) {
+        // Pop the last point and remove it from the sums
+        double backCurrent = m_currentBuffer.removeLast();
+        double backVoltage = m_voltageBuffer.removeLast();
+        m_currentSum -= backCurrent;
+        m_voltageSum -= backVoltage;
+        m_currentSquaredSum -= backCurrent * backCurrent;
+        m_voltageSquaredSum -= backVoltage * backVoltage;
+        m_prodSum -= backCurrent * backVoltage;
+      } else {
+        m_numPoints++;
+      }
+      m_currentBuffer.addFirst(current);
+      m_voltageBuffer.addFirst(voltage);
+      m_currentSum += current;
+      m_voltageSum += voltage;
+      m_currentSquaredSum += current * current;
+      m_voltageSquaredSum += voltage * voltage;
+      m_prodSum += current * voltage;
     }
-    m_currentBuffer.addFirst(totalCurrent);
-    m_voltageBuffer.addFirst(voltage);
-    m_currentSum += totalCurrent;
-    m_voltageSum += voltage;
-    m_currentSquaredSum += totalCurrent * totalCurrent;
-    m_voltageSquaredSum += voltage * voltage;
-    m_prodSum += totalCurrent * voltage;
 
     // Recalculate resistance
     if (m_numPoints < 2) {
@@ -133,7 +135,7 @@ public class ResistanceCalculator {
     double krSquared = covariance * covariance / (currentVariance * voltageVariance);
 
     if (krSquared > m_rSquaredThreshhold) {
-      // Slope of total current vs voltage
+      // Slope of current vs voltage
       double slope = covariance / currentVariance;
       return -slope;
     } else {
