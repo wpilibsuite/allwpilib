@@ -13,6 +13,9 @@ import edu.wpi.first.util.CircularBuffer;
  * {@link ResistanceCalculator#calculate(double, double) calculate} method.
  */
 public class ResistanceCalculator {
+  public static int kDefaultBufferSize = 250;
+  public static double kDefaultRSquaredThreshold = 0.75;
+
   /**
    * Buffers holding the total current values that will eventually need to be
    * subtracted from the sum when they leave the window.
@@ -59,8 +62,8 @@ public class ResistanceCalculator {
 
   /**
    * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
-   * linear regression over a window. Must be updated with current and voltage periodically using the
-   * {@link ResistanceCalculator#calculate(double, double) calculate} method.
+   * linear regression over a window. Must be updated with current and voltage periodically using
+   * the {@link ResistanceCalculator#calculate(double, double) calculate} method.
    *
    * @param bufferSize The maximum number of points to take the linear regression over.
    * @param krSquaredThreshhold The minimum R^2 value considered significant enough to return the
@@ -71,6 +74,20 @@ public class ResistanceCalculator {
     m_voltageBuffer = new CircularBuffer(bufferSize);
     this.m_rSquaredThreshhold = krSquaredThreshhold;
     this.m_bufferSize = bufferSize;
+  }
+
+  /**
+   * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
+   * linear regression over a window. Must be updated with current and voltage periodically using the
+   * {@link ResistanceCalculator#calculate(double, double) calculate} method.
+   * <p>Uses a buffer size of {@link ResistanceCalculator#kDefaultBufferSize} and an r^2 threshold of
+   * {@link ResistanceCalculator#kDefaultRSquaredThreshold}.</p>
+   */
+  public ResistanceCalculator() {
+    m_currentBuffer = new CircularBuffer(kDefaultBufferSize);
+    m_voltageBuffer = new CircularBuffer(kDefaultBufferSize);
+    this.m_rSquaredThreshhold = kDefaultRSquaredThreshold;
+    this.m_bufferSize = kDefaultBufferSize;
   }
 
   /**
