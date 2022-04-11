@@ -7,10 +7,10 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.util.CircularBuffer;
 
 /**
- * Finds the resistance using a running linear regression over a window.
- * Must be updated with total current and voltage periodically using the
- * {@link ResistanceCalculator#update(double, double) update} method.
- * Resistance is voltage sag / total current.
+ * Finds the resistance of a channel using a running linear regression over a window
+ * (resistance is voltage sag / total current).
+ * Must be updated with current and voltage periodically using the
+ * {@link ResistanceCalculator#calculate(double, double) calculate} method.
  */
 public class ResistanceCalculator {
   /**
@@ -19,8 +19,8 @@ public class ResistanceCalculator {
    */
   private final CircularBuffer m_currentBuffer;
   /**
-   * Buffer holding the voltage values that will eventually need to be subtracted from the sum when
-   * they leave the window.
+   * Buffer holding the voltage values that will eventually need to be subtracted
+   * from the sum when they leave the window.
    */
   private final CircularBuffer m_voltageBuffer;
   /**
@@ -58,45 +58,27 @@ public class ResistanceCalculator {
   private int m_numPoints = 0;
 
   /**
-   * Default constructor.
+   * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
+   * linear regression over a window. Must be updated with current and voltage periodically using the
+   * {@link ResistanceCalculator#calculate(double, double) calculate} method.
    *
-   * @param bufferSize          The maximum number of points to take the linear regression over.
+   * @param bufferSize The maximum number of points to take the linear regression over.
    * @param krSquaredThreshhold The minimum R^2 value considered significant enough to return the
-   *                           regression slope instead of NaN. Defaults to 0.
+   *                           regression slope instead of NaN.
    */
   public ResistanceCalculator(int bufferSize, double krSquaredThreshhold) {
     m_currentBuffer = new CircularBuffer(bufferSize);
     m_voltageBuffer = new CircularBuffer(bufferSize);
     this.m_rSquaredThreshhold = krSquaredThreshhold;
-    m_numPoints = 0;
-    m_currentSum = 0;
-    m_voltageSum = 0;
     this.m_bufferSize = bufferSize;
   }
 
   /**
-   * @return The current resistance, equal to the slope (negated) of the linear regression line.
+   * Create a new calculator with the same buffer size and r^2 threshold
+   * @return Another ResistanceCalculator with empty buffers
    */
-  public Double getResistance() {
-    if (m_numPoints < 2) {
-      return Double.NaN;
-    }
-
-    double currentVariance =
-        (m_currentSquaredSum / m_numPoints) - Math.pow(m_currentSum / m_numPoints, 2);
-    double voltageVariance =
-        (m_voltageSquaredSum / m_numPoints) - Math.pow(m_voltageSum / m_numPoints, 2);
-    double covariance =
-        (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
-    double krSquared = covariance * covariance / (currentVariance * voltageVariance);
-
-    if (krSquared > m_rSquaredThreshhold) {
-      // Slope of total current vs voltage
-      double slope = covariance / currentVariance;
-      return -slope;
-    } else {
-      return Double.NaN;
-    }
+  public ResistanceCalculator copy() {
+    return new ResistanceCalculator(m_bufferSize, m_rSquaredThreshhold);
   }
 
   /**
@@ -104,8 +86,10 @@ public class ResistanceCalculator {
    *
    * @param totalCurrent The current total current
    * @param voltage      The current voltage
+   * @return The current resistance, equal to the slope (negated) of the linear regression line.
    */
-  public void update(double totalCurrent, double voltage) {
+  public double calculate(double totalCurrent, double voltage) {
+    // Update buffers
     if (m_numPoints >= m_bufferSize) {
       // Pop the last point and remove it from the sums
       double backCurrent = m_currentBuffer.removeLast();
@@ -125,5 +109,26 @@ public class ResistanceCalculator {
     m_currentSquaredSum += totalCurrent * totalCurrent;
     m_voltageSquaredSum += voltage * voltage;
     m_prodSum += totalCurrent * voltage;
+
+    // Recalculate resistance
+    if (m_numPoints < 2) {
+      return Double.NaN;
+    }
+
+    double currentVariance =
+            (m_currentSquaredSum / m_numPoints) - Math.pow(m_currentSum / m_numPoints, 2);
+    double voltageVariance =
+            (m_voltageSquaredSum / m_numPoints) - Math.pow(m_voltageSum / m_numPoints, 2);
+    double covariance =
+            (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
+    double krSquared = covariance * covariance / (currentVariance * voltageVariance);
+
+    if (krSquared > m_rSquaredThreshhold) {
+      // Slope of total current vs voltage
+      double slope = covariance / currentVariance;
+      return -slope;
+    } else {
+      return Double.NaN;
+    }
   }
 }
