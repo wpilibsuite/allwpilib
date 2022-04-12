@@ -5,6 +5,7 @@
 #pragma once
 
 #include <atomic>
+
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>

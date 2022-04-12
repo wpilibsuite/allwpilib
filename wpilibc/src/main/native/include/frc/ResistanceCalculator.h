@@ -10,10 +10,10 @@ namespace frc {
 
 /**
  * Finds the resistance of a channel or the entire robot using a running linear
- * regression over a window. Must be updated with current and voltage periodically using the
- * <code>Calculate</code> method.
- * <p>To use this for finding the resistance of a channel, use the calculate method
- * with the battery voltage minus the voltage at the motor controller or whatever is
+ * regression over a window. Must be updated with current and voltage
+ * periodically using the <code>Calculate</code> method. <p>To use this for
+ * finding the resistance of a channel, use the calculate method with the
+ * battery voltage minus the voltage at the motor controller or whatever is
  * plugged in to the PDP at that channel.</p>
  */
 class ResistanceCalculator {
@@ -22,21 +22,22 @@ class ResistanceCalculator {
   static constexpr double kDefaultRSquaredThreshold = 0.5;
 
   /**
-   * Create a ResistanceCalculator to find the resistance of a channel using a running
-   * linear regression over a window. Must be updated with current and voltage periodically using
-   * the <code>Calculate</code> method.
+   * Create a ResistanceCalculator to find the resistance of a channel using a
+   * running linear regression over a window. Must be updated with current and
+   * voltage periodically using the <code>Calculate</code> method.
    *
-   * @param bufferSize The maximum number of points to take the linear regression over.
-   * @param krSquaredThreshhold The minimum R^2 value considered significant enough to return the
-   *                           regression slope instead of NaN.
+   * @param bufferSize The maximum number of points to take the linear
+   * regression over.
+   * @param krSquaredThreshhold The minimum R^2 value considered significant
+   * enough to return the regression slope instead of NaN.
    */
   ResistanceCalculator(double bufferSize, double krSquaredThreshold);
 
   /**
-   * Create a ResistanceCalculator to find the resistance of a channel using a running
-   * linear regression over a window. Must be updated with current and voltage periodically using
-   * the <code>Calculate</code> method.
-   * <p>Uses a buffer size of 250 and an r^2 threshold of 0.5.</p>
+   * Create a ResistanceCalculator to find the resistance of a channel using a
+   * running linear regression over a window. Must be updated with current and
+   * voltage periodically using the <code>Calculate</code> method. <p>Uses a
+   * buffer size of 250 and an r^2 threshold of 0.5.</p>
    */
   ResistanceCalculator();
 
@@ -45,7 +46,8 @@ class ResistanceCalculator {
   ResistanceCalculator& operator=(ResistanceCalculator&&) = default;
 
   /**
-   * Update the buffers with new (current, voltage) points, and remove old points if necessary.
+   * Update the buffers with new (current, voltage) points, and remove old
+   * points if necessary.
    *
    * @param current The current current
    * @param voltage The current voltage
@@ -60,8 +62,8 @@ class ResistanceCalculator {
    */
   wpi::circular_buffer<double> m_currentBuffer;
   /**
-   * Buffer holding the voltage values that will eventually need to be subtracted
-   * from the sum when they leave the window.
+   * Buffer holding the voltage values that will eventually need to be
+   * subtracted from the sum when they leave the window.
    */
   wpi::circular_buffer<double> m_voltageBuffer;
   /**
@@ -69,8 +71,8 @@ class ResistanceCalculator {
    */
   int m_bufferSize;
   /**
-   * The minimum R^2 value considered significant enough to return the regression slope instead of
-   * NaN.
+   * The minimum R^2 value considered significant enough to return the
+   * regression slope instead of NaN.
    */
   double m_rSquaredThreshold;
   /**

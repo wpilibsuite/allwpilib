@@ -24,9 +24,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_module;
   private final ResistanceCalculator m_totalResistanceCalculator;
   private final AtomicReference<Double> m_totalResistance = new AtomicReference<>(Double.NaN);
-
-  @SuppressWarnings("FieldCanBeLocal")
-  private final Notifier m_resistanceLoop;
+  private final Notifier m_resistanceLoop = new Notifier(this::updateResistance);
 
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
@@ -76,12 +74,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     m_totalResistanceCalculator = new ResistanceCalculator();
-    m_resistanceLoop =
-        new Notifier(
-            () ->
-                m_totalResistance.set(
-                    m_totalResistanceCalculator.calculate(
-                        this.getTotalCurrent(), this.getVoltage())));
     m_resistanceLoop.startPeriodic(PowerDistribution.kUpdatePeriod);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
@@ -227,6 +219,11 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    */
   public double getTotalResistance() {
     return m_totalResistance.get();
+  }
+
+  private void updateResistance() {
+    m_totalResistance.set(
+        m_totalResistanceCalculator.calculate(this.getTotalCurrent(), this.getVoltage()));
   }
 
   @Override

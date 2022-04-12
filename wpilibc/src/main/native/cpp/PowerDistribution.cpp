@@ -27,7 +27,8 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution() : m_resistanceLoop([=] () { UpdateResistance(); } ) {
+PowerDistribution::PowerDistribution()
+    : m_resistanceLoop([=]() { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -41,12 +42,13 @@ PowerDistribution::PowerDistribution() : m_resistanceLoop([=] () { UpdateResista
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
-  
-  m_resistanceLoop.StartPeriodic(units::time::second_t(PowerDistribution::kUpdatePeriod));
+
+  m_resistanceLoop.StartPeriodic(
+      units::time::second_t(PowerDistribution::kUpdatePeriod));
 }
 
 PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
-    : m_resistanceLoop([=] () { UpdateResistance(); }) {
+    : m_resistanceLoop([=]() { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -60,7 +62,8 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 
-  m_resistanceLoop.StartPeriodic(units::time::second_t(PowerDistribution::kUpdatePeriod));
+  m_resistanceLoop.StartPeriodic(
+      units::time::second_t(PowerDistribution::kUpdatePeriod));
 }
 
 PowerDistribution::~PowerDistribution() {
@@ -236,11 +239,7 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
         HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
       });
   builder.AddDoubleProperty(
-      "TotalResistance",
-      [=] {
-        return GetTotalResistance();
-      },
-      nullptr);
+      "TotalResistance", [=] { return GetTotalResistance(); }, nullptr);
 }
 
 void PowerDistribution::UpdateResistance() {

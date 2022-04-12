@@ -8,12 +8,12 @@
 
 using namespace frc;
 
-ResistanceCalculator::ResistanceCalculator(
-    double bufferSize, double krSquaredThreshold)
-        : m_currentBuffer(bufferSize),
-          m_voltageBuffer(bufferSize),
-          m_bufferSize(bufferSize),
-          m_rSquaredThreshold(krSquaredThreshold) {}
+ResistanceCalculator::ResistanceCalculator(double bufferSize,
+                                           double krSquaredThreshold)
+    : m_currentBuffer(bufferSize),
+      m_voltageBuffer(bufferSize),
+      m_bufferSize(bufferSize),
+      m_rSquaredThreshold(krSquaredThreshold) {}
 
 ResistanceCalculator::ResistanceCalculator()
     : m_currentBuffer(ResistanceCalculator::kDefaultBufferSize),
@@ -52,11 +52,14 @@ double ResistanceCalculator::Calculate(double current, double voltage) {
 
   double currentMean = m_currentSum / m_numPoints;
   double voltageMean = m_voltageSum / m_numPoints;
-  double currentVariance = (m_currentSquaredSum / m_numPoints) - currentMean * currentMean;
-  double voltageVariance = (m_voltageSquaredSum / m_numPoints) - voltageMean * voltageMean;
-  double covariance =
-      (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
-  double krSquared = covariance * covariance / (currentVariance * voltageVariance);
+  double currentVariance =
+      (m_currentSquaredSum / m_numPoints) - currentMean * currentMean;
+  double voltageVariance =
+      (m_voltageSquaredSum / m_numPoints) - voltageMean * voltageMean;
+  double covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) /
+                      (m_numPoints - 1);
+  double krSquared =
+      covariance * covariance / (currentVariance * voltageVariance);
 
   if (krSquared > m_rSquaredThreshold) {
     // Slope of current vs voltage
