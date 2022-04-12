@@ -30,7 +30,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    *
    * @param name The ligament name.
    * @param length The ligament length.
-   * @param angle The ligament angle.
+   * @param angle The ligament angle in degrees.
    * @param lineWidth The ligament's line width.
    * @param color The ligament's color.
    */
@@ -48,7 +48,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    *
    * @param name The ligament's name.
    * @param length The ligament's length.
-   * @param angle The ligament's angle relative to its parent.
+   * @param angle The ligament's angle relative to its parent in degrees.
    */
   public MechanismLigament2d(String name, double length, double angle) {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
@@ -57,7 +57,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   /**
    * Set the ligament's angle relative to its parent.
    *
-   * @param degrees the angle, in degrees
+   * @param degrees the angle in degrees
    */
   public synchronized void setAngle(double degrees) {
     m_angle = degrees;
@@ -76,7 +76,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   /**
    * Get the ligament's angle relative to its parent.
    *
-   * @return the angle, in degrees
+   * @return the angle in degrees
    */
   public synchronized double getAngle() {
     if (m_angleEntry != null) {

@@ -167,9 +167,6 @@ class Ultrasonic : public wpi::Sendable,
   // Time (sec) for the ping trigger pulse.
   static constexpr double kPingTime = 10 * 1e-6;
 
-  // Priority that the ultrasonic round robin task runs.
-  static constexpr int kPriority = 64;
-
   // Max time (ms) between readings.
   static constexpr auto kMaxUltrasonicTime = 0.1_s;
   static constexpr auto kSpeedOfSound = 1130_fps;

@@ -56,7 +56,7 @@ public class Trigger implements BooleanSupplier {
    * @return whether or not the trigger condition is active.
    */
   public boolean get() {
-    return this.getAsBoolean();
+    return m_isActive.getAsBoolean();
   }
 
   /**
@@ -69,8 +69,8 @@ public class Trigger implements BooleanSupplier {
    * @return whether or not the trigger condition is active.
    */
   @Override
-  public boolean getAsBoolean() {
-    return m_isActive.getAsBoolean();
+  public final boolean getAsBoolean() {
+    return this.get();
   }
 
   /**

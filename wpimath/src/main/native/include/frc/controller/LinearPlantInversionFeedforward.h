@@ -72,7 +72,7 @@ class LinearPlantInversionFeedforward {
    *
    * @return The row of the calculated feedforward.
    */
-  double Uff(int i) const { return m_uff(i, 0); }
+  double Uff(int i) const { return m_uff(i); }
 
   /**
    * Returns the current reference vector r.
@@ -88,7 +88,7 @@ class LinearPlantInversionFeedforward {
    *
    * @return The row of the current reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Resets the feedforward with a specified initial state vector.
@@ -123,7 +123,7 @@ class LinearPlantInversionFeedforward {
    */
   Eigen::Vector<double, Inputs> Calculate(
       const Eigen::Vector<double, States>& nextR) {
-    return Calculate(m_r, nextR);  // NOLINT
+    return Calculate(m_r, nextR);
   }
 
   /**

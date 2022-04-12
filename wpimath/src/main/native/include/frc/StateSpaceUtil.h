@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 #include <random>
 #include <type_traits>
 
@@ -32,7 +33,11 @@ void MatrixImpl(Matrix& result, T elem, Ts... elems) {
 
 template <typename Matrix, typename T, typename... Ts>
 void CostMatrixImpl(Matrix& result, T elem, Ts... elems) {
-  result(result.rows() - (sizeof...(Ts) + 1)) = 1.0 / std::pow(elem, 2);
+  if (elem == std::numeric_limits<double>::infinity()) {
+    result(result.rows() - (sizeof...(Ts) + 1)) = 0.0;
+  } else {
+    result(result.rows() - (sizeof...(Ts) + 1)) = 1.0 / std::pow(elem, 2);
+  }
   if constexpr (sizeof...(Ts) > 0) {
     CostMatrixImpl(result, elems...);
   }
@@ -116,20 +121,21 @@ Eigen::Matrix<double, Rows, Cols> MakeMatrix(Ts... elems) {
  * Creates a cost matrix from the given vector for use with LQR.
  *
  * The cost matrix is constructed using Bryson's rule. The inverse square of
- * each element in the input is taken and placed on the cost matrix diagonal.
+ * each tolerance is placed on the cost matrix diagonal. If a tolerance is
+ * infinity, its cost matrix entry is set to zero.
  *
- * @param costs An array. For a Q matrix, its elements are the maximum allowed
- *              excursions of the states from the reference. For an R matrix,
- *              its elements are the maximum allowed excursions of the control
- *              inputs from no actuation.
+ * @param tolerances An array. For a Q matrix, its elements are the maximum
+ *                   allowed excursions of the states from the reference. For an
+ *                   R matrix, its elements are the maximum allowed excursions
+ *                   of the control inputs from no actuation.
  * @return State excursion or control effort cost matrix.
  */
 template <typename... Ts, typename = std::enable_if_t<
                               std::conjunction_v<std::is_same<double, Ts>...>>>
 Eigen::Matrix<double, sizeof...(Ts), sizeof...(Ts)> MakeCostMatrix(
-    Ts... costs) {
+    Ts... tolerances) {
   Eigen::DiagonalMatrix<double, sizeof...(Ts)> result;
-  detail::CostMatrixImpl(result.diagonal(), costs...);
+  detail::CostMatrixImpl(result.diagonal(), tolerances...);
   return result;
 }
 

@@ -173,7 +173,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Returns the control input vector u.
@@ -189,7 +189,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the control input vector.
    */
-  double U(int i) const { return m_u(i, 0); }
+  double U(int i) const { return m_u(i); }
 
   /**
    * Resets the controller.
