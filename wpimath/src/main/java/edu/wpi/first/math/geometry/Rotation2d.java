@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.interpolation.Interpolatable;
+import edu.wpi.first.math.util.Units;
 import java.util.Objects;
 
 /** A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine). */
@@ -65,6 +66,16 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    */
   public static Rotation2d fromDegrees(double degrees) {
     return new Rotation2d(Math.toRadians(degrees));
+  }
+
+  /**
+   * Constructs and returns a Rotation2d with the given number of rotations.
+   *
+   * @param rotations The value of the angle in rotations.
+   * @return The rotation object with the desired angle value.
+   */
+  public static Rotation2d fromRotations(double rotations) {
+    return new Rotation2d(Units.rotationsToRadians(rotations));
   }
 
   /**
@@ -149,6 +160,15 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);
+  }
+
+  /**
+   * Returns the number of rotations of the rotation.
+   *
+   * @return The number of rotations of the rotation.
+   */
+  public double getRotations() {
+    return Units.radiansToRotations(m_value);
   }
 
   /**
