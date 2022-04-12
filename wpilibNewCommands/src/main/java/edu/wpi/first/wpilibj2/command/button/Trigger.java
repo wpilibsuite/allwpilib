@@ -348,17 +348,6 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when both
-   * triggers are active.
-   *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when both triggers are active
-   */
-  public Trigger and(Trigger trigger) {
-    return new Trigger(() -> get() && trigger.get());
-  }
-
-  /**
    * Composes this trigger with a boolean supplier, returning a new trigger that is active when both
    * triggers are active.
    *
@@ -366,20 +355,8 @@ public class Trigger implements BooleanSupplier {
    * @return the trigger that is active when both triggers are active
    */
   public Trigger and(BooleanSupplier booleanSupplier) {
-    return and(new Trigger(booleanSupplier));
+    return new Trigger(() -> get() && booleanSupplier.getAsBoolean());
   }
-
-  /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when either
-   * trigger is active.
-   *
-   * @param trigger the trigger to compose with
-   * @return the trigger that is active when either trigger is active
-   */
-  public Trigger or(Trigger trigger) {
-    return new Trigger(() -> get() || trigger.get());
-  }
-
 
   /**
    * Composes this trigger with a boolean supplier, returning a new trigger that is active when either
@@ -389,7 +366,7 @@ public class Trigger implements BooleanSupplier {
    * @return the trigger that is active when either trigger is active
    */
   public Trigger or(BooleanSupplier booleanSupplier) {
-    return or(new Trigger(booleanSupplier));
+    return new Trigger(() -> get() || booleanSupplier.getAsBoolean());
   }
 
   /**
