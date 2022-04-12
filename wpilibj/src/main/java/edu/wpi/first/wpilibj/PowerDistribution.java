@@ -13,10 +13,7 @@ import edu.wpi.first.hal.PowerDistributionVersion;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * Class for getting voltage, current, temperature, power, resistance, and energy from the
@@ -26,9 +23,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
   private final int m_module;
   private final ResistanceCalculator m_totalResistanceCalculator;
-  private final List<ResistanceCalculator> m_channelResistanceCalculators;
   private final AtomicReference<Double> m_totalResistance = new AtomicReference<>(Double.NaN);
-  private final AtomicReferenceArray<Double> m_channelResistances;
 
   @SuppressWarnings("FieldCanBeLocal")
   private final Notifier m_resistanceLoop;
@@ -81,13 +76,12 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     m_totalResistanceCalculator = new ResistanceCalculator();
-    m_channelResistances = new AtomicReferenceArray<>(this.getNumChannels());
-    m_channelResistanceCalculators = new ArrayList<>();
-    int numChannels = this.getNumChannels();
-    for (int i = 0; i < numChannels; i ++) {
-      m_channelResistanceCalculators.add(new ResistanceCalculator());
-    }
-    m_resistanceLoop = new Notifier(this::updateResistances);
+    m_resistanceLoop =
+        new Notifier(
+            () ->
+                m_totalResistance.set(
+                    m_totalResistanceCalculator.calculate(
+                        this.getTotalCurrent(), this.getVoltage())));
     m_resistanceLoop.startPeriodic(PowerDistribution.kUpdatePeriod);
 
     HAL.report(tResourceType.kResourceType_PDP, m_module + 1);
@@ -235,30 +229,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
     return m_totalResistance.get();
   }
 
-  /**
-   * Get the resistance of a channel. A {@link ResistanceCalculator} should have been passed in
-   * the constructor to enable calculating resistance.
-   * @param channel The channel to get the resistance for
-   * @return The channel's resistance if a resistance calculator was given, {@code NaN} otherwise.
-   */
-  public double getResistance(int channel) {
-    return m_channelResistances.get(channel);
-  }
-
-  /**
-   * Update the total resistance and the resistance of each channel.
-   */
-  private void updateResistances() {
-    double voltage = this.getVoltage();
-    m_totalResistance.set(
-        m_totalResistanceCalculator.calculate(this.getTotalCurrent(), voltage));
-    for (int channel = 0; channel < m_channelResistances.length(); channel ++) {
-      ResistanceCalculator calculator = m_channelResistanceCalculators.get(channel);
-      double resistance = calculator.calculate(this.getCurrent(channel), voltage);
-      m_channelResistances.set(channel, resistance);
-    }
-  }
-
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistribution");
@@ -267,9 +237,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
       final int chan = i;
       builder.addDoubleProperty(
           "Chan" + i, () -> PowerDistributionJNI.getChannelCurrentNoError(m_handle, chan), null);
-      builder.addDoubleProperty(
-          "ChanResistance" + i,
-          () -> this.getResistance(chan), null);
     }
     builder.addDoubleProperty(
         "Voltage", () -> PowerDistributionJNI.getVoltageNoError(m_handle), null);

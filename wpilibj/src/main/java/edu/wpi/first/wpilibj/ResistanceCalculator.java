@@ -13,8 +13,8 @@ import edu.wpi.first.util.CircularBuffer;
  * {@link ResistanceCalculator#calculate(double, double) calculate} method.
  */
 public class ResistanceCalculator {
-  public static int kDefaultBufferSize = 250;
-  public static double kDefaultRSquaredThreshold = 0.75;
+  public static final int kDefaultBufferSize = 250;
+  public static final double kDefaultRSquaredThreshold = 0.75;
 
   /**
    * Buffers holding the current values that will eventually need to be
@@ -38,27 +38,27 @@ public class ResistanceCalculator {
   /**
    * Running sum of the past currents.
    */
-  private double m_currentSum = 0;
+  private double m_currentSum;
   /**
    * Running sum of the past voltages.
    */
-  private double m_voltageSum = 0;
+  private double m_voltageSum;
   /**
    * Running sum of the squares of the past currents.
    */
-  private double m_currentSquaredSum = 0;
+  private double m_currentSquaredSum;
   /**
    * Running sum of the squares of the past voltages.
    */
-  private double m_voltageSquaredSum = 0;
+  private double m_voltageSquaredSum;
   /**
    * Running sum of the past current*voltage's.
    */
-  private double m_prodSum = 0;
+  private double m_prodSum;
   /**
    * The number of points currently in the buffer.
    */
-  private int m_numPoints = 0;
+  private int m_numPoints;
 
   /**
    * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
