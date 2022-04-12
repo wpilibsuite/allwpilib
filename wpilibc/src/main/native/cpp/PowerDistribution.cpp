@@ -27,7 +27,7 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 
 using namespace frc;
 
-PowerDistribution::PowerDistribution() {
+PowerDistribution::PowerDistribution() : m_resistanceLoop([=] () { UpdateResistance(); } ) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -41,9 +41,12 @@ PowerDistribution::PowerDistribution() {
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+  
+  m_resistanceLoop.StartPeriodic(units::time::second_t(PowerDistribution::kUpdatePeriod));
 }
 
-PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
+PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
+    : m_resistanceLoop([=] () { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -56,6 +59,8 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType) {
 
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
+
+  m_resistanceLoop.StartPeriodic(units::time::second_t(PowerDistribution::kUpdatePeriod));
 }
 
 PowerDistribution::~PowerDistribution() {
@@ -187,6 +192,10 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
+double PowerDistribution::GetTotalResistance() const {
+  return m_totalResistance.load();
+}
+
 void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistribution");
   int32_t status = 0;
@@ -226,4 +235,15 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
         int32_t lStatus = 0;
         HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
       });
+  builder.AddDoubleProperty(
+      "TotalResistance",
+      [=] {
+        return GetTotalResistance();
+      },
+      nullptr);
+}
+
+void PowerDistribution::UpdateResistance() {
+  m_totalResistance.store(
+      m_totalResistanceCalculator.Calculate(GetTotalCurrent(), GetVoltage()));
 }

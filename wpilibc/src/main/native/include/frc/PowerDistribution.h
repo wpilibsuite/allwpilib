@@ -4,10 +4,12 @@
 
 #pragma once
 
+#include <atomic>
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/Notifier.h"
 #include "frc/ResistanceCalculator.h"
 
 namespace frc {
@@ -20,6 +22,7 @@ class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
   static constexpr int kDefaultModule = -1;
+  static constexpr double kUpdatePeriod = 0.025;
   enum class ModuleType { kCTRE = 1, kRev = 2 };
 
   /**
@@ -122,6 +125,13 @@ class PowerDistribution : public wpi::Sendable,
    */
   void SetSwitchableChannel(bool enabled);
 
+  /**
+   * Get the robot's resistance. A {@link ResistanceCalculator} should have been passed in
+   * the constructor to enable calculating resistance.
+   * @return The robot resistance if a resistance calculator was given, {@code NaN} otherwise.
+   */
+  double GetTotalResistance() const;
+
   struct Version {
     uint32_t FirmwareMajor;
     uint32_t FirmwareMinor;
@@ -203,6 +213,11 @@ class PowerDistribution : public wpi::Sendable,
  private:
   hal::Handle<HAL_PowerDistributionHandle> m_handle;
   int m_module;
+  ResistanceCalculator m_totalResistanceCalculator;
+  std::atomic<double> m_totalResistance;
+  frc::Notifier m_resistanceLoop;
+
+  void UpdateResistance();
 };
 
 }  // namespace frc
