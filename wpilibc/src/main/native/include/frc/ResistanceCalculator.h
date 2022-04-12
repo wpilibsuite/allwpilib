@@ -28,7 +28,7 @@ class ResistanceCalculator {
    *
    * @param bufferSize The maximum number of points to take the linear
    * regression over.
-   * @param krSquaredThreshhold The minimum R^2 value considered significant
+   * @param krSquaredThreshold The minimum R^2 value considered significant
    * enough to return the regression slope instead of NaN.
    */
   ResistanceCalculator(double bufferSize, double krSquaredThreshold);

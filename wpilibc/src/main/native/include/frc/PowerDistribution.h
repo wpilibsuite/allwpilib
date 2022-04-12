@@ -127,9 +127,10 @@ class PowerDistribution : public wpi::Sendable,
   void SetSwitchableChannel(bool enabled);
 
   /**
-   * Get the robot's resistance. A {@link ResistanceCalculator} should have been passed in
-   * the constructor to enable calculating resistance.
-   * @return The robot resistance if a resistance calculator was given, {@code NaN} otherwise.
+   * Get the robot's resistance. A {@link ResistanceCalculator} should have been
+   * passed in the constructor to enable calculating resistance.
+   * @return The robot resistance if a resistance calculator was given, {@code
+   * NaN} otherwise.
    */
   double GetTotalResistance() const;
 

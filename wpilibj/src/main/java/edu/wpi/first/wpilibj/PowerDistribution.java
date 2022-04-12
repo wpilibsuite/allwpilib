@@ -16,8 +16,8 @@ import edu.wpi.first.util.sendable.SendableRegistry;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Class for getting voltage, current, temperature, power, resistance, and energy from the
- * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
+ * Class for getting voltage, current, temperature, power, resistance, and energy from the CTRE
+ * Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH) over CAN.
  */
 public class PowerDistribution implements Sendable, AutoCloseable {
   private final int m_handle;
@@ -28,9 +28,7 @@ public class PowerDistribution implements Sendable, AutoCloseable {
 
   public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
 
-  /**
-   * Seconds to wait before updating resistance.
-   */
+  /** Seconds to wait before updating resistance. */
   public static final double kUpdatePeriod = 0.025;
 
   public enum ModuleType {
@@ -213,8 +211,9 @@ public class PowerDistribution implements Sendable, AutoCloseable {
   }
 
   /**
-   * Get the robot's resistance. A {@link ResistanceCalculator} should have been passed in
-   * the constructor to enable calculating resistance.
+   * Get the robot's resistance. A {@link ResistanceCalculator} should have been passed in the
+   * constructor to enable calculating resistance.
+   *
    * @return The robot resistance if a resistance calculator was given, {@code NaN} otherwise.
    */
   public double getTotalResistance() {
@@ -243,8 +242,6 @@ public class PowerDistribution implements Sendable, AutoCloseable {
         "SwitchableChannel",
         () -> PowerDistributionJNI.getSwitchableChannelNoError(m_handle),
         value -> PowerDistributionJNI.setSwitchableChannel(m_handle, value));
-    builder.addDoubleProperty(
-        "TotalResistance",
-        this::getTotalResistance, null);
+    builder.addDoubleProperty("TotalResistance", this::getTotalResistance, null);
   }
 }
