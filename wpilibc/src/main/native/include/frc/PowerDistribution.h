@@ -43,8 +43,8 @@ class PowerDistribution : public wpi::Sendable,
   PowerDistribution(int module, ModuleType moduleType);
 
   ~PowerDistribution() override;
-  PowerDistribution(PowerDistribution&&) = default;
-  PowerDistribution& operator=(PowerDistribution&&) = default;
+  PowerDistribution(PowerDistribution&&);
+  PowerDistribution& operator=(PowerDistribution&&);
 
   /**
    * Query the input voltage of the PDP/PDH.

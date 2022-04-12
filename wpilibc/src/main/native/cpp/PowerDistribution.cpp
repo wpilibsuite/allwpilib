@@ -73,6 +73,23 @@ PowerDistribution::~PowerDistribution() {
   }
 }
 
+PowerDistribution::PowerDistribution(PowerDistribution&& other)
+    : m_handle(std::move(other.m_handle)),
+      m_module(other.m_module),
+      m_totalResistanceCalculator(std::move(other.m_totalResistanceCalculator)),
+      m_resistanceLoop(std::move(other.m_resistanceLoop)) {
+  m_totalResistance.store(other.m_totalResistance.load());
+}
+
+PowerDistribution& PowerDistribution::operator=(PowerDistribution&& other) {
+  m_handle = std::move(other.m_handle);
+  m_module = other.m_module;
+  m_totalResistanceCalculator = std::move(other.m_totalResistanceCalculator);
+  m_resistanceLoop = std::move(other.m_resistanceLoop);
+  m_totalResistance.store(other.m_totalResistance.load());
+  return *this;
+}
+
 double PowerDistribution::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetPowerDistributionVoltage(m_handle, &status);
