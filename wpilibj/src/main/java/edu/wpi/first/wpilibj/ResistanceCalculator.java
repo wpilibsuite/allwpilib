@@ -7,10 +7,12 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.util.CircularBuffer;
 
 /**
- * Finds the resistance of a channel using a running linear regression over a window
- * (resistance is voltage sag / current).
+ * Finds the resistance of a channel using a running linear regression over a window.
  * Must be updated with current and voltage periodically using the
  * {@link ResistanceCalculator#calculate(double, double) calculate} method.
+ * <p>To use this for finding the resistance of a channel, use the calculate method
+ * with the battery voltage minus the voltage at the motor controller or whatever is
+ * plugged in to the PDP at that channel.</p>
  */
 public class ResistanceCalculator {
   public static final int kDefaultBufferSize = 250;
@@ -34,7 +36,7 @@ public class ResistanceCalculator {
    * The minimum R^2 value considered significant enough to return the regression slope instead of
    * NaN.
    */
-  private final double m_rSquaredThreshhold;
+  private final double m_rSquaredThreshold;
   /**
    * Running sum of the past currents.
    */
@@ -66,13 +68,13 @@ public class ResistanceCalculator {
    * the {@link ResistanceCalculator#calculate(double, double) calculate} method.
    *
    * @param bufferSize The maximum number of points to take the linear regression over.
-   * @param krSquaredThreshhold The minimum R^2 value considered significant enough to return the
+   * @param krSquaredThreshold The minimum R^2 value considered significant enough to return the
    *                           regression slope instead of NaN.
    */
-  public ResistanceCalculator(int bufferSize, double krSquaredThreshhold) {
+  public ResistanceCalculator(int bufferSize, double krSquaredThreshold) {
     m_currentBuffer = new CircularBuffer(bufferSize);
     m_voltageBuffer = new CircularBuffer(bufferSize);
-    this.m_rSquaredThreshhold = krSquaredThreshhold;
+    this.m_rSquaredThreshold = krSquaredThreshold;
     this.m_bufferSize = bufferSize;
   }
 
@@ -86,7 +88,7 @@ public class ResistanceCalculator {
   public ResistanceCalculator() {
     m_currentBuffer = new CircularBuffer(kDefaultBufferSize);
     m_voltageBuffer = new CircularBuffer(kDefaultBufferSize);
-    this.m_rSquaredThreshhold = kDefaultRSquaredThreshold;
+    this.m_rSquaredThreshold = kDefaultRSquaredThreshold;
     this.m_bufferSize = kDefaultBufferSize;
   }
 
@@ -95,7 +97,7 @@ public class ResistanceCalculator {
    *
    * @param current The current current
    * @param voltage The current voltage
-   * @return The current resistance, equal to the slope (negated) of the linear regression line.
+   * @return The current resistance, in ohms
    */
   public double calculate(double current, double voltage) {
     // Update buffers only if drawing current
@@ -134,7 +136,7 @@ public class ResistanceCalculator {
             (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
     double krSquared = covariance * covariance / (currentVariance * voltageVariance);
 
-    if (krSquared > m_rSquaredThreshhold) {
+    if (krSquared > m_rSquaredThreshold) {
       // Slope of current vs voltage
       double slope = covariance / currentVariance;
       return -slope;

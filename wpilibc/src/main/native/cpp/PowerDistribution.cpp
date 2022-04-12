@@ -13,6 +13,7 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/Errors.h"
+#include "frc/ResistanceCalculator.h"
 #include "frc/SensorUtil.h"
 
 static_assert(static_cast<HAL_PowerDistributionType>(

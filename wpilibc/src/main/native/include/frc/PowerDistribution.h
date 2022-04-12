@@ -8,6 +8,8 @@
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
+#include "frc/ResistanceCalculator.h"
+
 namespace frc {
 
 /**
