@@ -52,6 +52,37 @@ class MerweScaledSigmaPoints {
 
   /**
    * Computes the sigma points for an unscented Kalman filter given the mean
+   * (x) and square-root covariance(S) of the filter.
+   *
+   * @param x An array of the means.
+   * @param S Square-root covariance of the filter.
+   *
+   * @return Two dimensional array of sigma points. Each column contains all of
+   *         the sigmas for one dimension in the problem space. Ordered by
+   *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
+   *
+   */
+  Eigen::Matrix<double, States, 2 * States + 1> SquareRootSigmaPoints(
+      const Eigen::Vector<double, States>& x,
+      const Eigen::Matrix<double, States, States>& S) {
+    double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
+    double eta = std::sqrt(lambda + States);
+    auto U = eta * S;
+
+    Eigen::Matrix<double, States, 2 * States + 1> sigmas;
+    sigmas.template block<States, 1>(0, 0) = x;
+    for (int k = 0; k < States; ++k) {
+      sigmas.template block<States, 1>(0, k + 1) =
+          x + U.template block<States, 1>(0, k);
+      sigmas.template block<States, 1>(0, States + k + 1) =
+          x - U.template block<States, 1>(0, k);
+    }
+
+    return sigmas;
+  }
+
+  /**
+   * Computes the sigma points for an unscented Kalman filter given the mean
    * (x) and covariance(P) of the filter.
    *
    * @param x An array of the means.
@@ -65,20 +96,7 @@ class MerweScaledSigmaPoints {
   Eigen::Matrix<double, States, 2 * States + 1> SigmaPoints(
       const Eigen::Vector<double, States>& x,
       const Eigen::Matrix<double, States, States>& P) {
-    double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
-    Eigen::Matrix<double, States, States> U =
-        ((lambda + States) * P).llt().matrixL();
-
-    Eigen::Matrix<double, States, 2 * States + 1> sigmas;
-    sigmas.template block<States, 1>(0, 0) = x;
-    for (int k = 0; k < States; ++k) {
-      sigmas.template block<States, 1>(0, k + 1) =
-          x + U.template block<States, 1>(0, k);
-      sigmas.template block<States, 1>(0, States + k + 1) =
-          x - U.template block<States, 1>(0, k);
-    }
-
-    return sigmas;
+    return SquareRootSigmaPoints(x, P.llt().matrixL());
   }
 
   /**

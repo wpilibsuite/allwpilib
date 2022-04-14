@@ -17,6 +17,7 @@
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
+#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 
@@ -215,6 +216,7 @@ class UnscentedKalmanFilter {
   void Reset() {
     m_xHat.setZero();
     m_P.setZero();
+    m_S.setZero();
     m_sigmasF.setZero();
   }
 
@@ -232,22 +234,22 @@ class UnscentedKalmanFilter {
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(contA, m_contQ, dt, &discA, &discQ);
+    DiscretizeAQTaylor<States>(contA, m_contQ, m_dt, &discA, &discQ);
+    Eigen::Matrix<double, States, States> squareRootDiscQ = discQ.sqrt();
 
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
 
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       Eigen::Vector<double, States> x = sigmas.template block<States, 1>(0, i);
       m_sigmasF.template block<States, 1>(0, i) = RK4(m_f, x, u, dt);
     }
 
-    auto ret = UnscentedTransform<States, States>(
-        m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX);
-    m_xHat = std::get<0>(ret);
-    m_P = std::get<1>(ret);
-
-    m_P += discQ;
+    auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
+        m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
+        squareRootDiscQ);
+    m_xHat = xHat;
+    m_S = S;
   }
 
   /**
@@ -344,20 +346,21 @@ class UnscentedKalmanFilter {
                    const Eigen::Vector<double, States>)>
                    addFuncX) {
     const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+    Eigen::Matrix<double, Rows, Rows> squareRootDiscR = discR.sqrt();
 
     // Transform sigma points into measurement space
     Eigen::Matrix<double, Rows, 2 * States + 1> sigmasH;
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
-        m_pts.SigmaPoints(m_xHat, m_P);
+        m_pts.SquareRootSigmaPoints(m_xHat, m_S);
     for (int i = 0; i < m_pts.NumSigmas(); ++i) {
       sigmasH.template block<Rows, 1>(0, i) =
           h(sigmas.template block<States, 1>(0, i), u);
     }
 
     // Mean and covariance of prediction passed through UT
-    auto [yHat, Py] = UnscentedTransform<Rows, States>(
-        sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY);
-    Py += discR;
+    auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
+        sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
+        squareRootDiscR);
 
     // Compute cross covariance of the state and the measurements
     Eigen::Matrix<double, States, Rows> Pxy;
@@ -371,19 +374,23 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // K = P_{xy} P_y⁻¹
-    // Kᵀ = P_yᵀ⁻¹ P_{xy}ᵀ
-    // P_yᵀKᵀ = P_{xy}ᵀ
-    // Kᵀ = P_yᵀ.solve(P_{xy}ᵀ)
-    // K = (P_yᵀ.solve(P_{xy}ᵀ)ᵀ
+    // K = (P_{xy} / S_yᵀ) / S_y
+    // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
+    // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
     Eigen::Matrix<double, States, Rows> K =
-        Py.transpose().ldlt().solve(Pxy.transpose()).transpose();
+        Sy.transpose()
+            .fullPivHouseholderQr()
+            .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
+            .transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, yHat));
 
-    // Pₖ₊₁⁺ = Pₖ₊₁⁻ − KP_yKᵀ
-    m_P -= K * Py * K.transpose();
+    Eigen::Matrix<double, States, Rows> U = K * Sy;
+    for (int i = 0; i < Rows; i++) {
+      Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
+          m_S, U.template block<States, 1>(0, i), -1);
+    }
   }
 
  private:
@@ -417,6 +424,7 @@ class UnscentedKalmanFilter {
       m_addFuncX;
   Eigen::Vector<double, States> m_xHat;
   Eigen::Matrix<double, States, States> m_P;
+  Eigen::Matrix<double, States, States> m_S;
   Eigen::Matrix<double, States, States> m_contQ;
   Eigen::Matrix<double, Outputs, Outputs> m_contR;
   Eigen::Matrix<double, States, 2 * States + 1> m_sigmasF;
