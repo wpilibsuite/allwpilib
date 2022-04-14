@@ -8,6 +8,8 @@
 #include <hal/FRCUsageReporting.h>
 #include <hal/Ports.h>
 #include <hal/PowerDistribution.h>
+#include <units/current.h>
+#include <units/impedance.h>
 #include <wpi/StackTrace.h>
 #include <wpi/sendable/SendableBuilder.h>
 #include <wpi/sendable/SendableRegistry.h>
@@ -210,7 +212,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-double PowerDistribution::GetTotalResistance() const {
+units::ohm_t PowerDistribution::GetTotalResistance() const {
   return m_totalResistance.load();
 }
 
@@ -254,10 +256,10 @@ void PowerDistribution::InitSendable(wpi::SendableBuilder& builder) {
         HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
       });
   builder.AddDoubleProperty(
-      "TotalResistance", [=] { return GetTotalResistance(); }, nullptr);
+      "TotalResistance", [=] { return GetTotalResistance().value(); }, nullptr);
 }
 
 void PowerDistribution::UpdateResistance() {
-  m_totalResistance.store(
-      m_totalResistanceCalculator.Calculate(GetTotalCurrent(), GetVoltage()));
+  m_totalResistance.store(m_totalResistanceCalculator.Calculate(
+      units::ampere_t(GetTotalCurrent()), units::volt_t(GetVoltage())));
 }

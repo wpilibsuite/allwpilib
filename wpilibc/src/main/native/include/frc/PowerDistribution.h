@@ -5,9 +5,10 @@
 #pragma once
 
 #include <atomic>
-#include <units/time.h>
 
 #include <hal/Types.h>
+#include <units/impedance.h>
+#include <units/time.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -132,7 +133,7 @@ class PowerDistribution : public wpi::Sendable,
    *
    * @return The robot total resistance, in Ohms.
    */
-  double GetTotalResistance() const;
+  units::ohm_t GetTotalResistance() const;
 
   struct Version {
     uint32_t FirmwareMajor;
@@ -216,7 +217,7 @@ class PowerDistribution : public wpi::Sendable,
   hal::Handle<HAL_PowerDistributionHandle> m_handle;
   int m_module;
   ResistanceCalculator m_totalResistanceCalculator;
-  std::atomic<double> m_totalResistance;
+  std::atomic<units::ohm_t> m_totalResistance;
   frc::Notifier m_totalResistanceNotifier;
 
   void UpdateResistance();

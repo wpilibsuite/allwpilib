@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <units/current.h>
+#include <units/impedance.h>
+#include <units/voltage.h>
 #include <wpi/circular_buffer.h>
 
 namespace frc {
@@ -54,19 +57,19 @@ class ResistanceCalculator {
    * @param voltage The current voltage
    * @return The current resistance in ohms
    */
-  double Calculate(double current, double voltage);
+  units::ohm_t Calculate(units::ampere_t current, units::volt_t voltage);
 
  private:
   /**
    * Buffers holding the current values that will eventually need to be
    * subtracted from the sum when they leave the window.
    */
-  wpi::circular_buffer<double> m_currentBuffer;
+  wpi::circular_buffer<units::ampere_t> m_currentBuffer;
   /**
    * Buffer holding the voltage values that will eventually need to be
    * subtracted from the sum when they leave the window.
    */
-  wpi::circular_buffer<double> m_voltageBuffer;
+  wpi::circular_buffer<units::volt_t> m_voltageBuffer;
   /**
    * The maximum number of points to take the linear regression over.
    */
@@ -79,23 +82,25 @@ class ResistanceCalculator {
   /**
    * Running sum of the past currents.
    */
-  double m_currentSum;
+  units::ampere_t m_currentSum;
   /**
    * Running sum of the past voltages.
    */
-  double m_voltageSum;
+  units::volt_t m_voltageSum;
   /**
    * Running sum of the squares of the past currents.
    */
-  double m_currentSquaredSum;
+  units::unit_t<units::squared<units::current::amperes>> m_currentSquaredSum;
   /**
    * Running sum of the squares of the past voltages.
    */
-  double m_voltageSquaredSum;
+  units::unit_t<units::squared<units::voltage::volts>> m_voltageSquaredSum;
   /**
    * Running sum of the past current*voltage's.
    */
-  double m_prodSum;
+  units::unit_t<
+      units::compound_unit<units::current::amperes, units::voltage::volts>>
+      m_prodSum;
   /**
    * The number of points currently in the buffer.
    */
