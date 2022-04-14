@@ -12,8 +12,8 @@
 
 namespace frc {
 
-using ampere_squared_t = units::unit_t<units::squared<units::current::amperes>>;
-using volt_squared_t = units::unit_t<units::squared<units::voltage::volts>>;
+using ampere_squared_t = units::unit_t<units::squared<units::amperes>>;
+using volt_squared_t = units::unit_t<units::squared<units::volts>>;
 
 /**
  * Finds the resistance of a channel or the entire robot using a running linear
