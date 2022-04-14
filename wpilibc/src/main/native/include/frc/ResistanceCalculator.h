@@ -19,7 +19,7 @@ namespace frc {
 class ResistanceCalculator {
  public:
   static constexpr int kDefaultBufferSize = 250;
-  static constexpr double kDefaultRSquaredThreshold = 0.5;
+  static constexpr double kDefaultRSquaredThreshold = 0.75;
 
   /**
    * Create a ResistanceCalculator to find the resistance of a channel using a

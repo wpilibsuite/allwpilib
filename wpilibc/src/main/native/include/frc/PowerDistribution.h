@@ -5,6 +5,7 @@
 #pragma once
 
 #include <atomic>
+#include <units/time.h>
 
 #include <hal/Types.h>
 #include <wpi/sendable/Sendable.h>
@@ -23,7 +24,7 @@ class PowerDistribution : public wpi::Sendable,
                           public wpi::SendableHelper<PowerDistribution> {
  public:
   static constexpr int kDefaultModule = -1;
-  static constexpr double kUpdatePeriod = 0.025;
+  static constexpr units::second_t kUpdatePeriod = 25_ms;
   enum class ModuleType { kCTRE = 1, kRev = 2 };
 
   /**
@@ -127,10 +128,9 @@ class PowerDistribution : public wpi::Sendable,
   void SetSwitchableChannel(bool enabled);
 
   /**
-   * Get the robot's resistance. A {@link ResistanceCalculator} should have been
-   * passed in the constructor to enable calculating resistance.
-   * @return The robot resistance if a resistance calculator was given, {@code
-   * NaN} otherwise.
+   * Get the robot's total resistance.
+   *
+   * @return The robot total resistance, in Ohms.
    */
   double GetTotalResistance() const;
 
@@ -217,7 +217,7 @@ class PowerDistribution : public wpi::Sendable,
   int m_module;
   ResistanceCalculator m_totalResistanceCalculator;
   std::atomic<double> m_totalResistance;
-  frc::Notifier m_resistanceLoop;
+  frc::Notifier m_totalResistanceNotifier;
 
   void UpdateResistance();
 };

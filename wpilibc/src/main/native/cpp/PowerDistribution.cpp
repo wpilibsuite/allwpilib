@@ -28,7 +28,7 @@ static_assert(frc::PowerDistribution::kDefaultModule ==
 using namespace frc;
 
 PowerDistribution::PowerDistribution()
-    : m_resistanceLoop([=]() { UpdateResistance(); }) {
+    : m_totalResistanceNotifier([=] { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -43,12 +43,11 @@ PowerDistribution::PowerDistribution()
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 
-  m_resistanceLoop.StartPeriodic(
-      units::time::second_t(PowerDistribution::kUpdatePeriod));
+  m_totalResistanceNotifier.StartPeriodic(PowerDistribution::kUpdatePeriod);
 }
 
 PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
-    : m_resistanceLoop([=]() { UpdateResistance(); }) {
+    : m_totalResistanceNotifier([=] { UpdateResistance(); }) {
   auto stack = wpi::GetStackTrace(1);
 
   int32_t status = 0;
@@ -62,8 +61,7 @@ PowerDistribution::PowerDistribution(int module, ModuleType moduleType)
   HAL_Report(HALUsageReporting::kResourceType_PDP, m_module + 1);
   wpi::SendableRegistry::AddLW(this, "PowerDistribution", m_module);
 
-  m_resistanceLoop.StartPeriodic(
-      units::time::second_t(PowerDistribution::kUpdatePeriod));
+  m_totalResistanceNotifier.StartPeriodic(PowerDistribution::kUpdatePeriod);
 }
 
 PowerDistribution::~PowerDistribution() {
@@ -77,7 +75,7 @@ PowerDistribution::PowerDistribution(PowerDistribution&& other)
     : m_handle(std::move(other.m_handle)),
       m_module(other.m_module),
       m_totalResistanceCalculator(std::move(other.m_totalResistanceCalculator)),
-      m_resistanceLoop(std::move(other.m_resistanceLoop)) {
+      m_totalResistanceNotifier(std::move(other.m_totalResistanceNotifier)) {
   m_totalResistance.store(other.m_totalResistance.load());
 }
 
@@ -85,7 +83,7 @@ PowerDistribution& PowerDistribution::operator=(PowerDistribution&& other) {
   m_handle = std::move(other.m_handle);
   m_module = other.m_module;
   m_totalResistanceCalculator = std::move(other.m_totalResistanceCalculator);
-  m_resistanceLoop = std::move(other.m_resistanceLoop);
+  m_totalResistanceNotifier = std::move(other.m_totalResistanceNotifier);
   m_totalResistance.store(other.m_totalResistance.load());
   return *this;
 }
