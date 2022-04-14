@@ -16,9 +16,8 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
-import org.junit.jupiter.api.Test;
-
 import java.util.function.BooleanSupplier;
+import org.junit.jupiter.api.Test;
 
 class ButtonTest extends CommandTestBase {
   @Test

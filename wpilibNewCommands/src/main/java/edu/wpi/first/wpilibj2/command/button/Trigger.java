@@ -359,8 +359,8 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Composes this trigger with a boolean supplier, returning a new trigger that is active when either
-   * trigger is active.
+   * Composes this trigger with a boolean supplier, returning a new trigger that is active when
+   * either trigger is active.
    *
    * @param booleanSupplier the boolean supplier to compose with
    * @return the trigger that is active when either trigger is active
