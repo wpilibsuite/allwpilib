@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-ResistanceCalculator::ResistanceCalculator(double bufferSize,
+ResistanceCalculator::ResistanceCalculator(int bufferSize,
                                            double krSquaredThreshold)
     : m_currentBuffer(bufferSize),
       m_voltageBuffer(bufferSize),
