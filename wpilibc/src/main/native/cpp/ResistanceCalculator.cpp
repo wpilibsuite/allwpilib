@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include <units/math.h>
+
 using namespace frc;
 
 ResistanceCalculator::ResistanceCalculator(int bufferSize,
@@ -21,13 +23,14 @@ ResistanceCalculator::ResistanceCalculator()
       m_bufferSize(ResistanceCalculator::kDefaultBufferSize),
       m_rSquaredThreshold(kDefaultRSquaredThreshold) {}
 
-double ResistanceCalculator::Calculate(double current, double voltage) {
+units::ohm_t ResistanceCalculator::Calculate(units::ampere_t current,
+                                             units::volt_t voltage) {
   // Update buffers only if drawing current
-  if (current != 0) {
+  if (current() != 0) {
     if (m_numPoints >= m_bufferSize) {
       // Pop the last point and remove it from the sums
-      double backCurrent = m_currentBuffer.pop_back();
-      double backVoltage = m_voltageBuffer.pop_back();
+      auto backCurrent = m_currentBuffer.pop_back();
+      auto backVoltage = m_voltageBuffer.pop_back();
       m_currentSum -= backCurrent;
       m_voltageSum -= backVoltage;
       m_currentSquaredSum -= backCurrent * backCurrent;
@@ -47,25 +50,26 @@ double ResistanceCalculator::Calculate(double current, double voltage) {
 
   // Recalculate resistance
   if (m_numPoints < 2) {
-    return std::nan("");
+    return units::ohm_t(std::nan(""));
   }
 
-  double currentMean = m_currentSum / m_numPoints;
-  double voltageMean = m_voltageSum / m_numPoints;
-  double currentVariance =
+  auto currentMean = m_currentSum / m_numPoints;
+  auto voltageMean = m_voltageSum / m_numPoints;
+  // todo make compound units work instead of turning into doubles
+  auto currentVariance =
       (m_currentSquaredSum / m_numPoints) - currentMean * currentMean;
-  double voltageVariance =
+  auto voltageVariance =
       (m_voltageSquaredSum / m_numPoints) - voltageMean * voltageMean;
-  double covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) /
-                      (m_numPoints - 1);
-  double krSquared =
+  auto covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) /
+                    (m_numPoints - 1);
+  auto krSquared =
       covariance * covariance / (currentVariance * voltageVariance);
 
   if (krSquared > m_rSquaredThreshold) {
     // Slope of current vs voltage
-    double slope = covariance / currentVariance;
-    return -slope;
+    auto slope = covariance / currentVariance;
+    return units::ohm_t(-slope);
   } else {
-    return std::nan("");
+    return units::ohm_t(std::nan(""));
   }
 }
