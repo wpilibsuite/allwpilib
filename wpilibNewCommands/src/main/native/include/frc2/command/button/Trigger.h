@@ -331,30 +331,12 @@ class Trigger {
   }
 
   /**
-   * Composes a trigger and a boolean function with logical AND.
-   *
-   * @return A trigger which is active when both components are active.
-   */
-  Trigger operator&&(std::function<bool()> rhs) {
-    return Trigger([*this, rhs] { return m_isActive() && rhs(); });
-  }
-
-  /**
    * Composes two triggers with logical OR.
    *
    * @return A trigger which is active when either component trigger is active.
    */
   Trigger operator||(Trigger rhs) {
     return Trigger([*this, rhs] { return m_isActive() || rhs.m_isActive(); });
-  }
-
-  /**
-   * Composes a trigger and a boolean function with logical OR.
-   *
-   * @return A trigger which is active when either component is active.
-   */
-  Trigger operator||(std::function<bool()> rhs) {
-    return Trigger([*this, rhs] { return m_isActive() || rhs(); });
   }
 
   /**
