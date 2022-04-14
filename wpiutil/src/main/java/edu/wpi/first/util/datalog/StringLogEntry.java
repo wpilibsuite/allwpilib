@@ -48,6 +48,6 @@ public class StringLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(String value) {
-    m_log.appendString(m_entry, value, 0);
+    append(value, 0);
   }
 }

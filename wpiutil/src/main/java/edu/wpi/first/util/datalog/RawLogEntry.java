@@ -48,6 +48,6 @@ public class RawLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(byte[] value) {
-    m_log.appendRaw(m_entry, value, 0);
+    append(value, 0);
   }
 }

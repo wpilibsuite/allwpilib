@@ -40,6 +40,6 @@ public class IntegerLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(long value) {
-    m_log.appendInteger(m_entry, value, 0);
+    append(value, 0);
   }
 }

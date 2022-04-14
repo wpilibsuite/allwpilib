@@ -40,6 +40,6 @@ public class FloatArrayLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(float[] value) {
-    m_log.appendFloatArray(m_entry, value, 0);
+    append(value, 0);
   }
 }

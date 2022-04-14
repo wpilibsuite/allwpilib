@@ -40,6 +40,6 @@ public class BooleanArrayLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(boolean[] value) {
-    m_log.appendBooleanArray(m_entry, value, 0);
+    append(value, 0);
   }
 }

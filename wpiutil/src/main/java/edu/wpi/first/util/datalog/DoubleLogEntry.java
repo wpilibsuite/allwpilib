@@ -40,6 +40,6 @@ public class DoubleLogEntry extends DataLogEntry {
    * @param value Value to record
    */
   public void append(double value) {
-    m_log.appendDouble(m_entry, value, 0);
+    append(value, 0);
   }
 }
