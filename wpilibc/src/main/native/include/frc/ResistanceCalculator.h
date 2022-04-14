@@ -12,9 +12,6 @@
 
 namespace frc {
 
-using ampere_squared_t = units::unit_t<units::squared<units::amperes>>;
-using volt_squared_t = units::unit_t<units::squared<units::volts>>;
-
 /**
  * Finds the resistance of a channel or the entire robot using a running linear
  * regression over a window. Must be updated with current and voltage
@@ -64,6 +61,8 @@ class ResistanceCalculator {
   units::ohm_t Calculate(units::ampere_t current, units::volt_t voltage);
 
  private:
+  using ampere_squared_t = units::unit_t<units::squared<units::amperes>>;
+  using volt_squared_t = units::unit_t<units::squared<units::volts>>;
   /**
    * Buffers holding the current values that will eventually need to be
    * subtracted from the sum when they leave the window.
