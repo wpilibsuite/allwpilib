@@ -144,9 +144,9 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the radian value of the rotation.
+   * Returns the radian value of the Rotation2d.
    *
-   * @return The radian value of the rotation.
+   * @return The radian value of the Rotation2d.
    */
   @JsonProperty
   public double getRadians() {
@@ -154,45 +154,45 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the degree value of the rotation.
+   * Returns the degree value of the Rotation2d.
    *
-   * @return The degree value of the rotation.
+   * @return The degree value of the Rotation2d.
    */
   public double getDegrees() {
     return Math.toDegrees(m_value);
   }
 
   /**
-   * Returns the number of rotations of the rotation.
+   * Returns the number of rotations of the Rotation2d.
    *
-   * @return The number of rotations of the rotation.
+   * @return The number of rotations of the Rotation2d.
    */
   public double getRotations() {
     return Units.radiansToRotations(m_value);
   }
 
   /**
-   * Returns the cosine of the rotation.
+   * Returns the cosine of the Rotation2d.
    *
-   * @return The cosine of the rotation.
+   * @return The cosine of the Rotation2d.
    */
   public double getCos() {
     return m_cos;
   }
 
   /**
-   * Returns the sine of the rotation.
+   * Returns the sine of the Rotation2d.
    *
-   * @return The sine of the rotation.
+   * @return The sine of the Rotation2d.
    */
   public double getSin() {
     return m_sin;
   }
 
   /**
-   * Returns the tangent of the rotation.
+   * Returns the tangent of the Rotation2d.
    *
-   * @return The tangent of the rotation.
+   * @return The tangent of the Rotation2d.
    */
   public double getTan() {
     return m_sin / m_cos;
