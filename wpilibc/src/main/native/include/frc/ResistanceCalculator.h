@@ -6,10 +6,14 @@
 
 #include <units/current.h>
 #include <units/impedance.h>
+#include <units/power.h>
 #include <units/voltage.h>
 #include <wpi/circular_buffer.h>
 
 namespace frc {
+
+using ampere_squared_t = units::unit_t<units::squared<units::current::amperes>>;
+using volt_squared_t = units::unit_t<units::squared<units::voltage::volts>>;
 
 /**
  * Finds the resistance of a channel or the entire robot using a running linear
@@ -90,17 +94,15 @@ class ResistanceCalculator {
   /**
    * Running sum of the squares of the past currents.
    */
-  units::unit_t<units::squared<units::current::amperes>> m_currentSquaredSum;
+  ampere_squared_t m_currentSquaredSum;
   /**
    * Running sum of the squares of the past voltages.
    */
-  units::unit_t<units::squared<units::voltage::volts>> m_voltageSquaredSum;
+  volt_squared_t m_voltageSquaredSum;
   /**
    * Running sum of the past current*voltage's.
    */
-  units::unit_t<
-      units::compound_unit<units::current::amperes, units::voltage::volts>>
-      m_prodSum;
+  units::watt_t m_prodSum;
   /**
    * The number of points currently in the buffer.
    */
