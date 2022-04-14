@@ -28,7 +28,7 @@ class ResistanceCalculator {
    *
    * @param bufferSize The maximum number of points to take the linear
    * regression over.
-   * @param krSquaredThreshold The minimum r² value (0 to 1) considered
+   * @param krSquaredThreshold The minimum R² value (0 to 1) considered
    * significant enough to return the regression slope instead of NaN. A lower
    * threshold allows resistance to be returned even with noisier data.
    */
@@ -38,7 +38,7 @@ class ResistanceCalculator {
    * Create a ResistanceCalculator to find the resistance of a channel using a
    * running linear regression over a window. Must be updated with current and
    * voltage periodically using the <code>Calculate</code> method. <p>Uses a
-   * buffer size of 250 and an r² threshold of 0.5.</p>
+   * buffer size of 250 and an R² threshold of 0.5.</p>
    */
   ResistanceCalculator();
 
@@ -72,7 +72,7 @@ class ResistanceCalculator {
    */
   int m_bufferSize;
   /**
-   * The minimum r² value considered significant enough to return the
+   * The minimum R² value considered significant enough to return the
    * regression slope instead of NaN.
    */
   double m_rSquaredThreshold;
