@@ -11,11 +11,11 @@
 using namespace frc;
 
 ResistanceCalculator::ResistanceCalculator(int bufferSize,
-                                           double krSquaredThreshold)
+                                           double rSquaredThreshold)
     : m_currentBuffer(bufferSize),
       m_voltageBuffer(bufferSize),
       m_bufferSize(bufferSize),
-      m_rSquaredThreshold(krSquaredThreshold) {}
+      m_rSquaredThreshold(rSquaredThreshold) {}
 
 ResistanceCalculator::ResistanceCalculator()
     : m_currentBuffer(ResistanceCalculator::kDefaultBufferSize),
@@ -26,7 +26,7 @@ ResistanceCalculator::ResistanceCalculator()
 units::ohm_t ResistanceCalculator::Calculate(units::ampere_t current,
                                              units::volt_t voltage) {
   // Update buffers only if drawing current
-  if (current() != 0) {
+  if (current != 0_A) {
     if (m_numPoints >= m_bufferSize) {
       // Pop the last point and remove it from the sums
       auto backCurrent = m_currentBuffer.pop_back();
@@ -50,7 +50,7 @@ units::ohm_t ResistanceCalculator::Calculate(units::ampere_t current,
 
   // Recalculate resistance
   if (m_numPoints < 2) {
-    return units::ohm_t(std::nan(""));
+    return units::ohm_t{std::nan("")};
   }
 
   auto currentMean = m_currentSum / m_numPoints;
@@ -62,14 +62,14 @@ units::ohm_t ResistanceCalculator::Calculate(units::ampere_t current,
       (m_voltageSquaredSum / m_numPoints) - voltageMean * voltageMean;
   auto covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) /
                     (m_numPoints - 1);
-  auto krSquared =
+  auto rSquared =
       covariance * covariance / (currentVariance * voltageVariance);
 
-  if (krSquared > m_rSquaredThreshold) {
+  if (rSquared > m_rSquaredThreshold) {
     // Slope of current vs voltage
     auto slope = covariance / currentVariance;
-    return units::ohm_t(-slope);
+    return units::ohm_t{-slope};
   } else {
-    return units::ohm_t(std::nan(""));
+    return units::ohm_t{std::nan("")};
   }
 }
