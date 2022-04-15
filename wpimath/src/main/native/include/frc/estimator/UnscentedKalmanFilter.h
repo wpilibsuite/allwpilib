@@ -17,7 +17,6 @@
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
 #include "units/time.h"
-#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
 
@@ -235,7 +234,7 @@ class UnscentedKalmanFilter {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, States> discQ;
     DiscretizeAQTaylor<States>(contA, m_contQ, m_dt, &discA, &discQ);
-    Eigen::Matrix<double, States, States> squareRootDiscQ = discQ.sqrt();
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discQ);
 
     Eigen::Matrix<double, States, 2 * States + 1> sigmas =
         m_pts.SquareRootSigmaPoints(m_xHat, m_S);
@@ -247,7 +246,7 @@ class UnscentedKalmanFilter {
 
     auto [xHat, S] = SquareRootUnscentedTransform<States, States>(
         m_sigmasF, m_pts.Wm(), m_pts.Wc(), m_meanFuncX, m_residualFuncX,
-        squareRootDiscQ);
+        discQ.template triangularView<Eigen::Lower>());
     m_xHat = xHat;
     m_S = S;
   }
@@ -345,8 +344,8 @@ class UnscentedKalmanFilter {
                    const Eigen::Vector<double, States>&,
                    const Eigen::Vector<double, States>)>
                    addFuncX) {
-    const Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
-    Eigen::Matrix<double, Rows, Rows> squareRootDiscR = discR.sqrt();
+    Eigen::Matrix<double, Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
+    Eigen::internal::llt_inplace<double, Eigen::Lower>::blocked(discR);
 
     // Transform sigma points into measurement space
     Eigen::Matrix<double, Rows, 2 * States + 1> sigmasH;
@@ -360,7 +359,7 @@ class UnscentedKalmanFilter {
     // Mean and covariance of prediction passed through UT
     auto [yHat, Sy] = SquareRootUnscentedTransform<Rows, States>(
         sigmasH, m_pts.Wm(), m_pts.Wc(), meanFuncY, residualFuncY,
-        squareRootDiscR);
+        discR.template triangularView<Eigen::Lower>());
 
     // Compute cross covariance of the state and the measurements
     Eigen::Matrix<double, States, Rows> Pxy;

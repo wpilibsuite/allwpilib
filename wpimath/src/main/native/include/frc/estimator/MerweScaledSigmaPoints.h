@@ -66,7 +66,7 @@ class MerweScaledSigmaPoints {
       const Eigen::Matrix<double, States, States>& S) {
     double lambda = std::pow(m_alpha, 2) * (States + m_kappa) - States;
     double eta = std::sqrt(lambda + States);
-    auto U = eta * S;
+    Eigen::Matrix<double, States, States> U = eta * S;
 
     Eigen::Matrix<double, States, 2 * States + 1> sigmas;
     sigmas.template block<States, 1>(0, 0) = x;
