@@ -163,3 +163,23 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
   ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
 }
+
+TEST(UnscentedKalmanFilterTest, RoundTripP) {
+  constexpr auto dt = 5_ms;
+
+  frc::UnscentedKalmanFilter<2, 2, 2> observer{
+      [](const Eigen::Vector<double, 2>& x, const Eigen::Vector<double, 2>& u) {
+        return x;
+      },
+      [](const Eigen::Vector<double, 2>& x, const Eigen::Vector<double, 2>& u) {
+        return x;
+      },
+      {0.0, 0.0},
+      {0.0, 0.0},
+      dt};
+
+  Eigen::Matrix<double, 2, 2> P({{2, 1}, {1, 2}});
+  observer.SetP(P);
+
+  ASSERT_TRUE(observer.P().isApprox(P));
+}

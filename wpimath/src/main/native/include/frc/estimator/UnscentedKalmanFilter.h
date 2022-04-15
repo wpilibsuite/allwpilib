@@ -183,6 +183,23 @@ class UnscentedKalmanFilter {
   void SetS(const Eigen::Matrix<double, States, States>& S) { m_S = S; }
 
   /**
+   * Returns the reconstructed error covariance matrix P.
+   */
+  const Eigen::Matrix<double, States, States> P() const {
+    return m_S.transpose() * m_S;
+  }
+
+  /**
+   * Set the current square-root error covariance matrix S by taking the square
+   * root of P.
+   *
+   * @param P The error covariance matrix P.
+   */
+  void SetP(const Eigen::Matrix<double, States, States>& P) {
+    m_S = P.llt().matrixU();
+  }
+
+  /**
    * Returns the state estimate x-hat.
    */
   const Eigen::Vector<double, States>& Xhat() const { return m_xHat; }
