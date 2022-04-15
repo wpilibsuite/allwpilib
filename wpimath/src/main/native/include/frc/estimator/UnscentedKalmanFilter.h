@@ -163,24 +163,24 @@ class UnscentedKalmanFilter {
   }
 
   /**
-   * Returns the error covariance matrix P.
+   * Returns the square-root error covariance matrix S.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const Eigen::Matrix<double, States, States>& S() const { return m_S; }
 
   /**
-   * Returns an element of the error covariance matrix P.
+   * Returns an element of the square-root error covariance matrix S.
    *
-   * @param i Row of P.
-   * @param j Column of P.
+   * @param i Row of S.
+   * @param j Column of S.
    */
-  double P(int i, int j) const { return m_P(i, j); }
+  double S(int i, int j) const { return m_S(i, j); }
 
   /**
-   * Set the current error covariance matrix P.
+   * Set the current square-root error covariance matrix S.
    *
-   * @param P The error covariance matrix P.
+   * @param S The square-root error covariance matrix S.
    */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  void SetS(const Eigen::Matrix<double, States, States>& S) { m_S = S; }
 
   /**
    * Returns the state estimate x-hat.
@@ -214,7 +214,6 @@ class UnscentedKalmanFilter {
    */
   void Reset() {
     m_xHat.setZero();
-    m_P.setZero();
     m_S.setZero();
     m_sigmasF.setZero();
   }
@@ -422,7 +421,6 @@ class UnscentedKalmanFilter {
       const Eigen::Vector<double, States>)>
       m_addFuncX;
   Eigen::Vector<double, States> m_xHat;
-  Eigen::Matrix<double, States, States> m_P;
   Eigen::Matrix<double, States, States> m_S;
   Eigen::Matrix<double, States, States> m_contQ;
   Eigen::Matrix<double, Outputs, Outputs> m_contR;

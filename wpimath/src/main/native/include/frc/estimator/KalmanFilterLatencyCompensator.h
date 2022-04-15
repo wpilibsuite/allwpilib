@@ -21,7 +21,7 @@ class KalmanFilterLatencyCompensator {
  public:
   struct ObserverSnapshot {
     Eigen::Vector<double, States> xHat;
-    Eigen::Matrix<double, States, States> errorCovariances;
+    Eigen::Matrix<double, States, States> squareRootErrorCovariances;
     Eigen::Vector<double, Inputs> inputs;
     Eigen::Vector<double, Outputs> localMeasurements;
 
@@ -29,7 +29,7 @@ class KalmanFilterLatencyCompensator {
                      const Eigen::Vector<double, Inputs>& u,
                      const Eigen::Vector<double, Outputs>& localY)
         : xHat(observer.Xhat()),
-          errorCovariances(observer.P()),
+          squareRootErrorCovariances(observer.S()),
           inputs(u),
           localMeasurements(localY) {}
   };
@@ -140,7 +140,7 @@ class KalmanFilterLatencyCompensator {
       auto& [key, snapshot] = m_pastObserverSnapshots[i];
 
       if (i == indexOfClosestEntry) {
-        observer->SetP(snapshot.errorCovariances);
+        observer->SetS(snapshot.squareRootErrorCovariances);
         observer->SetXhat(snapshot.xHat);
       }
 

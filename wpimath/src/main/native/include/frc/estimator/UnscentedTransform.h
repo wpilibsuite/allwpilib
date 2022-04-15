@@ -47,7 +47,7 @@ SquareRootUnscentedTransform(
         Eigen::Vector<double, CovDim>(const Eigen::Vector<double, CovDim>&,
                                       const Eigen::Vector<double, CovDim>&)>
         residualFunc,
-    const Eigen::Matrix<double, CovDim, CovDim> squareRootR) {
+    const Eigen::Matrix<double, CovDim, CovDim>& squareRootR) {
   // New mean is usually just the sum of the sigmas * weight:
   //       n
   // dot = Σ W[k] Xᵢ[k]
