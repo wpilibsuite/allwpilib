@@ -10,7 +10,7 @@ namespace drake::math {
 namespace {
 TEST(MerweScaledSigmaPointsTest, ZeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
-  auto points = sigmaPoints.SigmaPoints(
+  auto points = sigmaPoints.SquareRootSigmaPoints(
       Eigen::Vector<double, 2>{0.0, 0.0},
       Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 1.0}});
 
@@ -23,9 +23,9 @@ TEST(MerweScaledSigmaPointsTest, ZeroMean) {
 
 TEST(MerweScaledSigmaPointsTest, NonzeroMean) {
   frc::MerweScaledSigmaPoints<2> sigmaPoints;
-  auto points = sigmaPoints.SigmaPoints(
+  auto points = sigmaPoints.SquareRootSigmaPoints(
       Eigen::Vector<double, 2>{1.0, 2.0},
-      Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, 10.0}});
+      Eigen::Matrix<double, 2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
 
   EXPECT_TRUE(
       (points -

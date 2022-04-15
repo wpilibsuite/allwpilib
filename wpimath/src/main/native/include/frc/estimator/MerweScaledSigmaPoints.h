@@ -6,7 +6,6 @@
 
 #include <cmath>
 
-#include "Eigen/Cholesky"
 #include "Eigen/Core"
 
 namespace frc {
@@ -79,24 +78,6 @@ class MerweScaledSigmaPoints {
     }
 
     return sigmas;
-  }
-
-  /**
-   * Computes the sigma points for an unscented Kalman filter given the mean
-   * (x) and covariance(P) of the filter.
-   *
-   * @param x An array of the means.
-   * @param P Covariance of the filter.
-   *
-   * @return Two dimensional array of sigma points. Each column contains all of
-   *         the sigmas for one dimension in the problem space. Ordered by
-   *         Xi_0, Xi_{1..n}, Xi_{n+1..2n}.
-   *
-   */
-  Eigen::Matrix<double, States, 2 * States + 1> SigmaPoints(
-      const Eigen::Vector<double, States>& x,
-      const Eigen::Matrix<double, States, States>& P) {
-    return SquareRootSigmaPoints(x, P.llt().matrixL());
   }
 
   /**
