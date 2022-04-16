@@ -51,9 +51,11 @@ jobs:
           - os: windows-2019
             artifact-name: Win64
             architecture: x64
+            build-options: "--max-workers 1"
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
+            build-options: ""
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
     steps:
@@ -83,7 +85,7 @@ jobs:
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
       - name: Sign Libraries with Developer ID
         run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
