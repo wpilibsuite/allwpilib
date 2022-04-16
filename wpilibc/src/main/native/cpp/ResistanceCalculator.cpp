@@ -62,8 +62,7 @@ units::ohm_t ResistanceCalculator::Calculate(units::ampere_t current,
       (m_voltageSquaredSum / m_numPoints) - voltageMean * voltageMean;
   auto covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) /
                     (m_numPoints - 1);
-  auto rSquared =
-      covariance * covariance / (currentVariance * voltageVariance);
+  auto rSquared = covariance * covariance / (currentVariance * voltageVariance);
 
   if (rSquared > m_rSquaredThreshold) {
     // Slope of current vs voltage

@@ -67,6 +67,7 @@ public class ResistanceCalculator {
    * @param rSquaredThreshold The minimum R^2 value considered significant enough to return the
    *     regression slope instead of NaN.
    */
+  @SuppressWarnings("ParameterName")
   public ResistanceCalculator(int bufferSize, double rSquaredThreshold) {
     m_currentBuffer = new CircularBuffer(bufferSize);
     m_voltageBuffer = new CircularBuffer(bufferSize);
@@ -96,6 +97,7 @@ public class ResistanceCalculator {
    * @param voltage The current voltage
    * @return The current resistance, in ohms
    */
+  @SuppressWarnings("LocalVariableName")
   public double calculate(double current, double voltage) {
     // Update buffers only if drawing current
     if (current != 0) {
