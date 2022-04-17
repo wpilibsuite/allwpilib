@@ -101,9 +101,9 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
         new DigitalOutput(27);  // Drive SPI CS2 (IMU RST) low
     Wait(10_ms);                // Wait 10ms
     delete m_reset_out;
-    new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
+    DigitalInput* m_reset_in = new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
     Wait(500_ms);          // Wait 500ms for reset to complete
-
+    delete m_reset_in;
     // Configure standard SPI
     if (!SwitchToStandardSPI()) {
       return;
@@ -140,7 +140,9 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
     REPORT_WARNING("ADIS16470 IMU Successfully Initialized!");
 
     // Drive SPI CS3 (IMU ready LED) low (active low)
-    new DigitalOutput(28);
+    DigitalOutput* m_status_led = new DigitalOutput(28);
+    Wait(10_ms);
+    delete m_status_led;
   }
 
   // Report usage and post data to DS
