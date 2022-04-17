@@ -104,6 +104,7 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, SPI::Port port,
     DigitalInput* m_reset_in = new DigitalInput(27);  // Set SPI CS2 (IMU RST) high
     Wait(500_ms);          // Wait 500ms for reset to complete
     delete m_reset_in;
+
     // Configure standard SPI
     if (!SwitchToStandardSPI()) {
       return;
