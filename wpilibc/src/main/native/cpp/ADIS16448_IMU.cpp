@@ -102,9 +102,10 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
     DigitalOutput* m_reset_out = new DigitalOutput(18);  // Drive MXP DIO8 low
     Wait(10_ms);                                         // Wait 10ms
     delete m_reset_out;
-    new DigitalInput(18);  // Set MXP DIO8 high
+    DigitalInput* m_reset_in = new DigitalInput(18);  // Set MXP DIO8 high
     Wait(500_ms);          // Wait 500ms for reset to complete
-
+    delete m_reset_in;
+    
     ConfigCalTime(cal_time);
 
     // Configure standard SPI
@@ -143,7 +144,9 @@ ADIS16448_IMU::ADIS16448_IMU(IMUAxis yaw_axis, SPI::Port port,
 
     // TODO: Find what the proper pin is to turn this LED
     //  Drive MXP PWM5 (IMU ready LED) low (active low)
-    new DigitalOutput(19);
+    DigitalOutput* m_status_led = new DigitalOutput(19);
+    Wait(10_ms);                                         // Wait 10ms
+    delete m_status_led;
   }
 
   // Report usage and post data to DS
