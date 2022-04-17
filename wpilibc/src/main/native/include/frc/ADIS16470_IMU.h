@@ -296,6 +296,10 @@ class ADIS16470_IMU : public nt::NTSendable,
   static constexpr double deg_to_rad = 0.0174532;
   static constexpr double grav = 9.81;
 
+  /** @brief Resources **/
+  DigitalInput* m_reset_in;
+  DigitalOutput* m_status_led;
+
   /**
    * @brief Switches to standard SPI operation. Primarily used when exiting auto
    * SPI mode.
