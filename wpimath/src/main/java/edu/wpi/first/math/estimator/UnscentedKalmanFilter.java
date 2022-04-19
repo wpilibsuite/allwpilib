@@ -477,7 +477,10 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     // K = (P_{xy} / S_yᵀ) / S_y
     // K = (S_y \ P_{xy}ᵀ)ᵀ / S_y
     // K = (S_yᵀ \ (S_y \ P_{xy}ᵀ))ᵀ
-    Matrix<States, R> K = Sy.transpose().mldivide(Sy.mldivide(Pxy.transpose())).transpose();
+    Matrix<States, R> K =
+        Sy.transpose()
+            .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
+            .transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − ŷ)
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, yHat)));

@@ -290,28 +290,6 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
-   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting, where this
-   * matrix is A.
-   *
-   * @param <R2> Number of rows in B.
-   * @param <C2> Number of columns in B.
-   * @param other The B matrix.
-   * @return The solution matrix.
-   */
-  public final <R2 extends Num, C2 extends Num> Matrix<C, C2> mldivide(Matrix<R2, C2> other) {
-    Matrix<C, C2> solution = new Matrix<>(new SimpleMatrix(this.getNumCols(), other.getNumCols()));
-    WPIMathJNI.solveFullPivHouseholderQr(
-        this.getData(),
-        this.getNumRows(),
-        this.getNumCols(),
-        other.getData(),
-        other.getNumRows(),
-        other.getNumCols(),
-        solution.getData());
-    return solution;
-  }
-
-  /**
    * Calculates the transpose, Mᵀ of this matrix.
    *
    * @return The transpose matrix.
@@ -345,6 +323,10 @@ public class Matrix<R extends Num, C extends Num> {
    * <p>The matrix equation could also be written as x = A<sup>-1</sup>b. Where the pseudo inverse
    * is used if A is not square.
    *
+   * <p>Note that this method does not support solving using a QR decomposition with full-pivoting,
+   * as only column-pivoting is supported. For full-pivoting, use {@link
+   * #solveFullPivHouseholderQr}.
+   *
    * @param <C2> Columns in b.
    * @param b The right-hand side of the equation to solve.
    * @return The solution to the linear system.
@@ -352,6 +334,29 @@ public class Matrix<R extends Num, C extends Num> {
   @SuppressWarnings("ParameterName")
   public final <C2 extends Num> Matrix<C, C2> solve(Matrix<R, C2> b) {
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
+  }
+
+  /**
+   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting, where this
+   * matrix is A.
+   *
+   * @param <R2> Number of rows in B.
+   * @param <C2> Number of columns in B.
+   * @param other The B matrix.
+   * @return The solution matrix.
+   */
+  public final <R2 extends Num, C2 extends Num> Matrix<C, C2> solveFullPivHouseholderQr(
+      Matrix<R2, C2> other) {
+    Matrix<C, C2> solution = new Matrix<>(new SimpleMatrix(this.getNumCols(), other.getNumCols()));
+    WPIMathJNI.solveFullPivHouseholderQr(
+        this.getData(),
+        this.getNumRows(),
+        this.getNumCols(),
+        other.getData(),
+        other.getNumRows(),
+        other.getNumCols(),
+        solution.getData());
+    return solution;
   }
 
   /**
