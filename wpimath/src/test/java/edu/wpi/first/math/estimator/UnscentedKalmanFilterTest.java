@@ -197,8 +197,8 @@ class UnscentedKalmanFilterTest {
 
     final var finalPosition = trajectory.sample(trajectory.getTotalTimeSeconds());
 
-    assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 0.25);
-    assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 0.25);
+    assertEquals(finalPosition.poseMeters.getTranslation().getX(), observer.getXhat(0), 1.0);
+    assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 1.0);
     assertEquals(finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 1.0);
     assertEquals(0.0, observer.getXhat(3), 1.0);
     assertEquals(0.0, observer.getXhat(4), 1.0);
@@ -239,7 +239,7 @@ class UnscentedKalmanFilterTest {
   void testUnscentedTransform() {
     // From FilterPy
     var ret =
-        UnscentedKalmanFilter.unscentedTransform(
+        UnscentedKalmanFilter.squareRootUnscentedTransform(
             Nat.N4(),
             Nat.N4(),
             Matrix.mat(Nat.N4(), Nat.N9())
@@ -301,7 +301,8 @@ class UnscentedKalmanFilterTest {
                 16.66666667,
                 16.66666667),
             (sigmas, weights) -> sigmas.times(Matrix.changeBoundsUnchecked(weights)),
-            Matrix::minus);
+            Matrix::minus,
+            new Matrix<>(Nat.N4(), Nat.N4()));
 
     assertTrue(VecBuilder.fill(-0.9, 1, -0.9, 1).isEqual(ret.getFirst(), 1E-5));
 
@@ -324,6 +325,6 @@ class UnscentedKalmanFilterTest {
                 -5.10705197e-29,
                 2.00000500e-02,
                 2.00001000e-01)
-            .isEqual(ret.getSecond(), 1E-5));
+            .isEqual(ret.getSecond().transpose().times(ret.getSecond()), 1E-5));
   }
 }

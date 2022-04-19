@@ -40,6 +40,10 @@ namespace frc {
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
  * "Stochastic control theory".
  *
+ * <p> This class implements a square-root-form unscented Kalman filter
+ * (SR-UKF). For more information about the SR-UKF, see
+ * https://www.researchgate.net/publication/3908304.
+ *
  * @tparam States The number of states.
  * @tparam Inputs The number of inputs.
  * @tparam Outputs The number of outputs.

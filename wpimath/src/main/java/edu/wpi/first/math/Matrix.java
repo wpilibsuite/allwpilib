@@ -290,6 +290,26 @@ public class Matrix<R extends Num, C extends Num> {
   }
 
   /**
+   * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting, where this
+   * matrix is A.
+   *
+   * @param other The B matrix.
+   * @return The solution matrix.
+   */
+  public final <R2 extends Num, C2 extends Num> Matrix<C, C2> mldivide(Matrix<R2, C2> other) {
+    Matrix<C, C2> solution = new Matrix<>(new SimpleMatrix(this.getNumCols(), other.getNumCols()));
+    WPIMathJNI.solveFullPivHouseholderQr(
+        this.getData(),
+        this.getNumRows(),
+        this.getNumCols(),
+        other.getData(),
+        other.getNumRows(),
+        other.getNumCols(),
+        solution.getData());
+    return solution;
+  }
+
+  /**
    * Calculates the transpose, Mᵀ of this matrix.
    *
    * @return The transpose matrix.
@@ -675,6 +695,20 @@ public class Matrix<R extends Num, C extends Num> {
   public boolean isEqual(Matrix<?, ?> other, double tolerance) {
     return MatrixFeatures_DDRM.isEquals(
         this.m_storage.getDDRM(), other.m_storage.getDDRM(), tolerance);
+  }
+
+  /**
+   * Performs an inplace Cholesky rank update (or downdate).
+   *
+   * <p>If this matrix contains L where A = LL<sup>&top;</sup> before the update, it will contain L
+   * where LL<sup>&top;</sup> = A + &sigma;vv<sup>&top;</sup> after the update.
+   *
+   * @param v Vector to use for the update.
+   * @param sigma Sigma to use for the update.
+   * @param lowerTriangular Whether or not this matrix is lower triangular.
+   */
+  public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
+    WPIMathJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
   }
 
   @Override
