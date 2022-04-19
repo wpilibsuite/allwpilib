@@ -293,6 +293,8 @@ public class Matrix<R extends Num, C extends Num> {
    * Solves the least-squares problem Ax=B using a QR decomposition with full pivoting, where this
    * matrix is A.
    *
+   * @param <R2> Number of rows in B.
+   * @param <C2> Number of columns in B.
    * @param other The B matrix.
    * @return The solution matrix.
    */
