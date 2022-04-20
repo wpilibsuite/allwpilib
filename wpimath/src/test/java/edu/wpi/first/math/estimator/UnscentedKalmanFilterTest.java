@@ -268,9 +268,9 @@ class UnscentedKalmanFilterTest {
             VecBuilder.fill(0.0, 0.0),
             dtSeconds);
 
-    var P = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
-    observer.setP(P);
+    var expectedP = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
+    observer.setP(expectedP);
 
-    assertTrue(observer.getP().isEqual(P, 1e-9));
+    assertTrue(observer.getP().isEqual(expectedP, 1e-9));
   }
 }
