@@ -219,8 +219,8 @@ class UnscentedKalmanFilterTest {
     assertEquals(finalPosition.poseMeters.getTranslation().getY(), observer.getXhat(1), 0.15);
     assertEquals(
         finalPosition.poseMeters.getRotation().getRadians(), observer.getXhat(2), 0.000005);
-    assertEquals(0.0, observer.getXhat(3), 0.05);
-    assertEquals(0.0, observer.getXhat(4), 0.05);
+    assertEquals(0.0, observer.getXhat(3), 0.1);
+    assertEquals(0.0, observer.getXhat(4), 0.1);
   }
 
   @Test

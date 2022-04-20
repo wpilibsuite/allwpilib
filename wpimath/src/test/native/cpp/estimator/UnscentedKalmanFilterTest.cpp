@@ -170,8 +170,8 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
               0.15);
   EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
               0.000005);
-  EXPECT_NEAR(0.0, observer.Xhat(3), 0.05);
-  EXPECT_NEAR(0.0, observer.Xhat(4), 0.05);
+  EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
+  EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
 }
 
 TEST(UnscentedKalmanFilterTest, RoundTripP) {
