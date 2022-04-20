@@ -254,6 +254,7 @@ class UnscentedKalmanFilterTest {
     assertEquals(ref.get(0, 0), observer.getXhat(0), 5);
   }
 
+  @SuppressWarnings("LocalVariableName")
   @Test
   void testRoundTripP() {
     var dtSeconds = 0.005;
@@ -268,9 +269,9 @@ class UnscentedKalmanFilterTest {
             VecBuilder.fill(0.0, 0.0),
             dtSeconds);
 
-    var expectedP = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
-    observer.setP(expectedP);
+    var P = Matrix.mat(Nat.N2(), Nat.N2()).fill(2.0, 1.0, 1.0, 2.0);
+    observer.setP(P);
 
-    assertTrue(observer.getP().isEqual(expectedP, 1e-9));
+    assertTrue(observer.getP().isEqual(P, 1e-9));
   }
 }
