@@ -111,7 +111,7 @@ class MecanumDrivePoseEstimatorTest {
     }
 
     assertEquals(
-        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.25, "Incorrect mean error");
-    assertEquals(0.0, maxError, 0.42, "Incorrect max error");
+        0.0, errorSum / (trajectory.getTotalTimeSeconds() / dt), 0.025, "Incorrect mean error");
+    assertEquals(0.0, maxError, 0.07, "Incorrect max error");
   }
 }

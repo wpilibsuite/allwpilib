@@ -94,11 +94,15 @@ template <int CovDim, int States>
 Eigen::Vector<double, CovDim> AngleMean(
     const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
     const Eigen::Vector<double, 2 * States + 1>& Wm, int angleStatesIdx) {
-  double sumSin = sigmas.row(angleStatesIdx)
-                      .unaryExpr([](auto it) { return std::sin(it); })
+  double sumSin = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
+                    return std::sin(it);
+                  }) *
+                   Wm)
                       .sum();
-  double sumCos = sigmas.row(angleStatesIdx)
-                      .unaryExpr([](auto it) { return std::cos(it); })
+  double sumCos = (sigmas.row(angleStatesIdx).unaryExpr([](auto it) {
+                    return std::cos(it);
+                  }) *
+                   Wm)
                       .sum();
 
   Eigen::Vector<double, CovDim> ret = sigmas * Wm;

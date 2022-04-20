@@ -84,6 +84,6 @@ TEST(SwerveDrivePoseEstimatorTest, Accuracy) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.2);
-  EXPECT_LT(maxError, 0.4);
+  EXPECT_LT(errorSum / (trajectory.TotalTime().value() / dt.value()), 0.05);
+  EXPECT_LT(maxError, 0.1);
 }
