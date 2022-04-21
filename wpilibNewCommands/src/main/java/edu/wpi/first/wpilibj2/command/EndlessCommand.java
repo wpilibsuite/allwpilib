@@ -8,28 +8,25 @@ import static edu.wpi.first.wpilibj2.command.CommandGroupBase.registerGroupedCom
 import static edu.wpi.first.wpilibj2.command.CommandGroupBase.requireUngrouped;
 
 /**
- * A command that runs another command in perpetuity, ignoring that command's end conditions. While
- * this class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as it
+ * A command that runs another command endlessly, ignoring that command's end conditions. While this
+ * class does not extend {@link CommandGroupBase}, it is still considered a CommandGroup, as it
  * allows one to compose another command within it; the command instances that are passed to it
  * cannot be added to any other groups, or scheduled individually.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
  *
  * <p>This class is provided by the NewCommands VendorDep
- *
- * @deprecated Replaced by {@link EndlessCommand}.
  */
-@Deprecated(forRemoval = true, since = "2023")
-public class PerpetualCommand extends CommandBase {
+public class EndlessCommand extends CommandBase {
   protected final Command m_command;
 
   /**
-   * Creates a new PerpetualCommand. Will run another command in perpetuity, ignoring that command's
-   * end conditions, unless this command itself is interrupted.
+   * Creates a new EndlessCommand. Will run another command endlessly, ignoring that command's end
+   * conditions, unless this command itself is interrupted.
    *
-   * @param command the command to run perpetually
+   * @param command the command to run endlessly
    */
-  public PerpetualCommand(Command command) {
+  public EndlessCommand(Command command) {
     requireUngrouped(command);
     registerGroupedCommands(command);
     m_command = command;
@@ -57,7 +54,7 @@ public class PerpetualCommand extends CommandBase {
   }
 
   @Override
-  public PerpetualCommand perpetually() {
+  public EndlessCommand endlessly() {
     return this;
   }
 }
