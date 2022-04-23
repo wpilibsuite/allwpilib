@@ -15,7 +15,7 @@ import edu.wpi.first.util.CircularBuffer;
  * voltage minus the voltage at the motor controller or whatever is plugged in to the PDP at that
  * channel.
  */
-public class ResistanceCalculator {
+public final class ResistanceCalculator {
   public static final int kDefaultBufferSize = 250;
   public static final double kDefaultRSquaredThreshold = 0.75;
 
@@ -51,11 +51,11 @@ public class ResistanceCalculator {
    */
   @SuppressWarnings("ParameterName")
   public ResistanceCalculator(int bufferSize, double rSquaredThreshold) {
-    this.m_currentSums = new RunningSums(bufferSize);
-	  this.m_voltageSums = new RunningSums(bufferSize);
-	  this.m_prodSums	= new RunningSums(bufferSize);
     this.m_rSquaredThreshold = rSquaredThreshold;
     this.m_bufferSize = bufferSize;
+    this.m_currentSums = new RunningSums();
+	  this.m_voltageSums = new RunningSums();
+	  this.m_prodSums	= new RunningSums();
   }
 
   /**
@@ -81,9 +81,9 @@ public class ResistanceCalculator {
   @SuppressWarnings("LocalVariableName")
   public double calculate(double current, double voltage) {
     if (current != 0) {
-	  m_currentSums.update(current);
-	  m_voltageSums.update(voltage);
-	  m_prodSums.update(current * voltage);
+      m_currentSums.update(current);
+      m_voltageSums.update(voltage);
+      m_prodSums.update(current * voltage);
       if (m_numPoints < m_bufferSize) {
         m_numPoints++;
       }
@@ -113,11 +113,9 @@ public class ResistanceCalculator {
   }
 
   /** A helper class for calculating running sum and variance. */
-  private static final class RunningSums {
+  private final class RunningSums {
     /** Buffer holding values whose variance, sum, and squared sum is to be calculated. */
     private final CircularBuffer m_buffer;
-
-    private final double m_bufferSize;
 
     /** Running sum of the past values. */
     private double m_sum;
@@ -125,12 +123,8 @@ public class ResistanceCalculator {
     /** Running sum of the squares of the past values. */
     private double m_squaredSum;
 
-    /** Number of values in the buffer. */
-    private int m_numValues;
-
-    public RunningSums(int bufferSize) {
-      this.m_buffer = new CircularBuffer(bufferSize);
-      this.m_bufferSize = bufferSize;
+    public RunningSums() {
+      this.m_buffer = new CircularBuffer(m_bufferSize);
     }
 
     public double getSum() {
@@ -138,17 +132,15 @@ public class ResistanceCalculator {
     }
 
     public double calculateVariance() {
-      return m_squaredSum / m_numValues - m_sum * m_sum;
+      return m_squaredSum / m_numPoints - m_sum * m_sum;
     }
 
     public void update(double value) {
-      if (m_numValues >= m_bufferSize) {
+      if (m_numPoints >= m_bufferSize) {
         // Pop the last point and remove it from the sums
         double last = m_buffer.removeLast();
         m_sum -= last;
         m_squaredSum -= last * last;
-      } else {
-        m_numValues++;
       }
 
       m_buffer.addFirst(value);
