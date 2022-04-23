@@ -186,7 +186,7 @@ class Command {
    * @return the decorated command
    * @deprecated replace with EndlessCommand
    */
-  WPIDEPRECATED("Replace with Endlessly()")
+  WPI_DEPRECATED("Replace with Endlessly()")
   virtual PerpetualCommand Perpetually() &&;
 
   /**
