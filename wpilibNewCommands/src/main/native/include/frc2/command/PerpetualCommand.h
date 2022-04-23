@@ -31,8 +31,8 @@ namespace frc2 {
  *
  * @deprecated replace with EndlessCommand
  */
-WPI_DEPRECATED("Replace with EndlessCommand")
-class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
+class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
+    : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,
