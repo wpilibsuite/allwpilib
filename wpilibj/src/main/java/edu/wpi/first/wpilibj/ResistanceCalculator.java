@@ -19,17 +19,14 @@ public class ResistanceCalculator {
   public static final int kDefaultBufferSize = 250;
   public static final double kDefaultRSquaredThreshold = 0.75;
 
-  /**
-   * Buffers holding the current values that will eventually need to be subtracted from the sum when
-   * they leave the window.
-   */
-  private final CircularBuffer m_currentBuffer;
+  /** Running sum and squared sum of the current */
+  private final RunningSums m_currentSums;
 
-  /**
-   * Buffer holding the voltage values that will eventually need to be subtracted from the sum when
-   * they leave the window.
-   */
-  private final CircularBuffer m_voltageBuffer;
+  /** Running sum and squared sum of the voltage */
+  private final RunningSums m_voltageSums;
+
+  /** Running sum and squared sum of the products of current and voltage */
+  private final RunningSums m_prodSums;
 
   /** The maximum number of points to take the linear regression over. */
   private final int m_bufferSize;
@@ -39,21 +36,6 @@ public class ResistanceCalculator {
    * NaN.
    */
   private final double m_rSquaredThreshold;
-
-  /** Running sum of the past currents. */
-  private double m_currentSum;
-
-  /** Running sum of the past voltages. */
-  private double m_voltageSum;
-
-  /** Running sum of the squares of the past currents. */
-  private double m_currentSquaredSum;
-
-  /** Running sum of the squares of the past voltages. */
-  private double m_voltageSquaredSum;
-
-  /** Running sum of the past current*voltage's. */
-  private double m_prodSum;
 
   /** The number of points currently in the buffer. */
   private int m_numPoints;
@@ -69,8 +51,9 @@ public class ResistanceCalculator {
    */
   @SuppressWarnings("ParameterName")
   public ResistanceCalculator(int bufferSize, double rSquaredThreshold) {
-    m_currentBuffer = new CircularBuffer(bufferSize);
-    m_voltageBuffer = new CircularBuffer(bufferSize);
+    this.m_currentSums = new RunningSums(bufferSize);
+	this.m_voltageSums = new RunningSums(bufferSize);
+	this.m_prodSums	= new RunningSums(bufferSize);
     this.m_rSquaredThreshold = rSquaredThreshold;
     this.m_bufferSize = bufferSize;
   }
@@ -84,62 +67,93 @@ public class ResistanceCalculator {
    * of {@link ResistanceCalculator#kDefaultRSquaredThreshold}.
    */
   public ResistanceCalculator() {
-    m_currentBuffer = new CircularBuffer(kDefaultBufferSize);
-    m_voltageBuffer = new CircularBuffer(kDefaultBufferSize);
-    this.m_rSquaredThreshold = kDefaultRSquaredThreshold;
-    this.m_bufferSize = kDefaultBufferSize;
+    this(kDefaultBufferSize, kDefaultRSquaredThreshold);
   }
 
   /**
-   * Update the buffers with new (current, voltage) points, and remove old points if necessary.
+   * Recalculates resistance given a new current and voltage.
+   * The linear regression is only updated if current is nonzero.
    *
-   * @param current The current current
-   * @param voltage The current voltage
-   * @return The current resistance, in ohms
+   * @param current The current current, in amperes
+   * @param voltage The current voltage, in volts
+   * @return The current resistance, in ohms. NaN if fewer than 2 points have been added.
    */
   @SuppressWarnings("LocalVariableName")
   public double calculate(double current, double voltage) {
-    // Update buffers only if drawing current
     if (current != 0) {
-      if (m_numPoints >= m_bufferSize) {
-        // Pop the last point and remove it from the sums
-        double backCurrent = m_currentBuffer.removeLast();
-        double backVoltage = m_voltageBuffer.removeLast();
-        m_currentSum -= backCurrent;
-        m_voltageSum -= backVoltage;
-        m_currentSquaredSum -= backCurrent * backCurrent;
-        m_voltageSquaredSum -= backVoltage * backVoltage;
-        m_prodSum -= backCurrent * backVoltage;
-      } else {
+	  m_currentSums.update(current);
+	  m_voltageSums.update(voltage);
+	  m_prodSums.update(current * voltage);
+      if (m_numPoints < m_bufferSize) {
         m_numPoints++;
       }
-      m_currentBuffer.addFirst(current);
-      m_voltageBuffer.addFirst(voltage);
-      m_currentSum += current;
-      m_voltageSum += voltage;
-      m_currentSquaredSum += current * current;
-      m_voltageSquaredSum += voltage * voltage;
-      m_prodSum += current * voltage;
     }
 
-    // Recalculate resistance
     if (m_numPoints < 2) {
       return Double.NaN;
     }
 
-    double currentVariance =
-        (m_currentSquaredSum / m_numPoints) - Math.pow(m_currentSum / m_numPoints, 2);
-    double voltageVariance =
-        (m_voltageSquaredSum / m_numPoints) - Math.pow(m_voltageSum / m_numPoints, 2);
-    double covariance = (m_prodSum - m_currentSum * m_voltageSum / m_numPoints) / (m_numPoints - 1);
+    // Recalculate resistance
+	double currentSum = m_currentSums.getSum();
+	double voltageSum = m_voltageSums.getSum();
+	double prodSum = m_prodSums.getSum();
+    double currentVariance = m_currentSums.calculateVariance();
+    double voltageVariance = m_voltageSums.calculateVariance();
+
+    double covariance = (prodSum - currentSum * voltageSum / m_numPoints) / (m_numPoints - 1);
     double rSquared = covariance * covariance / (currentVariance * voltageVariance);
 
     if (rSquared > m_rSquaredThreshold) {
-      // Slope of current vs voltage
+      // Resistance is slope of current vs voltage negated
       double slope = covariance / currentVariance;
       return -slope;
     } else {
       return Double.NaN;
     }
+  }
+
+  /** A helper class for calculating running sum and variance */
+  private static final class RunningSums {
+	/** Buffer holding values whose variance, sum, and squared sum is to be calculated */
+	private final CircularBuffer m_buffer;
+
+	private final double m_bufferSize;
+
+	/** Running sum of the past values */
+	private double m_sum;
+
+	/** Running sum of the squares of the past values */
+	private double m_squaredSum;
+
+	/** Number of values in the buffer */
+	private int m_numValues;
+
+	public RunningSums(int bufferSize) {
+		this.m_buffer = new CircularBuffer(bufferSize);
+		this.m_bufferSize = bufferSize;
+	}
+
+	public double getSum() {
+		return m_sum;
+	}
+
+	public double calculateVariance() {
+		return m_squaredSum / m_numValues - m_sum * m_sum;
+	}
+
+	public void update(double value) {
+	  if (m_numValues >= m_bufferSize) {
+        // Pop the last point and remove it from the sums
+        double last = m_buffer.removeLast();
+        m_sum -= last;
+        m_squaredSum -= last * last;
+      } else {
+        m_numValues++;
+      }
+
+      m_buffer.addFirst(value);
+	  m_sum += value;
+	  m_squaredSum += value;
+	}
   }
 }
