@@ -31,7 +31,7 @@ public class CircularBuffer {
    *
    * @return number of elements in buffer
    */
-  public double size() {
+  public int size() {
     return m_length;
   }
 
