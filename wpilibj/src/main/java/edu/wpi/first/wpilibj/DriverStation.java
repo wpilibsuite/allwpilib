@@ -24,7 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
-public class DriverStation {
+public final class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
 

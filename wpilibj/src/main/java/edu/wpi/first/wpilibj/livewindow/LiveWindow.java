@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the LiveWindow.
  */
-public class LiveWindow {
+public final class LiveWindow {
   private static class Component {
     boolean m_firstTime = true;
     boolean m_telemetryEnabled = true;
