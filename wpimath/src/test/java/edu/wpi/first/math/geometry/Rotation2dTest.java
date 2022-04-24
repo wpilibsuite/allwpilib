@@ -15,8 +15,8 @@ class Rotation2dTest {
 
   @Test
   void testRadiansToDegrees() {
-    var rot1 = new Rotation2d(Math.PI / 3);
-    var rot2 = new Rotation2d(Math.PI / 4);
+    var rot1 = Rotation2d.fromRadians(Math.PI / 3);
+    var rot2 = Rotation2d.fromRadians(Math.PI / 4);
 
     assertAll(
         () -> assertEquals(rot1.getDegrees(), 60.0, kEpsilon),
