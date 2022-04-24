@@ -15,19 +15,20 @@ using namespace frc::sim;
 ElevatorSim::ElevatorSim(const LinearSystem<2, 1, 1>& plant,
                          const DCMotor& gearbox, double gearing,
                          units::meter_t drumRadius, units::meter_t minHeight,
-                         units::meter_t maxHeight,
+                         units::meter_t maxHeight, bool simulateGravity,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(plant, measurementStdDevs),
       m_gearbox(gearbox),
       m_drumRadius(drumRadius),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
-      m_gearing(gearing) {}
+      m_gearing(gearing),
+      m_simulateGravity(simulateGravity) {}
 
 ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
                          units::kilogram_t carriageMass,
                          units::meter_t drumRadius, units::meter_t minHeight,
-                         units::meter_t maxHeight,
+                         units::meter_t maxHeight, bool simulateGravity,
                          const std::array<double, 1>& measurementStdDevs)
     : LinearSystemSim(LinearSystemId::ElevatorSystem(gearbox, carriageMass,
                                                      drumRadius, gearing),
@@ -36,7 +37,8 @@ ElevatorSim::ElevatorSim(const DCMotor& gearbox, double gearing,
       m_drumRadius(drumRadius),
       m_minHeight(minHeight),
       m_maxHeight(maxHeight),
-      m_gearing(gearing) {}
+      m_gearing(gearing),
+      m_simulateGravity(simulateGravity) {}
 
 bool ElevatorSim::WouldHitLowerLimit(units::meter_t elevatorHeight) const {
   return elevatorHeight < m_minHeight;
@@ -87,8 +89,12 @@ Eigen::Vector<double, 2> ElevatorSim::UpdateX(
   auto updatedXhat = RKDP(
       [&](const Eigen::Vector<double, 2>& x,
           const Eigen::Vector<double, 1>& u_) -> Eigen::Vector<double, 2> {
-        return m_plant.A() * x + m_plant.B() * u_ +
-               Eigen::Vector<double, 2>{0.0, -9.8};
+        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
+
+        if (m_simulateGravity) {
+          xdot += Eigen::Vector<double, 2>{0.0, -9.8};
+        }
+        return xdot;
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
