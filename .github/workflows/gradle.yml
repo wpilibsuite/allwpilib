@@ -51,9 +51,6 @@ jobs:
           - os: windows-2019
             artifact-name: Win64
             architecture: x64
-          - os: windows-2019
-            artifact-name: Win32
-            architecture: x86
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
