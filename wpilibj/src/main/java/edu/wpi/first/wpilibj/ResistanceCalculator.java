@@ -54,8 +54,8 @@ public final class ResistanceCalculator {
     this.m_rSquaredThreshold = rSquaredThreshold;
     this.m_bufferSize = bufferSize;
     this.m_currentSums = new RunningSums();
-	  this.m_voltageSums = new RunningSums();
-	  this.m_prodSums	= new RunningSums();
+    this.m_voltageSums = new RunningSums();
+    this.m_prodSums  = new RunningSums();
   }
 
   /**
@@ -94,9 +94,9 @@ public final class ResistanceCalculator {
     }
 
     // Recalculate resistance
-	  double currentSum = m_currentSums.getSum();
-	  double voltageSum = m_voltageSums.getSum();
-	  double prodSum = m_prodSums.getSum();
+    double currentSum = m_currentSums.getSum();
+    double voltageSum = m_voltageSums.getSum();
+    double prodSum = m_prodSums.getSum();
     double currentVariance = m_currentSums.calculateVariance();
     double voltageVariance = m_voltageSums.calculateVariance();
 
@@ -123,7 +123,7 @@ public final class ResistanceCalculator {
     /** Running sum of the squares of the past values. */
     private double m_squaredSum;
 
-    public RunningSums() {
+    RunningSums() {
       this.m_buffer = new CircularBuffer(m_bufferSize);
     }
 
