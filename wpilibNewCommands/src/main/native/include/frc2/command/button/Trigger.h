@@ -35,7 +35,7 @@ class Trigger {
    *
    * @param isActive Whether the trigger is active.
    */
-  explicit Trigger(std::function<bool()> isActive)
+  Trigger(std::function<bool()> isActive)  // NOLINT
       : m_isActive{std::move(isActive)} {}
 
   /**
