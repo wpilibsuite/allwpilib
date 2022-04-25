@@ -4,6 +4,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.ArrayDeque;
+
 import edu.wpi.first.util.CircularBuffer;
 
 /**
@@ -19,14 +21,11 @@ public final class ResistanceCalculator {
   public static final int kDefaultBufferSize = 250;
   public static final double kDefaultRSquaredThreshold = 0.75;
 
-  /** Running sum and squared sum of the current. */
-  private final RunningSums m_currentSums;
+  /** Buffer holding previous current values. */
+  private final CircularBuffer m_currentBuffer;
 
-  /** Running sum and squared sum of the voltage. */
-  private final RunningSums m_voltageSums;
-
-  /** Running sum and squared sum of the products of current and voltage. */
-  private final RunningSums m_prodSums;
+  /** Buffer holding previous voltage values. */
+  private final CircularBuffer m_voltageBuffer;
 
   /** The maximum number of points to take the linear regression over. */
   private final int m_bufferSize;
@@ -39,6 +38,12 @@ public final class ResistanceCalculator {
 
   /** The number of points currently in the buffer. */
   private int m_numPoints;
+
+  /** Running sum of the current. */
+  private double m_currentSum;
+
+  /** Running sum of the voltage. */
+  private double m_voltageSum;
 
   /**
    * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
@@ -53,9 +58,8 @@ public final class ResistanceCalculator {
   public ResistanceCalculator(int bufferSize, double rSquaredThreshold) {
     this.m_rSquaredThreshold = rSquaredThreshold;
     this.m_bufferSize = bufferSize;
-    this.m_currentSums = new RunningSums();
-    this.m_voltageSums = new RunningSums();
-    this.m_prodSums  = new RunningSums();
+    this.m_currentBuffer = new CircularBuffer(bufferSize);
+    this.m_voltageBuffer = new CircularBuffer(bufferSize);
   }
 
   /**
@@ -71,8 +75,8 @@ public final class ResistanceCalculator {
   }
 
   /**
-   * Recalculates resistance given a new current and voltage.
-   * The linear regression is only updated if current is nonzero.
+   * Recalculates resistance given a new current and voltage. The linear regression is only updated
+   * if current is nonzero.
    *
    * @param current The current current, in amperes.
    * @param voltage The current voltage, in volts.
@@ -81,9 +85,18 @@ public final class ResistanceCalculator {
   @SuppressWarnings("LocalVariableName")
   public double calculate(double current, double voltage) {
     if (current != 0) {
-      m_currentSums.update(current);
-      m_voltageSums.update(voltage);
-      m_prodSums.update(current * voltage);
+      if (m_numPoints >= m_bufferSize) {
+        var lastCurrent = m_currentBuffer.removeLast();
+        var lastVoltage = m_voltageBuffer.removeLast();
+        m_currentSum -= lastCurrent;
+        m_voltageSum -= lastVoltage;
+      }
+
+      m_currentBuffer.addFirst(current);
+      m_voltageBuffer.addFirst(voltage);
+      m_currentSum += current;
+      m_voltageSum += voltage;
+      
       if (m_numPoints < m_bufferSize) {
         m_numPoints++;
       }
@@ -94,13 +107,11 @@ public final class ResistanceCalculator {
     }
 
     // Recalculate resistance
-    double currentSum = m_currentSums.getSum();
-    double voltageSum = m_voltageSums.getSum();
-    double prodSum = m_prodSums.getSum();
-    double currentVariance = m_currentSums.calculateVariance();
-    double voltageVariance = m_voltageSums.calculateVariance();
-
-    double covariance = (prodSum - currentSum * voltageSum / m_numPoints) / (m_numPoints - 1);
+    var currentMean = m_currentSum / m_numPoints;
+    var voltageMean = m_voltageSum / m_numPoints;
+    var currentVariance = covariance(currentMean, currentMean, m_currentBuffer, m_currentBuffer);
+    var voltageVariance = covariance(voltageMean, voltageMean, m_voltageBuffer, m_voltageBuffer);
+    double covariance = covariance(currentMean, voltageMean, m_currentBuffer, m_voltageBuffer);
     double rSquared = covariance * covariance / (currentVariance * voltageVariance);
 
     if (rSquared > m_rSquaredThreshold) {
@@ -112,40 +123,22 @@ public final class ResistanceCalculator {
     }
   }
 
-  /** A helper class for calculating running sum and variance. */
-  private final class RunningSums {
-    /** Buffer holding values whose variance, sum, and squared sum is to be calculated. */
-    private final CircularBuffer m_buffer;
+  /**
+   * Calculate covariance of two variables, x and y.
+   * @param xMean Mean of x
+   * @param yMean Mean of y
+   * @param xBuffer x values used for calculating covariance
+   * @param yBuffer y values used for calculating covariance
+   */
+  @SuppressWarnings("ParameterName")
+  private double covariance(
+      double xMean, double yMean, CircularBuffer xBuffer, CircularBuffer yBuffer) {
+    var prodSum = 0.0;
 
-    /** Running sum of the past values. */
-    private double m_sum;
-
-    /** Running sum of the squares of the past values. */
-    private double m_squaredSum;
-
-    RunningSums() {
-      this.m_buffer = new CircularBuffer(m_bufferSize);
+    for (int i = 0; i < m_numPoints; i ++) {
+      prodSum += (xBuffer.get(i) - xMean) * (yBuffer.get(i) - yMean);
     }
 
-    public double getSum() {
-      return m_sum;
-    }
-
-    public double calculateVariance() {
-      return m_squaredSum / m_numPoints - m_sum * m_sum;
-    }
-
-    public void update(double value) {
-      if (m_numPoints >= m_bufferSize) {
-        // Pop the last point and remove it from the sums
-        double last = m_buffer.removeLast();
-        m_sum -= last;
-        m_squaredSum -= last * last;
-      }
-
-      m_buffer.addFirst(value);
-      m_sum += value;
-      m_squaredSum += value;
-    }
+    return prodSum / m_numPoints;
   }
 }
