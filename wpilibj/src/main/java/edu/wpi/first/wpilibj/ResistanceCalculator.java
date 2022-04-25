@@ -4,8 +4,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.ArrayDeque;
-
 import edu.wpi.first.util.CircularBuffer;
 
 /**
@@ -39,11 +37,14 @@ public final class ResistanceCalculator {
   /** The number of points currently in the buffer. */
   private int m_numPoints;
 
-  /** Running sum of the current. */
-  private double m_currentSum;
+  /** Used for approximating current variance. */
+  private final OnlineCovariance m_currentVariance;
 
-  /** Running sum of the voltage. */
-  private double m_voltageSum;
+  /** Used for approximating voltage variance. */
+  private final OnlineCovariance m_voltageVariance;
+
+  /** Used for approximating covariance of current and voltage. */
+  private final OnlineCovariance m_covariance;
 
   /**
    * Create a {@code ResistanceCalculator} to find the resistance of a channel using a running
@@ -60,6 +61,9 @@ public final class ResistanceCalculator {
     this.m_bufferSize = bufferSize;
     this.m_currentBuffer = new CircularBuffer(bufferSize);
     this.m_voltageBuffer = new CircularBuffer(bufferSize);
+    this.m_currentVariance = new OnlineCovariance();
+    this.m_voltageVariance = new OnlineCovariance();
+    this.m_covariance = new OnlineCovariance();
   }
 
   /**
@@ -85,34 +89,33 @@ public final class ResistanceCalculator {
   @SuppressWarnings("LocalVariableName")
   public double calculate(double current, double voltage) {
     if (current != 0) {
-      if (m_numPoints >= m_bufferSize) {
+      if (m_currentBuffer.size() >= m_bufferSize) {
         var lastCurrent = m_currentBuffer.removeLast();
         var lastVoltage = m_voltageBuffer.removeLast();
-        m_currentSum -= lastCurrent;
-        m_voltageSum -= lastVoltage;
+        m_currentVariance.calculate(lastCurrent, lastCurrent, true);
+        m_voltageVariance.calculate(lastVoltage, lastVoltage, true);
+        m_covariance.calculate(lastCurrent, lastVoltage, true);
       }
 
       m_currentBuffer.addFirst(current);
       m_voltageBuffer.addFirst(voltage);
-      m_currentSum += current;
-      m_voltageSum += voltage;
-      
-      if (m_numPoints < m_bufferSize) {
-        m_numPoints++;
-      }
+
+      m_currentVariance.calculate(current, current, false);
+      m_voltageVariance.calculate(voltage, voltage, false);
+      m_covariance.calculate(current, voltage, false);
     }
 
-    if (m_numPoints < 2) {
+    if (m_currentBuffer.size() < 2) {
       return Double.NaN;
     }
 
     // Recalculate resistance
-    var currentMean = m_currentSum / m_numPoints;
-    var voltageMean = m_voltageSum / m_numPoints;
-    var currentVariance = covariance(currentMean, currentMean, m_currentBuffer, m_currentBuffer);
-    var voltageVariance = covariance(voltageMean, voltageMean, m_voltageBuffer, m_voltageBuffer);
-    double covariance = covariance(currentMean, voltageMean, m_currentBuffer, m_voltageBuffer);
-    double rSquared = covariance * covariance / (currentVariance * voltageVariance);
+    var currentVariance = m_currentVariance.getCovariance();
+    var voltageVariance = m_voltageVariance.getCovariance();
+    var covariance = m_covariance.getCovariance();
+    var rSquared = covariance * covariance / (currentVariance * voltageVariance);
+
+    System.out.printf("curr=%s, volt=%s, currVar=%s, voltVar=%s, cov=%s, r^2=%s, res=%s%n", current, voltage, currentVariance, voltageVariance, covariance, rSquared, -covariance / currentVariance);
 
     if (rSquared > m_rSquaredThreshold) {
       // Resistance is slope of current vs voltage negated
@@ -123,22 +126,48 @@ public final class ResistanceCalculator {
     }
   }
 
-  /**
-   * Calculate covariance of two variables, x and y.
-   * @param xMean Mean of x
-   * @param yMean Mean of y
-   * @param xBuffer x values used for calculating covariance
-   * @param yBuffer y values used for calculating covariance
-   */
-  @SuppressWarnings("ParameterName")
-  private double covariance(
-      double xMean, double yMean, CircularBuffer xBuffer, CircularBuffer yBuffer) {
-    var prodSum = 0.0;
+  /** A helper that approximates covariance incrementally */
+  private static final class OnlineCovariance {
+    /** Number of points covariance is calculated over. */
+    private int m_n;
 
-    for (int i = 0; i < m_numPoints; i ++) {
-      prodSum += (xBuffer.get(i) - xMean) * (yBuffer.get(i) - yMean);
+    /** Current mean of x values. */
+    private double m_xMean;
+
+    /** Current mean of y values. */
+    private double m_yMean;
+
+    /** Current approximated population covariance. */
+    private double m_cov;
+
+    /** The previously calculated covariance. */
+    public double getCovariance() {
+      return m_cov / (m_n - 1);
     }
 
-    return prodSum / m_numPoints;
+    /**
+     * Calculate the covariance based on a new point that may be removed or added.
+     * @param x The x value of the point.
+     * @param y The y value of the point.
+     * @param remove Whether to remove the point or add it.
+     * @return The new sample covariance.
+     */
+    public double calculate(double x, double y, boolean remove) {
+      // From https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance
+      var factor = remove ? -1 : 1;
+      m_n += factor;
+
+      var dx = x - m_xMean;
+      var dy = y - m_yMean;
+
+      m_xMean += factor * dx * m_n;
+      m_yMean += factor * dy * m_n;
+
+      // This is supposed to be (y - yMean) and not dy
+      m_cov += factor * dx * (y - m_yMean);
+
+      // Correction for sample variance
+      return m_cov / (m_n - 1);
+    }
   }
 }
