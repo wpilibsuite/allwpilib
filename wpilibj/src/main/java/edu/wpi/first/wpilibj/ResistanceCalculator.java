@@ -115,8 +115,6 @@ public final class ResistanceCalculator {
     var covariance = m_covariance.getCovariance();
     var rSquared = covariance * covariance / (currentVariance * voltageVariance);
 
-    System.out.printf("curr=%s, volt=%s, currVar=%s, voltVar=%s, cov=%s, r^2=%s, res=%s%n", current, voltage, currentVariance, voltageVariance, covariance, rSquared, -covariance / currentVariance);
-
     if (rSquared > m_rSquaredThreshold) {
       // Resistance is slope of current vs voltage negated
       double slope = covariance / currentVariance;
@@ -160,8 +158,8 @@ public final class ResistanceCalculator {
       var dx = x - m_xMean;
       var dy = y - m_yMean;
 
-      m_xMean += factor * dx * m_n;
-      m_yMean += factor * dy * m_n;
+      m_xMean += factor * dx / m_n;
+      m_yMean += factor * dy / m_n;
 
       // This is supposed to be (y - yMean) and not dy
       m_cov += factor * dx * (y - m_yMean);
