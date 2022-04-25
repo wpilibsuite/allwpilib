@@ -21,8 +21,8 @@ import java.nio.ByteOrder;
  * digital input and down on an edge from another digital input.
  */
 public class UpDownCounter implements Sendable, AutoCloseable {
-  private DigitalSource m_upSource;
-  private DigitalSource m_downSource;
+  private final DigitalSource m_upSource;
+  private final DigitalSource m_downSource;
 
   private final int m_handle;
 
@@ -43,6 +43,8 @@ public class UpDownCounter implements Sendable, AutoCloseable {
       CounterJNI.setCounterUpSource(
           m_handle, upSource.getPortHandleForRouting(), upSource.getAnalogTriggerTypeForRouting());
       CounterJNI.setCounterUpSourceEdge(m_handle, true, false);
+    } else {
+      m_upSource = null;
     }
 
     if (downSource != null) {
@@ -52,6 +54,8 @@ public class UpDownCounter implements Sendable, AutoCloseable {
           downSource.getPortHandleForRouting(),
           downSource.getAnalogTriggerTypeForRouting());
       CounterJNI.setCounterDownSourceEdge(m_handle, true, false);
+    } else {
+      m_downSource = null;
     }
 
     reset();

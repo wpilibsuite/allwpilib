@@ -64,6 +64,7 @@ class Robot : public frc::TimedRobot {
                                       kElevatorDrumRadius,
                                       kMinElevatorHeight,
                                       kMaxElevatorHeight,
+                                      true,
                                       {0.01}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 

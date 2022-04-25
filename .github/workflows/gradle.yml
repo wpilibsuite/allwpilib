@@ -23,7 +23,7 @@ jobs:
             build-options: "-Ponlylinuxaarch64bionic"
           - container: wpilib/ubuntu-base:18.04
             artifact-name: Linux
-            build-options: "-Dorg.gradle.jvmargs=-Xmx2g"
+            build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
@@ -51,9 +51,6 @@ jobs:
           - os: windows-2019
             artifact-name: Win64
             architecture: x64
-          - os: windows-2019
-            artifact-name: Win32
-            architecture: x86
           - os: macOS-11
             artifact-name: macOS
             architecture: x64
