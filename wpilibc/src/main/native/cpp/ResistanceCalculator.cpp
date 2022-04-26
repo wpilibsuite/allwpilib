@@ -10,7 +10,6 @@
 
 using namespace frc;
 
-
 /** The previously calculated covariance. */
 double ResistanceCalculator::OnlineCovariance::GetCovariance() {
   return m_cov / (m_n - 1);
@@ -23,8 +22,10 @@ double ResistanceCalculator::OnlineCovariance::GetCovariance() {
  * @param remove Whether to remove the point or add it.
  * @return The new sample covariance.
  */
-double ResistanceCalculator::OnlineCovariance::Calculate(double x, double y, bool remove) {
-  // From https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance
+double ResistanceCalculator::OnlineCovariance::Calculate(
+    double x, double y, bool remove) {
+  // From
+  // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Covariance
   auto factor = remove ? -1 : 1;
   m_n += factor;
 

@@ -141,6 +141,7 @@ public final class ResistanceCalculator {
 
     /**
      * Calculate the covariance based on a new point that may be removed or added.
+     *
      * @param x The x value of the point.
      * @param y The y value of the point.
      * @param remove Whether to remove the point or add it.
