@@ -34,9 +34,6 @@ public final class ResistanceCalculator {
    */
   private final double m_rSquaredThreshold;
 
-  /** The number of points currently in the buffer. */
-  private int m_numPoints;
-
   /** Used for approximating current variance. */
   private final OnlineCovariance m_currentVariance;
 
@@ -99,7 +96,6 @@ public final class ResistanceCalculator {
 
       m_currentBuffer.addFirst(current);
       m_voltageBuffer.addFirst(voltage);
-
       m_currentVariance.calculate(current, current, false);
       m_voltageVariance.calculate(voltage, voltage, false);
       m_covariance.calculate(current, voltage, false);
@@ -117,14 +113,14 @@ public final class ResistanceCalculator {
 
     if (rSquared > m_rSquaredThreshold) {
       // Resistance is slope of current vs voltage negated
-      double slope = covariance / currentVariance;
+      var slope = covariance / currentVariance;
       return -slope;
     } else {
       return Double.NaN;
     }
   }
 
-  /** A helper that approximates covariance incrementally */
+  /** A helper that approximates covariance incrementally. */
   private static final class OnlineCovariance {
     /** Number of points covariance is calculated over. */
     private int m_n;

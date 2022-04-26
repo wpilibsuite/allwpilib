@@ -64,17 +64,51 @@ class ResistanceCalculator {
   using ampere_squared_t = units::unit_t<units::squared<units::amperes>>;
   using volt_squared_t = units::unit_t<units::squared<units::volts>>;
 
+  class OnlineCovariance {
+   private:
+    /** Number of points covariance is calculated over. */
+    int m_n;
+
+    /** Current mean of x values. */
+    double m_xMean;
+
+    /** Current mean of y values. */
+    double m_yMean;
+
+    /** Current approximated population covariance. */
+    double m_cov;
+
+   public:
+    OnlineCovariance() = default;
+    ~OnlineCovariance() = default;
+    OnlineCovariance(OnlineCovariance&&) = default;
+    OnlineCovariance& operator=(OnlineCovariance&&) = default;
+
+    /** The previously calculated covariance. */
+    double GetCovariance();
+
+    /**
+     * Calculate the covariance based on a new point that may be removed or
+     * added.
+     * @param x The x value of the point.
+     * @param y The y value of the point.
+     * @param remove Whether to remove the point or add it.
+     * @return The new sample covariance.
+     */
+    double Calculate(double x, double y, bool remove);
+  };
+
   /**
    * Buffers holding the current values that will eventually need to be
    * subtracted from the sum when they leave the window.
    */
-  wpi::circular_buffer<units::ampere_t> m_currentBuffer;
+  wpi::circular_buffer<double> m_currentBuffer;
 
   /**
    * Buffer holding the voltage values that will eventually need to be
    * subtracted from the sum when they leave the window.
    */
-  wpi::circular_buffer<units::volt_t> m_voltageBuffer;
+  wpi::circular_buffer<double> m_voltageBuffer;
 
   /**
    * The maximum number of points to take the linear regression over.
@@ -87,30 +121,14 @@ class ResistanceCalculator {
    */
   double m_rSquaredThreshold;
 
-  /**
-   * Running sum of the past currents.
-   */
-  units::ampere_t m_currentSum;
+  /** Used for approximating current variance. */
+  OnlineCovariance m_currentVariance;
 
-  /**
-   * Running sum of the past voltages.
-   */
-  units::volt_t m_voltageSum;
+  /** Used for approximating voltage variance. */
+  OnlineCovariance m_voltageVariance;
 
-  /**
-   * Running sum of the squares of the past currents.
-   */
-  ampere_squared_t m_currentSquaredSum;
-
-  /**
-   * Running sum of the squares of the past voltages.
-   */
-  volt_squared_t m_voltageSquaredSum;
-
-  /**
-   * Running sum of the past current*voltage's.
-   */
-  units::watt_t m_prodSum;
+  /** Used for approximating covariance of current and voltage. */
+  OnlineCovariance m_covariance;
 
   /**
    * The number of points currently in the buffer.
