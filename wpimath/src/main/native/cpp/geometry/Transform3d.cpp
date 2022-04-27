@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/geometry/Transform2d.h"
+#include "frc/geometry/Transform3d.h"
 
-#include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Pose3d.h"
 
 using namespace frc;
 
-Transform2d::Transform2d(Pose2d initial, Pose2d final) {
+Transform3d::Transform3d(Pose3d initial, Pose3d final) {
   // We are rotating the difference between the translations
   // using a clockwise rotation matrix. This transforms the global
   // delta into a local delta (relative to the initial pose).
@@ -18,24 +18,24 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
   m_rotation = final.Rotation() - initial.Rotation();
 }
 
-Transform2d::Transform2d(Translation2d translation, Rotation2d rotation)
+Transform3d::Transform3d(Translation3d translation, Rotation3d rotation)
     : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
 
-Transform2d Transform2d::Inverse() const {
+Transform3d Transform3d::Inverse() const {
   // We are rotating the difference between the translations
   // using a clockwise rotation matrix. This transforms the global
   // delta into a local delta (relative to the initial pose).
-  return Transform2d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
+  return Transform3d{(-Translation()).RotateBy(-Rotation()), -Rotation()};
 }
 
-Transform2d Transform2d::operator+(const Transform2d& other) const {
-  return Transform2d{Pose2d{}, Pose2d{}.TransformBy(*this).TransformBy(other)};
+Transform3d Transform3d::operator+(const Transform3d& other) const {
+  return Transform3d{Pose3d{}, Pose3d{}.TransformBy(*this).TransformBy(other)};
 }
 
-bool Transform2d::operator==(const Transform2d& other) const {
+bool Transform3d::operator==(const Transform3d& other) const {
   return m_translation == other.m_translation && m_rotation == other.m_rotation;
 }
 
-bool Transform2d::operator!=(const Transform2d& other) const {
+bool Transform3d::operator!=(const Transform3d& other) const {
   return !operator==(other);
 }
