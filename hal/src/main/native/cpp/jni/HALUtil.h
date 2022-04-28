@@ -78,6 +78,10 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
 jbyteArray SetCANDataObject(JNIEnv* env, jobject canData, int32_t length,
                             uint64_t timestamp);
 
+jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
+                              int32_t length, uint32_t messageID,
+                              uint64_t timestamp);
+
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 
 jobject CreateDMABaseStore(JNIEnv* env, jint valueType, jint index);
