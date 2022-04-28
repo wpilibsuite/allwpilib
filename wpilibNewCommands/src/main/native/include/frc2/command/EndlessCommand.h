@@ -18,7 +18,7 @@
 
 namespace frc2 {
 /**
- * A command that runs another command in perpetuity, ignoring that command's
+ * A command that runs another command endlessly, ignoring that command's
  * end conditions.  While this class does not extend {@link CommandGroupBase},
  * it is still considered a CommandGroup, as it allows one to compose another
  * command within it; the command instances that are passed to it cannot be
@@ -28,41 +28,38 @@ namespace frc2 {
  * component commands.
  *
  * This class is provided by the NewCommands VendorDep
- *
- * @deprecated replace with EndlessCommand
  */
-class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
-    : public CommandHelper<CommandBase, PerpetualCommand> {
+class EndlessCommand : public CommandHelper<CommandBase, EndlessCommand> {
  public:
   /**
-   * Creates a new PerpetualCommand.  Will run another command in perpetuity,
+   * Creates a new EndlessCommand. Will run another command endlessly,
    * ignoring that command's end conditions, unless this command itself is
    * interrupted.
    *
-   * @param command the command to run perpetually
+   * @param command the command to run endlessly
    */
-  explicit PerpetualCommand(std::unique_ptr<Command>&& command);
+  explicit EndlessCommand(std::unique_ptr<Command>&& command);
 
   /**
-   * Creates a new PerpetualCommand.  Will run another command in perpetuity,
+   * Creates a new EndlessCommand. Will run another command endlessly,
    * ignoring that command's end conditions, unless this command itself is
    * interrupted.
    *
-   * @param command the command to run perpetually
+   * @param command the command to run endlessly
    */
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
-  explicit PerpetualCommand(T&& command)
-      : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(
+  explicit EndlessCommand(T&& command)
+      : EndlessCommand(std::make_unique<std::remove_reference_t<T>>(
             std::forward<T>(command))) {}
 
-  PerpetualCommand(PerpetualCommand&& other) = default;
+  EndlessCommand(EndlessCommand&& other) = default;
 
   // No copy constructors for command groups
-  PerpetualCommand(const PerpetualCommand& other) = delete;
+  EndlessCommand(const EndlessCommand& other) = delete;
 
   // Prevent template expansion from emulating copy ctor
-  PerpetualCommand(PerpetualCommand&) = delete;
+  EndlessCommand(EndlessCommand&) = delete;
 
   void Initialize() override;
 
@@ -70,7 +67,7 @@ class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
 
   void End(bool interrupted) override;
 
-  PerpetualCommand Perpetually() && override;
+  EndlessCommand Endlessly() && override;
 
  private:
   std::unique_ptr<Command> m_command;
