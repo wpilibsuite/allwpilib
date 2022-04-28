@@ -93,4 +93,50 @@ Java_edu_wpi_first_hal_can_CANJNI_getCANStatus
                      txFullCount, receiveErrorCount, transmitErrorCount);
 }
 
+/*
+ * Class:     edu_wpi_first_hal_can_CANJNI
+ * Method:    openCANStreamSession
+ * Signature: (III)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_can_CANJNI_openCANStreamSession
+  (JNIEnv* env, jclass, jint messageID, jint messageIDMask, jint maxMessages)
+{
+  uint32_t handle = 0;
+  int32_t status = 0;
+  HAL_CAN_OpenStreamSession(&handle, static_cast<uint32_t>(messageID),
+                            static_cast<uint32_t>(messageIDMask),
+                            static_cast<uint32_t>(maxMessages), &status);
+
+  if (!CheckStatus(env, status)) {
+    return static_cast<jint>(0);
+  }
+
+  return static_cast<jint>(handle);
+}
+
+/*
+ * Class:     edu_wpi_first_hal_can_CANJNI
+ * Method:    closeCANStreamSession
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_hal_can_CANJNI_closeCANStreamSession
+  (JNIEnv* env, jclass, jint sessionHandle)
+{
+  HAL_CAN_CloseStreamSession(static_cast<uint32_t>(sessionHandle));
+}
+
+/*
+ * Class:     edu_wpi_first_hal_can_CANJNI
+ * Method:    readCANStreamSession
+ * Signature: (I[Ljava/lang/Object;I)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_hal_can_CANJNI_readCANStreamSession
+  (JNIEnv*, jclass, jint, jobjectArray, jint)
+{
+  return (jint)0;
+}
+
 }  // extern "C"
