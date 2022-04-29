@@ -6,6 +6,7 @@
 
 #include <cstddef>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Core"
@@ -185,6 +186,10 @@ class SwerveDriveKinematics {
 
   mutable Translation2d m_previousCoR;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<4>;
+
 }  // namespace frc
 
 #include "SwerveDriveKinematics.inc"

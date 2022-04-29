@@ -6,6 +6,7 @@
 
 #include <limits>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 #include <wpi/timestamp.h>
 
@@ -319,5 +320,8 @@ class SwerveDrivePoseEstimator {
     return array;
   }
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDrivePoseEstimator<4>;
 
 }  // namespace frc
