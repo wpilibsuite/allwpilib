@@ -14,13 +14,27 @@
 #define WPILIB_DLLEXPORT __declspec(dllexport)
 #endif
 
+#elif defined(WPILIB_IMPORTS)
+
+#ifdef __GNUC__
+#define WPILIB_DLLEXPORT __attribute__((dllimport))
+#else
+#define WPILIB_DLLEXPORT __declspec(dllimport)
+#endif
+
 #else
 #define WPILIB_DLLEXPORT
 #endif
 
-#else
+#else  // _WIN32
+
+#ifdef WPILIB_EXPORTS
 #define WPILIB_DLLEXPORT __attribute__((visibility("default")))
+#else
+#define WPILIB_DLLEXPORT
 #endif
+
+#endif  // _WIN32
 
 // Synopsis
 //
