@@ -6,6 +6,7 @@
 
 #include <functional>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
 #include "Eigen/Cholesky"
@@ -424,5 +425,10 @@ class UnscentedKalmanFilter {
 
   MerweScaledSigmaPoints<States> m_pts;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<3, 3, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    UnscentedKalmanFilter<5, 3, 3>;
 
 }  // namespace frc
