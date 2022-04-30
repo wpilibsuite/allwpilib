@@ -9,8 +9,8 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -179,9 +179,8 @@ class SwerveDriveKinematics {
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
-      m_forwardKinematics;
+  mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
+  Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
   wpi::array<Translation2d, NumModules> m_modules;
 
   mutable Translation2d m_previousCoR;

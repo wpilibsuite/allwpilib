@@ -6,7 +6,7 @@
 
 #include <wpi/MathExtras.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "units/time.h"
@@ -70,8 +70,8 @@ class SimpleMotorFeedforward {
     auto plant = LinearSystemId::IdentifyVelocitySystem<Distance>(kV, kA);
     LinearPlantInversionFeedforward<1, 1> feedforward{plant, dt};
 
-    Eigen::Vector<double, 1> r{currentVelocity.value()};
-    Eigen::Vector<double, 1> nextR{nextVelocity.value()};
+    Vectord<1> r{currentVelocity.value()};
+    Vectord<1> nextR{nextVelocity.value()};
 
     return kS * wpi::sgn(currentVelocity.value()) +
            units::volt_t{feedforward.Calculate(r, nextR)(0)};

@@ -9,7 +9,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -213,9 +213,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   MecanumDriveKinematics m_kinematics;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
   Eigen::Matrix3d m_visionContR;
 
@@ -227,7 +225,7 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& vector) {
+      const Vectord<Dim>& vector) {
     wpi::array<double, Dim> array;
     for (size_t i = 0; i < Dim; ++i) {
       array[i] = vector(i);

@@ -21,15 +21,15 @@ namespace frc {
 template <int States, int Inputs, int Outputs>
 KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
     LinearSystem<States, Inputs, Outputs>& plant,
-    const wpi::array<double, States>& stateStdDevs,
-    const wpi::array<double, Outputs>& measurementStdDevs, units::second_t dt) {
+    const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+    units::second_t dt) {
   m_plant = &plant;
 
   auto contQ = MakeCovMatrix(stateStdDevs);
   auto contR = MakeCovMatrix(measurementStdDevs);
 
-  Eigen::Matrix<double, States, States> discA;
-  Eigen::Matrix<double, States, States> discQ;
+  Matrixd<States, States> discA;
+  Matrixd<States, States> discQ;
   DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
 
   auto discR = DiscretizeR<Outputs>(contR, dt);
@@ -46,12 +46,11 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
     throw std::invalid_argument(msg);
   }
 
-  Eigen::Matrix<double, States, States> P =
-      drake::math::DiscreteAlgebraicRiccatiEquation(
-          discA.transpose(), C.transpose(), discQ, discR);
+  Matrixd<States, States> P = drake::math::DiscreteAlgebraicRiccatiEquation(
+      discA.transpose(), C.transpose(), discQ, discR);
 
   // S = CPCᵀ + R
-  Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
+  Matrixd<Outputs, Outputs> S = C * P * C.transpose() + discR;
 
   // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
   // efficiently.
@@ -71,15 +70,14 @@ KalmanFilter<States, Inputs, Outputs>::KalmanFilter(
 }
 
 template <int States, int Inputs, int Outputs>
-void KalmanFilter<States, Inputs, Outputs>::Predict(
-    const Eigen::Vector<double, Inputs>& u, units::second_t dt) {
+void KalmanFilter<States, Inputs, Outputs>::Predict(const InputVector& u,
+                                                    units::second_t dt) {
   m_xHat = m_plant->CalculateX(m_xHat, u, dt);
 }
 
 template <int States, int Inputs, int Outputs>
-void KalmanFilter<States, Inputs, Outputs>::Correct(
-    const Eigen::Vector<double, Inputs>& u,
-    const Eigen::Vector<double, Outputs>& y) {
+void KalmanFilter<States, Inputs, Outputs>::Correct(const InputVector& u,
+                                                    const OutputVector& y) {
   // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
   m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
 }

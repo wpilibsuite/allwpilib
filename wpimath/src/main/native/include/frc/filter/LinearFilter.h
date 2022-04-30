@@ -14,8 +14,8 @@
 #include <wpi/circular_buffer.h>
 #include <wpi/span.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -209,7 +209,7 @@ class LinearFilter {
     static_assert(Derivative < Samples,
                   "Order of derivative must be less than number of samples.");
 
-    Eigen::Matrix<double, Samples, Samples> S;
+    Matrixd<Samples, Samples> S;
     for (int row = 0; row < Samples; ++row) {
       for (int col = 0; col < Samples; ++col) {
         S(row, col) = std::pow(stencil[col], row);
@@ -217,12 +217,12 @@ class LinearFilter {
     }
 
     // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
-    Eigen::Vector<double, Samples> d;
+    Vectord<Samples> d;
     for (int i = 0; i < Samples; ++i) {
       d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
     }
 
-    Eigen::Vector<double, Samples> a =
+    Vectord<Samples> a =
         S.householderQr().solve(d) / std::pow(period.value(), Derivative);
 
     // Reverse gains list

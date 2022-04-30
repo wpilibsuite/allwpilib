@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
 
@@ -36,6 +36,13 @@ namespace frc {
 template <int States, int Inputs, int Outputs>
 class KalmanFilter {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
+  using StateArray = wpi::array<double, States>;
+  using OutputArray = wpi::array<double, Outputs>;
+
   /**
    * Constructs a state-space observer with the given plant.
    *
@@ -45,9 +52,8 @@ class KalmanFilter {
    * @param dt                 Nominal discretization timestep.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const wpi::array<double, States>& stateStdDevs,
-               const wpi::array<double, Outputs>& measurementStdDevs,
-               units::second_t dt);
+               const StateArray& stateStdDevs,
+               const OutputArray& measurementStdDevs, units::second_t dt);
 
   KalmanFilter(KalmanFilter&&) = default;
   KalmanFilter& operator=(KalmanFilter&&) = default;
@@ -55,7 +61,7 @@ class KalmanFilter {
   /**
    * Returns the steady-state Kalman gain matrix K.
    */
-  const Eigen::Matrix<double, States, Outputs>& K() const { return m_K; }
+  const Matrixd<States, Outputs>& K() const { return m_K; }
 
   /**
    * Returns an element of the steady-state Kalman gain matrix K.
@@ -68,7 +74,7 @@ class KalmanFilter {
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Vector<double, States>& Xhat() const { return m_xHat; }
+  const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
@@ -82,7 +88,7 @@ class KalmanFilter {
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const Eigen::Vector<double, States>& xHat) { m_xHat = xHat; }
+  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -103,7 +109,7 @@ class KalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const Eigen::Vector<double, Inputs>& u, units::second_t dt);
+  void Predict(const InputVector& u, units::second_t dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -111,8 +117,7 @@ class KalmanFilter {
    * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  void Correct(const Eigen::Vector<double, Inputs>& u,
-               const Eigen::Vector<double, Outputs>& y);
+  void Correct(const InputVector& u, const OutputVector& y);
 
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
@@ -120,12 +125,12 @@ class KalmanFilter {
   /**
    * The steady-state Kalman gain matrix.
    */
-  Eigen::Matrix<double, States, Outputs> m_K;
+  Matrixd<States, Outputs> m_K;
 
   /**
    * The state estimate.
    */
-  Eigen::Vector<double, States> m_xHat;
+  StateVector m_xHat;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
