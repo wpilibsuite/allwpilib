@@ -326,7 +326,7 @@ Java_edu_wpi_first_hal_DriverStationJNI_updateDSData(JNIEnv*, jclass) {
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_hal_DriverStationJNI_provideNewDataEventHandle(
-    JNIEnv*, jclass, jint handle, jint wakeType) {
+    JNIEnv*, jclass, jint handle) {
   HAL_ProvideNewDataEventHandle(handle);
 }
 

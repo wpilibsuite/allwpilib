@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <hal/DriverStation.h>
+#include <frc/DriverStation.h>
 #include <networktables/NetworkTableInstance.h>
 
 #include "frc/DSControlWord.h"
@@ -100,6 +101,7 @@ units::second_t IterativeRobotBase::GetPeriod() const {
 }
 
 void IterativeRobotBase::LoopFunc() {
+  DriverStation::RefreshData();
   m_watchdog.Reset();
 
   // Get current mode

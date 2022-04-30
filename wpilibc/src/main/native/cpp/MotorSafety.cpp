@@ -28,12 +28,19 @@ void ResetMotorSafety() {
 
 MotorSafety::MotorSafety() {
   std::scoped_lock lock(listMutex);
+  bool startThread = instanceList.empty();
   instanceList.insert(this);
+  if (startThread) {
+    // TODO Threads
+  }
 }
 
 MotorSafety::~MotorSafety() {
   std::scoped_lock lock(listMutex);
   instanceList.erase(this);
+  if (instanceList.empty()) {
+    // TODO Threads
+  }
 }
 
 MotorSafety::MotorSafety(MotorSafety&& rhs)

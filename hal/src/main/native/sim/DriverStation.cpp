@@ -220,8 +220,12 @@ void HAL_ObserveUserProgramTest(void) {
 }
 
 void HAL_UpdateDSData(void) {}
-void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {}
-void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle, HAL_DriverStationWakeType handleWakeType) {}
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {}
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {}
+
+HAL_Bool HAL_GetOutputsEnabled(void) {
+  return false;
+}
 
 }  // extern "C"
 

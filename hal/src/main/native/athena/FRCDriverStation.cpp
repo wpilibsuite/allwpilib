@@ -17,6 +17,7 @@
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
 #include <wpi/SmallVector.h>
+#include <wpi/EventVector.h>
 
 #include "hal/DriverStation.h"
 
@@ -107,7 +108,7 @@ static JoystickDataCache* currentRead = &caches[0];
 static JoystickDataCache* currentCache = &caches[1];
 static JoystickDataCache* cacheToUpdate = &caches[2];
 
-static std::mutex cacheMutex;
+static wpi::mutex cacheMutex;
 
 /**
  * Retrieve the Joystick Descriptor for particular slot.
@@ -161,37 +162,13 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   return status;
 }
 
-namespace hal {
-struct EventVector {
-  wpi::mutex mutex;
-  wpi::SmallVector<WPI_EventHandle, 4> events;
-
-  void add(WPI_EventHandle handle) {
-    std::scoped_lock lock{mutex};
-    events.emplace_back(handle);
-  }
-  void remove(WPI_EventHandle handle) {
-    std::scoped_lock lock{mutex};
-    auto it = std::find_if(
-        events.begin(), events.end(),
-        [=](const WPI_EventHandle fromHandle) { return fromHandle == handle; });
-    if (it != events.end()) {
-      events.erase(it);
-    }
-  }
-  void wakeup() {
-    std::scoped_lock lock{mutex};
-    for (auto&& handle : events) {
-      wpi::SetEvent(handle);
-    }
-  }
-};
+namespace {
 struct FRCDriverStation {
-  EventVector newDataEvents;
+  wpi::EventVector newDataEvents;
 };
-}  // namespace hal
+}  // namespace
 
-static hal::FRCDriverStation* driverStation;
+static ::FRCDriverStation* driverStation;
 
 namespace hal::init {
 void InitializeFRCDriverStation() {
@@ -456,7 +433,7 @@ void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
   driverStation->newDataEvents.remove(handle);
 }
 
-HAL_Bool HAL_GetOutputsEnabled() {
+HAL_Bool HAL_GetOutputsEnabled(void) {
   return FRC_NetworkCommunication_getWatchdogActive();
 }
 

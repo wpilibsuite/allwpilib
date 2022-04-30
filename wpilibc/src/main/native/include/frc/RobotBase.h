@@ -196,14 +196,6 @@ class RobotBase {
   bool IsTest() const;
 
   /**
-   * Indicates if new data is available from the driver station.
-   *
-   * @return Has new data arrived over the network since the last time this
-   *         function was called?
-   */
-  bool IsNewDataAvailable() const;
-
-  /**
    * Gets the ID of the main robot thread.
    */
   static std::thread::id GetThreadId();

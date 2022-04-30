@@ -212,10 +212,6 @@ bool RobotBase::IsTest() const {
   return DriverStation::IsTest();
 }
 
-bool RobotBase::IsNewDataAvailable() const {
-  return DriverStation::IsNewControlData();
-}
-
 std::thread::id RobotBase::GetThreadId() {
   return m_threadId;
 }
@@ -251,8 +247,8 @@ RobotBase::RobotBase() {
     }
   }
 
-  // Call DriverStation::InDisabled() to kick off DS thread
-  DriverStation::InDisabled(true);
+  // Call DriverStation::RefreshData() to kick things off
+  DriverStation::RefreshData();
 
   // First and one-time initialization
   inst.GetTable("LiveWindow")

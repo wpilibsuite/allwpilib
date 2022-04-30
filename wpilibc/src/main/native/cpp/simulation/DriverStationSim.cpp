@@ -11,6 +11,7 @@
 #include <hal/simulation/MockHooks.h>
 
 #include "frc/DriverStation.h"
+#include "hal/DriverStation.h"
 
 using namespace frc;
 using namespace frc::sim;
@@ -154,8 +155,11 @@ void DriverStationSim::SetMatchTime(double matchTime) {
 }
 
 void DriverStationSim::NotifyNewData() {
+  wpi::Event waitEvent{true};
+  HAL_ProvideNewDataEventHandle(waitEvent.GetHandle());
   HALSIM_NotifyDriverStationNewData();
-  DriverStation::WaitForData();
+  wpi::WaitForObject(waitEvent.GetHandle());
+  HAL_RemoveNewDataEventHandle(waitEvent.GetHandle());
 }
 
 void DriverStationSim::SetSendError(bool shouldSend) {
