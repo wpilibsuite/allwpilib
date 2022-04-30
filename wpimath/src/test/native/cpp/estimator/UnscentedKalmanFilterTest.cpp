@@ -7,8 +7,8 @@
 #include <array>
 #include <cmath>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
@@ -20,8 +20,7 @@
 
 namespace {
 
-Eigen::Vector<double, 5> Dynamics(const Eigen::Vector<double, 5>& x,
-                                  const Eigen::Vector<double, 2>& u) {
+frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
@@ -43,7 +42,7 @@ Eigen::Vector<double, 5> Dynamics(const Eigen::Vector<double, 5>& x,
   units::volt_t Vr{u(1)};
 
   auto v = 0.5 * (vl + vr);
-  return Eigen::Vector<double, 5>{
+  return frc::Vectord<5>{
       v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
       ((vr - vl) / (2.0 * rb)).value(),
       k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
@@ -52,16 +51,16 @@ Eigen::Vector<double, 5> Dynamics(const Eigen::Vector<double, 5>& x,
           k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
 }
 
-Eigen::Vector<double, 3> LocalMeasurementModel(
-    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 2>& u) {
+frc::Vectord<3> LocalMeasurementModel(const frc::Vectord<5>& x,
+                                      const frc::Vectord<2>& u) {
   static_cast<void>(u);
-  return Eigen::Vector<double, 3>{x(2), x(3), x(4)};
+  return frc::Vectord<3>{x(2), x(3), x(4)};
 }
 
-Eigen::Vector<double, 5> GlobalMeasurementModel(
-    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 2>& u) {
+frc::Vectord<5> GlobalMeasurementModel(const frc::Vectord<5>& x,
+                                       const frc::Vectord<2>& u) {
   static_cast<void>(u);
-  return Eigen::Vector<double, 5>{x(0), x(1), x(2), x(3), x(4)};
+  return frc::Vectord<5>{x(0), x(1), x(2), x(3), x(4)};
 }
 }  // namespace
 
@@ -73,7 +72,7 @@ TEST(UnscentedKalmanFilterTest, Init) {
                                                {0.5, 0.5, 10.0, 1.0, 1.0},
                                                {0.0001, 0.01, 0.01},
                                                dt};
-  Eigen::Vector<double, 2> u{12.0, 12.0};
+  frc::Vectord<2> u{12.0, 12.0};
   observer.Predict(u, dt);
 
   auto localY = LocalMeasurementModel(observer.Xhat(), u);
@@ -102,14 +101,13 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
-  Eigen::Vector<double, 5> r = Eigen::Vector<double, 5>::Zero();
-  Eigen::Vector<double, 2> u = Eigen::Vector<double, 2>::Zero();
+  frc::Vectord<5> r = frc::Vectord<5>::Zero();
+  frc::Vectord<2> u = frc::Vectord<2>::Zero();
 
-  auto B = frc::NumericalJacobianU<5, 5, 2>(Dynamics,
-                                            Eigen::Vector<double, 5>::Zero(),
-                                            Eigen::Vector<double, 2>::Zero());
+  auto B = frc::NumericalJacobianU<5, 5, 2>(Dynamics, frc::Vectord<5>::Zero(),
+                                            frc::Vectord<2>::Zero());
 
-  observer.SetXhat(Eigen::Vector<double, 5>{
+  observer.SetXhat(frc::Vectord<5>{
       trajectory.InitialPose().Translation().X().value(),
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
@@ -124,17 +122,15 @@ TEST(UnscentedKalmanFilterTest, Convergence) {
     units::meters_per_second_t vr =
         ref.velocity * (1 + (ref.curvature * rb).value());
 
-    Eigen::Vector<double, 5> nextR{
+    frc::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
         ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
 
-    auto localY =
-        LocalMeasurementModel(trueXhat, Eigen::Vector<double, 2>::Zero());
+    auto localY = LocalMeasurementModel(trueXhat, frc::Vectord<2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    Eigen::Vector<double, 5> rdot = (nextR - r) / dt.value();
-    u = B.householderQr().solve(rdot -
-                                Dynamics(r, Eigen::Vector<double, 2>::Zero()));
+    frc::Vectord<5> rdot = (nextR - r) / dt.value();
+    u = B.householderQr().solve(rdot - Dynamics(r, frc::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
 

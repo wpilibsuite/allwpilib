@@ -8,7 +8,7 @@
 
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 
 namespace frc {
@@ -40,6 +40,15 @@ namespace frc {
 template <int States, int Inputs, int Outputs>
 class ExtendedKalmanFilter {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
+  using StateArray = wpi::array<double, States>;
+  using OutputArray = wpi::array<double, Outputs>;
+
+  using StateMatrix = Matrixd<States, States>;
+
   /**
    * Constructs an extended Kalman filter.
    *
@@ -51,17 +60,11 @@ class ExtendedKalmanFilter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(std::function<Eigen::Vector<double, States>(
-                           const Eigen::Vector<double, States>&,
-                           const Eigen::Vector<double, Inputs>&)>
-                           f,
-                       std::function<Eigen::Vector<double, Outputs>(
-                           const Eigen::Vector<double, States>&,
-                           const Eigen::Vector<double, Inputs>&)>
-                           h,
-                       const wpi::array<double, States>& stateStdDevs,
-                       const wpi::array<double, Outputs>& measurementStdDevs,
-                       units::second_t dt);
+  ExtendedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      units::second_t dt);
 
   /**
    * Constructs an extended Kalman filter.
@@ -77,30 +80,20 @@ class ExtendedKalmanFilter {
    * @param addFuncX           A function that adds two state vectors.
    * @param dt                 Nominal discretization timestep.
    */
-  ExtendedKalmanFilter(std::function<Eigen::Vector<double, States>(
-                           const Eigen::Vector<double, States>&,
-                           const Eigen::Vector<double, Inputs>&)>
-                           f,
-                       std::function<Eigen::Vector<double, Outputs>(
-                           const Eigen::Vector<double, States>&,
-                           const Eigen::Vector<double, Inputs>&)>
-                           h,
-                       const wpi::array<double, States>& stateStdDevs,
-                       const wpi::array<double, Outputs>& measurementStdDevs,
-                       std::function<Eigen::Vector<double, Outputs>(
-                           const Eigen::Vector<double, Outputs>&,
-                           const Eigen::Vector<double, Outputs>&)>
-                           residualFuncY,
-                       std::function<Eigen::Vector<double, States>(
-                           const Eigen::Vector<double, States>&,
-                           const Eigen::Vector<double, States>&)>
-                           addFuncX,
-                       units::second_t dt);
+  ExtendedKalmanFilter(
+      std::function<StateVector(const StateVector&, const InputVector&)> f,
+      std::function<OutputVector(const StateVector&, const InputVector&)> h,
+      const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
+      std::function<OutputVector(const OutputVector&, const OutputVector&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX,
+      units::second_t dt);
 
   /**
    * Returns the error covariance matrix P.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return m_P; }
+  const StateMatrix& P() const { return m_P; }
 
   /**
    * Returns an element of the error covariance matrix P.
@@ -115,12 +108,12 @@ class ExtendedKalmanFilter {
    *
    * @param P The error covariance matrix P.
    */
-  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
+  void SetP(const StateMatrix& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Vector<double, States>& Xhat() const { return m_xHat; }
+  const StateVector& Xhat() const { return m_xHat; }
 
   /**
    * Returns an element of the state estimate x-hat.
@@ -134,7 +127,7 @@ class ExtendedKalmanFilter {
    *
    * @param xHat The state estimate x-hat.
    */
-  void SetXhat(const Eigen::Vector<double, States>& xHat) { m_xHat = xHat; }
+  void SetXhat(const StateVector& xHat) { m_xHat = xHat; }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -158,7 +151,7 @@ class ExtendedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const Eigen::Vector<double, Inputs>& u, units::second_t dt);
+  void Predict(const InputVector& u, units::second_t dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -166,19 +159,15 @@ class ExtendedKalmanFilter {
    * @param u Same control input used in the predict step.
    * @param y Measurement vector.
    */
-  void Correct(const Eigen::Vector<double, Inputs>& u,
-               const Eigen::Vector<double, Outputs>& y) {
+  void Correct(const InputVector& u, const OutputVector& y) {
     Correct<Outputs>(u, y, m_h, m_contR, m_residualFuncY, m_addFuncX);
   }
 
   template <int Rows>
-  void Correct(const Eigen::Vector<double, Inputs>& u,
-               const Eigen::Vector<double, Rows>& y,
-               std::function<Eigen::Vector<double, Rows>(
-                   const Eigen::Vector<double, States>&,
-                   const Eigen::Vector<double, Inputs>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R);
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -197,46 +186,28 @@ class ExtendedKalmanFilter {
    * @param addFuncX      A function that adds two state vectors.
    */
   template <int Rows>
-  void Correct(const Eigen::Vector<double, Inputs>& u,
-               const Eigen::Vector<double, Rows>& y,
-               std::function<Eigen::Vector<double, Rows>(
-                   const Eigen::Vector<double, States>&,
-                   const Eigen::Vector<double, Inputs>&)>
-                   h,
-               const Eigen::Matrix<double, Rows, Rows>& R,
-               std::function<Eigen::Vector<double, Rows>(
-                   const Eigen::Vector<double, Rows>&,
-                   const Eigen::Vector<double, Rows>&)>
-                   residualFuncY,
-               std::function<Eigen::Vector<double, States>(
-                   const Eigen::Vector<double, States>&,
-                   const Eigen::Vector<double, States>)>
-                   addFuncX);
+  void Correct(
+      const InputVector& u, const Vectord<Rows>& y,
+      std::function<Vectord<Rows>(const StateVector&, const InputVector&)> h,
+      const Matrixd<Rows, Rows>& R,
+      std::function<Vectord<Rows>(const Vectord<Rows>&, const Vectord<Rows>&)>
+          residualFuncY,
+      std::function<StateVector(const StateVector&, const StateVector&)>
+          addFuncX);
 
  private:
-  std::function<Eigen::Vector<double, States>(
-      const Eigen::Vector<double, States>&,
-      const Eigen::Vector<double, Inputs>&)>
-      m_f;
-  std::function<Eigen::Vector<double, Outputs>(
-      const Eigen::Vector<double, States>&,
-      const Eigen::Vector<double, Inputs>&)>
-      m_h;
-  std::function<Eigen::Vector<double, Outputs>(
-      const Eigen::Vector<double, Outputs>&,
-      const Eigen::Vector<double, Outputs>)>
+  std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+  std::function<OutputVector(const StateVector&, const InputVector&)> m_h;
+  std::function<OutputVector(const OutputVector&, const OutputVector&)>
       m_residualFuncY;
-  std::function<Eigen::Vector<double, States>(
-      const Eigen::Vector<double, States>&,
-      const Eigen::Vector<double, States>)>
-      m_addFuncX;
-  Eigen::Vector<double, States> m_xHat;
-  Eigen::Matrix<double, States, States> m_P;
-  Eigen::Matrix<double, States, States> m_contQ;
-  Eigen::Matrix<double, Outputs, Outputs> m_contR;
+  std::function<StateVector(const StateVector&, const StateVector&)> m_addFuncX;
+  StateVector m_xHat;
+  StateMatrix m_P;
+  StateMatrix m_contQ;
+  Matrixd<Outputs, Outputs> m_contR;
   units::second_t m_dt;
 
-  Eigen::Matrix<double, States, States> m_initP;
+  StateMatrix m_initP;
 };
 
 }  // namespace frc

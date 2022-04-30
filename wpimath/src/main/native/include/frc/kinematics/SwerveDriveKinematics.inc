@@ -25,7 +25,7 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) =
-        Eigen::Matrix<double, 2, 3>{
+        Matrixd<2, 3>{
           {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).value()},
           {0, 1, (+m_modules[i].X() - centerOfRotation.X()).value()}};
       // clang-format on
@@ -37,13 +37,13 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
                                       chassisSpeeds.vy.value(),
                                       chassisSpeeds.omega.value()};
 
-  Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix =
+  Matrixd<NumModules * 2, 1> moduleStateMatrix =
       m_inverseKinematics * chassisSpeedsVector;
   wpi::array<SwerveModuleState, NumModules> moduleStates{wpi::empty_array};
 
   for (size_t i = 0; i < NumModules; i++) {
-    units::meters_per_second_t x{moduleStatesMatrix(i * 2, 0)};
-    units::meters_per_second_t y{moduleStatesMatrix(i * 2 + 1, 0)};
+    units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
+    units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
 
     auto speed = units::math::hypot(x, y);
     Rotation2d rotation{x.value(), y.value()};
@@ -70,17 +70,16 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
 template <size_t NumModules>
 ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
     wpi::array<SwerveModuleState, NumModules> moduleStates) const {
-  Eigen::Matrix<double, NumModules * 2, 1> moduleStatesMatrix;
+  Matrixd<NumModules * 2, 1> moduleStateMatrix;
 
   for (size_t i = 0; i < NumModules; ++i) {
     SwerveModuleState module = moduleStates[i];
-    moduleStatesMatrix(i * 2, 0) = module.speed.value() * module.angle.Cos();
-    moduleStatesMatrix(i * 2 + 1, 0) =
-        module.speed.value() * module.angle.Sin();
+    moduleStateMatrix(i * 2, 0) = module.speed.value() * module.angle.Cos();
+    moduleStateMatrix(i * 2 + 1, 0) = module.speed.value() * module.angle.Sin();
   }
 
   Eigen::Vector3d chassisSpeedsVector =
-      m_forwardKinematics.solve(moduleStatesMatrix);
+      m_forwardKinematics.solve(moduleStateMatrix);
 
   return {units::meters_per_second_t{chassisSpeedsVector(0)},
           units::meters_per_second_t{chassisSpeedsVector(1)},

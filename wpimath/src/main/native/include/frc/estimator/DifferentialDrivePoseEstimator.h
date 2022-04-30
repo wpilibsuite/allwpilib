@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -223,11 +223,9 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<5, 3, 3> m_observer;
   TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
-  Eigen::Matrix<double, 3, 3> m_visionContR;
+  Matrixd<3, 3> m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
@@ -237,13 +235,12 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& stdDevs);
+      const Vectord<Dim>& stdDevs);
 
-  static Eigen::Vector<double, 5> F(const Eigen::Vector<double, 5>& x,
-                                    const Eigen::Vector<double, 3>& u);
-  static Eigen::Vector<double, 5> FillStateVector(const Pose2d& pose,
-                                                  units::meter_t leftDistance,
-                                                  units::meter_t rightDistance);
+  static Vectord<5> F(const Vectord<5>& x, const Vectord<3>& u);
+  static Vectord<5> FillStateVector(const Pose2d& pose,
+                                    units::meter_t leftDistance,
+                                    units::meter_t rightDistance);
 };
 
 }  // namespace frc
