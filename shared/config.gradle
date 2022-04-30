@@ -10,7 +10,7 @@ nativeUtils {
     wpi {
         configureDependencies {
             wpiVersion = "-1"
-            niLibVersion = "2022.2.3"
+            niLibVersion = "2022.4.0"
             opencvVersion = "4.5.2-1"
             googleTestVersion = "1.9.0-5-437e100-1"
             imguiVersion = "1.86-1"
@@ -21,7 +21,10 @@ nativeUtils {
 
 nativeUtils.wpi.addWarnings()
 nativeUtils.wpi.addWarningsAsErrors()
-nativeUtils.wpi.addReleaseSymbolGeneration()
+
+if (project.name != 'wpilibcExamples') {
+    nativeUtils.wpi.addReleaseSymbolGeneration()
+}
 
 nativeUtils.setSinglePrintPerPlatform()
 nativeUtils.enableSourceLink()

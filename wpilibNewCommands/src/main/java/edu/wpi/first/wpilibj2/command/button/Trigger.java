@@ -23,6 +23,8 @@ import java.util.function.BooleanSupplier;
  * (for instance, if they want to react to the user holding a button while the robot is reading a
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_isActive;
@@ -54,7 +56,7 @@ public class Trigger implements BooleanSupplier {
    * @return whether or not the trigger condition is active.
    */
   public boolean get() {
-    return this.getAsBoolean();
+    return m_isActive.getAsBoolean();
   }
 
   /**
@@ -67,8 +69,8 @@ public class Trigger implements BooleanSupplier {
    * @return whether or not the trigger condition is active.
    */
   @Override
-  public boolean getAsBoolean() {
-    return m_isActive.getAsBoolean();
+  public final boolean getAsBoolean() {
+    return this.get();
   }
 
   /**
@@ -346,25 +348,25 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when both
+   * Composes this trigger with a boolean supplier, returning a new trigger that is active when both
    * triggers are active.
    *
-   * @param trigger the trigger to compose with
+   * @param booleanSupplier the boolean supplier to compose with
    * @return the trigger that is active when both triggers are active
    */
-  public Trigger and(Trigger trigger) {
-    return new Trigger(() -> get() && trigger.get());
+  public Trigger and(BooleanSupplier booleanSupplier) {
+    return new Trigger(() -> get() && booleanSupplier.getAsBoolean());
   }
 
   /**
-   * Composes this trigger with another trigger, returning a new trigger that is active when either
-   * trigger is active.
+   * Composes this trigger with a boolean supplier, returning a new trigger that is active when
+   * either trigger is active.
    *
-   * @param trigger the trigger to compose with
+   * @param booleanSupplier the boolean supplier to compose with
    * @return the trigger that is active when either trigger is active
    */
-  public Trigger or(Trigger trigger) {
-    return new Trigger(() -> get() || trigger.get());
+  public Trigger or(BooleanSupplier booleanSupplier) {
+    return new Trigger(() -> get() || booleanSupplier.getAsBoolean());
   }
 
   /**

@@ -15,6 +15,8 @@
 namespace frc2 {
 /**
  * A Button that uses a NetworkTable boolean field.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class NetworkButton : public Button {
  public:

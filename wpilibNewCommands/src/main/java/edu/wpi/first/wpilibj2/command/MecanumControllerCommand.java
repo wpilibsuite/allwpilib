@@ -35,6 +35,8 @@ import java.util.function.Supplier;
  *
  * <p>The robot angle controller does not follow the angle given by the trajectory but rather goes
  * to the angle given in the final state of the trajectory.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 @SuppressWarnings("MemberName")
 public class MecanumControllerCommand extends CommandBase {
@@ -110,9 +112,9 @@ public class MecanumControllerCommand extends CommandBase {
 
     m_controller =
         new HolonomicDriveController(
-            requireNonNullParam(xController, "xController", "SwerveControllerCommand"),
-            requireNonNullParam(yController, "xController", "SwerveControllerCommand"),
-            requireNonNullParam(thetaController, "thetaController", "SwerveControllerCommand"));
+            requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
+            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
+            requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");
@@ -253,9 +255,9 @@ public class MecanumControllerCommand extends CommandBase {
 
     m_controller =
         new HolonomicDriveController(
-            requireNonNullParam(xController, "xController", "SwerveControllerCommand"),
-            requireNonNullParam(yController, "xController", "SwerveControllerCommand"),
-            requireNonNullParam(thetaController, "thetaController", "SwerveControllerCommand"));
+            requireNonNullParam(xController, "xController", "MecanumControllerCommand"),
+            requireNonNullParam(yController, "yController", "MecanumControllerCommand"),
+            requireNonNullParam(thetaController, "thetaController", "MecanumControllerCommand"));
 
     m_desiredRotation =
         requireNonNullParam(desiredRotation, "desiredRotation", "MecanumControllerCommand");

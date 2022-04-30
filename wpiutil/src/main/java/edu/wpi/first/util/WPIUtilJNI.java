@@ -7,7 +7,7 @@ package edu.wpi.first.util;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public final class WPIUtilJNI {
+public class WPIUtilJNI {
   static boolean libraryLoaded = false;
   static RuntimeLoader<WPIUtilJNI> loader = null;
 

@@ -22,6 +22,8 @@ namespace frc {
  * It provides some convenience methods to run an internal PIDController. It
  * also allows access to the internal PIDController in order to give total
  * control to the programmer.
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:

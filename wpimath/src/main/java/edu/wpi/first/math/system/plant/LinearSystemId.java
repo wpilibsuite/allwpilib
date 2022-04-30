@@ -62,7 +62,7 @@ public final class LinearSystemId {
    * Create a state-space model of a flywheel system. The states of the system are [angular
    * velocity], inputs are [voltage], and outputs are [angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
+   * @param motor The motor (or gearbox) attached to the flywheel.
    * @param jKgMetersSquared The moment of inertia J of the flywheel.
    * @param G The reduction between motor and drum, as a ratio of output to input.
    * @return A LinearSystem representing the given characterized constants.
@@ -87,6 +87,42 @@ public final class LinearSystemId {
         VecBuilder.fill(G * motor.KtNMPerAmp / (motor.rOhms * jKgMetersSquared)),
         Matrix.eye(Nat.N1()),
         new Matrix<>(Nat.N1(), Nat.N1()));
+  }
+
+  /**
+   * Create a state-space model of a DC motor system. The states of the system are [angular
+   * position, angular velocity], inputs are [voltage], and outputs are [angular position, angular
+   * velocity].
+   *
+   * @param motor The motor (or gearbox) attached to the DC motor.
+   * @param jKgMetersSquared The moment of inertia J of the DC motor.
+   * @param G The reduction between motor and drum, as a ratio of output to input.
+   * @return A LinearSystem representing the given characterized constants.
+   * @throws IllegalArgumentException if jKgMetersSquared &lt;= 0 or G &lt;= 0.
+   */
+  @SuppressWarnings("ParameterName")
+  public static LinearSystem<N2, N1, N2> createDCMotorSystem(
+      DCMotor motor, double jKgMetersSquared, double G) {
+    if (jKgMetersSquared <= 0.0) {
+      throw new IllegalArgumentException("J must be greater than zero.");
+    }
+    if (G <= 0.0) {
+      throw new IllegalArgumentException("G must be greater than zero.");
+    }
+
+    return new LinearSystem<>(
+        Matrix.mat(Nat.N2(), Nat.N2())
+            .fill(
+                0,
+                1,
+                0,
+                -G
+                    * G
+                    * motor.KtNMPerAmp
+                    / (motor.KvRadPerSecPerVolt * motor.rOhms * jKgMetersSquared)),
+        VecBuilder.fill(0, G * motor.KtNMPerAmp / (motor.rOhms * jKgMetersSquared)),
+        Matrix.eye(Nat.N2()),
+        new Matrix<>(Nat.N2(), Nat.N1()));
   }
 
   /**

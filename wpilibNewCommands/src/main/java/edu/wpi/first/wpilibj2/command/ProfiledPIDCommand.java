@@ -17,6 +17,8 @@ import java.util.function.Supplier;
  * A command that controls an output with a {@link ProfiledPIDController}. Runs forever by default -
  * to add exit conditions and/or other behavior, subclass this class. The controller calculation and
  * output are performed synchronously in the command's execute() method.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ProfiledPIDCommand extends CommandBase {
   protected final ProfiledPIDController m_controller;
@@ -40,10 +42,10 @@ public class ProfiledPIDCommand extends CommandBase {
       Supplier<State> goalSource,
       BiConsumer<Double, State> useOutput,
       Subsystem... requirements) {
-    requireNonNullParam(controller, "controller", "SynchronousPIDCommand");
-    requireNonNullParam(measurementSource, "measurementSource", "SynchronousPIDCommand");
-    requireNonNullParam(goalSource, "goalSource", "SynchronousPIDCommand");
-    requireNonNullParam(useOutput, "useOutput", "SynchronousPIDCommand");
+    requireNonNullParam(controller, "controller", "ProfiledPIDCommand");
+    requireNonNullParam(measurementSource, "measurementSource", "ProfiledPIDCommand");
+    requireNonNullParam(goalSource, "goalSource", "ProfiledPIDCommand");
+    requireNonNullParam(useOutput, "useOutput", "ProfiledPIDCommand");
 
     m_controller = controller;
     m_useOutput = useOutput;

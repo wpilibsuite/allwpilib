@@ -26,8 +26,13 @@ namespace frc2 {
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their
  * component commands.
+ *
+ * This class is provided by the NewCommands VendorDep
+ *
+ * @deprecated replace with EndlessCommand
  */
-class PerpetualCommand : public CommandHelper<CommandBase, PerpetualCommand> {
+class WPI_DEPRECATED("Replace with EndlessCommand") PerpetualCommand
+    : public CommandHelper<CommandBase, PerpetualCommand> {
  public:
   /**
    * Creates a new PerpetualCommand.  Will run another command in perpetuity,

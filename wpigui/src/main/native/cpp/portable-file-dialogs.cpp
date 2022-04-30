@@ -35,6 +35,11 @@
 #ifndef _POSIX_C_SOURCE
 #   define _POSIX_C_SOURCE 2 // for popen()
 #endif
+#ifdef __APPLE__
+#   ifndef _DARWIN_C_SOURCE
+#       define _DARWIN_C_SOURCE
+#   endif
+#endif
 #include <cstdio>     // popen()
 #include <cstdlib>    // std::getenv()
 #include <fcntl.h>    // fcntl()
@@ -46,10 +51,20 @@
 #ifdef _WIN32
 #include <set>
 #endif
-#include <iostream>
 #include <regex>
 #include <thread>
 #include <chrono>
+
+// Versions of mingw64 g++ up to 9.3.0 do not have a complete IFileDialog
+#ifndef PFD_HAS_IFILEDIALOG
+#   define PFD_HAS_IFILEDIALOG 1
+#   if (defined __MINGW64__ || defined __MINGW32__) && defined __GXX_ABI_VERSION
+#       if __GXX_ABI_VERSION <= 1013
+#           undef PFD_HAS_IFILEDIALOG
+#           define PFD_HAS_IFILEDIALOG 0
+#       endif
+#   endif
+#endif
 
 //
 // Below this are all the method implementations.
@@ -88,6 +103,18 @@ public:
 
     private:
         HMODULE handle;
+    };
+
+    // Helper class around CoInitialize() and CoUnInitialize()
+    class ole32_dll : public dll
+    {
+    public:
+        ole32_dll();
+        ~ole32_dll();
+        bool is_initialized();
+
+    private:
+        HRESULT m_state;
     };
 
     // Helper class around CreateActCtx() and ActivateActCtx()
@@ -489,6 +516,30 @@ internal::platform::dll::~dll()
 }
 #endif // _WIN32
 
+// ole32_dll implementation
+
+#if _WIN32
+internal::platform::ole32_dll::ole32_dll()
+    : dll("ole32.dll")
+{
+    // Use COINIT_MULTITHREADED because COINIT_APARTMENTTHREADED causes crashes.
+    // See https://github.com/samhocevar/portable-file-dialogs/issues/51
+    auto coinit = proc<HRESULT WINAPI (LPVOID, DWORD)>(*this, "CoInitializeEx");
+    m_state = coinit(nullptr, COINIT_MULTITHREADED);
+}
+
+internal::platform::ole32_dll::~ole32_dll()
+{
+    if (is_initialized())
+        proc<void WINAPI ()>(*this, "CoUninitialize")();
+}
+
+bool internal::platform::ole32_dll::is_initialized()
+{
+    return m_state == S_OK || m_state == S_FALSE;
+}
+#endif
+
 // new_style_context implementation
 
 #if _WIN32
@@ -595,13 +646,17 @@ std::string internal::dialog::get_icon_name(icon _icon)
     }
 }
 
-// THis is only used for debugging purposes
-std::ostream& operator <<(std::ostream &s, std::vector<std::string> const &v)
+// This is only used for debugging purposes
+void print_command(std::vector<std::string> const &v)
 {
-    int not_first = 0;
-    for (auto &e : v)
-        s << (not_first++ ? " " : "") << e;
-    return s;
+    fputs("pfd: ", stderr);
+    for (size_t i = 0; i < v.size(); ++i) {
+        if (i > 0) {
+            fputc(' ', stderr);
+        }
+        fputs(v[i].c_str(), stderr);
+    }
+    fputc('\n', stderr);
 }
 
 // Properly quote a string for Powershell: replace ' or " with '' or ""
@@ -634,7 +689,9 @@ class internal::file_dialog::Impl {
  public:
 #if _WIN32
     static int CALLBACK bffcallback(HWND hwnd, UINT uMsg, LPARAM, LPARAM pData);
+#if PFD_HAS_IFILEDIALOG
     std::string select_folder_vista(IFileDialog *ifd, bool force_path);
+#endif
 
     std::wstring m_wtitle;
     std::wstring m_wdefault_path;
@@ -668,13 +725,16 @@ internal::file_dialog::file_dialog(type in_type,
         m_impl->m_wdefault_path = internal::str2wstr(default_path);
         auto wfilter_list = internal::str2wstr(filter_list);
 
+        // Initialise COM. This is required for the new folder selection window,
+        // (see https://github.com/samhocevar/portable-file-dialogs/pull/21)
+        // and to avoid random crashes with GetOpenFileNameW() (see
+        // https://github.com/samhocevar/portable-file-dialogs/issues/51)
+        internal::platform::ole32_dll ole32;
+
         // Folder selection uses a different method
         if (in_type == type::folder)
         {
-            internal::platform::dll ole32("ole32.dll");
-
-            auto status = internal::platform::dll::proc<HRESULT WINAPI (LPVOID, DWORD)>(ole32, "CoInitializeEx")
-                              (nullptr, COINIT_APARTMENTTHREADED);
+#if PFD_HAS_IFILEDIALOG
             if (flags(flag::is_vista))
             {
                 // On Vista and higher we should be able to use IFileDialog for folder selection
@@ -686,6 +746,7 @@ internal::file_dialog::file_dialog(type in_type,
                 if (SUCCEEDED(hr))
                     return m_impl->select_folder_vista(ifd, options & opt::force_path);
             }
+#endif
 
             BROWSEINFOW bi;
             memset(&bi, 0, sizeof(bi));
@@ -695,9 +756,7 @@ internal::file_dialog::file_dialog(type in_type,
 
             if (flags(flag::is_vista))
             {
-                // This hangs on Windows XP, as reported here:
-                // https://github.com/samhocevar/portable-file-dialogs/pull/21
-                if (status == S_OK)
+                if (ole32.is_initialized())
                     bi.ulFlags |= BIF_NEWDIALOGSTYLE;
                 bi.ulFlags |= BIF_EDITBOX;
                 bi.ulFlags |= BIF_STATUSTEXT;
@@ -713,8 +772,6 @@ internal::file_dialog::file_dialog(type in_type,
                 ret = internal::wstr2str(buffer);
                 delete[] buffer;
             }
-            if (status == S_OK)
-                internal::platform::dll::proc<void WINAPI ()>(ole32, "CoUninitialize")();
             return ret;
         }
 
@@ -750,37 +807,36 @@ internal::file_dialog::file_dialog(type in_type,
 
         internal::platform::dll comdlg32("comdlg32.dll");
 
+        // Apply new visual style (required for windows XP)
+        internal::platform::new_style_context ctx;
+
         if (in_type == type::save)
         {
             if (!(options & opt::force_overwrite))
                 ofn.Flags |= OFN_OVERWRITEPROMPT;
-
-            // using set context to apply new visual style (required for windows XP)
-            internal::platform::new_style_context ctx;
 
             internal::platform::dll::proc<BOOL WINAPI (LPOPENFILENAMEW)> get_save_file_name(comdlg32, "GetSaveFileNameW");
             if (get_save_file_name(&ofn) == 0)
                 return "";
             return internal::wstr2str(woutput.c_str());
         }
+        else
+        {
+            if (options & opt::multiselect)
+                ofn.Flags |= OFN_ALLOWMULTISELECT;
+            ofn.Flags |= OFN_PATHMUSTEXIST;
 
-        if (options & opt::multiselect)
-            ofn.Flags |= OFN_ALLOWMULTISELECT;
-        ofn.Flags |= OFN_PATHMUSTEXIST;
-
-        // using set context to apply new visual style (required for windows XP)
-        internal::platform::new_style_context ctx;
-
-        internal::platform::dll::proc<BOOL WINAPI (LPOPENFILENAMEW)> get_open_file_name(comdlg32, "GetOpenFileNameW");
-        if (get_open_file_name(&ofn) == 0)
-            return "";
+            internal::platform::dll::proc<BOOL WINAPI (LPOPENFILENAMEW)> get_open_file_name(comdlg32, "GetOpenFileNameW");
+            if (get_open_file_name(&ofn) == 0)
+                return "";
+        }
 
         std::string prefix;
         for (wchar_t const *p = woutput.c_str(); *p; )
         {
             auto filename = internal::wstr2str(p);
-            p += filename.size();
-            // In multiselect mode, we advance p one step more and
+            p += wcslen(p);
+            // In multiselect mode, we advance p one wchar further and
             // check for another filename. If there is one and the
             // prefix is empty, it means we just read the prefix.
             if ((options & opt::multiselect) && *++p && prefix.empty())
@@ -895,7 +951,10 @@ internal::file_dialog::file_dialog(type in_type,
             case type::folder: command.push_back("--getexistingdirectory"); break;
         }
         if (options & opt::multiselect)
-            command.push_back(" --multiple");
+        {
+            command.push_back("--multiple");
+            command.push_back("--separate-output");
+        }
 
         command.push_back(default_path);
 
@@ -909,7 +968,10 @@ internal::file_dialog::file_dialog(type in_type,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
@@ -923,8 +985,8 @@ std::string internal::file_dialog::string_result()
     auto ret = m_async->result();
     // Strip potential trailing newline (zenity). Also strip trailing slash
     // added by osascript for consistency with other backends.
-    while (ret.back() == '\n' || ret.back() == '/')
-        ret = ret.substr(0, ret.size() - 1);
+    while (!ret.empty() && (ret.back() == '\n' || ret.back() == '/'))
+        ret.pop_back();
     return ret;
 #endif
 }
@@ -965,6 +1027,7 @@ int CALLBACK internal::file_dialog::Impl::bffcallback(HWND hwnd, UINT uMsg,
     return 0;
 }
 
+#if PFD_HAS_IFILEDIALOG
 std::string internal::file_dialog::Impl::select_folder_vista(IFileDialog *ifd, bool force_path)
 {
     std::string result;
@@ -1016,8 +1079,7 @@ std::string internal::file_dialog::Impl::select_folder_vista(IFileDialog *ifd, b
             if (wselected)
             {
                 result = internal::wstr2str(std::wstring(wselected));
-                internal::platform::dll ole32("ole32.dll");
-                internal::platform::dll::proc<void WINAPI (LPVOID)>(ole32, "CoTaskMemFree")(wselected);
+                internal::platform::dll::proc<void WINAPI (LPVOID)>(internal::platform::ole32_dll(), "CoTaskMemFree")(wselected);
             }
         }
     }
@@ -1026,6 +1088,7 @@ std::string internal::file_dialog::Impl::select_folder_vista(IFileDialog *ifd, b
 
     return result;
 }
+#endif
 #endif
 
 // notify implementation
@@ -1127,7 +1190,10 @@ notify::notify(std::string const &title,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif
@@ -1141,7 +1207,9 @@ message::message(std::string const &title,
                         icon _icon /* = icon::info */)
 {
 #if _WIN32
-    UINT style = MB_TOPMOST;
+    // Use MB_SYSTEMMODAL rather than MB_TOPMOST to ensure the message window is brought
+    // to front. See https://github.com/samhocevar/portable-file-dialogs/issues/52
+    UINT style = MB_SYSTEMMODAL;
     switch (_icon)
     {
         case icon::warning: style |= MB_ICONWARNING; break;
@@ -1168,11 +1236,11 @@ message::message(std::string const &title,
     m_mappings[IDRETRY] = button::retry;
     m_mappings[IDIGNORE] = button::ignore;
 
-    m_async->start_func([this, text, title, style](int* exit_code) -> std::string
+    m_async->start_func([text, title, style](int* exit_code) -> std::string
     {
         auto wtext = internal::str2wstr(text);
         auto wtitle = internal::str2wstr(title);
-        // using set context to apply new visual style (required for all windows versions)
+        // Apply new visual style (required for all Windows versions)
         internal::platform::new_style_context ctx;
         *exit_code = MessageBoxW(GetActiveWindow(), wtext.c_str(), wtitle.c_str(), style);
         return "";
@@ -1328,7 +1396,10 @@ message::message(std::string const &title,
     }
 
     if (flags(flag::is_verbose))
-        std::cerr << "pfd: " << command << std::endl;
+        print_command(command);
+
+    if (!available())
+        fputs("pfd: Unable to find zenity/matedialog/qarma/kdialog to open file chooser\n", stderr);
 
     m_async->start_process(command);
 #endif

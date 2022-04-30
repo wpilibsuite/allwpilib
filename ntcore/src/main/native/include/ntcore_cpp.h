@@ -20,6 +20,10 @@
 
 #include "networktables/NetworkTableValue.h"
 
+namespace wpi::log {
+class DataLog;
+}  // namespace wpi::log
+
 /** NetworkTables (ntcore) namespace */
 namespace nt {
 
@@ -1230,6 +1234,55 @@ const char* LoadEntries(NT_Inst inst, std::string_view filename,
  * @return Timestamp
  */
 uint64_t Now();
+
+/** @} */
+
+/**
+ * @defgroup ntcore_data_logger_func Data Logger Functions
+ * @{
+ */
+
+/**
+ * Starts logging entry changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopEntryDataLog is
+ *            called or the instance is destroyed
+ * @param prefix only store entries with names that start with this prefix;
+ *               the prefix is not included in the data log entry name
+ * @param logPrefix prefix to add to data log entry names
+ * @return Data logger handle
+ */
+NT_DataLogger StartEntryDataLog(NT_Inst inst, wpi::log::DataLog& log,
+                                std::string_view prefix,
+                                std::string_view logPrefix);
+
+/**
+ * Stops logging entry changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void StopEntryDataLog(NT_DataLogger logger);
+
+/**
+ * Starts logging connection changes to a DataLog.
+ *
+ * @param inst instance handle
+ * @param log data log object; lifetime must extend until StopConnectionDataLog
+ *            is called or the instance is destroyed
+ * @param name data log entry name
+ * @return Data logger handle
+ */
+NT_ConnectionDataLogger StartConnectionDataLog(NT_Inst inst,
+                                               wpi::log::DataLog& log,
+                                               std::string_view name);
+
+/**
+ * Stops logging connection changes to a DataLog.
+ *
+ * @param logger data logger handle
+ */
+void StopConnectionDataLog(NT_ConnectionDataLogger logger);
 
 /** @} */
 

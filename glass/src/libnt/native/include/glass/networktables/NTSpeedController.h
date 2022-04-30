@@ -16,7 +16,7 @@
 namespace glass {
 class NTSpeedControllerModel : public SpeedControllerModel {
  public:
-  static constexpr const char* kType = "Speed Controller";
+  static constexpr const char* kType = "Motor Controller";
 
   explicit NTSpeedControllerModel(std::string_view path);
   NTSpeedControllerModel(NT_Inst instance, std::string_view path);

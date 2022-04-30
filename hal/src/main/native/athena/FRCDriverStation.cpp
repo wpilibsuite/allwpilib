@@ -145,9 +145,14 @@ static int32_t HAL_GetJoystickDescriptorInternal(int32_t joystickNum,
 
 static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
   MatchType_t matchType = MatchType_t::kMatchType_none;
+  info->gameSpecificMessageSize = sizeof(info->gameSpecificMessage);
   int status = FRC_NetworkCommunication_getMatchInfo(
       info->eventName, &matchType, &info->matchNumber, &info->replayNumber,
       info->gameSpecificMessage, &info->gameSpecificMessageSize);
+
+  if (info->gameSpecificMessageSize > sizeof(info->gameSpecificMessage)) {
+    info->gameSpecificMessageSize = 0;
+  }
 
   info->matchType = static_cast<HAL_MatchType>(matchType);
 

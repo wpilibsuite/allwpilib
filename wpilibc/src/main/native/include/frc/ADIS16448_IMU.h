@@ -354,7 +354,7 @@ class ADIS16448_IMU : public nt::NTSendable,
 
   bool m_auto_configured = false;
   SPI::Port m_spi_port;
-  CalibrationTime m_calibration_time;
+  CalibrationTime m_calibration_time{0};
   SPI* m_spi = nullptr;
   DigitalInput* m_auto_interrupt = nullptr;
 

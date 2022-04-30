@@ -23,12 +23,14 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
+class EndlessCommand;
 class ParallelCommandGroup;
 class ParallelRaceGroup;
 class ParallelDeadlineGroup;
 class SequentialCommandGroup;
 class PerpetualCommand;
 class ProxyScheduleCommand;
+class RepeatCommand;
 
 /**
  * A state machine representing a complete action to be performed by the robot.
@@ -41,6 +43,8 @@ class ProxyScheduleCommand;
  *
  * <p>Note: ALWAYS create a subclass by extending CommandHelper<Base, Subclass>,
  * or decorators will not function!
+ *
+ * This class is provided by the NewCommands VendorDep
  *
  * @see CommandScheduler
  * @see CommandHelper
@@ -118,6 +122,17 @@ class Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
+  virtual ParallelRaceGroup Until(std::function<bool()> condition) &&;
+
+  /**
+   * Decorates this command with an interrupt condition.  If the specified
+   * condition becomes true before the command finishes normally, the command
+   * will be interrupted and un-scheduled. Note that this only applies to the
+   * command returned by this method; the calling command is not itself changed.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
   virtual ParallelRaceGroup WithInterrupt(std::function<bool()> condition) &&;
 
   /**
@@ -169,8 +184,26 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
+   * @deprecated replace with EndlessCommand
    */
+  WPI_DEPRECATED("Replace with Endlessly()")
   virtual PerpetualCommand Perpetually() &&;
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end
+   * conditions. The decorated command can still be interrupted or canceled.
+   *
+   * @return the decorated command
+   */
+  virtual EndlessCommand Endlessly() &&;
+
+  /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until
+   * this command is interrupted. The decorated command can still be canceled.
+   *
+   * @return the decorated command
+   */
+  virtual RepeatCommand Repeat() &&;
 
   /**
    * Decorates this command to run "by proxy" by wrapping it in a

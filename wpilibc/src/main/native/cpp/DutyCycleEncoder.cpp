@@ -60,6 +60,8 @@ void DutyCycleEncoder::Init() {
         m_simDevice.CreateDouble("position", hal::SimDevice::kInput, 0.0);
     m_simDistancePerRotation = m_simDevice.CreateDouble(
         "distance_per_rot", hal::SimDevice::kOutput, 1.0);
+    m_simAbsolutePosition =
+        m_simDevice.CreateDouble("absPosition", hal::SimDevice::kInput, 0.0);
     m_simIsConnected =
         m_simDevice.CreateBoolean("connected", hal::SimDevice::kInput, true);
   } else {
@@ -76,6 +78,11 @@ void DutyCycleEncoder::Init() {
                                m_dutyCycle->GetSourceChannel());
 }
 
+static bool DoubleEquals(double a, double b) {
+  constexpr double epsilon = 0.00001;
+  return std::abs(a - b) < epsilon;
+}
+
 units::turn_t DutyCycleEncoder::Get() const {
   if (m_simPosition) {
     return units::turn_t{m_simPosition.Get()};
@@ -88,15 +95,9 @@ units::turn_t DutyCycleEncoder::Get() const {
     auto pos = m_dutyCycle->GetOutput();
     auto counter2 = m_counter->Get();
     auto pos2 = m_dutyCycle->GetOutput();
-    if (counter == counter2 && pos == pos2) {
+    if (counter == counter2 && DoubleEquals(pos, pos2)) {
       // map sensor range
-      if (pos < m_sensorMin) {
-        pos = m_sensorMin;
-      }
-      if (pos > m_sensorMax) {
-        pos = m_sensorMax;
-      }
-      pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+      pos = MapSensorRange(pos);
       units::turn_t turns{counter + pos - m_positionOffset};
       m_lastPosition = turns;
       return turns;
@@ -108,6 +109,33 @@ units::turn_t DutyCycleEncoder::Get() const {
       "Failed to read DutyCycle Encoder. Potential Speed Overrun. Returning "
       "last value");
   return m_lastPosition;
+}
+
+double DutyCycleEncoder::MapSensorRange(double pos) const {
+  if (pos < m_sensorMin) {
+    pos = m_sensorMin;
+  }
+  if (pos > m_sensorMax) {
+    pos = m_sensorMax;
+  }
+  pos = (pos - m_sensorMin) / (m_sensorMax - m_sensorMin);
+  return pos;
+}
+
+double DutyCycleEncoder::GetAbsolutePosition() const {
+  if (m_simAbsolutePosition) {
+    return m_simAbsolutePosition.Get();
+  }
+
+  return MapSensorRange(m_dutyCycle->GetOutput());
+}
+
+double DutyCycleEncoder::GetPositionOffset() const {
+  return m_positionOffset;
+}
+
+void DutyCycleEncoder::SetPositionOffset(double offset) {
+  m_positionOffset = std::clamp(offset, 0.0, 1.0);
 }
 
 void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {

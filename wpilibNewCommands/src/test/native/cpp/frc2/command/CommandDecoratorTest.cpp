@@ -34,13 +34,12 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
   frc::sim::ResumeTiming();
 }
 
-TEST_F(CommandDecoratorTest, WithInterrupt) {
+TEST_F(CommandDecoratorTest, Until) {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
 
-  auto command =
-      RunCommand([] {}, {}).WithInterrupt([&finished] { return finished; });
+  auto command = RunCommand([] {}, {}).Until([&finished] { return finished; });
 
   scheduler.Schedule(&command);
 

@@ -124,6 +124,13 @@ int PowerDistribution::GetModule() const {
   return m_module;
 }
 
+PowerDistribution::ModuleType PowerDistribution::GetType() const {
+  int32_t status = 0;
+  auto type = HAL_GetPowerDistributionType(m_handle, &status);
+  FRC_ReportError(status, "Module {}", m_module);
+  return static_cast<ModuleType>(type);
+}
+
 bool PowerDistribution::GetSwitchableChannel() const {
   int32_t status = 0;
   bool state = HAL_GetPowerDistributionSwitchableChannel(m_handle, &status);

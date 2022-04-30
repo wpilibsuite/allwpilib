@@ -62,11 +62,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   // These classes help us simulate our drivetrain
   public DifferentialDrivetrainSim m_drivetrainSimulator;
-  private EncoderSim m_leftEncoderSim;
-  private EncoderSim m_rightEncoderSim;
+  private final EncoderSim m_leftEncoderSim;
+  private final EncoderSim m_rightEncoderSim;
   // The Field2d class shows the field in the sim GUI
-  private Field2d m_fieldSim;
-  private ADXRS450_GyroSim m_gyroSim;
+  private final Field2d m_fieldSim;
+  private final ADXRS450_GyroSim m_gyroSim;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -101,6 +101,12 @@ public class DriveSubsystem extends SubsystemBase {
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
       SmartDashboard.putData("Field", m_fieldSim);
+    } else {
+      m_leftEncoderSim = null;
+      m_rightEncoderSim = null;
+      m_gyroSim = null;
+
+      m_fieldSim = null;
     }
   }
 

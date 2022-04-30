@@ -15,10 +15,14 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
 
     ext {
         nativeName = 'fieldImages'
+        baseId = nativeName
+        groupId = 'edu.wpi.first.fieldImages'
+        devMain = "edu.wpi.first.fieldImages.DevMain"
     }
 
     apply from: "${rootDir}/shared/resources.gradle"
     apply from: "${rootDir}/shared/config.gradle"
+    apply from: "${rootDir}/shared/java/javacommon.gradle"
 
     def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'fields', project)
 

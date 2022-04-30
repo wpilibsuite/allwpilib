@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
@@ -38,8 +40,8 @@ import java.util.function.BiConsumer;
  * <p><strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system containing x position, y
  * position, and heading.
  *
- * <p><strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity, right wheel
- * velocity, and change in gyro heading.
+ * <p><strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity, and angular rate
+ * in the field coordinate system.
  *
  * <p><strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y position, and
  * heading; or <strong> y = [theta]ᵀ </strong> containing gyro heading.
@@ -48,7 +50,7 @@ public class SwerveDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
   private final SwerveDriveKinematics m_kinematics;
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
-  private final KalmanFilterLatencyCompensator<N3, N3, N1> m_latencyCompensator;
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
 
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
@@ -67,9 +69,9 @@ public class SwerveDrivePoseEstimator {
    * @param stateStdDevs Standard deviations of model states. Increase these numbers to trust your
    *     model's state estimates less. This matrix is in the form [x, y, theta]ᵀ, with units in
    *     meters and radians.
-   * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
-   *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
-   *     is in the form [theta], with units in radians.
+   * @param localMeasurementStdDevs Standard deviation of the gyro measurement. Increase this number
+   *     to trust sensor readings from the gyro less. This matrix is in the form [theta], with units
+   *     in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
@@ -134,7 +136,7 @@ public class SwerveDrivePoseEstimator {
             AngleStatistics.angleAdd(2),
             m_nominalDt);
     m_kinematics = kinematics;
-    m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
+    m_poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -173,8 +175,6 @@ public class SwerveDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>You NEED to reset your encoders (to zero) when calling this method.
-   *
    * <p>The gyroscope angle does not need to be reset in the user's robot code. The library
    * automatically takes care of offsetting the gyro angle.
    *
@@ -184,7 +184,7 @@ public class SwerveDrivePoseEstimator {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.reset();
-    m_latencyCompensator.reset();
+    m_poseBuffer.clear();
 
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
 
@@ -209,6 +209,10 @@ public class SwerveDrivePoseEstimator {
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
    *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link SwerveDrivePoseEstimator#updateWithTime}
@@ -217,13 +221,13 @@ public class SwerveDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    m_latencyCompensator.applyPastGlobalMeasurement(
-        Nat.N3(),
-        m_observer,
-        m_nominalDt,
-        StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
-        m_visionCorrect,
-        timestampSeconds);
+    var sample = m_poseBuffer.getSample(timestampSeconds);
+    if (sample.isPresent()) {
+      m_visionCorrect.accept(
+          new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+          StateSpaceUtil.poseTo3dVector(
+              getEstimatedPosition().transformBy(visionRobotPoseMeters.minus(sample.get()))));
+    }
   }
 
   /**
@@ -232,6 +236,10 @@ public class SwerveDrivePoseEstimator {
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * SwerveDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
@@ -296,7 +304,7 @@ public class SwerveDrivePoseEstimator {
     m_previousAngle = angle;
 
     var localY = VecBuilder.fill(angle.getRadians());
-    m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
+    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);
 

@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  * synchronously from the main loop. Subsystems should be registered with the scheduler using {@link
  * CommandScheduler#registerSubsystem(Subsystem...)} in order for their {@link Subsystem#periodic()}
  * methods to be called and for their default commands to be scheduled.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public final class CommandScheduler implements NTSendable, AutoCloseable {
   /** The Singleton Instance. */

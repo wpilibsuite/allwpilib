@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "networktables/NetworkTableInstance.h"
+#include "ntcore_cpp.h"
 
 namespace nt {
 
@@ -190,6 +191,26 @@ inline const char* NetworkTableInstance::LoadEntries(
     std::string_view filename, std::string_view prefix,
     std::function<void(size_t line, const char* msg)> warn) {
   return ::nt::LoadEntries(m_handle, filename, prefix, warn);
+}
+
+inline NT_DataLogger NetworkTableInstance::StartEntryDataLog(
+    wpi::log::DataLog& log, std::string_view prefix,
+    std::string_view logPrefix) {
+  return ::nt::StartEntryDataLog(m_handle, log, prefix, logPrefix);
+}
+
+inline void NetworkTableInstance::StopEntryDataLog(NT_DataLogger logger) {
+  ::nt::StopEntryDataLog(logger);
+}
+
+inline NT_ConnectionDataLogger NetworkTableInstance::StartConnectionDataLog(
+    wpi::log::DataLog& log, std::string_view name) {
+  return ::nt::StartConnectionDataLog(m_handle, log, name);
+}
+
+inline void NetworkTableInstance::StopConnectionDataLog(
+    NT_ConnectionDataLogger logger) {
+  ::nt::StopConnectionDataLog(logger);
 }
 
 inline NT_Logger NetworkTableInstance::AddLogger(

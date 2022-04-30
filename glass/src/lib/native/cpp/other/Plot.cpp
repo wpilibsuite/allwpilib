@@ -105,7 +105,7 @@ class PlotSeries {
   int& m_digitalBitGap;
 
   // value storage
-  static constexpr int kMaxSize = 2000;
+  static constexpr int kMaxSize = 20000;
   static constexpr double kTimeGap = 0.05;
   std::atomic<int> m_size = 0;
   std::atomic<int> m_offset = 0;
@@ -246,7 +246,7 @@ void PlotSeries::SetSource(DataSource* source) {
   m_source = source;
 
   // add initial value
-  m_data[m_size++] = ImPlotPoint{wpi::Now() * 1.0e-6, source->GetValue()};
+  AppendValue(source->GetValue(), 0);
 
   m_newValueConn = source->valueChanged.connect_connection(
       [this](double value, uint64_t time) { AppendValue(value, time); });

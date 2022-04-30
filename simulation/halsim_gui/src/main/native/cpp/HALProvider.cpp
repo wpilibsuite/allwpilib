@@ -27,9 +27,6 @@ HALProvider::HALProvider(glass::Storage& storage) : Provider{storage} {
     for (auto&& entry : m_viewEntries) {
       if (entry->showDefault) {
         Show(entry.get(), entry->window);
-        if (entry->window) {
-          entry->window->SetDefaultVisibility(glass::Window::kShow);
-        }
       }
     }
   });
@@ -59,6 +56,9 @@ void HALProvider::DisplayMenu() {
                         visible || exists)) {
       if (!wasVisible && visible) {
         Show(viewEntry.get(), viewEntry->window);
+        if (viewEntry->window) {
+          viewEntry->window->SetVisible(true);
+        }
       } else if (wasVisible && !visible && viewEntry->window) {
         viewEntry->window->SetVisible(false);
       }
@@ -81,9 +81,8 @@ glass::Model* HALProvider::GetModel(std::string_view name) {
 }
 
 void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
-  // if there's already a window, just show it
+  // if there's already a window, we're done
   if (entry->window) {
-    entry->window->SetVisible(true);
     return;
   }
 
@@ -97,7 +96,9 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(entry->name, true, glass::Window::kHide);
+    window = GetOrAddWindow(
+        entry->name, true,
+        entry->showDefault ? glass::Window::kShow : glass::Window::kHide);
   }
   if (!window) {
     return;
@@ -110,6 +111,4 @@ void HALProvider::Show(ViewEntry* entry, glass::Window* window) {
     return;
   }
   window->SetView(std::move(view));
-
-  entry->window->SetVisible(true);
 }

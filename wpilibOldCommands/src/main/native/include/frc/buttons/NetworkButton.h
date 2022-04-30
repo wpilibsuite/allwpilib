@@ -14,6 +14,11 @@
 
 namespace frc {
 
+/**
+ * A that uses a NetworkTable boolean field.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ */
 class NetworkButton : public Button {
  public:
   NetworkButton(std::string_view tableName, std::string_view field);

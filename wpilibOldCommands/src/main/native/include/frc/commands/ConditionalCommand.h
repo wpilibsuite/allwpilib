@@ -26,6 +26,8 @@ namespace frc {
  * A ConditionalCommand will require the superset of subsystems of the onTrue
  * and onFalse commands.
  *
+ * This class is provided by the OldCommands VendorDep
+ *
  * @see Command
  * @see Scheduler
  */

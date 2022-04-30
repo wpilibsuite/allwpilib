@@ -68,8 +68,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry.update(
         m_gyro.getRotation2d(),
         m_frontLeft.getState(),
-        m_rearLeft.getState(),
         m_frontRight.getState(),
+        m_rearLeft.getState(),
         m_rearRight.getState());
   }
 

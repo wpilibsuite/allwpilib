@@ -247,7 +247,6 @@ if (WITH_TESTS)
     include(GoogleTest)
 endif()
 
-add_subdirectory(fieldImages)
 add_subdirectory(wpiutil)
 add_subdirectory(ntcore)
 
@@ -256,12 +255,14 @@ if (WITH_WPIMATH)
 endif()
 
 if (WITH_GUI)
+    add_subdirectory(fieldImages)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
     if (LIBSSH_FOUND)
         add_subdirectory(roborioteamnumbersetter)
+        add_subdirectory(datalogtool)
     endif()
 endif()
 

@@ -12,6 +12,7 @@
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
+#include "ntcore_cpp.h"
 
 using namespace wpi::java;
 
@@ -1856,6 +1857,57 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_now
   (JNIEnv*, jclass)
 {
   return nt::Now();
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    startEntryDataLog
+ * Signature: (IJLjava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startEntryDataLog
+  (JNIEnv* env, jclass, jint inst, jlong log, jstring prefix, jstring logPrefix)
+{
+  return nt::StartEntryDataLog(inst, *reinterpret_cast<wpi::log::DataLog*>(log),
+                               JStringRef{env, prefix},
+                               JStringRef{env, logPrefix});
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    stopEntryDataLog
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_stopEntryDataLog
+  (JNIEnv*, jclass, jint logger)
+{
+  nt::StopEntryDataLog(logger);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    startConnectionDataLog
+ * Signature: (IJLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_startConnectionDataLog
+  (JNIEnv* env, jclass, jint inst, jlong log, jstring name)
+{
+  return nt::StartConnectionDataLog(
+      inst, *reinterpret_cast<wpi::log::DataLog*>(log), JStringRef{env, name});
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    stopConnectionDataLog
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_networktables_NetworkTablesJNI_stopConnectionDataLog
+  (JNIEnv*, jclass, jint logger)
+{
+  nt::StopConnectionDataLog(logger);
 }
 
 /*

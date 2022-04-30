@@ -35,14 +35,14 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * Creates a new ArmFeedforward with the specified gains.
    *
    * @param kS   The static gain, in volts.
-   * @param kCos The gravity gain, in volts.
+   * @param kG The gravity gain, in volts.
    * @param kV   The velocity gain, in volt seconds per radian.
    * @param kA   The acceleration gain, in volt seconds^2 per radian.
    */
   constexpr ArmFeedforward(
-      units::volt_t kS, units::volt_t kCos, units::unit_t<kv_unit> kV,
+      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
       units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
-      : kS(kS), kCos(kCos), kV(kV), kA(kA) {}
+      : kS(kS), kG(kG), kV(kV), kA(kA) {}
 
   /**
    * Calculates the feedforward from the gains and setpoints.
@@ -56,7 +56,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
                           units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
                               units::unit_t<Acceleration>(0)) const {
-    return kS * wpi::sgn(velocity) + kCos * units::math::cos(angle) +
+    return kS * wpi::sgn(velocity) + kG * units::math::cos(angle) +
            kV * velocity + kA * acceleration;
   }
 
@@ -79,7 +79,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kCos * units::math::cos(angle) -
+    return (maxVoltage - kS - kG * units::math::cos(angle) -
             kA * acceleration) /
            kV;
   }
@@ -100,7 +100,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + kS - kCos * units::math::cos(angle) -
+    return (-maxVoltage + kS - kG * units::math::cos(angle) -
             kA * acceleration) /
            kV;
   }
@@ -121,7 +121,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       units::volt_t maxVoltage, units::unit_t<Angle> angle,
       units::unit_t<Velocity> velocity) {
     return (maxVoltage - kS * wpi::sgn(velocity) -
-            kCos * units::math::cos(angle) - kV * velocity) /
+            kG * units::math::cos(angle) - kV * velocity) /
            kA;
   }
 
@@ -144,7 +144,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   }
 
   units::volt_t kS{0};
-  units::volt_t kCos{0};
+  units::volt_t kG{0};
   units::unit_t<kv_unit> kV{0};
   units::unit_t<ka_unit> kA{0};
 };

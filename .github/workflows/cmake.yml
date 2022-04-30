@@ -2,6 +2,10 @@ name: CMake
 
 on: [pull_request, push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
@@ -16,50 +20,64 @@ jobs:
             name: macOS
             container: ""
             flags: "-DWITH_JAVA=OFF"
+
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v2
-      - name: Install Dependencies
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install opencv
-          fi
+
+      - name: Install opencv (macOS)
+        run: brew install opencv
+        if: runner.os == 'macOS'
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+
       - name: Install jinja
         run: python -m pip install jinja2
+
       - name: configure
         run: mkdir build && cd build && cmake ${{ matrix.flags }} ..
+
       - name: build
         working-directory: build
-        run: cmake --build . -j$(nproc)
+        run: cmake --build . --parallel $(nproc)
+
       - name: test
         working-directory: build
         run: ctest --output-on-failure
 
-  build-vcpkg:
+  build-windows:
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
     name: "Build - Windows"
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
-      - name: Prepare vcpkg
-        uses: lukka/run-vcpkg@v7
+
+      - name: Install CMake
+        uses: lukka/get-cmake@v3.23.0
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v10.2
         with:
-          vcpkgArguments: opencv
           vcpkgDirectory: ${{ runner.workspace }}/vcpkg
-          vcpkgTriplet: x64-windows
-          vcpkgGitCommitId: d781bd9ca77ac3dc2f13d88169021d48459c665f # HEAD on 2021-07-25
-      - name: Configure & Build
-        uses: lukka/run-cmake@v3
-        with:
-          buildDirectory: ${{ runner.workspace }}/build
-          cmakeAppendedArgs: -DWITH_JAVA=OFF
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          useVcpkgToolchainFile: true
-      - name: Run Tests
+          vcpkgGitCommitId: f6af75acc923c833a5620943e3fc7d5e4930f0df # HEAD on 2022-04-10
+          runVcpkgInstall: true
+
+      - name: Install jinja
+        run: python -m pip install jinja2
+
+      - name: configure
+        run: mkdir build && cd build && cmake -DWITH_JAVA=OFF -DCMAKE_TOOLCHAIN_FILE=${{ runner.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+
+      - name: build
+        working-directory: build
+        run: cmake --build . --parallel $(nproc)
+
+      - name: test
+        working-directory: build
         run: ctest -C "Debug" --output-on-failure
-        working-directory: ${{ runner.workspace }}/build

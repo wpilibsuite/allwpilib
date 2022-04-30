@@ -169,7 +169,7 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
 
   /* State variables */
   private volatile boolean m_thread_active = false;
-  private CalibrationTime m_calibration_time = CalibrationTime._512ms;
+  private CalibrationTime m_calibration_time = CalibrationTime._32ms;
   private volatile boolean m_first_run = true;
   private volatile boolean m_thread_idle = false;
   private boolean m_auto_configured = false;
@@ -961,11 +961,11 @@ public class ADIS16448_IMU implements AutoCloseable, NTSendable {
   public synchronized double getRate() {
     switch (m_yaw_axis) {
       case kX:
-        return getGyroAngleX();
+        return getGyroRateX();
       case kY:
-        return getGyroAngleY();
+        return getGyroRateY();
       case kZ:
-        return getGyroAngleZ();
+        return getGyroRateZ();
       default:
         return 0.0;
     }

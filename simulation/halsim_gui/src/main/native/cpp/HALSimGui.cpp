@@ -32,3 +32,23 @@ void HALSimGui::GlobalInit() {
 
   glass::AddStandardNetworkTablesViews(*ntProvider);
 }
+
+namespace halsimgui {
+
+void AddGuiInit(std::function<void()> initialize) {
+  wpi::gui::AddInit(std::move(initialize));
+}
+
+void AddGuiEarlyExecute(std::function<void()> execute) {
+  wpi::gui::AddEarlyExecute(std::move(execute));
+}
+
+void AddGuiLateExecute(std::function<void()> execute) {
+  wpi::gui::AddLateExecute(std::move(execute));
+}
+
+void GuiExit() {
+  wpi::gui::Exit();
+}
+
+}  // namespace halsimgui

@@ -31,11 +31,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *                           wrapped around.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
+   * @param simulateGravity    Whether gravity should be simulated or not.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const LinearSystem<2, 1, 1>& plant, const DCMotor& gearbox,
               double gearing, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
+              bool simulateGravity,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -50,11 +52,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
    *                           wrapped around.
    * @param minHeight          The minimum allowed height of the elevator.
    * @param maxHeight          The maximum allowed height of the elevator.
+   * @param simulateGravity    Whether gravity should be simulated or not.
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const DCMotor& gearbox, double gearing,
               units::kilogram_t carriageMass, units::meter_t drumRadius,
               units::meter_t minHeight, units::meter_t maxHeight,
+              bool simulateGravity,
               const std::array<double, 1>& measurementStdDevs = {0.0});
 
   /**
@@ -133,5 +137,6 @@ class ElevatorSim : public LinearSystemSim<2, 1, 1> {
   units::meter_t m_minHeight;
   units::meter_t m_maxHeight;
   double m_gearing;
+  bool m_simulateGravity;
 };
 }  // namespace frc::sim

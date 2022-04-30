@@ -18,6 +18,8 @@ package edu.wpi.first.wpilibj2.command;
  * Subsystem#periodic()} method to be called. It is recommended that this method be called from the
  * constructor of users' Subsystem implementations. The {@link SubsystemBase} class offers a simple
  * base for user implementations that handles this.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public interface Subsystem {
   /**

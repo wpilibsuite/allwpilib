@@ -17,8 +17,10 @@ namespace frc2 {
  * A command that runs a given runnable when it is initialized, and another
  * runnable when it ends. Useful for running and then stopping a motor, or
  * extending and then retracting a solenoid. Has no end condition as-is; either
- * subclass it or use Command.WithTimeout() or Command.WithInterrupt() to give
+ * subclass it or use Command.WithTimeout() or Command.Until() to give
  * it one.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class StartEndCommand : public CommandHelper<CommandBase, StartEndCommand> {
  public:

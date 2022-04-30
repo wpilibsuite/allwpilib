@@ -23,6 +23,7 @@
 #include "DriverStationGui.h"
 #include "EncoderSimGui.h"
 #include "HALSimGui.h"
+#include "HALSimGuiExt.h"
 #include "NetworkTablesSimGui.h"
 #include "PCMSimGui.h"
 #include "PWMSimGui.h"
@@ -49,6 +50,17 @@ __declspec(dllexport)
   glass::CreateContext();
 
   glass::SetStorageName("simgui");
+
+  HAL_RegisterExtension(HALSIMGUI_EXT_ADDGUIINIT,
+                        reinterpret_cast<void*>((AddGuiInitFn)&AddGuiInit));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_ADDGUILATEEXECUTE,
+      reinterpret_cast<void*>((AddGuiLateExecuteFn)&AddGuiLateExecute));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_ADDGUIEARLYEXECUTE,
+      reinterpret_cast<void*>((AddGuiEarlyExecuteFn)&AddGuiEarlyExecute));
+  HAL_RegisterExtension(HALSIMGUI_EXT_GUIEXIT,
+                        reinterpret_cast<void*>((GuiExitFn)&GuiExit));
 
   HALSimGui::GlobalInit();
   DriverStationGui::GlobalInit();

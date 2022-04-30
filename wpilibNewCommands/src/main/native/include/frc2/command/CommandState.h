@@ -10,6 +10,8 @@ namespace frc2 {
 /**
  * Class that holds scheduling state for a command.  Used internally by the
  * CommandScheduler
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class CommandState final {
  public:

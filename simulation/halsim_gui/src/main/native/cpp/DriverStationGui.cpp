@@ -247,8 +247,6 @@ class FMSSimModel : public glass::FMSModel {
   }
   void SetMatchTime(double val) override {
     HALSIM_SetDriverStationMatchTime(val);
-    int32_t status = 0;
-    m_startMatchTime = HAL_GetFPGATime(&status) * 1.0e-6 - val;
   }
   void SetEStop(bool val) override { HALSIM_SetDriverStationEStop(val); }
   void SetEnabled(bool val) override { HALSIM_SetDriverStationEnabled(val); }
@@ -266,8 +264,6 @@ class FMSSimModel : public glass::FMSModel {
 
   bool IsReadOnly() override;
 
-  bool m_matchTimeEnabled = true;
-
  private:
   glass::DataSource m_fmsAttached{"FMS:FMSAttached"};
   glass::DataSource m_dsAttached{"FMS:DSAttached"};
@@ -277,8 +273,7 @@ class FMSSimModel : public glass::FMSModel {
   glass::DataSource m_enabled{"FMS:RobotEnabled"};
   glass::DataSource m_test{"FMS:TestMode"};
   glass::DataSource m_autonomous{"FMS:AutonomousMode"};
-  double m_startMatchTime = 0.0;
-  double m_prevTime = 0.0;
+  double m_startMatchTime = -1.0;
 };
 
 }  // namespace
@@ -1138,6 +1133,7 @@ FMSSimModel::FMSSimModel() {
   m_enabled.SetDigital(true);
   m_test.SetDigital(true);
   m_autonomous.SetDigital(true);
+  m_matchTime.SetValue(-1.0);
 }
 
 void FMSSimModel::Update() {
@@ -1151,25 +1147,23 @@ void FMSSimModel::Update() {
   m_autonomous.SetValue(HALSIM_GetDriverStationAutonomous());
 
   double matchTime = HALSIM_GetDriverStationMatchTime();
-  if (m_matchTimeEnabled && !IsDSDisabled()) {
+  if (!IsDSDisabled() && enabled) {
     int32_t status = 0;
     double curTime = HAL_GetFPGATime(&status) * 1.0e-6;
-    if (m_startMatchTime == 0.0) {
-      m_startMatchTime = curTime;
+    if (m_startMatchTime == -1.0) {
+      m_startMatchTime = matchTime + curTime;
     }
-    if (enabled) {
-      matchTime = curTime - m_startMatchTime;
-      HALSIM_SetDriverStationMatchTime(matchTime);
-    } else {
-      if (m_prevTime == 0.0) {
-        m_prevTime = curTime;
-      }
-      m_startMatchTime += (curTime - m_prevTime);
+    matchTime = m_startMatchTime - curTime;
+    if (matchTime < 0) {
+      matchTime = -1.0;
     }
-    m_prevTime = curTime;
+    HALSIM_SetDriverStationMatchTime(matchTime);
   } else {
-    m_startMatchTime = 0.0;
-    m_prevTime = 0.0;
+    if (m_startMatchTime != -1.0) {
+      matchTime = -1.0;
+      HALSIM_SetDriverStationMatchTime(matchTime);
+    }
+    m_startMatchTime = -1.0;
   }
   m_matchTime.SetValue(matchTime);
 }
@@ -1424,9 +1418,8 @@ void DriverStationGui::GlobalInit() {
         win->SetDefaultSize(300, 560);
       }
     }
-    if (auto win = dsManager->AddWindow("FMS", [] {
-          DisplayFMS(gFMSModel.get(), &gFMSModel->m_matchTimeEnabled);
-        })) {
+    if (auto win =
+            dsManager->AddWindow("FMS", [] { DisplayFMS(gFMSModel.get()); })) {
       win->DisableRenamePopup();
       win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
       win->SetDefaultPos(5, 540);

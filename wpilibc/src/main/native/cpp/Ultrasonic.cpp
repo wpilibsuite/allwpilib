@@ -120,11 +120,6 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     }
 
     m_thread = std::thread(&Ultrasonic::UltrasonicChecker);
-
-    // TODO: Currently, lvuser does not have permissions to set task priorities.
-    // Until that is the case, uncommenting this will break user code that calls
-    // Ultrasonic::SetAutomicMode().
-    // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
     if (m_thread.joinable()) {

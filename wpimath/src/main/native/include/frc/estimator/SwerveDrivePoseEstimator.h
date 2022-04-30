@@ -12,10 +12,10 @@
 #include "Eigen/Core"
 #include "frc/StateSpaceUtil.h"
 #include "frc/estimator/AngleStatistics.h"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/time.h"
 
@@ -40,8 +40,8 @@ namespace frc {
  * <strong> x = [x, y, theta]ᵀ </strong> in the field coordinate system
  * containing x position, y position, and heading.
  *
- * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
- * right wheel velocity, and change in gyro heading.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
  * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
  * position, and heading; or <strong> y = [theta]ᵀ </strong> containing gyro
@@ -62,11 +62,10 @@ class SwerveDrivePoseEstimator {
    *                                 model's state estimates less. This matrix
    *                                 is in the form [x, y, theta]ᵀ, with units
    *                                 in meters and radians.
-   * @param localMeasurementStdDevs  Standard deviations of the encoder and gyro
-   *                                 measurements. Increase these numbers to
-   *                                 trust sensor readings from encoders
-   *                                 and gyros less. This matrix is in the form
-   *                                 [theta], with units in radians.
+   * @param localMeasurementStdDevs  Standard deviation of the gyro measurement.
+   *                                 Increase this number to trust sensor
+   *                                 readings from the gyro less. This matrix is
+   *                                 in the form [theta], with units in radians.
    * @param visionMeasurementStdDevs Standard deviations of the vision
    *                                 measurements. Increase these numbers to
    *                                 trust global measurements from vision
@@ -119,8 +118,6 @@ class SwerveDrivePoseEstimator {
   /**
    * Resets the robot's position on the field.
    *
-   * You NEED to reset your encoders (to zero) when calling this method.
-   *
    * The gyroscope angle does not need to be reset in the user's robot code.
    * The library automatically takes care of offsetting the gyro angle.
    *
@@ -130,7 +127,7 @@ class SwerveDrivePoseEstimator {
   void ResetPosition(const Pose2d& pose, const Rotation2d& gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.Reset();
-    m_latencyCompensator.Reset();
+    m_poseBuffer.Clear();
 
     m_observer.SetXhat(PoseTo3dVector(pose));
 
@@ -174,6 +171,10 @@ class SwerveDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -187,9 +188,11 @@ class SwerveDrivePoseEstimator {
    */
   void AddVisionMeasurement(const Pose2d& visionRobotPose,
                             units::second_t timestamp) {
-    m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-        &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-        m_visionCorrect, timestamp);
+    if (auto sample = m_poseBuffer.Sample(timestamp)) {
+      m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+                      PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                          visionRobotPose - sample.value())));
+    }
   }
 
   /**
@@ -198,6 +201,10 @@ class SwerveDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
@@ -278,7 +285,7 @@ class SwerveDrivePoseEstimator {
     Eigen::Vector<double, 1> localY{angle.Radians().value()};
     m_previousAngle = angle;
 
-    m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+    m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
     m_observer.Predict(u, dt);
     m_observer.Correct(u, localY);
@@ -289,8 +296,7 @@ class SwerveDrivePoseEstimator {
  private:
   UnscentedKalmanFilter<3, 3, 1> m_observer;
   SwerveDriveKinematics<NumModules>& m_kinematics;
-  KalmanFilterLatencyCompensator<3, 3, 1, UnscentedKalmanFilter<3, 3, 1>>
-      m_latencyCompensator;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
   std::function<void(const Eigen::Vector<double, 3>& u,
                      const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;

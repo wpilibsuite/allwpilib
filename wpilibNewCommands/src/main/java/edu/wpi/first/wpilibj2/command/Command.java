@@ -14,6 +14,8 @@ import java.util.function.BooleanSupplier;
  *
  * <p>Commands are run synchronously from the main robot loop; no multithreading is used, unless
  * specified explicitly from the command implementation.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public interface Command {
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
@@ -89,8 +91,27 @@ public interface Command {
    * @param condition the interrupt condition
    * @return the command with the interrupt condition added
    */
-  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
+  default ParallelRaceGroup until(BooleanSupplier condition) {
     return raceWith(new WaitUntilCommand(condition));
+  }
+
+  /**
+   * Decorates this command with an interrupt condition. If the specified condition becomes true
+   * before the command finishes normally, the command will be interrupted and un-scheduled. Note
+   * that this only applies to the command returned by this method; the calling command is not
+   * itself changed.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @param condition the interrupt condition
+   * @return the command with the interrupt condition added
+   */
+  default ParallelRaceGroup withInterrupt(BooleanSupplier condition) {
+    return until(condition);
   }
 
   /**
@@ -231,9 +252,43 @@ public interface Command {
    * decorated without issue.
    *
    * @return the decorated command
+   * @deprecated use {@link #endlessly()} instead.
    */
+  @Deprecated(forRemoval = true, since = "2023")
   default PerpetualCommand perpetually() {
     return new PerpetualCommand(this);
+  }
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end conditions. The decorated
+   * command can still be interrupted or canceled.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @return the decorated command
+   */
+  default EndlessCommand endlessly() {
+    return new EndlessCommand(this);
+  }
+
+  /**
+   * Decorates this command to run repeatedly, restarting it when it ends, until this command is
+   * interrupted. The decorated command can still be canceled.
+   *
+   * <p>Note: This decorator works by composing this command within a CommandGroup. The command
+   * cannot be used independently after being decorated, or be re-decorated with a different
+   * decorator, unless it is manually cleared from the list of grouped commands with {@link
+   * CommandGroupBase#clearGroupedCommand(Command)}. The decorated command can, however, be further
+   * decorated without issue.
+   *
+   * @return the decorated command
+   */
+  default RepeatCommand repeat() {
+    return new RepeatCommand(this);
   }
 
   /**

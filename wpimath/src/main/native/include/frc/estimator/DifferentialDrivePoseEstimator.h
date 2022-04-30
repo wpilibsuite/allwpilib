@@ -8,10 +8,10 @@
 #include <wpi/array.h>
 
 #include "Eigen/Core"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "units/time.h"
 
@@ -38,8 +38,8 @@ namespace frc {
  * system containing x position, y position, heading, left encoder distance,
  * and right encoder distance.
  *
- * <strong> u = [v_l, v_r, dtheta]ᵀ </strong> containing left wheel velocity,
- * right wheel velocity, and change in gyro heading.
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
  *
  * NB: Using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we
@@ -127,6 +127,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -147,6 +151,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
@@ -214,8 +222,7 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
  private:
   UnscentedKalmanFilter<5, 3, 3> m_observer;
-  KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
-      m_latencyCompensator;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
   std::function<void(const Eigen::Vector<double, 3>& u,
                      const Eigen::Vector<double, 3>& y)>
       m_visionCorrect;

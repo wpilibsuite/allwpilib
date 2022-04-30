@@ -12,11 +12,17 @@ import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.FloatArrayLogEntry;
+import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Provide access to the network communication data to / from the Driver Station. */
-public class DriverStation {
+public final class DriverStation {
   /** Number of Joystick Ports. */
   public static final int kJoystickPorts = 6;
 
@@ -224,6 +230,163 @@ public class DriverStation {
     }
   }
 
+  private static class JoystickLogSender {
+    JoystickLogSender(DataLog log, int stick, long timestamp) {
+      m_stick = stick;
+
+      m_logButtons = new BooleanArrayLogEntry(log, "DS:joystick" + stick + "/buttons", timestamp);
+      m_logAxes = new FloatArrayLogEntry(log, "DS:joystick" + stick + "/axes", timestamp);
+      m_logPOVs = new IntegerArrayLogEntry(log, "DS:joystick" + stick + "/povs", timestamp);
+
+      appendButtons(timestamp);
+      appendAxes(timestamp);
+      appendPOVs(timestamp);
+    }
+
+    public void send(long timestamp) {
+      if (m_joystickButtonsCache[m_stick].m_count != m_joystickButtons[m_stick].m_count
+          || m_joystickButtonsCache[m_stick].m_buttons != m_joystickButtons[m_stick].m_buttons) {
+        appendButtons(timestamp);
+      }
+
+      if (m_joystickAxesCache[m_stick].m_count != m_joystickAxes[m_stick].m_count) {
+        appendAxes(timestamp);
+      } else {
+        int count = m_joystickAxesCache[m_stick].m_count;
+        for (int i = 0; i < count; i++) {
+          if (m_joystickAxesCache[m_stick].m_axes[i] != m_joystickAxes[m_stick].m_axes[i]) {
+            appendAxes(timestamp);
+            break;
+          }
+        }
+      }
+
+      if (m_joystickPOVsCache[m_stick].m_count != m_joystickPOVs[m_stick].m_count) {
+        appendPOVs(timestamp);
+      } else {
+        int count = m_joystickPOVsCache[m_stick].m_count;
+        for (int i = 0; i < count; i++) {
+          if (m_joystickPOVsCache[m_stick].m_povs[i] != m_joystickPOVs[m_stick].m_povs[i]) {
+            appendPOVs(timestamp);
+            break;
+          }
+        }
+      }
+    }
+
+    void appendButtons(long timestamp) {
+      int count = m_joystickButtonsCache[m_stick].m_count;
+      if (m_sizedButtons == null || m_sizedButtons.length != count) {
+        m_sizedButtons = new boolean[count];
+      }
+      int buttons = m_joystickButtonsCache[m_stick].m_buttons;
+      for (int i = 0; i < count; i++) {
+        m_sizedButtons[i] = (buttons & (1 << i)) != 0;
+      }
+      m_logButtons.append(m_sizedButtons, timestamp);
+    }
+
+    void appendAxes(long timestamp) {
+      int count = m_joystickAxesCache[m_stick].m_count;
+      if (m_sizedAxes == null || m_sizedAxes.length != count) {
+        m_sizedAxes = new float[count];
+      }
+      System.arraycopy(m_joystickAxesCache[m_stick].m_axes, 0, m_sizedAxes, 0, count);
+      m_logAxes.append(m_sizedAxes, timestamp);
+    }
+
+    void appendPOVs(long timestamp) {
+      int count = m_joystickPOVsCache[m_stick].m_count;
+      if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
+        m_sizedPOVs = new long[count];
+      }
+      for (int i = 0; i < count; i++) {
+        m_sizedPOVs[i] = m_joystickPOVsCache[m_stick].m_povs[i];
+      }
+      m_logPOVs.append(m_sizedPOVs, timestamp);
+    }
+
+    final int m_stick;
+    boolean[] m_sizedButtons;
+    float[] m_sizedAxes;
+    long[] m_sizedPOVs;
+    final BooleanArrayLogEntry m_logButtons;
+    final FloatArrayLogEntry m_logAxes;
+    final IntegerArrayLogEntry m_logPOVs;
+  }
+
+  private static class DataLogSender {
+    DataLogSender(DataLog log, boolean logJoysticks, long timestamp) {
+      m_logEnabled = new BooleanLogEntry(log, "DS:enabled", timestamp);
+      m_logAutonomous = new BooleanLogEntry(log, "DS:autonomous", timestamp);
+      m_logTest = new BooleanLogEntry(log, "DS:test", timestamp);
+      m_logEstop = new BooleanLogEntry(log, "DS:estop", timestamp);
+
+      // append initial control word values
+      m_wasEnabled = m_controlWordCache.getEnabled();
+      m_wasAutonomous = m_controlWordCache.getAutonomous();
+      m_wasTest = m_controlWordCache.getTest();
+      m_wasEstop = m_controlWordCache.getEStop();
+
+      m_logEnabled.append(m_wasEnabled, timestamp);
+      m_logAutonomous.append(m_wasAutonomous, timestamp);
+      m_logTest.append(m_wasTest, timestamp);
+      m_logEstop.append(m_wasEstop, timestamp);
+
+      if (logJoysticks) {
+        m_joysticks = new JoystickLogSender[kJoystickPorts];
+        for (int i = 0; i < kJoystickPorts; i++) {
+          m_joysticks[i] = new JoystickLogSender(log, i, timestamp);
+        }
+      } else {
+        m_joysticks = new JoystickLogSender[0];
+      }
+    }
+
+    public void send(long timestamp) {
+      // append control word value changes
+      boolean enabled = m_controlWordCache.getEnabled();
+      if (enabled != m_wasEnabled) {
+        m_logEnabled.append(enabled, timestamp);
+      }
+      m_wasEnabled = enabled;
+
+      boolean autonomous = m_controlWordCache.getAutonomous();
+      if (autonomous != m_wasAutonomous) {
+        m_logAutonomous.append(autonomous, timestamp);
+      }
+      m_wasAutonomous = autonomous;
+
+      boolean test = m_controlWordCache.getTest();
+      if (test != m_wasTest) {
+        m_logTest.append(test, timestamp);
+      }
+      m_wasTest = test;
+
+      boolean estop = m_controlWordCache.getEStop();
+      if (estop != m_wasEstop) {
+        m_logEstop.append(estop, timestamp);
+      }
+      m_wasEstop = estop;
+
+      // append joystick value changes
+      for (JoystickLogSender joystick : m_joysticks) {
+        joystick.send(timestamp);
+      }
+    }
+
+    boolean m_wasEnabled;
+    boolean m_wasAutonomous;
+    boolean m_wasTest;
+    boolean m_wasEstop;
+    final BooleanLogEntry m_logEnabled;
+    final BooleanLogEntry m_logAutonomous;
+    final BooleanLogEntry m_logTest;
+    final BooleanLogEntry m_logEstop;
+
+    final JoystickLogSender[] m_joysticks;
+  }
+
   private static DriverStation instance = new DriverStation();
 
   // Joystick User Data
@@ -249,6 +412,7 @@ public class DriverStation {
   private static final ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
   private static final MatchDataSender m_matchDataSender;
+  private static DataLogSender m_dataLogSender;
 
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
@@ -376,7 +540,7 @@ public class DriverStation {
    */
   public static boolean getStickButton(final int stick, final int button) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
@@ -414,7 +578,7 @@ public class DriverStation {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -454,7 +618,7 @@ public class DriverStation {
       return false;
     }
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -556,7 +720,7 @@ public class DriverStation {
    */
   public static int getStickButtons(final int stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
-      throw new IllegalArgumentException("Joystick index is out of range, should be 0-3");
+      throw new IllegalArgumentException("Joystick index is out of range, should be 0-5");
     }
 
     m_cacheDataMutex.lock();
@@ -1044,6 +1208,7 @@ public class DriverStation {
 
     DriverStationJNI.getControlWord(m_controlWordCache);
 
+    DataLogSender dataLogSender;
     // lock joystick mutex to swap cache data
     m_cacheDataMutex.lock();
     try {
@@ -1077,11 +1242,16 @@ public class DriverStation {
       ControlWord currentWord = m_controlWord;
       m_controlWord = m_controlWordCache;
       m_controlWordCache = currentWord;
+
+      dataLogSender = m_dataLogSender;
     } finally {
       m_cacheDataMutex.unlock();
     }
 
     m_matchDataSender.sendMatchData();
+    if (dataLogSender != null) {
+      dataLogSender.send(WPIUtilJNI.now());
+    }
   }
 
   /**
@@ -1109,4 +1279,33 @@ public class DriverStation {
       }
     }
   }
+
+  /**
+   * Starts logging DriverStation data to data log. Repeated calls are ignored.
+   *
+   * @param log data log
+   * @param logJoysticks if true, log joystick data
+   */
+  @SuppressWarnings("PMD.NonThreadSafeSingleton")
+  public static void startDataLog(DataLog log, boolean logJoysticks) {
+    m_cacheDataMutex.lock();
+    try {
+      if (m_dataLogSender == null) {
+        m_dataLogSender = new DataLogSender(log, logJoysticks, WPIUtilJNI.now());
+      }
+    } finally {
+      m_cacheDataMutex.unlock();
+    }
+  }
+
+  /**
+   * Starts logging DriverStation data to data log, including joystick data. Repeated calls are
+   * ignored.
+   *
+   * @param log data log
+   */
+  public static void startDataLog(DataLog log) {
+    startDataLog(log, true);
+  }
+
 }

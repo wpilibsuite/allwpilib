@@ -28,6 +28,8 @@ import java.util.Vector;
  * Scheduler#run() run()} often to have {@link Command Commands} function correctly. However, this
  * is already done for you if you use the CommandBased Robot template.
  *
+ * <p>This class is provided by the OldCommands VendorDep
+ *
  * @see Command
  */
 public final class Scheduler implements NTSendable, AutoCloseable {

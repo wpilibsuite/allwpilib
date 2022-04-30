@@ -13,6 +13,8 @@ import java.util.Set;
  * and interrupting all the others.
  *
  * <p>As a rule, CommandGroups require the union of the requirements of their component commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ParallelRaceGroup extends CommandGroupBase {
   private final Set<Command> m_commands = new HashSet<>();

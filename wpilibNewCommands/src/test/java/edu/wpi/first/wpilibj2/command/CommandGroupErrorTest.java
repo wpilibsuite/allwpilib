@@ -40,7 +40,7 @@ class CommandGroupErrorTest extends CommandTestBase {
   void redecoratedCommandErrorTest() {
     Command command = new InstantCommand();
 
-    assertDoesNotThrow(() -> command.withTimeout(10).withInterrupt(() -> false));
+    assertDoesNotThrow(() -> command.withTimeout(10).until(() -> false));
     assertThrows(IllegalArgumentException.class, () -> command.withTimeout(10));
     CommandGroupBase.clearGroupedCommand(command);
     assertDoesNotThrow(() -> command.withTimeout(10));

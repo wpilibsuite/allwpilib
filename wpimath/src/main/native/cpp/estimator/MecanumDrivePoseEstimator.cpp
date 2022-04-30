@@ -60,7 +60,7 @@ void frc::MecanumDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle) {
   // Reset state estimate and error covariance
   m_observer.Reset();
-  m_latencyCompensator.Reset();
+  m_poseBuffer.Clear();
 
   m_observer.SetXhat(PoseTo3dVector(pose));
 
@@ -75,9 +75,11 @@ Pose2d frc::MecanumDrivePoseEstimator::GetEstimatedPosition() const {
 
 void frc::MecanumDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-      &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-      m_visionCorrect, timestamp);
+  if (auto sample = m_poseBuffer.Sample(timestamp)) {
+    m_visionCorrect(Eigen::Vector<double, 3>::Zero(),
+                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                        visionRobotPose - sample.value())));
+  }
 }
 
 Pose2d frc::MecanumDrivePoseEstimator::Update(
@@ -107,7 +109,7 @@ Pose2d frc::MecanumDrivePoseEstimator::UpdateWithTime(
   Eigen::Vector<double, 1> localY{angle.Radians().value()};
   m_previousAngle = angle;
 
-  m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
 
   m_observer.Predict(u, dt);
   m_observer.Correct(u, localY);

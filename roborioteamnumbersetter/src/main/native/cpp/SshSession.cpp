@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 
 #include <algorithm>
-#include <iostream>
 #include <stdexcept>
 
 #include <fmt/format.h>

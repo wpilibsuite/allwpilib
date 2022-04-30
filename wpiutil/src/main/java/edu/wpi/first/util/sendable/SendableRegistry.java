@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * The SendableRegistry class is the public interface for registering sensors and actuators for use
  * on dashboards and LiveWindow.
  */
-public class SendableRegistry {
+public final class SendableRegistry {
   private static class Component {
     Component() {}
 

@@ -135,7 +135,7 @@ class LinearQuadraticRegulatorImpl {
         drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
 
     // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    m_K = (B.transpose() * S * B + R)
+    m_K = (discB.transpose() * S * discB + R)
               .llt()
               .solve(discB.transpose() * S * discA + N.transpose());
 
@@ -173,7 +173,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Returns the control input vector u.
@@ -189,7 +189,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the control input vector.
    */
-  double U(int i) const { return m_u(i, 0); }
+  double U(int i) const { return m_u(i); }
 
   /**
    * Resets the controller.

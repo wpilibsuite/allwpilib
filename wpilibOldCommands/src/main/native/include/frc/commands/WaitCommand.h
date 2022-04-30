@@ -12,6 +12,12 @@
 
 namespace frc {
 
+/**
+ * A WaitCommand will wait for a certain amount of time before finishing. It is
+ * useful if you want a CommandGroup to pause for a moment.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class WaitCommand : public TimedCommand {
  public:
   /**

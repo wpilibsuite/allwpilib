@@ -53,6 +53,9 @@ class SpeedController;
  * The positive X axis points ahead, the positive Y axis points right, and the
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * MotorSafety is enabled by default. The DriveCartesian or DrivePolar
+ * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class KilloughDrive : public RobotDriveBase,
                       public wpi::Sendable,
@@ -62,6 +65,11 @@ class KilloughDrive : public RobotDriveBase,
   static constexpr double kDefaultRightMotorAngle = 120.0;
   static constexpr double kDefaultBackMotorAngle = 270.0;
 
+  /**
+   * Wheel speeds for a Killough drive.
+   *
+   * Uses normalized voltage [-1.0..1.0].
+   */
   struct WheelSpeeds {
     double left = 0.0;
     double right = 0.0;
@@ -154,6 +162,7 @@ class KilloughDrive : public RobotDriveBase,
    *                  Clockwise is positive.
    * @param gyroAngle The current angle reading from the gyro in degrees around
    *                  the Z axis. Use this to implement field-oriented controls.
+   * @return Wheel speeds [-1.0..1.0].
    */
   WheelSpeeds DriveCartesianIK(double ySpeed, double xSpeed, double zRotation,
                                double gyroAngle = 0.0);

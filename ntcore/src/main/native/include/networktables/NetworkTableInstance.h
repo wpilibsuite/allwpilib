@@ -507,6 +507,52 @@ class NetworkTableInstance final {
 
   /**
    * @{
+   * @name Data Logger Functions
+   */
+
+  /**
+   * Starts logging entry changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until StopEntryDataLog is
+   *            called or the instance is destroyed
+   * @param prefix only store entries with names that start with this prefix;
+   *               the prefix is not included in the data log entry name
+   * @param logPrefix prefix to add to data log entry names
+   * @return Data logger handle
+   */
+  NT_DataLogger StartEntryDataLog(wpi::log::DataLog& log,
+                                  std::string_view prefix,
+                                  std::string_view logPrefix);
+
+  /**
+   * Stops logging entry changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  static void StopEntryDataLog(NT_DataLogger logger);
+
+  /**
+   * Starts logging connection changes to a DataLog.
+   *
+   * @param log data log object; lifetime must extend until
+   *            StopConnectionDataLog is called or the instance is destroyed
+   * @param name data log entry name
+   * @return Data logger handle
+   */
+  NT_ConnectionDataLogger StartConnectionDataLog(wpi::log::DataLog& log,
+                                                 std::string_view name);
+
+  /**
+   * Stops logging connection changes to a DataLog.
+   *
+   * @param logger data logger handle
+   */
+  static void StopConnectionDataLog(NT_ConnectionDataLogger logger);
+
+  /** @} */
+
+  /**
+   * @{
    * @name Logger Functions
    */
 

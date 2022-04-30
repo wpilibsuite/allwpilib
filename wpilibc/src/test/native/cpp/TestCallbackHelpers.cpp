@@ -4,8 +4,6 @@
 
 #include "callback_helpers/TestCallbackHelpers.h"
 
-#include <iostream>
-
 #include <fmt/format.h>
 
 namespace frc::sim {

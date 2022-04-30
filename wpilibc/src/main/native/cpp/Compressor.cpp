@@ -29,7 +29,9 @@ Compressor::Compressor(PneumaticsModuleType moduleType)
     : Compressor{PneumaticsBase::GetDefaultForType(moduleType), moduleType} {}
 
 Compressor::~Compressor() {
-  m_module->UnreserveCompressor();
+  if (m_module) {
+    m_module->UnreserveCompressor();
+  }
 }
 
 void Compressor::Start() {
@@ -41,6 +43,10 @@ void Compressor::Stop() {
 }
 
 bool Compressor::Enabled() const {
+  return IsEnabled();
+}
+
+bool Compressor::IsEnabled() const {
   return m_module->GetCompressor();
 }
 
@@ -85,7 +91,7 @@ CompressorConfigType Compressor::GetConfigType() const {
 void Compressor::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSmartDashboardType("Compressor");
   builder.AddBooleanProperty(
-      "Enabled", [=] { return Enabled(); }, nullptr);
+      "Enabled", [=] { return IsEnabled(); }, nullptr);
   builder.AddBooleanProperty(
       "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
 }

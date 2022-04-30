@@ -12,6 +12,8 @@ namespace frc2 {
  * A class used to bind command scheduling to joystick button presses.  Can be
  * composed with other buttons with the operators in Trigger.
  *
+ * This class is provided by the NewCommands VendorDep
+ *
  * @see Trigger
  */
 class JoystickButton : public Button {
