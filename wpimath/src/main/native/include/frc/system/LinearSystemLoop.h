@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/SymbolExports.h>
+
 #include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/controller/LinearQuadraticRegulator.h"
@@ -210,7 +212,7 @@ class LinearSystemLoop {
    * Return the observer used internally.
    */
   const KalmanFilter<States, Inputs, Outputs>& Observer() const {
-    return m_observer;
+    return *m_observer;
   }
 
   /**
@@ -281,5 +283,10 @@ class LinearSystemLoop {
   static constexpr int kInputs = Inputs;
   static constexpr int kOutputs = Outputs;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    LinearSystemLoop<1, 1, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    LinearSystemLoop<2, 1, 1>;
 
 }  // namespace frc
