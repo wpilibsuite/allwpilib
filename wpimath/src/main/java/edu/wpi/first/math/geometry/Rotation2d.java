@@ -59,6 +59,16 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
+   * Constructs and returns a Rotation2d with the given radian value.
+   *
+   * @param radians The value of the angle in degrees.
+   * @return The rotation object with the desired angle value.
+   */
+  public static Rotation2d fromRadians(double radians) {
+    return new Rotation2d(radians);
+  }
+
+  /**
    * Constructs and returns a Rotation2d with the given degree value.
    *
    * @param degrees The value of the angle in degrees.
