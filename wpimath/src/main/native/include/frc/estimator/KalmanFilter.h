@@ -4,25 +4,14 @@
 
 #pragma once
 
-#include <frc/fmt/Eigen.h>
-
-#include <cmath>
-#include <string>
-
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Cholesky"
 #include "Eigen/Core"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
-#include "wpimath/MathShared.h"
 
 namespace frc {
-namespace detail {
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an
@@ -45,7 +34,7 @@ namespace detail {
  * @tparam Outputs The number of outputs.
  */
 template <int States, int Inputs, int Outputs>
-class KalmanFilterImpl {
+class KalmanFilter {
  public:
   /**
    * Constructs a state-space observer with the given plant.
@@ -55,59 +44,13 @@ class KalmanFilterImpl {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep.
    */
-  KalmanFilterImpl(LinearSystem<States, Inputs, Outputs>& plant,
-                   const wpi::array<double, States>& stateStdDevs,
-                   const wpi::array<double, Outputs>& measurementStdDevs,
-                   units::second_t dt) {
-    m_plant = &plant;
+  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
+               const wpi::array<double, States>& stateStdDevs,
+               const wpi::array<double, Outputs>& measurementStdDevs,
+               units::second_t dt);
 
-    auto contQ = MakeCovMatrix(stateStdDevs);
-    auto contR = MakeCovMatrix(measurementStdDevs);
-
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, States> discQ;
-    DiscretizeAQTaylor<States>(plant.A(), contQ, dt, &discA, &discQ);
-
-    auto discR = DiscretizeR<Outputs>(contR, dt);
-
-    const auto& C = plant.C();
-
-    if (!IsDetectable<States, Outputs>(discA, C)) {
-      std::string msg = fmt::format(
-          "The system passed to the Kalman filter is "
-          "unobservable!\n\nA =\n{}\nC =\n{}\n",
-          discA, C);
-
-      wpi::math::MathSharedStore::ReportError(msg);
-      throw std::invalid_argument(msg);
-    }
-
-    Eigen::Matrix<double, States, States> P =
-        drake::math::DiscreteAlgebraicRiccatiEquation(
-            discA.transpose(), C.transpose(), discQ, discR);
-
-    // S = CPCᵀ + R
-    Eigen::Matrix<double, Outputs, Outputs> S = C * P * C.transpose() + discR;
-
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    m_K = S.transpose().ldlt().solve(C * P.transpose()).transpose();
-
-    Reset();
-  }
-
-  KalmanFilterImpl(KalmanFilterImpl&&) = default;
-  KalmanFilterImpl& operator=(KalmanFilterImpl&&) = default;
+  KalmanFilter(KalmanFilter&&) = default;
+  KalmanFilter& operator=(KalmanFilter&&) = default;
 
   /**
    * Returns the steady-state Kalman gain matrix K.
@@ -160,9 +103,7 @@ class KalmanFilterImpl {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const Eigen::Vector<double, Inputs>& u, units::second_t dt) {
-    m_xHat = m_plant->CalculateX(m_xHat, u, dt);
-  }
+  void Predict(const Eigen::Vector<double, Inputs>& u, units::second_t dt);
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
@@ -171,10 +112,7 @@ class KalmanFilterImpl {
    * @param y Measurement vector.
    */
   void Correct(const Eigen::Vector<double, Inputs>& u,
-               const Eigen::Vector<double, Outputs>& y) {
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
-    m_xHat += m_K * (y - (m_plant->C() * m_xHat + m_plant->D() * u));
-  }
+               const Eigen::Vector<double, Outputs>& y);
 
  private:
   LinearSystem<States, Inputs, Outputs>* m_plant;
@@ -190,58 +128,11 @@ class KalmanFilterImpl {
   Eigen::Vector<double, States> m_xHat;
 };
 
-}  // namespace detail
-
-template <int States, int Inputs, int Outputs>
-class KalmanFilter : public detail::KalmanFilterImpl<States, Inputs, Outputs> {
- public:
-  /**
-   * Constructs a state-space observer with the given plant.
-   *
-   * @param plant              The plant used for the prediction step.
-   * @param stateStdDevs       Standard deviations of model states.
-   * @param measurementStdDevs Standard deviations of measurements.
-   * @param dt                 Nominal discretization timestep.
-   */
-  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
-               const wpi::array<double, States>& stateStdDevs,
-               const wpi::array<double, Outputs>& measurementStdDevs,
-               units::second_t dt)
-      : detail::KalmanFilterImpl<States, Inputs, Outputs>{
-            plant, stateStdDevs, measurementStdDevs, dt} {}
-
-  KalmanFilter(KalmanFilter&&) = default;
-  KalmanFilter& operator=(KalmanFilter&&) = default;
-};
-
-// Template specializations are used here to make common state-input-output
-// triplets compile faster.
-template <>
-class WPILIB_DLLEXPORT KalmanFilter<1, 1, 1>
-    : public detail::KalmanFilterImpl<1, 1, 1> {
- public:
-  KalmanFilter(LinearSystem<1, 1, 1>& plant,
-               const wpi::array<double, 1>& stateStdDevs,
-               const wpi::array<double, 1>& measurementStdDevs,
-               units::second_t dt);
-
-  KalmanFilter(KalmanFilter&&) = default;
-  KalmanFilter& operator=(KalmanFilter&&) = default;
-};
-
-// Template specializations are used here to make common state-input-output
-// triplets compile faster.
-template <>
-class WPILIB_DLLEXPORT KalmanFilter<2, 1, 1>
-    : public detail::KalmanFilterImpl<2, 1, 1> {
- public:
-  KalmanFilter(LinearSystem<2, 1, 1>& plant,
-               const wpi::array<double, 2>& stateStdDevs,
-               const wpi::array<double, 1>& measurementStdDevs,
-               units::second_t dt);
-
-  KalmanFilter(KalmanFilter&&) = default;
-  KalmanFilter& operator=(KalmanFilter&&) = default;
-};
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    KalmanFilter<1, 1, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    KalmanFilter<2, 1, 1>;
 
 }  // namespace frc
+
+#include "KalmanFilter.inc"
