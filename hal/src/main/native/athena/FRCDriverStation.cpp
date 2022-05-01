@@ -44,10 +44,17 @@ struct JoystickDataCache {
   HAL_AllianceStationID allianceStation;
   float matchTime;
   HAL_ControlWord controlWord;
+  bool updated;
 };
 static_assert(std::is_standard_layout_v<JoystickDataCache>);
 //static_assert(std::is_trivial_v<JoystickDataCache>);
+
+struct FRCDriverStation {
+  wpi::EventVector newDataEvents;
+};
 }  // namespace
+
+static ::FRCDriverStation* driverStation;
 
 // Message and Data variables
 static wpi::mutex msgMutex;
@@ -161,14 +168,6 @@ static int32_t HAL_GetMatchInfoInternal(HAL_MatchInfo* info) {
 
   return status;
 }
-
-namespace {
-struct FRCDriverStation {
-  wpi::EventVector newDataEvents;
-};
-}  // namespace
-
-static ::FRCDriverStation* driverStation;
 
 namespace hal::init {
 void InitializeFRCDriverStation() {
@@ -414,14 +413,16 @@ static void newDataOccur(uint32_t refNum) {
   {
     std::scoped_lock lock{cacheMutex};
     std::swap(currentCache, cacheToUpdate);
+    currentCache->updated = true;
   }
   driverStation->newDataEvents.wakeup();
 }
 
 void HAL_UpdateDSData(void) {
-  {
-    std::scoped_lock lock{cacheMutex};
+  std::scoped_lock lock{cacheMutex};
+  if (currentCache->updated) {
     std::swap(currentCache, currentRead);
+    currentCache->updated = false;
   }
 }
 

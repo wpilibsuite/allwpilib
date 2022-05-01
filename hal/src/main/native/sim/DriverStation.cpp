@@ -16,6 +16,7 @@
 #include <fmt/format.h>
 #include <wpi/condition_variable.h>
 #include <wpi/mutex.h>
+#include <wpi/EventVector.h>
 
 #include "HALInitializer.h"
 #include "hal/cpp/fpga_clock.h"
@@ -28,12 +29,66 @@ static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
 
-namespace hal::init {
-void InitializeDriverStation() {
-}
-}  // namespace hal::init
 
 using namespace hal;
+
+static constexpr int kJoystickPorts = 6;
+
+namespace {
+struct JoystickDataCache {
+  JoystickDataCache() {
+    std::memset(this, 0, sizeof(*this));
+  }
+  void Update();
+
+  HAL_JoystickAxes axes[kJoystickPorts];
+  HAL_JoystickPOVs povs[kJoystickPorts];
+  HAL_JoystickButtons buttons[kJoystickPorts];
+  HAL_AllianceStationID allianceStation;
+  float matchTime;
+  HAL_ControlWord controlWord;
+  bool updated;
+};
+static_assert(std::is_standard_layout_v<JoystickDataCache>);
+//static_assert(std::is_trivial_v<JoystickDataCache>);
+
+struct FRCDriverStation {
+  wpi::EventVector newDataEvents;
+};
+}  // namespace
+
+void JoystickDataCache::Update() {
+  for (int i = 0; i < kJoystickPorts; i++) {
+    SimDriverStationData->GetJoystickAxes(i, &axes[i]);
+    SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
+    SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
+  }
+  allianceStation = SimDriverStationData->allianceStationId;
+  matchTime = SimDriverStationData->matchTime;
+  std::memset(&controlWord, 0, sizeof(controlWord));
+  controlWord.enabled = SimDriverStationData->enabled;
+  controlWord.autonomous = SimDriverStationData->autonomous;
+  controlWord.test = SimDriverStationData->test;
+  controlWord.eStop = SimDriverStationData->eStop;
+  controlWord.fmsAttached = SimDriverStationData->fmsAttached;
+  controlWord.dsAttached = SimDriverStationData->dsAttached;
+}
+
+static JoystickDataCache caches[3];
+static JoystickDataCache* currentRead = &caches[0];
+static JoystickDataCache* currentCache = &caches[1];
+static JoystickDataCache* cacheToUpdate = &caches[2];
+
+static wpi::mutex cacheMutex;
+
+static ::FRCDriverStation* driverStation;
+
+namespace hal::init {
+void InitializeDriverStation() {
+  static FRCDriverStation ds;
+  driverStation = &ds;
+}
+}  // namespace hal::init
 
 extern "C" {
 
@@ -117,34 +172,33 @@ int32_t HAL_SendConsoleLine(const char* line) {
 }
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
-  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
-  controlWord->enabled = SimDriverStationData->enabled;
-  controlWord->autonomous = SimDriverStationData->autonomous;
-  controlWord->test = SimDriverStationData->test;
-  controlWord->eStop = SimDriverStationData->eStop;
-  controlWord->fmsAttached = SimDriverStationData->fmsAttached;
-  controlWord->dsAttached = SimDriverStationData->dsAttached;
+  // TODO determine if we need to handle this on timeout
+  std::scoped_lock lock{cacheMutex};
+  *controlWord = currentRead->controlWord;
   return 0;
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
-  *status = 0;
-  return SimDriverStationData->allianceStationId;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->allianceStation;
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
-  SimDriverStationData->GetJoystickAxes(joystickNum, axes);
+  std::scoped_lock lock{cacheMutex};
+  *axes = currentRead->axes[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
-  SimDriverStationData->GetJoystickPOVs(joystickNum, povs);
+  std::scoped_lock lock{cacheMutex};
+  *povs = currentRead->povs[joystickNum];
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
-  SimDriverStationData->GetJoystickButtons(joystickNum, buttons);
+  std::scoped_lock lock{cacheMutex};
+  *buttons = currentRead->buttons[joystickNum];
   return 0;
 }
 
@@ -191,7 +245,8 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 }
 
 double HAL_GetMatchTime(int32_t* status) {
-  return SimDriverStationData->matchTime;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->matchTime;
 }
 
 int32_t HAL_GetMatchInfo(HAL_MatchInfo* info) {
@@ -219,18 +274,41 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
-void HAL_UpdateDSData(void) {}
-void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {}
-void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {}
+void HAL_UpdateDSData(void) {
+  std::scoped_lock lock{cacheMutex};
+  if (currentCache->updated) {
+    std::swap(currentCache, currentRead);
+    currentCache->updated = false;
+  }
+}
+
+void HAL_ProvideNewDataEventHandle(WPI_EventHandle handle) {
+  driverStation->newDataEvents.add(handle);
+}
+
+void HAL_RemoveNewDataEventHandle(WPI_EventHandle handle) {
+  driverStation->newDataEvents.remove(handle);
+}
 
 HAL_Bool HAL_GetOutputsEnabled(void) {
-  return false;
+  std::scoped_lock lock{cacheMutex};
+  return currentRead->controlWord.enabled && currentRead->controlWord.dsAttached;
 }
 
 }  // extern "C"
 
 namespace hal {
 void NewDriverStationData() {
+  printf("Started to update\n");
+  cacheToUpdate->Update();
+  printf("Updated \n");
+    {
+    std::scoped_lock lock{cacheMutex};
+    std::swap(currentCache, cacheToUpdate);
+    currentCache->updated = true;
+  }
+  driverStation->newDataEvents.wakeup();
+  printf("Woken up\n");
   SimDriverStationData->CallNewDataCallbacks();
 }
 

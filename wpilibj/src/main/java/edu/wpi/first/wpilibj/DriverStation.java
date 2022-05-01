@@ -12,6 +12,7 @@ import edu.wpi.first.hal.MatchInfoData;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.EventVector;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
@@ -395,6 +396,7 @@ public final class DriverStation {
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
   private static MatchInfoData m_matchInfo = new MatchInfoData();
   private static ControlWord m_controlWord = new ControlWord();
+  private static EventVector m_eventVector = new EventVector();
 
   // Joystick Cached Data
   private static HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
@@ -1194,6 +1196,8 @@ public final class DriverStation {
    * otherwise the data will be copied from the DS polling loop.
    */
   public static void updateData() {
+    DriverStationJNI.updateDSData();
+
     // Get the status of all of the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
       m_joystickAxesCache[stick].m_count =
@@ -1248,11 +1252,26 @@ public final class DriverStation {
       m_cacheDataMutex.unlock();
     }
 
+    m_eventVector.wakeup();
+
     m_matchDataSender.sendMatchData();
     if (dataLogSender != null) {
       dataLogSender.send(WPIUtilJNI.now());
     }
   }
+
+  public static void refreshData() {
+    updateData();
+  }
+
+  public static void provideRefreshedDataEventHandle(int handle) {
+    m_eventVector.add(handle);
+  }
+
+  public static void removeRefreshedDataEventHandle(int handle) {
+    m_eventVector.remove(handle);
+  }
+
 
   /**
    * Reports errors related to unplugged joysticks Throttles the errors so that they don't overwhelm

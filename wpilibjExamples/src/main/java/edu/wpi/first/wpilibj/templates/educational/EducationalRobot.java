@@ -5,7 +5,7 @@
 package edu.wpi.first.wpilibj.templates.educational;
 
 import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -35,6 +35,10 @@ public class EducationalRobot extends RobotBase {
   public void startCompetition() {
     robotInit();
 
+    int event = WPIUtilJNI.createEvent(false, false);
+
+    DriverStation.provideRefreshedDataEventHandle(event);
+
     // Tell the DS that the robot is ready to be enabled
     DriverStationJNI.observeUserProgramStarting();
 
@@ -44,28 +48,42 @@ public class EducationalRobot extends RobotBase {
         disabled();
         DriverStationJNI.observeUserProgramDisabled();
         while (isDisabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else if (isAutonomous()) {
         autonomous();
         DriverStationJNI.observeUserProgramAutonomous();
         while (isAutonomousEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else if (isTest()) {
         test();
         DriverStationJNI.observeUserProgramTest();
         while (isTest() && isEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else {
         teleop();
         DriverStationJNI.observeUserProgramTeleop();
         while (isTeleopEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       }
     }
+
+    DriverStation.removeRefreshedDataEventHandle(event);
   }
 
   @Override

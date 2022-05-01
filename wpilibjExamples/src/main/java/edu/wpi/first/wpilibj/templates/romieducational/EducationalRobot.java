@@ -4,7 +4,8 @@
 
 package edu.wpi.first.wpilibj.templates.romieducational;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -34,40 +35,55 @@ public class EducationalRobot extends RobotBase {
   public void startCompetition() {
     robotInit();
 
+    int event = WPIUtilJNI.createEvent(false, false);
+
+    DriverStation.provideRefreshedDataEventHandle(event);
+
     // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+    DriverStationJNI.observeUserProgramStarting();
 
     while (!Thread.currentThread().isInterrupted() && !m_exit) {
+      DriverStation.updateData();
       if (isDisabled()) {
-        DriverStation.inDisabled(true);
         disabled();
-        DriverStation.inDisabled(false);
+        DriverStationJNI.observeUserProgramDisabled();
         while (isDisabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else if (isAutonomous()) {
-        DriverStation.inAutonomous(true);
         autonomous();
-        DriverStation.inAutonomous(false);
+        DriverStationJNI.observeUserProgramAutonomous();
         while (isAutonomousEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else if (isTest()) {
-        DriverStation.inTest(true);
         test();
-        DriverStation.inTest(false);
+        DriverStationJNI.observeUserProgramTest();
         while (isTest() && isEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       } else {
-        DriverStation.inTeleop(true);
         teleop();
-        DriverStation.inTeleop(false);
+        DriverStationJNI.observeUserProgramTeleop();
         while (isTeleopEnabled()) {
-          DriverStation.waitForData();
+          try {
+            WPIUtilJNI.waitForObject(event);
+          } catch (InterruptedException e) {
+          }
         }
       }
     }
+
+    DriverStation.removeRefreshedDataEventHandle(event);
   }
 
   @Override

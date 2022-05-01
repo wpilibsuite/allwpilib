@@ -61,6 +61,9 @@ TEST(DriverStationTest, Joystick) {
   HALSIM_SetJoystickPOVs(joystickUnderTest, &set_povs);
   HALSIM_SetJoystickButtons(joystickUnderTest, &set_buttons);
 
+  HALSIM_NotifyDriverStationNewData();
+  HAL_UpdateDSData();
+
   // Check the set values
   HAL_GetJoystickAxes(joystickUnderTest, &axes);
   HAL_GetJoystickPOVs(joystickUnderTest, &povs);
@@ -89,6 +92,9 @@ TEST(DriverStationTest, Joystick) {
 
   // Reset
   HALSIM_ResetDriverStationData();
+  HALSIM_NotifyDriverStationNewData();
+  HAL_UpdateDSData();
+
   for (int joystickNum = 0; joystickNum < 6; ++joystickNum) {
     HAL_GetJoystickAxes(joystickNum, &axes);
     HAL_GetJoystickPOVs(joystickNum, &povs);
