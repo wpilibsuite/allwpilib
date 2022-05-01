@@ -93,6 +93,6 @@ TEST(DifferentialDrivePoseEstimatorTest, Accuracy) {
   }
 
   EXPECT_NEAR(0.0, errorSum / (trajectory.TotalTime().value() / dt.value()),
-              0.035);
-  EXPECT_NEAR(0.0, maxError, 0.055);
+              0.05);
+  EXPECT_NEAR(0.0, maxError, 0.1);
 }
