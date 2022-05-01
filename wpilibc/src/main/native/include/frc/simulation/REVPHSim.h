@@ -35,6 +35,8 @@ class REVPHSim : public PneumaticsBaseSim {
 
   explicit REVPHSim(const PneumaticsBase& pneumatics);
 
+  virtual ~REVPHSim() = default;
+
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) override;
 
