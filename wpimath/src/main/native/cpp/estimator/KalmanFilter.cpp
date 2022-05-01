@@ -6,16 +6,7 @@
 
 namespace frc {
 
-KalmanFilter<1, 1, 1>::KalmanFilter(
-    LinearSystem<1, 1, 1>& plant, const wpi::array<double, 1>& stateStdDevs,
-    const wpi::array<double, 1>& measurementStdDevs, units::second_t dt)
-    : detail::KalmanFilterImpl<1, 1, 1>{plant, stateStdDevs, measurementStdDevs,
-                                        dt} {}
-
-KalmanFilter<2, 1, 1>::KalmanFilter(
-    LinearSystem<2, 1, 1>& plant, const wpi::array<double, 2>& stateStdDevs,
-    const wpi::array<double, 1>& measurementStdDevs, units::second_t dt)
-    : detail::KalmanFilterImpl<2, 1, 1>{plant, stateStdDevs, measurementStdDevs,
-                                        dt} {}
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<1, 1, 1>;
+template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<2, 1, 1>;
 
 }  // namespace frc

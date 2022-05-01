@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <iostream>
-
 #include <units/angular_acceleration.h>
 #include <units/angular_velocity.h>
 
@@ -48,10 +46,10 @@ TEST(StateSpaceSimTest, FlywheelSim) {
     // Then, SimulationPeriodic runs
     frc::sim::RoboRioSim::SetVInVoltage(
         frc::sim::BatterySim::Calculate({sim.GetCurrentDraw()}));
-    sim.SetInput(Eigen::Vector<double, 1>{
-        motor.Get() * frc::RobotController::GetInputVoltage()});
+    sim.SetInput(
+        frc::Vectord<1>{motor.Get() * frc::RobotController::GetInputVoltage()});
     sim.Update(20_ms);
-    encoderSim.SetRate(sim.GetAngularVelocity().to<double>());
+    encoderSim.SetRate(sim.GetAngularVelocity().value());
   }
 
   ASSERT_TRUE(std::abs(200 - encoder.GetRate()) < 0.1);

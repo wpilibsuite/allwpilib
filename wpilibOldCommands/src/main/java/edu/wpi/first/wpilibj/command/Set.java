@@ -8,7 +8,11 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 @SuppressWarnings("all")
-/** A set. */
+/**
+ * A set.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ */
 class Set {
   private Vector m_set = new Vector();
 

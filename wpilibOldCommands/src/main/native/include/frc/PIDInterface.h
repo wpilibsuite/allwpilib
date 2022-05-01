@@ -11,6 +11,8 @@ namespace frc {
 /**
  * Interface for PID Control Loop.
  *
+ * This class is provided by the OldCommands VendorDep
+ *
  * @deprecated All APIs which use this have been deprecated.
  */
 class PIDInterface {

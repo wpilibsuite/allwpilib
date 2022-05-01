@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "units/acceleration.h"
@@ -21,26 +21,26 @@ TEST(SimpleMotorFeedforwardTest, Calculate) {
   double Ka = 0.6;
   auto dt = 0.02_s;
 
-  Eigen::Matrix<double, 1, 1> A{-Kv / Ka};
-  Eigen::Matrix<double, 1, 1> B{1.0 / Ka};
+  Matrixd<1, 1> A{-Kv / Ka};
+  Matrixd<1, 1> B{1.0 / Ka};
 
   frc::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
   frc::SimpleMotorFeedforward<units::meter> simpleMotor{
       units::volt_t{Ks}, units::volt_t{Kv} / 1_mps,
       units::volt_t{Ka} / 1_mps_sq};
 
-  Eigen::Vector<double, 1> r{2.0};
-  Eigen::Vector<double, 1> nextR{3.0};
+  Vectord<1> r{2.0};
+  Vectord<1> nextR{3.0};
 
   EXPECT_NEAR(37.524995834325161 + Ks,
-              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+              simpleMotor.Calculate(2_mps, 3_mps, dt).value(), 0.002);
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
-              simpleMotor.Calculate(2_mps, 3_mps, dt).to<double>(), 0.002);
+              simpleMotor.Calculate(2_mps, 3_mps, dt).value(), 0.002);
 
   // These won't match exactly. It's just an approximation to make sure they're
   // in the same ballpark.
   EXPECT_NEAR(plantInversion.Calculate(r, nextR)(0) + Ks,
-              simpleMotor.Calculate(2_mps, 1_mps / dt).to<double>(), 2.0);
+              simpleMotor.Calculate(2_mps, 1_mps / dt).value(), 2.0);
 }
 
 }  // namespace frc

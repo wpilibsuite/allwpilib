@@ -6,10 +6,16 @@ FATAL: In-source builds are not allowed.
 ")
 endif()
 
+if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+    set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.18362.0 CACHE STRING INTERNAL FORCE)
+endif()
 
 project(allwpilib)
 cmake_minimum_required(VERSION 3.3.0)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+message(STATUS "Platform version: ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
 
 set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -139,6 +145,8 @@ if (USE_VCPKG_EIGEN)
 set (EIGEN_VCPKG_REPLACE "find_package(Eigen3 CONFIG)")
 endif()
 
+find_package(LIBSSH 0.7.1)
+
 if (WITH_FLAT_INSTALL)
 set(WPIUTIL_DEP_REPLACE "include($\{SELF_DIR\}/wpiutil-config.cmake)")
 set(NTCORE_DEP_REPLACE "include($\{SELF_DIR\}/ntcore-config.cmake)")
@@ -247,10 +255,15 @@ if (WITH_WPIMATH)
 endif()
 
 if (WITH_GUI)
+    add_subdirectory(fieldImages)
     add_subdirectory(imgui)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     add_subdirectory(outlineviewer)
+    if (LIBSSH_FOUND)
+        add_subdirectory(roborioteamnumbersetter)
+        add_subdirectory(datalogtool)
+    endif()
 endif()
 
 if (WITH_WPILIB OR WITH_SIMULATION_MODULES)

@@ -11,6 +11,18 @@
 #include "hal/Counter.h"
 #include "hal/Errors.h"
 
+static_assert(HAL_Counter_Mode::HAL_Counter_kTwoPulse ==
+              edu_wpi_first_hal_CounterJNI_TWO_PULSE);
+
+static_assert(HAL_Counter_Mode::HAL_Counter_kSemiperiod ==
+              edu_wpi_first_hal_CounterJNI_SEMI_PERIOD);
+
+static_assert(HAL_Counter_Mode::HAL_Counter_kPulseLength ==
+              edu_wpi_first_hal_CounterJNI_PULSE_LENGTH);
+
+static_assert(HAL_Counter_Mode::HAL_Counter_kExternalDirection ==
+              edu_wpi_first_hal_CounterJNI_EXTERNAL_DIRECTION);
+
 using namespace hal;
 
 extern "C" {

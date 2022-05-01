@@ -160,9 +160,9 @@ class MecanumDriveKinematicsTest {
   }
 
   @Test
-  void testNormalize() {
+  void testDesaturate() {
     var wheelSpeeds = new MecanumDriveWheelSpeeds(5, 6, 4, 7);
-    wheelSpeeds.normalize(5.5);
+    wheelSpeeds.desaturate(5.5);
 
     double factor = 5.5 / 7.0;
 

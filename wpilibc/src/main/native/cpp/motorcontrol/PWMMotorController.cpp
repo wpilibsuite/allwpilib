@@ -42,6 +42,10 @@ int PWMMotorController::GetChannel() const {
   return m_pwm.GetChannel();
 }
 
+void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
+  m_pwm.EnableDeadbandElimination(eliminateDeadband);
+}
+
 PWMMotorController::PWMMotorController(std::string_view name, int channel)
     : m_pwm(channel, false) {
   wpi::SendableRegistry::AddLW(this, name, channel);

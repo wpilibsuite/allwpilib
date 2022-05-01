@@ -16,6 +16,8 @@ namespace frc {
 
 /**
  * Common base class for drive platforms.
+ *
+ * MotorSafety is enabled by default.
  */
 class RobotDriveBase : public MotorSafety {
  public:
@@ -82,10 +84,10 @@ class RobotDriveBase : public MotorSafety {
   static double ApplyDeadband(double value, double deadband);
 
   /**
-   * Normalize all wheel speeds if the magnitude of any wheel is greater than
+   * Renormalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.
    */
-  static void Normalize(wpi::span<double> wheelSpeeds);
+  static void Desaturate(wpi::span<double> wheelSpeeds);
 
   double m_deadband = 0.02;
   double m_maxOutput = 1.0;

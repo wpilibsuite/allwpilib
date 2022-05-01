@@ -10,6 +10,8 @@ import java.util.Set;
  * Schedules the given commands when this command is initialized, and ends when all the commands are
  * no longer scheduled. Useful for forking off from CommandGroups. If this command is interrupted,
  * it will cancel all of the commands.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class ProxyScheduleCommand extends CommandBase {
   private final Set<Command> m_toSchedule;

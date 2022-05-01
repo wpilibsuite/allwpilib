@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
 /**
@@ -20,7 +22,7 @@ import java.util.Objects;
 @SuppressWarnings({"ParameterName", "MemberName"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class Translation2d {
+public class Translation2d implements Interpolatable<Translation2d> {
   private final double m_x;
   private final double m_y;
 
@@ -195,5 +197,12 @@ public class Translation2d {
   @Override
   public int hashCode() {
     return Objects.hash(m_x, m_y);
+  }
+
+  @Override
+  public Translation2d interpolate(Translation2d endValue, double t) {
+    return new Translation2d(
+        MathUtil.interpolate(this.getX(), endValue.getX(), t),
+        MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 }

@@ -21,7 +21,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd,
   if (period <= 0_s) {
     wpi::math::MathSharedStore::ReportError(
         "Controller period must be a non-zero positive number, got {}!",
-        period.to<double>());
+        period.value());
     m_period = 20_ms;
     wpi::math::MathSharedStore::ReportWarning(
         "{}", "Controller period defaulted to 20ms.");
@@ -70,6 +70,16 @@ units::second_t PIDController::GetPeriod() const {
 
 void PIDController::SetSetpoint(double setpoint) {
   m_setpoint = setpoint;
+
+  if (m_continuous) {
+    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+    m_positionError =
+        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
+  } else {
+    m_positionError = m_setpoint - m_measurement;
+  }
+
+  m_velocityError = (m_positionError - m_prevError) / m_period.value();
 }
 
 double PIDController::GetSetpoint() const {
@@ -77,19 +87,8 @@ double PIDController::GetSetpoint() const {
 }
 
 bool PIDController::AtSetpoint() const {
-  double positionError;
-  if (m_continuous) {
-    double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-    positionError =
-        frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
-  } else {
-    positionError = m_setpoint - m_measurement;
-  }
-
-  double velocityError = (positionError - m_prevError) / m_period.to<double>();
-
-  return std::abs(positionError) < m_positionTolerance &&
-         std::abs(velocityError) < m_velocityTolerance;
+  return std::abs(m_positionError) < m_positionTolerance &&
+         std::abs(m_velocityError) < m_velocityTolerance;
 }
 
 void PIDController::EnableContinuousInput(double minimumInput,
@@ -136,14 +135,14 @@ double PIDController::Calculate(double measurement) {
     m_positionError =
         frc::InputModulus(m_setpoint - m_measurement, -errorBound, errorBound);
   } else {
-    m_positionError = m_setpoint - measurement;
+    m_positionError = m_setpoint - m_measurement;
   }
 
-  m_velocityError = (m_positionError - m_prevError) / m_period.to<double>();
+  m_velocityError = (m_positionError - m_prevError) / m_period.value();
 
   if (m_Ki != 0) {
     m_totalError =
-        std::clamp(m_totalError + m_positionError * m_period.to<double>(),
+        std::clamp(m_totalError + m_positionError * m_period.value(),
                    m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
   }
 
@@ -151,8 +150,7 @@ double PIDController::Calculate(double measurement) {
 }
 
 double PIDController::Calculate(double measurement, double setpoint) {
-  // Set setpoint to provided value
-  SetSetpoint(setpoint);
+  m_setpoint = setpoint;
   return Calculate(measurement);
 }
 

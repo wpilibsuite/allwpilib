@@ -42,7 +42,7 @@ void DMA::SetPause(bool pause) {
 
 void DMA::SetTimedTrigger(units::second_t seconds) {
   int32_t status = 0;
-  HAL_SetDMATimedTrigger(dmaHandle, seconds.to<double>(), &status);
+  HAL_SetDMATimedTrigger(dmaHandle, seconds.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetTimedTrigger");
 }
 

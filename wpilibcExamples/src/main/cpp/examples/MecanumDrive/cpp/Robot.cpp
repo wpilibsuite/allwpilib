@@ -14,17 +14,18 @@
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override {
-    // Invert the left side motors. You may need to change or remove this to
+    // Invert the right side motors. You may need to change or remove this to
     // match your robot.
-    m_frontLeft.SetInverted(true);
-    m_rearLeft.SetInverted(true);
+    m_frontRight.SetInverted(true);
+    m_rearRight.SetInverted(true);
   }
 
   void TeleopPeriodic() override {
     /* Use the joystick X axis for lateral movement, Y axis for forward
      * movement, and Z axis for rotation.
      */
-    m_robotDrive.DriveCartesian(m_stick.GetX(), m_stick.GetY(), m_stick.GetZ());
+    m_robotDrive.DriveCartesian(-m_stick.GetY(), m_stick.GetX(),
+                                m_stick.GetZ());
   }
 
  private:

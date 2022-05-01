@@ -52,7 +52,7 @@ public abstract class MechanismObject2d {
     return object;
   }
 
-  final void update(NetworkTable table) {
+  final synchronized void update(NetworkTable table) {
     m_table = table;
     updateEntries(m_table);
     for (MechanismObject2d obj : m_objects.values()) {

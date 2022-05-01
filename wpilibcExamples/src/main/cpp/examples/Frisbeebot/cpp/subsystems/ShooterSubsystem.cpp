@@ -16,9 +16,9 @@ ShooterSubsystem::ShooterSubsystem()
       m_feederMotor(kFeederMotorPort),
       m_shooterEncoder(kEncoderPorts[0], kEncoderPorts[1]),
       m_shooterFeedforward(kS, kV) {
-  m_controller.SetTolerance(kShooterToleranceRPS.to<double>());
+  m_controller.SetTolerance(kShooterToleranceRPS.value());
   m_shooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  SetSetpoint(kShooterTargetRPS.to<double>());
+  SetSetpoint(kShooterTargetRPS.value());
 }
 
 void ShooterSubsystem::UseOutput(double output, double setpoint) {

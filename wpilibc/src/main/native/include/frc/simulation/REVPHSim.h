@@ -119,22 +119,22 @@ class REVPHSim {
    * @return the CallbackStore object associated with this callback
    */
   [[nodiscard]] std::unique_ptr<CallbackStore>
-  RegisterClosedLoopEnabledCallback(NotifyCallback callback,
-                                    bool initialNotify);
+  RegisterCompressorConfigTypeCallback(NotifyCallback callback,
+                                       bool initialNotify);
 
   /**
    * Check whether the closed loop compressor control is active.
    *
-   * @return true if active
+   * @return compressor config type
    */
-  bool GetClosedLoopEnabled() const;
+  int GetCompressorConfigType() const;
 
   /**
    * Turn on/off the closed loop control of the compressor.
    *
-   * @param closedLoopEnabled whether the control loop is active
+   * @param compressorConfigType compressor config type
    */
-  void SetClosedLoopEnabled(bool closedLoopEnabled);
+  void SetCompressorConfigType(int compressorConfigType);
 
   /**
    * Register a callback to be run whenever the pressure switch value changes.

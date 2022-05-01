@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/spline/Spline.h"
 
 namespace frc {
@@ -40,19 +40,16 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
    * Returns the coefficients matrix.
    * @return The coefficients matrix.
    */
-  Eigen::Matrix<double, 6, 3 + 1> Coefficients() const override {
-    return m_coefficients;
-  }
+  Matrixd<6, 3 + 1> Coefficients() const override { return m_coefficients; }
 
  private:
-  Eigen::Matrix<double, 6, 4> m_coefficients =
-      Eigen::Matrix<double, 6, 4>::Zero();
+  Matrixd<6, 4> m_coefficients = Matrixd<6, 4>::Zero();
 
   /**
    * Returns the hermite basis matrix for cubic hermite spline interpolation.
    * @return The hermite basis matrix for cubic hermite spline interpolation.
    */
-  static Eigen::Matrix<double, 4, 4> MakeHermiteBasis() {
+  static Matrixd<4, 4> MakeHermiteBasis() {
     // Given P(i), P'(i), P(i+1), P'(i+1), the control vectors, we want to find
     // the coefficients of the spline P(t) = a3 * t^3 + a2 * t^2 + a1 * t + a0.
     //
@@ -74,10 +71,10 @@ class WPILIB_DLLEXPORT CubicHermiteSpline : public Spline<3> {
     // [ a1 ] = [  0  1  0  0 ][ P(i+1)  ]
     // [ a0 ] = [  1  0  0  0 ][ P'(i+1) ]
 
-    static const Eigen::Matrix<double, 4, 4> basis{{+2.0, +1.0, -2.0, +1.0},
-                                                   {-3.0, -2.0, +3.0, -1.0},
-                                                   {+0.0, +1.0, +0.0, +0.0},
-                                                   {+1.0, +0.0, +0.0, +0.0}};
+    static const Matrixd<4, 4> basis{{+2.0, +1.0, -2.0, +1.0},
+                                     {-3.0, -2.0, +3.0, -1.0},
+                                     {+0.0, +1.0, +0.0, +0.0},
+                                     {+1.0, +0.0, +0.0, +0.0}};
     return basis;
   }
 

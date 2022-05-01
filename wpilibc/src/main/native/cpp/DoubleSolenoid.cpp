@@ -65,7 +65,9 @@ DoubleSolenoid::DoubleSolenoid(PneumaticsModuleType moduleType,
                      forwardChannel, reverseChannel} {}
 
 DoubleSolenoid::~DoubleSolenoid() {
-  m_module->UnreserveSolenoids(m_mask);
+  if (m_module) {
+    m_module->UnreserveSolenoids(m_mask);
+  }
 }
 
 void DoubleSolenoid::Set(Value value) {

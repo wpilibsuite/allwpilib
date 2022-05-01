@@ -31,12 +31,6 @@ public class Notifier implements AutoCloseable {
   private double m_periodSeconds;
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
-    close();
-  }
-
-  @Override
   public void close() {
     int handle = m_notifier.getAndSet(0);
     if (handle == 0) {
@@ -99,7 +93,7 @@ public class Notifier implements AutoCloseable {
                   break;
                 }
 
-                Runnable handler = null;
+                Runnable handler;
                 m_processLock.lock();
                 try {
                   handler = m_handler;

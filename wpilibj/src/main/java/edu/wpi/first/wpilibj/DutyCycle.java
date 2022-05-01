@@ -48,6 +48,7 @@ public class DutyCycle implements Sendable, AutoCloseable {
   /** Close the DutyCycle and free all resources. */
   @Override
   public void close() {
+    SendableRegistry.remove(this);
     DutyCycleJNI.free(m_handle);
   }
 

@@ -11,7 +11,11 @@
 class Robot : public frc::TimedRobot {
  public:
   Robot() {
+    m_right.SetInverted(true);
     m_robotDrive.SetExpiration(100_ms);
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
     m_timer.Start();
   }
 
@@ -23,11 +27,11 @@ class Robot : public frc::TimedRobot {
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
     if (m_timer.Get() < 2_s) {
-      // Drive forwards half speed
-      m_robotDrive.ArcadeDrive(0.5, 0.0);
+      // Drive forwards half speed, make sure to turn input squaring off
+      m_robotDrive.ArcadeDrive(0.5, 0.0, false);
     } else {
       // Stop robot
-      m_robotDrive.ArcadeDrive(0.0, 0.0);
+      m_robotDrive.ArcadeDrive(0.0, 0.0, false);
     }
   }
 
@@ -35,7 +39,7 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Drive with arcade style (use right stick)
-    m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
+    m_robotDrive.ArcadeDrive(-m_stick.GetY(), m_stick.GetX());
   }
 
   void TestInit() override {}

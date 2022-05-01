@@ -16,6 +16,20 @@ namespace wpi {
  */
 std::string GetStackTrace(int offset);
 
+/**
+ * The default implementation used for GetStackTrace().
+ *
+ * @param offset The number of symbols at the top of the stack to ignore
+ */
+std::string GetStackTraceDefault(int offset);
+
+/**
+ * Set the implementation used by GetStackTrace().
+ *
+ * @param func Function called by GetStackTrace().
+ */
+void SetGetStackTraceImpl(std::string (*func)(int offset));
+
 }  // namespace wpi
 
 #endif  // WPIUTIL_WPI_STACKTRACE_H_

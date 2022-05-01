@@ -4,7 +4,11 @@
 
 package edu.wpi.first.wpilibj;
 
-/** A description for the type of output value to provide to a PIDController. */
+/**
+ * A description for the type of output value to provide to a PIDController.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ */
 @Deprecated(since = "2020", forRemoval = true)
 public enum PIDSourceType {
   kDisplacement,

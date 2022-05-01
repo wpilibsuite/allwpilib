@@ -85,7 +85,7 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopInit() override {
-    m_loop.Reset(Eigen::Vector<double, 1>{m_encoder.GetRate()});
+    m_loop.Reset(frc::Vectord<1>{m_encoder.GetRate()});
   }
 
   void TeleopPeriodic() override {
@@ -93,14 +93,14 @@ class Robot : public frc::TimedRobot {
     // setpoint of a PID controller.
     if (m_joystick.GetRightBumper()) {
       // We pressed the bumper, so let's set our next reference
-      m_loop.SetNextR(Eigen::Vector<double, 1>{kSpinup.to<double>()});
+      m_loop.SetNextR(frc::Vectord<1>{kSpinup.value()});
     } else {
       // We released the bumper, so let's spin down
-      m_loop.SetNextR(Eigen::Vector<double, 1>{0.0});
+      m_loop.SetNextR(frc::Vectord<1>{0.0});
     }
 
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.Correct(Eigen::Vector<double, 1>{m_encoder.GetRate()});
+    m_loop.Correct(frc::Vectord<1>{m_encoder.GetRate()});
 
     // Update our LQR to generate new voltage commands and use the voltages to
     // predict the next state with out Kalman filter.

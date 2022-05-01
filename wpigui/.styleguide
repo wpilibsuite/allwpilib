@@ -27,5 +27,4 @@ includeOtherLibs {
   ^imgui
   ^implot
   ^stb
-  ^wpi/
 }

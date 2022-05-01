@@ -64,8 +64,8 @@ inline SynchronousInterrupt::WaitResult operator|(
 SynchronousInterrupt::WaitResult SynchronousInterrupt::WaitForInterrupt(
     units::second_t timeout, bool ignorePrevious) {
   int32_t status = 0;
-  auto result = HAL_WaitForInterrupt(m_handle, timeout.to<double>(),
-                                     ignorePrevious, &status);
+  auto result =
+      HAL_WaitForInterrupt(m_handle, timeout.value(), ignorePrevious, &status);
 
   auto rising =
       ((result & 0xFF) != 0) ? WaitResult::kRisingEdge : WaitResult::kTimeout;

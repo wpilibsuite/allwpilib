@@ -5,12 +5,14 @@
 #include "frc2/command/Command.h"
 
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
 #include "frc2/command/ParallelRaceGroup.h"
 #include "frc2/command/PerpetualCommand.h"
 #include "frc2/command/ProxyScheduleCommand.h"
+#include "frc2/command/RepeatCommand.h"
 #include "frc2/command/SequentialCommandGroup.h"
 #include "frc2/command/WaitCommand.h"
 #include "frc2/command/WaitUntilCommand.h"
@@ -33,6 +35,13 @@ void Command::End(bool interrupted) {}
 ParallelRaceGroup Command::WithTimeout(units::second_t duration) && {
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::make_unique<WaitCommand>(duration));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
+
+ParallelRaceGroup Command::Until(std::function<bool()> condition) && {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
   temp.emplace_back(std::move(*this).TransferOwnership());
   return ParallelRaceGroup(std::move(temp));
 }
@@ -78,6 +87,14 @@ SequentialCommandGroup Command::AndThen(
 
 PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
+}
+
+EndlessCommand Command::Endlessly() && {
+  return EndlessCommand(std::move(*this).TransferOwnership());
+}
+
+RepeatCommand Command::Repeat() && {
+  return RepeatCommand(std::move(*this).TransferOwnership());
 }
 
 ProxyScheduleCommand Command::AsProxy() {

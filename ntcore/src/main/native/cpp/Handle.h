@@ -5,6 +5,8 @@
 #ifndef NTCORE_HANDLE_H_
 #define NTCORE_HANDLE_H_
 
+#include <wpi/Synchronization.h>
+
 #include "ntcore_c.h"
 
 namespace nt {
@@ -17,7 +19,7 @@ namespace nt {
 class Handle {
  public:
   enum Type {
-    kConnectionListener = 1,
+    kConnectionListener = wpi::kHandleTypeNTBase,
     kConnectionListenerPoller,
     kEntry,
     kEntryListener,
@@ -26,7 +28,9 @@ class Handle {
     kLogger,
     kLoggerPoller,
     kRpcCall,
-    kRpcCallPoller
+    kRpcCallPoller,
+    kDataLogger,
+    kConnectionDataLogger
   };
   enum { kIndexMax = 0xfffff };
 

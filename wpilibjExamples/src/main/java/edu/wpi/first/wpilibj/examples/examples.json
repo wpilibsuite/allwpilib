@@ -701,7 +701,8 @@
       "Sensors",
       "Simulation",
       "Physics",
-      "Mechanism2d"
+      "Mechanism2d",
+      "Preferences"
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
@@ -770,5 +771,27 @@
     "gradlebase": "javaromi",
     "mainclass": "Main",
     "commandversion": 2
+  },
+  {
+    "name": "Digital Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's DIO",
+    "tags": [
+      "Digital"
+    ],
+    "foldername": "digitalcommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
+  },
+  {
+    "name": "I2C Communication Sample",
+    "description": "An example program that communicates with external devices (such as an Arduino) using the roboRIO's I2C port",
+    "tags": [
+      "I2C"
+    ],
+    "foldername": "i2ccommunication",
+    "gradlebase": "java",
+    "commandversion": 2,
+    "mainclass": "Main"
   }
 ]

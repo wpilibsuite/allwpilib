@@ -11,6 +11,7 @@ Development builds are the per-commit build hosted everytime a commit is pushed 
 In order to build a project using a development build, find the build.gradle file and open it. Then, add the following code below the plugin section and replace YEAR with the year of the development version.
 
 ```groovy
+wpi.maven.useLocal = false
 wpi.maven.useDevelopment = true
 wpi.versions.wpilibVersion = 'YEAR.+'
 wpi.versions.wpimathVersion = 'YEAR.+

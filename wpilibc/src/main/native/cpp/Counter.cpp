@@ -282,7 +282,7 @@ units::second_t Counter::GetPeriod() const {
 
 void Counter::SetMaxPeriod(units::second_t maxPeriod) {
   int32_t status = 0;
-  HAL_SetCounterMaxPeriod(m_counter, maxPeriod.to<double>(), &status);
+  HAL_SetCounterMaxPeriod(m_counter, maxPeriod.value(), &status);
   FRC_CheckErrorStatus(status, "{}", "SetMaxPeriod");
 }
 

@@ -29,8 +29,11 @@ include 'wpilibjExamples'
 include 'wpilibjIntegrationTests'
 include 'wpilibj'
 include 'crossConnIntegrationTests'
+include 'fieldImages'
 include 'glass'
 include 'outlineviewer'
+include 'roborioteamnumbersetter'
+include 'datalogtool'
 include 'simulation:gz_msgs'
 include 'simulation:frc_gazebo_plugins'
 include 'simulation:halsim_gazebo'
@@ -46,3 +49,28 @@ include 'wpilibNewCommands'
 include 'myRobot'
 include 'docs'
 include 'msvcruntime'
+
+buildCache {
+    def cred = {
+        if (System.env[it] != null) {
+            return System.env[it]
+        } else {
+            return System.getProperty(it)
+        }
+    }
+    local {
+        enabled = !System.getenv().containsKey("CI")
+    }
+    remote(HttpBuildCache) {
+        url = "https://frcmaven.wpi.edu/artifactory/wpilib-generic-gradle-cache/"
+        String user = cred('ARTIFACTORY_PUBLISH_USERNAME')
+        String pass = cred('ARTIFACTORY_PUBLISH_PASSWORD')
+        if (user && pass) {
+            push = true
+            credentials {
+                username = user
+                password = pass
+            }
+        }
+    }
+}

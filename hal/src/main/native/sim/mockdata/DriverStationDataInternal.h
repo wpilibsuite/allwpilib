@@ -126,7 +126,7 @@ class DriverStationData {
   SimDataValue<HAL_AllianceStationID, MakeAllianceStationIdValue,
                GetAllianceStationIdName>
       allianceStationId{static_cast<HAL_AllianceStationID>(0)};
-  SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{0.0};
+  SimDataValue<double, HAL_MakeDouble, GetMatchTimeName> matchTime{-1.0};
 
  private:
   SimCallbackRegistry<HAL_JoystickAxesCallback, GetJoystickAxesName>

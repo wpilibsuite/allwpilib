@@ -14,8 +14,8 @@
 #include "commands/SetDistanceToBox.h"
 #include "commands/SetWristSetpoint.h"
 
-Autonomous::Autonomous(Claw* claw, Wrist* wrist, Elevator* elevator,
-                       Drivetrain* drivetrain) {
+Autonomous::Autonomous(Claw& claw, Wrist& wrist, Elevator& elevator,
+                       Drivetrain& drivetrain) {
   SetName("Autonomous");
   AddCommands(
       // clang-format off

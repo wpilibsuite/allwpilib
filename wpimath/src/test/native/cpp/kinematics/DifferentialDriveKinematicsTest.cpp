@@ -20,8 +20,8 @@ TEST(DifferentialDriveKinematicsTest, InverseKinematicsFromZero) {
   const ChassisSpeeds chassisSpeeds;
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
 
-  EXPECT_NEAR(wheelSpeeds.left.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(wheelSpeeds.right.to<double>(), 0, kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.left.value(), 0, kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.right.value(), 0, kEpsilon);
 }
 
 TEST(DifferentialDriveKinematicsTest, ForwardKinematicsFromZero) {
@@ -29,9 +29,9 @@ TEST(DifferentialDriveKinematicsTest, ForwardKinematicsFromZero) {
   const DifferentialDriveWheelSpeeds wheelSpeeds;
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
 
-  EXPECT_NEAR(chassisSpeeds.vx.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 0, kEpsilon);
 }
 
 TEST(DifferentialDriveKinematicsTest, InverseKinematicsForStraightLine) {
@@ -39,8 +39,8 @@ TEST(DifferentialDriveKinematicsTest, InverseKinematicsForStraightLine) {
   const ChassisSpeeds chassisSpeeds{3.0_mps, 0_mps, 0_rad_per_s};
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
 
-  EXPECT_NEAR(wheelSpeeds.left.to<double>(), 3, kEpsilon);
-  EXPECT_NEAR(wheelSpeeds.right.to<double>(), 3, kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.left.value(), 3, kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.right.value(), 3, kEpsilon);
 }
 
 TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForStraightLine) {
@@ -48,9 +48,9 @@ TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForStraightLine) {
   const DifferentialDriveWheelSpeeds wheelSpeeds{3.0_mps, 3.0_mps};
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
 
-  EXPECT_NEAR(chassisSpeeds.vx.to<double>(), 3, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 3, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), 0, kEpsilon);
 }
 
 TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
@@ -59,10 +59,8 @@ TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
       0.0_mps, 0.0_mps, units::radians_per_second_t{wpi::numbers::pi}};
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
 
-  EXPECT_NEAR(wheelSpeeds.left.to<double>(), -0.381 * wpi::numbers::pi,
-              kEpsilon);
-  EXPECT_NEAR(wheelSpeeds.right.to<double>(), +0.381 * wpi::numbers::pi,
-              kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.left.value(), -0.381 * wpi::numbers::pi, kEpsilon);
+  EXPECT_NEAR(wheelSpeeds.right.value(), +0.381 * wpi::numbers::pi, kEpsilon);
 }
 
 TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
@@ -72,7 +70,7 @@ TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
       units::meters_per_second_t(-0.381 * wpi::numbers::pi)};
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
 
-  EXPECT_NEAR(chassisSpeeds.vx.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.vy.to<double>(), 0, kEpsilon);
-  EXPECT_NEAR(chassisSpeeds.omega.to<double>(), -wpi::numbers::pi, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vx.value(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.vy.value(), 0, kEpsilon);
+  EXPECT_NEAR(chassisSpeeds.omega.value(), -wpi::numbers::pi, kEpsilon);
 }

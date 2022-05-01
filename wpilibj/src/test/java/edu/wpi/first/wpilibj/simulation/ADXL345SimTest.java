@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class ADXL345SimTest {
+class ADXL345SimTest {
   @ParameterizedTest
   @EnumSource(Accelerometer.Range.class)
   void testInitI2C(Accelerometer.Range range) {

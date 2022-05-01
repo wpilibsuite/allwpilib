@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * The SendableRegistry class is the public interface for registering sensors and actuators for use
  * on dashboards and LiveWindow.
  */
-public class SendableRegistry {
+public final class SendableRegistry {
   private static class Component {
     Component() {}
 
@@ -462,7 +462,7 @@ public class SendableRegistry {
    * @param dataHandle data handle to get data object passed to callback
    * @param callback function to call for each object
    */
-  @SuppressWarnings("PMD.AvoidCatchingThrowable")
+  @SuppressWarnings({"PMD.AvoidCatchingThrowable", "PMD.AvoidReassigningCatchVariables"})
   public static synchronized void foreachLiveWindow(
       int dataHandle, Consumer<CallbackData> callback) {
     CallbackData cbdata = new CallbackData();

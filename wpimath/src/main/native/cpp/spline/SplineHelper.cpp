@@ -52,29 +52,27 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     c.emplace_back(0);
 
     // populate rhs vectors
-    dx.emplace_back(
-        3 * (waypoints[2].X().to<double>() - waypoints[0].X().to<double>()) -
-        xInitial[1]);
-    dy.emplace_back(
-        3 * (waypoints[2].Y().to<double>() - waypoints[0].Y().to<double>()) -
-        yInitial[1]);
+    dx.emplace_back(3 * (waypoints[2].X().value() - waypoints[0].X().value()) -
+                    xInitial[1]);
+    dy.emplace_back(3 * (waypoints[2].Y().value() - waypoints[0].Y().value()) -
+                    yInitial[1]);
     if (waypoints.size() > 4) {
       for (size_t i = 1; i <= waypoints.size() - 4; ++i) {
         // dx and dy represent the derivatives of the internal waypoints. The
         // derivative of the second internal waypoint should involve the third
         // and first internal waypoint, which have indices of 1 and 3 in the
         // waypoints list (which contains ALL waypoints).
-        dx.emplace_back(3 * (waypoints[i + 2].X().to<double>() -
-                             waypoints[i].X().to<double>()));
-        dy.emplace_back(3 * (waypoints[i + 2].Y().to<double>() -
-                             waypoints[i].Y().to<double>()));
+        dx.emplace_back(
+            3 * (waypoints[i + 2].X().value() - waypoints[i].X().value()));
+        dy.emplace_back(
+            3 * (waypoints[i + 2].Y().value() - waypoints[i].Y().value()));
       }
     }
-    dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().to<double>() -
-                         waypoints[waypoints.size() - 3].X().to<double>()) -
+    dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().value() -
+                         waypoints[waypoints.size() - 3].X().value()) -
                     xFinal[1]);
-    dy.emplace_back(3 * (waypoints[waypoints.size() - 1].Y().to<double>() -
-                         waypoints[waypoints.size() - 3].Y().to<double>()) -
+    dy.emplace_back(3 * (waypoints[waypoints.size() - 1].Y().value() -
+                         waypoints[waypoints.size() - 3].Y().value()) -
                     yFinal[1]);
 
     // Compute solution to tridiagonal system
@@ -89,10 +87,10 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     for (size_t i = 0; i < fx.size() - 1; ++i) {
       // Create the spline.
       const CubicHermiteSpline spline{
-          {waypoints[i].X().to<double>(), fx[i]},
-          {waypoints[i + 1].X().to<double>(), fx[i + 1]},
-          {waypoints[i].Y().to<double>(), fy[i]},
-          {waypoints[i + 1].Y().to<double>(), fy[i + 1]}};
+          {waypoints[i].X().value(), fx[i]},
+          {waypoints[i + 1].X().value(), fx[i + 1]},
+          {waypoints[i].Y().value(), fy[i]},
+          {waypoints[i + 1].Y().value(), fy[i + 1]}};
 
       splines.push_back(spline);
     }
@@ -102,10 +100,8 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
     const double yDeriv =
         (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-    wpi::array<double, 2> midXControlVector{waypoints[0].X().to<double>(),
-                                            xDeriv};
-    wpi::array<double, 2> midYControlVector{waypoints[0].Y().to<double>(),
-                                            yDeriv};
+    wpi::array<double, 2> midXControlVector{waypoints[0].X().value(), xDeriv};
+    wpi::array<double, 2> midYControlVector{waypoints[0].Y().value(), yDeriv};
 
     splines.emplace_back(xInitial, midXControlVector, yInitial,
                          midYControlVector);
@@ -140,16 +136,14 @@ SplineHelper::CubicControlVectorsFromWaypoints(
     const Pose2d& end) {
   double scalar;
   if (interiorWaypoints.empty()) {
-    scalar = 1.2 * start.Translation().Distance(end.Translation()).to<double>();
+    scalar = 1.2 * start.Translation().Distance(end.Translation()).value();
   } else {
     scalar =
-        1.2 *
-        start.Translation().Distance(interiorWaypoints.front()).to<double>();
+        1.2 * start.Translation().Distance(interiorWaypoints.front()).value();
   }
   const auto initialCV = CubicControlVector(scalar, start);
   if (!interiorWaypoints.empty()) {
-    scalar =
-        1.2 * end.Translation().Distance(interiorWaypoints.back()).to<double>();
+    scalar = 1.2 * end.Translation().Distance(interiorWaypoints.back()).value();
   }
   const auto finalCV = CubicControlVector(scalar, end);
   return {initialCV, finalCV};
@@ -165,7 +159,7 @@ std::vector<QuinticHermiteSpline> SplineHelper::QuinticSplinesFromWaypoints(
 
     // This just makes the splines look better.
     const auto scalar =
-        1.2 * p0.Translation().Distance(p1.Translation()).to<double>();
+        1.2 * p0.Translation().Distance(p1.Translation()).value();
 
     auto controlVectorA = QuinticControlVector(scalar, p0);
     auto controlVectorB = QuinticControlVector(scalar, p1);

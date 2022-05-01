@@ -112,9 +112,9 @@ static inline uint32_t unpack_right_shift_u32(
     return (uint32_t)((uint32_t)(value & mask) >> shift);
 }
 
-int PDH_switch_channel_set_pack(
+int PDH_set_switch_channel_pack(
     uint8_t *dst_p,
-    const struct PDH_switch_channel_set_t *src_p,
+    const struct PDH_set_switch_channel_t *src_p,
     size_t size)
 {
     if (size < 1u) {
@@ -124,13 +124,12 @@ int PDH_switch_channel_set_pack(
     memset(&dst_p[0], 0, 1);
 
     dst_p[0] |= pack_left_shift_u8(src_p->output_set_value, 0u, 0x01u);
-    dst_p[0] |= pack_left_shift_u8(src_p->use_system_enable, 1u, 0x02u);
 
     return (1);
 }
 
-int PDH_switch_channel_set_unpack(
-    struct PDH_switch_channel_set_t *dst_p,
+int PDH_set_switch_channel_unpack(
+    struct PDH_set_switch_channel_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -139,44 +138,28 @@ int PDH_switch_channel_set_unpack(
     }
 
     dst_p->output_set_value = unpack_right_shift_u8(src_p[0], 0u, 0x01u);
-    dst_p->use_system_enable = unpack_right_shift_u8(src_p[0], 1u, 0x02u);
 
     return (0);
 }
 
-uint8_t PDH_switch_channel_set_output_set_value_encode(double value)
+uint8_t PDH_set_switch_channel_output_set_value_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_switch_channel_set_output_set_value_decode(uint8_t value)
+double PDH_set_switch_channel_output_set_value_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_switch_channel_set_output_set_value_is_in_range(uint8_t value)
+bool PDH_set_switch_channel_output_set_value_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_switch_channel_set_use_system_enable_encode(double value)
-{
-    return (uint8_t)(value);
-}
-
-double PDH_switch_channel_set_use_system_enable_decode(uint8_t value)
-{
-    return ((double)value);
-}
-
-bool PDH_switch_channel_set_use_system_enable_is_in_range(uint8_t value)
-{
-    return (value <= 1u);
-}
-
-int PDH_status0_pack(
+int PDH_status_0_pack(
     uint8_t *dst_p,
-    const struct PDH_status0_t *src_p,
+    const struct PDH_status_0_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -191,22 +174,22 @@ int PDH_status0_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->channel_1_current, 6u, 0x0fu);
     dst_p[2] |= pack_left_shift_u16(src_p->channel_2_current, 4u, 0xf0u);
     dst_p[3] |= pack_right_shift_u16(src_p->channel_2_current, 4u, 0x3fu);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_0_brownout, 6u, 0x40u);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_1_brownout, 7u, 0x80u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_0_breaker_fault, 6u, 0x40u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_1_breaker_fault, 7u, 0x80u);
     dst_p[4] |= pack_left_shift_u16(src_p->channel_3_current, 0u, 0xffu);
     dst_p[5] |= pack_right_shift_u16(src_p->channel_3_current, 8u, 0x03u);
     dst_p[5] |= pack_left_shift_u16(src_p->channel_4_current, 2u, 0xfcu);
     dst_p[6] |= pack_right_shift_u16(src_p->channel_4_current, 6u, 0x0fu);
     dst_p[6] |= pack_left_shift_u16(src_p->channel_5_current, 4u, 0xf0u);
     dst_p[7] |= pack_right_shift_u16(src_p->channel_5_current, 4u, 0x3fu);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_2_brownout, 6u, 0x40u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_3_brownout, 7u, 0x80u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_2_breaker_fault, 6u, 0x40u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_3_breaker_fault, 7u, 0x80u);
 
     return (8);
 }
 
-int PDH_status0_unpack(
-    struct PDH_status0_t *dst_p,
+int PDH_status_0_unpack(
+    struct PDH_status_0_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -220,173 +203,173 @@ int PDH_status0_unpack(
     dst_p->channel_1_current |= unpack_left_shift_u16(src_p[2], 6u, 0x0fu);
     dst_p->channel_2_current = unpack_right_shift_u16(src_p[2], 4u, 0xf0u);
     dst_p->channel_2_current |= unpack_left_shift_u16(src_p[3], 4u, 0x3fu);
-    dst_p->channel_0_brownout = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
-    dst_p->channel_1_brownout = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
+    dst_p->channel_0_breaker_fault = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
+    dst_p->channel_1_breaker_fault = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
     dst_p->channel_3_current = unpack_right_shift_u16(src_p[4], 0u, 0xffu);
     dst_p->channel_3_current |= unpack_left_shift_u16(src_p[5], 8u, 0x03u);
     dst_p->channel_4_current = unpack_right_shift_u16(src_p[5], 2u, 0xfcu);
     dst_p->channel_4_current |= unpack_left_shift_u16(src_p[6], 6u, 0x0fu);
     dst_p->channel_5_current = unpack_right_shift_u16(src_p[6], 4u, 0xf0u);
     dst_p->channel_5_current |= unpack_left_shift_u16(src_p[7], 4u, 0x3fu);
-    dst_p->channel_2_brownout = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
-    dst_p->channel_3_brownout = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
+    dst_p->channel_2_breaker_fault = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
+    dst_p->channel_3_breaker_fault = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
 
     return (0);
 }
 
-uint16_t PDH_status0_channel_0_current_encode(double value)
+uint16_t PDH_status_0_channel_0_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_0_current_decode(uint16_t value)
+double PDH_status_0_channel_0_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_0_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_0_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status0_channel_1_current_encode(double value)
+uint16_t PDH_status_0_channel_1_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_1_current_decode(uint16_t value)
+double PDH_status_0_channel_1_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_1_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_1_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status0_channel_2_current_encode(double value)
+uint16_t PDH_status_0_channel_2_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_2_current_decode(uint16_t value)
+double PDH_status_0_channel_2_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_2_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_2_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status0_channel_0_brownout_encode(double value)
+uint8_t PDH_status_0_channel_0_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status0_channel_0_brownout_decode(uint8_t value)
+double PDH_status_0_channel_0_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status0_channel_0_brownout_is_in_range(uint8_t value)
+bool PDH_status_0_channel_0_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status0_channel_1_brownout_encode(double value)
+uint8_t PDH_status_0_channel_1_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status0_channel_1_brownout_decode(uint8_t value)
+double PDH_status_0_channel_1_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status0_channel_1_brownout_is_in_range(uint8_t value)
+bool PDH_status_0_channel_1_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint16_t PDH_status0_channel_3_current_encode(double value)
+uint16_t PDH_status_0_channel_3_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_3_current_decode(uint16_t value)
+double PDH_status_0_channel_3_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_3_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_3_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status0_channel_4_current_encode(double value)
+uint16_t PDH_status_0_channel_4_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_4_current_decode(uint16_t value)
+double PDH_status_0_channel_4_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_4_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_4_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status0_channel_5_current_encode(double value)
+uint16_t PDH_status_0_channel_5_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status0_channel_5_current_decode(uint16_t value)
+double PDH_status_0_channel_5_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status0_channel_5_current_is_in_range(uint16_t value)
+bool PDH_status_0_channel_5_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status0_channel_2_brownout_encode(double value)
+uint8_t PDH_status_0_channel_2_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status0_channel_2_brownout_decode(uint8_t value)
+double PDH_status_0_channel_2_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status0_channel_2_brownout_is_in_range(uint8_t value)
+bool PDH_status_0_channel_2_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status0_channel_3_brownout_encode(double value)
+uint8_t PDH_status_0_channel_3_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status0_channel_3_brownout_decode(uint8_t value)
+double PDH_status_0_channel_3_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status0_channel_3_brownout_is_in_range(uint8_t value)
+bool PDH_status_0_channel_3_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-int PDH_status1_pack(
+int PDH_status_1_pack(
     uint8_t *dst_p,
-    const struct PDH_status1_t *src_p,
+    const struct PDH_status_1_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -401,22 +384,22 @@ int PDH_status1_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->channel_7_current, 6u, 0x0fu);
     dst_p[2] |= pack_left_shift_u16(src_p->channel_8_current, 4u, 0xf0u);
     dst_p[3] |= pack_right_shift_u16(src_p->channel_8_current, 4u, 0x3fu);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_4_brownout, 6u, 0x40u);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_5_brownout, 7u, 0x80u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_4_breaker_fault, 6u, 0x40u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_5_breaker_fault, 7u, 0x80u);
     dst_p[4] |= pack_left_shift_u16(src_p->channel_9_current, 0u, 0xffu);
     dst_p[5] |= pack_right_shift_u16(src_p->channel_9_current, 8u, 0x03u);
     dst_p[5] |= pack_left_shift_u16(src_p->channel_10_current, 2u, 0xfcu);
     dst_p[6] |= pack_right_shift_u16(src_p->channel_10_current, 6u, 0x0fu);
     dst_p[6] |= pack_left_shift_u16(src_p->channel_11_current, 4u, 0xf0u);
     dst_p[7] |= pack_right_shift_u16(src_p->channel_11_current, 4u, 0x3fu);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_6_brownout, 6u, 0x40u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_7_brownout, 7u, 0x80u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_6_breaker_fault, 6u, 0x40u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_7_breaker_fault, 7u, 0x80u);
 
     return (8);
 }
 
-int PDH_status1_unpack(
-    struct PDH_status1_t *dst_p,
+int PDH_status_1_unpack(
+    struct PDH_status_1_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -430,173 +413,173 @@ int PDH_status1_unpack(
     dst_p->channel_7_current |= unpack_left_shift_u16(src_p[2], 6u, 0x0fu);
     dst_p->channel_8_current = unpack_right_shift_u16(src_p[2], 4u, 0xf0u);
     dst_p->channel_8_current |= unpack_left_shift_u16(src_p[3], 4u, 0x3fu);
-    dst_p->channel_4_brownout = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
-    dst_p->channel_5_brownout = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
+    dst_p->channel_4_breaker_fault = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
+    dst_p->channel_5_breaker_fault = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
     dst_p->channel_9_current = unpack_right_shift_u16(src_p[4], 0u, 0xffu);
     dst_p->channel_9_current |= unpack_left_shift_u16(src_p[5], 8u, 0x03u);
     dst_p->channel_10_current = unpack_right_shift_u16(src_p[5], 2u, 0xfcu);
     dst_p->channel_10_current |= unpack_left_shift_u16(src_p[6], 6u, 0x0fu);
     dst_p->channel_11_current = unpack_right_shift_u16(src_p[6], 4u, 0xf0u);
     dst_p->channel_11_current |= unpack_left_shift_u16(src_p[7], 4u, 0x3fu);
-    dst_p->channel_6_brownout = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
-    dst_p->channel_7_brownout = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
+    dst_p->channel_6_breaker_fault = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
+    dst_p->channel_7_breaker_fault = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
 
     return (0);
 }
 
-uint16_t PDH_status1_channel_6_current_encode(double value)
+uint16_t PDH_status_1_channel_6_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_6_current_decode(uint16_t value)
+double PDH_status_1_channel_6_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_6_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_6_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status1_channel_7_current_encode(double value)
+uint16_t PDH_status_1_channel_7_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_7_current_decode(uint16_t value)
+double PDH_status_1_channel_7_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_7_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_7_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status1_channel_8_current_encode(double value)
+uint16_t PDH_status_1_channel_8_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_8_current_decode(uint16_t value)
+double PDH_status_1_channel_8_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_8_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_8_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status1_channel_4_brownout_encode(double value)
+uint8_t PDH_status_1_channel_4_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status1_channel_4_brownout_decode(uint8_t value)
+double PDH_status_1_channel_4_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status1_channel_4_brownout_is_in_range(uint8_t value)
+bool PDH_status_1_channel_4_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status1_channel_5_brownout_encode(double value)
+uint8_t PDH_status_1_channel_5_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status1_channel_5_brownout_decode(uint8_t value)
+double PDH_status_1_channel_5_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status1_channel_5_brownout_is_in_range(uint8_t value)
+bool PDH_status_1_channel_5_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint16_t PDH_status1_channel_9_current_encode(double value)
+uint16_t PDH_status_1_channel_9_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_9_current_decode(uint16_t value)
+double PDH_status_1_channel_9_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_9_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_9_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status1_channel_10_current_encode(double value)
+uint16_t PDH_status_1_channel_10_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_10_current_decode(uint16_t value)
+double PDH_status_1_channel_10_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_10_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_10_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status1_channel_11_current_encode(double value)
+uint16_t PDH_status_1_channel_11_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status1_channel_11_current_decode(uint16_t value)
+double PDH_status_1_channel_11_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status1_channel_11_current_is_in_range(uint16_t value)
+bool PDH_status_1_channel_11_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status1_channel_6_brownout_encode(double value)
+uint8_t PDH_status_1_channel_6_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status1_channel_6_brownout_decode(uint8_t value)
+double PDH_status_1_channel_6_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status1_channel_6_brownout_is_in_range(uint8_t value)
+bool PDH_status_1_channel_6_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status1_channel_7_brownout_encode(double value)
+uint8_t PDH_status_1_channel_7_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status1_channel_7_brownout_decode(uint8_t value)
+double PDH_status_1_channel_7_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status1_channel_7_brownout_is_in_range(uint8_t value)
+bool PDH_status_1_channel_7_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-int PDH_status2_pack(
+int PDH_status_2_pack(
     uint8_t *dst_p,
-    const struct PDH_status2_t *src_p,
+    const struct PDH_status_2_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -611,22 +594,22 @@ int PDH_status2_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->channel_13_current, 6u, 0x0fu);
     dst_p[2] |= pack_left_shift_u16(src_p->channel_14_current, 4u, 0xf0u);
     dst_p[3] |= pack_right_shift_u16(src_p->channel_14_current, 4u, 0x3fu);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_8_brownout, 6u, 0x40u);
-    dst_p[3] |= pack_left_shift_u8(src_p->channel_9_brownout, 7u, 0x80u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_8_breaker_fault, 6u, 0x40u);
+    dst_p[3] |= pack_left_shift_u8(src_p->channel_9_breaker_fault, 7u, 0x80u);
     dst_p[4] |= pack_left_shift_u16(src_p->channel_15_current, 0u, 0xffu);
     dst_p[5] |= pack_right_shift_u16(src_p->channel_15_current, 8u, 0x03u);
     dst_p[5] |= pack_left_shift_u16(src_p->channel_16_current, 2u, 0xfcu);
     dst_p[6] |= pack_right_shift_u16(src_p->channel_16_current, 6u, 0x0fu);
     dst_p[6] |= pack_left_shift_u16(src_p->channel_17_current, 4u, 0xf0u);
     dst_p[7] |= pack_right_shift_u16(src_p->channel_17_current, 4u, 0x3fu);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_10_brownout, 6u, 0x40u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_11_brownout, 7u, 0x80u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_10_breaker_fault, 6u, 0x40u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_11_breaker_fault, 7u, 0x80u);
 
     return (8);
 }
 
-int PDH_status2_unpack(
-    struct PDH_status2_t *dst_p,
+int PDH_status_2_unpack(
+    struct PDH_status_2_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -640,173 +623,173 @@ int PDH_status2_unpack(
     dst_p->channel_13_current |= unpack_left_shift_u16(src_p[2], 6u, 0x0fu);
     dst_p->channel_14_current = unpack_right_shift_u16(src_p[2], 4u, 0xf0u);
     dst_p->channel_14_current |= unpack_left_shift_u16(src_p[3], 4u, 0x3fu);
-    dst_p->channel_8_brownout = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
-    dst_p->channel_9_brownout = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
+    dst_p->channel_8_breaker_fault = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
+    dst_p->channel_9_breaker_fault = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
     dst_p->channel_15_current = unpack_right_shift_u16(src_p[4], 0u, 0xffu);
     dst_p->channel_15_current |= unpack_left_shift_u16(src_p[5], 8u, 0x03u);
     dst_p->channel_16_current = unpack_right_shift_u16(src_p[5], 2u, 0xfcu);
     dst_p->channel_16_current |= unpack_left_shift_u16(src_p[6], 6u, 0x0fu);
     dst_p->channel_17_current = unpack_right_shift_u16(src_p[6], 4u, 0xf0u);
     dst_p->channel_17_current |= unpack_left_shift_u16(src_p[7], 4u, 0x3fu);
-    dst_p->channel_10_brownout = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
-    dst_p->channel_11_brownout = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
+    dst_p->channel_10_breaker_fault = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
+    dst_p->channel_11_breaker_fault = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
 
     return (0);
 }
 
-uint16_t PDH_status2_channel_12_current_encode(double value)
+uint16_t PDH_status_2_channel_12_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_12_current_decode(uint16_t value)
+double PDH_status_2_channel_12_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_12_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_12_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status2_channel_13_current_encode(double value)
+uint16_t PDH_status_2_channel_13_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_13_current_decode(uint16_t value)
+double PDH_status_2_channel_13_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_13_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_13_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status2_channel_14_current_encode(double value)
+uint16_t PDH_status_2_channel_14_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_14_current_decode(uint16_t value)
+double PDH_status_2_channel_14_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_14_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_14_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status2_channel_8_brownout_encode(double value)
+uint8_t PDH_status_2_channel_8_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status2_channel_8_brownout_decode(uint8_t value)
+double PDH_status_2_channel_8_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status2_channel_8_brownout_is_in_range(uint8_t value)
+bool PDH_status_2_channel_8_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status2_channel_9_brownout_encode(double value)
+uint8_t PDH_status_2_channel_9_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status2_channel_9_brownout_decode(uint8_t value)
+double PDH_status_2_channel_9_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status2_channel_9_brownout_is_in_range(uint8_t value)
+bool PDH_status_2_channel_9_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint16_t PDH_status2_channel_15_current_encode(double value)
+uint16_t PDH_status_2_channel_15_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_15_current_decode(uint16_t value)
+double PDH_status_2_channel_15_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_15_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_15_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status2_channel_16_current_encode(double value)
+uint16_t PDH_status_2_channel_16_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_16_current_decode(uint16_t value)
+double PDH_status_2_channel_16_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_16_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_16_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status2_channel_17_current_encode(double value)
+uint16_t PDH_status_2_channel_17_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status2_channel_17_current_decode(uint16_t value)
+double PDH_status_2_channel_17_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status2_channel_17_current_is_in_range(uint16_t value)
+bool PDH_status_2_channel_17_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status2_channel_10_brownout_encode(double value)
+uint8_t PDH_status_2_channel_10_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status2_channel_10_brownout_decode(uint8_t value)
+double PDH_status_2_channel_10_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status2_channel_10_brownout_is_in_range(uint8_t value)
+bool PDH_status_2_channel_10_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status2_channel_11_brownout_encode(double value)
+uint8_t PDH_status_2_channel_11_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status2_channel_11_brownout_decode(uint8_t value)
+double PDH_status_2_channel_11_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status2_channel_11_brownout_is_in_range(uint8_t value)
+bool PDH_status_2_channel_11_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-int PDH_status3_pack(
+int PDH_status_3_pack(
     uint8_t *dst_p,
-    const struct PDH_status3_t *src_p,
+    const struct PDH_status_3_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -819,28 +802,28 @@ int PDH_status3_pack(
     dst_p[1] |= pack_right_shift_u16(src_p->channel_18_current, 8u, 0x03u);
     dst_p[1] |= pack_left_shift_u16(src_p->channel_19_current, 2u, 0xfcu);
     dst_p[2] |= pack_right_shift_u16(src_p->channel_19_current, 6u, 0x0fu);
-    dst_p[2] |= pack_left_shift_u8(src_p->channel_12_brownout, 4u, 0x10u);
-    dst_p[2] |= pack_left_shift_u8(src_p->channel_13_brownout, 5u, 0x20u);
-    dst_p[2] |= pack_left_shift_u8(src_p->channel_14_brownout, 6u, 0x40u);
-    dst_p[2] |= pack_left_shift_u8(src_p->channel_15_brownout, 7u, 0x80u);
+    dst_p[2] |= pack_left_shift_u8(src_p->channel_12_breaker_fault, 4u, 0x10u);
+    dst_p[2] |= pack_left_shift_u8(src_p->channel_13_breaker_fault, 5u, 0x20u);
+    dst_p[2] |= pack_left_shift_u8(src_p->channel_14_breaker_fault, 6u, 0x40u);
+    dst_p[2] |= pack_left_shift_u8(src_p->channel_15_breaker_fault, 7u, 0x80u);
     dst_p[3] |= pack_left_shift_u8(src_p->channel_20_current, 0u, 0xffu);
     dst_p[4] |= pack_left_shift_u8(src_p->channel_21_current, 0u, 0xffu);
     dst_p[5] |= pack_left_shift_u8(src_p->channel_22_current, 0u, 0xffu);
     dst_p[6] |= pack_left_shift_u8(src_p->channel_23_current, 0u, 0xffu);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_16_brownout, 0u, 0x01u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_17_brownout, 1u, 0x02u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_18_brownout, 2u, 0x04u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_19_brownout, 3u, 0x08u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_20_brownout, 4u, 0x10u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_21_brownout, 5u, 0x20u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_22_brownout, 6u, 0x40u);
-    dst_p[7] |= pack_left_shift_u8(src_p->channel_23_brownout, 7u, 0x80u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_16_breaker_fault, 0u, 0x01u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_17_breaker_fault, 1u, 0x02u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_18_breaker_fault, 2u, 0x04u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_19_breaker_fault, 3u, 0x08u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_20_breaker_fault, 4u, 0x10u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_21_breaker_fault, 5u, 0x20u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_22_breaker_fault, 6u, 0x40u);
+    dst_p[7] |= pack_left_shift_u8(src_p->channel_23_breaker_fault, 7u, 0x80u);
 
     return (8);
 }
 
-int PDH_status3_unpack(
-    struct PDH_status3_t *dst_p,
+int PDH_status_3_unpack(
+    struct PDH_status_3_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -852,307 +835,307 @@ int PDH_status3_unpack(
     dst_p->channel_18_current |= unpack_left_shift_u16(src_p[1], 8u, 0x03u);
     dst_p->channel_19_current = unpack_right_shift_u16(src_p[1], 2u, 0xfcu);
     dst_p->channel_19_current |= unpack_left_shift_u16(src_p[2], 6u, 0x0fu);
-    dst_p->channel_12_brownout = unpack_right_shift_u8(src_p[2], 4u, 0x10u);
-    dst_p->channel_13_brownout = unpack_right_shift_u8(src_p[2], 5u, 0x20u);
-    dst_p->channel_14_brownout = unpack_right_shift_u8(src_p[2], 6u, 0x40u);
-    dst_p->channel_15_brownout = unpack_right_shift_u8(src_p[2], 7u, 0x80u);
+    dst_p->channel_12_breaker_fault = unpack_right_shift_u8(src_p[2], 4u, 0x10u);
+    dst_p->channel_13_breaker_fault = unpack_right_shift_u8(src_p[2], 5u, 0x20u);
+    dst_p->channel_14_breaker_fault = unpack_right_shift_u8(src_p[2], 6u, 0x40u);
+    dst_p->channel_15_breaker_fault = unpack_right_shift_u8(src_p[2], 7u, 0x80u);
     dst_p->channel_20_current = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
     dst_p->channel_21_current = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
     dst_p->channel_22_current = unpack_right_shift_u8(src_p[5], 0u, 0xffu);
     dst_p->channel_23_current = unpack_right_shift_u8(src_p[6], 0u, 0xffu);
-    dst_p->channel_16_brownout = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
-    dst_p->channel_17_brownout = unpack_right_shift_u8(src_p[7], 1u, 0x02u);
-    dst_p->channel_18_brownout = unpack_right_shift_u8(src_p[7], 2u, 0x04u);
-    dst_p->channel_19_brownout = unpack_right_shift_u8(src_p[7], 3u, 0x08u);
-    dst_p->channel_20_brownout = unpack_right_shift_u8(src_p[7], 4u, 0x10u);
-    dst_p->channel_21_brownout = unpack_right_shift_u8(src_p[7], 5u, 0x20u);
-    dst_p->channel_22_brownout = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
-    dst_p->channel_23_brownout = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
+    dst_p->channel_16_breaker_fault = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
+    dst_p->channel_17_breaker_fault = unpack_right_shift_u8(src_p[7], 1u, 0x02u);
+    dst_p->channel_18_breaker_fault = unpack_right_shift_u8(src_p[7], 2u, 0x04u);
+    dst_p->channel_19_breaker_fault = unpack_right_shift_u8(src_p[7], 3u, 0x08u);
+    dst_p->channel_20_breaker_fault = unpack_right_shift_u8(src_p[7], 4u, 0x10u);
+    dst_p->channel_21_breaker_fault = unpack_right_shift_u8(src_p[7], 5u, 0x20u);
+    dst_p->channel_22_breaker_fault = unpack_right_shift_u8(src_p[7], 6u, 0x40u);
+    dst_p->channel_23_breaker_fault = unpack_right_shift_u8(src_p[7], 7u, 0x80u);
 
     return (0);
 }
 
-uint16_t PDH_status3_channel_18_current_encode(double value)
+uint16_t PDH_status_3_channel_18_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status3_channel_18_current_decode(uint16_t value)
+double PDH_status_3_channel_18_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status3_channel_18_current_is_in_range(uint16_t value)
+bool PDH_status_3_channel_18_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint16_t PDH_status3_channel_19_current_encode(double value)
+uint16_t PDH_status_3_channel_19_current_encode(double value)
 {
     return (uint16_t)(value / 0.125);
 }
 
-double PDH_status3_channel_19_current_decode(uint16_t value)
+double PDH_status_3_channel_19_current_decode(uint16_t value)
 {
     return ((double)value * 0.125);
 }
 
-bool PDH_status3_channel_19_current_is_in_range(uint16_t value)
+bool PDH_status_3_channel_19_current_is_in_range(uint16_t value)
 {
     return (value <= 1023u);
 }
 
-uint8_t PDH_status3_channel_12_brownout_encode(double value)
+uint8_t PDH_status_3_channel_12_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_12_brownout_decode(uint8_t value)
+double PDH_status_3_channel_12_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_12_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_12_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_13_brownout_encode(double value)
+uint8_t PDH_status_3_channel_13_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_13_brownout_decode(uint8_t value)
+double PDH_status_3_channel_13_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_13_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_13_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_14_brownout_encode(double value)
+uint8_t PDH_status_3_channel_14_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_14_brownout_decode(uint8_t value)
+double PDH_status_3_channel_14_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_14_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_14_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_15_brownout_encode(double value)
+uint8_t PDH_status_3_channel_15_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_15_brownout_decode(uint8_t value)
+double PDH_status_3_channel_15_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_15_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_15_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_20_current_encode(double value)
+uint8_t PDH_status_3_channel_20_current_encode(double value)
 {
     return (uint8_t)(value / 0.0625);
 }
 
-double PDH_status3_channel_20_current_decode(uint8_t value)
+double PDH_status_3_channel_20_current_decode(uint8_t value)
 {
     return ((double)value * 0.0625);
 }
 
-bool PDH_status3_channel_20_current_is_in_range(uint8_t value)
+bool PDH_status_3_channel_20_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PDH_status3_channel_21_current_encode(double value)
+uint8_t PDH_status_3_channel_21_current_encode(double value)
 {
     return (uint8_t)(value / 0.0625);
 }
 
-double PDH_status3_channel_21_current_decode(uint8_t value)
+double PDH_status_3_channel_21_current_decode(uint8_t value)
 {
     return ((double)value * 0.0625);
 }
 
-bool PDH_status3_channel_21_current_is_in_range(uint8_t value)
+bool PDH_status_3_channel_21_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PDH_status3_channel_22_current_encode(double value)
+uint8_t PDH_status_3_channel_22_current_encode(double value)
 {
     return (uint8_t)(value / 0.0625);
 }
 
-double PDH_status3_channel_22_current_decode(uint8_t value)
+double PDH_status_3_channel_22_current_decode(uint8_t value)
 {
     return ((double)value * 0.0625);
 }
 
-bool PDH_status3_channel_22_current_is_in_range(uint8_t value)
+bool PDH_status_3_channel_22_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PDH_status3_channel_23_current_encode(double value)
+uint8_t PDH_status_3_channel_23_current_encode(double value)
 {
     return (uint8_t)(value / 0.0625);
 }
 
-double PDH_status3_channel_23_current_decode(uint8_t value)
+double PDH_status_3_channel_23_current_decode(uint8_t value)
 {
     return ((double)value * 0.0625);
 }
 
-bool PDH_status3_channel_23_current_is_in_range(uint8_t value)
+bool PDH_status_3_channel_23_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
 }
 
-uint8_t PDH_status3_channel_16_brownout_encode(double value)
+uint8_t PDH_status_3_channel_16_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_16_brownout_decode(uint8_t value)
+double PDH_status_3_channel_16_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_16_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_16_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_17_brownout_encode(double value)
+uint8_t PDH_status_3_channel_17_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_17_brownout_decode(uint8_t value)
+double PDH_status_3_channel_17_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_17_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_17_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_18_brownout_encode(double value)
+uint8_t PDH_status_3_channel_18_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_18_brownout_decode(uint8_t value)
+double PDH_status_3_channel_18_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_18_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_18_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_19_brownout_encode(double value)
+uint8_t PDH_status_3_channel_19_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_19_brownout_decode(uint8_t value)
+double PDH_status_3_channel_19_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_19_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_19_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_20_brownout_encode(double value)
+uint8_t PDH_status_3_channel_20_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_20_brownout_decode(uint8_t value)
+double PDH_status_3_channel_20_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_20_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_20_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_21_brownout_encode(double value)
+uint8_t PDH_status_3_channel_21_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_21_brownout_decode(uint8_t value)
+double PDH_status_3_channel_21_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_21_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_21_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_22_brownout_encode(double value)
+uint8_t PDH_status_3_channel_22_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_22_brownout_decode(uint8_t value)
+double PDH_status_3_channel_22_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_22_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_22_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status3_channel_23_brownout_encode(double value)
+uint8_t PDH_status_3_channel_23_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status3_channel_23_brownout_decode(uint8_t value)
+double PDH_status_3_channel_23_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status3_channel_23_brownout_is_in_range(uint8_t value)
+bool PDH_status_3_channel_23_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-int PDH_status4_pack(
+int PDH_status_4_pack(
     uint8_t *dst_p,
-    const struct PDH_status4_t *src_p,
+    const struct PDH_status_4_t *src_p,
     size_t size)
 {
     if (size < 8u) {
@@ -1165,29 +1148,49 @@ int PDH_status4_pack(
     dst_p[1] |= pack_right_shift_u16(src_p->v_bus, 8u, 0x0fu);
     dst_p[1] |= pack_left_shift_u8(src_p->system_enable, 4u, 0x10u);
     dst_p[1] |= pack_left_shift_u8(src_p->rsvd0, 5u, 0xe0u);
-    dst_p[2] |= pack_left_shift_u8(src_p->brownout, 0u, 0x01u);
+    dst_p[2] |= pack_left_shift_u8(src_p->brownout_fault, 0u, 0x01u);
     dst_p[2] |= pack_left_shift_u8(src_p->rsvd1, 1u, 0x02u);
-    dst_p[2] |= pack_left_shift_u8(src_p->can_warning, 2u, 0x04u);
+    dst_p[2] |= pack_left_shift_u8(src_p->can_warning_fault, 2u, 0x04u);
     dst_p[2] |= pack_left_shift_u8(src_p->hardware_fault, 3u, 0x08u);
-    dst_p[2] |= pack_left_shift_u8(src_p->sw_state, 4u, 0x10u);
-    dst_p[2] |= pack_left_shift_u8(src_p->sticky_brownout, 5u, 0x20u);
+    dst_p[2] |= pack_left_shift_u8(src_p->switch_channel_state, 4u, 0x10u);
+    dst_p[2] |= pack_left_shift_u8(src_p->sticky_brownout_fault, 5u, 0x20u);
     dst_p[2] |= pack_left_shift_u8(src_p->rsvd2, 6u, 0x40u);
-    dst_p[2] |= pack_left_shift_u8(src_p->sticky_can_warning, 7u, 0x80u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_can_bus_off, 0u, 0x01u);
+    dst_p[2] |= pack_left_shift_u8(src_p->sticky_can_warning_fault, 7u, 0x80u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_can_bus_off_fault, 0u, 0x01u);
     dst_p[3] |= pack_left_shift_u8(src_p->sticky_hardware_fault, 1u, 0x02u);
     dst_p[3] |= pack_left_shift_u8(src_p->sticky_firmware_fault, 2u, 0x04u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch20_brownout, 3u, 0x08u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch21_brownout, 4u, 0x10u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch22_brownout, 5u, 0x20u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch23_brownout, 6u, 0x40u);
-    dst_p[3] |= pack_left_shift_u8(src_p->sticky_has_reset, 7u, 0x80u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch20_breaker_fault, 3u, 0x08u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch21_breaker_fault, 4u, 0x10u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch22_breaker_fault, 5u, 0x20u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_ch23_breaker_fault, 6u, 0x40u);
+    dst_p[3] |= pack_left_shift_u8(src_p->sticky_has_reset_fault, 7u, 0x80u);
     dst_p[4] |= pack_left_shift_u8(src_p->total_current, 0u, 0xffu);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch0_breaker_fault, 0u, 0x01u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch1_breaker_fault, 1u, 0x02u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch2_breaker_fault, 2u, 0x04u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch3_breaker_fault, 3u, 0x08u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch4_breaker_fault, 4u, 0x10u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch5_breaker_fault, 5u, 0x20u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch6_breaker_fault, 6u, 0x40u);
+    dst_p[5] |= pack_left_shift_u8(src_p->sticky_ch7_breaker_fault, 7u, 0x80u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch8_breaker_fault, 0u, 0x01u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch9_breaker_fault, 1u, 0x02u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch10_breaker_fault, 2u, 0x04u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch11_breaker_fault, 3u, 0x08u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch12_breaker_fault, 4u, 0x10u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch13_breaker_fault, 5u, 0x20u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch14_breaker_fault, 6u, 0x40u);
+    dst_p[6] |= pack_left_shift_u8(src_p->sticky_ch15_breaker_fault, 7u, 0x80u);
+    dst_p[7] |= pack_left_shift_u8(src_p->sticky_ch16_breaker_fault, 0u, 0x01u);
+    dst_p[7] |= pack_left_shift_u8(src_p->sticky_ch17_breaker_fault, 1u, 0x02u);
+    dst_p[7] |= pack_left_shift_u8(src_p->sticky_ch18_breaker_fault, 2u, 0x04u);
+    dst_p[7] |= pack_left_shift_u8(src_p->sticky_ch19_breaker_fault, 3u, 0x08u);
 
     return (8);
 }
 
-int PDH_status4_unpack(
-    struct PDH_status4_t *dst_p,
+int PDH_status_4_unpack(
+    struct PDH_status_4_t *dst_p,
     const uint8_t *src_p,
     size_t size)
 {
@@ -1199,327 +1202,647 @@ int PDH_status4_unpack(
     dst_p->v_bus |= unpack_left_shift_u16(src_p[1], 8u, 0x0fu);
     dst_p->system_enable = unpack_right_shift_u8(src_p[1], 4u, 0x10u);
     dst_p->rsvd0 = unpack_right_shift_u8(src_p[1], 5u, 0xe0u);
-    dst_p->brownout = unpack_right_shift_u8(src_p[2], 0u, 0x01u);
+    dst_p->brownout_fault = unpack_right_shift_u8(src_p[2], 0u, 0x01u);
     dst_p->rsvd1 = unpack_right_shift_u8(src_p[2], 1u, 0x02u);
-    dst_p->can_warning = unpack_right_shift_u8(src_p[2], 2u, 0x04u);
+    dst_p->can_warning_fault = unpack_right_shift_u8(src_p[2], 2u, 0x04u);
     dst_p->hardware_fault = unpack_right_shift_u8(src_p[2], 3u, 0x08u);
-    dst_p->sw_state = unpack_right_shift_u8(src_p[2], 4u, 0x10u);
-    dst_p->sticky_brownout = unpack_right_shift_u8(src_p[2], 5u, 0x20u);
+    dst_p->switch_channel_state = unpack_right_shift_u8(src_p[2], 4u, 0x10u);
+    dst_p->sticky_brownout_fault = unpack_right_shift_u8(src_p[2], 5u, 0x20u);
     dst_p->rsvd2 = unpack_right_shift_u8(src_p[2], 6u, 0x40u);
-    dst_p->sticky_can_warning = unpack_right_shift_u8(src_p[2], 7u, 0x80u);
-    dst_p->sticky_can_bus_off = unpack_right_shift_u8(src_p[3], 0u, 0x01u);
+    dst_p->sticky_can_warning_fault = unpack_right_shift_u8(src_p[2], 7u, 0x80u);
+    dst_p->sticky_can_bus_off_fault = unpack_right_shift_u8(src_p[3], 0u, 0x01u);
     dst_p->sticky_hardware_fault = unpack_right_shift_u8(src_p[3], 1u, 0x02u);
     dst_p->sticky_firmware_fault = unpack_right_shift_u8(src_p[3], 2u, 0x04u);
-    dst_p->sticky_ch20_brownout = unpack_right_shift_u8(src_p[3], 3u, 0x08u);
-    dst_p->sticky_ch21_brownout = unpack_right_shift_u8(src_p[3], 4u, 0x10u);
-    dst_p->sticky_ch22_brownout = unpack_right_shift_u8(src_p[3], 5u, 0x20u);
-    dst_p->sticky_ch23_brownout = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
-    dst_p->sticky_has_reset = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
+    dst_p->sticky_ch20_breaker_fault = unpack_right_shift_u8(src_p[3], 3u, 0x08u);
+    dst_p->sticky_ch21_breaker_fault = unpack_right_shift_u8(src_p[3], 4u, 0x10u);
+    dst_p->sticky_ch22_breaker_fault = unpack_right_shift_u8(src_p[3], 5u, 0x20u);
+    dst_p->sticky_ch23_breaker_fault = unpack_right_shift_u8(src_p[3], 6u, 0x40u);
+    dst_p->sticky_has_reset_fault = unpack_right_shift_u8(src_p[3], 7u, 0x80u);
     dst_p->total_current = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
+    dst_p->sticky_ch0_breaker_fault = unpack_right_shift_u8(src_p[5], 0u, 0x01u);
+    dst_p->sticky_ch1_breaker_fault = unpack_right_shift_u8(src_p[5], 1u, 0x02u);
+    dst_p->sticky_ch2_breaker_fault = unpack_right_shift_u8(src_p[5], 2u, 0x04u);
+    dst_p->sticky_ch3_breaker_fault = unpack_right_shift_u8(src_p[5], 3u, 0x08u);
+    dst_p->sticky_ch4_breaker_fault = unpack_right_shift_u8(src_p[5], 4u, 0x10u);
+    dst_p->sticky_ch5_breaker_fault = unpack_right_shift_u8(src_p[5], 5u, 0x20u);
+    dst_p->sticky_ch6_breaker_fault = unpack_right_shift_u8(src_p[5], 6u, 0x40u);
+    dst_p->sticky_ch7_breaker_fault = unpack_right_shift_u8(src_p[5], 7u, 0x80u);
+    dst_p->sticky_ch8_breaker_fault = unpack_right_shift_u8(src_p[6], 0u, 0x01u);
+    dst_p->sticky_ch9_breaker_fault = unpack_right_shift_u8(src_p[6], 1u, 0x02u);
+    dst_p->sticky_ch10_breaker_fault = unpack_right_shift_u8(src_p[6], 2u, 0x04u);
+    dst_p->sticky_ch11_breaker_fault = unpack_right_shift_u8(src_p[6], 3u, 0x08u);
+    dst_p->sticky_ch12_breaker_fault = unpack_right_shift_u8(src_p[6], 4u, 0x10u);
+    dst_p->sticky_ch13_breaker_fault = unpack_right_shift_u8(src_p[6], 5u, 0x20u);
+    dst_p->sticky_ch14_breaker_fault = unpack_right_shift_u8(src_p[6], 6u, 0x40u);
+    dst_p->sticky_ch15_breaker_fault = unpack_right_shift_u8(src_p[6], 7u, 0x80u);
+    dst_p->sticky_ch16_breaker_fault = unpack_right_shift_u8(src_p[7], 0u, 0x01u);
+    dst_p->sticky_ch17_breaker_fault = unpack_right_shift_u8(src_p[7], 1u, 0x02u);
+    dst_p->sticky_ch18_breaker_fault = unpack_right_shift_u8(src_p[7], 2u, 0x04u);
+    dst_p->sticky_ch19_breaker_fault = unpack_right_shift_u8(src_p[7], 3u, 0x08u);
 
     return (0);
 }
 
-uint16_t PDH_status4_v_bus_encode(double value)
+uint16_t PDH_status_4_v_bus_encode(double value)
 {
     return (uint16_t)(value / 0.0078125);
 }
 
-double PDH_status4_v_bus_decode(uint16_t value)
+double PDH_status_4_v_bus_decode(uint16_t value)
 {
     return ((double)value * 0.0078125);
 }
 
-bool PDH_status4_v_bus_is_in_range(uint16_t value)
+bool PDH_status_4_v_bus_is_in_range(uint16_t value)
 {
     return (value <= 4095u);
 }
 
-uint8_t PDH_status4_system_enable_encode(double value)
+uint8_t PDH_status_4_system_enable_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_system_enable_decode(uint8_t value)
+double PDH_status_4_system_enable_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_system_enable_is_in_range(uint8_t value)
+bool PDH_status_4_system_enable_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_rsvd0_encode(double value)
+uint8_t PDH_status_4_rsvd0_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_rsvd0_decode(uint8_t value)
+double PDH_status_4_rsvd0_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_rsvd0_is_in_range(uint8_t value)
+bool PDH_status_4_rsvd0_is_in_range(uint8_t value)
 {
     return (value <= 7u);
 }
 
-uint8_t PDH_status4_brownout_encode(double value)
+uint8_t PDH_status_4_brownout_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_brownout_decode(uint8_t value)
+double PDH_status_4_brownout_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_brownout_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_rsvd1_encode(double value)
+uint8_t PDH_status_4_rsvd1_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_rsvd1_decode(uint8_t value)
+double PDH_status_4_rsvd1_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_rsvd1_is_in_range(uint8_t value)
+bool PDH_status_4_rsvd1_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_can_warning_encode(double value)
+uint8_t PDH_status_4_can_warning_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_can_warning_decode(uint8_t value)
+double PDH_status_4_can_warning_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_can_warning_is_in_range(uint8_t value)
+bool PDH_status_4_can_warning_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_hardware_fault_encode(double value)
+uint8_t PDH_status_4_hardware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_hardware_fault_decode(uint8_t value)
+double PDH_status_4_hardware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_hardware_fault_is_in_range(uint8_t value)
+bool PDH_status_4_hardware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sw_state_encode(double value)
+uint8_t PDH_status_4_switch_channel_state_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sw_state_decode(uint8_t value)
+double PDH_status_4_switch_channel_state_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sw_state_is_in_range(uint8_t value)
+bool PDH_status_4_switch_channel_state_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_brownout_encode(double value)
+uint8_t PDH_status_4_sticky_brownout_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_brownout_decode(uint8_t value)
+double PDH_status_4_sticky_brownout_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_brownout_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_rsvd2_encode(double value)
+uint8_t PDH_status_4_rsvd2_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_rsvd2_decode(uint8_t value)
+double PDH_status_4_rsvd2_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_rsvd2_is_in_range(uint8_t value)
+bool PDH_status_4_rsvd2_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_can_warning_encode(double value)
+uint8_t PDH_status_4_sticky_can_warning_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_can_warning_decode(uint8_t value)
+double PDH_status_4_sticky_can_warning_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_can_warning_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_can_warning_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_can_bus_off_encode(double value)
+uint8_t PDH_status_4_sticky_can_bus_off_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_can_bus_off_decode(uint8_t value)
+double PDH_status_4_sticky_can_bus_off_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_can_bus_off_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_can_bus_off_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_hardware_fault_encode(double value)
+uint8_t PDH_status_4_sticky_hardware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_hardware_fault_decode(uint8_t value)
+double PDH_status_4_sticky_hardware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_hardware_fault_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_hardware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_firmware_fault_encode(double value)
+uint8_t PDH_status_4_sticky_firmware_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_firmware_fault_decode(uint8_t value)
+double PDH_status_4_sticky_firmware_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_firmware_fault_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_firmware_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_ch20_brownout_encode(double value)
+uint8_t PDH_status_4_sticky_ch20_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_ch20_brownout_decode(uint8_t value)
+double PDH_status_4_sticky_ch20_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_ch20_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_ch20_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_ch21_brownout_encode(double value)
+uint8_t PDH_status_4_sticky_ch21_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_ch21_brownout_decode(uint8_t value)
+double PDH_status_4_sticky_ch21_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_ch21_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_ch21_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_ch22_brownout_encode(double value)
+uint8_t PDH_status_4_sticky_ch22_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_ch22_brownout_decode(uint8_t value)
+double PDH_status_4_sticky_ch22_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_ch22_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_ch22_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_ch23_brownout_encode(double value)
+uint8_t PDH_status_4_sticky_ch23_breaker_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_ch23_brownout_decode(uint8_t value)
+double PDH_status_4_sticky_ch23_breaker_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_ch23_brownout_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_ch23_breaker_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_sticky_has_reset_encode(double value)
+uint8_t PDH_status_4_sticky_has_reset_fault_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_status4_sticky_has_reset_decode(uint8_t value)
+double PDH_status_4_sticky_has_reset_fault_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_status4_sticky_has_reset_is_in_range(uint8_t value)
+bool PDH_status_4_sticky_has_reset_fault_is_in_range(uint8_t value)
 {
     return (value <= 1u);
 }
 
-uint8_t PDH_status4_total_current_encode(double value)
+uint8_t PDH_status_4_total_current_encode(double value)
 {
     return (uint8_t)(value / 2.0);
 }
 
-double PDH_status4_total_current_decode(uint8_t value)
+double PDH_status_4_total_current_decode(uint8_t value)
 {
     return ((double)value * 2.0);
 }
 
-bool PDH_status4_total_current_is_in_range(uint8_t value)
+bool PDH_status_4_total_current_is_in_range(uint8_t value)
 {
     (void)value;
 
     return (true);
+}
+
+uint8_t PDH_status_4_sticky_ch0_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch0_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch0_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch1_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch1_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch1_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch2_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch2_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch2_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch3_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch3_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch3_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch4_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch4_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch4_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch5_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch5_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch5_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch6_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch6_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch6_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch7_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch7_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch7_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch8_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch8_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch8_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch9_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch9_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch9_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch10_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch10_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch10_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch11_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch11_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch11_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch12_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch12_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch12_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch13_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch13_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch13_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch14_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch14_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch14_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch15_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch15_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch15_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch16_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch16_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch16_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch17_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch17_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch17_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch18_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch18_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch18_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
+}
+
+uint8_t PDH_status_4_sticky_ch19_breaker_fault_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_status_4_sticky_ch19_breaker_fault_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_status_4_sticky_ch19_breaker_fault_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
 }
 
 int PDH_clear_faults_pack(
@@ -1546,30 +1869,6 @@ int PDH_clear_faults_unpack(
     return (0);
 }
 
-int PDH_identify_pack(
-    uint8_t *dst_p,
-    const struct PDH_identify_t *src_p,
-    size_t size)
-{
-    (void)dst_p;
-    (void)src_p;
-    (void)size;
-
-    return (0);
-}
-
-int PDH_identify_unpack(
-    struct PDH_identify_t *dst_p,
-    const uint8_t *src_p,
-    size_t size)
-{
-    (void)dst_p;
-    (void)src_p;
-    (void)size;
-
-    return (0);
-}
-
 int PDH_version_pack(
     uint8_t *dst_p,
     const struct PDH_version_t *src_p,
@@ -1584,11 +1883,11 @@ int PDH_version_pack(
     dst_p[0] |= pack_left_shift_u8(src_p->firmware_fix, 0u, 0xffu);
     dst_p[1] |= pack_left_shift_u8(src_p->firmware_minor, 0u, 0xffu);
     dst_p[2] |= pack_left_shift_u8(src_p->firmware_year, 0u, 0xffu);
-    dst_p[3] |= pack_left_shift_u8(src_p->hardware_code, 0u, 0xffu);
-    dst_p[4] |= pack_left_shift_u32(src_p->unique_id, 0u, 0xffu);
-    dst_p[5] |= pack_right_shift_u32(src_p->unique_id, 8u, 0xffu);
-    dst_p[6] |= pack_right_shift_u32(src_p->unique_id, 16u, 0xffu);
-    dst_p[7] |= pack_right_shift_u32(src_p->unique_id, 24u, 0xffu);
+    dst_p[3] |= pack_left_shift_u8(src_p->hardware_minor, 0u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->hardware_major, 0u, 0xffu);
+    dst_p[5] |= pack_left_shift_u32(src_p->unique_id, 0u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->unique_id, 8u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->unique_id, 16u, 0xffu);
 
     return (8);
 }
@@ -1605,11 +1904,11 @@ int PDH_version_unpack(
     dst_p->firmware_fix = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
     dst_p->firmware_minor = unpack_right_shift_u8(src_p[1], 0u, 0xffu);
     dst_p->firmware_year = unpack_right_shift_u8(src_p[2], 0u, 0xffu);
-    dst_p->hardware_code = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
-    dst_p->unique_id = unpack_right_shift_u32(src_p[4], 0u, 0xffu);
-    dst_p->unique_id |= unpack_left_shift_u32(src_p[5], 8u, 0xffu);
-    dst_p->unique_id |= unpack_left_shift_u32(src_p[6], 16u, 0xffu);
-    dst_p->unique_id |= unpack_left_shift_u32(src_p[7], 24u, 0xffu);
+    dst_p->hardware_minor = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
+    dst_p->hardware_major = unpack_right_shift_u8(src_p[4], 0u, 0xffu);
+    dst_p->unique_id = unpack_right_shift_u32(src_p[5], 0u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[6], 8u, 0xffu);
+    dst_p->unique_id |= unpack_left_shift_u32(src_p[7], 16u, 0xffu);
 
     return (0);
 }
@@ -1665,17 +1964,34 @@ bool PDH_version_firmware_year_is_in_range(uint8_t value)
     return (true);
 }
 
-uint8_t PDH_version_hardware_code_encode(double value)
+uint8_t PDH_version_hardware_minor_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double PDH_version_hardware_code_decode(uint8_t value)
+double PDH_version_hardware_minor_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool PDH_version_hardware_code_is_in_range(uint8_t value)
+bool PDH_version_hardware_minor_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+uint8_t PDH_version_hardware_major_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double PDH_version_hardware_major_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool PDH_version_hardware_major_is_in_range(uint8_t value)
 {
     (void)value;
 
@@ -1694,97 +2010,5 @@ double PDH_version_unique_id_decode(uint32_t value)
 
 bool PDH_version_unique_id_is_in_range(uint32_t value)
 {
-    (void)value;
-
-    return (true);
-}
-
-int PDH_configure_hr_channel_pack(
-    uint8_t *dst_p,
-    const struct PDH_configure_hr_channel_t *src_p,
-    size_t size)
-{
-    if (size < 3u) {
-        return (-EINVAL);
-    }
-
-    memset(&dst_p[0], 0, 3);
-
-    dst_p[0] |= pack_left_shift_u8(src_p->channel, 0u, 0xffu);
-    dst_p[1] |= pack_left_shift_u16(src_p->period, 0u, 0xffu);
-    dst_p[2] |= pack_right_shift_u16(src_p->period, 8u, 0xffu);
-
-    return (3);
-}
-
-int PDH_configure_hr_channel_unpack(
-    struct PDH_configure_hr_channel_t *dst_p,
-    const uint8_t *src_p,
-    size_t size)
-{
-    if (size < 3u) {
-        return (-EINVAL);
-    }
-
-    dst_p->channel = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
-    dst_p->period = unpack_right_shift_u16(src_p[1], 0u, 0xffu);
-    dst_p->period |= unpack_left_shift_u16(src_p[2], 8u, 0xffu);
-
-    return (0);
-}
-
-uint8_t PDH_configure_hr_channel_channel_encode(double value)
-{
-    return (uint8_t)(value);
-}
-
-double PDH_configure_hr_channel_channel_decode(uint8_t value)
-{
-    return ((double)value);
-}
-
-bool PDH_configure_hr_channel_channel_is_in_range(uint8_t value)
-{
-    return (value <= 23u);
-}
-
-uint16_t PDH_configure_hr_channel_period_encode(double value)
-{
-    return (uint16_t)(value);
-}
-
-double PDH_configure_hr_channel_period_decode(uint16_t value)
-{
-    return ((double)value);
-}
-
-bool PDH_configure_hr_channel_period_is_in_range(uint16_t value)
-{
-    (void)value;
-
-    return (true);
-}
-
-int PDH_enter_bootloader_pack(
-    uint8_t *dst_p,
-    const struct PDH_enter_bootloader_t *src_p,
-    size_t size)
-{
-    (void)dst_p;
-    (void)src_p;
-    (void)size;
-
-    return (0);
-}
-
-int PDH_enter_bootloader_unpack(
-    struct PDH_enter_bootloader_t *dst_p,
-    const uint8_t *src_p,
-    size_t size)
-{
-    (void)dst_p;
-    (void)src_p;
-    (void)size;
-
-    return (0);
+    return (value <= 16777215u);
 }

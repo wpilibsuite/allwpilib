@@ -77,7 +77,7 @@ class TrapezoidProfileTest {
     double lastPos = state.position;
     for (int i = 0; i < 1600; ++i) {
       if (i == 400) {
-        constraints.maxVelocity = 0.75;
+        constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
       }
 
       profile = new TrapezoidProfile(constraints, goal, state);
@@ -201,7 +201,7 @@ class TrapezoidProfileTest {
     for (int i = 0; i < 400; i++) {
       profile = new TrapezoidProfile(constraints, goal, state);
       state = profile.calculate(kDt);
-      if (!reachedGoal && (Math.abs(state.velocity - 1) < 10e-5)) {
+      if (!reachedGoal && Math.abs(state.velocity - 1) < 10e-5) {
         assertNear(predictedTimeLeft, i / 100.0, 2e-2);
         reachedGoal = true;
       }
@@ -244,7 +244,7 @@ class TrapezoidProfileTest {
     for (int i = 0; i < 400; i++) {
       profile = new TrapezoidProfile(constraints, goal, state);
       state = profile.calculate(kDt);
-      if (!reachedGoal && (Math.abs(state.velocity + 1) < 10e-5)) {
+      if (!reachedGoal && Math.abs(state.velocity + 1) < 10e-5) {
         assertNear(predictedTimeLeft, i / 100.0, 2e-2);
         reachedGoal = true;
       }

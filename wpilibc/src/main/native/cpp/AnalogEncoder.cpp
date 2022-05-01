@@ -10,6 +10,7 @@
 #include "frc/AnalogInput.h"
 #include "frc/Counter.h"
 #include "frc/Errors.h"
+#include "frc/RobotController.h"
 
 using namespace frc;
 
@@ -42,6 +43,8 @@ void AnalogEncoder::Init() {
 
   if (m_simDevice) {
     m_simPosition = m_simDevice.CreateDouble("Position", false, 0.0);
+    m_simAbsolutePosition =
+        m_simDevice.CreateDouble("absPosition", hal::SimDevice::kInput, 0.0);
   }
 
   m_analogTrigger.SetLimitsVoltage(1.25, 3.75);
@@ -52,6 +55,11 @@ void AnalogEncoder::Init() {
 
   wpi::SendableRegistry::AddLW(this, "DutyCycle Encoder",
                                m_analogInput->GetChannel());
+}
+
+static bool DoubleEquals(double a, double b) {
+  constexpr double epsilon = 0.00001;
+  return std::abs(a - b) < epsilon;
 }
 
 units::turn_t AnalogEncoder::Get() const {
@@ -66,7 +74,8 @@ units::turn_t AnalogEncoder::Get() const {
     auto pos = m_analogInput->GetVoltage();
     auto counter2 = m_counter.Get();
     auto pos2 = m_analogInput->GetVoltage();
-    if (counter == counter2 && pos == pos2) {
+    if (counter == counter2 && DoubleEquals(pos, pos2)) {
+      pos = pos / frc::RobotController::GetVoltage5V();
       units::turn_t turns{counter + pos - m_positionOffset};
       m_lastPosition = turns;
       return turns;
@@ -80,8 +89,20 @@ units::turn_t AnalogEncoder::Get() const {
   return m_lastPosition;
 }
 
+double AnalogEncoder::GetAbsolutePosition() const {
+  if (m_simAbsolutePosition) {
+    return m_simAbsolutePosition.Get();
+  }
+
+  return m_analogInput->GetVoltage() / frc::RobotController::GetVoltage5V();
+}
+
 double AnalogEncoder::GetPositionOffset() const {
   return m_positionOffset;
+}
+
+void AnalogEncoder::SetPositionOffset(double offset) {
+  m_positionOffset = std::clamp(offset, 0.0, 1.0);
 }
 
 void AnalogEncoder::SetDistancePerRotation(double distancePerRotation) {
@@ -93,12 +114,13 @@ double AnalogEncoder::GetDistancePerRotation() const {
 }
 
 double AnalogEncoder::GetDistance() const {
-  return Get().to<double>() * GetDistancePerRotation();
+  return Get().value() * GetDistancePerRotation();
 }
 
 void AnalogEncoder::Reset() {
   m_counter.Reset();
-  m_positionOffset = m_analogInput->GetVoltage();
+  m_positionOffset =
+      m_analogInput->GetVoltage() / frc::RobotController::GetVoltage5V();
 }
 
 int AnalogEncoder::GetChannel() const {

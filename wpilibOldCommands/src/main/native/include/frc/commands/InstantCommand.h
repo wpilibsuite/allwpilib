@@ -16,6 +16,8 @@ namespace frc {
  * This command will execute once, then finish immediately afterward.
  *
  * Subclassing InstantCommand is shorthand for returning true from IsFinished().
+ *
+ * This class is provided by the OldCommands VendorDep
  */
 class InstantCommand : public Command {
  public:

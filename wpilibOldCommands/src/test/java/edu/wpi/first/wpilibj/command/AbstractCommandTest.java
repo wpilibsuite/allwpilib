@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 
 /** The basic test for all {@link Command} tests. */
-public abstract class AbstractCommandTest {
+public class AbstractCommandTest {
   @BeforeEach
   void commandSetup() {
     Scheduler.getInstance().removeAll();

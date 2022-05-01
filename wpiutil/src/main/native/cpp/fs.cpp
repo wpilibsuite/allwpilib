@@ -82,17 +82,6 @@ namespace fs {
 const file_t kInvalidFile = INVALID_HANDLE_VALUE;
 
 static DWORD nativeDisposition(CreationDisposition Disp, OpenFlags Flags) {
-  // This is a compatibility hack.  Really we should respect the creation
-  // disposition, but a lot of old code relied on the implicit assumption that
-  // OF_Append implied it would open an existing file.  Since the disposition is
-  // now explicit and defaults to CD_CreateAlways, this assumption would cause
-  // any usage of OF_Append to append to a new file, even if the file already
-  // existed.  A better solution might have two new creation dispositions:
-  // CD_AppendAlways and CD_AppendNew.  This would also address the problem of
-  // OF_Append being used on a read-only descriptor, which doesn't make sense.
-  if (Flags & OF_Append)
-    return OPEN_ALWAYS;
-
   switch (Disp) {
     case CD_CreateAlways:
       return CREATE_ALWAYS;
@@ -249,12 +238,6 @@ static int nativeOpenFlags(CreationDisposition Disp, OpenFlags Flags,
     Result |= O_WRONLY;
   } else if (Access == (FA_Read | FA_Write)) {
     Result |= O_RDWR;
-  }
-
-  // This is for compatibility with old code that assumed F_Append implied
-  // would open an existing file.  See Windows/Path.inc for a longer comment.
-  if (Flags & F_Append) {
-    Disp = CD_OpenAlways;
   }
 
   if (Disp == CD_CreateNew) {

@@ -138,42 +138,41 @@ public class LinearFilter {
   }
 
   /**
-   * Creates a backward finite difference filter that computes the nth derivative of the input given
-   * the specified number of samples.
+   * Creates a finite difference filter that computes the nth derivative of the input given the
+   * specified stencil points.
    *
-   * <p>For example, a first derivative filter that uses two samples and a sample period of 20 ms
-   * would be
-   *
-   * <pre><code>
-   * LinearFilter.backwardFiniteDifference(1, 2, 0.02);
-   * </code></pre>
+   * <p>Stencil points are the indices of the samples to use in the finite difference. 0 is the
+   * current sample, -1 is the previous sample, -2 is the sample before that, etc. Don't use
+   * positive stencil points (samples from the future) if the LinearFilter will be used for
+   * stream-based online filtering.
    *
    * @param derivative The order of the derivative to compute.
    * @param samples The number of samples to use to compute the given derivative. This must be one
    *     more than the order of derivative or higher.
+   * @param stencil List of stencil points.
    * @param period The period in seconds between samples taken by the user.
    * @return Linear filter.
+   * @throws IllegalArgumentException if derivative &lt; 1, samples &lt;= 0, or derivative &gt;=
+   *     samples.
    */
   @SuppressWarnings("LocalVariableName")
-  public static LinearFilter backwardFiniteDifference(int derivative, int samples, double period) {
+  public static LinearFilter finiteDifference(
+      int derivative, int samples, int[] stencil, double period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
-    // <p>For a given list of stencil points s of length n and the order of
+    // For a given list of stencil points s of length n and the order of
     // derivative d < n, the finite difference coefficients can be obtained by
     // solving the following linear system for the vector a.
     //
-    // <pre>
     // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
     // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
     // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
-    // </pre>
     //
-    // <p>where δᵢ,ⱼ are the Kronecker delta. For backward finite difference,
-    // the stencil points are the range [-n + 1, 0]. The FIR gains are the
-    // elements of the vector a in reverse order divided by hᵈ.
+    // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
+    // vector a in reverse order divided by hᵈ.
     //
-    // <p>The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
 
     if (derivative < 1) {
       throw new IllegalArgumentException(
@@ -192,8 +191,7 @@ public class LinearFilter {
     var S = new SimpleMatrix(samples, samples);
     for (int row = 0; row < samples; ++row) {
       for (int col = 0; col < samples; ++col) {
-        double s = 1 - samples + col;
-        S.set(row, col, Math.pow(s, row));
+        S.set(row, col, Math.pow(stencil[col], row));
       }
     }
 
@@ -211,9 +209,34 @@ public class LinearFilter {
       ffGains[i] = a.get(samples - i - 1, 0);
     }
 
-    double[] fbGains = new double[0];
+    return new LinearFilter(ffGains, new double[0]);
+  }
 
-    return new LinearFilter(ffGains, fbGains);
+  /**
+   * Creates a backward finite difference filter that computes the nth derivative of the input given
+   * the specified number of samples.
+   *
+   * <p>For example, a first derivative filter that uses two samples and a sample period of 20 ms
+   * would be
+   *
+   * <pre><code>
+   * LinearFilter.backwardFiniteDifference(1, 2, 0.02);
+   * </code></pre>
+   *
+   * @param derivative The order of the derivative to compute.
+   * @param samples The number of samples to use to compute the given derivative. This must be one
+   *     more than the order of derivative or higher.
+   * @param period The period in seconds between samples taken by the user.
+   * @return Linear filter.
+   */
+  public static LinearFilter backwardFiniteDifference(int derivative, int samples, double period) {
+    // Generate stencil points from -(samples - 1) to 0
+    int[] stencil = new int[samples];
+    for (int i = 0; i < samples; ++i) {
+      stencil[i] = -(samples - 1) + i;
+    }
+
+    return finiteDifference(derivative, samples, stencil, period);
   }
 
   /** Reset the filter state. */

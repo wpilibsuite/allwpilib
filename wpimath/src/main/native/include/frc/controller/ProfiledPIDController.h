@@ -193,8 +193,8 @@ class ProfiledPIDController
    * @param maximumInput The maximum value expected from the input.
    */
   void EnableContinuousInput(Distance_t minimumInput, Distance_t maximumInput) {
-    m_controller.EnableContinuousInput(minimumInput.template to<double>(),
-                                       maximumInput.template to<double>());
+    m_controller.EnableContinuousInput(minimumInput.value(),
+                                       maximumInput.value());
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
   }
@@ -224,11 +224,11 @@ class ProfiledPIDController
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  void SetTolerance(
-      Distance_t positionTolerance,
-      Velocity_t velocityTolerance = std::numeric_limits<double>::infinity()) {
-    m_controller.SetTolerance(positionTolerance.template to<double>(),
-                              velocityTolerance.template to<double>());
+  void SetTolerance(Distance_t positionTolerance,
+                    Velocity_t velocityTolerance =
+                        Velocity_t(std::numeric_limits<double>::infinity())) {
+    m_controller.SetTolerance(positionTolerance.value(),
+                              velocityTolerance.value());
   }
 
   /**
@@ -273,8 +273,8 @@ class ProfiledPIDController
 
     frc::TrapezoidProfile<Distance> profile{m_constraints, m_goal, m_setpoint};
     m_setpoint = profile.Calculate(GetPeriod());
-    return m_controller.Calculate(measurement.template to<double>(),
-                                  m_setpoint.position.template to<double>());
+    return m_controller.Calculate(measurement.value(),
+                                  m_setpoint.position.value());
   }
 
   /**
@@ -351,7 +351,7 @@ class ProfiledPIDController
     builder.AddDoubleProperty(
         "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
     builder.AddDoubleProperty(
-        "goal", [this] { return GetGoal().position.template to<double>(); },
+        "goal", [this] { return GetGoal().position.value(); },
         [this](double value) { SetGoal(Distance_t{value}); });
   }
 

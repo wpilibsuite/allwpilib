@@ -2,17 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <limits>
+
 #include "frc/MathUtil.h"
 #include "gtest/gtest.h"
 #include "units/angle.h"
 
-#define EXPECT_UNITS_EQ(a, b) \
-  EXPECT_DOUBLE_EQ((a).to<double>(), (b).to<double>())
+#define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 
-#define EXPECT_UNITS_NEAR(a, b, c) \
-  EXPECT_NEAR((a).to<double>(), (b).to<double>(), c)
+#define EXPECT_UNITS_NEAR(a, b, c) EXPECT_NEAR((a).value(), (b).value(), c)
 
-TEST(MathUtilTest, ApplyDeadband) {
+TEST(MathUtilTest, ApplyDeadbandUnityScale) {
   // < 0
   EXPECT_DOUBLE_EQ(-1.0, frc::ApplyDeadband(-1.0, 0.02));
   EXPECT_DOUBLE_EQ((-0.03 + 0.02) / (1.0 - 0.02),
@@ -29,6 +29,33 @@ TEST(MathUtilTest, ApplyDeadband) {
   EXPECT_DOUBLE_EQ((0.03 - 0.02) / (1.0 - 0.02),
                    frc::ApplyDeadband(0.03, 0.02));
   EXPECT_DOUBLE_EQ(1.0, frc::ApplyDeadband(1.0, 0.02));
+}
+
+TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
+  // < 0
+  EXPECT_DOUBLE_EQ(-2.5, frc::ApplyDeadband(-2.5, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(-0.02, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(-0.01, 0.02, 2.5));
+
+  // == 0
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.0, 0.02, 2.5));
+
+  // > 0
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.01, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(0.0, frc::ApplyDeadband(0.02, 0.02, 2.5));
+  EXPECT_DOUBLE_EQ(2.5, frc::ApplyDeadband(2.5, 0.02, 2.5));
+}
+
+TEST(MathUtilTest, ApplyDeadbandUnits) {
+  // < 0
+  EXPECT_DOUBLE_EQ(
+      -20, frc::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad).value());
+}
+
+TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
+  EXPECT_DOUBLE_EQ(
+      80.0,
+      frc::ApplyDeadband(100.0, 20.0, std::numeric_limits<double>::infinity()));
 }
 
 TEST(MathUtilTest, InputModulus) {

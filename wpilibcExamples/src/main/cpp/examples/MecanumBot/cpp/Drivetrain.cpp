@@ -22,13 +22,13 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
       m_feedforward.Calculate(wheelSpeeds.rearRight);
 
   const double frontLeftOutput = m_frontLeftPIDController.Calculate(
-      m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.to<double>());
+      m_frontLeftEncoder.GetRate(), wheelSpeeds.frontLeft.value());
   const double frontRightOutput = m_frontRightPIDController.Calculate(
-      m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.to<double>());
+      m_frontRightEncoder.GetRate(), wheelSpeeds.frontRight.value());
   const double backLeftOutput = m_backLeftPIDController.Calculate(
-      m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.to<double>());
+      m_backLeftEncoder.GetRate(), wheelSpeeds.rearLeft.value());
   const double backRightOutput = m_backRightPIDController.Calculate(
-      m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.to<double>());
+      m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.value());
 
   m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
                               frontLeftFeedforward);
@@ -47,7 +47,7 @@ void Drivetrain::Drive(units::meters_per_second_t xSpeed,
       fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
                           xSpeed, ySpeed, rot, m_gyro.GetRotation2d())
                     : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
-  wheelSpeeds.Normalize(kMaxSpeed);
+  wheelSpeeds.Desaturate(kMaxSpeed);
   SetSpeeds(wheelSpeeds);
 }
 

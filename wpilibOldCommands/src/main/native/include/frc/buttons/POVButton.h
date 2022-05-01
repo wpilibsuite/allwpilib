@@ -8,6 +8,12 @@
 #include "frc/buttons/Button.h"
 
 namespace frc {
+
+/**
+ * A Button that gets its state from a POV on a GenericHID.
+ *
+ * <p>This class is provided by the OldCommands VendorDep
+ */
 class POVButton : public Button {
  public:
   /**

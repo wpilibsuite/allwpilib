@@ -35,7 +35,7 @@ class PCMTest : public testing::Test {
   frc::DigitalInput m_fakeSolenoid2{TestBench::kFakeSolenoid2Channel};
 
   void Reset() {
-    m_pneumaticsModule.SetClosedLoopControl(false);
+    m_pneumaticsModule.DisableCompressor();
     m_fakePressureSwitch.Set(false);
   }
 };
@@ -46,7 +46,7 @@ class PCMTest : public testing::Test {
 TEST_F(PCMTest, PressureSwitch) {
   Reset();
 
-  m_pneumaticsModule.SetClosedLoopControl(true);
+  m_pneumaticsModule.EnableCompressorDigital();
 
   // Turn on the compressor
   m_fakePressureSwitch.Set(true);

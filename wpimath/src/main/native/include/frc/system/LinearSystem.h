@@ -6,8 +6,9 @@
 
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/StateSpaceUtil.h"
 #include "frc/system/Discretization.h"
 #include "units/time.h"
@@ -21,10 +22,18 @@ namespace frc {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
+ * @tparam Outputs Number of outputs.
  */
 template <int States, int Inputs, int Outputs>
 class LinearSystem {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+  using OutputVector = Vectord<Outputs>;
+
   /**
    * Constructs a discrete plant with the given continuous system coefficients.
    *
@@ -32,11 +41,33 @@ class LinearSystem {
    * @param B    Input matrix.
    * @param C    Output matrix.
    * @param D    Feedthrough matrix.
+   * @throws std::domain_error if any matrix element isn't finite.
    */
-  LinearSystem(const Eigen::Matrix<double, States, States>& A,
-               const Eigen::Matrix<double, States, Inputs>& B,
-               const Eigen::Matrix<double, Outputs, States>& C,
-               const Eigen::Matrix<double, Outputs, Inputs>& D) {
+  LinearSystem(const Matrixd<States, States>& A,
+               const Matrixd<States, Inputs>& B,
+               const Matrixd<Outputs, States>& C,
+               const Matrixd<Outputs, Inputs>& D) {
+    if (!A.allFinite()) {
+      throw std::domain_error(
+          "Elements of A aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!B.allFinite()) {
+      throw std::domain_error(
+          "Elements of B aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!C.allFinite()) {
+      throw std::domain_error(
+          "Elements of C aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+    if (!D.allFinite()) {
+      throw std::domain_error(
+          "Elements of D aren't finite. This is usually due to model "
+          "implementation errors.");
+    }
+
     m_A = A;
     m_B = B;
     m_C = C;
@@ -51,7 +82,7 @@ class LinearSystem {
   /**
    * Returns the system matrix A.
    */
-  const Eigen::Matrix<double, States, States>& A() const { return m_A; }
+  const Matrixd<States, States>& A() const { return m_A; }
 
   /**
    * Returns an element of the system matrix A.
@@ -64,7 +95,7 @@ class LinearSystem {
   /**
    * Returns the input matrix B.
    */
-  const Eigen::Matrix<double, States, Inputs>& B() const { return m_B; }
+  const Matrixd<States, Inputs>& B() const { return m_B; }
 
   /**
    * Returns an element of the input matrix B.
@@ -77,7 +108,7 @@ class LinearSystem {
   /**
    * Returns the output matrix C.
    */
-  const Eigen::Matrix<double, Outputs, States>& C() const { return m_C; }
+  const Matrixd<Outputs, States>& C() const { return m_C; }
 
   /**
    * Returns an element of the output matrix C.
@@ -90,7 +121,7 @@ class LinearSystem {
   /**
    * Returns the feedthrough matrix D.
    */
-  const Eigen::Matrix<double, Outputs, Inputs>& D() const { return m_D; }
+  const Matrixd<Outputs, Inputs>& D() const { return m_D; }
 
   /**
    * Returns an element of the feedthrough matrix D.
@@ -110,11 +141,10 @@ class LinearSystem {
    * @param clampedU The control input.
    * @param dt       Timestep for model update.
    */
-  Eigen::Vector<double, States> CalculateX(
-      const Eigen::Vector<double, States>& x,
-      const Eigen::Vector<double, Inputs>& clampedU, units::second_t dt) const {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
+  StateVector CalculateX(const StateVector& x, const InputVector& clampedU,
+                         units::second_t dt) const {
+    Matrixd<States, States> discA;
+    Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
 
     return discA * x + discB * clampedU;
@@ -129,9 +159,8 @@ class LinearSystem {
    * @param x The current state.
    * @param clampedU The control input.
    */
-  Eigen::Vector<double, Outputs> CalculateY(
-      const Eigen::Vector<double, States>& x,
-      const Eigen::Vector<double, Inputs>& clampedU) const {
+  OutputVector CalculateY(const StateVector& x,
+                          const InputVector& clampedU) const {
     return m_C * x + m_D * clampedU;
   }
 
@@ -139,22 +168,22 @@ class LinearSystem {
   /**
    * Continuous system matrix.
    */
-  Eigen::Matrix<double, States, States> m_A;
+  Matrixd<States, States> m_A;
 
   /**
    * Continuous input matrix.
    */
-  Eigen::Matrix<double, States, Inputs> m_B;
+  Matrixd<States, Inputs> m_B;
 
   /**
    * Output matrix.
    */
-  Eigen::Matrix<double, Outputs, States> m_C;
+  Matrixd<Outputs, States> m_C;
 
   /**
    * Feedthrough matrix.
    */
-  Eigen::Matrix<double, Outputs, Inputs> m_D;
+  Matrixd<Outputs, Inputs> m_D;
 };
 
 }  // namespace frc

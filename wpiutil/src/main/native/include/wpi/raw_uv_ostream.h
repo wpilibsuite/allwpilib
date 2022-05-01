@@ -53,6 +53,11 @@ class raw_uv_ostream : public raw_ostream {
 
   void flush() = delete;
 
+  /**
+   * Resets the amount of allocated space.
+   */
+  void reset() { m_left = 0; }
+
  private:
   void write_impl(const char* data, size_t len) override;
   uint64_t current_pos() const override;

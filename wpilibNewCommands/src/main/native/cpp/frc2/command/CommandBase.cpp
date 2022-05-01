@@ -26,6 +26,10 @@ void CommandBase::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
   m_requirements.insert(requirements.begin(), requirements.end());
 }
 
+void CommandBase::AddRequirements(Subsystem* requirement) {
+  m_requirements.insert(requirement);
+}
+
 wpi::SmallSet<Subsystem*, 4> CommandBase::GetRequirements() const {
   return m_requirements;
 }

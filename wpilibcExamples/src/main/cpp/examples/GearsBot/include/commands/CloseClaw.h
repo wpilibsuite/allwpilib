@@ -14,7 +14,7 @@
  */
 class CloseClaw : public frc2::CommandHelper<frc2::CommandBase, CloseClaw> {
  public:
-  explicit CloseClaw(Claw* claw);
+  explicit CloseClaw(Claw& claw);
   void Initialize() override;
   bool IsFinished() override;
   void End(bool interrupted) override;

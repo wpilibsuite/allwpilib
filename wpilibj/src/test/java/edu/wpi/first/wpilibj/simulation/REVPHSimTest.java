@@ -10,11 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.CompressorConfigType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsHub;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.simulation.testutils.BooleanCallback;
 import edu.wpi.first.wpilibj.simulation.testutils.DoubleCallback;
+import edu.wpi.first.wpilibj.simulation.testutils.EnumCallback;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -30,7 +32,7 @@ class REVPHSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PneumaticsHub ph = new PneumaticsHub(1)) {
+        PneumaticHub ph = new PneumaticHub(1)) {
       assertTrue(sim.getInitialized());
     }
     assertFalse(sim.getInitialized());
@@ -40,7 +42,7 @@ class REVPHSimTest {
   void solenoidOutputTest() {
     HAL.initialize(500, 0);
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
@@ -96,7 +98,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorOnCallback(callback, false)) {
       assertFalse(ph.getCompressor());
       assertFalse(sim.getCompressorOn());
@@ -109,22 +111,62 @@ class REVPHSimTest {
   }
 
   @Test
-  void setClosedLoopEnabled() {
+  void setEnableDigital() {
     HAL.initialize(500, 0);
 
     REVPHSim sim = new REVPHSim(1);
-    BooleanCallback callback = new BooleanCallback();
+    EnumCallback callback = new EnumCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
-        CallbackStore cb = sim.registerClosedLoopEnabledCallback(callback, false)) {
-      ph.setClosedLoopControl(false);
-      assertFalse(ph.getClosedLoopControl());
+    try (PneumaticHub ph = new PneumaticHub(1);
+        CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
+      ph.disableCompressor();
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
 
-      ph.setClosedLoopControl(true);
-      assertTrue(sim.getClosedLoopEnabled());
-      assertTrue(ph.getClosedLoopControl());
+      ph.enableCompressorDigital();
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Digital.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Digital);
       assertTrue(callback.wasTriggered());
-      assertTrue(callback.getSetValue());
+      assertEquals(callback.getSetValue(), CompressorConfigType.Digital.getValue());
+    }
+  }
+
+  @Test
+  void setEnableAnalog() {
+    HAL.initialize(500, 0);
+
+    REVPHSim sim = new REVPHSim(1);
+    EnumCallback callback = new EnumCallback();
+
+    try (PneumaticHub ph = new PneumaticHub(1);
+        CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
+      ph.disableCompressor();
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+
+      ph.enableCompressorAnalog(1, 2);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Analog.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Analog);
+      assertTrue(callback.wasTriggered());
+      assertEquals(callback.getSetValue(), CompressorConfigType.Analog.getValue());
+    }
+  }
+
+  @Test
+  void setEnableHybrid() {
+    HAL.initialize(500, 0);
+
+    REVPHSim sim = new REVPHSim(1);
+    EnumCallback callback = new EnumCallback();
+
+    try (PneumaticHub ph = new PneumaticHub(1);
+        CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
+      ph.disableCompressor();
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Disabled);
+
+      ph.enableCompressorHybrid(1, 2);
+      assertEquals(sim.getCompressorConfigType(), CompressorConfigType.Hybrid.getValue());
+      assertEquals(ph.getCompressorConfigType(), CompressorConfigType.Hybrid);
+      assertTrue(callback.wasTriggered());
+      assertEquals(callback.getSetValue(), CompressorConfigType.Hybrid.getValue());
     }
   }
 
@@ -135,7 +177,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerPressureSwitchCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 
@@ -154,7 +196,7 @@ class REVPHSimTest {
     REVPHSim sim = new REVPHSim(1);
     DoubleCallback callback = new DoubleCallback();
 
-    try (PneumaticsHub ph = new PneumaticsHub(1);
+    try (PneumaticHub ph = new PneumaticHub(1);
         CallbackStore cb = sim.registerCompressorCurrentCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 

@@ -15,6 +15,22 @@ namespace frc {
 
 class Command;
 
+/**
+ * This class defines a major component of the robot.
+ *
+ * A good example of a subsystem is the drivetrain, or a claw if the robot has
+ * one.
+ *
+ * All motors should be a part of a subsystem. For instance, all the wheel
+ * motors should be a part of some kind of "Drivetrain" subsystem.
+ *
+ * Subsystems are used within the command system as requirements for Command.
+ * Only one command which requires a subsystem can run at a time. Also,
+ * subsystems can have default commands which are started if there is no command
+ * running which requires this subsystem.
+ *
+ * This class is provided by the OldCommands VendorDep
+ */
 class Subsystem : public wpi::Sendable, public wpi::SendableHelper<Subsystem> {
   friend class Scheduler;
 

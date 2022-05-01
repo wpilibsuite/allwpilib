@@ -10,6 +10,8 @@ import static edu.wpi.first.wpilibj.util.ErrorMessages.requireNonNullParam;
  * A Command that runs instantly; it will initialize, execute once, and end on the same iteration of
  * the scheduler. Users can either pass in a Runnable and a set of requirements, or else subclass
  * this command if desired.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class InstantCommand extends CommandBase {
   private final Runnable m_toRun;

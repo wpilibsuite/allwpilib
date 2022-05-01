@@ -7,11 +7,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
-#include "frc/estimator/KalmanFilterLatencyCompensator.h"
+#include "frc/EigenCore.h"
 #include "frc/estimator/UnscentedKalmanFilter.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
+#include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "units/time.h"
 
@@ -31,19 +31,24 @@ namespace frc {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * Our state-space system is:
+ * The state-space system used internally has the following states (x), inputs
+ * (u), and outputs (y):
  *
- * <strong> x = [[x, y, theta, dist_l, dist_r]]ᵀ </strong> in the field
- * coordinate system.
+ * <strong> x = [x, y, theta, dist_l, dist_r]ᵀ </strong> in the field coordinate
+ * system containing x position, y position, heading, left encoder distance,
+ * and right encoder distance.
  *
- * <strong> u = [[d_l, d_r, dtheta]]ᵀ </strong> (robot-relative velocities) --
- * NB: using velocities make things considerably easier, because it means that
+ * <strong> u = [v_x, v_y, omega]ᵀ </strong> containing x velocity, y velocity,
+ * and angular velocity in the field coordinate system.
+ *
+ * NB: Using velocities make things considerably easier, because it means that
  * teams don't have to worry about getting an accurate model. Basically, we
  * suspect that it's easier for teams to get good encoder data than it is for
- * them to perform system identification well enough to get a good model
+ * them to perform system identification well enough to get a good model.
  *
- * <strong>y = [[x, y, theta]]ᵀ </strong> from vision,
- * or <strong>y = [[dist_l, dist_r, theta]] </strong> from encoders and gyro.
+ * <strong> y = [x, y, theta]ᵀ </strong> from vision containing x position, y
+ * position, and heading; or <strong>y = [dist_l, dist_r, theta] </strong>
+ * containing left encoder position, right encoder position, and gyro heading.
  */
 class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
  public:
@@ -122,6 +127,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
    *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
+   *
    * @param visionRobotPose The pose of the robot as measured by the vision
    *                        camera.
    * @param timestamp       The timestamp of the vision measurement in seconds.
@@ -142,6 +151,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
    *
    * This method can be called as infrequently as you want, as long as you are
    * calling Update() every loop.
+   *
+   * To promote stability of the pose estimate and make it robust to bad vision
+   * data, we recommend only adding vision measurements that are already within
+   * one meter or so of the current pose estimate.
    *
    * Note that the vision measurement standard deviations passed into this
    * method will continue to apply to future measurements until a subsequent
@@ -209,13 +222,10 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
  private:
   UnscentedKalmanFilter<5, 3, 3> m_observer;
-  KalmanFilterLatencyCompensator<5, 3, 3, UnscentedKalmanFilter<5, 3, 3>>
-      m_latencyCompensator;
-  std::function<void(const Eigen::Vector<double, 3>& u,
-                     const Eigen::Vector<double, 3>& y)>
-      m_visionCorrect;
+  TimeInterpolatableBuffer<Pose2d> m_poseBuffer{1.5_s};
+  std::function<void(const Vectord<3>& u, const Vectord<3>& y)> m_visionCorrect;
 
-  Eigen::Matrix<double, 3, 3> m_visionContR;
+  Matrixd<3, 3> m_visionContR;
 
   units::second_t m_nominalDt;
   units::second_t m_prevTime = -1_s;
@@ -225,13 +235,12 @@ class WPILIB_DLLEXPORT DifferentialDrivePoseEstimator {
 
   template <int Dim>
   static wpi::array<double, Dim> StdDevMatrixToArray(
-      const Eigen::Vector<double, Dim>& stdDevs);
+      const Vectord<Dim>& stdDevs);
 
-  static Eigen::Vector<double, 5> F(const Eigen::Vector<double, 5>& x,
-                                    const Eigen::Vector<double, 3>& u);
-  static Eigen::Vector<double, 5> FillStateVector(const Pose2d& pose,
-                                                  units::meter_t leftDistance,
-                                                  units::meter_t rightDistance);
+  static Vectord<5> F(const Vectord<5>& x, const Vectord<3>& u);
+  static Vectord<5> FillStateVector(const Pose2d& pose,
+                                    units::meter_t leftDistance,
+                                    units::meter_t rightDistance);
 };
 
 }  // namespace frc

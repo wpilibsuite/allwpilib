@@ -6,10 +6,11 @@
 
 #include <cstddef>
 
+#include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
@@ -65,8 +66,8 @@ class SwerveDriveKinematics {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).template to<double>(),
-        0, 1, (+m_modules[i].X()).template to<double>();
+        1, 0, (-m_modules[i].Y()).value(),
+        0, 1, (+m_modules[i].X()).value();
       // clang-format on
     }
 
@@ -82,8 +83,8 @@ class SwerveDriveKinematics {
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).template to<double>(),
-        0, 1, (+m_modules[i].X()).template to<double>();
+        1, 0, (-m_modules[i].Y()).value(),
+        0, 1, (+m_modules[i].X()).value();
       // clang-format on
     }
 
@@ -114,7 +115,7 @@ class SwerveDriveKinematics {
    * @return An array containing the module states. Use caution because these
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
-   * NormalizeWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
+   * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
    * units::meters_per_second_t) function to rectify this issue. In addition,
    * you can leverage the power of C++17 to directly assign the module states to
    * variables:
@@ -159,29 +160,35 @@ class SwerveDriveKinematics {
       wpi::array<SwerveModuleState, NumModules> moduleStates) const;
 
   /**
-   * Normalizes the wheel speeds using some max attainable speed. Sometimes,
-   * after inverse kinematics, the requested speed from a/several modules may be
-   * above the max attainable speed for the driving motor on that module. To fix
-   * this issue, one can "normalize" all the wheel speeds to make sure that all
-   * requested module speeds are below the absolute threshold, while maintaining
-   * the ratio of speeds between modules.
+   * Renormalizes the wheel speeds if any individual speed is above the
+   * specified maximum.
+   *
+   * Sometimes, after inverse kinematics, the requested speed
+   * from one or more modules may be above the max attainable speed for the
+   * driving motor on that module. To fix this issue, one can reduce all the
+   * wheel speeds to make sure that all requested module speeds are at-or-below
+   * the absolute threshold, while maintaining the ratio of speeds between
+   * modules.
    *
    * @param moduleStates Reference to array of module states. The array will be
    * mutated with the normalized speeds!
    * @param attainableMaxSpeed The absolute max speed that a module can reach.
    */
-  static void NormalizeWheelSpeeds(
+  static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
       units::meters_per_second_t attainableMaxSpeed);
 
  private:
-  mutable Eigen::Matrix<double, NumModules * 2, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Eigen::Matrix<double, NumModules * 2, 3>>
-      m_forwardKinematics;
+  mutable Matrixd<NumModules * 2, 3> m_inverseKinematics;
+  Eigen::HouseholderQR<Matrixd<NumModules * 2, 3>> m_forwardKinematics;
   wpi::array<Translation2d, NumModules> m_modules;
 
   mutable Translation2d m_previousCoR;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    SwerveDriveKinematics<4>;
+
 }  // namespace frc
 
 #include "SwerveDriveKinematics.inc"

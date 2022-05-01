@@ -141,3 +141,8 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
       config.EndVelocity(), config.MaxVelocity(), config.MaxAcceleration(),
       config.IsReversed());
 }
+
+void TrajectoryGenerator::SetErrorHandler(
+    std::function<void(const char*)> func) {
+  s_errorFunc = std::move(func);
+}

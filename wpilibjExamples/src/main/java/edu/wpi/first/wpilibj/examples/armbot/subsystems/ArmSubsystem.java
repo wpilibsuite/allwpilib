@@ -19,7 +19,7 @@ public class ArmSubsystem extends ProfiledPIDSubsystem {
       new QuadratureEncoder(ArmConstants.kEncoderPorts[0], ArmConstants.kEncoderPorts[1]);
   private final ArmFeedforward m_feedforward =
       new ArmFeedforward(
-          ArmConstants.kSVolts, ArmConstants.kCosVolts,
+          ArmConstants.kSVolts, ArmConstants.kGVolts,
           ArmConstants.kVVoltSecondPerRad, ArmConstants.kAVoltSecondSquaredPerRad);
 
   /** Create a new ArmSubsystem. */

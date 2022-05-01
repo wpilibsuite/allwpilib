@@ -190,7 +190,7 @@ static size_t thread_stack_size(void) {
      * on the architecture.
      */
     if (lim.rlim_cur >= 8192)
-      if (lim.rlim_cur >= PTHREAD_STACK_MIN)
+      if (lim.rlim_cur >= (rlim_t) PTHREAD_STACK_MIN)
         return lim.rlim_cur;
   }
 #endif
@@ -232,7 +232,7 @@ int uv_thread_create_ex(uv_thread_t* tid,
     /* Round up to the nearest page boundary. */
     stack_size = (stack_size + pagesize - 1) &~ (pagesize - 1);
 #ifdef PTHREAD_STACK_MIN
-    if (stack_size < PTHREAD_STACK_MIN)
+    if (stack_size < (size_t) PTHREAD_STACK_MIN)
       stack_size = PTHREAD_STACK_MIN;
 #endif
   }

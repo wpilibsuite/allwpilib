@@ -94,8 +94,7 @@ public class TimedRobot extends IterativeRobotBase {
   }
 
   @Override
-  @SuppressWarnings("NoFinalizer")
-  protected void finalize() {
+  public void close() {
     NotifierJNI.stopNotifier(m_notifier);
     NotifierJNI.cleanNotifier(m_notifier);
   }

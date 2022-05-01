@@ -32,7 +32,7 @@ void StackTraceWalker::OnOutput(LPCTSTR szText) {
 
 namespace wpi {
 
-std::string GetStackTrace(int offset) {
+std::string GetStackTraceDefault(int offset) {
   // TODO: implement offset
   std::string output;
   StackTraceWalker walker(output);

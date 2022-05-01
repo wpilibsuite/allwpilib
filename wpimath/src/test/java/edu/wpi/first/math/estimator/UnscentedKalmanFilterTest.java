@@ -29,9 +29,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class UnscentedKalmanFilterTest {
+class UnscentedKalmanFilterTest {
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
-  public static Matrix<N6, N1> getDynamics(Matrix<N6, N1> x, Matrix<N2, N1> u) {
+  private static Matrix<N6, N1> getDynamics(Matrix<N6, N1> x, Matrix<N2, N1> u) {
     var motors = DCMotor.getCIM(2);
 
     var gHigh = 7.08;
@@ -69,19 +69,19 @@ public class UnscentedKalmanFilterTest {
         k2 * ((C1 * vl) + (C2 * Vl)) + k1 * ((C1 * vr) + (C2 * Vr)));
   }
 
-  @SuppressWarnings("ParameterName")
-  public static Matrix<N4, N1> getLocalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
+  @SuppressWarnings({"PMD.UnusedFormalParameter", "ParameterName"})
+  private static Matrix<N4, N1> getLocalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
     return VecBuilder.fill(x.get(2, 0), x.get(3, 0), x.get(4, 0), x.get(5, 0));
   }
 
-  @SuppressWarnings("ParameterName")
-  public static Matrix<N6, N1> getGlobalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
+  @SuppressWarnings({"PMD.UnusedFormalParameter", "ParameterName"})
+  private static Matrix<N6, N1> getGlobalMeasurementModel(Matrix<N6, N1> x, Matrix<N2, N1> u) {
     return x.copy();
   }
 
   @Test
   @SuppressWarnings("LocalVariableName")
-  public void testInit() {
+  void testInit() {
     assertDoesNotThrow(
         () -> {
           UnscentedKalmanFilter<N6, N2, N4> observer =
@@ -104,7 +104,7 @@ public class UnscentedKalmanFilterTest {
 
   @SuppressWarnings("LocalVariableName")
   @Test
-  public void testConvergence() {
+  void testConvergence() {
     double dtSeconds = 0.00505;
     double rbMeters = 0.8382 / 2.0; // Robot radius
 
@@ -206,7 +206,7 @@ public class UnscentedKalmanFilterTest {
 
   @Test
   @SuppressWarnings({"LocalVariableName", "ParameterName"})
-  public void testLinearUKF() {
+  void testLinearUKF() {
     var dt = 0.020;
     var plant = LinearSystemId.identifyVelocitySystem(0.02, 0.006);
     var observer =
@@ -236,7 +236,7 @@ public class UnscentedKalmanFilterTest {
   }
 
   @Test
-  public void testUnscentedTransform() {
+  void testUnscentedTransform() {
     // From FilterPy
     var ret =
         UnscentedKalmanFilter.unscentedTransform(

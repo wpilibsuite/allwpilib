@@ -29,6 +29,8 @@ import java.util.function.Supplier;
  * <p>Advanced teams seeking more flexibility (for example, those who wish to use the onboard PID
  * functionality of a "smart" motor controller) may use the secondary constructor that omits the PID
  * and feedforward functionality, returning only the raw wheel speeds from the RAMSETE controller.
+ *
+ * <p>This class is provided by the NewCommands VendorDep
  */
 public class RamseteCommand extends CommandBase {
   private final Timer m_timer = new Timer();
@@ -117,7 +119,8 @@ public class RamseteCommand extends CommandBase {
     m_pose = requireNonNullParam(pose, "pose", "RamseteCommand");
     m_follower = requireNonNullParam(follower, "follower", "RamseteCommand");
     m_kinematics = requireNonNullParam(kinematics, "kinematics", "RamseteCommand");
-    m_output = requireNonNullParam(outputMetersPerSecond, "output", "RamseteCommand");
+    m_output =
+        requireNonNullParam(outputMetersPerSecond, "outputMetersPerSecond", "RamseteCommand");
 
     m_feedforward = null;
     m_speeds = null;

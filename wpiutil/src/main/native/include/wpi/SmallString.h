@@ -181,21 +181,6 @@ public:
   }
 
   /// @}
-  /// @name Substring Operations
-  /// @{
-
-  /// Return a reference to the substring from [Start, Start + N).
-  ///
-  /// \param Start The index of the starting character in the substring; if
-  /// the index is npos or greater than the length of the string then the
-  /// empty substring will be returned.
-  ///
-  /// \param N The number of characters to included in the substring. If \p N
-  /// exceeds the number of characters remaining in the string, the string
-  /// suffix (starting with \p Start) will be returned.
-  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
-    return str().substr(Start, N);
-  }
 
   // Extra methods.
 

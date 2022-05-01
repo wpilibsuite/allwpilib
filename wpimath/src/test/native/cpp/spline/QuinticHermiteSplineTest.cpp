@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <chrono>
-#include <iostream>
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
@@ -40,25 +39,25 @@ class QuinticHermiteSplineTest : public ::testing::Test {
 
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
-      EXPECT_LT(std::abs(twist.dx.to<double>()),
-                SplineParameterizer::kMaxDx.to<double>());
-      EXPECT_LT(std::abs(twist.dy.to<double>()),
-                SplineParameterizer::kMaxDy.to<double>());
-      EXPECT_LT(std::abs(twist.dtheta.to<double>()),
-                SplineParameterizer::kMaxDtheta.to<double>());
+      EXPECT_LT(std::abs(twist.dx.value()),
+                SplineParameterizer::kMaxDx.value());
+      EXPECT_LT(std::abs(twist.dy.value()),
+                SplineParameterizer::kMaxDy.value());
+      EXPECT_LT(std::abs(twist.dtheta.value()),
+                SplineParameterizer::kMaxDtheta.value());
     }
 
     // Check first point.
-    EXPECT_NEAR(poses.front().first.X().to<double>(), a.X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Y().to<double>(), a.Y().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Rotation().Radians().to<double>(),
-                a.Rotation().Radians().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.front().first.X().value(), a.X().value(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Y().value(), a.Y().value(), 1E-9);
+    EXPECT_NEAR(poses.front().first.Rotation().Radians().value(),
+                a.Rotation().Radians().value(), 1E-9);
 
     // Check last point.
-    EXPECT_NEAR(poses.back().first.X().to<double>(), b.X().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Y().to<double>(), b.Y().to<double>(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Rotation().Radians().to<double>(),
-                b.Rotation().Radians().to<double>(), 1E-9);
+    EXPECT_NEAR(poses.back().first.X().value(), b.X().value(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Y().value(), b.Y().value(), 1E-9);
+    EXPECT_NEAR(poses.back().first.Rotation().Radians().value(),
+                b.Rotation().Radians().value(), 1E-9);
 
     static_cast<void>(duration);
   }

@@ -7,18 +7,11 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/array.h>
 
-#include "Eigen/Cholesky"
-#include "Eigen/Core"
-#include "Eigen/Eigenvalues"
-#include "drake/math/discrete_algebraic_riccati_equation.h"
-#include "frc/StateSpaceUtil.h"
-#include "frc/system/Discretization.h"
+#include "frc/EigenCore.h"
 #include "frc/system/LinearSystem.h"
 #include "units/time.h"
-#include "unsupported/Eigen/MatrixFunctions"
 
 namespace frc {
-namespace detail {
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic
@@ -27,10 +20,19 @@ namespace detail {
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ *
+ * @tparam States Number of states.
+ * @tparam Inputs Number of inputs.
  */
 template <int States, int Inputs>
-class LinearQuadraticRegulatorImpl {
+class LinearQuadraticRegulator {
  public:
+  using StateVector = Vectord<States>;
+  using InputVector = Vectord<Inputs>;
+
+  using StateArray = wpi::array<double, States>;
+  using InputArray = wpi::array<double, Inputs>;
+
   /**
    * Constructs a controller with the given coefficients and plant.
    *
@@ -40,12 +42,9 @@ class LinearQuadraticRegulatorImpl {
    * @param dt     Discretization timestep.
    */
   template <int Outputs>
-  LinearQuadraticRegulatorImpl(
-      const LinearSystem<States, Inputs, Outputs>& plant,
-      const wpi::array<double, States>& Qelems,
-      const wpi::array<double, Inputs>& Relems, units::second_t dt)
-      : LinearQuadraticRegulatorImpl(plant.A(), plant.B(), Qelems, Relems, dt) {
-  }
+  LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
+                           const StateArray& Qelems, const InputArray& Relems,
+                           units::second_t dt);
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -56,13 +55,10 @@ class LinearQuadraticRegulatorImpl {
    * @param Relems The maximum desired control effort for each input.
    * @param dt     Discretization timestep.
    */
-  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
-                               const Eigen::Matrix<double, States, Inputs>& B,
-                               const wpi::array<double, States>& Qelems,
-                               const wpi::array<double, Inputs>& Relems,
-                               units::second_t dt)
-      : LinearQuadraticRegulatorImpl(A, B, MakeCostMatrix(Qelems),
-                                     MakeCostMatrix(Relems), dt) {}
+  LinearQuadraticRegulator(const Matrixd<States, States>& A,
+                           const Matrixd<States, Inputs>& B,
+                           const StateArray& Qelems, const InputArray& Relems,
+                           units::second_t dt);
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -73,25 +69,11 @@ class LinearQuadraticRegulatorImpl {
    * @param R  The input cost matrix.
    * @param dt Discretization timestep.
    */
-  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
-                               const Eigen::Matrix<double, States, Inputs>& B,
-                               const Eigen::Matrix<double, States, States>& Q,
-                               const Eigen::Matrix<double, Inputs, Inputs>& R,
-                               units::second_t dt) {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
-
-    Eigen::Matrix<double, States, States> S =
-        drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R);
-
-    // K = (BᵀSB + R)⁻¹BᵀSA
-    m_K = (discB.transpose() * S * discB + R)
-              .llt()
-              .solve(discB.transpose() * S * discA);
-
-    Reset();
-  }
+  LinearQuadraticRegulator(const Matrixd<States, States>& A,
+                           const Matrixd<States, Inputs>& B,
+                           const Matrixd<States, States>& Q,
+                           const Matrixd<Inputs, Inputs>& R,
+                           units::second_t dt);
 
   /**
    * Constructs a controller with the given coefficients and plant.
@@ -103,35 +85,20 @@ class LinearQuadraticRegulatorImpl {
    * @param N  The state-input cross-term cost matrix.
    * @param dt Discretization timestep.
    */
-  LinearQuadraticRegulatorImpl(const Eigen::Matrix<double, States, States>& A,
-                               const Eigen::Matrix<double, States, Inputs>& B,
-                               const Eigen::Matrix<double, States, States>& Q,
-                               const Eigen::Matrix<double, Inputs, Inputs>& R,
-                               const Eigen::Matrix<double, States, Inputs>& N,
-                               units::second_t dt) {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
+  LinearQuadraticRegulator(const Matrixd<States, States>& A,
+                           const Matrixd<States, Inputs>& B,
+                           const Matrixd<States, States>& Q,
+                           const Matrixd<Inputs, Inputs>& R,
+                           const Matrixd<States, Inputs>& N,
+                           units::second_t dt);
 
-    Eigen::Matrix<double, States, States> S =
-        drake::math::DiscreteAlgebraicRiccatiEquation(discA, discB, Q, R, N);
-
-    // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
-    m_K = (B.transpose() * S * B + R)
-              .llt()
-              .solve(discB.transpose() * S * discA + N.transpose());
-
-    Reset();
-  }
-
-  LinearQuadraticRegulatorImpl(LinearQuadraticRegulatorImpl&&) = default;
-  LinearQuadraticRegulatorImpl& operator=(LinearQuadraticRegulatorImpl&&) =
-      default;
+  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
+  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
 
   /**
    * Returns the controller matrix K.
    */
-  const Eigen::Matrix<double, Inputs, States>& K() const { return m_K; }
+  const Matrixd<Inputs, States>& K() const { return m_K; }
 
   /**
    * Returns an element of the controller matrix K.
@@ -146,7 +113,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The reference vector.
    */
-  const Eigen::Vector<double, States>& R() const { return m_r; }
+  const StateVector& R() const { return m_r; }
 
   /**
    * Returns an element of the reference vector r.
@@ -155,14 +122,14 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the reference vector.
    */
-  double R(int i) const { return m_r(i, 0); }
+  double R(int i) const { return m_r(i); }
 
   /**
    * Returns the control input vector u.
    *
    * @return The control input.
    */
-  const Eigen::Vector<double, Inputs>& U() const { return m_u; }
+  const InputVector& U() const { return m_u; }
 
   /**
    * Returns an element of the control input vector u.
@@ -171,7 +138,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @return The row of the control input vector.
    */
-  double U(int i) const { return m_u(i, 0); }
+  double U(int i) const { return m_u(i); }
 
   /**
    * Resets the controller.
@@ -186,11 +153,7 @@ class LinearQuadraticRegulatorImpl {
    *
    * @param x The current state x.
    */
-  Eigen::Vector<double, Inputs> Calculate(
-      const Eigen::Vector<double, States>& x) {
-    m_u = m_K * (m_r - x);
-    return m_u;
-  }
+  InputVector Calculate(const StateVector& x);
 
   /**
    * Returns the next output of the controller.
@@ -198,12 +161,7 @@ class LinearQuadraticRegulatorImpl {
    * @param x     The current state x.
    * @param nextR The next reference vector r.
    */
-  Eigen::Vector<double, Inputs> Calculate(
-      const Eigen::Vector<double, States>& x,
-      const Eigen::Vector<double, States>& nextR) {
-    m_r = nextR;
-    return Calculate(x);
-  }
+  InputVector Calculate(const StateVector& x, const StateVector& nextR);
 
   /**
    * Adjusts LQR controller gain to compensate for a pure time delay in the
@@ -223,208 +181,26 @@ class LinearQuadraticRegulatorImpl {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         units::second_t dt, units::second_t inputDelay) {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
-
-    m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
-  }
+                         units::second_t dt, units::second_t inputDelay);
 
  private:
   // Current reference
-  Eigen::Vector<double, States> m_r;
+  StateVector m_r;
 
   // Computed controller output
-  Eigen::Vector<double, Inputs> m_u;
+  InputVector m_u;
 
   // Controller gain
-  Eigen::Matrix<double, Inputs, States> m_K;
+  Matrixd<Inputs, States> m_K;
 };
 
-}  // namespace detail
-
-template <int States, int Inputs>
-class LinearQuadraticRegulator
-    : public detail::LinearQuadraticRegulatorImpl<States, Inputs> {
- public:
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param plant  The plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
-                           const wpi::array<double, States>& Qelems,
-                           const wpi::array<double, Inputs>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A      Continuous system matrix of the plant being controlled.
-   * @param B      Continuous input matrix of the plant being controlled.
-   * @param Qelems The maximum desired error tolerance for each state.
-   * @param Relems The maximum desired control effort for each input.
-   * @param dt     Discretization timestep.
-   */
-  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
-                           const Eigen::Matrix<double, States, Inputs>& B,
-                           const wpi::array<double, States>& Qelems,
-                           const wpi::array<double, Inputs>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
-                                 MakeCostMatrix(Relems), dt) {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A  Continuous system matrix of the plant being controlled.
-   * @param B  Continuous input matrix of the plant being controlled.
-   * @param Q  The state cost matrix.
-   * @param R  The input cost matrix.
-   * @param dt Discretization timestep.
-   */
-  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
-                           const Eigen::Matrix<double, States, Inputs>& B,
-                           const Eigen::Matrix<double, States, States>& Q,
-                           const Eigen::Matrix<double, Inputs, Inputs>& R,
-                           units::second_t dt)
-      : detail::LinearQuadraticRegulatorImpl<States, Inputs>{A, B, Q, R, dt} {}
-
-  /**
-   * Constructs a controller with the given coefficients and plant.
-   *
-   * @param A  Continuous system matrix of the plant being controlled.
-   * @param B  Continuous input matrix of the plant being controlled.
-   * @param Q  The state cost matrix.
-   * @param R  The input cost matrix.
-   * @param N  The state-input cross-term cost matrix.
-   * @param dt Discretization timestep.
-   */
-  LinearQuadraticRegulator(const Eigen::Matrix<double, States, States>& A,
-                           const Eigen::Matrix<double, States, Inputs>& B,
-                           const Eigen::Matrix<double, States, States>& Q,
-                           const Eigen::Matrix<double, Inputs, Inputs>& R,
-                           const Eigen::Matrix<double, States, Inputs>& N,
-                           units::second_t dt)
-      : detail::LinearQuadraticRegulatorImpl<States, Inputs>{A, B, Q,
-                                                             R, N, dt} {}
-
-  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
-  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
-};
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-class WPILIB_DLLEXPORT LinearQuadraticRegulator<1, 1>
-    : public detail::LinearQuadraticRegulatorImpl<1, 1> {
- public:
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<1, 1, Outputs>& plant,
-                           const wpi::array<double, 1>& Qelems,
-                           const wpi::array<double, 1>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
-                           const Eigen::Matrix<double, 1, 1>& B,
-                           const wpi::array<double, 1>& Qelems,
-                           const wpi::array<double, 1>& Relems,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
-                           const Eigen::Matrix<double, 1, 1>& B,
-                           const Eigen::Matrix<double, 1, 1>& Q,
-                           const Eigen::Matrix<double, 1, 1>& R,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 1, 1>& A,
-                           const Eigen::Matrix<double, 1, 1>& B,
-                           const Eigen::Matrix<double, 1, 1>& Q,
-                           const Eigen::Matrix<double, 1, 1>& R,
-                           const Eigen::Matrix<double, 1, 1>& N,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
-  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
-};
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-class WPILIB_DLLEXPORT LinearQuadraticRegulator<2, 1>
-    : public detail::LinearQuadraticRegulatorImpl<2, 1> {
- public:
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<2, 1, Outputs>& plant,
-                           const wpi::array<double, 2>& Qelems,
-                           const wpi::array<double, 1>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 1>& B,
-                           const wpi::array<double, 2>& Qelems,
-                           const wpi::array<double, 1>& Relems,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 1>& B,
-                           const Eigen::Matrix<double, 2, 2>& Q,
-                           const Eigen::Matrix<double, 1, 1>& R,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 1>& B,
-                           const Eigen::Matrix<double, 2, 2>& Q,
-                           const Eigen::Matrix<double, 1, 1>& R,
-                           const Eigen::Matrix<double, 2, 1>& N,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
-  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
-};
-
-// Template specializations are used here to make common state-input pairs
-// compile faster.
-template <>
-class WPILIB_DLLEXPORT LinearQuadraticRegulator<2, 2>
-    : public detail::LinearQuadraticRegulatorImpl<2, 2> {
- public:
-  template <int Outputs>
-  LinearQuadraticRegulator(const LinearSystem<2, 2, Outputs>& plant,
-                           const wpi::array<double, 2>& Qelems,
-                           const wpi::array<double, 2>& Relems,
-                           units::second_t dt)
-      : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 2>& B,
-                           const wpi::array<double, 2>& Qelems,
-                           const wpi::array<double, 2>& Relems,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 2>& B,
-                           const Eigen::Matrix<double, 2, 2>& Q,
-                           const Eigen::Matrix<double, 2, 2>& R,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(const Eigen::Matrix<double, 2, 2>& A,
-                           const Eigen::Matrix<double, 2, 2>& B,
-                           const Eigen::Matrix<double, 2, 2>& Q,
-                           const Eigen::Matrix<double, 2, 2>& R,
-                           const Eigen::Matrix<double, 2, 2>& N,
-                           units::second_t dt);
-
-  LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;
-  LinearQuadraticRegulator& operator=(LinearQuadraticRegulator&&) = default;
-};
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    LinearQuadraticRegulator<1, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    LinearQuadraticRegulator<2, 1>;
+extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
+    LinearQuadraticRegulator<2, 2>;
 
 }  // namespace frc
+
+#include "LinearQuadraticRegulator.inc"

@@ -105,7 +105,7 @@ static bool PWMsAnyInitialized() {
 }
 
 void PWMSimGui::Initialize() {
-  HALSimGui::halProvider.Register(
+  HALSimGui::halProvider->Register(
       "PWM Outputs", PWMsAnyInitialized,
       [] { return std::make_unique<PWMsSimModel>(); },
       [](glass::Window* win, glass::Model* model) {
@@ -113,7 +113,7 @@ void PWMSimGui::Initialize() {
         win->SetDefaultPos(910, 20);
         return glass::MakeFunctionView([=] {
           glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
-                             HALSimGui::halProvider.AreOutputsEnabled());
+                             HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

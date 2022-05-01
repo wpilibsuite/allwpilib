@@ -11,9 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.wpilibj.simulation.UltrasonicSim;
 import org.junit.jupiter.api.Test;
 
-public class UltrasonicTest {
+class UltrasonicTest {
   @Test
-  public void testUltrasonic() {
+  void testUltrasonic() {
     try (Ultrasonic ultrasonic = new Ultrasonic(0, 1)) {
       UltrasonicSim sim = new UltrasonicSim(ultrasonic);
 

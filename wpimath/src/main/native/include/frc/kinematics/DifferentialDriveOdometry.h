@@ -6,7 +6,6 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "DifferentialDriveKinematics.h"
 #include "frc/geometry/Pose2d.h"
 #include "units/length.h"
 

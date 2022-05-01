@@ -30,7 +30,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    *
    * @param name The ligament name.
    * @param length The ligament length.
-   * @param angle The ligament angle.
+   * @param angle The ligament angle in degrees.
    * @param lineWidth The ligament's line width.
    * @param color The ligament's color.
    */
@@ -48,7 +48,7 @@ public class MechanismLigament2d extends MechanismObject2d {
    *
    * @param name The ligament's name.
    * @param length The ligament's length.
-   * @param angle The ligament's angle relative to its parent.
+   * @param angle The ligament's angle relative to its parent in degrees.
    */
   public MechanismLigament2d(String name, double length, double angle) {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
@@ -57,7 +57,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   /**
    * Set the ligament's angle relative to its parent.
    *
-   * @param degrees the angle, in degrees
+   * @param degrees the angle in degrees
    */
   public synchronized void setAngle(double degrees) {
     m_angle = degrees;
@@ -76,7 +76,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   /**
    * Get the ligament's angle relative to its parent.
    *
-   * @return the angle, in degrees
+   * @return the angle in degrees
    */
   public synchronized double getAngle() {
     if (m_angleEntry != null) {
@@ -118,6 +118,32 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   /**
+   * Get the ligament color.
+   *
+   * @return the color of the line
+   */
+  public synchronized Color8Bit getColor() {
+    if (m_colorEntry != null) {
+      m_color = m_colorEntry.getString("");
+    }
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    if (m_color.length() == 7 && m_color.charAt(0) == '#') {
+      try {
+        r = Integer.parseInt(m_color.substring(1, 3), 16);
+        g = Integer.parseInt(m_color.substring(3, 5), 16);
+        b = Integer.parseInt(m_color.substring(5, 7), 16);
+      } catch (NumberFormatException e) {
+        r = 0;
+        g = 0;
+        b = 0;
+      }
+    }
+    return new Color8Bit(r, g, b);
+  }
+
+  /**
    * Set the line thickness.
    *
    * @param weight the line thickness
@@ -127,8 +153,20 @@ public class MechanismLigament2d extends MechanismObject2d {
     flush();
   }
 
+  /**
+   * Get the line thickness.
+   *
+   * @return the line thickness
+   */
+  public synchronized double getLineWeight() {
+    if (m_weightEntry != null) {
+      m_weight = m_weightEntry.getDouble(0.0);
+    }
+    return m_weight;
+  }
+
   @Override
-  protected synchronized void updateEntries(NetworkTable table) {
+  protected void updateEntries(NetworkTable table) {
     table.getEntry(".type").setString("line");
     m_angleEntry = table.getEntry("angle");
     m_lengthEntry = table.getEntry("length");
@@ -138,7 +176,7 @@ public class MechanismLigament2d extends MechanismObject2d {
   }
 
   /** Flush latest data to NT. */
-  private synchronized void flush() {
+  private void flush() {
     if (m_angleEntry != null) {
       m_angleEntry.setDouble(m_angle);
     }

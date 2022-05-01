@@ -7,7 +7,11 @@ package edu.wpi.first.wpilibj.drive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.MotorSafety;
 
-/** Common base class for drive platforms. */
+/**
+ * Common base class for drive platforms.
+ *
+ * <p>{@link edu.wpi.first.wpilibj.MotorSafety} is enabled by default.
+ */
 public abstract class RobotDriveBase extends MotorSafety {
   public static final double kDefaultDeadband = 0.02;
   public static final double kDefaultMaxOutput = 1.0;

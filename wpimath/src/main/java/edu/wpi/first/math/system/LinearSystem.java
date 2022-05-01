@@ -33,6 +33,7 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
    * @param b The input matrix B.
    * @param c The output matrix C.
    * @param d The feedthrough matrix D.
+   * @throws IllegalArgumentException if any matrix element isn't finite.
    */
   @SuppressWarnings("ParameterName")
   public LinearSystem(
@@ -40,6 +41,39 @@ public class LinearSystem<States extends Num, Inputs extends Num, Outputs extend
       Matrix<States, Inputs> b,
       Matrix<Outputs, States> c,
       Matrix<Outputs, Inputs> d) {
+    for (int row = 0; row < a.getNumRows(); ++row) {
+      for (int col = 0; col < a.getNumCols(); ++col) {
+        if (!Double.isFinite(a.get(row, col))) {
+          throw new IllegalArgumentException(
+              "Elements of A aren't finite. This is usually due to model implementation errors.");
+        }
+      }
+    }
+    for (int row = 0; row < b.getNumRows(); ++row) {
+      for (int col = 0; col < b.getNumCols(); ++col) {
+        if (!Double.isFinite(b.get(row, col))) {
+          throw new IllegalArgumentException(
+              "Elements of B aren't finite. This is usually due to model implementation errors.");
+        }
+      }
+    }
+    for (int row = 0; row < c.getNumRows(); ++row) {
+      for (int col = 0; col < c.getNumCols(); ++col) {
+        if (!Double.isFinite(c.get(row, col))) {
+          throw new IllegalArgumentException(
+              "Elements of C aren't finite. This is usually due to model implementation errors.");
+        }
+      }
+    }
+    for (int row = 0; row < d.getNumRows(); ++row) {
+      for (int col = 0; col < d.getNumCols(); ++col) {
+        if (!Double.isFinite(d.get(row, col))) {
+          throw new IllegalArgumentException(
+              "Elements of D aren't finite. This is usually due to model implementation errors.");
+        }
+      }
+    }
+
     this.m_A = a;
     this.m_B = b;
     this.m_C = c;

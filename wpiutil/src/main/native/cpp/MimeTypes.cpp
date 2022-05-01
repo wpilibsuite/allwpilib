@@ -4,6 +4,7 @@
 
 #include "wpi/MimeTypes.h"
 
+#include "wpi/StringExtras.h"
 #include "wpi/StringMap.h"
 
 namespace wpi {
@@ -53,11 +54,11 @@ std::string_view MimeTypeFromPath(std::string_view path) {
 
   auto pos = path.find_last_of("/");
   if (pos != std::string_view::npos) {
-    path = path.substr(pos + 1);
+    path = wpi::substr(path, pos + 1);
   }
   auto dot_pos = path.find_last_of(".");
   if (dot_pos > 0 && dot_pos != std::string_view::npos) {
-    auto type = mimeTypes.find(path.substr(dot_pos + 1));
+    auto type = mimeTypes.find(wpi::substr(path, dot_pos + 1));
     if (type != mimeTypes.end()) {
       return type->getValue();
     }

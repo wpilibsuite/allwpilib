@@ -10,11 +10,12 @@
 #include <stdexcept>
 #include <vector>
 
+#include <wpi/array.h>
 #include <wpi/circular_buffer.h>
 #include <wpi/span.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "units/time.h"
 #include "wpimath/MathShared.h"
 
@@ -125,7 +126,7 @@ class LinearFilter {
    */
   static LinearFilter<T> SinglePoleIIR(double timeConstant,
                                        units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
 
@@ -144,7 +145,7 @@ class LinearFilter {
    *                     user.
    */
   static LinearFilter<T> HighPass(double timeConstant, units::second_t period) {
-    double gain = std::exp(-period.to<double>() / timeConstant);
+    double gain = std::exp(-period.value() / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
 
@@ -167,6 +168,73 @@ class LinearFilter {
   }
 
   /**
+   * Creates a finite difference filter that computes the nth derivative of the
+   * input given the specified stencil points.
+   *
+   * Stencil points are the indices of the samples to use in the finite
+   * difference. 0 is the current sample, -1 is the previous sample, -2 is the
+   * sample before that, etc. Don't use positive stencil points (samples from
+   * the future) if the LinearFilter will be used for stream-based online
+   * filtering.
+   *
+   * @tparam Derivative The order of the derivative to compute.
+   * @tparam Samples    The number of samples to use to compute the given
+   *                    derivative. This must be one more than the order of
+   *                    derivative or higher.
+   * @param stencil     List of stencil points.
+   * @param period      The period in seconds between samples taken by the user.
+   */
+  template <int Derivative, int Samples>
+  static LinearFilter<T> FiniteDifference(
+      const wpi::array<int, Samples> stencil, units::second_t period) {
+    // See
+    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
+    //
+    // For a given list of stencil points s of length n and the order of
+    // derivative d < n, the finite difference coefficients can be obtained by
+    // solving the following linear system for the vector a.
+    //
+    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
+    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
+    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
+    //
+    // where δᵢ,ⱼ are the Kronecker delta. The FIR gains are the elements of the
+    // vector a in reverse order divided by hᵈ.
+    //
+    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
+
+    static_assert(Derivative >= 1,
+                  "Order of derivative must be greater than or equal to one.");
+    static_assert(Samples > 0, "Number of samples must be greater than zero.");
+    static_assert(Derivative < Samples,
+                  "Order of derivative must be less than number of samples.");
+
+    Matrixd<Samples, Samples> S;
+    for (int row = 0; row < Samples; ++row) {
+      for (int col = 0; col < Samples; ++col) {
+        S(row, col) = std::pow(stencil[col], row);
+      }
+    }
+
+    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
+    Vectord<Samples> d;
+    for (int i = 0; i < Samples; ++i) {
+      d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
+    }
+
+    Vectord<Samples> a =
+        S.householderQr().solve(d) / std::pow(period.value(), Derivative);
+
+    // Reverse gains list
+    std::vector<double> ffGains;
+    for (int i = Samples - 1; i >= 0; --i) {
+      ffGains.push_back(a(i));
+    }
+
+    return LinearFilter(ffGains, {});
+  }
+
+  /**
    * Creates a backward finite difference filter that computes the nth
    * derivative of the input given the specified number of samples.
    *
@@ -184,56 +252,14 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static auto BackwardFiniteDifference(units::second_t period) {
-    // See
-    // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
-    //
-    // For a given list of stencil points s of length n and the order of
-    // derivative d < n, the finite difference coefficients can be obtained by
-    // solving the following linear system for the vector a.
-    //
-    // @verbatim
-    // [s₁⁰   ⋯  sₙ⁰ ][a₁]      [ δ₀,d ]
-    // [ ⋮    ⋱  ⋮   ][⋮ ] = d! [  ⋮   ]
-    // [s₁ⁿ⁻¹ ⋯ sₙⁿ⁻¹][aₙ]      [δₙ₋₁,d]
-    // @endverbatim
-    //
-    // where δᵢ,ⱼ are the Kronecker delta. For backward finite difference, the
-    // stencil points are the range [-n + 1, 0]. The FIR gains are the elements
-    // of the vector a in reverse order divided by hᵈ.
-    //
-    // The order of accuracy of the approximation is of the form O(hⁿ⁻ᵈ).
-
-    static_assert(Derivative >= 1,
-                  "Order of derivative must be greater than or equal to one.");
-    static_assert(Samples > 0, "Number of samples must be greater than zero.");
-    static_assert(Derivative < Samples,
-                  "Order of derivative must be less than number of samples.");
-
-    Eigen::Matrix<double, Samples, Samples> S;
-    for (int row = 0; row < Samples; ++row) {
-      for (int col = 0; col < Samples; ++col) {
-        double s = 1 - Samples + col;
-        S(row, col) = std::pow(s, row);
-      }
-    }
-
-    // Fill in Kronecker deltas: https://en.wikipedia.org/wiki/Kronecker_delta
-    Eigen::Vector<double, Samples> d;
+  static LinearFilter<T> BackwardFiniteDifference(units::second_t period) {
+    // Generate stencil points from -(samples - 1) to 0
+    wpi::array<int, Samples> stencil{wpi::empty_array};
     for (int i = 0; i < Samples; ++i) {
-      d(i) = (i == Derivative) ? Factorial(Derivative) : 0.0;
+      stencil[i] = -(Samples - 1) + i;
     }
 
-    Eigen::Vector<double, Samples> a =
-        S.householderQr().solve(d) / std::pow(period.to<double>(), Derivative);
-
-    // Reverse gains list
-    std::vector<double> gains;
-    for (int i = Samples - 1; i >= 0; --i) {
-      gains.push_back(a(i));
-    }
-
-    return LinearFilter(gains, {});
+    return FiniteDifference<Derivative, Samples>(stencil, period);
   }
 
   /**

@@ -12,6 +12,8 @@
 namespace frc2 {
 /**
  * A command that prints a string when initialized.
+ *
+ * This class is provided by the NewCommands VendorDep
  */
 class PrintCommand : public CommandHelper<InstantCommand, PrintCommand> {
  public:

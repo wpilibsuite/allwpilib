@@ -16,13 +16,23 @@ import edu.wpi.first.math.system.NumericalJacobian;
 import java.util.function.BiFunction;
 
 /**
- * Kalman filters combine predictions from a model and measurements to give an estimate of the true
- * system state. This is useful because many states cannot be measured directly as a result of
+ * A Kalman filter combines predictions from a model and measurements to give an estimate of the
+ * true system state. This is useful because many states cannot be measured directly as a result of
  * sensor noise, or because the state is "hidden".
  *
- * <p>The Extended Kalman filter is just like the {@link KalmanFilter Kalman filter}, but we make a
- * linear approximation of nonlinear dynamics and/or nonlinear measurement models. This means that
- * the EKF works with nonlinear systems.
+ * <p>Kalman filters use a K gain matrix to determine whether to trust the model or measurements
+ * more. Kalman filter theory uses statistics to compute an optimal K gain which minimizes the sum
+ * of squares error in the state estimate. This K gain is used to correct the state estimate by some
+ * amount of the difference between the actual measurements and the measurements predicted by the
+ * model.
+ *
+ * <p>An extended Kalman filter supports nonlinear state and measurement models. It propagates the
+ * error covariance by linearizing the models around the state estimate, then applying the linear
+ * Kalman filter equations.
+ *
+ * <p>For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9 "Stochastic control
+ * theory".
  */
 @SuppressWarnings("ClassTypeParameterName")
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num>
@@ -123,7 +133,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     m_addFuncX = addFuncX;
 
     m_contQ = StateSpaceUtil.makeCovarianceMatrix(states, stateStdDevs);
-    this.m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
+    m_contR = StateSpaceUtil.makeCovarianceMatrix(outputs, measurementStdDevs);
     m_dtSeconds = dtSeconds;
 
     reset();
@@ -141,9 +151,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     final var discR = Discretization.discretizeR(m_contR, dtSeconds);
 
-    // IsStabilizable(Aᵀ, Cᵀ) will tell us if the system is observable.
-    boolean isObservable = StateSpaceUtil.isStabilizable(discA.transpose(), C.transpose());
-    if (isObservable && outputs.getNum() <= states.getNum()) {
+    if (StateSpaceUtil.isDetectable(discA, C) && outputs.getNum() <= states.getNum()) {
       m_initP =
           Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, discR);
     } else {
@@ -358,7 +366,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX.apply(m_xHat, K.times(residualFuncY.apply(y, h.apply(m_xHat, u))));
 
-    // Pₖ₊₁⁺ = (I − KC)Pₖ₊₁⁻
-    m_P = Matrix.eye(m_states).minus(K.times(C)).times(m_P);
+    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Use Joseph form for numerical stability
+    m_P =
+        Matrix.eye(m_states)
+            .minus(K.times(C))
+            .times(m_P)
+            .times(Matrix.eye(m_states).minus(K.times(C)).transpose())
+            .plus(K.times(discR).times(K.transpose()));
   }
 }

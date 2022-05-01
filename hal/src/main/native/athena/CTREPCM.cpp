@@ -335,8 +335,13 @@ HAL_Bool HAL_GetCTREPCMSolenoidVoltageFault(HAL_CTREPCMHandle handle,
 
 void HAL_ClearAllCTREPCMStickyFaults(HAL_CTREPCMHandle handle,
                                      int32_t* status) {
+  auto pcm = pcmHandles->Get(handle);
+  if (pcm == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
   uint8_t controlData[] = {0, 0, 0, 0x80};
-  HAL_WriteCANPacket(handle, controlData, sizeof(controlData), Control2,
+  HAL_WriteCANPacket(pcm->canHandle, controlData, sizeof(controlData), Control2,
                      status);
 }
 
@@ -393,7 +398,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
       (std::min)(static_cast<uint32_t>(durMs) / 10,
                  static_cast<uint32_t>(0xFF));
   HAL_WriteCANPacketRepeating(pcm->canHandle, pcm->oneShot.sol10MsPerUnit, 8,
-                              Control2, SendPeriod, status);
+                              Control3, SendPeriod, status);
 }
 
 }  // extern "C"

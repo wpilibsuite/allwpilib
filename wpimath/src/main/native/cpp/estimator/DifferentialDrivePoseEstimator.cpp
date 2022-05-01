@@ -19,9 +19,8 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     units::second_t nominalDt)
     : m_observer(
           &DifferentialDrivePoseEstimator::F,
-          [](const Eigen::Vector<double, 5>& x,
-             const Eigen::Vector<double, 3>& u) {
-            return Eigen::Vector<double, 3>{x(3, 0), x(4, 0), x(2, 0)};
+          [](const Vectord<5>& x, const Vectord<3>& u) {
+            return Vectord<3>{x(3, 0), x(4, 0), x(2, 0)};
           },
           stateStdDevs, localMeasurementStdDevs, frc::AngleMean<5, 5>(2),
           frc::AngleMean<3, 5>(2), frc::AngleResidual<5>(2),
@@ -30,11 +29,10 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
   SetVisionMeasurementStdDevs(visionMeasurmentStdDevs);
 
   // Create correction mechanism for vision measurements.
-  m_visionCorrect = [&](const Eigen::Vector<double, 3>& u,
-                        const Eigen::Vector<double, 3>& y) {
+  m_visionCorrect = [&](const Vectord<3>& u, const Vectord<3>& y) {
     m_observer.Correct<3>(
         u, y,
-        [](const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 3>&) {
+        [](const Vectord<5>& x, const Vectord<3>&) {
           return x.block<3, 1>(0, 0);
         },
         m_visionContR, frc::AngleMean<3, 5>(2), frc::AngleResidual<3>(2),
@@ -56,7 +54,7 @@ void DifferentialDrivePoseEstimator::ResetPosition(
     const Pose2d& pose, const Rotation2d& gyroAngle) {
   // Reset state estimate and error covariance
   m_observer.Reset();
-  m_latencyCompensator.Reset();
+  m_poseBuffer.Clear();
 
   m_observer.SetXhat(FillStateVector(pose, 0_m, 0_m));
 
@@ -72,9 +70,11 @@ Pose2d DifferentialDrivePoseEstimator::GetEstimatedPosition() const {
 
 void DifferentialDrivePoseEstimator::AddVisionMeasurement(
     const Pose2d& visionRobotPose, units::second_t timestamp) {
-  m_latencyCompensator.ApplyPastGlobalMeasurement<3>(
-      &m_observer, m_nominalDt, PoseTo3dVector(visionRobotPose),
-      m_visionCorrect, timestamp);
+  if (auto sample = m_poseBuffer.Sample(timestamp)) {
+    m_visionCorrect(Vectord<3>::Zero(),
+                    PoseTo3dVector(GetEstimatedPosition().TransformBy(
+                        visionRobotPose - sample.value())));
+  }
 }
 
 Pose2d DifferentialDrivePoseEstimator::Update(
@@ -95,41 +95,39 @@ Pose2d DifferentialDrivePoseEstimator::UpdateWithTime(
   auto angle = gyroAngle + m_gyroOffset;
   auto omega = (gyroAngle - m_previousAngle).Radians() / dt;
 
-  auto u = Eigen::Vector<double, 3>{
-      (wheelSpeeds.left + wheelSpeeds.right).to<double>() / 2.0, 0.0,
-      omega.to<double>()};
+  auto u = Vectord<3>{(wheelSpeeds.left + wheelSpeeds.right).value() / 2.0, 0.0,
+                      omega.value()};
 
   m_previousAngle = angle;
 
-  auto localY = Eigen::Vector<double, 3>{leftDistance.to<double>(),
-                                         rightDistance.to<double>(),
-                                         angle.Radians().to<double>()};
+  auto localY = Vectord<3>{leftDistance.value(), rightDistance.value(),
+                           angle.Radians().value()};
 
-  m_latencyCompensator.AddObserverState(m_observer, u, localY, currentTime);
+  m_poseBuffer.AddSample(currentTime, GetEstimatedPosition());
   m_observer.Predict(u, dt);
   m_observer.Correct(u, localY);
 
   return GetEstimatedPosition();
 }
 
-Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::F(
-    const Eigen::Vector<double, 5>& x, const Eigen::Vector<double, 3>& u) {
+Vectord<5> DifferentialDrivePoseEstimator::F(const Vectord<5>& x,
+                                             const Vectord<3>& u) {
   // Apply a rotation matrix. Note that we do not add x because Runge-Kutta does
   // that for us.
   auto& theta = x(2);
-  Eigen::Matrix<double, 5, 5> toFieldRotation{
+  Matrixd<5, 5> toFieldRotation{
       {std::cos(theta), -std::sin(theta), 0.0, 0.0, 0.0},
       {std::sin(theta), std::cos(theta), 0.0, 0.0, 0.0},
       {0.0, 0.0, 1.0, 0.0, 0.0},
       {0.0, 0.0, 0.0, 1.0, 0.0},
       {0.0, 0.0, 0.0, 0.0, 1.0}};
   return toFieldRotation *
-         Eigen::Vector<double, 5>{u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0)};
+         Vectord<5>{u(0, 0), u(1, 0), u(2, 0), u(0, 0), u(1, 0)};
 }
 
 template <int Dim>
 wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
-    const Eigen::Vector<double, Dim>& stdDevs) {
+    const Vectord<Dim>& stdDevs) {
   wpi::array<double, Dim> array;
   for (size_t i = 0; i < Dim; ++i) {
     array[i] = stdDevs(i);
@@ -137,11 +135,11 @@ wpi::array<double, Dim> DifferentialDrivePoseEstimator::StdDevMatrixToArray(
   return array;
 }
 
-Eigen::Vector<double, 5> DifferentialDrivePoseEstimator::FillStateVector(
+Vectord<5> DifferentialDrivePoseEstimator::FillStateVector(
     const Pose2d& pose, units::meter_t leftDistance,
     units::meter_t rightDistance) {
-  return Eigen::Vector<double, 5>{
-      pose.Translation().X().to<double>(), pose.Translation().Y().to<double>(),
-      pose.Rotation().Radians().to<double>(), leftDistance.to<double>(),
-      rightDistance.to<double>()};
+  return Vectord<5>{pose.Translation().X().value(),
+                    pose.Translation().Y().value(),
+                    pose.Rotation().Radians().value(), leftDistance.value(),
+                    rightDistance.value()};
 }

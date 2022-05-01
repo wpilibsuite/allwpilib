@@ -34,6 +34,11 @@ DriveSubsystem::DriveSubsystem()
   m_rearLeftEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_frontRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_rearRightEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
+  // We need to invert one side of the drivetrain so that positive voltages
+  // result in both sides moving forward. Depending on how your robot's
+  // gearbox is constructed, you might have to invert the left side instead.
+  m_frontRight.SetInverted(true);
+  m_rearRight.SetInverted(true);
 }
 
 void DriveSubsystem::Periodic() {

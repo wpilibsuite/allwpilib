@@ -18,7 +18,7 @@
 class SetDistanceToBox
     : public frc2::CommandHelper<frc2::PIDCommand, SetDistanceToBox> {
  public:
-  explicit SetDistanceToBox(double distance, Drivetrain* drivetrain);
+  explicit SetDistanceToBox(double distance, Drivetrain& drivetrain);
   void Initialize() override;
   bool IsFinished() override;
 

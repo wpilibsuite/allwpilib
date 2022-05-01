@@ -9,7 +9,7 @@
 using namespace frc;
 
 WaitCommand::WaitCommand(units::second_t timeout)
-    : TimedCommand(fmt::format("Wait({})", timeout.to<double>()), timeout) {}
+    : TimedCommand(fmt::format("Wait({})", timeout.value()), timeout) {}
 
 WaitCommand::WaitCommand(std::string_view name, units::second_t timeout)
     : TimedCommand(name, timeout) {}

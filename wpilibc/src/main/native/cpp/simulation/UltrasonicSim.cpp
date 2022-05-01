@@ -20,5 +20,5 @@ void UltrasonicSim::SetRangeValid(bool isValid) {
 }
 
 void UltrasonicSim::SetRange(units::meter_t range) {
-  m_simRange.Set(range.to<double>());
+  m_simRange.Set(range.value());
 }

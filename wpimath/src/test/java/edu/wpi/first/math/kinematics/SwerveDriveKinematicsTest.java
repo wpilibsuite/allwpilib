@@ -229,14 +229,14 @@ class SwerveDriveKinematicsTest {
   }
 
   @Test
-  void testNormalize() {
+  void testDesaturate() {
     SwerveModuleState fl = new SwerveModuleState(5, new Rotation2d());
     SwerveModuleState fr = new SwerveModuleState(6, new Rotation2d());
     SwerveModuleState bl = new SwerveModuleState(4, new Rotation2d());
     SwerveModuleState br = new SwerveModuleState(7, new Rotation2d());
 
     SwerveModuleState[] arr = {fl, fr, bl, br};
-    SwerveDriveKinematics.normalizeWheelSpeeds(arr, 5.5);
+    SwerveDriveKinematics.desaturateWheelSpeeds(arr, 5.5);
 
     double factor = 5.5 / 7.0;
 

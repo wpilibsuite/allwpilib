@@ -185,15 +185,18 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                         it.buildable = false
                         return
                     }
+                    lib project: ':cscore', library: 'cscore', linkage: 'static'
                     lib library: 'glassnt', linkage: 'static'
                     lib library: nativeName, linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                    nativeUtils.useRequiredLibrary(it, 'opencv_static')
                     nativeUtils.useRequiredLibrary(it, 'imgui_static')
                     if (it.targetPlatform.operatingSystem.isWindows()) {
                         it.linker.args << 'Gdi32.lib' << 'Shell32.lib' << 'd3d11.lib' << 'd3dcompiler.lib'
+                        it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
                     } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
                         it.linker.args << '-framework' << 'Metal' << '-framework' << 'MetalKit' << '-framework' << 'Cocoa' << '-framework' << 'IOKit' << '-framework' << 'CoreFoundation' << '-framework' << 'CoreVideo' << '-framework' << 'QuartzCore'
                     } else {

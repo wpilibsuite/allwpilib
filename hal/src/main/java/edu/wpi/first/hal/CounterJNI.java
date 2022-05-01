@@ -7,6 +7,11 @@ package edu.wpi.first.hal;
 import java.nio.IntBuffer;
 
 public class CounterJNI extends JNIWrapper {
+  public static final int TWO_PULSE = 0;
+  public static final int SEMI_PERIOD = 1;
+  public static final int PULSE_LENGTH = 2;
+  public static final int EXTERNAL_DIRECTION = 3;
+
   public static native int initializeCounter(int mode, IntBuffer index);
 
   public static native void freeCounter(int counterHandle);

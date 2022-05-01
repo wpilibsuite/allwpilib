@@ -9,6 +9,7 @@
 
 #include "glass/Context.h"
 #include "glass/DataSource.h"
+#include "glass/Storage.h"
 
 using namespace glass;
 
@@ -66,21 +67,21 @@ void glass::DisplayEncoder(EncoderModel* model) {
   int chB = model->GetChannelB();
 
   // build header label
-  std::string* name = GetStorage().GetStringRef("name");
+  std::string& name = GetStorage().GetString("name");
   char label[128];
-  if (!name->empty()) {
-    std::snprintf(label, sizeof(label), "%s [%d,%d]###name", name->c_str(), chA,
-                  chB);
+  if (!name.empty()) {
+    std::snprintf(label, sizeof(label), "%s [%d,%d]###header", name.c_str(),
+                  chA, chB);
   } else {
-    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###name", chA, chB);
+    std::snprintf(label, sizeof(label), "Encoder[%d,%d]###header", chA, chB);
   }
 
   // header
   bool open = CollapsingHeader(label);
 
   // context menu to change name
-  if (PopupEditName("name", name)) {
-    model->SetName(name->c_str());
+  if (PopupEditName("header", &name)) {
+    model->SetName(name);
   }
 
   if (!open) {
