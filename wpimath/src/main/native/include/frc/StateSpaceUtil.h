@@ -94,30 +94,6 @@ bool IsStabilizableImpl(const Matrixd<States, States>& A,
 }  // namespace detail
 
 /**
- * Creates a matrix from the given list of elements.
- *
- * The elements of the matrix are filled in in row-major order.
- *
- * @param elems An array of elements in the matrix.
- * @return A matrix containing the given elements.
- * @deprecated Use Eigen::Matrix or Eigen::Vector initializer list constructor.
- */
-template <int Rows, int Cols, typename... Ts,
-          typename =
-              std::enable_if_t<std::conjunction_v<std::is_same<double, Ts>...>>>
-WPI_DEPRECATED(
-    "Use Eigen::Matrix or Eigen::Vector initializer list constructor")
-Matrixd<Rows, Cols> MakeMatrix(Ts... elems) {
-  static_assert(
-      sizeof...(elems) == Rows * Cols,
-      "Number of provided elements doesn't match matrix dimensionality");
-
-  Matrixd<Rows, Cols> result;
-  detail::MatrixImpl<Rows, Cols>(result, elems...);
-  return result;
-}
-
-/**
  * Creates a cost matrix from the given vector for use with LQR.
  *
  * The cost matrix is constructed using Bryson's rule. The inverse square of
