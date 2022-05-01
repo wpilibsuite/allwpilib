@@ -137,9 +137,7 @@ class UnscentedKalmanFilter {
   /**
    * Returns the reconstructed error covariance matrix P.
    */
-  StateMatrix P() const {
-    return m_S.transpose() * m_S;
-  }
+  StateMatrix P() const { return m_S.transpose() * m_S; }
 
   /**
    * Set the current square-root error covariance matrix S by taking the square
