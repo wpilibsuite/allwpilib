@@ -35,15 +35,8 @@ class REVPHSim : public PneumaticsBaseSim {
 
   explicit REVPHSim(const PneumaticsBase& pneumatics);
 
-  /**
-   * Register a callback to be run when a solenoid is initialized on a channel.
-   *
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
-      NotifyCallback callback, bool initialNotify);
+      NotifyCallback callback, bool initialNotify) override;
 
   bool GetInitialized() const override;
 
