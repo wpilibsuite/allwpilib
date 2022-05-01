@@ -13,7 +13,7 @@ using namespace frc::sim;
 
 PneumaticsBaseSim::PneumaticsBaseSim(int module) : m_index{module} {}
 
-static std::shared_ptr<PneumaticsBaseSim> GetForType(
+std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
     int module, PneumaticsModuleType type) {
   switch (type) {
     case PneumaticsModuleType::REVPH:
@@ -22,3 +22,4 @@ static std::shared_ptr<PneumaticsBaseSim> GetForType(
     case PneumaticsModuleType::CTREPCM:
       return std::make_shared<CTREPCMSim>(module);
   }
+}
