@@ -9,6 +9,7 @@
 #include <wpi/interpolating_map.h>
 
 #include "frc/EigenCore.h"
+#include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/trajectory/Trajectory.h"
@@ -31,14 +32,6 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT LTVDifferentialDriveController {
  public:
-  /**
-   * Motor voltages for a differential drive.
-   */
-  struct WheelVoltages {
-    units::volt_t left = 0_V;
-    units::volt_t right = 0_V;
-  };
-
   /**
    * Constructs a linear time-varying differential drive controller.
    *
@@ -95,12 +88,11 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param leftVelocityRef  The desired left velocity.
    * @param rightVelocityRef The desired right velocity.
    */
-  WheelVoltages Calculate(const Pose2d& currentPose,
-                          units::meters_per_second_t leftVelocity,
-                          units::meters_per_second_t rightVelocity,
-                          const Pose2d& poseRef,
-                          units::meters_per_second_t leftVelocityRef,
-                          units::meters_per_second_t rightVelocityRef);
+  DifferentialDriveWheelVoltages Calculate(
+      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
+      units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
+      units::meters_per_second_t leftVelocityRef,
+      units::meters_per_second_t rightVelocityRef);
 
   /**
    * Returns the left and right output voltages of the LTV controller.
@@ -114,10 +106,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param desiredState The desired pose, linear velocity, and angular velocity
    *                     from a trajectory.
    */
-  WheelVoltages Calculate(const Pose2d& currentPose,
-                          units::meters_per_second_t leftVelocity,
-                          units::meters_per_second_t rightVelocity,
-                          const Trajectory::State& desiredState);
+  DifferentialDriveWheelVoltages Calculate(
+      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
+      units::meters_per_second_t rightVelocity,
+      const Trajectory::State& desiredState);
 
  private:
   units::meter_t m_trackwidth;

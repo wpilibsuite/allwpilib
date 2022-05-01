@@ -19,8 +19,7 @@ DifferentialDriveAccelerationLimiter::DifferentialDriveAccelerationLimiter(
       m_maxLinearAccel{maxLinearAccel},
       m_maxAngularAccel{maxAngularAccel} {}
 
-DifferentialDriveAccelerationLimiter::WheelVoltages
-DifferentialDriveAccelerationLimiter::Calculate(
+DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
     units::meters_per_second_t leftVelocity,
     units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
     units::volt_t rightVoltage) {
