@@ -58,16 +58,14 @@ public class DoubleSolenoidSim {
   public DoubleSolenoid.Value get() {
     boolean fwdState = m_module.getSolenoidOutput(m_fwd);
     boolean revState = m_module.getSolenoidOutput(m_rev);
-    if (!fwdState && !revState) {
-      return DoubleSolenoid.Value.kOff;
-    } else if (fwdState && !revState) {
+    if (fwdState && !revState) {
       return DoubleSolenoid.Value.kForward;
     } else if (!fwdState && revState) {
       return DoubleSolenoid.Value.kReverse;
     } else {
-      throw new AssertionError(
-          "In a double solenoid, both fwd and rev can't be on at the same time.");
+      return DoubleSolenoid.Value.kOff;
     }
+
   }
 
   /**
@@ -76,28 +74,8 @@ public class DoubleSolenoidSim {
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final DoubleSolenoid.Value value) {
-    boolean forward;
-    boolean reverse;
-
-    switch (value) {
-      case kOff:
-        forward = false;
-        reverse = false;
-        break;
-      case kForward:
-        forward = true;
-        reverse = false;
-        break;
-      case kReverse:
-        forward = false;
-        reverse = true;
-        break;
-      default:
-        throw new AssertionError("Illegal value: " + value);
-    }
-
-    m_module.setSolenoidOutput(m_fwd, forward);
-    m_module.setSolenoidOutput(m_rev, reverse);
+    m_module.setSolenoidOutput(m_fwd, value == DoubleSolenoid.Value.kForward);
+    m_module.setSolenoidOutput(m_rev, value == DoubleSolenoid.Value.kReverse);
   }
 
   /**
@@ -105,7 +83,7 @@ public class DoubleSolenoidSim {
    *
    * @return the wrapped {@link PneumaticsBaseSim} object.
    */
-  public PneumaticsBaseSim getPCMSim() {
+  public PneumaticsBaseSim getModuleSim() {
     return m_module;
   }
 }
