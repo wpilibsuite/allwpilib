@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hal/Types.h>
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 
@@ -56,6 +57,19 @@ class Compressor : public wpi::Sendable,
 
   Compressor(Compressor&&) = default;
   Compressor& operator=(Compressor&&) = default;
+
+  /**
+   * Check if compressor output is active.
+   * To (re)enable the compressor use EnableDigital() or EnableAnalog(...).
+   *
+   * @return true if the compressor is on.
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor
+   * use IsEnabled().
+   */
+  WPI_DEPRECATED(
+      "To avoid confusion in thinking this (re)enables the compressor use "
+      "IsEnabled()")
+  bool Enabled() const;
 
   /**
    * Returns whether the compressor is active or not.

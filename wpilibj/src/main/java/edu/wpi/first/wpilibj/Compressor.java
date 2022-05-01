@@ -63,6 +63,18 @@ public class Compressor implements Sendable, AutoCloseable {
   }
 
   /**
+   * Get the status of the compressor. To (re)enable the compressor use enableDigital() or
+   * enableAnalog(...).
+   *
+   * @return true if the compressor is on
+   * @deprecated To avoid confusion in thinking this (re)enables the compressor use IsEnabled().
+   */
+  @Deprecated(since = "2023", forRemoval = true)
+  public boolean enabled() {
+    return isEnabled();
+  }
+
+  /**
    * Returns whether the compressor is active or not.
    *
    * @return true if the compressor is on - otherwise false.
