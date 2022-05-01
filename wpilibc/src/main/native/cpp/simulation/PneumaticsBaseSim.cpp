@@ -4,9 +4,7 @@
 
 #include "frc/simulation/PneumaticsBaseSim.h"
 
-
 #include "frc/Errors.h"
-
 #include "frc/PneumaticsModuleType.h"
 #include "frc/simulation/CTREPCMSim.h"
 #include "frc/simulation/REVPHSim.h"
@@ -24,9 +22,9 @@ std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
 
     case PneumaticsModuleType::CTREPCM:
       return std::make_shared<CTREPCMSim>(module);
-    
+
     default:
       throw FRC_MakeError(err::InvalidParameter, "{}",
-                      static_cast<int>(module));
+                          static_cast<int>(module));
   }
 }

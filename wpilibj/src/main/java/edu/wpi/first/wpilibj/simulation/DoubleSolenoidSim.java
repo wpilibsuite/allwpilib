@@ -65,7 +65,6 @@ public class DoubleSolenoidSim {
     } else {
       return DoubleSolenoid.Value.kOff;
     }
-
   }
 
   /**
