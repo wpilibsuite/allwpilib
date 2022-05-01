@@ -5,7 +5,6 @@
 #pragma once
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 #include "frc/RobotBase.h"
 #include "frc/Watchdog.h"
@@ -206,17 +205,6 @@ class IterativeRobotBase : public RobotBase {
    * Gets time period between calls to Periodic() functions.
    */
   units::second_t GetPeriod() const;
-
-  /**
-   * Constructor for IterativeRobotBase.
-   *
-   * @param period Period in seconds.
-   *
-   * @deprecated Use IterativeRobotBase(units::second_t period) with unit-safety
-   * instead
-   */
-  WPI_DEPRECATED("Use constructor with unit-safety instead.")
-  explicit IterativeRobotBase(double period);
 
   /**
    * Constructor for IterativeRobotBase.

@@ -75,12 +75,6 @@ std::shared_ptr<Component> Instance::GetOrAdd(wpi::Sendable* sendable) {
   return data;
 }
 
-LiveWindow* LiveWindow::GetInstance() {
-  ::GetInstance();
-  static LiveWindow instance;
-  return &instance;
-}
-
 void LiveWindow::SetEnabledCallback(std::function<void()> func) {
   ::GetInstance().enabled = func;
 }

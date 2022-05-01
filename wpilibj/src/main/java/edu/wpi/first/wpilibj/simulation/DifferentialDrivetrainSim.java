@@ -426,14 +426,7 @@ public class DifferentialDrivetrainSim {
   public enum KitbotWheelSize {
     kSixInch(Units.inchesToMeters(6)),
     kEightInch(Units.inchesToMeters(8)),
-    kTenInch(Units.inchesToMeters(10)),
-
-    @Deprecated
-    SixInch(Units.inchesToMeters(6)),
-    @Deprecated
-    EightInch(Units.inchesToMeters(8)),
-    @Deprecated
-    TenInch(Units.inchesToMeters(10));
+    kTenInch(Units.inchesToMeters(10));
 
     @SuppressWarnings("MemberName")
     public final double value;

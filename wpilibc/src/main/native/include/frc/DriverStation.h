@@ -7,7 +7,6 @@
 #include <string>
 
 #include <units/time.h>
-#include <wpi/deprecated.h>
 
 namespace wpi::log {
 class DataLog;
@@ -23,15 +22,6 @@ class DriverStation final {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
-
-  /**
-   * Return a reference to the singleton DriverStation.
-   *
-   * @return Reference to the DS instance
-   * @deprecated Use the static methods
-   */
-  WPI_DEPRECATED("Use static methods")
-  static DriverStation& GetInstance();
 
   static constexpr int kJoystickPorts = 6;
 
@@ -200,27 +190,8 @@ class DriverStation final {
    * Check if the DS is commanding teleop mode.
    *
    * @return True if the robot is being commanded to be in teleop mode
-   * @deprecated Use IsTeleop() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleop() instead")
-  static bool IsOperatorControl();
-
-  /**
-   * Check if the DS is commanding teleop mode.
-   *
-   * @return True if the robot is being commanded to be in teleop mode
    */
   static bool IsTeleop();
-
-  /**
-   * Check if the DS is commanding teleop mode and if it has enabled the robot.
-   *
-   * @return True if the robot is being commanded to be in teleop mode and
-   * enabled.
-   * @deprecated Use IsTeleopEnabled() instead.
-   */
-  WPI_DEPRECATED("Use IsTeleopEnabled() instead")
-  static bool IsOperatorControlEnabled();
 
   /**
    * Check if the DS is commanding teleop mode and if it has enabled the robot.
@@ -394,17 +365,6 @@ class DriverStation final {
    *                 autonomous code.
    */
   static void InAutonomous(bool entering);
-
-  /**
-   * Only to be used to tell the Driver Station what code you claim to be
-   * executing for diagnostic purposes only.
-   *
-   * @param entering If true, starting teleop code; if false, leaving teleop
-   *                 code.
-   * @deprecated Use InTeleop() instead.
-   */
-  WPI_DEPRECATED("Use InTeleop() instead")
-  static void InOperatorControl(bool entering);
 
   /**
    * Only to be used to tell the Driver Station what code you claim to be

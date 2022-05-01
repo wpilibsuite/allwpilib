@@ -12,6 +12,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"

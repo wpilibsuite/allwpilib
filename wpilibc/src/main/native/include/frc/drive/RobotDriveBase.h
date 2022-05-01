@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc/MotorSafety.h"
@@ -72,17 +71,6 @@ class RobotDriveBase : public MotorSafety {
   std::string GetDescription() const override = 0;
 
  protected:
-  /**
-   * Returns 0.0 if the given value is within the specified range around zero.
-   * The remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
-   *
-   * @param value    value to clip
-   * @param deadband range around zero
-   * @deprecated Use ApplyDeadband() in frc/MathUtil.h.
-   */
-  WPI_DEPRECATED("Use ApplyDeadband() in frc/MathUtil.h")
-  static double ApplyDeadband(double value, double deadband);
-
   /**
    * Renormalize all wheel speeds if the magnitude of any wheel is greater than
    * 1.0.

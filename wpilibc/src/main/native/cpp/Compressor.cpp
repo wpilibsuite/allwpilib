@@ -34,18 +34,6 @@ Compressor::~Compressor() {
   }
 }
 
-void Compressor::Start() {
-  EnableDigital();
-}
-
-void Compressor::Stop() {
-  Disable();
-}
-
-bool Compressor::Enabled() const {
-  return IsEnabled();
-}
-
 bool Compressor::IsEnabled() const {
   return m_module->GetCompressor();
 }

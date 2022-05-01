@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
+
 #include "frc/AnalogPotentiometer.h"
 #include "frc/PIDSource.h"
 
