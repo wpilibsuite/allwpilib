@@ -38,56 +38,18 @@ class CTREPCMSim : public PneumaticsBaseSim {
 
   void SetInitialized(bool initialized) override;
 
-  /**
-   * Register a callback to be run when the solenoid output on a channel
-   * changes.
-   *
-   * @param channel the channel to monitor
-   * @param callback the callback
-   * @param initialNotify should the callback be run with the initial value
-   * @return the CallbackStore object associated with this callback
-   */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterSolenoidOutputCallback(
       int channel, NotifyCallback callback, bool initialNotify) override;
 
-  /**
-   * Check the solenoid output on a specific channel.
-   *
-   * @param channel the channel to check
-   * @return the solenoid output
-   */
   bool GetSolenoidOutput(int channel) const override;
 
-  /**
-   * Change the solenoid output on a specific channel.
-   *
-   * @param channel the channel to check
-   * @param solenoidOutput the new solenoid output
-   */
   void SetSolenoidOutput(int channel, bool solenoidOutput) override;
 
-  /**
-   * Register a callback to be run when the compressor activates.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterCompressorOnCallback(
       NotifyCallback callback, bool initialNotify) override;
 
-  /**
-   * Check if the compressor is on.
-   *
-   * @return true if the compressor is active
-   */
   bool GetCompressorOn() const override;
 
-  /**
-   * Set whether the compressor is active.
-   *
-   * @param compressorOn the new value
-   */
   void SetCompressorOn(bool compressorOn) override;
 
   /**
@@ -166,19 +128,9 @@ class CTREPCMSim : public PneumaticsBaseSim {
    */
   void SetCompressorCurrent(double compressorCurrent) override;
 
-  /**
-   * Get the current value of all solenoid outputs.
-   *
-   * @return the solenoid outputs (1 bit per output)
-   */
-  uint8_t GetAllSolenoidOutputs() const;
+  uint8_t GetAllSolenoidOutputs() const override;
 
-  /**
-   * Change all of the solenoid outputs.
-   *
-   * @param outputs the new solenoid outputs (1 bit per output)
-   */
-  void SetAllSolenoidOutputs(uint8_t outputs);
+  void SetAllSolenoidOutputs(uint8_t outputs) override;
 
   void ResetData() override;
 };

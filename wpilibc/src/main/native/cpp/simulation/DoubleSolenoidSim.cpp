@@ -11,18 +11,18 @@ using namespace frc::sim;
 
 DoubleSolenoidSim::DoubleSolenoidSim(
     std::shared_ptr<PneumaticsBaseSim> moduleSim, int fwd, int rev)
-    : m_module{moduleSim}, m_fwd{fwd}, m_rev{rev} {}
+    : m_module{std::move(moduleSim)}, m_fwd{fwd}, m_rev{rev} {}
 
 DoubleSolenoidSim::DoubleSolenoidSim(int module, PneumaticsModuleType type,
                                      int fwd, int rev)
-    : m_module{PneumaticsBaseSim::GetForType(module, type)},
+    : m_module{std::move(PneumaticsBaseSim::GetForType(module, type))},
       m_fwd{fwd},
       m_rev{rev} {}
 
 DoubleSolenoidSim::DoubleSolenoidSim(PneumaticsModuleType type, int fwd,
                                      int rev)
-    : m_module{PneumaticsBaseSim::GetForType(
-          PneumaticsBase::GetDefaultForType(type), type)},
+    : m_module{std::move(PneumaticsBaseSim::GetForType(
+          PneumaticsBase::GetDefaultForType(type), type))},
       m_fwd{fwd},
       m_rev{rev} {}
 

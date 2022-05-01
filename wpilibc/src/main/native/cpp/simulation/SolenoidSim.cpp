@@ -11,7 +11,7 @@ using namespace frc::sim;
 
 SolenoidSim::SolenoidSim(std::shared_ptr<PneumaticsBaseSim> moduleSim,
                          int channel)
-    : m_module{moduleSim}, m_channel{channel} {}
+    : m_module{std::move(moduleSim)}, m_channel{channel} {}
 
 SolenoidSim::SolenoidSim(int module, PneumaticsModuleType type, int channel)
     : m_module{PneumaticsBaseSim::GetForType(module, type)},
