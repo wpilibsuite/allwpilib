@@ -4,6 +4,7 @@
 
 package edu.wpi.first.math.estimator;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N1;
@@ -48,7 +50,7 @@ public class MecanumDrivePoseEstimator {
   private final UnscentedKalmanFilter<N3, N3, N1> m_observer;
   private final MecanumDriveKinematics m_kinematics;
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
-  private final KalmanFilterLatencyCompensator<N3, N3, N1> m_latencyCompensator;
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
 
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
@@ -134,7 +136,7 @@ public class MecanumDrivePoseEstimator {
             AngleStatistics.angleAdd(2),
             m_nominalDt);
     m_kinematics = kinematics;
-    m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
+    m_poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -184,7 +186,7 @@ public class MecanumDrivePoseEstimator {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.reset();
-    m_latencyCompensator.reset();
+    m_poseBuffer.clear();
 
     m_observer.setXhat(StateSpaceUtil.poseTo3dVector(poseMeters));
 
@@ -209,6 +211,10 @@ public class MecanumDrivePoseEstimator {
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * MecanumDrivePoseEstimator#update} every loop.
    *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link MecanumDrivePoseEstimator#updateWithTime}
@@ -217,13 +223,13 @@ public class MecanumDrivePoseEstimator {
    *     Timer.getFPGATimestamp as your time source or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    m_latencyCompensator.applyPastGlobalMeasurement(
-        Nat.N3(),
-        m_observer,
-        m_nominalDt,
-        StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
-        m_visionCorrect,
-        timestampSeconds);
+    var sample = m_poseBuffer.getSample(timestampSeconds);
+    if (sample.isPresent()) {
+      m_visionCorrect.accept(
+          new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+          StateSpaceUtil.poseTo3dVector(
+              getEstimatedPosition().transformBy(visionRobotPoseMeters.minus(sample.get()))));
+    }
   }
 
   /**
@@ -232,6 +238,10 @@ public class MecanumDrivePoseEstimator {
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * MecanumDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
@@ -296,7 +306,7 @@ public class MecanumDrivePoseEstimator {
     m_previousAngle = angle;
 
     var localY = VecBuilder.fill(angle.getRadians());
-    m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
+    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);
 

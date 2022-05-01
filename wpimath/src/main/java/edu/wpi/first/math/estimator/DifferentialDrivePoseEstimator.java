@@ -11,6 +11,7 @@ import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -55,7 +56,7 @@ import java.util.function.BiConsumer;
 public class DifferentialDrivePoseEstimator {
   final UnscentedKalmanFilter<N5, N3, N3> m_observer; // Package-private to allow for unit testing
   private final BiConsumer<Matrix<N3, N1>, Matrix<N3, N1>> m_visionCorrect;
-  private final KalmanFilterLatencyCompensator<N5, N3, N3> m_latencyCompensator;
+  private final TimeInterpolatableBuffer<Pose2d> m_poseBuffer;
 
   private final double m_nominalDt; // Seconds
   private double m_prevTimeSeconds = -1.0;
@@ -135,7 +136,7 @@ public class DifferentialDrivePoseEstimator {
             AngleStatistics.angleResidual(2),
             AngleStatistics.angleAdd(2),
             m_nominalDt);
-    m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
+    m_poseBuffer = TimeInterpolatableBuffer.createBuffer(1.5);
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
@@ -221,7 +222,7 @@ public class DifferentialDrivePoseEstimator {
   public void resetPosition(Pose2d poseMeters, Rotation2d gyroAngle) {
     // Reset state estimate and error covariance
     m_observer.reset();
-    m_latencyCompensator.reset();
+    m_poseBuffer.clear();
 
     m_observer.setXhat(fillStateVector(poseMeters, 0.0, 0.0));
 
@@ -246,6 +247,10 @@ public class DifferentialDrivePoseEstimator {
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * DifferentialDrivePoseEstimator#update} every loop.
    *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
+   *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
@@ -255,13 +260,13 @@ public class DifferentialDrivePoseEstimator {
    *     source in this case.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    m_latencyCompensator.applyPastGlobalMeasurement(
-        Nat.N3(),
-        m_observer,
-        m_nominalDt,
-        StateSpaceUtil.poseTo3dVector(visionRobotPoseMeters),
-        m_visionCorrect,
-        timestampSeconds);
+    var sample = m_poseBuffer.getSample(timestampSeconds);
+    if (sample.isPresent()) {
+      m_visionCorrect.accept(
+          new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0),
+          StateSpaceUtil.poseTo3dVector(
+              getEstimatedPosition().transformBy(visionRobotPoseMeters.minus(sample.get()))));
+    }
   }
 
   /**
@@ -270,6 +275,10 @@ public class DifferentialDrivePoseEstimator {
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
    * DifferentialDrivePoseEstimator#update} every loop.
+   *
+   * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
+   * recommend only adding vision measurements that are already within one meter or so of the
+   * current pose estimate.
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
@@ -354,7 +363,7 @@ public class DifferentialDrivePoseEstimator {
     m_previousAngle = angle;
 
     var localY = VecBuilder.fill(distanceLeftMeters, distanceRightMeters, angle.getRadians());
-    m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
+    m_poseBuffer.addSample(currentTimeSeconds, getEstimatedPosition());
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);
 

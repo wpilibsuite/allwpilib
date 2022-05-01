@@ -22,12 +22,12 @@ public class OnBoardIO extends SubsystemBase {
   private final DigitalOutput m_yellowLed = new DigitalOutput(3);
 
   // DIO 1
-  private DigitalInput m_buttonB;
-  private DigitalOutput m_greenLed;
+  private final DigitalInput m_buttonB;
+  private final DigitalOutput m_greenLed;
 
   // DIO 2
-  private DigitalInput m_buttonC;
-  private DigitalOutput m_redLed;
+  private final DigitalInput m_buttonC;
+  private final DigitalOutput m_redLed;
 
   private static final double MESSAGE_INTERVAL = 1.0;
   private double m_nextMessageTime;
@@ -46,13 +46,17 @@ public class OnBoardIO extends SubsystemBase {
   public OnBoardIO(ChannelMode dio1, ChannelMode dio2) {
     if (dio1 == ChannelMode.INPUT) {
       m_buttonB = new DigitalInput(1);
+      m_greenLed = null;
     } else {
+      m_buttonB = null;
       m_greenLed = new DigitalOutput(1);
     }
 
     if (dio2 == ChannelMode.INPUT) {
       m_buttonC = new DigitalInput(2);
+      m_redLed = null;
     } else {
+      m_buttonC = null;
       m_redLed = new DigitalOutput(2);
     }
   }

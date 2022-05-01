@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.CommandTestBase;
+import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 
 class ButtonTest extends CommandTestBase {
@@ -172,6 +173,17 @@ class ButtonTest extends CommandTestBase {
     assertTrue(button1.or(button2).get());
     assertFalse(button1.negate().get());
     assertTrue(button1.and(button2.negate()).get());
+  }
+
+  @Test
+  void buttonCompositionSupplierTest() {
+    InternalButton button1 = new InternalButton();
+    BooleanSupplier booleanSupplier = () -> false;
+
+    button1.setPressed(true);
+
+    assertFalse(button1.and(booleanSupplier).get());
+    assertTrue(button1.or(booleanSupplier).get());
   }
 
   @Test

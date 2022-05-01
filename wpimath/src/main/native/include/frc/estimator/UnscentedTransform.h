@@ -6,8 +6,8 @@
 
 #include <tuple>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 
 namespace frc {
 
@@ -34,27 +34,24 @@ namespace frc {
  * sigmas.
  */
 template <int CovDim, int States>
-std::tuple<Eigen::Vector<double, CovDim>, Eigen::Matrix<double, CovDim, CovDim>>
+std::tuple<Vectord<CovDim>, Matrixd<CovDim, CovDim>>
 SquareRootUnscentedTransform(
-    const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
-    const Eigen::Vector<double, 2 * States + 1>& Wm,
-    const Eigen::Vector<double, 2 * States + 1>& Wc,
-    std::function<Eigen::Vector<double, CovDim>(
-        const Eigen::Matrix<double, CovDim, 2 * States + 1>&,
-        const Eigen::Vector<double, 2 * States + 1>&)>
+    const Matrixd<CovDim, 2 * States + 1>& sigmas,
+    const Vectord<2 * States + 1>& Wm, const Vectord<2 * States + 1>& Wc,
+    std::function<Vectord<CovDim>(const Matrixd<CovDim, 2 * States + 1>&,
+                                  const Vectord<2 * States + 1>&)>
         meanFunc,
-    std::function<
-        Eigen::Vector<double, CovDim>(const Eigen::Vector<double, CovDim>&,
-                                      const Eigen::Vector<double, CovDim>&)>
+    std::function<Vectord<CovDim>(const Vectord<CovDim>&,
+                                  const Vectord<CovDim>&)>
         residualFunc,
-    const Eigen::Matrix<double, CovDim, CovDim>& squareRootR) {
+    const Matrixd<CovDim, CovDim>& squareRootR) {
   // New mean is usually just the sum of the sigmas * weight:
   //       n
   // dot = Σ W[k] Xᵢ[k]
   //      k=1
-  Eigen::Vector<double, CovDim> x = meanFunc(sigmas, Wm);
+  Vectord<CovDim> x = meanFunc(sigmas, Wm);
 
-  Eigen::Matrix<double, CovDim, States * 2 + CovDim> Sbar;
+  Matrixd<CovDim, States * 2 + CovDim> Sbar;
   for (int i = 0; i < States * 2; i++) {
     Sbar.template block<CovDim, 1>(0, i) =
         std::sqrt(Wc[1]) *
@@ -63,12 +60,11 @@ SquareRootUnscentedTransform(
   Sbar.template block<CovDim, CovDim>(0, States * 2) = squareRootR;
 
   // Merwe defines the QR decomposition as Aᵀ = QR
-  Eigen::Matrix<double, CovDim, CovDim> S =
-      Sbar.transpose()
-          .householderQr()
-          .matrixQR()
-          .template block<CovDim, CovDim>(0, 0)
-          .template triangularView<Eigen::Upper>();
+  Matrixd<CovDim, CovDim> S = Sbar.transpose()
+                                  .householderQr()
+                                  .matrixQR()
+                                  .template block<CovDim, CovDim>(0, 0)
+                                  .template triangularView<Eigen::Upper>();
 
   Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(
       S, residualFunc(sigmas.template block<CovDim, 1>(0, 0), x), Wc[0]);

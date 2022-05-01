@@ -19,7 +19,7 @@ namespace frc {
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation {
+class DriverStation final {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };

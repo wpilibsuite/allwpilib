@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 
 namespace frc {
 
@@ -17,16 +17,16 @@ namespace frc {
  * @param x     Vector argument.
  */
 template <int Rows, int Cols, typename F>
-auto NumericalJacobian(F&& f, const Eigen::Vector<double, Cols>& x) {
+auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
   constexpr double kEpsilon = 1e-5;
-  Eigen::Matrix<double, Rows, Cols> result;
+  Matrixd<Rows, Cols> result;
   result.setZero();
 
   // It's more expensive, but +- epsilon will be more accurate
   for (int i = 0; i < Cols; ++i) {
-    Eigen::Vector<double, Cols> dX_plus = x;
+    Vectord<Cols> dX_plus = x;
     dX_plus(i) += kEpsilon;
-    Eigen::Vector<double, Cols> dX_minus = x;
+    Vectord<Cols> dX_minus = x;
     dX_minus(i) -= kEpsilon;
     result.col(i) = (f(dX_plus) - f(dX_minus)) / (kEpsilon * 2.0);
   }
@@ -48,12 +48,10 @@ auto NumericalJacobian(F&& f, const Eigen::Vector<double, Cols>& x) {
  * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
-auto NumericalJacobianX(F&& f, const Eigen::Vector<double, States>& x,
-                        const Eigen::Vector<double, Inputs>& u,
-                        Args&&... args) {
+auto NumericalJacobianX(F&& f, const Vectord<States>& x,
+                        const Vectord<Inputs>& u, Args&&... args) {
   return NumericalJacobian<Rows, States>(
-      [&](const Eigen::Vector<double, States>& x) { return f(x, u, args...); },
-      x);
+      [&](const Vectord<States>& x) { return f(x, u, args...); }, x);
 }
 
 /**
@@ -70,12 +68,10 @@ auto NumericalJacobianX(F&& f, const Eigen::Vector<double, States>& x,
  * @param args     Remaining arguments to f(x, u, ...).
  */
 template <int Rows, int States, int Inputs, typename F, typename... Args>
-auto NumericalJacobianU(F&& f, const Eigen::Vector<double, States>& x,
-                        const Eigen::Vector<double, Inputs>& u,
-                        Args&&... args) {
+auto NumericalJacobianU(F&& f, const Vectord<States>& x,
+                        const Vectord<Inputs>& u, Args&&... args) {
   return NumericalJacobian<Rows, Inputs>(
-      [&](const Eigen::Vector<double, Inputs>& u) { return f(x, u, args...); },
-      u);
+      [&](const Vectord<Inputs>& u) { return f(x, u, args...); }, u);
 }
 
 }  // namespace frc

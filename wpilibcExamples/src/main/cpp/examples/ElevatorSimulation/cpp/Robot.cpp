@@ -64,6 +64,7 @@ class Robot : public frc::TimedRobot {
                                       kElevatorDrumRadius,
                                       kMinElevatorHeight,
                                       kMaxElevatorHeight,
+                                      true,
                                       {0.01}};
   frc::sim::EncoderSim m_encoderSim{m_encoder};
 
@@ -87,7 +88,7 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_elevatorSim.SetInput(Eigen::Vector<double, 1>{
+    m_elevatorSim.SetInput(frc::Vectord<1>{
         m_motor.Get() * frc::RobotController::GetInputVoltage()});
 
     // Next, we update it. The standard loop time is 20ms.

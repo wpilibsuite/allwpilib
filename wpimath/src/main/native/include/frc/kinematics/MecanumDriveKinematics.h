@@ -6,8 +6,8 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "Eigen/Core"
 #include "Eigen/QR"
+#include "frc/EigenCore.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/kinematics/MecanumDriveWheelSpeeds.h"
@@ -115,8 +115,8 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics {
       const MecanumDriveWheelSpeeds& wheelSpeeds) const;
 
  private:
-  mutable Eigen::Matrix<double, 4, 3> m_inverseKinematics;
-  Eigen::HouseholderQR<Eigen::Matrix<double, 4, 3>> m_forwardKinematics;
+  mutable Matrixd<4, 3> m_inverseKinematics;
+  Eigen::HouseholderQR<Matrixd<4, 3>> m_forwardKinematics;
   Translation2d m_frontLeftWheel;
   Translation2d m_frontRightWheel;
   Translation2d m_rearLeftWheel;

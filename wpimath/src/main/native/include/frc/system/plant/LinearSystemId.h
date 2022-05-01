@@ -56,15 +56,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-std::pow(G, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(r) * m * motor.Kv))
-                  .value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0,
-                                  (G * motor.Kt / (motor.R * r * m)).value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, (-std::pow(G, 2) * motor.Kt /
+                           (motor.R * units::math::pow<2>(r) * m * motor.Kv))
+                              .value()}};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * r * m)).value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -90,12 +88,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{
+    Matrixd<2, 2> A{
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -134,10 +132,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 1, 1> A{-kV.value() / kA.value()};
-    Eigen::Matrix<double, 1, 1> B{1.0 / kA.value()};
-    Eigen::Matrix<double, 1, 1> C{1.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<1, 1> A{-kV.value() / kA.value()};
+    Matrixd<1, 1> B{1.0 / kA.value()};
+    Matrixd<1, 1> C{1.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -176,10 +174,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, 1.0 / kA.value()};
-    Eigen::Matrix<double, 1, 2> C{1.0, 0.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
+    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    Matrixd<1, 2> C{1.0, 0.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<2, 1, 1>(A, B, C, D);
   }
@@ -224,12 +222,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
     double B1 = 1.0 / kAlinear.value() + 1.0 / kAangular.value();
     double B2 = 1.0 / kAlinear.value() - 1.0 / kAangular.value();
 
-    Eigen::Matrix<double, 2, 2> A =
-        0.5 * Eigen::Matrix<double, 2, 2>{{A1, A2}, {A2, A1}};
-    Eigen::Matrix<double, 2, 2> B =
-        0.5 * Eigen::Matrix<double, 2, 2>{{B1, B2}, {B2, B1}};
-    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
+    Matrixd<2, 2> A = 0.5 * Matrixd<2, 2>{{A1, A2}, {A2, A1}};
+    Matrixd<2, 2> B = 0.5 * Matrixd<2, 2>{{B1, B2}, {B2, B1}};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
@@ -311,11 +307,11 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 1, 1> A{
+    Matrixd<1, 1> A{
         (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
-    Eigen::Matrix<double, 1, 1> C{1.0};
-    Eigen::Matrix<double, 1, 1> D{0.0};
+    Matrixd<1, 1> B{(G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<1, 1> C{1.0};
+    Matrixd<1, 1> D{0.0};
 
     return LinearSystem<1, 1, 1>(A, B, C, D);
   }
@@ -342,12 +338,12 @@ class WPILIB_DLLEXPORT LinearSystemId {
       throw std::domain_error("G must be greater than zero.");
     }
 
-    Eigen::Matrix<double, 2, 2> A{
+    Matrixd<2, 2> A{
         {0.0, 1.0},
         {0.0, (-std::pow(G, 2) * motor.Kt / (motor.Kv * motor.R * J)).value()}};
-    Eigen::Matrix<double, 2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
-    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Eigen::Matrix<double, 2, 1> D{0.0, 0.0};
+    Matrixd<2, 1> B{0.0, (G * motor.Kt / (motor.R * J)).value()};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 1> D{0.0, 0.0};
 
     return LinearSystem<2, 1, 2>(A, B, C, D);
   }
@@ -391,18 +387,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
               (motor.Kv * motor.R * units::math::pow<2>(r));
     auto C2 = G * motor.Kt / (motor.R * r);
 
-    Eigen::Matrix<double, 2, 2> A{
-        {((1 / m + units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C1).value()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C1).value()}};
-    Eigen::Matrix<double, 2, 2> B{
-        {((1 / m + units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / m - units::math::pow<2>(rb) / J) * C2).value()},
-        {((1 / m - units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / m + units::math::pow<2>(rb) / J) * C2).value()}};
-    Eigen::Matrix<double, 2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
-    Eigen::Matrix<double, 2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
+    Matrixd<2, 2> A{{((1 / m + units::math::pow<2>(rb) / J) * C1).value(),
+                     ((1 / m - units::math::pow<2>(rb) / J) * C1).value()},
+                    {((1 / m - units::math::pow<2>(rb) / J) * C1).value(),
+                     ((1 / m + units::math::pow<2>(rb) / J) * C1).value()}};
+    Matrixd<2, 2> B{{((1 / m + units::math::pow<2>(rb) / J) * C2).value(),
+                     ((1 / m - units::math::pow<2>(rb) / J) * C2).value()},
+                    {((1 / m - units::math::pow<2>(rb) / J) * C2).value(),
+                     ((1 / m + units::math::pow<2>(rb) / J) * C2).value()}};
+    Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
+    Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 
     return LinearSystem<2, 2, 2>(A, B, C, D);
   }
