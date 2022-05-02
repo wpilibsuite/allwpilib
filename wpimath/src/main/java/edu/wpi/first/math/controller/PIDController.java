@@ -343,6 +343,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_positionError = 0;
     m_prevError = 0;
     m_totalError = 0;
+    m_velocityError = 0;
   }
 
   @Override
