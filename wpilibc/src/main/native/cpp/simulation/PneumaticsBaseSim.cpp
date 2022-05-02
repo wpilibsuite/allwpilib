@@ -14,6 +14,8 @@ using namespace frc::sim;
 
 PneumaticsBaseSim::PneumaticsBaseSim(int module) : m_index{module} {}
 
+PneumaticsBaseSim::PneumaticsBaseSim(const PneumaticsBase& module) : m_index{module.GetModuleNumber()} {}
+
 std::shared_ptr<PneumaticsBaseSim> PneumaticsBaseSim::GetForType(
     int module, PneumaticsModuleType type) {
   switch (type) {
