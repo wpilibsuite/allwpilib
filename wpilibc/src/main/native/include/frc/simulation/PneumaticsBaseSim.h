@@ -14,6 +14,8 @@ namespace frc::sim {
 
 class PneumaticsBaseSim {
  public:
+  virtual ~PneumaticsBaseSim() = default;
+
   static std::shared_ptr<PneumaticsBaseSim> GetForType(
       int module, PneumaticsModuleType type);
 
