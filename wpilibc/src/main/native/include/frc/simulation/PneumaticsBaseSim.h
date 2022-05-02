@@ -162,14 +162,14 @@ class PneumaticsBaseSim {
    *
    * @return the solenoid outputs (1 bit per output)
    */
-  virtual uint8_t GetAllSolenoidOutputs() const;
+  virtual uint8_t GetAllSolenoidOutputs() const = 0;
 
   /**
    * Change all of the solenoid outputs.
    *
    * @param outputs the new solenoid outputs (1 bit per output)
    */
-  virtual void SetAllSolenoidOutputs(uint8_t outputs);
+  virtual void SetAllSolenoidOutputs(uint8_t outputs) = 0;
 
   /** Reset all simulation data for this object. */
   virtual void ResetData() = 0;
