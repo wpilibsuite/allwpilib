@@ -31,7 +31,7 @@ class CTREPCMSim : public PneumaticsBaseSim {
 
   explicit CTREPCMSim(const PneumaticsBase& pneumatics);
 
-  virtual ~CTREPCMSim() = default;
+  ~CTREPCMSim() override = default;
 
   [[nodiscard]] std::unique_ptr<CallbackStore> RegisterInitializedCallback(
       NotifyCallback callback, bool initialNotify) override;
