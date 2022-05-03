@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <utility>
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/math.h"
@@ -20,6 +21,16 @@ wpi::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds,
     const Translation2d& centerOfRotation) const {
+
+  if (chassisSpeeds.vx.value() == 0 && chassisSpeeds.vy.value() == 0 &&
+      chassisSpeeds.omega.value() == 0) {
+    for (size_t i = 0; i < NumModules; i++) {
+      m_moduleStates[i].speed = 0_mps;
+    }
+
+    return m_moduleStates;
+  }
+  
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
@@ -39,7 +50,6 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
 
   Matrixd<NumModules * 2, 1> moduleStateMatrix =
       m_inverseKinematics * chassisSpeedsVector;
-  wpi::array<SwerveModuleState, NumModules> moduleStates{wpi::empty_array};
 
   for (size_t i = 0; i < NumModules; i++) {
     units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
@@ -48,10 +58,10 @@ SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     auto speed = units::math::hypot(x, y);
     Rotation2d rotation{x.value(), y.value()};
 
-    moduleStates[i] = {speed, rotation};
+    m_moduleStates[i] = {speed, rotation};
   }
 
-  return moduleStates;
+  return m_moduleStates;
 }
 
 template <size_t NumModules>
