@@ -37,20 +37,6 @@ public class LTVDifferentialDriveController {
   private Matrix<N5, N1> m_error = new Matrix<>(Nat.N5(), Nat.N1());
   private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
 
-  /** Motor voltages for a differential drive. */
-  @SuppressWarnings("MemberName")
-  public static class WheelVoltages {
-    public double left;
-    public double right;
-
-    public WheelVoltages() {}
-
-    public WheelVoltages(double left, double right) {
-      this.left = left;
-      this.right = right;
-    }
-  }
-
   /** States of the drivetrain system. */
   enum State {
     kX(0),
@@ -204,7 +190,7 @@ public class LTVDifferentialDriveController {
    * @return Left and right output voltages of the LTV controller.
    */
   @SuppressWarnings("LocalVariableName")
-  public WheelVoltages calculate(
+  public DifferentialDriveWheelVoltages calculate(
       Pose2d currentPose,
       double leftVelocity,
       double rightVelocity,
@@ -245,7 +231,7 @@ public class LTVDifferentialDriveController {
 
     var u = K.times(inRobotFrame).times(m_error);
 
-    return new WheelVoltages(u.get(0, 0), u.get(1, 0));
+    return new DifferentialDriveWheelVoltages(u.get(0, 0), u.get(1, 0));
   }
 
   /**
@@ -260,7 +246,7 @@ public class LTVDifferentialDriveController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The left and right output voltages of the LTV controller.
    */
-  public WheelVoltages calculate(
+  public DifferentialDriveWheelVoltages calculate(
       Pose2d currentPose,
       double leftVelocity,
       double rightVelocity,

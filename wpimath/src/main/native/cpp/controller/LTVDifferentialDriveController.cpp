@@ -94,8 +94,7 @@ void LTVDifferentialDriveController::SetTolerance(
                  leftVelocityTolerance.value(), rightVelocityTolerance.value()};
 }
 
-LTVDifferentialDriveController::WheelVoltages
-LTVDifferentialDriveController::Calculate(
+DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
     const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
     units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
     units::meters_per_second_t leftVelocityRef,
@@ -124,11 +123,11 @@ LTVDifferentialDriveController::Calculate(
 
   Vectord<2> u = K * inRobotFrame * m_error;
 
-  return WheelVoltages{units::volt_t{u(0)}, units::volt_t{u(1)}};
+  return DifferentialDriveWheelVoltages{units::volt_t{u(0)},
+                                        units::volt_t{u(1)}};
 }
 
-LTVDifferentialDriveController::WheelVoltages
-LTVDifferentialDriveController::Calculate(
+DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
     const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
     units::meters_per_second_t rightVelocity,
     const Trajectory::State& desiredState) {
