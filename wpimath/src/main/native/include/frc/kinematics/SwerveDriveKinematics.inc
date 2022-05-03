@@ -21,16 +21,15 @@ wpi::array<SwerveModuleState, NumModules>
 SwerveDriveKinematics<NumModules>::ToSwerveModuleStates(
     const ChassisSpeeds& chassisSpeeds,
     const Translation2d& centerOfRotation) const {
-
-  if (chassisSpeeds.vx.value() == 0 && chassisSpeeds.vy.value() == 0 &&
-      chassisSpeeds.omega.value() == 0) {
+  if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
+      chassisSpeeds.omega == 0_rad_per_s) {
     for (size_t i = 0; i < NumModules; i++) {
       m_moduleStates[i].speed = 0_mps;
     }
 
     return m_moduleStates;
   }
-  
+
   // We have a new center of rotation. We need to compute the matrix again.
   if (centerOfRotation != m_previousCoR) {
     for (size_t i = 0; i < NumModules; i++) {
