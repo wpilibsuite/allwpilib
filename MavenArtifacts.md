@@ -134,14 +134,6 @@ All artifacts are based at `edu.wpi.first.artifactname` in the repository.
   * wpimath
   * wpiutil
 
-* wpilibOldCommands
-  * wpilibc
-  * hal
-  * cameraserver
-  * ntcore
-  * cscore
-  * wpiutil
-
 
 ### Third Party Artifacts
 

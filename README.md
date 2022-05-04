@@ -79,7 +79,7 @@ If opening from a fresh clone, generated java dependencies will not exist. Most 
 
 `./gradlew testDesktopCpp` and `./gradlew testDesktopJava` will build and run the tests for `wpilibc` and `wpilibj` respectively. They will only build the minimum components required to run the tests.
 
-`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibOldCommands`, `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
+`testDesktopCpp` and `testDesktopJava` tasks also exist for the projects `wpiutil`, `ntcore`, `cscore`, `hal` `wpilibNewCommands` and `cameraserver`. These can be ran with `./gradlew :projectName:task`.
 
 `./gradlew buildDesktopCpp` and `./gradlew buildDesktopJava` will compile `wpilibcExamples` and `wpilibjExamples` respectively. The results can't be ran, but they can compile.
 

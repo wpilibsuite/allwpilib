@@ -47,7 +47,6 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 }
 
@@ -161,7 +160,6 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
                     }
                 }
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -208,7 +206,6 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
                     }
                 }
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
