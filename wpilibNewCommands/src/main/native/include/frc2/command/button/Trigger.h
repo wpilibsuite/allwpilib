@@ -9,6 +9,8 @@
 #include <memory>
 #include <utility>
 
+#include <frc/event/BooleanEvent.h>
+#include <frc/event/EventLoop.h>
 #include <frc/filter/Debouncer.h>
 #include <units/time.h>
 #include <wpi/span.h>
@@ -19,32 +21,41 @@
 namespace frc2 {
 class Command;
 /**
- * A class used to bind command scheduling to events.  The
- * Trigger class is a base for all command-event-binding classes, and so the
- * methods are named fairly abstractly; for purpose-specific wrappers, see
- * Button.
+ * This class is a command-based wrapper around {@link BooleanEvent}, providing
+ * an easy way to link commands to inputs.
  *
  * This class is provided by the NewCommands VendorDep
  *
  * @see Button
  */
-class Trigger {
+class Trigger : public frc::BooleanEvent {
  public:
+  /**
+   * Creates a new trigger with the given condition determining whether it is
+   * active.
+   *
+   * <p>Polled by the default scheduler button loop.
+   *
+   * @param isActive returns whether or not the trigger should be active
+   */
+  explicit Trigger(std::function<bool()> isActive)
+      : BooleanEvent{CommandScheduler::GetInstance().GetDefaultButtonLoop(),
+                     std::move(isActive)} {}
+
   /**
    * Create a new trigger that is active when the given condition is true.
    *
+   * @param loop The loop instance that polls this trigger.
    * @param isActive Whether the trigger is active.
    */
-  Trigger(std::function<bool()> isActive)  // NOLINT
-      : m_isActive{std::move(isActive)} {}
+  Trigger(frc::EventLoop* loop, std::function<bool()> isActive)
+      : BooleanEvent{loop, std::move(isActive)} {}
 
   /**
    * Create a new trigger that is never active (default constructor) - activity
    *  can be further determined by subclass code.
    */
-  Trigger() {
-    m_isActive = [] { return false; };
-  }
+  Trigger() : Trigger([] { return false; }) {}
 
   Trigger(const Trigger& other);
 
@@ -72,19 +83,10 @@ class Trigger {
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
   Trigger WhenActive(T&& command, bool interruptible = true) {
-    CommandScheduler::GetInstance().AddButton(
-        [pressedLast = m_isActive(), *this,
-         command = std::make_unique<std::remove_reference_t<T>>(
+    this->Rising().IfHigh(
+        [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
-         interruptible]() mutable {
-          bool pressed = m_isActive();
-
-          if (!pressedLast && pressed) {
-            command->Schedule(interruptible);
-          }
-
-          pressedLast = pressed;
-        });
+         interruptible] { command->Schedule(interruptible); });
 
     return *this;
   }
@@ -131,21 +133,11 @@ class Trigger {
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveContinous(T&& command, bool interruptible = true) {
-    CommandScheduler::GetInstance().AddButton(
-        [pressedLast = m_isActive(), *this,
-         command = std::make_unique<std::remove_reference_t<T>>(
-             std::forward<T>(command)),
-         interruptible]() mutable {
-          bool pressed = m_isActive();
+    std::shared_ptr<T> ptr =
+        std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
+    this->IfHigh([ptr, interruptible] { ptr->Schedule(interruptible); });
+    this->Falling().IfHigh([ptr] { ptr->Cancel(); });
 
-          if (pressed) {
-            command->Schedule(interruptible);
-          } else if (pressedLast && !pressed) {
-            command->Cancel();
-          }
-
-          pressedLast = pressed;
-        });
     return *this;
   }
 
@@ -191,21 +183,13 @@ class Trigger {
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
   Trigger WhileActiveOnce(T&& command, bool interruptible = true) {
-    CommandScheduler::GetInstance().AddButton(
-        [pressedLast = m_isActive(), *this,
-         command = std::make_unique<std::remove_reference_t<T>>(
-             std::forward<T>(command)),
-         interruptible]() mutable {
-          bool pressed = m_isActive();
+    std::shared_ptr<T> ptr =
+        std::make_shared<std::remove_reference_t<T>>(std::forward<T>(command));
 
-          if (!pressedLast && pressed) {
-            command->Schedule(interruptible);
-          } else if (pressedLast && !pressed) {
-            command->Cancel();
-          }
+    this->Rising().IfHigh(
+        [ptr, interruptible] { ptr->Schedule(interruptible); });
+    this->Falling().IfHigh([ptr] { ptr->Cancel(); });
 
-          pressedLast = pressed;
-        });
     return *this;
   }
 
@@ -233,19 +217,11 @@ class Trigger {
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
   Trigger WhenInactive(T&& command, bool interruptible = true) {
-    CommandScheduler::GetInstance().AddButton(
-        [pressedLast = m_isActive(), *this,
-         command = std::make_unique<std::remove_reference_t<T>>(
+    this->Falling().IfHigh(
+        [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
-         interruptible]() mutable {
-          bool pressed = m_isActive();
+         interruptible] { command->Schedule(interruptible); });
 
-          if (pressedLast && !pressed) {
-            command->Schedule(interruptible);
-          }
-
-          pressedLast = pressed;
-        });
     return *this;
   }
 
@@ -291,23 +267,17 @@ class Trigger {
   template <class T, typename = std::enable_if_t<std::is_base_of_v<
                          Command, std::remove_reference_t<T>>>>
   Trigger ToggleWhenActive(T&& command, bool interruptible = true) {
-    CommandScheduler::GetInstance().AddButton(
-        [pressedLast = m_isActive(), *this,
-         command = std::make_unique<std::remove_reference_t<T>>(
+    this->Rising().IfHigh(
+        [command = std::make_unique<std::remove_reference_t<T>>(
              std::forward<T>(command)),
-         interruptible]() mutable {
-          bool pressed = m_isActive();
-
-          if (!pressedLast && pressed) {
-            if (command->IsScheduled()) {
-              command->Cancel();
-            } else {
-              command->Schedule(interruptible);
-            }
+         interruptible] {
+          if (!command->IsScheduled()) {
+            command->Schedule(interruptible);
+          } else {
+            command->Cancel();
           }
-
-          pressedLast = pressed;
         });
+
     return *this;
   }
 
@@ -322,12 +292,26 @@ class Trigger {
   Trigger CancelWhenActive(Command* command);
 
   /**
+   * Get a new event that events only when this one newly changes to true.
+   *
+   * @return a new event representing when this one newly changes to true.
+   */
+  Trigger Rising() { return BooleanEvent::Rising().CastTo<Trigger>(); }
+
+  /**
+   * Get a new event that triggers only when this one newly changes to false.
+   *
+   * @return a new event representing when this one newly changes to false.
+   */
+  Trigger Falling() { return BooleanEvent::Falling().CastTo<Trigger>(); }
+
+  /**
    * Composes two triggers with logical AND.
    *
    * @return A trigger which is active when both component triggers are active.
    */
-  Trigger operator&&(Trigger rhs) {
-    return Trigger([*this, rhs] { return m_isActive() && rhs.m_isActive(); });
+  Trigger operator&&(std::function<bool()> rhs) {
+    return BooleanEvent::operator&&(rhs).CastTo<Trigger>();
   }
 
   /**
@@ -335,8 +319,8 @@ class Trigger {
    *
    * @return A trigger which is active when either component trigger is active.
    */
-  Trigger operator||(Trigger rhs) {
-    return Trigger([*this, rhs] { return m_isActive() || rhs.m_isActive(); });
+  Trigger operator||(std::function<bool()> rhs) {
+    return BooleanEvent::operator||(rhs).CastTo<Trigger>();
   }
 
   /**
@@ -345,9 +329,7 @@ class Trigger {
    * @return A trigger which is active when the component trigger is inactive,
    * and vice-versa.
    */
-  Trigger operator!() {
-    return Trigger([*this] { return !m_isActive(); });
-  }
+  Trigger operator!() { return BooleanEvent::operator!().CastTo<Trigger>(); }
 
   /**
    * Creates a new debounced trigger from this trigger - it will become active
@@ -359,9 +341,8 @@ class Trigger {
    */
   Trigger Debounce(units::second_t debounceTime,
                    frc::Debouncer::DebounceType type =
-                       frc::Debouncer::DebounceType::kRising);
-
- private:
-  std::function<bool()> m_isActive;
+                       frc::Debouncer::DebounceType::kRising) {
+    return BooleanEvent::Debounce(debounceTime, type).CastTo<Trigger>();
+  }
 };
 }  // namespace frc2

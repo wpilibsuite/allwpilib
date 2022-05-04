@@ -10,7 +10,7 @@ CommandTestBase::CommandTestBase() {
   auto& scheduler = CommandScheduler::GetInstance();
   scheduler.CancelAll();
   scheduler.Enable();
-  scheduler.ClearButtons();
+  scheduler.GetActiveButtonLoop()->Clear();
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {
@@ -22,7 +22,7 @@ void CommandTestBase::SetUp() {
 }
 
 void CommandTestBase::TearDown() {
-  CommandScheduler::GetInstance().ClearButtons();
+  CommandScheduler::GetInstance().GetActiveButtonLoop()->Clear();
 }
 
 void CommandTestBase::SetDSEnabled(bool enabled) {
