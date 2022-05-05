@@ -59,11 +59,7 @@ LTVDifferentialDriveController::LTVDifferentialDriveController(
   units::meters_per_second_t maxV{
       -plant.A().householderQr().solve(plant.B() * Vectord<2>{12.0, 12.0})(0)};
 
-  Vectord<5> x = Vectord<5>::Zero();
   for (auto velocity = -maxV; velocity < maxV; velocity += 0.01_mps) {
-    x(State::kLeftVelocity) = velocity.value();
-    x(State::kRightVelocity) = velocity.value();
-
     // The DARE is ill-conditioned if the velocity is close to zero, so don't
     // let the system stop.
     if (units::math::abs(velocity) < 1e-4_mps) {
