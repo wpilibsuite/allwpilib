@@ -28,13 +28,15 @@ namespace frc {
  *                    Positive values up.
  * @param targetPitch The pitch of the target in the camera's lens. Positive
  *                    values up.
+ * @param targetYaw The yaw of the target in the camera's lens.
  * @return The estimated distance to the target.
  */
 WPILIB_DLLEXPORT
 units::meter_t CalculateDistanceToTarget(units::meter_t cameraHeight,
                                          units::meter_t targetHeight,
                                          units::radian_t cameraPitch,
-                                         units::radian_t targetPitch);
+                                         units::radian_t targetPitch,
+                                         units::radian_t targetYaw = units::radian_t{0.0});
 
 /**
  * Estimate the position of the robot in the field.

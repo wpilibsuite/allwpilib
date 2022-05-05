@@ -32,15 +32,26 @@ public final class ComputerVisionUtil {
    *     Positive values up.
    * @param targetPitchRadians The pitch of the target in the camera's lens in radians. Positive
    *     values up.
+   * @param targetYawRadians The yaw of the target in the camera's lens in radians.
    * @return The estimated distance to the target in meters.
    */
   public static double calculateDistanceToTarget(
       double cameraHeightMeters,
       double targetHeightMeters,
       double cameraPitchRadians,
-      double targetPitchRadians) {
+      double targetPitchRadians,
+      double targetYawRadians) {
     return (targetHeightMeters - cameraHeightMeters)
-        / Math.tan(cameraPitchRadians + targetPitchRadians);
+        / (Math.tan(cameraPitchRadians + targetPitchRadians) * Math.cos(targetYawRadians));
+  }
+
+  public static double calculateDistanceToTarget(
+      double cameraHeightMeters,
+      double targetHeightMeters,
+      double cameraPitchRadians,
+      double targetPitchRadians) {
+    return calculateDistanceToTarget(
+        cameraHeightMeters, targetHeightMeters, cameraPitchRadians, targetPitchRadians, 0);
   }
 
   /**
