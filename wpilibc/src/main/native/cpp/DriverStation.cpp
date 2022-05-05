@@ -233,12 +233,6 @@ Instance::~Instance() {
   }
 }
 
-DriverStation& DriverStation::GetInstance() {
-  ::GetInstance();
-  static DriverStation instance;
-  return instance;
-}
-
 bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= kJoystickPorts) {
     FRC_ReportError(warn::BadJoystickIndex, "stick {} out of range", stick);
@@ -504,18 +498,10 @@ bool DriverStation::IsAutonomousEnabled() {
   return controlWord.autonomous && controlWord.enabled;
 }
 
-bool DriverStation::IsOperatorControl() {
-  return IsTeleop();
-}
-
 bool DriverStation::IsTeleop() {
   HAL_ControlWord controlWord;
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
-}
-
-bool DriverStation::IsOperatorControlEnabled() {
-  return IsTeleopEnabled();
 }
 
 bool DriverStation::IsTeleopEnabled() {
@@ -669,10 +655,6 @@ void DriverStation::InDisabled(bool entering) {
 
 void DriverStation::InAutonomous(bool entering) {
   ::GetInstance().userInAutonomous = entering;
-}
-
-void DriverStation::InOperatorControl(bool entering) {
-  InTeleop(entering);
 }
 
 void DriverStation::InTeleop(bool entering) {

@@ -166,7 +166,9 @@ class Encoder : public CounterBase,
    * scaled using the value from SetDistancePerPulse().
    *
    * @return Period in seconds of the most recent pulse.
+   * @deprecated Use getRate() in favor of this method.
    */
+  WPI_DEPRECATED("Use GetRate() in favor of this method")
   units::second_t GetPeriod() const override;
 
   /**
@@ -177,13 +179,12 @@ class Encoder : public CounterBase,
    * to determine if the wheels or other shaft has stopped rotating.
    * This method compensates for the decoding type.
    *
-   * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled
-   *             periods and SetMinRate() scales using value from
-   *             SetDistancePerPulse().
-   *
    * @param maxPeriod The maximum time between rising and falling edges before
    *                  the FPGA will report the device stopped. This is expressed
    *                  in seconds.
+   * @deprecated Use SetMinRate() in favor of this method.  This takes unscaled
+   *             periods and SetMinRate() scales using value from
+   *             SetDistancePerPulse().
    */
   WPI_DEPRECATED(
       "Use SetMinRate() in favor of this method.  This takes unscaled periods "

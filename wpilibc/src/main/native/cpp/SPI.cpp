@@ -196,16 +196,6 @@ void SPI::SetSampleDataOnTrailingEdge() {
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
 }
 
-void SPI::SetSampleDataOnFalling() {
-  m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
-}
-
-void SPI::SetSampleDataOnRising() {
-  m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
-}
-
 void SPI::SetClockActiveLow() {
   m_clockIdleHigh = true;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
@@ -276,10 +266,6 @@ void SPI::StartAutoRate(units::second_t period) {
   int32_t status = 0;
   HAL_StartSPIAutoRate(m_port, period.value(), &status);
   FRC_CheckErrorStatus(status, "Port {}", m_port);
-}
-
-void SPI::StartAutoRate(double period) {
-  StartAutoRate(units::second_t(period));
 }
 
 void SPI::StartAutoTrigger(DigitalSource& source, bool rising, bool falling) {
@@ -353,13 +339,6 @@ void SPI::InitAccumulator(units::second_t period, int cmd, int xferSize,
       std::make_unique<Accumulator>(m_port, xferSize, validMask, validValue,
                                     dataShift, dataSize, isSigned, bigEndian);
   m_accum->m_notifier.StartPeriodic(period * kAccumulateDepth / 2);
-}
-
-void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
-                          int validValue, int dataShift, int dataSize,
-                          bool isSigned, bool bigEndian) {
-  InitAccumulator(units::second_t(period), cmd, xferSize, validMask, validValue,
-                  dataShift, dataSize, isSigned, bigEndian);
 }
 
 void SPI::FreeAccumulator() {

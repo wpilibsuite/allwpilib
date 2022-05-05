@@ -30,7 +30,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class PreferencesTest {
-  private final Preferences m_prefs = Preferences.getInstance();
   private final NetworkTable m_table = NetworkTableInstance.getDefault().getTable("Preferences");
 
   private static final String kFilename = "networktables.ini";
@@ -66,7 +65,7 @@ class PreferencesTest {
 
   @Test
   void removeAllTest() {
-    m_prefs.removeAll();
+    Preferences.removeAll();
 
     Set<String> keys = m_table.getKeys();
     keys.remove(".type");
@@ -79,37 +78,37 @@ class PreferencesTest {
   @ParameterizedTest
   @MethodSource("defaultKeyProvider")
   void defaultKeysTest(String key) {
-    assertTrue(m_prefs.containsKey(key));
+    assertTrue(Preferences.containsKey(key));
   }
 
   @ParameterizedTest
   @MethodSource("defaultKeyProvider")
   void defaultKeysAllTest(String key) {
-    assertTrue(m_prefs.getKeys().contains(key));
+    assertTrue(Preferences.getKeys().contains(key));
   }
 
   @Test
   void defaultValueTest() {
     assertAll(
-        () -> assertEquals(172L, m_prefs.getLong("checkedValueLong", 0)),
-        () -> assertEquals(0.2, m_prefs.getDouble("checkedValueDouble", 0), 1e-6),
-        () -> assertEquals("Hello. How are you?", m_prefs.getString("checkedValueString", "")),
-        () -> assertEquals(2, m_prefs.getInt("checkedValueInt", 0)),
-        () -> assertEquals(3.4, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
-        () -> assertFalse(m_prefs.getBoolean("checkedValueBoolean", true)));
+        () -> assertEquals(172L, Preferences.getLong("checkedValueLong", 0)),
+        () -> assertEquals(0.2, Preferences.getDouble("checkedValueDouble", 0), 1e-6),
+        () -> assertEquals("Hello. How are you?", Preferences.getString("checkedValueString", "")),
+        () -> assertEquals(2, Preferences.getInt("checkedValueInt", 0)),
+        () -> assertEquals(3.4, Preferences.getFloat("checkedValueFloat", 0), 1e-6),
+        () -> assertFalse(Preferences.getBoolean("checkedValueBoolean", true)));
   }
 
   @Test
   void backupTest() {
-    m_prefs.removeAll();
+    Preferences.removeAll();
 
     assertAll(
-        () -> assertEquals(0, m_prefs.getLong("checkedValueLong", 0)),
-        () -> assertEquals(0, m_prefs.getDouble("checkedValueDouble", 0), 1e-6),
-        () -> assertEquals("", m_prefs.getString("checkedValueString", "")),
-        () -> assertEquals(0, m_prefs.getInt("checkedValueInt", 0)),
-        () -> assertEquals(0, m_prefs.getFloat("checkedValueFloat", 0), 1e-6),
-        () -> assertTrue(m_prefs.getBoolean("checkedValueBoolean", true)));
+        () -> assertEquals(0, Preferences.getLong("checkedValueLong", 0)),
+        () -> assertEquals(0, Preferences.getDouble("checkedValueDouble", 0), 1e-6),
+        () -> assertEquals("", Preferences.getString("checkedValueString", "")),
+        () -> assertEquals(0, Preferences.getInt("checkedValueInt", 0)),
+        () -> assertEquals(0, Preferences.getFloat("checkedValueFloat", 0), 1e-6),
+        () -> assertTrue(Preferences.getBoolean("checkedValueBoolean", true)));
   }
 
   @Nested
@@ -119,10 +118,10 @@ class PreferencesTest {
       final String key = "test";
       final int value = 123;
 
-      m_prefs.putInt(key, value);
+      Preferences.setInt(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getInt(key, -1)),
+          () -> assertEquals(value, Preferences.getInt(key, -1)),
           () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).intValue()));
     }
 
@@ -131,10 +130,10 @@ class PreferencesTest {
       final String key = "test";
       final long value = 190L;
 
-      m_prefs.putLong(key, value);
+      Preferences.setLong(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getLong(key, -1)),
+          () -> assertEquals(value, Preferences.getLong(key, -1)),
           () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).longValue()));
     }
 
@@ -143,10 +142,10 @@ class PreferencesTest {
       final String key = "test";
       final float value = 9.42f;
 
-      m_prefs.putFloat(key, value);
+      Preferences.setFloat(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getFloat(key, -1), 1e-6),
+          () -> assertEquals(value, Preferences.getFloat(key, -1), 1e-6),
           () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).floatValue(), 1e-6));
     }
 
@@ -155,10 +154,10 @@ class PreferencesTest {
       final String key = "test";
       final double value = 6.28;
 
-      m_prefs.putDouble(key, value);
+      Preferences.setDouble(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getDouble(key, -1), 1e-6),
+          () -> assertEquals(value, Preferences.getDouble(key, -1), 1e-6),
           () -> assertEquals(value, m_table.getEntry(key).getNumber(-1).doubleValue(), 1e-6));
     }
 
@@ -167,10 +166,10 @@ class PreferencesTest {
       final String key = "test";
       final String value = "value";
 
-      m_prefs.putString(key, value);
+      Preferences.setString(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getString(key, "")),
+          () -> assertEquals(value, Preferences.getString(key, "")),
           () -> assertEquals(value, m_table.getEntry(key).getString("")));
     }
 
@@ -179,10 +178,10 @@ class PreferencesTest {
       final String key = "test";
       final boolean value = true;
 
-      m_prefs.putBoolean(key, value);
+      Preferences.setBoolean(key, value);
 
       assertAll(
-          () -> assertEquals(value, m_prefs.getBoolean(key, false)),
+          () -> assertEquals(value, Preferences.getBoolean(key, false)),
           () -> assertEquals(value, m_table.getEntry(key).getBoolean(false)));
     }
   }

@@ -8,7 +8,6 @@
 #include <string_view>
 
 #include <wpi/StringMap.h>
-#include <wpi/deprecated.h>
 
 #include "frc/smartdashboard/SendableChooserBase.h"
 
@@ -67,36 +66,6 @@ class SendableChooser : public SendableChooserBase {
    * @param object the option
    */
   void SetDefaultOption(std::string_view name, T object);
-
-  /**
-   * Adds the given object to the list of options.
-   *
-   * On the SmartDashboard on the desktop, the object will appear as the given
-   * name.
-   *
-   * @deprecated use AddOption(std::string_view name, T object) instead.
-   *
-   * @param name   the name of the option
-   * @param object the option
-   */
-  WPI_DEPRECATED("use AddOption() instead")
-  void AddObject(std::string_view name, T object) { AddOption(name, object); }
-
-  /**
-   * Add the given object to the list of options and marks it as the default.
-   *
-   * Functionally, this is very close to AddOption() except that it will use
-   * this as the default option if none other is explicitly selected.
-   *
-   * @deprecated use SetDefaultOption(std::string_view name, T object) instead.
-   *
-   * @param name   the name of the option
-   * @param object the option
-   */
-  WPI_DEPRECATED("use SetDefaultOption() instead")
-  void AddDefault(std::string_view name, T object) {
-    SetDefaultOption(name, object);
-  }
 
   /**
    * Returns a copy of the selected option (a raw pointer U* if T =

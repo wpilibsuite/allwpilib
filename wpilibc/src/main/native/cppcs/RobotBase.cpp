@@ -192,16 +192,8 @@ bool RobotBase::IsAutonomousEnabled() const {
   return DriverStation::IsAutonomousEnabled();
 }
 
-bool RobotBase::IsOperatorControl() const {
-  return DriverStation::IsTeleop();
-}
-
 bool RobotBase::IsTeleop() const {
   return DriverStation::IsTeleop();
-}
-
-bool RobotBase::IsOperatorControlEnabled() const {
-  return DriverStation::IsTeleopEnabled();
 }
 
 bool RobotBase::IsTeleopEnabled() const {

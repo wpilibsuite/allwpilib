@@ -12,20 +12,12 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
-#include "frc/SpeedController.h"
+#include "frc/motorcontrol/MotorController.h"
 
 using namespace frc;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4996)  // was declared deprecated
-#elif defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
-                                     SpeedController& rightMotor)
+DifferentialDrive::DifferentialDrive(MotorController& leftMotor,
+                                     MotorController& rightMotor)
     : m_leftMotor(&leftMotor), m_rightMotor(&rightMotor) {
   wpi::SendableRegistry::AddChild(this, m_leftMotor);
   wpi::SendableRegistry::AddChild(this, m_rightMotor);

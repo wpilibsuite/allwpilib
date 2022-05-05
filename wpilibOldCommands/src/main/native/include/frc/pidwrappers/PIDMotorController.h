@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/deprecated.h>
 #include <wpi/sendable/Sendable.h>
 #include <wpi/sendable/SendableHelper.h>
 

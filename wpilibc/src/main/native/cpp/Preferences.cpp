@@ -38,12 +38,6 @@ void ResetPreferencesInstance() {
 }  // namespace frc::impl
 #endif
 
-Preferences* Preferences::GetInstance() {
-  ::GetInstance();
-  static Preferences instance;
-  return &instance;
-}
-
 std::vector<std::string> Preferences::GetKeys() {
   return ::GetInstance().table->GetKeys();
 }
@@ -80,10 +74,6 @@ void Preferences::SetString(std::string_view key, std::string_view value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutString(std::string_view key, std::string_view value) {
-  SetString(key, value);
-}
-
 void Preferences::InitString(std::string_view key, std::string_view value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultString(value);
@@ -94,10 +84,6 @@ void Preferences::SetInt(std::string_view key, int value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutInt(std::string_view key, int value) {
-  SetInt(key, value);
 }
 
 void Preferences::InitInt(std::string_view key, int value) {
@@ -112,10 +98,6 @@ void Preferences::SetDouble(std::string_view key, double value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutDouble(std::string_view key, double value) {
-  SetDouble(key, value);
-}
-
 void Preferences::InitDouble(std::string_view key, double value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultDouble(value);
@@ -126,10 +108,6 @@ void Preferences::SetFloat(std::string_view key, float value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutFloat(std::string_view key, float value) {
-  SetFloat(key, value);
 }
 
 void Preferences::InitFloat(std::string_view key, float value) {
@@ -144,10 +122,6 @@ void Preferences::SetBoolean(std::string_view key, bool value) {
   entry.SetPersistent();
 }
 
-void Preferences::PutBoolean(std::string_view key, bool value) {
-  SetBoolean(key, value);
-}
-
 void Preferences::InitBoolean(std::string_view key, bool value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDefaultBoolean(value);
@@ -158,10 +132,6 @@ void Preferences::SetLong(std::string_view key, int64_t value) {
   auto entry = ::GetInstance().table->GetEntry(key);
   entry.SetDouble(value);
   entry.SetPersistent();
-}
-
-void Preferences::PutLong(std::string_view key, int64_t value) {
-  SetLong(key, value);
 }
 
 void Preferences::InitLong(std::string_view key, int64_t value) {
