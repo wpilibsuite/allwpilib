@@ -127,11 +127,7 @@ public class LTVDifferentialDriveController {
             .times(-1.0)
             .get(0, 0);
 
-    var x = new Matrix<>(Nat.N5(), Nat.N1());
     for (double velocity = -maxV; velocity < maxV; velocity += 0.01) {
-      x.set(State.kLeftVelocity.value, 0, velocity);
-      x.set(State.kRightVelocity.value, 0, velocity);
-
       // The DARE is ill-conditioned if the velocity is close to zero, so don't
       // let the system stop.
       if (Math.abs(velocity) < 1e-4) {
