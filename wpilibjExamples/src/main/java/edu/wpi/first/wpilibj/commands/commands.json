@@ -10,78 +10,7 @@
     "commandversion": 0
   },
   {
-    "name": "Command (Old)",
-    "description": "Create a base command",
-    "tags": [
-      "command"
-    ],
-    "foldername": "command",
-    "replacename": "ReplaceMeCommand",
-    "commandversion": 1
-  },
-  {
-    "name": "Command Group (Old)",
-    "description": "Create a command group",
-    "tags": [
-      "commandgroup"
-    ],
-    "foldername": "commandgroup",
-    "replacename": "ReplaceMeCommandGroup",
-    "commandversion": 1
-  },
-  {
-    "name": "Instant Command (Old)",
-    "description": "A command that runs immediately",
-    "tags": [
-      "instantcommand"
-    ],
-    "foldername": "instant",
-    "replacename": "ReplaceMeInstantCommand",
-    "commandversion": 1
-  },
-  {
-    "name": "Subsystem (Old)",
-    "description": "A subsystem",
-    "tags": [
-      "subsystem"
-    ],
-    "foldername": "subsystem",
-    "replacename": "ReplaceMeSubsystem",
-    "commandversion": 1
-  },
-  {
-    "name": "PID Subsystem (Old)",
-    "description": "A subsystem that runs a PID loop",
-    "tags": [
-      "pidsubsystem",
-      "pid"
-    ],
-    "foldername": "pidsubsystem",
-    "replacename": "ReplaceMePIDSubsystem",
-    "commandversion": 1
-  },
-  {
-    "name": "Timed Command (Old)",
-    "description": "A command that runs for a specified time",
-    "tags": [
-      "timedcommand"
-    ],
-    "foldername": "timed",
-    "replacename": "ReplaceMeTimedCommand",
-    "commandversion": 1
-  },
-  {
-    "name": "Trigger (Old)",
-    "description": "A command that runs off of a trigger",
-    "tags": [
-      "trigger"
-    ],
-    "foldername": "trigger",
-    "replacename": "ReplaceMeTrigger",
-    "commandversion": 1
-  },
-  {
-    "name": "Command (New)",
+    "name": "Command",
     "description": "A command.",
     "tags": [
       "command"
@@ -91,7 +20,7 @@
     "commandversion": 2
   },
   {
-    "name": "InstantCommand (New)",
+    "name": "InstantCommand",
     "description": "A command that finishes instantly.",
     "tags": [
       "instantcommand"
@@ -101,7 +30,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelCommandGroup (New)",
+    "name": "ParallelCommandGroup",
     "description": "A command group that runs commands in parallel, ending when all commands have finished.",
     "tags": [
       "parallelcommandgroup"
@@ -111,7 +40,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelDeadlineGroup (New)",
+    "name": "ParallelDeadlineGroup",
     "description": "A command group that runs commands in parallel, ending when a specific command has finished.",
     "tags": [
       "paralleldeadlinegroup"
@@ -121,7 +50,7 @@
     "commandversion": 2
   },
   {
-    "name": "ParallelRaceGroup (New)",
+    "name": "ParallelRaceGroup",
     "description": "A command that runs commands in parallel, ending as soon as any command has finished.",
     "tags": [
       "parallelracegroup"
@@ -131,7 +60,7 @@
     "commandversion": 2
   },
   {
-    "name": "PIDCommand (New)",
+    "name": "PIDCommand",
     "description": "A command that runs a PIDController.",
     "tags": [
       "pidcommand"
@@ -141,7 +70,7 @@
     "commandversion": 2
   },
   {
-    "name": "PIDSubsystem (New)",
+    "name": "PIDSubsystem",
     "description": "A subsystem that runs a PIDController.",
     "tags": [
       "pidsubsystem"
@@ -151,7 +80,7 @@
     "commandversion": 2
   },
   {
-    "name": "ProfiledPIDCommand (New)",
+    "name": "ProfiledPIDCommand",
     "description": "A command that runs a ProfiledPIDController.",
     "tags": [
       "profiledpidcommand"
@@ -161,7 +90,7 @@
     "commandversion": 2
   },
   {
-    "name": "ProfiledPIDSubsystem (New)",
+    "name": "ProfiledPIDSubsystem",
     "description": "A subsystem that runs a ProfiledPIDController.",
     "tags": [
       "profiledpidsubsystem"
@@ -171,7 +100,7 @@
     "commandversion": 2
   },
   {
-    "name": "SequentialCommandGroup (New)",
+    "name": "SequentialCommandGroup",
     "description": "A command group that runs commands in sequence.",
     "tags": [
       "sequentialcommandgroup"
@@ -181,7 +110,7 @@
     "commandversion": 2
   },
   {
-    "name": "Subsystem (New)",
+    "name": "Subsystem",
     "description": "A robot subsystem.",
     "tags": [
       "subsystem"
@@ -191,7 +120,7 @@
     "commandversion": 2
   },
   {
-    "name": "TrapezoidProfileCommand (New)",
+    "name": "TrapezoidProfileCommand",
     "description": "A command that executes a trapezoidal motion profile.",
     "tags": [
       "trapezoidprofilecommand"
@@ -201,7 +130,7 @@
     "commandversion": 2
   },
   {
-    "name": "TrapezoidProfileSubsystem (New)",
+    "name": "TrapezoidProfileSubsystem",
     "description": "A subystem that executes a trapezoidal motion profile.",
     "tags": [
       "trapezoidprofilesubsystem"

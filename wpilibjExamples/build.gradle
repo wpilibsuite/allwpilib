@@ -34,7 +34,6 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
