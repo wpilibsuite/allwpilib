@@ -27,7 +27,7 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   targetPitch = -10_deg;
 
   dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw);
+                                        targetPitch, targetYaw);
   EXPECT_NEAR(5.671, dist.value(), 0.01);
 
   camHeight = 3_m;
@@ -36,9 +36,9 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   targetPitch = -30_deg;
 
   dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw);
+                                        targetPitch, targetYaw);
   EXPECT_NEAR(3.464, dist.value(), 0.01);
-  
+
   camHeight = 1_m;
   targetHeight = 3_m;
   camPitch = 0_deg;
@@ -46,7 +46,7 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   targetYaw = 30_deg;
 
   dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch, targetYaw);
+                                        targetPitch, targetYaw);
   EXPECT_NEAR(4, dist.value(), 0.01);
 }
 
