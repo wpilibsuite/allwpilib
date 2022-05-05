@@ -4,10 +4,12 @@
 
 package edu.wpi.first.math.controller;
 
+import edu.wpi.first.math.InterpolatingMatrixTreeMap;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -25,12 +27,9 @@ import edu.wpi.first.math.trajectory.Trajectory;
  */
 @SuppressWarnings("MemberName")
 public class LTVUnicycleController {
-  private final Matrix<N3, N3> m_A = new Matrix<>(Nat.N3(), Nat.N3());
-  private final Matrix<N3, N2> m_B =
-      new MatBuilder<>(Nat.N3(), Nat.N2()).fill(1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-  private final Matrix<N3, N3> m_Q;
-  private final Matrix<N2, N2> m_R;
-  private final double m_dt;
+  // LUT from drivetrain linear velocity to LQR gain
+  private final InterpolatingMatrixTreeMap<Double, N2, N3> m_table =
+      new InterpolatingMatrixTreeMap<>();
 
   private Pose2d m_poseError;
   private Pose2d m_poseTolerance;
@@ -66,6 +65,30 @@ public class LTVUnicycleController {
   }
 
   /**
+   * Constructs a linear time-varying unicycle controller with default maximum desired error
+   * tolerances of (0.0625 m, 0.125 m, 2 rad) and default maximum desired control effort of (1 m/s,
+   * 2 rad/s).
+   *
+   * @param dt Discretization timestep in seconds.
+   */
+  public LTVUnicycleController(double dt) {
+    this(VecBuilder.fill(0.0625, 0.125, 2.0), VecBuilder.fill(1.0, 2.0), dt, 9.0);
+  }
+
+  /**
+   * Constructs a linear time-varying unicycle controller with default maximum desired error
+   * tolerances of (0.0625 m, 0.125 m, 2 rad) and default maximum desired control effort of (1 m/s,
+   * 2 rad/s).
+   *
+   * @param dt Discretization timestep in seconds.
+   * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
+   *     table. The default is 9 m/s.
+   */
+  public LTVUnicycleController(double dt, double maxVelocity) {
+    this(VecBuilder.fill(0.0625, 0.125, 2.0), VecBuilder.fill(1.0, 2.0), dt, maxVelocity);
+  }
+
+  /**
    * Constructs a linear time-varying unicycle controller.
    *
    * @param qelems The maximum desired error tolerance for each state.
@@ -73,9 +96,36 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
-    m_dt = dt;
-    m_Q = StateSpaceUtil.makeCostMatrix(qelems);
-    m_R = StateSpaceUtil.makeCostMatrix(relems);
+    this(qelems, relems, dt, 9.0);
+  }
+
+  /**
+   * Constructs a linear time-varying unicycle controller.
+   *
+   * @param qelems The maximum desired error tolerance for each state.
+   * @param relems The maximum desired control effort for each input.
+   * @param dt Discretization timestep in seconds.
+   * @param maxVelocity The maximum velocity in meters per second for the controller gain lookup
+   *     table. The default is 9 m/s.
+   */
+  @SuppressWarnings("LocalVariableName")
+  public LTVUnicycleController(
+      Vector<N3> qelems, Vector<N2> relems, double dt, double maxVelocity) {
+    var A = new Matrix<>(Nat.N3(), Nat.N3());
+    var B = new MatBuilder<>(Nat.N3(), Nat.N2()).fill(1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+    var Q = StateSpaceUtil.makeCostMatrix(qelems);
+    var R = StateSpaceUtil.makeCostMatrix(relems);
+
+    for (double velocity = -maxVelocity; velocity < maxVelocity; velocity += 0.01) {
+      // The DARE is ill-conditioned if the velocity is close to zero, so don't
+      // let the system stop.
+      if (Math.abs(velocity) < 1e-4) {
+        m_table.put(velocity, new Matrix<>(Nat.N2(), Nat.N3()));
+      } else {
+        A.set(State.kY.value, State.kHeading.value, velocity);
+        m_table.put(velocity, new LinearQuadraticRegulator<N3, N2, N3>(A, B, Q, R, dt).getK());
+      }
+    }
   }
 
   /**
@@ -122,15 +172,12 @@ public class LTVUnicycleController {
 
     m_poseError = poseRef.relativeTo(currentPose);
 
-    if (Math.abs(linearVelocityRef) < 1e-4) {
-      m_A.set(State.kY.value, State.kHeading.value, 1e-4);
-    } else {
-      m_A.set(State.kY.value, State.kHeading.value, linearVelocityRef);
-    }
+    @SuppressWarnings("LocalVariableName")
+    var K = m_table.get(linearVelocityRef);
     var e =
         new MatBuilder<>(Nat.N3(), Nat.N1())
             .fill(m_poseError.getX(), m_poseError.getY(), m_poseError.getRotation().getRadians());
-    var u = new LinearQuadraticRegulator<N3, N2, N3>(m_A, m_B, m_Q, m_R, m_dt).getK().times(e);
+    var u = K.times(e);
 
     return new ChassisSpeeds(
         linearVelocityRef + u.get(0, 0), 0.0, angularVelocityRef + u.get(1, 0));
