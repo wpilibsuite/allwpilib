@@ -154,7 +154,7 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Returns the absolute value of the Rotation2d 
+   * Returns the absolute value of the Rotation2d. 
    * 
    * @return The new absolute value Rotation2d
    */
@@ -163,7 +163,8 @@ public class Rotation2d implements Interpolatable<Rotation2d> {
   }
 
   /**
-   * Inverts the Rotation2d, unlike `unaryMinus`, which is a flip across the x-axis, this rotates the angle 180 degrees about the origin.
+   * Inverts the Rotation2d, unlike `unaryMinus`, which is a flip across the x-axis, 
+   * this rotates the angle 180 degrees about the origin.
    * 
    * @return The new inverted Rotation2d 
    */
