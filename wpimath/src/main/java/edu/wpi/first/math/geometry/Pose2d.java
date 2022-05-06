@@ -11,17 +11,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import java.util.Objects;
 
-/** Represents a 2d pose containing translational and rotational elements. */
+/** Represents a 2D pose containing translational and rotational elements. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Pose2d implements Interpolatable<Pose2d> {
   private final Translation2d m_translation;
   private final Rotation2d m_rotation;
 
-  /**
-   * Constructs a pose at the origin facing toward the positive X axis. (Translation2d{0, 0} and
-   * Rotation{0})
-   */
+  /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose2d() {
     m_translation = new Translation2d();
     m_rotation = new Rotation2d();
@@ -42,8 +39,7 @@ public class Pose2d implements Interpolatable<Pose2d> {
   }
 
   /**
-   * Convenience constructors that takes in x and y values directly instead of having to construct a
-   * Translation2d.
+   * Constructs a pose with x and y translations instead of a separate Translation2d.
    *
    * @param x The x component of the translational component of the pose.
    * @param y The y component of the translational component of the pose.
@@ -57,8 +53,11 @@ public class Pose2d implements Interpolatable<Pose2d> {
   /**
    * Transforms the pose by the given transformation and returns the new transformed pose.
    *
-   * <p>The matrix multiplication is as follows [x_new] [cos, -sin, 0][transform.x] [y_new] += [sin,
-   * cos, 0][transform.y] [t_new] [0, 0, 1][transform.t]
+   * <pre>
+   * [x_new]    [cos, -sin, 0][transform.x]
+   * [y_new] += [sin,  cos, 0][transform.y]
+   * [t_new]    [  0,    0, 1][transform.t]
+   * </pre>
    *
    * @param other The transform to transform the pose by.
    * @return The transformed pose.
@@ -160,8 +159,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
    *
    * @param twist The change in pose in the robot's coordinate frame since the previous pose update.
    *     For example, if a non-holonomic robot moves forward 0.01 meters and changes angle by 0.5
-   *     degrees since the previous pose update, the twist would be Twist2d{0.01, 0.0,
-   *     toRadians(0.5)}
+   *     degrees since the previous pose update, the twist would be Twist2d(0.01, 0.0,
+   *     Units.degreesToRadians(0.5)).
    * @return The new pose of the robot.
    */
   public Pose2d exp(Twist2d twist) {
