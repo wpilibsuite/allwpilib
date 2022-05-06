@@ -24,6 +24,10 @@ units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
 }
 
+Rotation2d Translation2d::Rotation() const {
+  return Rotation2d(double(m_x), double(m_y));
+}
+
 Translation2d Translation2d::RotateBy(const Rotation2d& other) const {
   return {m_x * other.Cos() - m_y * other.Sin(),
           m_x * other.Sin() + m_y * other.Cos()};
