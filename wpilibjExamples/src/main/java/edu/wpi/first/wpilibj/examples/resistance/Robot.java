@@ -6,9 +6,11 @@ package edu.wpi.first.wpilibj.examples.resistance;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.ResistanceCalculator;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.function.DoubleSupplier;
 
 /**
  * Sample program to demonstrate logging the resistance of a particular PDP/PDH
@@ -16,30 +18,22 @@ import java.util.function.DoubleSupplier;
  * the current and voltage of a particular channel and doing a linear regression
  * on that data.
  */
-public class Robot extends TimedRobot {
-  /**
-   * Object representing the PDP or PDH on the robot. The PowerDistribution
-   * class implements Sendable and logs the robot resistance. It can also be used
-   * to get the current flowing through a particular channel.
-   */
-  private final PowerDistribution m_powerDistribution = new PowerDistribution();
-
-  /**
-   * The channel whose resistance will be logged in this example.
-   */
+public class Robot extends TimedRobot {  
+  /** The channel whose resistance will be logged in this example. */
   private static final int kChannel = 1;
 
   /**
-   * Used to calculate the resistance of channel 1.
+   * Object representing the PDP or PDH on the robot. The PowerDistribution class implements
+   * Sendable and logs the robot resistance. It can also be used to get the current flowing through
+   * a particular channel.
    */
+  private final PowerDistribution m_powerDistribution = new PowerDistribution();
+
+  /** Used to calculate the resistance of channel 1. */
   private final ResistanceCalculator m_resistCalc = new ResistanceCalculator();
 
-  /**
-   * Used to get the voltage received by the motor plugged into channel 1.
-   * It is only a Supplier here because this is an example. In real code, a
-   * motor controller on the CAN bus would be used to get the voltage instead.
-   */
-  private final DoubleSupplier m_chan1Voltage = () -> 1.0;
+  /** The motor plugged into channel 1. */
+  private final MotorController m_motor = new PWMSparkMax(0);
 
   @Override
   public void robotInit() {
@@ -51,9 +45,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     var chan1Current = m_powerDistribution.getCurrent(kChannel);
-    // Get the voltage received by the motor plugged into channel 1. Note that
-    // in practice, this voltage would be gotten through a motor controller object.
-    var chan1Voltage = m_chan1Voltage.getAsDouble();
+    // Get the voltage given to the motor plugged into channel 1.
+    var chan1Voltage = m_motor.get() * RobotController.getBatteryVoltage();
 
     // Calculate and log channel 1's resistance
     SmartDashboard.putNumber(
