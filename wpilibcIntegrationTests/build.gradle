@@ -44,7 +44,6 @@ model {
                         cppCompiler.args "-Wno-unused-variable"
                         cppCompiler.args "-Wno-error=deprecated-declarations"
                     }
-                    lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
@@ -54,6 +53,7 @@ model {
                     project(':hal').addHalDependency(binary, 'shared')
                     project(':hal').addHalJniDependency(binary)
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')

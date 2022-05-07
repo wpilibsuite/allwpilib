@@ -44,10 +44,10 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibOldCommands')
     implementation project(':wpilibNewCommands')
 }
 
@@ -161,7 +161,6 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCpp.binary = binary
                     }
                 }
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'shared'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -171,9 +170,11 @@ model {
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalDependency(binary, 'shared')
                 project(':hal').addHalJniDependency(binary)
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')
@@ -208,7 +209,6 @@ model {
                         deploy.targets.roborio.artifacts.myRobotCppStatic.binary = binary
                     }
                 }
-                lib project: ':wpilibOldCommands', library: 'wpilibOldCommands', linkage: 'static'
                 lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
@@ -216,6 +216,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
                 project(':hal').addHalDependency(binary, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                     nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')

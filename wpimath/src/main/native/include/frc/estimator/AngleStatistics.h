@@ -6,7 +6,7 @@
 
 #include <wpi/numbers>
 
-#include "Eigen/Core"
+#include "frc/EigenCore.h"
 #include "frc/MathUtil.h"
 
 namespace frc {
@@ -21,10 +21,9 @@ namespace frc {
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-Eigen::Vector<double, States> AngleResidual(
-    const Eigen::Vector<double, States>& a,
-    const Eigen::Vector<double, States>& b, int angleStateIdx) {
-  Eigen::Vector<double, States> ret = a - b;
+Vectord<States> AngleResidual(const Vectord<States>& a,
+                              const Vectord<States>& b, int angleStateIdx) {
+  Vectord<States> ret = a - b;
   ret[angleStateIdx] =
       AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
   return ret;
@@ -38,8 +37,7 @@ Eigen::Vector<double, States> AngleResidual(
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-std::function<Eigen::Vector<double, States>(
-    const Eigen::Vector<double, States>&, const Eigen::Vector<double, States>&)>
+std::function<Vectord<States>(const Vectord<States>&, const Vectord<States>&)>
 AngleResidual(int angleStateIdx) {
   return [=](auto a, auto b) {
     return AngleResidual<States>(a, b, angleStateIdx);
@@ -56,10 +54,9 @@ AngleResidual(int angleStateIdx) {
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-Eigen::Vector<double, States> AngleAdd(const Eigen::Vector<double, States>& a,
-                                       const Eigen::Vector<double, States>& b,
-                                       int angleStateIdx) {
-  Eigen::Vector<double, States> ret = a + b;
+Vectord<States> AngleAdd(const Vectord<States>& a, const Vectord<States>& b,
+                         int angleStateIdx) {
+  Vectord<States> ret = a + b;
   ret[angleStateIdx] =
       InputModulus(ret[angleStateIdx], -wpi::numbers::pi, wpi::numbers::pi);
   return ret;
@@ -73,8 +70,7 @@ Eigen::Vector<double, States> AngleAdd(const Eigen::Vector<double, States>& a,
  * @param angleStateIdx The row containing angles to be normalized.
  */
 template <int States>
-std::function<Eigen::Vector<double, States>(
-    const Eigen::Vector<double, States>&, const Eigen::Vector<double, States>&)>
+std::function<Vectord<States>(const Vectord<States>&, const Vectord<States>&)>
 AngleAdd(int angleStateIdx) {
   return [=](auto a, auto b) { return AngleAdd<States>(a, b, angleStateIdx); };
 }
@@ -91,9 +87,9 @@ AngleAdd(int angleStateIdx) {
  * @param angleStatesIdx The row containing the angles.
  */
 template <int CovDim, int States>
-Eigen::Vector<double, CovDim> AngleMean(
-    const Eigen::Matrix<double, CovDim, 2 * States + 1>& sigmas,
-    const Eigen::Vector<double, 2 * States + 1>& Wm, int angleStatesIdx) {
+Vectord<CovDim> AngleMean(const Matrixd<CovDim, 2 * States + 1>& sigmas,
+                          const Vectord<2 * States + 1>& Wm,
+                          int angleStatesIdx) {
   double sumSin = sigmas.row(angleStatesIdx)
                       .unaryExpr([](auto it) { return std::sin(it); })
                       .sum();
@@ -101,7 +97,7 @@ Eigen::Vector<double, CovDim> AngleMean(
                       .unaryExpr([](auto it) { return std::cos(it); })
                       .sum();
 
-  Eigen::Vector<double, CovDim> ret = sigmas * Wm;
+  Vectord<CovDim> ret = sigmas * Wm;
   ret[angleStatesIdx] = std::atan2(sumSin, sumCos);
   return ret;
 }
@@ -116,9 +112,8 @@ Eigen::Vector<double, CovDim> AngleMean(
  * @param angleStateIdx The row containing the angles.
  */
 template <int CovDim, int States>
-std::function<Eigen::Vector<double, CovDim>(
-    const Eigen::Matrix<double, CovDim, 2 * States + 1>&,
-    const Eigen::Vector<double, 2 * States + 1>&)>
+std::function<Vectord<CovDim>(const Matrixd<CovDim, 2 * States + 1>&,
+                              const Vectord<2 * States + 1>&)>
 AngleMean(int angleStateIdx) {
   return [=](auto sigmas, auto Wm) {
     return AngleMean<CovDim, States>(sigmas, Wm, angleStateIdx);

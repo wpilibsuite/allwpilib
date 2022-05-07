@@ -11,9 +11,11 @@ apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     devImplementation project(':wpiutil')
+    devImplementation project(':wpinet')
     devImplementation project(':ntcore')
     devImplementation project(':cscore')
 }
@@ -70,6 +72,7 @@ model {
             }
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }

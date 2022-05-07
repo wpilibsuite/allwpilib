@@ -151,6 +151,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     }
                     lib library: nativeName, linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'
@@ -189,6 +190,7 @@ if (!project.hasProperty('onlylinuxathena') && !project.hasProperty('onlylinuxra
                     lib library: 'glassnt', linkage: 'static'
                     lib library: nativeName, linkage: 'static'
                     lib project: ':ntcore', library: 'ntcore', linkage: 'static'
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                     lib project: ':wpigui', library: 'wpigui', linkage: 'static'

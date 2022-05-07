@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <frc/EigenCore.h>
 #include <frc/kinematics/DifferentialDriveKinematics.h>
 #include <frc/system/LinearSystem.h>
 #include <frc/system/plant/DCMotor.h>
 
-#include <Eigen/Core>
 #include <units/length.h>
 #include <units/moment_of_inertia.h>
 #include <units/time.h>
@@ -80,7 +80,7 @@ class DifferentialDrivetrainSim {
    * @param u The input vector.
    * @return The normalized input.
    */
-  Eigen::Vector<double, 2> ClampInput(const Eigen::Vector<double, 2>& u);
+  Vectord<2> ClampInput(const Vectord<2>& u);
 
   /**
    * Sets the applied voltage to the drivetrain. Note that positive voltage must
@@ -178,7 +178,7 @@ class DifferentialDrivetrainSim {
    *
    * @param state The state.
    */
-  void SetState(const Eigen::Vector<double, 7>& state);
+  void SetState(const Vectord<7>& state);
 
   /**
    * Sets the system pose.
@@ -187,8 +187,7 @@ class DifferentialDrivetrainSim {
    */
   void SetPose(const frc::Pose2d& pose);
 
-  Eigen::Vector<double, 7> Dynamics(const Eigen::Vector<double, 7>& x,
-                                    const Eigen::Vector<double, 2>& u);
+  Vectord<7> Dynamics(const Vectord<7>& x, const Vectord<2>& u);
 
   class State {
    public:
@@ -301,7 +300,7 @@ class DifferentialDrivetrainSim {
   /**
    * Returns the current output vector y.
    */
-  Eigen::Vector<double, 7> GetOutput() const;
+  Vectord<7> GetOutput() const;
 
   /**
    * Returns an element of the state vector. Note that this will not include
@@ -314,7 +313,7 @@ class DifferentialDrivetrainSim {
   /**
    * Returns the current state vector x. Note that this will not include noise!
    */
-  Eigen::Vector<double, 7> GetState() const;
+  Vectord<7> GetState() const;
 
   LinearSystem<2, 2, 2> m_plant;
   units::meter_t m_rb;
@@ -325,9 +324,9 @@ class DifferentialDrivetrainSim {
   double m_originalGearing;
   double m_currentGearing;
 
-  Eigen::Vector<double, 7> m_x;
-  Eigen::Vector<double, 2> m_u;
-  Eigen::Vector<double, 7> m_y;
+  Vectord<7> m_x;
+  Vectord<2> m_u;
+  Vectord<7> m_y;
   std::array<double, 7> m_measurementStdDevs;
 };
 }  // namespace frc::sim
