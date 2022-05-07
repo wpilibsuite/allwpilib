@@ -4,10 +4,10 @@
 
 #include "UsbCameraListener.h"
 
-#include <wpi/EventLoopRunner.h>
 #include <wpi/StringExtras.h>
-#include <wpi/uv/FsEvent.h>
-#include <wpi/uv/Timer.h>
+#include <wpinet/EventLoopRunner.h>
+#include <wpinet/uv/FsEvent.h>
+#include <wpinet/uv/Timer.h>
 
 #include "Notifier.h"
 

@@ -6,15 +6,16 @@
 #define UNICODE
 #endif
 
-#include "wpi/MulticastServiceResolver.h"
+#include "wpinet/MulticastServiceResolver.h"
 
 #include <string>
 
+#include <wpi/ConvertUTF.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
+
 #include "DynamicDns.h"
-#include "wpi/ConvertUTF.h"
-#include "wpi/SmallString.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
 
 #pragma comment(lib, "dnsapi")
 

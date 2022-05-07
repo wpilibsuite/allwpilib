@@ -3,10 +3,10 @@ apply from: "${rootDir}/shared/resources.gradle"
 ext {
     skipJniCheck = true
     baseId = 'wpinet'
-    groupId = 'edu.wpi.first.wpinet'
+    groupId = 'edu.wpi.first.net'
 
     nativeName = 'wpinet'
-    devMain = 'edu.wpi.first.wpinet.DevMain'
+    devMain = 'edu.wpi.first.net.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {

@@ -4,11 +4,12 @@
 
 #include <cstdio>
 
-#include "wpi/EventLoopRunner.h"
-#include "wpi/Logger.h"
-#include "wpi/ParallelTcpConnector.h"
-#include "wpi/uv/Error.h"
-#include "wpi/uv/Tcp.h"
+#include <wpi/Logger.h>
+
+#include "wpinet/EventLoopRunner.h"
+#include "wpinet/ParallelTcpConnector.h"
+#include "wpinet/uv/Error.h"
+#include "wpinet/uv/Tcp.h"
 
 namespace uv = wpi::uv;
 

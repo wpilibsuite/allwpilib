@@ -2,14 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/PortForwarder.h"
+#include "wpinet/PortForwarder.h"
 
-#include "fmt/format.h"
-#include "wpi/DenseMap.h"
-#include "wpi/EventLoopRunner.h"
-#include "wpi/uv/GetAddrInfo.h"
-#include "wpi/uv/Tcp.h"
-#include "wpi/uv/Timer.h"
+#include <fmt/format.h>
+#include <wpi/DenseMap.h>
+
+#include "wpinet/EventLoopRunner.h"
+#include "wpinet/uv/GetAddrInfo.h"
+#include "wpinet/uv/Tcp.h"
+#include "wpinet/uv/Timer.h"
 
 using namespace wpi;
 

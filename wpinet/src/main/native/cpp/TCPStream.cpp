@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "wpi/TCPStream.h"
+#include "wpinet/TCPStream.h"
 
 #include <fcntl.h>
 

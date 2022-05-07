@@ -2,10 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/uv/GetNameInfo.h"
+#include "wpinet/uv/GetNameInfo.h"
 
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/util.h"
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/util.h"
 
 namespace wpi::uv {
 

@@ -23,11 +23,11 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpi/uv/GetNameInfo.h"  // NOLINT(build/include_order)
+#include "wpinet/uv/GetNameInfo.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
-#include "wpi/uv/Loop.h"
+#include "wpinet/uv/Loop.h"
 
 namespace wpi::uv {
 

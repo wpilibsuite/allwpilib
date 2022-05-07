@@ -4,17 +4,18 @@
 
 #include <cstdio>
 
-#include "fmt/format.h"
-#include "wpi/MathExtras.h"
-#include "wpi/SmallVector.h"
-#include "wpi/StringExtras.h"
-#include "wpi/raw_uv_ostream.h"
-#include "wpi/timestamp.h"
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/Tcp.h"
-#include "wpi/uv/Tty.h"
-#include "wpi/uv/Udp.h"
-#include "wpi/uv/util.h"
+#include <fmt/format.h>
+#include <wpi/MathExtras.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringExtras.h>
+#include <wpi/timestamp.h>
+
+#include "wpinet/raw_uv_ostream.h"
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/Tcp.h"
+#include "wpinet/uv/Tty.h"
+#include "wpinet/uv/Udp.h"
+#include "wpinet/uv/util.h"
 
 namespace uv = wpi::uv;
 

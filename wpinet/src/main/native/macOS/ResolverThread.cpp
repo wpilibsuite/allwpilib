@@ -4,7 +4,7 @@
 
 #include "ResolverThread.h"
 
-#include "wpi/mutex.h"
+#include <wpi/mutex.h>
 
 using namespace wpi;
 

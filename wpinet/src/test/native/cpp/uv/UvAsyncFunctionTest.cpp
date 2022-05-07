@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/uv/AsyncFunction.h"  // NOLINT(build/include_order)
+#include "wpinet/uv/AsyncFunction.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
 #include <thread>
 
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/Prepare.h"
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/Prepare.h"
 
 namespace wpi::uv {
 

@@ -4,11 +4,12 @@
 
 #include <cstdio>
 
-#include "fmt/format.h"
-#include "wpi/DsClient.h"
-#include "wpi/EventLoopRunner.h"
-#include "wpi/Logger.h"
-#include "wpi/uv/Error.h"
+#include <fmt/format.h>
+#include <wpi/Logger.h>
+
+#include "wpinet/DsClient.h"
+#include "wpinet/EventLoopRunner.h"
+#include "wpinet/uv/Error.h"
 
 namespace uv = wpi::uv;
 

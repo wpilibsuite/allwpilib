@@ -23,11 +23,11 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpi/uv/Loop.h"  // NOLINT(build/include_order)
+#include "wpinet/uv/Loop.h"  // NOLINT(build/include_order)
 
 #include "gtest/gtest.h"  // NOLINT(build/include_order)
 
-#include "wpi/uv/Timer.h"
+#include "wpinet/uv/Timer.h"
 
 namespace wpi::uv {
 

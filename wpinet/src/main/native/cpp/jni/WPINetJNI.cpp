@@ -4,12 +4,13 @@
 
 #include <jni.h>
 
+#include <wpi/jni_util.h>
+
 #include "../MulticastHandleManager.h"
 #include "edu_wpi_first_net_WPINetJNI.h"
-#include "wpi/MulticastServiceAnnouncer.h"
-#include "wpi/MulticastServiceResolver.h"
-#include "wpi/PortForwarder.h"
-#include "wpi/jni_util.h"
+#include "wpinet/MulticastServiceAnnouncer.h"
+#include "wpinet/MulticastServiceResolver.h"
+#include "wpinet/PortForwarder.h"
 
 using namespace wpi::java;
 

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/uv/Tcp.h"
+#include "wpinet/uv/Tcp.h"
 
 #include <cstring>
 
-#include "wpi/uv/util.h"
+#include "wpinet/uv/util.h"
 
 namespace wpi::uv {
 

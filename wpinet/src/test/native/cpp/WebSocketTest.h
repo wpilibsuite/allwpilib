@@ -8,11 +8,12 @@
 #include <memory>
 #include <vector>
 
+#include <wpi/span.h>
+
 #include "gtest/gtest.h"
-#include "wpi/span.h"
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/Pipe.h"
-#include "wpi/uv/Timer.h"
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/Pipe.h"
+#include "wpinet/uv/Timer.h"
 
 namespace wpi {
 

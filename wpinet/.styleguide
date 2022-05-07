@@ -10,7 +10,7 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   src/main/native/cpp/http_parser\.cpp$
-  src/main/native/include/wpi/http_parser\.h$
+  src/main/native/include/wpinet/http_parser\.h$
   src/main/native/include/uv\.h$
   src/main/native/include/uv/
   src/main/native/libuv/
@@ -22,9 +22,9 @@ licenseUpdateExclude {
   src/main/native/cpp/TCPAcceptor\.cpp$
   src/main/native/cpp/TCPConnector\.cpp$
   src/main/native/cpp/TCPStream\.cpp$
-  src/main/native/include/wpi/TCPAcceptor\.h$
-  src/main/native/include/wpi/TCPConnector\.h$
-  src/main/native/include/wpi/TCPStream\.h$
+  src/main/native/include/wpinet/TCPAcceptor\.h$
+  src/main/native/include/wpinet/TCPConnector\.h$
+  src/main/native/include/wpinet/TCPStream\.h$
 }
 
 repoRootNameOverride {
@@ -33,6 +33,11 @@ repoRootNameOverride {
 
 includeGuardRoots {
   wpinet/src/main/native/cpp/
-  wpinet/src/main/native/include/
+  wpinet/src/main/native/include/wpinet/
   wpinet/src/test/native/cpp/
+}
+
+includeOtherLibs {
+  ^fmt/
+  ^wpi/
 }

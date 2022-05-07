@@ -4,12 +4,13 @@
 
 #include <cstdio>
 
-#include "fmt/format.h"
-#include "wpi/EventLoopRunner.h"
-#include "wpi/HttpServerConnection.h"
-#include "wpi/UrlParser.h"
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/Tcp.h"
+#include <fmt/format.h>
+
+#include "wpinet/EventLoopRunner.h"
+#include "wpinet/HttpServerConnection.h"
+#include "wpinet/UrlParser.h"
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/Tcp.h"
 
 namespace uv = wpi::uv;
 

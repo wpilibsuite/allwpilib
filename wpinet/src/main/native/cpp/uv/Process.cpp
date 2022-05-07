@@ -2,11 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/uv/Process.h"
+#include "wpinet/uv/Process.h"
 
-#include "wpi/SmallString.h"
-#include "wpi/uv/Loop.h"
-#include "wpi/uv/Pipe.h"
+#include <wpi/SmallString.h>
+
+#include "wpinet/uv/Loop.h"
+#include "wpinet/uv/Pipe.h"
 
 namespace wpi::uv {
 
