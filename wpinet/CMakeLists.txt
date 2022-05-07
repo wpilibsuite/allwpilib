@@ -71,46 +71,46 @@ file(GLOB_RECURSE wpinet_linux_src src/main/native/linux/*.cpp)
 file(GLOB_RECURSE wpinet_macos_src src/main/native/macOS/*.cpp)
 file(GLOB_RECURSE wpinet_windows_src src/main/native/windows/*.cpp)
 
-file(GLOB uv_native_src src/main/native/libuv/src/*.cpp)
+file(GLOB uv_native_src src/main/native/thirdparty/libuv/src/*.cpp)
 
-file(GLOB uv_windows_src src/main/native/libuv/src/win/*.cpp)
+file(GLOB uv_windows_src src/main/native/thirdparty/libuv/src/win/*.cpp)
 
 set(uv_unix_src
-    src/main/native/libuv/src/unix/async.cpp
-    src/main/native/libuv/src/unix/core.cpp
-    src/main/native/libuv/src/unix/dl.cpp
-    src/main/native/libuv/src/unix/fs.cpp
-    src/main/native/libuv/src/unix/getaddrinfo.cpp
-    src/main/native/libuv/src/unix/getnameinfo.cpp
-    src/main/native/libuv/src/unix/loop-watcher.cpp
-    src/main/native/libuv/src/unix/loop.cpp
-    src/main/native/libuv/src/unix/pipe.cpp
-    src/main/native/libuv/src/unix/poll.cpp
-    src/main/native/libuv/src/unix/process.cpp
-    src/main/native/libuv/src/unix/signal.cpp
-    src/main/native/libuv/src/unix/stream.cpp
-    src/main/native/libuv/src/unix/tcp.cpp
-    src/main/native/libuv/src/unix/thread.cpp
-    src/main/native/libuv/src/unix/tty.cpp
-    src/main/native/libuv/src/unix/udp.cpp
+    src/main/native/thirdparty/libuv/src/unix/async.cpp
+    src/main/native/thirdparty/libuv/src/unix/core.cpp
+    src/main/native/thirdparty/libuv/src/unix/dl.cpp
+    src/main/native/thirdparty/libuv/src/unix/fs.cpp
+    src/main/native/thirdparty/libuv/src/unix/getaddrinfo.cpp
+    src/main/native/thirdparty/libuv/src/unix/getnameinfo.cpp
+    src/main/native/thirdparty/libuv/src/unix/loop-watcher.cpp
+    src/main/native/thirdparty/libuv/src/unix/loop.cpp
+    src/main/native/thirdparty/libuv/src/unix/pipe.cpp
+    src/main/native/thirdparty/libuv/src/unix/poll.cpp
+    src/main/native/thirdparty/libuv/src/unix/process.cpp
+    src/main/native/thirdparty/libuv/src/unix/signal.cpp
+    src/main/native/thirdparty/libuv/src/unix/stream.cpp
+    src/main/native/thirdparty/libuv/src/unix/tcp.cpp
+    src/main/native/thirdparty/libuv/src/unix/thread.cpp
+    src/main/native/thirdparty/libuv/src/unix/tty.cpp
+    src/main/native/thirdparty/libuv/src/unix/udp.cpp
 )
 
 set(uv_darwin_src
-    src/main/native/libuv/src/unix/bsd-ifaddrs.cpp
-    src/main/native/libuv/src/unix/darwin.cpp
-    src/main/native/libuv/src/unix/darwin-proctitle.cpp
-    src/main/native/libuv/src/unix/fsevents.cpp
-    src/main/native/libuv/src/unix/kqueue.cpp
-    src/main/native/libuv/src/unix/proctitle.cpp
+    src/main/native/thirdparty/libuv/src/unix/bsd-ifaddrs.cpp
+    src/main/native/thirdparty/libuv/src/unix/darwin.cpp
+    src/main/native/thirdparty/libuv/src/unix/darwin-proctitle.cpp
+    src/main/native/thirdparty/libuv/src/unix/fsevents.cpp
+    src/main/native/thirdparty/libuv/src/unix/kqueue.cpp
+    src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
 )
 
 set(uv_linux_src
-    src/main/native/libuv/src/unix/linux-core.cpp
-    src/main/native/libuv/src/unix/linux-inotify.cpp
-    src/main/native/libuv/src/unix/linux-syscalls.cpp
-    src/main/native/libuv/src/unix/procfs-exepath.cpp
-    src/main/native/libuv/src/unix/proctitle.cpp
-    src/main/native/libuv/src/unix/sysinfo-loadavg.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux-core.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux-inotify.cpp
+    src/main/native/thirdparty/libuv/src/unix/linux-syscalls.cpp
+    src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp
+    src/main/native/thirdparty/libuv/src/unix/proctitle.cpp
+    src/main/native/thirdparty/libuv/src/unix/sysinfo-loadavg.cpp
 )
 
 add_library(wpinet ${wpinet_native_src} ${wpinet_resources_src})
@@ -124,11 +124,11 @@ target_link_libraries(wpinet PUBLIC wpiutil)
 
 if (NOT USE_VCPKG_LIBUV)
     target_sources(wpinet PRIVATE ${uv_native_src})
-    install(DIRECTORY src/main/native/libuv/include/ DESTINATION "${include_dest}/wpinet")
+    install(DIRECTORY src/main/native/thirdparty/libuv/include/ DESTINATION "${include_dest}/wpinet")
     target_include_directories(wpinet PRIVATE
-        src/main/native/libuv/src)
+        src/main/native/thirdparty/libuv/src)
     target_include_directories(wpinet PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/libuv/include>
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libuv/include>
                             $<INSTALL_INTERFACE:${include_dest}/wpinet>)
     if(NOT MSVC)
         target_sources(wpinet PRIVATE ${uv_unix_src})

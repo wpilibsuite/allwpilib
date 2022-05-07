@@ -24,9 +24,7 @@ LLVM                  wpiutil/src/main/native/include/wpi/{various files}
 JSON for Modern C++   wpiutil/src/main/native/include/wpi/json.h
                       wpiutil/src/main/native/cpp/json_*.cpp
                       wpiutil/src/test/native/cpp/json/
-libuv                 wpiutil/src/main/native/include/uv.h
-                      wpiutil/src/main/native/include/uv/
-                      wpiutil/src/main/native/libuv/
+libuv                 wpinet/src/main/native/thirdparty/libuv/
 fmtlib                wpiutil/src/main/native/fmtlib/
 sigslot               wpiutil/src/main/native/include/wpi/Signal.h
                       wpiutil/src/test/native/cpp/sigslot/
@@ -34,11 +32,11 @@ tcpsockets            wpiutil/src/main/native/cpp/TCP{Stream,Connector,Acceptor}
                       wpiutil/src/main/native/include/wpi/TCP*.h
 MPack                 wpiutil/src/main/native/include/mpack.h
                       wpiutil/src/main/native/cpp/mpack.cpp
-Bootstrap             wpiutil/src/main/native/resources/bootstrap-*
-CoreUI                wpiutil/src/main/native/resources/coreui-*
-Feather Icons         wpiutil/src/main/native/resources/feather-*
-jQuery                wpiutil/src/main/native/resources/jquery-*
-popper.js             wpiutil/src/main/native/resources/popper-*
+Bootstrap             wpinet/src/main/native/resources/bootstrap-*
+CoreUI                wpinet/src/main/native/resources/coreui-*
+Feather Icons         wpinet/src/main/native/resources/feather-*
+jQuery                wpinet/src/main/native/resources/jquery-*
+popper.js             wpinet/src/main/native/resources/popper-*
 units                 wpimath/src/main/native/include/units/
 Eigen                 wpimath/src/main/native/eigeninclude/
                       wpimath/src/main/native/include/unsupported/

@@ -16,11 +16,11 @@ ext {
         it.sources {
             libuvCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/libuv/src'
+                    srcDirs 'src/main/native/thirdparty/libuv/src'
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
             resourcesCpp(CppSourceSet) {
@@ -38,7 +38,7 @@ ext {
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/src/unix'
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
                             'async.cpp',
                             'core.cpp',
@@ -61,7 +61,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                     }
                 }
                 wpinetUnixCpp(CppSourceSet) {
@@ -83,11 +83,11 @@ ext {
             it.sources {
                 libuvWindowsCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/src/win'
+                        srcDirs 'src/main/native/thirdparty/libuv/src/win'
                         include '*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                     }
                 }
                 wpinetWindowsCpp(CppSourceSet) {
@@ -105,7 +105,7 @@ ext {
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/src/unix'
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
                             'bsd-ifaddrs.cpp',
                             'darwin.cpp',
@@ -116,7 +116,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                     }
                 }
                 wpinetmacOSCpp(CppSourceSet) {
@@ -134,7 +134,7 @@ ext {
             it.sources {
                 libuvLinuxCpp(CppSourceSet) {
                     source {
-                        srcDirs 'src/main/native/libuv/src/unix'
+                        srcDirs 'src/main/native/thirdparty/libuv/src/unix'
                         includes = [
                             'linux-core.cpp',
                             'linux-inotify.cpp',
@@ -145,7 +145,7 @@ ext {
                         ]
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                        srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                     }
                 }
                 wpinetLinuxCpp(CppSourceSet) {
@@ -207,7 +207,7 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
-    from('src/main/native/libuv/include') {
+    from('src/main/native/thirdparty/libuv/include') {
         into '/'
     }
 }
@@ -217,7 +217,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/libuv/include', 'src/main/native/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                 }
             }
         }
