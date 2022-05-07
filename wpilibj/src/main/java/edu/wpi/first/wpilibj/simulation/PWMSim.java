@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.simulation;
 import edu.wpi.first.hal.simulation.NotifyCallback;
 import edu.wpi.first.hal.simulation.PWMDataJNI;
 import edu.wpi.first.wpilibj.PWM;
+import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 
 /** Class to control a simulated PWM output. */
 public class PWMSim {
@@ -19,6 +20,15 @@ public class PWMSim {
    */
   public PWMSim(PWM pwm) {
     m_index = pwm.getChannel();
+  }
+
+  /**
+   * Constructs from a PWMMotorController object.
+   *
+   * @param motorctrl PWMMotorController to simulate
+   */
+  public PWMSim(PWMMotorController motorctrl) {
+    m_index = motorctrl.getChannel();
   }
 
   /**

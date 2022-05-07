@@ -12,8 +12,6 @@
 
 using namespace frc;
 
-static constexpr double kEpsilon = 1E-9;
-
 TEST(Transform2dTest, Inverse) {
   const Pose2d initial{1_m, 2_m, 45_deg};
   const Transform2d transform{{5_m, 0_m}, 5_deg};
@@ -21,10 +19,10 @@ TEST(Transform2dTest, Inverse) {
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
 
-  EXPECT_NEAR(initial.X().value(), untransformed.X().value(), kEpsilon);
-  EXPECT_NEAR(initial.Y().value(), untransformed.Y().value(), kEpsilon);
-  EXPECT_NEAR(initial.Rotation().Degrees().value(),
-              untransformed.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_NEAR(initial.X().value(), untransformed.X().value(), 1e-9);
+  EXPECT_DOUBLE_EQ(initial.Y().value(), untransformed.Y().value());
+  EXPECT_DOUBLE_EQ(initial.Rotation().Degrees().value(),
+                   untransformed.Rotation().Degrees().value());
 }
 
 TEST(Transform2dTest, Composition) {
@@ -35,10 +33,10 @@ TEST(Transform2dTest, Composition) {
   auto transformedSeparate = initial + transform1 + transform2;
   auto transformedCombined = initial + (transform1 + transform2);
 
-  EXPECT_NEAR(transformedSeparate.X().value(), transformedCombined.X().value(),
-              kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Y().value(), transformedCombined.Y().value(),
-              kEpsilon);
-  EXPECT_NEAR(transformedSeparate.Rotation().Degrees().value(),
-              transformedCombined.Rotation().Degrees().value(), kEpsilon);
+  EXPECT_DOUBLE_EQ(transformedSeparate.X().value(),
+                   transformedCombined.X().value());
+  EXPECT_DOUBLE_EQ(transformedSeparate.Y().value(),
+                   transformedCombined.Y().value());
+  EXPECT_DOUBLE_EQ(transformedSeparate.Rotation().Degrees().value(),
+                   transformedCombined.Rotation().Degrees().value());
 }

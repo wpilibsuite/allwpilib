@@ -11,6 +11,7 @@
 namespace frc {
 
 class PWM;
+class PWMMotorController;
 
 namespace sim {
 
@@ -25,6 +26,13 @@ class PWMSim {
    * @param pwm PWM to simulate
    */
   explicit PWMSim(const PWM& pwm);
+
+  /**
+   * Constructs from a PWMMotorController object.
+   *
+   * @param motorctrl PWMMotorController to simulate
+   */
+  explicit PWMSim(const PWMMotorController& motorctrl);
 
   /**
    * Constructs from a PWM channel number.

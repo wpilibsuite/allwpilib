@@ -78,6 +78,25 @@ class SwerveDriveKinematicsTest {
   }
 
   @Test
+  void testConserveWheelAngle() {
+    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
+    m_kinematics.toSwerveModuleStates(speeds);
+    var moduleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds());
+
+    // Robot is stationary, but module angles are preserved.
+
+    assertAll(
+        () -> assertEquals(0.0, moduleStates[0].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[1].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[2].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(0.0, moduleStates[3].speedMetersPerSecond, kEpsilon),
+        () -> assertEquals(135.0, moduleStates[0].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(45.0, moduleStates[1].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(-135.0, moduleStates[2].angle.getDegrees(), kEpsilon),
+        () -> assertEquals(-45.0, moduleStates[3].angle.getDegrees(), kEpsilon));
+  }
+
+  @Test
   void testTurnInPlaceInverseKinematics() {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 2 * Math.PI);
     var moduleStates = m_kinematics.toSwerveModuleStates(speeds);
