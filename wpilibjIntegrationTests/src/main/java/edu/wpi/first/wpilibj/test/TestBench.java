@@ -311,21 +311,6 @@ public final class TestBench {
   }
 
   /**
-   * Gets the singleton of the TestBench. If the TestBench is not already allocated in constructs an
-   * new instance of it. Otherwise it returns the existing instance.
-   *
-   * @return The Singleton instance of the TestBench
-   * @deprecated Use the static methods instead
-   */
-  @Deprecated
-  public static TestBench getInstance() {
-    if (instance == null) {
-      instance = new TestBench();
-    }
-    return instance;
-  }
-
-  /**
    * Provides access to the output stream for the test system. This should be used instead of
    * System.out This is gives us a way to implement changes to where the output text of this test
    * system is sent.

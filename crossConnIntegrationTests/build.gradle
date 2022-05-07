@@ -91,6 +91,7 @@ model {
                     }
                     project(':hal').addHalDependency(binary, 'shared')
                     project(':hal').addHalJniDependency(binary)
+                    lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     if (binary.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
                         nativeUtils.useRequiredLibrary(binary, 'ni_link_libraries', 'ni_runtime_libraries')

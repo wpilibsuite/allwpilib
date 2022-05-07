@@ -30,10 +30,10 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   frc::LinearPlantInversionFeedforward feedforward{plant, 20_ms};
   frc::RamseteController ramsete;
 
-  feedforward.Reset(Eigen::Vector<double, 2>{0.0, 0.0});
+  feedforward.Reset(frc::Vectord<2>{0.0, 0.0});
 
   // Ground truth.
-  Eigen::Vector<double, 7> groundTruthX = Eigen::Vector<double, 7>::Zero();
+  frc::Vectord<7> groundTruthX = frc::Vectord<7>::Zero();
 
   frc::TrajectoryConfig config{1_mps, 1_mps_sq};
   config.AddConstraint(
@@ -48,7 +48,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
     auto [l, r] = kinematics.ToWheelSpeeds(ramseteOut);
     auto voltages =
-        feedforward.Calculate(Eigen::Vector<double, 2>{l.value(), r.value()});
+        feedforward.Calculate(frc::Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
     sim.SetInputs(units::volt_t(voltages(0, 0)), units::volt_t(voltages(1, 0)));
@@ -56,7 +56,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
 
     // Update ground truth.
     groundTruthX = frc::RK4(
-        [&sim](const auto& x, const auto& u) -> Eigen::Vector<double, 7> {
+        [&sim](const auto& x, const auto& u) -> frc::Vectord<7> {
           return sim.Dynamics(x, u);
         },
         groundTruthX, voltages, 20_ms);

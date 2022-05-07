@@ -284,9 +284,8 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.Command}
-   *   <li>{@link edu.wpi.first.wpilibj.command.CommandGroup}
-   *   <li>Any custom subclass of {@code Command} or {@code CommandGroup}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.Command}
+   *   <li>Any custom subclass of {@code Command}
    * </ul>
    *
    * <br>
@@ -300,7 +299,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.command.PIDCommand}
+   *   <li>{@link edu.wpi.first.wpilibj2.command.PIDCommand}
    *   <li>Any custom subclass of {@code PIDCommand}
    * </ul>
    *
@@ -314,7 +313,7 @@ public enum BuiltInWidgets implements WidgetType {
    * Supported types:
    *
    * <ul>
-   *   <li>{@link edu.wpi.first.wpilibj.PIDController}
+   *   <li>{@link edu.wpi.first.math.controller.PIDController}
    * </ul>
    *
    * <br>

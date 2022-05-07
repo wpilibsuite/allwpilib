@@ -4,11 +4,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <string_view>
-
-#include "wpi/deprecated.h"
 #include "wpi/sendable/SendableRegistry.h"
 
 namespace wpi {
@@ -46,123 +41,6 @@ class SendableHelper {
     SendableRegistry::Move(static_cast<Derived*>(this),
                            static_cast<Derived*>(&rhs));
     return *this;
-  }
-
-  /**
-   * Gets the name of this Sendable object.
-   *
-   * @deprecated use SendableRegistry::GetName()
-   *
-   * @return Name
-   */
-  WPI_DEPRECATED("use SendableRegistry::GetName()")
-  std::string GetName() const {
-    return SendableRegistry::GetName(static_cast<const Derived*>(this));
-  }
-
-  /**
-   * Sets the name of this Sendable object.
-   *
-   * @deprecated use SendableRegistry::SetName()
-   *
-   * @param name name
-   */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view name) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), name);
-  }
-
-  /**
-   * Sets both the subsystem name and device name of this Sendable object.
-   *
-   * @deprecated use SendableRegistry::SetName()
-   *
-   * @param subsystem subsystem name
-   * @param name device name
-   */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view subsystem, std::string_view name) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), subsystem, name);
-  }
-
-  /**
-   * Gets the subsystem name of this Sendable object.
-   *
-   * @deprecated use SendableRegistry::GetSubsystem().
-   *
-   * @return Subsystem name
-   */
-  WPI_DEPRECATED("use SendableRegistry::GetSubsystem()")
-  std::string GetSubsystem() const {
-    return SendableRegistry::GetSubsystem(static_cast<const Derived*>(this));
-  }
-
-  /**
-   * Sets the subsystem name of this Sendable object.
-   *
-   * @deprecated use SendableRegistry::SetSubsystem()
-   *
-   * @param subsystem subsystem name
-   */
-  WPI_DEPRECATED("use SendableRegistry::SetSubsystem()")
-  void SetSubsystem(std::string_view subsystem) {
-    SendableRegistry::SetSubsystem(static_cast<Derived*>(this), subsystem);
-  }
-
- protected:
-  /**
-   * Add a child component.
-   *
-   * @deprecated use SendableRegistry::AddChild()
-   *
-   * @param child child component
-   */
-  WPI_DEPRECATED("use SendableRegistry::AddChild()")
-  void AddChild(std::shared_ptr<Sendable> child) {
-    SendableRegistry::AddChild(static_cast<Derived*>(this), child.get());
-  }
-
-  /**
-   * Add a child component.
-   *
-   * @deprecated use SendableRegistry::AddChild()
-   *
-   * @param child child component
-   */
-  WPI_DEPRECATED("use SendableRegistry::AddChild()")
-  void AddChild(void* child) {
-    SendableRegistry::AddChild(static_cast<Derived*>(this), child);
-  }
-
-  /**
-   * Sets the name of the sensor with a channel number.
-   *
-   * @deprecated use SendableRegistry::SetName()
-   *
-   * @param moduleType A string that defines the module name in the label for
-   *                   the value
-   * @param channel    The channel number the device is plugged into
-   */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view moduleType, int channel) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType, channel);
-  }
-
-  /**
-   * Sets the name of the sensor with a module and channel number.
-   *
-   * @deprecated use SendableRegistry::SetName()
-   *
-   * @param moduleType   A string that defines the module name in the label for
-   *                     the value
-   * @param moduleNumber The number of the particular module type
-   * @param channel      The channel number the device is plugged into (usually
-   * PWM)
-   */
-  WPI_DEPRECATED("use SendableRegistry::SetName()")
-  void SetName(std::string_view moduleType, int moduleNumber, int channel) {
-    SendableRegistry::SetName(static_cast<Derived*>(this), moduleType,
-                              moduleNumber, channel);
   }
 
  protected:

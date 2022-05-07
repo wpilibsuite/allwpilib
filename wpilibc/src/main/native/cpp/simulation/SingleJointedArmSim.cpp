@@ -72,12 +72,12 @@ units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
 }
 
 void SingleJointedArmSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.value()});
+  SetInput(Vectord<1>{voltage.value()});
 }
 
-Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
-    const Eigen::Vector<double, 2>& currentXhat,
-    const Eigen::Vector<double, 1>& u, units::second_t dt) {
+Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
+                                        const Vectord<1>& u,
+                                        units::second_t dt) {
   // Horizontal case:
   // Torque = F * r = I * alpha
   // alpha = F * r / I
@@ -88,15 +88,14 @@ Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
   // We therefore find that f(x, u) = Ax + Bu + [[0] [m * g * r / I *
   // std::cos(theta)]]
 
-  Eigen::Vector<double, 2> updatedXhat = RKDP(
-      [&](const auto& x, const auto& u) -> Eigen::Vector<double, 2> {
-        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
+  Vectord<2> updatedXhat = RKDP(
+      [&](const auto& x, const auto& u) -> Vectord<2> {
+        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Eigen::Vector<double, 2>{
-              0.0, (m_armMass * m_r * -9.8 * 3.0 / (m_armMass * m_r * m_r) *
-                    std::cos(x(0)))
-                       .value()};
+          xdot += Vectord<2>{0.0, (m_armMass * m_r * -9.8 * 3.0 /
+                                   (m_armMass * m_r * m_r) * std::cos(x(0)))
+                                      .value()};
         }
         return xdot;
       },
@@ -104,9 +103,9 @@ Eigen::Vector<double, 2> SingleJointedArmSim::UpdateX(
 
   // Check for collisions.
   if (WouldHitLowerLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minAngle.value(), 0.0};
+    return Vectord<2>{m_minAngle.value(), 0.0};
   } else if (WouldHitUpperLimit(units::radian_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxAngle.value(), 0.0};
+    return Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;
 }

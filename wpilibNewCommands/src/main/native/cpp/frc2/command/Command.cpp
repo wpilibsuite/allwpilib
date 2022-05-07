@@ -5,6 +5,7 @@
 #include "frc2/command/Command.h"
 
 #include "frc2/command/CommandScheduler.h"
+#include "frc2/command/EndlessCommand.h"
 #include "frc2/command/InstantCommand.h"
 #include "frc2/command/ParallelCommandGroup.h"
 #include "frc2/command/ParallelDeadlineGroup.h"
@@ -86,6 +87,10 @@ SequentialCommandGroup Command::AndThen(
 
 PerpetualCommand Command::Perpetually() && {
   return PerpetualCommand(std::move(*this).TransferOwnership());
+}
+
+EndlessCommand Command::Endlessly() && {
+  return EndlessCommand(std::move(*this).TransferOwnership());
 }
 
 RepeatCommand Command::Repeat() && {

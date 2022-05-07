@@ -6,9 +6,9 @@
 
 #include <utility>
 
-#include <wpi/NetworkStream.h>
-#include <wpi/raw_socket_istream.h>
 #include <wpi/timestamp.h>
+#include <wpinet/NetworkStream.h>
+#include <wpinet/raw_socket_istream.h>
 
 #include "IConnectionNotifier.h"
 #include "Log.h"

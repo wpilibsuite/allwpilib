@@ -116,6 +116,7 @@ model {
                 cppCompiler.define 'DYNAMIC_CAMERA_SERVER'
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
@@ -135,6 +136,7 @@ model {
             binaries.all {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
@@ -172,6 +174,7 @@ model {
                 lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 project(':hal').addHalDependency(it, 'shared')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -222,6 +225,7 @@ model {
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'

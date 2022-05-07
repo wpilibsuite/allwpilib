@@ -19,11 +19,11 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 
   ImplicitModelFollower<2, 2> imf{plant, plant};
 
-  Eigen::Vector<double, 2> x{0.0, 0.0};
-  Eigen::Vector<double, 2> xImf{0.0, 0.0};
+  Vectord<2> x{0.0, 0.0};
+  Vectord<2> xImf{0.0, 0.0};
 
   // Forward
-  Eigen::Vector<double, 2> u{12.0, 12.0};
+  Vectord<2> u{12.0, 12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
@@ -33,7 +33,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
   }
 
   // Backward
-  u = Eigen::Vector<double, 2>{-12.0, -12.0};
+  u = Vectord<2>{-12.0, -12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
@@ -43,7 +43,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
   }
 
   // Rotate CCW
-  u = Eigen::Vector<double, 2>{-12.0, 12.0};
+  u = Vectord<2>{-12.0, 12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
@@ -68,11 +68,11 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
 
   ImplicitModelFollower<2, 2> imf{plant, plantRef};
 
-  Eigen::Vector<double, 2> x{0.0, 0.0};
-  Eigen::Vector<double, 2> xImf{0.0, 0.0};
+  Vectord<2> x{0.0, 0.0};
+  Vectord<2> xImf{0.0, 0.0};
 
   // Forward
-  Eigen::Vector<double, 2> u{12.0, 12.0};
+  Vectord<2> u{12.0, 12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
@@ -84,7 +84,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   // Backward
   x.setZero();
   xImf.setZero();
-  u = Eigen::Vector<double, 2>{-12.0, -12.0};
+  u = Vectord<2>{-12.0, -12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
@@ -96,7 +96,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   // Rotate CCW
   x.setZero();
   xImf.setZero();
-  u = Eigen::Vector<double, 2>{-12.0, 12.0};
+  u = Vectord<2>{-12.0, 12.0};
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);

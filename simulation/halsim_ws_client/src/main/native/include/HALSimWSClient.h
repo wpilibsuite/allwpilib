@@ -8,7 +8,7 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/EventLoopRunner.h>
+#include <wpinet/EventLoopRunner.h>
 
 #include "HALSimWS.h"
 

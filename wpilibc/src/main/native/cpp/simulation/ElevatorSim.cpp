@@ -80,29 +80,27 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
 }
 
 void ElevatorSim::SetInputVoltage(units::volt_t voltage) {
-  SetInput(Eigen::Vector<double, 1>{voltage.value()});
+  SetInput(Vectord<1>{voltage.value()});
 }
 
-Eigen::Vector<double, 2> ElevatorSim::UpdateX(
-    const Eigen::Vector<double, 2>& currentXhat,
-    const Eigen::Vector<double, 1>& u, units::second_t dt) {
+Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
+                                const Vectord<1>& u, units::second_t dt) {
   auto updatedXhat = RKDP(
-      [&](const Eigen::Vector<double, 2>& x,
-          const Eigen::Vector<double, 1>& u_) -> Eigen::Vector<double, 2> {
-        Eigen::Vector<double, 2> xdot = m_plant.A() * x + m_plant.B() * u;
+      [&](const Vectord<2>& x, const Vectord<1>& u_) -> Vectord<2> {
+        Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
         if (m_simulateGravity) {
-          xdot += Eigen::Vector<double, 2>{0.0, -9.8};
+          xdot += Vectord<2>{0.0, -9.8};
         }
         return xdot;
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
   if (WouldHitLowerLimit(units::meter_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_minHeight.value(), 0.0};
+    return Vectord<2>{m_minHeight.value(), 0.0};
   }
   if (WouldHitUpperLimit(units::meter_t(updatedXhat(0)))) {
-    return Eigen::Vector<double, 2>{m_maxHeight.value(), 0.0};
+    return Vectord<2>{m_maxHeight.value(), 0.0};
   }
   return updatedXhat;
 }

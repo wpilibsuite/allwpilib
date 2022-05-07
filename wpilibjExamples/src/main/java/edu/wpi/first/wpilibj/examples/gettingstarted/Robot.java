@@ -47,7 +47,8 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // Drive for 2 seconds
     if (m_timer.get() < 2.0) {
-      m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
+      // Drive forwards half speed, make sure to turn input squaring off
+      m_robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
       m_robotDrive.stopMotor(); // stop robot
     }

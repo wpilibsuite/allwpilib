@@ -37,26 +37,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class CameraServer {
   public static final int kBasePort = 1181;
 
-  @Deprecated public static final int kSize640x480 = 0;
-  @Deprecated public static final int kSize320x240 = 1;
-  @Deprecated public static final int kSize160x120 = 2;
-
   private static final String kPublishName = "/CameraPublisher";
   private static CameraServer server;
-
-  /**
-   * Get the CameraServer instance.
-   *
-   * @return The CameraServer instance.
-   * @deprecated Use the static methods
-   */
-  @Deprecated
-  public static synchronized CameraServer getInstance() {
-    if (server == null) {
-      server = new CameraServer();
-    }
-    return server;
-  }
 
   private static final AtomicInteger m_defaultUsbDevice = new AtomicInteger();
   private static String m_primarySourceName;

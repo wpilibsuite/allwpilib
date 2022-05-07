@@ -19,10 +19,10 @@ class ComputerVisionUtilTest {
     var targetHeight = 3;
     var camPitch = Units.degreesToRadians(0);
     var targetPitch = Units.degreesToRadians(30);
-
+    var targetYaw = Units.degreesToRadians(0);
     var dist =
         ComputerVisionUtil.calculateDistanceToTarget(
-            camHeight, targetHeight, camPitch, targetPitch);
+            camHeight, targetHeight, camPitch, targetPitch, targetYaw);
 
     Assertions.assertEquals(3.464, dist, 0.01);
 
@@ -33,7 +33,7 @@ class ComputerVisionUtilTest {
 
     dist =
         ComputerVisionUtil.calculateDistanceToTarget(
-            camHeight, targetHeight, camPitch, targetPitch);
+            camHeight, targetHeight, camPitch, targetPitch, targetYaw);
     Assertions.assertEquals(5.671, dist, 0.01);
 
     camHeight = 3;
@@ -43,9 +43,21 @@ class ComputerVisionUtilTest {
 
     dist =
         ComputerVisionUtil.calculateDistanceToTarget(
-            camHeight, targetHeight, camPitch, targetPitch);
+            camHeight, targetHeight, camPitch, targetPitch, targetYaw);
 
     Assertions.assertEquals(3.464, dist, 0.01);
+
+    camHeight = 1;
+    targetHeight = 3;
+    camPitch = Units.degreesToRadians(0);
+    targetPitch = Units.degreesToRadians(30);
+    targetYaw = Units.degreesToRadians(30);
+
+    dist =
+        ComputerVisionUtil.calculateDistanceToTarget(
+            camHeight, targetHeight, camPitch, targetPitch, targetYaw);
+
+    Assertions.assertEquals(4, dist, 0.01);
   }
 
   @Test
@@ -64,7 +76,7 @@ class ComputerVisionUtilTest {
             ComputerVisionUtil.estimateCameraToTarget(
                 new Translation2d(
                     ComputerVisionUtil.calculateDistanceToTarget(
-                        camHeight, targetHeight, camPitch, targetPitch),
+                        camHeight, targetHeight, camPitch, targetPitch, targetYaw.getRadians()),
                     targetYaw),
                 fieldToTarget,
                 gyroAngle),
@@ -82,7 +94,7 @@ class ComputerVisionUtilTest {
             ComputerVisionUtil.estimateCameraToTarget(
                 new Translation2d(
                     ComputerVisionUtil.calculateDistanceToTarget(
-                        camHeight, targetHeight, camPitch, targetPitch),
+                        camHeight, targetHeight, camPitch, targetPitch, targetYaw.getRadians()),
                     targetYaw),
                 fieldToTarget,
                 gyroAngle),

@@ -24,6 +24,7 @@ dependencies {
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')

@@ -123,30 +123,6 @@ public class SPI implements AutoCloseable {
     SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
   }
 
-  /**
-   * Configure that the data is stable on the falling edge and the data changes on the rising edge.
-   * Note this gets reversed is setClockActiveLow is set.
-   *
-   * @deprecated use {@link #setSampleDataOnTrailingEdge()} in most cases.
-   */
-  @Deprecated
-  public final void setSampleDataOnFalling() {
-    m_sampleOnTrailing = 1;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
-  }
-
-  /**
-   * Configure that the data is stable on the rising edge and the data changes on the falling edge.
-   * Note this gets reversed is setClockActiveLow is set.
-   *
-   * @deprecated use {@link #setSampleDataOnLeadingEdge()} in most cases.
-   */
-  @Deprecated
-  public final void setSampleDataOnRising() {
-    m_sampleOnTrailing = 0;
-    SPIJNI.spiSetOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clockIdleHigh);
-  }
-
   /** Configure the chip select line to be active high. */
   public final void setChipSelectActiveHigh() {
     SPIJNI.spiSetChipSelectActiveHigh(m_port);

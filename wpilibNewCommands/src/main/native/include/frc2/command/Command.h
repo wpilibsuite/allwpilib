@@ -12,6 +12,7 @@
 #include <units/time.h>
 #include <wpi/Demangle.h>
 #include <wpi/SmallSet.h>
+#include <wpi/deprecated.h>
 #include <wpi/span.h>
 
 #include "frc2/command/Subsystem.h"
@@ -23,6 +24,7 @@ std::string GetTypeName(const T& type) {
   return wpi::Demangle(typeid(type).name());
 }
 
+class EndlessCommand;
 class ParallelCommandGroup;
 class ParallelRaceGroup;
 class ParallelDeadlineGroup;
@@ -183,8 +185,18 @@ class Command {
    * conditions.  The decorated command can still be interrupted or canceled.
    *
    * @return the decorated command
+   * @deprecated replace with EndlessCommand
    */
+  WPI_DEPRECATED("Replace with Endlessly()")
   virtual PerpetualCommand Perpetually() &&;
+
+  /**
+   * Decorates this command to run endlessly, ignoring its ordinary end
+   * conditions. The decorated command can still be interrupted or canceled.
+   *
+   * @return the decorated command
+   */
+  virtual EndlessCommand Endlessly() &&;
 
   /**
    * Decorates this command to run repeatedly, restarting it when it ends, until

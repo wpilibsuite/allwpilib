@@ -17,6 +17,7 @@ Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
 
 include 'wpiutil'
+include 'wpinet'
 include 'ntcore'
 include 'hal'
 include 'cscore'
@@ -44,8 +45,32 @@ include 'simulation:halsim_ws_client'
 include 'simulation:halsim_ws_server'
 include 'cameraserver'
 include 'cameraserver:multiCameraServer'
-include 'wpilibOldCommands'
 include 'wpilibNewCommands'
 include 'myRobot'
 include 'docs'
 include 'msvcruntime'
+
+buildCache {
+    def cred = {
+        if (System.env[it] != null) {
+            return System.env[it]
+        } else {
+            return System.getProperty(it)
+        }
+    }
+    local {
+        enabled = !System.getenv().containsKey("CI")
+    }
+    remote(HttpBuildCache) {
+        url = "https://frcmaven.wpi.edu/artifactory/wpilib-generic-gradle-cache/"
+        String user = cred('ARTIFACTORY_PUBLISH_USERNAME')
+        String pass = cred('ARTIFACTORY_PUBLISH_PASSWORD')
+        if (user && pass) {
+            push = true
+            credentials {
+                username = user
+                password = pass
+            }
+        }
+    }
+}

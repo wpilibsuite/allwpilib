@@ -19,7 +19,7 @@ Transform2d::Transform2d(Pose2d initial, Pose2d final) {
 }
 
 Transform2d::Transform2d(Translation2d translation, Rotation2d rotation)
-    : m_translation(translation), m_rotation(rotation) {}
+    : m_translation(std::move(translation)), m_rotation(std::move(rotation)) {}
 
 Transform2d Transform2d::Inverse() const {
   // We are rotating the difference between the translations

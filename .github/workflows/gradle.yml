@@ -35,7 +35,10 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.artifact-name }}
@@ -83,7 +86,10 @@ jobs:
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew build -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - name: Sign Libraries with Developer ID
         run: ./gradlew build -PbuildServer -PskipJavaFormat -PdeveloperID=${{ secrets.APPLE_DEVELOPER_ID }} ${{ env.EXTRA_GRADLE_ARGS }}
         if: |
@@ -110,7 +116,10 @@ jobs:
         run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/v')
       - name: Build with Gradle
-        run: ./gradlew docs:zipDocs -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        run: ./gradlew docs:zipDocs --build-cache -PbuildServer ${{ env.EXTRA_GRADLE_ARGS }}
+        env:
+          ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
       - uses: actions/upload-artifact@v2
         with:
           name: Documentation

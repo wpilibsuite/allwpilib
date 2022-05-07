@@ -15,10 +15,10 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   auto targetHeight = 3_m;
   auto camPitch = 0_deg;
   auto targetPitch = 30_deg;
+  auto targetYaw = 0_deg;
 
   auto dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch);
-
+                                             targetPitch, targetYaw);
   EXPECT_NEAR(3.464, dist.value(), 0.01);
 
   camHeight = 1_m;
@@ -27,7 +27,7 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   targetPitch = -10_deg;
 
   dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                        targetPitch);
+                                        targetPitch, targetYaw);
   EXPECT_NEAR(5.671, dist.value(), 0.01);
 
   camHeight = 3_m;
@@ -36,9 +36,18 @@ TEST(ComputerVisionUtilTest, CalculateDistanceToTarget) {
   targetPitch = -30_deg;
 
   dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                        targetPitch);
-
+                                        targetPitch, targetYaw);
   EXPECT_NEAR(3.464, dist.value(), 0.01);
+
+  camHeight = 1_m;
+  targetHeight = 3_m;
+  camPitch = 0_deg;
+  targetPitch = 30_deg;
+  targetYaw = 30_deg;
+
+  dist = frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
+                                        targetPitch, targetYaw);
+  EXPECT_NEAR(4, dist.value(), 0.01);
 }
 
 TEST(ComputerVisionUtilTest, EstimateFieldToRobot) {
@@ -55,7 +64,7 @@ TEST(ComputerVisionUtilTest, EstimateFieldToRobot) {
       frc::EstimateCameraToTarget(
           frc::Translation2d{
               frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch),
+                                             targetPitch, targetYaw.Radians()),
               targetYaw},
           fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);
@@ -70,7 +79,7 @@ TEST(ComputerVisionUtilTest, EstimateFieldToRobot) {
       frc::EstimateCameraToTarget(
           frc::Translation2d{
               frc::CalculateDistanceToTarget(camHeight, targetHeight, camPitch,
-                                             targetPitch),
+                                             targetPitch, targetYaw.Radians()),
               targetYaw},
           fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);

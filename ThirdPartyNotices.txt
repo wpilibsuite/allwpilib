@@ -24,9 +24,7 @@ LLVM                  wpiutil/src/main/native/include/wpi/{various files}
 JSON for Modern C++   wpiutil/src/main/native/include/wpi/json.h
                       wpiutil/src/main/native/cpp/json_*.cpp
                       wpiutil/src/test/native/cpp/json/
-libuv                 wpiutil/src/main/native/include/uv.h
-                      wpiutil/src/main/native/include/uv/
-                      wpiutil/src/main/native/libuv/
+libuv                 wpinet/src/main/native/thirdparty/libuv/
 fmtlib                wpiutil/src/main/native/fmtlib/
 sigslot               wpiutil/src/main/native/include/wpi/Signal.h
                       wpiutil/src/test/native/cpp/sigslot/
@@ -34,11 +32,11 @@ tcpsockets            wpiutil/src/main/native/cpp/TCP{Stream,Connector,Acceptor}
                       wpiutil/src/main/native/include/wpi/TCP*.h
 MPack                 wpiutil/src/main/native/include/mpack.h
                       wpiutil/src/main/native/cpp/mpack.cpp
-Bootstrap             wpiutil/src/main/native/resources/bootstrap-*
-CoreUI                wpiutil/src/main/native/resources/coreui-*
-Feather Icons         wpiutil/src/main/native/resources/feather-*
-jQuery                wpiutil/src/main/native/resources/jquery-*
-popper.js             wpiutil/src/main/native/resources/popper-*
+Bootstrap             wpinet/src/main/native/resources/bootstrap-*
+CoreUI                wpinet/src/main/native/resources/coreui-*
+Feather Icons         wpinet/src/main/native/resources/feather-*
+jQuery                wpinet/src/main/native/resources/jquery-*
+popper.js             wpinet/src/main/native/resources/popper-*
 units                 wpimath/src/main/native/include/units/
 Eigen                 wpimath/src/main/native/eigeninclude/
                       wpimath/src/main/native/include/unsupported/
@@ -54,7 +52,7 @@ Team 254 Library      wpilibj/src/main/java/edu/wpi/first/wpilibj/spline/SplineP
 Portable File Dialogs wpigui/src/main/native/include/portable-file-dialogs.h
 Drake                 wpimath/src/main/native/cpp/drake/common/drake_assert_and_throw.cpp
                       wpimath/src/main/native/cpp/drake/math/discrete_algebraic_riccati_equation.cpp
-
+V8 export-template    wpiutil/src/main/native/include/wpi/SymbolExports.h
 
 ==============================================================================
 Google Test License
@@ -969,3 +967,33 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+==================
+V8 export-template
+==================
+Copyright 2014, the V8 project authors. All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+    * Neither the name of Google Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
