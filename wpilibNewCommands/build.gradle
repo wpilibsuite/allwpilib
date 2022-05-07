@@ -15,12 +15,14 @@ apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 
 dependencies {
     implementation project(':wpiutil')
+    implementation project(':wpinet')
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
     devImplementation project(':wpiutil')
+    devImplementation project(':wpinet')
     devImplementation project(':ntcore')
     devImplementation project(':cscore')
     devImplementation project(':hal')
@@ -71,10 +73,12 @@ model {
             lib project: ':ntcore', library: 'ntcore', linkage: 'shared'
             project(':hal').addHalDependency(it, 'shared')
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
 
             if (it.component.name == "${nativeName}Dev") {
                 lib project: ':ntcore', library: 'ntcoreJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 project(':hal').addHalJniDependency(it)
             }

@@ -6,9 +6,9 @@
 
 #include <wpi/SmallString.h>
 #include <wpi/StringExtras.h>
-#include <wpi/TCPConnector.h>
 #include <wpi/raw_ostream.h>
-#include <wpi/raw_socket_istream.h>
+#include <wpinet/TCPConnector.h>
+#include <wpinet/raw_socket_istream.h>
 
 #include "Dispatcher.h"
 #include "Log.h"

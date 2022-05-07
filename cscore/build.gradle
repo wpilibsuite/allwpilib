@@ -45,6 +45,7 @@ model {
                     return
                 }
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
 
                 if (it.targetPlatform.operatingSystem.linux) {
                     it.linker.args '-Wl,--version-script=' + file('src/main/native/LinuxSymbolScript.txt')
@@ -53,6 +54,15 @@ model {
                     it.linker.args file('src/main/native/MacSymbolScript.txt').toString()
                 }
             }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
     }
 }
@@ -190,6 +200,7 @@ model {
                         targetBuildTypes 'debug'
                         binaries.all {
                             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                             lib library: 'cscore', linkage: 'shared'
                             nativeUtils.useRequiredLibrary(it, 'imgui_static')
@@ -220,6 +231,7 @@ model {
                     targetBuildTypes 'debug'
                     binaries.all {
                         lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                        lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                         lib library: 'cscore', linkage: 'shared'
                     }
                     sources {
