@@ -4,12 +4,11 @@
 
 package edu.wpi.first.wpilibj.examples.resistance;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.ResistanceCalculator;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.DoubleSupplier;
 
 /**
  * Sample program to demonstrate logging the resistance of a particular PDP/PDH
@@ -23,7 +22,7 @@ public class Robot extends TimedRobot {
    * class implements Sendable and logs the robot resistance. It can also be used
    * to get the current flowing through a particular channel.
    */
-  private final PowerDistribution powerDistribution = new PowerDistribution();
+  private final PowerDistribution m_powerDistribution = new PowerDistribution();
 
   /**
    * The channel whose resistance will be logged in this example.
@@ -46,12 +45,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Display the PowerDistribution on the dashboard so that the robot
     // resistance can be seen.
-    SmartDashboard.putData(powerDistribution);
+    SmartDashboard.putData(m_powerDistribution);
   }
 
   @Override
   public void robotPeriodic() {
-    var chan1Current = powerDistribution.getCurrent(kChannel);
+    var chan1Current = m_powerDistribution.getCurrent(kChannel);
     // Get the voltage received by the motor plugged into channel 1. Note that
     // in practice, this voltage would be gotten through a motor controller object.
     var chan1Voltage = m_chan1Voltage.getAsDouble();
