@@ -56,7 +56,9 @@ compileJava {
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+    }
 }
 
 dependencies {
