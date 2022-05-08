@@ -11,17 +11,17 @@ def main():
     root, repo = setup_upstream_repo("http://github.com/libuv/libuv", "v1.30.1")
     wpinet = os.path.join(root, "wpinet")
 
+    # yapf: disable
     # Apply patches to original git repo
     am_patches(repo, [
-        # yapf: disable
         os.path.join(root, "upstream_utils/libuv_patches/0001-Fix-missing-casts.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0002-Fix-warnings.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0003-Preprocessor-cleanup.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0004-Cleanup-problematic-language.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0005-Use-roborio-time.patch"),
         os.path.join(root, "upstream_utils/libuv_patches/0006-Style-comments-cleanup.patch"),
-        # yapf: enable
     ])
+    # yapf: enable
 
     # Delete old install
     for d in ["src/main/native/thirdparty/libuv"]:
