@@ -27,7 +27,7 @@ def main():
     for d in ["src/main/native/thirdparty/libuv"]:
         shutil.rmtree(os.path.join(wpinet, d), ignore_errors=True)
 
-    include_blacklist = [
+    include_ignorelist = [
         "aix.h",
         "os390.h",
         "stdint-msvc2008.h",
@@ -35,10 +35,10 @@ def main():
     ]
 
     include_files = walk_cwd_and_copy_if(
-        lambda dp, f: "include" in dp and f not in include_blacklist,
+        lambda dp, f: "include" in dp and f not in include_ignorelist,
         os.path.join(wpinet, "src/main/native/thirdparty/libuv"))
 
-    src_blacklist = [
+    src_ignorelist = [
         "aix-common.c",
         "aix.c",
         "bsd-proctitle.c",
@@ -51,7 +51,7 @@ def main():
     ]
     src_files = walk_cwd_and_copy_if(
         lambda dp, f: "src" in dp and "docs" not in dp and f not in
-        src_blacklist, os.path.join(wpinet, "src/main/native/thirdparty/libuv"))
+        src_ignorelist, os.path.join(wpinet, "src/main/native/thirdparty/libuv"))
 
 
 if __name__ == "__main__":
