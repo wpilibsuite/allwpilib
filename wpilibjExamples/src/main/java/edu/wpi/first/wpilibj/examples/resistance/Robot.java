@@ -13,12 +13,11 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Sample program to demonstrate logging the resistance of a particular PDP/PDH
- * channel and the robot's resistance. The resistance can be calculated by recording
- * the current and voltage of a particular channel and doing a linear regression
- * on that data.
+ * Sample program to demonstrate logging the resistance of a particular PDP/PDH channel and the
+ * robot's resistance. The resistance can be calculated by recording the current and voltage of a
+ * particular channel and doing a linear regression on that data.
  */
-public class Robot extends TimedRobot {  
+public class Robot extends TimedRobot {
   /** The channel whose resistance will be logged in this example. */
   private static final int kChannel = 1;
 
