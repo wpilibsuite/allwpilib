@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * particular channel and doing a linear regression on that data.
  */
 public class Robot extends TimedRobot {
-  /** The channel whose resistance will be logged in this example. */
+  /** The channel on the PDP whose resistance will be logged in this example. */
   private static final int kChannel = 1;
 
   /**
