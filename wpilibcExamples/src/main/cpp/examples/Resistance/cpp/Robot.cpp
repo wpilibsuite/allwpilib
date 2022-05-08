@@ -4,7 +4,9 @@
 
 #include <frc/PowerDistribution.h>
 #include <frc/ResistanceCalculator.h>
+#include <frc/RobotController.h>
 #include <frc/TimedRobot.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <wpi/numbers>
 
@@ -19,18 +21,20 @@ class Robot : public frc::TimedRobot {
   Robot() {
     // Display the PowerDistribution on the dashboard so that the robot
     // resistance can be seen.
-    frc::SmartDashboard::PutData(m_powerDistribution);
+    frc::SmartDashboard::PutData(&m_powerDistribution);
   }
 
   void TeleopPeriodic() override {
-    auto chan1Current = m_powerDistribution.getCurrent(kChannel);
-    // Get the voltage given to the motor plugged into channel 1.
-    auto chan1Voltage = m_motor.get() * RobotController.getBatteryVoltage();
+    // Get the current for channel 1
+    units::ampere_t chan1Current(m_powerDistribution.GetCurrent(kChannel));
+    // Get the voltage given to the motor plugged into channel 1
+    units::volt_t chan1Voltage(m_motor.Get() * frc::RobotController::GetBatteryVoltage());
+    
+    // Calculate the channel's resistance based on that current and voltage
+    units::ohm_t resistance = m_resistCalc.Calculate(chan1Current, chan1Voltage);
 
-    // Calculate and log channel 1's resistance
-    frc::SmartDashboard::PutNumber(
-        "Channel 1 resistance",
-        m_resistCalc.Calculate(chan1Current, chan1Voltage));
+    // Log the resistance
+    frc::SmartDashboard::PutNumber("Channel 1 resistance", resistance);
   }
 
  private:
@@ -42,13 +46,13 @@ class Robot : public frc::TimedRobot {
    * class implements Sendable and logs the robot resistance. It can also be
    * used to get the current flowing through a particular channel.
    */
-  PowerDistribution m_powerDistribution;
+  frc::PowerDistribution m_powerDistribution;
 
   /** Used to calculate the resistance of channel 1. */
-  ResistanceCalculator m_resistCalc;
+  frc::ResistanceCalculator m_resistCalc;
 
   /** The motor plugged into channel 1. */
-  PWMSparkMax m_motor(0);
+  frc::PWMSparkMax m_motor{0};
 };
 
 #ifndef RUNNING_FRC_TESTS
