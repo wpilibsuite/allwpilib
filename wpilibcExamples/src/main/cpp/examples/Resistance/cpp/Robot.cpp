@@ -28,13 +28,15 @@ class Robot : public frc::TimedRobot {
     // Get the current for channel 1
     units::ampere_t chan1Current(m_powerDistribution.GetCurrent(kChannel));
     // Get the voltage given to the motor plugged into channel 1
-    units::volt_t chan1Voltage(m_motor.Get() * frc::RobotController::GetBatteryVoltage());
+    units::volt_t chan1Voltage(
+        m_motor.Get() * frc::RobotController::GetBatteryVoltage());
     
     // Calculate the channel's resistance based on that current and voltage
-    units::ohm_t resistance = m_resistCalc.Calculate(chan1Current, chan1Voltage);
+    units::ohm_t resistance =
+        m_resistCalc.Calculate(chan1Current, chan1Voltage);
 
     // Log the resistance
-    frc::SmartDashboard::PutNumber("Channel 1 resistance", resistance);
+    frc::SmartDashboard::PutNumber("Channel 1 resistance", resistance());
   }
 
  private:
