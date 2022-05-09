@@ -1,0 +1,179 @@
+From 547f7d0515749853b2798623a4e9fcc39121d4c6 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 23:06:16 -0400
+Subject: [PATCH 23/37] Fixup includes
+
+---
+ llvm/include/llvm/ADT/StringMap.h                 | 3 ++-
+ llvm/include/llvm/Support/MathExtras.h            | 1 +
+ llvm/include/llvm/Support/MemoryBuffer.h          | 1 +
+ llvm/include/llvm/Support/PointerLikeTypeTraits.h | 2 ++
+ llvm/include/llvm/Support/SwapByteOrder.h         | 1 +
+ llvm/lib/Support/ConvertUTFWrapper.cpp            | 1 +
+ llvm/lib/Support/ErrorHandling.cpp                | 7 +++----
+ llvm/lib/Support/SmallPtrSet.cpp                  | 1 +
+ llvm/lib/Support/Windows/WindowsSupport.h         | 2 +-
+ llvm/lib/Support/raw_ostream.cpp                  | 3 ++-
+ llvm/unittests/ADT/SmallPtrSetTest.cpp            | 1 +
+ 11 files changed, 16 insertions(+), 7 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
+index df9f3da888da..45dbea2753e9 100644
+--- a/llvm/include/llvm/ADT/StringMap.h
++++ b/llvm/include/llvm/ADT/StringMap.h
+@@ -14,9 +14,10 @@
+ #ifndef LLVM_ADT_STRINGMAP_H
+ #define LLVM_ADT_STRINGMAP_H
+ 
++#include "wpi/SmallVector.h"
+ #include "llvm/ADT/iterator.h"
+ #include "llvm/ADT/iterator_range.h"
+-#include "llvm/Support/Allocator.h"
++#include "llvm/Support/MemAlloc.h"
+ #include "llvm/Support/PointerLikeTypeTraits.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include <algorithm>
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index bfef92c81a1f..d0454e6d2d81 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -18,6 +18,7 @@
+ #include "llvm/Support/SwapByteOrder.h"
+ #include <algorithm>
+ #include <cassert>
++#include <cmath>
+ #include <climits>
+ #include <cstring>
+ #include <limits>
+diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
+index 58665a5ae35a..300b1cca1282 100644
+--- a/llvm/include/llvm/Support/MemoryBuffer.h
++++ b/llvm/include/llvm/Support/MemoryBuffer.h
+@@ -15,6 +15,7 @@
+ #define LLVM_SUPPORT_MEMORYBUFFER_H
+ 
+ #include "llvm/Support/ErrorOr.h"
++#include "llvm/Support/span.h"
+ #include <cstddef>
+ #include <cstdint>
+ #include <memory>
+diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+index 1710b57131d1..15b7a4f874ae 100644
+--- a/llvm/include/llvm/Support/PointerLikeTypeTraits.h
++++ b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+@@ -16,6 +16,8 @@
+ #define LLVM_SUPPORT_POINTERLIKETYPETRAITS_H
+ 
+ #include "llvm/Support/DataTypes.h"
++#include <cstdint>
++#include <cstdlib>
+ #include <assert.h>
+ #include <type_traits>
+ 
+diff --git a/llvm/include/llvm/Support/SwapByteOrder.h b/llvm/include/llvm/Support/SwapByteOrder.h
+index 71d3724950ab..bb7ca81abd1e 100644
+--- a/llvm/include/llvm/Support/SwapByteOrder.h
++++ b/llvm/include/llvm/Support/SwapByteOrder.h
+@@ -18,6 +18,7 @@
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/DataTypes.h"
+ #include <cstddef>
++#include <cstdint>
+ #if defined(_MSC_VER) && !defined(_DEBUG)
+ #include <stdlib.h>
+ #endif
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index cc76c0520538..af280e087123 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -9,6 +9,7 @@
+ 
+ #include "llvm/ADT/span.h"
+ #include "llvm/Support/ConvertUTF.h"
++#include "wpi/SmallVector.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/SwapByteOrder.h"
+ #include <string>
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 55149d4f8140..faca1ca607d0 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -28,12 +28,11 @@
+ #include <mutex>
+ #include <new>
+ 
+-#if defined(HAVE_UNISTD_H)
+-# include <unistd.h>
++#ifndef _WIN32
++#include <unistd.h>
+ #endif
+ #if defined(_MSC_VER)
+-# include <io.h>
+-# include <fcntl.h>
++#include <io.h>
+ #endif
+ 
+ using namespace llvm;
+diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
+index 8b8318c7a946..2a09d93f6ab8 100644
+--- a/llvm/lib/Support/SmallPtrSet.cpp
++++ b/llvm/lib/Support/SmallPtrSet.cpp
+@@ -15,6 +15,7 @@
+ #include "llvm/ADT/SmallPtrSet.h"
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "llvm/Support/MathExtras.h"
++#include "llvm/Support/MemAlloc.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include <algorithm>
+ #include <cassert>
+diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
+index e92d7094e57d..fd23a0254306 100644
+--- a/llvm/lib/Support/Windows/WindowsSupport.h
++++ b/llvm/lib/Support/Windows/WindowsSupport.h
+@@ -36,9 +36,9 @@
+ 
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+-#include "llvm/Config/config.h" // Get build system configuration settings
+ #include "llvm/Support/Chrono.h"
+ #include "llvm/Support/Compiler.h"
++#include "llvm/Support/VersionTuple.h"
+ #include <cassert>
+ #include <string>
+ #include <system_error>
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index a7336b592d97..0c04653a12fc 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -16,7 +16,7 @@
+ #endif
+ 
+ #include "llvm/Support/raw_ostream.h"
+-#include "llvm/ADT/STLExtras.h"
++#include "llvm/ADT/SmallString.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/Config/config.h"
+@@ -26,6 +26,7 @@
+ #include "llvm/Support/Format.h"
+ #include "llvm/Support/FormatVariadic.h"
+ #include "llvm/Support/MathExtras.h"
++#include "wpi/WindowsError.h"
+ #include "llvm/Support/NativeFormatting.h"
+ #include "llvm/Support/Process.h"
+ #include "llvm/Support/Program.h"
+diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+index 4ee9e132251a..e9822d166424 100644
+--- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
++++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+@@ -15,6 +15,7 @@
+ #include "llvm/ADT/PointerIntPair.h"
+ #include "llvm/Support/PointerLikeTypeTraits.h"
+ #include "gtest/gtest.h"
++#include <algorithm>
+ 
+ using namespace llvm;
+ 
+-- 
+2.20.1.windows.1
+

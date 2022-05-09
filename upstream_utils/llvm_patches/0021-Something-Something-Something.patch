@@ -1,0 +1,57 @@
+From 831f60e1bf31db04219fbf88e2f7043ddebef2fc Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 01:15:57 -0400
+Subject: [PATCH 21/37] Something Something Something
+
+---
+ llvm/lib/Support/ErrorHandling.cpp |  5 -----
+ llvm/lib/Support/raw_ostream.cpp   | 10 ++++------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 730a4632bf8c..55149d4f8140 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -97,11 +97,6 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+     fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
+   }
+ 
+-  // If we reached here, we are failing ungracefully. Run the interrupt handlers
+-  // to make sure any special cleanups get done, in particular that we remove
+-  // files registered with RemoveFileOnSignal.
+-  sys::RunInterruptHandlers();
+-
+   exit(1);
+ }
+ 
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index f3fd24a81c3c..a7336b592d97 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -370,10 +370,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
+ raw_fd_ostream::~raw_fd_ostream() {
+   if (FD >= 0) {
+     flush();
+-    if (ShouldClose) {
+-      if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-        error_detected(EC);
+-    }
++    if (ShouldClose && ::close(FD) < 0)
++      error_detected(std::error_code(errno, std::generic_category()));
+   }
+ 
+ #ifdef __MINGW32__
+@@ -451,8 +449,8 @@ void raw_fd_ostream::close() {
+   assert(ShouldClose);
+   ShouldClose = false;
+   flush();
+-  if (auto EC = sys::Process::SafelyCloseFileDescriptor(FD))
+-    error_detected(EC);
++  if (::close(FD) < 0)
++    error_detected(std::error_code(errno, std::generic_category()));
+   FD = -1;
+ }
+ 
+-- 
+2.20.1.windows.1
+

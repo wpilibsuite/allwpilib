@@ -1,0 +1,34 @@
+From bee38c2845af051e50d6f9deb6b3586eaca18edf Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 22:34:13 -0400
+Subject: [PATCH 17/37] Change unique_function size
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index a0a702c5c297..76ad3b319d7a 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -44,7 +44,7 @@ template <typename FunctionT> class unique_function;
+ 
+ template <typename ReturnT, typename... ParamTs>
+ class unique_function<ReturnT(ParamTs...)> {
+-  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
++  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
+ 
+   // MSVC has a bug and ICEs if we give it a particular dependent value
+   // expression as part of the `std::conditional` below. To work around this,
+@@ -112,7 +112,7 @@ class unique_function<ReturnT(ParamTs...)> {
+         "Should always use all of the out-of-line storage for inline storage!");
+ 
+     // For in-line storage, we just provide an aligned character buffer. We
+-    // provide three pointers worth of storage here.
++    // provide four pointers worth of storage here.
+     typename std::aligned_storage<InlineStorageSize, alignof(void *)>::type
+         InlineStorage;
+   } StorageUnion;
+-- 
+2.20.1.windows.1
+

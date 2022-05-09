@@ -1,0 +1,44 @@
+From 237d4a460b087a3b2105edb0d4a9948aa9ae6e5f Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 22:50:24 -0400
+Subject: [PATCH 19/37] Add lerp and sgn
+
+---
+ llvm/include/llvm/Support/MathExtras.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 2188f701f924..bfef92c81a1f 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -858,6 +858,27 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
+ 
+ /// Use this rather than HUGE_VALF; the latter causes warnings on MSVC.
+ extern const float huge_valf;
++
++// Typesafe implementation of the signum function.
++// Returns -1 if negative, 1 if positive, 0 if 0.
++template <typename T>
++constexpr int sgn(T val) {
++  return (T(0) < val) - (val < T(0));
++}
++
++/**
++ * Linearly interpolates between two values.
++ *
++ * @param startValue The start value.
++ * @param endValue The end value.
++ * @param t The fraction for interpolation.
++ *
++ * @return The interpolated value.
++ */
++template <typename T>
++constexpr T Lerp(const T& startValue, const T& endValue, double t) {
++  return startValue + (endValue - startValue) * t;
++}
+ } // End llvm namespace
+ 
+ #endif
+-- 
+2.20.1.windows.1
+

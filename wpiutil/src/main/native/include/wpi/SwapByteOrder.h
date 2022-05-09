@@ -17,7 +17,7 @@
 
 #include "wpi/Compiler.h"
 #include <cstddef>
-#include <stdint.h>
+#include <cstdint>
 #if defined(_MSC_VER) && !defined(_DEBUG)
 #include <stdlib.h>
 #endif

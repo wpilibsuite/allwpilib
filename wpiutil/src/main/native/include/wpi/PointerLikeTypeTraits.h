@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <assert.h>
 #include <type_traits>
 
 namespace wpi {

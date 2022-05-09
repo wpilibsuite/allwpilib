@@ -20,7 +20,6 @@
 #include "wpi/type_traits.h"
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <initializer_list>
@@ -358,7 +357,6 @@ public:
   bool erase(PtrType Ptr) {
     return erase_imp(PtrTraits::getAsVoidPointer(Ptr));
   }
-
   /// count - Return 1 if the specified pointer is in the set, 0 otherwise.
   size_type count(ConstPtrType Ptr) const { return find(Ptr) != end() ? 1 : 0; }
   iterator find(ConstPtrType Ptr) const {
@@ -460,4 +458,4 @@ namespace std {
 
 } // end namespace std
 
-#endif // LLVM_ADT_SMALLPTRSET_H
+#endif // WPIUTIL_WPI_SMALLPTRSET_H

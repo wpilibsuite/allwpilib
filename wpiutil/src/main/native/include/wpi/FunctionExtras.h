@@ -33,11 +33,10 @@
 #ifndef WPIUTIL_WPI_FUNCTION_EXTRAS_H
 #define WPIUTIL_WPI_FUNCTION_EXTRAS_H
 
-#include "wpi/Compiler.h"
 #include "wpi/PointerIntPair.h"
 #include "wpi/PointerUnion.h"
+#include "wpi/type_traits.h"
 #include <memory>
-#include <type_traits>
 
 namespace wpi {
 
@@ -238,11 +237,7 @@ public:
     return *this;
   }
 
-  template <typename CallableT>
-  unique_function(CallableT Callable,
-                  std::enable_if_t<
-                    std::is_invocable_r_v<
-                      ReturnT, CallableT, ParamTs...>>* = nullptr) {
+  template <typename CallableT> unique_function(CallableT Callable) {
     bool IsInlineStorage = true;
     void *CallableAddr = getInlineStorage();
     if (sizeof(CallableT) > InlineStorageSize ||

@@ -1,0 +1,52 @@
+From d126ac306b9d94188716d6066ef2c832e808b5e6 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 23:18:58 -0400
+Subject: [PATCH 25/37] fixup inline macro
+
+---
+ llvm/include/llvm/Support/Chrono.h   | 4 ++--
+ llvm/include/llvm/Support/Compiler.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
+index 4430ea1ce06b..a3ee12326782 100644
+--- a/llvm/include/llvm/Support/Chrono.h
++++ b/llvm/include/llvm/Support/Chrono.h
+@@ -33,14 +33,14 @@ template <typename D = std::chrono::nanoseconds>
+ using TimePoint = std::chrono::time_point<std::chrono::system_clock, D>;
+ 
+ /// Convert a TimePoint to std::time_t
+-LLVM_ATTRIBUTE_ALWAYS_INLINE inline std::time_t toTimeT(TimePoint<> TP) {
++LLVM_ATTRIBUTE_ALWAYS_INLINE std::time_t toTimeT(TimePoint<> TP) {
+   using namespace std::chrono;
+   return system_clock::to_time_t(
+       time_point_cast<system_clock::time_point::duration>(TP));
+ }
+ 
+ /// Convert a std::time_t to a TimePoint
+-LLVM_ATTRIBUTE_ALWAYS_INLINE inline TimePoint<std::chrono::seconds>
++LLVM_ATTRIBUTE_ALWAYS_INLINE TimePoint<std::chrono::seconds>
+ toTimePoint(std::time_t T) {
+   using namespace std::chrono;
+   return time_point_cast<seconds>(system_clock::from_time_t(T));
+diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
+index a30c594a2afd..1dcacde42090 100644
+--- a/llvm/include/llvm/Support/Compiler.h
++++ b/llvm/include/llvm/Support/Compiler.h
+@@ -217,11 +217,11 @@
+ /// errors, just use it in GCC 4.0 and later.
+ #ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
+ #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)
+-#define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
++#define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline)) inline
+ #elif defined(_MSC_VER)
+ #define LLVM_ATTRIBUTE_ALWAYS_INLINE __forceinline
+ #else
+-#define LLVM_ATTRIBUTE_ALWAYS_INLINE
++#define LLVM_ATTRIBUTE_ALWAYS_INLINE inline
+ #endif
+ #endif
+ 
+-- 
+2.20.1.windows.1
+

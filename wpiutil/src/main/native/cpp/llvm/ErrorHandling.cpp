@@ -14,10 +14,10 @@
 
 #include "wpi/ErrorHandling.h"
 #include "wpi/SmallVector.h"
+#include "wpi/Errc.h"
 #include "wpi/WindowsError.h"
 #include "fmt/format.h"
 #include <cassert>
-#include <cstdio>
 #include <cstdlib>
 #include <mutex>
 #include <new>
@@ -25,7 +25,6 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-
 #if defined(_MSC_VER)
 #include <io.h>
 #endif
@@ -53,7 +52,7 @@ static std::mutex ErrorHandlerMutex;
 static std::mutex BadAllocErrorHandlerMutex;
 
 void wpi::install_fatal_error_handler(fatal_error_handler_t handler,
-                                      void *user_data) {
+                                       void *user_data) {
   std::scoped_lock Lock(ErrorHandlerMutex);
   assert(!ErrorHandler && "Error handler already registered!\n");
   ErrorHandler = handler;
@@ -95,7 +94,7 @@ void wpi::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
 }
 
 void wpi::install_bad_alloc_error_handler(fatal_error_handler_t handler,
-                                          void *user_data) {
+                                           void *user_data) {
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
   assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
   BadAllocErrorHandler = handler;
@@ -163,7 +162,7 @@ public:
 } new_handler_installer;
 
 void wpi::wpi_unreachable_internal(const char *msg, const char *file,
-                                   unsigned line) {
+                                     unsigned line) {
   // This code intentionally doesn't call the ErrorHandler callback, because
   // wpi_unreachable is intended to be used to indicate "impossible"
   // situations, and not legitimate runtime errors.

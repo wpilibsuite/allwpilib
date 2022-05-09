@@ -43,7 +43,6 @@ protected:
   mutable const ManagedStaticBase *Next;
 
   void RegisterManagedStatic(void *(*creator)(), void (*deleter)(void*)) const;
-  void RegisterManagedStatic(void *created, void (*deleter)(void*)) const;
 
 public:
   /// isConstructed - Return true if this object has not been created yet.
@@ -61,12 +60,6 @@ template <class C, class Creator = object_creator<C>,
           class Deleter = object_deleter<C>>
 class ManagedStatic : public ManagedStaticBase {
 public:
-  ManagedStatic() = default;
-
-  ManagedStatic(C* created, void(*deleter)(void*)) {
-    RegisterManagedStatic(created, deleter);
-  }
-
   // Accessors.
   C &operator*() {
     void *Tmp = Ptr.load(std::memory_order_acquire);

@@ -87,8 +87,8 @@
 
 ------------------------------------------------------------------------ */
 
-#ifndef LLVM_SUPPORT_CONVERTUTF_H
-#define LLVM_SUPPORT_CONVERTUTF_H
+#ifndef WPIUTIL_WPI_CONVERTUTF_H
+#define WPIUTIL_WPI_CONVERTUTF_H
 
 #include "wpi/span.h"
 
@@ -97,13 +97,10 @@
 #include <string_view>
 #include <system_error>
 
-// Wrap everything in namespace wpi so that programs can link with wpiutil and
+// Wrap everything in namespace wpi so that programs can link with llvm and
 // their own version of the unicode libraries.
 
 namespace wpi {
-
-template <typename T>
-class SmallVectorImpl;
 
 /* ---------------------------------------------------------------------
     The following 4 definitions are compiler-specific.
@@ -187,6 +184,13 @@ unsigned getNumBytesForUTF8(UTF8 firstByte);
 /*************************************************************************/
 /* Below are LLVM-specific wrappers of the functions above. */
 
+template <typename T> class SmallVectorImpl;
+
+/**
+* Converts a UTF-8 C-string to a std::wstring.
+* \return true on success.
+*/
+bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
 
 /**
  * Convert an Unicode code point to UTF8 sequence.
@@ -215,10 +219,10 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr);
  *
  * \sa ConvertUTF8toUTF32
  */
-static inline ConversionResult convertUTF8Sequence(const UTF8 **source,
-                                                   const UTF8 *sourceEnd,
-                                                   UTF32 *target,
-                                                   ConversionFlags flags) {
+inline ConversionResult convertUTF8Sequence(const UTF8 **source,
+                                            const UTF8 *sourceEnd,
+                                            UTF32 *target,
+                                            ConversionFlags flags) {
   if (*source == sourceEnd)
     return sourceExhausted;
   unsigned size = getNumBytesForUTF8(**source);
@@ -234,12 +238,14 @@ static inline ConversionResult convertUTF8Sequence(const UTF8 **source,
 bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
 
 /**
- * Converts a UTF-16 string into a UTF-8 string.
+ * Converts a stream of raw bytes assumed to be UTF16 into a UTF8 std::string.
  *
+ * \param [in] SrcBytes A buffer of what is assumed to be UTF-16 encoded text.
+ * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
-bool convertUTF16ToUTF8String(span<const UTF16> SrcUTF16,
-                              SmallVectorImpl<char> &DstUTF8);
+bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes,
+                              SmallVectorImpl<char> &Out);
 
 /**
  * Converts a UTF-8 string into a UTF-16 string with native endianness.

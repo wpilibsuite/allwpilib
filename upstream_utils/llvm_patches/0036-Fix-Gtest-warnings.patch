@@ -1,0 +1,62 @@
+From 54ce786e01764ef99af98402f82b8a3d38fabb46 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 18:56:35 -0400
+Subject: [PATCH 36/37] Fix Gtest warnings
+
+---
+ llvm/unittests/ADT/DenseMapTest.cpp    | 2 +-
+ llvm/unittests/ADT/MapVectorTest.cpp   | 2 +-
+ llvm/unittests/ADT/SmallVectorTest.cpp | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
+index d3fd9ec14adb..1114ea43e2a8 100644
+--- a/llvm/unittests/ADT/DenseMapTest.cpp
++++ b/llvm/unittests/ADT/DenseMapTest.cpp
+@@ -106,7 +106,7 @@ typedef ::testing::Types<DenseMap<uint32_t, uint32_t>,
+                          SmallDenseMap<CtorTester, CtorTester, 4,
+                                        CtorTesterMapInfo>
+                          > DenseMapTestTypes;
+-TYPED_TEST_CASE(DenseMapTest, DenseMapTestTypes);
++TYPED_TEST_SUITE(DenseMapTest, DenseMapTestTypes);
+ 
+ // Empty map tests
+ TYPED_TEST(DenseMapTest, EmptyIntMapTest) {
+diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
+index 0b1418295f14..0afa981e7c36 100644
+--- a/llvm/unittests/ADT/MapVectorTest.cpp
++++ b/llvm/unittests/ADT/MapVectorTest.cpp
+@@ -168,7 +168,7 @@ template <class IntType> struct MapVectorMappedTypeTest : ::testing::Test {
+ 
+ using MapIntTypes = ::testing::Types<int, long, long long, unsigned,
+                                      unsigned long, unsigned long long>;
+-TYPED_TEST_CASE(MapVectorMappedTypeTest, MapIntTypes);
++TYPED_TEST_SUITE(MapVectorMappedTypeTest, MapIntTypes);
+ 
+ TYPED_TEST(MapVectorMappedTypeTest, DifferentDenseMap) {
+   // Test that using a map with a mapped type other than 'unsigned' compiles
+diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
+index 19da97d72dfc..0166a6ba706b 100644
+--- a/llvm/unittests/ADT/SmallVectorTest.cpp
++++ b/llvm/unittests/ADT/SmallVectorTest.cpp
+@@ -211,7 +211,7 @@ typedef ::testing::Types<SmallVector<Constructable, 0>,
+                          SmallVector<Constructable, 4>,
+                          SmallVector<Constructable, 5>
+                          > SmallVectorTestTypes;
+-TYPED_TEST_CASE(SmallVectorTest, SmallVectorTestTypes);
++TYPED_TEST_SUITE(SmallVectorTest, SmallVectorTestTypes);
+ 
+ // Constructor test.
+ TYPED_TEST(SmallVectorTest, ConstructorNonIterTest) {
+@@ -770,7 +770,7 @@ typedef ::testing::Types<
+     std::pair<SmallVector<Constructable, 2>, SmallVector<Constructable, 2>>
+   > DualSmallVectorTestTypes;
+ 
+-TYPED_TEST_CASE(DualSmallVectorsTest, DualSmallVectorTestTypes);
++TYPED_TEST_SUITE(DualSmallVectorsTest, DualSmallVectorTestTypes);
+ 
+ TYPED_TEST(DualSmallVectorsTest, MoveAssignment) {
+   SCOPED_TRACE("MoveAssignTest-DualVectorTypes");
+-- 
+2.20.1.windows.1
+

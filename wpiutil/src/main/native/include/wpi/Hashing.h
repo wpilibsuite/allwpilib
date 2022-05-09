@@ -48,12 +48,10 @@
 #include "wpi/Endian.h"
 #include "wpi/SwapByteOrder.h"
 #include "wpi/type_traits.h"
-#include <stdint.h>
 #include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <string>
-#include <string_view>
 #include <utility>
 
 #ifdef _WIN32
@@ -151,7 +149,7 @@ namespace detail {
 inline uint64_t fetch64(const char *p) {
   uint64_t result;
   memcpy(&result, p, sizeof(result));
-  if (support::endian::system_endianness() == support::big)
+  if (sys::IsBigEndianHost)
     sys::swapByteOrder(result);
   return result;
 }
@@ -159,7 +157,7 @@ inline uint64_t fetch64(const char *p) {
 inline uint32_t fetch32(const char *p) {
   uint32_t result;
   memcpy(&result, p, sizeof(result));
-  if (support::endian::system_endianness() == support::big)
+  if (sys::IsBigEndianHost)
     sys::swapByteOrder(result);
   return result;
 }

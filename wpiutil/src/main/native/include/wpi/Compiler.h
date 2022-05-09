@@ -15,6 +15,7 @@
 #ifndef WPIUTIL_WPI_COMPILER_H
 #define WPIUTIL_WPI_COMPILER_H
 
+
 #include <new>
 #include <stddef.h>
 
@@ -68,7 +69,7 @@
 
 // We require at least MSVC 2015.
 #if !LLVM_MSC_PREREQ(1900)
-#error wpiutil requires at least MSVC 2015.
+#error LLVM requires at least MSVC 2015.
 #endif
 
 #else
@@ -98,6 +99,18 @@
 #else
 #define LLVM_LVALUE_FUNCTION
 #endif
+#endif
+
+/// LLVM_LIBRARY_VISIBILITY - If a class marked with this attribute is linked
+/// into a shared library, then the class should be private to the library and
+/// not accessible from outside it.  Can also be used to mark variables and
+/// functions, making them private to any shared library they are linked into.
+/// On PE/COFF targets, library visibility is the default, so this isn't needed.
+#if (__has_attribute(visibility) || LLVM_GNUC_PREREQ(4, 0, 0)) &&              \
+    !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32)
+#define LLVM_LIBRARY_VISIBILITY __attribute__ ((visibility("hidden")))
+#else
+#define LLVM_LIBRARY_VISIBILITY
 #endif
 
 #ifndef LLVM_PREFETCH
@@ -150,6 +163,14 @@
 #else
 #define LLVM_ATTRIBUTE_UNUSED
 #endif
+#endif
+
+// FIXME: Provide this for PE/COFF targets.
+#if (__has_attribute(weak) || LLVM_GNUC_PREREQ(4, 0, 0)) &&                    \
+    (!defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32))
+#define LLVM_ATTRIBUTE_WEAK __attribute__((__weak__))
+#else
+#define LLVM_ATTRIBUTE_WEAK
 #endif
 
 #ifndef LLVM_READNONE
@@ -405,6 +426,71 @@
 #else
 # define LLVM_PTR_SIZE sizeof(void *)
 #endif
+#endif
+
+/// \macro LLVM_MEMORY_SANITIZER_BUILD
+/// Whether LLVM itself is built with MemorySanitizer instrumentation.
+#if __has_feature(memory_sanitizer)
+# define LLVM_MEMORY_SANITIZER_BUILD 1
+# include <sanitizer/msan_interface.h>
+#else
+# define LLVM_MEMORY_SANITIZER_BUILD 0
+# define __msan_allocated_memory(p, size)
+# define __msan_unpoison(p, size)
+#endif
+
+/// \macro LLVM_ADDRESS_SANITIZER_BUILD
+/// Whether LLVM itself is built with AddressSanitizer instrumentation.
+#if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
+# define LLVM_ADDRESS_SANITIZER_BUILD 1
+# include <sanitizer/asan_interface.h>
+#else
+# define LLVM_ADDRESS_SANITIZER_BUILD 0
+# define __asan_poison_memory_region(p, size)
+# define __asan_unpoison_memory_region(p, size)
+#endif
+
+/// \macro LLVM_THREAD_SANITIZER_BUILD
+/// Whether LLVM itself is built with ThreadSanitizer instrumentation.
+#if __has_feature(thread_sanitizer) || defined(__SANITIZE_THREAD__)
+# define LLVM_THREAD_SANITIZER_BUILD 1
+#else
+# define LLVM_THREAD_SANITIZER_BUILD 0
+#endif
+
+#if LLVM_THREAD_SANITIZER_BUILD
+// Thread Sanitizer is a tool that finds races in code.
+// See http://code.google.com/p/data-race-test/wiki/DynamicAnnotations .
+// tsan detects these exact functions by name.
+#ifdef __cplusplus
+extern "C" {
+#endif
+void AnnotateHappensAfter(const char *file, int line, const volatile void *cv);
+void AnnotateHappensBefore(const char *file, int line, const volatile void *cv);
+void AnnotateIgnoreWritesBegin(const char *file, int line);
+void AnnotateIgnoreWritesEnd(const char *file, int line);
+#ifdef __cplusplus
+}
+#endif
+
+// This marker is used to define a happens-before arc. The race detector will
+// infer an arc from the begin to the end when they share the same pointer
+// argument.
+# define TsanHappensBefore(cv) AnnotateHappensBefore(__FILE__, __LINE__, cv)
+
+// This marker defines the destination of a happens-before arc.
+# define TsanHappensAfter(cv) AnnotateHappensAfter(__FILE__, __LINE__, cv)
+
+// Ignore any races on writes between here and the next TsanIgnoreWritesEnd.
+# define TsanIgnoreWritesBegin() AnnotateIgnoreWritesBegin(__FILE__, __LINE__)
+
+// Resume checking for racy writes.
+# define TsanIgnoreWritesEnd() AnnotateIgnoreWritesEnd(__FILE__, __LINE__)
+#else
+# define TsanHappensBefore(cv)
+# define TsanHappensAfter(cv)
+# define TsanIgnoreWritesBegin()
+# define TsanIgnoreWritesEnd()
 #endif
 
 /// \macro LLVM_NO_SANITIZE

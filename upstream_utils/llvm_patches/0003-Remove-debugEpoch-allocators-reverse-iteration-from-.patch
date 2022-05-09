@@ -1,0 +1,390 @@
+From a29351e2560e8aeae20e7f6a10d9efef455007ed Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 19:58:29 -0400
+Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
+ collections
+
+---
+ llvm/include/llvm/ADT/DenseMap.h    | 25 -------------
+ llvm/include/llvm/ADT/SmallPtrSet.h | 35 +++--------------
+ llvm/include/llvm/ADT/StringMap.h   | 58 +++++++----------------------
+ llvm/lib/Support/SmallPtrSet.cpp    |  1 -
+ 4 files changed, 18 insertions(+), 101 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index ba60b7972a8f..055f3d01ce06 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -72,8 +72,6 @@ public:
+     // empty buckets.
+     if (empty())
+       return end();
+-    if (shouldReverseIterate<KeyT>())
+-      return makeIterator(getBucketsEnd() - 1, getBuckets(), *this);
+     return makeIterator(getBuckets(), getBucketsEnd(), *this);
+   }
+   inline iterator end() {
+@@ -82,8 +80,6 @@ public:
+   inline const_iterator begin() const {
+     if (empty())
+       return end();
+-    if (shouldReverseIterate<KeyT>())
+-      return makeConstIterator(getBucketsEnd() - 1, getBuckets(), *this);
+     return makeConstIterator(getBuckets(), getBucketsEnd(), *this);
+   }
+   inline const_iterator end() const {
+@@ -429,20 +425,12 @@ private:
+   iterator makeIterator(BucketT *P, BucketT *E,
+                         DebugEpochBase &Epoch,
+                         bool NoAdvance=false) {
+-    if (shouldReverseIterate<KeyT>()) {
+-      BucketT *B = P == getBucketsEnd() ? getBuckets() : P + 1;
+-      return iterator(B, E, Epoch, NoAdvance);
+-    }
+     return iterator(P, E, Epoch, NoAdvance);
+   }
+ 
+   const_iterator makeConstIterator(const BucketT *P, const BucketT *E,
+                                    const DebugEpochBase &Epoch,
+                                    const bool NoAdvance=false) const {
+-    if (shouldReverseIterate<KeyT>()) {
+-      const BucketT *B = P == getBucketsEnd() ? getBuckets() : P + 1;
+-      return const_iterator(B, E, Epoch, NoAdvance);
+-    }
+     return const_iterator(P, E, Epoch, NoAdvance);
+   }
+ 
+@@ -1132,10 +1120,6 @@ public:
+     assert(isHandleInSync() && "invalid construction!");
+ 
+     if (NoAdvance) return;
+-    if (shouldReverseIterate<KeyT>()) {
+-      RetreatPastEmptyBuckets();
+-      return;
+-    }
+     AdvancePastEmptyBuckets();
+   }
+ 
+@@ -1150,14 +1134,10 @@ public:
+ 
+   reference operator*() const {
+     assert(isHandleInSync() && "invalid iterator access!");
+-    if (shouldReverseIterate<KeyT>())
+-      return Ptr[-1];
+     return *Ptr;
+   }
+   pointer operator->() const {
+     assert(isHandleInSync() && "invalid iterator access!");
+-    if (shouldReverseIterate<KeyT>())
+-      return &(Ptr[-1]);
+     return Ptr;
+   }
+ 
+@@ -1178,11 +1158,6 @@ public:
+ 
+   inline DenseMapIterator& operator++() {  // Preincrement
+     assert(isHandleInSync() && "invalid iterator access!");
+-    if (shouldReverseIterate<KeyT>()) {
+-      --Ptr;
+-      RetreatPastEmptyBuckets();
+-      return *this;
+-    }
+     ++Ptr;
+     AdvancePastEmptyBuckets();
+     return *this;
+diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
+index db08e40257ba..d326a43a34ec 100644
+--- a/llvm/include/llvm/ADT/SmallPtrSet.h
++++ b/llvm/include/llvm/ADT/SmallPtrSet.h
+@@ -15,7 +15,6 @@
+ #ifndef LLVM_ADT_SMALLPTRSET_H
+ #define LLVM_ADT_SMALLPTRSET_H
+ 
+-#include "llvm/ADT/EpochTracker.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/ReverseIteration.h"
+ #include "llvm/Support/type_traits.h"
+@@ -47,7 +46,7 @@ namespace llvm {
+ /// (-2), to allow deletion.  The hash table is resized when the table is 3/4 or
+ /// more.  When this happens, the table is doubled in size.
+ ///
+-class SmallPtrSetImplBase : public DebugEpochBase {
++class SmallPtrSetImplBase {
+   friend class SmallPtrSetIteratorImpl;
+ 
+ protected:
+@@ -93,7 +92,6 @@ public:
+   size_type size() const { return NumNonEmpty - NumTombstones; }
+ 
+   void clear() {
+-    incrementEpoch();
+     // If the capacity of the array is huge, and the # elements used is small,
+     // shrink the array.
+     if (!isSmall()) {
+@@ -140,14 +138,12 @@ protected:
+       if (LastTombstone != nullptr) {
+         *LastTombstone = Ptr;
+         --NumTombstones;
+-        incrementEpoch();
+         return std::make_pair(LastTombstone, true);
+       }
+ 
+       // Nope, there isn't.  If we stay small, just 'pushback' now.
+       if (NumNonEmpty < CurArraySize) {
+         SmallArray[NumNonEmpty++] = Ptr;
+-        incrementEpoch();
+         return std::make_pair(SmallArray + (NumNonEmpty - 1), true);
+       }
+       // Otherwise, hit the big set case, which will call grow.
+@@ -227,10 +223,6 @@ protected:
+ public:
+   explicit SmallPtrSetIteratorImpl(const void *const *BP, const void*const *E)
+     : Bucket(BP), End(E) {
+-    if (shouldReverseIterate()) {
+-      RetreatIfNotValid();
+-      return;
+-    }
+     AdvanceIfNotValid();
+   }
+ 
+@@ -264,8 +256,7 @@ protected:
+ 
+ /// SmallPtrSetIterator - This implements a const_iterator for SmallPtrSet.
+ template <typename PtrTy>
+-class SmallPtrSetIterator : public SmallPtrSetIteratorImpl,
+-                            DebugEpochBase::HandleBase {
++class SmallPtrSetIterator : public SmallPtrSetIteratorImpl {
+   using PtrTraits = PointerLikeTypeTraits<PtrTy>;
+ 
+ public:
+@@ -275,29 +266,17 @@ public:
+   using difference_type = std::ptrdiff_t;
+   using iterator_category = std::forward_iterator_tag;
+ 
+-  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E,
+-                               const DebugEpochBase &Epoch)
+-      : SmallPtrSetIteratorImpl(BP, E), DebugEpochBase::HandleBase(&Epoch) {}
++  explicit SmallPtrSetIterator(const void *const *BP, const void *const *E)
++      : SmallPtrSetIteratorImpl(BP, E) {}
+ 
+   // Most methods provided by baseclass.
+ 
+   const PtrTy operator*() const {
+-    assert(isHandleInSync() && "invalid iterator access!");
+-    if (shouldReverseIterate()) {
+-      assert(Bucket > End);
+-      return PtrTraits::getFromVoidPointer(const_cast<void *>(Bucket[-1]));
+-    }
+     assert(Bucket < End);
+     return PtrTraits::getFromVoidPointer(const_cast<void*>(*Bucket));
+   }
+ 
+   inline SmallPtrSetIterator& operator++() {          // Preincrement
+-    assert(isHandleInSync() && "invalid iterator access!");
+-    if (shouldReverseIterate()) {
+-      --Bucket;
+-      RetreatIfNotValid();
+-      return *this;
+-    }
+     ++Bucket;
+     AdvanceIfNotValid();
+     return *this;
+@@ -395,8 +374,6 @@ public:
+   }
+ 
+   iterator begin() const {
+-    if (shouldReverseIterate())
+-      return makeIterator(EndPointer() - 1);
+     return makeIterator(CurArray);
+   }
+   iterator end() const { return makeIterator(EndPointer()); }
+@@ -404,9 +381,7 @@ public:
+ private:
+   /// Create an iterator that dereferences to same place as the given pointer.
+   iterator makeIterator(const void *const *P) const {
+-    if (shouldReverseIterate())
+-      return iterator(P == EndPointer() ? CurArray : P + 1, CurArray, *this);
+-    return iterator(P, EndPointer(), *this);
++    return iterator(P, EndPointer());
+   }
+ };
+ 
+diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
+index a9f83d3f5091..13c19d381155 100644
+--- a/llvm/include/llvm/ADT/StringMap.h
++++ b/llvm/include/llvm/ADT/StringMap.h
+@@ -152,19 +152,16 @@ public:
+ 
+   /// Create a StringMapEntry for the specified key construct the value using
+   /// \p InitiVals.
+-  template <typename AllocatorTy, typename... InitTy>
+-  static StringMapEntry *Create(StringRef Key, AllocatorTy &Allocator,
+-                                InitTy &&... InitVals) {
++  template <typename... InitTy>
++  static StringMapEntry *Create(StringRef Key, InitTy &&... InitVals) {
+     size_t KeyLength = Key.size();
+ 
+     // Allocate a new item with space for the string at the end and a null
+     // terminator.
+     size_t AllocSize = sizeof(StringMapEntry) + KeyLength + 1;
+-    size_t Alignment = alignof(StringMapEntry);
+ 
+     StringMapEntry *NewItem =
+-      static_cast<StringMapEntry*>(Allocator.Allocate(AllocSize,Alignment));
+-    assert(NewItem && "Unhandled out-of-memory");
++      static_cast<StringMapEntry*>(safe_malloc(AllocSize));
+ 
+     // Construct the value.
+     new (NewItem) StringMapEntry(KeyLength, std::forward<InitTy>(InitVals)...);
+@@ -177,13 +174,6 @@ public:
+     return NewItem;
+   }
+ 
+-  /// Create - Create a StringMapEntry with normal malloc/free.
+-  template <typename... InitType>
+-  static StringMapEntry *Create(StringRef Key, InitType &&... InitVal) {
+-    MallocAllocator A;
+-    return Create(Key, A, std::forward<InitType>(InitVal)...);
+-  }
+-
+   static StringMapEntry *Create(StringRef Key) {
+     return Create(Key, ValueTy());
+   }
+@@ -197,18 +187,10 @@ public:
+ 
+   /// Destroy - Destroy this StringMapEntry, releasing memory back to the
+   /// specified allocator.
+-  template<typename AllocatorTy>
+-  void Destroy(AllocatorTy &Allocator) {
++  void Destroy() {
+     // Free memory referenced by the item.
+-    size_t AllocSize = sizeof(StringMapEntry) + getKeyLength() + 1;
+     this->~StringMapEntry();
+-    Allocator.Deallocate(static_cast<void *>(this), AllocSize);
+-  }
+-
+-  /// Destroy this object, releasing memory back to the malloc allocator.
+-  void Destroy() {
+-    MallocAllocator A;
+-    Destroy(A);
++    std::free(static_cast<void *>(this));
+   }
+ };
+ 
+@@ -216,10 +198,8 @@ public:
+ /// keys that are "strings", which are basically ranges of bytes. This does some
+ /// funky memory allocation and hashing things to make it extremely efficient,
+ /// storing the string data *after* the value in the map.
+-template<typename ValueTy, typename AllocatorTy = MallocAllocator>
++template<typename ValueTy>
+ class StringMap : public StringMapImpl {
+-  AllocatorTy Allocator;
+-
+ public:
+   using MapEntryTy = StringMapEntry<ValueTy>;
+ 
+@@ -228,13 +208,6 @@ public:
+   explicit StringMap(unsigned InitialSize)
+     : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
+ 
+-  explicit StringMap(AllocatorTy A)
+-    : StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))), Allocator(A) {}
+-
+-  StringMap(unsigned InitialSize, AllocatorTy A)
+-    : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))),
+-      Allocator(A) {}
+-
+   StringMap(std::initializer_list<std::pair<StringRef, ValueTy>> List)
+       : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
+     for (const auto &P : List) {
+@@ -243,11 +216,10 @@ public:
+   }
+ 
+   StringMap(StringMap &&RHS)
+-      : StringMapImpl(std::move(RHS)), Allocator(std::move(RHS.Allocator)) {}
++      : StringMapImpl(std::move(RHS)) {}
+ 
+   StringMap(const StringMap &RHS) :
+-    StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))),
+-    Allocator(RHS.Allocator) {
++    StringMapImpl(static_cast<unsigned>(sizeof(MapEntryTy))) {
+     if (RHS.empty())
+       return;
+ 
+@@ -267,7 +239,7 @@ public:
+       }
+ 
+       TheTable[I] = MapEntryTy::Create(
+-          static_cast<MapEntryTy *>(Bucket)->getKey(), Allocator,
++          static_cast<MapEntryTy *>(Bucket)->getKey(),
+           static_cast<MapEntryTy *>(Bucket)->getValue());
+       HashTable[I] = RHSHashTable[I];
+     }
+@@ -282,7 +254,6 @@ public:
+ 
+   StringMap &operator=(StringMap RHS) {
+     StringMapImpl::swap(RHS);
+-    std::swap(Allocator, RHS.Allocator);
+     return *this;
+   }
+ 
+@@ -294,16 +265,13 @@ public:
+       for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
+         StringMapEntryBase *Bucket = TheTable[I];
+         if (Bucket && Bucket != getTombstoneVal()) {
+-          static_cast<MapEntryTy*>(Bucket)->Destroy(Allocator);
++          static_cast<MapEntryTy*>(Bucket)->Destroy();
+         }
+       }
+     }
+     free(TheTable);
+   }
+ 
+-  AllocatorTy &getAllocator() { return Allocator; }
+-  const AllocatorTy &getAllocator() const { return Allocator; }
+-
+   using key_type = const char*;
+   using mapped_type = ValueTy;
+   using value_type = StringMapEntry<ValueTy>;
+@@ -401,7 +369,7 @@ public:
+ 
+     if (Bucket == getTombstoneVal())
+       --NumTombstones;
+-    Bucket = MapEntryTy::Create(Key, Allocator, std::forward<ArgsTy>(Args)...);
++    Bucket = MapEntryTy::Create(Key, std::forward<ArgsTy>(Args)...);
+     ++NumItems;
+     assert(NumItems + NumTombstones <= NumBuckets);
+ 
+@@ -418,7 +386,7 @@ public:
+     for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
+       StringMapEntryBase *&Bucket = TheTable[I];
+       if (Bucket && Bucket != getTombstoneVal()) {
+-        static_cast<MapEntryTy*>(Bucket)->Destroy(Allocator);
++        static_cast<MapEntryTy*>(Bucket)->Destroy();
+       }
+       Bucket = nullptr;
+     }
+@@ -436,7 +404,7 @@ public:
+   void erase(iterator I) {
+     MapEntryTy &V = *I;
+     remove(&V);
+-    V.Destroy(Allocator);
++    V.Destroy();
+   }
+ 
+   bool erase(StringRef Key) {
+diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
+index fed4a17d6635..8b8318c7a946 100644
+--- a/llvm/lib/Support/SmallPtrSet.cpp
++++ b/llvm/lib/Support/SmallPtrSet.cpp
+@@ -59,7 +59,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
+   else
+     ++NumNonEmpty; // Track density.
+   *Bucket = Ptr;
+-  incrementEpoch();
+   return std::make_pair(Bucket, true);
+ }
+ 
+-- 
+2.20.1.windows.1
+

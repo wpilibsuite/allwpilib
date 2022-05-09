@@ -104,7 +104,7 @@ struct const_pointer_or_const_ref<
   using type = typename add_const_past_pointer<T>::type;
 };
 
-} // namespace wpi
+} // end namespace wpi
 
 // If the compiler supports detecting whether a class is final, define
 // an LLVM_IS_FINAL macro. If it cannot be defined properly, this
@@ -122,4 +122,4 @@ struct const_pointer_or_const_ref<
 #undef WPI_DEFINED_HAS_FEATURE
 #endif
 
-#endif // LLVM_SUPPORT_TYPE_TRAITS_H
+#endif // WPIUTIL_WPI_TYPE_TRAITS_H

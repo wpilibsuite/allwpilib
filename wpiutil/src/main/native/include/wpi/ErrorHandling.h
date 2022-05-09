@@ -20,6 +20,7 @@
 #include <string_view>
 
 namespace wpi {
+
   /// An error handler callback.
   typedef void (*fatal_error_handler_t)(void *user_data,
                                         const std::string& reason,
@@ -108,8 +109,8 @@ void install_out_of_memory_new_handler();
 /// in the unwind chain.
 ///
 /// If no error handler is installed (default), then a bad_alloc exception
-/// is thrown, if LLVM is compiled with exception support, otherwise an
-/// assertion is called.
+/// is thrown, if LLVM is compiled with exception support, otherwise an assertion
+/// is called.
 void report_bad_alloc_error(const char *Reason, bool GenCrashDiag = true);
 
 /// This function calls abort(), and prints the optional message to stderr.
@@ -117,7 +118,7 @@ void report_bad_alloc_error(const char *Reason, bool GenCrashDiag = true);
 /// calling this function directly.
 LLVM_ATTRIBUTE_NORETURN void
 wpi_unreachable_internal(const char *msg = nullptr, const char *file = nullptr,
-                         unsigned line = 0);
+                          unsigned line = 0);
 }
 
 /// Marks that the current location is not supposed to be reachable.

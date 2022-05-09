@@ -124,7 +124,7 @@ public:
     using Ty = typename ::wpi::PointerUnionTypeSelector<
         PT1, T, IsPT1,
         ::wpi::PointerUnionTypeSelector<PT2, T, IsPT2,
-                                        UNION_DOESNT_CONTAIN_TYPE<T>>>::Return;
+                                         UNION_DOESNT_CONTAIN_TYPE<T>>>::Return;
     int TyNo = Ty::Num;
     return static_cast<int>(Val.getInt()) == TyNo;
   }
@@ -382,7 +382,7 @@ public:
     using Ty = typename ::wpi::PointerUnionTypeSelector<
         PT1, T, InnerUnion1,
         ::wpi::PointerUnionTypeSelector<PT2, T, InnerUnion1,
-                                        InnerUnion2>>::Return;
+                                         InnerUnion2>>::Return;
     return Val.template is<Ty>() && Val.template get<Ty>().template is<T>();
   }
 
@@ -395,7 +395,7 @@ public:
     using Ty = typename ::wpi::PointerUnionTypeSelector<
         PT1, T, InnerUnion1,
         ::wpi::PointerUnionTypeSelector<PT2, T, InnerUnion1,
-                                        InnerUnion2>>::Return;
+                                         InnerUnion2>>::Return;
     return Val.template get<Ty>().template get<T>();
   }
 

@@ -1,0 +1,184 @@
+From bc297f1259885676700e8eaa2508e5ec86024905 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 21:56:02 -0400
+Subject: [PATCH 12/37] Prefer std:: over llvm::
+
+---
+ llvm/include/llvm/ADT/FunctionExtras.h  |  6 ++--
+ llvm/include/llvm/Support/MathExtras.h  |  2 +-
+ llvm/include/llvm/Support/type_traits.h | 39 -------------------------
+ llvm/lib/Support/ErrorHandling.cpp      |  3 +-
+ llvm/lib/Support/ManagedStatic.cpp      |  4 +--
+ llvm/unittests/ADT/MapVectorTest.cpp    |  8 ++---
+ llvm/unittests/ADT/SmallPtrSetTest.cpp  |  2 +-
+ 7 files changed, 13 insertions(+), 51 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
+index 2b75dc6ac219..a0a702c5c297 100644
+--- a/llvm/include/llvm/ADT/FunctionExtras.h
++++ b/llvm/include/llvm/ADT/FunctionExtras.h
+@@ -65,8 +65,8 @@ class unique_function<ReturnT(ParamTs...)> {
+   template <typename T>
+   using AdjustedParamT = typename std::conditional<
+       !std::is_reference<T>::value &&
+-          llvm::is_trivially_copy_constructible<T>::value &&
+-          llvm::is_trivially_move_constructible<T>::value &&
++          std::is_trivially_copy_constructible<T>::value &&
++          std::is_trivially_move_constructible<T>::value &&
+           IsSizeLessThanThresholdT<T>::value,
+       T, T &>::type;
+ 
+@@ -255,7 +255,7 @@ public:
+     // FIXME: We should use constexpr if here and below to avoid instantiating
+     // the non-trivial static objects when unnecessary. While the linker should
+     // remove them, it is still wasteful.
+-    if (llvm::is_trivially_move_constructible<CallableT>::value &&
++    if (std::is_trivially_move_constructible<CallableT>::value &&
+         std::is_trivially_destructible<CallableT>::value) {
+       // We need to create a nicely aligned object. We use a static variable
+       // for this because it is a trivial struct.
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 4cf6c0e08cf1..4f0a28dd8490 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -529,7 +529,7 @@ inline double Log2(double Value) {
+ #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
+   return __builtin_log(Value) / __builtin_log(2.0);
+ #else
+-  return log2(Value);
++  return std::log2(Value);
+ #endif
+ }
+ 
+diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
+index 27e27af260b2..7104c9383cf4 100644
+--- a/llvm/include/llvm/Support/type_traits.h
++++ b/llvm/include/llvm/Support/type_traits.h
+@@ -104,45 +104,6 @@ struct const_pointer_or_const_ref<
+   using type = typename add_const_past_pointer<T>::type;
+ };
+ 
+-namespace detail {
+-/// Internal utility to detect trivial copy construction.
+-template<typename T> union copy_construction_triviality_helper {
+-    T t;
+-    copy_construction_triviality_helper() = default;
+-    copy_construction_triviality_helper(const copy_construction_triviality_helper&) = default;
+-    ~copy_construction_triviality_helper() = default;
+-};
+-/// Internal utility to detect trivial move construction.
+-template<typename T> union move_construction_triviality_helper {
+-    T t;
+-    move_construction_triviality_helper() = default;
+-    move_construction_triviality_helper(move_construction_triviality_helper&&) = default;
+-    ~move_construction_triviality_helper() = default;
+-};
+-} // end namespace detail
+-
+-/// An implementation of `std::is_trivially_copy_constructible` since we have
+-/// users with STLs that don't yet include it.
+-template <typename T>
+-struct is_trivially_copy_constructible
+-    : std::is_copy_constructible<
+-          ::llvm::detail::copy_construction_triviality_helper<T>> {};
+-template <typename T>
+-struct is_trivially_copy_constructible<T &> : std::true_type {};
+-template <typename T>
+-struct is_trivially_copy_constructible<T &&> : std::false_type {};
+-
+-/// An implementation of `std::is_trivially_move_constructible` since we have
+-/// users with STLs that don't yet include it.
+-template <typename T>
+-struct is_trivially_move_constructible
+-    : std::is_move_constructible<
+-          ::llvm::detail::move_construction_triviality_helper<T>> {};
+-template <typename T>
+-struct is_trivially_move_constructible<T &> : std::true_type {};
+-template <typename T>
+-struct is_trivially_move_constructible<T &&> : std::true_type {};
+-
+ } // end namespace llvm
+ 
+ // If the compiler supports detecting whether a class is final, define
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index cb7170093bd6..f00940339fef 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -214,12 +214,13 @@ void LLVMResetFatalErrorHandler() {
+ 
+ #ifdef _WIN32
+ 
++#include <system_error>
+ #include <winerror.h>
+ 
+ // I'd rather not double the line count of the following.
+ #define MAP_ERR_TO_COND(x, y)                                                  \
+   case x:                                                                      \
+-    return make_error_code(errc::y)
++    return std::make_error_code(std::errc::y)
+ 
+ std::error_code llvm::mapWindowsError(unsigned EV) {
+   switch (EV) {
+diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
+index 283231897773..1c6847f71529 100644
+--- a/llvm/lib/Support/ManagedStatic.cpp
++++ b/llvm/lib/Support/ManagedStatic.cpp
+@@ -20,14 +20,14 @@ using namespace llvm;
+ 
+ static const ManagedStaticBase *StaticList = nullptr;
+ static llvm::mutex *ManagedStaticMutex = nullptr;
+-static llvm::once_flag mutex_init_flag;
++static std::once_flag mutex_init_flag;
+ 
+ static void initializeMutex() {
+   ManagedStaticMutex = new llvm::mutex();
+ }
+ 
+ static llvm::mutex* getManagedStaticMutex() {
+-  llvm::call_once(mutex_init_flag, initializeMutex);
++  std::call_once(mutex_init_flag, initializeMutex);
+   return ManagedStaticMutex;
+ }
+ 
+diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
+index 16e9b5a74f42..a53448b8d938 100644
+--- a/llvm/unittests/ADT/MapVectorTest.cpp
++++ b/llvm/unittests/ADT/MapVectorTest.cpp
+@@ -150,8 +150,8 @@ TEST(MapVectorTest, iteration_test) {
+ 
+ TEST(MapVectorTest, NonCopyable) {
+   MapVector<int, std::unique_ptr<int>> MV;
+-  MV.insert(std::make_pair(1, llvm::make_unique<int>(1)));
+-  MV.insert(std::make_pair(2, llvm::make_unique<int>(2)));
++  MV.insert(std::make_pair(1, std::make_unique<int>(1)));
++  MV.insert(std::make_pair(2, std::make_unique<int>(2)));
+ 
+   ASSERT_EQ(MV.count(1), 1u);
+   ASSERT_EQ(*MV.find(2)->second, 2);
+@@ -307,8 +307,8 @@ TEST(SmallMapVectorSmallTest, iteration_test) {
+ 
+ TEST(SmallMapVectorSmallTest, NonCopyable) {
+   SmallMapVector<int, std::unique_ptr<int>, 8> MV;
+-  MV.insert(std::make_pair(1, llvm::make_unique<int>(1)));
+-  MV.insert(std::make_pair(2, llvm::make_unique<int>(2)));
++  MV.insert(std::make_pair(1, std::make_unique<int>(1)));
++  MV.insert(std::make_pair(2, std::make_unique<int>(2)));
+ 
+   ASSERT_EQ(MV.count(1), 1u);
+   ASSERT_EQ(*MV.find(2)->second, 2);
+diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+index 76f9cf7fb9af..4ee9e132251a 100644
+--- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
++++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
+@@ -299,7 +299,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
+ 
+   // Sort.  We should hit the first element just once and the final element N
+   // times.
+-  llvm::sort(std::begin(Found), std::end(Found));
++  std::sort(std::begin(Found), std::end(Found));
+   for (auto F = std::begin(Found), E = std::end(Found); F != E; ++F)
+     EXPECT_EQ(F - Found + 1, *F);
+ }
+-- 
+2.20.1.windows.1
+

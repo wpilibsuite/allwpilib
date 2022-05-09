@@ -1,0 +1,222 @@
+From 67da2af70a3000b14d3d3bbbd3e6126922c56b6c Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 22:58:49 -0400
+Subject: [PATCH 20/37] Prefer fs::file_t
+
+---
+ llvm/include/llvm/Support/MemoryBuffer.h | 17 +++++++++----
+ llvm/include/llvm/Support/raw_ostream.h  |  6 ++---
+ llvm/lib/Support/MemoryBuffer.cpp        | 32 ++++++++++++------------
+ llvm/lib/Support/raw_ostream.cpp         |  9 ++++---
+ 4 files changed, 36 insertions(+), 28 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
+index 1111c34f0d6c..58665a5ae35a 100644
+--- a/llvm/include/llvm/Support/MemoryBuffer.h
++++ b/llvm/include/llvm/Support/MemoryBuffer.h
+@@ -14,15 +14,22 @@
+ #ifndef LLVM_SUPPORT_MEMORYBUFFER_H
+ #define LLVM_SUPPORT_MEMORYBUFFER_H
+ 
+-#include "llvm-c/Types.h"
+-#include "llvm/Support/CBindingWrapping.h"
+ #include "llvm/Support/ErrorOr.h"
+-#include "llvm/Support/FileSystem.h"
+ #include <cstddef>
+ #include <cstdint>
+ #include <memory>
+ #include <string_view>
+ 
++// Duplicated from fs.h to avoid a dependency
++namespace fs {
++#if defined(_WIN32)
++// A Win32 HANDLE is a typedef of void*
++using file_t = void*;
++#else
++using file_t = int;
++#endif
++}  // namespace fs
++
+ namespace llvm {
+ 
+ class MemoryBufferRef;
+@@ -89,7 +96,7 @@ public:
+   /// MemoryBuffer. The slice is specified by an \p Offset and \p MapSize.
+   /// Since this is in the middle of a file, the buffer is not null terminated.
+   static ErrorOr<std::unique_ptr<MemoryBuffer>>
+-  getOpenFileSlice(int FD, const std::string_view &Filename, uint64_t MapSize,
++  getOpenFileSlice(fs::file_t FD, const std::string_view &Filename, uint64_t MapSize,
+                    int64_t Offset, bool IsVolatile = false);
+ 
+   /// Given an already-open file descriptor, read the file and return a
+@@ -99,7 +106,7 @@ public:
+   /// can change outside the user's control, e.g. when libclang tries to parse
+   /// while the user is editing/updating the file or if the file is on an NFS.
+   static ErrorOr<std::unique_ptr<MemoryBuffer>>
+-  getOpenFile(int FD, const std::string_view &Filename, uint64_t FileSize,
++  getOpenFile(fs::file_t FD, const std::string_view &Filename, uint64_t FileSize,
+               bool RequiresNullTerminator = true, bool IsVolatile = false);
+ 
+   /// Open the specified memory range as a MemoryBuffer. Note that InputData
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index 0787120ee569..d8128fa609da 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -24,15 +24,13 @@
+ #include <string_view>
+ #include <system_error>
+ 
+-namespace llvm {
+-
+-namespace sys {
+ namespace fs {
+ enum FileAccess : unsigned;
+ enum OpenFlags : unsigned;
+ enum CreationDisposition : unsigned;
+ } // end namespace fs
+-} // end namespace sys
++
++namespace llvm {
+ 
+ /// This class implements an extremely fast bulk output stream that can *only*
+ /// output to a stream.  It does not support seeking, reopening, rewinding, line
+diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
+index 8df224fad27e..711364a13f8a 100644
+--- a/llvm/lib/Support/MemoryBuffer.cpp
++++ b/llvm/lib/Support/MemoryBuffer.cpp
+@@ -194,7 +194,7 @@ class MemoryBufferMMapFile : public MB {
+   }
+ 
+ public:
+-  MemoryBufferMMapFile(bool RequiresNullTerminator, int FD, uint64_t Len,
++  MemoryBufferMMapFile(bool RequiresNullTerminator, fs::file_t FD, uint64_t Len,
+                        uint64_t Offset, std::error_code &EC)
+       : MFR(FD, MB::Mapmode, getLegalMapSize(Len, Offset),
+             getLegalMapOffset(Offset), EC) {
+@@ -220,7 +220,7 @@ public:
+ }
+ 
+ static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
+-getMemoryBufferForStream(int FD, std::string_view BufferName) {
++getMemoryBufferForStream(fs::file_t FD, std::string_view BufferName) {
+   const ssize_t ChunkSize = 4096*4;
+   SmallString<ChunkSize> Buffer;
+   ssize_t ReadBytes;
+@@ -246,7 +246,7 @@ MemoryBuffer::getFile(std::string_view Filename, int64_t FileSize,
+ 
+ template <typename MB>
+ static ErrorOr<std::unique_ptr<MB>>
+-getOpenFileImpl(int FD, std::string_view Filename, uint64_t FileSize,
++getOpenFileImpl(fs::file_t FD, std::string_view Filename, uint64_t FileSize,
+                 uint64_t MapSize, int64_t Offset, bool RequiresNullTerminator,
+                 bool IsVolatile);
+ 
+@@ -254,15 +254,15 @@ template <typename MB>
+ static ErrorOr<std::unique_ptr<MB>>
+ getFileAux(std::string_view Filename, int64_t FileSize, uint64_t MapSize,
+            uint64_t Offset, bool RequiresNullTerminator, bool IsVolatile) {
+-  int FD;
+-  std::error_code EC = sys::fs::openFileForRead(Filename, FD, sys::fs::OF_None);
++  std::error_code EC;
++  fs::file_t FD = sys::fs::openFileForRead(Filename, EC, sys::fs::OF_None);
+ 
+   if (EC)
+     return EC;
+ 
+   auto Ret = getOpenFileImpl<MB>(FD, Filename, FileSize, MapSize, Offset,
+                                  RequiresNullTerminator, IsVolatile);
+-  close(FD);
++  fs::CloseFile(FD);
+   return Ret;
+ }
+ 
+@@ -316,7 +316,7 @@ WritableMemoryBuffer::getNewMemBuffer(size_t Size, std::string_view BufferName)
+   return SB;
+ }
+ 
+-static bool shouldUseMmap(int FD,
++static bool shouldUseMmap(fs::file_t FD,
+                           size_t FileSize,
+                           size_t MapSize,
+                           off_t Offset,
+@@ -374,9 +374,9 @@ static bool shouldUseMmap(int FD,
+ static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
+ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
+                  uint64_t Offset) {
+-  int FD;
+-  std::error_code EC = sys::fs::openFileForReadWrite(
+-      Filename, FD, sys::fs::CD_OpenExisting, sys::fs::OF_None);
++  std::error_code EC;
++  fs::file_t FD = sys::fs::openFileForReadWrite(
++      Filename, EC, sys::fs::CD_OpenExisting, sys::fs::OF_None);
+ 
+   if (EC)
+     return EC;
+@@ -426,7 +426,7 @@ WriteThroughMemoryBuffer::getFileSlice(std::string_view Filename, uint64_t MapSi
+ 
+ template <typename MB>
+ static ErrorOr<std::unique_ptr<MB>>
+-getOpenFileImpl(int FD, std::string_view Filename, uint64_t FileSize,
++getOpenFileImpl(fs::file_t FD, std::string_view Filename, uint64_t FileSize,
+                 uint64_t MapSize, int64_t Offset, bool RequiresNullTerminator,
+                 bool IsVolatile) {
+   static int PageSize = sys::Process::getPageSize();
+@@ -502,14 +502,14 @@ getOpenFileImpl(int FD, std::string_view Filename, uint64_t FileSize,
+ }
+ 
+ ErrorOr<std::unique_ptr<MemoryBuffer>>
+-MemoryBuffer::getOpenFile(int FD, std::string_view Filename, uint64_t FileSize,
++MemoryBuffer::getOpenFile(fs::file_t FD, std::string_view Filename, uint64_t FileSize,
+                           bool RequiresNullTerminator, bool IsVolatile) {
+   return getOpenFileImpl<MemoryBuffer>(FD, Filename, FileSize, FileSize, 0,
+                          RequiresNullTerminator, IsVolatile);
+ }
+ 
+ ErrorOr<std::unique_ptr<MemoryBuffer>>
+-MemoryBuffer::getOpenFileSlice(int FD, std::string_view Filename, uint64_t MapSize,
++MemoryBuffer::getOpenFileSlice(fs::file_t FD, std::string_view Filename, uint64_t MapSize,
+                                int64_t Offset, bool IsVolatile) {
+   assert(MapSize != uint64_t(-1));
+   return getOpenFileImpl<MemoryBuffer>(FD, Filename, -1, MapSize, Offset, false,
+@@ -528,13 +528,13 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
+ 
+ ErrorOr<std::unique_ptr<MemoryBuffer>>
+ MemoryBuffer::getFileAsStream(std::string_view Filename) {
+-  int FD;
+-  std::error_code EC = sys::fs::openFileForRead(Filename, FD, sys::fs::OF_None);
++  std::error_code EC;
++  fs::file_t FD = sys::fs::openFileForRead(Filename, EC, sys::fs::OF_None);
+   if (EC)
+     return EC;
+   ErrorOr<std::unique_ptr<MemoryBuffer>> Ret =
+       getMemoryBufferForStream(FD, Filename);
+-  close(FD);
++  fs::CloseFile(FD);
+   return Ret;
+ }
+ 
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 4db2ee588706..f3fd24a81c3c 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -295,11 +295,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+     return STDOUT_FILENO;
+   }
+ 
+-  int FD;
++  fs::file_t FD;
+   if (Access & sys::fs::FA_Read)
+-    EC = sys::fs::openFileForReadWrite(Filename, FD, Disp, Flags);
++    FD = sys::fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+   else
+-    EC = sys::fs::openFileForWrite(Filename, FD, Disp, Flags);
++    FD = sys::fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
++  if (EC)
++    return -1;
++  int FD = fs::FileToFd(F, EC, Flags);
+   if (EC)
+     return -1;
+ 
+-- 
+2.20.1.windows.1
+

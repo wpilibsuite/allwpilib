@@ -1,0 +1,38 @@
+From 169aec1d57c4628b8ee6d9aee3df6f8191f65cab Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 18:52:17 -0400
+Subject: [PATCH 35/37] Fix documentation warnings
+
+---
+ llvm/include/llvm/Support/MemoryBuffer.h | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
+index c72b14826248..89248e426efa 100644
+--- a/llvm/include/llvm/Support/MemoryBuffer.h
++++ b/llvm/include/llvm/Support/MemoryBuffer.h
+@@ -76,10 +76,6 @@ public:
+   /// if successful, otherwise returning null. If FileSize is specified, this
+   /// means that the client knows that the file exists and that it has the
+   /// specified size.
+-  ///
+-  /// \param IsVolatile Set to true to indicate that the contents of the file
+-  /// can change outside the user's control, e.g. when libclang tries to parse
+-  /// while the user is editing/updating the file or if the file is on an NFS.
+   static ErrorOr<std::unique_ptr<MemoryBuffer>>
+   getFile(const std::string_view &Filename, int64_t FileSize = -1,
+           bool RequiresNullTerminator = true, bool IsVolatile = false);
+@@ -99,10 +95,6 @@ public:
+ 
+   /// Given an already-open file descriptor, read the file and return a
+   /// MemoryBuffer.
+-  ///
+-  /// \param IsVolatile Set to true to indicate that the contents of the file
+-  /// can change outside the user's control, e.g. when libclang tries to parse
+-  /// while the user is editing/updating the file or if the file is on an NFS.
+   static ErrorOr<std::unique_ptr<MemoryBuffer>>
+   getOpenFile(fs::file_t FD, const std::string_view &Filename, uint64_t FileSize,
+               bool RequiresNullTerminator = true, bool IsVolatile = false);
+-- 
+2.20.1.windows.1
+

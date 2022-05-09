@@ -15,14 +15,18 @@
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
 #include "wpi/Compiler.h"
-#include <cstdint>
+#include "wpi/SwapByteOrder.h"
 #include <algorithm>
 #include <cassert>
-#include <climits>
 #include <cmath>
+#include <climits>
 #include <cstring>
 #include <limits>
 #include <type_traits>
+
+#ifdef __ANDROID_NDK__
+#include <android/api-level.h>
+#endif
 
 #ifdef _MSC_VER
 // Declare these intrinsics manually rather including intrin.h. It's very
@@ -441,6 +445,21 @@ constexpr inline bool isPowerOf2_64(uint64_t Value) {
   return Value && !(Value & (Value - 1));
 }
 
+/// Return a byte-swapped representation of the 16-bit argument.
+inline uint16_t ByteSwap_16(uint16_t Value) {
+  return sys::SwapByteOrder_16(Value);
+}
+
+/// Return a byte-swapped representation of the 32-bit argument.
+inline uint32_t ByteSwap_32(uint32_t Value) {
+  return sys::SwapByteOrder_32(Value);
+}
+
+/// Return a byte-swapped representation of the 64-bit argument.
+inline uint64_t ByteSwap_64(uint64_t Value) {
+  return sys::SwapByteOrder_64(Value);
+}
+
 /// Count the number of ones from the most significant bit to the first
 /// zero bit.
 ///
@@ -838,6 +857,9 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
   return SaturatingAdd(A, Product, &Overflowed);
 }
 
+/// Use this rather than HUGE_VALF; the latter causes warnings on MSVC.
+extern const float huge_valf;
+
 // Typesafe implementation of the signum function.
 // Returns -1 if negative, 1 if positive, 0 if 0.
 template <typename T>
@@ -858,7 +880,6 @@ template <typename T>
 constexpr T Lerp(const T& startValue, const T& endValue, double t) {
   return startValue + (endValue - startValue) * t;
 }
-
-} // namespace wpi
+} // End wpi namespace
 
 #endif

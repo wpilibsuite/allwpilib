@@ -1,0 +1,156 @@
+From c2ef5051bf461104fcb9489c8f169cf696811b00 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 20:31:11 -0400
+Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
+
+---
+ llvm/include/llvm/Support/Compiler.h | 17 +----------------
+ llvm/lib/Support/ErrorHandling.cpp   | 26 --------------------------
+ 2 files changed, 1 insertion(+), 42 deletions(-)
+
+diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
+index 4de815fe61d7..c90f8dd77417 100644
+--- a/llvm/include/llvm/Support/Compiler.h
++++ b/llvm/include/llvm/Support/Compiler.h
+@@ -479,7 +479,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+ /// some constant value. In almost all circumstances this is most appropriate
+ /// for use with a pointer, integer, or small aggregation of pointers and
+ /// integers.
+-#if LLVM_ENABLE_THREADS
++#ifndef LLVM_THREAD_LOCAL
+ #if __has_feature(cxx_thread_local)
+ #define LLVM_THREAD_LOCAL thread_local
+ #elif defined(_MSC_VER)
+@@ -490,21 +490,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+ // we only need the restricted functionality that provides.
+ #define LLVM_THREAD_LOCAL __thread
+ #endif
+-#else // !LLVM_ENABLE_THREADS
+-// If threading is disabled entirely, this compiles to nothing and you get
+-// a normal global variable.
+-#define LLVM_THREAD_LOCAL
+-#endif
+-
+-/// \macro LLVM_ENABLE_EXCEPTIONS
+-/// Whether LLVM is built with exception support.
+-#if __has_feature(cxx_exceptions)
+-#define LLVM_ENABLE_EXCEPTIONS 1
+-#elif defined(__GNUC__) && defined(__EXCEPTIONS)
+-#define LLVM_ENABLE_EXCEPTIONS 1
+-#elif defined(_MSC_VER) && defined(_CPPUNWIND)
+-#define LLVM_ENABLE_EXCEPTIONS 1
+-#endif
+ 
+ namespace llvm {
+ 
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 21712c5c039e..7408aa47cae8 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -45,7 +45,6 @@ static void *ErrorHandlerUserData = nullptr;
+ static fatal_error_handler_t BadAllocErrorHandler = nullptr;
+ static void *BadAllocErrorHandlerUserData = nullptr;
+ 
+-#if LLVM_ENABLE_THREADS == 1
+ // Mutexes to synchronize installing error handlers and calling error handlers.
+ // Do not use ManagedStatic, or that may allocate memory while attempting to
+ // report an OOM.
+@@ -59,22 +58,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
+ // builds. We can remove these ifdefs if that script goes away.
+ static std::mutex ErrorHandlerMutex;
+ static std::mutex BadAllocErrorHandlerMutex;
+-#endif
+ 
+ void llvm::install_fatal_error_handler(fatal_error_handler_t handler,
+                                        void *user_data) {
+-#if LLVM_ENABLE_THREADS == 1
+   std::lock_guard<std::mutex> Lock(ErrorHandlerMutex);
+-#endif
+   assert(!ErrorHandler && "Error handler already registered!\n");
+   ErrorHandler = handler;
+   ErrorHandlerUserData = user_data;
+ }
+ 
+ void llvm::remove_fatal_error_handler() {
+-#if LLVM_ENABLE_THREADS == 1
+   std::lock_guard<std::mutex> Lock(ErrorHandlerMutex);
+-#endif
+   ErrorHandler = nullptr;
+   ErrorHandlerUserData = nullptr;
+ }
+@@ -97,9 +91,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+   {
+     // Only acquire the mutex while reading the handler, so as not to invoke a
+     // user-supplied callback under a lock.
+-#if LLVM_ENABLE_THREADS == 1
+     std::lock_guard<std::mutex> Lock(ErrorHandlerMutex);
+-#endif
+     handler = ErrorHandler;
+     handlerData = ErrorHandlerUserData;
+   }
+@@ -128,18 +120,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+ 
+ void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
+                                            void *user_data) {
+-#if LLVM_ENABLE_THREADS == 1
+   std::lock_guard<std::mutex> Lock(BadAllocErrorHandlerMutex);
+-#endif
+   assert(!ErrorHandler && "Bad alloc error handler already registered!\n");
+   BadAllocErrorHandler = handler;
+   BadAllocErrorHandlerUserData = user_data;
+ }
+ 
+ void llvm::remove_bad_alloc_error_handler() {
+-#if LLVM_ENABLE_THREADS == 1
+   std::lock_guard<std::mutex> Lock(BadAllocErrorHandlerMutex);
+-#endif
+   BadAllocErrorHandler = nullptr;
+   BadAllocErrorHandlerUserData = nullptr;
+ }
+@@ -150,9 +138,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+   {
+     // Only acquire the mutex while reading the handler, so as not to invoke a
+     // user-supplied callback under a lock.
+-#if LLVM_ENABLE_THREADS == 1
+     std::lock_guard<std::mutex> Lock(BadAllocErrorHandlerMutex);
+-#endif
+     Handler = BadAllocErrorHandler;
+     HandlerData = BadAllocErrorHandlerUserData;
+   }
+@@ -162,25 +148,14 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+     llvm_unreachable("bad alloc handler should not return");
+   }
+ 
+-#ifdef LLVM_ENABLE_EXCEPTIONS
+-  // If exceptions are enabled, make OOM in malloc look like OOM in new.
+-  throw std::bad_alloc();
+-#else
+   // Don't call the normal error handler. It may allocate memory. Directly write
+   // an OOM to stderr and abort.
+   char OOMMessage[] = "LLVM ERROR: out of memory\n";
+   ssize_t written = ::write(2, OOMMessage, strlen(OOMMessage));
+   (void)written;
+   abort();
+-#endif
+ }
+ 
+-#ifdef LLVM_ENABLE_EXCEPTIONS
+-// Do not set custom new handler if exceptions are enabled. In this case OOM
+-// errors are handled by throwing 'std::bad_alloc'.
+-void llvm::install_out_of_memory_new_handler() {
+-}
+-#else
+ // Causes crash on allocation failure. It is called prior to the handler set by
+ // 'install_bad_alloc_error_handler'.
+ static void out_of_memory_new_handler() {
+@@ -206,7 +181,6 @@ public:
+     install_out_of_memory_new_handler();
+   }
+ } new_handler_installer;
+-#endif
+ 
+ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+                                      unsigned line) {
+-- 
+2.20.1.windows.1
+

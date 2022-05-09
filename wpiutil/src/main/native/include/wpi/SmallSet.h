@@ -16,8 +16,8 @@
 
 #include "wpi/SmallPtrSet.h"
 #include "wpi/SmallVector.h"
-#include "wpi/Compiler.h"
 #include "wpi/iterator.h"
+#include "wpi/Compiler.h"
 #include "wpi/type_traits.h"
 #include <cstddef>
 #include <functional>
@@ -251,4 +251,4 @@ class SmallSet<PointeeType*, N> : public SmallPtrSet<PointeeType*, N> {};
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_SMALLSET_H
+#endif // WPIUTIL_WPI_SMALLSET_H

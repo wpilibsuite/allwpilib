@@ -28,6 +28,7 @@
 #include "wpi/MathExtras.h"
 #include "wpi/MemAlloc.h"
 #include "wpi/type_traits.h"
+#include "wpi/ErrorHandling.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -57,9 +58,7 @@ protected:
   void grow_pod(void *FirstEl, size_t MinCapacity, size_t TSize);
 
 public:
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
   size_t size() const { return Size; }
-  LLVM_ATTRIBUTE_ALWAYS_INLINE
   size_t capacity() const { return Capacity; }
 
   LLVM_NODISCARD bool empty() const { return !Size; }
@@ -75,7 +74,7 @@ public:
   /// which will only be overwritten.
   void set_size(size_t Size) {
     assert(Size <= capacity());
-    this->Size = static_cast<unsigned>(Size);
+    this->Size =static_cast<unsigned>(Size);
   }
 };
 
@@ -191,7 +190,7 @@ public:
 
 /// SmallVectorTemplateBase<isPodLike = false> - This is where we put method
 /// implementations that are designed to work with non-POD-like T's.
-template <typename T, bool = isPodLike<T>::value>
+template <typename T, bool isPodLike>
 class SmallVectorTemplateBase : public SmallVectorTemplateCommon<T> {
 protected:
   SmallVectorTemplateBase(size_t Size) : SmallVectorTemplateCommon<T>(Size) {}
@@ -329,8 +328,8 @@ public:
 /// This class consists of common code factored out of the SmallVector class to
 /// reduce code duplication based on the SmallVector 'N' template parameter.
 template <typename T>
-class SmallVectorImpl : public SmallVectorTemplateBase<T> {
-  using SuperClass = SmallVectorTemplateBase<T>;
+class SmallVectorImpl : public SmallVectorTemplateBase<T, isPodLike<T>::value> {
+  using SuperClass = SmallVectorTemplateBase<T, isPodLike<T>::value>;
 
 public:
   using iterator = typename SuperClass::iterator;
@@ -946,4 +945,4 @@ namespace std {
 
 } // end namespace std
 
-#endif // LLVM_ADT_SMALLVECTOR_H
+#endif // WPIUTIL_WPI_SMALLVECTOR_H

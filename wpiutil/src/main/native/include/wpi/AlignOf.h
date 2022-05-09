@@ -143,4 +143,4 @@ struct AlignedCharArrayUnion : wpi::AlignedCharArray<
 };
 } // end namespace wpi
 
-#endif // LLVM_SUPPORT_ALIGNOF_H
+#endif // WPIUTIL_WPI_ALIGNOF_H

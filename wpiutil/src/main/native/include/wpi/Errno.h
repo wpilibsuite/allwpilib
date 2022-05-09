@@ -35,4 +35,4 @@ inline auto RetryAfterSignal(const FailT &Fail, const Fun &F,
 }  // namespace sys
 }  // namespace wpi
 
-#endif  // WPIUTIL_WPI_ERRNO_H
+#endif  // LLVM_SYSTEM_ERRNO_H

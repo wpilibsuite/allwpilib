@@ -1,4 +1,4 @@
-//===- llvm/Support/Errc.h - Defines the llvm::errc enum --------*- C++ -*-===//
+//===- llvm/Support/Errc.h - Defines the wpi::errc enum --------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //

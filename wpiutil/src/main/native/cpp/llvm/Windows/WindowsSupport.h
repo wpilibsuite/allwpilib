@@ -19,8 +19,8 @@
 //===          is guaranteed to work on *all* Win32 variants.
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_SUPPORT_WINDOWSSUPPORT_H
-#define LLVM_SUPPORT_WINDOWSSUPPORT_H
+#ifndef WPIUTIL_WPI_WINDOWSSUPPORT_H
+#define WPIUTIL_WPI_WINDOWSSUPPORT_H
 
 // mingw-w64 tends to define it as 0x0502 in its headers.
 #undef _WIN32_WINNT
@@ -41,13 +41,15 @@
 #include "wpi/VersionTuple.h"
 #include <cassert>
 #include <string>
-#include <string_view>
 #include <system_error>
 #define WIN32_NO_STATUS
 #include <windows.h>
 #undef WIN32_NO_STATUS
 #include <winternl.h>
 #include <ntstatus.h>
+
+// Must be included after windows.h
+#include <wincrypt.h>
 
 namespace wpi {
 
@@ -164,6 +166,22 @@ struct JobHandleTraits : CommonHandleTraits {
   }
 };
 
+struct CryptContextTraits : CommonHandleTraits {
+  typedef HCRYPTPROV handle_type;
+
+  static handle_type GetInvalid() {
+    return 0;
+  }
+
+  static void Close(handle_type h) {
+    ::CryptReleaseContext(h, 0);
+  }
+
+  static bool IsValid(handle_type h) {
+    return h != GetInvalid();
+  }
+};
+
 struct RegTraits : CommonHandleTraits {
   typedef HKEY handle_type;
 
@@ -190,6 +208,7 @@ struct FileHandleTraits : CommonHandleTraits {};
 
 typedef ScopedHandle<CommonHandleTraits> ScopedCommonHandle;
 typedef ScopedHandle<FileHandleTraits>   ScopedFileHandle;
+typedef ScopedHandle<CryptContextTraits> ScopedCryptContext;
 typedef ScopedHandle<RegTraits>          ScopedRegHandle;
 typedef ScopedHandle<FindHandleTraits>   ScopedFindHandle;
 typedef ScopedHandle<JobHandleTraits>    ScopedJobHandle;

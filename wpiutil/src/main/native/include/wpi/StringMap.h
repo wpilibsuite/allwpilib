@@ -35,7 +35,6 @@ namespace wpi {
 template<typename ValueTy> class StringMapConstIterator;
 template<typename ValueTy> class StringMapIterator;
 template<typename ValueTy> class StringMapKeyIterator;
-template<typename ValueTy> class StringMapEntry;
 
 /// StringMapEntryBase - Shared base class of StringMapEntry instances.
 class StringMapEntryBase {
@@ -137,7 +136,7 @@ public:
   StringMapEntry(StringMapEntry &E) = delete;
 
   std::string_view getKey() const {
-    return {getKeyData(), getKeyLength()};
+    return std::string_view(getKeyData(), getKeyLength());
   }
 
   const ValueTy &getValue() const { return second; }
@@ -150,7 +149,7 @@ public:
   /// StringMapEntry object.
   const char *getKeyData() const {return reinterpret_cast<const char*>(this+1);}
 
-  std::string_view first() const { return {getKeyData(), getKeyLength()}; }
+  std::string_view first() const { return std::string_view(getKeyData(), getKeyLength()); }
 
   /// Create a StringMapEntry for the specified key construct the value using
   /// \p InitiVals.
@@ -195,7 +194,6 @@ public:
     std::free(static_cast<void *>(this));
   }
 };
-
 
 /// StringMap - This is an unconventional map that is specialized for handling
 /// keys that are "strings", which are basically ranges of bytes. This does some
@@ -439,13 +437,7 @@ public:
     return static_cast<DerivedTy &>(*this);
   }
 
-#if __cplusplus < 202002L
   bool operator==(const DerivedTy &RHS) const { return Ptr == RHS.Ptr; }
-#else
-  friend bool operator==(const DerivedTy &LHS, const DerivedTy &RHS) {
-    return LHS.Ptr == RHS.Ptr;
-  }
-#endif
 
   DerivedTy &operator++() { // Preincrement
     ++Ptr;
@@ -490,15 +482,13 @@ class StringMapConstIterator
                                  const StringMapEntry<ValueTy>>;
 
 public:
-  using value_type = const StringMapEntry<ValueTy>;
-
   StringMapConstIterator() = default;
   explicit StringMapConstIterator(StringMapEntryBase **Bucket,
                                   bool NoAdvance = false)
       : base(Bucket, NoAdvance) {}
 
-  value_type &operator*() const {
-    return *static_cast<value_type *>(*this->Ptr);
+  const StringMapEntry<ValueTy> &operator*() const {
+    return *static_cast<const StringMapEntry<ValueTy> *>(*this->Ptr);
   }
 };
 
@@ -509,15 +499,13 @@ class StringMapIterator : public StringMapIterBase<StringMapIterator<ValueTy>,
       StringMapIterBase<StringMapIterator<ValueTy>, StringMapEntry<ValueTy>>;
 
 public:
-  using value_type = StringMapEntry<ValueTy>;
-
   StringMapIterator() = default;
   explicit StringMapIterator(StringMapEntryBase **Bucket,
                              bool NoAdvance = false)
       : base(Bucket, NoAdvance) {}
 
-  value_type &operator*() const {
-    return *static_cast<value_type *>(*this->Ptr);
+  StringMapEntry<ValueTy> &operator*() const {
+    return *static_cast<StringMapEntry<ValueTy> *>(*this->Ptr);
   }
 
   operator StringMapConstIterator<ValueTy>() const {
@@ -635,4 +623,4 @@ inline bool operator>=(const StringMap<ValueTy>& lhs,
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_STRINGMAP_H
+#endif // WPIUTIL_WPI_STRINGMAP_H

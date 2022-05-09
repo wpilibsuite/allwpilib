@@ -1,0 +1,220 @@
+From 8b0522394b3192cbf19737a0b997fa7b39645a1b Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 20:07:25 -0400
+Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
+
+---
+ llvm/include/llvm/ADT/DenseMap.h       |  6 +++---
+ llvm/include/llvm/ADT/DenseMapInfo.h   |  2 +-
+ llvm/include/llvm/ADT/SmallVector.h    | 12 ++++++------
+ llvm/include/llvm/Support/ConvertUTF.h |  2 +-
+ llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
+ 5 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 055f3d01ce06..52cdb4906e3d 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -351,7 +351,7 @@ protected:
+       return 0;
+     // +1 is required because of the strict equality.
+     // For example if NumEntries is 48, we need to return 401.
+-    return NextPowerOf2(NumEntries * 4 / 3 + 1);
++    return static_cast<unsigned>(NextPowerOf2(NumEntries * 4 / 3 + 1));
+   }
+ 
+   void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
+@@ -389,7 +389,7 @@ protected:
+     setNumTombstones(other.getNumTombstones());
+ 
+     if (isPodLike<KeyT>::value && isPodLike<ValueT>::value)
+-      memcpy(getBuckets(), other.getBuckets(),
++      memcpy(reinterpret_cast<void *>(getBuckets()), other.getBuckets(),
+              getNumBuckets() * sizeof(BucketT));
+     else
+       for (size_t i = 0; i < getNumBuckets(); ++i) {
+@@ -737,7 +737,7 @@ public:
+     // Reduce the number of buckets.
+     unsigned NewNumBuckets = 0;
+     if (OldNumEntries)
+-      NewNumBuckets = std::max(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
++      NewNumBuckets = (std::max)(64, 1 << (Log2_32_Ceil(OldNumEntries) + 1));
+     if (NewNumBuckets == NumBuckets) {
+       this->BaseT::initEmpty();
+       return;
+diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
+index 5d12b424fb37..5ab8907c8f58 100644
+--- a/llvm/include/llvm/ADT/DenseMapInfo.h
++++ b/llvm/include/llvm/ADT/DenseMapInfo.h
+@@ -265,7 +265,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
+ template <> struct DenseMapInfo<hash_code> {
+   static inline hash_code getEmptyKey() { return hash_code(-1); }
+   static inline hash_code getTombstoneKey() { return hash_code(-2); }
+-  static unsigned getHashValue(hash_code val) { return val; }
++  static unsigned getHashValue(hash_code val) { return static_cast<unsigned>(val); }
+   static bool isEqual(hash_code LHS, hash_code RHS) { return LHS == RHS; }
+ };
+ 
+diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
+index acb4426b4f45..116a858091f0 100644
+--- a/llvm/include/llvm/ADT/SmallVector.h
++++ b/llvm/include/llvm/ADT/SmallVector.h
+@@ -43,7 +43,7 @@ protected:
+ 
+   SmallVectorBase() = delete;
+   SmallVectorBase(void *FirstEl, size_t Capacity)
+-      : BeginX(FirstEl), Capacity(Capacity) {}
++      : BeginX(FirstEl), Capacity(static_cast<unsigned>(Capacity)) {}
+ 
+   /// This is an implementation of the grow() method which only works
+   /// on POD-like data types and is out of line to reduce code duplication.
+@@ -66,7 +66,7 @@ public:
+   /// which will only be overwritten.
+   void set_size(size_t Size) {
+     assert(Size <= capacity());
+-    this->Size = Size;
++    this->Size =static_cast<unsigned>(Size);
+   }
+ };
+ 
+@@ -243,7 +243,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
+ 
+   // Always grow, even from zero.
+   size_t NewCapacity = size_t(NextPowerOf2(this->capacity() + 2));
+-  NewCapacity = std::min(std::max(NewCapacity, MinSize), size_t(UINT32_MAX));
++  NewCapacity = (std::min)((std::max)(NewCapacity, MinSize), size_t(UINT32_MAX));
+   T *NewElts = static_cast<T*>(llvm::safe_malloc(NewCapacity*sizeof(T)));
+ 
+   // Move the elements over.
+@@ -257,7 +257,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
+     free(this->begin());
+ 
+   this->BeginX = NewElts;
+-  this->Capacity = NewCapacity;
++  this->Capacity = static_cast<unsigned>(NewCapacity);
+ }
+ 
+ 
+@@ -299,7 +299,7 @@ protected:
+     // use memcpy here. Note that I and E are iterators and thus might be
+     // invalid for memcpy if they are equal.
+     if (I != E)
+-      memcpy(Dest, I, (E - I) * sizeof(T));
++      memcpy(reinterpret_cast<void *>(Dest), I, (E - I) * sizeof(T));
+   }
+ 
+   /// Double the size of the allocated memory, guaranteeing space for at
+@@ -310,7 +310,7 @@ public:
+   void push_back(const T &Elt) {
+     if (LLVM_UNLIKELY(this->size() >= this->capacity()))
+       this->grow();
+-    memcpy(this->end(), &Elt, sizeof(T));
++    memcpy(reinterpret_cast<void *>(this->end()), &Elt, sizeof(T));
+     this->set_size(this->size() + 1);
+   }
+ 
+diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
+index 6ae56c2470bb..617851c806fe 100644
+--- a/llvm/include/llvm/Support/ConvertUTF.h
++++ b/llvm/include/llvm/Support/ConvertUTF.h
+@@ -110,7 +110,7 @@ namespace llvm {
+ typedef unsigned int    UTF32;  /* at least 32 bits */
+ typedef unsigned short  UTF16;  /* at least 16 bits */
+ typedef unsigned char   UTF8;   /* typically 8 bits */
+-typedef unsigned char   Boolean; /* 0 or 1 */
++typedef bool   Boolean; /* 0 or 1 */
+ 
+ /* Some fundamental constants */
+ #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index b59f21b4998e..4cf6c0e08cf1 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -61,7 +61,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
+     // Bisection method.
+     std::size_t ZeroBits = 0;
+     T Shift = std::numeric_limits<T>::digits >> 1;
+-    T Mask = std::numeric_limits<T>::max() >> Shift;
++    T Mask = (std::numeric_limits<T>::max)() >> Shift;
+     while (Shift) {
+       if ((Val & Mask) == 0) {
+         Val >>= Shift;
+@@ -202,7 +202,7 @@ std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+ ///   valid arguments.
+ template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
+   if (ZB == ZB_Max && Val == 0)
+-    return std::numeric_limits<T>::max();
++    return (std::numeric_limits<T>::max)();
+ 
+   return countTrailingZeros(Val, ZB_Undefined);
+ }
+@@ -243,7 +243,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
+ ///   valid arguments.
+ template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
+   if (ZB == ZB_Max && Val == 0)
+-    return std::numeric_limits<T>::max();
++    return (std::numeric_limits<T>::max)();
+ 
+   // Use ^ instead of - because both gcc and llvm can remove the associated ^
+   // in the __builtin_clz intrinsic on x86.
+@@ -537,26 +537,26 @@ inline double Log2(double Value) {
+ /// (32 bit edition.)
+ /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
+ inline unsigned Log2_32(uint32_t Value) {
+-  return 31 - countLeadingZeros(Value);
++  return static_cast<unsigned>(31 - countLeadingZeros(Value));
+ }
+ 
+ /// Return the floor log base 2 of the specified value, -1 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64(uint64_t Value) {
+-  return 63 - countLeadingZeros(Value);
++  return static_cast<unsigned>(63 - countLeadingZeros(Value));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 32 if the value is zero.
+ /// (32 bit edition).
+ /// Ex. Log2_32_Ceil(32) == 5, Log2_32_Ceil(1) == 0, Log2_32_Ceil(6) == 3
+ inline unsigned Log2_32_Ceil(uint32_t Value) {
+-  return 32 - countLeadingZeros(Value - 1);
++  return static_cast<unsigned>(32 - countLeadingZeros(Value - 1));
+ }
+ 
+ /// Return the ceil log base 2 of the specified value, 64 if the value is zero.
+ /// (64 bit edition.)
+ inline unsigned Log2_64_Ceil(uint64_t Value) {
+-  return 64 - countLeadingZeros(Value - 1);
++  return static_cast<unsigned>(64 - countLeadingZeros(Value - 1));
+ }
+ 
+ /// Return the greatest common divisor of the values using Euclid's algorithm.
+@@ -765,7 +765,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
+ template <typename T>
+ typename std::enable_if<std::is_unsigned<T>::value, T>::type
+ AbsoluteDifference(T X, T Y) {
+-  return std::max(X, Y) - std::min(X, Y);
++  return (std::max)(X, Y) - (std::min)(X, Y);
+ }
+ 
+ /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
+@@ -780,7 +780,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+   T Z = X + Y;
+   Overflowed = (Z < X || Z < Y);
+   if (Overflowed)
+-    return std::numeric_limits<T>::max();
++    return (std::numeric_limits<T>::max)();
+   else
+     return Z;
+ }
+@@ -805,7 +805,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+   // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
+   // will necessarily be less than Log2Max as desired.
+   int Log2Z = Log2_64(X) + Log2_64(Y);
+-  const T Max = std::numeric_limits<T>::max();
++  const T Max = (std::numeric_limits<T>::max)();
+   int Log2Max = Log2_64(Max);
+   if (Log2Z < Log2Max) {
+     return X * Y;
+-- 
+2.20.1.windows.1
+

@@ -829,6 +829,6 @@ std::error_code UTF16ToCurCP(const wchar_t *utf16, size_t utf16_len,
 
 #endif  // _WIN32
 
-} // namespace llvm
+} // namespace wpi
 
 ConvertUTF_RESTORE_WARNINGS

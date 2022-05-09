@@ -21,9 +21,9 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Compiler.h"
 #include "wpi/ErrorHandling.h"
+#include "wpi/fs.h"
 #include "wpi/MathExtras.h"
 #include "wpi/WindowsError.h"
-#include "wpi/fs.h"
 #include <algorithm>
 #include <cctype>
 #include <cerrno>
@@ -305,11 +305,10 @@ static int getFD(std::string_view Filename, std::error_code &EC,
   }
 
   fs::file_t F;
-  if (Access & fs::FA_Read) {
+  if (Access & fs::FA_Read)
     F = fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
-  } else {
+  else
     F = fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
-  }
   if (EC)
     return -1;
   int FD = fs::FileToFd(F, EC, Flags);
@@ -367,10 +366,10 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
       ::GetFileType((HANDLE)::_get_osfhandle(fd)) == FILE_TYPE_CHAR;
 #endif
 
+
   // Get the starting position.
   off_t loc = ::lseek(FD, 0, SEEK_CUR);
 #ifdef _WIN32
-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
   SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
 #else
   SupportsSeeking = loc != (off_t)-1;
@@ -467,10 +466,10 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
       return;
 #endif
 
-  // The maximum write size is limited to INT32_MAX. A write
-  // greater than SSIZE_MAX is implementation-defined in POSIX,
-  // and Windows _write requires 32 bit input.
-  size_t MaxWriteSize = INT32_MAX;
+  // The maximum write size is limited to SSIZE_MAX because a write
+  // greater than SSIZE_MAX is implementation-defined in POSIX.
+  // Since SSIZE_MAX is not portable, we use SIZE_MAX >> 1 instead.
+  size_t MaxWriteSize = SIZE_MAX >> 1;
 
 #if defined(__linux__)
   // It is observed that Linux returns EINVAL for a very large write (>2G).
@@ -556,7 +555,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
     return 0;
   return raw_ostream::preferred_buffer_size();
 #elif !defined(__minix)
-  // Minix has no st_blksize.
+  // Windows and Minix have no st_blksize.
   assert(FD >= 0 && "File not yet open!");
   struct stat statbuf;
   if (fstat(FD, &statbuf) != 0)
@@ -585,23 +584,23 @@ void raw_fd_ostream::anchor() {}
 raw_ostream &wpi::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
-  static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::F_None);
+  static raw_fd_ostream S("-", EC, fs::F_None);
   assert(!EC);
-  return *S;
+  return S;
 }
 
 /// errs() - This returns a reference to a raw_ostream for standard error.
 /// Use it like: errs() << "foo" << "bar";
 raw_ostream &wpi::errs() {
   // Set standard error to be unbuffered by default.
-  static raw_fd_ostream* S = new raw_fd_ostream(STDERR_FILENO, false, true);
-  return *S;
+  static raw_fd_ostream S(STDERR_FILENO, false, true);
+  return S;
 }
 
 /// nulls() - This returns a reference to a raw_ostream which discards output.
 raw_ostream &wpi::nulls() {
-  static raw_null_ostream* S = new raw_null_ostream;
-  return *S;
+  static raw_null_ostream S;
+  return S;
 }
 
 //===----------------------------------------------------------------------===//
@@ -691,14 +690,15 @@ raw_null_ostream::~raw_null_ostream() {
 #endif
 }
 
-void raw_null_ostream::write_impl(const char * /*Ptr*/, size_t /*Size*/) {}
+void raw_null_ostream::write_impl(const char *Ptr, size_t Size) {
+}
 
 uint64_t raw_null_ostream::current_pos() const {
   return 0;
 }
 
-void raw_null_ostream::pwrite_impl(const char * /*Ptr*/, size_t /*Size*/,
-                                   uint64_t /*Offset*/) {}
+void raw_null_ostream::pwrite_impl(const char *Ptr, size_t Size,
+                                   uint64_t Offset) {}
 
 void raw_pwrite_stream::anchor() {}
 

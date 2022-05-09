@@ -237,4 +237,4 @@ struct SmallMapVector
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_MAPVECTOR_H
+#endif // WPIUTIL_WPI_MAPVECTOR_H

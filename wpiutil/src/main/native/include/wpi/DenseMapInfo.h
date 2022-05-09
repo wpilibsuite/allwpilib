@@ -15,8 +15,8 @@
 #define WPIUTIL_WPI_DENSEMAPINFO_H
 
 #include "wpi/Hashing.h"
-#include "wpi/PointerLikeTypeTraits.h"
 #include "wpi/span.h"
+#include "wpi/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -238,12 +238,12 @@ template <> struct DenseMapInfo<std::string_view> {
 template <typename T> struct DenseMapInfo<span<T>> {
   static inline span<T> getEmptyKey() {
     return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(0)),
-                   size_t(0));
+                       size_t(0));
   }
 
   static inline span<T> getTombstoneKey() {
     return span<T>(reinterpret_cast<const T *>(~static_cast<uintptr_t>(1)),
-                   size_t(0));
+                       size_t(0));
   }
 
   static unsigned getHashValue(span<T> Val) {
@@ -271,4 +271,4 @@ template <> struct DenseMapInfo<hash_code> {
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_DENSEMAPINFO_H
+#endif // WPIUTIL_WPI_DENSEMAPINFO_H

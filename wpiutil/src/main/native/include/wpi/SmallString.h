@@ -29,8 +29,7 @@ public:
   SmallString() = default;
 
   /// Initialize from a std::string_view.
-  SmallString(std::string_view S)
-    : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
+  SmallString(std::string_view S) : SmallVector<char, InternalLen>(S.begin(), S.end()) {}
 
   /// Initialize with a range.
   template<typename ItTy>
@@ -185,10 +184,7 @@ public:
   // Extra methods.
 
   /// Explicit conversion to std::string_view.
-  std::string_view str() const { return {this->begin(), this->size()}; }
-
-  /// Explicit conversion to std::string.
-  std::string string() const { return {this->begin(), this->size()}; }
+  std::string_view str() const { return std::string_view(this->begin(), this->size()); }
 
   // TODO: Make this const, if it's safe...
   const char* c_str() {
@@ -199,6 +195,9 @@ public:
 
   /// Implicit conversion to std::string_view.
   operator std::string_view() const { return str(); }
+
+  /// Explicit conversion to std::string.
+  std::string string() const { return {this->begin(), this->size()}; }
 
   /// Implicit conversion to std::string.
   operator std::string() const { return string(); }
@@ -221,4 +220,4 @@ public:
 
 } // end namespace wpi
 
-#endif // LLVM_ADT_SMALLSTRING_H
+#endif // WPIUTIL_WPI_SMALLSTRING_H
