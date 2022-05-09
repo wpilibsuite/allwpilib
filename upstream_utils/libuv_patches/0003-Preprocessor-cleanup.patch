@@ -1,0 +1,202 @@
+From 80055296378f0a8ad0eec823fd2d0209a447fd22 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 26 Apr 2022 15:19:14 -0400
+Subject: [PATCH 3/6] Preprocessor cleanup
+
+---
+ include/uv.h        | 18 +-----------------
+ include/uv/unix.h   |  6 ------
+ include/uv/win.h    |  6 +-----
+ src/unix/internal.h |  4 ++++
+ src/unix/poll.c     |  5 +++--
+ src/win/fs.c        |  1 +
+ src/win/tty.c       |  2 ++
+ src/win/util.c      |  6 ++++++
+ src/win/winsock.c   |  1 +
+ 9 files changed, 19 insertions(+), 30 deletions(-)
+
+diff --git a/include/uv.h b/include/uv.h
+index f97801ce..ccf62c8f 100644
+--- a/include/uv.h
++++ b/include/uv.h
+@@ -23,9 +23,6 @@
+ 
+ #ifndef UV_H
+ #define UV_H
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+ 
+ #ifdef _WIN32
+   /* Windows - set up dll import/export decorators. */
+@@ -50,11 +47,7 @@ extern "C" {
+ #include <stddef.h>
+ #include <stdio.h>
+ 
+-#if defined(_MSC_VER) && _MSC_VER < 1600
+-# include "uv/stdint-msvc2008.h"
+-#else
+-# include <stdint.h>
+-#endif
++#include <stdint.h>
+ 
+ #if defined(_WIN32)
+ # include "uv/win.h"
+@@ -692,16 +685,10 @@ UV_EXTERN int uv_tty_set_mode(uv_tty_t*, uv_tty_mode_t mode);
+ UV_EXTERN int uv_tty_reset_mode(void);
+ UV_EXTERN int uv_tty_get_winsize(uv_tty_t*, int* width, int* height);
+ 
+-#ifdef __cplusplus
+-extern "C++" {
+-
+ inline int uv_tty_set_mode(uv_tty_t* handle, int mode) {
+   return uv_tty_set_mode(handle, static_cast<uv_tty_mode_t>(mode));
+ }
+ 
+-}
+-#endif
+-
+ UV_EXTERN uv_handle_type uv_guess_handle(uv_file file);
+ 
+ /*
+@@ -1693,7 +1680,4 @@ UV_EXTERN void uv_loop_set_data(uv_loop_t*, void* data);
+ #undef UV_LOOP_PRIVATE_PLATFORM_FIELDS
+ #undef UV__ERR
+ 
+-#ifdef __cplusplus
+-}
+-#endif
+ #endif /* UV_H */
+diff --git a/include/uv/unix.h b/include/uv/unix.h
+index a647593a..504bab7c 100644
+--- a/include/uv/unix.h
++++ b/include/uv/unix.h
+@@ -47,12 +47,6 @@
+ 
+ #if defined(__linux__)
+ # include "uv/linux.h"
+-#elif defined (__MVS__)
+-# include "uv/os390.h"
+-#elif defined(_AIX)
+-# include "uv/aix.h"
+-#elif defined(__sun)
+-# include "uv/sunos.h"
+ #elif defined(__APPLE__)
+ # include "uv/darwin.h"
+ #elif defined(__DragonFly__)       || \
+diff --git a/include/uv/win.h b/include/uv/win.h
+index 354e0989..ca5242f7 100644
+--- a/include/uv/win.h
++++ b/include/uv/win.h
+@@ -53,11 +53,7 @@ typedef struct pollfd {
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ 
+-#if defined(_MSC_VER) && _MSC_VER < 1600
+-# include "uv/stdint-msvc2008.h"
+-#else
+-# include <stdint.h>
+-#endif
++#include <stdint.h>
+ 
+ #include "uv/tree.h"
+ #include "uv/threadpool.h"
+diff --git a/src/unix/internal.h b/src/unix/internal.h
+index 2db30350..13ca2e63 100644
+--- a/src/unix/internal.h
++++ b/src/unix/internal.h
+@@ -168,9 +168,11 @@ struct uv__stream_queued_fds_s {
+     defined(__NetBSD__)
+ #define uv__cloexec uv__cloexec_ioctl
+ #define uv__nonblock uv__nonblock_ioctl
++#define UV__NONBLOCK_IS_IOCTL
+ #else
+ #define uv__cloexec uv__cloexec_fcntl
+ #define uv__nonblock uv__nonblock_fcntl
++#define UV__NONBLOCK_IS_FCNTL
+ #endif
+ 
+ /* On Linux, uv__nonblock_fcntl() and uv__nonblock_ioctl() do not commute
+@@ -183,6 +185,8 @@ struct uv__stream_queued_fds_s {
+ #if defined(__linux__) && O_NDELAY != O_NONBLOCK
+ #undef uv__nonblock
+ #define uv__nonblock uv__nonblock_fcntl
++#undef UV__NONBLOCK_IS_IOCTL
++#define UV__NONBLOCK_IS_FCNTL
+ #endif
+ 
+ /* core */
+diff --git a/src/unix/poll.c b/src/unix/poll.c
+index 3d5022b2..d578611e 100644
+--- a/src/unix/poll.c
++++ b/src/unix/poll.c
+@@ -79,9 +79,10 @@ int uv_poll_init(uv_loop_t* loop, uv_poll_t* handle, int fd) {
+    * Workaround for e.g. kqueue fds not supporting ioctls.
+    */
+   err = uv__nonblock(fd, 1);
++#ifdef UV__NONBLOCK_IS_IOCTL
+   if (err == UV_ENOTTY)
+-    if (uv__nonblock == uv__nonblock_ioctl)
+-      err = uv__nonblock_fcntl(fd, 1);
++    err = uv__nonblock_fcntl(fd, 1);
++#endif
+ 
+   if (err)
+     return err;
+diff --git a/src/win/fs.c b/src/win/fs.c
+index 5434698b..6b9e37b0 100644
+--- a/src/win/fs.c
++++ b/src/win/fs.c
+@@ -39,6 +39,7 @@
+ 
+ #include <wincrypt.h>
+ 
++#pragma comment(lib, "Advapi32.lib")
+ 
+ #define UV_FS_FREE_PATHS         0x0002
+ #define UV_FS_FREE_PTR           0x0008
+diff --git a/src/win/tty.c b/src/win/tty.c
+index deec66fe..e4d7ac96 100644
+--- a/src/win/tty.c
++++ b/src/win/tty.c
+@@ -42,6 +42,8 @@
+ #include "stream-inl.h"
+ #include "req-inl.h"
+ 
++#pragma comment(lib, "User32.lib")
++
+ #ifndef InterlockedOr
+ # define InterlockedOr _InterlockedOr
+ #endif
+diff --git a/src/win/util.c b/src/win/util.c
+index d1cd19ba..b5afb1d8 100644
+--- a/src/win/util.c
++++ b/src/win/util.c
+@@ -67,6 +67,12 @@
+ static char *process_title;
+ static CRITICAL_SECTION process_title_lock;
+ 
++#pragma comment(lib, "Advapi32.lib")
++#pragma comment(lib, "IPHLPAPI.lib")
++#pragma comment(lib, "Psapi.lib")
++#pragma comment(lib, "Userenv.lib")
++#pragma comment(lib, "kernel32.lib")
++
+ /* Interval (in seconds) of the high-resolution clock. */
+ static double hrtime_interval_ = 0;
+ 
+diff --git a/src/win/winsock.c b/src/win/winsock.c
+index 5820ba9c..918acaf5 100644
+--- a/src/win/winsock.c
++++ b/src/win/winsock.c
+@@ -25,6 +25,7 @@
+ #include "uv.h"
+ #include "internal.h"
+ 
++#pragma comment(lib, "Ws2_32.lib")
+ 
+ /* Whether there are any non-IFS LSPs stacked on TCP */
+ int uv_tcp_non_ifs_lsp_ipv4;
+-- 
+2.20.1.windows.1
+
