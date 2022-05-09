@@ -39,7 +39,8 @@ class Robot : public frc::TimedRobot {
 
   void TeleopPeriodic() override {
     // Drive with arcade style (use right stick to steer)
-    m_robotDrive.ArcadeDrive(m_controller.GetLeftY(), m_controller.GetRightX());
+    m_robotDrive.ArcadeDrive(-m_controller.GetLeftY(),
+                             m_controller.GetRightX());
   }
 
   void TestInit() override {}
