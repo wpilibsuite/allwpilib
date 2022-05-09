@@ -50,8 +50,9 @@ def main():
         "sysinfo-memory.c",
     ]
     src_files = walk_cwd_and_copy_if(
-        lambda dp, f: "src" in dp and "docs" not in dp and f not in
-        src_ignorelist, os.path.join(wpinet, "src/main/native/thirdparty/libuv"))
+        lambda dp, f: "src" in dp and "docs" not in dp and f
+        not in src_ignorelist,
+        os.path.join(wpinet, "src/main/native/thirdparty/libuv"))
 
 
 if __name__ == "__main__":
