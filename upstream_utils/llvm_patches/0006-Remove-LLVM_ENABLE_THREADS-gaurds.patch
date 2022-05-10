@@ -1,7 +1,7 @@
-From f5729fc1c4be5e2781e9af916f967f04a5a71001 Mon Sep 17 00:00:00 2001
+From 0b0ddd609c14d51a4cdcc62e25b499049138e2b2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:31:11 -0400
-Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
+Subject: [PATCH 06/36] Remove LLVM_ENABLE_THREADS gaurds
 
 ---
  llvm/include/llvm/Support/Compiler.h | 17 +----------------
@@ -9,10 +9,10 @@ Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
  2 files changed, 1 insertion(+), 42 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 14e4d6e97140..c382d8f64f52 100644
+index 3f4f465f3960..d95da1f01399 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -492,7 +492,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -500,7 +500,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// some constant value. In almost all circumstances this is most appropriate
  /// for use with a pointer, integer, or small aggregation of pointers and
  /// integers.
@@ -21,7 +21,7 @@ index 14e4d6e97140..c382d8f64f52 100644
  #if __has_feature(cxx_thread_local)
  #define LLVM_THREAD_LOCAL thread_local
  #elif defined(_MSC_VER)
-@@ -503,21 +503,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -511,21 +511,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -44,10 +44,10 @@ index 14e4d6e97140..c382d8f64f52 100644
  namespace llvm {
  
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 21712c5c039e..7408aa47cae8 100644
+index 0f13f7a536f1..9fffa96602db 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -45,7 +45,6 @@ static void *ErrorHandlerUserData = nullptr;
+@@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
  static fatal_error_handler_t BadAllocErrorHandler = nullptr;
  static void *BadAllocErrorHandlerUserData = nullptr;
  
@@ -55,7 +55,7 @@ index 21712c5c039e..7408aa47cae8 100644
  // Mutexes to synchronize installing error handlers and calling error handlers.
  // Do not use ManagedStatic, or that may allocate memory while attempting to
  // report an OOM.
-@@ -59,22 +58,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
+@@ -58,22 +57,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
  // builds. We can remove these ifdefs if that script goes away.
  static std::mutex ErrorHandlerMutex;
  static std::mutex BadAllocErrorHandlerMutex;
@@ -78,7 +78,7 @@ index 21712c5c039e..7408aa47cae8 100644
    ErrorHandler = nullptr;
    ErrorHandlerUserData = nullptr;
  }
-@@ -97,9 +91,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -96,9 +90,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -88,7 +88,7 @@ index 21712c5c039e..7408aa47cae8 100644
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -128,18 +120,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -127,18 +119,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
@@ -107,7 +107,7 @@ index 21712c5c039e..7408aa47cae8 100644
    BadAllocErrorHandler = nullptr;
    BadAllocErrorHandlerUserData = nullptr;
  }
-@@ -150,9 +138,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -149,9 +137,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -117,7 +117,7 @@ index 21712c5c039e..7408aa47cae8 100644
      Handler = BadAllocErrorHandler;
      HandlerData = BadAllocErrorHandlerUserData;
    }
-@@ -162,25 +148,14 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -161,25 +147,14 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
      llvm_unreachable("bad alloc handler should not return");
    }
  
@@ -143,10 +143,10 @@ index 21712c5c039e..7408aa47cae8 100644
  // Causes crash on allocation failure. It is called prior to the handler set by
  // 'install_bad_alloc_error_handler'.
  static void out_of_memory_new_handler() {
-@@ -206,7 +181,6 @@ public:
-     install_out_of_memory_new_handler();
-   }
- } new_handler_installer;
+@@ -193,7 +168,6 @@ void llvm::install_out_of_memory_new_handler() {
+   (void)old;
+   assert(old == nullptr && "new-handler already installed");
+ }
 -#endif
  
  void llvm::llvm_unreachable_internal(const char *msg, const char *file,

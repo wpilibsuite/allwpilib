@@ -150,7 +150,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/llvm/llvm-project",
-                                     "llvmorg-8.0.0")
+                                     "llvmorg-9.0.0")
     wpiutil = os.path.join(root, "wpiutil")
 
     patch_root = os.path.join(root, "upstream_utils/llvm_patches")
@@ -181,18 +181,17 @@ def main():
         os.path.join(patch_root, "0023-Fixup-includes.patch"),
         os.path.join(patch_root, "0024-use-wpilib-memmap.patch"),
         os.path.join(patch_root, "0025-fixup-inline-macro.patch"),
-        os.path.join(patch_root, "0026-Add-timepoint-function.patch"),
-        os.path.join(patch_root, "0027-c-20-macro-updates.patch"),
-        os.path.join(patch_root, "0028-EpochTracker-abi-macro.patch"),
-        os.path.join(patch_root, "0029-Remove-unused-functions.patch"),
-        os.path.join(patch_root, "0030-Add-vector-to-raw_ostream.patch"),
-        os.path.join(patch_root, "0031-Add-missing-raw_ostream-functions.patch"),
-        os.path.join(patch_root, "0032-OS-dependent-changes.patch"),
-        os.path.join(patch_root, "0033-Turn-off-16-8-conversion-check.patch"),
-        os.path.join(patch_root, "0034-Random-fixes.-Sigh.patch"),
-        os.path.join(patch_root, "0035-Fix-documentation-warnings.patch"),
-        os.path.join(patch_root, "0036-Fix-Gtest-warnings.patch"),
-        os.path.join(patch_root, "0037-Fix-athena-compilation-error.patch"),
+        os.path.join(patch_root, "0026-c-20-macro-updates.patch"),
+        os.path.join(patch_root, "0027-EpochTracker-abi-macro.patch"),
+        os.path.join(patch_root, "0028-Remove-unused-functions.patch"),
+        os.path.join(patch_root, "0029-Add-vector-to-raw_ostream.patch"),
+        os.path.join(patch_root, "0030-Add-missing-raw_ostream-functions.patch"),
+        os.path.join(patch_root, "0031-OS-dependent-changes.patch"),
+        os.path.join(patch_root, "0032-Turn-off-16-8-conversion-check.patch"),
+        os.path.join(patch_root, "0033-Random-fixes.-Sigh.patch"),
+        os.path.join(patch_root, "0034-Fix-documentation-warnings.patch"),
+        os.path.join(patch_root, "0035-Fix-Gtest-warnings.patch"),
+        os.path.join(patch_root, "0036-Fix-athena-compilation-error.patch"),
     ]
     # yapf: enable
     am_patches(repo, frontend_patches, use_threeway=True)

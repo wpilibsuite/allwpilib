@@ -1,7 +1,7 @@
-From e119106dcbb71506c95f47d0da12c816af8af77b Mon Sep 17 00:00:00 2001
+From 0e307e5176214eaa0dc8d86b3b15b0b3f7370a34 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:13:45 -0400
-Subject: [PATCH 24/37] use wpilib memmap
+Subject: [PATCH 24/36] use wpilib memmap
 
 ---
  llvm/include/llvm/Support/MemoryBuffer.h | 25 ------
@@ -9,10 +9,10 @@ Subject: [PATCH 24/37] use wpilib memmap
  2 files changed, 16 insertions(+), 108 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 300b1cca1282..c72b14826248 100644
+index a592849d484f..f0fc3b44c6f1 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -55,9 +55,6 @@ protected:
+@@ -54,9 +54,6 @@ protected:
    void init(const uint8_t *BufStart, const uint8_t *BufEnd,
              bool RequiresNullTerminator);
  
@@ -22,7 +22,7 @@ index 300b1cca1282..c72b14826248 100644
  public:
    MemoryBuffer(const MemoryBuffer &) = delete;
    MemoryBuffer &operator=(const MemoryBuffer &) = delete;
-@@ -124,15 +121,6 @@ public:
+@@ -123,15 +120,6 @@ public:
    static std::unique_ptr<MemoryBuffer>
    getMemBufferCopy(span<const uint8_t> InputData, const std::string_view &BufferName = "");
  
@@ -38,7 +38,7 @@ index 300b1cca1282..c72b14826248 100644
    /// Map a subrange of the specified file as a MemoryBuffer.
    static ErrorOr<std::unique_ptr<MemoryBuffer>>
    getFileSlice(const std::string_view &Filename, uint64_t MapSize, uint64_t Offset,
-@@ -163,9 +151,6 @@ class WritableMemoryBuffer : public MemoryBuffer {
+@@ -162,9 +150,6 @@ class WritableMemoryBuffer : public MemoryBuffer {
  protected:
    WritableMemoryBuffer() = default;
  
@@ -48,7 +48,7 @@ index 300b1cca1282..c72b14826248 100644
  public:
    using MemoryBuffer::getBuffer;
    using MemoryBuffer::getBufferEnd;
-@@ -209,12 +194,10 @@ private:
+@@ -208,12 +193,10 @@ private:
    //   WritableMemoryBuffer::getXXX()
    // and be surprised that they got a read-only Buffer.
    using MemoryBuffer::getFileAsStream;
@@ -61,7 +61,7 @@ index 300b1cca1282..c72b14826248 100644
  };
  
  /// This class is an extension of MemoryBuffer, which allows write access to
-@@ -225,9 +208,6 @@ class WriteThroughMemoryBuffer : public MemoryBuffer {
+@@ -224,9 +207,6 @@ class WriteThroughMemoryBuffer : public MemoryBuffer {
  protected:
    WriteThroughMemoryBuffer() = default;
  
@@ -71,7 +71,7 @@ index 300b1cca1282..c72b14826248 100644
  public:
    using MemoryBuffer::getBuffer;
    using MemoryBuffer::getBufferEnd;
-@@ -257,12 +237,10 @@ private:
+@@ -256,12 +236,10 @@ private:
    //   WritableMemoryBuffer::getXXX()
    // and be surprised that they got a read-only Buffer.
    using MemoryBuffer::getFileAsStream;
@@ -84,7 +84,7 @@ index 300b1cca1282..c72b14826248 100644
  };
  
  class MemoryBufferRef {
-@@ -285,9 +263,6 @@ public:
+@@ -284,9 +262,6 @@ public:
    size_t getBufferSize() const { return Buffer.size(); }
  };
  
@@ -95,10 +95,10 @@ index 300b1cca1282..c72b14826248 100644
  
  #endif // LLVM_SUPPORT_MEMORYBUFFER_H
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 711364a13f8a..11670cc2bcc8 100644
+index b9ff5958532c..a8de13a928ea 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -151,17 +151,6 @@ MemoryBuffer::getMemBufferCopy(span<const uint8_t> InputData, std::string_view B
+@@ -150,17 +150,6 @@ MemoryBuffer::getMemBufferCopy(span<const uint8_t> InputData, std::string_view B
    return nullptr;
  }
  
@@ -116,7 +116,7 @@ index 711364a13f8a..11670cc2bcc8 100644
  ErrorOr<std::unique_ptr<MemoryBuffer>>
  MemoryBuffer::getFileSlice(std::string_view FilePath, uint64_t MapSize,
                             uint64_t Offset, bool IsVolatile) {
-@@ -174,15 +163,26 @@ MemoryBuffer::getFileSlice(std::string_view FilePath, uint64_t MapSize,
+@@ -173,15 +162,26 @@ MemoryBuffer::getFileSlice(std::string_view FilePath, uint64_t MapSize,
  //===----------------------------------------------------------------------===//
  
  namespace {
@@ -146,9 +146,9 @@ index 711364a13f8a..11670cc2bcc8 100644
    }
  
    static uint64_t getLegalMapSize(uint64_t Len, uint64_t Offset) {
-@@ -196,8 +196,8 @@ class MemoryBufferMMapFile : public MB {
+@@ -195,8 +195,8 @@ class MemoryBufferMMapFile : public MB {
  public:
-   MemoryBufferMMapFile(bool RequiresNullTerminator, fs::file_t FD, uint64_t Len,
+   MemoryBufferMMapFile(bool RequiresNullTerminator, sys::fs::file_t FD, uint64_t Len,
                         uint64_t Offset, std::error_code &EC)
 -      : MFR(FD, MB::Mapmode, getLegalMapSize(Len, Offset),
 -            getLegalMapOffset(Offset), EC) {
@@ -157,11 +157,11 @@ index 711364a13f8a..11670cc2bcc8 100644
      if (!EC) {
        const uint8_t *Start = getStart(Len, Offset);
        MemoryBuffer::init(Start, Start + Len, RequiresNullTerminator);
-@@ -316,61 +316,6 @@ WritableMemoryBuffer::getNewMemBuffer(size_t Size, std::string_view BufferName)
+@@ -313,61 +313,6 @@ WritableMemoryBuffer::getNewMemBuffer(size_t Size, std::string_view BufferName)
    return SB;
  }
  
--static bool shouldUseMmap(fs::file_t FD,
+-static bool shouldUseMmap(sys::fs::file_t FD,
 -                          size_t FileSize,
 -                          size_t MapSize,
 -                          off_t Offset,
@@ -219,16 +219,16 @@ index 711364a13f8a..11670cc2bcc8 100644
  static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
  getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
                   uint64_t Offset) {
-@@ -429,8 +374,6 @@ static ErrorOr<std::unique_ptr<MB>>
- getOpenFileImpl(fs::file_t FD, std::string_view Filename, uint64_t FileSize,
+@@ -425,8 +370,6 @@ static ErrorOr<std::unique_ptr<MB>>
+ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize,
                  uint64_t MapSize, int64_t Offset, bool RequiresNullTerminator,
                  bool IsVolatile) {
--  static int PageSize = sys::Process::getPageSize();
+-  static int PageSize = sys::Process::getPageSizeEstimate();
 -
    // Default is to map the full file.
    if (MapSize == uint64_t(-1)) {
      // If we don't know the file size, use fstat to find out.  fstat on an open
-@@ -516,16 +459,6 @@ MemoryBuffer::getOpenFileSlice(fs::file_t FD, std::string_view Filename, uint64_
+@@ -487,16 +430,6 @@ MemoryBuffer::getOpenFileSlice(sys::fs::file_t FD, std::string_view Filename, ui
                                         IsVolatile);
  }
  
@@ -239,11 +239,11 @@ index 711364a13f8a..11670cc2bcc8 100644
 -  // fallback if it fails.
 -  sys::ChangeStdinToBinary();
 -
--  return getMemoryBufferForStream(0, "<stdin>");
+-  return getMemoryBufferForStream(sys::fs::getStdinHandle(), "<stdin>");
 -}
 -
  ErrorOr<std::unique_ptr<MemoryBuffer>>
- MemoryBuffer::getFileAsStream(std::string_view Filename) {
+ MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
    std::error_code EC;
 -- 
 2.20.1.windows.1

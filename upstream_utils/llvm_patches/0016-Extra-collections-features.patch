@@ -1,17 +1,17 @@
-From 937a4eb2651d4e5a0be9cfcd98c0c898b06fa9f5 Mon Sep 17 00:00:00 2001
+From 276b6e259d22fb516d200a62d73c2071a09266f6 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 16/37] Extra collections features
+Subject: [PATCH 16/36] Extra collections features
 
 ---
  llvm/include/llvm/ADT/StringMap.h | 103 +++++++++++++++++++++++++++++-
  1 file changed, 102 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 7d939f007279..df9f3da888da 100644
+index f19482187a8b..57f006bc5cde 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -61,7 +61,7 @@ protected:
+@@ -60,7 +60,7 @@ protected:
  protected:
    explicit StringMapImpl(unsigned itemSize)
        : ItemSize(itemSize) {}
@@ -20,7 +20,7 @@ index 7d939f007279..df9f3da888da 100644
        : TheTable(RHS.TheTable), NumBuckets(RHS.NumBuckets),
          NumItems(RHS.NumItems), NumTombstones(RHS.NumTombstones),
          ItemSize(RHS.ItemSize) {
-@@ -450,11 +450,27 @@ public:
+@@ -454,11 +454,27 @@ public:
      return Tmp;
    }
  
@@ -48,7 +48,7 @@ index 7d939f007279..df9f3da888da 100644
  };
  
  template <typename ValueTy>
-@@ -519,6 +535,91 @@ private:
+@@ -523,6 +539,91 @@ private:
    std::string_view Key;
  };
  

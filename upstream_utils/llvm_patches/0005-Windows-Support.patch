@@ -1,18 +1,19 @@
-From 03ee81b8bd00222722c3d4b060efa72950796c21 Mon Sep 17 00:00:00 2001
+From 26c8d760a8f1488656277b02cac7c43cb31c029f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 05/37] Windows Support
+Subject: [PATCH 05/36] Windows Support
 
 ---
  llvm/lib/Support/ConvertUTF.cpp           | 95 +++++++++++++++++++++++
+ llvm/lib/Support/MemoryBuffer.cpp         |  4 +-
  llvm/lib/Support/Windows/WindowsSupport.h | 33 ++++++--
- 2 files changed, 120 insertions(+), 8 deletions(-)
+ 3 files changed, 122 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index 8f02fae4f558..ba93b72379f1 100644
+index e24a918c5c89..b4c7fffee8f7 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
-@@ -52,6 +52,11 @@
+@@ -51,6 +51,11 @@
  #endif
  #include <assert.h>
  
@@ -24,7 +25,7 @@ index 8f02fae4f558..ba93b72379f1 100644
  /*
   * This code extensively uses fall-through switches.
   * Keep the compiler from warning about that.
-@@ -734,6 +739,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+@@ -733,6 +738,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
  
     --------------------------------------------------------------------- */
  
@@ -121,11 +122,26 @@ index 8f02fae4f558..ba93b72379f1 100644
  } // namespace llvm
  
  ConvertUTF_RESTORE_WARNINGS
+diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
+index d0e5bb154c1a..8fc905472a62 100644
+--- a/llvm/lib/Support/MemoryBuffer.cpp
++++ b/llvm/lib/Support/MemoryBuffer.cpp
+@@ -209,8 +209,8 @@ public:
+ 
+ static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
+ getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {
+-  const ssize_t ChunkSize = 4096*4;
+-  SmallString<ChunkSize> Buffer;
++  constexpr size_t ChunkSize = 4096*4;
++  SmallVector<uint8_t, ChunkSize> Buffer;
+   size_t ReadBytes;
+   // Read into Buffer until we hit EOF.
+   do {
 diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index 979cc5d01390..9e9a0820359c 100644
+index fed9b2f462ef..508c4d96defa 100644
 --- a/llvm/lib/Support/Windows/WindowsSupport.h
 +++ b/llvm/lib/Support/Windows/WindowsSupport.h
-@@ -52,11 +52,35 @@
+@@ -51,11 +51,35 @@
  
  namespace llvm {
  
@@ -162,7 +178,7 @@ index 979cc5d01390..9e9a0820359c 100644
  
  /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
  /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-@@ -222,13 +246,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+@@ -221,13 +245,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
    return Time;
  }
  

@@ -1,0 +1,367 @@
+From f23e3a7536742c9d07a2ba0edcb406ea229be177 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 00:10:48 -0400
+Subject: [PATCH 28/36] Remove unused functions
+
+---
+ llvm/include/llvm/ADT/SmallString.h       | 86 ++---------------------
+ llvm/include/llvm/Support/ConvertUTF.h    |  7 --
+ llvm/include/llvm/Support/Errno.h         |  9 ---
+ llvm/include/llvm/Support/VersionTuple.h  |  7 --
+ llvm/lib/Support/ConvertUTFWrapper.cpp    | 36 ----------
+ llvm/lib/Support/ErrorHandling.cpp        | 16 -----
+ llvm/unittests/Support/ConvertUTFTest.cpp | 70 ------------------
+ 7 files changed, 6 insertions(+), 225 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
+index 6bbb537f6f58..bbcfa1c39164 100644
+--- a/llvm/include/llvm/ADT/SmallString.h
++++ b/llvm/include/llvm/ADT/SmallString.h
+@@ -93,48 +93,12 @@ public:
+   /// @name String Comparison
+   /// @{
+ 
+-  /// Check for string equality.  This is more efficient than compare() when
+-  /// the relative ordering of inequal strings isn't needed.
+-  bool equals(std::string_view RHS) const {
+-    return str().equals(RHS);
+-  }
+-
+-  /// Check for string equality, ignoring case.
+-  bool equals_lower(std::string_view RHS) const {
+-    return str().equals_lower(RHS);
+-  }
+-
+   /// Compare two strings; the result is -1, 0, or 1 if this string is
+   /// lexicographically less than, equal to, or greater than the \p RHS.
+   int compare(std::string_view RHS) const {
+     return str().compare(RHS);
+   }
+ 
+-  /// compare_lower - Compare two strings, ignoring case.
+-  int compare_lower(std::string_view RHS) const {
+-    return str().compare_lower(RHS);
+-  }
+-
+-  /// compare_numeric - Compare two strings, treating sequences of digits as
+-  /// numbers.
+-  int compare_numeric(std::string_view RHS) const {
+-    return str().compare_numeric(RHS);
+-  }
+-
+-  /// @}
+-  /// @name String Predicates
+-  /// @{
+-
+-  /// startswith - Check if this string starts with the given \p Prefix.
+-  bool startswith(std::string_view Prefix) const {
+-    return str().startswith(Prefix);
+-  }
+-
+-  /// endswith - Check if this string ends with the given \p Suffix.
+-  bool endswith(std::string_view Suffix) const {
+-    return str().endswith(Suffix);
+-  }
+-
+   /// @}
+   /// @name String Searching
+   /// @{
+@@ -215,50 +179,6 @@ public:
+   }
+ 
+   /// @}
+-  /// @name Helpful Algorithms
+-  /// @{
+-
+-  /// Return the number of occurrences of \p C in the string.
+-  size_t count(char C) const {
+-    return str().count(C);
+-  }
+-
+-  /// Return the number of non-overlapped occurrences of \p Str in the
+-  /// string.
+-  size_t count(std::string_view Str) const {
+-    return str().count(Str);
+-  }
+-
+-  /// @}
+-  /// @name Substring Operations
+-  /// @{
+-
+-  /// Return a reference to the substring from [Start, Start + N).
+-  ///
+-  /// \param Start The index of the starting character in the substring; if
+-  /// the index is npos or greater than the length of the string then the
+-  /// empty substring will be returned.
+-  ///
+-  /// \param N The number of characters to included in the substring. If \p N
+-  /// exceeds the number of characters remaining in the string, the string
+-  /// suffix (starting with \p Start) will be returned.
+-  std::string_view substr(size_t Start, size_t N = std::string_view::npos) const {
+-    return str().substr(Start, N);
+-  }
+-
+-  /// Return a reference to the substring from [Start, End).
+-  ///
+-  /// \param Start The index of the starting character in the substring; if
+-  /// the index is npos or greater than the length of the string then the
+-  /// empty substring will be returned.
+-  ///
+-  /// \param End The index following the last character to include in the
+-  /// substring. If this is npos, or less than \p Start, or exceeds the
+-  /// number of characters remaining in the string, the string suffix
+-  /// (starting with \p Start) will be returned.
+-  std::string_view slice(size_t Start, size_t End) const {
+-    return str().slice(Start, End);
+-  }
+ 
+   // Extra methods.
+ 
+@@ -275,6 +195,12 @@ public:
+   /// Implicit conversion to std::string_view.
+   operator std::string_view() const { return str(); }
+ 
++  /// Explicit conversion to std::string.
++  std::string string() const { return {this->begin(), this->size()}; }
++
++  /// Implicit conversion to std::string.
++  operator std::string() const { return string(); }
++
+   // Extra operators.
+   const SmallString &operator=(std::string_view RHS) {
+     this->clear();
+diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
+index 48435fbb6f30..75529de5fca2 100644
+--- a/llvm/include/llvm/Support/ConvertUTF.h
++++ b/llvm/include/llvm/Support/ConvertUTF.h
+@@ -191,13 +191,6 @@ template <typename T> class SmallVectorImpl;
+ */
+ bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
+ 
+-/**
+-* Converts a std::wstring to a UTF-8 encoded std::string.
+-* \return true on success.
+-*/
+-bool convertWideToUTF8(const std::wstring &Source, std::string &Result);
+-
+-
+ /**
+  * Convert an Unicode code point to UTF8 sequence.
+  *
+diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
+index aedb5fb292b8..3227a2308dfb 100644
+--- a/llvm/include/llvm/Support/Errno.h
++++ b/llvm/include/llvm/Support/Errno.h
+@@ -20,15 +20,6 @@
+ namespace llvm {
+ namespace sys {
+ 
+-/// Returns a string representation of the errno value, using whatever
+-/// thread-safe variant of strerror() is available.  Be sure to call this
+-/// immediately after the function that set errno, or errno may have been
+-/// overwritten by an intervening call.
+-std::string StrError();
+-
+-/// Like the no-argument version above, but uses \p errnum instead of errno.
+-std::string StrError(int errnum);
+-
+ template <typename FailT, typename Fun, typename... Args>
+ inline auto RetryAfterSignal(const FailT &Fail, const Fun &F,
+                              const Args &... As) -> decltype(F(As...)) {
+diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
+index e705a21a206c..1c95ea94140c 100644
+--- a/llvm/include/llvm/Support/VersionTuple.h
++++ b/llvm/include/llvm/Support/VersionTuple.h
+@@ -14,7 +14,6 @@
+ #ifndef LLVM_SUPPORT_VERSIONTUPLE_H
+ #define LLVM_SUPPORT_VERSIONTUPLE_H
+ 
+-#include "llvm/Support/raw_ostream.h"
+ #include <optional>
+ #include <string>
+ #include <tuple>
+@@ -135,13 +134,7 @@ public:
+   friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
+     return !(X < Y);
+   }
+-
+-  /// Retrieve a string representation of the version number.
+-  std::string getAsString() const;
+ };
+ 
+-/// Print a version number.
+-raw_ostream &operator<<(raw_ostream &Out, const VersionTuple &V);
+-
+ } // end namespace llvm
+ #endif // LLVM_SUPPORT_VERSIONTUPLE_H
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index f381978d28fc..89671f10858e 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -204,41 +204,5 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
+   return ConvertUTF8toWide(std::string_view(Source), Result);
+ }
+ 
+-bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
+-  if (sizeof(wchar_t) == 1) {
+-    const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
+-    const UTF8 *End =
+-        reinterpret_cast<const UTF8 *>(Source.data() + Source.size());
+-    if (!isLegalUTF8String(&Start, End))
+-      return false;
+-    Result.resize(Source.size());
+-    memcpy(&Result[0], Source.data(), Source.size());
+-    return true;
+-  } else if (sizeof(wchar_t) == 2) {
+-    return convertUTF16ToUTF8String(
+-        llvm::ArrayRef<UTF16>(reinterpret_cast<const UTF16 *>(Source.data()),
+-                              Source.size()),
+-        Result);
+-  } else if (sizeof(wchar_t) == 4) {
+-    const UTF32 *Start = reinterpret_cast<const UTF32 *>(Source.data());
+-    const UTF32 *End =
+-        reinterpret_cast<const UTF32 *>(Source.data() + Source.size());
+-    Result.resize(UNI_MAX_UTF8_BYTES_PER_CODE_POINT * Source.size());
+-    UTF8 *ResultPtr = reinterpret_cast<UTF8 *>(&Result[0]);
+-    UTF8 *ResultEnd = reinterpret_cast<UTF8 *>(&Result[0] + Result.size());
+-    if (ConvertUTF32toUTF8(&Start, End, &ResultPtr, ResultEnd,
+-                           strictConversion) == conversionOK) {
+-      Result.resize(reinterpret_cast<char *>(ResultPtr) - &Result[0]);
+-      return true;
+-    } else {
+-      Result.clear();
+-      return false;
+-    }
+-  } else {
+-    llvm_unreachable(
+-        "Control should never reach this point; see static_assert further up");
+-  }
+-}
+-
+ } // end namespace llvm
+ 
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 74f80129e362..e0f4088bb6c2 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -169,22 +169,6 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+ #endif
+ }
+ 
+-static void bindingsErrorHandler(void *user_data, const std::string& reason,
+-                                 bool gen_crash_diag) {
+-  LLVMFatalErrorHandler handler =
+-      LLVM_EXTENSION reinterpret_cast<LLVMFatalErrorHandler>(user_data);
+-  handler(reason.c_str());
+-}
+-
+-void LLVMInstallFatalErrorHandler(LLVMFatalErrorHandler Handler) {
+-  install_fatal_error_handler(bindingsErrorHandler,
+-                              LLVM_EXTENSION reinterpret_cast<void *>(Handler));
+-}
+-
+-void LLVMResetFatalErrorHandler() {
+-  remove_fatal_error_handler();
+-}
+-
+ #ifdef _WIN32
+ 
+ #include <system_error>
+diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
+index 6b6507e75d12..5188ca2e9e29 100644
+--- a/llvm/unittests/Support/ConvertUTFTest.cpp
++++ b/llvm/unittests/Support/ConvertUTFTest.cpp
+@@ -13,28 +13,6 @@
+ 
+ using namespace llvm;
+ 
+-TEST(ConvertUTFTest, ConvertUTF16LittleEndianToUTF8String) {
+-  // Src is the look of disapproval.
+-  static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
+-  ArrayRef<char> Ref(Src, sizeof(Src) - 1);
+-  std::string Result;
+-  bool Success = convertUTF16ToUTF8String(Ref, Result);
+-  EXPECT_TRUE(Success);
+-  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
+-}
+-
+-TEST(ConvertUTFTest, ConvertUTF16BigEndianToUTF8String) {
+-  // Src is the look of disapproval.
+-  static const char Src[] = "\xfe\xff\x0c\xa0\x00_\x0c\xa0";
+-  ArrayRef<char> Ref(Src, sizeof(Src) - 1);
+-  std::string Result;
+-  bool Success = convertUTF16ToUTF8String(Ref, Result);
+-  EXPECT_TRUE(Success);
+-  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
+-}
+-
+ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
+   // Src is the look of disapproval.
+   static const char Src[] = "\xe0\xb2\xa0_\xe0\xb2\xa0";
+@@ -48,19 +26,6 @@ TEST(ConvertUTFTest, ConvertUTF8ToUTF16String) {
+     EXPECT_EQ(Expected[I], Result[I]);
+ }
+ 
+-TEST(ConvertUTFTest, OddLengthInput) {
+-  std::string Result;
+-  bool Success = convertUTF16ToUTF8String(makeArrayRef("xxxxx", 5), Result);
+-  EXPECT_FALSE(Success);
+-}
+-
+-TEST(ConvertUTFTest, Empty) {
+-  std::string Result;
+-  bool Success = convertUTF16ToUTF8String(llvm::ArrayRef<char>(None), Result);
+-  EXPECT_TRUE(Success);
+-  EXPECT_TRUE(Result.empty());
+-}
+-
+ TEST(ConvertUTFTest, HasUTF16BOM) {
+   bool HasBOM = hasUTF16ByteOrderMark("\xff\xfe");
+   EXPECT_TRUE(HasBOM);
+@@ -77,41 +42,6 @@ TEST(ConvertUTFTest, HasUTF16BOM) {
+   EXPECT_FALSE(HasBOM);
+ }
+ 
+-TEST(ConvertUTFTest, UTF16WrappersForConvertUTF16ToUTF8String) {
+-  // Src is the look of disapproval.
+-  static const char Src[] = "\xff\xfe\xa0\x0c_\x00\xa0\x0c";
+-  ArrayRef<UTF16> SrcRef = makeArrayRef((const UTF16 *)Src, 4);
+-  std::string Result;
+-  bool Success = convertUTF16ToUTF8String(SrcRef, Result);
+-  EXPECT_TRUE(Success);
+-  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
+-}
+-
+-TEST(ConvertUTFTest, ConvertUTF8toWide) {
+-  // Src is the look of disapproval.
+-  static const char Src[] = "\xe0\xb2\xa0_\xe0\xb2\xa0";
+-  std::wstring Result;
+-  bool Success = ConvertUTF8toWide((const char*)Src, Result);
+-  EXPECT_TRUE(Success);
+-  std::wstring Expected(L"\x0ca0_\x0ca0");
+-  EXPECT_EQ(Expected, Result);
+-  Result.clear();
+-  Success = ConvertUTF8toWide(StringRef(Src, 7), Result);
+-  EXPECT_TRUE(Success);
+-  EXPECT_EQ(Expected, Result);
+-}
+-
+-TEST(ConvertUTFTest, convertWideToUTF8) {
+-  // Src is the look of disapproval.
+-  static const wchar_t Src[] = L"\x0ca0_\x0ca0";
+-  std::string Result;
+-  bool Success = convertWideToUTF8(Src, Result);
+-  EXPECT_TRUE(Success);
+-  std::string Expected("\xe0\xb2\xa0_\xe0\xb2\xa0");
+-  EXPECT_EQ(Expected, Result);
+-}
+-
+ struct ConvertUTFResultContainer {
+   ConversionResult ErrorCode;
+   std::vector<unsigned> UnicodeScalars;
+-- 
+2.20.1.windows.1
+

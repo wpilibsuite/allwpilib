@@ -1,17 +1,17 @@
-From 8f0137b38b5bf736bbdb81e0860dc1303c7941da Mon Sep 17 00:00:00 2001
+From 5bcd2098d10a149d6472b25ef8f4658e1d1d5c6c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:49:20 -0400
-Subject: [PATCH 11/37] Remove DJB dep
+Subject: [PATCH 11/36] Remove DJB dep
 
 ---
  llvm/lib/Support/StringMap.cpp | 20 +++++++++++++++++---
  1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/llvm/lib/Support/StringMap.cpp b/llvm/lib/Support/StringMap.cpp
-index d20c62267534..5c8f2c8b8824 100644
+index 942f07096223..2c2fb3fdbb47 100644
 --- a/llvm/lib/Support/StringMap.cpp
 +++ b/llvm/lib/Support/StringMap.cpp
-@@ -14,12 +14,26 @@
+@@ -13,12 +13,26 @@
  #include "llvm/ADT/StringMap.h"
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Support/Compiler.h"
@@ -39,7 +39,7 @@ index d20c62267534..5c8f2c8b8824 100644
  /// Returns the number of buckets to allocate to ensure that the DenseMap can
  /// accommodate \p NumEntries without need to grow().
  static unsigned getMinBucketToReserveForEntries(unsigned NumEntries) {
-@@ -81,7 +95,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
+@@ -80,7 +94,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
      init(16);
      HTSize = NumBuckets;
    }
@@ -48,7 +48,7 @@ index d20c62267534..5c8f2c8b8824 100644
    unsigned BucketNo = FullHashValue & (HTSize-1);
    unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
  
-@@ -135,7 +149,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
+@@ -134,7 +148,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
  int StringMapImpl::FindKey(std::string_view Key) const {
    unsigned HTSize = NumBuckets;
    if (HTSize == 0) return -1;  // Really empty table?

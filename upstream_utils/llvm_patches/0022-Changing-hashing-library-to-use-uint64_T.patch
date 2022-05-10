@@ -1,7 +1,7 @@
-From 802d114be472a374b3697ef69887abe19b58b4bf Mon Sep 17 00:00:00 2001
+From 63113ad88845b8b2ef031b7b4a3fd2cdd4f6dd42 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:04:38 -0400
-Subject: [PATCH 22/37] Changing hashing library to use uint64_T
+Subject: [PATCH 22/36] Changing hashing library to use uint64_T
 
 ---
  llvm/include/llvm/ADT/Hashing.h    | 13 +++++++++----
@@ -9,19 +9,19 @@ Subject: [PATCH 22/37] Changing hashing library to use uint64_T
  2 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index cd78678bee54..5075a892c289 100644
+index 523096a52eaf..58d16385f752 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -197,7 +197,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
+@@ -196,7 +196,7 @@ inline uint64_t hash_1to3_bytes(const char *s, size_t len, uint64_t seed) {
    uint8_t b = s[len >> 1];
    uint8_t c = s[len - 1];
    uint32_t y = static_cast<uint32_t>(a) + (static_cast<uint32_t>(b) << 8);
--  uint32_t z = len + (static_cast<uint32_t>(c) << 2);
+-  uint32_t z = static_cast<uint32_t>(len) + (static_cast<uint32_t>(c) << 2);
 +  uint32_t z = static_cast<uint32_t>(len + (static_cast<uint64_t>(c) << 2));
    return shift_mix(y * k2 ^ z * k3 ^ seed) * k2;
  }
  
-@@ -573,7 +573,7 @@ public:
+@@ -572,7 +572,7 @@ public:
      // Check whether the entire set of values fit in the buffer. If so, we'll
      // use the optimized short hashing routine and skip state entirely.
      if (length == 0)
@@ -30,7 +30,7 @@ index cd78678bee54..5075a892c289 100644
  
      // Mix the final buffer, rotating it if we did a partial fill in order to
      // simulate doing a mix of the last 64-bytes. That is how the algorithm
-@@ -585,7 +585,7 @@ public:
+@@ -584,7 +584,7 @@ public:
      state.mix(buffer);
      length += buffer_ptr - buffer;
  
@@ -39,7 +39,7 @@ index cd78678bee54..5075a892c289 100644
    }
  };
  
-@@ -624,7 +624,7 @@ inline hash_code hash_integer_value(uint64_t value) {
+@@ -623,7 +623,7 @@ inline hash_code hash_integer_value(uint64_t value) {
    const uint64_t seed = get_execution_seed();
    const char *s = reinterpret_cast<const char *>(&value);
    const uint64_t a = fetch32(s);
@@ -48,7 +48,7 @@ index cd78678bee54..5075a892c289 100644
  }
  
  } // namespace detail
-@@ -660,6 +660,11 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -659,6 +659,11 @@ hash_code hash_value(const std::basic_string<T> &arg) {
    return hash_combine_range(arg.begin(), arg.end());
  }
  
@@ -61,10 +61,10 @@ index cd78678bee54..5075a892c289 100644
  
  #ifdef _WIN32
 diff --git a/llvm/unittests/ADT/HashingTest.cpp b/llvm/unittests/ADT/HashingTest.cpp
-index 2d0a0ea38a66..e1e63d169d21 100644
+index 2157754261e3..c3969c493c24 100644
 --- a/llvm/unittests/ADT/HashingTest.cpp
 +++ b/llvm/unittests/ADT/HashingTest.cpp
-@@ -206,7 +206,8 @@ TEST(HashingTest, HashCombineRangeLengthDiff) {
+@@ -205,7 +205,8 @@ TEST(HashingTest, HashCombineRangeLengthDiff) {
    }
  }
  

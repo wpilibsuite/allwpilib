@@ -1,0 +1,243 @@
+From 3eac8778e4c0ab944b11da7be455d123ee099fd4 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 01:56:39 -0400
+Subject: [PATCH 33/36] Random fixes. Sigh
+
+---
+ llvm/lib/Support/MemoryBuffer.cpp         | 59 ++++++++++++-----------
+ llvm/lib/Support/Windows/WindowsSupport.h |  4 ++
+ llvm/lib/Support/raw_ostream.cpp          | 23 ++++++---
+ llvm/unittests/ADT/StringMapTest.cpp      | 20 +-------
+ llvm/unittests/Support/ConvertUTFTest.cpp |  1 +
+ 5 files changed, 53 insertions(+), 54 deletions(-)
+
+diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
+index 35a15868fea0..299610233405 100644
+--- a/llvm/lib/Support/MemoryBuffer.cpp
++++ b/llvm/lib/Support/MemoryBuffer.cpp
+@@ -22,27 +22,37 @@
+ #define WIN32_LEAN_AND_MEAN
+ #endif
+ 
+-#include "llvm/ADT/SmallString.h"
+-#include "llvm/Config/config.h"
+-#include "llvm/Support/Errc.h"
+-#include "llvm/Support/Errno.h"
+-#include "llvm/Support/FileSystem.h"
+-#include "llvm/Support/MathExtras.h"
+-#include "llvm/Support/Path.h"
+-#include "llvm/Support/Process.h"
+-#include "llvm/Support/Program.h"
+-#include "llvm/Support/SmallVectorMemoryBuffer.h"
+-#include <cassert>
+-#include <cerrno>
+-#include <cstring>
+-#include <new>
++#include <windows.h>  // NOLINT(build/include_order)
++
++#endif
++
++#include <sys/stat.h>
+ #include <sys/types.h>
+-#include <system_error>
++
+ #if !defined(_MSC_VER) && !defined(__MINGW32__)
+ #include <unistd.h>
+ #else
+ #include <io.h>
+ #endif
++
++#include <cassert>
++#include <cerrno>
++#include <cstring>
++#include <new>
++#include <system_error>
++
++#include "wpi/SmallString.h"
++#include "wpi/Errc.h"
++#include "wpi/Errno.h"
++#include "wpi/MappedFileRegion.h"
++#include "wpi/fs.h"
++#include "wpi/MathExtras.h"
++#include "wpi/SmallVectorMemoryBuffer.h"
++
++#ifdef _WIN32
++#include "wpi/WindowsError.h"
++#endif
++
+ using namespace llvm;
+ 
+ //===----------------------------------------------------------------------===//
+@@ -81,11 +91,8 @@ struct NamedBufferAlloc {
+ }
+ 
+ void *operator new(size_t N, const NamedBufferAlloc &Alloc) {
+-  SmallString<256> NameBuf;
+-  std::string_view NameRef = Alloc.Name.tostd::string_view(NameBuf);
+-
+-  char *Mem = static_cast<char *>(operator new(N + NameRef.size() + 1));
+-  CopyStringView(Mem + N, NameRef);
++  uint8_t *Mem = static_cast<uint8_t *>(operator new(N + Alloc.Name.size() + 1));
++  CopyStringView(Mem + N, Alloc.Name);
+   return Mem;
+ }
+ 
+@@ -295,16 +302,14 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+   // that MemoryBuffer and data are aligned so PointerIntPair works with them.
+   // TODO: Is 16-byte alignment enough?  We copy small object files with large
+   // alignment expectations into this buffer.
+-  SmallString<256> NameBuf;
+-  std::string_view NameRef = BufferName.tostd::string_view(NameBuf);
+-  size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + NameRef.size() + 1, 16);
++  size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + BufferName.size() + 1, 16);
+   size_t RealLen = AlignedStringLen + Size + 1;
+   uint8_t *Mem = static_cast<uint8_t*>(operator new(RealLen, std::nothrow));
+   if (!Mem)
+     return nullptr;
+ 
+   // The name is stored after the class itself.
+-  CopyStringView(Mem + sizeof(MemBuffer), NameRef);
++  CopyStringView(Mem + sizeof(MemBuffer), BufferName);
+ 
+   // The buffer begins after the name and must be aligned.
+   uint8_t *Buf = Mem + AlignedStringLen;
+@@ -426,8 +431,8 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+     MapSize = FileSize;
+   }
+ 
+-  if (shouldUseMmap(FD, FileSize, MapSize, Offset, RequiresNullTerminator,
+-                    PageSize, IsVolatile)) {
++  // Don't use mmap for small files
++  if (MapSize >= 4 * 4096) {
+     std::error_code EC;
+     std::unique_ptr<MB> Result(
+         new (NamedBufferAlloc(Filename)) MemoryBufferMMapFile<MB>(
+@@ -503,7 +508,7 @@ MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
+ }
+ 
+ MemoryBufferRef MemoryBuffer::getMemBufferRef() const {
+-  std::string_view Data = getBuffer();
++  span<const uint8_t> Data = getBuffer();
+   std::string_view Identifier = getBufferIdentifier();
+   return MemoryBufferRef(Data, Identifier);
+ }
+diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
+index a12cd688ac2e..5a6659ad29e3 100644
+--- a/llvm/lib/Support/Windows/WindowsSupport.h
++++ b/llvm/lib/Support/Windows/WindowsSupport.h
+@@ -41,7 +41,11 @@
+ #include <cassert>
+ #include <string>
+ #include <system_error>
++#define WIN32_NO_STATUS
+ #include <windows.h>
++#undef WIN32_NO_STATUS
++#include <winternl.h>
++#include <ntstatus.h>
+ 
+ // Must be included after windows.h
+ #include <wincrypt.h>
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 5d77fd0f29d7..1d3500f92f32 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -38,12 +38,11 @@
+ #include <system_error>
+ 
+ // <fcntl.h> may provide O_BINARY.
+-#if defined(HAVE_FCNTL_H)
+-# include <fcntl.h>
+-#endif
++#include <fcntl.h>
+ 
+-#if defined(HAVE_UNISTD_H)
+-# include <unistd.h>
++#ifndef _WIN32
++#include <unistd.h>
++#include <sys/uio.h>
+ #endif
+ 
+ #if defined(__CYGWIN__)
+@@ -70,6 +69,14 @@
+ 
+ using namespace llvm;
+ 
++namespace {
++// Find the length of an array.
++template <class T, std::size_t N>
++constexpr inline size_t array_lengthof(T (&)[N]) {
++  return N;
++}
++}  // namespace
++
+ raw_ostream::~raw_ostream() {
+   // raw_ostream's subclasses should take care to flush the buffer
+   // in their destructors.
+@@ -302,11 +309,11 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+     return STDOUT_FILENO;
+   }
+ 
+-  fs::file_t FD;
++  fs::file_t F;
+   if (Access & sys::fs::FA_Read)
+-    FD = sys::fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
++    F = sys::fs::OpenFileForReadWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+   else
+-    FD = sys::fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
++    F = sys::fs::OpenFileForWrite(fs::path{std::string_view{Filename.data(), Filename.size()}}, EC, Disp, Flags);
+   if (EC)
+     return -1;
+   int FD = fs::FileToFd(F, EC, Flags);
+diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
+index 5158aa8ad38f..72bc2bcdbb64 100644
+--- a/llvm/unittests/ADT/StringMapTest.cpp
++++ b/llvm/unittests/ADT/StringMapTest.cpp
+@@ -227,7 +227,7 @@ TEST_F(StringMapTest, InsertTest) {
+   testMap.insert(
+       StringMap<uint32_t>::value_type::Create(
+           std::string_view(testKeyFirst, testKeyLength),
+-          testMap.getAllocator(), 1u));
++          1u));
+   assertSingleItemMap();
+ }
+ 
+@@ -444,24 +444,6 @@ TEST(StringMapCustomTest, BracketOperatorCtor) {
+   EXPECT_EQ(0u, CountCtorCopyAndMove::Ctor);
+ }
+ 
+-namespace {
+-struct NonMoveableNonCopyableType {
+-  int Data = 0;
+-  NonMoveableNonCopyableType() = default;
+-  NonMoveableNonCopyableType(int Data) : Data(Data) {}
+-  NonMoveableNonCopyableType(const NonMoveableNonCopyableType &) = delete;
+-  NonMoveableNonCopyableType(NonMoveableNonCopyableType &&) = delete;
+-};
+-}
+-
+-// Test that we can "emplace" an element in the map without involving map/move
+-TEST(StringMapCustomTest, EmplaceTest) {
+-  StringMap<NonMoveableNonCopyableType> Map;
+-  Map.try_emplace("abcd", 42);
+-  EXPECT_EQ(1u, Map.count("abcd"));
+-  EXPECT_EQ(42, Map["abcd"].Data);
+-}
+-
+ // Test that StringMapEntryBase can handle size_t wide sizes.
+ TEST(StringMapCustomTest, StringMapEntryBaseSize) {
+   size_t LargeValue;
+diff --git a/llvm/unittests/Support/ConvertUTFTest.cpp b/llvm/unittests/Support/ConvertUTFTest.cpp
+index 5188ca2e9e29..7a096c98159e 100644
+--- a/llvm/unittests/Support/ConvertUTFTest.cpp
++++ b/llvm/unittests/Support/ConvertUTFTest.cpp
+@@ -7,6 +7,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/Support/ConvertUTF.h"
++#include "wpi/SmallVector.h"
+ #include "gtest/gtest.h"
+ #include <string>
+ #include <vector>
+-- 
+2.20.1.windows.1
+

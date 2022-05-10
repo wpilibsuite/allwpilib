@@ -1,9 +1,8 @@
 //===- llvm/ADT/PointerIntPair.h - Pair for pointer and int -----*- C++ -*-===//
 //
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
 //
@@ -15,6 +14,7 @@
 #define WPIUTIL_WPI_POINTERINTPAIR_H
 
 #include "wpi/PointerLikeTypeTraits.h"
+#include "wpi/type_traits.h"
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -174,12 +174,6 @@ struct PointerIntPairInfo {
     // Preserve all bits other than the ones we are updating.
     return (OrigValue & ~ShiftedIntMask) | IntWord << IntShift;
   }
-};
-
-template <typename T> struct isPodLike;
-template <typename PointerTy, unsigned IntBits, typename IntType>
-struct isPodLike<PointerIntPair<PointerTy, IntBits, IntType>> {
-  static const bool value = true;
 };
 
 // Provide specialization of DenseMapInfo for PointerIntPair.

@@ -1,7 +1,7 @@
-From ae973dadf2b7023ad100ed505ab3a4dcd8c20143 Mon Sep 17 00:00:00 2001
+From eb50b258366fcfeddf81f7c2e35a402a7592a2f8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:07:25 -0400
-Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
+Subject: [PATCH 04/36] Fix warnings for casting, wrap min/max for windows
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
@@ -12,7 +12,7 @@ Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
  5 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 1d2ec4b46a4c..b6ecbca7f6c3 100644
+index dbecf3c658d8..13ac6c508536 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -381,7 +381,7 @@ protected:
@@ -24,7 +24,7 @@ index 1d2ec4b46a4c..b6ecbca7f6c3 100644
    }
  
    void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -806,7 +806,7 @@ public:
+@@ -807,7 +807,7 @@ public:
      // Reduce the number of buckets.
      unsigned NewNumBuckets = 0;
      if (OldNumEntries)
@@ -34,7 +34,7 @@ index 1d2ec4b46a4c..b6ecbca7f6c3 100644
        this->BaseT::initEmpty();
        return;
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index 5d12b424fb37..5ab8907c8f58 100644
+index 5ef6f3ad1b04..99af567d4ef4 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
 @@ -265,7 +265,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
@@ -47,28 +47,28 @@ index 5d12b424fb37..5ab8907c8f58 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 0636abbb1fbf..daa9ee2c47ea 100644
+index 17586904d212..004958a4b321 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -43,7 +43,7 @@ protected:
+@@ -42,7 +42,7 @@ protected:
  
    SmallVectorBase() = delete;
-   SmallVectorBase(void *FirstEl, size_t Capacity)
--      : BeginX(FirstEl), Capacity(Capacity) {}
-+      : BeginX(FirstEl), Capacity(static_cast<unsigned>(Capacity)) {}
+   SmallVectorBase(void *FirstEl, size_t TotalCapacity)
+-      : BeginX(FirstEl), Capacity(TotalCapacity) {}
++      : BeginX(FirstEl), Capacity(static_cast<unsigned>(TotalCapacity)) {}
  
    /// This is an implementation of the grow() method which only works
    /// on POD-like data types and is out of line to reduce code duplication.
-@@ -66,7 +66,7 @@ public:
+@@ -65,7 +65,7 @@ public:
    /// which will only be overwritten.
-   void set_size(size_t Size) {
-     assert(Size <= capacity());
--    this->Size = Size;
-+    this->Size =static_cast<unsigned>(Size);
+   void set_size(size_t N) {
+     assert(N <= capacity());
+-    Size = N;
++    Size = static_cast<unsigned>(N);
    }
  };
  
-@@ -243,7 +243,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
+@@ -236,7 +236,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
  
    // Always grow, even from zero.
    size_t NewCapacity = size_t(NextPowerOf2(this->capacity() + 2));
@@ -77,7 +77,7 @@ index 0636abbb1fbf..daa9ee2c47ea 100644
    T *NewElts = static_cast<T*>(llvm::safe_malloc(NewCapacity*sizeof(T)));
  
    // Move the elements over.
-@@ -257,7 +257,7 @@ void SmallVectorTemplateBase<T, isPodLike>::grow(size_t MinSize) {
+@@ -250,7 +250,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
      free(this->begin());
  
    this->BeginX = NewElts;
@@ -85,12 +85,12 @@ index 0636abbb1fbf..daa9ee2c47ea 100644
 +  this->Capacity = static_cast<unsigned>(NewCapacity);
  }
  
- 
+ /// SmallVectorTemplateBase<TriviallyCopyable = true> - This is where we put
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 6ae56c2470bb..617851c806fe 100644
+index 1add185330fa..c83ba81fa2e2 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -110,7 +110,7 @@ namespace llvm {
+@@ -109,7 +109,7 @@ namespace llvm {
  typedef unsigned int    UTF32;  /* at least 32 bits */
  typedef unsigned short  UTF16;  /* at least 16 bits */
  typedef unsigned char   UTF8;   /* typically 8 bits */
@@ -100,19 +100,19 @@ index 6ae56c2470bb..617851c806fe 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index b59f21b4998e..4cf6c0e08cf1 100644
+index 249139e824b5..e20f0dc8b774 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -61,7 +61,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
+@@ -60,7 +60,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
      // Bisection method.
-     std::size_t ZeroBits = 0;
+     unsigned ZeroBits = 0;
      T Shift = std::numeric_limits<T>::digits >> 1;
 -    T Mask = std::numeric_limits<T>::max() >> Shift;
 +    T Mask = (std::numeric_limits<T>::max)() >> Shift;
      while (Shift) {
        if ((Val & Mask) == 0) {
          Val >>= Shift;
-@@ -202,7 +202,7 @@ std::size_t countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+@@ -201,7 +201,7 @@ unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
  ///   valid arguments.
  template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -121,7 +121,7 @@ index b59f21b4998e..4cf6c0e08cf1 100644
  
    return countTrailingZeros(Val, ZB_Undefined);
  }
-@@ -243,7 +243,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
+@@ -242,7 +242,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
  ///   valid arguments.
  template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -130,7 +130,7 @@ index b59f21b4998e..4cf6c0e08cf1 100644
  
    // Use ^ instead of - because both gcc and llvm can remove the associated ^
    // in the __builtin_clz intrinsic on x86.
-@@ -537,26 +537,26 @@ inline double Log2(double Value) {
+@@ -536,26 +536,26 @@ inline double Log2(double Value) {
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {
@@ -161,7 +161,7 @@ index b59f21b4998e..4cf6c0e08cf1 100644
  }
  
  /// Return the greatest common divisor of the values using Euclid's algorithm.
-@@ -765,7 +765,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
+@@ -769,7 +769,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
  template <typename T>
  typename std::enable_if<std::is_unsigned<T>::value, T>::type
  AbsoluteDifference(T X, T Y) {
@@ -170,7 +170,7 @@ index b59f21b4998e..4cf6c0e08cf1 100644
  }
  
  /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
-@@ -780,7 +780,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -784,7 +784,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
    T Z = X + Y;
    Overflowed = (Z < X || Z < Y);
    if (Overflowed)
@@ -179,7 +179,7 @@ index b59f21b4998e..4cf6c0e08cf1 100644
    else
      return Z;
  }
-@@ -805,7 +805,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -809,7 +809,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
    // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
    // will necessarily be less than Log2Max as desired.
    int Log2Z = Log2_64(X) + Log2_64(Y);

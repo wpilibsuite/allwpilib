@@ -1,0 +1,48 @@
+From 42cad4555deb0c77163c999f330c487d1c2873c4 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 23:59:44 -0400
+Subject: [PATCH 26/36] c++20 macro updates
+
+---
+ llvm/include/llvm/Support/Compiler.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
+index a567f8423526..790203058a27 100644
+--- a/llvm/include/llvm/Support/Compiler.h
++++ b/llvm/include/llvm/Support/Compiler.h
+@@ -133,6 +133,11 @@
+ #ifndef LLVM_NODISCARD
+ #if __cplusplus > 201402L && __has_cpp_attribute(nodiscard)
+ #define LLVM_NODISCARD [[nodiscard]]
++// Detect MSVC directly, since __cplusplus still defaults to old version
++#elif _MSVC_LANG >= 201703L
++#define LLVM_NODISCARD [[nodiscard]]
++#elif _MSC_VER
++#define LLVM_NODISCARD
+ #elif !__cplusplus
+ // Workaround for llvm.org/PR23435, since clang 3.6 and below emit a spurious
+ // error when __has_cpp_attribute is given a scoped attribute in C mode.
+@@ -273,6 +278,11 @@
+ #ifndef LLVM_FALLTHROUGH
+ #if __cplusplus > 201402L && __has_cpp_attribute(fallthrough)
+ #define LLVM_FALLTHROUGH [[fallthrough]]
++// Detect MSVC directly, since __cplusplus still defaults to old version
++#elif _MSVC_LANG >= 201703L
++#define LLVM_FALLTHROUGH [[fallthrough]]
++#elif _MSC_VER
++#define LLVM_FALLTHROUGH
+ #elif __has_cpp_attribute(gnu::fallthrough)
+ #define LLVM_FALLTHROUGH [[gnu::fallthrough]]
+ #elif !__cplusplus
+@@ -567,6 +577,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+ // we only need the restricted functionality that provides.
+ #define LLVM_THREAD_LOCAL __thread
+ #endif
++#endif
+ 
+ namespace llvm {
+ 
+-- 
+2.20.1.windows.1
+

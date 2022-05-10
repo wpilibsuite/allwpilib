@@ -1,7 +1,7 @@
-From 01b18092ee9a39176d26d92f4f6b0fca2859dcc3 Mon Sep 17 00:00:00 2001
+From f15b9f1df0514ddf542e5451d3ab1aab57f25f77 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:50:32 -0400
-Subject: [PATCH 09/37] Prefer scoped lock, wpi mutex
+Subject: [PATCH 09/36] Prefer scoped lock, wpi mutex
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 12 ++++++------
@@ -9,10 +9,10 @@ Subject: [PATCH 09/37] Prefer scoped lock, wpi mutex
  2 files changed, 13 insertions(+), 23 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 7408aa47cae8..a738af664d22 100644
+index 9fffa96602db..e8f2621fa3a5 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -61,14 +61,14 @@ static std::mutex BadAllocErrorHandlerMutex;
+@@ -60,14 +60,14 @@ static std::mutex BadAllocErrorHandlerMutex;
  
  void llvm::install_fatal_error_handler(fatal_error_handler_t handler,
                                         void *user_data) {
@@ -29,7 +29,7 @@ index 7408aa47cae8..a738af664d22 100644
    ErrorHandler = nullptr;
    ErrorHandlerUserData = nullptr;
  }
-@@ -91,7 +91,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -90,7 +90,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -38,7 +38,7 @@ index 7408aa47cae8..a738af664d22 100644
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -120,14 +120,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -119,14 +119,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
@@ -55,7 +55,7 @@ index 7408aa47cae8..a738af664d22 100644
    BadAllocErrorHandler = nullptr;
    BadAllocErrorHandlerUserData = nullptr;
  }
-@@ -138,7 +138,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -137,7 +137,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -65,10 +65,10 @@ index 7408aa47cae8..a738af664d22 100644
      HandlerData = BadAllocErrorHandlerUserData;
    }
 diff --git a/llvm/lib/Support/ManagedStatic.cpp b/llvm/lib/Support/ManagedStatic.cpp
-index 74f71a385027..283231897773 100644
+index 28ceb1a70e42..bf7e0074d26e 100644
 --- a/llvm/lib/Support/ManagedStatic.cpp
 +++ b/llvm/lib/Support/ManagedStatic.cpp
-@@ -13,21 +13,20 @@
+@@ -12,21 +12,20 @@
  
  #include "llvm/Support/ManagedStatic.h"
  #include "llvm/Config/config.h"
@@ -95,7 +95,7 @@ index 74f71a385027..283231897773 100644
    llvm::call_once(mutex_init_flag, initializeMutex);
    return ManagedStaticMutex;
  }
-@@ -36,7 +35,7 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
+@@ -35,7 +34,7 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
                                                void (*Deleter)(void*)) const {
    assert(Creator);
    if (llvm_is_multithreaded()) {
@@ -104,7 +104,7 @@ index 74f71a385027..283231897773 100644
  
      if (!Ptr.load(std::memory_order_relaxed)) {
        void *Tmp = Creator();
-@@ -48,15 +47,6 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
+@@ -47,15 +46,6 @@ void ManagedStaticBase::RegisterManagedStatic(void *(*Creator)(),
        Next = StaticList;
        StaticList = this;
      }
@@ -120,7 +120,7 @@ index 74f71a385027..283231897773 100644
    }
  }
  
-@@ -78,7 +68,7 @@ void ManagedStaticBase::destroy() const {
+@@ -77,7 +67,7 @@ void ManagedStaticBase::destroy() const {
  
  /// llvm_shutdown - Deallocate and destroy all ManagedStatic variables.
  void llvm::llvm_shutdown() {

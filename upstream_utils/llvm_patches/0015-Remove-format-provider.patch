@@ -1,7 +1,7 @@
-From 82ee905755fa39d0ff059e61e3c66be5e7c8a86c Mon Sep 17 00:00:00 2001
+From b26537d98000d9768d30dad2d037e36aac17676c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:08:59 -0400
-Subject: [PATCH 15/37] Remove format provider
+Subject: [PATCH 15/36] Remove format provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ----------
@@ -11,10 +11,10 @@ Subject: [PATCH 15/37] Remove format provider
  4 files changed, 497 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 13518b48e7f8..3de6323f61f3 100644
+index 29a3e0873792..06829d1fbe14 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
-@@ -11,7 +11,6 @@
+@@ -10,7 +10,6 @@
  #define LLVM_SUPPORT_CHRONO_H
  
  #include "llvm/Support/Compiler.h"
@@ -22,7 +22,7 @@ index 13518b48e7f8..3de6323f61f3 100644
  
  #include <chrono>
  #include <ctime>
-@@ -59,114 +58,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
+@@ -58,114 +57,6 @@ toTimePoint(std::time_t T, uint32_t nsec) {
  
  raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
  
@@ -138,10 +138,10 @@ index 13518b48e7f8..3de6323f61f3 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 47fa577cddd9..d766f8e38cce 100644
+index 141e624dd6b9..ad9c6849a712 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -26,12 +26,6 @@
+@@ -25,12 +25,6 @@
  
  namespace llvm {
  
@@ -154,7 +154,7 @@ index 47fa577cddd9..d766f8e38cce 100644
  namespace sys {
  namespace fs {
  enum FileAccess : unsigned;
-@@ -212,29 +206,6 @@ public:
+@@ -211,29 +205,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -184,7 +184,7 @@ index 47fa577cddd9..d766f8e38cce 100644
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -242,21 +213,6 @@ public:
+@@ -241,21 +212,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -206,7 +206,7 @@ index 47fa577cddd9..d766f8e38cce 100644
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -449,16 +405,6 @@ public:
+@@ -448,16 +404,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -224,10 +224,10 @@ index 47fa577cddd9..d766f8e38cce 100644
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index c573652d6bd7..93c2866caace 100644
+index b85866c3b78d..cd0e1f631e1f 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -109,41 +109,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+@@ -108,41 +108,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
    assert(OutBufStart <= OutBufEnd && "Invalid size!");
  }
  
@@ -269,7 +269,7 @@ index c573652d6bd7..93c2866caace 100644
  raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
-@@ -184,16 +149,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -183,16 +148,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -286,7 +286,7 @@ index c573652d6bd7..93c2866caace 100644
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -283,176 +238,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
+@@ -282,176 +237,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
    OutBufCur += Size;
  }
  
@@ -463,7 +463,7 @@ index c573652d6bd7..93c2866caace 100644
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
    static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
-@@ -486,14 +271,6 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+@@ -485,14 +270,6 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
  
  void raw_ostream::anchor() {}
  
@@ -478,7 +478,7 @@ index c573652d6bd7..93c2866caace 100644
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -783,56 +560,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -782,56 +559,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
@@ -536,10 +536,10 @@ index c573652d6bd7..93c2866caace 100644
  
  //===----------------------------------------------------------------------===//
 diff --git a/llvm/unittests/Support/Chrono.cpp b/llvm/unittests/Support/Chrono.cpp
-index a6b76c81a9c0..ae1e4b79531b 100644
+index 9a08a5c1bfdf..3c049de18c0a 100644
 --- a/llvm/unittests/Support/Chrono.cpp
 +++ b/llvm/unittests/Support/Chrono.cpp
-@@ -31,37 +31,6 @@ TEST(Chrono, TimeTConversion) {
+@@ -30,37 +30,6 @@ TEST(Chrono, TimeTConversion) {
    EXPECT_EQ(TP, toTimePoint(toTimeT(TP)));
  }
  
@@ -577,7 +577,7 @@ index a6b76c81a9c0..ae1e4b79531b 100644
  // Test that toTimePoint and toTimeT can be called with a arguments with varying
  // precisions.
  TEST(Chrono, ImplicitConversions) {
-@@ -79,34 +48,4 @@ TEST(Chrono, ImplicitConversions) {
+@@ -78,34 +47,4 @@ TEST(Chrono, ImplicitConversions) {
    EXPECT_EQ(TimeT, toTimeT(Nano));
  }
  

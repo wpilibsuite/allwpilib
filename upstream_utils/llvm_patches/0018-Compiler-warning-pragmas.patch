@@ -1,7 +1,7 @@
-From 1f840051411175fc6ce6018b19b006893f6e8f30 Mon Sep 17 00:00:00 2001
+From 6ab5217730bb8150a296b9e490cd4fc031889c14 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:42:42 -0400
-Subject: [PATCH 18/37] Compiler warning pragmas
+Subject: [PATCH 18/36] Compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++
@@ -17,10 +17,10 @@ Subject: [PATCH 18/37] Compiler warning pragmas
  10 files changed, 77 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 76ad3b319d7a..c7d8d12fd3d3 100644
+index 01878e990a0c..6b3a1b4d989a 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -42,6 +42,12 @@ namespace llvm {
+@@ -41,6 +41,12 @@ namespace llvm {
  
  template <typename FunctionT> class unique_function;
  
@@ -33,7 +33,7 @@ index 76ad3b319d7a..c7d8d12fd3d3 100644
  template <typename ReturnT, typename... ParamTs>
  class unique_function<ReturnT(ParamTs...)> {
    static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
-@@ -288,6 +294,10 @@ public:
+@@ -287,6 +293,10 @@ public:
    }
  };
  
@@ -45,10 +45,10 @@ index 76ad3b319d7a..c7d8d12fd3d3 100644
  
  #endif // LLVM_ADT_FUNCTION_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 658cfdd40c1b..cd78678bee54 100644
+index f840d1e4ea8b..523096a52eaf 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -55,6 +55,11 @@
+@@ -54,6 +54,11 @@
  #include <string>
  #include <utility>
  
@@ -60,7 +60,7 @@ index 658cfdd40c1b..cd78678bee54 100644
  namespace llvm {
  
  /// An opaque object representing a hash code.
-@@ -657,4 +662,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -656,4 +661,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
  
  } // namespace llvm
  
@@ -70,10 +70,10 @@ index 658cfdd40c1b..cd78678bee54 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index daa9ee2c47ea..9d3142911c03 100644
+index 87381d536700..8ac4de0512a9 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -14,6 +14,14 @@
+@@ -13,6 +13,14 @@
  #ifndef LLVM_ADT_SMALLVECTOR_H
  #define LLVM_ADT_SMALLVECTOR_H
  
@@ -89,10 +89,10 @@ index daa9ee2c47ea..9d3142911c03 100644
  #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 4f0a28dd8490..2188f701f924 100644
+index 134f3c3bbe38..d356733d4792 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -373,6 +373,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+@@ -372,6 +372,11 @@ inline uint64_t maxUIntN(uint64_t N) {
    return UINT64_MAX >> (64 - N);
  }
  
@@ -104,7 +104,7 @@ index 4f0a28dd8490..2188f701f924 100644
  /// Gets the minimum value for a N-bit signed integer.
  inline int64_t minIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
-@@ -380,6 +385,10 @@ inline int64_t minIntN(int64_t N) {
+@@ -379,6 +384,10 @@ inline int64_t minIntN(int64_t N) {
    return -(UINT64_C(1)<<(N-1));
  }
  
@@ -116,10 +116,10 @@ index 4f0a28dd8490..2188f701f924 100644
  inline int64_t maxIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
 diff --git a/llvm/include/llvm/Support/MemAlloc.h b/llvm/include/llvm/Support/MemAlloc.h
-index d06c659cfba6..70ef40514838 100644
+index 0e5869141fd3..4cec468a8c8c 100644
 --- a/llvm/include/llvm/Support/MemAlloc.h
 +++ b/llvm/include/llvm/Support/MemAlloc.h
-@@ -23,6 +23,14 @@
+@@ -22,6 +22,14 @@
  
  namespace llvm {
  
@@ -133,8 +133,8 @@ index d06c659cfba6..70ef40514838 100644
 +
  LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_malloc(size_t Sz) {
    void *Result = std::malloc(Sz);
-   if (Result == nullptr)
-@@ -45,5 +53,9 @@ LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_realloc(void *Ptr, size_t Sz) {
+   if (Result == nullptr) {
+@@ -62,5 +70,9 @@ LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_realloc(void *Ptr, size_t Sz) {
    return Result;
  }
  
@@ -145,10 +145,10 @@ index d06c659cfba6..70ef40514838 100644
  }
  #endif
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 4a87be65256f..8df224fad27e 100644
+index 431f7e5c040f..e97efae32c5e 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -12,6 +12,17 @@
+@@ -11,6 +11,17 @@
  //===----------------------------------------------------------------------===//
  
  #include "llvm/Support/MemoryBuffer.h"
@@ -167,10 +167,10 @@ index 4a87be65256f..8df224fad27e 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Errc.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 93c2866caace..5f94646993fc 100644
+index cd0e1f631e1f..39de2852c468 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -11,6 +11,10 @@
+@@ -10,6 +10,10 @@
  //
  //===----------------------------------------------------------------------===//
  
@@ -182,10 +182,10 @@ index 93c2866caace..5f94646993fc 100644
  #include "llvm/ADT/STLExtras.h"
  #include "llvm/ADT/SmallVector.h"
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index a53448b8d938..5b5bc4238366 100644
+index f7e5812f2e99..511642b60516 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
-@@ -7,6 +7,13 @@
+@@ -6,6 +6,13 @@
  //
  //===----------------------------------------------------------------------===//
  
@@ -200,10 +200,10 @@ index a53448b8d938..5b5bc4238366 100644
  #include "llvm/ADT/iterator_range.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 069c8d65e91d..19da97d72dfc 100644
+index 61682b50dea2..8be4575eaa7e 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
-@@ -18,6 +18,10 @@
+@@ -17,6 +17,10 @@
  #include <list>
  #include <stdarg.h>
  
@@ -215,10 +215,10 @@ index 069c8d65e91d..19da97d72dfc 100644
  
  namespace {
 diff --git a/llvm/unittests/Support/AlignOfTest.cpp b/llvm/unittests/Support/AlignOfTest.cpp
-index 388ca11b7769..290b7b2ec267 100644
+index 94c6f5a0f53f..48d081d98a99 100644
 --- a/llvm/unittests/Support/AlignOfTest.cpp
 +++ b/llvm/unittests/Support/AlignOfTest.cpp
-@@ -32,10 +32,9 @@ namespace {
+@@ -31,10 +31,9 @@ namespace {
  #pragma clang diagnostic ignored "-Wunknown-pragmas"
  #pragma clang diagnostic ignored "-Winaccessible-base"
  #elif ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402

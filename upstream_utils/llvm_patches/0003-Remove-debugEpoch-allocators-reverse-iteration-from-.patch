@@ -1,7 +1,7 @@
-From 165e0950f0bf05bae728e347b64b259618ef8574 Mon Sep 17 00:00:00 2001
+From 073eae2cbb9e48d3173582aeecade805e19f4924 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:58:29 -0400
-Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
+Subject: [PATCH 03/36] Remove debugEpoch, allocators, reverse iteration from
  collections
 
 ---
@@ -12,10 +12,10 @@ Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
  4 files changed, 18 insertions(+), 101 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 1f50502fff92..1d2ec4b46a4c 100644
+index a05cf8130d3c..dbecf3c658d8 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -102,8 +102,6 @@ public:
+@@ -101,8 +101,6 @@ public:
      // empty buckets.
      if (empty())
        return end();
@@ -24,7 +24,7 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      return makeIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline iterator end() {
-@@ -112,8 +110,6 @@ public:
+@@ -111,8 +109,6 @@ public:
    inline const_iterator begin() const {
      if (empty())
        return end();
@@ -33,7 +33,7 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      return makeConstIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline const_iterator end() const {
-@@ -459,20 +455,12 @@ private:
+@@ -460,20 +456,12 @@ private:
    iterator makeIterator(BucketT *P, BucketT *E,
                          DebugEpochBase &Epoch,
                          bool NoAdvance=false) {
@@ -54,7 +54,7 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      return const_iterator(P, E, Epoch, NoAdvance);
    }
  
-@@ -1201,10 +1189,6 @@ public:
+@@ -1202,10 +1190,6 @@ public:
      assert(isHandleInSync() && "invalid construction!");
  
      if (NoAdvance) return;
@@ -65,7 +65,7 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      AdvancePastEmptyBuckets();
    }
  
-@@ -1219,14 +1203,10 @@ public:
+@@ -1220,14 +1204,10 @@ public:
  
    reference operator*() const {
      assert(isHandleInSync() && "invalid iterator access!");
@@ -80,7 +80,7 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      return Ptr;
    }
  
-@@ -1247,11 +1227,6 @@ public:
+@@ -1248,11 +1228,6 @@ public:
  
    inline DenseMapIterator& operator++() {  // Preincrement
      assert(isHandleInSync() && "invalid iterator access!");
@@ -93,10 +93,10 @@ index 1f50502fff92..1d2ec4b46a4c 100644
      AdvancePastEmptyBuckets();
      return *this;
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index db08e40257ba..d326a43a34ec 100644
+index 913518230d2d..32a69e55d509 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
-@@ -15,7 +15,6 @@
+@@ -14,7 +14,6 @@
  #ifndef LLVM_ADT_SMALLPTRSET_H
  #define LLVM_ADT_SMALLPTRSET_H
  
@@ -104,7 +104,7 @@ index db08e40257ba..d326a43a34ec 100644
  #include "llvm/Support/Compiler.h"
  #include "llvm/Support/ReverseIteration.h"
  #include "llvm/Support/type_traits.h"
-@@ -47,7 +46,7 @@ namespace llvm {
+@@ -46,7 +45,7 @@ namespace llvm {
  /// (-2), to allow deletion.  The hash table is resized when the table is 3/4 or
  /// more.  When this happens, the table is doubled in size.
  ///
@@ -113,7 +113,7 @@ index db08e40257ba..d326a43a34ec 100644
    friend class SmallPtrSetIteratorImpl;
  
  protected:
-@@ -93,7 +92,6 @@ public:
+@@ -92,7 +91,6 @@ public:
    size_type size() const { return NumNonEmpty - NumTombstones; }
  
    void clear() {
@@ -121,7 +121,7 @@ index db08e40257ba..d326a43a34ec 100644
      // If the capacity of the array is huge, and the # elements used is small,
      // shrink the array.
      if (!isSmall()) {
-@@ -140,14 +138,12 @@ protected:
+@@ -139,14 +137,12 @@ protected:
        if (LastTombstone != nullptr) {
          *LastTombstone = Ptr;
          --NumTombstones;
@@ -136,7 +136,7 @@ index db08e40257ba..d326a43a34ec 100644
          return std::make_pair(SmallArray + (NumNonEmpty - 1), true);
        }
        // Otherwise, hit the big set case, which will call grow.
-@@ -227,10 +223,6 @@ protected:
+@@ -226,10 +222,6 @@ protected:
  public:
    explicit SmallPtrSetIteratorImpl(const void *const *BP, const void*const *E)
      : Bucket(BP), End(E) {
@@ -147,7 +147,7 @@ index db08e40257ba..d326a43a34ec 100644
      AdvanceIfNotValid();
    }
  
-@@ -264,8 +256,7 @@ protected:
+@@ -263,8 +255,7 @@ protected:
  
  /// SmallPtrSetIterator - This implements a const_iterator for SmallPtrSet.
  template <typename PtrTy>
@@ -157,7 +157,7 @@ index db08e40257ba..d326a43a34ec 100644
    using PtrTraits = PointerLikeTypeTraits<PtrTy>;
  
  public:
-@@ -275,29 +266,17 @@ public:
+@@ -274,29 +265,17 @@ public:
    using difference_type = std::ptrdiff_t;
    using iterator_category = std::forward_iterator_tag;
  
@@ -189,7 +189,7 @@ index db08e40257ba..d326a43a34ec 100644
      ++Bucket;
      AdvanceIfNotValid();
      return *this;
-@@ -395,8 +374,6 @@ public:
+@@ -394,8 +373,6 @@ public:
    }
  
    iterator begin() const {
@@ -198,7 +198,7 @@ index db08e40257ba..d326a43a34ec 100644
      return makeIterator(CurArray);
    }
    iterator end() const { return makeIterator(EndPointer()); }
-@@ -404,9 +381,7 @@ public:
+@@ -403,9 +380,7 @@ public:
  private:
    /// Create an iterator that dereferences to same place as the given pointer.
    iterator makeIterator(const void *const *P) const {
@@ -210,10 +210,10 @@ index db08e40257ba..d326a43a34ec 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index a9f83d3f5091..13c19d381155 100644
+index 8a586fc26709..78c188e0ce0f 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -152,19 +152,16 @@ public:
+@@ -151,19 +151,16 @@ public:
  
    /// Create a StringMapEntry for the specified key construct the value using
    /// \p InitiVals.
@@ -236,7 +236,7 @@ index a9f83d3f5091..13c19d381155 100644
  
      // Construct the value.
      new (NewItem) StringMapEntry(KeyLength, std::forward<InitTy>(InitVals)...);
-@@ -177,13 +174,6 @@ public:
+@@ -176,13 +173,6 @@ public:
      return NewItem;
    }
  
@@ -250,7 +250,7 @@ index a9f83d3f5091..13c19d381155 100644
    static StringMapEntry *Create(StringRef Key) {
      return Create(Key, ValueTy());
    }
-@@ -197,18 +187,10 @@ public:
+@@ -196,18 +186,10 @@ public:
  
    /// Destroy - Destroy this StringMapEntry, releasing memory back to the
    /// specified allocator.
@@ -271,7 +271,7 @@ index a9f83d3f5091..13c19d381155 100644
    }
  };
  
-@@ -216,10 +198,8 @@ public:
+@@ -215,10 +197,8 @@ public:
  /// keys that are "strings", which are basically ranges of bytes. This does some
  /// funky memory allocation and hashing things to make it extremely efficient,
  /// storing the string data *after* the value in the map.
@@ -283,7 +283,7 @@ index a9f83d3f5091..13c19d381155 100644
  public:
    using MapEntryTy = StringMapEntry<ValueTy>;
  
-@@ -228,13 +208,6 @@ public:
+@@ -227,13 +207,6 @@ public:
    explicit StringMap(unsigned InitialSize)
      : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
  
@@ -297,7 +297,7 @@ index a9f83d3f5091..13c19d381155 100644
    StringMap(std::initializer_list<std::pair<StringRef, ValueTy>> List)
        : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
      for (const auto &P : List) {
-@@ -243,11 +216,10 @@ public:
+@@ -242,11 +215,10 @@ public:
    }
  
    StringMap(StringMap &&RHS)
@@ -311,7 +311,7 @@ index a9f83d3f5091..13c19d381155 100644
      if (RHS.empty())
        return;
  
-@@ -267,7 +239,7 @@ public:
+@@ -266,7 +238,7 @@ public:
        }
  
        TheTable[I] = MapEntryTy::Create(
@@ -320,7 +320,7 @@ index a9f83d3f5091..13c19d381155 100644
            static_cast<MapEntryTy *>(Bucket)->getValue());
        HashTable[I] = RHSHashTable[I];
      }
-@@ -282,7 +254,6 @@ public:
+@@ -281,7 +253,6 @@ public:
  
    StringMap &operator=(StringMap RHS) {
      StringMapImpl::swap(RHS);
@@ -328,7 +328,7 @@ index a9f83d3f5091..13c19d381155 100644
      return *this;
    }
  
-@@ -294,16 +265,13 @@ public:
+@@ -293,16 +264,13 @@ public:
        for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
          StringMapEntryBase *Bucket = TheTable[I];
          if (Bucket && Bucket != getTombstoneVal()) {
@@ -346,7 +346,7 @@ index a9f83d3f5091..13c19d381155 100644
    using key_type = const char*;
    using mapped_type = ValueTy;
    using value_type = StringMapEntry<ValueTy>;
-@@ -401,7 +369,7 @@ public:
+@@ -405,7 +373,7 @@ public:
  
      if (Bucket == getTombstoneVal())
        --NumTombstones;
@@ -355,7 +355,7 @@ index a9f83d3f5091..13c19d381155 100644
      ++NumItems;
      assert(NumItems + NumTombstones <= NumBuckets);
  
-@@ -418,7 +386,7 @@ public:
+@@ -422,7 +390,7 @@ public:
      for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
        StringMapEntryBase *&Bucket = TheTable[I];
        if (Bucket && Bucket != getTombstoneVal()) {
@@ -364,7 +364,7 @@ index a9f83d3f5091..13c19d381155 100644
        }
        Bucket = nullptr;
      }
-@@ -436,7 +404,7 @@ public:
+@@ -440,7 +408,7 @@ public:
    void erase(iterator I) {
      MapEntryTy &V = *I;
      remove(&V);
@@ -374,10 +374,10 @@ index a9f83d3f5091..13c19d381155 100644
  
    bool erase(StringRef Key) {
 diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
-index fed4a17d6635..8b8318c7a946 100644
+index f60464c8e756..930ebdde2cc1 100644
 --- a/llvm/lib/Support/SmallPtrSet.cpp
 +++ b/llvm/lib/Support/SmallPtrSet.cpp
-@@ -59,7 +59,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
+@@ -58,7 +58,6 @@ SmallPtrSetImplBase::insert_imp_big(const void *Ptr) {
    else
      ++NumNonEmpty; // Track density.
    *Bucket = Ptr;

@@ -1,7 +1,7 @@
-From 6616e895807014574497d8551ec0fd2e11e97ce8 Mon Sep 17 00:00:00 2001
+From 3a8e3b98e9ed24036de5586d7b5f715ffed0f508 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:53:22 -0400
-Subject: [PATCH 01/37] Fix spelling errors
+Subject: [PATCH 01/36] Fix spelling errors
 
 ---
  llvm/include/llvm/Support/Chrono.h        | 2 +-
@@ -10,10 +10,10 @@ Subject: [PATCH 01/37] Fix spelling errors
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 57677e8d5cf1..13518b48e7f8 100644
+index 334ab60835a4..29a3e0873792 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
-@@ -23,7 +23,7 @@ class raw_ostream;
+@@ -22,7 +22,7 @@ class raw_ostream;
  namespace sys {
  
  /// A time point on the system clock. This is provided for two reasons:
@@ -23,10 +23,10 @@ index 57677e8d5cf1..13518b48e7f8 100644
  ///   platforms).
  /// - to shorten the type name
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index fec39e59a717..aff57de458cc 100644
+index f75c2984a9ff..851537ddde39 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
-@@ -46,7 +46,7 @@ class StringRef;
+@@ -45,7 +45,7 @@ class StringRef;
    void install_fatal_error_handler(fatal_error_handler_t handler,
                                     void *user_data = nullptr);
  
@@ -36,10 +36,10 @@ index fec39e59a717..aff57de458cc 100644
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 8933295d4ea4..c1a8de5b65d0 100644
+index b5196cd84cb4..aef1d6798dc8 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -201,7 +201,7 @@ public:
+@@ -200,7 +200,7 @@ public:
  private:
    // Hide these base class factory function so one can't write
    //   WritableMemoryBuffer::getXXX()
@@ -48,7 +48,7 @@ index 8933295d4ea4..c1a8de5b65d0 100644
    using MemoryBuffer::getFileAsStream;
    using MemoryBuffer::getFileOrSTDIN;
    using MemoryBuffer::getMemBuffer;
-@@ -249,7 +249,7 @@ public:
+@@ -248,7 +248,7 @@ public:
  private:
    // Hide these base class factory function so one can't write
    //   WritableMemoryBuffer::getXXX()

@@ -1,7 +1,7 @@
-From b4495a065bde2effaac669961252e3c0db22b36e Mon Sep 17 00:00:00 2001
+From 09d8607b2c6ca06653efb642062abd277a7a1bbc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:50:29 -0400
-Subject: [PATCH 02/37] Completly overwrite string extras
+Subject: [PATCH 02/36] Completly overwrite string extras
 
 ---
  llvm/include/llvm/ADT/StringExtras.h | 893 ++++++++++++++++++---------
@@ -9,10 +9,10 @@ Subject: [PATCH 02/37] Completly overwrite string extras
  2 files changed, 921 insertions(+), 359 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringExtras.h b/llvm/include/llvm/ADT/StringExtras.h
-index 60a03633a8a6..97b5695866cd 100644
+index 16ac90bd6c89..22fd07597f8a 100644
 --- a/llvm/include/llvm/ADT/StringExtras.h
 +++ b/llvm/include/llvm/ADT/StringExtras.h
-@@ -11,90 +11,60 @@
+@@ -10,90 +10,60 @@
  //
  //===----------------------------------------------------------------------===//
  
@@ -121,7 +121,7 @@ index 60a03633a8a6..97b5695866cd 100644
        return false;
    return true;
  }
-@@ -103,26 +73,26 @@ inline bool isASCII(llvm::StringRef S) {
+@@ -102,26 +72,26 @@ inline bool isASCII(llvm::StringRef S) {
  ///
  /// Locale-independent version of the C standard library isprint whose results
  /// may differ on different platforms.
@@ -152,7 +152,7 @@ index 60a03633a8a6..97b5695866cd 100644
    char Buffer[17];
    char *BufPtr = std::end(Buffer);
  
-@@ -137,266 +107,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
+@@ -136,266 +106,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
    return std::string(BufPtr, std::end(Buffer));
  }
  
@@ -993,10 +993,10 @@ index 60a03633a8a6..97b5695866cd 100644
 +
 +#endif // WPIUTIL_WPI_STRINGEXTRAS_H
 diff --git a/llvm/lib/Support/StringExtras.cpp b/llvm/lib/Support/StringExtras.cpp
-index 386d74a47983..25df66fde3b7 100644
+index bf28b2be5657..a65d763d6900 100644
 --- a/llvm/lib/Support/StringExtras.cpp
 +++ b/llvm/lib/Support/StringExtras.cpp
-@@ -11,81 +11,346 @@
+@@ -10,81 +10,346 @@
  //
  //===----------------------------------------------------------------------===//
  
