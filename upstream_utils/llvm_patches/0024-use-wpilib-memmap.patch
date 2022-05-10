@@ -1,4 +1,4 @@
-From 0e307e5176214eaa0dc8d86b3b15b0b3f7370a34 Mon Sep 17 00:00:00 2001
+From 55a9c67ad158f544695de9a357d9226b126fd325 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:13:45 -0400
 Subject: [PATCH 24/36] use wpilib memmap
@@ -95,7 +95,7 @@ index a592849d484f..f0fc3b44c6f1 100644
  
  #endif // LLVM_SUPPORT_MEMORYBUFFER_H
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index b9ff5958532c..a8de13a928ea 100644
+index 1762199b5136..df18f4a282ab 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -150,17 +150,6 @@ MemoryBuffer::getMemBufferCopy(span<const uint8_t> InputData, std::string_view B
@@ -157,7 +157,7 @@ index b9ff5958532c..a8de13a928ea 100644
      if (!EC) {
        const uint8_t *Start = getStart(Len, Offset);
        MemoryBuffer::init(Start, Start + Len, RequiresNullTerminator);
-@@ -313,61 +313,6 @@ WritableMemoryBuffer::getNewMemBuffer(size_t Size, std::string_view BufferName)
+@@ -315,61 +315,6 @@ WritableMemoryBuffer::getNewMemBuffer(size_t Size, std::string_view BufferName)
    return SB;
  }
  
@@ -219,7 +219,7 @@ index b9ff5958532c..a8de13a928ea 100644
  static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
  getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
                   uint64_t Offset) {
-@@ -425,8 +370,6 @@ static ErrorOr<std::unique_ptr<MB>>
+@@ -427,8 +372,6 @@ static ErrorOr<std::unique_ptr<MB>>
  getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize,
                  uint64_t MapSize, int64_t Offset, bool RequiresNullTerminator,
                  bool IsVolatile) {
@@ -228,7 +228,7 @@ index b9ff5958532c..a8de13a928ea 100644
    // Default is to map the full file.
    if (MapSize == uint64_t(-1)) {
      // If we don't know the file size, use fstat to find out.  fstat on an open
-@@ -487,16 +430,6 @@ MemoryBuffer::getOpenFileSlice(sys::fs::file_t FD, std::string_view Filename, ui
+@@ -502,16 +445,6 @@ MemoryBuffer::getOpenFileSlice(sys::fs::file_t FD, std::string_view Filename, ui
                                         IsVolatile);
  }
  

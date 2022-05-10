@@ -1,4 +1,4 @@
-From d975f836aa98d8a4a001c0c667ed33d6598c19cd Mon Sep 17 00:00:00 2001
+From 015012f4226638685745bb5e6d4185d56e59978c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:57:38 -0400
 Subject: [PATCH 13/36] Prefer fmtlib
@@ -8,10 +8,10 @@ Subject: [PATCH 13/36] Prefer fmtlib
  1 file changed, 6 insertions(+), 14 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 165b57b2f5a4..c7dd696b7288 100644
+index 383a046a9d56..c4b9c67c99e7 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -21,7 +21,7 @@
+@@ -22,7 +22,7 @@
  #include "llvm/Support/Signals.h"
  #include "llvm/Support/Threading.h"
  #include "llvm/Support/WindowsError.h"
@@ -20,7 +20,7 @@ index 165b57b2f5a4..c7dd696b7288 100644
  #include <cassert>
  #include <cstdlib>
  #include <mutex>
-@@ -93,15 +93,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+@@ -94,15 +94,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
    if (handler) {
      handler(handlerData, std::string{Reason}, GenCrashDiag);
    } else {
@@ -37,7 +37,7 @@ index 165b57b2f5a4..c7dd696b7288 100644
    }
  
    // If we reached here, we are failing ungracefully. Run the interrupt handlers
-@@ -170,11 +162,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
+@@ -171,11 +163,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
    // llvm_unreachable is intended to be used to indicate "impossible"
    // situations, and not legitimate runtime errors.
    if (msg)

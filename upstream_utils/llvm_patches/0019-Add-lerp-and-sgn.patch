@@ -1,21 +1,20 @@
-From 0b422258dc519296c1dea7dcfd386feb4077f947 Mon Sep 17 00:00:00 2001
+From 980092b86658ccc8147cb2ff3f690e8518b1be95 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:50:24 -0400
 Subject: [PATCH 19/36] Add lerp and sgn
 
 ---
- llvm/include/llvm/Support/MathExtras.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index d356733d4792..f977798c9d40 100644
+index ed58ed4ba12e..a128ebea8e38 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -862,6 +862,27 @@ SaturatingMultiplyAdd(T X, T Y, T A, bool *ResultOverflowed = nullptr) {
+@@ -960,6 +960,26 @@ MulOverflow(T X, T Y, T &Result) {
+     return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
+ }
  
- /// Use this rather than HUGE_VALF; the latter causes warnings on MSVC.
- extern const float huge_valf;
-+
 +// Typesafe implementation of the signum function.
 +// Returns -1 if negative, 1 if positive, 0 if 0.
 +template <typename T>

@@ -1,4 +1,4 @@
-From eb50b258366fcfeddf81f7c2e35a402a7592a2f8 Mon Sep 17 00:00:00 2001
+From 8584a13f51caed25afdacae685cd68643ca71493 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:07:25 -0400
 Subject: [PATCH 04/36] Fix warnings for casting, wrap min/max for windows
@@ -8,14 +8,14 @@ Subject: [PATCH 04/36] Fix warnings for casting, wrap min/max for windows
  llvm/include/llvm/ADT/DenseMapInfo.h   |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    |  8 ++++----
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
- llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 5 files changed, 18 insertions(+), 18 deletions(-)
+ llvm/include/llvm/Support/MathExtras.h | 24 ++++++++++++------------
+ 5 files changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index dbecf3c658d8..13ac6c508536 100644
+index 7a3ef03412eb..c660fee9d735 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -381,7 +381,7 @@ protected:
+@@ -355,7 +355,7 @@ protected:
        return 0;
      // +1 is required because of the strict equality.
      // For example if NumEntries is 48, we need to return 401.
@@ -24,7 +24,7 @@ index dbecf3c658d8..13ac6c508536 100644
    }
  
    void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -807,7 +807,7 @@ public:
+@@ -783,7 +783,7 @@ public:
      // Reduce the number of buckets.
      unsigned NewNumBuckets = 0;
      if (OldNumEntries)
@@ -34,10 +34,10 @@ index dbecf3c658d8..13ac6c508536 100644
        this->BaseT::initEmpty();
        return;
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index 5ef6f3ad1b04..99af567d4ef4 100644
+index bd4c60c8f13e..d376cf9cfa0f 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -265,7 +265,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
+@@ -276,7 +276,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
  template <> struct DenseMapInfo<hash_code> {
    static inline hash_code getEmptyKey() { return hash_code(-1); }
    static inline hash_code getTombstoneKey() { return hash_code(-2); }
@@ -47,7 +47,7 @@ index 5ef6f3ad1b04..99af567d4ef4 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 17586904d212..004958a4b321 100644
+index 8c46aa906905..d4b0b4020d0b 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -42,7 +42,7 @@ protected:
@@ -100,10 +100,10 @@ index 1add185330fa..c83ba81fa2e2 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 249139e824b5..e20f0dc8b774 100644
+index 37b9669cbeed..a1b4a1a06873 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -60,7 +60,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
+@@ -97,7 +97,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
      // Bisection method.
      unsigned ZeroBits = 0;
      T Shift = std::numeric_limits<T>::digits >> 1;
@@ -112,7 +112,7 @@ index 249139e824b5..e20f0dc8b774 100644
      while (Shift) {
        if ((Val & Mask) == 0) {
          Val >>= Shift;
-@@ -201,7 +201,7 @@ unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
+@@ -238,7 +238,7 @@ unsigned countLeadingZeros(T Val, ZeroBehavior ZB = ZB_Width) {
  ///   valid arguments.
  template <typename T> T findFirstSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -121,7 +121,7 @@ index 249139e824b5..e20f0dc8b774 100644
  
    return countTrailingZeros(Val, ZB_Undefined);
  }
-@@ -242,7 +242,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
+@@ -279,7 +279,7 @@ template <typename T> T maskLeadingZeros(unsigned N) {
  ///   valid arguments.
  template <typename T> T findLastSet(T Val, ZeroBehavior ZB = ZB_Max) {
    if (ZB == ZB_Max && Val == 0)
@@ -130,7 +130,7 @@ index 249139e824b5..e20f0dc8b774 100644
  
    // Use ^ instead of - because both gcc and llvm can remove the associated ^
    // in the __builtin_clz intrinsic on x86.
-@@ -536,26 +536,26 @@ inline double Log2(double Value) {
+@@ -583,26 +583,26 @@ inline double Log2(double Value) {
  /// (32 bit edition.)
  /// Ex. Log2_32(32) == 5, Log2_32(1) == 0, Log2_32(0) == -1, Log2_32(6) == 2
  inline unsigned Log2_32(uint32_t Value) {
@@ -161,7 +161,7 @@ index 249139e824b5..e20f0dc8b774 100644
  }
  
  /// Return the greatest common divisor of the values using Euclid's algorithm.
-@@ -769,7 +769,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
+@@ -782,7 +782,7 @@ inline int64_t SignExtend64(uint64_t X, unsigned B) {
  template <typename T>
  typename std::enable_if<std::is_unsigned<T>::value, T>::type
  AbsoluteDifference(T X, T Y) {
@@ -170,7 +170,7 @@ index 249139e824b5..e20f0dc8b774 100644
  }
  
  /// Add two unsigned integers, X and Y, of type T.  Clamp the result to the
-@@ -784,7 +784,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -797,7 +797,7 @@ SaturatingAdd(T X, T Y, bool *ResultOverflowed = nullptr) {
    T Z = X + Y;
    Overflowed = (Z < X || Z < Y);
    if (Overflowed)
@@ -179,7 +179,7 @@ index 249139e824b5..e20f0dc8b774 100644
    else
      return Z;
  }
-@@ -809,7 +809,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
+@@ -822,7 +822,7 @@ SaturatingMultiply(T X, T Y, bool *ResultOverflowed = nullptr) {
    // Special case: if X or Y is 0, Log2_64 gives -1, and Log2Z
    // will necessarily be less than Log2Max as desired.
    int Log2Z = Log2_64(X) + Log2_64(Y);
@@ -188,6 +188,18 @@ index 249139e824b5..e20f0dc8b774 100644
    int Log2Max = Log2_64(Max);
    if (Log2Z < Log2Max) {
      return X * Y;
+@@ -946,9 +946,9 @@ MulOverflow(T X, T Y, T &Result) {
+   // Check how the max allowed absolute value (2^n for negative, 2^(n-1) for
+   // positive) divided by an argument compares to the other.
+   if (IsNegative)
+-    return UX > (static_cast<U>(std::numeric_limits<T>::max()) + U(1)) / UY;
++    return UX > (static_cast<U>((std::numeric_limits<T>::max)()) + U(1)) / UY;
+   else
+-    return UX > (static_cast<U>(std::numeric_limits<T>::max())) / UY;
++    return UX > (static_cast<U>((std::numeric_limits<T>::max)())) / UY;
+ }
+ 
+ } // End llvm namespace
 -- 
 2.20.1.windows.1
 

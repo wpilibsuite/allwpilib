@@ -37,6 +37,7 @@
 #include "wpi/StringExtras.h"
 #include "wpi/Chrono.h"
 #include "wpi/Compiler.h"
+#include "wpi/ErrorHandling.h"
 #include "wpi/VersionTuple.h"
 #include <cassert>
 #include <string>
@@ -89,6 +90,13 @@ inline bool RunningWindows8OrGreater() {
 wpi::VersionTuple GetWindowsOSVersion();
 
 bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
+
+// Include GetLastError() in a fatal error message.
+LLVM_ATTRIBUTE_NORETURN inline void ReportLastErrorFatal(const char *Msg) {
+  std::string ErrMsg;
+  MakeErrMsg(&ErrMsg, Msg);
+  wpi::report_fatal_error(ErrMsg);
+}
 
 template <typename HandleTraits>
 class ScopedHandle {

@@ -1,0 +1,52 @@
+From 7b14a86f6da332b7239c6e6dac51e2df4a3d4eb2 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 19:00:55 -0400
+Subject: [PATCH 35/36] Fix athena compilation error
+
+---
+ llvm/lib/Support/MemoryBuffer.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
+index 299610233405..85d238bec585 100644
+--- a/llvm/lib/Support/MemoryBuffer.cpp
++++ b/llvm/lib/Support/MemoryBuffer.cpp
+@@ -146,7 +146,7 @@ getMemBufferCopyImpl(span<const uint8_t> InputData, std::string_view BufferName)
+   if (!Buf)
+     return make_error_code(errc::not_enough_memory);
+   memcpy(Buf->getBufferStart(), InputData.data(), InputData.size());
+-  return std::move(Buf);
++  return ErrorOr<std::unique_ptr<WritableMemoryBuffer>>(std::move(Buf));
+ }
+ 
+ std::unique_ptr<MemoryBuffer>
+@@ -378,7 +378,7 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
+                                                          Offset, EC));
+   if (EC)
+     return EC;
+-  return std::move(Result);
++  return ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>(std::move(Result));
+ }
+ 
+ ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
+@@ -438,7 +438,7 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+         new (NamedBufferAlloc(Filename)) MemoryBufferMMapFile<MB>(
+             RequiresNullTerminator, FD, MapSize, Offset, EC));
+     if (!EC)
+-      return std::move(Result);
++      return ErrorOr<std::unique_ptr<MB>>(std::move(Result));
+   }
+ 
+   auto Buf = WritableMemoryBuffer::getNewUninitMemBuffer(MapSize, Filename);
+@@ -477,7 +477,7 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+     BufPtr += NumRead;
+   }
+ 
+-  return std::move(Buf);
++  return ErrorOr<std::unique_ptr<MB>>(std::move(Buf));
+ }
+ 
+ ErrorOr<std::unique_ptr<MemoryBuffer>>
+-- 
+2.20.1.windows.1
+

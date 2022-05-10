@@ -1,4 +1,4 @@
-From 9670ff9e50880397feaa2f7904be313d4516fa43 Mon Sep 17 00:00:00 2001
+From 6d4f17e0a239ae17d1baea0e1fadd69b16ba9f8d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:56:02 -0400
 Subject: [PATCH 12/36] Prefer std:: over llvm::
@@ -12,16 +12,15 @@ Subject: [PATCH 12/36] Prefer std:: over llvm::
  llvm/include/llvm/Support/type_traits.h   | 117 ----------------------
  llvm/lib/Support/ErrorHandling.cpp        |   3 +-
  llvm/lib/Support/ManagedStatic.cpp        |   4 +-
- llvm/unittests/ADT/MapVectorTest.cpp      |   8 +-
  llvm/unittests/ADT/PointerIntPairTest.cpp |   4 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp    |   2 +-
- 11 files changed, 20 insertions(+), 149 deletions(-)
+ 10 files changed, 16 insertions(+), 145 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 13ac6c508536..8ef870dce720 100644
+index c660fee9d735..d74b5830a32c 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -141,8 +141,8 @@ public:
+@@ -115,8 +115,8 @@ public:
      }
  
      const KeyT EmptyKey = getEmptyKey(), TombstoneKey = getTombstoneKey();
@@ -32,7 +31,7 @@ index 13ac6c508536..8ef870dce720 100644
        // Use a simpler loop when these are trivial types.
        for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P)
          P->getFirst() = EmptyKey;
-@@ -418,8 +418,8 @@ protected:
+@@ -392,8 +392,8 @@ protected:
      setNumEntries(other.getNumEntries());
      setNumTombstones(other.getNumTombstones());
  
@@ -68,10 +67,10 @@ index 121aa527a5da..6b6a438f1ffc 100644
        // We need to create a nicely aligned object. We use a static variable
        // for this because it is a trivial struct.
 diff --git a/llvm/include/llvm/ADT/PointerIntPair.h b/llvm/include/llvm/ADT/PointerIntPair.h
-index 24a2bb67a36e..c543ab843e2f 100644
+index fa6bf1504469..c450ee47cb6e 100644
 --- a/llvm/include/llvm/ADT/PointerIntPair.h
 +++ b/llvm/include/llvm/ADT/PointerIntPair.h
-@@ -126,19 +126,6 @@ public:
+@@ -127,19 +127,6 @@ public:
    }
  };
  
@@ -92,7 +91,7 @@ index 24a2bb67a36e..c543ab843e2f 100644
  struct PointerIntPairInfo {
    static_assert(PtrTraits::NumLowBitsAvailable <
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 004958a4b321..87381d536700 100644
+index d4b0b4020d0b..3f674c31dfd0 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -175,7 +175,7 @@ public:
@@ -105,10 +104,10 @@ index 004958a4b321..87381d536700 100644
  protected:
    SmallVectorTemplateBase(size_t Size) : SmallVectorTemplateCommon<T>(Size) {}
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index e20f0dc8b774..134f3c3bbe38 100644
+index a1b4a1a06873..887c0ce27e51 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -528,7 +528,7 @@ inline double Log2(double Value) {
+@@ -575,7 +575,7 @@ inline double Log2(double Value) {
  #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
    return __builtin_log(Value) / __builtin_log(2.0);
  #else
@@ -118,10 +117,10 @@ index e20f0dc8b774..134f3c3bbe38 100644
  }
  
 diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
-index c70fc1a273c3..1cb7876a500b 100644
+index b7d48e8e1ade..77469a098c45 100644
 --- a/llvm/include/llvm/Support/type_traits.h
 +++ b/llvm/include/llvm/Support/type_traits.h
-@@ -75,123 +75,6 @@ struct const_pointer_or_const_ref<
+@@ -70,123 +70,6 @@ struct const_pointer_or_const_ref<
    using type = typename add_const_past_pointer<T>::type;
  };
  
@@ -244,12 +243,12 @@ index c70fc1a273c3..1cb7876a500b 100644
 -
  } // end namespace llvm
  
- // If the compiler supports detecting whether a class is final, define
+ #endif // LLVM_SUPPORT_TYPE_TRAITS_H
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 56349705103d..165b57b2f5a4 100644
+index eee176a7b04f..383a046a9d56 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -201,12 +201,13 @@ void LLVMResetFatalErrorHandler() {
+@@ -202,12 +202,13 @@ void LLVMResetFatalErrorHandler() {
  
  #ifdef _WIN32
  
@@ -285,32 +284,6 @@ index bf7e0074d26e..339eccdac1bd 100644
    return ManagedStaticMutex;
  }
  
-diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index b8fdbdd0e0ba..f7e5812f2e99 100644
---- a/llvm/unittests/ADT/MapVectorTest.cpp
-+++ b/llvm/unittests/ADT/MapVectorTest.cpp
-@@ -149,8 +149,8 @@ TEST(MapVectorTest, iteration_test) {
- 
- TEST(MapVectorTest, NonCopyable) {
-   MapVector<int, std::unique_ptr<int>> MV;
--  MV.insert(std::make_pair(1, llvm::make_unique<int>(1)));
--  MV.insert(std::make_pair(2, llvm::make_unique<int>(2)));
-+  MV.insert(std::make_pair(1, std::make_unique<int>(1)));
-+  MV.insert(std::make_pair(2, std::make_unique<int>(2)));
- 
-   ASSERT_EQ(MV.count(1), 1u);
-   ASSERT_EQ(*MV.find(2)->second, 2);
-@@ -306,8 +306,8 @@ TEST(SmallMapVectorSmallTest, iteration_test) {
- 
- TEST(SmallMapVectorSmallTest, NonCopyable) {
-   SmallMapVector<int, std::unique_ptr<int>, 8> MV;
--  MV.insert(std::make_pair(1, llvm::make_unique<int>(1)));
--  MV.insert(std::make_pair(2, llvm::make_unique<int>(2)));
-+  MV.insert(std::make_pair(1, std::make_unique<int>(1)));
-+  MV.insert(std::make_pair(2, std::make_unique<int>(2)));
- 
-   ASSERT_EQ(MV.count(1), 1u);
-   ASSERT_EQ(*MV.find(2)->second, 2);
 diff --git a/llvm/unittests/ADT/PointerIntPairTest.cpp b/llvm/unittests/ADT/PointerIntPairTest.cpp
 index 6b3a4c055c9e..fda421ad778e 100644
 --- a/llvm/unittests/ADT/PointerIntPairTest.cpp
@@ -334,7 +307,7 @@ index 6b3a4c055c9e..fda421ad778e 100644
        "trivially copyable");
  }
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index cff1632586be..2e7d58b0749e 100644
+index 3226fe615509..ba096b47fb85 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -298,7 +298,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {

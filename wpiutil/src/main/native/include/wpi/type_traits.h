@@ -17,11 +17,6 @@
 #include <type_traits>
 #include <utility>
 
-#ifndef __has_feature
-#define WPI_DEFINED_HAS_FEATURE
-#define __has_feature(x) 0
-#endif
-
 namespace wpi {
 
 
@@ -76,21 +71,5 @@ struct const_pointer_or_const_ref<
 };
 
 } // end namespace wpi
-
-// If the compiler supports detecting whether a class is final, define
-// an LLVM_IS_FINAL macro. If it cannot be defined properly, this
-// macro will be left undefined.
-#ifndef LLVM_IS_FINAL
-#if __cplusplus >= 201402L || defined(_MSC_VER)
-#define LLVM_IS_FINAL(Ty) std::is_final<Ty>()
-#elif __has_feature(is_final) || LLVM_GNUC_PREREQ(4, 7, 0)
-#define LLVM_IS_FINAL(Ty) __is_final(Ty)
-#endif
-#endif
-
-#ifdef WPI_DEFINED_HAS_FEATURE
-#undef __has_feature
-#undef WPI_DEFINED_HAS_FEATURE
-#endif
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

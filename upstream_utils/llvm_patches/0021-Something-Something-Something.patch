@@ -1,18 +1,18 @@
-From e2d5b6e02f3139641c166213d83b0b192be252dd Mon Sep 17 00:00:00 2001
+From de99e28908332bc5dc5105a99e63114d3d420caf Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 01:15:57 -0400
 Subject: [PATCH 21/36] Something Something Something
 
 ---
- llvm/lib/Support/ErrorHandling.cpp |  5 -----
+ llvm/lib/Support/ErrorHandling.cpp |  7 +------
  llvm/lib/Support/raw_ostream.cpp   | 10 ++++------
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ 2 files changed, 5 insertions(+), 12 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index c7dd696b7288..ca76a8368520 100644
+index c4b9c67c99e7..3f43db159175 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -96,11 +96,6 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
+@@ -97,12 +97,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
      fmt::print(stderr, "LLVM ERROR: {}\n", Reason);
    }
  
@@ -21,14 +21,16 @@ index c7dd696b7288..ca76a8368520 100644
 -  // files registered with RemoveFileOnSignal.
 -  sys::RunInterruptHandlers();
 -
-   exit(1);
+-  sys::Process::Exit(1);
++  exit(1);
  }
  
+ void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index e58d5196dfb3..2659d50137b1 100644
+index 5fc0db039c29..4cace846e000 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -376,10 +376,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
+@@ -387,10 +387,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -41,7 +43,7 @@ index e58d5196dfb3..2659d50137b1 100644
    }
  
  #ifdef __MINGW32__
-@@ -509,8 +507,8 @@ void raw_fd_ostream::close() {
+@@ -520,8 +518,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();

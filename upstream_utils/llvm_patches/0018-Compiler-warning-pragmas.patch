@@ -1,4 +1,4 @@
-From 6ab5217730bb8150a296b9e490cd4fc031889c14 Mon Sep 17 00:00:00 2001
+From 120d240fdb535844cf41294b02ad4e89e46bd65c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:42:42 -0400
 Subject: [PATCH 18/36] Compiler warning pragmas
@@ -45,10 +45,10 @@ index 01878e990a0c..6b3a1b4d989a 100644
  
  #endif // LLVM_ADT_FUNCTION_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index f840d1e4ea8b..523096a52eaf 100644
+index cf1b49ea6d40..9897ad933326 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -54,6 +54,11 @@
+@@ -55,6 +55,11 @@
  #include <string>
  #include <utility>
  
@@ -60,7 +60,7 @@ index f840d1e4ea8b..523096a52eaf 100644
  namespace llvm {
  
  /// An opaque object representing a hash code.
-@@ -656,4 +661,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -657,4 +662,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
  
  } // namespace llvm
  
@@ -70,7 +70,7 @@ index f840d1e4ea8b..523096a52eaf 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 87381d536700..8ac4de0512a9 100644
+index 3f674c31dfd0..d4c66a9e4d98 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -13,6 +13,14 @@
@@ -89,10 +89,10 @@ index 87381d536700..8ac4de0512a9 100644
  #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 134f3c3bbe38..d356733d4792 100644
+index 887c0ce27e51..ed58ed4ba12e 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -372,6 +372,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+@@ -409,6 +409,11 @@ inline uint64_t maxUIntN(uint64_t N) {
    return UINT64_MAX >> (64 - N);
  }
  
@@ -104,7 +104,7 @@ index 134f3c3bbe38..d356733d4792 100644
  /// Gets the minimum value for a N-bit signed integer.
  inline int64_t minIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
-@@ -379,6 +384,10 @@ inline int64_t minIntN(int64_t N) {
+@@ -416,6 +421,10 @@ inline int64_t minIntN(int64_t N) {
    return -(UINT64_C(1)<<(N-1));
  }
  
@@ -145,7 +145,7 @@ index 0e5869141fd3..4cec468a8c8c 100644
  }
  #endif
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 431f7e5c040f..e97efae32c5e 100644
+index 4103a5685f38..0784a21a1d2d 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -11,6 +11,17 @@
@@ -167,7 +167,7 @@ index 431f7e5c040f..e97efae32c5e 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Errc.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index cd0e1f631e1f..39de2852c468 100644
+index 8ff5108ecafd..936423d368b1 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -215,7 +215,7 @@ index 61682b50dea2..8be4575eaa7e 100644
  
  namespace {
 diff --git a/llvm/unittests/Support/AlignOfTest.cpp b/llvm/unittests/Support/AlignOfTest.cpp
-index 94c6f5a0f53f..48d081d98a99 100644
+index d8cabde6c727..f2a2af0d3add 100644
 --- a/llvm/unittests/Support/AlignOfTest.cpp
 +++ b/llvm/unittests/Support/AlignOfTest.cpp
 @@ -31,10 +31,9 @@ namespace {

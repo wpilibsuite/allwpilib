@@ -1,0 +1,41 @@
+From 053cc5f21e492db7b9646cf175246d2c4d59018f Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 00:25:03 -0400
+Subject: [PATCH 29/36] Add missing raw_ostream functions
+
+---
+ llvm/include/llvm/Support/raw_ostream.h | 3 +++
+ llvm/lib/Support/raw_ostream.cpp        | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
+index c56c82f0c0ea..e8fc18b83366 100644
+--- a/llvm/include/llvm/Support/raw_ostream.h
++++ b/llvm/include/llvm/Support/raw_ostream.h
+@@ -298,6 +298,9 @@ private:
+   /// \invariant { Size > 0 }
+   virtual void write_impl(const char *Ptr, size_t Size) = 0;
+ 
++  // An out of line virtual method to provide a home for the class vtable.
++  virtual void handle();
++
+   /// Return the current position within the stream, not counting the bytes
+   /// currently in the buffer.
+   virtual uint64_t current_pos() const = 0;
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 45d635bcd1c1..a12171035b59 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -91,6 +91,9 @@ raw_ostream::~raw_ostream() {
+     delete [] OutBufStart;
+ }
+ 
++// An out of line virtual method to provide a home for the class vtable.
++void raw_ostream::handle() {}
++
+ size_t raw_ostream::preferred_buffer_size() const {
+   // BUFSIZ is intended to be a reasonable default.
+   return BUFSIZ;
+-- 
+2.20.1.windows.1
+

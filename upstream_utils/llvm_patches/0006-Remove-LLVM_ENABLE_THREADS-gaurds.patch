@@ -1,27 +1,39 @@
-From 0b0ddd609c14d51a4cdcc62e25b499049138e2b2 Mon Sep 17 00:00:00 2001
+From ee2eb71a5e30fb0a40e002c7dab2551e13ff20fc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:31:11 -0400
 Subject: [PATCH 06/36] Remove LLVM_ENABLE_THREADS gaurds
 
 ---
- llvm/include/llvm/Support/Compiler.h | 17 +----------------
- llvm/lib/Support/ErrorHandling.cpp   | 26 --------------------------
- 2 files changed, 1 insertion(+), 42 deletions(-)
+ llvm/include/llvm/Support/Compiler.h | 29 +++++++---------------------
+ llvm/lib/Support/ErrorHandling.cpp   | 26 -------------------------
+ 2 files changed, 7 insertions(+), 48 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 3f4f465f3960..d95da1f01399 100644
+index 6f6f65cad6f5..9ac17001d0dc 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -500,7 +500,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
- /// some constant value. In almost all circumstances this is most appropriate
- /// for use with a pointer, integer, or small aggregation of pointers and
- /// integers.
+@@ -512,13 +512,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+ /// extern globals, and static globals.
+ ///
+ /// This is essentially an extremely restricted analog to C++11's thread_local
+-/// support. It uses thread_local if available, falling back on gcc __thread
+-/// if not. __thread doesn't support many of the C++11 thread_local's
+-/// features. You should only use this for PODs that you can statically
+-/// initialize to some constant value. In almost all circumstances this is most
+-/// appropriate for use with a pointer, integer, or small aggregation of
+-/// pointers and integers.
 -#if LLVM_ENABLE_THREADS
-+#ifndef LLVM_THREAD_LOCAL
- #if __has_feature(cxx_thread_local)
++/// support, and uses that when available. However, it falls back on
++/// platform-specific or vendor-provided extensions when necessary. These
++/// extensions don't support many of the C++11 thread_local's features. You
++/// should only use this for PODs that you can statically initialize to
++/// some constant value. In almost all circumstances this is most appropriate
++/// for use with a pointer, integer, or small aggregation of pointers and
++/// integers.
+ #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
- #elif defined(_MSC_VER)
-@@ -511,21 +511,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+ #else
+@@ -526,21 +526,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -41,13 +53,13 @@ index 3f4f465f3960..d95da1f01399 100644
 -#define LLVM_ENABLE_EXCEPTIONS 1
 -#endif
  
+ #ifdef __cplusplus
  namespace llvm {
- 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 0f13f7a536f1..9fffa96602db 100644
+index a9463024c420..6b92788f9710 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -44,7 +44,6 @@ static void *ErrorHandlerUserData = nullptr;
+@@ -45,7 +45,6 @@ static void *ErrorHandlerUserData = nullptr;
  static fatal_error_handler_t BadAllocErrorHandler = nullptr;
  static void *BadAllocErrorHandlerUserData = nullptr;
  
@@ -55,7 +67,7 @@ index 0f13f7a536f1..9fffa96602db 100644
  // Mutexes to synchronize installing error handlers and calling error handlers.
  // Do not use ManagedStatic, or that may allocate memory while attempting to
  // report an OOM.
-@@ -58,22 +57,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
+@@ -59,22 +58,17 @@ static void *BadAllocErrorHandlerUserData = nullptr;
  // builds. We can remove these ifdefs if that script goes away.
  static std::mutex ErrorHandlerMutex;
  static std::mutex BadAllocErrorHandlerMutex;
@@ -78,7 +90,7 @@ index 0f13f7a536f1..9fffa96602db 100644
    ErrorHandler = nullptr;
    ErrorHandlerUserData = nullptr;
  }
-@@ -96,9 +90,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -97,9 +91,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -88,7 +100,7 @@ index 0f13f7a536f1..9fffa96602db 100644
      handler = ErrorHandler;
      handlerData = ErrorHandlerUserData;
    }
-@@ -127,18 +119,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -128,18 +120,14 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                             void *user_data) {
@@ -107,7 +119,7 @@ index 0f13f7a536f1..9fffa96602db 100644
    BadAllocErrorHandler = nullptr;
    BadAllocErrorHandlerUserData = nullptr;
  }
-@@ -149,9 +137,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -150,9 +138,7 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
    {
      // Only acquire the mutex while reading the handler, so as not to invoke a
      // user-supplied callback under a lock.
@@ -117,7 +129,7 @@ index 0f13f7a536f1..9fffa96602db 100644
      Handler = BadAllocErrorHandler;
      HandlerData = BadAllocErrorHandlerUserData;
    }
-@@ -161,25 +147,14 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+@@ -162,25 +148,14 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
      llvm_unreachable("bad alloc handler should not return");
    }
  
@@ -143,7 +155,7 @@ index 0f13f7a536f1..9fffa96602db 100644
  // Causes crash on allocation failure. It is called prior to the handler set by
  // 'install_bad_alloc_error_handler'.
  static void out_of_memory_new_handler() {
-@@ -193,7 +168,6 @@ void llvm::install_out_of_memory_new_handler() {
+@@ -194,7 +169,6 @@ void llvm::install_out_of_memory_new_handler() {
    (void)old;
    assert(old == nullptr && "new-handler already installed");
  }

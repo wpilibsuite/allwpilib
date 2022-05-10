@@ -1,31 +1,30 @@
-From cec65bffef16c29b173391feda66fe25599d244d Mon Sep 17 00:00:00 2001
+From c17a62ba54c1510d144b2de414e2135eb6f61f0f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:40:33 -0400
 Subject: [PATCH 08/36] Remove header dependency for endian
 
 ---
- llvm/include/llvm/ADT/Hashing.h    |  2 +-
- llvm/include/llvm/Support/Endian.h | 22 +++++++++++++++++++++-
- 2 files changed, 22 insertions(+), 2 deletions(-)
+ llvm/include/llvm/ADT/Hashing.h    | 1 +
+ llvm/include/llvm/Support/Endian.h | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 008188bfa210..f840d1e4ea8b 100644
+index adcc5cf54da9..cf1b49ea6d40 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -45,7 +45,7 @@
- #define LLVM_ADT_HASHING_H
+@@ -46,6 +46,7 @@
  
  #include "llvm/Support/DataTypes.h"
--#include "llvm/Support/Host.h"
+ #include "llvm/Support/ErrorHandling.h"
 +#include "llvm/Support/Endian.h"
  #include "llvm/Support/SwapByteOrder.h"
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
 diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
-index d8be94427d7e..691462e2756a 100644
+index 87aecedd3a4b..d4a1e40d8e78 100644
 --- a/llvm/include/llvm/Support/Endian.h
 +++ b/llvm/include/llvm/Support/Endian.h
-@@ -15,14 +15,34 @@
+@@ -15,14 +15,19 @@
  
  #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
@@ -42,21 +41,6 @@ index d8be94427d7e..691462e2756a 100644
  #include <cstring>
  #include <type_traits>
  
-+
-+
-+namespace wpi {
-+namespace sys {
-+
-+#if defined(BYTE_ORDER) && defined(BIG_ENDIAN) && BYTE_ORDER == BIG_ENDIAN
-+constexpr bool IsBigEndianHost = true;
-+#else
-+constexpr bool IsBigEndianHost = false;
-+#endif
-+
-+  static const bool IsLittleEndianHost = !IsBigEndianHost;
-+
-+}
-+}
 +
  namespace llvm {
  namespace support {

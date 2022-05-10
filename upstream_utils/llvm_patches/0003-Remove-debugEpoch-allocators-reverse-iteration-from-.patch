@@ -1,4 +1,4 @@
-From 073eae2cbb9e48d3173582aeecade805e19f4924 Mon Sep 17 00:00:00 2001
+From 488d963a73d52ed784aca62694587d68a4608d9d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:58:29 -0400
 Subject: [PATCH 03/36] Remove debugEpoch, allocators, reverse iteration from
@@ -12,10 +12,10 @@ Subject: [PATCH 03/36] Remove debugEpoch, allocators, reverse iteration from
  4 files changed, 18 insertions(+), 101 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index a05cf8130d3c..dbecf3c658d8 100644
+index 148d319c8603..7a3ef03412eb 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -101,8 +101,6 @@ public:
+@@ -75,8 +75,6 @@ public:
      // empty buckets.
      if (empty())
        return end();
@@ -24,7 +24,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      return makeIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline iterator end() {
-@@ -111,8 +109,6 @@ public:
+@@ -85,8 +83,6 @@ public:
    inline const_iterator begin() const {
      if (empty())
        return end();
@@ -33,7 +33,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      return makeConstIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline const_iterator end() const {
-@@ -460,20 +456,12 @@ private:
+@@ -434,20 +430,12 @@ private:
    iterator makeIterator(BucketT *P, BucketT *E,
                          DebugEpochBase &Epoch,
                          bool NoAdvance=false) {
@@ -54,7 +54,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      return const_iterator(P, E, Epoch, NoAdvance);
    }
  
-@@ -1202,10 +1190,6 @@ public:
+@@ -1183,10 +1171,6 @@ public:
      assert(isHandleInSync() && "invalid construction!");
  
      if (NoAdvance) return;
@@ -65,7 +65,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      AdvancePastEmptyBuckets();
    }
  
-@@ -1220,14 +1204,10 @@ public:
+@@ -1201,14 +1185,10 @@ public:
  
    reference operator*() const {
      assert(isHandleInSync() && "invalid iterator access!");
@@ -80,7 +80,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      return Ptr;
    }
  
-@@ -1248,11 +1228,6 @@ public:
+@@ -1229,11 +1209,6 @@ public:
  
    inline DenseMapIterator& operator++() {  // Preincrement
      assert(isHandleInSync() && "invalid iterator access!");
@@ -93,7 +93,7 @@ index a05cf8130d3c..dbecf3c658d8 100644
      AdvancePastEmptyBuckets();
      return *this;
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index 913518230d2d..32a69e55d509 100644
+index 1d8280063c80..e51f50dfea10 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
 @@ -14,7 +14,6 @@
@@ -210,10 +210,10 @@ index 913518230d2d..32a69e55d509 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 8a586fc26709..78c188e0ce0f 100644
+index 108185bd07b9..5846a2f4ac2b 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -151,19 +151,16 @@ public:
+@@ -174,19 +174,16 @@ public:
  
    /// Create a StringMapEntry for the specified key construct the value using
    /// \p InitiVals.
@@ -236,7 +236,7 @@ index 8a586fc26709..78c188e0ce0f 100644
  
      // Construct the value.
      new (NewItem) StringMapEntry(KeyLength, std::forward<InitTy>(InitVals)...);
-@@ -176,13 +173,6 @@ public:
+@@ -199,13 +196,6 @@ public:
      return NewItem;
    }
  
@@ -250,7 +250,7 @@ index 8a586fc26709..78c188e0ce0f 100644
    static StringMapEntry *Create(StringRef Key) {
      return Create(Key, ValueTy());
    }
-@@ -196,18 +186,10 @@ public:
+@@ -219,18 +209,10 @@ public:
  
    /// Destroy - Destroy this StringMapEntry, releasing memory back to the
    /// specified allocator.
@@ -258,7 +258,7 @@ index 8a586fc26709..78c188e0ce0f 100644
 -  void Destroy(AllocatorTy &Allocator) {
 +  void Destroy() {
      // Free memory referenced by the item.
--    size_t AllocSize = sizeof(StringMapEntry) + getKeyLength() + 1;
+-    size_t AllocSize = sizeof(StringMapEntry) + this->getKeyLength() + 1;
      this->~StringMapEntry();
 -    Allocator.Deallocate(static_cast<void *>(this), AllocSize);
 -  }
@@ -271,7 +271,7 @@ index 8a586fc26709..78c188e0ce0f 100644
    }
  };
  
-@@ -215,10 +197,8 @@ public:
+@@ -238,10 +220,8 @@ public:
  /// keys that are "strings", which are basically ranges of bytes. This does some
  /// funky memory allocation and hashing things to make it extremely efficient,
  /// storing the string data *after* the value in the map.
@@ -283,7 +283,7 @@ index 8a586fc26709..78c188e0ce0f 100644
  public:
    using MapEntryTy = StringMapEntry<ValueTy>;
  
-@@ -227,13 +207,6 @@ public:
+@@ -250,13 +230,6 @@ public:
    explicit StringMap(unsigned InitialSize)
      : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
  
@@ -297,7 +297,7 @@ index 8a586fc26709..78c188e0ce0f 100644
    StringMap(std::initializer_list<std::pair<StringRef, ValueTy>> List)
        : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
      for (const auto &P : List) {
-@@ -242,11 +215,10 @@ public:
+@@ -265,11 +238,10 @@ public:
    }
  
    StringMap(StringMap &&RHS)
@@ -311,7 +311,7 @@ index 8a586fc26709..78c188e0ce0f 100644
      if (RHS.empty())
        return;
  
-@@ -266,7 +238,7 @@ public:
+@@ -289,7 +261,7 @@ public:
        }
  
        TheTable[I] = MapEntryTy::Create(
@@ -320,7 +320,7 @@ index 8a586fc26709..78c188e0ce0f 100644
            static_cast<MapEntryTy *>(Bucket)->getValue());
        HashTable[I] = RHSHashTable[I];
      }
-@@ -281,7 +253,6 @@ public:
+@@ -304,7 +276,6 @@ public:
  
    StringMap &operator=(StringMap RHS) {
      StringMapImpl::swap(RHS);
@@ -328,7 +328,7 @@ index 8a586fc26709..78c188e0ce0f 100644
      return *this;
    }
  
-@@ -293,16 +264,13 @@ public:
+@@ -316,16 +287,13 @@ public:
        for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
          StringMapEntryBase *Bucket = TheTable[I];
          if (Bucket && Bucket != getTombstoneVal()) {
@@ -346,7 +346,7 @@ index 8a586fc26709..78c188e0ce0f 100644
    using key_type = const char*;
    using mapped_type = ValueTy;
    using value_type = StringMapEntry<ValueTy>;
-@@ -405,7 +373,7 @@ public:
+@@ -438,7 +406,7 @@ public:
  
      if (Bucket == getTombstoneVal())
        --NumTombstones;
@@ -355,7 +355,7 @@ index 8a586fc26709..78c188e0ce0f 100644
      ++NumItems;
      assert(NumItems + NumTombstones <= NumBuckets);
  
-@@ -422,7 +390,7 @@ public:
+@@ -455,7 +423,7 @@ public:
      for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
        StringMapEntryBase *&Bucket = TheTable[I];
        if (Bucket && Bucket != getTombstoneVal()) {
@@ -364,7 +364,7 @@ index 8a586fc26709..78c188e0ce0f 100644
        }
        Bucket = nullptr;
      }
-@@ -440,7 +408,7 @@ public:
+@@ -473,7 +441,7 @@ public:
    void erase(iterator I) {
      MapEntryTy &V = *I;
      remove(&V);

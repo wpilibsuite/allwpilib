@@ -1,4 +1,4 @@
-From b35ee31e3e4cfe77c76549070ba5b38f34826006 Mon Sep 17 00:00:00 2001
+From 19e410724e6d7dd0c47e8582ab1a91e15d38774f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:58:49 -0400
 Subject: [PATCH 20/36] Prefer fs::file_t
@@ -41,12 +41,12 @@ index 908336281dae..8bf00de79b73 100644
  
  class MemoryBufferRef;
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index ad9c6849a712..169afcf9e37d 100644
+index 23beb8793c69..3d74dcdd580b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -23,15 +23,13 @@
- #include <string_view>
+@@ -24,15 +24,13 @@
  #include <system_error>
+ #include <type_traits>
  
 -namespace llvm {
 -
@@ -63,10 +63,10 @@ index ad9c6849a712..169afcf9e37d 100644
  /// This class implements an extremely fast bulk output stream that can *only*
  /// output to a stream.  It does not support seeking, reopening, rewinding, line
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index e97efae32c5e..b9ff5958532c 100644
+index 0784a21a1d2d..1762199b5136 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -253,11 +253,10 @@ template <typename MB>
+@@ -255,11 +255,10 @@ template <typename MB>
  static ErrorOr<std::unique_ptr<MB>>
  getFileAux(std::string_view Filename, int64_t FileSize, uint64_t MapSize,
             uint64_t Offset, bool RequiresNullTerminator, bool IsVolatile) {
@@ -82,7 +82,7 @@ index e97efae32c5e..b9ff5958532c 100644
    auto Ret = getOpenFileImpl<MB>(FD, Filename, FileSize, MapSize, Offset,
                                   RequiresNullTerminator, IsVolatile);
    sys::fs::closeFile(FD);
-@@ -372,11 +371,11 @@ static bool shouldUseMmap(sys::fs::file_t FD,
+@@ -374,11 +373,11 @@ static bool shouldUseMmap(sys::fs::file_t FD,
  static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
  getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
                   uint64_t Offset) {
@@ -99,7 +99,7 @@ index e97efae32c5e..b9ff5958532c 100644
  
    // Default is to map the full file.
    if (MapSize == uint64_t(-1)) {
-@@ -400,7 +399,6 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
+@@ -402,7 +401,6 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
      MapSize = FileSize;
    }
  
@@ -107,7 +107,7 @@ index e97efae32c5e..b9ff5958532c 100644
    std::unique_ptr<WriteThroughMemoryBuffer> Result(
        new (NamedBufferAlloc(Filename))
            MemoryBufferMMapFile<WriteThroughMemoryBuffer>(false, FD, MapSize,
-@@ -501,11 +499,10 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
+@@ -516,11 +514,10 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
  
  ErrorOr<std::unique_ptr<MemoryBuffer>>
  MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
@@ -124,10 +124,10 @@ index e97efae32c5e..b9ff5958532c 100644
        getMemoryBufferForStream(FD, Filename);
    sys::fs::closeFile(FD);
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 39de2852c468..e58d5196dfb3 100644
+index 936423d368b1..5fc0db039c29 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -295,11 +295,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -306,11 +306,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
      return STDOUT_FILENO;
    }
  

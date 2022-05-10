@@ -1,14 +1,69 @@
-From 26c8d760a8f1488656277b02cac7c43cb31c029f Mon Sep 17 00:00:00 2001
+From 30e3c0bbdd870a788ef15a56d68e07f0dc9fec81 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
 Subject: [PATCH 05/36] Windows Support
 
 ---
- llvm/lib/Support/ConvertUTF.cpp           | 95 +++++++++++++++++++++++
- llvm/lib/Support/MemoryBuffer.cpp         |  4 +-
- llvm/lib/Support/Windows/WindowsSupport.h | 33 ++++++--
+ .../llvm/Support/Windows/WindowsSupport.h     | 33 +++++--
+ llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
+ llvm/lib/Support/MemoryBuffer.cpp             |  4 +-
  3 files changed, 122 insertions(+), 10 deletions(-)
 
+diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+index bb7e79b86018..eff608d795a3 100644
+--- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
++++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+@@ -53,11 +53,35 @@
+ 
+ namespace llvm {
+ 
++/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
++/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
++/// GetVersionEx is deprecated, but this API exposes the build number which can
++/// be useful for working around certain kernel bugs.
++inline llvm::VersionTuple GetWindowsOSVersion() {
++  typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
++  HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
++  if (hMod) {
++    auto getVer = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
++    if (getVer) {
++      RTL_OSVERSIONINFOEXW info{};
++      info.dwOSVersionInfoSize = sizeof(info);
++      if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
++        return llvm::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
++                                  info.dwBuildNumber);
++      }
++    }
++  }
++  return llvm::VersionTuple(0, 0, 0, 0);
++}
++
+ /// Determines if the program is running on Windows 8 or newer. This
+ /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
+ /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
+ /// yet have VersionHelpers.h, so we have our own helper.
+-bool RunningWindows8OrGreater();
++inline bool RunningWindows8OrGreater() {
++  // Windows 8 is version 6.2, service pack 0.
++  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
++}
+ 
+ /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
+ /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
+@@ -230,13 +254,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+   return Time;
+ }
+ 
+-namespace windows {
+-// Returns command line arguments. Unlike arguments given to main(),
+-// this function guarantees that the returned arguments are encoded in
+-// UTF-8 regardless of the current code page setting.
+-std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
+-                                        BumpPtrAllocator &Alloc);
+-} // end namespace windows
+ } // end namespace sys
+ } // end namespace llvm.
+ 
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
 index e24a918c5c89..b4c7fffee8f7 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
@@ -123,7 +178,7 @@ index e24a918c5c89..b4c7fffee8f7 100644
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index d0e5bb154c1a..8fc905472a62 100644
+index e4027ca7bbfd..deed2d9ffca6 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -209,8 +209,8 @@ public:
@@ -134,64 +189,9 @@ index d0e5bb154c1a..8fc905472a62 100644
 -  SmallString<ChunkSize> Buffer;
 +  constexpr size_t ChunkSize = 4096*4;
 +  SmallVector<uint8_t, ChunkSize> Buffer;
-   size_t ReadBytes;
    // Read into Buffer until we hit EOF.
-   do {
-diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index fed9b2f462ef..508c4d96defa 100644
---- a/llvm/lib/Support/Windows/WindowsSupport.h
-+++ b/llvm/lib/Support/Windows/WindowsSupport.h
-@@ -51,11 +51,35 @@
- 
- namespace llvm {
- 
-+/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
-+/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-+/// GetVersionEx is deprecated, but this API exposes the build number which can
-+/// be useful for working around certain kernel bugs.
-+inline llvm::VersionTuple GetWindowsOSVersion() {
-+  typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
-+  HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
-+  if (hMod) {
-+    auto getVer = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
-+    if (getVer) {
-+      RTL_OSVERSIONINFOEXW info{};
-+      info.dwOSVersionInfoSize = sizeof(info);
-+      if (getVer((PRTL_OSVERSIONINFOW)&info) == ((NTSTATUS)0x00000000L)) {
-+        return llvm::VersionTuple(info.dwMajorVersion, info.dwMinorVersion, 0,
-+                                  info.dwBuildNumber);
-+      }
-+    }
-+  }
-+  return llvm::VersionTuple(0, 0, 0, 0);
-+}
-+
- /// Determines if the program is running on Windows 8 or newer. This
- /// reimplements one of the helpers in the Windows 8.1 SDK, which are intended
- /// to supercede raw calls to GetVersionEx. Old SDKs, Cygwin, and MinGW don't
- /// yet have VersionHelpers.h, so we have our own helper.
--bool RunningWindows8OrGreater();
-+inline bool RunningWindows8OrGreater() {
-+  // Windows 8 is version 6.2, service pack 0.
-+  return GetWindowsOSVersion() >= llvm::VersionTuple(6, 2, 0, 0);
-+}
- 
- /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
- /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-@@ -221,13 +245,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
-   return Time;
- }
- 
--namespace windows {
--// Returns command line arguments. Unlike arguments given to main(),
--// this function guarantees that the returned arguments are encoded in
--// UTF-8 regardless of the current code page setting.
--std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
--                                        BumpPtrAllocator &Alloc);
--} // end namespace windows
- } // end namespace sys
- } // end namespace llvm.
- 
+   for (;;) {
+     Buffer.reserve(Buffer.size() + ChunkSize);
 -- 
 2.20.1.windows.1
 

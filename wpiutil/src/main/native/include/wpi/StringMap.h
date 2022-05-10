@@ -26,6 +26,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <iterator>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -119,36 +120,57 @@ public:
   }
 };
 
-/// StringMapEntry - This is used to represent one value that is inserted into
-/// a StringMap.  It contains the Value itself and the key: the string length
-/// and data.
+/// StringMapEntryStorage - Holds the value in a StringMapEntry.
+///
+/// Factored out into a separate base class to make it easier to specialize.
+/// This is primarily intended to support StringSet, which doesn't need a value
+/// stored at all.
 template<typename ValueTy>
-class StringMapEntry : public StringMapEntryBase {
+class StringMapEntryStorage : public StringMapEntryBase {
 public:
   ValueTy second;
 
-  explicit StringMapEntry(size_t strLen)
+  explicit StringMapEntryStorage(size_t strLen)
     : StringMapEntryBase(strLen), second() {}
   template <typename... InitTy>
-  StringMapEntry(size_t strLen, InitTy &&... InitVals)
+  StringMapEntryStorage(size_t strLen, InitTy &&... InitVals)
       : StringMapEntryBase(strLen), second(std::forward<InitTy>(InitVals)...) {}
-  StringMapEntry(StringMapEntry &E) = delete;
-
-  std::string_view getKey() const {
-    return std::string_view(getKeyData(), getKeyLength());
-  }
+  StringMapEntryStorage(StringMapEntryStorage &E) = delete;
 
   const ValueTy &getValue() const { return second; }
   ValueTy &getValue() { return second; }
 
   void setValue(const ValueTy &V) { second = V; }
+};
+
+template<>
+class StringMapEntryStorage<std::nullopt_t> : public StringMapEntryBase {
+public:
+  explicit StringMapEntryStorage(size_t strLen, std::nullopt_t none = std::nullopt)
+    : StringMapEntryBase(strLen) {}
+  StringMapEntryStorage(StringMapEntryStorage &E) = delete;
+
+  std::nullopt_t getValue() const { return std::nullopt; }
+};
+
+/// StringMapEntry - This is used to represent one value that is inserted into
+/// a StringMap.  It contains the Value itself and the key: the string length
+/// and data.
+template<typename ValueTy>
+class StringMapEntry final : public StringMapEntryStorage<ValueTy> {
+public:
+  using StringMapEntryStorage<ValueTy>::StringMapEntryStorage;
+
+  std::string_view getKey() const {
+    return std::string_view(getKeyData(), this->getKeyLength());
+  }
 
   /// getKeyData - Return the start of the string data that is the key for this
   /// value.  The string data is always stored immediately after the
   /// StringMapEntry object.
   const char *getKeyData() const {return reinterpret_cast<const char*>(this+1);}
 
-  std::string_view first() const { return std::string_view(getKeyData(), getKeyLength()); }
+  std::string_view first() const { return std::string_view(getKeyData(), this->getKeyLength()); }
 
   /// Create a StringMapEntry for the specified key construct the value using
   /// \p InitiVals.
@@ -358,6 +380,16 @@ public:
   /// the pair points to the element with key equivalent to the key of the pair.
   std::pair<iterator, bool> insert(std::pair<std::string_view, ValueTy> KV) {
     return try_emplace(KV.first, std::move(KV.second));
+  }
+
+  /// Inserts an element or assigns to the current element if the key already
+  /// exists. The return type is the same as try_emplace.
+  template <typename V>
+  std::pair<iterator, bool> insert_or_assign(std::string_view Key, V &&Val) {
+    auto Ret = try_emplace(Key, std::forward<V>(Val));
+    if (!Ret.second)
+      Ret.first->second = std::forward<V>(Val);
+    return Ret;
   }
 
   /// Emplace a new element for the specified key into the map if the key isn't

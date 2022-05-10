@@ -1,4 +1,4 @@
-From 6189d089be1a3be4d14e8aa853d17392aefbdc0f Mon Sep 17 00:00:00 2001
+From d5c4593458ded670b89435d2d212346d0ac9b472 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:42:38 -0400
 Subject: [PATCH 10/36] Remove StringRef, ArrayRef, Optional
@@ -6,30 +6,30 @@ Subject: [PATCH 10/36] Remove StringRef, ArrayRef, Optional
 ---
  llvm/include/llvm/ADT/DenseMapInfo.h          |  36 +++---
  llvm/include/llvm/ADT/SmallSet.h              |  12 +-
- llvm/include/llvm/ADT/SmallString.h           |  60 +++++-----
- llvm/include/llvm/ADT/StringMap.h             |  44 +++----
+ llvm/include/llvm/ADT/SmallString.h           |  60 ++++-----
+ llvm/include/llvm/ADT/StringMap.h             |  54 ++++----
  llvm/include/llvm/Support/ConvertUTF.h        |  43 ++-----
  llvm/include/llvm/Support/ErrorHandling.h     |   7 +-
- llvm/include/llvm/Support/MemoryBuffer.h      |  52 ++++-----
+ llvm/include/llvm/Support/MemoryBuffer.h      |  52 ++++----
  .../llvm/Support/SmallVectorMemoryBuffer.h    |   6 +-
- llvm/include/llvm/Support/VersionTuple.h      |  20 ++--
- llvm/include/llvm/Support/raw_ostream.h       |  38 +++++--
+ llvm/include/llvm/Support/VersionTuple.h      |  20 ++-
+ .../llvm/Support/Windows/WindowsSupport.h     |   2 -
+ llvm/include/llvm/Support/raw_ostream.h       |  38 ++++--
  llvm/lib/Support/ConvertUTFWrapper.cpp        |  37 +++---
- llvm/lib/Support/ErrorHandling.cpp            |  13 +--
- llvm/lib/Support/MemoryBuffer.cpp             |  76 ++++++-------
+ llvm/lib/Support/ErrorHandling.cpp            |  13 +-
+ llvm/lib/Support/MemoryBuffer.cpp             |  76 ++++++------
  llvm/lib/Support/StringMap.cpp                |  12 +-
- llvm/lib/Support/Windows/WindowsSupport.h     |   2 -
  llvm/lib/Support/raw_ostream.cpp              |  16 +--
  llvm/unittests/ADT/DenseMapTest.cpp           |  14 +--
  llvm/unittests/ADT/HashingTest.cpp            |   2 +-
- llvm/unittests/ADT/SmallStringTest.cpp        | 107 +++---------------
- llvm/unittests/ADT/SmallVectorTest.cpp        |  20 +---
- llvm/unittests/ADT/StringMapTest.cpp          |  39 ++-----
+ llvm/unittests/ADT/SmallStringTest.cpp        | 115 +++---------------
+ llvm/unittests/ADT/SmallVectorTest.cpp        |  20 +--
+ llvm/unittests/ADT/StringMapTest.cpp          |  60 ++-------
  llvm/unittests/Support/ConvertUTFTest.cpp     |  25 ++--
- 22 files changed, 270 insertions(+), 411 deletions(-)
+ 22 files changed, 274 insertions(+), 446 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index 99af567d4ef4..1101e8a7b5a7 100644
+index d376cf9cfa0f..a1aaea533978 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
 @@ -13,14 +13,14 @@
@@ -41,7 +41,7 @@ index 99af567d4ef4..1101e8a7b5a7 100644
 -#include "llvm/ADT/StringRef.h"
 +#include "llvm/ADT/span.h"
  #include "llvm/Support/PointerLikeTypeTraits.h"
- #include "llvm/Support/ScalableSize.h"
+ #include "llvm/Support/TypeSize.h"
  #include <cassert>
  #include <cstddef>
  #include <cstdint>
@@ -49,7 +49,7 @@ index 99af567d4ef4..1101e8a7b5a7 100644
  #include <utility>
  
  namespace llvm {
-@@ -206,26 +206,26 @@ struct DenseMapInfo<std::pair<T, U>> {
+@@ -217,26 +217,26 @@ struct DenseMapInfo<std::pair<T, U>> {
    }
  };
  
@@ -84,7 +84,7 @@ index 99af567d4ef4..1101e8a7b5a7 100644
      if (RHS.data() == getEmptyKey().data())
        return LHS.data() == getEmptyKey().data();
      if (RHS.data() == getTombstoneKey().data())
-@@ -234,26 +234,26 @@ template <> struct DenseMapInfo<StringRef> {
+@@ -245,26 +245,26 @@ template <> struct DenseMapInfo<StringRef> {
    }
  };
  
@@ -120,7 +120,7 @@ index 99af567d4ef4..1101e8a7b5a7 100644
        return LHS.data() == getEmptyKey().data();
      if (RHS.data() == getTombstoneKey().data())
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index 6b128c2e2992..556349e0f004 100644
+index a03fa7dd8423..8294a816f284 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
 @@ -13,7 +13,6 @@
@@ -385,7 +385,7 @@ index 898be80d0324..6bbb537f6f58 100644
      return *this;
    }
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 78c188e0ce0f..f19482187a8b 100644
+index 5846a2f4ac2b..7662fc1294cd 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -13,7 +13,6 @@
@@ -428,23 +428,42 @@ index 78c188e0ce0f..f19482187a8b 100644
  
    /// Allocate the table with the specified number of buckets and otherwise
    /// setup the map as empty.
-@@ -133,8 +133,8 @@ public:
-       : StringMapEntryBase(strLen), second(std::forward<InitTy>(InitVals)...) {}
-   StringMapEntry(StringMapEntry &E) = delete;
+@@ -142,13 +142,13 @@ public:
+ };
+ 
+ template<>
+-class StringMapEntryStorage<NoneType> : public StringMapEntryBase {
++class StringMapEntryStorage<std::nullopt_t> : public StringMapEntryBase {
+ public:
+-  explicit StringMapEntryStorage(size_t strLen, NoneType none = None)
++  explicit StringMapEntryStorage(size_t strLen, std::nullopt_t none = std::nullopt)
+     : StringMapEntryBase(strLen) {}
+   StringMapEntryStorage(StringMapEntryStorage &E) = delete;
+ 
+-  NoneType getValue() const { return None; }
++  std::nullopt_t getValue() const { return std::nullopt; }
+ };
+ 
+ /// StringMapEntry - This is used to represent one value that is inserted into
+@@ -159,8 +159,8 @@ class StringMapEntry final : public StringMapEntryStorage<ValueTy> {
+ public:
+   using StringMapEntryStorage<ValueTy>::StringMapEntryStorage;
  
 -  StringRef getKey() const {
--    return StringRef(getKeyData(), getKeyLength());
+-    return StringRef(getKeyData(), this->getKeyLength());
 +  std::string_view getKey() const {
-+    return std::string_view(getKeyData(), getKeyLength());
++    return std::string_view(getKeyData(), this->getKeyLength());
    }
  
-   const ValueTy &getValue() const { return second; }
-@@ -147,12 +147,12 @@ public:
+   /// getKeyData - Return the start of the string data that is the key for this
+@@ -168,14 +168,12 @@ public:
    /// StringMapEntry object.
    const char *getKeyData() const {return reinterpret_cast<const char*>(this+1);}
  
--  StringRef first() const { return StringRef(getKeyData(), getKeyLength()); }
-+  std::string_view first() const { return std::string_view(getKeyData(), getKeyLength()); }
+-  StringRef first() const {
+-    return StringRef(getKeyData(), this->getKeyLength());
+-  }
++  std::string_view first() const { return std::string_view(getKeyData(), this->getKeyLength()); }
  
    /// Create a StringMapEntry for the specified key construct the value using
    /// \p InitiVals.
@@ -454,7 +473,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      size_t KeyLength = Key.size();
  
      // Allocate a new item with space for the string at the end and a null
-@@ -173,7 +173,7 @@ public:
+@@ -196,7 +194,7 @@ public:
      return NewItem;
    }
  
@@ -463,7 +482,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      return Create(Key, ValueTy());
    }
  
-@@ -207,7 +207,7 @@ public:
+@@ -230,7 +228,7 @@ public:
    explicit StringMap(unsigned InitialSize)
      : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
  
@@ -472,7 +491,7 @@ index 78c188e0ce0f..f19482187a8b 100644
        : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
      for (const auto &P : List) {
        insert(P);
-@@ -297,13 +297,13 @@ public:
+@@ -320,13 +318,13 @@ public:
                        StringMapKeyIterator<ValueTy>(end()));
    }
  
@@ -488,7 +507,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      int Bucket = FindKey(Key);
      if (Bucket == -1) return end();
      return const_iterator(TheTable+Bucket, true);
-@@ -311,7 +311,7 @@ public:
+@@ -334,7 +332,7 @@ public:
  
    /// lookup - Return the entry for the specified key, or a default
    /// constructed value if no such entry exists.
@@ -497,7 +516,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      const_iterator it = find(Key);
      if (it != end())
        return it->second;
-@@ -320,10 +320,10 @@ public:
+@@ -343,10 +341,10 @@ public:
  
    /// Lookup the ValueTy for the \p Key, or create a default constructed value
    /// if the key is not in the map.
@@ -510,7 +529,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      return find(Key) == end() ? 0 : 1;
    }
  
-@@ -355,7 +355,7 @@ public:
+@@ -378,14 +376,14 @@ public:
    /// isn't already in the map. The bool component of the returned pair is true
    /// if and only if the insertion takes place, and the iterator component of
    /// the pair points to the element with key equivalent to the key of the pair.
@@ -519,7 +538,15 @@ index 78c188e0ce0f..f19482187a8b 100644
      return try_emplace(KV.first, std::move(KV.second));
    }
  
-@@ -364,7 +364,7 @@ public:
+   /// Inserts an element or assigns to the current element if the key already
+   /// exists. The return type is the same as try_emplace.
+   template <typename V>
+-  std::pair<iterator, bool> insert_or_assign(StringRef Key, V &&Val) {
++  std::pair<iterator, bool> insert_or_assign(std::string_view Key, V &&Val) {
+     auto Ret = try_emplace(Key, std::forward<V>(Val));
+     if (!Ret.second)
+       Ret.first->second = std::forward<V>(Val);
+@@ -397,7 +395,7 @@ public:
    /// if and only if the insertion takes place, and the iterator component of
    /// the pair points to the element with key equivalent to the key of the pair.
    template <typename... ArgsTy>
@@ -528,7 +555,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      unsigned BucketNo = LookupBucketFor(Key);
      StringMapEntryBase *&Bucket = TheTable[BucketNo];
      if (Bucket && Bucket != getTombstoneVal())
-@@ -411,7 +411,7 @@ public:
+@@ -444,7 +442,7 @@ public:
      V.Destroy();
    }
  
@@ -537,7 +564,7 @@ index 78c188e0ce0f..f19482187a8b 100644
      iterator I = find(Key);
      if (I == end()) return false;
      erase(I);
-@@ -504,23 +504,23 @@ template <typename ValueTy>
+@@ -537,23 +535,23 @@ template <typename ValueTy>
  class StringMapKeyIterator
      : public iterator_adaptor_base<StringMapKeyIterator<ValueTy>,
                                     StringMapConstIterator<ValueTy>,
@@ -890,7 +917,7 @@ index b63b58e3a8ba..5699105bf8e2 100644
    BufferKind getBufferKind() const override { return MemoryBuffer_Malloc; }
  
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 14736d6b28f0..e705a21a206c 100644
+index f3eeea2f7b44..ab01dabb33dd 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
 @@ -14,9 +14,8 @@
@@ -934,7 +961,7 @@ index 14736d6b28f0..e705a21a206c 100644
      return Build;
    }
  
-@@ -139,11 +138,6 @@ public:
+@@ -146,11 +145,6 @@ public:
  
    /// Retrieve a string representation of the version number.
    std::string getAsString() const;
@@ -946,8 +973,21 @@ index 14736d6b28f0..e705a21a206c 100644
  };
  
  /// Print a version number.
+diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+index eff608d795a3..16975cfb16e8 100644
+--- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
++++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
+@@ -35,8 +35,6 @@
+ 
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
+-#include "llvm/ADT/StringRef.h"
+-#include "llvm/ADT/Twine.h"
+ #include "llvm/Config/config.h" // Get build system configuration settings
+ #include "llvm/Support/Allocator.h"
+ #include "llvm/Support/Chrono.h"
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 48bb623b0638..141e624dd6b9 100644
+index c8770c337588..2d4788594df1 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -14,12 +14,13 @@
@@ -963,9 +1003,9 @@ index 48bb623b0638..141e624dd6b9 100644
  #include <string>
 +#include <string_view>
  #include <system_error>
+ #include <type_traits>
  
- namespace llvm {
-@@ -164,7 +165,22 @@ public:
+@@ -178,7 +179,22 @@ public:
      return *this;
    }
  
@@ -989,7 +1029,7 @@ index 48bb623b0638..141e624dd6b9 100644
      // Inline fast path, particularly for strings with a known length.
      size_t Size = Str.size();
  
-@@ -183,7 +199,7 @@ public:
+@@ -197,7 +213,7 @@ public:
      // Inline fast path, particularly for constant strings where a sufficiently
      // smart compiler will simplify strlen.
  
@@ -998,7 +1038,7 @@ index 48bb623b0638..141e624dd6b9 100644
    }
  
    raw_ostream &operator<<(const std::string &Str) {
-@@ -220,7 +236,7 @@ public:
+@@ -237,7 +253,7 @@ public:
  
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
@@ -1007,7 +1047,7 @@ index 48bb623b0638..141e624dd6b9 100644
  
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
-@@ -404,14 +420,14 @@ public:
+@@ -436,14 +452,14 @@ public:
    /// As a special case, if Filename is "-", then the stream will use
    /// STDOUT_FILENO instead of opening a file. This will not close the stdout
    /// descriptor.
@@ -1027,7 +1067,7 @@ index 48bb623b0638..141e624dd6b9 100644
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags);
  
-@@ -530,8 +546,8 @@ public:
+@@ -564,8 +580,8 @@ public:
  
    void flush() = delete;
  
@@ -1154,7 +1194,7 @@ index eb4ead6b46b4..d20012132def 100644
  
  bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index e8f2621fa3a5..56349705103d 100644
+index 4d6e15e07b9e..eee176a7b04f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -1165,7 +1205,7 @@ index e8f2621fa3a5..56349705103d 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Debug.h"
  #include "llvm/Support/Errc.h"
-@@ -73,18 +72,14 @@ void llvm::remove_fatal_error_handler() {
+@@ -74,18 +73,14 @@ void llvm::remove_fatal_error_handler() {
  }
  
  void llvm::report_fatal_error(const char *Reason, bool GenCrashDiag) {
@@ -1187,7 +1227,7 @@ index e8f2621fa3a5..56349705103d 100644
    llvm::fatal_error_handler_t handler = nullptr;
    void* handlerData = nullptr;
    {
-@@ -96,7 +91,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -97,7 +92,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
    }
  
    if (handler) {
@@ -1197,7 +1237,7 @@ index e8f2621fa3a5..56349705103d 100644
      // Blast the result out to stderr.  We don't try hard to make sure this
      // succeeds (e.g. handling EINTR) and we can't use errs() here because
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 8fc905472a62..0cdcf929f698 100644
+index deed2d9ffca6..a6e29c40a3b4 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -54,9 +54,9 @@ void MemoryBuffer::init(const char *BufStart, const char *BufEnd,
@@ -1329,8 +1369,8 @@ index 8fc905472a62..0cdcf929f698 100644
 +getMemoryBufferForStream(sys::fs::file_t FD, std::string_view BufferName) {
    constexpr size_t ChunkSize = 4096*4;
    SmallVector<uint8_t, ChunkSize> Buffer;
-   size_t ReadBytes;
-@@ -226,7 +226,7 @@ getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {
+   // Read into Buffer until we hit EOF.
+@@ -228,7 +228,7 @@ getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {
  
  
  ErrorOr<std::unique_ptr<MemoryBuffer>>
@@ -1339,7 +1379,7 @@ index 8fc905472a62..0cdcf929f698 100644
                        bool RequiresNullTerminator, bool IsVolatile) {
    return getFileAux<MemoryBuffer>(Filename, FileSize, FileSize, 0,
                                    RequiresNullTerminator, IsVolatile);
-@@ -234,13 +234,13 @@ MemoryBuffer::getFile(const Twine &Filename, int64_t FileSize,
+@@ -236,13 +236,13 @@ MemoryBuffer::getFile(const Twine &Filename, int64_t FileSize,
  
  template <typename MB>
  static ErrorOr<std::unique_ptr<MB>>
@@ -1355,7 +1395,7 @@ index 8fc905472a62..0cdcf929f698 100644
             uint64_t Offset, bool RequiresNullTerminator, bool IsVolatile) {
    Expected<sys::fs::file_t> FDOrErr =
        sys::fs::openNativeFileForRead(Filename, sys::fs::OF_None);
-@@ -254,7 +254,7 @@ getFileAux(const Twine &Filename, int64_t FileSize, uint64_t MapSize,
+@@ -256,7 +256,7 @@ getFileAux(const Twine &Filename, int64_t FileSize, uint64_t MapSize,
  }
  
  ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
@@ -1364,7 +1404,7 @@ index 8fc905472a62..0cdcf929f698 100644
                                bool IsVolatile) {
    return getFileAux<WritableMemoryBuffer>(Filename, FileSize, FileSize, 0,
                                            /*RequiresNullTerminator*/ false,
-@@ -262,21 +262,21 @@ WritableMemoryBuffer::getFile(const Twine &Filename, int64_t FileSize,
+@@ -264,21 +264,21 @@ WritableMemoryBuffer::getFile(const Twine &Filename, int64_t FileSize,
  }
  
  ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
@@ -1389,7 +1429,7 @@ index 8fc905472a62..0cdcf929f698 100644
    size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + NameRef.size() + 1, 16);
    size_t RealLen = AlignedStringLen + Size + 1;
    char *Mem = static_cast<char*>(operator new(RealLen, std::nothrow));
-@@ -284,18 +284,18 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, const Twine &BufferName
+@@ -286,18 +286,18 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, const Twine &BufferName
      return nullptr;
  
    // The name is stored after the class itself.
@@ -1411,7 +1451,7 @@ index 8fc905472a62..0cdcf929f698 100644
    auto SB = WritableMemoryBuffer::getNewUninitMemBuffer(Size, BufferName);
    if (!SB)
      return nullptr;
-@@ -359,7 +359,7 @@ static bool shouldUseMmap(sys::fs::file_t FD,
+@@ -361,7 +361,7 @@ static bool shouldUseMmap(sys::fs::file_t FD,
  }
  
  static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
@@ -1420,7 +1460,7 @@ index 8fc905472a62..0cdcf929f698 100644
                   uint64_t Offset) {
    Expected<sys::fs::file_t> FDOrErr = sys::fs::openNativeFileForReadWrite(
        Filename, sys::fs::CD_OpenExisting, sys::fs::OF_None);
-@@ -400,20 +400,20 @@ getReadWriteFile(const Twine &Filename, uint64_t FileSize, uint64_t MapSize,
+@@ -402,20 +402,20 @@ getReadWriteFile(const Twine &Filename, uint64_t FileSize, uint64_t MapSize,
  }
  
  ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
@@ -1444,7 +1484,7 @@ index 8fc905472a62..0cdcf929f698 100644
                  uint64_t MapSize, int64_t Offset, bool RequiresNullTerminator,
                  bool IsVolatile) {
    static int PageSize = sys::Process::getPageSizeEstimate();
-@@ -464,14 +464,14 @@ getOpenFileImpl(sys::fs::file_t FD, const Twine &Filename, uint64_t FileSize,
+@@ -479,14 +479,14 @@ getOpenFileImpl(sys::fs::file_t FD, const Twine &Filename, uint64_t FileSize,
  }
  
  ErrorOr<std::unique_ptr<MemoryBuffer>>
@@ -1461,7 +1501,7 @@ index 8fc905472a62..0cdcf929f698 100644
                                 int64_t Offset, bool IsVolatile) {
    assert(MapSize != uint64_t(-1));
    return getOpenFileImpl<MemoryBuffer>(FD, Filename, -1, MapSize, Offset, false,
-@@ -489,7 +489,7 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
+@@ -504,7 +504,7 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
  }
  
  ErrorOr<std::unique_ptr<MemoryBuffer>>
@@ -1470,7 +1510,7 @@ index 8fc905472a62..0cdcf929f698 100644
    Expected<sys::fs::file_t> FDOrErr =
        sys::fs::openNativeFileForRead(Filename, sys::fs::OF_None);
    if (!FDOrErr)
-@@ -502,8 +502,8 @@ MemoryBuffer::getFileAsStream(const Twine &Filename) {
+@@ -517,8 +517,8 @@ MemoryBuffer::getFileAsStream(const Twine &Filename) {
  }
  
  MemoryBufferRef MemoryBuffer::getMemBufferRef() const {
@@ -1538,24 +1578,11 @@ index 6b5ea020dd46..942f07096223 100644
    int Bucket = FindKey(Key);
    if (Bucket == -1) return nullptr;
  
-diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index 508c4d96defa..b2a604cb2d37 100644
---- a/llvm/lib/Support/Windows/WindowsSupport.h
-+++ b/llvm/lib/Support/Windows/WindowsSupport.h
-@@ -35,8 +35,6 @@
- 
- #include "llvm/ADT/SmallVector.h"
- #include "llvm/ADT/StringExtras.h"
--#include "llvm/ADT/StringRef.h"
--#include "llvm/ADT/Twine.h"
- #include "llvm/Config/config.h" // Get build system configuration settings
- #include "llvm/Support/Chrono.h"
- #include "llvm/Support/Compiler.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 2baccaa0cbd7..b85866c3b78d 100644
+index 13b0203ac953..8fdbf5157f3c 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -143,7 +143,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
+@@ -162,7 +162,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
  }
  
  
@@ -1564,7 +1591,7 @@ index 2baccaa0cbd7..b85866c3b78d 100644
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
      switch (c) {
-@@ -497,7 +497,7 @@ void format_object_base::home() {
+@@ -516,7 +516,7 @@ void format_object_base::home() {
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
  
@@ -1573,7 +1600,7 @@ index 2baccaa0cbd7..b85866c3b78d 100644
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags) {
    assert((Access & sys::fs::FA_Write) &&
-@@ -525,25 +525,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
+@@ -544,25 +544,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
    return FD;
  }
  
@@ -1604,7 +1631,7 @@ index 2baccaa0cbd7..b85866c3b78d 100644
                                 sys::fs::CreationDisposition Disp,
                                 sys::fs::FileAccess Access,
                                 sys::fs::OpenFlags Flags)
-@@ -673,7 +673,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -692,7 +692,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
    // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
    // and using WriteConsoleW. If that fails, fall back to plain write().
    if (IsWindowsConsole)
@@ -1614,7 +1641,7 @@ index 2baccaa0cbd7..b85866c3b78d 100644
  #endif
  
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index 7e85ce7011fd..a596338f1e74 100644
+index 1ff12a6366cb..20ba795c05df 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -481,9 +481,9 @@ TEST(DenseMapCustomTest, ReserveTest) {
@@ -1661,7 +1688,7 @@ index 66d63d437a46..2157754261e3 100644
  #if 0 // Enable this to generate paste-able text for the above structure.
      std::string member_str = "\"" + str.str() + "\",";
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index 6868381c5cf1..1e4ae1576e24 100644
+index 686215fd2238..af37122064cf 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -50,21 +50,21 @@ TEST_F(SmallStringTest, AssignRepeated) {
@@ -1777,7 +1804,7 @@ index 6868381c5cf1..1e4ae1576e24 100644
  
    theString = "hellx xello hell ello world foo bar hello";
    EXPECT_EQ(36U, theString.find("hello"));
-@@ -147,60 +130,4 @@ TEST_F(SmallStringTest, Find) {
+@@ -147,68 +130,4 @@ TEST_F(SmallStringTest, Find) {
    EXPECT_EQ(0U, theString.find(""));
  }
  
@@ -1803,7 +1830,7 @@ index 6868381c5cf1..1e4ae1576e24 100644
 -  EXPECT_EQ("abcdyyy", theString.slice(0, 7));
 -}
 -
--TEST(StringRefTest, Comparisons) {
+-TEST_F(SmallStringTest, Comparisons) {
 -  EXPECT_EQ(-1, SmallString<10>("aab").compare("aad"));
 -  EXPECT_EQ( 0, SmallString<10>("aab").compare("aab"));
 -  EXPECT_EQ( 1, SmallString<10>("aab").compare("aaa"));
@@ -1837,7 +1864,15 @@ index 6868381c5cf1..1e4ae1576e24 100644
 -  EXPECT_EQ( 1, SmallString<10>("V8_q0").compare_numeric("V1_q0"));
 -}
 -
- }
+-// Check gtest prints SmallString as a string instead of a container of chars.
+-// The code is in utils/unittest/googletest/internal/custom/gtest-printers.h
+-TEST_F(SmallStringTest, GTestPrinter) {
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(SmallString<1>("foo")));
+-  const SmallVectorImpl<char> &ErasedSmallString = SmallString<1>("foo");
+-  EXPECT_EQ(R"("foo")", ::testing::PrintToString(ErasedSmallString));
+-}
+-
+ } // namespace
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
 index dbe404869e2c..61682b50dea2 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
@@ -1875,7 +1910,7 @@ index dbe404869e2c..61682b50dea2 100644
 -
  } // end namespace
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 4038d4d3d2f7..5158aa8ad38f 100644
+index 5f0c83d0de6e..be34a6dc0f56 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -7,7 +7,6 @@
@@ -1912,7 +1947,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
                  testMap.begin());
      EXPECT_TRUE(testMap.find(testKeyStr) == testMap.begin());
    }
-@@ -93,10 +92,10 @@ TEST_F(StringMapTest, ConstEmptyMapTest) {
+@@ -103,10 +102,10 @@ TEST_F(StringMapTest, ConstEmptyMapTest) {
  
    // Lookup tests
    EXPECT_EQ(0u, constTestMap.count(testKey));
@@ -1925,7 +1960,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
                constTestMap.end());
    EXPECT_TRUE(constTestMap.find(testKeyStr) == constTestMap.end());
  }
-@@ -216,7 +215,7 @@ TEST_F(StringMapTest, IterationTest) {
+@@ -226,7 +225,7 @@ TEST_F(StringMapTest, IterationTest) {
  TEST_F(StringMapTest, StringMapEntryTest) {
    StringMap<uint32_t>::value_type* entry =
        StringMap<uint32_t>::value_type::Create(
@@ -1934,7 +1969,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
    EXPECT_STREQ(testKey, entry->first().data());
    EXPECT_EQ(1u, entry->second);
    free(entry);
-@@ -227,7 +226,7 @@ TEST_F(StringMapTest, InsertTest) {
+@@ -237,7 +236,7 @@ TEST_F(StringMapTest, InsertTest) {
    SCOPED_TRACE("InsertTest");
    testMap.insert(
        StringMap<uint32_t>::value_type::Create(
@@ -1943,10 +1978,31 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
            testMap.getAllocator(), 1u));
    assertSingleItemMap();
  }
-@@ -269,20 +268,6 @@ TEST_F(StringMapTest, InsertRehashingPairTest) {
+@@ -279,41 +278,6 @@ TEST_F(StringMapTest, InsertRehashingPairTest) {
    EXPECT_EQ(42u, It->second);
  }
  
+-TEST_F(StringMapTest, InsertOrAssignTest) {
+-  struct A : CountCopyAndMove {
+-    A(int v) : v(v) {}
+-    int v;
+-  };
+-  StringMap<A> t(0);
+-
+-  auto try1 = t.insert_or_assign("A", A(1));
+-  EXPECT_TRUE(try1.second);
+-  EXPECT_EQ(1, try1.first->second.v);
+-  EXPECT_EQ(1, try1.first->second.move);
+-
+-  auto try2 = t.insert_or_assign("A", A(2));
+-  EXPECT_FALSE(try2.second);
+-  EXPECT_EQ(2, try2.first->second.v);
+-  EXPECT_EQ(2, try1.first->second.move);
+-
+-  EXPECT_EQ(try1.first, try2.first);
+-  EXPECT_EQ(0, try1.first->second.copy);
+-}
+-
 -TEST_F(StringMapTest, IterMapKeys) {
 -  StringMap<int> Map;
 -  Map["A"] = 1;
@@ -1964,7 +2020,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
  // Create a non-default constructable value
  struct StringMapTestStruct {
    StringMapTestStruct(int i) : i(i) {}
-@@ -321,13 +306,13 @@ private:
+@@ -352,13 +316,13 @@ private:
  TEST_F(StringMapTest, MoveOnly) {
    StringMap<MoveOnly> t;
    t.insert(std::make_pair("Test", MoveOnly(42)));
@@ -1980,7 +2036,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
    StringMapEntry<MoveOnly>::Create(Key, Immovable())
        ->Destroy();
  }
-@@ -437,7 +422,7 @@ TEST(StringMapCustomTest, InitialSizeTest) {
+@@ -468,7 +432,7 @@ TEST(StringMapCustomTest, InitialSizeTest) {
      CountCtorCopyAndMove::Copy = 0;
      for (int i = 0; i < Size; ++i)
        Map.insert(std::pair<std::string, CountCtorCopyAndMove>(
@@ -1989,7 +2045,7 @@ index 4038d4d3d2f7..5158aa8ad38f 100644
            std::forward_as_tuple(i)));
      // After the initial move, the map will move the Elts in the Entry.
      EXPECT_EQ((unsigned)Size * 2, CountCtorCopyAndMove::Move);
-@@ -506,7 +491,7 @@ TEST(StringMapCustomTest, StringMapEntrySize) {
+@@ -537,7 +501,7 @@ TEST(StringMapCustomTest, StringMapEntrySize) {
    else
      LargeValue = std::numeric_limits<unsigned>::max() + 1ULL;
    StringMapEntry<int> LargeEntry(LargeValue);

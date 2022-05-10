@@ -1,4 +1,4 @@
-From 33aee91cb5fe35d13b43b562ec091919a2c3f8b8 Mon Sep 17 00:00:00 2001
+From fa3b8d9f2e5a9526f2f2fc18e72435d09bffc658 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:18:58 -0400
 Subject: [PATCH 25/36] fixup inline macro
@@ -8,10 +8,10 @@ Subject: [PATCH 25/36] fixup inline macro
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 118a802347dd..a567f8423526 100644
+index cf31a98e78c7..f36ac0c28a34 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -229,11 +229,11 @@
+@@ -256,11 +256,11 @@
  /// errors, just use it in GCC 4.0 and later.
  #ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
  #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)

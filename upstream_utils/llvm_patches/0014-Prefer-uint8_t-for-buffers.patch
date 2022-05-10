@@ -1,4 +1,4 @@
-From d940cea8b2c6f9a32444c675be7406e9ba2b7b21 Mon Sep 17 00:00:00 2001
+From 7a19c4b2859913bf02f8e102384bc1cadfb8fb1a Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:07:37 -0400
 Subject: [PATCH 14/36] Prefer uint8_t for buffers
@@ -115,7 +115,7 @@ index 5699105bf8e2..e4e0713d135f 100644
  };
  
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 0cdcf929f698..431f7e5c040f 100644
+index a6e29c40a3b4..4103a5685f38 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -42,7 +42,7 @@ MemoryBuffer::~MemoryBuffer() { }
@@ -154,7 +154,7 @@ index 0cdcf929f698..431f7e5c040f 100644
        MemoryBuffer::init(Start, Start + Len, RequiresNullTerminator);
      }
    }
-@@ -279,7 +279,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -281,7 +281,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    std::string_view NameRef = BufferName.tostd::string_view(NameBuf);
    size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + NameRef.size() + 1, 16);
    size_t RealLen = AlignedStringLen + Size + 1;
@@ -163,7 +163,7 @@ index 0cdcf929f698..431f7e5c040f 100644
    if (!Mem)
      return nullptr;
  
-@@ -287,7 +287,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -289,7 +289,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    CopyStringView(Mem + sizeof(MemBuffer), NameRef);
  
    // The buffer begins after the name and must be aligned.
