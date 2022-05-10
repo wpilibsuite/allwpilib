@@ -83,24 +83,13 @@ inline bool RunningWindows8OrGreater() {
   return GetWindowsOSVersion() >= wpi::VersionTuple(6, 2, 0, 0);
 }
 
-inline bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix) {
-  if (!ErrMsg)
-    return true;
-  char *buffer = NULL;
-  DWORD LastError = GetLastError();
-  DWORD R = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                               FORMAT_MESSAGE_FROM_SYSTEM |
-                               FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                           NULL, LastError, 0, (LPSTR)&buffer, 1, NULL);
-  if (R)
-    *ErrMsg = prefix + ": " + buffer;
-  else
-    *ErrMsg = prefix + ": Unknown error";
-  *ErrMsg += " (0x" + wpi::utohexstr(LastError) + ")";
+/// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
+/// RtlGetVersion or GetVersionEx under the hood depending on what is available.
+/// GetVersionEx is deprecated, but this API exposes the build number which can
+/// be useful for working around certain kernel bugs.
+wpi::VersionTuple GetWindowsOSVersion();
 
-  LocalFree(buffer);
-  return R != 0;
-}
+bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
 
 template <typename HandleTraits>
 class ScopedHandle {

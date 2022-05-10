@@ -1,15 +1,15 @@
-From d070d159a9ae01b38660212095e3e40243ad272a Mon Sep 17 00:00:00 2001
+From 5810ce017761d64512fc8f857776157cc27b58f1 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:25:03 -0400
 Subject: [PATCH 31/37] Add missing raw_ostream functions
 
 ---
- llvm/include/llvm/Support/raw_ostream.h | 11 +++++++++++
- llvm/lib/Support/raw_ostream.cpp        |  5 +++++
- 2 files changed, 16 insertions(+)
+ llvm/include/llvm/Support/raw_ostream.h | 3 +++
+ llvm/lib/Support/raw_ostream.cpp        | 3 +++
+ 2 files changed, 6 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 93637c904aae..8a6228ba3c1e 100644
+index 8776ba2f5cde..26dd54a84466 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -281,6 +281,9 @@ private:
@@ -22,33 +22,11 @@ index 93637c904aae..8a6228ba3c1e 100644
    /// Return the current position within the stream, not counting the bytes
    /// currently in the buffer.
    virtual uint64_t current_pos() const = 0;
-@@ -356,6 +359,12 @@ class raw_fd_ostream : public raw_pwrite_stream {
- 
-   bool SupportsSeeking;
- 
-+#ifdef _WIN32
-+  /// True if this fd refers to a Windows console device. Mintty and other
-+  /// terminal emulators are TTYs, but they are not consoles.
-+  bool IsWindowsConsole = false;
-+#endif
-+
-   /// See raw_ostream::write_impl.
-   void write_impl(const char *Ptr, size_t Size) override;
- 
-@@ -623,6 +632,8 @@ class buffer_ostream : public raw_svector_ostream {
-   raw_ostream &OS;
-   SmallVector<char, 0> Buffer;
- 
-+  virtual void anchor() override;
-+
- public:
-   buffer_ostream(raw_ostream &OS) : raw_svector_ostream(Buffer), OS(OS) {}
-   ~buffer_ostream() override { OS << str(); }
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index d3736bd7ff14..351323194c27 100644
+index 4903cee49290..bfaf47645fc7 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -80,6 +80,9 @@ raw_ostream::~raw_ostream() {
+@@ -81,6 +81,9 @@ raw_ostream::~raw_ostream() {
      delete [] OutBufStart;
  }
  
@@ -58,12 +36,6 @@ index d3736bd7ff14..351323194c27 100644
  size_t raw_ostream::preferred_buffer_size() const {
    // BUFSIZ is intended to be a reasonable default.
    return BUFSIZ;
-@@ -626,3 +629,5 @@ void raw_null_ostream::pwrite_impl(const char *Ptr, size_t Size,
-                                    uint64_t Offset) {}
- 
- void raw_pwrite_stream::anchor() {}
-+
-+void buffer_ostream::anchor() {}
 -- 
 2.20.1.windows.1
 

@@ -1,4 +1,4 @@
-From 54ce786e01764ef99af98402f82b8a3d38fabb46 Mon Sep 17 00:00:00 2001
+From e23a2221a50a12ffff948d6b17e9fd063a92e399 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 18:56:35 -0400
 Subject: [PATCH 36/37] Fix Gtest warnings
@@ -10,7 +10,7 @@ Subject: [PATCH 36/37] Fix Gtest warnings
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index d3fd9ec14adb..1114ea43e2a8 100644
+index 7d2494bff3b3..4c7c46240b9d 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -106,7 +106,7 @@ typedef ::testing::Types<DenseMap<uint32_t, uint32_t>,
@@ -23,10 +23,10 @@ index d3fd9ec14adb..1114ea43e2a8 100644
  // Empty map tests
  TYPED_TEST(DenseMapTest, EmptyIntMapTest) {
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index 0b1418295f14..0afa981e7c36 100644
+index 5b5bc4238366..89d35addb509 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
-@@ -168,7 +168,7 @@ template <class IntType> struct MapVectorMappedTypeTest : ::testing::Test {
+@@ -170,7 +170,7 @@ template <class IntType> struct MapVectorMappedTypeTest : ::testing::Test {
  
  using MapIntTypes = ::testing::Types<int, long, long long, unsigned,
                                       unsigned long, unsigned long long>;

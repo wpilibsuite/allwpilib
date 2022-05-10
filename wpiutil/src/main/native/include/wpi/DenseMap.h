@@ -25,6 +25,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstring>
+#include <initializer_list>
 #include <iterator>
 #include <new>
 #include <type_traits>
@@ -38,6 +39,34 @@ namespace detail {
 // implementation without requiring two members.
 template <typename KeyT, typename ValueT>
 struct DenseMapPair : public std::pair<KeyT, ValueT> {
+
+  // FIXME: Switch to inheriting constructors when we drop support for older
+  //        clang versions.
+  // NOTE: This default constructor is declared with '{}' rather than
+  //       '= default' to work around a separate bug in clang-3.8. This can
+  //       also go when we switch to inheriting constructors.
+  DenseMapPair() {}
+
+  DenseMapPair(const KeyT &Key, const ValueT &Value)
+      : std::pair<KeyT, ValueT>(Key, Value) {}
+
+  DenseMapPair(KeyT &&Key, ValueT &&Value)
+      : std::pair<KeyT, ValueT>(std::move(Key), std::move(Value)) {}
+
+  template <typename AltKeyT, typename AltValueT>
+  DenseMapPair(AltKeyT &&AltKey, AltValueT &&AltValue,
+               typename std::enable_if<
+                   std::is_convertible<AltKeyT, KeyT>::value &&
+                   std::is_convertible<AltValueT, ValueT>::value>::type * = 0)
+      : std::pair<KeyT, ValueT>(std::forward<AltKeyT>(AltKey),
+                                std::forward<AltValueT>(AltValue)) {}
+
+  template <typename AltPairT>
+  DenseMapPair(AltPairT &&AltPair,
+               typename std::enable_if<std::is_convertible<
+                   AltPairT, std::pair<KeyT, ValueT>>::value>::type * = 0)
+      : std::pair<KeyT, ValueT>(std::forward<AltPairT>(AltPair)) {}
+
   KeyT &getFirst() { return std::pair<KeyT, ValueT>::first; }
   const KeyT &getFirst() const { return std::pair<KeyT, ValueT>::first; }
   ValueT &getSecond() { return std::pair<KeyT, ValueT>::second; }
@@ -46,9 +75,10 @@ struct DenseMapPair : public std::pair<KeyT, ValueT> {
 
 } // end namespace detail
 
-template <
-    typename KeyT, typename ValueT, typename KeyInfoT = DenseMapInfo<KeyT>,
-    typename Bucket = detail::DenseMapPair<KeyT, ValueT>, bool IsConst = false>
+template <typename KeyT, typename ValueT,
+          typename KeyInfoT = DenseMapInfo<KeyT>,
+          typename Bucket = wpi::detail::DenseMapPair<KeyT, ValueT>,
+          bool IsConst = false>
 class DenseMapIterator;
 
 template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
@@ -663,7 +693,7 @@ bool operator!=(
 
 template <typename KeyT, typename ValueT,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
 class DenseMap : public DenseMapBase<DenseMap<KeyT, ValueT, KeyInfoT, BucketT>,
                                      KeyT, ValueT, KeyInfoT, BucketT> {
   friend class DenseMapBase<DenseMap, KeyT, ValueT, KeyInfoT, BucketT>;
@@ -825,7 +855,7 @@ private:
 
 template <typename KeyT, typename ValueT, unsigned InlineBuckets = 4,
           typename KeyInfoT = DenseMapInfo<KeyT>,
-          typename BucketT = detail::DenseMapPair<KeyT, ValueT>>
+          typename BucketT = wpi::detail::DenseMapPair<KeyT, ValueT>>
 class SmallDenseMap
     : public DenseMapBase<
           SmallDenseMap<KeyT, ValueT, InlineBuckets, KeyInfoT, BucketT>, KeyT,

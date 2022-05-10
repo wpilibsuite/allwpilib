@@ -1,4 +1,4 @@
-From bc297f1259885676700e8eaa2508e5ec86024905 Mon Sep 17 00:00:00 2001
+From e9cd688a5324283ff9ae9f544362f5e762889b4b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:56:02 -0400
 Subject: [PATCH 12/37] Prefer std:: over llvm::
@@ -51,10 +51,10 @@ index 4cf6c0e08cf1..4f0a28dd8490 100644
  }
  
 diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
-index 27e27af260b2..7104c9383cf4 100644
+index cc50eccf17f1..8c441766c751 100644
 --- a/llvm/include/llvm/Support/type_traits.h
 +++ b/llvm/include/llvm/Support/type_traits.h
-@@ -104,45 +104,6 @@ struct const_pointer_or_const_ref<
+@@ -105,45 +105,6 @@ struct const_pointer_or_const_ref<
    using type = typename add_const_past_pointer<T>::type;
  };
  

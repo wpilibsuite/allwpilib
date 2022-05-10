@@ -1,4 +1,4 @@
-From a29351e2560e8aeae20e7f6a10d9efef455007ed Mon Sep 17 00:00:00 2001
+From 165e0950f0bf05bae728e347b64b259618ef8574 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:58:29 -0400
 Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
@@ -12,10 +12,10 @@ Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
  4 files changed, 18 insertions(+), 101 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index ba60b7972a8f..055f3d01ce06 100644
+index 1f50502fff92..1d2ec4b46a4c 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -72,8 +72,6 @@ public:
+@@ -102,8 +102,6 @@ public:
      // empty buckets.
      if (empty())
        return end();
@@ -24,7 +24,7 @@ index ba60b7972a8f..055f3d01ce06 100644
      return makeIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline iterator end() {
-@@ -82,8 +80,6 @@ public:
+@@ -112,8 +110,6 @@ public:
    inline const_iterator begin() const {
      if (empty())
        return end();
@@ -33,7 +33,7 @@ index ba60b7972a8f..055f3d01ce06 100644
      return makeConstIterator(getBuckets(), getBucketsEnd(), *this);
    }
    inline const_iterator end() const {
-@@ -429,20 +425,12 @@ private:
+@@ -459,20 +455,12 @@ private:
    iterator makeIterator(BucketT *P, BucketT *E,
                          DebugEpochBase &Epoch,
                          bool NoAdvance=false) {
@@ -54,7 +54,7 @@ index ba60b7972a8f..055f3d01ce06 100644
      return const_iterator(P, E, Epoch, NoAdvance);
    }
  
-@@ -1132,10 +1120,6 @@ public:
+@@ -1201,10 +1189,6 @@ public:
      assert(isHandleInSync() && "invalid construction!");
  
      if (NoAdvance) return;
@@ -65,7 +65,7 @@ index ba60b7972a8f..055f3d01ce06 100644
      AdvancePastEmptyBuckets();
    }
  
-@@ -1150,14 +1134,10 @@ public:
+@@ -1219,14 +1203,10 @@ public:
  
    reference operator*() const {
      assert(isHandleInSync() && "invalid iterator access!");
@@ -80,7 +80,7 @@ index ba60b7972a8f..055f3d01ce06 100644
      return Ptr;
    }
  
-@@ -1178,11 +1158,6 @@ public:
+@@ -1247,11 +1227,6 @@ public:
  
    inline DenseMapIterator& operator++() {  // Preincrement
      assert(isHandleInSync() && "invalid iterator access!");

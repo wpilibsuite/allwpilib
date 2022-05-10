@@ -366,7 +366,6 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
       ::GetFileType((HANDLE)::_get_osfhandle(fd)) == FILE_TYPE_CHAR;
 #endif
 
-
   // Get the starting position.
   off_t loc = ::lseek(FD, 0, SEEK_CUR);
 #ifdef _WIN32
@@ -466,10 +465,10 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
       return;
 #endif
 
-  // The maximum write size is limited to SSIZE_MAX because a write
-  // greater than SSIZE_MAX is implementation-defined in POSIX.
-  // Since SSIZE_MAX is not portable, we use SIZE_MAX >> 1 instead.
-  size_t MaxWriteSize = SIZE_MAX >> 1;
+  // The maximum write size is limited to INT32_MAX. A write
+  // greater than SSIZE_MAX is implementation-defined in POSIX,
+  // and Windows _write requires 32 bit input.
+  size_t MaxWriteSize = INT32_MAX;
 
 #if defined(__linux__)
   // It is observed that Linux returns EINVAL for a very large write (>2G).
@@ -555,7 +554,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
     return 0;
   return raw_ostream::preferred_buffer_size();
 #elif !defined(__minix)
-  // Windows and Minix have no st_blksize.
+  // Minix has no st_blksize.
   assert(FD >= 0 && "File not yet open!");
   struct stat statbuf;
   if (fstat(FD, &statbuf) != 0)

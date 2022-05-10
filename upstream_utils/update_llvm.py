@@ -150,7 +150,7 @@ def overwrite_tests(wpiutil_root, llvm_root):
 
 def main():
     root, repo = setup_upstream_repo("https://github.com/llvm/llvm-project",
-                                     "llvmorg-7.0.0")
+                                     "llvmorg-8.0.0")
     wpiutil = os.path.join(root, "wpiutil")
 
     patch_root = os.path.join(root, "upstream_utils/llvm_patches")

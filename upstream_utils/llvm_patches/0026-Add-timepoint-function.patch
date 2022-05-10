@@ -1,31 +1,25 @@
-From cf5620de760964374b30ab3d68040b457e0f05d7 Mon Sep 17 00:00:00 2001
+From 93ddfb0d58181f2c3b018eaeab766377e622baf6 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:19:55 -0400
 Subject: [PATCH 26/37] Add timepoint function
 
 ---
- llvm/include/llvm/Support/Chrono.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ llvm/include/llvm/Support/Chrono.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index a3ee12326782..f44273e1c9a3 100644
+index 7b7621146647..f44273e1c9a3 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
-@@ -46,6 +46,14 @@ toTimePoint(std::time_t T) {
-   return time_point_cast<seconds>(system_clock::from_time_t(T));
+@@ -47,7 +47,7 @@ toTimePoint(std::time_t T) {
  }
  
-+/// Convert a std::time_t + nanoseconds to a TimePoint
+ /// Convert a std::time_t + nanoseconds to a TimePoint
+-LLVM_ATTRIBUTE_ALWAYS_INLINE inline TimePoint<>
 +LLVM_ATTRIBUTE_ALWAYS_INLINE TimePoint<>
-+toTimePoint(std::time_t T, uint32_t nsec) {
-+  using namespace std::chrono;
-+  return time_point_cast<nanoseconds>(system_clock::from_time_t(T))
-+    + nanoseconds(nsec);
-+}
-+
- } // namespace sys
- 
- raw_ostream &operator<<(raw_ostream &OS, sys::TimePoint<> TP);
+ toTimePoint(std::time_t T, uint32_t nsec) {
+   using namespace std::chrono;
+   return time_point_cast<nanoseconds>(system_clock::from_time_t(T))
 -- 
 2.20.1.windows.1
 

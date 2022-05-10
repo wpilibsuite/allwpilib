@@ -1,21 +1,21 @@
-From 8b0522394b3192cbf19737a0b997fa7b39645a1b Mon Sep 17 00:00:00 2001
+From ae973dadf2b7023ad100ed505ab3a4dcd8c20143 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:07:25 -0400
 Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       |  6 +++---
+ llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
  llvm/include/llvm/ADT/DenseMapInfo.h   |  2 +-
- llvm/include/llvm/ADT/SmallVector.h    | 12 ++++++------
+ llvm/include/llvm/ADT/SmallVector.h    |  8 ++++----
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 5 files changed, 21 insertions(+), 21 deletions(-)
+ 5 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 055f3d01ce06..52cdb4906e3d 100644
+index 1d2ec4b46a4c..b6ecbca7f6c3 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -351,7 +351,7 @@ protected:
+@@ -381,7 +381,7 @@ protected:
        return 0;
      // +1 is required because of the strict equality.
      // For example if NumEntries is 48, we need to return 401.
@@ -24,16 +24,7 @@ index 055f3d01ce06..52cdb4906e3d 100644
    }
  
    void moveFromOldBuckets(BucketT *OldBucketsBegin, BucketT *OldBucketsEnd) {
-@@ -389,7 +389,7 @@ protected:
-     setNumTombstones(other.getNumTombstones());
- 
-     if (isPodLike<KeyT>::value && isPodLike<ValueT>::value)
--      memcpy(getBuckets(), other.getBuckets(),
-+      memcpy(reinterpret_cast<void *>(getBuckets()), other.getBuckets(),
-              getNumBuckets() * sizeof(BucketT));
-     else
-       for (size_t i = 0; i < getNumBuckets(); ++i) {
-@@ -737,7 +737,7 @@ public:
+@@ -806,7 +806,7 @@ public:
      // Reduce the number of buckets.
      unsigned NewNumBuckets = 0;
      if (OldNumEntries)
@@ -56,7 +47,7 @@ index 5d12b424fb37..5ab8907c8f58 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index acb4426b4f45..116a858091f0 100644
+index 0636abbb1fbf..daa9ee2c47ea 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -43,7 +43,7 @@ protected:
@@ -94,24 +85,6 @@ index acb4426b4f45..116a858091f0 100644
 +  this->Capacity = static_cast<unsigned>(NewCapacity);
  }
  
- 
-@@ -299,7 +299,7 @@ protected:
-     // use memcpy here. Note that I and E are iterators and thus might be
-     // invalid for memcpy if they are equal.
-     if (I != E)
--      memcpy(Dest, I, (E - I) * sizeof(T));
-+      memcpy(reinterpret_cast<void *>(Dest), I, (E - I) * sizeof(T));
-   }
- 
-   /// Double the size of the allocated memory, guaranteeing space for at
-@@ -310,7 +310,7 @@ public:
-   void push_back(const T &Elt) {
-     if (LLVM_UNLIKELY(this->size() >= this->capacity()))
-       this->grow();
--    memcpy(this->end(), &Elt, sizeof(T));
-+    memcpy(reinterpret_cast<void *>(this->end()), &Elt, sizeof(T));
-     this->set_size(this->size() + 1);
-   }
  
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
 index 6ae56c2470bb..617851c806fe 100644

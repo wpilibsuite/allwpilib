@@ -1,4 +1,4 @@
-From f12fafce5205d73dce01e01f524f69075138c792 Mon Sep 17 00:00:00 2001
+From e0a51bcd04441b7fc8ac30a81325a980e0a249df Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:42:38 -0400
 Subject: [PATCH 10/37] Remove StringRef, ArrayRef, Optional
@@ -19,14 +19,14 @@ Subject: [PATCH 10/37] Remove StringRef, ArrayRef, Optional
  llvm/lib/Support/MemoryBuffer.cpp             |  76 ++++++-------
  llvm/lib/Support/StringMap.cpp                |  12 +-
  llvm/lib/Support/Windows/WindowsSupport.h     |   2 -
- llvm/lib/Support/raw_ostream.cpp              |  14 +--
+ llvm/lib/Support/raw_ostream.cpp              |  16 +--
  llvm/unittests/ADT/DenseMapTest.cpp           |  14 +--
  llvm/unittests/ADT/HashingTest.cpp            |   2 +-
  llvm/unittests/ADT/SmallStringTest.cpp        | 107 +++---------------
  llvm/unittests/ADT/SmallVectorTest.cpp        |  20 +---
  llvm/unittests/ADT/StringMapTest.cpp          |  54 ++-------
  llvm/unittests/Support/ConvertUTFTest.cpp     |  25 ++--
- 22 files changed, 269 insertions(+), 425 deletions(-)
+ 22 files changed, 270 insertions(+), 426 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
 index 5ab8907c8f58..5747103047ef 100644
@@ -655,7 +655,7 @@ index 617851c806fe..5e820ad5822f 100644
                              SmallVectorImpl<char> &utf8);
  /// Convert from UTF16 to the current code page used in the system
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 5c67713fb061..096ef6ed68af 100644
+index aff57de458cc..e8bcef7f22ad 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -17,10 +17,9 @@
@@ -946,7 +946,7 @@ index e85a188e54b4..ad5c33c90ea8 100644
  
  /// Print a version number.
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index b9ea9b5817f2..7bcf875302be 100644
+index d062e716209d..47fa577cddd9 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -15,12 +15,13 @@
@@ -1006,7 +1006,7 @@ index b9ea9b5817f2..7bcf875302be 100644
  
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
-@@ -399,14 +415,14 @@ public:
+@@ -405,14 +421,14 @@ public:
    /// As a special case, if Filename is "-", then the stream will use
    /// STDOUT_FILENO instead of opening a file. This will not close the stdout
    /// descriptor.
@@ -1026,7 +1026,7 @@ index b9ea9b5817f2..7bcf875302be 100644
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags);
  
-@@ -525,8 +541,8 @@ public:
+@@ -531,8 +547,8 @@ public:
  
    void flush() = delete;
  
@@ -1538,7 +1538,7 @@ index c1f707ce50a5..d20c62267534 100644
    if (Bucket == -1) return nullptr;
  
 diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index 8dd120947100..e92d7094e57d 100644
+index 9e9a0820359c..c6c8097efcbf 100644
 --- a/llvm/lib/Support/Windows/WindowsSupport.h
 +++ b/llvm/lib/Support/Windows/WindowsSupport.h
 @@ -36,8 +36,6 @@
@@ -1551,10 +1551,10 @@ index 8dd120947100..e92d7094e57d 100644
  #include "llvm/Support/Chrono.h"
  #include "llvm/Support/Compiler.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 038ad00bd608..39b5fdd0a399 100644
+index 21dde7ff914a..c573652d6bd7 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -143,7 +143,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
+@@ -144,7 +144,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
  }
  
  
@@ -1563,7 +1563,7 @@ index 038ad00bd608..39b5fdd0a399 100644
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
      switch (c) {
-@@ -497,7 +497,7 @@ void format_object_base::home() {
+@@ -498,7 +498,7 @@ void format_object_base::home() {
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
  
@@ -1572,7 +1572,7 @@ index 038ad00bd608..39b5fdd0a399 100644
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags) {
    assert((Access & sys::fs::FA_Write) &&
-@@ -525,25 +525,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
+@@ -526,25 +526,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
    return FD;
  }
  
@@ -1603,11 +1603,20 @@ index 038ad00bd608..39b5fdd0a399 100644
                                 sys::fs::CreationDisposition Disp,
                                 sys::fs::FileAccess Access,
                                 sys::fs::OpenFlags Flags)
+@@ -674,7 +674,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+   // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
+   // and using WriteConsoleW. If that fails, fall back to plain write().
+   if (IsWindowsConsole)
+-    if (write_console_impl(FD, StringRef(Ptr, Size)))
++    if (write_console_impl(FD, std::string_view(Ptr, Size)))
+       return;
+ #endif
+ 
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index 87f22f6f403e..d3fd9ec14adb 100644
+index ee9c5dd38000..7d2494bff3b3 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
-@@ -471,9 +471,9 @@ TEST(DenseMapCustomTest, ReserveTest) {
+@@ -491,9 +491,9 @@ TEST(DenseMapCustomTest, ReserveTest) {
    }
  }
  
@@ -1620,7 +1629,7 @@ index 87f22f6f403e..d3fd9ec14adb 100644
  
    M["a"] = 1;
    M["b"] = 2;
-@@ -488,12 +488,12 @@ TEST(DenseMapCustomTest, StringRefTest) {
+@@ -508,12 +508,12 @@ TEST(DenseMapCustomTest, StringRefTest) {
  
    // Test the empty string, spelled various ways.
    EXPECT_EQ(0, M.lookup(""));
@@ -1638,10 +1647,10 @@ index 87f22f6f403e..d3fd9ec14adb 100644
  
  // Key traits that allows lookup with either an unsigned or char* key;
 diff --git a/llvm/unittests/ADT/HashingTest.cpp b/llvm/unittests/ADT/HashingTest.cpp
-index 367f58dc7a6a..afa1ac7fcf8d 100644
+index d96dd7e2f071..2d0a0ea38a66 100644
 --- a/llvm/unittests/ADT/HashingTest.cpp
 +++ b/llvm/unittests/ADT/HashingTest.cpp
-@@ -319,7 +319,7 @@ TEST(HashingTest, HashCombineRangeGoldenTest) {
+@@ -266,7 +266,7 @@ TEST(HashingTest, HashCombineRangeGoldenTest) {
  #endif
    };
    for (unsigned i = 0; i < sizeof(golden_data)/sizeof(*golden_data); ++i) {
@@ -1865,7 +1874,7 @@ index 9c501bbdf1a3..069c8d65e91d 100644
 -
  } // end namespace
 diff --git a/llvm/unittests/ADT/StringMapTest.cpp b/llvm/unittests/ADT/StringMapTest.cpp
-index 1f5c4f031642..e02f57c43a68 100644
+index a44bbbfee095..e02f57c43a68 100644
 --- a/llvm/unittests/ADT/StringMapTest.cpp
 +++ b/llvm/unittests/ADT/StringMapTest.cpp
 @@ -8,8 +8,6 @@
@@ -1946,7 +1955,7 @@ index 1f5c4f031642..e02f57c43a68 100644
 -  Map["D"] = 3;
 -
 -  auto Keys = to_vector<4>(Map.keys());
--  llvm::sort(Keys.begin(), Keys.end());
+-  llvm::sort(Keys);
 -
 -  SmallVector<StringRef, 4> Expected = {"A", "B", "C", "D"};
 -  EXPECT_EQ(Expected, Keys);
@@ -1960,7 +1969,7 @@ index 1f5c4f031642..e02f57c43a68 100644
 -  Set.insert("D");
 -
 -  auto Keys = to_vector<4>(Set.keys());
--  llvm::sort(Keys.begin(), Keys.end());
+-  llvm::sort(Keys);
 -
 -  SmallVector<StringRef, 4> Expected = {"A", "B", "C", "D"};
 -  EXPECT_EQ(Expected, Keys);

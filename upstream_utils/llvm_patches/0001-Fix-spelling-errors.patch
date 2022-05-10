@@ -1,4 +1,4 @@
-From 3d4f2f598a07cb9f74eabb851818f7dc3ae0c406 Mon Sep 17 00:00:00 2001
+From 6616e895807014574497d8551ec0fd2e11e97ce8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:53:22 -0400
 Subject: [PATCH 01/37] Fix spelling errors
@@ -10,7 +10,7 @@ Subject: [PATCH 01/37] Fix spelling errors
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 994068af3771..2a14b56e5f6b 100644
+index 57677e8d5cf1..13518b48e7f8 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -23,7 +23,7 @@ class raw_ostream;
@@ -23,7 +23,7 @@ index 994068af3771..2a14b56e5f6b 100644
  ///   platforms).
  /// - to shorten the type name
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 39cbfed2436a..5c67713fb061 100644
+index fec39e59a717..aff57de458cc 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -46,7 +46,7 @@ class StringRef;

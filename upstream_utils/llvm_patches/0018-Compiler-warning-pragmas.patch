@@ -1,4 +1,4 @@
-From 535afdcb6864097d33a610d790d27f1039abbf6e Mon Sep 17 00:00:00 2001
+From 1f840051411175fc6ce6018b19b006893f6e8f30 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:42:42 -0400
 Subject: [PATCH 18/37] Compiler warning pragmas
@@ -11,10 +11,10 @@ Subject: [PATCH 18/37] Compiler warning pragmas
  llvm/include/llvm/Support/MemAlloc.h   | 12 ++++++++++++
  llvm/lib/Support/MemoryBuffer.cpp      | 11 +++++++++++
  llvm/lib/Support/raw_ostream.cpp       |  4 ++++
- llvm/unittests/ADT/MapVectorTest.cpp   |  5 +++++
+ llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
  llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 10 files changed, 75 insertions(+), 4 deletions(-)
+ 10 files changed, 77 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
 index 76ad3b319d7a..c7d8d12fd3d3 100644
@@ -45,7 +45,7 @@ index 76ad3b319d7a..c7d8d12fd3d3 100644
  
  #endif // LLVM_ADT_FUNCTION_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index 95f86072fc14..482b068ad23c 100644
+index 658cfdd40c1b..cd78678bee54 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -55,6 +55,11 @@
@@ -60,7 +60,7 @@ index 95f86072fc14..482b068ad23c 100644
  namespace llvm {
  
  /// An opaque object representing a hash code.
-@@ -658,4 +663,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -657,4 +662,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
  
  } // namespace llvm
  
@@ -70,7 +70,7 @@ index 95f86072fc14..482b068ad23c 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 116a858091f0..1a038d287122 100644
+index daa9ee2c47ea..9d3142911c03 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -14,6 +14,14 @@
@@ -167,7 +167,7 @@ index 4a87be65256f..8df224fad27e 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Errc.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 3601a3dfba0a..4db2ee588706 100644
+index 93c2866caace..5f94646993fc 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -11,6 +11,10 @@
@@ -182,16 +182,18 @@ index 3601a3dfba0a..4db2ee588706 100644
  #include "llvm/ADT/STLExtras.h"
  #include "llvm/ADT/SmallVector.h"
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index a53448b8d938..0b1418295f14 100644
+index a53448b8d938..5b5bc4238366 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
-@@ -7,6 +7,11 @@
+@@ -7,6 +7,13 @@
  //
  //===----------------------------------------------------------------------===//
  
 +#if defined(__GNUC__)
 +#pragma GCC diagnostic ignored "-Wpedantic"
++#if !defined(__clang__)
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
 +#endif
 +
  #include "llvm/ADT/MapVector.h"

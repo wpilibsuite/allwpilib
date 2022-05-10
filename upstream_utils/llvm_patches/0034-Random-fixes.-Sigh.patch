@@ -1,4 +1,4 @@
-From 3c1ebcd5557b1ea98862705ecbb7b90bd5d45554 Mon Sep 17 00:00:00 2001
+From 5259c1e727dd54652ea874370d91f515054543be Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 01:56:39 -0400
 Subject: [PATCH 34/37] Random fixes. Sigh
@@ -6,10 +6,10 @@ Subject: [PATCH 34/37] Random fixes. Sigh
 ---
  llvm/lib/Support/MemoryBuffer.cpp         | 63 ++++++++++++-----------
  llvm/lib/Support/Windows/WindowsSupport.h |  4 ++
- llvm/lib/Support/raw_ostream.cpp          | 24 ++++++---
+ llvm/lib/Support/raw_ostream.cpp          | 23 ++++++---
  llvm/unittests/ADT/StringMapTest.cpp      | 20 +------
  llvm/unittests/Support/ConvertUTFTest.cpp |  1 +
- 5 files changed, 56 insertions(+), 56 deletions(-)
+ 5 files changed, 55 insertions(+), 56 deletions(-)
 
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
 index 83ddd51fe406..0bbcbf7aa2b1 100644
@@ -133,7 +133,7 @@ index 83ddd51fe406..0bbcbf7aa2b1 100644
    return MemoryBufferRef(Data, Identifier);
  }
 diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index fd23a0254306..18921acf6dc2 100644
+index 1639cbd3cc6e..1c6add009396 100644
 --- a/llvm/lib/Support/Windows/WindowsSupport.h
 +++ b/llvm/lib/Support/Windows/WindowsSupport.h
 @@ -42,7 +42,11 @@
@@ -149,7 +149,7 @@ index fd23a0254306..18921acf6dc2 100644
  // Must be included after windows.h
  #include <wincrypt.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index b93c0f7c1a37..8a06859dd42e 100644
+index a1b207e3c0c7..2c48a50c6103 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -39,12 +39,11 @@
@@ -169,13 +169,7 @@ index b93c0f7c1a37..8a06859dd42e 100644
  #endif
  
  #if defined(__CYGWIN__)
-@@ -65,11 +64,20 @@
- #endif
- 
- #ifdef _WIN32
-+#include "wpi/ConvertUTF.h"
- #include "Windows/WindowsSupport.h"
- #endif
+@@ -71,6 +70,14 @@
  
  using namespace llvm;
  
@@ -190,7 +184,7 @@ index b93c0f7c1a37..8a06859dd42e 100644
  raw_ostream::~raw_ostream() {
    // raw_ostream's subclasses should take care to flush the buffer
    // in their destructors.
-@@ -302,11 +310,11 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -303,11 +310,11 @@ static int getFD(std::string_view Filename, std::error_code &EC,
      return STDOUT_FILENO;
    }
  

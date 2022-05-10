@@ -1,14 +1,14 @@
-From 69f733f5a82f5d654c1e239748a5f9285d82a2f2 Mon Sep 17 00:00:00 2001
+From 189e88e88d7128df92a8c7b9b04b7480336361a3 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:59:44 -0400
 Subject: [PATCH 27/37] c++20 macro updates
 
 ---
- llvm/include/llvm/Support/Compiler.h | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ llvm/include/llvm/Support/Compiler.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 1dcacde42090..f3704f95ee5b 100644
+index c8cff135b2f1..19d9a3f79d86 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
 @@ -134,6 +134,11 @@
@@ -23,7 +23,7 @@ index 1dcacde42090..f3704f95ee5b 100644
  #elif !__cplusplus
  // Workaround for llvm.org/PR23435, since clang 3.6 and below emit a spurious
  // error when __has_cpp_attribute is given a scoped attribute in C mode.
-@@ -261,6 +266,11 @@
+@@ -274,6 +279,11 @@
  #ifndef LLVM_FALLTHROUGH
  #if __cplusplus > 201402L && __has_cpp_attribute(fallthrough)
  #define LLVM_FALLTHROUGH [[fallthrough]]
@@ -35,7 +35,7 @@ index 1dcacde42090..f3704f95ee5b 100644
  #elif __has_cpp_attribute(gnu::fallthrough)
  #define LLVM_FALLTHROUGH [[gnu::fallthrough]]
  #elif !__cplusplus
-@@ -546,6 +556,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -559,6 +569,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -43,29 +43,6 @@ index 1dcacde42090..f3704f95ee5b 100644
  
  namespace llvm {
  
-@@ -560,7 +571,7 @@ namespace llvm {
- /// reduced default alignment.
- inline void *allocate_buffer(size_t Size, size_t Alignment) {
-   return ::operator new(Size
--#if __cpp_aligned_new
-+#ifdef __cpp_aligned_new
-                         ,
-                         std::align_val_t(Alignment)
- #endif
-@@ -576,11 +587,11 @@ inline void *allocate_buffer(size_t Size, size_t Alignment) {
- /// most likely using the above helper.
- inline void deallocate_buffer(void *Ptr, size_t Size, size_t Alignment) {
-   ::operator delete(Ptr
--#if __cpp_sized_deallocation
-+#ifdef __cpp_sized_deallocation
-                     ,
-                     Size
- #endif
--#if __cpp_aligned_new
-+#ifdef __cpp_aligned_new
-                     ,
-                     std::align_val_t(Alignment)
- #endif
 -- 
 2.20.1.windows.1
 

@@ -1,4 +1,4 @@
-From c2ef5051bf461104fcb9489c8f169cf696811b00 Mon Sep 17 00:00:00 2001
+From f5729fc1c4be5e2781e9af916f967f04a5a71001 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:31:11 -0400
 Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
@@ -9,10 +9,10 @@ Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
  2 files changed, 1 insertion(+), 42 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 4de815fe61d7..c90f8dd77417 100644
+index 14e4d6e97140..c382d8f64f52 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -479,7 +479,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -492,7 +492,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// some constant value. In almost all circumstances this is most appropriate
  /// for use with a pointer, integer, or small aggregation of pointers and
  /// integers.
@@ -21,7 +21,7 @@ index 4de815fe61d7..c90f8dd77417 100644
  #if __has_feature(cxx_thread_local)
  #define LLVM_THREAD_LOCAL thread_local
  #elif defined(_MSC_VER)
-@@ -490,21 +490,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -503,21 +503,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif

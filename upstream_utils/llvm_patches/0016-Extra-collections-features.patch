@@ -1,84 +1,12 @@
-From 2eee50cfa40568e5478556b73586b966ed479e5a Mon Sep 17 00:00:00 2001
+From 937a4eb2651d4e5a0be9cfcd98c0c898b06fa9f5 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
 Subject: [PATCH 16/37] Extra collections features
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       |  39 ++++++++++
- llvm/include/llvm/ADT/PointerIntPair.h |   2 +
- llvm/include/llvm/ADT/StringMap.h      | 103 ++++++++++++++++++++++++-
- 3 files changed, 143 insertions(+), 1 deletion(-)
+ llvm/include/llvm/ADT/StringMap.h | 103 +++++++++++++++++++++++++++++-
+ 1 file changed, 102 insertions(+), 1 deletion(-)
 
-diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 52cdb4906e3d..bd48c2ed1a0e 100644
---- a/llvm/include/llvm/ADT/DenseMap.h
-+++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -627,6 +627,40 @@ public:
-   }
- };
- 
-+/// Equality comparison for DenseMap.
-+///
-+/// Iterates over elements of LHS confirming that each (key, value) pair in LHS
-+/// is also in RHS, and that no additional pairs are in RHS.
-+/// Equivalent to N calls to RHS.find and N value comparisons. Amortized
-+/// complexity is linear, worst case is O(N^2) (if every hash collides).
-+template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
-+          typename BucketT>
-+bool operator==(
-+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &LHS,
-+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &RHS) {
-+  if (LHS.size() != RHS.size())
-+    return false;
-+
-+  for (auto &KV : LHS) {
-+    auto I = RHS.find(KV.first);
-+    if (I == RHS.end() || I->second != KV.second)
-+      return false;
-+  }
-+
-+  return true;
-+}
-+
-+/// Inequality comparison for DenseMap.
-+///
-+/// Equivalent to !(LHS == RHS). See operator== for performance notes.
-+template <typename DerivedT, typename KeyT, typename ValueT, typename KeyInfoT,
-+          typename BucketT>
-+bool operator!=(
-+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &LHS,
-+    const DenseMapBase<DerivedT, KeyT, ValueT, KeyInfoT, BucketT> &RHS) {
-+  return !(LHS == RHS);
-+}
-+
- template <typename KeyT, typename ValueT,
-           typename KeyInfoT = DenseMapInfo<KeyT>,
-           typename BucketT = detail::DenseMapPair<KeyT, ValueT>>
-@@ -664,6 +698,11 @@ public:
-     this->insert(I, E);
-   }
- 
-+  DenseMap(std::initializer_list<typename BaseT::value_type> Vals) {
-+    init(Vals.size());
-+    this->insert(Vals.begin(), Vals.end());
-+  }
-+
-   ~DenseMap() {
-     this->destroyAll();
-     operator delete(Buckets);
-diff --git a/llvm/include/llvm/ADT/PointerIntPair.h b/llvm/include/llvm/ADT/PointerIntPair.h
-index 884d05155bff..6d1b53a90ad2 100644
---- a/llvm/include/llvm/ADT/PointerIntPair.h
-+++ b/llvm/include/llvm/ADT/PointerIntPair.h
-@@ -42,6 +42,8 @@ template <typename PointerTy, unsigned IntBits, typename IntType = unsigned,
-           typename PtrTraits = PointerLikeTypeTraits<PointerTy>,
-           typename Info = PointerIntPairInfo<PointerTy, IntBits, PtrTraits>>
- class PointerIntPair {
-+  // Used by MSVC visualizer and generally helpful for debugging/visualizing.
-+  using InfoTy = Info;
-   intptr_t Value = 0;
- 
- public:
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
 index 7d939f007279..df9f3da888da 100644
 --- a/llvm/include/llvm/ADT/StringMap.h

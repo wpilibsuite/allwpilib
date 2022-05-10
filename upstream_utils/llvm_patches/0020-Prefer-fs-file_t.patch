@@ -1,4 +1,4 @@
-From 67da2af70a3000b14d3d3bbbd3e6126922c56b6c Mon Sep 17 00:00:00 2001
+From 97f25c0234f6690002eabc07acbaba7f422ba5d0 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:58:49 -0400
 Subject: [PATCH 20/37] Prefer fs::file_t
@@ -59,7 +59,7 @@ index 1111c34f0d6c..58665a5ae35a 100644
  
    /// Open the specified memory range as a MemoryBuffer. Note that InputData
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 0787120ee569..d8128fa609da 100644
+index d766f8e38cce..cb4c0f28e596 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -24,15 +24,13 @@
@@ -196,10 +196,10 @@ index 8df224fad27e..711364a13f8a 100644
  }
  
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 4db2ee588706..f3fd24a81c3c 100644
+index 5f94646993fc..979e2d1b60fc 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -295,11 +295,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -296,11 +296,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
      return STDOUT_FILENO;
    }
  

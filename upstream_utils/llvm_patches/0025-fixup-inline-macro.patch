@@ -1,4 +1,4 @@
-From d126ac306b9d94188716d6066ef2c832e808b5e6 Mon Sep 17 00:00:00 2001
+From 5f2c91886d7d7d7c0d37f861e67114ad5e1b4a47 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:18:58 -0400
 Subject: [PATCH 25/37] fixup inline macro
@@ -9,7 +9,7 @@ Subject: [PATCH 25/37] fixup inline macro
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 4430ea1ce06b..a3ee12326782 100644
+index 3de6323f61f3..7b7621146647 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -33,14 +33,14 @@ template <typename D = std::chrono::nanoseconds>
@@ -30,10 +30,10 @@ index 4430ea1ce06b..a3ee12326782 100644
    using namespace std::chrono;
    return time_point_cast<seconds>(system_clock::from_time_t(T));
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index a30c594a2afd..1dcacde42090 100644
+index 995aff255766..c8cff135b2f1 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -217,11 +217,11 @@
+@@ -230,11 +230,11 @@
  /// errors, just use it in GCC 4.0 and later.
  #ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
  #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)

@@ -1,15 +1,15 @@
-From 9e47f952eb957db2d6f95833796d7ed6d5b9721f Mon Sep 17 00:00:00 2001
+From b4495a065bde2effaac669961252e3c0db22b36e Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:50:29 -0400
 Subject: [PATCH 02/37] Completly overwrite string extras
 
 ---
- llvm/include/llvm/ADT/StringExtras.h | 892 ++++++++++++++++++---------
+ llvm/include/llvm/ADT/StringExtras.h | 893 ++++++++++++++++++---------
  llvm/lib/Support/StringExtras.cpp    | 387 ++++++++++--
- 2 files changed, 921 insertions(+), 358 deletions(-)
+ 2 files changed, 921 insertions(+), 359 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringExtras.h b/llvm/include/llvm/ADT/StringExtras.h
-index 71b0e7527cb7..97b5695866cd 100644
+index 60a03633a8a6..97b5695866cd 100644
 --- a/llvm/include/llvm/ADT/StringExtras.h
 +++ b/llvm/include/llvm/ADT/StringExtras.h
 @@ -11,90 +11,60 @@
@@ -152,28 +152,29 @@ index 71b0e7527cb7..97b5695866cd 100644
    char Buffer[17];
    char *BufPtr = std::end(Buffer);
  
-@@ -137,265 +107,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
+@@ -137,266 +107,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
    return std::string(BufPtr, std::end(Buffer));
  }
  
 -/// Convert buffer \p Input to its hexadecimal representation.
 -/// The returned string is double the size of \p Input.
--inline std::string toHex(StringRef Input) {
+-inline std::string toHex(StringRef Input, bool LowerCase = false) {
 -  static const char *const LUT = "0123456789ABCDEF";
+-  const uint8_t Offset = LowerCase ? 32 : 0;
 -  size_t Length = Input.size();
 -
 -  std::string Output;
 -  Output.reserve(2 * Length);
 -  for (size_t i = 0; i < Length; ++i) {
 -    const unsigned char c = Input[i];
--    Output.push_back(LUT[c >> 4]);
--    Output.push_back(LUT[c & 15]);
+-    Output.push_back(LUT[c >> 4] | Offset);
+-    Output.push_back(LUT[c & 15] | Offset);
 -  }
 -  return Output;
 -}
 -
--inline std::string toHex(ArrayRef<uint8_t> Input) {
--  return toHex(toStringRef(Input));
+-inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
+-  return toHex(toStringRef(Input), LowerCase);
 -}
 -
 -inline uint8_t hexFromNibbles(char MSB, char LSB) {

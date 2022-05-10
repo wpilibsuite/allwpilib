@@ -1,4 +1,4 @@
-From 547f7d0515749853b2798623a4e9fcc39121d4c6 Mon Sep 17 00:00:00 2001
+From 1f01d36f867790a49b5bdfb2e43586b9ba701b9b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:06:16 -0400
 Subject: [PATCH 23/37] Fixup includes
@@ -12,10 +12,10 @@ Subject: [PATCH 23/37] Fixup includes
  llvm/lib/Support/ConvertUTFWrapper.cpp            | 1 +
  llvm/lib/Support/ErrorHandling.cpp                | 7 +++----
  llvm/lib/Support/SmallPtrSet.cpp                  | 1 +
- llvm/lib/Support/Windows/WindowsSupport.h         | 2 +-
+ llvm/lib/Support/Windows/WindowsSupport.h         | 1 -
  llvm/lib/Support/raw_ostream.cpp                  | 3 ++-
  llvm/unittests/ADT/SmallPtrSetTest.cpp            | 1 +
- 11 files changed, 16 insertions(+), 7 deletions(-)
+ 11 files changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
 index df9f3da888da..45dbea2753e9 100644
@@ -127,22 +127,19 @@ index 8b8318c7a946..2a09d93f6ab8 100644
  #include <algorithm>
  #include <cassert>
 diff --git a/llvm/lib/Support/Windows/WindowsSupport.h b/llvm/lib/Support/Windows/WindowsSupport.h
-index e92d7094e57d..fd23a0254306 100644
+index c6c8097efcbf..1639cbd3cc6e 100644
 --- a/llvm/lib/Support/Windows/WindowsSupport.h
 +++ b/llvm/lib/Support/Windows/WindowsSupport.h
-@@ -36,9 +36,9 @@
+@@ -36,7 +36,6 @@
  
  #include "llvm/ADT/SmallVector.h"
  #include "llvm/ADT/StringExtras.h"
 -#include "llvm/Config/config.h" // Get build system configuration settings
  #include "llvm/Support/Chrono.h"
  #include "llvm/Support/Compiler.h"
-+#include "llvm/Support/VersionTuple.h"
- #include <cassert>
- #include <string>
- #include <system_error>
+ #include "llvm/Support/VersionTuple.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a7336b592d97..0c04653a12fc 100644
+index 3f476d438029..88fe57239e64 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -16,7 +16,7 @@
