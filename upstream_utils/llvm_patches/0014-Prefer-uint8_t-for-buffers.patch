@@ -1,19 +1,20 @@
-From 18b830cc382fa0422097c54818579fa1a922b0f4 Mon Sep 17 00:00:00 2001
+From f7014c5f0388ab098492b9a78657800b75d99027 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:07:37 -0400
-Subject: [PATCH 14/37] Prefer uint8_t for buffers
+Subject: [PATCH 14/36] Prefer uint8_t for buffers
 
 ---
- llvm/include/llvm/Support/MemoryBuffer.h      | 30 +++++++++----------
- .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 ++--
- llvm/lib/Support/MemoryBuffer.cpp             | 12 ++++----
- 3 files changed, 24 insertions(+), 24 deletions(-)
+ llvm/include/llvm/Support/MemoryBuffer.h      | 26 +++++++++----------
+ llvm/include/llvm/Support/MemoryBufferRef.h   |  4 +--
+ .../llvm/Support/SmallVectorMemoryBuffer.h    |  6 ++---
+ llvm/lib/Support/MemoryBuffer.cpp             | 12 ++++-----
+ 4 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 07db11788512..4b9b5086fb5e 100644
+index 0a6f8b639dc2..12f301b9d791 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -48,13 +48,13 @@ using file_t = int;
+@@ -46,13 +46,13 @@ using file_t = int;
  /// reading when they encounter a '\0' than to continually check the file
  /// position to see if it has reached the end of the file.
  class MemoryBuffer {
@@ -30,7 +31,7 @@ index 07db11788512..4b9b5086fb5e 100644
              bool RequiresNullTerminator);
  
  public:
-@@ -62,8 +62,8 @@ public:
+@@ -60,8 +60,8 @@ public:
    MemoryBuffer &operator=(const MemoryBuffer &) = delete;
    virtual ~MemoryBuffer();
  
@@ -41,7 +42,7 @@ index 07db11788512..4b9b5086fb5e 100644
    size_t getBufferSize() const { return BufferEnd-BufferStart; }
  
    span<const uint8_t> getBuffer() const {
-@@ -169,11 +169,11 @@ public:
+@@ -167,11 +167,11 @@ public:
  
    // const_cast is well-defined here, because the underlying buffer is
    // guaranteed to have been initialized with a mutable buffer.
@@ -57,7 +58,7 @@ index 07db11788512..4b9b5086fb5e 100644
    }
    span<uint8_t> getBuffer() {
      return {getBufferStart(), getBufferEnd()};
-@@ -228,11 +228,11 @@ public:
+@@ -226,11 +226,11 @@ public:
  
    // const_cast is well-defined here, because the underlying buffer is
    // guaranteed to have been initialized with a mutable buffer.
@@ -73,8 +74,12 @@ index 07db11788512..4b9b5086fb5e 100644
    }
    span<uint8_t> getBuffer() {
      return {getBufferStart(), getBufferEnd()};
-@@ -273,8 +273,8 @@ public:
- 
+diff --git a/llvm/include/llvm/Support/MemoryBufferRef.h b/llvm/include/llvm/Support/MemoryBufferRef.h
+index 34fa70bc6f8e..fd9896f6fd55 100644
+--- a/llvm/include/llvm/Support/MemoryBufferRef.h
++++ b/llvm/include/llvm/Support/MemoryBufferRef.h
+@@ -34,8 +34,8 @@ public:
+   span<const uint8_t> getBuffer() const { return Buffer; }
    std::string_view getBufferIdentifier() const { return Identifier; }
  
 -  const char *getBufferStart() const { return Buffer.begin(); }
@@ -82,8 +87,8 @@ index 07db11788512..4b9b5086fb5e 100644
 +  const uint8_t *getBufferStart() const { return Buffer.begin(); }
 +  const uint8_t *getBufferEnd() const { return Buffer.end(); }
    size_t getBufferSize() const { return Buffer.size(); }
- };
  
+   /// Check pointer identity (not value) of identifier and data.
 diff --git a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 index fe9bf46d12a5..89fa409f94ba 100644
 --- a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h

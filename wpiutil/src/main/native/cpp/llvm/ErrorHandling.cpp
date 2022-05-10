@@ -124,13 +124,17 @@ void wpi::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
 
   // Don't call the normal error handler. It may allocate memory. Directly write
   // an OOM to stderr and abort.
-  char OOMMessage[] = "LLVM ERROR: out of memory\n";
+  const char *OOMMessage = "LLVM ERROR: out of memory\n";
+  const char *Newline = "\n";
 #ifdef _WIN32
-  int written = ::_write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::_write(2, Reason, strlen(Reason));
+  (void)!::_write(2, Newline, strlen(Newline));
 #else
-  ssize_t written = ::write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::write(2, OOMMessage, strlen(OOMMessage));
+  (void)!::write(2, Reason, strlen(Reason));
+  (void)!::write(2, Newline, strlen(Newline));
 #endif
-  (void)written;
   abort();
 }
 
@@ -145,7 +149,8 @@ static void out_of_memory_new_handler() {
 void wpi::install_out_of_memory_new_handler() {
   std::new_handler old = std::set_new_handler(out_of_memory_new_handler);
   (void)old;
-  assert(old == nullptr && "new-handler already installed");
+  assert((old == nullptr || old == out_of_memory_new_handler) &&
+         "new-handler already installed");
 }
 
 void wpi::wpi_unreachable_internal(const char *msg, const char *file,

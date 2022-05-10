@@ -1,0 +1,87 @@
+From 546a9958bf41bfa5b55bd37d0edfe31a7b39e2ba Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 18:56:35 -0400
+Subject: [PATCH 33/36] Fix Gtest warnings
+
+---
+ llvm/unittests/ADT/DenseMapTest.cpp       | 2 +-
+ llvm/unittests/ADT/MapVectorTest.cpp      | 2 +-
+ llvm/unittests/ADT/SmallVectorTest.cpp    | 4 ++--
+ llvm/unittests/Support/MathExtrasTest.cpp | 6 +++++-
+ 4 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
+index 4e38bce4e64d..683ecddddbe1 100644
+--- a/llvm/unittests/ADT/DenseMapTest.cpp
++++ b/llvm/unittests/ADT/DenseMapTest.cpp
+@@ -105,7 +105,7 @@ typedef ::testing::Types<DenseMap<uint32_t, uint32_t>,
+                          SmallDenseMap<CtorTester, CtorTester, 4,
+                                        CtorTesterMapInfo>
+                          > DenseMapTestTypes;
+-TYPED_TEST_CASE(DenseMapTest, DenseMapTestTypes);
++TYPED_TEST_SUITE(DenseMapTest, DenseMapTestTypes);
+ 
+ // Empty map tests
+ TYPED_TEST(DenseMapTest, EmptyIntMapTest) {
+diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
+index bba529f9c87a..7bd1bfe02fc2 100644
+--- a/llvm/unittests/ADT/MapVectorTest.cpp
++++ b/llvm/unittests/ADT/MapVectorTest.cpp
+@@ -169,7 +169,7 @@ template <class IntType> struct MapVectorMappedTypeTest : ::testing::Test {
+ 
+ using MapIntTypes = ::testing::Types<int, long, long long, unsigned,
+                                      unsigned long, unsigned long long>;
+-TYPED_TEST_CASE(MapVectorMappedTypeTest, MapIntTypes);
++TYPED_TEST_SUITE(MapVectorMappedTypeTest, MapIntTypes);
+ 
+ TYPED_TEST(MapVectorMappedTypeTest, DifferentDenseMap) {
+   // Test that using a map with a mapped type other than 'unsigned' compiles
+diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
+index 9709b0c2b3fb..8f7efff523ec 100644
+--- a/llvm/unittests/ADT/SmallVectorTest.cpp
++++ b/llvm/unittests/ADT/SmallVectorTest.cpp
+@@ -212,7 +212,7 @@ typedef ::testing::Types<SmallVector<Constructable, 0>,
+                          SmallVector<Constructable, 4>,
+                          SmallVector<Constructable, 5>
+                          > SmallVectorTestTypes;
+-TYPED_TEST_CASE(SmallVectorTest, SmallVectorTestTypes);
++TYPED_TEST_SUITE(SmallVectorTest, SmallVectorTestTypes);
+ 
+ // Constructor test.
+ TYPED_TEST(SmallVectorTest, ConstructorNonIterTest) {
+@@ -815,7 +815,7 @@ typedef ::testing::Types<
+     std::pair<SmallVector<Constructable, 2>, SmallVector<Constructable, 2>>
+   > DualSmallVectorTestTypes;
+ 
+-TYPED_TEST_CASE(DualSmallVectorsTest, DualSmallVectorTestTypes);
++TYPED_TEST_SUITE(DualSmallVectorsTest, DualSmallVectorTestTypes);
+ 
+ TYPED_TEST(DualSmallVectorsTest, MoveAssignment) {
+   SCOPED_TRACE("MoveAssignTest-DualVectorTypes");
+diff --git a/llvm/unittests/Support/MathExtrasTest.cpp b/llvm/unittests/Support/MathExtrasTest.cpp
+index d899af9685e3..6e80f63cc11f 100644
+--- a/llvm/unittests/Support/MathExtrasTest.cpp
++++ b/llvm/unittests/Support/MathExtrasTest.cpp
+@@ -9,6 +9,10 @@
+ #include "llvm/Support/MathExtras.h"
+ #include "gtest/gtest.h"
+ 
++#if defined(__GNUC__)
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ using namespace llvm;
+ 
+ namespace {
+@@ -483,7 +487,7 @@ class OverflowTest : public ::testing::Test { };
+ using OverflowTestTypes = ::testing::Types<signed char, short, int, long,
+                                            long long>;
+ 
+-TYPED_TEST_CASE(OverflowTest, OverflowTestTypes);
++TYPED_TEST_SUITE(OverflowTest, OverflowTestTypes);
+ 
+ TYPED_TEST(OverflowTest, AddNoOverflow) {
+   TypeParam Result;
+-- 
+2.20.1.windows.1
+

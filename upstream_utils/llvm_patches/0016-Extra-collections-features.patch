@@ -1,7 +1,7 @@
-From b6df666edf911536acf11c12624b428bd922c39d Mon Sep 17 00:00:00 2001
+From 962485a9e9c3e9137fb39e4616841236867b073f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 16/37] Extra collections features
+Subject: [PATCH 16/36] Extra collections features
 
 ---
  llvm/include/llvm/ADT/SmallSet.h  |   2 +-
@@ -9,10 +9,10 @@ Subject: [PATCH 16/37] Extra collections features
  2 files changed, 103 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index 8294a816f284..541ec172069b 100644
+index e4c209c5f2a9..f2b402ccf9a0 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
-@@ -262,7 +262,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+@@ -269,7 +269,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
      return false;
  
    // All elements in LHS must also be in RHS
@@ -22,7 +22,7 @@ index 8294a816f284..541ec172069b 100644
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index a7281bd3a069..809ad5776600 100644
+index 7b0fc072f935..ce4e807b51f4 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -40,7 +40,7 @@ protected:
@@ -34,7 +34,7 @@ index a7281bd3a069..809ad5776600 100644
        : TheTable(RHS.TheTable), NumBuckets(RHS.NumBuckets),
          NumItems(RHS.NumItems), NumTombstones(RHS.NumTombstones),
          ItemSize(RHS.ItemSize) {
-@@ -386,11 +386,27 @@ public:
+@@ -390,11 +390,27 @@ public:
      return Tmp;
    }
  
@@ -62,7 +62,7 @@ index a7281bd3a069..809ad5776600 100644
  };
  
  template <typename ValueTy>
-@@ -455,6 +471,91 @@ private:
+@@ -459,6 +475,91 @@ private:
    std::string_view Key;
  };
  

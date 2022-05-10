@@ -18,7 +18,6 @@
 #ifndef WPIUTIL_WPI_ITERATOR_RANGE_H
 #define WPIUTIL_WPI_ITERATOR_RANGE_H
 
-#include <iterator>
 #include <utility>
 
 namespace wpi {

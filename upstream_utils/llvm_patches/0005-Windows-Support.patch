@@ -1,7 +1,7 @@
-From b510e240dae707e773042ff066d587eb94e12d59 Mon Sep 17 00:00:00 2001
+From 05e7209a635f17bfd2c1554ddfed21b5dfc84188 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 05/37] Windows Support
+Subject: [PATCH 05/36] Windows Support
 
 ---
  .../llvm/Support/Windows/WindowsSupport.h     | 39 +++++---

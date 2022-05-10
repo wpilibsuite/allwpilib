@@ -1,7 +1,7 @@
-From 1c9990a9ed6805167621295bf832578eaae829d9 Mon Sep 17 00:00:00 2001
+From 260ece471340749a460d6e897621f7c8bd16eef7 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 01:15:57 -0400
-Subject: [PATCH 21/37] Something Something Something
+Subject: [PATCH 21/36] Something Something Something
 
 ---
  llvm/lib/Support/ErrorHandling.cpp |  7 +------
@@ -9,7 +9,7 @@ Subject: [PATCH 21/37] Something Something Something
  2 files changed, 5 insertions(+), 12 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index a86e17f515b1..3f43db159175 100644
+index 8ed850184137..2cd427bbd344 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -97,12 +97,7 @@ void llvm::report_fatal_error(const std::string_view &Reason, bool GenCrashDiag)
@@ -27,10 +27,10 @@ index a86e17f515b1..3f43db159175 100644
  
  void llvm::install_bad_alloc_error_handler(fatal_error_handler_t handler,
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 8136efd6e837..273c233b97d0 100644
+index 588dac275b79..fb4df18d364a 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -395,10 +395,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
+@@ -394,10 +394,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
  raw_fd_ostream::~raw_fd_ostream() {
    if (FD >= 0) {
      flush();
@@ -43,7 +43,7 @@ index 8136efd6e837..273c233b97d0 100644
    }
  
  #ifdef __MINGW32__
-@@ -528,8 +526,8 @@ void raw_fd_ostream::close() {
+@@ -527,8 +525,8 @@ void raw_fd_ostream::close() {
    assert(ShouldClose);
    ShouldClose = false;
    flush();

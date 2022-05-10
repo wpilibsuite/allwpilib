@@ -1,7 +1,7 @@
-From 9f1c61dc08516d15d3cb6ac3e3f77471d661c726 Mon Sep 17 00:00:00 2001
+From 154385db292a453a3961c5cc76c5cda869618c9d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:58:49 -0400
-Subject: [PATCH 20/37] Prefer fs::file_t
+Subject: [PATCH 20/36] Prefer fs::file_t
 
 ---
  llvm/include/llvm/Support/MemoryBuffer.h | 12 ++++++++--
@@ -11,18 +11,19 @@ Subject: [PATCH 20/37] Prefer fs::file_t
  4 files changed, 31 insertions(+), 25 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 4b9b5086fb5e..2fcf0516b83f 100644
+index 12f301b9d791..918752587424 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -13,14 +13,22 @@
+@@ -13,8 +13,6 @@
  #ifndef LLVM_SUPPORT_MEMORYBUFFER_H
  #define LLVM_SUPPORT_MEMORYBUFFER_H
  
 -#include "llvm-c/Types.h"
 -#include "llvm/Support/CBindingWrapping.h"
  #include "llvm/Support/ErrorOr.h"
+ #include "llvm/Support/MemoryBufferRef.h"
  #include <cstddef>
- #include <cstdint>
+@@ -22,6 +20,16 @@
  #include <memory>
  #include <string_view>
  
@@ -37,13 +38,13 @@ index 4b9b5086fb5e..2fcf0516b83f 100644
 +}  // namespace fs
 +
  namespace llvm {
- 
- class MemoryBufferRef;
+ namespace sys {
+ namespace fs {
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index a578f903bc2f..073b159b004b 100644
+index 99ff192edc5c..013367654a70 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -24,15 +24,13 @@
+@@ -25,16 +25,14 @@
  #include <system_error>
  #include <type_traits>
  
@@ -54,6 +55,7 @@ index a578f903bc2f..073b159b004b 100644
  enum FileAccess : unsigned;
  enum OpenFlags : unsigned;
  enum CreationDisposition : unsigned;
+ class FileLocker;
  } // end namespace fs
 -} // end namespace sys
 +
@@ -123,10 +125,10 @@ index d0ee3ee9dedf..cbd1cf047815 100644
        getMemoryBufferForStream(FD, Filename);
    sys::fs::closeFile(FD);
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 1d0447e292d8..8136efd6e837 100644
+index 3ecae08be081..588dac275b79 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -312,11 +312,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -310,11 +310,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
      return STDOUT_FILENO;
    }
  

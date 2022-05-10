@@ -1,14 +1,14 @@
-From f1246099e430b3fb333ea65c771703d0df882a98 Mon Sep 17 00:00:00 2001
+From 4534fe28972a103d27b3b9e8a23c6ca84916e742 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:08:59 -0400
-Subject: [PATCH 15/37] Remove format provider
+Subject: [PATCH 15/36] Remove format provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ---------
- llvm/include/llvm/Support/raw_ostream.h |  72 +-----
- llvm/lib/Support/raw_ostream.cpp        | 283 ------------------------
+ llvm/include/llvm/Support/raw_ostream.h |  73 +-----
+ llvm/lib/Support/raw_ostream.cpp        | 300 ------------------------
  llvm/unittests/Support/Chrono.cpp       |  61 -----
- 4 files changed, 11 insertions(+), 514 deletions(-)
+ 4 files changed, 11 insertions(+), 532 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
 index 7ae0991400a6..06829d1fbe14 100644
@@ -138,10 +138,10 @@ index 7ae0991400a6..06829d1fbe14 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index afdd94ed397d..a578f903bc2f 100644
+index d85e2ba6e4a3..99ff192edc5c 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -26,12 +26,6 @@
+@@ -27,13 +27,6 @@
  
  namespace llvm {
  
@@ -150,11 +150,12 @@ index afdd94ed397d..a578f903bc2f 100644
 -class FormattedString;
 -class FormattedNumber;
 -class FormattedBytes;
+-template <class T> class LLVM_NODISCARD Expected;
 -
  namespace sys {
  namespace fs {
  enum FileAccess : unsigned;
-@@ -65,7 +59,6 @@ private:
+@@ -77,7 +70,6 @@ private:
    /// for a \see write_impl() call to handle the data which has been put into
    /// this buffer.
    char *OutBufStart, *OutBufEnd, *OutBufCur;
@@ -162,7 +163,7 @@ index afdd94ed397d..a578f903bc2f 100644
  
    /// Optional stream this stream is tied to. If this stream is written to, the
    /// tied-to stream will be flushed first.
-@@ -230,32 +223,6 @@ public:
+@@ -245,32 +237,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -195,7 +196,7 @@ index afdd94ed397d..a578f903bc2f 100644
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -263,21 +230,6 @@ public:
+@@ -278,21 +244,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -217,7 +218,7 @@ index afdd94ed397d..a578f903bc2f 100644
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -291,15 +243,21 @@ public:
+@@ -306,15 +257,21 @@ public:
    /// @param Bold bold/brighter text, default false
    /// @param BG if true change the background, default: change foreground
    /// @returns itself so it can be used within << invocations
@@ -243,7 +244,7 @@ index afdd94ed397d..a578f903bc2f 100644
  
    /// This function determines if this stream is connected to a "tty" or
    /// "console" window. That is, the output would be displayed to the user
-@@ -312,7 +270,7 @@ public:
+@@ -327,7 +284,7 @@ public:
  
    // Enable or disable colors. Once enable_colors(false) is called,
    // changeColor() has no effect until enable_colors(true) is called.
@@ -252,7 +253,7 @@ index afdd94ed397d..a578f903bc2f 100644
  
    /// Tie this stream to the specified stream. Replaces any existing tied-to
    /// stream. Specifying a nullptr unties the stream.
-@@ -372,10 +330,6 @@ private:
+@@ -387,10 +344,6 @@ private:
    /// unused bytes in the buffer.
    void copy_to_buffer(const char *Ptr, size_t Size);
  
@@ -263,7 +264,7 @@ index afdd94ed397d..a578f903bc2f 100644
    /// Flush the tied-to stream (if present) and then write the required data.
    void flush_tied_then_write(const char *Ptr, size_t Size);
  
-@@ -490,10 +444,6 @@ public:
+@@ -515,10 +468,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
@@ -275,10 +276,10 @@ index afdd94ed397d..a578f903bc2f 100644
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index a2f332cd9664..206c784990c0 100644
+index 543b895e268b..8dcac30388a0 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -119,49 +119,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
+@@ -117,49 +117,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
    assert(OutBufStart <= OutBufEnd && "Invalid size!");
  }
  
@@ -328,7 +329,7 @@ index a2f332cd9664..206c784990c0 100644
  raw_ostream &raw_ostream::write_escaped(std::string_view Str,
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
-@@ -202,16 +159,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
+@@ -200,16 +157,6 @@ raw_ostream &raw_ostream::write_escaped(std::string_view Str,
    return *this;
  }
  
@@ -345,7 +346,7 @@ index a2f332cd9664..206c784990c0 100644
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -307,173 +254,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+@@ -305,173 +252,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
    write_impl(Ptr, Size);
  }
  
@@ -519,7 +520,7 @@ index a2f332cd9664..206c784990c0 100644
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
    static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
-@@ -505,63 +285,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+@@ -503,63 +283,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
    return write_padding<'\0'>(*this, NumZeros);
  }
  
@@ -583,7 +584,7 @@ index a2f332cd9664..206c784990c0 100644
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -853,14 +578,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -852,31 +577,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
@@ -592,7 +593,24 @@ index a2f332cd9664..206c784990c0 100644
 -}
 -
 -bool raw_fd_ostream::has_colors() const {
--  return sys::Process::FileDescriptorHasColors(FD);
+-  if (!HasColors)
+-    HasColors = sys::Process::FileDescriptorHasColors(FD);
+-  return *HasColors;
+-}
+-
+-Expected<sys::fs::FileLocker> raw_fd_ostream::lock() {
+-  std::error_code EC = sys::fs::lockFile(FD);
+-  if (!EC)
+-    return sys::fs::FileLocker(FD);
+-  return errorCodeToError(EC);
+-}
+-
+-Expected<sys::fs::FileLocker>
+-raw_fd_ostream::tryLockFor(std::chrono::milliseconds Timeout) {
+-  std::error_code EC = sys::fs::tryLockFile(FD, Timeout);
+-  if (!EC)
+-    return sys::fs::FileLocker(FD);
+-  return errorCodeToError(EC);
 -}
 -
  void raw_fd_ostream::anchor() {}

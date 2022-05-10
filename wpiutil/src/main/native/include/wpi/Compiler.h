@@ -156,7 +156,7 @@
 
 // Use the 'nodiscard' attribute in C++17 or newer mode.
 #ifndef LLVM_NODISCARD
-#if __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(nodiscard)
+#if defined(__cplusplus) && __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(nodiscard)
 #define LLVM_NODISCARD [[nodiscard]]
 #elif LLVM_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
 #define LLVM_NODISCARD [[clang::warn_unused_result]]
@@ -256,7 +256,7 @@
 /// errors, just use it in GCC 4.0 and later.
 #ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
 #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)
-#define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline)) inline
+#define LLVM_ATTRIBUTE_ALWAYS_INLINE inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
 #define LLVM_ATTRIBUTE_ALWAYS_INLINE __forceinline
 #else
@@ -298,7 +298,7 @@
 
 /// LLVM_FALLTHROUGH - Mark fallthrough cases in switch statements.
 #ifndef LLVM_FALLTHROUGH
-#if __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(fallthrough)
+#if defined(__cplusplus) && __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(fallthrough)
 #define LLVM_FALLTHROUGH [[fallthrough]]
 #elif LLVM_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
 #define LLVM_FALLTHROUGH [[gnu::fallthrough]]
@@ -347,20 +347,10 @@
 #endif
 
 // LLVM_ATTRIBUTE_DEPRECATED(decl, "message")
+// This macro will be removed.
+// Use C++14's attribute instead: [[deprecated("message")]]
 #ifndef LLVM_ATTRIBUTE_DEPRECATED
-#if __has_feature(attribute_deprecated_with_message)
-# define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-  decl __attribute__((deprecated(message)))
-#elif defined(__GNUC__)
-# define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-  decl __attribute__((deprecated))
-#elif defined(_MSC_VER)
-# define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-  __declspec(deprecated(message)) decl
-#else
-# define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-  decl
-#endif
+#define LLVM_ATTRIBUTE_DEPRECATED(decl, message) [[deprecated(message)]] decl
 #endif
 
 /// LLVM_BUILTIN_UNREACHABLE - On compilers which support it, expands

@@ -94,6 +94,8 @@ bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes, SmallVectorImpl<char> 
   const UTF16 *Src = SrcBytes.begin();
   const UTF16 *SrcEnd = SrcBytes.end();
 
+  assert((uintptr_t)Src % sizeof(UTF16) == 0);
+
   // Byteswap if necessary.
   std::vector<UTF16> ByteSwapped;
   if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {

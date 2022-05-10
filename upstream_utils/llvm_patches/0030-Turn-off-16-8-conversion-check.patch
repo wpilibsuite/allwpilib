@@ -1,0 +1,27 @@
+From b728ecfd9fcf0608017762aca5c616e04ac0c4a1 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 02:59:09 -0400
+Subject: [PATCH 30/36] Turn off 16-> 8 conversion check
+
+---
+ llvm/lib/Support/ConvertUTFWrapper.cpp | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
+index ecf72e64c15c..97defe3c3519 100644
+--- a/llvm/lib/Support/ConvertUTFWrapper.cpp
++++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
+@@ -87,10 +87,6 @@ bool hasUTF16ByteOrderMark(span<const char> S) {
+ bool convertUTF16ToUTF8String(span<const UTF16> SrcBytes, SmallVectorImpl<char> &Out) {
+   assert(Out.empty());
+ 
+-  // Error out on an uneven byte count.
+-  if (SrcBytes.size() % 2)
+-    return false;
+-
+   // Avoid OOB by returning early on empty input.
+   if (SrcBytes.empty())
+     return true;
+-- 
+2.20.1.windows.1
+

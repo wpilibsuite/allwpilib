@@ -1,0 +1,258 @@
+From 88e25df0a88aedbc0a8c650891297cb3b0244548 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Wed, 4 May 2022 00:59:50 -0400
+Subject: [PATCH 29/36] OS dependent changes
+
+---
+ llvm/lib/Support/ErrorHandling.cpp |   6 ++
+ llvm/lib/Support/MemoryBuffer.cpp  | 117 ++++++++++++++++++++---------
+ llvm/lib/Support/raw_ostream.cpp   |  20 ++---
+ 3 files changed, 98 insertions(+), 45 deletions(-)
+
+diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
+index 9db381b04247..7ea605f0add5 100644
+--- a/llvm/lib/Support/ErrorHandling.cpp
++++ b/llvm/lib/Support/ErrorHandling.cpp
+@@ -133,9 +133,15 @@ void llvm::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
+   // an OOM to stderr and abort.
+   const char *OOMMessage = "LLVM ERROR: out of memory\n";
+   const char *Newline = "\n";
++#ifdef _WIN32
++  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
++  (void)!::_write(2, Reason, strlen(Reason));
++  (void)!::_write(2, Newline, strlen(Newline));
++#else
+   (void)!::write(2, OOMMessage, strlen(OOMMessage));
+   (void)!::write(2, Reason, strlen(Reason));
+   (void)!::write(2, Newline, strlen(Newline));
++#endif
+   abort();
+ }
+ 
+diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
+index df18f4a282ab..35a15868fea0 100644
+--- a/llvm/lib/Support/MemoryBuffer.cpp
++++ b/llvm/lib/Support/MemoryBuffer.cpp
+@@ -222,17 +222,25 @@ static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
+ getMemoryBufferForStream(sys::fs::file_t FD, std::string_view BufferName) {
+   constexpr size_t ChunkSize = 4096*4;
+   SmallVector<uint8_t, ChunkSize> Buffer;
++#ifdef _WIN32
++  DWORD ReadBytes;
++#else
++  ssize_t ReadBytes;
++#endif
+   // Read into Buffer until we hit EOF.
+-  for (;;) {
++  do {
+     Buffer.reserve(Buffer.size() + ChunkSize);
+-    Expected<size_t> ReadBytes = sys::fs::readNativeFile(
+-        FD, makeMutableArrayRef(Buffer.end(), ChunkSize));
+-    if (!ReadBytes)
+-      return errorToErrorCode(ReadBytes.takeError());
+-    if (*ReadBytes == 0)
+-      break;
+-    Buffer.set_size(Buffer.size() + *ReadBytes);
+-  }
++#ifdef _WIN32
++    if (!ReadFile(FD, Buffer.end(), ChunkSize, &ReadBytes, nullptr)) {
++      return mapWindowsError(GetLastError());
++    }
++#else
++    ReadBytes = sys::RetryAfterSignal(-1, ::read, FD, Buffer.end(), ChunkSize);
++    if (ReadBytes == -1)
++      return std::error_code(errno, std::generic_category());
++#endif
++    Buffer.set_size(Buffer.size() + ReadBytes);
++  } while (ReadBytes != 0);
+ 
+   return getMemBufferCopyImpl(Buffer, BufferName);
+ }
+@@ -329,19 +337,32 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
+     // If we don't know the file size, use fstat to find out.  fstat on an open
+     // file descriptor is cheaper than stat on a random path.
+     if (FileSize == uint64_t(-1)) {
+-      sys::fs::file_status Status;
+-      std::error_code EC = sys::fs::status(FD, Status);
+-      if (EC)
+-        return EC;
++#ifdef _WIN32
++      // If this not a file or a block device (e.g. it's a named pipe
++      // or character device), we can't mmap it, so error out.
++      if (GetFileType(FD) != FILE_TYPE_DISK) {
++        return std::error_code(errno, std::generic_category());
++      }
++
++      LARGE_INTEGER fileSizeWin;
++      if (!GetFileSizeEx(FD, &fileSizeWin)) {
++        return wpi::mapWindowsError(GetLastError());
++      }
++      FileSize = fileSizeWin.QuadPart;
++#else
++      struct stat status;
++      if (fstat(FD, &status) < 0) {
++        return std::error_code(errno, std::generic_category());
++      }
+ 
+       // If this not a file or a block device (e.g. it's a named pipe
+       // or character device), we can't mmap it, so error out.
+-      sys::fs::file_type Type = Status.type();
+-      if (Type != sys::fs::file_type::regular_file &&
+-          Type != sys::fs::file_type::block_file)
++      if (status.st_mode != S_IFREG && status.st_mode != S_IFBLK) {
+         return make_error_code(errc::invalid_argument);
++      }
+ 
+-      FileSize = Status.getSize();
++      FileSize = status.st_size;
++#endif
+     }
+     MapSize = FileSize;
+   }
+@@ -377,20 +398,30 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+     // If we don't know the file size, use fstat to find out.  fstat on an open
+     // file descriptor is cheaper than stat on a random path.
+     if (FileSize == uint64_t(-1)) {
+-      sys::fs::file_status Status;
+-      std::error_code EC = sys::fs::status(FD, Status);
+-      if (EC)
+-        return EC;
++#ifdef _WIN32
++      // If this not a file or a block device (e.g. it's a named pipe
++      // or character device), we can't trust the size. Create the memory
++      // buffer by copying off the stream.
++      LARGE_INTEGER fileSizeWin;
++      if (GetFileType(FD) != FILE_TYPE_DISK || !GetFileSizeEx(FD, &fileSizeWin)) {
++        return getMemoryBufferForStream(FD, Filename);
++      }
++      FileSize = fileSizeWin.QuadPart;
++#else
++      struct stat status;
++      if (fstat(FD, &status) < 0) {
++        return std::error_code(errno, std::generic_category());
++      }
+ 
+       // If this not a file or a block device (e.g. it's a named pipe
+       // or character device), we can't trust the size. Create the memory
+       // buffer by copying off the stream.
+-      sys::fs::file_type Type = Status.type();
+-      if (Type != sys::fs::file_type::regular_file &&
+-          Type != sys::fs::file_type::block_file)
++      if (status.st_mode != S_IFREG && status.st_mode != S_IFBLK) {
+         return getMemoryBufferForStream(FD, Filename);
++      }
+ 
+-      FileSize = Status.getSize();
++      FileSize = status.st_size;
++#endif
+     }
+     MapSize = FileSize;
+   }
+@@ -412,19 +443,33 @@ getOpenFileImpl(sys::fs::file_t FD, std::string_view Filename, uint64_t FileSize
+     return make_error_code(errc::not_enough_memory);
+   }
+ 
+-  // Read until EOF, zero-initialize the rest.
+-  MutableArrayRef<char> ToRead = Buf->getBuffer();
+-  while (!ToRead.empty()) {
+-    Expected<size_t> ReadBytes =
+-        sys::fs::readNativeFileSlice(FD, ToRead, Offset);
+-    if (!ReadBytes)
+-      return errorToErrorCode(ReadBytes.takeError());
+-    if (*ReadBytes == 0) {
+-      std::memset(ToRead.data(), 0, ToRead.size());
++  uint8_t *BufPtr = Buf.get()->getBufferStart();
++
++  size_t BytesLeft = MapSize;
++  while (BytesLeft) {
++#ifdef _WIN32
++    LARGE_INTEGER offsetWin;
++    offsetWin.QuadPart = Offset;
++    DWORD NumRead;
++    if (!SetFilePointerEx(FD, offsetWin, nullptr, FILE_BEGIN) ||
++        !ReadFile(FD, BufPtr, BytesLeft, &NumRead, nullptr)) {
++      return mapWindowsError(GetLastError());
++    }
++// TODO
++#else
++    ssize_t NumRead = sys::RetryAfterSignal(-1, ::pread, FD, BufPtr, BytesLeft,
++                                            MapSize - BytesLeft + Offset);
++#endif
++    if (NumRead == -1) {
++      // Error while reading.
++      return std::error_code(errno, std::generic_category());
++    }
++    if (NumRead == 0) {
++      memset(BufPtr, 0, BytesLeft); // zero-initialize rest of the buffer.
+       break;
+     }
+-    ToRead = ToRead.drop_front(*ReadBytes);
+-    Offset += *ReadBytes;
++    BytesLeft -= NumRead;
++    BufPtr += NumRead;
+   }
+ 
+   return std::move(Buf);
+diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
+index 941240c832dd..16e8fc5de488 100644
+--- a/llvm/lib/Support/raw_ostream.cpp
++++ b/llvm/lib/Support/raw_ostream.cpp
+@@ -310,8 +310,11 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+     EC = std::error_code();
+     // If user requested binary then put stdout into binary mode if
+     // possible.
+-    if (!(Flags & sys::fs::OF_Text))
+-      sys::ChangeStdoutToBinary();
++    if (!(Flags & sys::fs::OF_Text)) {
++#if defined(_WIN32)
++      _setmode(_fileno(stdout), _O_BINARY);
++#endif
++    }
+     return STDOUT_FILENO;
+   }
+ 
+@@ -383,10 +386,7 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+   // Get the starting position.
+   off_t loc = ::lseek(FD, 0, SEEK_CUR);
+ #ifdef _WIN32
+-  // MSVCRT's _lseek(SEEK_CUR) doesn't return -1 for pipes.
+-  sys::fs::file_status Status;
+-  std::error_code EC = status(FD, Status);
+-  SupportsSeeking = !EC && Status.type() == sys::fs::file_type::regular_file;
++  SupportsSeeking = loc != (off_t)-1 && ::GetFileType(reinterpret_cast<HANDLE>(::_get_osfhandle(FD))) != FILE_TYPE_PIPE;
+ #else
+   SupportsSeeking = loc != (off_t)-1;
+ #endif
+@@ -435,7 +435,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+ // the input is UTF-8 or transcode from the local codepage to UTF-8 before
+ // quoting it. If they don't, this may mess up the encoding, but this is still
+ // probably the best compromise we can make.
+-static bool write_console_impl(int FD, StringRef Data) {
++static bool write_console_impl(int FD, std::string_view Data) {
+   SmallVector<wchar_t, 256> WideText;
+ 
+   // Fall back to ::write if it wasn't valid UTF-8.
+@@ -495,7 +495,11 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+ 
+   do {
+     size_t ChunkSize = std::min(Size, MaxWriteSize);
++#ifdef _WIN32
++    int ret = ::_write(FD, Ptr, ChunkSize);
++#else
+     ssize_t ret = ::write(FD, Ptr, ChunkSize);
++#endif
+ 
+     if (ret < 0) {
+       // If it's a recoverable error, swallow it and retry the write.
+@@ -540,8 +544,6 @@ uint64_t raw_fd_ostream::seek(uint64_t off) {
+   flush();
+ #ifdef _WIN32
+   pos = ::_lseeki64(FD, off, SEEK_SET);
+-#elif defined(HAVE_LSEEK64)
+-  pos = ::lseek64(FD, off, SEEK_SET);
+ #else
+   pos = ::lseek(FD, off, SEEK_SET);
+ #endif
+-- 
+2.20.1.windows.1
+

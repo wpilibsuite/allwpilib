@@ -15,6 +15,7 @@
 #define WPIUTIL_WPI_POINTERLIKETYPETRAITS_H
 
 #include <cassert>
+#include <cstdint>
 #include <type_traits>
 
 namespace wpi {

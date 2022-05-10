@@ -1,7 +1,7 @@
-From 1f54d8e9cf9593fa3d06599835d9f67735f4fa2e Mon Sep 17 00:00:00 2001
+From 5ca95255bc32bf678d5fc7ef111673d36cb861cc Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:07:25 -0400
-Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
+Subject: [PATCH 04/36] Fix warnings for casting, wrap min/max for windows
 
 ---
  llvm/include/llvm/ADT/DenseMap.h       |  4 ++--
@@ -9,10 +9,11 @@ Subject: [PATCH 04/37] Fix warnings for casting, wrap min/max for windows
  llvm/include/llvm/ADT/SmallVector.h    | 12 ++++++------
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 24 ++++++++++++------------
- 5 files changed, 22 insertions(+), 22 deletions(-)
+ llvm/lib/Support/SmallVector.cpp       |  2 +-
+ 6 files changed, 23 insertions(+), 23 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index fe3b2469e424..e607475ae908 100644
+index de9f57db8af4..334292a969bb 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -359,7 +359,7 @@ protected:
@@ -34,10 +35,10 @@ index fe3b2469e424..e607475ae908 100644
        this->BaseT::initEmpty();
        return;
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index e465331ac6f7..c3e6d1d9b1d6 100644
+index 8271b9334b86..1837e5a57147 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -343,7 +343,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
+@@ -345,7 +345,7 @@ template <typename T> struct DenseMapInfo<ArrayRef<T>> {
  template <> struct DenseMapInfo<hash_code> {
    static inline hash_code getEmptyKey() { return hash_code(-1); }
    static inline hash_code getTombstoneKey() { return hash_code(-2); }
@@ -47,10 +48,10 @@ index e465331ac6f7..c3e6d1d9b1d6 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 3ccee3d21d48..d82304c9bfad 100644
+index e960b272db04..0f993853f9b6 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -50,12 +50,12 @@ protected:
+@@ -49,12 +49,12 @@ protected:
  
    /// The maximum value of the Size_T used.
    static constexpr size_t SizeTypeMax() {
@@ -63,9 +64,9 @@ index 3ccee3d21d48..d82304c9bfad 100644
 -      : BeginX(FirstEl), Capacity(TotalCapacity) {}
 +      : BeginX(FirstEl), Capacity(static_cast<unsigned>(TotalCapacity)) {}
  
-   /// This is an implementation of the grow() method which only works
-   /// on POD-like data types and is out of line to reduce code duplication.
-@@ -79,7 +79,7 @@ public:
+   /// This is a helper for \a grow() that's out of line to reduce code
+   /// duplication.  This function will report a fatal error if it can't grow at
+@@ -83,7 +83,7 @@ public:
    /// which will only be overwritten.
    void set_size(size_t N) {
      assert(N <= capacity());
@@ -74,7 +75,7 @@ index 3ccee3d21d48..d82304c9bfad 100644
    }
  };
  
-@@ -162,7 +162,7 @@ public:
+@@ -263,7 +263,7 @@ public:
  
    size_type size_in_bytes() const { return size() * sizeof(T); }
    size_type max_size() const {
@@ -83,16 +84,7 @@ index 3ccee3d21d48..d82304c9bfad 100644
    }
  
    size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
-@@ -280,7 +280,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
- 
-   // Always grow, even from zero.
-   size_t NewCapacity = size_t(NextPowerOf2(this->capacity() + 2));
--  NewCapacity = std::min(std::max(NewCapacity, MinSize), this->SizeTypeMax());
-+  NewCapacity = (std::min)((std::max)(NewCapacity, MinSize), this->SizeTypeMax());
-   T *NewElts = static_cast<T*>(llvm::safe_malloc(NewCapacity*sizeof(T)));
- 
-   // Move the elements over.
-@@ -294,7 +294,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::grow(size_t MinSize) {
+@@ -448,7 +448,7 @@ void SmallVectorTemplateBase<T, TriviallyCopyable>::takeAllocationForGrow(
      free(this->begin());
  
    this->BeginX = NewElts;
@@ -101,6 +93,15 @@ index 3ccee3d21d48..d82304c9bfad 100644
  }
  
  /// SmallVectorTemplateBase<TriviallyCopyable = true> - This is where we put
+@@ -674,7 +674,7 @@ public:
+     }
+ 
+     // Assign over existing elements.
+-    std::fill_n(this->begin(), std::min(NumElts, this->size()), Elt);
++    std::fill_n(this->begin(), (std::min)(NumElts, this->size()), Elt);
+     if (NumElts > this->size())
+       std::uninitialized_fill_n(this->end(), NumElts - this->size(), Elt);
+     else if (NumElts < this->size())
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
 index 1add185330fa..c83ba81fa2e2 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
@@ -115,7 +116,7 @@ index 1add185330fa..c83ba81fa2e2 100644
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 16da3046c8ce..5240b59ba59b 100644
+index 33b9065261e8..a65edc71415c 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -98,7 +98,7 @@ template <typename T, std::size_t SizeOfT> struct TrailingZerosCounter {
@@ -215,6 +216,19 @@ index 16da3046c8ce..5240b59ba59b 100644
  }
  
  } // End llvm namespace
+diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
+index 0005f7840912..26901fe97d20 100644
+--- a/llvm/lib/Support/SmallVector.cpp
++++ b/llvm/lib/Support/SmallVector.cpp
+@@ -95,7 +95,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
+   // In theory 2*capacity can overflow if the capacity is 64 bit, but the
+   // original capacity would never be large enough for this to be a problem.
+   size_t NewCapacity = 2 * OldCapacity + 1; // Always grow.
+-  return std::min(std::max(NewCapacity, MinSize), MaxSize);
++  return (std::min)((std::max)(NewCapacity, MinSize), MaxSize);
+ }
+ 
+ // Note: Moving this function into the header may cause performance regression.
 -- 
 2.20.1.windows.1
 

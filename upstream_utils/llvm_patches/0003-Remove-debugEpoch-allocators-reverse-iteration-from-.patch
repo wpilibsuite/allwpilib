@@ -1,7 +1,7 @@
-From c0e275f81a0c36deaa55b042252f5b0394f19c14 Mon Sep 17 00:00:00 2001
+From a82eff3fd13ec091feb16626838b188549e4b29c Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:58:29 -0400
-Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
+Subject: [PATCH 03/36] Remove debugEpoch, allocators, reverse iteration from
  collections
 
 ---
@@ -14,7 +14,7 @@ Subject: [PATCH 03/37] Remove debugEpoch, allocators, reverse iteration from
  6 files changed, 34 insertions(+), 134 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 34d397cc9793..fe3b2469e424 100644
+index ce0b05db840c..de9f57db8af4 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
 @@ -76,8 +76,6 @@ public:
@@ -167,7 +167,7 @@ index 34d397cc9793..fe3b2469e424 100644
      return const_iterator(P, E, Epoch, NoAdvance);
    }
  
-@@ -1213,10 +1175,6 @@ public:
+@@ -1211,10 +1173,6 @@ public:
      assert(isHandleInSync() && "invalid construction!");
  
      if (NoAdvance) return;
@@ -178,7 +178,7 @@ index 34d397cc9793..fe3b2469e424 100644
      AdvancePastEmptyBuckets();
    }
  
-@@ -1231,16 +1189,10 @@ public:
+@@ -1229,16 +1187,10 @@ public:
  
    reference operator*() const {
      assert(isHandleInSync() && "invalid iterator access!");
@@ -195,7 +195,7 @@ index 34d397cc9793..fe3b2469e424 100644
      return Ptr;
    }
  
-@@ -1261,12 +1213,6 @@ public:
+@@ -1258,12 +1210,6 @@ public:
  
    inline DenseMapIterator& operator++() {  // Preincrement
      assert(isHandleInSync() && "invalid iterator access!");
@@ -326,10 +326,10 @@ index 57dd8f6b695d..2565678eb932 100644
  };
  
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 840f328db796..87ce5a5e0dfa 100644
+index a82afc9a817c..a97b5660da53 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -102,10 +102,8 @@ public:
+@@ -104,10 +104,8 @@ public:
  /// keys that are "strings", which are basically ranges of bytes. This does some
  /// funky memory allocation and hashing things to make it extremely efficient,
  /// storing the string data *after* the value in the map.
@@ -341,7 +341,7 @@ index 840f328db796..87ce5a5e0dfa 100644
  public:
    using MapEntryTy = StringMapEntry<ValueTy>;
  
-@@ -114,14 +112,6 @@ public:
+@@ -116,14 +114,6 @@ public:
    explicit StringMap(unsigned InitialSize)
        : StringMapImpl(InitialSize, static_cast<unsigned>(sizeof(MapEntryTy))) {}
  
@@ -356,7 +356,7 @@ index 840f328db796..87ce5a5e0dfa 100644
    StringMap(std::initializer_list<std::pair<StringRef, ValueTy>> List)
        : StringMapImpl(List.size(), static_cast<unsigned>(sizeof(MapEntryTy))) {
      for (const auto &P : List) {
-@@ -130,11 +120,10 @@ public:
+@@ -132,11 +122,10 @@ public:
    }
  
    StringMap(StringMap &&RHS)
@@ -371,7 +371,7 @@ index 840f328db796..87ce5a5e0dfa 100644
      if (RHS.empty())
        return;
  
-@@ -154,7 +143,7 @@ public:
+@@ -156,7 +145,7 @@ public:
        }
  
        TheTable[I] = MapEntryTy::Create(
@@ -380,7 +380,7 @@ index 840f328db796..87ce5a5e0dfa 100644
            static_cast<MapEntryTy *>(Bucket)->getValue());
        HashTable[I] = RHSHashTable[I];
      }
-@@ -169,7 +158,6 @@ public:
+@@ -171,7 +160,6 @@ public:
  
    StringMap &operator=(StringMap RHS) {
      StringMapImpl::swap(RHS);
@@ -388,7 +388,7 @@ index 840f328db796..87ce5a5e0dfa 100644
      return *this;
    }
  
-@@ -181,16 +169,13 @@ public:
+@@ -183,16 +171,13 @@ public:
        for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
          StringMapEntryBase *Bucket = TheTable[I];
          if (Bucket && Bucket != getTombstoneVal()) {
@@ -406,7 +406,7 @@ index 840f328db796..87ce5a5e0dfa 100644
    using key_type = const char *;
    using mapped_type = ValueTy;
    using value_type = StringMapEntry<ValueTy>;
-@@ -319,7 +304,7 @@ public:
+@@ -321,7 +306,7 @@ public:
  
      if (Bucket == getTombstoneVal())
        --NumTombstones;
@@ -415,7 +415,7 @@ index 840f328db796..87ce5a5e0dfa 100644
      ++NumItems;
      assert(NumItems + NumTombstones <= NumBuckets);
  
-@@ -337,7 +322,7 @@ public:
+@@ -339,7 +324,7 @@ public:
      for (unsigned I = 0, E = NumBuckets; I != E; ++I) {
        StringMapEntryBase *&Bucket = TheTable[I];
        if (Bucket && Bucket != getTombstoneVal()) {
@@ -424,7 +424,7 @@ index 840f328db796..87ce5a5e0dfa 100644
        }
        Bucket = nullptr;
      }
-@@ -353,7 +338,7 @@ public:
+@@ -355,7 +340,7 @@ public:
    void erase(iterator I) {
      MapEntryTy &V = *I;
      remove(&V);

@@ -1,7 +1,7 @@
-From af92f804fbca7dec7c9197f31c0049bd89e4d71b Mon Sep 17 00:00:00 2001
+From 0678e1ec717946f9ec243a710e186a12678f4251 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:06:16 -0400
-Subject: [PATCH 23/37] Fixup includes
+Subject: [PATCH 23/36] Fixup includes
 
 ---
  llvm/include/llvm/ADT/DenseMapInfo.h               | 1 -
@@ -9,19 +9,20 @@ Subject: [PATCH 23/37] Fixup includes
  llvm/include/llvm/ADT/StringMapEntry.h             | 4 ++++
  llvm/include/llvm/Support/MathExtras.h             | 1 +
  llvm/include/llvm/Support/MemoryBuffer.h           | 1 +
+ llvm/include/llvm/Support/PointerLikeTypeTraits.h  | 1 +
  llvm/include/llvm/Support/Windows/WindowsSupport.h | 2 --
  llvm/lib/Support/ConvertUTFWrapper.cpp             | 1 +
  llvm/lib/Support/ErrorHandling.cpp                 | 7 +++----
  llvm/lib/Support/SmallPtrSet.cpp                   | 1 +
- llvm/lib/Support/raw_ostream.cpp                   | 5 +++--
+ llvm/lib/Support/raw_ostream.cpp                   | 6 ++++--
  llvm/unittests/ADT/SmallPtrSetTest.cpp             | 1 +
- 11 files changed, 21 insertions(+), 10 deletions(-)
+ 12 files changed, 23 insertions(+), 10 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index e3343a552340..ca6aa6d922c1 100644
+index be9620dbd50e..80a62d77946f 100644
 --- a/llvm/include/llvm/ADT/DenseMapInfo.h
 +++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -16,7 +16,6 @@
+@@ -18,7 +18,6 @@
  #include "llvm/ADT/Hashing.h"
  #include "llvm/ADT/span.h"
  #include "llvm/Support/PointerLikeTypeTraits.h"
@@ -30,7 +31,7 @@ index e3343a552340..ca6aa6d922c1 100644
  #include <cstddef>
  #include <cstdint>
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 809ad5776600..7ee44a438880 100644
+index ce4e807b51f4..1f1855338626 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
 @@ -14,10 +14,15 @@
@@ -66,7 +67,7 @@ index 253cb4b02152..ede4b3967373 100644
  #include <string_view>
  
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 45fed17bcc80..231fa8f77be9 100644
+index f72d70f0b671..c363c7e9118f 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -16,6 +16,7 @@
@@ -78,17 +79,29 @@ index 45fed17bcc80..231fa8f77be9 100644
  #include <cmath>
  #include <cstdint>
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 2fcf0516b83f..a2030c23839b 100644
+index 918752587424..f77e873fe13d 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -14,6 +14,7 @@
- #define LLVM_SUPPORT_MEMORYBUFFER_H
+@@ -15,6 +15,7 @@
  
  #include "llvm/Support/ErrorOr.h"
+ #include "llvm/Support/MemoryBufferRef.h"
 +#include "llvm/Support/span.h"
  #include <cstddef>
  #include <cstdint>
  #include <memory>
+diff --git a/llvm/include/llvm/Support/PointerLikeTypeTraits.h b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+index 1b15f930bd87..acadd5e89a16 100644
+--- a/llvm/include/llvm/Support/PointerLikeTypeTraits.h
++++ b/llvm/include/llvm/Support/PointerLikeTypeTraits.h
+@@ -16,6 +16,7 @@
+ 
+ #include "llvm/Support/DataTypes.h"
+ #include <cassert>
++#include <cstdint>
+ #include <type_traits>
+ 
+ namespace llvm {
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 index 16975cfb16e8..201cb25b0dce 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
@@ -103,7 +116,7 @@ index 16975cfb16e8..201cb25b0dce 100644
  #include "llvm/Support/Compiler.h"
  #include "llvm/Support/ErrorHandling.h"
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 3c41886fbaba..40277e4352b5 100644
+index b1721ddeae6c..d8bcc9770c06 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -8,6 +8,7 @@
@@ -115,7 +128,7 @@ index 3c41886fbaba..40277e4352b5 100644
  #include "llvm/Support/SwapByteOrder.h"
  #include <string>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 3f43db159175..d062226c52af 100644
+index 2cd427bbd344..553a68de4e3d 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -28,12 +28,11 @@
@@ -147,19 +160,20 @@ index 930ebdde2cc1..da65ee31ce5c 100644
  #include <algorithm>
  #include <cassert>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 273c233b97d0..30ab5153da3e 100644
+index fb4df18d364a..a2153dbaf937 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -15,7 +15,7 @@
+@@ -15,7 +15,8 @@
  #endif
  
  #include "llvm/Support/raw_ostream.h"
 -#include "llvm/ADT/STLExtras.h"
 +#include "llvm/ADT/SmallString.h"
- #include "llvm/ADT/SmallVector.h"
++#include "llvm/ADT/SmallVector.h"
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
-@@ -25,6 +25,7 @@
+ #include "llvm/Support/Compiler.h"
+@@ -24,6 +25,7 @@
  #include "llvm/Support/Format.h"
  #include "llvm/Support/FormatVariadic.h"
  #include "llvm/Support/MathExtras.h"
@@ -167,7 +181,7 @@ index 273c233b97d0..30ab5153da3e 100644
  #include "llvm/Support/NativeFormatting.h"
  #include "llvm/Support/Process.h"
  #include "llvm/Support/Program.h"
-@@ -64,7 +65,7 @@
+@@ -62,7 +64,7 @@
  
  #ifdef _WIN32
  #include "llvm/Support/ConvertUTF.h"

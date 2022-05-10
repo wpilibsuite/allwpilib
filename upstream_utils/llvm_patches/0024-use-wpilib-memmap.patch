@@ -1,7 +1,7 @@
-From f5a638ab093513b6bffd4054d77795eb206e11a2 Mon Sep 17 00:00:00 2001
+From 9c78270091626ebd218d4fd5d169522b3582ba25 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 23:13:45 -0400
-Subject: [PATCH 24/37] use wpilib memmap
+Subject: [PATCH 24/36] use wpilib memmap
 
 ---
  llvm/include/llvm/Support/MemoryBuffer.h |  16 ----
@@ -9,10 +9,10 @@ Subject: [PATCH 24/37] use wpilib memmap
  2 files changed, 10 insertions(+), 107 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index a2030c23839b..6d7d75bcf96f 100644
+index f77e873fe13d..143799a4d982 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -132,15 +132,6 @@ public:
+@@ -130,15 +130,6 @@ public:
    static std::unique_ptr<MemoryBuffer>
    getMemBufferCopy(span<const uint8_t> InputData, const std::string_view &BufferName = "");
  
@@ -28,7 +28,7 @@ index a2030c23839b..6d7d75bcf96f 100644
    /// Map a subrange of the specified file as a MemoryBuffer.
    static ErrorOr<std::unique_ptr<MemoryBuffer>>
    getFileSlice(const std::string_view &Filename, uint64_t MapSize, uint64_t Offset,
-@@ -214,12 +205,10 @@ private:
+@@ -212,12 +203,10 @@ private:
    //   WritableMemoryBuffer::getXXX()
    // and be surprised that they got a read-only Buffer.
    using MemoryBuffer::getFileAsStream;
@@ -41,7 +41,7 @@ index a2030c23839b..6d7d75bcf96f 100644
  };
  
  /// This class is an extension of MemoryBuffer, which allows write access to
-@@ -259,12 +248,10 @@ private:
+@@ -257,17 +246,12 @@ private:
    //   WritableMemoryBuffer::getXXX()
    // and be surprised that they got a read-only Buffer.
    using MemoryBuffer::getFileAsStream;
@@ -51,11 +51,6 @@ index a2030c23839b..6d7d75bcf96f 100644
    using MemoryBuffer::getOpenFile;
    using MemoryBuffer::getOpenFileSlice;
 -  using MemoryBuffer::getSTDIN;
- };
- 
- class MemoryBufferRef {
-@@ -287,9 +274,6 @@ public:
-   size_t getBufferSize() const { return Buffer.size(); }
  };
  
 -// Create wrappers for C Binding types (see CBindingWrapping.h).

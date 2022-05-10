@@ -29,7 +29,6 @@
 #include <cstdio>
 #include <iterator>
 #include <sys/stat.h>
-#include <system_error>
 
 // <fcntl.h> may provide O_BINARY.
 #include <fcntl.h>
@@ -360,8 +359,9 @@ raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
 
 /// FD is the file descriptor that this writes to.  If ShouldClose is true, this
 /// closes the file when the stream is destroyed.
-raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
-    : raw_pwrite_stream(unbuffered), FD(fd), ShouldClose(shouldClose) {
+raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
+                               OStreamKind K)
+    : raw_pwrite_stream(unbuffered, K), FD(fd), ShouldClose(shouldClose) {
   if (FD < 0 ) {
     ShouldClose = false;
     return;
@@ -617,6 +617,27 @@ raw_ostream &wpi::nulls() {
 }
 
 //===----------------------------------------------------------------------===//
+// File Streams
+//===----------------------------------------------------------------------===//
+
+raw_fd_stream::raw_fd_stream(std::string_view Filename, std::error_code &EC)
+    : raw_fd_ostream(getFD(Filename, EC, fs::CD_CreateAlways,
+                           fs::FA_Write | fs::FA_Read,
+                           fs::OF_None),
+                     true, false, OStreamKind::OK_FDStream) {
+  if (EC)
+    return;
+
+  // Do not support non-seekable files.
+  if (!supportsSeeking())
+    EC = std::make_error_code(std::errc::invalid_argument);
+}
+
+bool raw_fd_stream::classof(const raw_ostream *OS) {
+  return OS->get_kind() == OStreamKind::OK_FDStream;
+}
+
+//===----------------------------------------------------------------------===//
 //  raw_string_ostream
 //===----------------------------------------------------------------------===//
 
@@ -716,3 +737,5 @@ void raw_null_ostream::pwrite_impl(const char *Ptr, size_t Size,
 void raw_pwrite_stream::anchor() {}
 
 void buffer_ostream::anchor() {}
+
+void buffer_unique_ostream::anchor() {}

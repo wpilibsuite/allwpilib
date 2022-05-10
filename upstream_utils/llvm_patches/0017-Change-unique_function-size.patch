@@ -1,14 +1,14 @@
-From 935bc494e7ca435e9789b4a6ee684a10360084a8 Mon Sep 17 00:00:00 2001
+From 8439fa2cefa02eaf3d4303e04fde00b08bcf1d5b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:34:13 -0400
-Subject: [PATCH 17/37] Change unique_function size
+Subject: [PATCH 17/36] Change unique_function size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 928202851d8c..35f9b06bd700 100644
+index c6ce4eb5c3be..dba5cc241086 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -62,7 +62,7 @@ using EnableIfTrivial =
@@ -18,8 +18,8 @@ index 928202851d8c..35f9b06bd700 100644
 -  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
 +  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
  
-   // MSVC has a bug and ICEs if we give it a particular dependent value
-   // expression as part of the `std::conditional` below. To work around this,
+   template <typename T, class = void>
+   struct IsSizeLessThanThresholdT : std::false_type {};
 @@ -130,7 +130,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  

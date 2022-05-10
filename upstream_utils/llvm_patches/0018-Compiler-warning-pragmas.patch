@@ -1,7 +1,7 @@
-From 844f774a226dff999db88a8e1da3b89c0934cc7d Mon Sep 17 00:00:00 2001
+From 1fbae4c83d27fb5dd818b253400b5d9250eddaaa Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:42:42 -0400
-Subject: [PATCH 18/37] Compiler warning pragmas
+Subject: [PATCH 18/36] Compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++
@@ -17,7 +17,7 @@ Subject: [PATCH 18/37] Compiler warning pragmas
  10 files changed, 78 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 35f9b06bd700..f48ff6ee55a3 100644
+index dba5cc241086..63cfb911da8f 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
 @@ -53,6 +53,12 @@ namespace llvm {
@@ -45,11 +45,11 @@ index 35f9b06bd700..f48ff6ee55a3 100644
  
  #endif // LLVM_ADT_FUNCTION_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index dd479f84f1d8..20a38672d0df 100644
+index 9b85801d6720..87a1e9778fed 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
-@@ -55,6 +55,11 @@
- #include <string>
+@@ -56,6 +56,11 @@
+ #include <tuple>
  #include <utility>
  
 +#ifdef _WIN32
@@ -60,7 +60,7 @@ index dd479f84f1d8..20a38672d0df 100644
  namespace llvm {
  
  /// An opaque object representing a hash code.
-@@ -655,4 +660,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -680,4 +685,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
  
  } // namespace llvm
  
@@ -70,7 +70,7 @@ index dd479f84f1d8..20a38672d0df 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 552c46c84162..d9c6ae8dcc61 100644
+index 15a91519462d..eed2685c5936 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -13,6 +13,14 @@
@@ -86,10 +86,10 @@ index 552c46c84162..d9c6ae8dcc61 100644
 +#endif
 +
  #include "llvm/ADT/iterator_range.h"
- #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/ErrorHandling.h"
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index b98da614121e..673a053087ef 100644
+index c3ad4a13b422..23eac2981816 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -436,6 +436,11 @@ inline uint64_t maxUIntN(uint64_t N) {
@@ -105,7 +105,7 @@ index b98da614121e..673a053087ef 100644
  inline int64_t minIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
 @@ -443,6 +448,10 @@ inline int64_t minIntN(int64_t N) {
-   return -(UINT64_C(1)<<(N-1));
+   return UINT64_C(1) + ~(UINT64_C(1) << (N - 1));
  }
  
 +#ifdef _WIN32
@@ -167,7 +167,7 @@ index 59b3b703d76a..d0ee3ee9dedf 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Errc.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 206c784990c0..1d0447e292d8 100644
+index 8dcac30388a0..3ecae08be081 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -180,7 +180,7 @@ index 206c784990c0..1d0447e292d8 100644
 +
  #include "llvm/Support/raw_ostream.h"
  #include "llvm/ADT/STLExtras.h"
- #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/StringExtras.h"
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
 index 7a77df45bce8..bba529f9c87a 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
@@ -200,7 +200,7 @@ index 7a77df45bce8..bba529f9c87a 100644
  #include "llvm/ADT/iterator_range.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 61682b50dea2..8be4575eaa7e 100644
+index 7ede47357474..9709b0c2b3fb 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -17,6 +17,10 @@

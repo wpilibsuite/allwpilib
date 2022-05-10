@@ -1,14 +1,14 @@
-From 067f1792f4482183600a1db2383cccd2fa9079a2 Mon Sep 17 00:00:00 2001
+From c4a4da4bea5042b4a1165b1dc85ad39fa3518f0d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:36:15 -0400
-Subject: [PATCH 07/37] Safe #define guards in Compiler.h
+Subject: [PATCH 07/36] Safe #define guards in Compiler.h
 
 ---
  llvm/include/llvm/Support/Compiler.h | 54 ++++++++++++++++++++++++++++
  1 file changed, 54 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 661a43de4a14..124aaa89ea2a 100644
+index b8cf8ea32838..0f29a3a44ab3 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
 @@ -80,6 +80,7 @@
@@ -76,7 +76,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  // Use the 'nodiscard' attribute in C++17 or newer mode.
 +#ifndef LLVM_NODISCARD
- #if __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(nodiscard)
+ #if defined(__cplusplus) && __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(nodiscard)
  #define LLVM_NODISCARD [[nodiscard]]
  #elif LLVM_HAS_CPP_ATTRIBUTE(clang::warn_unused_result)
 @@ -159,6 +170,7 @@
@@ -152,11 +152,11 @@ index 661a43de4a14..124aaa89ea2a 100644
  /// errors, just use it in GCC 4.0 and later.
 +#ifndef LLVM_ATTRIBUTE_ALWAYS_INLINE
  #if __has_attribute(always_inline) || LLVM_GNUC_PREREQ(4, 0, 0)
- #define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
+ #define LLVM_ATTRIBUTE_ALWAYS_INLINE inline __attribute__((always_inline))
  #elif defined(_MSC_VER)
 @@ -240,7 +263,9 @@
  #else
- #define LLVM_ATTRIBUTE_ALWAYS_INLINE
+ #define LLVM_ATTRIBUTE_ALWAYS_INLINE inline
  #endif
 +#endif
  
@@ -194,7 +194,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  /// LLVM_FALLTHROUGH - Mark fallthrough cases in switch statements.
 +#ifndef LLVM_FALLTHROUGH
- #if __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(fallthrough)
+ #if defined(__cplusplus) && __cplusplus > 201402L && LLVM_HAS_CPP_ATTRIBUTE(fallthrough)
  #define LLVM_FALLTHROUGH [[fallthrough]]
  #elif LLVM_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
 @@ -279,6 +310,7 @@
@@ -205,7 +205,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  /// LLVM_REQUIRE_CONSTANT_INITIALIZATION - Apply this to globals to ensure that
  /// they are constant initialized.
-@@ -307,13 +339,16 @@
+@@ -307,28 +339,35 @@
  
  /// LLVM_EXTENSION - Support compilers where we have a keyword to suppress
  /// pedantic diagnostics.
@@ -218,14 +218,10 @@ index 661a43de4a14..124aaa89ea2a 100644
 +#endif
  
  // LLVM_ATTRIBUTE_DEPRECATED(decl, "message")
+ // This macro will be removed.
+ // Use C++14's attribute instead: [[deprecated("message")]]
 +#ifndef LLVM_ATTRIBUTE_DEPRECATED
- #if __has_feature(attribute_deprecated_with_message)
- # define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-   decl __attribute__((deprecated(message)))
-@@ -327,18 +362,22 @@
- # define LLVM_ATTRIBUTE_DEPRECATED(decl, message) \
-   decl
- #endif
+ #define LLVM_ATTRIBUTE_DEPRECATED(decl, message) [[deprecated(message)]] decl
 +#endif
  
  /// LLVM_BUILTIN_UNREACHABLE - On compilers which support it, expands
@@ -245,7 +241,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #if __has_builtin(__builtin_trap) || LLVM_GNUC_PREREQ(4, 3, 0)
  # define LLVM_BUILTIN_TRAP __builtin_trap()
  #elif defined(_MSC_VER)
-@@ -350,10 +389,12 @@
+@@ -340,10 +379,12 @@
  #else
  # define LLVM_BUILTIN_TRAP *(volatile int*)0x11 = 0
  #endif
@@ -258,7 +254,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #if __has_builtin(__builtin_debugtrap)
  # define LLVM_BUILTIN_DEBUGTRAP __builtin_debugtrap()
  #elif defined(_MSC_VER)
-@@ -367,9 +408,11 @@
+@@ -357,9 +398,11 @@
  // program to abort if encountered.
  # define LLVM_BUILTIN_DEBUGTRAP
  #endif
@@ -270,7 +266,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #if __has_builtin(__builtin_assume_aligned) || LLVM_GNUC_PREREQ(4, 7, 0)
  # define LLVM_ASSUME_ALIGNED(p, a) __builtin_assume_aligned(p, a)
  #elif defined(LLVM_BUILTIN_UNREACHABLE)
-@@ -378,6 +421,7 @@
+@@ -368,6 +411,7 @@
  #else
  # define LLVM_ASSUME_ALIGNED(p, a) (p)
  #endif
@@ -278,7 +274,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  /// \macro LLVM_PACKED
  /// Used to specify a packed structure.
-@@ -397,6 +441,7 @@
+@@ -387,6 +431,7 @@
  ///   long long l;
  /// };
  /// LLVM_PACKED_END
@@ -286,7 +282,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #ifdef _MSC_VER
  # define LLVM_PACKED(d) __pragma(pack(push, 1)) d __pragma(pack(pop))
  # define LLVM_PACKED_START __pragma(pack(push, 1))
-@@ -406,11 +451,13 @@
+@@ -396,11 +441,13 @@
  # define LLVM_PACKED_START _Pragma("pack(push, 1)")
  # define LLVM_PACKED_END   _Pragma("pack(pop)")
  #endif
@@ -300,7 +296,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #ifdef __SIZEOF_POINTER__
  # define LLVM_PTR_SIZE __SIZEOF_POINTER__
  #elif defined(_WIN64)
-@@ -422,6 +469,7 @@
+@@ -412,6 +459,7 @@
  #else
  # define LLVM_PTR_SIZE sizeof(void *)
  #endif
@@ -308,7 +304,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  /// \macro LLVM_MEMORY_SANITIZER_BUILD
  /// Whether LLVM itself is built with MemorySanitizer instrumentation.
-@@ -492,11 +540,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -482,11 +530,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  
  /// \macro LLVM_NO_SANITIZE
  /// Disable a particular sanitizer for a function.
@@ -322,7 +318,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  
  /// Mark debug helper function definitions like dump() that should not be
  /// stripped from debug builds.
-@@ -504,17 +554,20 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -494,17 +544,20 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// `#if !defined(NDEBUG) || defined(LLVM_ENABLE_DUMP)` so they do always
  /// get stripped in release builds.
  // FIXME: Move this to a private config.h as it's not usable in public headers.
@@ -343,7 +339,7 @@ index 661a43de4a14..124aaa89ea2a 100644
  #if defined(_MSC_VER)
  #define LLVM_PRETTY_FUNCTION __FUNCSIG__
  #elif defined(__GNUC__) || defined(__clang__)
-@@ -522,6 +575,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -512,6 +565,7 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  #else
  #define LLVM_PRETTY_FUNCTION __func__
  #endif

@@ -1,7 +1,7 @@
-From 2878b733a776e48cf65ed81dc11c9c63650cd2d6 Mon Sep 17 00:00:00 2001
+From 78d6516ace3e43bed98489f3c7dd0aa4906103ba Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 19:53:22 -0400
-Subject: [PATCH 01/37] Fix spelling errors
+Subject: [PATCH 01/36] Fix spelling errors
 
 ---
  llvm/include/llvm/Support/Chrono.h        | 2 +-
@@ -23,7 +23,7 @@ index 098512dce783..7ae0991400a6 100644
  ///   platforms).
  /// - to shorten the type name
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 7cbc668b3a0e..d88d79b69440 100644
+index 0ec0242d569d..dd85a5892e01 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -45,7 +45,7 @@ class StringRef;
@@ -36,10 +36,10 @@ index 7cbc668b3a0e..d88d79b69440 100644
  
    /// ScopedFatalErrorHandler - This is a simple helper class which just
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index f47a8d2d334b..3b20fec3e136 100644
+index 9e6ee2536c5e..fb3d03dd5454 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -205,7 +205,7 @@ public:
+@@ -203,7 +203,7 @@ public:
  private:
    // Hide these base class factory function so one can't write
    //   WritableMemoryBuffer::getXXX()
@@ -48,7 +48,7 @@ index f47a8d2d334b..3b20fec3e136 100644
    using MemoryBuffer::getFileAsStream;
    using MemoryBuffer::getFileOrSTDIN;
    using MemoryBuffer::getMemBuffer;
-@@ -250,7 +250,7 @@ public:
+@@ -248,7 +248,7 @@ public:
  private:
    // Hide these base class factory function so one can't write
    //   WritableMemoryBuffer::getXXX()
