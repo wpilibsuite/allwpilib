@@ -19,6 +19,8 @@
 #include <tuple>
 
 namespace wpi {
+class raw_ostream;
+class StringRef;
 
 /// Represents a version number in the form major[.minor[.subminor[.build]]].
 class VersionTuple {

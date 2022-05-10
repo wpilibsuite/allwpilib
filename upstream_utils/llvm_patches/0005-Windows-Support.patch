@@ -1,16 +1,16 @@
-From 30e3c0bbdd870a788ef15a56d68e07f0dc9fec81 Mon Sep 17 00:00:00 2001
+From b510e240dae707e773042ff066d587eb94e12d59 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 05/36] Windows Support
+Subject: [PATCH 05/37] Windows Support
 
 ---
- .../llvm/Support/Windows/WindowsSupport.h     | 33 +++++--
+ .../llvm/Support/Windows/WindowsSupport.h     | 39 +++++---
  llvm/lib/Support/ConvertUTF.cpp               | 95 +++++++++++++++++++
  llvm/lib/Support/MemoryBuffer.cpp             |  4 +-
- 3 files changed, 122 insertions(+), 10 deletions(-)
+ 3 files changed, 122 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index bb7e79b86018..eff608d795a3 100644
+index bd5a90c2c3f0..eff608d795a3 100644
 --- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
 +++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
 @@ -53,11 +53,35 @@
@@ -50,7 +50,7 @@ index bb7e79b86018..eff608d795a3 100644
  
  /// Returns the Windows version as Major.Minor.0.BuildNumber. Uses
  /// RtlGetVersion or GetVersionEx under the hood depending on what is available.
-@@ -230,13 +254,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
+@@ -230,19 +254,6 @@ inline FILETIME toFILETIME(TimePoint<> TP) {
    return Time;
  }
  
@@ -60,6 +60,12 @@ index bb7e79b86018..eff608d795a3 100644
 -// UTF-8 regardless of the current code page setting.
 -std::error_code GetCommandLineArguments(SmallVectorImpl<const char *> &Args,
 -                                        BumpPtrAllocator &Alloc);
+-
+-/// Convert UTF-8 path to a suitable UTF-16 path for use with the Win32 Unicode
+-/// File API.
+-std::error_code widenPath(const Twine &Path8, SmallVectorImpl<wchar_t> &Path16,
+-                          size_t MaxPathLen = MAX_PATH);
+-
 -} // end namespace windows
  } // end namespace sys
  } // end namespace llvm.
@@ -178,10 +184,10 @@ index e24a918c5c89..b4c7fffee8f7 100644
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index e4027ca7bbfd..deed2d9ffca6 100644
+index 248fb72c4968..dca541d1dd5d 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -209,8 +209,8 @@ public:
+@@ -223,8 +223,8 @@ public:
  
  static ErrorOr<std::unique_ptr<WritableMemoryBuffer>>
  getMemoryBufferForStream(sys::fs::file_t FD, const Twine &BufferName) {

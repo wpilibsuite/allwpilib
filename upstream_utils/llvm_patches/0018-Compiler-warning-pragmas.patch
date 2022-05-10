@@ -1,27 +1,27 @@
-From 120d240fdb535844cf41294b02ad4e89e46bd65c Mon Sep 17 00:00:00 2001
+From 844f774a226dff999db88a8e1da3b89c0934cc7d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:42:42 -0400
-Subject: [PATCH 18/36] Compiler warning pragmas
+Subject: [PATCH 18/37] Compiler warning pragmas
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 10 ++++++++++
  llvm/include/llvm/ADT/Hashing.h        |  9 +++++++++
  llvm/include/llvm/ADT/SmallVector.h    |  8 ++++++++
  llvm/include/llvm/Support/MathExtras.h |  9 +++++++++
- llvm/include/llvm/Support/MemAlloc.h   | 12 ++++++++++++
+ llvm/include/llvm/Support/MemAlloc.h   | 13 +++++++++++++
  llvm/lib/Support/MemoryBuffer.cpp      | 11 +++++++++++
  llvm/lib/Support/raw_ostream.cpp       |  4 ++++
  llvm/unittests/ADT/MapVectorTest.cpp   |  7 +++++++
  llvm/unittests/ADT/SmallVectorTest.cpp |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp |  7 +++----
- 10 files changed, 77 insertions(+), 4 deletions(-)
+ 10 files changed, 78 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 01878e990a0c..6b3a1b4d989a 100644
+index 35f9b06bd700..f48ff6ee55a3 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -41,6 +41,12 @@ namespace llvm {
- 
+@@ -53,6 +53,12 @@ namespace llvm {
+ ///   It can hold functions with a non-const operator(), like mutable lambdas.
  template <typename FunctionT> class unique_function;
  
 +// GCC warns on OutOfLineStorage
@@ -30,10 +30,10 @@ index 01878e990a0c..6b3a1b4d989a 100644
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 +#endif
 +
- template <typename ReturnT, typename... ParamTs>
- class unique_function<ReturnT(ParamTs...)> {
-   static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
-@@ -287,6 +293,10 @@ public:
+ namespace detail {
+ 
+ template <typename T>
+@@ -378,6 +384,10 @@ public:
    }
  };
  
@@ -45,7 +45,7 @@ index 01878e990a0c..6b3a1b4d989a 100644
  
  #endif // LLVM_ADT_FUNCTION_H
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index cf1b49ea6d40..9897ad933326 100644
+index dd479f84f1d8..20a38672d0df 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -55,6 +55,11 @@
@@ -60,7 +60,7 @@ index cf1b49ea6d40..9897ad933326 100644
  namespace llvm {
  
  /// An opaque object representing a hash code.
-@@ -657,4 +662,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
+@@ -655,4 +660,8 @@ hash_code hash_value(const std::basic_string<T> &arg) {
  
  } // namespace llvm
  
@@ -70,7 +70,7 @@ index cf1b49ea6d40..9897ad933326 100644
 +
  #endif
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 3f674c31dfd0..d4c66a9e4d98 100644
+index 552c46c84162..d9c6ae8dcc61 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -13,6 +13,14 @@
@@ -89,10 +89,10 @@ index 3f674c31dfd0..d4c66a9e4d98 100644
  #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 887c0ce27e51..ed58ed4ba12e 100644
+index b98da614121e..673a053087ef 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -409,6 +409,11 @@ inline uint64_t maxUIntN(uint64_t N) {
+@@ -436,6 +436,11 @@ inline uint64_t maxUIntN(uint64_t N) {
    return UINT64_MAX >> (64 - N);
  }
  
@@ -104,7 +104,7 @@ index 887c0ce27e51..ed58ed4ba12e 100644
  /// Gets the minimum value for a N-bit signed integer.
  inline int64_t minIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
-@@ -416,6 +421,10 @@ inline int64_t minIntN(int64_t N) {
+@@ -443,6 +448,10 @@ inline int64_t minIntN(int64_t N) {
    return -(UINT64_C(1)<<(N-1));
  }
  
@@ -116,7 +116,7 @@ index 887c0ce27e51..ed58ed4ba12e 100644
  inline int64_t maxIntN(int64_t N) {
    assert(N > 0 && N <= 64 && "integer width out of range");
 diff --git a/llvm/include/llvm/Support/MemAlloc.h b/llvm/include/llvm/Support/MemAlloc.h
-index 0e5869141fd3..4cec468a8c8c 100644
+index d6012bd5a698..01007deb89bb 100644
 --- a/llvm/include/llvm/Support/MemAlloc.h
 +++ b/llvm/include/llvm/Support/MemAlloc.h
 @@ -22,6 +22,14 @@
@@ -134,18 +134,18 @@ index 0e5869141fd3..4cec468a8c8c 100644
  LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_malloc(size_t Sz) {
    void *Result = std::malloc(Sz);
    if (Result == nullptr) {
-@@ -62,5 +70,9 @@ LLVM_ATTRIBUTE_RETURNS_NONNULL inline void *safe_realloc(void *Ptr, size_t Sz) {
-   return Result;
- }
+@@ -84,4 +92,9 @@ allocate_buffer(size_t Size, size_t Alignment);
+ void deallocate_buffer(void *Ptr, size_t Size, size_t Alignment);
  
+ } // namespace llvm
++
 +#ifdef _WIN32
 +#pragma warning(pop)
 +#endif
 +
- }
  #endif
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 4103a5685f38..0784a21a1d2d 100644
+index 59b3b703d76a..d0ee3ee9dedf 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -11,6 +11,17 @@
@@ -167,7 +167,7 @@ index 4103a5685f38..0784a21a1d2d 100644
  #include "llvm/Config/config.h"
  #include "llvm/Support/Errc.h"
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 8ff5108ecafd..936423d368b1 100644
+index 206c784990c0..1d0447e292d8 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -182,7 +182,7 @@ index 8ff5108ecafd..936423d368b1 100644
  #include "llvm/ADT/STLExtras.h"
  #include "llvm/ADT/SmallVector.h"
 diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
-index f7e5812f2e99..511642b60516 100644
+index 7a77df45bce8..bba529f9c87a 100644
 --- a/llvm/unittests/ADT/MapVectorTest.cpp
 +++ b/llvm/unittests/ADT/MapVectorTest.cpp
 @@ -6,6 +6,13 @@

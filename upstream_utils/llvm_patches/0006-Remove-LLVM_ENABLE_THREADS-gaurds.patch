@@ -1,7 +1,7 @@
-From ee2eb71a5e30fb0a40e002c7dab2551e13ff20fc Mon Sep 17 00:00:00 2001
+From 0066ce9ff3786fe2bff61519caad9f39b6271600 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:31:11 -0400
-Subject: [PATCH 06/36] Remove LLVM_ENABLE_THREADS gaurds
+Subject: [PATCH 06/37] Remove LLVM_ENABLE_THREADS gaurds
 
 ---
  llvm/include/llvm/Support/Compiler.h | 29 +++++++---------------------
@@ -9,10 +9,10 @@ Subject: [PATCH 06/36] Remove LLVM_ENABLE_THREADS gaurds
  2 files changed, 7 insertions(+), 48 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index 6f6f65cad6f5..9ac17001d0dc 100644
+index 80ea76240d6c..661a43de4a14 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -512,13 +512,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -528,13 +528,13 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  /// extern globals, and static globals.
  ///
  /// This is essentially an extremely restricted analog to C++11's thread_local
@@ -33,7 +33,7 @@ index 6f6f65cad6f5..9ac17001d0dc 100644
  #if __has_feature(cxx_thread_local) || defined(_MSC_VER)
  #define LLVM_THREAD_LOCAL thread_local
  #else
-@@ -526,21 +526,6 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
+@@ -542,20 +542,5 @@ void AnnotateIgnoreWritesEnd(const char *file, int line);
  // we only need the restricted functionality that provides.
  #define LLVM_THREAD_LOCAL __thread
  #endif
@@ -53,10 +53,9 @@ index 6f6f65cad6f5..9ac17001d0dc 100644
 -#define LLVM_ENABLE_EXCEPTIONS 1
 -#endif
  
- #ifdef __cplusplus
- namespace llvm {
+ #endif
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index a9463024c420..6b92788f9710 100644
+index f70a6921a41a..1b162b771079 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -45,7 +45,6 @@ static void *ErrorHandlerUserData = nullptr;

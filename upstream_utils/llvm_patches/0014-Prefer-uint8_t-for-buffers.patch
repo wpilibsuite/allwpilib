@@ -1,7 +1,7 @@
-From 7a19c4b2859913bf02f8e102384bc1cadfb8fb1a Mon Sep 17 00:00:00 2001
+From 18b830cc382fa0422097c54818579fa1a922b0f4 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:07:37 -0400
-Subject: [PATCH 14/36] Prefer uint8_t for buffers
+Subject: [PATCH 14/37] Prefer uint8_t for buffers
 
 ---
  llvm/include/llvm/Support/MemoryBuffer.h      | 30 +++++++++----------
@@ -10,10 +10,10 @@ Subject: [PATCH 14/36] Prefer uint8_t for buffers
  3 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 3b1f56540a2b..908336281dae 100644
+index 07db11788512..4b9b5086fb5e 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -37,13 +37,13 @@ class MemoryBufferRef;
+@@ -48,13 +48,13 @@ using file_t = int;
  /// reading when they encounter a '\0' than to continually check the file
  /// position to see if it has reached the end of the file.
  class MemoryBuffer {
@@ -29,8 +29,8 @@ index 3b1f56540a2b..908336281dae 100644
 +  void init(const uint8_t *BufStart, const uint8_t *BufEnd,
              bool RequiresNullTerminator);
  
-   static constexpr sys::fs::mapped_file_region::mapmode Mapmode =
-@@ -54,8 +54,8 @@ public:
+ public:
+@@ -62,8 +62,8 @@ public:
    MemoryBuffer &operator=(const MemoryBuffer &) = delete;
    virtual ~MemoryBuffer();
  
@@ -41,7 +41,7 @@ index 3b1f56540a2b..908336281dae 100644
    size_t getBufferSize() const { return BufferEnd-BufferStart; }
  
    span<const uint8_t> getBuffer() const {
-@@ -164,11 +164,11 @@ public:
+@@ -169,11 +169,11 @@ public:
  
    // const_cast is well-defined here, because the underlying buffer is
    // guaranteed to have been initialized with a mutable buffer.
@@ -57,7 +57,7 @@ index 3b1f56540a2b..908336281dae 100644
    }
    span<uint8_t> getBuffer() {
      return {getBufferStart(), getBufferEnd()};
-@@ -226,11 +226,11 @@ public:
+@@ -228,11 +228,11 @@ public:
  
    // const_cast is well-defined here, because the underlying buffer is
    // guaranteed to have been initialized with a mutable buffer.
@@ -73,7 +73,7 @@ index 3b1f56540a2b..908336281dae 100644
    }
    span<uint8_t> getBuffer() {
      return {getBufferStart(), getBufferEnd()};
-@@ -271,8 +271,8 @@ public:
+@@ -273,8 +273,8 @@ public:
  
    std::string_view getBufferIdentifier() const { return Identifier; }
  
@@ -85,7 +85,7 @@ index 3b1f56540a2b..908336281dae 100644
  };
  
 diff --git a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
-index 5699105bf8e2..e4e0713d135f 100644
+index fe9bf46d12a5..89fa409f94ba 100644
 --- a/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 +++ b/llvm/include/llvm/Support/SmallVectorMemoryBuffer.h
 @@ -36,14 +36,14 @@ public:
@@ -102,7 +102,7 @@ index 5699105bf8e2..e4e0713d135f 100644
    /// SmallVector r-value and std::string_view.
 -  SmallVectorMemoryBuffer(SmallVectorImpl<char> &&SV, std::string_view Name)
 +  SmallVectorMemoryBuffer(SmallVectorImpl<uint8_t> &&SV, std::string_view Name)
-       : SV(std::move(SV)), BufferName(Name) {
+       : SV(std::move(SV)), BufferName(std::string(Name)) {
      init(this->SV.begin(), this->SV.end(), false);
    }
 @@ -56,7 +56,7 @@ public:
@@ -115,7 +115,7 @@ index 5699105bf8e2..e4e0713d135f 100644
  };
  
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index a6e29c40a3b4..4103a5685f38 100644
+index 9d0050aebfad..59b3b703d76a 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
 @@ -42,7 +42,7 @@ MemoryBuffer::~MemoryBuffer() { }
@@ -136,7 +136,7 @@ index a6e29c40a3b4..4103a5685f38 100644
    if (!Data.empty())
      memcpy(Memory, Data.data(), Data.size());
    Memory[Data.size()] = 0; // Null terminate string.
-@@ -177,7 +177,7 @@ class MemoryBufferMMapFile : public MB {
+@@ -191,7 +191,7 @@ class MemoryBufferMMapFile : public MB {
      return Len + (Offset - getLegalMapOffset(Offset));
    }
  
@@ -145,8 +145,8 @@ index a6e29c40a3b4..4103a5685f38 100644
      return MFR.const_data() + (Offset - getLegalMapOffset(Offset));
    }
  
-@@ -187,7 +187,7 @@ public:
-       : MFR(FD, MB::Mapmode, getLegalMapSize(Len, Offset),
+@@ -201,7 +201,7 @@ public:
+       : MFR(FD, Mapmode<MB>, getLegalMapSize(Len, Offset),
              getLegalMapOffset(Offset), EC) {
      if (!EC) {
 -      const char *Start = getStart(Len, Offset);
@@ -154,7 +154,7 @@ index a6e29c40a3b4..4103a5685f38 100644
        MemoryBuffer::init(Start, Start + Len, RequiresNullTerminator);
      }
    }
-@@ -281,7 +281,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -295,7 +295,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    std::string_view NameRef = BufferName.tostd::string_view(NameBuf);
    size_t AlignedStringLen = alignTo(sizeof(MemBuffer) + NameRef.size() + 1, 16);
    size_t RealLen = AlignedStringLen + Size + 1;
@@ -163,7 +163,7 @@ index a6e29c40a3b4..4103a5685f38 100644
    if (!Mem)
      return nullptr;
  
-@@ -289,7 +289,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
+@@ -303,7 +303,7 @@ WritableMemoryBuffer::getNewUninitMemBuffer(size_t Size, std::string_view Buffer
    CopyStringView(Mem + sizeof(MemBuffer), NameRef);
  
    // The buffer begins after the name and must be aligned.

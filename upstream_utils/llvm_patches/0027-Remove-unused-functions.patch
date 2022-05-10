@@ -1,20 +1,20 @@
-From bf404d49c6efacc63deecd26505289f934f52fc7 Mon Sep 17 00:00:00 2001
+From eb1751de2156e7600e46812ba805b93b1f07a94f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 00:10:48 -0400
-Subject: [PATCH 27/36] Remove unused functions
+Subject: [PATCH 27/37] Remove unused functions
 
 ---
- llvm/include/llvm/ADT/SmallString.h       | 86 ++---------------------
+ llvm/include/llvm/ADT/SmallString.h       | 88 ++---------------------
  llvm/include/llvm/Support/ConvertUTF.h    |  7 --
  llvm/include/llvm/Support/Errno.h         |  9 ---
- llvm/include/llvm/Support/VersionTuple.h  |  7 --
+ llvm/include/llvm/Support/VersionTuple.h  | 11 ---
  llvm/lib/Support/ConvertUTFWrapper.cpp    | 36 ----------
  llvm/lib/Support/ErrorHandling.cpp        | 16 -----
  llvm/unittests/Support/ConvertUTFTest.cpp | 70 ------------------
- 7 files changed, 6 insertions(+), 225 deletions(-)
+ 7 files changed, 5 insertions(+), 232 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index 6bbb537f6f58..bbcfa1c39164 100644
+index e748015a514f..bbcfa1c39164 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -93,48 +93,12 @@ public:
@@ -117,19 +117,21 @@ index 6bbb537f6f58..bbcfa1c39164 100644
  
    // Extra methods.
  
-@@ -275,6 +195,12 @@ public:
+@@ -275,9 +195,11 @@ public:
    /// Implicit conversion to std::string_view.
    operator std::string_view() const { return str(); }
  
+-  explicit operator std::string() const {
+-    return std::string(this->data(), this->size());
+-  }
 +  /// Explicit conversion to std::string.
 +  std::string string() const { return {this->begin(), this->size()}; }
 +
 +  /// Implicit conversion to std::string.
 +  operator std::string() const { return string(); }
-+
+ 
    // Extra operators.
    const SmallString &operator=(std::string_view RHS) {
-     this->clear();
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
 index 48435fbb6f30..75529de5fca2 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
@@ -149,7 +151,7 @@ index 48435fbb6f30..75529de5fca2 100644
   * Convert an Unicode code point to UTF8 sequence.
   *
 diff --git a/llvm/include/llvm/Support/Errno.h b/llvm/include/llvm/Support/Errno.h
-index aedb5fb292b8..3227a2308dfb 100644
+index dc3b3322ed98..0156e283fa08 100644
 --- a/llvm/include/llvm/Support/Errno.h
 +++ b/llvm/include/llvm/Support/Errno.h
 @@ -20,15 +20,6 @@
@@ -166,10 +168,10 @@ index aedb5fb292b8..3227a2308dfb 100644
 -std::string StrError(int errnum);
 -
  template <typename FailT, typename Fun, typename... Args>
- inline auto RetryAfterSignal(const FailT &Fail, const Fun &F,
-                              const Args &... As) -> decltype(F(As...)) {
+ inline decltype(auto) RetryAfterSignal(const FailT &Fail, const Fun &F,
+                                        const Args &... As) {
 diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index ab01dabb33dd..7dd221c078e2 100644
+index fb1ab4987564..f0051c4bfb1d 100644
 --- a/llvm/include/llvm/Support/VersionTuple.h
 +++ b/llvm/include/llvm/Support/VersionTuple.h
 @@ -14,7 +14,6 @@
@@ -180,10 +182,14 @@ index ab01dabb33dd..7dd221c078e2 100644
  #include <optional>
  #include <string>
  #include <tuple>
-@@ -142,13 +141,7 @@ public:
+@@ -144,17 +143,7 @@ public:
    friend bool operator>=(const VersionTuple &X, const VersionTuple &Y) {
      return !(X < Y);
    }
+-
+-  friend llvm::hash_code hash_value(const VersionTuple &VT) {
+-    return llvm::hash_combine(VT.Major, VT.Minor, VT.Subminor, VT.Build);
+-  }
 -
 -  /// Retrieve a string representation of the version number.
 -  std::string getAsString() const;
@@ -195,7 +201,7 @@ index ab01dabb33dd..7dd221c078e2 100644
  } // end namespace llvm
  #endif // LLVM_SUPPORT_VERSIONTUPLE_H
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index f381978d28fc..89671f10858e 100644
+index 40277e4352b5..89f3e96c81cf 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -204,41 +204,5 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {

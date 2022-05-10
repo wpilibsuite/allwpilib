@@ -63,16 +63,16 @@
 
 using namespace wpi;
 
-const raw_ostream::Colors raw_ostream::BLACK;
-const raw_ostream::Colors raw_ostream::RED;
-const raw_ostream::Colors raw_ostream::GREEN;
-const raw_ostream::Colors raw_ostream::YELLOW;
-const raw_ostream::Colors raw_ostream::BLUE;
-const raw_ostream::Colors raw_ostream::MAGENTA;
-const raw_ostream::Colors raw_ostream::CYAN;
-const raw_ostream::Colors raw_ostream::WHITE;
-const raw_ostream::Colors raw_ostream::SAVEDCOLOR;
-const raw_ostream::Colors raw_ostream::RESET;
+constexpr raw_ostream::Colors raw_ostream::BLACK;
+constexpr raw_ostream::Colors raw_ostream::RED;
+constexpr raw_ostream::Colors raw_ostream::GREEN;
+constexpr raw_ostream::Colors raw_ostream::YELLOW;
+constexpr raw_ostream::Colors raw_ostream::BLUE;
+constexpr raw_ostream::Colors raw_ostream::MAGENTA;
+constexpr raw_ostream::Colors raw_ostream::CYAN;
+constexpr raw_ostream::Colors raw_ostream::WHITE;
+constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
+constexpr raw_ostream::Colors raw_ostream::RESET;
 
 namespace {
 // Find the length of an array.
@@ -172,7 +172,7 @@ void raw_ostream::flush_nonempty() {
   assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
   size_t Length = OutBufCur - OutBufStart;
   OutBufCur = OutBufStart;
-  write_impl(OutBufStart, Length);
+  flush_tied_then_write(OutBufStart, Length);
 }
 
 raw_ostream &raw_ostream::write(unsigned char C) {
@@ -180,7 +180,7 @@ raw_ostream &raw_ostream::write(unsigned char C) {
   if (LLVM_UNLIKELY(OutBufCur >= OutBufEnd)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
       if (BufferMode == BufferKind::Unbuffered) {
-        write_impl(reinterpret_cast<char*>(&C), 1);
+        flush_tied_then_write(reinterpret_cast<char *>(&C), 1);
         return *this;
       }
       // Set up a buffer and start over.
@@ -200,7 +200,7 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
   if (LLVM_UNLIKELY(size_t(OutBufEnd - OutBufCur) < Size)) {
     if (LLVM_UNLIKELY(!OutBufStart)) {
       if (BufferMode == BufferKind::Unbuffered) {
-        write_impl(Ptr, Size);
+        flush_tied_then_write(Ptr, Size);
         return *this;
       }
       // Set up a buffer and start over.
@@ -216,7 +216,7 @@ raw_ostream &raw_ostream::write(const char *Ptr, size_t Size) {
     if (LLVM_UNLIKELY(OutBufCur == OutBufStart)) {
       assert(NumBytes != 0 && "undefined behavior");
       size_t BytesToWrite = Size - (Size % NumBytes);
-      write_impl(Ptr, BytesToWrite);
+      flush_tied_then_write(Ptr, BytesToWrite);
       size_t BytesRemaining = Size - BytesToWrite;
       if (BytesRemaining > size_t(OutBufEnd - OutBufCur)) {
         // Too much left over to copy into our buffer.
@@ -255,6 +255,12 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
   }
 
   OutBufCur += Size;
+}
+
+void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+  if (TiedStream)
+    TiedStream->flush();
+  write_impl(Ptr, Size);
 }
 
 template <char C>
@@ -360,6 +366,8 @@ raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered)
     ShouldClose = false;
     return;
   }
+
+  enable_colors(true);
 
   // Do not attempt to close stdout or stderr. We used to try to maintain the
   // property that tools that support writing file to stdout should not also
@@ -573,7 +581,7 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
   // If this is a terminal, don't use buffering. Line buffering
   // would be a more traditional thing to do, but it's not worth
   // the complexity.
-  if (S_ISCHR(statbuf.st_mode) && isatty(FD))
+  if (S_ISCHR(statbuf.st_mode) && is_displayed())
     return 0;
   // Return the preferred block size.
   return statbuf.st_blksize;
@@ -588,9 +596,7 @@ void raw_fd_ostream::anchor() {}
 //  outs(), errs(), nulls()
 //===----------------------------------------------------------------------===//
 
-/// outs() - This returns a reference to a raw_ostream for standard output.
-/// Use it like: outs() << "foo" << "bar";
-raw_ostream &wpi::outs() {
+raw_fd_ostream &wpi::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
   static raw_fd_ostream S("-", EC, fs::OF_None);
@@ -598,10 +604,8 @@ raw_ostream &wpi::outs() {
   return S;
 }
 
-/// errs() - This returns a reference to a raw_ostream for standard error.
-/// Use it like: errs() << "foo" << "bar";
-raw_ostream &wpi::errs() {
-  // Set standard error to be unbuffered by default.
+raw_fd_ostream &wpi::errs() {
+  // Set standard error to be unbuffered and tied to outs() by default.
   static raw_fd_ostream S(STDERR_FILENO, false, true);
   return S;
 }

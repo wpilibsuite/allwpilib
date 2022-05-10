@@ -1,7 +1,7 @@
-From 7b14a86f6da332b7239c6e6dac51e2df4a3d4eb2 Mon Sep 17 00:00:00 2001
+From 83e13c166d39eafb30003c8ed73e3c99dd8ede85 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Wed, 4 May 2022 19:00:55 -0400
-Subject: [PATCH 35/36] Fix athena compilation error
+Subject: [PATCH 35/37] Fix athena compilation error
 
 ---
  llvm/lib/Support/MemoryBuffer.cpp | 8 ++++----

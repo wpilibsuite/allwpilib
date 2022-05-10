@@ -1,17 +1,17 @@
-From b48a2b38d133453913ee450629c137f2d32eb3b6 Mon Sep 17 00:00:00 2001
+From f1246099e430b3fb333ea65c771703d0df882a98 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:08:59 -0400
-Subject: [PATCH 15/36] Remove format provider
+Subject: [PATCH 15/37] Remove format provider
 
 ---
  llvm/include/llvm/Support/Chrono.h      | 109 ---------
- llvm/include/llvm/Support/raw_ostream.h |  60 -----
- llvm/lib/Support/raw_ostream.cpp        | 291 ------------------------
+ llvm/include/llvm/Support/raw_ostream.h |  72 +-----
+ llvm/lib/Support/raw_ostream.cpp        | 283 ------------------------
  llvm/unittests/Support/Chrono.cpp       |  61 -----
- 4 files changed, 521 deletions(-)
+ 4 files changed, 11 insertions(+), 514 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 29a3e0873792..06829d1fbe14 100644
+index 7ae0991400a6..06829d1fbe14 100644
 --- a/llvm/include/llvm/Support/Chrono.h
 +++ b/llvm/include/llvm/Support/Chrono.h
 @@ -10,7 +10,6 @@
@@ -80,8 +80,8 @@ index 29a3e0873792..06829d1fbe14 100644
 -struct format_provider<std::chrono::duration<Rep, Period>> {
 -private:
 -  typedef std::chrono::duration<Rep, Period> Dur;
--  typedef typename std::conditional<
--      std::chrono::treat_as_floating_point<Rep>::value, double, intmax_t>::type
+-  typedef std::conditional_t<std::chrono::treat_as_floating_point<Rep>::value,
+-                             double, intmax_t>
 -      InternalRep;
 -
 -  template <typename AsPeriod> static InternalRep getAs(const Dur &D) {
@@ -138,7 +138,7 @@ index 29a3e0873792..06829d1fbe14 100644
  
  #endif // LLVM_SUPPORT_CHRONO_H
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 2d4788594df1..23beb8793c69 100644
+index afdd94ed397d..a578f903bc2f 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -26,12 +26,6 @@
@@ -154,7 +154,15 @@ index 2d4788594df1..23beb8793c69 100644
  namespace sys {
  namespace fs {
  enum FileAccess : unsigned;
-@@ -225,32 +219,6 @@ public:
+@@ -65,7 +59,6 @@ private:
+   /// for a \see write_impl() call to handle the data which has been put into
+   /// this buffer.
+   char *OutBufStart, *OutBufEnd, *OutBufCur;
+-  bool ColorEnabled = false;
+ 
+   /// Optional stream this stream is tied to. If this stream is written to, the
+   /// tied-to stream will be flushed first.
+@@ -230,32 +223,6 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -187,7 +195,7 @@ index 2d4788594df1..23beb8793c69 100644
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
    raw_ostream &write_escaped(std::string_view Str, bool UseHexEscapes = false);
-@@ -258,21 +226,6 @@ public:
+@@ -263,21 +230,6 @@ public:
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
  
@@ -209,35 +217,65 @@ index 2d4788594df1..23beb8793c69 100644
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
  
-@@ -414,7 +367,6 @@ class raw_fd_ostream : public raw_pwrite_stream {
-   int FD;
-   bool ShouldClose;
-   bool SupportsSeeking = false;
--  bool ColorEnabled = true;
+@@ -291,15 +243,21 @@ public:
+   /// @param Bold bold/brighter text, default false
+   /// @param BG if true change the background, default: change foreground
+   /// @returns itself so it can be used within << invocations
+-  virtual raw_ostream &changeColor(enum Colors Color, bool Bold = false,
+-                                   bool BG = false);
++  virtual raw_ostream &changeColor(enum Colors Color,
++                                   bool Bold = false,
++                                   bool BG = false) {
++    (void)Color;
++    (void)Bold;
++    (void)BG;
++    return *this;
++  }
  
- #ifdef _WIN32
-   /// True if this fd refers to a Windows console device. Mintty and other
-@@ -480,18 +432,6 @@ public:
+   /// Resets the colors to terminal defaults. Call this when you are done
+   /// outputting colored text, or before program exit.
+-  virtual raw_ostream &resetColor();
++  virtual raw_ostream &resetColor() { return *this; }
+ 
+   /// Reverses the foreground and background colors.
+-  virtual raw_ostream &reverseColor();
++  virtual raw_ostream &reverseColor() { return *this; }
+ 
+   /// This function determines if this stream is connected to a "tty" or
+   /// "console" window. That is, the output would be displayed to the user
+@@ -312,7 +270,7 @@ public:
+ 
+   // Enable or disable colors. Once enable_colors(false) is called,
+   // changeColor() has no effect until enable_colors(true) is called.
+-  virtual void enable_colors(bool enable) { ColorEnabled = enable; }
++  virtual void enable_colors(bool /*enable*/) {}
+ 
+   /// Tie this stream to the specified stream. Replaces any existing tied-to
+   /// stream. Specifying a nullptr unties the stream.
+@@ -372,10 +330,6 @@ private:
+   /// unused bytes in the buffer.
+   void copy_to_buffer(const char *Ptr, size_t Size);
+ 
+-  /// Compute whether colors should be used and do the necessary work such as
+-  /// flushing. The result is affected by calls to enable_color().
+-  bool prepare_colors();
+-
+   /// Flush the tied-to stream (if present) and then write the required data.
+   void flush_tied_then_write(const char *Ptr, size_t Size);
+ 
+@@ -490,10 +444,6 @@ public:
    /// to the offset specified from the beginning of the file.
    uint64_t seek(uint64_t off);
  
--  raw_ostream &changeColor(enum Colors colors, bool bold=false,
--                           bool bg=false) override;
--  raw_ostream &resetColor() override;
--
--  raw_ostream &reverseColor() override;
--
 -  bool is_displayed() const override;
 -
 -  bool has_colors() const override;
--
--  void enable_colors(bool enable) override { ColorEnabled = enable; }
 -
    std::error_code error() const { return EC; }
  
    /// Return the value of the flag in this raw_fd_ostream indicating whether an
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 8fdbf5157f3c..8ff5108ecafd 100644
+index a2f332cd9664..206c784990c0 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -119,49 +119,6 @@ void raw_ostream::SetBufferAndMode(char *BufferStart, size_t Size,
@@ -307,8 +345,8 @@ index 8fdbf5157f3c..8ff5108ecafd 100644
  void raw_ostream::flush_nonempty() {
    assert(OutBufCur > OutBufStart && "Invalid call to flush_nonempty.");
    size_t Length = OutBufCur - OutBufStart;
-@@ -301,176 +248,6 @@ void raw_ostream::copy_to_buffer(const char *Ptr, size_t Size) {
-   OutBufCur += Size;
+@@ -307,173 +254,6 @@ void raw_ostream::flush_tied_then_write(const char *Ptr, size_t Size) {
+   write_impl(Ptr, Size);
  }
  
 -// Formatted output.
@@ -353,36 +391,33 @@ index 8fdbf5157f3c..8ff5108ecafd 100644
 -}
 -
 -raw_ostream &raw_ostream::operator<<(const formatv_object_base &Obj) {
--  SmallString<128> S;
 -  Obj.format(*this);
 -  return *this;
 -}
 -
 -raw_ostream &raw_ostream::operator<<(const FormattedString &FS) {
--  if (FS.Str.size() >= FS.Width || FS.Justify == FormattedString::JustifyNone) {
--    this->operator<<(FS.Str);
--    return *this;
+-  unsigned LeftIndent = 0;
+-  unsigned RightIndent = 0;
+-  const ssize_t Difference = FS.Width - FS.Str.size();
+-  if (Difference > 0) {
+-    switch (FS.Justify) {
+-    case FormattedString::JustifyNone:
+-      break;
+-    case FormattedString::JustifyLeft:
+-      RightIndent = Difference;
+-      break;
+-    case FormattedString::JustifyRight:
+-      LeftIndent = Difference;
+-      break;
+-    case FormattedString::JustifyCenter:
+-      LeftIndent = Difference / 2;
+-      RightIndent = Difference - LeftIndent;
+-      break;
+-    }
 -  }
--  const size_t Difference = FS.Width - FS.Str.size();
--  switch (FS.Justify) {
--  case FormattedString::JustifyLeft:
--    this->operator<<(FS.Str);
--    this->indent(Difference);
--    break;
--  case FormattedString::JustifyRight:
--    this->indent(Difference);
--    this->operator<<(FS.Str);
--    break;
--  case FormattedString::JustifyCenter: {
--    int PadAmount = Difference / 2;
--    this->indent(PadAmount);
--    this->operator<<(FS.Str);
--    this->indent(Difference - PadAmount);
--    break;
--  }
--  default:
--    llvm_unreachable("Bad Justification");
--  }
+-  indent(LeftIndent);
+-  (*this) << FS.Str;
+-  indent(RightIndent);
 -  return *this;
 -}
 -
@@ -484,8 +519,57 @@ index 8fdbf5157f3c..8ff5108ecafd 100644
  template <char C>
  static raw_ostream &write_padding(raw_ostream &OS, unsigned NumChars) {
    static const char Chars[] = {C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C,
-@@ -504,14 +281,6 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+@@ -505,63 +285,8 @@ raw_ostream &raw_ostream::write_zeros(unsigned NumZeros) {
+   return write_padding<'\0'>(*this, NumZeros);
+ }
  
+-bool raw_ostream::prepare_colors() {
+-  // Colors were explicitly disabled.
+-  if (!ColorEnabled)
+-    return false;
+-
+-  // Colors require changing the terminal but this stream is not going to a
+-  // terminal.
+-  if (sys::Process::ColorNeedsFlush() && !is_displayed())
+-    return false;
+-
+-  if (sys::Process::ColorNeedsFlush())
+-    flush();
+-
+-  return true;
+-}
+-
+-raw_ostream &raw_ostream::changeColor(enum Colors colors, bool bold, bool bg) {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  const char *colorcode =
+-      (colors == SAVEDCOLOR)
+-          ? sys::Process::OutputBold(bg)
+-          : sys::Process::OutputColor(static_cast<char>(colors), bold, bg);
+-  if (colorcode)
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::resetColor() {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  if (const char *colorcode = sys::Process::ResetColor())
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
+-raw_ostream &raw_ostream::reverseColor() {
+-  if (!prepare_colors())
+-    return *this;
+-
+-  if (const char *colorcode = sys::Process::OutputReverse())
+-    write(colorcode, strlen(colorcode));
+-  return *this;
+-}
+-
  void raw_ostream::anchor() {}
  
 -//===----------------------------------------------------------------------===//
@@ -499,62 +583,10 @@ index 8fdbf5157f3c..8ff5108ecafd 100644
  //===----------------------------------------------------------------------===//
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
-@@ -801,66 +570,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
+@@ -853,14 +578,6 @@ size_t raw_fd_ostream::preferred_buffer_size() const {
  #endif
  }
  
--raw_ostream &raw_fd_ostream::changeColor(enum Colors colors, bool bold,
--                                         bool bg) {
--  if (!ColorEnabled)
--    return *this;
--
--  if (sys::Process::ColorNeedsFlush())
--    flush();
--  const char *colorcode =
--      (colors == SAVEDCOLOR)
--          ? sys::Process::OutputBold(bg)
--          : sys::Process::OutputColor(static_cast<char>(colors), bold, bg);
--  if (colorcode) {
--    size_t len = strlen(colorcode);
--    write(colorcode, len);
--    // don't account colors towards output characters
--    pos -= len;
--  }
--  return *this;
--}
--
--raw_ostream &raw_fd_ostream::resetColor() {
--  if (!ColorEnabled)
--    return *this;
--
--  if (sys::Process::ColorNeedsFlush())
--    flush();
--  const char *colorcode = sys::Process::ResetColor();
--  if (colorcode) {
--    size_t len = strlen(colorcode);
--    write(colorcode, len);
--    // don't account colors towards output characters
--    pos -= len;
--  }
--  return *this;
--}
--
--raw_ostream &raw_fd_ostream::reverseColor() {
--  if (!ColorEnabled)
--    return *this;
--
--  if (sys::Process::ColorNeedsFlush())
--    flush();
--  const char *colorcode = sys::Process::OutputReverse();
--  if (colorcode) {
--    size_t len = strlen(colorcode);
--    write(colorcode, len);
--    // don't account colors towards output characters
--    pos -= len;
--  }
--  return *this;
--}
--
 -bool raw_fd_ostream::is_displayed() const {
 -  return sys::Process::FileDescriptorIsDisplayed(FD);
 -}

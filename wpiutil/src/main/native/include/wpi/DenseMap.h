@@ -18,6 +18,7 @@
 #include "wpi/AlignOf.h"
 #include "wpi/Compiler.h"
 #include "wpi/MathExtras.h"
+#include "wpi/MemAlloc.h"
 #include "wpi/PointerLikeTypeTraits.h"
 #include "wpi/type_traits.h"
 #include <algorithm>
@@ -115,9 +116,8 @@ public:
     }
 
     const KeyT EmptyKey = getEmptyKey(), TombstoneKey = getTombstoneKey();
-    if (std::is_trivially_copyable<KeyT>::value &&
-        std::is_trivially_copyable<ValueT>::value) {
-      // Use a simpler loop when these are trivial types.
+    if (std::is_trivially_destructible<ValueT>::value) {
+      // Use a simpler loop when values don't need destruction.
       for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P)
         P->getFirst() = EmptyKey;
     } else {
@@ -146,13 +146,15 @@ public:
   iterator find(const_arg_type_t<KeyT> Val) {
     BucketT *TheBucket;
     if (LookupBucketFor(Val, TheBucket))
-      return makeIterator(TheBucket, getBucketsEnd(), *this, true);
+      return makeIterator(TheBucket, getBucketsEnd(),
+                          *this, true);
     return end();
   }
   const_iterator find(const_arg_type_t<KeyT> Val) const {
     const BucketT *TheBucket;
     if (LookupBucketFor(Val, TheBucket))
-      return makeConstIterator(TheBucket, getBucketsEnd(), *this, true);
+      return makeConstIterator(TheBucket, getBucketsEnd(),
+                               *this, true);
     return end();
   }
 
@@ -165,14 +167,16 @@ public:
   iterator find_as(const LookupKeyT &Val) {
     BucketT *TheBucket;
     if (LookupBucketFor(Val, TheBucket))
-      return makeIterator(TheBucket, getBucketsEnd(), *this, true);
+      return makeIterator(TheBucket, getBucketsEnd(),
+                          *this, true);
     return end();
   }
   template<class LookupKeyT>
   const_iterator find_as(const LookupKeyT &Val) const {
     const BucketT *TheBucket;
     if (LookupBucketFor(Val, TheBucket))
-      return makeConstIterator(TheBucket, getBucketsEnd(), *this, true);
+      return makeConstIterator(TheBucket, getBucketsEnd(),
+                               *this, true);
     return end();
   }
 
@@ -206,16 +210,16 @@ public:
   std::pair<iterator, bool> try_emplace(KeyT &&Key, Ts &&... Args) {
     BucketT *TheBucket;
     if (LookupBucketFor(Key, TheBucket))
-      return std::make_pair(
-               makeIterator(TheBucket, getBucketsEnd(), *this, true),
-               false); // Already in map.
+      return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                         *this, true),
+                            false); // Already in map.
 
     // Otherwise, insert the new element.
     TheBucket =
         InsertIntoBucket(TheBucket, std::move(Key), std::forward<Ts>(Args)...);
-    return std::make_pair(
-             makeIterator(TheBucket, getBucketsEnd(), *this, true),
-             true);
+    return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                       *this, true),
+                          true);
   }
 
   // Inserts key,value pair into the map if the key isn't already in the map.
@@ -225,15 +229,15 @@ public:
   std::pair<iterator, bool> try_emplace(const KeyT &Key, Ts &&... Args) {
     BucketT *TheBucket;
     if (LookupBucketFor(Key, TheBucket))
-      return std::make_pair(
-               makeIterator(TheBucket, getBucketsEnd(), *this, true),
-               false); // Already in map.
+      return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                         *this, true),
+                            false); // Already in map.
 
     // Otherwise, insert the new element.
     TheBucket = InsertIntoBucket(TheBucket, Key, std::forward<Ts>(Args)...);
-    return std::make_pair(
-             makeIterator(TheBucket, getBucketsEnd(), *this, true),
-             true);
+    return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                       *this, true),
+                          true);
   }
 
   /// Alternate version of insert() which allows a different, and possibly
@@ -246,16 +250,16 @@ public:
                                       const LookupKeyT &Val) {
     BucketT *TheBucket;
     if (LookupBucketFor(Val, TheBucket))
-      return std::make_pair(
-               makeIterator(TheBucket, getBucketsEnd(), *this, true),
-               false); // Already in map.
+      return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                         *this, true),
+                            false); // Already in map.
 
     // Otherwise, insert the new element.
     TheBucket = InsertIntoBucketWithLookup(TheBucket, std::move(KV.first),
                                            std::move(KV.second), Val);
-    return std::make_pair(
-             makeIterator(TheBucket, getBucketsEnd(), *this, true),
-             true);
+    return std::make_pair(makeIterator(TheBucket, getBucketsEnd(),
+                                       *this, true),
+                          true);
   }
 
   /// insert - Range insertion of pairs.
@@ -683,7 +687,7 @@ class DenseMap : public DenseMapBase<DenseMap<KeyT, ValueT, KeyInfoT, BucketT>,
   unsigned NumBuckets;
 
 public:
-  /// Create a DenseMap wth an optional \p InitialReserve that guarantee that
+  /// Create a DenseMap with an optional \p InitialReserve that guarantee that
   /// this number of elements can be inserted in the map without grow()
   explicit DenseMap(unsigned InitialReserve = 0) { init(InitialReserve); }
 
@@ -1178,7 +1182,7 @@ public:
   // for const iterator destinations so it doesn't end up as a user defined copy
   // constructor.
   template <bool IsConstSrc,
-            typename = typename std::enable_if<!IsConstSrc && IsConst>::type>
+            typename = std::enable_if_t<!IsConstSrc && IsConst>>
   DenseMapIterator(
       const DenseMapIterator<KeyT, ValueT, KeyInfoT, Bucket, IsConstSrc> &I)
       : DebugEpochBase::HandleBase(I), Ptr(I.Ptr), End(I.End) {}

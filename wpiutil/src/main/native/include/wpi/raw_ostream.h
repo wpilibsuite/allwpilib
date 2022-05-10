@@ -59,6 +59,10 @@ private:
   /// this buffer.
   char *OutBufStart, *OutBufEnd, *OutBufCur;
 
+  /// Optional stream this stream is tied to. If this stream is written to, the
+  /// tied-to stream will be flushed first.
+  raw_ostream *TiedStream = nullptr;
+
   enum class BufferKind {
     Unbuffered = 0,
     InternalBuffer,
@@ -80,16 +84,16 @@ public:
     RESET,
   };
 
-  static const Colors BLACK = Colors::BLACK;
-  static const Colors RED = Colors::RED;
-  static const Colors GREEN = Colors::GREEN;
-  static const Colors YELLOW = Colors::YELLOW;
-  static const Colors BLUE = Colors::BLUE;
-  static const Colors MAGENTA = Colors::MAGENTA;
-  static const Colors CYAN = Colors::CYAN;
-  static const Colors WHITE = Colors::WHITE;
-  static const Colors SAVEDCOLOR = Colors::SAVEDCOLOR;
-  static const Colors RESET = Colors::RESET;
+  static constexpr Colors BLACK = Colors::BLACK;
+  static constexpr Colors RED = Colors::RED;
+  static constexpr Colors GREEN = Colors::GREEN;
+  static constexpr Colors YELLOW = Colors::YELLOW;
+  static constexpr Colors BLUE = Colors::BLUE;
+  static constexpr Colors MAGENTA = Colors::MAGENTA;
+  static constexpr Colors CYAN = Colors::CYAN;
+  static constexpr Colors WHITE = Colors::WHITE;
+  static constexpr Colors SAVEDCOLOR = Colors::SAVEDCOLOR;
+  static constexpr Colors RESET = Colors::RESET;
 
   explicit raw_ostream(bool unbuffered = false)
       : BufferMode(unbuffered ? BufferKind::Unbuffered
@@ -272,11 +276,16 @@ public:
   virtual bool is_displayed() const { return false; }
 
   /// This function determines if this stream is displayed and supports colors.
+  /// The result is unaffected by calls to enable_color().
   virtual bool has_colors() const { return is_displayed(); }
 
-  // Enable or disable colors. Once disable_colors() is called,
-  // changeColor() has no effect until enable_colors() is called.
+  // Enable or disable colors. Once enable_colors(false) is called,
+  // changeColor() has no effect until enable_colors(true) is called.
   virtual void enable_colors(bool /*enable*/) {}
+
+  /// Tie this stream to the specified stream. Replaces any existing tied-to
+  /// stream. Specifying a nullptr unties the stream.
+  void tie(raw_ostream *TieTo) { TiedStream = TieTo; }
 
   //===--------------------------------------------------------------------===//
   // Subclass Interface
@@ -335,15 +344,18 @@ private:
   /// unused bytes in the buffer.
   void copy_to_buffer(const char *Ptr, size_t Size);
 
+  /// Flush the tied-to stream (if present) and then write the required data.
+  void flush_tied_then_write(const char *Ptr, size_t Size);
+
   virtual void anchor();
 };
 
 /// Call the appropriate insertion operator, given an rvalue reference to a
 /// raw_ostream object and return a stream of the same type as the argument.
 template <typename OStream, typename T>
-typename std::enable_if<!std::is_reference<OStream>::value &&
-                            std::is_base_of<raw_ostream, OStream>::value,
-                        OStream &&>::type
+std::enable_if_t<!std::is_reference<OStream>::value &&
+                     std::is_base_of<raw_ostream, OStream>::value,
+                 OStream &&>
 operator<<(OStream &&OS, const T &Value) {
   OS << Value;
   return std::move(OS);
@@ -466,13 +478,16 @@ public:
   void clear_error() { EC = std::error_code(); }
 };
 
-/// This returns a reference to a raw_ostream for standard output. Use it like:
-/// outs() << "foo" << "bar";
-raw_ostream &outs();
+/// This returns a reference to a raw_fd_ostream for standard output. Use it
+/// like: outs() << "foo" << "bar";
+raw_fd_ostream &outs();
 
-/// This returns a reference to a raw_ostream for standard error. Use it like:
-/// errs() << "foo" << "bar";
-raw_ostream &errs();
+/// This returns a reference to a raw_ostream for standard error.
+/// Use it like: errs() << "foo" << "bar";
+/// By default, the stream is tied to stdout to ensure stdout is flushed before
+/// stderr is written, to ensure the error messages are written in their
+/// expected place.
+raw_fd_ostream &errs();
 
 /// This returns a reference to a raw_ostream which simply discards output.
 raw_ostream &nulls();
@@ -494,7 +509,9 @@ class raw_string_ostream : public raw_ostream {
   uint64_t current_pos() const override { return OS.size(); }
 
 public:
-  explicit raw_string_ostream(std::string &O) : OS(O) {}
+  explicit raw_string_ostream(std::string &O) : OS(O) {
+    SetUnbuffered();
+  }
   ~raw_string_ostream() override;
 
   /// Flushes the stream contents to the target string and returns  the string's
@@ -535,7 +552,7 @@ public:
   void flush() = delete;
 
   /// Return a std::string_view for the vector contents.
-  std::string_view str() { return std::string_view(OS.data(), OS.size()); }
+  std::string_view str() const { return std::string_view(OS.data(), OS.size()); }
 };
 
 /// A raw_ostream that writes to a vector.  This is a

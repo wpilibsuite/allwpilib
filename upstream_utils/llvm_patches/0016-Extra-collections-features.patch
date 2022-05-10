@@ -1,7 +1,7 @@
-From 73f6696eeb3d28c3b107d3ade75105e2536f9261 Mon Sep 17 00:00:00 2001
+From b6df666edf911536acf11c12624b428bd922c39d Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:16:10 -0400
-Subject: [PATCH 16/36] Extra collections features
+Subject: [PATCH 16/37] Extra collections features
 
 ---
  llvm/include/llvm/ADT/SmallSet.h  |   2 +-
@@ -22,19 +22,19 @@ index 8294a816f284..541ec172069b 100644
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/include/llvm/ADT/StringMap.h b/llvm/include/llvm/ADT/StringMap.h
-index 7662fc1294cd..ece359012c58 100644
+index a7281bd3a069..809ad5776600 100644
 --- a/llvm/include/llvm/ADT/StringMap.h
 +++ b/llvm/include/llvm/ADT/StringMap.h
-@@ -60,7 +60,7 @@ protected:
+@@ -40,7 +40,7 @@ protected:
+ 
  protected:
-   explicit StringMapImpl(unsigned itemSize)
-       : ItemSize(itemSize) {}
+   explicit StringMapImpl(unsigned itemSize) : ItemSize(itemSize) {}
 -  StringMapImpl(StringMapImpl &&RHS)
 +  StringMapImpl(StringMapImpl &&RHS) noexcept
        : TheTable(RHS.TheTable), NumBuckets(RHS.NumBuckets),
          NumItems(RHS.NumItems), NumTombstones(RHS.NumTombstones),
          ItemSize(RHS.ItemSize) {
-@@ -485,11 +485,27 @@ public:
+@@ -386,11 +386,27 @@ public:
      return Tmp;
    }
  
@@ -62,7 +62,7 @@ index 7662fc1294cd..ece359012c58 100644
  };
  
  template <typename ValueTy>
-@@ -554,6 +570,91 @@ private:
+@@ -455,6 +471,91 @@ private:
    std::string_view Key;
  };
  

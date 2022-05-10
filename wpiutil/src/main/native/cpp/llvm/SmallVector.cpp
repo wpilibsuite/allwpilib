@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "wpi/SmallVector.h"
+#include <cstdint>
 using namespace wpi;
 
 // Check that no bytes are wasted and everything is well-aligned.
@@ -37,17 +38,25 @@ static_assert(sizeof(SmallVector<void *, 1>) ==
                   sizeof(unsigned) * 2 + sizeof(void *) * 2,
               "wasted space in SmallVector size 1");
 
-/// grow_pod - This is an implementation of the grow() method which only works
-/// on POD-like datatypes and is out of line to reduce code duplication.
+// Note: Moving this function into the header may cause performance regression.
 void SmallVectorBase::grow_pod(void *FirstEl, size_t MinCapacity,
-                               size_t TSize) {
-  // Ensure we can fit the new capacity in 32 bits.
-  if (MinCapacity > UINT32_MAX)
+                                       size_t TSize) {
+  // Ensure we can fit the new capacity.
+  // This is only going to be applicable when the capacity is 32 bit.
+  if (MinCapacity > SizeTypeMax())
     report_bad_alloc_error("SmallVector capacity overflow during allocation");
 
+  // Ensure we can meet the guarantee of space for at least one more element.
+  // The above check alone will not catch the case where grow is called with a
+  // default MinCapacity of 0, but the current capacity cannot be increased.
+  // This is only going to be applicable when the capacity is 32 bit.
+  if (capacity() == SizeTypeMax())
+    report_bad_alloc_error("SmallVector capacity unable to grow");
+
+  // In theory 2*capacity can overflow if the capacity is 64 bit, but the
+  // original capacity would never be large enough for this to be a problem.
   size_t NewCapacity = 2 * capacity() + 1; // Always grow.
-  NewCapacity =
-      std::min(std::max(NewCapacity, MinCapacity), size_t(UINT32_MAX));
+  NewCapacity = std::min(std::max(NewCapacity, MinCapacity), SizeTypeMax());
 
   void *NewElts;
   if (BeginX == FirstEl) {

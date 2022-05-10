@@ -1,23 +1,23 @@
-From 51f8a3fefab6086b810389bbe7ede26000280c95 Mon Sep 17 00:00:00 2001
+From 02bf8d372a7a0e83894d23fca0140735125182d2 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:49:20 -0400
-Subject: [PATCH 11/36] Remove DJB dep
+Subject: [PATCH 11/37] Remove DJB dep
 
 ---
- llvm/lib/Support/StringMap.cpp | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ llvm/lib/Support/StringMap.cpp | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/llvm/lib/Support/StringMap.cpp b/llvm/lib/Support/StringMap.cpp
-index 942f07096223..2c2fb3fdbb47 100644
+index d9eeba619428..f0d5ae6de646 100644
 --- a/llvm/lib/Support/StringMap.cpp
 +++ b/llvm/lib/Support/StringMap.cpp
-@@ -13,12 +13,26 @@
+@@ -12,11 +12,26 @@
+ 
  #include "llvm/ADT/StringMap.h"
  #include "llvm/ADT/StringExtras.h"
- #include "llvm/Support/Compiler.h"
 -#include "llvm/Support/DJB.h"
++#include "llvm/Support/Compiler.h"
  #include "llvm/Support/MathExtras.h"
- #include <cassert>
  
  using namespace llvm;
  
@@ -39,22 +39,22 @@ index 942f07096223..2c2fb3fdbb47 100644
  /// Returns the number of buckets to allocate to ensure that the DenseMap can
  /// accommodate \p NumEntries without need to grow().
  static unsigned getMinBucketToReserveForEntries(unsigned NumEntries) {
-@@ -80,7 +94,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
+@@ -77,7 +92,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
      init(16);
      HTSize = NumBuckets;
    }
 -  unsigned FullHashValue = djbHash(Name, 0);
 +  unsigned FullHashValue = HashString(Name);
-   unsigned BucketNo = FullHashValue & (HTSize-1);
+   unsigned BucketNo = FullHashValue & (HTSize - 1);
    unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
  
-@@ -134,7 +148,7 @@ unsigned StringMapImpl::LookupBucketFor(std::string_view Name) {
- int StringMapImpl::FindKey(std::string_view Key) const {
+@@ -133,7 +148,7 @@ int StringMapImpl::FindKey(std::string_view Key) const {
    unsigned HTSize = NumBuckets;
-   if (HTSize == 0) return -1;  // Really empty table?
+   if (HTSize == 0)
+     return -1; // Really empty table?
 -  unsigned FullHashValue = djbHash(Key, 0);
 +  unsigned FullHashValue = HashString(Key);
-   unsigned BucketNo = FullHashValue & (HTSize-1);
+   unsigned BucketNo = FullHashValue & (HTSize - 1);
    unsigned *HashTable = (unsigned *)(TheTable + NumBuckets + 1);
  
 -- 

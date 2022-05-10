@@ -1,17 +1,17 @@
-From 60546514e8146871b68cab6042a377e7dcba8814 Mon Sep 17 00:00:00 2001
+From 1507738efff910f82042a36f401674418d6c6e94 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 36/36] Delete numbers from mathextras
+Subject: [PATCH 36/37] Delete numbers from mathextras
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 36 --------------------------
  1 file changed, 36 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index cf143933587c..02fc782ebfea 100644
+index 231fa8f77be9..8ce61abd4e72 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -51,42 +51,6 @@ enum ZeroBehavior {
+@@ -52,42 +52,6 @@ enum ZeroBehavior {
    ZB_Width
  };
  

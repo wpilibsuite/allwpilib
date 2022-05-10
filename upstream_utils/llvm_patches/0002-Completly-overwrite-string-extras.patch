@@ -1,15 +1,15 @@
-From 3ab44f97057515ff2e838d02ca6417b133d0a955 Mon Sep 17 00:00:00 2001
+From 81f2545b400acdcbf6bfdcb26e97b433acb61a01 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:50:29 -0400
-Subject: [PATCH 02/36] Completly overwrite string extras
+Subject: [PATCH 02/37] Completly overwrite string extras
 
 ---
- llvm/include/llvm/ADT/StringExtras.h | 893 ++++++++++++++++++---------
- llvm/lib/Support/StringExtras.cpp    | 419 ++++++++++---
- 2 files changed, 936 insertions(+), 376 deletions(-)
+ llvm/include/llvm/ADT/StringExtras.h | 905 ++++++++++++++++++---------
+ llvm/lib/Support/StringExtras.cpp    | 446 +++++++++----
+ 2 files changed, 927 insertions(+), 424 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/StringExtras.h b/llvm/include/llvm/ADT/StringExtras.h
-index ef1a11e0619b..22fd07597f8a 100644
+index 990a3054a9d2..36cd45bd6f76 100644
 --- a/llvm/include/llvm/ADT/StringExtras.h
 +++ b/llvm/include/llvm/ADT/StringExtras.h
 @@ -10,90 +10,60 @@
@@ -121,7 +121,7 @@ index ef1a11e0619b..22fd07597f8a 100644
        return false;
    return true;
  }
-@@ -102,26 +72,26 @@ inline bool isASCII(llvm::StringRef S) {
+@@ -102,7 +72,7 @@ inline bool isASCII(llvm::StringRef S) {
  ///
  /// Locale-independent version of the C standard library isprint whose results
  /// may differ on different platforms.
@@ -129,6 +129,8 @@ index ef1a11e0619b..22fd07597f8a 100644
 +constexpr bool isPrint(char C) noexcept {
    unsigned char UC = static_cast<unsigned char>(C);
    return (0x20 <= UC) && (UC <= 0x7E);
+ }
+@@ -116,20 +86,20 @@ inline bool isSpace(char C) {
  }
  
  /// Returns the corresponding lowercase character if \p x is uppercase.
@@ -152,7 +154,7 @@ index ef1a11e0619b..22fd07597f8a 100644
    char Buffer[17];
    char *BufPtr = std::end(Buffer);
  
-@@ -136,266 +106,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
+@@ -144,278 +114,593 @@ inline std::string utohexstr(uint64_t X, bool LowerCase = false) {
    return std::string(BufPtr, std::end(Buffer));
  }
  
@@ -169,40 +171,6 @@ index ef1a11e0619b..22fd07597f8a 100644
 -    const unsigned char c = Input[i];
 -    Output.push_back(LUT[c >> 4] | Offset);
 -    Output.push_back(LUT[c & 15] | Offset);
--  }
--  return Output;
--}
--
--inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
--  return toHex(toStringRef(Input), LowerCase);
--}
--
--inline uint8_t hexFromNibbles(char MSB, char LSB) {
--  unsigned U1 = hexDigitValue(MSB);
--  unsigned U2 = hexDigitValue(LSB);
--  assert(U1 != -1U && U2 != -1U);
--
--  return static_cast<uint8_t>((U1 << 4) | U2);
--}
--
--/// Convert hexadecimal string \p Input to its binary representation.
--/// The return string is half the size of \p Input.
--inline std::string fromHex(StringRef Input) {
--  if (Input.empty())
--    return std::string();
--
--  std::string Output;
--  Output.reserve((Input.size() + 1) / 2);
--  if (Input.size() % 2 == 1) {
--    Output.push_back(hexFromNibbles('0', Input.front()));
--    Input = Input.drop_front();
--  }
--
--  assert(Input.size() % 2 == 0);
--  while (!Input.empty()) {
--    uint8_t Hex = hexFromNibbles(Input[0], Input[1]);
--    Output.push_back(Hex);
--    Input = Input.drop_front(2);
 -  }
 -  return Output;
 +/**
@@ -408,25 +376,8 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  return str.find(ch) != std::string_view::npos;
  }
  
--/// Convert the string \p S to an integer of the specified type using
--/// the radix \p Base.  If \p Base is 0, auto-detects the radix.
--/// Returns true if the number was successfully converted, false otherwise.
--template <typename N> bool to_integer(StringRef S, N &Num, unsigned Base = 0) {
--  return !S.getAsInteger(Base, Num);
--}
--
--namespace detail {
--template <typename N>
--inline bool to_float(const Twine &T, N &Num, N (*StrTo)(const char *, char **)) {
--  SmallString<32> Storage;
--  StringRef S = T.toNullTerminatedStringRef(Storage);
--  char *End;
--  N Temp = StrTo(S.data(), &End);
--  if (*End != '\0')
--    return false;
--  Num = Temp;
--  return true;
--}
+-inline std::string toHex(ArrayRef<uint8_t> Input, bool LowerCase = false) {
+-  return toHex(toStringRef(Input), LowerCase);
 +/**
 + * Checks if @p str contains the substring @p other.
 + */
@@ -434,8 +385,12 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  return str.find(other) != std::string_view::npos;
  }
  
--inline bool to_float(const Twine &T, float &Num) {
--  return detail::to_float(T, Num, strtof);
+-inline uint8_t hexFromNibbles(char MSB, char LSB) {
+-  unsigned U1 = hexDigitValue(MSB);
+-  unsigned U2 = hexDigitValue(LSB);
+-  assert(U1 != -1U && U2 != -1U);
+-
+-  return static_cast<uint8_t>((U1 << 4) | U2);
 +/**
 + * Checks if @p str contains the substring @p other, ignoring case.
 + */
@@ -444,8 +399,26 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  return find_lower(str, other) != std::string_view::npos;
  }
  
--inline bool to_float(const Twine &T, double &Num) {
--  return detail::to_float(T, Num, strtod);
+-/// Convert hexadecimal string \p Input to its binary representation.
+-/// The return string is half the size of \p Input.
+-inline std::string fromHex(StringRef Input) {
+-  if (Input.empty())
+-    return std::string();
+-
+-  std::string Output;
+-  Output.reserve((Input.size() + 1) / 2);
+-  if (Input.size() % 2 == 1) {
+-    Output.push_back(hexFromNibbles('0', Input.front()));
+-    Input = Input.drop_front();
+-  }
+-
+-  assert(Input.size() % 2 == 0);
+-  while (!Input.empty()) {
+-    uint8_t Hex = hexFromNibbles(Input[0], Input[1]);
+-    Output.push_back(Hex);
+-    Input = Input.drop_front(2);
+-  }
+-  return Output;
 +/**
 + * Checks if @p str contains the substring @p other, ignoring case.
 + */
@@ -453,8 +426,11 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  return find_lower(str, ch) != std::string_view::npos;
  }
  
--inline bool to_float(const Twine &T, long double &Num) {
--  return detail::to_float(T, Num, strtold);
+-/// Convert the string \p S to an integer of the specified type using
+-/// the radix \p Base.  If \p Base is 0, auto-detects the radix.
+-/// Returns true if the number was successfully converted, false otherwise.
+-template <typename N> bool to_integer(StringRef S, N &Num, unsigned Base = 0) {
+-  return !S.getAsInteger(Base, Num);
 +/**
 + * Checks if @p str contains the substring @p other, ignoring case.
 + */
@@ -481,6 +457,32 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  return str;
  }
  
+-namespace detail {
+-template <typename N>
+-inline bool to_float(const Twine &T, N &Num, N (*StrTo)(const char *, char **)) {
+-  SmallString<32> Storage;
+-  StringRef S = T.toNullTerminatedStringRef(Storage);
+-  char *End;
+-  N Temp = StrTo(S.data(), &End);
+-  if (*End != '\0')
+-    return false;
+-  Num = Temp;
+-  return true;
+-}
+-}
+-
+-inline bool to_float(const Twine &T, float &Num) {
+-  return detail::to_float(T, Num, strtof);
+-}
+-
+-inline bool to_float(const Twine &T, double &Num) {
+-  return detail::to_float(T, Num, strtod);
+-}
+-
+-inline bool to_float(const Twine &T, long double &Num) {
+-  return detail::to_float(T, Num, strtold);
+-}
+-
 -inline std::string utostr(uint64_t X, bool isNeg = false) {
 -  char Buffer[21];
 -  char *BufPtr = std::end(Buffer);
@@ -508,7 +510,7 @@ index ef1a11e0619b..22fd07597f8a 100644
 -
 -inline std::string itostr(int64_t X) {
 -  if (X < 0)
--    return utostr(static_cast<uint64_t>(-X), true);
+-    return utostr(-static_cast<uint64_t>(X), true);
 -  else
 -    return utostr(static_cast<uint64_t>(X));
 -}
@@ -562,7 +564,7 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  auto length = str.size();
 +  if (n >= length) {
 +    return str;
-   }
++  }
 +  return drop_front(str, length - n);
 +}
 +
@@ -605,7 +607,7 @@ index ef1a11e0619b..22fd07597f8a 100644
 +  auto idx = str.find(separator);
 +  if (idx == std::string_view::npos) {
 +    return {str, {}};
-+  }
+   }
 +  return {slice(str, 0, idx), slice(str, idx + 1, std::string_view::npos)};
 +}
 +
@@ -778,6 +780,18 @@ index ef1a11e0619b..22fd07597f8a 100644
 -
 -/// printLowerCase - Print each character as lowercase if it is uppercase.
 -void printLowerCase(StringRef String, raw_ostream &Out);
+-
+-/// Converts a string from camel-case to snake-case by replacing all uppercase
+-/// letters with '_' followed by the letter in lowercase, except if the
+-/// uppercase letter is the first character of the string.
+-std::string convertToSnakeFromCamelCase(StringRef input);
+-
+-/// Converts a string from snake-case to camel-case by replacing all occurrences
+-/// of '_' followed by a lowercase letter with the letter in uppercase.
+-/// Optionally allow capitalization of the first letter (if it is a lowercase
+-/// letter)
+-std::string convertToCamelFromSnakeCase(StringRef input,
+-                                        bool capitalizeFirst = false);
 -
  namespace detail {
 -
@@ -993,16 +1007,18 @@ index ef1a11e0619b..22fd07597f8a 100644
 +
 +#endif // WPIUTIL_WPI_STRINGEXTRAS_H
 diff --git a/llvm/lib/Support/StringExtras.cpp b/llvm/lib/Support/StringExtras.cpp
-index af8dd463e125..a65d763d6900 100644
+index c206bd214519..a65d763d6900 100644
 --- a/llvm/lib/Support/StringExtras.cpp
 +++ b/llvm/lib/Support/StringExtras.cpp
-@@ -10,83 +10,346 @@
+@@ -10,128 +10,346 @@
  //
  //===----------------------------------------------------------------------===//
  
 -#include "llvm/ADT/StringExtras.h"
 -#include "llvm/ADT/SmallVector.h"
 -#include "llvm/Support/raw_ostream.h"
+-#include <cctype>
+-
 -using namespace llvm;
 -
 -/// StrInStrNoCase - Portable version of strcasestr.  Locates the first
@@ -1163,7 +1179,19 @@ index af8dd463e125..a65d763d6900 100644
 -void llvm::printLowerCase(StringRef String, raw_ostream &Out) {
 -  for (const char C : String)
 -    Out << toLower(C);
-+    }
+-}
+-
+-std::string llvm::convertToSnakeFromCamelCase(StringRef input) {
+-  if (input.empty())
+-    return "";
+-
+-  std::string snakeCase;
+-  snakeCase.reserve(input.size());
+-  for (char c : input) {
+-    if (!std::isupper(c)) {
+-      snakeCase.push_back(c);
+-      continue;
+     }
 +  }
 +  return std::string_view::npos;
 +}
@@ -1204,17 +1232,27 @@ index af8dd463e125..a65d763d6900 100644
 +    // Jump forward.
 +    s = slice(s, idx + separator.size(), std::string_view::npos);
 +  }
-+
+ 
+-    if (!snakeCase.empty() && snakeCase.back() != '_')
+-      snakeCase.push_back('_');
+-    snakeCase.push_back(llvm::toLower(c));
 +  // Push the tail.
 +  if (keepEmpty || !s.empty()) {
 +    arr.push_back(s);
-+  }
-+}
-+
+   }
+-  return snakeCase;
+ }
+ 
+-std::string llvm::convertToCamelFromSnakeCase(StringRef input,
+-                                              bool capitalizeFirst) {
+-  if (input.empty())
+-    return "";
 +void wpi::split(std::string_view str, SmallVectorImpl<std::string_view>& arr,
 +                char separator, int maxSplit, bool keepEmpty) noexcept {
 +  std::string_view s = str;
-+
+ 
+-  std::string output;
+-  output.reserve(input.size());
 +  // Count down from maxSplit. When maxSplit is -1, this will just split
 +  // "forever". This doesn't support splitting more than 2^31 times
 +  // intentionally; if we ever want that we can make maxSplit a 64-bit integer
@@ -1244,12 +1282,23 @@ index af8dd463e125..a65d763d6900 100644
 +  if (str.empty()) {
 +    return 10;
 +  }
-+
+ 
+-  // Push the first character, capatilizing if necessary.
+-  if (capitalizeFirst && std::islower(input.front()))
+-    output.push_back(llvm::toUpper(input.front()));
+-  else
+-    output.push_back(input.front());
 +  if (wpi::starts_with(str, "0x") || wpi::starts_with(str, "0X")) {
 +    str.remove_prefix(2);
 +    return 16;
 +  }
-+
+ 
+-  // Walk the input converting any `*_[a-z]` snake case into `*[A-Z]` camelCase.
+-  for (size_t pos = 1, e = input.size(); pos < e; ++pos) {
+-    if (input[pos] == '_' && pos != (e - 1) && std::islower(input[pos + 1]))
+-      output.push_back(llvm::toUpper(input[++pos]));
+-    else
+-      output.push_back(input[pos]);
 +  if (wpi::starts_with(str, "0b") || wpi::starts_with(str, "0B")) {
 +    str.remove_prefix(2);
 +    return 2;
@@ -1418,7 +1467,8 @@ index af8dd463e125..a65d763d6900 100644
 +  long double val = std::strtold(storage.c_str(), &end);
 +  if (*end != '\0') {
 +    return std::nullopt;
-+  }
+   }
+-  return output;
 +  return val;
  }
 -- 

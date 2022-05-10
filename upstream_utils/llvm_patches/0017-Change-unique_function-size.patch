@@ -1,34 +1,34 @@
-From c6f3d1096881c24e568e807f8095a33abecdfbe2 Mon Sep 17 00:00:00 2001
+From 935bc494e7ca435e9789b4a6ee684a10360084a8 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:34:13 -0400
-Subject: [PATCH 17/36] Change unique_function size
+Subject: [PATCH 17/37] Change unique_function size
 
 ---
  llvm/include/llvm/ADT/FunctionExtras.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 6b6a438f1ffc..01878e990a0c 100644
+index 928202851d8c..35f9b06bd700 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -43,7 +43,7 @@ template <typename FunctionT> class unique_function;
+@@ -62,7 +62,7 @@ using EnableIfTrivial =
  
- template <typename ReturnT, typename... ParamTs>
- class unique_function<ReturnT(ParamTs...)> {
+ template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
+ protected:
 -  static constexpr size_t InlineStorageSize = sizeof(void *) * 3;
 +  static constexpr size_t InlineStorageSize = sizeof(void *) * 4;
  
    // MSVC has a bug and ICEs if we give it a particular dependent value
    // expression as part of the `std::conditional` below. To work around this,
-@@ -111,7 +111,7 @@ class unique_function<ReturnT(ParamTs...)> {
+@@ -130,7 +130,7 @@ protected:
          "Should always use all of the out-of-line storage for inline storage!");
  
      // For in-line storage, we just provide an aligned character buffer. We
 -    // provide three pointers worth of storage here.
 +    // provide four pointers worth of storage here.
-     typename std::aligned_storage<InlineStorageSize, alignof(void *)>::type
-         InlineStorage;
-   } StorageUnion;
+     // This is mutable as an inlined `const unique_function<void() const>` may
+     // still modify its own mutable members.
+     mutable
 -- 
 2.20.1.windows.1
 

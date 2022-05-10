@@ -1,27 +1,26 @@
-From 19e410724e6d7dd0c47e8582ab1a91e15d38774f Mon Sep 17 00:00:00 2001
+From 9f1c61dc08516d15d3cb6ac3e3f77471d661c726 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 22:58:49 -0400
-Subject: [PATCH 20/36] Prefer fs::file_t
+Subject: [PATCH 20/37] Prefer fs::file_t
 
 ---
- llvm/include/llvm/Support/MemoryBuffer.h | 13 ++++++++---
+ llvm/include/llvm/Support/MemoryBuffer.h | 12 ++++++++--
  llvm/include/llvm/Support/raw_ostream.h  |  6 ++---
  llvm/lib/Support/MemoryBuffer.cpp        | 29 +++++++++++-------------
  llvm/lib/Support/raw_ostream.cpp         |  9 +++++---
- 4 files changed, 31 insertions(+), 26 deletions(-)
+ 4 files changed, 31 insertions(+), 25 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MemoryBuffer.h b/llvm/include/llvm/Support/MemoryBuffer.h
-index 908336281dae..8bf00de79b73 100644
+index 4b9b5086fb5e..2fcf0516b83f 100644
 --- a/llvm/include/llvm/Support/MemoryBuffer.h
 +++ b/llvm/include/llvm/Support/MemoryBuffer.h
-@@ -13,15 +13,22 @@
+@@ -13,14 +13,22 @@
  #ifndef LLVM_SUPPORT_MEMORYBUFFER_H
  #define LLVM_SUPPORT_MEMORYBUFFER_H
  
 -#include "llvm-c/Types.h"
 -#include "llvm/Support/CBindingWrapping.h"
  #include "llvm/Support/ErrorOr.h"
--#include "llvm/Support/FileSystem.h"
  #include <cstddef>
  #include <cstdint>
  #include <memory>
@@ -41,7 +40,7 @@ index 908336281dae..8bf00de79b73 100644
  
  class MemoryBufferRef;
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index 23beb8793c69..3d74dcdd580b 100644
+index a578f903bc2f..073b159b004b 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -24,15 +24,13 @@
@@ -63,10 +62,10 @@ index 23beb8793c69..3d74dcdd580b 100644
  /// This class implements an extremely fast bulk output stream that can *only*
  /// output to a stream.  It does not support seeking, reopening, rewinding, line
 diff --git a/llvm/lib/Support/MemoryBuffer.cpp b/llvm/lib/Support/MemoryBuffer.cpp
-index 0784a21a1d2d..1762199b5136 100644
+index d0ee3ee9dedf..cbd1cf047815 100644
 --- a/llvm/lib/Support/MemoryBuffer.cpp
 +++ b/llvm/lib/Support/MemoryBuffer.cpp
-@@ -255,11 +255,10 @@ template <typename MB>
+@@ -269,11 +269,10 @@ template <typename MB>
  static ErrorOr<std::unique_ptr<MB>>
  getFileAux(std::string_view Filename, int64_t FileSize, uint64_t MapSize,
             uint64_t Offset, bool RequiresNullTerminator, bool IsVolatile) {
@@ -82,7 +81,7 @@ index 0784a21a1d2d..1762199b5136 100644
    auto Ret = getOpenFileImpl<MB>(FD, Filename, FileSize, MapSize, Offset,
                                   RequiresNullTerminator, IsVolatile);
    sys::fs::closeFile(FD);
-@@ -374,11 +373,11 @@ static bool shouldUseMmap(sys::fs::file_t FD,
+@@ -388,11 +387,11 @@ static bool shouldUseMmap(sys::fs::file_t FD,
  static ErrorOr<std::unique_ptr<WriteThroughMemoryBuffer>>
  getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
                   uint64_t Offset) {
@@ -99,7 +98,7 @@ index 0784a21a1d2d..1762199b5136 100644
  
    // Default is to map the full file.
    if (MapSize == uint64_t(-1)) {
-@@ -402,7 +401,6 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
+@@ -416,7 +415,6 @@ getReadWriteFile(std::string_view Filename, uint64_t FileSize, uint64_t MapSize,
      MapSize = FileSize;
    }
  
@@ -107,7 +106,7 @@ index 0784a21a1d2d..1762199b5136 100644
    std::unique_ptr<WriteThroughMemoryBuffer> Result(
        new (NamedBufferAlloc(Filename))
            MemoryBufferMMapFile<WriteThroughMemoryBuffer>(false, FD, MapSize,
-@@ -516,11 +514,10 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
+@@ -530,11 +528,10 @@ ErrorOr<std::unique_ptr<MemoryBuffer>> MemoryBuffer::getSTDIN() {
  
  ErrorOr<std::unique_ptr<MemoryBuffer>>
  MemoryBuffer::getFileAsStream(const std::string_view &Filename) {
@@ -124,10 +123,10 @@ index 0784a21a1d2d..1762199b5136 100644
        getMemoryBufferForStream(FD, Filename);
    sys::fs::closeFile(FD);
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 936423d368b1..5fc0db039c29 100644
+index 1d0447e292d8..8136efd6e837 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -306,11 +306,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
+@@ -312,11 +312,14 @@ static int getFD(std::string_view Filename, std::error_code &EC,
      return STDOUT_FILENO;
    }
  

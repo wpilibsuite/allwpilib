@@ -13,7 +13,6 @@
 #ifndef WPIUTIL_WPI_ENDIAN_H
 #define WPIUTIL_WPI_ENDIAN_H
 
-#include "wpi/AlignOf.h"
 #include "wpi/Compiler.h"
 #include "wpi/SwapByteOrder.h"
 
@@ -116,7 +115,7 @@ inline void write(void *memory, value_type value) {
 }
 
 template <typename value_type>
-using make_unsigned_t = typename std::make_unsigned<value_type>::type;
+using make_unsigned_t = std::make_unsigned_t<value_type>;
 
 /// Read a value of a particular endianness from memory, for a location
 /// that starts at the given bit offset within the first byte.

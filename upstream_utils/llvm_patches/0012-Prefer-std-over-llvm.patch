@@ -1,37 +1,27 @@
-From 6d4f17e0a239ae17d1baea0e1fadd69b16ba9f8d Mon Sep 17 00:00:00 2001
+From 2d14950bcd47a87c9b959dd9a4ba1eeb5399608f Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 21:56:02 -0400
-Subject: [PATCH 12/36] Prefer std:: over llvm::
+Subject: [PATCH 12/37] Prefer std:: over llvm::
 
 ---
- llvm/include/llvm/ADT/DenseMap.h          |   8 +-
+ llvm/include/llvm/ADT/DenseMap.h          |   4 +-
  llvm/include/llvm/ADT/FunctionExtras.h    |   6 +-
  llvm/include/llvm/ADT/PointerIntPair.h    |  13 ---
- llvm/include/llvm/ADT/SmallVector.h       |   2 +-
+ llvm/include/llvm/ADT/SmallVector.h       |   4 +-
+ llvm/include/llvm/ADT/StringMapEntry.h    |   2 +-
  llvm/include/llvm/Support/MathExtras.h    |   2 +-
  llvm/include/llvm/Support/type_traits.h   | 117 ----------------------
  llvm/lib/Support/ErrorHandling.cpp        |   3 +-
  llvm/lib/Support/ManagedStatic.cpp        |   4 +-
  llvm/unittests/ADT/PointerIntPairTest.cpp |   4 +-
  llvm/unittests/ADT/SmallPtrSetTest.cpp    |   2 +-
- 10 files changed, 16 insertions(+), 145 deletions(-)
+ 11 files changed, 16 insertions(+), 145 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index c660fee9d735..d74b5830a32c 100644
+index e607475ae908..13e6806f6e7c 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -115,8 +115,8 @@ public:
-     }
- 
-     const KeyT EmptyKey = getEmptyKey(), TombstoneKey = getTombstoneKey();
--    if (is_trivially_copyable<KeyT>::value &&
--        is_trivially_copyable<ValueT>::value) {
-+    if (std::is_trivially_copyable<KeyT>::value &&
-+        std::is_trivially_copyable<ValueT>::value) {
-       // Use a simpler loop when these are trivial types.
-       for (BucketT *P = getBuckets(), *E = getBucketsEnd(); P != E; ++P)
-         P->getFirst() = EmptyKey;
-@@ -392,8 +392,8 @@ protected:
+@@ -396,8 +396,8 @@ protected:
      setNumEntries(other.getNumEntries());
      setNumTombstones(other.getNumTombstones());
  
@@ -43,10 +33,19 @@ index c660fee9d735..d74b5830a32c 100644
               getNumBuckets() * sizeof(BucketT));
      else
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index 121aa527a5da..6b6a438f1ffc 100644
+index 4c75e4d2547b..928202851d8c 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -64,8 +64,8 @@ class unique_function<ReturnT(ParamTs...)> {
+@@ -57,7 +57,7 @@ namespace detail {
+ 
+ template <typename T>
+ using EnableIfTrivial =
+-    std::enable_if_t<llvm::is_trivially_move_constructible<T>::value &&
++    std::enable_if_t<std::is_trivially_move_constructible<T>::value &&
+                      std::is_trivially_destructible<T>::value>;
+ 
+ template <typename ReturnT, typename... ParamTs> class UniqueFunctionBase {
+@@ -83,8 +83,8 @@ protected:
    template <typename T>
    using AdjustedParamT = typename std::conditional<
        !std::is_reference<T>::value &&
@@ -57,17 +56,8 @@ index 121aa527a5da..6b6a438f1ffc 100644
            IsSizeLessThanThresholdT<T>::value,
        T, T &>::type;
  
-@@ -254,7 +254,7 @@ public:
-     // FIXME: We should use constexpr if here and below to avoid instantiating
-     // the non-trivial static objects when unnecessary. While the linker should
-     // remove them, it is still wasteful.
--    if (llvm::is_trivially_move_constructible<CallableT>::value &&
-+    if (std::is_trivially_move_constructible<CallableT>::value &&
-         std::is_trivially_destructible<CallableT>::value) {
-       // We need to create a nicely aligned object. We use a static variable
-       // for this because it is a trivial struct.
 diff --git a/llvm/include/llvm/ADT/PointerIntPair.h b/llvm/include/llvm/ADT/PointerIntPair.h
-index fa6bf1504469..c450ee47cb6e 100644
+index cb8b202c48b7..7c9cebb6754b 100644
 --- a/llvm/include/llvm/ADT/PointerIntPair.h
 +++ b/llvm/include/llvm/ADT/PointerIntPair.h
 @@ -127,19 +127,6 @@ public:
@@ -91,23 +81,38 @@ index fa6bf1504469..c450ee47cb6e 100644
  struct PointerIntPairInfo {
    static_assert(PtrTraits::NumLowBitsAvailable <
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index d4b0b4020d0b..3f674c31dfd0 100644
+index d82304c9bfad..552c46c84162 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -175,7 +175,7 @@ public:
- 
- /// SmallVectorTemplateBase<TriviallyCopyable = false> - This is where we put method
- /// implementations that are designed to work with non-POD-like T's.
--template <typename T, bool = is_trivially_copyable<T>::value>
-+template <typename T, bool = std::is_trivially_copyable<T>::value>
+@@ -208,8 +208,8 @@ public:
+ /// copy these types with memcpy, there is no way for the type to observe this.
+ /// This catches the important case of std::pair<POD, POD>, which is not
+ /// trivially assignable.
+-template <typename T, bool = (is_trivially_copy_constructible<T>::value) &&
+-                             (is_trivially_move_constructible<T>::value) &&
++template <typename T, bool = (std::is_trivially_copy_constructible<T>::value) &&
++                             (std::is_trivially_move_constructible<T>::value) &&
+                              std::is_trivially_destructible<T>::value>
  class SmallVectorTemplateBase : public SmallVectorTemplateCommon<T> {
  protected:
-   SmallVectorTemplateBase(size_t Size) : SmallVectorTemplateCommon<T>(Size) {}
+diff --git a/llvm/include/llvm/ADT/StringMapEntry.h b/llvm/include/llvm/ADT/StringMapEntry.h
+index afc829de53d0..253cb4b02152 100644
+--- a/llvm/include/llvm/ADT/StringMapEntry.h
++++ b/llvm/include/llvm/ADT/StringMapEntry.h
+@@ -107,7 +107,7 @@ public:
+     // Copy the string information.
+     char *strBuffer = const_cast<char *>(newItem->getKeyData());
+     if (keyLength > 0)
+-      memcpy(strBuffer, key.data(), keyLength);
++      std::memcpy(strBuffer, key.data(), keyLength);
+     strBuffer[keyLength] = 0; // Null terminate for convenience of clients.
+     return newItem;
+   }
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index a1b4a1a06873..887c0ce27e51 100644
+index 5240b59ba59b..b98da614121e 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
-@@ -575,7 +575,7 @@ inline double Log2(double Value) {
+@@ -587,7 +587,7 @@ inline double Log2(double Value) {
  #if defined(__ANDROID_API__) && __ANDROID_API__ < 18
    return __builtin_log(Value) / __builtin_log(2.0);
  #else
@@ -117,10 +122,10 @@ index a1b4a1a06873..887c0ce27e51 100644
  }
  
 diff --git a/llvm/include/llvm/Support/type_traits.h b/llvm/include/llvm/Support/type_traits.h
-index b7d48e8e1ade..77469a098c45 100644
+index 7b7d5d991f3f..0beab0128a40 100644
 --- a/llvm/include/llvm/Support/type_traits.h
 +++ b/llvm/include/llvm/Support/type_traits.h
-@@ -70,123 +70,6 @@ struct const_pointer_or_const_ref<
+@@ -69,123 +69,6 @@ struct const_pointer_or_const_ref<T,
    using type = typename add_const_past_pointer<T>::type;
  };
  
@@ -245,7 +250,7 @@ index b7d48e8e1ade..77469a098c45 100644
  
  #endif // LLVM_SUPPORT_TYPE_TRAITS_H
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index eee176a7b04f..383a046a9d56 100644
+index d7c3dd75d71f..58f0ccc58173 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -202,12 +202,13 @@ void LLVMResetFatalErrorHandler() {
@@ -285,7 +290,7 @@ index bf7e0074d26e..339eccdac1bd 100644
  }
  
 diff --git a/llvm/unittests/ADT/PointerIntPairTest.cpp b/llvm/unittests/ADT/PointerIntPairTest.cpp
-index 6b3a4c055c9e..fda421ad778e 100644
+index b8ba3e32b288..8a42e5b9f557 100644
 --- a/llvm/unittests/ADT/PointerIntPairTest.cpp
 +++ b/llvm/unittests/ADT/PointerIntPairTest.cpp
 @@ -62,7 +62,7 @@ TEST(PointerIntPairTest, GetSet) {
@@ -298,7 +303,7 @@ index 6b3a4c055c9e..fda421ad778e 100644
  }
  
 @@ -101,7 +101,7 @@ TEST(PointerIntPairTest, ManyUnusedBits) {
-             PointerLikeTypeTraits<decltype(pair)>::NumLowBitsAvailable);
+             (int)PointerLikeTypeTraits<decltype(pair)>::NumLowBitsAvailable);
  
    static_assert(
 -      is_trivially_copyable<
@@ -307,7 +312,7 @@ index 6b3a4c055c9e..fda421ad778e 100644
        "trivially copyable");
  }
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 3226fe615509..ba096b47fb85 100644
+index eacd62ffc6ff..dc5c2b7ea230 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -298,7 +298,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {

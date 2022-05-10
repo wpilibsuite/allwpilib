@@ -1,15 +1,15 @@
-From c17a62ba54c1510d144b2de414e2135eb6f61f0f Mon Sep 17 00:00:00 2001
+From e515d1be16145c4c3e33e32862b1d08d7e2b588b Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:40:33 -0400
-Subject: [PATCH 08/36] Remove header dependency for endian
+Subject: [PATCH 08/37] Remove header dependency for endian
 
 ---
  llvm/include/llvm/ADT/Hashing.h    | 1 +
- llvm/include/llvm/Support/Endian.h | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ llvm/include/llvm/Support/Endian.h | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/Hashing.h b/llvm/include/llvm/ADT/Hashing.h
-index adcc5cf54da9..cf1b49ea6d40 100644
+index 9ee310c879fd..dd479f84f1d8 100644
 --- a/llvm/include/llvm/ADT/Hashing.h
 +++ b/llvm/include/llvm/ADT/Hashing.h
 @@ -46,6 +46,7 @@
@@ -21,14 +21,12 @@ index adcc5cf54da9..cf1b49ea6d40 100644
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
 diff --git a/llvm/include/llvm/Support/Endian.h b/llvm/include/llvm/Support/Endian.h
-index 87aecedd3a4b..d4a1e40d8e78 100644
+index 5e7c1e961b9d..2c5ce2d1f41d 100644
 --- a/llvm/include/llvm/Support/Endian.h
 +++ b/llvm/include/llvm/Support/Endian.h
-@@ -15,14 +15,19 @@
+@@ -15,12 +15,18 @@
  
- #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
--#include "llvm/Support/Host.h"
  #include "llvm/Support/SwapByteOrder.h"
 +
 +#if defined(__linux__) || defined(__GNU__)

@@ -1,7 +1,7 @@
-From 67e22b1501a43d7d603dce93a779c3162cebee2c Mon Sep 17 00:00:00 2001
+From f67832c0aa4b51c1c821b156e5e7907fee1bdf62 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:50:32 -0400
-Subject: [PATCH 09/36] Prefer scoped lock, wpi mutex
+Subject: [PATCH 09/37] Prefer scoped lock, wpi mutex
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 12 ++++++------
@@ -9,7 +9,7 @@ Subject: [PATCH 09/36] Prefer scoped lock, wpi mutex
  2 files changed, 12 insertions(+), 21 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 6b92788f9710..4d6e15e07b9e 100644
+index 1b162b771079..d84bfb559931 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -61,14 +61,14 @@ static std::mutex BadAllocErrorHandlerMutex;
