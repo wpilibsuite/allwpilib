@@ -21,9 +21,9 @@ class Pose2dTest {
     var transformed = initial.plus(transformation);
 
     assertAll(
-        () -> assertEquals(transformed.getX(), 1 + 5.0 / Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(transformed.getY(), 2 + 5.0 / Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(transformed.getRotation().getDegrees(), 50.0, kEpsilon));
+        () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), kEpsilon),
+        () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), kEpsilon),
+        () -> assertEquals(50.0, transformed.getRotation().getDegrees(), kEpsilon));
   }
 
   @Test
@@ -34,9 +34,9 @@ class Pose2dTest {
     var finalRelativeToInitial = last.relativeTo(initial);
 
     assertAll(
-        () -> assertEquals(finalRelativeToInitial.getX(), 5.0 * Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(finalRelativeToInitial.getY(), 0.0, kEpsilon),
-        () -> assertEquals(finalRelativeToInitial.getRotation().getDegrees(), 0.0, kEpsilon));
+        () -> assertEquals(5.0 * Math.sqrt(2.0), finalRelativeToInitial.getX(), kEpsilon),
+        () -> assertEquals(0.0, finalRelativeToInitial.getY(), kEpsilon),
+        () -> assertEquals(0.0, finalRelativeToInitial.getRotation().getDegrees(), kEpsilon));
   }
 
   @Test
@@ -61,8 +61,8 @@ class Pose2dTest {
     final var transform = last.minus(initial);
 
     assertAll(
-        () -> assertEquals(transform.getX(), 5.0 * Math.sqrt(2.0), kEpsilon),
-        () -> assertEquals(transform.getY(), 0.0, kEpsilon),
-        () -> assertEquals(transform.getRotation().getDegrees(), 0.0, kEpsilon));
+        () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), kEpsilon),
+        () -> assertEquals(0.0, transform.getY(), kEpsilon),
+        () -> assertEquals(0.0, transform.getRotation().getDegrees(), kEpsilon));
   }
 }

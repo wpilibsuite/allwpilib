@@ -89,6 +89,23 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
 }
 
+TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
+  ChassisSpeeds speeds{0_mps, 0_mps,
+                       units::radians_per_second_t(2 * wpi::numbers::pi)};
+  m_kinematics.ToSwerveModuleStates(speeds);
+  auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
+
+  EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(fr.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(bl.speed.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(br.speed.value(), 0.0, kEpsilon);
+
+  EXPECT_NEAR(fl.angle.Degrees().value(), 135.0, kEpsilon);
+  EXPECT_NEAR(fr.angle.Degrees().value(), 45.0, kEpsilon);
+  EXPECT_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
+  EXPECT_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+}
+
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematics) {
   SwerveModuleState fl{106.629_mps, Rotation2d(135_deg)};
   SwerveModuleState fr{106.629_mps, Rotation2d(45_deg)};

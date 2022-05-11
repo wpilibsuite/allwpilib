@@ -6,12 +6,12 @@
 
 #include <fmt/format.h>
 #include <wpi/SmallString.h>
-#include <wpi/UrlParser.h>
-#include <wpi/WebSocketServer.h>
 #include <wpi/fs.h>
-#include <wpi/raw_uv_ostream.h>
-#include <wpi/uv/Loop.h>
-#include <wpi/uv/Tcp.h>
+#include <wpinet/UrlParser.h>
+#include <wpinet/WebSocketServer.h>
+#include <wpinet/raw_uv_ostream.h>
+#include <wpinet/uv/Loop.h>
+#include <wpinet/uv/Tcp.h>
 
 #include "HALSimHttpConnection.h"
 

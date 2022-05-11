@@ -11,9 +11,11 @@ namespace frc {
 units::meter_t CalculateDistanceToTarget(units::meter_t cameraHeight,
                                          units::meter_t targetHeight,
                                          units::radian_t cameraPitch,
-                                         units::radian_t targetPitch) {
+                                         units::radian_t targetPitch,
+                                         units::radian_t targetYaw) {
   return (targetHeight - cameraHeight) /
-         units::math::tan(cameraPitch + targetPitch);
+         (units::math::tan(cameraPitch + targetPitch) *
+          units::math::cos(targetYaw));
 }
 
 frc::Pose2d EstimateFieldToRobot(
@@ -22,11 +24,12 @@ frc::Pose2d EstimateFieldToRobot(
     const frc::Rotation2d& targetYaw, const frc::Rotation2d& gyroAngle,
     const frc::Pose2d& fieldToTarget, const frc::Transform2d& cameraToRobot) {
   return EstimateFieldToRobot(
-      EstimateCameraToTarget(frc::Translation2d{CalculateDistanceToTarget(
-                                                    cameraHeight, targetHeight,
-                                                    cameraPitch, targetPitch),
-                                                targetYaw},
-                             fieldToTarget, gyroAngle),
+      EstimateCameraToTarget(
+          frc::Translation2d{
+              CalculateDistanceToTarget(cameraHeight, targetHeight, cameraPitch,
+                                        targetPitch, targetYaw.Radians()),
+              targetYaw},
+          fieldToTarget, gyroAngle),
       fieldToTarget, cameraToRobot);
 }
 

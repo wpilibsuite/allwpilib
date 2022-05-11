@@ -10,10 +10,10 @@
 
 #include <WSProviderContainer.h>
 #include <WSProvider_SimDevice.h>
-#include <wpi/uv/Async.h>
-#include <wpi/uv/Loop.h>
-#include <wpi/uv/Tcp.h>
-#include <wpi/uv/Timer.h>
+#include <wpinet/uv/Async.h>
+#include <wpinet/uv/Loop.h>
+#include <wpinet/uv/Tcp.h>
+#include <wpinet/uv/Timer.h>
 
 namespace wpi {
 class json;

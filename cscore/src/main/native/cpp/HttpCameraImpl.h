@@ -14,12 +14,12 @@
 #include <thread>
 #include <vector>
 
-#include <wpi/HttpUtil.h>
 #include <wpi/SmallString.h>
 #include <wpi/StringMap.h>
 #include <wpi/condition_variable.h>
 #include <wpi/raw_istream.h>
 #include <wpi/span.h>
+#include <wpinet/HttpUtil.h>
 
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
