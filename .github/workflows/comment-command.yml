@@ -7,7 +7,6 @@ jobs:
   wpiformat:
     if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/wpiformat')
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2022-20.04
     steps:
       - name: React Rocket
         uses: actions/github-script@v4
@@ -20,12 +19,6 @@ jobs:
               comment_id: context.payload.comment.id,
               content: "rocket",
             });
-      - name: Install Github CLI
-        run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          sudo apt update
-          sudo apt install gh
       - uses: actions/checkout@v2
       - name: Fetch all history and metadata
         run: |
